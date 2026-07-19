@@ -1,0 +1,13 @@
+nav:
+    projects: Proyectos
+    new_project: Nuevo proyecto
+    log_out: Cerrar sesión
+locale:
+    nav: Idioma
+    en: English
+    es: Español
+auth:
+    tagline: Seguimiento de errores self-hosted para PHP y Symfony.
+    brand_eyebrow: Seguimiento de errores
+    bootstrap_eyebrow: Arranque
+    bootstrap_hint: Crea la primera cuenta de administrador. El registro se cierra cuando exista este usuario.

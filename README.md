@@ -8,10 +8,11 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 
 > The Symfony instrumentation **bundle** lives in a separate repository and will be published later. Until then, configure the official PHP SDK DSN against this server.
 
-## Features (v1)
+## Features
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member`)
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
+- **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
 - Projects with rotatable **API keys** and Envelope-compatible **DSN**
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger)
@@ -32,7 +33,7 @@ cd symfony-beacon
 cp .env.dist .env
 make up
 make console ARGS='doctrine:migrations:migrate -n'
-# Option A — register the first admin in the UI: https://localhost:9444/register
+# Option A — register the first admin in the UI: https://localhost:9444/en/register
 # Option B — seed demo user + project + DSN:
 make console ARGS='app:seed-demo'
 ```
@@ -41,9 +42,10 @@ make console ARGS='app:seed-demo'
 - HTTPS: https://localhost:9444  
 - MySQL: `localhost:3308`
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
-- First-user registration (empty DB only): https://localhost:9444/register
+- First-user registration (empty DB only): https://localhost:9444/en/register (Spanish: `/es/register`)
+- Login: https://localhost:9444/en/login (includes **Remember me**)
 
-> After the first user exists, `/register` redirects to login.
+> After the first user exists, `/en/register` redirects to `/en/login`. Auth routes use `/{_locale}` (`en` default). Bare `/`, `/login`, `/register`, and `/logout` redirect to the English AuthKit paths. After sign-in, the app home is **`/dashboard`**.
 
 Seed prints a DSN like:
 

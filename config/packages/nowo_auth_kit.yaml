@@ -1,10 +1,11 @@
-# nowo-tech/auth-kit-bundle — first-user bootstrap registration
+# nowo-tech/auth-kit-bundle — first-user bootstrap + i18n + remember me
 # https://github.com/nowo-tech/AuthKitBundle
 nowo_auth_kit:
     default_profile: default
     default_locale: en
-    enabled_locales: [en]
-    locale_in_path: false
+    enabled_locales: [en, es]
+    # Prefix auth routes with /{_locale} (e.g. /en/login, /es/login)
+    locale_in_path: true
     profiles:
         default:
             user_class: App\Identity\Entity\User
@@ -16,12 +17,19 @@ nowo_auth_kit:
             login_fields:
                 - identifier
                 - password
+                - remember_me
             registration_fields:
                 - email
                 - displayName
                 - password
             remember_me:
-                enabled: false
+                enabled: true
+                lifetime: 604800
+                path: /
+            password_strength:
+                enabled: true
+                level: medium
+                policy_mode: level
             password_reset:
                 mode: disabled
             embed:

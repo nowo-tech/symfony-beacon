@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app.request.locale|default('en') }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,16 +23,16 @@
                         symfony-beacon
                     </a>
                     <nav class="flex items-center gap-3 text-sm">
-                        <a href="{{ path('dashboard_home') }}" class="no-underline text-[var(--color-ink)]/75 hover:text-[var(--color-moss)]">Projects</a>
-                        <a href="{{ path('project_new') }}" class="btn-ghost no-underline">New project</a>
+                        <a href="{{ path('dashboard_home') }}" class="no-underline text-[var(--color-ink)]/75 hover:text-[var(--color-moss)]">{{ 'nav.projects'|trans }}</a>
+                        <a href="{{ path('project_new') }}" class="btn-ghost no-underline">{{ 'nav.new_project'|trans }}</a>
                         <span class="hidden text-[var(--color-ink)]/50 sm:inline">{{ app.user.userIdentifier }}</span>
-                        <a href="{{ path('nowo_auth_kit_logout') }}" class="btn-ghost no-underline">Log out</a>
+                        <a href="{{ path('nowo_auth_kit_logout', auth_kit_route_params()) }}" class="btn-ghost no-underline">{{ 'nav.log_out'|trans }}</a>
                     </nav>
                 </div>
             </header>
         {% endif %}
 
-        <main class="relative z-10 mx-auto max-w-6xl px-4 py-8 {% if not app.user %}flex min-h-screen items-center justify-center py-12{% endif %}">
+        <main class="relative z-10 mx-auto max-w-6xl px-4 py-8 {% if not app.user %}auth-shell-main flex min-h-screen justify-center py-12{% endif %}">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
                     <div class="mb-4 rounded-md border px-4 py-3 text-sm {% if label == 'error' %}border-red-200 bg-red-50 text-red-800{% else %}border-emerald-200 bg-emerald-50 text-emerald-900{% endif %}">

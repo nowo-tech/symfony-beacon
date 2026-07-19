@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7077f8eff5d4ee1ccc90d1c17eb28b23",
+    "content-hash": "492202248da6f713a9961b0eff3028e4",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -1214,6 +1214,183 @@
                 }
             ],
             "time": "2026-07-16T18:58:00+00:00"
+        },
+        {
+            "name": "nowo-tech/password-strength-bundle",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/PasswordStrengthBundle.git",
+                "reference": "bf885936483dc0973e92df76e87c3df94d5b0d7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/PasswordStrengthBundle/zipball/bf885936483dc0973e92df76e87c3df94d5b0d7e",
+                "reference": "bf885936483dc0973e92df76e87c3df94d5b0d7e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1 <8.6",
+                "symfony/config": "^6.0 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.0 || ^7.0 || ^8.0",
+                "symfony/form": "^6.0 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/http-foundation": "^6.0 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.0 || ^7.0 || ^8.0",
+                "symfony/translation": "^6.0 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/validator": "^6.0 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/password-toggle-bundle": "^2.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0",
+                "symfony/browser-kit": "^6.0 || ^7.0 || ^8.0",
+                "symfony/dom-crawler": "^6.0 || ^7.0 || ^8.0",
+                "symfony/yaml": "^6.0 || ^7.0 || ^8.0"
+            },
+            "suggest": {
+                "nowo-tech/password-toggle-bundle": "Show/hide password visibility toggle integrated with strength fields"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "bundle": "Nowo\\PasswordStrengthBundle\\PasswordStrengthBundle"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\PasswordStrengthBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony PasswordType extension with configurable strength policies, live feedback, HTML pattern, and validator.",
+            "homepage": "https://github.com/nowo-tech/PasswordStrengthBundle",
+            "keywords": [
+                "form",
+                "password",
+                "password-strength",
+                "security",
+                "symfony",
+                "symfony-bundle",
+                "typescript",
+                "validation",
+                "vite"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/PasswordStrengthBundle/issues",
+                "source": "https://github.com/nowo-tech/PasswordStrengthBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T11:48:42+00:00"
+        },
+        {
+            "name": "nowo-tech/password-toggle-bundle",
+            "version": "v2.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/PasswordToggleBundle.git",
+                "reference": "1c3039e7aa6a0fff1d66c8449db7d1eb7ccebb34"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/PasswordToggleBundle/zipball/1c3039e7aa6a0fff1d66c8449db7d1eb7ccebb34",
+                "reference": "1c3039e7aa6a0fff1d66c8449db7d1eb7ccebb34",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/form": "^7.0 || ^8.0",
+                "symfony/framework-bundle": "^7.0 || ^8.0",
+                "symfony/twig-bundle": "^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "psr/log": "^3.0",
+                "rector/rector": "^2.0",
+                "symfony/console": "^7.0 || ^8.0",
+                "symfony/dependency-injection": "^7.0 || ^8.0",
+                "symfony/http-client": "^7.0 || ^8.0",
+                "symfony/http-kernel": "^7.0 || ^8.0",
+                "symfony/ux-icons": "^2.0 || ^3.0",
+                "symfony/yaml": "^7.0 || ^8.0"
+            },
+            "suggest": {
+                "symfony/http-client": "Required by symfony/ux-icons to fetch Iconify icons unless icons are locked locally (php bin/console ux:icons:lock).",
+                "symfony/ux-icons": "Required for the default toggle widget icons (ux_icon). Install together with symfony/http-client unless you override the form theme."
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\PasswordToggleBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle providing a password form type with toggle visibility feature",
+            "homepage": "https://github.com/nowo-tech/PasswordToggleBundle",
+            "keywords": [
+                "bundle",
+                "form",
+                "password",
+                "symfony",
+                "toggle",
+                "visibility"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/PasswordToggleBundle/issues",
+                "source": "https://github.com/nowo-tech/PasswordToggleBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T11:53:52+00:00"
         },
         {
             "name": "pentatrion/vite-bundle",
@@ -5615,6 +5792,99 @@
                 }
             ],
             "time": "2026-05-29T05:06:50+00:00"
+        },
+        {
+            "name": "symfony/ux-icons",
+            "version": "v2.36.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-icons.git",
+                "reference": "567f33ddffc25504788abc61977565381e424ada"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/567f33ddffc25504788abc61977565381e424ada",
+                "reference": "567f33ddffc25504788abc61977565381e424ada",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/framework-bundle": "^6.4|^7.0|^8.0",
+                "symfony/twig-bundle": "^6.4|^7.0|^8.0"
+            },
+            "conflict": {
+                "symfony/flex": "<1.13",
+                "symfony/ux-twig-component": "<2.21"
+            },
+            "require-dev": {
+                "psr/log": "^2|^3",
+                "symfony/asset-mapper": "^6.4|^7.0|^8.0",
+                "symfony/console": "^6.4|^7.0|^8.0",
+                "symfony/http-client": "^6.4|^7.0|^8.0",
+                "symfony/phpunit-bridge": "^6.3|^7.0|^8.0",
+                "symfony/ux-twig-component": "^2.14|^3.0",
+                "zenstruck/console-test": "^1.5"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Icons\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Bond",
+                    "email": "kevinbond@gmail.com"
+                },
+                {
+                    "name": "Simon André",
+                    "email": "smn.andre@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Renders local and remote SVG icons in your Twig templates.",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "icons",
+                "svg",
+                "symfony-ux",
+                "twig"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-icons/tree/v2.36.1"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-06-16T05:43:46+00:00"
         },
         {
             "name": "symfony/validator",

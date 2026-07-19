@@ -1,4 +1,5 @@
 {% use "form_div_layout.html.twig" %}
+{% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
 
 {%- block form_row -%}
     <div class="space-y-1.5">
@@ -26,6 +27,11 @@
     {% endif %}
 {%- endblock form_widget_simple -%}
 
+{%- block toggle_password_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{- parent() -}}
+{%- endblock toggle_password_widget -%}
+
 {%- block textarea_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
     {{- parent() -}}
@@ -36,12 +42,25 @@
     {{- parent() -}}
 {%- endblock choice_widget_collapsed -%}
 
+{%- block checkbox_row -%}
+    <div class="space-y-1.5">
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock checkbox_row -%}
+
 {%- block checkbox_widget -%}
-    <label class="inline-flex items-center gap-2 text-sm text-[var(--color-ink)]/80">
-        {{- parent() -}}
-        {% if form.vars.label is not same as(false) %}
-            <span>{{ form.vars.label|trans({}, translation_domain) }}</span>
-        {% endif %}
+    <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--color-ink)]/80">
+        <input type="checkbox"
+            {{ block('widget_attributes') }}
+            {% if value is defined %} value="{{ value }}"{% endif %}
+            {% if checked %} checked="checked"{% endif %}
+            class="size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30"
+        >
+        {% if label is not same as(false) -%}
+            <span>{{ label|trans({}, translation_domain) }}</span>
+        {%- endif %}
     </label>
 {%- endblock checkbox_widget -%}
 
@@ -56,8 +75,5 @@
 {%- endblock form_errors -%}
 
 {%- block repeated_row -%}
-    {#
-        Password confirmation: render each sub-field as its own row.
-    #}
     {{- block('form_rows') -}}
 {%- endblock repeated_row -%}

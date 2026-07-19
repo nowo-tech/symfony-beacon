@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-19
+
+### Added
+
+- AuthKit i18n with `locale_in_path` (`/en/login`, `/es/login`, …), message catalogues (`messages.*`, `NowoAuthKitBundle.*`), and a top-right locale dropdown
+- Remember me on login (`remember_me.enabled: true`, 7-day cookie)
+- Password show/hide via [`nowo-tech/password-toggle-bundle`](https://packagist.org/packages/nowo-tech/password-toggle-bundle) `2.0.4`
+- Password strength policy and live feedback via [`nowo-tech/password-strength-bundle`](https://packagist.org/packages/nowo-tech/password-strength-bundle) `1.3.0` (medium level on registration)
+- Convenience redirects: `/`, `/login`, `/register`, `/logout` → default-locale AuthKit paths (`/en/…`)
+- Contributing guide section for adding locales (`docs/CONTRIBUTING.md`)
+
+### Changed
+
+- Dashboard home moved from `/` to `/dashboard` (`dashboard_home`); `/` redirects to `/en/login`
+- Composer direct dependencies pinned to exact versions (no `^` / `8.1.*` on app requires); `bump-after-update: false`
+- Auth layout scroll/overflow so tall registration forms (strength requirements) remain usable
+
+### Fixed
+
+- Auth pages blocked scrolling (`overflow: hidden` on `.page-shell`) when the register form exceeded the viewport
+
 ## [0.2.0] - 2026-07-19
 
 ### Added
@@ -41,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nowo-tech/symfony-beacon/releases/tag/v0.1.0

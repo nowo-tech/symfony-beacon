@@ -98,7 +98,7 @@
 .page-shell {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background:
     radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in srgb, var(--color-mist) 90%, white), transparent 55%),
     radial-gradient(ellipse 70% 45% at 95% 0%, color-mix(in srgb, var(--color-sand) 70%, white), transparent 50%),
@@ -115,6 +115,125 @@
       linear-gradient(90deg, var(--color-sand) 1px, transparent 1px);
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent);
+  }
+}
+
+/* Center auth panels when short; keep top reachable when the form is taller than the viewport */
+.auth-shell-main {
+  align-items: safe center;
+}
+
+.locale-switcher {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 30;
+}
+
+.locale-switcher__details {
+  position: relative;
+}
+
+.locale-switcher__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  list-style: none;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-sand);
+  background: rgb(255 255 255 / 85%);
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 2px rgb(15 28 24 / 6%);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::marker {
+    content: "";
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+.locale-switcher__details[open] .locale-switcher__summary {
+  border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
+  background: #fff;
+}
+
+.locale-switcher__details[open] .locale-switcher__chevron {
+  transform: rotate(180deg);
+}
+
+.locale-switcher__code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-moss);
+}
+
+.locale-switcher__label {
+  max-width: 7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.locale-switcher__chevron {
+  flex-shrink: 0;
+  opacity: 0.65;
+  transition: transform 0.15s ease;
+}
+
+.locale-switcher__menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-sand);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 8px 24px rgb(15 28 24 / 10%);
+  backdrop-filter: blur(10px);
+}
+
+.locale-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--color-mist);
+    color: var(--color-ink);
+  }
+
+  &.is-active {
+    background: color-mix(in srgb, var(--color-moss) 12%, white);
+    font-weight: 600;
   }
 }
 

@@ -11,4 +11,7 @@ return [
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     Nowo\TwigInspectorBundle\NowoTwigInspectorBundle::class => ['dev' => true, 'test' => true],
     Nowo\AuthKitBundle\NowoAuthKitBundle::class => ['all' => true],
+    Nowo\PasswordStrengthBundle\PasswordStrengthBundle::class => ['all' => true],
+    Nowo\PasswordToggleBundle\NowoPasswordToggleBundle::class => ['all' => true],
+    Symfony\UX\Icons\UXIconsBundle::class => ['all' => true],
 ];

@@ -1,0 +1,13 @@
+# Full configuration reference: https://symfony.com/bundles/ux-icons/current/index.html#configuration
+ux_icons:
+    iconify:
+        enabled: true
+    default_icon_attributes:
+        fill: currentColor
+        height: '1em'
+        width: '1em'
+    ignore_not_found: '%kernel.debug%'
+
+when@prod:
+    ux_icons:
+        ignore_not_found: true

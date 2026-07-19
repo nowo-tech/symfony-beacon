@@ -22,7 +22,7 @@ final class DashboardController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'dashboard_home', methods: ['GET'])]
+    #[Route('/dashboard', name: 'dashboard_home', methods: ['GET'])]
     public function home(Request $request): Response
     {
         /** @var User $user */

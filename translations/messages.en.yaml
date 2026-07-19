@@ -1,0 +1,13 @@
+nav:
+    projects: Projects
+    new_project: New project
+    log_out: Log out
+locale:
+    nav: Language
+    en: English
+    es: Español
+auth:
+    tagline: Self-hosted error tracking for PHP & Symfony.
+    brand_eyebrow: Error tracking
+    bootstrap_eyebrow: Bootstrap
+    bootstrap_hint: Create the first administrator account. Registration closes after this user exists.

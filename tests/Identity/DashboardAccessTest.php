@@ -14,7 +14,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
     public function testLoginPageIsPublic(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        $client->request(Request::METHOD_GET, '/en/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'symfony-beacon');
     }
@@ -22,8 +22,15 @@ final class DashboardAccessTest extends DatabaseWebTestCase
     public function testDashboardRequiresAuth(): void
     {
         $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/dashboard');
+        self::assertResponseRedirects('/en/login');
+    }
+
+    public function testRootRedirectsToLogin(): void
+    {
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/');
-        self::assertResponseRedirects('/login');
+        self::assertResponseRedirects('/en/login');
     }
 
     public function testOwnerSeesProject(): void
@@ -31,7 +38,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         [$client, $user, $project] = $this->bootWithDemoProject();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/');
+        $client->request(Request::METHOD_GET, '/dashboard');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', $project->getName());
 

@@ -1,0 +1,32 @@
+# Convenience redirects: bare auth paths → default locale (/en/…)
+app_home_redirect:
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: nowo_auth_kit_login
+        _locale: en
+        permanent: false
+
+app_auth_login_default_redirect:
+    path: /login
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: nowo_auth_kit_login
+        _locale: en
+        permanent: false
+
+app_auth_register_default_redirect:
+    path: /register
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: nowo_auth_kit_register
+        _locale: en
+        permanent: false
+
+app_auth_logout_default_redirect:
+    path: /logout
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: nowo_auth_kit_logout
+        _locale: en
+        permanent: false

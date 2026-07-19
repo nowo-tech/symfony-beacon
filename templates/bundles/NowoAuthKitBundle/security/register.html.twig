@@ -1,15 +1,18 @@
 {% extends layout_template %}
 
-{% form_theme registration_form 'form/auth_kit_theme.html.twig' %}
+{% form_theme registration_form with [
+    '@PasswordStrengthBundle/Form/password_strength_theme_tailwind2.html.twig',
+    'form/auth_kit_theme.html.twig'
+] %}
 
 {% block title %}{{ 'register.title'|trans({}, 'NowoAuthKitBundle') }} — symfony-beacon{% endblock %}
 
 {% block body %}
 <div class="fade-up mb-10 text-center">
-    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">Bootstrap</p>
+    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">{{ 'auth.bootstrap_eyebrow'|trans }}</p>
     <h1 class="brand-mark text-4xl sm:text-5xl">symfony-beacon</h1>
     <p class="mx-auto mt-3 max-w-sm text-base leading-relaxed text-[var(--color-ink)]/65">
-        Create the first administrator account. Registration closes after this user exists.
+        {{ 'auth.bootstrap_hint'|trans }}
     </p>
 </div>
 
