@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event {{ event.eventId }}{% endblock %}
+
+{% block body %}
+<a href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}" class="text-sm no-underline">← Issue</a>
+<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">Event detail</h1>
+<p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ event.eventId }} · {{ event.platform }} · {{ event.environment|default('n/a') }}</p>
+<pre class="panel mt-6 overflow-x-auto font-mono text-xs">{{ event.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+{% endblock %}

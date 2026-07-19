@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Issues — {{ project.name }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <a href="{{ path('project_show', {id: project.id}) }}" class="text-sm no-underline">← {{ project.name }}</a>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">Issues</h1>
+    </div>
+</div>
+
+<form method="get" class="panel mb-6 grid gap-3 md:grid-cols-4">
+    <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="Search title…">
+    <select class="input" name="level">
+        <option value="">Any level</option>
+        {% for level in ['fatal','error','warning','info','debug'] %}
+            <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
+        {% endfor %}
+    </select>
+    <select class="input" name="status">
+        {% for status in ['unresolved','resolved','ignored',''] %}
+            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status ?: 'any status' }}</option>
+        {% endfor %}
+    </select>
+    <div class="flex gap-2">
+        <input class="input" name="environment" value="{{ filters.environment }}" placeholder="Environment">
+        <button class="btn-primary" type="submit">Filter</button>
+    </div>
+</form>
+
+{% if issues is empty %}
+    <div class="panel text-[var(--color-ink)]/70">No issues match these filters.</div>
+{% else %}
+    <div class="panel overflow-x-auto p-0">
+        <table class="w-full text-left text-sm">
+            <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
+                <tr>
+                    <th class="px-4 py-3">Issue</th>
+                    <th class="px-4 py-3">Level</th>
+                    <th class="px-4 py-3">Events</th>
+                    <th class="px-4 py-3">Last seen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in issues %}
+                    <tr class="border-b border-[var(--color-sand)] last:border-0 hover:bg-white/70">
+                        <td class="px-4 py-3">
+                            <a class="font-medium no-underline" href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}">{{ issue.title }}</a>
+                            <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
+                        </td>
+                        <td class="px-4 py-3"><span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}bg-red-100 text-red-800{% else %}bg-amber-100 text-amber-900{% endif %}">{{ issue.level }}</span></td>
+                        <td class="px-4 py-3">{{ issue.eventCount }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

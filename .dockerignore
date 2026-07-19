@@ -1,0 +1,17 @@
+**/.git
+**/.github
+**/var
+**/vendor
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.dev
+**/.env.prod
+**/.env.test
+**/.phpunit.cache
+**/.idea
+**/.vscode
+**/node_modules
+**/.pnpm-store
+*.md
+!README.md

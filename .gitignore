@@ -1,0 +1,63 @@
+###> symfony/framework-bundle ###
+# Only `.env.dist` is versioned. Install: `cp .env.dist .env` (or `make up`).
+# Never commit secrets. Optional overrides: `.env.local` (gitignored).
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.dev
+/.env.prod
+/.env.test
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> phpstan/phpstan ###
+/phpstan.neon
+###< phpstan/phpstan ###
+
+###> rector/rector ###
+/.rector.cache/
+###< rector/rector ###
+
+###> vincentlanglet/twig-cs-fixer ###
+/.twig-cs-fixer.php
+/.twig-cs-fixer.cache
+###< vincentlanglet/twig-cs-fixer ###
+
+###> pentatrion/vite-bundle ###
+/node_modules/
+/public/build/
+/.pnpm-store/
+###< pentatrion/vite-bundle ###
+
+# Docker / IDE
+/.idea/
+/.vscode/
+*.log
+composer.phar
+
+# Cursor: version Spec Kit skills, CLI attribution config, and rules
+.cursor/*
+!.cursor/skills/
+!.cursor/skills/**
+!.cursor/cli.json
+!.cursor/rules/
+!.cursor/rules/**
+
+# Spec Kit: specs and .specify are versioned
+
+# Env template (only versioned env file)
+!.env.dist

@@ -1,0 +1,33 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	# FRANKENPHP_CONFIG is set by frankenphp/docker-entrypoint.sh from FRANKENPHP_MODE:
+	#   classic → empty (classic php_server, boot per request)
+	#   worker  → "worker { file ./public/index.php ... }" (app kept in memory)
+	#
+	# Important: the worker MUST point at the front controller (public/index.php).
+	# Symfony ≥7.4 detects $_SERVER['FRANKENPHP_WORKER']=1 (injected by FrankenPHP)
+	# and uses FrankenPhpWorkerRunner → frankenphp_handle_request().
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+{$SERVER_NAME:localhost} {
+	log {
+		{$CADDY_SERVER_LOG_OPTIONS}
+	}
+
+	# Symfony document root
+	root * /app/public
+	encode zstd br gzip
+
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	# classic: run PHP per request.
+	# worker:  if a worker is registered for ./public/index.php, requests to that
+	#          script are handled by the worker (no re-bootstrap).
+	php_server
+}

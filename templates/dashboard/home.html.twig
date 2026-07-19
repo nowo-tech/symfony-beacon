@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projects — symfony-beacon{% endblock %}
+
+{% block body %}
+<div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">Projects</h1>
+        <p class="mt-1 text-[var(--color-ink)]/65">Filter and open projects you can access.</p>
+    </div>
+    <form method="get" class="flex gap-2">
+        <input class="input min-w-64" type="search" name="q" value="{{ query }}" placeholder="Search projects…">
+        <button class="btn-ghost" type="submit">Filter</button>
+    </form>
+</div>
+
+{% if projects is empty %}
+    <div class="panel text-center">
+        <p class="mb-4 text-[var(--color-ink)]/70">No projects yet.</p>
+        <a class="btn-primary no-underline" href="{{ path('project_new') }}">Create your first project</a>
+    </div>
+{% else %}
+    <div class="grid gap-4 md:grid-cols-2">
+        {% for project in projects %}
+            <a href="{{ path('project_show', {id: project.id}) }}" class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+                <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ project.name }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ project.slug }}</p>
+                {% set days = statsPreview[project.id]|default([]) %}
+                {% if days %}
+                    {% set errors = 0 %}
+                    {% for day in days %}{% set errors = errors + day.errorCount %}{% endfor %}
+                    <p class="mt-3 text-sm text-[var(--color-moss)]">{{ errors }} errors in last 7 days</p>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

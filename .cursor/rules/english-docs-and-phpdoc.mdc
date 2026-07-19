@@ -1,0 +1,13 @@
+---
+description: Documentation, PHPDoc, and code comments must be written in English
+alwaysApply: true
+---
+
+# English documentation and PHPDoc
+
+- Write all project documentation in English (`README.md`, `docs/**`, `specs/**`, constitution).
+- Write PHPDoc and inline code comments in English (`src/`, `tests/`, `public/`).
+- Write comments in Docker/Compose/Caddy/shell and Makefile help text in English.
+- Keep Twig/UI copy in English and use `lang="en"` on HTML documents.
+- Do not add Spanish (or other non-English) prose to docs or PHPDoc.
+- Constitution principle VI and `docs/CONTRIBUTING.md` are the source of this rule.

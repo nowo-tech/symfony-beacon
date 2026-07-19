@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Performance — {{ project.name }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <a href="{{ path('project_show', {id: project.id}) }}" class="text-sm no-underline">← {{ project.name }}</a>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">Performance</h1>
+        <p class="text-[var(--color-ink)]/65">Transactions and N+1 analysis</p>
+    </div>
+    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.id, nplus1: nPlusOneOnly ? 0 : 1}) }}">
+        {% if nPlusOneOnly %}Show all{% else %}N+1 only{% endif %}
+    </a>
+</div>
+
+{% if transactions is empty %}
+    <div class="panel text-[var(--color-ink)]/70">No transactions yet.</div>
+{% else %}
+    <div class="panel overflow-x-auto p-0">
+        <table class="w-full text-left text-sm">
+            <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
+                <tr>
+                    <th class="px-4 py-3">Transaction</th>
+                    <th class="px-4 py-3">Duration</th>
+                    <th class="px-4 py-3">Spans</th>
+                    <th class="px-4 py-3">N+1</th>
+                    <th class="px-4 py-3">Received</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                    <tr class="border-b border-[var(--color-sand)] last:border-0">
+                        <td class="px-4 py-3">
+                            <a class="font-medium no-underline" href="{{ path('performance_show', {projectId: project.id, id: tx.id}) }}">{{ tx.transactionName }}</a>
+                        </td>
+                        <td class="px-4 py-3">{{ tx.durationMs|number_format(1) }} ms</td>
+                        <td class="px-4 py-3">{{ tx.spanCount }}</td>
+                        <td class="px-4 py-3">
+                            {% if tx.nPlusOneCount > 0 %}
+                                <span class="badge bg-amber-100 text-amber-900">{{ tx.nPlusOneCount }}</span>
+                            {% else %}
+                                0
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ tx.receivedAt|date('Y-m-d H:i') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

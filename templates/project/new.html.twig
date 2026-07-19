@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New project — symfony-beacon{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-lg">
+    <h1 class="mb-6 font-[family-name:var(--font-display)] text-3xl font-bold">New project</h1>
+    <form method="post" class="panel space-y-4">
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="name">Name</label>
+            <input class="input" id="name" name="name" required>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="description">Description</label>
+            <textarea class="input" id="description" name="description" rows="3"></textarea>
+        </div>
+        <button class="btn-primary" type="submit">Create project</button>
+    </form>
+</div>
+{% endblock %}

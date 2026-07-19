@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ issue.title }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">← Issues</a>
+<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ issue.title }}</h1>
+<p class="mt-1 text-[var(--color-ink)]/65">{{ issue.culprit }} · {{ issue.eventCount }} events · {{ issue.status.value }}</p>
+
+{% set event = latestEvent %}
+{% if event %}
+    <section class="panel mt-6">
+        <h2 class="mb-3 text-lg font-semibold">Latest stack / payload</h2>
+        <p class="mb-2 text-sm text-[var(--color-ink)]/60">
+            Event <a href="{{ path('event_show', {projectId: project.id, eventId: event.eventId}) }}">{{ event.eventId }}</a>
+            · {{ event.environment|default('n/a') }}
+            · {{ event.receivedAt|date('Y-m-d H:i:s') }}
+        </p>
+        {% set exception = event.payload.exception.values[0]|default(null) %}
+        {% if exception and exception.stacktrace.frames is defined %}
+            <ol class="space-y-2 font-mono text-xs">
+                {% for frame in exception.stacktrace.frames|reverse %}
+                    <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] px-3 py-2">
+                        <span class="text-[var(--color-moss)]">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
+                        :{{ frame.lineno|default('?') }}
+                        <span class="text-[var(--color-ink)]/50">in</span>
+                        {{ frame.function|default('unknown') }}
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <pre class="overflow-x-auto rounded bg-[var(--color-ink)] p-4 text-xs text-emerald-100">{{ event.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+    </section>
+{% endif %}
+
+<section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">Recent events</h2>
+    <ul class="divide-y divide-[var(--color-sand)] text-sm">
+        {% for e in events %}
+            <li class="flex items-center justify-between py-2">
+                <a href="{{ path('event_show', {projectId: project.id, eventId: e.eventId}) }}">{{ e.eventId }}</a>
+                <span class="text-[var(--color-ink)]/55">{{ e.receivedAt|date('Y-m-d H:i:s') }}</span>
+            </li>
+        {% else %}
+            <li class="py-2 text-[var(--color-ink)]/60">No events stored.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

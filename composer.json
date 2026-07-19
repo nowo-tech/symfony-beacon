@@ -1,0 +1,134 @@
+{
+    "name": "nowo-tech/symfony-beacon",
+    "type": "project",
+    "license": "MIT",
+    "description": "Self-hosted error tracking for PHP/Symfony — Envelope wire protocol compatible, FrankenPHP worker, MySQL, Spec-Driven Development",
+    "homepage": "https://github.com/nowo-tech/symfony-beacon",
+    "authors": [
+        {
+            "name": "Nowo.tech",
+            "homepage": "https://nowo.tech"
+        },
+        {
+            "name": "Héctor Franco Aceituno",
+            "email": "hectorfranco@nowo.tech",
+            "homepage": "https://github.com/HecFranco",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/nowo-tech/symfony-beacon",
+        "issues": "https://github.com/nowo-tech/symfony-beacon/issues",
+        "docs": "https://github.com/nowo-tech/symfony-beacon/tree/main/docs"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.5",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
+        "pentatrion/vite-bundle": "^8.2",
+        "symfony/console": "8.1.*",
+        "symfony/doctrine-messenger": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/flex": "^2",
+        "symfony/form": "8.1.*",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/messenger": "8.1.*",
+        "symfony/password-hasher": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/security-bundle": "8.1.*",
+        "symfony/security-csrf": "8.1.*",
+        "symfony/string": "8.1.*",
+        "symfony/translation": "8.1.*",
+        "symfony/twig-bundle": "8.1.*",
+        "symfony/validator": "8.1.*",
+        "symfony/yaml": "8.1.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "cs-check": "php-cs-fixer check --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "twig-cs": "twig-cs-fixer lint --config=.twig-cs-fixer.dist.php",
+        "twig-cs-fix": "twig-cs-fixer fix --config=.twig-cs-fixer.dist.php",
+        "phpstan": "phpstan analyse --memory-limit=512M",
+        "rector": "rector process --dry-run",
+        "rector-fix": "rector process",
+        "test": "phpunit",
+        "qa": [
+            "@cs-check",
+            "@twig-cs",
+            "@phpstan",
+            "@rector",
+            "@test"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "8.1.*",
+            "docker": true
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "nowo-tech/twig-inspector-bundle": "^1.0",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^13.2",
+        "rector/rector": "^2.5",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/css-selector": "8.1.*",
+        "symfony/web-profiler-bundle": "8.1.*",
+        "vincentlanglet/twig-cs-fixer": "^4.0"
+    }
+}

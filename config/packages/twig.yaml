@@ -1,0 +1,11 @@
+twig:
+    file_name_pattern: '*.twig'
+
+when@dev:
+    twig:
+        # Better Web Profiler Twig panel + Twig Inspector comments
+        debug: true
+
+when@test:
+    twig:
+        strict_variables: true

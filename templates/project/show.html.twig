@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ project.name }} — symfony-beacon{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div>
+        <p class="text-sm uppercase tracking-wide text-[var(--color-ink)]/50">Project</p>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ project.name }}</h1>
+        <p class="mt-1 text-[var(--color-ink)]/65">{{ project.description|default('No description') }}</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a class="btn-ghost no-underline" href="{{ path('issue_index', {id: project.id}) }}">Issues</a>
+        <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.id}) }}">Performance</a>
+        <a class="btn-ghost no-underline" href="{{ path('analytics_show', {id: project.id}) }}">Analytics</a>
+    </div>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-2">
+    <section class="panel">
+        <h2 class="mb-3 text-lg font-semibold">API keys / DSN</h2>
+        <ul class="space-y-3">
+            {% for key in project.apiKeys %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge bg-red-100 text-red-800">inactive</span>{% endif %}</div>
+                    <code class="mt-2 block break-all text-xs">{{ key.buildDsn(baseUrl) }}</code>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/55">public: {{ key.publicKey }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if membership.role.value in ['owner', 'admin'] %}
+            <form method="post" action="{{ path('project_keys_create', {id: project.id}) }}" class="mt-4 flex gap-2">
+                <input class="input" name="label" placeholder="Key label" value="Secondary">
+                <button class="btn-primary" type="submit">Add key</button>
+            </form>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="mb-3 text-lg font-semibold">Members</h2>
+        <ul class="space-y-2 text-sm">
+            {% for member in project.memberships %}
+                <li class="flex items-center justify-between border-b border-[var(--color-sand)] py-2 last:border-0">
+                    <span>{{ member.user.email }}</span>
+                    <span class="badge bg-[var(--color-sand)]">{{ member.role.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="mt-3 text-xs text-[var(--color-ink)]/55">Your role: {{ membership.role.value }}</p>
+    </section>
+</div>
+{% endblock %}

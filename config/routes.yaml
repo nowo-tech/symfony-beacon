@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
+
+controllers_identity:
+    resource:
+        path: ../src/Identity/Controller/
+        namespace: App\Identity\Controller
+    type: attribute
+
+controllers_project:
+    resource:
+        path: ../src/Project/Controller/
+        namespace: App\Project\Controller
+    type: attribute
+
+controllers_ingest:
+    resource:
+        path: ../src/Ingest/Controller/
+        namespace: App\Ingest\Controller
+    type: attribute
+
+controllers_issues:
+    resource:
+        path: ../src/Issues/Controller/
+        namespace: App\Issues\Controller
+    type: attribute
+
+controllers_performance:
+    resource:
+        path: ../src/Performance/Controller/
+        namespace: App\Performance\Controller
+    type: attribute
+
+controllers_analytics:
+    resource:
+        path: ../src/Analytics/Controller/
+        namespace: App\Analytics\Controller
+    type: attribute
