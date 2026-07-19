@@ -26,6 +26,11 @@
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 
+	# Vite HMR / assets (dev) — same-origin HTTPS so Tailwind CSS loads in the browser.
+	handle /build* {
+		reverse_proxy vite:5173
+	}
+
 	# classic: run PHP per request.
 	# worker:  if a worker is registered for ./public/index.php, requests to that
 	#          script are handled by the worker (no re-bootstrap).

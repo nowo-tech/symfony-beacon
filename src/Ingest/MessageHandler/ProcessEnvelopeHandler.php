@@ -16,21 +16,22 @@ use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
 use App\Project\Repository\ProjectRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class ProcessEnvelopeHandler
+final readonly class ProcessEnvelopeHandler
 {
     public function __construct(
-        private readonly EnvelopeParser $envelopeParser,
-        private readonly FingerprintCalculator $fingerprintCalculator,
-        private readonly NPlusOneDetector $nPlusOneDetector,
-        private readonly ProjectRepository $projectRepository,
-        private readonly IssueRepository $issueRepository,
-        private readonly EventRepository $eventRepository,
-        private readonly DailyProjectStatRepository $dailyProjectStatRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private EnvelopeParser $envelopeParser,
+        private FingerprintCalculator $fingerprintCalculator,
+        private NPlusOneDetector $nPlusOneDetector,
+        private ProjectRepository $projectRepository,
+        private IssueRepository $issueRepository,
+        private EventRepository $eventRepository,
+        private DailyProjectStatRepository $dailyProjectStatRepository,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -42,7 +43,7 @@ final class ProcessEnvelopeHandler
         }
 
         $parsed = $this->envelopeParser->parse($message->rawEnvelope);
-        $receivedAt = new \DateTimeImmutable($message->receivedAtIso);
+        $receivedAt = new DateTimeImmutable($message->receivedAtIso);
 
         foreach ($parsed['items'] as $item) {
             $type = (string) ($item['header']['type'] ?? '');
@@ -65,7 +66,7 @@ final class ProcessEnvelopeHandler
     /**
      * @param array<string, mixed> $payload
      */
-    private function ingestEvent(int $projectId, array $payload, \DateTimeImmutable $receivedAt): void
+    private function ingestEvent(int $projectId, array $payload, DateTimeImmutable $receivedAt): void
     {
         $project = $this->projectRepository->find($projectId);
         if (null === $project) {
@@ -73,13 +74,13 @@ final class ProcessEnvelopeHandler
         }
 
         $eventId = (string) ($payload['event_id'] ?? bin2hex(random_bytes(16)));
-        if (null !== $this->eventRepository->findOneByEventId($eventId)) {
+        if ($this->eventRepository->findOneByEventId($eventId) instanceof Event) {
             return;
         }
 
         $fingerprint = $this->fingerprintCalculator->calculate($payload);
         $issue = $this->issueRepository->findOneByProjectAndFingerprint($project, $fingerprint);
-        if (null === $issue) {
+        if (!$issue instanceof Issue) {
             $issue = new Issue();
             $issue->setProject($project);
             $issue->setFingerprint($fingerprint);
@@ -104,7 +105,7 @@ final class ProcessEnvelopeHandler
         $event->setPlatform(isset($payload['platform']) ? (string) $payload['platform'] : 'php');
         $event->setReceivedAt($receivedAt);
         if (isset($payload['timestamp']) && is_numeric($payload['timestamp'])) {
-            $event->setEventTimestamp((new \DateTimeImmutable())->setTimestamp((int) $payload['timestamp']));
+            $event->setEventTimestamp(new DateTimeImmutable()->setTimestamp((int) $payload['timestamp']));
         } else {
             $event->setEventTimestamp($receivedAt);
         }
@@ -117,7 +118,7 @@ final class ProcessEnvelopeHandler
     /**
      * @param array<string, mixed> $payload
      */
-    private function ingestTransaction(int $projectId, array $payload, \DateTimeImmutable $receivedAt): void
+    private function ingestTransaction(int $projectId, array $payload, DateTimeImmutable $receivedAt): void
     {
         $project = $this->projectRepository->find($projectId);
         if (null === $project) {
@@ -161,7 +162,7 @@ final class ProcessEnvelopeHandler
 
         foreach ($spanInputs as $spanData) {
             $span = new PerfSpan();
-            $span->setSpanId($spanData['span_id'] !== '' ? $spanData['span_id'] : bin2hex(random_bytes(8)));
+            $span->setSpanId('' !== $spanData['span_id'] ? $spanData['span_id'] : bin2hex(random_bytes(8)));
             $span->setOp($spanData['op']);
             $span->setDescription($spanData['description']);
             $span->setNPlusOneCandidate(isset($candidateIds[$spanData['span_id']]));

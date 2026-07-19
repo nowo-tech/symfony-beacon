@@ -13,7 +13,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
 {
     public function testLoginPageIsPublic(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'symfony-beacon');
@@ -21,7 +21,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
 
     public function testDashboardRequiresAuth(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/');
         self::assertResponseRedirects('/login');
     }
@@ -43,8 +43,8 @@ final class DashboardAccessTest extends DatabaseWebTestCase
     public function testForeignProjectIsDenied(): void
     {
         [$client, , $project] = $this->bootWithDemoProject('owner2@example.com');
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $stranger = new User();
         $stranger->setEmail('stranger@example.com');

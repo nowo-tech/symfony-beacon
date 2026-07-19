@@ -6,6 +6,7 @@ namespace App\Project\Entity;
 
 use App\Issues\Entity\Issue;
 use App\Project\Repository\ProjectRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,11 +31,11 @@ class Project
     private ?string $description = null;
 
     /** @var Collection<int, ProjectApiKey> */
-    #[ORM\OneToMany(targetEntity: ProjectApiKey::class, mappedBy: 'project', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: ProjectApiKey::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $apiKeys;
 
     /** @var Collection<int, ProjectMembership> */
-    #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'project', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $memberships;
 
     /** @var Collection<int, Issue> */
@@ -42,14 +43,14 @@ class Project
     private Collection $issues;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->apiKeys = new ArrayCollection();
         $this->memberships = new ArrayCollection();
         $this->issues = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -137,7 +138,7 @@ class Project
         return $this->issues;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }

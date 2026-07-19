@@ -4,13 +4,14 @@
 
 Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **Envelope wire protocol**, so you can point the official PHP SDK (`sentry/sentry` on Packagist) at this server via a project DSN — no SaaS account required.
 
-Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **Tailwind**, and **Spec-Driven Development** (GitHub Spec Kit).
+Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
 
 > The Symfony instrumentation **bundle** lives in a separate repository and will be published later. Until then, configure the official PHP SDK DSN against this server.
 
 ## Features (v1)
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member`)
+- **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - Projects with rotatable **API keys** and Envelope-compatible **DSN**
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger)
@@ -31,13 +32,18 @@ cd symfony-beacon
 cp .env.dist .env
 make up
 make console ARGS='doctrine:migrations:migrate -n'
+# Option A — register the first admin in the UI: https://localhost:9444/register
+# Option B — seed demo user + project + DSN:
 make console ARGS='app:seed-demo'
 ```
 
 - HTTP: http://localhost:9081  
 - HTTPS: https://localhost:9444  
 - MySQL: `localhost:3308`
-- Demo login: `admin@symfony-beacon.local` / `admin123`
+- Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
+- First-user registration (empty DB only): https://localhost:9444/register
+
+> After the first user exists, `/register` redirects to login.
 
 Seed prints a DSN like:
 
@@ -62,7 +68,7 @@ Modular Symfony (not full DDD):
 
 | Module | Responsibility |
 |--------|----------------|
-| `Identity` | Users, login, seed command |
+| `Identity` | Users (AuthKit login/register), seed command |
 | `Project` | Projects, API keys, memberships |
 | `Ingest` | Envelope API + async pipeline |
 | `Issues` | Grouping, list/filter, event detail |

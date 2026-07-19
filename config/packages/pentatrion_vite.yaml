@@ -1,0 +1,5 @@
+# Serve Vite through FrankenPHP/Caddy (DEFAULT_URI) to avoid HTTP assets on HTTPS pages.
+when@dev:
+    pentatrion_vite:
+        proxy_origin: '%env(DEFAULT_URI)%'
+        crossorigin: true

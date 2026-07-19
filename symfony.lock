@@ -47,6 +47,9 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "nowo-tech/auth-kit-bundle": {
+        "version": "v1.5.1"
+    },
     "nowo-tech/twig-inspector-bundle": {
         "version": "v1.0.36"
     },

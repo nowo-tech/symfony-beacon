@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "071192c10f6e2947c9bb13503e320506",
+    "content-hash": "7077f8eff5d4ee1ccc90d1c17eb28b23",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -1120,6 +1120,100 @@
                 "source": "https://github.com/doctrine/sql-formatter/tree/1.5.4"
             },
             "time": "2026-02-08T16:21:46+00:00"
+        },
+        {
+            "name": "nowo-tech/auth-kit-bundle",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/AuthKitBundle.git",
+                "reference": "1946c97313ff1ce23ae5d649501b35a177526809"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/1946c97313ff1ce23ae5d649501b35a177526809",
+                "reference": "1946c97313ff1ce23ae5d649501b35a177526809",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.10 || ^3.0",
+                "doctrine/orm": "^2.15 || ^3.0",
+                "php": ">=8.2 <8.6",
+                "symfony/asset": "^7.4 || ^8.0",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/form": "^7.4 || ^8.0",
+                "symfony/framework-bundle": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/password-hasher": "^7.4 || ^8.0",
+                "symfony/property-access": "^7.4 || ^8.0",
+                "symfony/routing": "^7.4 || ^8.0",
+                "symfony/security-bundle": "^7.4 || ^8.0",
+                "symfony/translation": "^7.4 || ^8.0",
+                "symfony/twig-bundle": "^7.4 || ^8.0",
+                "symfony/validator": "^7.4 || ^8.0",
+                "symfony/yaml": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/password-strength-bundle": "^1.0",
+                "nowo-tech/password-toggle-bundle": "^2.0.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0"
+            },
+            "suggest": {
+                "nowo-tech/password-strength-bundle": "Strength policies, live feedback, and validator for registration and password reset fields (^1.0)",
+                "nowo-tech/password-toggle-bundle": "Password fields with visibility toggle (^1.2.8)",
+                "symfony/http-client": "Required with symfony/ux-icons to fetch toggle icons on demand",
+                "symfony/ux-icons": "Required for password visibility toggle icons (^2.0 || ^3.0)"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\AuthKitBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle for configurable login and registration with overridable templates, registration modes, and i18n",
+            "homepage": "https://github.com/nowo-tech/AuthKitBundle",
+            "keywords": [
+                "Authentication",
+                "auth",
+                "bundle",
+                "login",
+                "registration",
+                "security",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/AuthKitBundle/issues",
+                "source": "https://github.com/nowo-tech/AuthKitBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T18:58:00+00:00"
         },
         {
             "name": "pentatrion/vite-bundle",

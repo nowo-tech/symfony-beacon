@@ -24,7 +24,7 @@ final class PerformanceController extends AbstractController
     ) {
     }
 
-    #[Route('/projects/{id}/performance', name: 'performance_index', methods: ['GET'], requirements: ['id' => '\d+'])]
+    #[Route('/projects/{id}/performance', name: 'performance_index', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function index(Project $project, Request $request): Response
     {
         /** @var User $user */
@@ -41,13 +41,13 @@ final class PerformanceController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/{projectId}/performance/{id}', name: 'performance_show', methods: ['GET'], requirements: ['projectId' => '\d+', 'id' => '\d+'])]
+    #[Route('/projects/{projectId}/performance/{id}', name: 'performance_show', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['GET'])]
     public function show(int $projectId, PerfTransaction $transaction): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $project = $transaction->getProject();
-        if (null === $project || $project->getId() !== $projectId) {
+        if (!$project instanceof Project || $project->getId() !== $projectId) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($project, $user);

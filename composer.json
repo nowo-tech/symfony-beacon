@@ -2,7 +2,7 @@
     "name": "nowo-tech/symfony-beacon",
     "type": "project",
     "license": "MIT",
-    "description": "Self-hosted error tracking for PHP/Symfony — Envelope wire protocol compatible, FrankenPHP worker, MySQL, Spec-Driven Development",
+    "description": "Self-hosted error tracking for PHP/Symfony \u2014 Envelope wire protocol compatible, FrankenPHP worker, MySQL, Spec-Driven Development",
     "homepage": "https://github.com/nowo-tech/symfony-beacon",
     "authors": [
         {
@@ -10,7 +10,7 @@
             "homepage": "https://nowo.tech"
         },
         {
-            "name": "Héctor Franco Aceituno",
+            "name": "H\u00e9ctor Franco Aceituno",
             "email": "hectorfranco@nowo.tech",
             "homepage": "https://github.com/HecFranco",
             "role": "Developer"
@@ -30,6 +30,7 @@
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
+        "nowo-tech/auth-kit-bundle": "^1.5",
         "pentatrion/vite-bundle": "^8.2",
         "symfony/console": "8.1.*",
         "symfony/doctrine-messenger": "8.1.*",

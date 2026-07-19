@@ -14,12 +14,12 @@
     <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="Search title…">
     <select class="input" name="level">
         <option value="">Any level</option>
-        {% for level in ['fatal','error','warning','info','debug'] %}
+        {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
             <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
         {% endfor %}
     </select>
     <select class="input" name="status">
-        {% for status in ['unresolved','resolved','ignored',''] %}
+        {% for status in ['unresolved', 'resolved', 'ignored', ''] %}
             <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status ?: 'any status' }}</option>
         {% endfor %}
     </select>

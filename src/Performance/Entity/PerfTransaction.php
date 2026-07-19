@@ -6,6 +6,7 @@ namespace App\Performance\Entity;
 
 use App\Performance\Repository\PerfTransactionRepository;
 use App\Project\Entity\Project;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -45,16 +46,16 @@ class PerfTransaction
     private array $payload = [];
 
     /** @var Collection<int, PerfSpan> */
-    #[ORM\OneToMany(targetEntity: PerfSpan::class, mappedBy: 'transaction', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: PerfSpan::class, mappedBy: 'transaction', cascade: ['persist'], orphanRemoval: true)]
     private Collection $spans;
 
     #[ORM\Column]
-    private \DateTimeImmutable $receivedAt;
+    private DateTimeImmutable $receivedAt;
 
     public function __construct()
     {
         $this->spans = new ArrayCollection();
-        $this->receivedAt = new \DateTimeImmutable();
+        $this->receivedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -170,12 +171,12 @@ class PerfTransaction
         return $this;
     }
 
-    public function getReceivedAt(): \DateTimeImmutable
+    public function getReceivedAt(): DateTimeImmutable
     {
         return $this->receivedAt;
     }
 
-    public function setReceivedAt(\DateTimeImmutable $receivedAt): self
+    public function setReceivedAt(DateTimeImmutable $receivedAt): self
     {
         $this->receivedAt = $receivedAt;
 

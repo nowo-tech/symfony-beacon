@@ -1,0 +1,47 @@
+---
+description: Prefer nowo-tech kits (Auth/Audit/User/…) and remind about legal/cookie notices
+alwaysApply: true
+---
+
+# Nowo.tech kits and legal reminders
+
+When implementing product features in this repo, **prefer official `nowo-tech/*` Symfony bundles** instead of reinventing auth, users, audit fields, cookies, or legal UX.
+
+## Prefer these kits (do not hand-roll equivalents)
+
+| Need | Package | Notes |
+|------|---------|--------|
+| Login / registration / password reset UI | `nowo-tech/auth-kit-bundle` | Configurable flows, Twig overrides, i18n |
+| User enable/disable, last activity, online | `nowo-tech/user-kit-bundle` | Account lifecycle on top of Security |
+| createdAt/updatedAt + blame fields | `nowo-tech/audit-kit-bundle` | Opt-in Doctrine timestamps/blame |
+| Cookie / GDPR consent modal | `nowo-tech/cookie-consent-bundle` | Categories + optional consent logging |
+| Login throttling | `nowo-tech/login-throttle-bundle` | Wraps Symfony `login_throttling` |
+| Password policy / strength / toggle | `nowo-tech/password-*-bundle` | Prefer kits over custom validators/UI |
+| Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
+
+Packagist vendor: https://packagist.org/packages/nowo-tech/
+
+## Before inventing Identity/Security UI
+
+1. Ask whether `auth-kit-bundle` + `user-kit-bundle` cover the need.
+2. Prefer integrating those bundles (Flex recipes, template overrides) over growing `src/Identity` with bespoke login/register CRUD.
+3. Use `audit-kit-bundle` for entity timestamps/blame instead of copying trait logic.
+
+## Legal / aviso legal (ALWAYS remind)
+
+When touching public UI, marketing pages, cookies, analytics, contact forms, or self-hosted SaaS surfaces, **remind the user** and propose:
+
+- Legal notice / privacy / terms pages (aviso legal, privacy policy, terms of use) as English UI copy (`lang="en"`), with room for operator-specific text.
+- Cookie consent via `nowo-tech/cookie-consent-bundle` when any non-essential cookie or third-party script appears (Vite analytics, embeds, etc.).
+- GDPR-oriented data handling (`anonymize-bundle`, encrypt-bundle) when storing personal data beyond auth essentials.
+
+Do **not** silently ship tracking or optional cookies without consent UX.
+
+## Current project status (honest baseline)
+
+`symfony-beacon` v1 Identity is a **minimal custom** login (`SecurityController` + `User` entity). That was a bootstrap shortcut for Envelope ingest MVP — **not** a reason to keep duplicating AuthKit/UserKit/AuditKit. When auth/user/audit work comes up, propose migrating to the kits above.
+
+## Agent behaviour
+
+- If the user asks for login, registration, memberships, audit columns, or legal/cookie UX → **mention the matching nowo-tech package first**, then implement with it unless they explicitly refuse.
+- Keep docs/PHPDoc/UI strings in English (see `english-docs-and-phpdoc` rule).

@@ -22,7 +22,7 @@ final class AnalyticsController extends AbstractController
     ) {
     }
 
-    #[Route('/projects/{id}/analytics', name: 'analytics_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    #[Route('/projects/{id}/analytics', name: 'analytics_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Project $project): Response
     {
         /** @var User $user */

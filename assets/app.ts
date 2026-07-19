@@ -1,3 +1,6 @@
-import './styles/app.css';
+import './styles/tailwind.css';
+import './styles/app.scss';
 
-document.documentElement.dataset.assets = 'ts+tailwind';
+document.documentElement.dataset.assets = 'ts+scss+tailwind';
+
+export {};

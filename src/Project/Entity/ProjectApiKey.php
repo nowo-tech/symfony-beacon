@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Project\Entity;
 
 use App\Project\Repository\ProjectApiKeyRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectApiKeyRepository::class)]
@@ -34,11 +35,11 @@ class ProjectApiKey
     private bool $active = true;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public static function generate(Project $project, string $label = 'Default'): self
@@ -117,13 +118,13 @@ class ProjectApiKey
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
     /**
-     * Envelope-compatible DSN: https://{public}@{host}/{projectId}
+     * Envelope-compatible DSN: https://{public}@{host}/{projectId}.
      */
     public function buildDsn(string $baseUrl): string
     {

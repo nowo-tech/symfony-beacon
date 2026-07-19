@@ -9,7 +9,7 @@ namespace App\Performance\Service;
  */
 final class NPlusOneDetector
 {
-    private const MIN_REPEATS = 5;
+    private const int MIN_REPEATS = 5;
 
     /**
      * @param list<array{op?: string, description?: string, span_id?: string}> $spans

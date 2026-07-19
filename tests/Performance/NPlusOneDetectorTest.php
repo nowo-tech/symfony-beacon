@@ -20,7 +20,7 @@ final class NPlusOneDetectorTest extends TestCase
             ];
         }
 
-        $result = (new NPlusOneDetector())->detect($spans);
+        $result = new NPlusOneDetector()->detect($spans);
 
         self::assertSame(1, $result['count']);
         self::assertSame(6, $result['groups'][0]['repeats']);
@@ -34,7 +34,7 @@ final class NPlusOneDetectorTest extends TestCase
             ['op' => 'db', 'description' => 'SELECT 2', 'span_id' => 'b'],
         ];
 
-        $result = (new NPlusOneDetector())->detect($spans);
+        $result = new NPlusOneDetector()->detect($spans);
         self::assertSame(0, $result['count']);
     }
 }

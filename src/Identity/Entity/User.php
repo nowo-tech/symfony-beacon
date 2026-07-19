@@ -6,6 +6,7 @@ namespace App\Identity\Entity;
 
 use App\Identity\Repository\UserRepository;
 use App\Project\Entity\ProjectMembership;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -40,12 +41,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $memberships;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->memberships = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -127,7 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->memberships;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }

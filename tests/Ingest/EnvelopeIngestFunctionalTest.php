@@ -15,7 +15,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
     {
         [$client, , $project] = $this->bootWithDemoProject();
 
-        $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], [], "{}");
+        $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], [], '{}');
 
         self::assertResponseStatusCodeSame(401);
     }
@@ -59,7 +59,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $em = static::getContainer()->get('doctrine')->getManager();
+        $em = self::getContainer()->get('doctrine')->getManager();
         /** @var list<Issue> $issues */
         $issues = $em->getRepository(Issue::class)->findAll();
         self::assertCount(1, $issues);
@@ -106,7 +106,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $em = static::getContainer()->get('doctrine')->getManager();
+        $em = self::getContainer()->get('doctrine')->getManager();
         /** @var list<PerfTransaction> $txs */
         $txs = $em->getRepository(PerfTransaction::class)->findAll();
         self::assertCount(1, $txs);

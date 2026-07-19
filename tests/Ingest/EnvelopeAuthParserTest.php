@@ -15,7 +15,6 @@ final class EnvelopeAuthParserTest extends TestCase
         $result = $parser->parseFromRequest(
             'Sentry sentry_version=7, sentry_key=publickey, sentry_client=sentry.php/4.0',
             '',
-            null,
         );
 
         self::assertSame('publickey', $result['sentry_key']);
@@ -24,7 +23,7 @@ final class EnvelopeAuthParserTest extends TestCase
     public function testParsesQueryAndDsn(): void
     {
         $parser = new EnvelopeAuthParser();
-        $fromQuery = $parser->parseFromRequest(null, 'sentry_key=qkey&sentry_secret=sec', null);
+        $fromQuery = $parser->parseFromRequest(null, 'sentry_key=qkey&sentry_secret=sec');
         self::assertSame('qkey', $fromQuery['sentry_key']);
         self::assertSame('sec', $fromQuery['sentry_secret']);
 

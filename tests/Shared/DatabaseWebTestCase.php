@@ -10,6 +10,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -19,9 +20,9 @@ abstract class DatabaseWebTestCase extends WebTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $client = static::createClient();
+        static::createClient();
         $em = static::getContainer()->get(EntityManagerInterface::class);
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool = new SchemaTool($em);
         $meta = $em->getMetadataFactory()->getAllMetadata();
         $schemaTool->dropSchema($meta);
         $schemaTool->createSchema($meta);

@@ -1,0 +1,30 @@
+{% extends layout_template %}
+
+{% form_theme registration_form 'form/auth_kit_theme.html.twig' %}
+
+{% block title %}{{ 'register.title'|trans({}, 'NowoAuthKitBundle') }} — symfony-beacon{% endblock %}
+
+{% block body %}
+<div class="fade-up mb-10 text-center">
+    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">Bootstrap</p>
+    <h1 class="brand-mark text-4xl sm:text-5xl">symfony-beacon</h1>
+    <p class="mx-auto mt-3 max-w-sm text-base leading-relaxed text-[var(--color-ink)]/65">
+        Create the first administrator account. Registration closes after this user exists.
+    </p>
+</div>
+
+<div class="fade-up-delay panel shadow-md">
+    <h2 class="mb-4 text-lg font-semibold text-[var(--color-ink)]">{{ 'register.heading'|trans({}, 'NowoAuthKitBundle') }}</h2>
+
+    {{ form_start(registration_form, {attr: {class: 'space-y-4'}}) }}
+        {% for field in registration_form %}
+            {{ form_row(field) }}
+        {% endfor %}
+        <button type="submit" class="btn-primary w-full">{{ 'register.submit'|trans({}, 'NowoAuthKitBundle') }}</button>
+    {{ form_end(registration_form) }}
+
+    <p class="mt-5 text-center text-sm text-[var(--color-ink)]/60">
+        <a href="{{ path(login_route, auth_kit_route_params()) }}" class="no-underline font-medium">{{ 'register.login_link'|trans({}, 'NowoAuthKitBundle') }}</a>
+    </p>
+</div>
+{% endblock %}

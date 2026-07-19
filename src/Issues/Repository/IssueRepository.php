@@ -48,7 +48,7 @@ class IssueRepository extends ServiceEntityRepository
         if (null !== $level && '' !== $level) {
             $qb->andWhere('i.level = :level')->setParameter('level', $level);
         }
-        if (null !== $status) {
+        if ($status instanceof IssueStatus) {
             $qb->andWhere('i.status = :status')->setParameter('status', $status);
         }
         if (null !== $environment && '' !== $environment) {

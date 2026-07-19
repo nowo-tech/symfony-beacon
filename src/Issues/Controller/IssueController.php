@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
+use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
@@ -27,7 +28,7 @@ final class IssueController extends AbstractController
     ) {
     }
 
-    #[Route('/projects/{id}/issues', name: 'issue_index', methods: ['GET'], requirements: ['id' => '\d+'])]
+    #[Route('/projects/{id}/issues', name: 'issue_index', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function index(Project $project, Request $request): Response
     {
         /** @var User $user */
@@ -59,13 +60,13 @@ final class IssueController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', methods: ['GET'], requirements: ['projectId' => '\d+', 'id' => '\d+'])]
+    #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['GET'])]
     public function show(int $projectId, Issue $issue): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $project = $issue->getProject();
-        if (null === $project || $project->getId() !== $projectId) {
+        if (!$project instanceof Project || $project->getId() !== $projectId) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($project, $user);
@@ -80,13 +81,13 @@ final class IssueController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/{projectId}/events/{eventId}', name: 'event_show', methods: ['GET'], requirements: ['projectId' => '\d+'])]
+    #[Route('/projects/{projectId}/events/{eventId}', name: 'event_show', requirements: ['projectId' => '\d+'], methods: ['GET'])]
     public function eventShow(int $projectId, string $eventId): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $event = $this->eventRepository->findOneByEventId($eventId);
-        if (null === $event || null === $event->getIssue()?->getProject() || $event->getIssue()->getProject()->getId() !== $projectId) {
+        if (!$event instanceof Event || !$event->getIssue()?->getProject() instanceof Project || $event->getIssue()->getProject()->getId() !== $projectId) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($event->getIssue()->getProject(), $user);

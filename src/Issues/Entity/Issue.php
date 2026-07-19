@@ -7,6 +7,7 @@ namespace App\Issues\Entity;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -46,10 +47,10 @@ class Issue
     private int $eventCount = 0;
 
     #[ORM\Column]
-    private \DateTimeImmutable $firstSeen;
+    private DateTimeImmutable $firstSeen;
 
     #[ORM\Column]
-    private \DateTimeImmutable $lastSeen;
+    private DateTimeImmutable $lastSeen;
 
     /** @var Collection<int, Event> */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true)]
@@ -57,7 +58,7 @@ class Issue
 
     public function __construct()
     {
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $this->firstSeen = $now;
         $this->lastSeen = $now;
         $this->events = new ArrayCollection();
@@ -152,24 +153,24 @@ class Issue
         return $this;
     }
 
-    public function getFirstSeen(): \DateTimeImmutable
+    public function getFirstSeen(): DateTimeImmutable
     {
         return $this->firstSeen;
     }
 
-    public function setFirstSeen(\DateTimeImmutable $firstSeen): self
+    public function setFirstSeen(DateTimeImmutable $firstSeen): self
     {
         $this->firstSeen = $firstSeen;
 
         return $this;
     }
 
-    public function getLastSeen(): \DateTimeImmutable
+    public function getLastSeen(): DateTimeImmutable
     {
         return $this->lastSeen;
     }
 
-    public function setLastSeen(\DateTimeImmutable $lastSeen): self
+    public function setLastSeen(DateTimeImmutable $lastSeen): self
     {
         $this->lastSeen = $lastSeen;
 

@@ -5,29 +5,34 @@ declare(strict_types=1);
 namespace App\Ingest\Controller;
 
 use App\Ingest\Message\ProcessEnvelopeMessage;
-use App\Ingest\Service\EnvelopeParser;
 use App\Ingest\Service\EnvelopeAuthParser;
+use App\Ingest\Service\EnvelopeParser;
+use App\Project\Entity\Project;
+use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 
 #[AsController]
-final class EnvelopeController
+final readonly class EnvelopeController
 {
     public function __construct(
-        private readonly EnvelopeAuthParser $authParser,
-        private readonly EnvelopeParser $envelopeParser,
-        private readonly ProjectRepository $projectRepository,
-        private readonly ProjectApiKeyRepository $apiKeyRepository,
-        private readonly MessageBusInterface $bus,
+        private EnvelopeAuthParser $authParser,
+        private EnvelopeParser $envelopeParser,
+        private ProjectRepository $projectRepository,
+        private ProjectApiKeyRepository $apiKeyRepository,
+        private MessageBusInterface $bus,
     ) {
     }
 
-    #[Route('/api/{projectId}/envelope/', name: 'ingest_envelope', methods: ['POST'], requirements: ['projectId' => '\d+'])]
+    #[Route('/api/{projectId}/envelope/', name: 'ingest_envelope', requirements: ['projectId' => '\d+'], methods: ['POST'])]
     public function __invoke(int $projectId, Request $request): Response
     {
         $body = $request->getContent();
@@ -44,7 +49,7 @@ final class EnvelopeController
                     $envelopeDsn = $header['dsn'];
                 }
             }
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Auth may still succeed via HTTP header.
         }
 
@@ -59,7 +64,7 @@ final class EnvelopeController
         }
 
         $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['sentry_key']);
-        if (null === $apiKey || null === $apiKey->getProject() || $apiKey->getProject()->getId() !== $projectId) {
+        if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
             return new Response('forbidden', Response::HTTP_FORBIDDEN);
         }
 
@@ -70,7 +75,7 @@ final class EnvelopeController
         // Validate parseability early (fail fast) without doing heavy work.
         try {
             $this->envelopeParser->parse($body);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return new Response('invalid envelope: '.$e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -81,7 +86,7 @@ final class EnvelopeController
         $this->bus->dispatch(new ProcessEnvelopeMessage(
             $projectId,
             $body,
-            (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ));
 
         return new Response('', Response::HTTP_OK);

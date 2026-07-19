@@ -6,6 +6,7 @@ namespace App\Analytics\Entity;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Project\Entity\Project;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DailyProjectStatRepository::class)]
@@ -23,7 +24,7 @@ class DailyProjectStat
     private ?Project $project = null;
 
     #[ORM\Column(type: 'date_immutable')]
-    private \DateTimeImmutable $statDate;
+    private DateTimeImmutable $statDate;
 
     #[ORM\Column]
     private int $errorCount = 0;
@@ -36,7 +37,7 @@ class DailyProjectStat
 
     public function __construct()
     {
-        $this->statDate = new \DateTimeImmutable('today');
+        $this->statDate = new DateTimeImmutable('today');
     }
 
     public function getId(): ?int
@@ -56,12 +57,12 @@ class DailyProjectStat
         return $this;
     }
 
-    public function getStatDate(): \DateTimeImmutable
+    public function getStatDate(): DateTimeImmutable
     {
         return $this->statDate;
     }
 
-    public function setStatDate(\DateTimeImmutable $statDate): self
+    public function setStatDate(DateTimeImmutable $statDate): self
     {
         $this->statDate = $statDate;
 

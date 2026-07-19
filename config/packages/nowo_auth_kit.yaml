@@ -1,0 +1,42 @@
+# nowo-tech/auth-kit-bundle — first-user bootstrap registration
+# https://github.com/nowo-tech/AuthKitBundle
+nowo_auth_kit:
+    default_profile: default
+    default_locale: en
+    enabled_locales: [en]
+    locale_in_path: false
+    profiles:
+        default:
+            user_class: App\Identity\Entity\User
+            user_identifier_field: email
+            registration_mode: first_user_only
+            registration_role: ROLE_ADMIN
+            login_success_route: dashboard_home
+            firewall: main
+            login_fields:
+                - identifier
+                - password
+            registration_fields:
+                - email
+                - displayName
+                - password
+            remember_me:
+                enabled: false
+            password_reset:
+                mode: disabled
+            embed:
+                mode: disabled
+            templates:
+                layout: '@NowoAuthKitBundle/layout.html.twig'
+                login: '@NowoAuthKitBundle/security/login.html.twig'
+                register: '@NowoAuthKitBundle/security/register.html.twig'
+            routes:
+                login:
+                    path: /login
+                    name: nowo_auth_kit_login
+                logout:
+                    path: /logout
+                    name: nowo_auth_kit_logout
+                register:
+                    path: /register
+                    name: nowo_auth_kit_register

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Entity;
 
 use App\Issues\Repository\EventRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -39,15 +40,15 @@ class Event
     private array $payload = [];
 
     #[ORM\Column]
-    private \DateTimeImmutable $eventTimestamp;
+    private DateTimeImmutable $eventTimestamp;
 
     #[ORM\Column]
-    private \DateTimeImmutable $receivedAt;
+    private DateTimeImmutable $receivedAt;
 
     public function __construct()
     {
-        $this->eventTimestamp = new \DateTimeImmutable();
-        $this->receivedAt = new \DateTimeImmutable();
+        $this->eventTimestamp = new DateTimeImmutable();
+        $this->receivedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -133,24 +134,24 @@ class Event
         return $this;
     }
 
-    public function getEventTimestamp(): \DateTimeImmutable
+    public function getEventTimestamp(): DateTimeImmutable
     {
         return $this->eventTimestamp;
     }
 
-    public function setEventTimestamp(\DateTimeImmutable $eventTimestamp): self
+    public function setEventTimestamp(DateTimeImmutable $eventTimestamp): self
     {
         $this->eventTimestamp = $eventTimestamp;
 
         return $this;
     }
 
-    public function getReceivedAt(): \DateTimeImmutable
+    public function getReceivedAt(): DateTimeImmutable
     {
         return $this->receivedAt;
     }
 
-    public function setReceivedAt(\DateTimeImmutable $receivedAt): self
+    public function setReceivedAt(DateTimeImmutable $receivedAt): self
     {
         $this->receivedAt = $receivedAt;
 

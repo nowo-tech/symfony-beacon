@@ -46,7 +46,7 @@ final class SeedDemoCommand extends Command
         $baseUrl = (string) $input->getOption('base-url');
 
         $user = $this->userRepository->findOneByEmail($email);
-        if (null === $user) {
+        if (!$user instanceof User) {
             $user = new User();
             $user->setEmail($email);
             $user->setDisplayName('Demo Admin');

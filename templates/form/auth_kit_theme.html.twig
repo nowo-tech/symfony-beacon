@@ -1,0 +1,63 @@
+{% use "form_div_layout.html.twig" %}
+
+{%- block form_row -%}
+    <div class="space-y-1.5">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock form_row -%}
+
+{%- block form_label -%}
+    {% if label is not same as(false) -%}
+        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' block text-sm font-medium text-[var(--color-ink)]/85')|trim}) %}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_label -%}
+
+{%- block form_widget_simple -%}
+    {% set type = type|default('text') %}
+    {% if type == 'hidden' %}
+        {{- parent() -}}
+    {% else %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+        {{- parent() -}}
+    {% endif %}
+{%- endblock form_widget_simple -%}
+
+{%- block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block checkbox_widget -%}
+    <label class="inline-flex items-center gap-2 text-sm text-[var(--color-ink)]/80">
+        {{- parent() -}}
+        {% if form.vars.label is not same as(false) %}
+            <span>{{ form.vars.label|trans({}, translation_domain) }}</span>
+        {% endif %}
+    </label>
+{%- endblock checkbox_widget -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="list-none space-y-1 text-sm text-[var(--color-alert)]">
+            {%- for error in errors -%}
+                <li>{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block repeated_row -%}
+    {#
+        Password confirmation: render each sub-field as its own row.
+    #}
+    {{- block('form_rows') -}}
+{%- endblock repeated_row -%}

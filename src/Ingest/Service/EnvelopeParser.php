@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ingest\Service;
 
+use InvalidArgumentException;
+
 /**
  * Parses Envelope wire format (newline-delimited JSON header + items).
  *
@@ -22,12 +24,12 @@ final class EnvelopeParser
         $body = str_replace("\r\n", "\n", $body);
         $lines = explode("\n", $body);
         if ('' === trim($lines[0] ?? '')) {
-            throw new \InvalidArgumentException('Empty envelope');
+            throw new InvalidArgumentException('Empty envelope');
         }
 
         $header = json_decode($lines[0], true, 512, \JSON_THROW_ON_ERROR);
         if (!\is_array($header)) {
-            throw new \InvalidArgumentException('Invalid envelope header');
+            throw new InvalidArgumentException('Invalid envelope header');
         }
 
         $items = [];
@@ -41,7 +43,7 @@ final class EnvelopeParser
 
             $itemHeader = json_decode($lines[$i], true, 512, \JSON_THROW_ON_ERROR);
             if (!\is_array($itemHeader)) {
-                throw new \InvalidArgumentException('Invalid item header');
+                throw new InvalidArgumentException('Invalid item header');
             }
             ++$i;
 

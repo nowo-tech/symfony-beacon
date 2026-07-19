@@ -7,6 +7,7 @@ namespace App\Project\Entity;
 use App\Identity\Entity\User;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectMembershipRepository::class)]
@@ -31,11 +32,11 @@ class ProjectMembership
     private ProjectRole $role = ProjectRole::Member;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -79,7 +80,7 @@ class ProjectMembership
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }

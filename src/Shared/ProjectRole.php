@@ -12,16 +12,16 @@ enum ProjectRole: string
 
     public function canManageMembers(): bool
     {
-        return $this === self::Owner || $this === self::Admin;
+        return self::Owner === $this || self::Admin === $this;
     }
 
     public function canManageApiKeys(): bool
     {
-        return $this === self::Owner || $this === self::Admin;
+        return self::Owner === $this || self::Admin === $this;
     }
 
     public function canMutateProject(): bool
     {
-        return $this === self::Owner || $this === self::Admin;
+        return self::Owner === $this || self::Admin === $this;
     }
 }

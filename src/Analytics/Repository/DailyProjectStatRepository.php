@@ -6,6 +6,7 @@ namespace App\Analytics\Repository;
 
 use App\Analytics\Entity\DailyProjectStat;
 use App\Project\Entity\Project;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,7 +20,7 @@ class DailyProjectStatRepository extends ServiceEntityRepository
         parent::__construct($registry, DailyProjectStat::class);
     }
 
-    public function findOrCreate(Project $project, \DateTimeImmutable $date): DailyProjectStat
+    public function findOrCreate(Project $project, DateTimeImmutable $date): DailyProjectStat
     {
         $day = $date->setTime(0, 0);
         $stat = $this->findOneBy(['project' => $project, 'statDate' => $day]);
@@ -40,7 +41,7 @@ class DailyProjectStatRepository extends ServiceEntityRepository
      */
     public function findLastDays(Project $project, int $days = 14): array
     {
-        $from = (new \DateTimeImmutable('today'))->modify(\sprintf('-%d days', $days - 1));
+        $from = new DateTimeImmutable('today')->modify(\sprintf('-%d days', $days - 1));
 
         /** @var list<DailyProjectStat> $result */
         $result = $this->createQueryBuilder('s')

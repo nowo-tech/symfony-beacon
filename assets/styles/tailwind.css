@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-ink: #0f1c18;
+  --color-paper: #f3f6f4;
+  --color-moss: #1f6f54;
+  --color-moss-deep: #134736;
+  --color-sand: #d8e2dc;
+  --color-mist: #e7f0eb;
+  --color-alert: #b42318;
+  --color-warn: #b54708;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-paper)] text-[var(--color-ink)] font-sans antialiased min-h-screen;
+  }
+
+  a {
+    @apply text-[var(--color-moss)] hover:text-[var(--color-moss-deep)];
+  }
+}

@@ -11,10 +11,10 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-final class ProjectAccessService
+final readonly class ProjectAccessService
 {
     public function __construct(
-        private readonly ProjectMembershipRepository $membershipRepository,
+        private ProjectMembershipRepository $membershipRepository,
     ) {
     }
 
@@ -26,7 +26,7 @@ final class ProjectAccessService
     public function requireMembership(Project $project, User $user): ProjectMembership
     {
         $membership = $this->getMembership($project, $user);
-        if (null === $membership) {
+        if (!$membership instanceof ProjectMembership) {
             throw new AccessDeniedHttpException('You do not have access to this project.');
         }
 

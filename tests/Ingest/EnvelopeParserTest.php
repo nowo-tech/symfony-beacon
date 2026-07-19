@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Ingest;
 
 use App\Ingest\Service\EnvelopeParser;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class EnvelopeParserTest extends TestCase
@@ -17,7 +18,7 @@ final class EnvelopeParserTest extends TestCase
             json_encode(['event_id' => 'abc', 'message' => 'boom', 'level' => 'error'], \JSON_THROW_ON_ERROR),
         ]);
 
-        $parsed = (new EnvelopeParser())->parse($body);
+        $parsed = new EnvelopeParser()->parse($body);
 
         self::assertSame('abc', $parsed['header']['event_id']);
         self::assertCount(1, $parsed['items']);
@@ -28,7 +29,7 @@ final class EnvelopeParserTest extends TestCase
 
     public function testRejectsEmptyEnvelope(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        (new EnvelopeParser())->parse("\n");
+        $this->expectException(InvalidArgumentException::class);
+        new EnvelopeParser()->parse("\n");
     }
 }
