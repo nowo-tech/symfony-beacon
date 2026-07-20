@@ -34,29 +34,29 @@ make sync-beacon   # or make up (syncs before starting)
 
 Override the Beacon checkout path with `BEACON_REPO=/path/to/symfony-beacon`.
 
-## PHP SDK
+## Preferred client (BeaconBundle)
 
-```php
-\Sentry\init([
-    'dsn' => 'https://PUBLIC@localhost:9444/1',
-    // For local self-signed TLS you may need transport options / HTTP instead of HTTPS.
-]);
+Install [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) and set `BEACON_DSN` to this server (any host/port):
+
+```env
+BEACON_DSN=https://PUBLIC@localhost:9444/1
 ```
 
-Ingest endpoint used by the SDK:
+The bundle authenticates by embedding the DSN in the envelope header and uses `Content-Type: application/x-beacon-envelope`.
+
+Ingest endpoint:
 
 ```http
 POST /api/{project_id}/envelope/
-X-Sentry-Auth: Sentry sentry_version=7, sentry_key=PUBLIC, sentry_client=…
-Content-Type: application/x-sentry-envelope
+Content-Type: application/x-beacon-envelope
 ```
 
 ## Auth
 
-Supported:
+Supported Envelope mechanisms (mapped to project API keys):
 
-- `X-Sentry-Auth` header (`sentry_key`, optional `sentry_secret`)
-- Query string `?sentry_key=…`
+- Envelope auth header with `public_key` / optional secret pairs (wire field names `sentry_key` / `sentry_secret` for protocol compatibility)
+- Query string `?sentry_key=…` (same wire field name)
 - Envelope header `"dsn": "https://…"`
 
 The public key must belong to the `{project_id}` in the URL.
@@ -83,17 +83,7 @@ sequenceDiagram
 
 The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMessage`, and returns `200` quickly. The Compose `messenger` service persists issues/events/transactions.
 
-## Symfony bundle
-
-Install [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) and set `BEACON_DSN` to this server (any host/port):
-
-```env
-BEACON_DSN=https://PUBLIC@localhost:9444/1
-```
-
-The bundle authenticates by embedding the DSN in the envelope header and uses `Content-Type: application/x-beacon-envelope`.
-
-Supported client capabilities (BeaconBundle):
+## Client capabilities (BeaconBundle)
 
 | Capability | Envelope | Beacon UI |
 |------------|----------|-----------|
@@ -104,4 +94,3 @@ Supported client capabilities (BeaconBundle):
 | Contexts (PHP / Symfony / OS) | payload `contexts` | Event detail |
 
 From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC@host.docker.internal:9081/1`.
-

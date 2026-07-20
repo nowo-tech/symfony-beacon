@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.7.2 to the next release](#upgrading-from-072-to-the-next-release)
+- [Upgrading from 0.8.0 to the next release](#upgrading-from-080-to-the-next-release)
+- [Upgrading from 0.7.2 to 0.8.0](#upgrading-from-072-to-080)
 - [Upgrading from 0.7.1 to 0.7.2](#upgrading-from-071-to-072)
 - [Upgrading from 0.7.0 to 0.7.1](#upgrading-from-070-to-071)
 - [Upgrading from 0.6.0 to 0.7.0](#upgrading-from-060-to-070)
@@ -17,7 +18,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.7.2 to the next release
+## Upgrading from 0.8.0 to the next release
 
 When a newer tag exists:
 
@@ -27,6 +28,38 @@ When a newer tag exists:
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
 5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
 6. Run quality checks: `make qa` (or at least `make test`).
+
+---
+
+## Upgrading from 0.7.2 to 0.8.0
+
+### 1. Pull
+
+```bash
+git fetch --tags
+git checkout v0.8.0
+make hooks   # once per clone: enable .githooks (optional but recommended)
+```
+
+No database migrations. No `.env` changes.
+
+### 2. Behaviour
+
+- Envelope **ingest auth is unchanged** for clients (same HTTP header / query / DSN mechanisms).
+- Internal parser keys are now `public_key` / `secret_key` (only relevant if you called `EnvelopeAuthParser` from custom code).
+- Docs point at BeaconBundle as the supported PHP client ([dsn.md](dsn.md)).
+
+### 3. Contributors
+
+Run `make hooks` so commits cannot pick up Cursor `Co-authored-by` trailers. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### 4. Verify
+
+```bash
+make test
+# or at least ingest tests
+docker compose exec php vendor/bin/phpunit tests/Ingest
+```
 
 ---
 

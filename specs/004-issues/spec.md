@@ -4,7 +4,7 @@
 **Created**: 2026-07-19  
 **Status**: Completed (as-built through v0.6.0)  
 
-**Input**: Group ingested events into issues, browse/filter them per project, and inspect event detail in a Sentry-like UI.
+**Input**: Group ingested events into issues, browse/filter them per project, and inspect event detail in a structured Beacon UI.
 
 ## Summary
 
@@ -37,7 +37,7 @@ As a project member, I can open `/projects/{id}/issues` (project home redirects 
 
 ### User Story 2 - Inspect issue and event detail (Priority: P1)
 
-As a developer, I open an issue and see a Sentry-style layout: hero, highlights, stack frames, breadcrumbs, request, tags, contexts, extra, raw JSON, plus aside (details, assignee, recent events).
+As a developer, I open an issue and see a structured layout: hero, highlights, stack frames, breadcrumbs, request, tags, contexts, extra, raw JSON, plus aside (details, assignee, recent events).
 
 **Independent Test**: Ingest an event with stack/source context; open issue and event pages; assert panels and stack rendering.
 
@@ -83,7 +83,7 @@ As ingest, similar events merge into one issue; resolved issues reopen on new ev
 - **FR-003**: Issues list MUST support filters and URL state: `q`, `level`, `status`, `environment`, `assignee`, `sort`, `dir`, `page`, `per_page`.
 - **FR-004**: List MUST use DataTables (responsive) via Stimulus `datatable` for client paging/sort UX while honouring server initial sort.
 - **FR-005**: Occurrence stats MUST expose total, last 24h, 7d, 30d, first_seen, last_seen.
-- **FR-006**: Issue detail MUST present Sentry-style panels including stack source context and Copy path.
+- **FR-006**: Issue detail MUST present structured panels including stack source context and Copy path.
 - **FR-007**: Panels MUST be collapsible with `localStorage` + optional account defaults (`IssuePanelIds`).
 - **FR-008**: Assignee MUST be an optional project member with list filter support.
 - **FR-009**: Status workflow MUST support unresolved / resolved / ignored (UI + reopen rule as above).

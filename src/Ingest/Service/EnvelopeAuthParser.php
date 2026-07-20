@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Ingest\Service;
 
 /**
- * Extracts sentry_key / project hints from Envelope auth mechanisms.
+ * Extracts public key / secret from Envelope auth mechanisms.
+ *
+ * Accepts historical Envelope wire field names in headers and query strings for client compatibility.
  */
 final class EnvelopeAuthParser
 {
     /**
-     * @return array{sentry_key: ?string, sentry_secret: ?string}
+     * @return array{public_key: ?string, secret_key: ?string}
      */
     public function parseFromRequest(?string $authHeader, string $queryString, ?string $envelopeDsn = null): array
     {
@@ -43,7 +45,7 @@ final class EnvelopeAuthParser
             }
         }
 
-        return ['sentry_key' => $key, 'sentry_secret' => $secret];
+        return ['public_key' => $key, 'secret_key' => $secret];
     }
 
     /**

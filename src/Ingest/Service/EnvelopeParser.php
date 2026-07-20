@@ -8,8 +8,6 @@ use InvalidArgumentException;
 
 /**
  * Parses Envelope wire format (newline-delimited JSON header + items).
- *
- * @see https://develop.sentry.dev/sdk/envelopes/
  */
 final class EnvelopeParser
 {

@@ -64,16 +64,16 @@ final readonly class EnvelopeController
             $envelopeDsn,
         );
 
-        if (null === $auth['sentry_key']) {
+        if (null === $auth['public_key']) {
             return new Response('missing authorization information', Response::HTTP_UNAUTHORIZED);
         }
 
-        $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['sentry_key']);
+        $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['public_key']);
         if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
             return new Response('forbidden', Response::HTTP_FORBIDDEN);
         }
 
-        if (null !== $auth['sentry_secret'] && null !== $apiKey->getSecretKey() && !hash_equals($apiKey->getSecretKey(), $auth['sentry_secret'])) {
+        if (null !== $auth['secret_key'] && null !== $apiKey->getSecretKey() && !hash_equals($apiKey->getSecretKey(), $auth['secret_key'])) {
             return new Response('forbidden', Response::HTTP_FORBIDDEN);
         }
 

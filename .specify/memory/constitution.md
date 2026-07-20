@@ -57,7 +57,7 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Entrypoint: `.docker/frankenphp/docker-entrypoint.sh` maps `FRANKENPHP_MODE` → `FRANKENPHP_CONFIG`.
 - Document root: `/app/public`.
 - Secrets: never in git. Version **only** `.env.dist`.
-- Ingest auth: Envelope-compatible (`X-Sentry-Auth` / query / envelope `dsn`) mapped to project API keys.
+- Ingest auth: Envelope-compatible (auth header / query / envelope `dsn`) mapped to project API keys.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository** (out of scope here); configure via `BEACON_DSN`.
 - Native mobile shells consume `/config/ios_v1.json` and `/config/android_v1.json` (Hotwire Native); see `docs/native-mobile.md`.

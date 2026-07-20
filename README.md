@@ -2,11 +2,11 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **Envelope wire protocol**, so you can point the official PHP SDK (`sentry/sentry` on Packagist) at this server via a project DSN — no SaaS account required.
+Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **Envelope wire protocol**, so clients send events to this server via a project DSN — no SaaS account required.
 
 Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
 
-> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Until Packagist publish, path-repo / VCS install works; you can also point `sentry/sentry` at the same DSN.
+> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Until Packagist publish, path-repo / VCS install works.
 
 
 ## Features
@@ -17,8 +17,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Project **Settings** with API keys, members, **notification destinations** (Slack / HTTP), and danger zone
 - Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive table (server-side sort + page in the URL)
-- Issue detail: Sentry-style layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts
-- `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
+- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts
+- `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily analytics (errors, transactions, N+1 counts)
 - Project notifications (Slack Incoming Webhook + generic HTTP JSON)

@@ -16,7 +16,7 @@ As an SDK / BeaconBundle client, I POST to `POST /api/{project_id}/envelope/` wi
 
 **Acceptance Scenarios**:
 
-1. **Given** a valid project API key via `X-Sentry-Auth`, query string, or envelope `dsn`, **When** I POST a well-formed envelope, **Then** the HTTP layer acknowledges success promptly.
+1. **Given** a valid project API key via Envelope auth header, query string, or envelope `dsn`, **When** I POST a well-formed envelope, **Then** the HTTP layer acknowledges success promptly.
 2. **Given** an invalid or missing key, **When** I POST, **Then** the request is rejected without processing.
 3. **Given** Docker local clients, **When** DSN points at host port **9081** / `host.docker.internal`, **Then** ingest is reachable (documented in README).
 

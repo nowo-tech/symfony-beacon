@@ -42,7 +42,7 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Choice | Rationale |
 |--------|-----------|
 | `POST /api/{project_id}/envelope/` | Envelope-compatible URL shape; SDKs and `nowo-tech/beacon-bundle` can point a DSN at any host/port. |
-| Auth via `X-Sentry-Auth` / query / envelope `dsn` | Wire compatibility with existing clients; mapped to project API keys. |
+| Auth via Envelope auth header / query / envelope `dsn` | Wire compatibility with Envelope clients; mapped to project API keys. |
 | Messenger (`ProcessEnvelopeMessage`) | Grouping, fingerprinting, N+1 detection, and daily stats are CPU/DB heavy — they must not block the ACK. |
 | Separate `messenger` Compose service | Ingest HTTP workers stay responsive while a dedicated consumer drains the queue. |
 
@@ -71,7 +71,7 @@ Identity in this repo owns **User** persistence and project membership; AuthKit 
 
 | Choice | Rationale |
 |--------|-----------|
-| Envelope protocol on the server | Operators can use `sentry/sentry` or other Envelope clients immediately. |
+| Envelope protocol on the server | Operators can point Envelope-compatible clients (especially `nowo-tech/beacon-bundle`) at this server immediately. |
 | `nowo-tech/beacon-bundle` in another repository | Client instrumentation (Monolog, exceptions, `send.*` flags, stack source context) evolves on the app side without coupling release cycles to the server. DSN = host/port/project against this server. |
 
 Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([event-context.md](event-context.md)).
@@ -175,8 +175,8 @@ sequenceDiagram
   participant Handler as ProcessEnvelopeHandler
 
   Client->>HTTP: POST /api/{project_id}/envelope/
-  HTTP->>Auth: parse X-Sentry-Auth / query / dsn
-  Auth-->>HTTP: sentry_key (+ optional secret)
+  HTTP->>Auth: parse Envelope auth header / query / dsn
+  Auth-->>HTTP: public_key (+ optional secret)
   HTTP->>Keys: findActiveByPublicKey
   alt missing or wrong project key
     HTTP-->>Client: 401 / 403
