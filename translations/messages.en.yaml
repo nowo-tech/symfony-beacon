@@ -137,6 +137,8 @@ issues:
     stacktrace: Stack Trace
     source_context: Source
     no_source_context: No source context for this frame.
+    copy_path: Copy path
+    path_copied: Copied
     breadcrumbs: Breadcrumbs
     raw_payload: Raw payload
     highlights: Highlights
@@ -158,6 +160,18 @@ issues:
         any_status: any status
         any_assignee: Any assignee
         environment: Environment
+    sort_by: Sort by %column%
+    dt:
+        empty: No issues to display
+        info: Showing _START_–_END_ of _TOTAL_
+        info_empty: Showing 0–0 of 0
+        info_filtered: (filtered from _MAX_ total)
+        length_menu: Show _MENU_
+        first: First
+        last: Last
+        next: Next
+        previous: Previous
+        zero: No matching issues
     col:
         issue: Issue
         level: Level

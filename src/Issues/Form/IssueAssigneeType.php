@@ -19,7 +19,7 @@ final class IssueAssigneeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('assignee', ProjectMemberAutocompleteField::class, [
-            'label' => 'issues.assignee',
+            'label' => false,
             'extra_options' => [
                 'project_id' => $options['project_id'],
             ],

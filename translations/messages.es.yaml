@@ -137,6 +137,8 @@ issues:
     stacktrace: Stack Trace
     source_context: Código fuente
     no_source_context: Sin código fuente para este frame.
+    copy_path: Copiar ruta
+    path_copied: Copiado
     breadcrumbs: Breadcrumbs
     raw_payload: Payload en bruto
     highlights: Highlights
@@ -158,6 +160,18 @@ issues:
         any_status: cualquier estado
         any_assignee: Cualquier asignado
         environment: Entorno
+    sort_by: Ordenar por %column%
+    dt:
+        empty: No hay incidencias
+        info: Mostrando _START_–_END_ de _TOTAL_
+        info_empty: Mostrando 0–0 de 0
+        info_filtered: (filtrado de _MAX_ en total)
+        length_menu: Mostrar _MENU_
+        first: Primera
+        last: Última
+        next: Siguiente
+        previous: Anterior
+        zero: Ninguna incidencia coincide
     col:
         issue: Incidencia
         level: Nivel

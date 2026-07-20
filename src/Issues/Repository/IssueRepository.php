@@ -6,9 +6,11 @@ namespace App\Issues\Repository;
 
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
+use App\Issues\IssueListSort;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,11 +39,13 @@ class IssueRepository extends ServiceEntityRepository
         ?string $environment = null,
         ?User $assignee = null,
         bool $unassignedOnly = false,
+        ?IssueListSort $sort = null,
     ): array {
+        $sort ??= new IssueListSort(IssueListSort::DEFAULT_FIELD, IssueListSort::DEFAULT_DIRECTION);
+
         $qb = $this->createQueryBuilder('i')
             ->andWhere('i.project = :project')
             ->setParameter('project', $project)
-            ->orderBy('i.lastSeen', 'DESC')
             ->setMaxResults(100);
 
         if (null !== $query && '' !== trim($query)) {
@@ -66,9 +70,36 @@ class IssueRepository extends ServiceEntityRepository
                 ->distinct();
         }
 
+        if ($sort->isSqlSortable()) {
+            $this->applySqlSort($qb, $sort);
+        } else {
+            // Occurrence windows are sorted in PHP after stats are loaded.
+            $qb->orderBy('i.lastSeen', 'DESC');
+        }
+
         /** @var list<Issue> $result */
         $result = $qb->getQuery()->getResult();
 
         return $result;
+    }
+
+    private function applySqlSort(QueryBuilder $qb, IssueListSort $sort): void
+    {
+        $dir = strtoupper($sort->direction);
+
+        match ($sort->field) {
+            'title' => $qb->orderBy('i.title', $dir)->addOrderBy('i.id', 'DESC'),
+            'level' => $qb->orderBy('i.level', $dir)->addOrderBy('i.lastSeen', 'DESC'),
+            'events' => $qb->orderBy('i.eventCount', $dir)->addOrderBy('i.lastSeen', 'DESC'),
+            'first_seen' => $qb->orderBy('i.firstSeen', $dir)->addOrderBy('i.id', 'DESC'),
+            'last_seen' => $qb->orderBy('i.lastSeen', $dir)->addOrderBy('i.id', 'DESC'),
+            'assignee' => $qb
+                ->leftJoin('i.assignee', 'assignee_user')
+                ->addSelect('assignee_user')
+                ->orderBy('assignee_user.displayName', $dir)
+                ->addOrderBy('assignee_user.email', $dir)
+                ->addOrderBy('i.lastSeen', 'DESC'),
+            default => $qb->orderBy('i.lastSeen', 'DESC'),
+        };
     }
 }

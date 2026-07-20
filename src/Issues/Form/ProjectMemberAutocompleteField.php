@@ -30,6 +30,7 @@ final class ProjectMemberAutocompleteField extends AbstractType
             'placeholder' => 'issues.assignee_unassigned',
             'translation_domain' => 'messages',
             'required' => false,
+            'label' => false,
             'choice_label' => static function (User $user): string {
                 $name = trim($user->getDisplayName());
 
@@ -42,6 +43,8 @@ final class ProjectMemberAutocompleteField extends AbstractType
                 'plugins' => ['clear_button'],
                 'maxOptions' => 20,
                 'dropdownParent' => 'body',
+                'openOnFocus' => true,
+                'highlight' => true,
             ],
             'filter_query' => static function (Options $options): \Closure {
                 $extra = $options['extra_options'];

@@ -94,14 +94,34 @@
                 {% for frame in frames|reverse %}
                     {% set inApp = frame.in_app|default(false) %}
                     {% set hasSource = frame.context_line is defined and frame.context_line is not same as(null) and frame.context_line is not same as('') %}
+                    {% set fileLabel = frame.filename|default(frame.abs_path|default('?')) %}
+                    {% set filePath = frame.abs_path|default(frame.filename|default('')) %}
+                    {% set fileCopy = filePath ~ (frame.lineno is defined and frame.lineno ? ':' ~ frame.lineno : '') %}
                     <li class="issue-stack__frame{% if inApp %} issue-stack__frame--app{% endif %}">
                         <details class="issue-stack__details"{% if loop.first %} open{% endif %}>
                             <summary class="issue-stack__summary">
                                 <span class="issue-stack__chevron" aria-hidden="true"></span>
                                 <span class="issue-stack__summary-body">
                                     <span class="issue-stack__meta">
-                                        <span class="issue-stack__file font-mono">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
+                                        <span class="issue-stack__file font-mono" title="{{ filePath }}">{{ fileLabel }}</span>
                                         <span class="issue-stack__line font-mono">:{{ frame.lineno|default('?') }}</span>
+                                        {% if filePath %}
+                                            <span
+                                                class="issue-stack__copy"
+                                                data-controller="clipboard-copy"
+                                                data-clipboard-copy-text-value="{{ fileCopy|e('html_attr') }}"
+                                                data-clipboard-copy-label-value="{{ 'issues.copy_path'|trans|e('html_attr') }}"
+                                                data-clipboard-copy-done-label-value="{{ 'issues.path_copied'|trans|e('html_attr') }}"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    class="issue-stack__copy-btn"
+                                                    data-action="click->clipboard-copy#copy"
+                                                    aria-label="{{ 'issues.copy_path'|trans }}"
+                                                    title="{{ 'issues.copy_path'|trans }} — {{ fileCopy }}"
+                                                >{{ 'issues.copy_path'|trans }}</button>
+                                            </span>
+                                        {% endif %}
                                         {% if inApp %}
                                             <span class="issue-badge issue-badge--app">{{ 'issues.in_app'|trans }}</span>
                                         {% endif %}

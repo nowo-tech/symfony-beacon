@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
+use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Form\IssueAssigneeType;
+use App\Issues\IssueListSort;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
@@ -58,6 +60,17 @@ final class IssueController extends AbstractController
             }
         }
 
+        $sort = IssueListSort::fromQuery(
+            $request->query->getString('sort') ?: null,
+            $request->query->getString('dir') ?: null,
+        );
+
+        $perPage = $request->query->getInt('per_page', 25);
+        if (!\in_array($perPage, [10, 25, 50, 100], true)) {
+            $perPage = 25;
+        }
+        $page = max(1, $request->query->getInt('page', 1));
+
         $issues = $this->issueRepository->search(
             $project,
             $request->query->getString('q') ?: null,
@@ -66,22 +79,66 @@ final class IssueController extends AbstractController
             $request->query->getString('environment') ?: null,
             $assignee,
             $unassignedOnly,
+            $sort,
         );
         $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($issues);
+        if ($sort->isOccurrenceSortable()) {
+            $issues = $this->sortIssuesByOccurrence($issues, $occurrenceByIssue, $sort);
+        }
 
         return $this->render('issue/index.html.twig', [
             'project' => $project,
             'issues' => $issues,
             'occurrenceByIssue' => $occurrenceByIssue,
             'members' => $members,
+            'sort' => $sort,
             'filters' => [
                 'q' => $request->query->getString('q'),
                 'level' => $request->query->getString('level'),
                 'status' => $status->value,
                 'environment' => $request->query->getString('environment'),
                 'assignee' => $assigneeFilter,
+                'sort' => $sort->field,
+                'dir' => $sort->direction,
+                'page' => $page,
+                'per_page' => $perPage,
             ],
         ]);
+    }
+
+    /**
+     * @param list<Issue>                      $issues
+     * @param array<int, IssueOccurrenceStats> $occurrenceByIssue
+     *
+     * @return list<Issue>
+     */
+    private function sortIssuesByOccurrence(array $issues, array $occurrenceByIssue, IssueListSort $sort): array
+    {
+        usort($issues, static function (Issue $a, Issue $b) use ($occurrenceByIssue, $sort): int {
+            $statsA = $occurrenceByIssue[$a->getId() ?? 0] ?? null;
+            $statsB = $occurrenceByIssue[$b->getId() ?? 0] ?? null;
+            $valueA = match ($sort->field) {
+                'events_24h' => $statsA instanceof IssueOccurrenceStats ? $statsA->last24h : 0,
+                'events_7d' => $statsA instanceof IssueOccurrenceStats ? $statsA->last7d : 0,
+                'events_30d' => $statsA instanceof IssueOccurrenceStats ? $statsA->last30d : 0,
+                default => 0,
+            };
+            $valueB = match ($sort->field) {
+                'events_24h' => $statsB instanceof IssueOccurrenceStats ? $statsB->last24h : 0,
+                'events_7d' => $statsB instanceof IssueOccurrenceStats ? $statsB->last7d : 0,
+                'events_30d' => $statsB instanceof IssueOccurrenceStats ? $statsB->last30d : 0,
+                default => 0,
+            };
+
+            $cmp = $valueA <=> $valueB;
+            if (0 === $cmp) {
+                $cmp = $b->getLastSeen() <=> $a->getLastSeen();
+            }
+
+            return 'asc' === $sort->direction ? $cmp : -$cmp;
+        });
+
+        return $issues;
     }
 
     #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['GET'])]

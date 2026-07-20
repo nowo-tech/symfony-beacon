@@ -80,10 +80,11 @@
 
         {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'assignee', title: 'issues.assignee'|trans } %}
             {% block body %}
-                <p class="mb-3 text-xs text-[var(--color-ink)]/55">{{ 'issues.assignee_help'|trans }}</p>
-                {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form space-y-3'}}) }}
-                    {{ form_row(assigneeForm.assignee, {row_attr: {class: 'space-y-1'}}) }}
-                    <button class="btn-primary w-full" type="submit">{{ 'issues.assignee_save'|trans }}</button>
+                <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
+                {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
+                    {{ form_widget(assigneeForm.assignee) }}
+                    {{ form_errors(assigneeForm.assignee) }}
+                    <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
                 {{ form_end(assigneeForm) }}
             {% endblock %}
         {% endembed %}

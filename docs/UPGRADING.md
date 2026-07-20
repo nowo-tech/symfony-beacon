@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.5.0 to the next release](#upgrading-from-050-to-the-next-release)
+- [Upgrading from 0.6.0 to the next release](#upgrading-from-060-to-the-next-release)
+- [Upgrading from 0.5.0 to 0.6.0](#upgrading-from-050-to-060)
 - [Upgrading from 0.4.0 to 0.5.0](#upgrading-from-040-to-050)
 - [Upgrading from 0.3.0 to 0.4.0](#upgrading-from-030-to-040)
 - [Upgrading from 0.2.0 to 0.3.0](#upgrading-from-020-to-030)
@@ -13,9 +14,9 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.5.0 to the next release
+## Upgrading from 0.6.0 to the next release
 
-No further release yet. When upgrading past `v0.5.0`:
+No further release yet. When upgrading past `v0.6.0`:
 
 1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
 2. Diff env templates: compare your local `.env` against the new `.env.dist` and add any missing keys.
@@ -24,7 +25,7 @@ No further release yet. When upgrading past `v0.5.0`:
 5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build` (or your image build step).
 6. Run quality checks: `make qa` (or at least `make test`).
 
-### Stack versions (0.5.0)
+### Stack versions (0.6.0)
 
 | Component | Constraint / image | Notes |
 |---|---|---|
@@ -35,7 +36,49 @@ No further release yet. When upgrading past `v0.5.0`:
 | Cookies / legal | `nowo-tech/cookie-consent-bundle` | Consent modal + legal pages |
 | Menus / breadcrumbs / forms / PWA | Nowo kit bundles | See README Features |
 | Autocomplete | `symfony/ux-autocomplete` | Issue assignee field |
+| Issues table | DataTables 2 + Responsive (+ jQuery) | Via Vite (`pnpm`) |
 | Vite / Tailwind / SCSS | Tailwind 4, Sass, Stimulus | Assets via HTTPS `/build` proxy |
+
+---
+
+## Upgrading from 0.5.0 to 0.6.0
+
+### 1. Pull and refresh
+
+```bash
+git fetch --tags
+git checkout v0.6.0   # or merge/rebase main
+make down && make up
+docker compose exec php composer install
+docker compose exec vite pnpm install   # pulls DataTables / jQuery
+make vite-build
+```
+
+No new Doctrine migrations in 0.6.0.
+
+### 2. Frontend (required)
+
+`pnpm install` + `make vite-build` are required: the issues index now depends on DataTables assets baked into `public/build/`.
+
+### 3. URL / bookmark notes
+
+Issues list query params:
+
+| Param | Role |
+|---|---|
+| `q`, `level`, `status`, `assignee`, `environment` | Server-side filters (GET form) |
+| `sort`, `dir` | Initial sort (server) + kept in sync by DataTables |
+| `page`, `per_page` | DataTables paging (`per_page` ∈ 10/25/50/100) |
+
+Example: `/projects/1/issues?q=demo&sort=last_seen&dir=desc&page=1&per_page=25`
+
+### 4. Verify
+
+```bash
+make test
+# /projects/{id}/issues → paging, responsive collapse, sort updates the URL
+# Issue detail → Stack Trace → Copy path
+```
 
 ---
 
