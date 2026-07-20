@@ -16,7 +16,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Project **Settings** with API keys, members, **notification destinations** (Slack / HTTP), and danger zone
-- Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive/paginated table (sort + page in the URL)
+- Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive table (server-side sort + page in the URL)
 - Issue detail: Sentry-style layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
@@ -46,11 +46,10 @@ git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
 cp .env.dist .env
 make up          # starts stack + builds frontend into public/build/
-make console ARGS='doctrine:migrations:migrate -n'
+make bootstrap   # migrate + seed demo user/project + write .demo-client.env
 # Optional live CSS/JS reload: make vite-hmr  (stop it + make vite-build when done)
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
-# Option B — seed demo user + project + DSN + N+1 performance samples:
-make seed
+# Option B — seed only (if migrate already done): make seed
 ```
 
 - HTTP: http://localhost:9081  
@@ -64,13 +63,14 @@ make seed
 
 > After the first user exists, `/en/register` redirects to `/en/login`. Auth routes use `/{_locale}` (`en` default). Bare `/`, `/login`, `/register`, and `/logout` redirect to the English AuthKit paths. After sign-in, the app home is **`/dashboard`**.
 
-Seed prints a DSN like:
+Seed prints DSNs and writes `.demo-client.env` for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
 
 ```text
-https://<public_key>@localhost:9444/<project_id>
+UI DSN: https://<public_key>@localhost:9444/<project_id>
+Client DSN (Docker): http://<public_key>@host.docker.internal:9081/<project_id>
 ```
 
-Use that DSN with the PHP SDK package `sentry/sentry` (host/port must match how the SDK reaches this server).
+In `BeaconBundle/demo/symfony8`, `make up` / `make sync-beacon` copies that Client DSN into `BEACON_DSN` so `/exception` can ingest directly.
 
 ## FrankenPHP worker
 

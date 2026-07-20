@@ -20,7 +20,19 @@ Docker clients (BeaconBundle FrankenPHP demo) should prefer **HTTP ingest** on p
 http://PUBLIC_KEY@host.docker.internal:9081/1
 ```
 
-Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo`.
+Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo` / `make seed`.
+
+### Local demo sync (BeaconBundle)
+
+`make seed` / `make bootstrap` writes `.demo-client.env` with a Docker-ready `BEACON_DSN` (`http://…@host.docker.internal:9081/{id}`).
+
+In the sibling repo `BeaconBundle/demo/symfony8`:
+
+```bash
+make sync-beacon   # or make up (syncs before starting)
+```
+
+Override the Beacon checkout path with `BEACON_REPO=/path/to/symfony-beacon`.
 
 ## PHP SDK
 

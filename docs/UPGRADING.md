@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.6.0 to the next release](#upgrading-from-060-to-the-next-release)
+- [Upgrading from 0.7.0 to the next release](#upgrading-from-070-to-the-next-release)
+- [Upgrading from 0.6.0 to 0.7.0](#upgrading-from-060-to-070)
 - [Upgrading from 0.5.0 to 0.6.0](#upgrading-from-050-to-060)
 - [Upgrading from 0.4.0 to 0.5.0](#upgrading-from-040-to-050)
 - [Upgrading from 0.3.0 to 0.4.0](#upgrading-from-030-to-040)
@@ -14,21 +15,79 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.6.0 to the next release
+## Upgrading from 0.7.0 to the next release
 
-When upgrading past `v0.6.0` (includes project notifications work-in-progress on main):
+When a newer tag exists:
 
 1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
-2. Diff env templates: compare your local `.env` against the new `.env.dist` and add any missing keys.
-3. Rebuild containers after Docker/FrankenPHP/Node changes: `make down && make build && make up`.
-4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'` (adds `notification_destination`).
-5. Add ops env keys from `.env.dist` if missing: `BEACON_RETENTION_DAYS`, `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT`, `BEACON_INGEST_RATE_LIMIT`.
-6. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build` (or your image build step).
-7. Run quality checks: `make qa` (or at least `make test`).
-8. Configure Slack/HTTP destinations under **Project → Settings → Notifications** (see [notifications.md](notifications.md)).
-9. Optional cron: `app:retention:purge`; probes: `/health/live`, `/health/ready` (see [production.md](production.md)).
+2. Diff your `.env` against `.env.dist`.
+3. Rebuild containers if Docker/FrankenPHP/Node changed: `make down && make build && make up`.
+4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
+5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
+6. Run quality checks: `make qa` (or at least `make test`).
 
-### Stack versions (0.6.0)
+---
+
+## Upgrading from 0.6.0 to 0.7.0
+
+### 1. Pull and refresh
+
+```bash
+git fetch --tags
+git checkout v0.7.0   # or merge/rebase main
+make down && make up
+docker compose exec php composer install
+docker compose exec vite pnpm install
+make vite-build
+```
+
+### 2. Environment
+
+Diff `.env` against `.env.dist` and add if missing:
+
+| Key | Role |
+|---|---|
+| `BEACON_RETENTION_DAYS` | Retention purge age (`0` = off) |
+| `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT` | Cap events per project (`0` = off) |
+| `BEACON_INGEST_RATE_LIMIT` | Per-project ingest rate (HTTP 429 when exceeded) |
+
+### 3. Database
+
+```bash
+make console ARGS='doctrine:migrations:migrate -n'
+```
+
+Adds `notification_destination` (and related schema from `Version20260720233000`).
+
+### 4. Issues list behaviour
+
+Sort and paging are **server-side** again (column header links + `per_page` in the filter form). DataTables only collapses columns on narrow viewports. Existing bookmarks with `sort` / `dir` / `page` / `per_page` keep working.
+
+### 5. Ops / product features
+
+- Project → Settings → **Notifications** (Slack / HTTP): [notifications.md](notifications.md)
+- Optional cron: `app:retention:purge`
+- Probes: `/health/live`, `/health/ready` — [production.md](production.md)
+- Login throttling defaults: see `config/packages/nowo_login_throttle.yaml`
+
+### 6. Local BeaconBundle demo (optional)
+
+```bash
+make bootstrap   # migrate + seed + write .demo-client.env
+```
+
+Then in `BeaconBundle/demo/symfony8`: `make sync-beacon` (see [dsn.md](dsn.md)).
+
+### 7. Verify
+
+```bash
+make qa
+# or
+make test
+curl -fsS http://localhost:9081/health/live
+```
+
+### Stack versions (0.7.0)
 
 | Component | Constraint / image | Notes |
 |---|---|---|
@@ -36,10 +95,11 @@ When upgrading past `v0.6.0` (includes project notifications work-in-progress on
 | Symfony | `8.1.*` (Flex) / exact pins in `composer.json` | Application framework |
 | MySQL | Compose service (see `compose.yaml`) | Default host port `3308` |
 | Auth | `nowo-tech/auth-kit-bundle` | First-user registration + i18n |
+| Login throttle | `nowo-tech/login-throttle-bundle` | Brute-force protection |
 | Cookies / legal | `nowo-tech/cookie-consent-bundle` | Consent modal + legal pages |
 | Menus / breadcrumbs / forms / PWA | Nowo kit bundles | See README Features |
 | Autocomplete | `symfony/ux-autocomplete` | Issue assignee field |
-| Issues table | DataTables 2 + Responsive (+ jQuery) | Via Vite (`pnpm`) |
+| Issues table | DataTables 2 + Responsive (+ jQuery) | Responsive only; sort/page server-side |
 | Vite / Tailwind / SCSS | Tailwind 4, Sass, Stimulus | Assets via HTTPS `/build` proxy |
 
 ---

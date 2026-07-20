@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-20
+
 ### Added
 
 - Project **notifications**: Slack Incoming Webhook and generic HTTP JSON destinations (Settings UI), async delivery via Messenger (`specs/009-project-notifications`)
@@ -14,13 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Ingest rate limit** per project (`BEACON_INGEST_RATE_LIMIT`, HTTP 429)
 - Public **health probes** `GET /health/live` and `GET /health/ready` (DB + Messenger queue depth)
 - Login throttling via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle)
-- Docs: [product roadmap](ROADMAP.md), [notifications](notifications.md); expanded [production](production.md)
+- Docs: [product roadmap](ROADMAP.md), [notifications](notifications.md), [architecture](architecture.md); expanded [production](production.md)
+- Demo bootstrap: `make bootstrap` (migrate + seed); `app:seed-demo` writes `.demo-client.env` for BeaconBundle `make sync-beacon`
 
 ### Changed
 
-- Issues list: responsive table layout (column priorities, wrap titles/culprits, filter grid on small screens; DataTables collapses secondary columns)
-- Issues list: sync sort/paging via Turbo history (avoid bare `history.replaceState` wiping Drive state so issue detail links navigate correctly)
+- Issues list: **server-side** sort and paging (column header links + `per_page`); DataTables only handles responsive column collapse
+- Issues list: responsive filter grid and wrap-friendly title/culprit cells
 - Issue ingest reopens **ignored** issues to unresolved on a matching event (same as resolved), so regression alerts match the notifications spec
+
+### Fixed
+
+- Issues list → issue detail navigation under Turbo Drive (DataTables no longer rewrites `history` / client-side paging that blocked page swaps)
 
 ## [0.6.0] - 2026-07-20
 
@@ -137,7 +144,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.3.0...v0.4.0

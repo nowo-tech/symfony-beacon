@@ -1,4 +1,4 @@
-.PHONY: help up down build build-prod logs shell console seed classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
+.PHONY: help up down build build-prod logs shell console seed bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa
 
 help:
@@ -20,7 +20,8 @@ help:
 	@echo "  make mysql           mysql CLI shell"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
-	@echo "  make seed            Seed demo user + project + DSN (app:seed-demo)"
+	@echo "  make seed            Seed demo user + project + write .demo-client.env"
+	@echo "  make bootstrap       Migrate DB + seed (after make up)"
 	@echo "  make restart         Restart php + messenger"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
@@ -91,6 +92,11 @@ console:
 
 seed:
 	docker compose exec -T php bin/console app:seed-demo
+	@echo "Client env: .demo-client.env — in BeaconBundle/demo/symfony8 run: make sync-beacon"
+
+bootstrap:
+	docker compose exec -T php bin/console doctrine:migrations:migrate -n
+	@$(MAKE) seed
 
 restart:
 	docker compose restart php messenger
