@@ -1,13 +1,14 @@
 # nowo-tech/twig-inspector-bundle — see https://github.com/nowo-tech/TwigInspectorBundle
-# Works with defaults; customize as needed.
+# Dev-only (require-dev); must not load when composer install --no-dev (prod image).
 
-nowo_twig_inspector:
-    enabled_extensions:
-        - '.html.twig'
-    # excluded_templates:
-    #     - 'admin/*'
-    # excluded_blocks:
-    #     - 'javascript'
-    enable_metrics: true
-    inject_on_sub_requests: false
-    cookie_name: 'twig_inspector_is_active'
+when@dev:
+    nowo_twig_inspector:
+        enabled_extensions:
+            - '.html.twig'
+        # excluded_templates:
+        #     - 'admin/*'
+        # excluded_blocks:
+        #     - 'javascript'
+        enable_metrics: true
+        inject_on_sub_requests: false
+        cookie_name: 'twig_inspector_is_active'
