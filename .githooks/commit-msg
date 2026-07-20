@@ -1,17 +1,16 @@
-#!/usr/bin/env bash
-# Strip Cursor Agent attribution trailers from commit messages (prepare-commit-msg).
+#!/usr/bin/env sh
+# Strip Cursor agent attribution trailers from the final commit message.
 # Enable: make setup-hooks  (sets core.hooksPath=.githooks)
-set -euo pipefail
+set -eu
 
-msg_file="${1:-}"
-[[ -n "$msg_file" && -f "$msg_file" ]] || exit 0
-
+MSG_FILE="${1:?commit message file required}"
 tmp="$(mktemp)"
+
 sed -E \
   -e '/^Co-authored-by:[[:space:]]*.*[Cc]ursor/Id' \
   -e '/^Co-authored-by:[[:space:]]*.*@cursor\.(com|so)/Id' \
   -e '/^Made-with:[[:space:]]*[Cc]ursor/Id' \
-  "$msg_file" > "$tmp"
-mv "$tmp" "$msg_file"
+  "$MSG_FILE" > "$tmp"
 
+mv "$tmp" "$MSG_FILE"
 exit 0

@@ -11,6 +11,30 @@
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
 10. Public-facing UI must include legal pages and cookie consent (`docs/legal-and-cookies.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
 
+## Git hygiene
+
+Run once per clone:
+
+```bash
+make setup-hooks
+```
+
+This points `core.hooksPath` at `.githooks/`, which strips Cursor `Co-authored-by` / `Made-with` trailers from commit messages.
+
+Before push / release:
+
+```bash
+make check-no-cursor-coauthor
+```
+
+If history already contains forbidden trailers:
+
+```bash
+make strip-cursor-coauthor-from-history
+# then: git push --force-with-lease origin main
+# recreate/force-push affected tags if needed
+```
+
 The client Symfony bundle is **out of scope** for this repository.
 
 ## Internationalization

@@ -1,5 +1,6 @@
 .PHONY: help up down build build-prod logs shell console seed bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa \
+	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
@@ -35,6 +36,24 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
+	@echo ""
+	@echo "Git hygiene:"
+	@echo "  make setup-hooks                    Install .githooks (strips Cursor co-authors)"
+	@echo "  make check-no-cursor-coauthor       Fail if Cursor trailers exist in history"
+	@echo "  make strip-cursor-coauthor-from-history  Rewrite local history to remove them"
+
+setup-hooks:
+	@chmod +x .githooks/commit-msg .githooks/prepare-commit-msg .scripts/check-no-cursor-coauthor.sh .scripts/strip-cursor-coauthor-from-history.sh
+	@git config core.hooksPath .githooks
+	@echo "✅ Git hooks installed (.githooks — strips Cursor Co-authored-by / Made-with trailers)."
+
+check-no-cursor-coauthor:
+	@chmod +x .scripts/check-no-cursor-coauthor.sh
+	@./.scripts/check-no-cursor-coauthor.sh HEAD
+
+strip-cursor-coauthor-from-history:
+	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
+	@./.scripts/strip-cursor-coauthor-from-history.sh main
 
 up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
