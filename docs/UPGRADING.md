@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.7.1 to the next release](#upgrading-from-071-to-the-next-release)
+- [Upgrading from 0.7.2 to the next release](#upgrading-from-072-to-the-next-release)
+- [Upgrading from 0.7.1 to 0.7.2](#upgrading-from-071-to-072)
 - [Upgrading from 0.7.0 to 0.7.1](#upgrading-from-070-to-071)
 - [Upgrading from 0.6.0 to 0.7.0](#upgrading-from-060-to-070)
 - [Upgrading from 0.5.0 to 0.6.0](#upgrading-from-050-to-060)
@@ -16,7 +17,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.7.1 to the next release
+## Upgrading from 0.7.2 to the next release
 
 When a newer tag exists:
 
@@ -26,6 +27,20 @@ When a newer tag exists:
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
 5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
 6. Run quality checks: `make qa` (or at least `make test`).
+
+---
+
+## Upgrading from 0.7.1 to 0.7.2
+
+Code style only (PHP-CS-Fixer). **No schema, env, Composer, or behaviour changes.**
+
+```bash
+git fetch --tags
+git checkout v0.7.2
+# or pull main and deploy as usual
+```
+
+No migrations required.
 
 ---
 
