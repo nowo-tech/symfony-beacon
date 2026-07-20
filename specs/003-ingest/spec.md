@@ -32,7 +32,7 @@ As the server, heavy work runs on Messenger (`ProcessEnvelopeMessage` / handler)
 
 ### User Story 3 - Promoted event fields (Priority: P2)
 
-As ingest, I store full `payload` and promote common columns (see `010-rich-event-context` / `docs/event-context.md`).
+As ingest, I store full `payload` and promote common columns (see `010-rich-event-context` / `docs/EVENT-CONTEXT.md`).
 
 **Acceptance Scenarios**:
 

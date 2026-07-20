@@ -29,6 +29,8 @@
   --beacon-warn: #b54708;
   --beacon-surface: #ffffff;
   --beacon-surface-muted: #f7faf8;
+  /* Beacon mark green from brand logos (distinct from button moss). */
+  --beacon-mark: #4aad7f;
   --beacon-shell-a: #eef3f0;
   --beacon-shell-b: #e8efe9;
   --beacon-flash-error-bg: #fef2f2;
@@ -66,6 +68,7 @@
   --beacon-warn: #fdb022;
   --beacon-surface: #151c19;
   --beacon-surface-muted: #1a2320;
+  --beacon-mark: #4aad7f;
   --beacon-shell-a: #101714;
   --beacon-shell-b: #0e1512;
   --beacon-flash-error-bg: color-mix(in srgb, var(--beacon-alert) 18%, var(--beacon-surface));

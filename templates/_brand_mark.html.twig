@@ -1,0 +1,22 @@
+{#
+  Brand lockup: beacon icon + configurable name (Appearance settings).
+  Options:
+    - tag: HTML tag (a|h1|span), default a
+    - href: link target when tag is a
+    - size: sm|md|lg|xl (default md)
+    - class: extra classes
+#}
+{% set tag = tag|default('a') %}
+{% set size = size|default('md') %}
+{% set brand_classes = 'brand-mark brand-mark--' ~ size ~ (class is defined and class ? ' ' ~ class : '') %}
+{% if tag == 'a' %}
+    <a href="{{ href|default(path('dashboard_home')) }}" class="{{ brand_classes }}">
+        <span class="brand-mark__icon">{% include '_brand_icon.html.twig' %}</span>
+        <span class="brand-mark__name">{{ site_appearance.brandName }}</span>
+    </a>
+{% else %}
+    <{{ tag }} class="{{ brand_classes }}">
+        <span class="brand-mark__icon">{% include '_brand_icon.html.twig' %}</span>
+        <span class="brand-mark__name">{{ site_appearance.brandName }}</span>
+    </{{ tag }}>
+{% endif %}

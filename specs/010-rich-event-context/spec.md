@@ -20,7 +20,7 @@
 ### As-built notes
 
 - **Server vs client**: Beacon (this repo) owns ingest promotion + UI. Configurable `nowo_beacon.send.*` and frame source context generation live in **BeaconBundle** (separate repository). Acceptance for US2 is verified against the bundle release notes / CONFIGURATION.md, not only this codebase.
-- **Stack source context**: When frames include `pre_context` / `context_line` / `post_context`, Issues/Event UI renders them (see `docs/event-context.md`).
+- **Stack source context**: When frames include `pre_context` / `context_line` / `post_context`, Issues/Event UI renders them (see `docs/EVENT-CONTEXT.md`).
 - **Promoted columns**: `environment`, `release_version`, `platform`, `php_version`, `symfony_version`, `user_identifier`, `event_timestamp`, `received_at`.
 
 ## User Scenarios & Testing *(mandatory)*

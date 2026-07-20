@@ -3,13 +3,13 @@
 1. Follow Spec-Driven Development (see `.specify/memory/constitution.md`).
 2. Open or update a feature under `specs/NNN-name/` before large changes.
 3. Prefer official [`nowo-tech/*`](https://packagist.org/packages/nowo-tech/) kits (AuthKit, UserKit, AuditKit, cookie consent, …) over reinventing auth/user/legal UX — see `.cursor/rules/nowo-tech-kits-and-legal.mdc`.
-4. Keep application code FrankenPHP **worker-safe** (`docs/frankenphp-coding.md`).
-5. Read [docs/architecture.md](architecture.md) before proposing structural changes (modular Symfony vs DDD, ingest vs UI boundaries).
+4. Keep application code FrankenPHP **worker-safe** (`docs/FRANKENPHP-CODING.md`).
+5. Read [docs/ARCHITECTURE.md](ARCHITECTURE.md) before proposing structural changes (modular Symfony vs DDD, ingest vs UI boundaries).
 6. Add PHPUnit coverage for behavior changes.
 7. Frontend: TypeScript + SCSS + Tailwind 4 under `assets/` (do not put Tailwind `@apply` inside SCSS).
 8. Run `make test` (and ideally `make qa`) before opening a PR.
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
-10. Public-facing UI must include legal pages and cookie consent (`docs/legal-and-cookies.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
+10. Public-facing UI must include legal pages and cookie consent (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
 
 ## Git hygiene
 

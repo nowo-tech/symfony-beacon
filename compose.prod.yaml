@@ -4,7 +4,7 @@
 #   cp .env.dist .env   # set real APP_SECRET / MySQL passwords first
 #   docker compose -f compose.prod.yaml --env-file .env up --build -d
 #
-# Docs: docs/production.md
+# Docs: docs/PRODUCTION.md
 services:
   php:
     image: ${IMAGES_PREFIX:-}symfony-frankenphp

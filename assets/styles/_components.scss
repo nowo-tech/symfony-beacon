@@ -1221,11 +1221,92 @@ textarea.input {
 }
 
 .brand-mark {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+  margin: 0;
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.025em;
   color: var(--color-ink);
   text-decoration: none;
+  line-height: 1.1;
+}
+
+.brand-mark:hover {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.brand-mark__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  /* Mint from brand assets — not ink, not dark moss. */
+  color: var(--beacon-mark, #4aad7f);
+}
+
+.brand-mark__icon-svg {
+  display: block;
+  width: 1.5rem;
+  height: auto;
+  color: inherit;
+}
+
+.brand-mark__arc--inner {
+  opacity: 0.9;
+}
+
+.brand-mark__arc--outer {
+  opacity: 0.55;
+}
+
+.brand-mark__name {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.brand-mark--sm {
+  font-size: 1.125rem;
+  gap: 0.4rem;
+}
+
+.brand-mark--sm .brand-mark__icon-svg {
+  width: 1.25rem;
+}
+
+.brand-mark--md {
+  font-size: 1.25rem;
+  gap: 0.5rem;
+}
+
+.brand-mark--md .brand-mark__icon-svg {
+  width: 1.45rem;
+}
+
+.brand-mark--lg {
+  font-size: 1.5rem;
+  gap: 0.55rem;
+}
+
+.brand-mark--lg .brand-mark__icon-svg {
+  width: 1.75rem;
+}
+
+/* Auth / marketing hero: horizontal lockup, compact like public/brand logos. */
+.brand-mark--hero {
+  justify-content: center;
+  gap: 0.65rem;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 600;
+}
+
+.brand-mark--hero .brand-mark__icon-svg {
+  width: clamp(1.6rem, 4vw, 2rem);
 }
 
 /* —— App shell (authenticated) —— */
@@ -2130,6 +2211,11 @@ textarea.input {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-moss);
+}
+
+.beacon-pwa-install__mark {
+  display: block;
+  margin: 0 0 0.5rem;
 }
 
 .beacon-pwa-install__title {

@@ -63,7 +63,7 @@ The public key must belong to the `{project_id}` in the URL.
 
 ### Ingest sequence (overview)
 
-Full architecture diagrams (module map, grouping, N+1, UI access) live in [architecture.md](architecture.md#flows-mermaid).
+Full architecture diagrams (module map, grouping, N+1, UI access) live in [ARCHITECTURE.md](ARCHITECTURE.md#flows-mermaid).
 
 ```mermaid
 sequenceDiagram

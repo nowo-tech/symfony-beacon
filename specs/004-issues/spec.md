@@ -10,7 +10,7 @@
 
 Issues are keyed by a **similarity fingerprint** within a project. The project issues index uses DataTables with URL-synced sort/paging/filters. Issue detail presents structured panels (stack with source context, breadcrumbs, request, tags, contexts, extra, raw JSON) plus assignee and occurrence stats. Collapsible panel preferences are stored per browser (`localStorage`) with account-level defaults.
 
-Cross-links: [`docs/event-context.md`](../../docs/event-context.md), ingest reopen behaviour in `003-ingest`.
+Cross-links: [`docs/EVENT-CONTEXT.md`](../../docs/EVENT-CONTEXT.md), ingest reopen behaviour in `003-ingest`.
 
 ## Clarifications (as-built)
 

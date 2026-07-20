@@ -20,7 +20,7 @@
 
 ## Phase 3: Docs & verification
 
-- [x] T010 Write `docs/native-mobile.md` and link from README / changelog
+- [x] T010 Write `docs/NATIVE-MOBILE.md` and link from README / changelog
 - [x] T011 Add PHPUnit coverage for config endpoints + native UA layout
 - [x] T012 Verify lint:container and native tests green
 

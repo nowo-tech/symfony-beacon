@@ -55,6 +55,7 @@
 </head>
 <body>
     <div>
+        <img src="{{ asset('brand/beacon-mark.svg') }}" alt="" width="40" height="47" style="display:block;margin:0 auto 1rem">
         <p class="eyebrow">{{ site_appearance.brandName|default(manifest_name) }}</p>
         <h1>{{ 'offline.heading'|trans({}, 'NowoPwaBundle') }}</h1>
         <p>{{ 'offline.body'|trans({}, 'NowoPwaBundle') }}</p>

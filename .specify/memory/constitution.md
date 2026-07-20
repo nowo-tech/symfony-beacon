@@ -38,7 +38,7 @@ Do not document or depend on host-installed PHP/Composer.
 ### V. Classic ↔ worker compatibility
 
 Application code must be safe in **worker mode** (resettable cross-request state; per-request stateful services implement `ResetInterface` when needed).
-See `docs/frankenphp-coding.md`. Default coding target: `FRANKENPHP_MODE=worker` and `FRANKENPHP_RESET_KERNEL=false`.
+See `docs/FRANKENPHP-CODING.md`. Default coding target: `FRANKENPHP_MODE=worker` and `FRANKENPHP_RESET_KERNEL=false`.
 
 ### VI. Efficient ingest
 
@@ -60,7 +60,7 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Ingest auth: Envelope-compatible (auth header / query / envelope `dsn`) mapped to project API keys.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository** (out of scope here); configure via `BEACON_DSN`.
-- Native mobile shells consume `/config/ios_v1.json` and `/config/android_v1.json` (Hotwire Native); see `docs/native-mobile.md`.
+- Native mobile shells consume `/config/ios_v1.json` and `/config/android_v1.json` (Hotwire Native); see `docs/NATIVE-MOBILE.md`.
 
 ## Development workflow (SDD)
 

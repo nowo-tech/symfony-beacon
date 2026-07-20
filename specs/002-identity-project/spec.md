@@ -41,7 +41,7 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 
 1. **Given** `/account/profile`, `/account/security`, `/account/display`, **When** I save Display prefs, **Then** preferred collapsed issue panels are stored on the user (`preferredCollapsedIssuePanels` / `IssuePanelIds`).
 2. **Given** `ROLE_ADMIN`, **When** I open `/admin` and `/settings/appearance`, **Then** admin hubs load.
-3. **Given** public legal/cookie surfaces, **When** non-essential cookies apply, **Then** cookie consent and legal pages remain available (see `docs/legal-and-cookies.md`).
+3. **Given** public legal/cookie surfaces, **When** non-essential cookies apply, **Then** cookie consent and legal pages remain available (see `docs/LEGAL-AND-COOKIES.md`).
 
 ## Requirements *(mandatory)*
 

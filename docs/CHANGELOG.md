@@ -7,11 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-07-21
+
+### Added
+
+- Brand assets: beacon mark + light/dark wordmark (`public/brand/`), used in header, auth, favicon, PWA offline/install, and README
+
+### Changed
+
+- Documentation filenames under `docs/` are **UPPERCASE** (`ARCHITECTURE.md`, `DSN.md`, …); cross-links in README, specs, and constitution updated
+
+### Fixed
+
+- Prod Docker image: load `nowo_twig_inspector` config only under `when@dev` (bundle is `require-dev`)
+- Twig CS whitespace in kit overrides and issue templates (CI)
+- Issue/transaction breadcrumbs: parent “Project” / “Issues” links use `projectId`, not the nested `{id}` (issue or transaction)
+
 ## [0.8.0] - 2026-07-20
 
 ### Changed
 
-- Product docs and specs no longer reference third-party SaaS SDKs; prefer [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) + Envelope wire protocol ([dsn.md](dsn.md), README, architecture)
+- Product docs and specs no longer reference third-party SaaS SDKs; prefer [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) + Envelope wire protocol ([DSN.md](DSN.md), README, architecture)
 - `EnvelopeAuthParser` returns `public_key` / `secret_key` (still accepts historical Envelope auth header / query field names for compatibility)
 - Issue UI / CHANGELOG wording: “structured” detail layout (no third-party brand comparisons)
 
@@ -41,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Ingest rate limit** per project (`BEACON_INGEST_RATE_LIMIT`, HTTP 429)
 - Public **health probes** `GET /health/live` and `GET /health/ready` (DB + Messenger queue depth)
 - Login throttling via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle)
-- Docs: [product roadmap](ROADMAP.md), [notifications](notifications.md), [architecture](architecture.md); expanded [production](production.md)
+- Docs: [product roadmap](ROADMAP.md), [notifications](NOTIFICATIONS.md), [architecture](ARCHITECTURE.md); expanded [production](PRODUCTION.md)
 - Demo bootstrap: `make bootstrap` (migrate + seed); `app:seed-demo` writes `.demo-client.env` for BeaconBundle `make sync-beacon`
 - Demo seed samples: performance N+1 (`demo.nplus1.products`) and a 14-day analytics window
 
@@ -53,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- `symfony/ux-turbo` and `symfony/ux-native` (Hotwire Native shell). Prefer the PWA (`nowo-tech/pwa-bundle`); see [native-mobile.md](native-mobile.md)
+- `symfony/ux-turbo` and `symfony/ux-native` (Hotwire Native shell). Prefer the PWA (`nowo-tech/pwa-bundle`); see [NATIVE-MOBILE.md](NATIVE-MOBILE.md)
 
 ### Fixed
 
@@ -96,18 +112,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Rich event context: microsecond `event_timestamp` / `received_at`, promoted `php_version` / `symfony_version` / `user_identifier`, structured event detail UI (`docs/event-context.md`, spec `010-rich-event-context`)
+- Rich event context: microsecond `event_timestamp` / `received_at`, promoted `php_version` / `symfony_version` / `user_identifier`, structured event detail UI (`docs/EVENT-CONTEXT.md`, spec `010-rich-event-context`)
 - Event detail UI renders `breadcrumbs.values` from Envelope payloads (BeaconBundle `addBreadcrumb`)
 - Project **Settings** (`/projects/{id}/settings`): API keys / DSN, members, danger zone
 - Project danger zone: clear history (owner/admin) and delete project with typed name confirmation (owner) — spec `011-project-danger-zone`
 - Human-friendly API key labels and public keys (`calm-otter-a3f2…`) with Suggest name control
 - Project section nav (Issues / Performance / Analytics / Settings); opening a project lands on Issues
-- Symfony UX Native + Turbo for Hotwire Native shells (`docs/native-mobile.md`)
-- Public legal pages + cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) (`docs/legal-and-cookies.md`)
+- Symfony UX Native + Turbo for Hotwire Native shells (`docs/NATIVE-MOBILE.md`)
+- Public legal pages + cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) (`docs/LEGAL-AND-COOKIES.md`)
 - Main nav / breadcrumbs / forms / PWA via Nowo kits (`dashboard-menu`, `breadcrumb-kit`, `form-kit`, `pwa-bundle`)
 - Account preferences split: `/account/profile`, `/account/security`, `/account/display`
 - Appearance settings for admins; admin hub at `/admin`
-- DSN docs: capability matrix and Docker HTTP ingest notes (`docs/dsn.md`)
+- DSN docs: capability matrix and Docker HTTP ingest notes (`docs/DSN.md`)
 
 ### Changed
 
@@ -174,7 +190,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.0...v0.7.1

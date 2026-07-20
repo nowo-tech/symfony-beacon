@@ -18,7 +18,7 @@ Enable Beacon to power Hotwire Native iOS/Android shells by integrating Symfony 
 | Security | `PUBLIC_ACCESS` for native config paths |
 | Layout | Hide PWA install + redundant chrome when native; safe-area CSS |
 | Bridge | Optional Stimulus `beacon-theme-bridge` for theme sync |
-| Docs | `docs/native-mobile.md` + README link |
+| Docs | `docs/NATIVE-MOBILE.md` + README link |
 
 ## Constitution alignment
 

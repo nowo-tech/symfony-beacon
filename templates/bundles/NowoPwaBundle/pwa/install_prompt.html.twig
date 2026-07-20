@@ -19,6 +19,7 @@
         <div class="{{ css_class }}__backdrop beacon-pwa-install__backdrop" data-pwa-install-action="dismiss-remind" aria-hidden="true"></div>
     {% endif %}
     <div class="{{ css_class }}__panel beacon-pwa-install__panel">
+        <img class="beacon-pwa-install__mark" src="{{ asset('brand/beacon-mark.svg') }}" alt="" width="36" height="42">
         <p class="beacon-pwa-install__eyebrow">{{ site_appearance.brandName|default(manifest.short_name|default('Beacon')) }}</p>
         <p id="nowo-pwa-install-title" class="beacon-pwa-install__title">{{ 'preferences.display.pwa_prompt_title'|trans }}</p>
         <p id="nowo-pwa-install-message" class="beacon-pwa-install__message">{{ 'install.message'|trans({}, 'NowoPwaBundle') }}</p>

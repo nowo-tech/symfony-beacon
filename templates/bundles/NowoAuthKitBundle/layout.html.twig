@@ -11,7 +11,7 @@
     <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
     <style>{{ site_appearance.cssOverrides|raw }}</style>
     {{ nowo_pwa_head() }}
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🟩</text></svg>">
+    <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
     {{ vite_entry_link_tags('app') }}
     {{ vite_entry_script_tags('app') }}
     <link rel="stylesheet" href="{{ asset('css/toggle_password.css', 'nowo_password_toggle') }}">

@@ -1,5 +1,12 @@
 # Symfony Beacon — self-hosted error tracking for PHP & Symfony
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/brand/logo-dark.jpg">
+    <img src="public/brand/logo-light.jpg" alt="symfony-beacon" width="480">
+  </picture>
+</p>
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **Envelope wire protocol**, so clients send events to this server via a project DSN — no SaaS account required.
@@ -29,7 +36,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt)
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
-- Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/legal-and-cookies.md](docs/legal-and-cookies.md)
+- Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, appearance, menus, breadcrumbs)
@@ -79,11 +86,11 @@ make worker   # FRANKENPHP_MODE=worker
 make classic  # per-request boot
 ```
 
-Application code is written for worker safety (`ResetInterface` when needed). See [docs/frankenphp-coding.md](docs/frankenphp-coding.md).
+Application code is written for worker safety (`ResetInterface` when needed). See [docs/FRANKENPHP-CODING.md](docs/FRANKENPHP-CODING.md).
 
 ## Architecture
 
-Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/architecture.md](docs/architecture.md).
+Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 | Module | Responsibility |
 |--------|----------------|
@@ -110,17 +117,17 @@ docker compose exec php php bin/phpunit
 
 ## Documentation
 
-- [Architecture rationale](docs/architecture.md)
+- [Architecture rationale](docs/ARCHITECTURE.md)
 - [Product roadmap](docs/ROADMAP.md)
-- [Project notifications](docs/notifications.md)
+- [Project notifications](docs/NOTIFICATIONS.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)
-- [DSN / SDK](docs/dsn.md)
-- [Event context (timestamps, versions, user)](docs/event-context.md)
-- [Mobile / PWA (Hotwire Native removed)](docs/native-mobile.md)
-- [Legal pages & cookie consent](docs/legal-and-cookies.md)
-- [Production](docs/production.md)
+- [DSN / SDK](docs/DSN.md)
+- [Event context (timestamps, versions, user)](docs/EVENT-CONTEXT.md)
+- [Mobile / PWA (Hotwire Native removed)](docs/NATIVE-MOBILE.md)
+- [Legal pages & cookie consent](docs/LEGAL-AND-COOKIES.md)
+- [Production](docs/PRODUCTION.md)
 - [Contributing](docs/CONTRIBUTING.md)
 
 ## License

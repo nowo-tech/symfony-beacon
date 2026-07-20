@@ -13,7 +13,7 @@
         <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
         <style>{{ site_appearance.cssOverrides|raw }}</style>
         {{ nowo_pwa_head() }}
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🟩</text></svg>">
+        <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
         {% block stylesheets %}
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
@@ -38,9 +38,7 @@
                                 <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
                             </svg>
                         </button>
-                        <a href="{{ path('dashboard_home') }}" class="brand-mark text-xl">
-                            {{ site_appearance.brandName }}
-                        </a>
+                        {% include '_brand_mark.html.twig' with {size: 'sm'} %}
                     </div>
                     <div class="app-header__end">
                         {% include '_theme_toggle.html.twig' with {compact: true} %}

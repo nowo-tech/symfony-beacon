@@ -27,4 +27,4 @@
 
 - [x] T013 Unit: dispatcher filter matching + occurrence rules
 - [x] T014 Functional: permissions + CRUD + ingest notify (mock HttpClient)
-- [x] T015 Update ROADMAP/CHANGELOG/UPGRADING/notifications.md; spec In progress until tagged release
+- [x] T015 Update ROADMAP/CHANGELOG/UPGRADING/NOTIFICATIONS.md; spec In progress until tagged release

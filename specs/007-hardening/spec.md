@@ -10,10 +10,10 @@ Hardening in this product means **operator-ready defaults**: production Docker t
 
 ## Scope (as-built)
 
-- Production image target `frankenphp_prod` and guidance in `docs/production.md`.
+- Production image target `frankenphp_prod` and guidance in `docs/PRODUCTION.md`.
 - Secrets: version `.env.dist` only; never commit `.env`.
 - CSRF on forms (Symfony Security / form components).
-- Cookie consent + legal/privacy/terms pages for self-hosted UI (`docs/legal-and-cookies.md`, `nowo-tech/cookie-consent-bundle`).
+- Cookie consent + legal/privacy/terms pages for self-hosted UI (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`).
 - Dependency pinning via Composer/lock and CI green tests.
 
 ## Out of scope / future
@@ -30,5 +30,5 @@ Hardening in this product means **operator-ready defaults**: production Docker t
 
 ## Success Criteria
 
-- **SC-001**: A new operator can follow `docs/production.md` without host-installed PHP.
+- **SC-001**: A new operator can follow `docs/PRODUCTION.md` without host-installed PHP.
 - **SC-002**: CI remains green; no secrets committed.

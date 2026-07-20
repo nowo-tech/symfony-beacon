@@ -4,4 +4,4 @@
 
 Server: promoted columns + `DATETIME(6)` + event/issue UI. Client `send.*` and frame context generation: BeaconBundle (separate repo).
 
-See `spec.md` and `docs/event-context.md`.
+See `spec.md` and `docs/EVENT-CONTEXT.md`.

@@ -2,7 +2,7 @@
 
 This document explains **why** Symfony Beacon uses its current shape: modular Symfony packages, FrankenPHP, Envelope-compatible ingest, Messenger, Twig + Vite, and Nowo.tech kits — instead of a full DDD/hexagonal rewrite, a separate SPA, or a classic Nginx+FPM stack.
 
-Normative constraints live in [`.specify/memory/constitution.md`](../.specify/memory/constitution.md). Coding rules for the HTTP runtime are in [frankenphp-coding.md](frankenphp-coding.md).
+Normative constraints live in [`.specify/memory/constitution.md`](../.specify/memory/constitution.md). Coding rules for the HTTP runtime are in [FRANKENPHP-CODING.md](FRANKENPHP-CODING.md).
 
 ## Product constraints that drive the design
 
@@ -33,7 +33,7 @@ Modules stay **thin and directional**: Ingest writes Issues/Performance/Analytic
 | Classic **or** worker via `FRANKENPHP_MODE` | Operators can trade isolation for throughput without forking the codebase. Application code targets **worker-safe** behaviour so both modes remain valid. |
 | Docker Compose as the required local env | Reproducible MySQL, Messenger consumer, Vite, and Caddy ports; no “works on my host PHP” drift. |
 
-See [production.md](production.md) for the optional baked prod image target.
+See [PRODUCTION.md](PRODUCTION.md) for the optional baked prod image target.
 
 ## Why fast ACK + Symfony Messenger
 
@@ -53,7 +53,7 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Server-rendered Twig | Auth, CSRF, flash messages, and permission checks stay in one stack; good fit for an operator console. |
 | Stimulus | Progressive enhancement for interactive widgets (DataTables, clipboard, collapse panels). |
 | Vite + TypeScript + Tailwind 4 | Modern asset pipeline without splitting the product into “API repo + frontend repo”. |
-| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [native-mobile.md](native-mobile.md) for removed Hotwire Native notes). |
+| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](NATIVE-MOBILE.md) for removed Hotwire Native notes). |
 
 A dedicated SPA would force a second auth model, duplicated validation, and larger ops surface for little benefit on CRUD-heavy admin screens.
 
@@ -63,7 +63,7 @@ Login, registration, cookies, menus, and forms are solved problems. Prefering [`
 
 - Keeps Beacon focused on **telemetry** (ingest, grouping, performance, analytics).
 - Reuses tested AuthKit / cookie-consent / dashboard-menu / form-kit behaviour.
-- Leaves room for operator legal pages without inventing a consent stack ([legal-and-cookies.md](legal-and-cookies.md)).
+- Leaves room for operator legal pages without inventing a consent stack ([LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
 
 Identity in this repo owns **User** persistence and project membership; AuthKit owns the login/register chrome.
 
@@ -74,7 +74,7 @@ Identity in this repo owns **User** persistence and project membership; AuthKit 
 | Envelope protocol on the server | Operators can point Envelope-compatible clients (especially `nowo-tech/beacon-bundle`) at this server immediately. |
 | `nowo-tech/beacon-bundle` in another repository | Client instrumentation (Monolog, exceptions, `send.*` flags, stack source context) evolves on the app side without coupling release cycles to the server. DSN = host/port/project against this server. |
 
-Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([event-context.md](event-context.md)).
+Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([EVENT-CONTEXT.md](EVENT-CONTEXT.md)).
 
 ## Why Spec-Driven Development
 

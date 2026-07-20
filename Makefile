@@ -10,7 +10,7 @@ help:
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
 	@echo "  make down            Stop containers"
 	@echo "  make build           Rebuild the php image (dev)"
-	@echo "  make build-prod      Build frankenphp_prod image (see docs/production.md)"
+	@echo "  make build-prod      Build frankenphp_prod image (see docs/PRODUCTION.md)"
 	@echo "  make logs            Follow php service logs"
 	@echo "  make vite-hmr        Start Vite HMR (compose profile hmr)"
 	@echo "  make vite            Follow Vite HMR logs"

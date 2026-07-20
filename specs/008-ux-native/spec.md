@@ -61,7 +61,7 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 
 **Why this priority**: Server support alone does not produce App Store / Play binaries; operators need a clear guide.
 
-**Independent Test**: Open `docs/native-mobile.md` and verify it describes config URLs, UA behaviour, and client scaffolding pointers.
+**Independent Test**: Open `docs/NATIVE-MOBILE.md` and verify it describes config URLs, UA behaviour, and client scaffolding pointers.
 
 **Acceptance Scenarios**:
 

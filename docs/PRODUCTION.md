@@ -13,7 +13,7 @@ The Dockerfile also defines a **`frankenphp_prod`** target for baked, no-dev dep
 | PHP / Caddy | Xdebug available, `--watch` | Production `php.ini`, no watch |
 | Secrets | Local `.env` (gitignored) | Inject at **runtime** (env / orchestrator) |
 
-FrankenPHP HTTP modes (`FRANKENPHP_MODE=classic|worker`, `LOOP_MAX`, `RESET_KERNEL`) work the same in prod — see [`frankenphp-coding.md`](frankenphp-coding.md).
+FrankenPHP HTTP modes (`FRANKENPHP_MODE=classic|worker`, `LOOP_MAX`, `RESET_KERNEL`) work the same in prod — see [`FRANKENPHP-CODING.md`](FRANKENPHP-CODING.md).
 
 ## Build
 

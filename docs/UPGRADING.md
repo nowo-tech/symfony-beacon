@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.8.0 to the next release](#upgrading-from-080-to-the-next-release)
+- [Upgrading from 0.8.1 to the next release](#upgrading-from-081-to-the-next-release)
+- [Upgrading from 0.8.0 to 0.8.1](#upgrading-from-080-to-081)
 - [Upgrading from 0.7.2 to 0.8.0](#upgrading-from-072-to-080)
 - [Upgrading from 0.7.1 to 0.7.2](#upgrading-from-071-to-072)
 - [Upgrading from 0.7.0 to 0.7.1](#upgrading-from-070-to-071)
@@ -18,7 +19,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.8.0 to the next release
+## Upgrading from 0.8.1 to the next release
 
 When a newer tag exists:
 
@@ -28,6 +29,37 @@ When a newer tag exists:
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
 5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
 6. Run quality checks: `make qa` (or at least `make test`).
+
+---
+
+## Upgrading from 0.8.0 to 0.8.1
+
+### 1. Pull
+
+```bash
+git fetch --tags
+git checkout v0.8.1
+```
+
+No database migrations. No `.env` changes.
+
+### 2. Docs paths
+
+Markdown under `docs/` is now **UPPERCASE** (e.g. `docs/architecture.md` → `docs/ARCHITECTURE.md`). Update bookmarks and external links.
+
+### 3. Deploy notes
+
+- Rebuild frontend assets so brand lockup CSS is included: `make vite-build` (or your usual asset pipeline).
+- Rebuild the prod image if you use `frankenphp_prod` (Twig Inspector config is scoped to `when@dev`).
+- Breadcrumb parent links on issue/transaction detail pages now resolve with the project id; no admin re-seed required.
+
+### 4. Verify
+
+```bash
+make test
+# or at least
+docker compose exec php vendor/bin/phpunit tests/Shared/NowoKitsUiTest.php
+```
 
 ---
 
@@ -47,7 +79,7 @@ No database migrations. No `.env` changes.
 
 - Envelope **ingest auth is unchanged** for clients (same HTTP header / query / DSN mechanisms).
 - Internal parser keys are now `public_key` / `secret_key` (only relevant if you called `EnvelopeAuthParser` from custom code).
-- Docs point at BeaconBundle as the supported PHP client ([dsn.md](dsn.md)).
+- Docs point at BeaconBundle as the supported PHP client ([DSN.md](DSN.md)).
 
 ### 3. Contributors
 
@@ -82,8 +114,8 @@ No migrations required.
 Documentation and release-notes clarity only. **No schema, env, or Composer changes.**
 
 1. Pull `v0.7.1` (or merge `main`).
-2. Optional: re-read [native-mobile.md](native-mobile.md) if you still expected Hotwire Native — that stack was removed in **0.7.0**.
-3. Local BeaconBundle pairing remains: `make bootstrap` → demo `make sync-beacon` ([dsn.md](dsn.md)).
+2. Optional: re-read [NATIVE-MOBILE.md](NATIVE-MOBILE.md) if you still expected Hotwire Native — that stack was removed in **0.7.0**.
+3. Local BeaconBundle pairing remains: `make bootstrap` → demo `make sync-beacon` ([DSN.md](DSN.md)).
 
 ```bash
 git fetch --tags
@@ -131,14 +163,14 @@ Sort and paging are **server-side** again (column header links + `per_page` in t
 
 ### 5. Ops / product features
 
-- Project → Settings → **Notifications** (Slack / HTTP): [notifications.md](notifications.md)
+- Project → Settings → **Notifications** (Slack / HTTP): [NOTIFICATIONS.md](NOTIFICATIONS.md)
 - Optional cron: `app:retention:purge`
-- Probes: `/health/live`, `/health/ready` — [production.md](production.md)
+- Probes: `/health/live`, `/health/ready` — [PRODUCTION.md](PRODUCTION.md)
 - Login throttling defaults: see `config/packages/nowo_login_throttle.yaml`
 
 ### 6. Turbo / Hotwire Native removed
 
-`symfony/ux-turbo` and `symfony/ux-native` are gone. Use the PWA for installable mobile access ([native-mobile.md](native-mobile.md)). Full page loads replace Turbo Drive navigation.
+`symfony/ux-turbo` and `symfony/ux-native` are gone. Use the PWA for installable mobile access ([NATIVE-MOBILE.md](NATIVE-MOBILE.md)). Full page loads replace Turbo Drive navigation.
 
 ### 7. Local BeaconBundle demo (optional)
 
@@ -146,7 +178,7 @@ Sort and paging are **server-side** again (column header links + `per_page` in t
 make bootstrap   # migrate + seed + write .demo-client.env
 ```
 
-Then in `BeaconBundle/demo/symfony8`: `make sync-beacon` (see [dsn.md](dsn.md)).
+Then in `BeaconBundle/demo/symfony8`: `make sync-beacon` (see [DSN.md](DSN.md)).
 
 ### 8. Verify
 
@@ -309,7 +341,7 @@ BeaconBundle demos should use:
 BEACON_DSN=http://PUBLIC_KEY@host.docker.internal:9081/1
 ```
 
-See [`dsn.md`](dsn.md).
+See [`DSN.md`](DSN.md).
 
 ### 5. Legal / cookies
 

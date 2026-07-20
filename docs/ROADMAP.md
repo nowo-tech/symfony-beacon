@@ -2,7 +2,7 @@
 
 Living plan for **symfony-beacon** and the companion client **[nowo-tech/beacon-bundle](https://github.com/nowo-tech/BeaconBundle)**. Priorities follow product completeness analysis (post-v0.6.0): close the operator loop (alerts), keep self-hosting safe, then deepen automatic instrumentation.
 
-Related: [architecture.md](architecture.md), [CHANGELOG.md](CHANGELOG.md), feature specs under `specs/`.
+Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), feature specs under `specs/`.
 
 ## Guiding principles
 
@@ -34,7 +34,7 @@ Related: [architecture.md](architecture.md), [CHANGELOG.md](CHANGELOG.md), featu
 | AuthKit, projects, Settings, danger zone | Beacon | `002`, `011` |
 | Rich event context + stack source context | Beacon + Bundle | `010`, Bundle ≥ 1.3.0 |
 | PWA + Hotwire Native server contract | Beacon | `008-ux-native` |
-| Architecture rationale + Mermaid flows | Beacon | `docs/architecture.md` |
+| Architecture rationale + Mermaid flows | Beacon | `docs/ARCHITECTURE.md` |
 
 ---
 
@@ -66,7 +66,7 @@ Goal: a team can be notified when something new or regressing happens, without b
 | 2.1 | Configurable **retention** + purge job (max age / max events per project) | Beacon | **Done** |
 | 2.2 | **Ingest rate limit** per project / API key | Beacon | **Done** |
 | 2.3 | **Health / ready** endpoints + Messenger queue depth signal | Beacon | **Done** |
-| 2.4 | Production scaling / backup notes in `docs/production.md` | Beacon | **Done** |
+| 2.4 | Production scaling / backup notes in `docs/PRODUCTION.md` | Beacon | **Done** |
 | 2.5 | `nowo-tech/login-throttle-bundle` (or equivalent) on AuthKit login | Beacon | **Done** |
 
 ### Exit criteria (Phase 2)
@@ -115,7 +115,7 @@ Documented so the roadmap does not silently expand mission:
 - Native store apps inside this repo (server contract only)
 - Email digests, PagerDuty-native, Discord-native bots (generic webhook may still target them)
 
-See `docs/architecture.md` non-goals and constitution.
+See `docs/ARCHITECTURE.md` non-goals and constitution.
 
 ---
 

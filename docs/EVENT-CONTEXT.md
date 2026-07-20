@@ -19,7 +19,7 @@ Beacon stores the full Envelope event JSON in `event.payload` and promotes commo
 
 Use `nowo-tech/beacon-bundle` `nowo_beacon.send.*` switches to control what the client attaches (stacktrace, request, user, PHP/Symfony versions, etc.). See the bundle [CONFIGURATION.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md).
 
-`send.user` is **off by default** because it may transmit personal data. If you enable it, keep Beacon legal/privacy pages and cookie consent aligned with your processing (see [legal-and-cookies.md](legal-and-cookies.md)).
+`send.user` is **off by default** because it may transmit personal data. If you enable it, keep Beacon legal/privacy pages and cookie consent aligned with your processing (see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
 
 ## Stack source context
 

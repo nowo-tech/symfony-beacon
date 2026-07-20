@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared;
 
+use App\Issues\Entity\Issue;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -59,6 +61,54 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Projects');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Project');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Settings');
+    }
+
+    public function testIssueShowBreadcrumbsUseProjectIdNotIssueId(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('issue-bc@example.com');
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+
+        // Ensure issue id ≠ project id so a wrong param copy is detectable.
+        $padding = new Issue();
+        $padding->setProject($project);
+        $padding->setFingerprint(hash('sha256', 'breadcrumb-pad'));
+        $padding->setTitle('Padding issue');
+        $padding->setCulprit('demo');
+        $padding->setLevel('error');
+        $padding->setFirstSeen(new DateTimeImmutable());
+        $padding->setLastSeen(new DateTimeImmutable());
+        $padding->incrementEventCount();
+        $em->persist($padding);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint(hash('sha256', 'breadcrumb-issue'));
+        $issue->setTitle('Breadcrumb issue');
+        $issue->setCulprit('demo');
+        $issue->setLevel('error');
+        $issue->setFirstSeen(new DateTimeImmutable());
+        $issue->setLastSeen(new DateTimeImmutable());
+        $issue->incrementEventCount();
+        $em->persist($issue);
+        $em->flush();
+
+        $projectId = (int) $project->getId();
+        $issueId = (int) $issue->getId();
+        self::assertNotSame($projectId, $issueId);
+
+        $this->login($client, $user);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectId.'/issues/'.$issueId);
+        self::assertResponseIsSuccessful();
+
+        $wrap = $crawler->filter('.beacon-breadcrumb-wrap');
+        self::assertGreaterThan(0, $wrap->count());
+        $html = $wrap->html();
+        self::assertStringContainsString('/projects/'.$projectId.'/issues"', $html);
+        self::assertStringContainsString('/projects/'.$projectId.'"', $html);
+        self::assertStringNotContainsString('/projects/'.$issueId.'"', $html);
+        self::assertStringNotContainsString('/projects/'.$issueId.'/issues', $html);
     }
 
     public function testPreferencesSectionUsesPreferencesMenu(): void
