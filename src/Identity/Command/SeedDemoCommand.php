@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Identity\Command;
 
+use App\Analytics\Service\AnalyticsDemoSeeder;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
+use App\Performance\Service\PerformanceDemoSeeder;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
@@ -21,7 +23,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(name: 'app:seed-demo', description: 'Seed a demo user, project, API key, breadcrumbs, and main menu')]
+/**
+ * Seeds a demo admin user, sample project/API key, menus, N+1 samples, and analytics.
+ */
+#[AsCommand(name: 'app:seed-demo', description: 'Seed a demo user, project, API key, breadcrumbs, menu, N+1 samples, and analytics')]
 final class SeedDemoCommand extends Command
 {
     public function __construct(
@@ -30,6 +35,8 @@ final class SeedDemoCommand extends Command
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly BreadcrumbDemoSeeder $breadcrumbDemoSeeder,
         private readonly DashboardMenuDemoSeeder $dashboardMenuDemoSeeder,
+        private readonly PerformanceDemoSeeder $performanceDemoSeeder,
+        private readonly AnalyticsDemoSeeder $analyticsDemoSeeder,
     ) {
         parent::__construct();
     }
@@ -95,6 +102,18 @@ final class SeedDemoCommand extends Command
             $io->success('Seeded main navigation menu');
         } else {
             $io->note('Main navigation menu already exists');
+        }
+
+        if ($project instanceof Project && $this->performanceDemoSeeder->seedIfEmpty($project)) {
+            $io->success('Seeded performance samples (including N+1). Open /projects/{id}/performance?nplus1=1');
+        } else {
+            $io->note('Performance N+1 demo samples already exist');
+        }
+
+        if ($project instanceof Project && $this->analyticsDemoSeeder->seedIfEmpty($project)) {
+            $io->success('Seeded analytics daily stats (14-day window). Open /projects/{id}/analytics');
+        } else {
+            $io->note('Analytics daily stats already cover the demo window');
         }
 
         if ($apiKey instanceof ProjectApiKey) {

@@ -58,6 +58,56 @@ See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager i
 
 Keep the **HTTP** container separate from the **`messenger:consume`** process (same as local Compose). Scale consumers independently; do not confuse them with `FRANKENPHP_MODE=worker`.
 
+Example (two consumer replicas):
+
+```bash
+docker compose up -d --scale messenger=2
+```
+
+Monitor queue depth via `GET /health/ready` → `checks.messenger_async_pending` (Doctrine transport).
+
+## Health probes
+
+| Path | Auth | Purpose |
+|------|------|---------|
+| `GET /health/live` | Public | Process is up |
+| `GET /health/ready` | Public | Database reachable + async queue depth |
+
+Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/Compose healthchecks.
+
+## Retention purge
+
+Configure in `.env`:
+
+| Variable | Meaning |
+|----------|---------|
+| `BEACON_RETENTION_DAYS` | Delete events/transactions/stats older than N days (`0` = off) |
+| `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT` | Cap stored events per project (`0` = off) |
+
+Run daily (cron / systemd timer):
+
+```bash
+php bin/console app:retention:purge
+# or
+make console ARGS='app:retention:purge'
+```
+
+## Ingest rate limit
+
+`BEACON_INGEST_RATE_LIMIT` = max Envelope POSTs per project per minute (`0` = unlimited). Exceeded requests get HTTP `429` with `Retry-After: 60`.
+
+## Login throttling
+
+`nowo-tech/login-throttle-bundle` + Symfony `login_throttling` on the `main` firewall (default: 5 attempts / 15 minutes). Tune `config/packages/nowo_login_throttle.yaml` and `security.yaml`.
+
+## Backups
+
+Minimum operator checklist:
+
+1. **MySQL**: scheduled `mysqldump` (or volume snapshots) of the Compose `database` data directory / managed DB.
+2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) separately from the DB dump.
+3. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.
+
 ## Out of scope (intentionally)
 
 This boilerplate does **not** ship Kubernetes manifests, TLS termination in front of Caddy, or a managed database. Use the prod image as the application unit inside your own platform.

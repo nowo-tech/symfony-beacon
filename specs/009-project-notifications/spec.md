@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-20
 
-**Status**: Ready for planning
+**Status**: Completed (implementation on main; tag with next Beacon release — see [docs/ROADMAP.md](../../docs/ROADMAP.md) Phase 1)
 
 **Input**: User description: "Add the option to send notifications for errors, warnings, N+1, … to different destinations (Slack, …); must be configurable per project."
 
@@ -14,6 +14,7 @@
 
 - **Q1 (destination types for v1)**: Slack Incoming Webhook **and** generic HTTP webhook (JSON). Discord/email/OAuth Slack apps out of scope for v1.
 - **Q2 (issue occurrence rule)**: Notify on **first occurrence** of a new issue **and** on **regression** (issue was `resolved` or `ignored` and becomes active again). Do **not** notify on every duplicate event for an already-open issue.
+- **Implementation note (ingest)**: Matching events reopen both **`resolved` and `ignored`** issues to **unresolved**, and notify on new issue + regression only.
 
 ## User Scenarios & Testing *(mandatory)*
 

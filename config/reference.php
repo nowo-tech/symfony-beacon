@@ -629,7 +629,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     rate_limiter?: bool|array{ // Rate limiter configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         limiters?: array<string, array{ // Default: []
  *             lock_factory?: scalar|Param|null, // The service ID of the lock factory used by this limiter (or null to disable locking). // Default: "auto"
  *             cache_pool?: scalar|Param|null, // The cache pool to use for storing the current limiter state. // Default: "cache.rate_limiter"
@@ -1883,19 +1883,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         offline?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/offline.html.twig"
  *     },
  * }
- * @psalm-type TurboConfig = array{
- *     broadcast?: bool|array{
- *         enabled?: bool|Param, // Default: true
- *         entity_template_prefixes?: list<scalar|Param|null>,
- *         doctrine_orm?: bool|array{ // Enable the Doctrine ORM integration
- *             enabled?: bool|Param, // Default: true
- *         },
- *     },
- *     default_transport?: scalar|Param|null, // Default: "default"
- * }
- * @psalm-type UxNativeConfig = array{
- *     output_dir?: scalar|Param|null, // Directory where configuration JSON files are written. Defaults to %kernel.project_dir%/public. // Default: null
- * }
  * @psalm-type NowoCookieConsentConfig = array{
  *     doctrine?: array{ // Doctrine DBAL connection and table prefix for cookie consent entities.
  *         connection?: scalar|Param|null, // Name of the Doctrine DBAL connection to use (e.g. default, or a custom connection). // Default: "default"
@@ -1944,6 +1931,27 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     preferences_bubble_icon?: scalar|Param|null, // Custom HTML or SVG markup for the preferences bubble icon. Leave empty for the default cookie SVG. // Default: null
  *     preference_sections?: mixed, // Default: []
  * }
+ * @psalm-type NowoLoginThrottleConfig = array{
+ *     enabled?: bool|Param, // Enable or disable login throttling (for simple single-firewall configuration) // Default: true
+ *     max_count_attempts?: int|Param, // Maximum number of login attempts before throttling (for simple single-firewall configuration) // Default: 3
+ *     timeout?: int|Param, // Ban period in seconds (for simple single-firewall configuration) // Default: 600
+ *     watch_period?: int|Param, // With storage=database: part of generated limiter service ID and optional cleanup(); attempt window uses timeout (single-firewall mode). // Default: 3600
+ *     firewall?: scalar|Param|null, // Firewall name where login_throttling should be applied (for simple single-firewall configuration) // Default: "main"
+ *     storage?: "cache"|"database"|Param, // Storage backend for login attempts (for simple single-firewall configuration) // Default: "cache"
+ *     rate_limiter?: scalar|Param|null, // Custom rate limiter service ID (for simple single-firewall configuration) // Default: null
+ *     cache_pool?: scalar|Param|null, // Cache pool to use for storing the limiter state (for simple single-firewall configuration, only used when storage=cache) // Default: "cache.rate_limiter"
+ *     lock_factory?: scalar|Param|null, // Lock factory service ID for rate limiter (for simple single-firewall configuration, only used when storage=cache) // Default: null
+ *     firewalls?: array<string, array{ // Default: []
+ *         enabled?: bool|Param, // Enable or disable login throttling for this firewall // Default: true
+ *         max_count_attempts?: int|Param, // Maximum number of login attempts before throttling // Default: 3
+ *         timeout?: int|Param, // Ban period in seconds // Default: 600
+ *         watch_period?: int|Param, // With storage=database: part of generated limiter service ID and shared-limiter grouping; attempt window uses timeout. // Default: 3600
+ *         storage?: "cache"|"database"|Param, // Storage backend for login attempts // Default: "cache"
+ *         rate_limiter?: scalar|Param|null, // Custom rate limiter service ID (optional). If not provided, Symfony will use default login throttling rate limiter or database rate limiter if storage=database. Use same service ID to share rate limiter across firewalls. // Default: null
+ *         cache_pool?: scalar|Param|null, // Cache pool to use for storing the limiter state (only used when storage=cache) // Default: "cache.rate_limiter"
+ *         lock_factory?: scalar|Param|null, // Lock factory service ID for rate limiter (optional, only used when storage=cache) // Default: null
+ *     }>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1966,9 +1974,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_dashboard_menu?: NowoDashboardMenuConfig,
  *     nowo_form_kit?: NowoFormKitConfig,
  *     nowo_pwa?: NowoPwaConfig,
- *     turbo?: TurboConfig,
- *     ux_native?: UxNativeConfig,
  *     nowo_cookie_consent?: NowoCookieConsentConfig,
+ *     nowo_login_throttle?: NowoLoginThrottleConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1993,9 +2000,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
  *         nowo_form_kit?: NowoFormKitConfig,
  *         nowo_pwa?: NowoPwaConfig,
- *         turbo?: TurboConfig,
- *         ux_native?: UxNativeConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2019,9 +2025,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
  *         nowo_form_kit?: NowoFormKitConfig,
  *         nowo_pwa?: NowoPwaConfig,
- *         turbo?: TurboConfig,
- *         ux_native?: UxNativeConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2047,9 +2052,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
  *         nowo_form_kit?: NowoFormKitConfig,
  *         nowo_pwa?: NowoPwaConfig,
- *         turbo?: TurboConfig,
- *         ux_native?: UxNativeConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

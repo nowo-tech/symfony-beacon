@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Project **notifications**: Slack Incoming Webhook and generic HTTP JSON destinations (Settings UI), async delivery via Messenger (`specs/009-project-notifications`)
+- **Retention purge** (`app:retention:purge`) via `BEACON_RETENTION_DAYS` / `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT` (`specs/012-safe-self-hosting`)
+- **Ingest rate limit** per project (`BEACON_INGEST_RATE_LIMIT`, HTTP 429)
+- Public **health probes** `GET /health/live` and `GET /health/ready` (DB + Messenger queue depth)
+- Login throttling via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle)
+- Docs: [product roadmap](ROADMAP.md), [notifications](notifications.md); expanded [production](production.md)
+
+### Changed
+
+- Issues list: responsive table layout (column priorities, wrap titles/culprits, filter grid on small screens; DataTables collapses secondary columns)
+- Issues list: sync sort/paging via Turbo history (avoid bare `history.replaceState` wiping Drive state so issue detail links navigate correctly)
+- Issue ingest reopens **ignored** issues to unresolved on a matching event (same as resolved), so regression alerts match the notifications spec
+
 ## [0.6.0] - 2026-07-20
 
 ### Added

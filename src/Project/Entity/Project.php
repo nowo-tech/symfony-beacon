@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Project\Entity;
 
 use App\Issues\Entity\Issue;
+use App\Notifications\Entity\NotificationDestination;
 use App\Project\Repository\ProjectRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Telemetry project owning API keys, memberships, and ingested data.
+ */
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'project')]
 #[ORM\UniqueConstraint(name: 'uniq_project_slug', columns: ['slug'])]
@@ -42,6 +46,10 @@ class Project
     #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'project')]
     private Collection $issues;
 
+    /** @var Collection<int, NotificationDestination> */
+    #[ORM\OneToMany(targetEntity: NotificationDestination::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $notificationDestinations;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -50,6 +58,7 @@ class Project
         $this->apiKeys = new ArrayCollection();
         $this->memberships = new ArrayCollection();
         $this->issues = new ArrayCollection();
+        $this->notificationDestinations = new ArrayCollection();
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -136,6 +145,24 @@ class Project
     public function getIssues(): Collection
     {
         return $this->issues;
+    }
+
+    /**
+     * @return Collection<int, NotificationDestination>
+     */
+    public function getNotificationDestinations(): Collection
+    {
+        return $this->notificationDestinations;
+    }
+
+    public function addNotificationDestination(NotificationDestination $destination): self
+    {
+        if (!$this->notificationDestinations->contains($destination)) {
+            $this->notificationDestinations->add($destination);
+            $destination->setProject($this);
+        }
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeImmutable

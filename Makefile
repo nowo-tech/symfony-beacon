@@ -1,17 +1,18 @@
-.PHONY: help up down build build-prod logs shell console seed classic worker restart mysql messenger-logs messenger-ping vite vite-build vite-watch pnpm specify-check \
+.PHONY: help up down build build-prod logs shell console seed classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
-	@echo "  make up              Start stack (php + mysql + messenger + vite)"
+	@echo "  make up              Start stack (php + mysql + messenger) + vite-build"
 	@echo "  make classic         FrankenPHP HTTP in classic mode"
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
 	@echo "  make down            Stop containers"
 	@echo "  make build           Rebuild the php image (dev)"
 	@echo "  make build-prod      Build frankenphp_prod image (see docs/production.md)"
 	@echo "  make logs            Follow php service logs"
-	@echo "  make vite            Follow Vite logs (dev = watch + HMR)"
+	@echo "  make vite-hmr        Start Vite HMR (compose profile hmr)"
+	@echo "  make vite            Follow Vite HMR logs"
 	@echo "  make vite-build      pnpm run build (one-shot → public/build/)"
 	@echo "  make vite-watch      pnpm run watch (vite build --watch, no HMR)"
 	@echo "  make pnpm            pnpm in php container (ARGS='install' / 'add -D …')"
@@ -20,7 +21,7 @@ help:
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
 	@echo "  make seed            Seed demo user + project + DSN (app:seed-demo)"
-	@echo "  make restart         Restart php + messenger + vite"
+	@echo "  make restart         Restart php + messenger"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
 	@echo "Quality:"
@@ -37,17 +38,21 @@ help:
 up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	docker compose up --build -d
+	@echo "Building frontend assets (static public/build/)…"
+	@$(MAKE) vite-build
 
 classic:
 	@test -f .env || cp .env.dist .env
 	FRANKENPHP_MODE=classic docker compose up --build -d
+	@$(MAKE) vite-build
 
 worker:
 	@test -f .env || cp .env.dist .env
 	FRANKENPHP_MODE=worker docker compose up --build -d
+	@$(MAKE) vite-build
 
 down:
-	docker compose down
+	docker compose --profile hmr down
 
 build:
 	docker compose build --no-cache
@@ -57,6 +62,11 @@ build-prod:
 
 logs:
 	docker compose logs -f php
+
+vite-hmr:
+	docker compose --profile hmr up -d vite
+	@echo "Vite HMR is on — entrypoints use viteServer (browser shows a pending HMR WebSocket)."
+	@echo "For stable UI without HMR: docker compose --profile hmr stop vite && make vite-build"
 
 vite:
 	docker compose logs -f vite
@@ -83,7 +93,8 @@ seed:
 	docker compose exec -T php bin/console app:seed-demo
 
 restart:
-	docker compose restart php messenger vite
+	docker compose restart php messenger
+	@$(MAKE) vite-build
 
 mysql:
 	docker compose exec database mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}

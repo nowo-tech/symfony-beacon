@@ -36,9 +36,9 @@
                         <td class="px-4 py-3">{{ tx.spanCount }}</td>
                         <td class="px-4 py-3">
                             {% if tx.nPlusOneCount > 0 %}
-                                <span class="badge bg-amber-100 text-amber-900">{{ tx.nPlusOneCount }}</span>
+                                <span class="badge badge-warn">{{ tx.nPlusOneCount }}</span>
                             {% else %}
-                                0
+                                <span class="text-[var(--color-ink)]/45">0</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">{{ tx.receivedAt|date('Y-m-d H:i') }}</td>

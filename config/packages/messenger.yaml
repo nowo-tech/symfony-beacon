@@ -21,6 +21,7 @@ framework:
 
         routing:
             App\Ingest\Message\ProcessEnvelopeMessage: async
+            App\Notifications\Message\DeliverNotificationMessage: async
 
 when@test:
     framework:

@@ -15,7 +15,8 @@ Artifacts under `specs/` are the source of truth; code must align with them.
 - **Docker Compose** as the required local environment
 - FrankenPHP in **classic** or **worker** mode, switched only via `FRANKENPHP_MODE`
 - **MySQL 9.7**, Symfony Messenger (async ingest), Pentatrion Vite + **Tailwind CSS**
-- Modular Symfony layout under `src/{Identity,Project,Ingest,Issues,Performance,Analytics,Shared}`
+- Modular Symfony layout under `src/{Identity,Project,Ingest,Issues,Performance,Analytics,Native,Shared}`
+- Prefer official `nowo-tech/*` kits for auth/users/cookies/menus where applicable (AuthKit, cookie-consent, etc.)
 - Progressive Web App via `nowo-tech/pwa-bundle` for browser installability
 - Hotwire Native support via `symfony/ux-native` + `symfony/ux-turbo` (server-side shell contract; see `specs/008-ux-native`)
 
@@ -79,4 +80,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Every significant PR/change must map to a spec under `specs/`.
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.1.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-20
+**Version**: 1.1.1 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-20

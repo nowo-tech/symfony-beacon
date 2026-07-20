@@ -160,18 +160,14 @@ issues:
         any_status: cualquier estado
         any_assignee: Cualquier asignado
         environment: Entorno
+        per_page: Resultados por página
+        per_page_option: '%count% por página'
     sort_by: Ordenar por %column%
-    dt:
-        empty: No hay incidencias
-        info: Mostrando _START_–_END_ de _TOTAL_
-        info_empty: Mostrando 0–0 de 0
-        info_filtered: (filtrado de _MAX_ en total)
-        length_menu: Mostrar _MENU_
-        first: Primera
-        last: Última
-        next: Siguiente
+    pagination:
+        showing: Mostrando %from%–%to% de %total%
+        nav: Páginas del listado de incidencias
         previous: Anterior
-        zero: Ninguna incidencia coincide
+        next: Siguiente
     col:
         issue: Incidencia
         level: Nivel
@@ -191,6 +187,7 @@ performance:
     back: ← Rendimiento
     no_nplus1: sin N+1 detectado
     nplus1_groups: '%count% grupo(s) N+1'
+    nplus1_flag: N+1
     spans_count: '%count% spans'
     col:
         transaction: Transacción
@@ -425,3 +422,44 @@ legal:
         purpose_consent: Guarda las categorías de cookies elegidas y una clave anonimizada para el registro de consentimiento.
         storage_heading: Almacenamiento local
         storage_body: El tema (día/noche) puede guardarse en localStorage del navegador y no es una cookie. Suele considerarse necesario para la UX, pero el operador debe confirmarlo según su jurisdicción.
+
+notifications:
+    title: Notificaciones
+    intro: Envía alertas a Slack Incoming Webhooks o endpoints HTTP genéricos cuando aparezcan incidencias nuevas, regresiones o grupos N+1.
+    empty: Aún no hay destinos. Añade un webhook de Slack o HTTP para avisar a tu equipo.
+    add: Añadir destino
+    edit: Editar
+    enable: Activar
+    disable: Desactivar
+    disabled: Desactivado
+    test: Enviar prueba
+    delete: Eliminar
+    delete_confirm: ¿Eliminar este destino de notificación?
+    save: Guardar destino
+    cancel: Cancelar
+    new_title: Nuevo destino de notificación
+    edit_title: Editar destino de notificación
+    form_help: Pega una URL de Incoming Webhook o cualquier endpoint HTTPS que acepte JSON. Los secretos de la URL se enmascaran en la lista de ajustes.
+    form:
+        label: Etiqueta
+        type: Tipo
+        endpoint: URL del webhook
+        enabled: Activado
+        categories: Categorías de alerta
+    type:
+        slack: Slack Incoming Webhook
+        http: Webhook HTTP genérico
+    category:
+        fatal: Fatal
+        error: Error
+        warning: Advertencia
+        info: Info
+        debug: Debug
+        n_plus_one: Detecciones N+1
+    flash:
+        created: Destino de notificación creado.
+        updated: Destino de notificación actualizado.
+        enabled: Destino activado.
+        disabled: Destino desactivado.
+        deleted: Destino eliminado.
+        test_queued: Notificación de prueba encolada.

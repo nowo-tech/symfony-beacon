@@ -42,16 +42,20 @@ services:
       - target: 443
         published: ${HTTPS_PORT:-9443}
         protocol: tcp
-      - target: 443
-        published: ${HTTP3_PORT:-9443}
-        protocol: udp
+      # HTTP/3/UDP disabled locally: Caddy Alt-Svc h3=":443" does not match the
+      # published HTTPS_PORT (e.g. 9444) and browsers leave /_wdt pending.
     extra_hosts:
       - host.docker.internal:host-gateway
     tty: true
 
-  # Vite / Pentatrion (pnpm). Listens on 5173 inside the network; host maps VITE_PORT.
+  # Vite / Pentatrion (pnpm). Optional HMR — enable with: docker compose --profile hmr up -d
+  # Default stack uses `make vite-build` (static public/build/). Leaving `pnpm run dev` running
+  # rewrites entrypoints.json to viteServer mode and leaves a forever-pending HMR WebSocket
+  # in the browser network panel ("page stuck downloading").
   # Browser loads /build over HTTPS via Caddy (see Caddyfile) — avoids mixed content.
+  # Built files under public/build/ are served from disk; only missing paths hit this service.
   vite:
+    profiles: ["hmr"]
     image: ${IMAGES_PREFIX:-}symfony-beacon-dev
     build:
       context: .
@@ -77,6 +81,13 @@ services:
         published: ${VITE_PORT:-5173}
         protocol: tcp
     command: ["pnpm", "run", "dev"]
+    # Image HEALTHCHECK probes FrankenPHP :2019; this service only runs Vite.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:5173/build/@vite/client >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 20s
     tty: true
 
   ###> doctrine/doctrine-bundle ###
@@ -146,6 +157,9 @@ services:
         "--time-limit=3600",
         "--memory-limit=128M",
       ]
+    # Image HEALTHCHECK expects FrankenPHP :2019; this process only runs Messenger.
+    healthcheck:
+      disable: true
     tty: true
 
 volumes:

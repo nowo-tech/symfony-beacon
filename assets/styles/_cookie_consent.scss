@@ -1,0 +1,151 @@
+/* Beacon skin for nowo-tech/cookie-consent-bundle (Tailwind modal). */
+
+.nowo-cookie-consent--beacon {
+  --nowo-cc-font-family: var(--font-sans, "IBM Plex Sans", "Segoe UI", sans-serif);
+  --nowo-cc-btn-radius: 0.375rem;
+  --nowo-cc-modal-radius: 0.75rem;
+  z-index: 60;
+}
+
+/* Light (matches Beacon [data-theme="light"]) */
+html[data-theme="light"] .nowo-cookie-consent--beacon,
+.nowo-cookie-consent--beacon.nowo-cookie-consent--theme-light:not(.nowo-cookie-consent--dark-mode) {
+  --nowo-cc-bg: var(--beacon-surface, #ffffff);
+  --nowo-cc-primary: var(--beacon-ink, #0f1c18);
+  --nowo-cc-secondary: color-mix(in srgb, var(--beacon-ink, #0f1c18) 62%, transparent);
+  --nowo-cc-btn-primary-bg: var(--beacon-moss, #1f6f54);
+  --nowo-cc-btn-primary-color: #ffffff;
+  --nowo-cc-btn-primary-hover-bg: var(--beacon-moss-deep, #134736);
+  --nowo-cc-btn-primary-hover-color: #ffffff;
+  --nowo-cc-btn-secondary-bg: var(--beacon-mist, #e7f0eb);
+  --nowo-cc-btn-secondary-color: var(--beacon-ink, #0f1c18);
+  --nowo-cc-btn-secondary-hover-bg: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-btn-secondary-hover-color: var(--beacon-ink, #0f1c18);
+  --nowo-cc-separator: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-footer-bg: var(--beacon-surface-muted, #f7faf8);
+  --nowo-cc-footer-border: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-overlay: color-mix(in srgb, var(--beacon-ink, #0f1c18) 45%, transparent);
+  --nowo-cc-category-block-bg: var(--beacon-mist, #e7f0eb);
+  --nowo-cc-category-block-border: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-category-block-hover-bg: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-category-block-hover-border: var(--beacon-sand, #d8e2dc);
+  --nowo-cc-toggle-off-bg: #7a8a84;
+  --nowo-cc-toggle-on-bg: var(--beacon-moss, #1f6f54);
+  --nowo-cc-toggle-readonly-bg: color-mix(in srgb, var(--beacon-moss, #1f6f54) 35%, #d5dee2);
+  --nowo-cc-toggle-readonly-icon: var(--beacon-moss-deep, #134736);
+  --nowo-cc-link: var(--beacon-moss, #1f6f54);
+}
+
+/* Dark (matches Beacon [data-theme="dark"]) */
+html[data-theme="dark"] .nowo-cookie-consent--beacon,
+.nowo-cookie-consent--beacon.nowo-cookie-consent--theme-dark,
+.nowo-cookie-consent--beacon.nowo-cookie-consent--dark-mode {
+  color-scheme: dark;
+  --nowo-cc-bg: var(--beacon-surface, #15201c);
+  --nowo-cc-primary: var(--beacon-ink, #e8f0eb);
+  --nowo-cc-secondary: color-mix(in srgb, var(--beacon-ink, #e8f0eb) 68%, transparent);
+  --nowo-cc-btn-primary-bg: var(--beacon-moss, #4aad7f);
+  --nowo-cc-btn-primary-color: #0a1612;
+  --nowo-cc-btn-primary-hover-bg: var(--beacon-moss-deep, #6bc49a);
+  --nowo-cc-btn-primary-hover-color: #0a1612;
+  --nowo-cc-btn-secondary-bg: var(--beacon-surface-muted, #1c2a25);
+  --nowo-cc-btn-secondary-color: var(--beacon-ink, #e8f0eb);
+  --nowo-cc-btn-secondary-hover-bg: color-mix(in srgb, var(--beacon-moss, #4aad7f) 22%, #1c2a25);
+  --nowo-cc-btn-secondary-hover-color: var(--beacon-ink, #e8f0eb);
+  --nowo-cc-separator: color-mix(in srgb, var(--beacon-ink, #e8f0eb) 12%, transparent);
+  --nowo-cc-footer-bg: var(--beacon-surface-muted, #1c2a25);
+  --nowo-cc-footer-border: color-mix(in srgb, var(--beacon-ink, #e8f0eb) 12%, transparent);
+  --nowo-cc-overlay: rgba(4, 10, 8, 0.72);
+  --nowo-cc-category-block-bg: var(--beacon-surface-muted, #1c2a25);
+  --nowo-cc-category-block-border: color-mix(in srgb, var(--beacon-ink, #e8f0eb) 14%, transparent);
+  --nowo-cc-category-block-hover-bg: color-mix(in srgb, var(--beacon-moss, #4aad7f) 14%, #1c2a25);
+  --nowo-cc-category-block-hover-border: color-mix(in srgb, var(--beacon-moss, #4aad7f) 28%, transparent);
+  --nowo-cc-toggle-off-bg: #5a6b64;
+  --nowo-cc-toggle-on-bg: var(--beacon-moss, #4aad7f);
+  --nowo-cc-toggle-readonly-bg: color-mix(in srgb, var(--beacon-moss, #4aad7f) 40%, #343c40);
+  --nowo-cc-toggle-readonly-icon: var(--beacon-moss-deep, #6bc49a);
+  --nowo-cc-link: var(--beacon-moss, #4aad7f);
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__panel {
+  background: var(--nowo-cc-bg);
+  border: 1px solid var(--nowo-cc-separator);
+  border-radius: var(--nowo-cc-modal-radius);
+  box-shadow: 0 1.25rem 2.5rem rgba(15, 28, 24, 0.28);
+  color: var(--nowo-cc-primary);
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__header {
+  border-bottom: 1px solid var(--nowo-cc-separator);
+  padding: 1rem 1.25rem;
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__title {
+  font-family: var(--font-display, "Source Serif 4 Variable", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__scrollable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__read-more {
+  color: var(--nowo-cc-link, var(--nowo-cc-btn-primary-bg));
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__read-more:hover {
+  color: var(--nowo-cc-btn-primary-hover-bg);
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  min-height: 0;
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nowo-cookie-consent--beacon.nowo-cookie-consent--equal-weight-buttons .nowo-cookie-consent__btn-group {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .nowo-cookie-consent--beacon.nowo-cookie-consent--equal-weight-buttons .nowo-cookie-consent__btn-group {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.nowo-cookie-consent--beacon .nowo-cookie-consent__btn {
+  white-space: normal;
+}
+
+.nowo-cookie-consent--beacon.nowo-cookie-consent--layout-box .nowo-cookie-consent__dialog {
+  max-width: min(32rem, calc(100vw - 2rem));
+  width: 100%;
+}
+
+.nowo-cookie-consent--beacon.nowo-cookie-consent--variant-wide .nowo-cookie-consent__dialog {
+  max-width: min(36rem, calc(100vw - 2rem));
+}

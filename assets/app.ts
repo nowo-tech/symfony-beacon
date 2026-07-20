@@ -1,3 +1,4 @@
+import './styles/fonts.css';
 import './styles/tailwind.css';
 import './styles/app.scss';
 import './stimulus_bootstrap';
@@ -43,6 +44,17 @@ function syncThemeControls(theme: Theme): void {
   });
 }
 
+function syncCookieConsentTheme(theme: Theme): void {
+  const modal = document.getElementById('cookieconsent');
+  if (!(modal instanceof HTMLElement) || modal.dataset.beaconThemeSync !== 'true') {
+    return;
+  }
+
+  const dark = theme === 'dark';
+  modal.classList.toggle('nowo-cookie-consent--dark-mode', dark);
+  modal.dataset.nowoDarkMode = dark ? 'true' : 'false';
+}
+
 function applyTheme(theme: Theme, persist: boolean): void {
   document.documentElement.dataset.theme = theme;
   if (persist) {
@@ -53,6 +65,7 @@ function applyTheme(theme: Theme, persist: boolean): void {
     }
   }
   syncThemeControls(theme);
+  syncCookieConsentTheme(theme);
 }
 
 function initTheme(): void
@@ -198,18 +211,9 @@ document.addEventListener('click', (event) => {
     });
 });
 
-document.addEventListener('turbo:load', () => {
-  initTheme();
-  initSidebar();
-  initColorHexLabels();
-});
-
-// Fallback when Turbo is unavailable (should be rare).
-if (!window.Turbo) {
-  initTheme();
-  initSidebar();
-  initColorHexLabels();
-}
+initTheme();
+initSidebar();
+initColorHexLabels();
 
 function initColorHexLabels(): void {
   document.querySelectorAll<HTMLInputElement>('input[type="color"]').forEach((input) => {

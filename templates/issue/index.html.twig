@@ -5,12 +5,22 @@
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'issues'} %}
 
-<form method="get" action="{{ path('issue_index', {id: project.id}) }}" class="issue-filters panel mb-6 grid gap-3 md:grid-cols-5">
+{% set filterQuery = {
+    q: filters.q,
+    level: filters.level,
+    status: filters.status,
+    environment: filters.environment,
+    assignee: filters.assignee,
+    per_page: filters.per_page,
+    sort: filters.sort,
+    dir: filters.dir,
+} %}
+
+<form method="get" action="{{ path('issue_index', {id: project.id}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
     <input type="hidden" name="sort" value="{{ filters.sort }}">
     <input type="hidden" name="dir" value="{{ filters.dir }}">
     <input type="hidden" name="page" value="1">
-    <input type="hidden" name="per_page" value="{{ filters.per_page }}">
-    <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
+    <input class="input issue-filters__search" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
     <select class="input" name="level">
         <option value="">{{ 'issues.filter.any_level'|trans }}</option>
         {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
@@ -29,46 +39,48 @@
             <option value="{{ member.id }}" {% if filters.assignee == (member.id ~ '') %}selected{% endif %}>{{ member.displayName ?: member.email }}</option>
         {% endfor %}
     </select>
-    <div class="flex gap-2">
-        <input class="input" name="environment" value="{{ filters.environment }}" placeholder="{{ 'issues.filter.environment'|trans }}">
-        <button class="btn-primary" type="submit">{{ 'common.filter'|trans }}</button>
-    </div>
+    <input class="input" name="environment" value="{{ filters.environment }}" placeholder="{{ 'issues.filter.environment'|trans }}">
+    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
+        {% for size in [10, 25, 50, 100] %}
+            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({ '%count%': size }) }}</option>
+        {% endfor %}
+    </select>
+    <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
 </form>
 
-{% if issues is empty %}
+{% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70">{{ 'issues.empty'|trans }}</div>
 {% else %}
-    <div class="panel issue-table-panel">
+    <div class="panel issue-table-panel" data-controller="datatable">
+        <div class="issue-table-scroll">
         <table
-            class="issue-table display nowrap w-full text-left text-sm"
+            class="issue-table display w-full text-left text-sm"
             style="width:100%"
-            data-controller="datatable"
-            data-datatable-sort-value="{{ filters.sort }}"
-            data-datatable-dir-value="{{ filters.dir }}"
-            data-datatable-page-value="{{ filters.page }}"
-            data-datatable-per-page-value="{{ filters.per_page }}"
-            data-datatable-empty-value="{{ 'issues.dt.empty'|trans|e('html_attr') }}"
-            data-datatable-info-value="{{ 'issues.dt.info'|trans|e('html_attr') }}"
-            data-datatable-info-empty-value="{{ 'issues.dt.info_empty'|trans|e('html_attr') }}"
-            data-datatable-info-filtered-value="{{ 'issues.dt.info_filtered'|trans|e('html_attr') }}"
-            data-datatable-length-menu-value="{{ 'issues.dt.length_menu'|trans|e('html_attr') }}"
-            data-datatable-paginate-first-value="{{ 'issues.dt.first'|trans|e('html_attr') }}"
-            data-datatable-paginate-last-value="{{ 'issues.dt.last'|trans|e('html_attr') }}"
-            data-datatable-paginate-next-value="{{ 'issues.dt.next'|trans|e('html_attr') }}"
-            data-datatable-paginate-previous-value="{{ 'issues.dt.previous'|trans|e('html_attr') }}"
-            data-datatable-zero-records-value="{{ 'issues.dt.zero'|trans|e('html_attr') }}"
+            data-datatable-target="table"
         >
             <thead>
                 <tr>
-                    <th>{{ 'issues.col.issue'|trans }}</th>
-                    <th>{{ 'issues.col.level'|trans }}</th>
-                    <th>{{ 'issues.col.assignee'|trans }}</th>
-                    <th class="dt-head-right">{{ 'issues.col.events'|trans }}</th>
-                    <th class="dt-head-right">{{ 'issues.col.events_24h'|trans }}</th>
-                    <th class="dt-head-right">{{ 'issues.col.events_7d'|trans }}</th>
-                    <th class="dt-head-right">{{ 'issues.col.events_30d'|trans }}</th>
-                    <th>{{ 'issues.col.first_seen'|trans }}</th>
-                    <th>{{ 'issues.col.last_seen'|trans }}</th>
+                    {% set columns = [
+                        { key: 'title', label: 'issues.col.issue', priority: 1, head_class: '' },
+                        { key: 'level', label: 'issues.col.level', priority: 2, head_class: '' },
+                        { key: 'assignee', label: 'issues.col.assignee', priority: 6, head_class: '' },
+                        { key: 'events', label: 'issues.col.events', priority: 3, head_class: 'dt-head-right' },
+                        { key: 'events_24h', label: 'issues.col.events_24h', priority: 8, head_class: 'dt-head-right' },
+                        { key: 'events_7d', label: 'issues.col.events_7d', priority: 9, head_class: 'dt-head-right' },
+                        { key: 'events_30d', label: 'issues.col.events_30d', priority: 10, head_class: 'dt-head-right' },
+                        { key: 'first_seen', label: 'issues.col.first_seen', priority: 7, head_class: '' },
+                        { key: 'last_seen', label: 'issues.col.last_seen', priority: 4, head_class: '' }
+                    ] %}
+                    {% for column in columns %}
+                        {% set next = sort.forColumnClick(column.key) %}
+                        <th class="{{ column.head_class }}" data-priority="{{ column.priority }}">
+                            <a
+                                class="issue-table__sort{% if filters.sort == column.key %} is-active is-{{ filters.dir }}{% endif %}"
+                                href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ sort: next.field, dir: next.direction, page: 1 })) }}"
+                                title="{{ 'issues.sort_by'|trans({ '%column%': column.label|trans }) }}"
+                            >{{ column.label|trans }}</a>
+                        </th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
@@ -76,9 +88,9 @@
                     {% set occ = occurrenceByIssue[issue.id]|default(null) %}
                     {% set assigneeLabel = issue.assignee ? (issue.assignee.displayName ?: issue.assignee.email) : ('issues.assignee_unassigned'|trans) %}
                     <tr>
-                        <td>
-                            <a class="font-medium no-underline" href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}">{{ issue.title }}</a>
-                            <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
+                        <td class="issue-table__issue">
+                            <a class="font-medium no-underline issue-table__title" href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}" data-action="click->datatable#openIssue">{{ issue.title }}</a>
+                            <div class="text-xs text-[var(--color-ink)]/55 issue-table__culprit">{{ issue.culprit }}</div>
                         </td>
                         <td data-order="{{ issue.level }}">
                             <span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span>
@@ -94,12 +106,46 @@
                         <td class="dt-body-right font-mono" data-order="{{ occ ? occ.last24h : 0 }}">{{ occ ? occ.last24h : '—' }}</td>
                         <td class="dt-body-right font-mono" data-order="{{ occ ? occ.last7d : 0 }}">{{ occ ? occ.last7d : '—' }}</td>
                         <td class="dt-body-right font-mono" data-order="{{ occ ? occ.last30d : 0 }}">{{ occ ? occ.last30d : '—' }}</td>
-                        <td data-order="{{ issue.firstSeen|date('U') }}" class="whitespace-nowrap">{{ issue.firstSeen|date('Y-m-d H:i') }}</td>
-                        <td data-order="{{ issue.lastSeen|date('U') }}" class="whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
+                        <td data-order="{{ issue.firstSeen|date('U') }}" class="issue-table__date">{{ issue.firstSeen|date('Y-m-d H:i') }}</td>
+                        <td data-order="{{ issue.lastSeen|date('U') }}" class="issue-table__date">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+        </div>
+
+        {% set from = (pagination.page - 1) * pagination.per_page + 1 %}
+        {% set to = (pagination.page - 1) * pagination.per_page + issues|length %}
+        <div class="issue-pagination">
+            <p class="issue-pagination__info">
+                {{ 'issues.pagination.showing'|trans({ '%from%': from, '%to%': to, '%total%': pagination.total }) }}
+            </p>
+            {% if pagination.total_pages > 1 %}
+                <nav class="issue-pagination__nav" aria-label="{{ 'issues.pagination.nav'|trans }}">
+                    {% if pagination.page > 1 %}
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: pagination.page - 1 })) }}">{{ 'issues.pagination.previous'|trans }}</a>
+                    {% else %}
+                        <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.previous'|trans }}</span>
+                    {% endif %}
+
+                    {% for p in 1..pagination.total_pages %}
+                        {% if p == pagination.page %}
+                            <span class="issue-pagination__link is-active" aria-current="page">{{ p }}</span>
+                        {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
+                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: p })) }}">{{ p }}</a>
+                        {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
+                            <span class="issue-pagination__ellipsis">…</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.page < pagination.total_pages %}
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: pagination.page + 1 })) }}">{{ 'issues.pagination.next'|trans }}</a>
+                    {% else %}
+                        <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.next'|trans }}</span>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        </div>
     </div>
 {% endif %}
 {% endblock %}

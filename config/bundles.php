@@ -22,7 +22,6 @@ return [
     Nowo\DashboardMenuBundle\NowoDashboardMenuBundle::class => ['all' => true],
     Nowo\FormKitBundle\NowoFormKitBundle::class => ['all' => true],
     Nowo\PwaBundle\PwaBundle::class => ['all' => true],
-    Symfony\UX\Turbo\TurboBundle::class => ['all' => true],
-    Symfony\UX\Native\UXNativeBundle::class => ['all' => true],
     Nowo\CookieConsentBundle\NowoCookieConsentBundle::class => ['all' => true],
+    Nowo\LoginThrottleBundle\NowoLoginThrottleBundle::class => ['all' => true],
 ];

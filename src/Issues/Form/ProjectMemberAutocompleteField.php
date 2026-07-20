@@ -42,7 +42,6 @@ final class ProjectMemberAutocompleteField extends AbstractType
             'tom_select_options' => [
                 'plugins' => ['clear_button'],
                 'maxOptions' => 20,
-                'dropdownParent' => 'body',
                 'openOnFocus' => true,
                 'highlight' => true,
             ],

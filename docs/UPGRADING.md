@@ -16,14 +16,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Upgrading from 0.6.0 to the next release
 
-No further release yet. When upgrading past `v0.6.0`:
+When upgrading past `v0.6.0` (includes project notifications work-in-progress on main):
 
 1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
 2. Diff env templates: compare your local `.env` against the new `.env.dist` and add any missing keys.
 3. Rebuild containers after Docker/FrankenPHP/Node changes: `make down && make build && make up`.
-4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
-5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build` (or your image build step).
-6. Run quality checks: `make qa` (or at least `make test`).
+4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'` (adds `notification_destination`).
+5. Add ops env keys from `.env.dist` if missing: `BEACON_RETENTION_DAYS`, `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT`, `BEACON_INGEST_RATE_LIMIT`.
+6. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build` (or your image build step).
+7. Run quality checks: `make qa` (or at least `make test`).
+8. Configure Slack/HTTP destinations under **Project → Settings → Notifications** (see [notifications.md](notifications.md)).
+9. Optional cron: `app:retention:purge`; probes: `/health/live`, `/health/ready` (see [production.md](production.md)).
 
 ### Stack versions (0.6.0)
 

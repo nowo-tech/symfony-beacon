@@ -8,6 +8,9 @@ use App\Project\Repository\ProjectApiKeyRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Project ingest credential (public/secret key pair) used in Envelope DSN auth.
+ */
 #[ORM\Entity(repositoryClass: ProjectApiKeyRepository::class)]
 #[ORM\Table(name: 'project_api_key')]
 #[ORM\UniqueConstraint(name: 'uniq_api_key_public', columns: ['public_key'])]

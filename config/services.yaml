@@ -7,6 +7,12 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(BEACON_RETENTION_DAYS): '0'
+    env(BEACON_RETENTION_MAX_EVENTS_PER_PROJECT): '0'
+    env(BEACON_INGEST_RATE_LIMIT): '120'
+    beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
+    beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
+    beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -19,5 +25,16 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Shared\Retention\RetentionPurger:
+        arguments:
+            $retentionDays: '%beacon.retention_days%'
+            $maxEventsPerProject: '%beacon.retention_max_events%'
+
+    App\Shared\Retention\RetentionPurgeCommand:
+        arguments:
+            $retentionDays: '%beacon.retention_days%'
+            $maxEventsPerProject: '%beacon.retention_max_events%'
+
+    App\Ingest\Service\IngestRateLimiter:
+        arguments:
+            $limitPerMinute: '%beacon.ingest_rate_limit%'

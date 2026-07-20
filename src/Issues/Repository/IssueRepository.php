@@ -40,13 +40,83 @@ class IssueRepository extends ServiceEntityRepository
         ?User $assignee = null,
         bool $unassignedOnly = false,
         ?IssueListSort $sort = null,
+        ?int $limit = null,
+        ?int $offset = null,
     ): array {
         $sort ??= new IssueListSort(IssueListSort::DEFAULT_FIELD, IssueListSort::DEFAULT_DIRECTION);
 
+        $qb = $this->createFilteredQueryBuilder(
+            $project,
+            $query,
+            $level,
+            $status,
+            $environment,
+            $assignee,
+            $unassignedOnly,
+        );
+
+        if ($sort->isSqlSortable()) {
+            $this->applySqlSort($qb, $sort);
+        } else {
+            // Occurrence windows are sorted in PHP after stats are loaded.
+            $qb->orderBy('i.lastSeen', 'DESC')->addOrderBy('i.id', 'DESC');
+        }
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+        }
+        if (null !== $offset && $offset > 0) {
+            $qb->setFirstResult($offset);
+        }
+
+        /** @var list<Issue> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
+
+    public function countSearch(
+        Project $project,
+        ?string $query = null,
+        ?string $level = null,
+        ?IssueStatus $status = null,
+        ?string $environment = null,
+        ?User $assignee = null,
+        bool $unassignedOnly = false,
+    ): int {
+        $qb = $this->createFilteredQueryBuilder(
+            $project,
+            $query,
+            $level,
+            $status,
+            $environment,
+            $assignee,
+            $unassignedOnly,
+            forCount: true,
+        );
+
+        if (null !== $environment && '' !== $environment) {
+            $qb->select('COUNT(DISTINCT i.id)');
+        } else {
+            $qb->select('COUNT(i.id)');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    private function createFilteredQueryBuilder(
+        Project $project,
+        ?string $query,
+        ?string $level,
+        ?IssueStatus $status,
+        ?string $environment,
+        ?User $assignee,
+        bool $unassignedOnly,
+        bool $forCount = false,
+    ): QueryBuilder {
         $qb = $this->createQueryBuilder('i')
             ->andWhere('i.project = :project')
-            ->setParameter('project', $project)
-            ->setMaxResults(100);
+            ->setParameter('project', $project);
 
         if (null !== $query && '' !== trim($query)) {
             $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
@@ -66,21 +136,13 @@ class IssueRepository extends ServiceEntityRepository
         if (null !== $environment && '' !== $environment) {
             $qb->innerJoin('i.events', 'e')
                 ->andWhere('e.environment = :env')
-                ->setParameter('env', $environment)
-                ->distinct();
+                ->setParameter('env', $environment);
+            if (!$forCount) {
+                $qb->distinct();
+            }
         }
 
-        if ($sort->isSqlSortable()) {
-            $this->applySqlSort($qb, $sort);
-        } else {
-            // Occurrence windows are sorted in PHP after stats are loaded.
-            $qb->orderBy('i.lastSeen', 'DESC');
-        }
-
-        /** @var list<Issue> $result */
-        $result = $qb->getQuery()->getResult();
-
-        return $result;
+        return $qb;
     }
 
     private function applySqlSort(QueryBuilder $qb, IssueListSort $sort): void
@@ -99,7 +161,7 @@ class IssueRepository extends ServiceEntityRepository
                 ->orderBy('assignee_user.displayName', $dir)
                 ->addOrderBy('assignee_user.email', $dir)
                 ->addOrderBy('i.lastSeen', 'DESC'),
-            default => $qb->orderBy('i.lastSeen', 'DESC'),
+            default => $qb->orderBy('i.lastSeen', 'DESC')->addOrderBy('i.id', 'DESC'),
         };
     }
 }

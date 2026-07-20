@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Project performance transactions list/detail with optional N+1 filter.
+ */
 #[IsGranted('ROLE_USER')]
 final class PerformanceController extends AbstractController
 {

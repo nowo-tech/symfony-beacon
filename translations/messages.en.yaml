@@ -160,18 +160,14 @@ issues:
         any_status: any status
         any_assignee: Any assignee
         environment: Environment
+        per_page: Results per page
+        per_page_option: '%count% per page'
     sort_by: Sort by %column%
-    dt:
-        empty: No issues to display
-        info: Showing _START_–_END_ of _TOTAL_
-        info_empty: Showing 0–0 of 0
-        info_filtered: (filtered from _MAX_ total)
-        length_menu: Show _MENU_
-        first: First
-        last: Last
-        next: Next
+    pagination:
+        showing: Showing %from%–%to% of %total%
+        nav: Issue list pages
         previous: Previous
-        zero: No matching issues
+        next: Next
     col:
         issue: Issue
         level: Level
@@ -191,6 +187,7 @@ performance:
     back: ← Performance
     no_nplus1: no N+1 detected
     nplus1_groups: '%count% N+1 group(s)'
+    nplus1_flag: N+1
     spans_count: '%count% spans'
     col:
         transaction: Transaction
@@ -425,3 +422,44 @@ legal:
         purpose_consent: Stores cookie category choices and an anonymized consent key for logging.
         storage_heading: Local storage
         storage_body: Theme (day/night) may be stored in the browser’s localStorage and is not a cookie. It does not require consent under typical ePrivacy guidance for strictly necessary UX, but operators should confirm for their jurisdiction.
+
+notifications:
+    title: Notifications
+    intro: Send alerts to Slack Incoming Webhooks or generic HTTP endpoints when new issues, regressions, or N+1 groups appear.
+    empty: No destinations yet. Add a Slack or HTTP webhook to notify your team.
+    add: Add destination
+    edit: Edit
+    enable: Enable
+    disable: Disable
+    disabled: Disabled
+    test: Send test
+    delete: Delete
+    delete_confirm: Delete this notification destination?
+    save: Save destination
+    cancel: Cancel
+    new_title: New notification destination
+    edit_title: Edit notification destination
+    form_help: Paste an Incoming Webhook URL or any HTTPS endpoint that accepts JSON. Secrets in the URL are masked in the settings list.
+    form:
+        label: Label
+        type: Type
+        endpoint: Webhook URL
+        enabled: Enabled
+        categories: Alert categories
+    type:
+        slack: Slack Incoming Webhook
+        http: Generic HTTP webhook
+    category:
+        fatal: Fatal
+        error: Error
+        warning: Warning
+        info: Info
+        debug: Debug
+        n_plus_one: N+1 detections
+    flash:
+        created: Notification destination created.
+        updated: Notification destination updated.
+        enabled: Destination enabled.
+        disabled: Destination disabled.
+        deleted: Destination deleted.
+        test_queued: Test notification queued for delivery.

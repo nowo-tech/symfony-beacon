@@ -49,6 +49,24 @@ Supported:
 
 The public key must belong to the `{project_id}` in the URL.
 
+### Ingest sequence (overview)
+
+Full architecture diagrams (module map, grouping, N+1, UI access) live in [architecture.md](architecture.md#flows-mermaid).
+
+```mermaid
+sequenceDiagram
+  participant SDK as Client SDK
+  participant API as Beacon Envelope API
+  participant Bus as Messenger
+  participant DB as MySQL
+
+  SDK->>API: POST /api/{project_id}/envelope/ + auth
+  API->>API: Validate key + parse envelope
+  API->>Bus: ProcessEnvelopeMessage
+  API-->>SDK: 200 ACK
+  Bus->>DB: Persist issue/event or transaction
+```
+
 ## Async processing
 
 The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMessage`, and returns `200` quickly. The Compose `messenger` service persists issues/events/transactions.

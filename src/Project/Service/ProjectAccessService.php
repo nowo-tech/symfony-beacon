@@ -11,6 +11,9 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Enforces project membership and role checks for controllers.
+ */
 final readonly class ProjectAccessService
 {
     public function __construct(
@@ -23,6 +26,9 @@ final readonly class ProjectAccessService
         return $this->membershipRepository->findOneByProjectAndUser($project, $user);
     }
 
+    /**
+     * @throws AccessDeniedHttpException when the user is not a project member
+     */
     public function requireMembership(Project $project, User $user): ProjectMembership
     {
         $membership = $this->getMembership($project, $user);
@@ -33,6 +39,11 @@ final readonly class ProjectAccessService
         return $membership;
     }
 
+    /**
+     * Requires membership with at least the given role (member < admin < owner).
+     *
+     * @throws AccessDeniedHttpException when membership or role is insufficient
+     */
     public function requireRole(Project $project, User $user, ProjectRole $minimum): ProjectMembership
     {
         $membership = $this->requireMembership($project, $user);

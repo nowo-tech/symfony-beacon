@@ -9,6 +9,9 @@ use App\Project\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Daily aggregate counters for a project (errors, transactions, N+1 groups).
+ */
 #[ORM\Entity(repositoryClass: DailyProjectStatRepository::class)]
 #[ORM\Table(name: 'daily_project_stat')]
 #[ORM\UniqueConstraint(name: 'uniq_project_stat_day', columns: ['project_id', 'stat_date'])]

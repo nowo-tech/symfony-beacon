@@ -93,8 +93,9 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 
 ### Key Entities
 
-- **Native configuration document**: Versioned settings + ordered path rules consumed by Hotwire Native clients.
-- **Native request**: An HTTP request identified as coming from a Hotwire Native shell.
+- **Native configuration document**: Versioned settings + ordered path rules consumed by Hotwire Native clients (built by `App\Native\AppNativeConfiguration`).
+- **Native request**: An HTTP request identified as coming from a Hotwire Native shell (`ux_is_native()`).
+- **Theme bridge**: Stimulus `beacon-theme-bridge` keeps native chrome in sync with app theme after Turbo navigations.
 
 ## Success Criteria *(mandatory)*
 

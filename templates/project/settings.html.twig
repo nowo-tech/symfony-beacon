@@ -62,6 +62,63 @@
     </section>
 </div>
 
+<section class="panel mt-6">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-semibold">{{ 'notifications.title'|trans }}</h2>
+        {% if membership.role.value in ['owner', 'admin'] %}
+            <a class="btn-primary" href="{{ path('project_notification_new', {id: project.id}) }}">{{ 'notifications.add'|trans }}</a>
+        {% endif %}
+    </div>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'notifications.intro'|trans }}</p>
+    {% set destinations = project.notificationDestinations %}
+    {% if destinations is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'notifications.empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-3">
+            {% for destination in destinations %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <div class="font-medium">
+                                {{ destination.label }}
+                                {% if not destination.enabled %}
+                                    <span class="badge badge-error">{{ 'notifications.disabled'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                                {{ ('notifications.type.' ~ destination.type.value)|trans }}
+                                · {{ destination.maskedEndpointUrl }}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% for category in destination.categories %}
+                                    <span class="mr-1">{{ ('notifications.category.' ~ category)|trans }}</span>{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if membership.role.value in ['owner', 'admin'] %}
+                            <div class="flex flex-wrap gap-2">
+                                <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.id, id: destination.id}) }}">{{ 'notifications.edit'|trans }}</a>
+                                <form method="post" action="{{ path('project_notification_toggle', {projectId: project.id, id: destination.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_toggle_' ~ destination.id) }}">
+                                    <button class="btn-ghost" type="submit">{{ destination.enabled ? 'notifications.disable'|trans : 'notifications.enable'|trans }}</button>
+                                </form>
+                                <form method="post" action="{{ path('project_notification_test', {projectId: project.id, id: destination.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_test_' ~ destination.id) }}">
+                                    <button class="btn-ghost" type="submit">{{ 'notifications.test'|trans }}</button>
+                                </form>
+                                <form method="post" action="{{ path('project_notification_delete', {projectId: project.id, id: destination.id}) }}" onsubmit="return confirm('{{ 'notifications.delete_confirm'|trans|e('js') }}')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_' ~ destination.id) }}">
+                                    <button class="btn-danger" type="submit">{{ 'notifications.delete'|trans }}</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
 {% if membership.role.value in ['owner', 'admin'] %}
 <section class="panel panel--danger mt-6">
     <h2 class="mb-2 text-lg font-semibold text-[var(--color-alert)]">{{ 'project.danger.title'|trans }}</h2>

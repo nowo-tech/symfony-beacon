@@ -1,0 +1,10 @@
+nowo_login_throttle:
+    enabled: true
+    max_count_attempts: 5
+    timeout: 900
+    watch_period: 3600
+    firewall: main
+    storage: cache
+    rate_limiter: null
+    cache_pool: cache.rate_limiter
+    lock_factory: null

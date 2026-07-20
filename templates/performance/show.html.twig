@@ -1,36 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ transaction.transactionName }}{% endblock %}
+{% block title %}{{ transaction.transactionName }} — {{ project.name }}{% endblock %}
 
 {% block body %}
-<a href="{{ path('performance_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'performance.back'|trans }}</a>
-<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ transaction.transactionName }}</h1>
-<p class="mt-1 text-sm text-[var(--color-ink)]/65">
-    {{ transaction.durationMs|number_format(1) }} ms · {{ 'performance.spans_count'|trans({'%count%': transaction.spanCount}) }} ·
-    {% if transaction.nPlusOneCount > 0 %}
-        <span class="text-[var(--color-warn)]">{{ 'performance.nplus1_groups'|trans({'%count%': transaction.nPlusOneCount}) }}</span>
-    {% else %}
-        {{ 'performance.no_nplus1'|trans }}
-    {% endif %}
-</p>
+{% include 'project/_nav.html.twig' with {project: project, current: 'performance'} %}
 
-<section class="panel mt-6 overflow-x-auto p-0">
-    <table class="w-full text-left text-sm">
-        <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
+<a href="{{ path('performance_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'performance.back'|trans }}</a>
+
+<header class="perf-tx-hero mt-3">
+    <h1 class="perf-tx-hero__title font-[family-name:var(--font-display)]">{{ transaction.transactionName }}</h1>
+    <ul class="perf-tx-hero__meta">
+        <li>{{ transaction.durationMs|number_format(1) }} ms</li>
+        <li>{{ 'performance.spans_count'|trans({'%count%': transaction.spanCount}) }}</li>
+        <li>
+            {% if transaction.nPlusOneCount > 0 %}
+                <span class="badge badge-warn">{{ 'performance.nplus1_groups'|trans({'%count%': transaction.nPlusOneCount}) }}</span>
+            {% else %}
+                <span class="text-[var(--color-ink)]/55">{{ 'performance.no_nplus1'|trans }}</span>
+            {% endif %}
+        </li>
+        <li class="text-[var(--color-ink)]/55">{{ transaction.receivedAt|date('Y-m-d H:i:s') }}</li>
+    </ul>
+</header>
+
+<section class="panel perf-span-panel mt-6 overflow-x-auto p-0">
+    <table class="perf-span-table w-full text-left text-sm">
+        <thead>
             <tr>
-                <th class="px-4 py-3">{{ 'performance.col.op'|trans }}</th>
-                <th class="px-4 py-3">{{ 'performance.col.description'|trans }}</th>
-                <th class="px-4 py-3">{{ 'performance.col.duration'|trans }}</th>
-                <th class="px-4 py-3">{{ 'performance.col.nplus1'|trans }}</th>
+                <th>{{ 'performance.col.op'|trans }}</th>
+                <th>{{ 'performance.col.description'|trans }}</th>
+                <th class="perf-span-table__num">{{ 'performance.col.duration'|trans }}</th>
+                <th>{{ 'performance.col.nplus1'|trans }}</th>
             </tr>
         </thead>
         <tbody>
             {% for span in transaction.spans %}
-                <tr class="border-b border-[var(--color-sand)] last:border-0 {% if span.nPlusOneCandidate %}bg-amber-50{% endif %}">
-                    <td class="px-4 py-3 font-mono text-xs">{{ span.op }}</td>
-                    <td class="px-4 py-3 font-mono text-xs">{{ span.description }}</td>
-                    <td class="px-4 py-3">{{ span.durationMs|number_format(1) }} ms</td>
-                    <td class="px-4 py-3">{% if span.nPlusOneCandidate %}{{ 'common.yes'|trans }}{% else %}—{% endif %}</td>
+                <tr class="{% if span.nPlusOneCandidate %}is-nplus1{% endif %}">
+                    <td class="perf-span-table__op">{{ span.op }}</td>
+                    <td class="perf-span-table__desc">{{ span.description }}</td>
+                    <td class="perf-span-table__num">{{ span.durationMs|number_format(1) }} ms</td>
+                    <td>
+                        {% if span.nPlusOneCandidate %}
+                            <span class="badge badge-warn">{{ 'performance.nplus1_flag'|trans }}</span>
+                        {% else %}
+                            <span class="perf-span-table__empty">—</span>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -23,6 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Project issues list/detail, assignee updates, and status changes.
+ */
 #[IsGranted('ROLE_USER')]
 final class IssueController extends AbstractController
 {
@@ -71,19 +74,59 @@ final class IssueController extends AbstractController
         }
         $page = max(1, $request->query->getInt('page', 1));
 
-        $issues = $this->issueRepository->search(
+        $q = $request->query->getString('q') ?: null;
+        $level = $request->query->getString('level') ?: null;
+        $environment = $request->query->getString('environment') ?: null;
+
+        $total = $this->issueRepository->countSearch(
             $project,
-            $request->query->getString('q') ?: null,
-            $request->query->getString('level') ?: null,
+            $q,
+            $level,
             $status,
-            $request->query->getString('environment') ?: null,
+            $environment,
             $assignee,
             $unassignedOnly,
-            $sort,
         );
-        $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($issues);
+        $totalPages = max(1, (int) ceil($total / $perPage));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * $perPage;
+
         if ($sort->isOccurrenceSortable()) {
-            $issues = $this->sortIssuesByOccurrence($issues, $occurrenceByIssue, $sort);
+            $allIssues = $this->issueRepository->search(
+                $project,
+                $q,
+                $level,
+                $status,
+                $environment,
+                $assignee,
+                $unassignedOnly,
+                $sort,
+            );
+            $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($allIssues);
+            $allIssues = $this->sortIssuesByOccurrence($allIssues, $occurrenceByIssue, $sort);
+            $issues = \array_values(\array_slice($allIssues, $offset, $perPage));
+            $pageIds = [];
+            foreach ($issues as $issue) {
+                $id = $issue->getId();
+                if (null !== $id) {
+                    $pageIds[$id] = true;
+                }
+            }
+            $occurrenceByIssue = \array_intersect_key($occurrenceByIssue, $pageIds);
+        } else {
+            $issues = $this->issueRepository->search(
+                $project,
+                $q,
+                $level,
+                $status,
+                $environment,
+                $assignee,
+                $unassignedOnly,
+                $sort,
+                $perPage,
+                $offset,
+            );
+            $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($issues);
         }
 
         return $this->render('issue/index.html.twig', [
@@ -92,6 +135,12 @@ final class IssueController extends AbstractController
             'occurrenceByIssue' => $occurrenceByIssue,
             'members' => $members,
             'sort' => $sort,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => $totalPages,
+            ],
             'filters' => [
                 'q' => $request->query->getString('q'),
                 'level' => $request->query->getString('level'),

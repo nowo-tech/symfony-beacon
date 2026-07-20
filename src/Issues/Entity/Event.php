@@ -8,6 +8,9 @@ use App\Issues\Repository\EventRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Stored Envelope event (full payload plus promoted context columns).
+ */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: 'event')]
 #[ORM\UniqueConstraint(name: 'uniq_event_id', columns: ['event_id'])]

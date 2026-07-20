@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Admin UI for site brand name and accent colors.
+ */
 #[IsGranted('ROLE_ADMIN')]
 final class AppearanceSettingsController extends AbstractController
 {

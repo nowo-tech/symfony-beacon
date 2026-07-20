@@ -1,4 +1,0 @@
-# Hotwire Native / Symfony UX Native
-# https://symfony.com/bundles/ux-native/current/index.html
-ux_native:
-    output_dir: '%kernel.project_dir%/public'

@@ -13,6 +13,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\FingerprintCalculator;
+use App\Notifications\Service\NotificationDispatcher;
 use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
@@ -22,6 +23,9 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Persists Envelope event/transaction items, groups issues, and updates analytics.
+ */
 #[AsMessageHandler]
 final readonly class ProcessEnvelopeHandler
 {
@@ -34,6 +38,7 @@ final readonly class ProcessEnvelopeHandler
         private IssueRepository $issueRepository,
         private EventRepository $eventRepository,
         private DailyProjectStatRepository $dailyProjectStatRepository,
+        private NotificationDispatcher $notificationDispatcher,
         private EntityManagerInterface $entityManager,
     ) {
     }
@@ -83,7 +88,10 @@ final readonly class ProcessEnvelopeHandler
 
         $fingerprint = $this->fingerprintCalculator->calculate($payload);
         $issue = $this->issueRepository->findOneByProjectAndFingerprint($project, $fingerprint);
-        if (!$issue instanceof Issue) {
+        $isNew = !$issue instanceof Issue;
+        $previousStatus = $issue instanceof Issue ? $issue->getStatus() : null;
+
+        if ($isNew) {
             $issue = new Issue();
             $issue->setProject($project);
             $issue->setFingerprint($fingerprint);
@@ -98,8 +106,14 @@ final readonly class ProcessEnvelopeHandler
         $issue->incrementEventCount();
         $issue->setTitle($this->fingerprintCalculator->title($payload));
         $issue->setCulprit($this->fingerprintCalculator->culprit($payload));
-        if (IssueStatus::Resolved === $issue->getStatus()) {
+
+        $isRegression = false;
+        if (!$isNew && (
+            IssueStatus::Resolved === $previousStatus
+            || IssueStatus::Ignored === $previousStatus
+        )) {
             $issue->setStatus(IssueStatus::Unresolved);
+            $isRegression = true;
         }
 
         $event = new Event();
@@ -119,6 +133,14 @@ final readonly class ProcessEnvelopeHandler
 
         $stat = $this->dailyProjectStatRepository->findOrCreate($project, $receivedAt);
         $stat->incrementErrorCount();
+
+        $this->entityManager->flush();
+
+        if ($isNew) {
+            $this->notificationDispatcher->dispatchNewIssue($project, $issue);
+        } elseif ($isRegression) {
+            $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
+        }
     }
 
     /**
@@ -186,6 +208,12 @@ final readonly class ProcessEnvelopeHandler
         $stat->incrementTransactionCount();
         if ($detection['count'] > 0) {
             $stat->incrementNPlusOneCount($detection['count']);
+        }
+
+        $this->entityManager->flush();
+
+        if ($detection['count'] > 0) {
+            $this->notificationDispatcher->dispatchNPlusOne($project, $tx);
         }
     }
 

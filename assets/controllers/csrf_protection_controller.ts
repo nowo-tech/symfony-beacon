@@ -1,19 +1,6 @@
 const nameCheck = /^[-_a-zA-Z0-9]{4,22}$/;
 const tokenCheck = /^[-_/+a-zA-Z0-9]{24,}$/;
 
-type CsrfHeaders = Record<string, string>;
-
-interface TurboFormSubmission {
-  formElement: HTMLFormElement;
-  fetchRequest: {
-    headers: Record<string, string>;
-  };
-}
-
-interface TurboSubmitEventDetail {
-  formSubmission: TurboFormSubmission;
-}
-
 interface MsCrypto {
   getRandomValues: Crypto["getRandomValues"];
 }
@@ -45,8 +32,6 @@ function randomToken(): string {
 }
 
 // Generate and double-submit a CSRF token in a form field and a cookie, as defined by Symfony's SameOriginCsrfTokenManager.
-// Use `form.requestSubmit()` to ensure that the submit event is triggered. Using `form.submit()` will not trigger the event
-// and thus this event-listener will not be executed.
 document.addEventListener(
   "submit",
   (event: Event) => {
@@ -56,20 +41,6 @@ document.addEventListener(
   },
   true,
 );
-
-// When @hotwired/turbo handles form submissions, send the CSRF token in a header in addition to a cookie.
-// The `framework.csrf_protection.check_header` config option needs to be enabled for the header to be checked.
-document.addEventListener("turbo:submit-start", ((event: CustomEvent<TurboSubmitEventDetail>) => {
-  const headers = generateCsrfHeaders(event.detail.formSubmission.formElement);
-  for (const [key, value] of Object.entries(headers)) {
-    event.detail.formSubmission.fetchRequest.headers[key] = value;
-  }
-}) as EventListener);
-
-// When @hotwired/turbo handles form submissions, remove the CSRF cookie once a form has been submitted.
-document.addEventListener("turbo:submit-end", ((event: CustomEvent<TurboSubmitEventDetail>) => {
-  removeCsrfToken(event.detail.formSubmission.formElement);
-}) as EventListener);
 
 export function generateCsrfToken(formElement: HTMLFormElement): void {
   const csrfField = csrfFieldFrom(formElement);
@@ -93,21 +64,6 @@ export function generateCsrfToken(formElement: HTMLFormElement): void {
     const cookie = `${csrfCookie}_${csrfToken}=${csrfCookie}; path=/; samesite=strict`;
     document.cookie = window.location.protocol === "https:" ? `__Host-${cookie}; secure` : cookie;
   }
-}
-
-export function generateCsrfHeaders(formElement: HTMLFormElement): CsrfHeaders {
-  const headers: CsrfHeaders = {};
-  const csrfField = csrfFieldFrom(formElement);
-  if (!csrfField) {
-    return headers;
-  }
-
-  const csrfCookie = csrfField.getAttribute("data-csrf-protection-cookie-value");
-  if (csrfCookie && tokenCheck.test(csrfField.value) && nameCheck.test(csrfCookie)) {
-    headers[csrfCookie] = csrfField.value;
-  }
-
-  return headers;
 }
 
 export function removeCsrfToken(formElement: HTMLFormElement): void {

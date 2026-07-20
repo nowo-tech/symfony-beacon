@@ -36,6 +36,12 @@ controllers_analytics:
         namespace: App\Analytics\Controller
     type: attribute
 
+controllers_notifications:
+    resource:
+        path: ../src/Notifications/Controller/
+        namespace: App\Notifications\Controller
+    type: attribute
+
 controllers_appearance:
     resource:
         path: ../src/Shared/Appearance/Controller/
@@ -52,4 +58,10 @@ controllers_legal:
     resource:
         path: ../src/Shared/Legal/Controller/
         namespace: App\Shared\Legal\Controller
+    type: attribute
+
+controllers_health:
+    resource:
+        path: ../src/Shared/Health/
+        namespace: App\Shared\Health
     type: attribute

@@ -1,6 +1,13 @@
 {
 	{$CADDY_GLOBAL_OPTIONS}
 
+	# Dev publishes HTTPS on a non-default host port (e.g. 9444→443). Caddy still
+	# advertises Alt-Svc h3=":443", so browsers try HTTP/3 on localhost:443 (nothing
+	# listens) and XHR like /_wdt stay "pending". Stick to h1/h2 for local stack.
+	servers {
+		protocols h1 h2
+	}
+
 	# FRANKENPHP_CONFIG is set by frankenphp/docker-entrypoint.sh from FRANKENPHP_MODE:
 	#   classic → empty (classic php_server, boot per request)
 	#   worker  → "worker { file ./public/index.php ... }" (app kept in memory)
@@ -42,15 +49,33 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 		{$CADDY_SERVER_LOG_OPTIONS}
 	}
 
+	# Instruct browsers to forget a previously advertised HTTP/3 endpoint
+	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
+	header Alt-Svc "clear"
+
 	# Symfony document root
 	root * /app/public
 	encode zstd br gzip
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 
-	# Vite HMR / assets (dev) — same-origin HTTPS so Tailwind CSS loads in the browser.
+	# Vite assets: prefer files already written under public/build/ (vite-build).
+	# Only proxy to the Vite container for missing paths (HMR / transformed modules).
+	# Blind reverse_proxy of all /build* hangs the browser when Vite is slow or when a
+	# long-lived HMR WebSocket stays "pending" in the network panel.
 	handle /build* {
-		reverse_proxy vite:5173
+		root * /app/public
+		@built file
+		handle @built {
+			file_server
+		}
+		handle {
+			reverse_proxy vite:5173 {
+				transport http {
+					dial_timeout 2s
+				}
+			}
+		}
 	}
 
 	# classic: run PHP per request.

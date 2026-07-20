@@ -7,6 +7,7 @@ namespace App\Ingest\Controller;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\IngestRateLimiter;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
@@ -20,6 +21,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Throwable;
 
+/**
+ * Envelope ingest endpoint: authenticates, ACKs quickly, and dispatches async processing.
+ */
 #[AsController]
 final readonly class EnvelopeController
 {
@@ -28,6 +32,7 @@ final readonly class EnvelopeController
         private EnvelopeParser $envelopeParser,
         private ProjectRepository $projectRepository,
         private ProjectApiKeyRepository $apiKeyRepository,
+        private IngestRateLimiter $ingestRateLimiter,
         private MessageBusInterface $bus,
     ) {
     }
@@ -81,6 +86,12 @@ final readonly class EnvelopeController
 
         if (null === $this->projectRepository->find($projectId)) {
             return new Response('project not found', Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$this->ingestRateLimiter->accept($projectId)) {
+            return new Response('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
+                'Retry-After' => '60',
+            ]);
         }
 
         $this->bus->dispatch(new ProcessEnvelopeMessage(

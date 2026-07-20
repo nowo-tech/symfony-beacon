@@ -7,6 +7,9 @@ namespace App\Performance\Entity;
 use App\Performance\Repository\PerfSpanRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Single span within a performance transaction; may be marked as an N+1 candidate.
+ */
 #[ORM\Entity(repositoryClass: PerfSpanRepository::class)]
 #[ORM\Table(name: 'perf_span')]
 #[ORM\Index(name: 'idx_span_tx_op', columns: ['transaction_id', 'op'])]

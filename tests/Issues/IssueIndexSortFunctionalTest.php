@@ -31,9 +31,11 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
         self::assertStringContainsString('dir=asc', (string) $client->getRequest()->getRequestUri());
         self::assertStringContainsString('q=issue', (string) $client->getRequest()->getRequestUri());
 
-        self::assertSelectorExists('table.issue-table[data-controller="datatable"]');
-        self::assertSame('title', $crawler->filter('table.issue-table')->attr('data-datatable-sort-value'));
-        self::assertSame('asc', $crawler->filter('table.issue-table')->attr('data-datatable-dir-value'));
+        self::assertSelectorExists('.issue-table-panel[data-controller="datatable"]');
+        self::assertSelectorExists('table.issue-table[data-datatable-target="table"]');
+        self::assertSame('title', $crawler->filter('form.issue-filters input[name="sort"]')->attr('value'));
+        self::assertSame('asc', $crawler->filter('form.issue-filters input[name="dir"]')->attr('value'));
+        self::assertSame('25', $crawler->filter('form.issue-filters select[name="per_page"] option[selected]')->attr('value'));
 
         $titles = $crawler->filter('table.issue-table tbody tr td:first-child a')->each(
             static fn ($node): string => trim($node->text()),
@@ -49,6 +51,32 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
         self::assertSame('title', $crawler->filter('form.issue-filters input[name="sort"]')->attr('value'));
         self::assertSame('desc', $crawler->filter('form.issue-filters input[name="dir"]')->attr('value'));
         self::assertSame('1', $crawler->filter('form.issue-filters input[name="page"]')->attr('value'));
+    }
+
+    public function testServerSidePaginationLimitsRows(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('page-issues@example.com');
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        for ($i = 1; $i <= 12; ++$i) {
+            $em->persist($this->makeIssue(
+                $project,
+                \sprintf('Paged issue %02d', $i),
+                new DateTimeImmutable(\sprintf('-%d hours', 13 - $i)),
+            ));
+        }
+        $em->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=asc&per_page=10&page=1');
+        self::assertResponseIsSuccessful();
+        self::assertCount(10, $crawler->filter('table.issue-table tbody tr'));
+        self::assertSelectorExists('.issue-pagination');
+        self::assertSelectorExists('a.issue-pagination__link[href*="page=2"]');
+
+        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=asc&per_page=10&page=2');
+        self::assertCount(2, $crawler->filter('table.issue-table tbody tr'));
     }
 
     private function makeIssue(Project $project, string $title, DateTimeImmutable $seen): Issue

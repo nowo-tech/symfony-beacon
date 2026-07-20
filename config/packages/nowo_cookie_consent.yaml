@@ -24,6 +24,11 @@ nowo_cookie_consent:
     # Beacon uses Tailwind 4
     ui_theme: tailwind
 
+    # Skin follows Beacon via CSS (`assets/styles/_cookie_consent.scss`) + data-theme sync.
+    color_theme: light
+    dark_mode_enabled: false
+    disable_page_interaction: true
+
     # Floating cookie bubble only on login/register (included manually in AuthKit layout).
     preferences_bubble_enabled: false
     preferences_bubble_position: bottom-right
@@ -41,9 +46,15 @@ nowo_cookie_consent:
         - legal_terms
         - legal_cookies
 
-    csrf_protection: true
+    # Vendor nowo-consent-modal.js posts via XHR (no submit event), so Symfony's
+    # stateless CSRF Stimulus never runs and the form stays invalid. Prefer a
+    # dedicated action URL without CSRF over POSTing to /en/login (400).
+    csrf_protection: false
     http_only: true
-    disable_page_interaction: false
+
+    # Without this, the form has no action → browser/XHR POSTs to the current page
+    # (e.g. /en/login → 400) and the modal never closes.
+    form_action: nowo_cookie_consent.show
 
     # First-party cookies used by this Beacon instance
     cookie_inventory:

@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Authenticated home listing projects the user can access.
+ */
 #[IsGranted('ROLE_USER')]
 final class DashboardController extends AbstractController
 {

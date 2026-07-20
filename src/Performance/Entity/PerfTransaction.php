@@ -11,6 +11,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Ingested performance transaction with span children and N+1 group count.
+ */
 #[ORM\Entity(repositoryClass: PerfTransactionRepository::class)]
 #[ORM\Table(name: 'perf_transaction')]
 #[ORM\Index(name: 'idx_tx_project_received', columns: ['project_id', 'received_at'])]

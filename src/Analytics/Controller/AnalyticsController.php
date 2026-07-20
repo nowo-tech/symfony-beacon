@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Renders per-project daily analytics (errors, transactions, N+1).
+ */
 #[IsGranted('ROLE_USER')]
 final class AnalyticsController extends AbstractController
 {

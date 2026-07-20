@@ -15,18 +15,19 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Opening a project lands on **Issues**; configuration lives under **Settings**
+- Project **Settings** with API keys, members, **notification destinations** (Slack / HTTP), and danger zone
 - Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive/paginated table (sort + page in the URL)
 - Issue detail: Sentry-style layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily analytics (errors, transactions, N+1 counts)
+- Project notifications (Slack Incoming Webhook + generic HTTP JSON)
+- Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{id}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt)
-- **Native mobile** via [`symfony/ux-native`](https://ux.symfony.com/native) + Turbo (Hotwire Native shell — how to create iOS/Android apps: [docs/native-mobile.md](docs/native-mobile.md))
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/legal-and-cookies.md](docs/legal-and-cookies.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
@@ -44,10 +45,11 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
 cp .env.dist .env
-make up
+make up          # starts stack + builds frontend into public/build/
 make console ARGS='doctrine:migrations:migrate -n'
+# Optional live CSS/JS reload: make vite-hmr  (stop it + make vite-build when done)
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
-# Option B — seed demo user + project + DSN:
+# Option B — seed demo user + project + DSN + N+1 performance samples:
 make seed
 ```
 
@@ -55,6 +57,8 @@ make seed
 - HTTPS: https://localhost:9444  
 - MySQL: `localhost:3308`
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
+- After seed, open Performance with N+1 filter: `/projects/1/performance?nplus1=1` (transaction `demo.nplus1.products`)
+- After seed, open Analytics: `/projects/1/analytics` (14 days of error / transaction / N+1 counters)
 - First-user registration (empty DB only): https://localhost:9444/en/register (Spanish: `/es/register`)
 - Login: https://localhost:9444/en/login (includes **Remember me**)
 
@@ -79,16 +83,19 @@ Application code is written for worker safety (`ResetInterface` when needed). Se
 
 ## Architecture
 
-Modular Symfony (not full DDD):
+Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/architecture.md](docs/architecture.md).
 
 | Module | Responsibility |
 |--------|----------------|
-| `Identity` | Users (AuthKit login/register), seed command |
-| `Project` | Projects, API keys, memberships |
+| `Identity` | Users (AuthKit login/register), account prefs, seed command |
+| `Project` | Projects, API keys, memberships, Settings / danger zone |
 | `Ingest` | Envelope API + async pipeline |
-| `Issues` | Grouping, list/filter, event detail |
+| `Issues` | Grouping, list/filter, assignee, event detail |
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates |
+| `Notifications` | Slack / HTTP webhook destinations |
+| `Native` | Hotwire Native config (`/config/*_v1.json`) |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
 
 ## Spec-Driven Development
 
@@ -104,6 +111,9 @@ docker compose exec php php bin/phpunit
 
 ## Documentation
 
+- [Architecture rationale](docs/architecture.md)
+- [Product roadmap](docs/ROADMAP.md)
+- [Project notifications](docs/notifications.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)

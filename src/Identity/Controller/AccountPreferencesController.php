@@ -19,6 +19,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Account profile, security, and display preference screens.
+ */
 #[IsGranted('ROLE_USER')]
 final class AccountPreferencesController extends AbstractController
 {

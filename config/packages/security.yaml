@@ -32,6 +32,9 @@ security:
                 lifetime: 604800
                 path: /
                 remember_me_parameter: login_form[_remember_me]
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             logout:
                 path: nowo_auth_kit_logout
                 target: nowo_auth_kit_login
@@ -49,12 +52,11 @@ security:
         - { path: ^/api/\d+/envelope, roles: PUBLIC_ACCESS }
         # PWA assets (manifest, service worker, offline fallback)
         - { path: ^/(manifest\.webmanifest|sw\.js|offline)$, roles: PUBLIC_ACCESS }
-        # Hotwire Native client configuration (Symfony UX Native)
-        - { path: ^/config/(ios|android)_v\d+\.json$, roles: PUBLIC_ACCESS }
         # Legal pages + cookie consent modal (nowo-tech/cookie-consent-bundle)
         - { path: ^/legal/, roles: PUBLIC_ACCESS }
         - { path: ^/cookie_consent(_alt)?$, roles: PUBLIC_ACCESS }
         - { path: ^/cookie-consent/config, roles: PUBLIC_ACCESS }
+        - { path: ^/health/(live|ready)$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

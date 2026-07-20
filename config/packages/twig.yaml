@@ -3,6 +3,9 @@ twig:
     form_themes:
         - '@NowoFormKit/form/static_blocks.html.twig'
         - 'form/beacon_theme.html.twig'
+    paths:
+        # CookieConsentBundle does not auto-register templates/bundles/ overrides (unlike AuthKit).
+        '%kernel.project_dir%/templates/bundles/NowoCookieConsentBundle': NowoCookieConsentBundle
     globals:
         enabled_locales: '%kernel.enabled_locales%'
         default_locale: '%kernel.default_locale%'

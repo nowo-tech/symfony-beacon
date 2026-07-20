@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ (is_edit ? 'notifications.edit_title' : 'notifications.new_title')|trans }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
+
+<h1 class="mb-2 text-2xl font-semibold">{{ (is_edit ? 'notifications.edit_title' : 'notifications.new_title')|trans }}</h1>
+<p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'notifications.form_help'|trans }}</p>
+
+{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
+    {{ form_row(form.label) }}
+    {{ form_row(form.type) }}
+    {{ form_row(form.endpointUrl) }}
+    {{ form_row(form.enabled) }}
+    {{ form_row(form.categories) }}
+    <div class="flex flex-wrap gap-2 pt-2">
+        <button class="btn-primary" type="submit">{{ 'notifications.save'|trans }}</button>
+        <a class="btn-ghost" href="{{ path('project_settings', {id: project.id}) }}">{{ 'notifications.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

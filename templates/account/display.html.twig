@@ -34,15 +34,13 @@
         >{{ 'preferences.issue_panels_reset'|trans }}</button>
     </section>
 
-    {% if not ux_is_native() %}
-        <section class="panel mt-6 space-y-3" aria-labelledby="display-pwa-heading">
-            <div>
-                <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
-                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>
-            </div>
-            {{ nowo_pwa_install_links() }}
-        </section>
-    {% endif %}
+    <section class="panel mt-6 space-y-3" aria-labelledby="display-pwa-heading">
+        <div>
+            <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>
+        </div>
+        {{ nowo_pwa_install_links() }}
+    </section>
 </div>
 <script>
 (() => {

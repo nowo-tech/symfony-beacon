@@ -22,12 +22,18 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | Setting | Beacon value |
 |---------|----------------|
 | `ui_theme` | `tailwind` |
+| `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
+| `csrf_protection` | `false` (vendor modal JS posts via XHR without firing `submit`, so Symfony stateless CSRF never hydrates) |
+| `color_theme` | `light` (Beacon SCSS remaps to moss tokens; follows `data-theme`) |
+| `disable_page_interaction` | `true` (dimmed overlay until choice) |
 | `categories` | `analytics`, `preferences` (plus always-on required) |
 | `use_logger` | `true` (writes `dashboard_cookie_log`) |
 | `use_cookie_inventory` | `true` (YAML inventory for session / remember-me / consent cookies) |
-| `preferences_bubble_enabled` | `true` (re-open settings after consent) |
+| `preferences_bubble_enabled` | `false` (AuthKit layout can include the bubble manually) |
 | `enabled_locales` | `en`, `es` |
 | `disabled_routes` | legal pages (banner does not auto-open there) |
+
+Twig overrides live under `templates/bundles/NowoCookieConsentBundle/` (registered in `config/packages/twig.yaml`) and style tokens in `assets/styles/_cookie_consent.scss`.
 
 Routes: `config/routes/nowo_cookie_consent.yaml`  
 Privacy link from the modal: `translations/NowoCookieConsentBundle.*.yaml` → `legal_privacy`.

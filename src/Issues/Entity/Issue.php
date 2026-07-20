@@ -13,6 +13,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Grouped error issue keyed by project fingerprint, with optional assignee.
+ */
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[ORM\Table(name: 'issue')]
 #[ORM\UniqueConstraint(name: 'uniq_project_fingerprint', columns: ['project_id', 'fingerprint'])]

@@ -10,6 +10,9 @@ use App\Shared\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Links a user to a project with an owner/admin/member role.
+ */
 #[ORM\Entity(repositoryClass: ProjectMembershipRepository::class)]
 #[ORM\Table(name: 'project_membership')]
 #[ORM\UniqueConstraint(name: 'uniq_project_user', columns: ['project_id', 'user_id'])]
