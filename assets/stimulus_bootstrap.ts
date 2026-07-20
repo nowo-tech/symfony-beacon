@@ -1,10 +1,16 @@
 import { startStimulusApp } from 'vite-plugin-symfony/stimulus/helpers';
 import type { Application } from '@hotwired/stimulus';
+import BeaconThemeBridgeController from './controllers/beacon_theme_bridge_controller';
+import CollapsePanelController from './controllers/collapse_panel_controller';
+import ConfirmDialogController from './controllers/confirm_dialog_controller';
+import HumanKeyLabelController from './controllers/human_key_label_controller';
 
-/** Starts Stimulus and registers UX controllers from assets/controllers.json. */
+/** Starts Stimulus (UX controllers from controllers.json + local app controllers). */
 const app: Application = startStimulusApp();
 
-// Register any custom, third-party controllers here:
-// app.register('some_controller_name', SomeImportedController);
+app.register('beacon-theme-bridge', BeaconThemeBridgeController);
+app.register('collapse-panel', CollapsePanelController);
+app.register('confirm-dialog', ConfirmDialogController);
+app.register('human-key-label', HumanKeyLabelController);
 
 export { app };

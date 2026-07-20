@@ -111,6 +111,7 @@ issues:
     back_to_issue: ← Incidencia
     event_count: '%count% eventos'
     latest_stack: Último stack / payload
+    latest_event: Último evento
     event: Evento
     recent_events: Eventos recientes
     no_events: No hay eventos guardados.
@@ -124,17 +125,48 @@ issues:
     os: Sistema operativo
     user: Usuario
     server_name: Servidor
-    stacktrace: Stack trace
-    breadcrumbs: Migas de contexto
+    logger: Logger
+    message: Mensaje
+    fingerprint: Fingerprint
+    request: Petición HTTP
+    request_method: Método
+    request_url: URL
+    request_query: Query string
+    request_headers: Cabeceras
+    extra: Datos adicionales
+    stacktrace: Stack Trace
+    source_context: Código fuente
+    no_source_context: Sin código fuente para este frame.
+    breadcrumbs: Breadcrumbs
     raw_payload: Payload en bruto
+    highlights: Highlights
+    tags: Tags
+    contexts: Contexts
+    context_runtime: Runtime
+    context_framework: Framework
+    in_app: in-app
+    aside_details: Detalles
+    assignee: Asignado a
+    assignee_unassigned: Sin asignar
+    assignee_help: Elige un miembro del proyecto responsable de resolver esta incidencia.
+    assignee_save: Guardar asignación
+    assignee_saved: Asignación actualizada.
+    assignee_not_member: Ese usuario no es miembro de este proyecto.
+    assignee_invalid: No se pudo actualizar la asignación.
     filter:
         any_level: Cualquier nivel
         any_status: cualquier estado
+        any_assignee: Cualquier asignado
         environment: Entorno
     col:
         issue: Incidencia
         level: Nivel
+        assignee: Asignado
         events: Eventos
+        events_24h: 24h
+        events_7d: 7d
+        events_30d: 30d
+        first_seen: Primera vez
         last_seen: Última vez
 performance:
     title: Rendimiento
@@ -223,7 +255,7 @@ preferences:
         submit: Actualizar contraseña
     display:
         title: Interfaz
-        intro: Elige idioma, tema y ancho del contenido para tu cuenta.
+        intro: Elige idioma, tema, ancho del contenido y qué paneles de incidencia empiezan colapsados.
         submit: Guardar interfaz
         pwa_title: Instalar aplicación
         pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
@@ -243,6 +275,25 @@ preferences:
     theme_dark: Noche
     width_content: Contenido (centrado)
     width_full: Ancho completo
+    issue_panels_collapsed: Paneles de incidencia colapsados por defecto
+    issue_panels_help: Los paneles marcados empiezan colapsados en el detalle de incidencia/evento. El navegador recuerda si los abres o cierras a mano.
+    issue_panels_browser: Diseño de paneles en el navegador
+    issue_panels_browser_help: Borra los estados abierto/cerrado guardados en este navegador para volver a aplicar los valores por defecto de preferencias.
+    issue_panels_reset: Borrar estados guardados de paneles
+    issue_panels_reset_done: Borrado
+    issue_panel:
+        highlights: Highlights
+        stacktrace: Stack Trace
+        message: Mensaje
+        breadcrumbs: Breadcrumbs
+        request: Petición HTTP
+        tags: Tags
+        contexts: Contexts
+        extra: Datos adicionales
+        raw: Payload en bruto
+        details: Detalles (sidebar)
+        assignee: Asignado a
+        recent_events: Eventos recientes
     error:
         current_password: La contraseña actual no es correcta.
         email_in_use: Este correo ya está en uso.

@@ -11,10 +11,28 @@
         {{ form_row(form.preferredLocale) }}
         {{ form_row(form.preferredTheme) }}
         {{ form_row(form.preferredContentWidth) }}
+        <fieldset class="space-y-2 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-medium text-[var(--color-ink)]/85">{{ 'preferences.issue_panels_collapsed'|trans }}</legend>
+            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_help'|trans }}</p>
+            <div class="issue-panel-prefs">
+                {{ form_widget(form.preferredCollapsedIssuePanels) }}
+            </div>
+            {{ form_errors(form.preferredCollapsedIssuePanels) }}
+        </fieldset>
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
+
+    <section class="panel mt-4 space-y-2">
+        <h2 class="text-sm font-semibold">{{ 'preferences.issue_panels_browser'|trans }}</h2>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_browser_help'|trans }}</p>
+        <button
+            type="button"
+            class="btn-ghost"
+            data-reset-issue-panels
+        >{{ 'preferences.issue_panels_reset'|trans }}</button>
+    </section>
 
     {% if not ux_is_native() %}
         <section class="panel mt-6 space-y-3" aria-labelledby="display-pwa-heading">
@@ -26,4 +44,16 @@
         </section>
     {% endif %}
 </div>
+<script>
+(() => {
+  const btn = document.querySelector('[data-reset-issue-panels]');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    try {
+      localStorage.removeItem('beacon.issuePanelState');
+    } catch (_) {}
+    btn.textContent = {{ 'preferences.issue_panels_reset_done'|trans|json_encode|raw }};
+  });
+})();
+</script>
 {% endblock %}

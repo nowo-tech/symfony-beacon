@@ -7,11 +7,14 @@ namespace App\Issues\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Form\IssueAssigneeType;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
+use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\IssueStatus;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +27,9 @@ final class IssueController extends AbstractController
     public function __construct(
         private readonly IssueRepository $issueRepository,
         private readonly EventRepository $eventRepository,
+        private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -40,22 +45,41 @@ final class IssueController extends AbstractController
             ? (IssueStatus::tryFrom($statusParam) ?? IssueStatus::Unresolved)
             : IssueStatus::Unresolved;
 
+        $members = $this->membershipRepository->findUsersByProject($project);
+        $assigneeFilter = $request->query->getString('assignee');
+        $assignee = null;
+        $unassignedOnly = 'unassigned' === $assigneeFilter;
+        if (!$unassignedOnly && '' !== $assigneeFilter && ctype_digit($assigneeFilter)) {
+            foreach ($members as $member) {
+                if ($member->getId() === (int) $assigneeFilter) {
+                    $assignee = $member;
+                    break;
+                }
+            }
+        }
+
         $issues = $this->issueRepository->search(
             $project,
             $request->query->getString('q') ?: null,
             $request->query->getString('level') ?: null,
             $status,
             $request->query->getString('environment') ?: null,
+            $assignee,
+            $unassignedOnly,
         );
+        $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($issues);
 
         return $this->render('issue/index.html.twig', [
             'project' => $project,
             'issues' => $issues,
+            'occurrenceByIssue' => $occurrenceByIssue,
+            'members' => $members,
             'filters' => [
                 'q' => $request->query->getString('q'),
                 'level' => $request->query->getString('level'),
                 'status' => $status->value,
                 'environment' => $request->query->getString('environment'),
+                'assignee' => $assigneeFilter,
             ],
         ]);
     }
@@ -72,12 +96,61 @@ final class IssueController extends AbstractController
         $this->projectAccess->requireMembership($project, $user);
 
         $events = $this->eventRepository->findLatestForIssue($issue);
+        $latestEvent = $events[0] ?? null;
+        $occurrence = $this->eventRepository->occurrenceStatsForIssue($issue);
+        $assigneeForm = $this->createForm(IssueAssigneeType::class, $issue, [
+            'project_id' => (int) $project->getId(),
+            'action' => $this->generateUrl('issue_assign', ['projectId' => $project->getId(), 'id' => $issue->getId()]),
+            'method' => 'POST',
+        ]);
 
         return $this->render('issue/show.html.twig', [
             'project' => $project,
             'issue' => $issue,
             'events' => $events,
-            'latestEvent' => $events[0] ?? null,
+            'latestEvent' => $latestEvent,
+            'occurrence' => $occurrence,
+            'assigneeForm' => $assigneeForm->createView(),
+        ]);
+    }
+
+    #[Route('/projects/{projectId}/issues/{id}/assign', name: 'issue_assign', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['POST'])]
+    public function assign(Request $request, int $projectId, Issue $issue): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $project = $issue->getProject();
+        if (!$project instanceof Project || $project->getId() !== $projectId) {
+            throw $this->createNotFoundException();
+        }
+        $this->projectAccess->requireMembership($project, $user);
+
+        $form = $this->createForm(IssueAssigneeType::class, $issue, [
+            'project_id' => (int) $project->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $assignee = $issue->getAssignee();
+            if ($assignee instanceof User && null === $this->membershipRepository->findOneByProjectAndUser($project, $assignee)) {
+                $this->addFlash('error', 'issues.assignee_not_member');
+                $issue->setAssignee(null);
+            } else {
+                $this->entityManager->flush();
+                $this->addFlash('success', 'issues.assignee_saved');
+            }
+
+            return $this->redirectToRoute('issue_show', [
+                'projectId' => $project->getId(),
+                'id' => $issue->getId(),
+            ]);
+        }
+
+        $this->addFlash('error', 'issues.assignee_invalid');
+
+        return $this->redirectToRoute('issue_show', [
+            'projectId' => $project->getId(),
+            'id' => $issue->getId(),
         ]);
     }
 

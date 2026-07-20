@@ -6,6 +6,11 @@ namespace App\Issues\Service;
 
 /**
  * Builds a stable issue fingerprint from an Envelope event payload.
+ *
+ * Grouping prefers similarity over exact text:
+ * - exception type + stack location (file/function), without fragile line numbers
+ * - volatile tokens in messages (IDs, UUIDs, numbers) are normalized
+ * - client-provided fingerprint arrays still win when present
  */
 final class FingerprintCalculator
 {
@@ -23,19 +28,20 @@ final class FingerprintCalculator
         $exception = $this->firstException($payload);
         if (null !== $exception) {
             $type = (string) ($exception['type'] ?? 'Error');
-            $value = (string) ($exception['value'] ?? '');
-            $frame = $this->topFrame($exception);
-            $file = (string) ($frame['filename'] ?? $frame['abs_path'] ?? '');
+            $value = $this->normalizeMessage((string) ($exception['value'] ?? ''));
+            $frame = $this->topFrame($exception['stacktrace']['frames'] ?? null);
+            $file = $this->normalizePath((string) ($frame['filename'] ?? $frame['abs_path'] ?? ''));
             $function = (string) ($frame['function'] ?? '');
-            $lineno = (string) ($frame['lineno'] ?? '');
 
-            return hash('sha256', implode('|', [$type, $value, $file, $function, $lineno]));
+            return hash('sha256', implode('|', [$type, $value, $file, $function]));
         }
 
-        $message = (string) ($payload['message'] ?? 'unknown');
-        $culprit = (string) ($payload['culprit'] ?? '');
+        $message = $this->normalizeMessage((string) ($payload['message'] ?? 'unknown'));
+        $frame = $this->topFrame($payload['stacktrace']['frames'] ?? null);
+        $file = $this->normalizePath((string) ($frame['filename'] ?? $frame['abs_path'] ?? ''));
+        $function = (string) ($frame['function'] ?? ($payload['culprit'] ?? ''));
 
-        return hash('sha256', $message.'|'.$culprit);
+        return hash('sha256', implode('|', [$message, $file, $function]));
     }
 
     /**
@@ -64,11 +70,39 @@ final class FingerprintCalculator
         }
 
         $exception = $this->firstException($payload);
-        $frame = null !== $exception ? $this->topFrame($exception) : [];
+        $frame = null !== $exception
+            ? $this->topFrame($exception['stacktrace']['frames'] ?? null)
+            : $this->topFrame($payload['stacktrace']['frames'] ?? null);
         $function = (string) ($frame['function'] ?? '');
         $file = (string) ($frame['filename'] ?? '');
 
         return '' !== $function ? $function : $file;
+    }
+
+    /**
+     * Collapse volatile tokens so similar messages share a fingerprint.
+     */
+    public function normalizeMessage(string $message): string
+    {
+        $normalized = preg_replace(
+            '/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i',
+            '<uuid>',
+            $message,
+        ) ?? $message;
+        $normalized = preg_replace('/\b[0-9a-f]{32}\b/i', '<hex>', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\d+/', '<n>', $normalized) ?? $normalized;
+
+        return trim(preg_replace('/\s+/', ' ', $normalized) ?? $normalized);
+    }
+
+    private function normalizePath(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+        if (preg_match('#/(src|app|tests)/(.+)$#', $path, $matches)) {
+            return $matches[1].'/'.$matches[2];
+        }
+
+        return basename($path);
     }
 
     /**
@@ -90,19 +124,29 @@ final class FingerprintCalculator
     }
 
     /**
-     * @param array<string, mixed> $exception
+     * Prefer the outermost in-app frame; fall back to the last frame.
+     *
+     * @param mixed $frames
      *
      * @return array<string, mixed>
      */
-    private function topFrame(array $exception): array
+    private function topFrame(mixed $frames): array
     {
-        $frames = $exception['stacktrace']['frames'] ?? null;
         if (!\is_array($frames) || [] === $frames) {
             return [];
         }
 
-        $last = $frames[\count($frames) - 1];
+        $fallback = [];
+        foreach (array_reverse($frames) as $frame) {
+            if (!\is_array($frame)) {
+                continue;
+            }
+            $fallback = $frame;
+            if (!empty($frame['in_app'])) {
+                return $frame;
+            }
+        }
 
-        return \is_array($last) ? $last : [];
+        return $fallback;
     }
 }

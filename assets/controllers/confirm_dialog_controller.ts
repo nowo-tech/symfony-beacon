@@ -21,16 +21,30 @@ export default class extends Controller {
   declare readonly hasExpectedValue: boolean;
   declare readonly expectedValue: string;
 
+  /** Ignore backdrop clicks that belong to the same gesture that opened the dialog. */
+  private ignoreBackdropUntil = 0;
+
   open(event?: Event): void {
     event?.preventDefault();
+    event?.stopPropagation();
+
     if (this.hasConfirmInputTarget) {
       this.confirmInputTarget.value = "";
     }
     this.syncSubmit();
-    this.dialogTarget.showModal();
-    if (this.hasConfirmInputTarget) {
-      this.confirmInputTarget.focus();
-    }
+
+    // Opening synchronously from a click can deliver that same click to the
+    // newly shown modal backdrop (danger-zone buttons sit under the overlay),
+    // which would close the dialog immediately via backdropClose.
+    this.ignoreBackdropUntil = Date.now() + 350;
+    requestAnimationFrame(() => {
+      if (!this.dialogTarget.open) {
+        this.dialogTarget.showModal();
+      }
+      if (this.hasConfirmInputTarget) {
+        this.confirmInputTarget.focus();
+      }
+    });
   }
 
   close(event?: Event): void {
@@ -39,6 +53,9 @@ export default class extends Controller {
   }
 
   backdropClose(event: MouseEvent): void {
+    if (Date.now() < this.ignoreBackdropUntil) {
+      return;
+    }
     if (event.target === this.dialogTarget) {
       this.dialogTarget.close();
     }

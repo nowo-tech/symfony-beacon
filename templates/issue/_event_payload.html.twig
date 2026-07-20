@@ -1,0 +1,307 @@
+{#
+  Sentry-like event body. Expects `event`.
+  Order: Highlights → Stack → Breadcrumbs → Request → Tags → Contexts → Extra → Raw
+#}
+{% set payload = event.payload %}
+{% set exceptionValues = payload.exception.values|default([]) %}
+{% set exception = exceptionValues[0]|default(null) %}
+{% set frames = exception.stacktrace.frames|default(payload.stacktrace.frames|default([])) %}
+{% set breadcrumbs = payload.breadcrumbs.values|default([]) %}
+{% set user = payload.user|default(null) %}
+{% set runtime = payload.contexts.runtime|default(null) %}
+{% set framework = payload.contexts.framework|default(null) %}
+{% set os = payload.contexts.os|default(null) %}
+{% set request = payload.request|default(payload.contexts.request|default(null)) %}
+{% set requestUrl = request.url|default(request.request_uri|default(payload.extra.request_uri|default(null))) %}
+{% set requestMethod = request.method|default(request.request_method|default(payload.extra.request_method|default(null))) %}
+{% set headers = request.headers|default({}) %}
+{% set levelLabel = payload.level|default(issue is defined ? issue.level : 'error') %}
+
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'highlights', title: 'issues.highlights'|trans } %}
+    {% block body %}
+        <table class="issue-kv">
+            <tbody>
+                <tr>
+                    <th>{{ 'issues.col.level'|trans }}</th>
+                    <td><span class="issue-badge issue-badge--level">{{ levelLabel }}</span></td>
+                </tr>
+                {% if payload.logger is defined %}
+                    <tr>
+                        <th>{{ 'issues.logger'|trans }}</th>
+                        <td class="font-mono">{{ payload.logger }}</td>
+                    </tr>
+                {% endif %}
+                {% if payload.server_name is defined %}
+                    <tr>
+                        <th>{{ 'issues.server_name'|trans }}</th>
+                        <td class="font-mono">{{ payload.server_name }}</td>
+                    </tr>
+                {% endif %}
+                {% if requestUrl %}
+                    <tr>
+                        <th>{{ 'issues.request_url'|trans }}</th>
+                        <td class="font-mono break-all">
+                            {% if requestMethod %}<span class="issue-badge">{{ requestMethod }}</span> {% endif %}
+                            {{ requestUrl }}
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th>{{ 'issues.release'|trans }}</th>
+                    <td>{{ event.releaseVersion|default(payload.release|default('common.na'|trans)) }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'issues.filter.environment'|trans }}</th>
+                    <td>{{ event.environment|default(payload.environment|default('common.na'|trans)) }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'issues.occurred_at'|trans }}</th>
+                    <td class="font-mono">{{ event.eventTimestamp|date('Y-m-d H:i:s.u') }} UTC</td>
+                </tr>
+                <tr>
+                    <th>{{ 'issues.received_at'|trans }}</th>
+                    <td class="font-mono">{{ event.receivedAt|date('Y-m-d H:i:s.u') }} UTC</td>
+                </tr>
+                {% if payload.fingerprint is defined and payload.fingerprint %}
+                    <tr>
+                        <th>{{ 'issues.fingerprint'|trans }}</th>
+                        <td class="font-mono text-xs">{{ payload.fingerprint|join(' · ') }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}
+
+{% if frames is not empty or exception %}
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'stacktrace', title: 'issues.stacktrace'|trans } %}
+    {% block body %}
+        {% for ex in exceptionValues|default(exception ? [exception] : []) %}
+            <div class="issue-exception{% if not loop.first %} mt-4{% endif %}">
+                <p class="issue-exception__type font-mono">{{ ex.type|default('common.unknown'|trans) }}</p>
+                {% if ex.value is defined and ex.value %}
+                    <p class="issue-exception__value">{{ ex.value }}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            {% if payload.message is defined and payload.message %}
+                <p class="issue-exception__value mb-3">{{ payload.message }}</p>
+            {% endif %}
+        {% endfor %}
+
+        {% if frames is not empty %}
+            <ol class="issue-stack">
+                {% for frame in frames|reverse %}
+                    {% set inApp = frame.in_app|default(false) %}
+                    {% set hasSource = frame.context_line is defined and frame.context_line is not same as(null) and frame.context_line is not same as('') %}
+                    <li class="issue-stack__frame{% if inApp %} issue-stack__frame--app{% endif %}">
+                        <details class="issue-stack__details"{% if loop.first %} open{% endif %}>
+                            <summary class="issue-stack__summary">
+                                <span class="issue-stack__chevron" aria-hidden="true"></span>
+                                <span class="issue-stack__summary-body">
+                                    <span class="issue-stack__meta">
+                                        <span class="issue-stack__file font-mono">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
+                                        <span class="issue-stack__line font-mono">:{{ frame.lineno|default('?') }}</span>
+                                        {% if inApp %}
+                                            <span class="issue-badge issue-badge--app">{{ 'issues.in_app'|trans }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <span class="issue-stack__fn font-mono">
+                                        {{ frame.function|default('common.unknown'|trans) }}
+                                    </span>
+                                </span>
+                            </summary>
+                            {% if hasSource %}
+                                {% set pre = frame.pre_context|default([]) %}
+                                {% set post = frame.post_context|default([]) %}
+                                {% set startLine = frame.lineno - pre|length %}
+                                <div class="issue-stack__source" aria-label="{{ 'issues.source_context'|trans }}">
+                                    {% for line in pre %}
+                                        <div class="issue-stack__src-line">
+                                            <span class="issue-stack__ln">{{ startLine + loop.index0 }}</span>
+                                            <code>{{ line }}</code>
+                                        </div>
+                                    {% endfor %}
+                                    <div class="issue-stack__src-line issue-stack__src-line--active">
+                                        <span class="issue-stack__ln">{{ frame.lineno }}</span>
+                                        <code>{{ frame.context_line }}</code>
+                                    </div>
+                                    {% for line in post %}
+                                        <div class="issue-stack__src-line">
+                                            <span class="issue-stack__ln">{{ frame.lineno + loop.index }}</span>
+                                            <code>{{ line }}</code>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="issue-stack__empty">{{ 'issues.no_source_context'|trans }}</p>
+                            {% endif %}
+                        </details>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    {% endblock %}
+{% endembed %}
+{% elseif payload.message is defined and payload.message %}
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'message', title: 'issues.message'|trans } %}
+    {% block body %}
+        <p class="issue-exception__value whitespace-pre-wrap font-mono text-sm">{{ payload.message }}</p>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if breadcrumbs is not empty %}
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'breadcrumbs', title: 'issues.breadcrumbs'|trans } %}
+    {% block body %}
+        <ol class="issue-crumbs">
+            {% for crumb in breadcrumbs %}
+                <li class="issue-crumbs__item">
+                    <span class="issue-crumbs__time font-mono">{{ crumb.timestamp|default('') }}</span>
+                    <span class="issue-badge">{{ crumb.category|default('default') }}</span>
+                    {% if crumb.level is defined %}<span class="issue-badge issue-badge--level">{{ crumb.level }}</span>{% endif %}
+                    <span class="issue-crumbs__msg">{{ crumb.message|default('') }}</span>
+                    {% if crumb.data is defined and crumb.data %}
+                        <pre class="code-block issue-crumbs__data">{{ crumb.data|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if request or requestUrl %}
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'request', title: 'issues.request'|trans } %}
+    {% block body %}
+        <table class="issue-kv">
+            <tbody>
+                {% if requestMethod %}
+                    <tr>
+                        <th>{{ 'issues.request_method'|trans }}</th>
+                        <td class="font-mono">{{ requestMethod }}</td>
+                    </tr>
+                {% endif %}
+                {% if requestUrl %}
+                    <tr>
+                        <th>{{ 'issues.request_url'|trans }}</th>
+                        <td class="font-mono break-all">{{ requestUrl }}</td>
+                    </tr>
+                {% endif %}
+                {% if request.query_string is defined and request.query_string %}
+                    <tr>
+                        <th>{{ 'issues.request_query'|trans }}</th>
+                        <td class="font-mono break-all">{{ request.query_string }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% if headers is iterable and headers is not empty %}
+            <h3 class="issue-section__subtitle">{{ 'issues.request_headers'|trans }}</h3>
+            <table class="issue-kv">
+                <tbody>
+                    {% for name, value in headers %}
+                        <tr>
+                            <th class="font-mono">{{ name }}</th>
+                            <td class="font-mono break-all text-xs">{{ value is iterable ? value|join(', ') : value }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'tags', title: 'issues.tags'|trans } %}
+    {% block body %}
+        <ul class="issue-tags">
+            <li><span class="issue-tags__key">environment</span><span class="issue-tags__val">{{ event.environment|default(payload.environment|default('—')) }}</span></li>
+            <li><span class="issue-tags__key">level</span><span class="issue-tags__val">{{ levelLabel }}</span></li>
+            <li><span class="issue-tags__key">platform</span><span class="issue-tags__val">{{ event.platform|default(payload.platform|default('php')) }}</span></li>
+            {% if event.releaseVersion or payload.release is defined %}
+                <li><span class="issue-tags__key">release</span><span class="issue-tags__val">{{ event.releaseVersion|default(payload.release) }}</span></li>
+            {% endif %}
+            {% if payload.server_name is defined %}
+                <li><span class="issue-tags__key">server_name</span><span class="issue-tags__val">{{ payload.server_name }}</span></li>
+            {% endif %}
+            {% if event.phpVersion or runtime %}
+                <li><span class="issue-tags__key">runtime</span><span class="issue-tags__val">php {{ event.phpVersion|default(runtime.version|default('')) }}</span></li>
+            {% endif %}
+            {% if event.symfonyVersion or framework %}
+                <li><span class="issue-tags__key">framework</span><span class="issue-tags__val">symfony {{ event.symfonyVersion|default(framework.version|default('')) }}</span></li>
+            {% endif %}
+            {% if os %}
+                <li><span class="issue-tags__key">os</span><span class="issue-tags__val">{{ os.name|default('?') }}{% if os.version is defined %} {{ os.version }}{% endif %}</span></li>
+            {% endif %}
+            {% if event.userIdentifier or user %}
+                <li><span class="issue-tags__key">user</span><span class="issue-tags__val">{{ event.userIdentifier|default(user.username|default(user.id|default(user.email|default('—')))) }}</span></li>
+            {% endif %}
+            {% if payload.logger is defined %}
+                <li><span class="issue-tags__key">logger</span><span class="issue-tags__val">{{ payload.logger }}</span></li>
+            {% endif %}
+        </ul>
+    {% endblock %}
+{% endembed %}
+
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'contexts', title: 'issues.contexts'|trans } %}
+    {% block body %}
+        <div class="issue-contexts">
+            {% if runtime %}
+                <div class="issue-contexts__card">
+                    <h3>{{ 'issues.context_runtime'|trans }}</h3>
+                    <table class="issue-kv issue-kv--compact">
+                        <tr><th>name</th><td>{{ runtime.name|default('php') }}</td></tr>
+                        <tr><th>version</th><td>{{ runtime.version|default(event.phpVersion|default('—')) }}</td></tr>
+                    </table>
+                </div>
+            {% endif %}
+            {% if framework %}
+                <div class="issue-contexts__card">
+                    <h3>{{ 'issues.context_framework'|trans }}</h3>
+                    <table class="issue-kv issue-kv--compact">
+                        <tr><th>name</th><td>{{ framework.name|default('symfony') }}</td></tr>
+                        <tr><th>version</th><td>{{ framework.version|default(event.symfonyVersion|default('—')) }}</td></tr>
+                    </table>
+                </div>
+            {% endif %}
+            {% if os %}
+                <div class="issue-contexts__card">
+                    <h3>{{ 'issues.os'|trans }}</h3>
+                    <table class="issue-kv issue-kv--compact">
+                        <tr><th>name</th><td>{{ os.name|default('—') }}</td></tr>
+                        {% if os.version is defined %}<tr><th>version</th><td>{{ os.version }}</td></tr>{% endif %}
+                    </table>
+                </div>
+            {% endif %}
+            {% if user or event.userIdentifier %}
+                <div class="issue-contexts__card">
+                    <h3>{{ 'issues.user'|trans }}</h3>
+                    <table class="issue-kv issue-kv--compact">
+                        {% if user.id is defined %}<tr><th>id</th><td>{{ user.id }}</td></tr>{% endif %}
+                        {% if user.username is defined %}<tr><th>username</th><td>{{ user.username }}</td></tr>{% endif %}
+                        {% if user.email is defined %}<tr><th>email</th><td>{{ user.email }}</td></tr>{% endif %}
+                        {% if not user and event.userIdentifier %}<tr><th>id</th><td>{{ event.userIdentifier }}</td></tr>{% endif %}
+                    </table>
+                </div>
+            {% endif %}
+            {% if not runtime and not framework and not os and not user and not event.userIdentifier %}
+                <p class="text-sm text-[var(--color-ink)]/55">{{ 'common.na'|trans }}</p>
+            {% endif %}
+        </div>
+    {% endblock %}
+{% endembed %}
+
+{% if payload.extra is defined and payload.extra %}
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'extra', title: 'issues.extra'|trans } %}
+    {% block body %}
+        <pre class="code-block">{{ payload.extra|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'raw', title: 'issues.raw_payload'|trans } %}
+    {% block body %}
+        <pre class="code-block">{{ payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+    {% endblock %}
+{% endembed %}

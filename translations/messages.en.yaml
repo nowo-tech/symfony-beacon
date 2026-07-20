@@ -111,6 +111,7 @@ issues:
     back_to_issue: ← Issue
     event_count: '%count% events'
     latest_stack: Latest stack / payload
+    latest_event: Latest event
     event: Event
     recent_events: Recent events
     no_events: No events stored.
@@ -124,17 +125,48 @@ issues:
     os: Operating system
     user: User
     server_name: Server
-    stacktrace: Stack trace
+    logger: Logger
+    message: Message
+    fingerprint: Fingerprint
+    request: HTTP Request
+    request_method: Method
+    request_url: URL
+    request_query: Query string
+    request_headers: Headers
+    extra: Additional data
+    stacktrace: Stack Trace
+    source_context: Source
+    no_source_context: No source context for this frame.
     breadcrumbs: Breadcrumbs
     raw_payload: Raw payload
+    highlights: Highlights
+    tags: Tags
+    contexts: Contexts
+    context_runtime: Runtime
+    context_framework: Framework
+    in_app: in-app
+    aside_details: Details
+    assignee: Assignee
+    assignee_unassigned: Unassigned
+    assignee_help: Choose a project member responsible for resolving this issue.
+    assignee_save: Save assignee
+    assignee_saved: Assignee updated.
+    assignee_not_member: That user is not a member of this project.
+    assignee_invalid: Could not update the assignee.
     filter:
         any_level: Any level
         any_status: any status
+        any_assignee: Any assignee
         environment: Environment
     col:
         issue: Issue
         level: Level
+        assignee: Assignee
         events: Events
+        events_24h: 24h
+        events_7d: 7d
+        events_30d: 30d
+        first_seen: First seen
         last_seen: Last seen
 performance:
     title: Performance
@@ -223,7 +255,7 @@ preferences:
         submit: Update password
     display:
         title: Display
-        intro: Choose language, theme, and content width for your account.
+        intro: Choose language, theme, content width, and which issue panels start collapsed.
         submit: Save display settings
         pwa_title: Install app
         pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
@@ -243,6 +275,25 @@ preferences:
     theme_dark: Night
     width_content: Content (centered)
     width_full: Full width
+    issue_panels_collapsed: Issue panels collapsed by default
+    issue_panels_help: Checked panels start collapsed on issue and event detail pages. Your browser remembers manual open/close overrides.
+    issue_panels_browser: Browser panel layout
+    issue_panels_browser_help: Clear the open/closed states saved in this browser so the preference defaults apply again.
+    issue_panels_reset: Clear saved panel states
+    issue_panels_reset_done: Cleared
+    issue_panel:
+        highlights: Highlights
+        stacktrace: Stack Trace
+        message: Message
+        breadcrumbs: Breadcrumbs
+        request: HTTP Request
+        tags: Tags
+        contexts: Contexts
+        extra: Additional data
+        raw: Raw payload
+        details: Details sidebar
+        assignee: Assignee
+        recent_events: Recent events
     error:
         current_password: Current password is incorrect.
         email_in_use: This email is already in use.

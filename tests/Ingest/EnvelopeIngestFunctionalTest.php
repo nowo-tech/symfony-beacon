@@ -85,6 +85,61 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertSame('2024-07-20 16:00:00.654321', $stored->getEventTimestamp()->format('Y-m-d H:i:s.u'));
     }
 
+    public function testGroupsSimilarEventsAndCountsOccurrences(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject();
+        $headers = ['HTTP_X_SENTRY_AUTH' => 'Sentry sentry_version=7, sentry_key='.$apiKey->getPublicKey()];
+
+        foreach ([10, 99] as $i => $userId) {
+            $eventId = bin2hex(random_bytes(16));
+            $body = implode("\n", [
+                json_encode(['event_id' => $eventId], \JSON_THROW_ON_ERROR),
+                json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR),
+                json_encode([
+                    'event_id' => $eventId,
+                    'message' => 'User '.$userId.' not found',
+                    'level' => 'error',
+                    'platform' => 'php',
+                    'environment' => 'test',
+                    'exception' => [
+                        'values' => [[
+                            'type' => 'RuntimeException',
+                            'value' => 'User '.$userId.' not found',
+                            'stacktrace' => [
+                                'frames' => [
+                                    [
+                                        'filename' => '/app/src/User/Finder.php',
+                                        'function' => 'App\\User\\Finder::find',
+                                        'lineno' => 20 + $i,
+                                        'in_app' => true,
+                                    ],
+                                ],
+                            ],
+                        ]],
+                    ],
+                ], \JSON_THROW_ON_ERROR),
+            ]);
+
+            $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], $headers, $body);
+            self::assertResponseIsSuccessful();
+        }
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        /** @var list<Issue> $issues */
+        $issues = $em->getRepository(Issue::class)->findBy(['project' => $project]);
+        self::assertCount(1, $issues);
+        self::assertSame(2, $issues[0]->getEventCount());
+        self::assertNotNull($issues[0]->getFirstSeen());
+        self::assertNotNull($issues[0]->getLastSeen());
+
+        $stats = self::getContainer()->get(\App\Issues\Repository\EventRepository::class)
+            ->occurrenceStatsForIssue($issues[0]);
+        self::assertSame(2, $stats->total);
+        self::assertSame(2, $stats->last24h);
+        self::assertSame(2, $stats->last7d);
+        self::assertSame(2, $stats->last30d);
+    }
+
     public function testIngestsTransactionWithNPlusOne(): void
     {
         [$client, , $project, $apiKey] = $this->bootWithDemoProject();

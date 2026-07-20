@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Identity;
 
+use App\Identity\Entity\User;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,18 +61,28 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/account/display');
         self::assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('Save display settings')->form([
-            'user_preferences[preferredLocale]' => 'es',
-            'user_preferences[preferredTheme]' => 'dark',
-            'user_preferences[preferredContentWidth]' => 'full',
-        ]);
-        $client->submit($form);
+        $form = $crawler->selectButton('Save display settings')->form();
+        $values = $form->getPhpValues();
+        $values['user_preferences']['preferredLocale'] = 'es';
+        $values['user_preferences']['preferredTheme'] = 'dark';
+        $values['user_preferences']['preferredContentWidth'] = 'full';
+        $values['user_preferences']['preferredCollapsedIssuePanels'] = ['raw', 'tags'];
+        $client->request($form->getMethod(), $form->getUri(), $values);
         self::assertResponseRedirects('/account/display');
         $client->followRedirect();
         self::assertSelectorExists('[data-app-shell].is-full-width');
-        self::assertSelectorExists('script');
-        self::assertStringContainsString('__BEACON_USER_THEME__', $client->getResponse()->getContent() ?: '');
-        self::assertStringContainsString('dark', $client->getResponse()->getContent() ?: '');
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('__BEACON_USER_THEME__', $html);
+        self::assertStringContainsString('dark', $html);
+        self::assertStringContainsString('__BEACON_ISSUE_PANEL_DEFAULTS__', $html);
+        self::assertStringContainsString('"raw"', $html);
+        self::assertStringContainsString('"tags"', $html);
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame(['raw', 'tags'], $reloaded->getPreferredCollapsedIssuePanels());
     }
 
     public function testPreferencesSidebarHasSplitMenuItems(): void

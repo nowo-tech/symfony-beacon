@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Issues\Repository;
 
+use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,5 +41,80 @@ class EventRepository extends ServiceEntityRepository
     public function findOneByEventId(string $eventId): ?Event
     {
         return $this->findOneBy(['eventId' => $eventId]);
+    }
+
+    public function occurrenceStatsForIssue(Issue $issue, ?DateTimeImmutable $now = null): IssueOccurrenceStats
+    {
+        $map = $this->occurrenceStatsForIssues([$issue], $now);
+
+        return $map[$issue->getId()] ?? new IssueOccurrenceStats(
+            total: $issue->getEventCount(),
+            last24h: 0,
+            last7d: 0,
+            last30d: 0,
+        );
+    }
+
+    /**
+     * Batch window counts for issue list pages (avoids N+1).
+     *
+     * @param list<Issue> $issues
+     *
+     * @return array<int, IssueOccurrenceStats> keyed by issue id
+     */
+    public function occurrenceStatsForIssues(array $issues, ?DateTimeImmutable $now = null): array
+    {
+        $now ??= new DateTimeImmutable('now');
+        $stats = [];
+        foreach ($issues as $issue) {
+            $id = $issue->getId();
+            if (null === $id) {
+                continue;
+            }
+            $stats[$id] = new IssueOccurrenceStats(
+                total: $issue->getEventCount(),
+                last24h: 0,
+                last7d: 0,
+                last30d: 0,
+            );
+        }
+
+        if ([] === $stats) {
+            return [];
+        }
+
+        $since30 = $now->modify('-30 days');
+        $since7 = $now->modify('-7 days');
+        $since24 = $now->modify('-24 hours');
+
+        $rows = $this->createQueryBuilder('e')
+            ->select('IDENTITY(e.issue) AS issueId')
+            ->addSelect('SUM(CASE WHEN e.receivedAt >= :since24 THEN 1 ELSE 0 END) AS c24')
+            ->addSelect('SUM(CASE WHEN e.receivedAt >= :since7 THEN 1 ELSE 0 END) AS c7')
+            ->addSelect('SUM(CASE WHEN e.receivedAt >= :since30 THEN 1 ELSE 0 END) AS c30')
+            ->andWhere('e.issue IN (:issues)')
+            ->andWhere('e.receivedAt >= :since30')
+            ->setParameter('issues', $issues)
+            ->setParameter('since24', $since24)
+            ->setParameter('since7', $since7)
+            ->setParameter('since30', $since30)
+            ->groupBy('e.issue')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($rows as $row) {
+            $id = (int) $row['issueId'];
+            if (!isset($stats[$id])) {
+                continue;
+            }
+            $stats[$id] = new IssueOccurrenceStats(
+                total: $stats[$id]->total,
+                last24h: (int) $row['c24'],
+                last7d: (int) $row['c7'],
+                last30d: (int) $row['c30'],
+            );
+        }
+
+        return $stats;
     }
 }

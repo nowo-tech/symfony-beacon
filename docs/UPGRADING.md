@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.4.0 to the next release](#upgrading-from-040-to-the-next-release)
+- [Upgrading from 0.5.0 to the next release](#upgrading-from-050-to-the-next-release)
+- [Upgrading from 0.4.0 to 0.5.0](#upgrading-from-040-to-050)
 - [Upgrading from 0.3.0 to 0.4.0](#upgrading-from-030-to-040)
 - [Upgrading from 0.2.0 to 0.3.0](#upgrading-from-020-to-030)
 - [Upgrading from 0.1.0 to 0.2.0](#upgrading-from-010-to-020)
@@ -12,17 +13,18 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.4.0 to the next release
+## Upgrading from 0.5.0 to the next release
 
-No further release yet. When upgrading past `v0.4.0`:
+No further release yet. When upgrading past `v0.5.0`:
 
 1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
 2. Diff env templates: compare your local `.env` against the new `.env.dist` and add any missing keys.
 3. Rebuild containers after Docker/FrankenPHP/Node changes: `make down && make build && make up`.
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
-5. Run quality checks: `make qa` (or at least `make test`).
+5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build` (or your image build step).
+6. Run quality checks: `make qa` (or at least `make test`).
 
-### Stack versions (0.4.0)
+### Stack versions (0.5.0)
 
 | Component | Constraint / image | Notes |
 |---|---|---|
@@ -32,7 +34,56 @@ No further release yet. When upgrading past `v0.4.0`:
 | Auth | `nowo-tech/auth-kit-bundle` | First-user registration + i18n |
 | Cookies / legal | `nowo-tech/cookie-consent-bundle` | Consent modal + legal pages |
 | Menus / breadcrumbs / forms / PWA | Nowo kit bundles | See README Features |
+| Autocomplete | `symfony/ux-autocomplete` | Issue assignee field |
 | Vite / Tailwind / SCSS | Tailwind 4, Sass, Stimulus | Assets via HTTPS `/build` proxy |
+
+---
+
+## Upgrading from 0.4.0 to 0.5.0
+
+### 1. Pull and refresh
+
+```bash
+git fetch --tags
+git checkout v0.5.0   # or merge/rebase main
+make down && make up
+docker compose exec php composer install
+docker compose exec vite pnpm install
+make console ARGS='doctrine:migrations:migrate -n'
+make vite-build   # required when Vite dev server is not used in the deploy
+```
+
+### 2. Database migrations (required)
+
+New columns:
+
+| Migration | Change |
+|---|---|
+| `Version20260720214500` | `issue.assignee_id` (nullable FK → `app_user`) |
+| `Version20260720223000` | `app_user.preferred_collapsed_issue_panels` (JSON) |
+
+```bash
+make console ARGS='doctrine:migrations:migrate -n'
+```
+
+### 3. Behaviour notes (non-breaking for operators)
+
+- **Fingerprints** are recalculated for new events only; existing issues keep their stored fingerprint. Similar new events may join an existing group more often (line numbers no longer dominate).
+- **Assignee** is optional; members appear via `/autocomplete/project_member` (requires login).
+- **Panel collapse** defaults live under Account → Display; browsers also store open/closed state in `localStorage` (`beacon.issuePanelState`).
+- Stack **source context** appears when the client (e.g. BeaconBundle ≥ 1.3.0) sends `pre_context` / `context_line` / `post_context`.
+
+### 4. Client pairing
+
+For full stack source snippets in the UI, upgrade the PHP client to **BeaconBundle `v1.3.0+`** (or another SDK that sends frame source context).
+
+### 5. Verify
+
+```bash
+make test
+# Issue list → assign filter; open issue → assignee autocomplete + collapsible stack frames
+# Account → Display → default collapsed panels
+```
 
 ---
 

@@ -24,4 +24,24 @@ class ProjectMembershipRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['project' => $project, 'user' => $user]);
     }
+
+    /**
+     * @return list<User>
+     */
+    public function findUsersByProject(Project $project): array
+    {
+        /** @var list<User> $users */
+        $users = $this->getEntityManager()->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->innerJoin('u.memberships', 'm')
+            ->andWhere('m.project = :project')
+            ->setParameter('project', $project)
+            ->orderBy('u.displayName', 'ASC')
+            ->addOrderBy('u.email', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $users;
+    }
 }

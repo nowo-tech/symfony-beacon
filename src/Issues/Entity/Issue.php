@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Entity;
 
+use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
@@ -17,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'uniq_project_fingerprint', columns: ['project_id', 'fingerprint'])]
 #[ORM\Index(name: 'idx_issue_project_last_seen', columns: ['project_id', 'last_seen'])]
 #[ORM\Index(name: 'idx_issue_project_status', columns: ['project_id', 'status'])]
+#[ORM\Index(name: 'idx_issue_project_assignee', columns: ['project_id', 'assignee_id'])]
 class Issue
 {
     #[ORM\Id]
@@ -27,6 +29,10 @@ class Issue
     #[ORM\ManyToOne(inversedBy: 'issues')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Project $project = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $assignee = null;
 
     #[ORM\Column(length: 64)]
     private string $fingerprint = '';
@@ -77,6 +83,18 @@ class Issue
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getAssignee(): ?User
+    {
+        return $this->assignee;
+    }
+
+    public function setAssignee(?User $assignee): self
+    {
+        $this->assignee = $assignee;
 
         return $this;
     }

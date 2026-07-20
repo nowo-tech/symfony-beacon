@@ -2,121 +2,54 @@
 
 {% block title %}{{ 'issues.event'|trans }} {{ event.eventId }}{% endblock %}
 
+{% block body %}
 {% set payload = event.payload %}
 {% set exception = payload.exception.values[0]|default(null) %}
-{% set frames = exception.stacktrace.frames|default([]) %}
-{% set user = payload.user|default(null) %}
-{% set runtime = payload.contexts.runtime|default(null) %}
-{% set framework = payload.contexts.framework|default(null) %}
-{% set os = payload.contexts.os|default(null) %}
+{% set headline = exception.type|default(payload.message|default(issue.title)) %}
+{% set subtitle = exception.value|default(null) %}
 
-{% block body %}
 <a href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}" class="text-sm no-underline">{{ 'issues.back_to_issue'|trans }}</a>
-<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'issues.event_detail'|trans }}</h1>
-<p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ event.eventId }} · {{ event.platform }} · {{ event.environment|default('common.na'|trans) }}</p>
 
-<section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.context'|trans }}</h2>
-    <dl class="grid gap-3 text-sm sm:grid-cols-2">
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.occurred_at'|trans }}</dt>
-            <dd class="font-mono">{{ event.eventTimestamp|date('Y-m-d H:i:s.u') }} UTC</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.received_at'|trans }}</dt>
-            <dd class="font-mono">{{ event.receivedAt|date('Y-m-d H:i:s.u') }} UTC</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.filter.environment'|trans }}</dt>
-            <dd>{{ event.environment|default('common.na'|trans) }}</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.release'|trans }}</dt>
-            <dd>{{ event.releaseVersion|default('common.na'|trans) }}</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.php_version'|trans }}</dt>
-            <dd>{{ event.phpVersion|default(runtime.version|default('common.na'|trans)) }}</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.symfony_version'|trans }}</dt>
-            <dd>{{ event.symfonyVersion|default(framework.version|default('common.na'|trans)) }}</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.os'|trans }}</dt>
-            <dd>{% if os %}{{ os.name|default('?') }}{% if os.version is defined %} {{ os.version }}{% endif %}{% else %}{{ 'common.na'|trans }}{% endif %}</dd>
-        </div>
-        <div>
-            <dt class="text-[var(--color-ink)]/55">{{ 'issues.user'|trans }}</dt>
-            <dd>
-                {% if event.userIdentifier or user %}
-                    {{ event.userIdentifier|default(user.id|default(user.username|default(user.email|default('common.na'|trans)))) }}
-                    {% if user.email is defined and user.email and event.userIdentifier != user.email %}
-                        <span class="text-[var(--color-ink)]/50">({{ user.email }})</span>
-                    {% endif %}
-                {% else %}
-                    {{ 'common.na'|trans }}
-                {% endif %}
-            </dd>
-        </div>
-        {% if payload.server_name is defined %}
-            <div>
-                <dt class="text-[var(--color-ink)]/55">{{ 'issues.server_name'|trans }}</dt>
-                <dd>{{ payload.server_name }}</dd>
-            </div>
-        {% endif %}
-        {% if payload.level is defined %}
-            <div>
-                <dt class="text-[var(--color-ink)]/55">{{ 'issues.col.level'|trans }}</dt>
-                <dd>{{ payload.level }}</dd>
-            </div>
-        {% endif %}
-    </dl>
-</section>
+<div class="issue-layout mt-3">
+    <div class="issue-layout__main">
+        <header class="issue-hero">
+            <p class="issue-hero__status">
+                <span class="issue-badge">{{ 'issues.event'|trans }}</span>
+                <span class="issue-badge issue-badge--level">{{ payload.level|default(issue.level) }}</span>
+            </p>
+            <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
+            {% if subtitle %}
+                <p class="issue-hero__message">{{ subtitle }}</p>
+            {% endif %}
+            <p class="issue-hero__culprit font-mono text-xs">{{ event.eventId }} · {{ event.platform }} · {{ event.environment|default('common.na'|trans) }}</p>
+        </header>
 
-{% if frames is not empty %}
-<section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.stacktrace'|trans }}</h2>
-    {% if exception %}
-        <p class="mb-3 font-mono text-sm">
-            <span class="text-[var(--color-moss)]">{{ exception.type|default('common.unknown'|trans) }}</span>
-            {{ exception.value|default('') }}
-        </p>
-    {% endif %}
-    <ol class="space-y-2 font-mono text-xs">
-        {% for frame in frames|reverse %}
-            <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] px-3 py-2">
-                <span class="text-[var(--color-moss)]">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
-                :{{ frame.lineno|default('?') }}
-                <span class="text-[var(--color-ink)]/50">in</span>
-                {{ frame.function|default('common.unknown'|trans) }}
-            </li>
-        {% endfor %}
-    </ol>
-</section>
-{% endif %}
+        {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
+    </div>
 
-{% set breadcrumbs = payload.breadcrumbs.values|default([]) %}
-{% if breadcrumbs is not empty %}
-<section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.breadcrumbs'|trans }}</h2>
-    <ol class="space-y-2 text-sm">
-        {% for crumb in breadcrumbs %}
-            <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] px-3 py-2">
-                <span class="font-mono text-xs text-[var(--color-ink)]/50">{{ crumb.timestamp|default('') }}</span>
-                <span class="ml-2 rounded bg-[var(--color-moss)]/15 px-1.5 py-0.5 text-xs text-[var(--color-moss)]">{{ crumb.category|default('default') }}</span>
-                <span class="ml-2">{{ crumb.message|default('') }}</span>
-                {% if crumb.level is defined %}
-                    <span class="ml-2 text-xs text-[var(--color-ink)]/45">{{ crumb.level }}</span>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ol>
-</section>
-{% endif %}
-
-<section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.raw_payload'|trans }}</h2>
-    <pre class="overflow-x-auto font-mono text-xs">{{ payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-</section>
+    <aside class="issue-layout__aside">
+        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'details', title: 'issues.aside_details'|trans } %}
+            {% block body %}
+                <dl class="issue-aside-stats__grid">
+                    <div>
+                        <dt>{{ 'issues.occurred_at'|trans }}</dt>
+                        <dd class="font-mono text-xs">{{ event.eventTimestamp|date('Y-m-d H:i:s') }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'issues.received_at'|trans }}</dt>
+                        <dd class="font-mono text-xs">{{ event.receivedAt|date('Y-m-d H:i:s') }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'projects.title'|trans }}</dt>
+                        <dd><a href="{{ path('issue_index', {id: project.id}) }}">{{ project.name }}</a></dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'issues.back_to_issue'|trans }}</dt>
+                        <dd><a href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}">#{{ issue.id }}</a></dd>
+                    </div>
+                </dl>
+            {% endblock %}
+        {% endembed %}
+    </aside>
+</div>
 {% endblock %}

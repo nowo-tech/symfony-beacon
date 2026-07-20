@@ -17,6 +17,7 @@ use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -97,6 +98,9 @@ final readonly class ProcessEnvelopeHandler
         $issue->incrementEventCount();
         $issue->setTitle($this->fingerprintCalculator->title($payload));
         $issue->setCulprit($this->fingerprintCalculator->culprit($payload));
+        if (IssueStatus::Resolved === $issue->getStatus()) {
+            $issue->setStatus(IssueStatus::Unresolved);
+        }
 
         $event = new Event();
         $event->setIssue($issue);

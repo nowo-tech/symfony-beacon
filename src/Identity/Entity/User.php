@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Entity;
 
 use App\Identity\Repository\UserRepository;
+use App\Issues\IssuePanelIds;
 use App\Project\Entity\ProjectMembership;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,6 +48,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** Main content width: `content` (centered max-width) or `full`. Null = content. */
     #[ORM\Column(length: 8, nullable: true)]
     private ?string $preferredContentWidth = null;
+
+    /**
+     * Issue/event panel ids that should start collapsed (browser can override via localStorage).
+     *
+     * @var list<string>|null
+     */
+    #[ORM\Column(nullable: true)]
+    private ?array $preferredCollapsedIssuePanels = null;
 
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
@@ -188,6 +197,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $normalized = null;
         }
         $this->preferredContentWidth = $normalized;
+
+        return $this;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getPreferredCollapsedIssuePanels(): array
+    {
+        if (null === $this->preferredCollapsedIssuePanels) {
+            return IssuePanelIds::defaultCollapsed();
+        }
+
+        return IssuePanelIds::sanitize($this->preferredCollapsedIssuePanels);
+    }
+
+    /**
+     * @param list<string>|null $preferredCollapsedIssuePanels
+     */
+    public function setPreferredCollapsedIssuePanels(?array $preferredCollapsedIssuePanels): self
+    {
+        if (null === $preferredCollapsedIssuePanels) {
+            $this->preferredCollapsedIssuePanels = null;
+
+            return $this;
+        }
+
+        $this->preferredCollapsedIssuePanels = IssuePanelIds::sanitize($preferredCollapsedIssuePanels);
 
         return $this;
     }

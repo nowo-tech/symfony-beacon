@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Identity\Entity\User;
+use App\Issues\IssuePanelIds;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Account display preferences: locale, theme, and content width.
+ * Account display preferences: locale, theme, content width, issue panels.
  */
 final class AccountDisplayType extends FormKitAbstractType
 {
@@ -21,6 +23,11 @@ final class AccountDisplayType extends FormKitAbstractType
         $localeChoices = [];
         foreach ($enabledLocales as $locale) {
             $localeChoices[strtoupper($locale)] = $locale;
+        }
+
+        $panelChoices = [];
+        foreach (IssuePanelIds::all() as $panelId) {
+            $panelChoices['preferences.issue_panel.'.$panelId] = $panelId;
         }
 
         $this->withBuilder($builder, function () use ($localeChoices): void {
@@ -47,6 +54,16 @@ final class AccountDisplayType extends FormKitAbstractType
                 'required' => true,
             ]);
         });
+
+        $builder->add('preferredCollapsedIssuePanels', ChoiceType::class, [
+            'choices' => $panelChoices,
+            'choice_translation_domain' => 'messages',
+            'multiple' => true,
+            'expanded' => true,
+            'required' => false,
+            'label' => 'preferences.issue_panels_collapsed',
+            'help' => 'preferences.issue_panels_help',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -5,7 +5,7 @@
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'issues'} %}
 
-<form method="get" class="panel mb-6 grid gap-3 md:grid-cols-4">
+<form method="get" class="panel mb-6 grid gap-3 md:grid-cols-5">
     <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
     <select class="input" name="level">
         <option value="">{{ 'issues.filter.any_level'|trans }}</option>
@@ -16,6 +16,13 @@
     <select class="input" name="status">
         {% for status in ['unresolved', 'resolved', 'ignored', ''] %}
             <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status ? status : 'issues.filter.any_status'|trans }}</option>
+        {% endfor %}
+    </select>
+    <select class="input" name="assignee">
+        <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
+        <option value="unassigned" {% if filters.assignee == 'unassigned' %}selected{% endif %}>{{ 'issues.assignee_unassigned'|trans }}</option>
+        {% for member in members %}
+            <option value="{{ member.id }}" {% if filters.assignee == (member.id ~ '') %}selected{% endif %}>{{ member.displayName ?: member.email }}</option>
         {% endfor %}
     </select>
     <div class="flex gap-2">
@@ -33,19 +40,36 @@
                 <tr>
                     <th class="px-4 py-3">{{ 'issues.col.issue'|trans }}</th>
                     <th class="px-4 py-3">{{ 'issues.col.level'|trans }}</th>
-                    <th class="px-4 py-3">{{ 'issues.col.events'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'issues.col.assignee'|trans }}</th>
+                    <th class="px-4 py-3 text-right">{{ 'issues.col.events'|trans }}</th>
+                    <th class="px-4 py-3 text-right">{{ 'issues.col.events_24h'|trans }}</th>
+                    <th class="px-4 py-3 text-right">{{ 'issues.col.events_7d'|trans }}</th>
+                    <th class="px-4 py-3 text-right">{{ 'issues.col.events_30d'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'issues.col.first_seen'|trans }}</th>
                     <th class="px-4 py-3">{{ 'issues.col.last_seen'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for issue in issues %}
+                    {% set occ = occurrenceByIssue[issue.id]|default(null) %}
                     <tr class="row-hover border-b border-[var(--color-sand)] last:border-0">
                         <td class="px-4 py-3">
                             <a class="font-medium no-underline" href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}">{{ issue.title }}</a>
                             <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
                         </td>
                         <td class="px-4 py-3"><span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span></td>
-                        <td class="px-4 py-3">{{ issue.eventCount }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            {% if issue.assignee %}
+                                {{ issue.assignee.displayName ?: issue.assignee.email }}
+                            {% else %}
+                                <span class="text-[var(--color-ink)]/45">{{ 'issues.assignee_unassigned'|trans }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono">{{ occ ? occ.total : issue.eventCount }}</td>
+                        <td class="px-4 py-3 text-right font-mono">{{ occ ? occ.last24h : '—' }}</td>
+                        <td class="px-4 py-3 text-right font-mono">{{ occ ? occ.last7d : '—' }}</td>
+                        <td class="px-4 py-3 text-right font-mono">{{ occ ? occ.last30d : '—' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ issue.firstSeen|date('Y-m-d H:i') }}</td>
                         <td class="px-4 py-3 whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
                     </tr>
                 {% endfor %}

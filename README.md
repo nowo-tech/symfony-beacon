@@ -16,9 +16,10 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Opening a project lands on **Issues**; configuration lives under **Settings**
+- Issue list with filters, **assignee**, grouping by similarity fingerprint, and 24h / 7d / 30d occurrence windows
+- Issue detail: Sentry-style layout, collapsible panels, stack source context, breadcrumbs, request/tags/contexts
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
-- Issue grouping (fingerprint), filters, event detail + stack trace
 - Daily analytics (errors, transactions, N+1 counts)
 - Performance transactions/spans with **N+1** detection
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
@@ -29,7 +30,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/legal-and-cookies.md](docs/legal-and-cookies.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
-- Account preferences at `/account/profile`, `/account/security`, `/account/display`
+- Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, appearance, menus, breadcrumbs)
 
 ## Requirements

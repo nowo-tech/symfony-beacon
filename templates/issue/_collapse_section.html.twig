@@ -1,0 +1,24 @@
+{#
+  Collapsible panel shell.
+  Required: panel_id (string), title (already translated string)
+  Block: body
+#}
+<section
+    class="panel issue-section"
+    data-controller="collapse-panel"
+    data-collapse-panel-id-value="{{ panel_id }}"
+>
+    <button
+        type="button"
+        class="issue-section__toggle"
+        data-collapse-panel-target="button"
+        data-action="collapse-panel#toggle"
+        aria-expanded="true"
+    >
+        <h2 class="issue-section__title">{{ title }}</h2>
+        <span class="issue-section__chevron" data-collapse-panel-target="icon" aria-hidden="true">▾</span>
+    </button>
+    <div class="issue-section__body" data-collapse-panel-target="body">
+        {% block body %}{% endblock %}
+    </div>
+</section>

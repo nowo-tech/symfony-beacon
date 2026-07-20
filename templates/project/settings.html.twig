@@ -88,7 +88,7 @@
         </div>
 
         {% if membership.role.value == 'owner' %}
-            <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name }}">
+            <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name|e('html_attr') }}">
                 <button type="button" class="btn-danger" data-action="confirm-dialog#open">{{ 'project.danger.delete_open'|trans }}</button>
                 <dialog
                     class="confirm-dialog"

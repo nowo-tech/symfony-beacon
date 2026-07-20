@@ -3,51 +3,105 @@
 {% block title %}{{ issue.title }} — {{ project.name }}{% endblock %}
 
 {% block body %}
-<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
-<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ issue.title }}</h1>
-<p class="mt-1 text-[var(--color-ink)]/65">{{ issue.culprit }} · {{ 'issues.event_count'|trans({'%count%': issue.eventCount}) }} · {{ issue.status.value }}</p>
-
 {% set event = latestEvent %}
-{% if event %}
-    <section class="panel mt-6">
-        <h2 class="mb-3 text-lg font-semibold">{{ 'issues.latest_stack'|trans }}</h2>
-        <p class="mb-2 text-sm text-[var(--color-ink)]/60">
-            {{ 'issues.event'|trans }} <a href="{{ path('event_show', {projectId: project.id, eventId: event.eventId}) }}">{{ event.eventId }}</a>
-            · {{ event.environment|default('common.na'|trans) }}
-            · {{ event.receivedAt|date('Y-m-d H:i:s.u') }}
-            {% if event.releaseVersion %}· {{ event.releaseVersion }}{% endif %}
-            {% if event.phpVersion %}· PHP {{ event.phpVersion }}{% endif %}
-            {% if event.symfonyVersion %}· Symfony {{ event.symfonyVersion }}{% endif %}
-        </p>
-        {% set exception = event.payload.exception.values[0]|default(null) %}
-        {% if exception and exception.stacktrace.frames is defined %}
-            <ol class="space-y-2 font-mono text-xs">
-                {% for frame in exception.stacktrace.frames|reverse %}
-                    <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] px-3 py-2">
-                        <span class="text-[var(--color-moss)]">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
-                        :{{ frame.lineno|default('?') }}
-                        <span class="text-[var(--color-ink)]/50">in</span>
-                        {{ frame.function|default('common.unknown'|trans) }}
-                    </li>
-                {% endfor %}
-            </ol>
-        {% else %}
-            <pre class="overflow-x-auto rounded bg-[var(--color-ink)] p-4 text-xs text-emerald-100">{{ event.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-        {% endif %}
-    </section>
-{% endif %}
+{% set payload = event ? event.payload : {} %}
+{% set exception = payload.exception.values[0]|default(null) %}
+{% set headline = exception.type|default(issue.title) %}
+{% set subtitle = exception.value|default(payload.message|default(issue.culprit)) %}
 
-<section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.recent_events'|trans }}</h2>
-    <ul class="divide-y divide-[var(--color-sand)] text-sm">
-        {% for e in events %}
-            <li class="flex items-center justify-between py-2">
-                <a href="{{ path('event_show', {projectId: project.id, eventId: e.eventId}) }}">{{ e.eventId }}</a>
-                <span class="text-[var(--color-ink)]/55">{{ e.receivedAt|date('Y-m-d H:i:s.u') }}</span>
-            </li>
+<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
+
+<div class="issue-layout mt-3">
+    <div class="issue-layout__main">
+        <header class="issue-hero">
+            <p class="issue-hero__status">
+                <span class="issue-badge issue-badge--status">{{ issue.status.value }}</span>
+                <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
+            </p>
+            <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
+            {% if subtitle and subtitle != headline %}
+                <p class="issue-hero__message">{{ subtitle }}</p>
+            {% endif %}
+            {% if issue.culprit %}
+                <p class="issue-hero__culprit font-mono">{{ issue.culprit }}</p>
+            {% endif %}
+        </header>
+
+        {% if event %}
+            {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
         {% else %}
-            <li class="py-2 text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</li>
-        {% endfor %}
-    </ul>
-</section>
+            <section class="panel mt-6">
+                <p class="text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</p>
+            </section>
+        {% endif %}
+    </div>
+
+    <aside class="issue-layout__aside">
+        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'details', title: 'issues.aside_details'|trans } %}
+            {% block body %}
+                <dl class="issue-aside-stats__grid">
+                    <div>
+                        <dt>{{ 'issues.col.events'|trans }}</dt>
+                        <dd class="font-mono text-lg">{{ occurrence.total|default(issue.eventCount) }}</dd>
+                    </div>
+                    <div class="issue-aside-windows">
+                        <div>
+                            <dt>{{ 'issues.col.events_24h'|trans }}</dt>
+                            <dd class="font-mono">{{ occurrence.last24h|default(0) }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ 'issues.col.events_7d'|trans }}</dt>
+                            <dd class="font-mono">{{ occurrence.last7d|default(0) }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ 'issues.col.events_30d'|trans }}</dt>
+                            <dd class="font-mono">{{ occurrence.last30d|default(0) }}</dd>
+                        </div>
+                    </div>
+                    <div>
+                        <dt>{{ 'issues.col.first_seen'|trans }}</dt>
+                        <dd>{{ issue.firstSeen|date('Y-m-d H:i:s') }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'issues.col.last_seen'|trans }}</dt>
+                        <dd>{{ issue.lastSeen|date('Y-m-d H:i:s') }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'issues.filter.environment'|trans }}</dt>
+                        <dd>{{ event ? event.environment|default('—') : '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ 'projects.title'|trans }}</dt>
+                        <dd><a href="{{ path('issue_index', {id: project.id}) }}">{{ project.name }}</a></dd>
+                    </div>
+                </dl>
+            {% endblock %}
+        {% endembed %}
+
+        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'assignee', title: 'issues.assignee'|trans } %}
+            {% block body %}
+                <p class="mb-3 text-xs text-[var(--color-ink)]/55">{{ 'issues.assignee_help'|trans }}</p>
+                {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form space-y-3'}}) }}
+                    {{ form_row(assigneeForm.assignee, {row_attr: {class: 'space-y-1'}}) }}
+                    <button class="btn-primary w-full" type="submit">{{ 'issues.assignee_save'|trans }}</button>
+                {{ form_end(assigneeForm) }}
+            {% endblock %}
+        {% endembed %}
+
+        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'recent_events', title: 'issues.recent_events'|trans } %}
+            {% block body %}
+                <ul class="issue-event-list">
+                    {% for e in events %}
+                        <li>
+                            <a href="{{ path('event_show', {projectId: project.id, eventId: e.eventId}) }}" class="font-mono text-xs">{{ e.eventId|slice(0, 12) }}…</a>
+                            <span class="text-[var(--color-ink)]/50 text-xs">{{ e.receivedAt|date('H:i:s') }}</span>
+                        </li>
+                    {% else %}
+                        <li class="text-[var(--color-ink)]/60 text-sm">{{ 'issues.no_events'|trans }}</li>
+                    {% endfor %}
+                </ul>
+            {% endblock %}
+        {% endembed %}
+    </aside>
+</div>
 {% endblock %}

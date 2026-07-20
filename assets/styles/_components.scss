@@ -64,6 +64,8 @@
     font-weight: 600;
   }
 }
+
+.btn-danger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +103,11 @@
   padding: 0;
   background: transparent;
   max-width: min(28rem, calc(100vw - 2rem));
+  width: min(28rem, calc(100vw - 2rem));
+
+  &[open] {
+    display: block;
+  }
 
   &::backdrop {
     background: rgb(12 18 16 / 55%);
@@ -114,6 +121,20 @@
   color: var(--color-ink);
   padding: 1.25rem;
   box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
+}
+
+/* Readable in light and dark themes (do not use --color-ink as background). */
+.code-block {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+  padding: 1rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre;
 }
 
 .confirm-dialog__title {
@@ -153,6 +174,472 @@
   backdrop-filter: blur(8px);
 }
 
+/* —— Issue detail (Sentry-like layout) —— */
+.issue-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .issue-layout {
+    grid-template-columns: minmax(0, 1fr) 16.5rem;
+    align-items: start;
+  }
+}
+
+.issue-layout__aside {
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-hero__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.65rem;
+}
+
+.issue-hero__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.issue-hero__message {
+  margin: 0.55rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  white-space: pre-wrap;
+}
+
+.issue-hero__culprit {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+  word-break: break-all;
+}
+
+.issue-section {
+  margin-top: 1rem;
+}
+
+.issue-section__title {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-section__toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.issue-section__toggle .issue-section__title {
+  margin: 0;
+}
+
+.issue-section__chevron {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.issue-section__body {
+  margin-top: 0.85rem;
+}
+
+.issue-section.is-collapsed .issue-section__body {
+  display: none;
+}
+
+.issue-panel-prefs {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.issue-panel-prefs label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.issue-section__subtitle {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-kv {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.issue-kv th,
+.issue-kv td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--color-sand);
+  text-align: left;
+  vertical-align: top;
+}
+
+.issue-kv th {
+  width: 9.5rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-kv--compact th {
+  width: 5.5rem;
+}
+
+.issue-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface-muted);
+  padding: 0.1rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.issue-badge--level {
+  border-color: color-mix(in srgb, var(--color-alert) 40%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-alert) 14%, var(--color-surface));
+  color: var(--color-alert);
+}
+
+.issue-badge--status {
+  border-color: color-mix(in srgb, var(--color-warn) 40%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-warn) 14%, var(--color-surface));
+  color: var(--color-warn);
+}
+
+.issue-badge--app {
+  border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 14%, var(--color-surface));
+  color: var(--color-moss);
+  text-transform: none;
+}
+
+.issue-exception__type {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-moss);
+  word-break: break-all;
+}
+
+.issue-exception__value {
+  margin: 0.35rem 0 0.85rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--color-ink) 85%, transparent);
+  white-space: pre-wrap;
+}
+
+.issue-stack {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.issue-stack__frame {
+  border: 1px solid var(--color-sand);
+  border-radius: 0.4rem;
+  background: var(--color-surface-muted);
+  padding: 0;
+}
+
+.issue-stack__frame--app {
+  border-color: color-mix(in srgb, var(--color-moss) 35%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 8%, var(--color-surface));
+}
+
+.issue-stack__details {
+  margin: 0;
+  padding: 0;
+}
+
+.issue-stack__summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  user-select: none;
+}
+
+.issue-stack__summary::-webkit-details-marker {
+  display: none;
+}
+
+.issue-stack__summary::marker {
+  content: '';
+}
+
+.issue-stack__chevron {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  font-size: 0.75rem;
+  line-height: 1;
+
+  &::before {
+    content: '▸';
+  }
+}
+
+.issue-stack__details[open] > .issue-stack__summary .issue-stack__chevron::before {
+  content: '▾';
+}
+
+.issue-stack__summary-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.issue-stack__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.issue-stack__file {
+  font-size: 0.75rem;
+  color: var(--color-moss);
+  word-break: break-all;
+}
+
+.issue-stack__line {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-stack__fn {
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  word-break: break-all;
+}
+
+.issue-stack__empty {
+  margin: 0;
+  padding: 0 0.7rem 0.55rem 1.9rem;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+}
+
+.issue-stack__source {
+  margin: 0 0.7rem 0.55rem 1.9rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.35rem;
+  background: var(--color-surface);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.issue-stack__src-line {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.1rem 0.55rem;
+  white-space: pre;
+}
+
+.issue-stack__src-line code {
+  font: inherit;
+  color: color-mix(in srgb, var(--color-ink) 82%, transparent);
+}
+
+.issue-stack__ln {
+  text-align: right;
+  color: color-mix(in srgb, var(--color-ink) 40%, transparent);
+  user-select: none;
+}
+
+.issue-stack__src-line--active {
+  background: color-mix(in srgb, var(--color-alert) 14%, var(--color-surface));
+  border-left: 3px solid var(--color-alert);
+  padding-left: calc(0.55rem - 3px);
+}
+
+.issue-stack__src-line--active code {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.issue-crumbs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.issue-crumbs__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.4rem;
+  background: var(--color-surface-muted);
+  font-size: 0.8125rem;
+}
+
+.issue-crumbs__time {
+  font-size: 0.7rem;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.issue-crumbs__data {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.issue-tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.45rem;
+}
+
+.issue-tags li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.35rem;
+  padding: 0.4rem 0.55rem;
+  background: var(--color-surface-muted);
+}
+
+.issue-tags__key {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+}
+
+.issue-tags__val {
+  font-size: 0.78rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  word-break: break-all;
+}
+
+.issue-contexts {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.issue-contexts__card {
+  border: 1px solid var(--color-sand);
+  border-radius: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--color-surface-muted);
+}
+
+.issue-contexts__card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.issue-aside-stats__grid {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.issue-aside-stats__grid dt {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+}
+
+.issue-aside-stats__grid dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+}
+
+.issue-aside-windows {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.issue-aside-windows > div {
+  border: 1px solid var(--color-sand);
+  border-radius: 0.35rem;
+  padding: 0.4rem 0.45rem;
+  background: var(--color-surface-muted);
+}
+
+.issue-aside-windows dt {
+  font-size: 0.65rem;
+}
+
+.issue-aside-windows dd {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.issue-event-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.issue-event-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .input {
   width: 100%;
   border-radius: 0.375rem;
@@ -172,6 +659,74 @@
     border-color: var(--color-moss);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 20%, transparent);
   }
+}
+
+/* Symfony UX Autocomplete (Tom Select) — match Beacon inputs */
+.issue-assignee-form .ts-wrapper {
+  width: 100%;
+}
+
+.issue-assignee-form .ts-control {
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  box-shadow: none;
+  min-height: 2.5rem;
+}
+
+.issue-assignee-form .ts-wrapper.focus .ts-control,
+.issue-assignee-form .ts-wrapper.dropdown-active .ts-control {
+  border-color: var(--color-moss);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 20%, transparent);
+}
+
+.issue-assignee-form .ts-control input {
+  color: var(--color-ink) !important;
+  font-size: 0.875rem !important;
+}
+
+.issue-assignee-form .ts-control input::placeholder {
+  color: color-mix(in srgb, var(--color-ink) 40%, transparent);
+}
+
+.issue-assignee-form .ts-wrapper.single .ts-control {
+  background-image: none;
+  background-color: var(--color-surface);
+}
+
+.issue-assignee-form .ts-wrapper.single .ts-control::after {
+  border-top-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.issue-assignee-form .ts-wrapper.single.dropdown-active .ts-control::after {
+  border-bottom-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+body > .ts-dropdown {
+  z-index: 80;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 0 12px 28px rgb(var(--beacon-shadow) / 18%);
+}
+
+body > .ts-dropdown .option {
+  color: var(--color-ink);
+  padding: 0.45rem 0.65rem;
+}
+
+body > .ts-dropdown .option.active,
+body > .ts-dropdown .option:hover {
+  background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
+  color: var(--color-ink);
+}
+
+body > .ts-dropdown .no-results {
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
 }
 
 .input-color {

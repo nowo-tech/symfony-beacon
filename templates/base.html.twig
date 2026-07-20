@@ -6,6 +6,9 @@
         {% if app.user and app.user.preferredTheme %}
             <script>window.__BEACON_USER_THEME__ = {{ app.user.preferredTheme|json_encode|raw }};</script>
         {% endif %}
+        <script>
+            window.__BEACON_ISSUE_PANEL_DEFAULTS__ = {{ (app.user ? app.user.preferredCollapsedIssuePanels : ['raw', 'extra'])|json_encode|raw }};
+        </script>
         {% include '_theme_boot.html.twig' %}
         <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
         <style>{{ site_appearance.cssOverrides|raw }}</style>

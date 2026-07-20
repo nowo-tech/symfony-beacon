@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Repository;
 
+use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
@@ -34,6 +35,8 @@ class IssueRepository extends ServiceEntityRepository
         ?string $level = null,
         ?IssueStatus $status = null,
         ?string $environment = null,
+        ?User $assignee = null,
+        bool $unassignedOnly = false,
     ): array {
         $qb = $this->createQueryBuilder('i')
             ->andWhere('i.project = :project')
@@ -50,6 +53,11 @@ class IssueRepository extends ServiceEntityRepository
         }
         if ($status instanceof IssueStatus) {
             $qb->andWhere('i.status = :status')->setParameter('status', $status);
+        }
+        if ($unassignedOnly) {
+            $qb->andWhere('i.assignee IS NULL');
+        } elseif ($assignee instanceof User) {
+            $qb->andWhere('i.assignee = :assignee')->setParameter('assignee', $assignee);
         }
         if (null !== $environment && '' !== $environment) {
             $qb->innerJoin('i.events', 'e')
