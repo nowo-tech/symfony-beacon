@@ -9,26 +9,26 @@
         <a href="{{ path(dashboard_routes.index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="text-decoration-none">{{ 'dashboard.collections_heading'|trans }}</a>
         {% if collection is not null and collection.id %}
             <span class="text-muted"> / </span>
-            <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id }) }}" class="text-decoration-none"><code>{{ collection.code }}</code></a>
+            <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id}) }}" class="text-decoration-none"><code>{{ collection.code }}</code></a>
         {% endif %}
         <span class="text-muted"> / </span>
         <span>{{ title }}</span>
     </nav>
     <h1 class="h3 mb-3">{{ title }}</h1>
 
-    {{ form_start(form, { attr: { class: 'bk-dashboard-form' } }) }}
-        {{ form_row(form.code, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.contextKey, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.name, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.homeIcon, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.separatorIcon, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.classList, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.classItem, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.classSeparator, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.classCurrent, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
-        {{ form_row(form.responsiveConfigJson, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' }, attr: { class: 'form-control font-monospace', rows: 6, spellcheck: 'false' } }) }}
+    {{ form_start(form, {attr: {class: 'bk-dashboard-form'}}) }}
+        {{ form_row(form.code, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.contextKey, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.name, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.homeIcon, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.separatorIcon, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.classList, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.classItem, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.classSeparator, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.classCurrent, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
+        {{ form_row(form.responsiveConfigJson, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}, attr: {class: 'form-control font-monospace', rows: 6, spellcheck: 'false'}}) }}
         {% if form.inlineEditAccessKey is defined %}
-            {{ form_row(form.inlineEditAccessKey, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
+            {{ form_row(form.inlineEditAccessKey, {label_attr: {class: 'form-label'}, row_attr: {class: 'mb-2'}}) }}
         {% endif %}
         {{ form_rest(form) }}
         <div class="d-flex gap-2 flex-wrap mt-3">

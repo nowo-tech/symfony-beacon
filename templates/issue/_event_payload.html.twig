@@ -17,7 +17,7 @@
 {% set headers = request.headers|default({}) %}
 {% set levelLabel = payload.level|default(issue is defined ? issue.level : 'error') %}
 
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'highlights', title: 'issues.highlights'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'highlights', title: 'issues.highlights'|trans} %}
     {% block body %}
         <table class="issue-kv">
             <tbody>
@@ -74,7 +74,7 @@
 {% endembed %}
 
 {% if frames is not empty or exception %}
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'stacktrace', title: 'issues.stacktrace'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'stacktrace', title: 'issues.stacktrace'|trans} %}
     {% block body %}
         {% for ex in exceptionValues|default(exception ? [exception] : []) %}
             <div class="issue-exception{% if not loop.first %} mt-4{% endif %}">
@@ -164,7 +164,7 @@
     {% endblock %}
 {% endembed %}
 {% elseif payload.message is defined and payload.message %}
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'message', title: 'issues.message'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'message', title: 'issues.message'|trans} %}
     {% block body %}
         <p class="issue-exception__value whitespace-pre-wrap font-mono text-sm">{{ payload.message }}</p>
     {% endblock %}
@@ -172,7 +172,7 @@
 {% endif %}
 
 {% if breadcrumbs is not empty %}
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'breadcrumbs', title: 'issues.breadcrumbs'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'breadcrumbs', title: 'issues.breadcrumbs'|trans} %}
     {% block body %}
         <ol class="issue-crumbs">
             {% for crumb in breadcrumbs %}
@@ -192,7 +192,7 @@
 {% endif %}
 
 {% if request or requestUrl %}
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'request', title: 'issues.request'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'request', title: 'issues.request'|trans} %}
     {% block body %}
         <table class="issue-kv">
             <tbody>
@@ -233,7 +233,7 @@
 {% endembed %}
 {% endif %}
 
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'tags', title: 'issues.tags'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'tags', title: 'issues.tags'|trans} %}
     {% block body %}
         <ul class="issue-tags">
             <li><span class="issue-tags__key">environment</span><span class="issue-tags__val">{{ event.environment|default(payload.environment|default('—')) }}</span></li>
@@ -264,7 +264,7 @@
     {% endblock %}
 {% endembed %}
 
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'contexts', title: 'issues.contexts'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'contexts', title: 'issues.contexts'|trans} %}
     {% block body %}
         <div class="issue-contexts">
             {% if runtime %}
@@ -313,14 +313,14 @@
 {% endembed %}
 
 {% if payload.extra is defined and payload.extra %}
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'extra', title: 'issues.extra'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'extra', title: 'issues.extra'|trans} %}
     {% block body %}
         <pre class="code-block">{{ payload.extra|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
     {% endblock %}
 {% endembed %}
 {% endif %}
 
-{% embed 'issue/_collapse_section.html.twig' with { panel_id: 'raw', title: 'issues.raw_payload'|trans } %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'raw', title: 'issues.raw_payload'|trans} %}
     {% block body %}
         <pre class="code-block">{{ payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
     {% endblock %}

@@ -37,7 +37,7 @@
     </div>
 
     <aside class="issue-layout__aside">
-        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'details', title: 'issues.aside_details'|trans } %}
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'details', title: 'issues.aside_details'|trans} %}
             {% block body %}
                 <dl class="issue-aside-stats__grid">
                     <div>
@@ -78,7 +78,7 @@
             {% endblock %}
         {% endembed %}
 
-        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'assignee', title: 'issues.assignee'|trans } %}
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'assignee', title: 'issues.assignee'|trans} %}
             {% block body %}
                 <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
                 {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
@@ -89,7 +89,7 @@
             {% endblock %}
         {% endembed %}
 
-        {% embed 'issue/_collapse_section.html.twig' with { panel_id: 'recent_events', title: 'issues.recent_events'|trans } %}
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'recent_events', title: 'issues.recent_events'|trans} %}
             {% block body %}
                 <ul class="issue-event-list">
                     {% for e in events %}

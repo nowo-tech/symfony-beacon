@@ -42,7 +42,7 @@
     <input class="input" name="environment" value="{{ filters.environment }}" placeholder="{{ 'issues.filter.environment'|trans }}">
     <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
         {% for size in [10, 25, 50, 100] %}
-            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({ '%count%': size }) }}</option>
+            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
         {% endfor %}
     </select>
     <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
@@ -61,23 +61,23 @@
             <thead>
                 <tr>
                     {% set columns = [
-                        { key: 'title', label: 'issues.col.issue', priority: 1, head_class: '' },
-                        { key: 'level', label: 'issues.col.level', priority: 2, head_class: '' },
-                        { key: 'assignee', label: 'issues.col.assignee', priority: 6, head_class: '' },
-                        { key: 'events', label: 'issues.col.events', priority: 3, head_class: 'dt-head-right' },
-                        { key: 'events_24h', label: 'issues.col.events_24h', priority: 8, head_class: 'dt-head-right' },
-                        { key: 'events_7d', label: 'issues.col.events_7d', priority: 9, head_class: 'dt-head-right' },
-                        { key: 'events_30d', label: 'issues.col.events_30d', priority: 10, head_class: 'dt-head-right' },
-                        { key: 'first_seen', label: 'issues.col.first_seen', priority: 7, head_class: '' },
-                        { key: 'last_seen', label: 'issues.col.last_seen', priority: 4, head_class: '' }
+                        {key: 'title', label: 'issues.col.issue', priority: 1, head_class: ''},
+                        {key: 'level', label: 'issues.col.level', priority: 2, head_class: ''},
+                        {key: 'assignee', label: 'issues.col.assignee', priority: 6, head_class: ''},
+                        {key: 'events', label: 'issues.col.events', priority: 3, head_class: 'dt-head-right'},
+                        {key: 'events_24h', label: 'issues.col.events_24h', priority: 8, head_class: 'dt-head-right'},
+                        {key: 'events_7d', label: 'issues.col.events_7d', priority: 9, head_class: 'dt-head-right'},
+                        {key: 'events_30d', label: 'issues.col.events_30d', priority: 10, head_class: 'dt-head-right'},
+                        {key: 'first_seen', label: 'issues.col.first_seen', priority: 7, head_class: ''},
+                        {key: 'last_seen', label: 'issues.col.last_seen', priority: 4, head_class: ''}
                     ] %}
                     {% for column in columns %}
                         {% set next = sort.forColumnClick(column.key) %}
                         <th class="{{ column.head_class }}" data-priority="{{ column.priority }}">
                             <a
                                 class="issue-table__sort{% if filters.sort == column.key %} is-active is-{{ filters.dir }}{% endif %}"
-                                href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ sort: next.field, dir: next.direction, page: 1 })) }}"
-                                title="{{ 'issues.sort_by'|trans({ '%column%': column.label|trans }) }}"
+                                href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({sort: next.field, dir: next.direction, page: 1})) }}"
+                                title="{{ 'issues.sort_by'|trans({'%column%': column.label|trans}) }}"
                             >{{ column.label|trans }}</a>
                         </th>
                     {% endfor %}
@@ -118,12 +118,12 @@
         {% set to = (pagination.page - 1) * pagination.per_page + issues|length %}
         <div class="issue-pagination">
             <p class="issue-pagination__info">
-                {{ 'issues.pagination.showing'|trans({ '%from%': from, '%to%': to, '%total%': pagination.total }) }}
+                {{ 'issues.pagination.showing'|trans({'%from%': from, '%to%': to, '%total%': pagination.total}) }}
             </p>
             {% if pagination.total_pages > 1 %}
                 <nav class="issue-pagination__nav" aria-label="{{ 'issues.pagination.nav'|trans }}">
                     {% if pagination.page > 1 %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: pagination.page - 1 })) }}">{{ 'issues.pagination.previous'|trans }}</a>
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: pagination.page - 1})) }}">{{ 'issues.pagination.previous'|trans }}</a>
                     {% else %}
                         <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.previous'|trans }}</span>
                     {% endif %}
@@ -132,14 +132,14 @@
                         {% if p == pagination.page %}
                             <span class="issue-pagination__link is-active" aria-current="page">{{ p }}</span>
                         {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
-                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: p })) }}">{{ p }}</a>
+                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: p})) }}">{{ p }}</a>
                         {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
                             <span class="issue-pagination__ellipsis">…</span>
                         {% endif %}
                     {% endfor %}
 
                     {% if pagination.page < pagination.total_pages %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({ page: pagination.page + 1 })) }}">{{ 'issues.pagination.next'|trans }}</a>
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: pagination.page + 1})) }}">{{ 'issues.pagination.next'|trans }}</a>
                     {% else %}
                         <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.next'|trans }}</span>
                     {% endif %}

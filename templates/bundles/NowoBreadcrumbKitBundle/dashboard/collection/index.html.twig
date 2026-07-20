@@ -34,10 +34,10 @@
                         {% endif %}
                     </div>
                     <div class="d-flex gap-1">
-                        <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: c.id }) }}" class="btn btn-sm btn-outline-primary" title="{{ 'dashboard.link_items'|trans }}" aria-label="{{ 'dashboard.link_items'|trans }}">{{ bk_icon.items() }}</a>
-                        <a href="{{ path(dashboard_routes.export|default('nowo_breadcrumb_kit_dashboard_collections_export'), { id: c.id }) }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener noreferrer" title="{{ 'dashboard.link_export_json'|trans }}" aria-label="{{ 'dashboard.link_export_json'|trans }}">{{ bk_icon.export_json() }}</a>
-                        <button type="button" class="btn btn-sm btn-outline-primary btn-bk-collection-form" data-bs-toggle="modal" data-bs-target="#modal-bk-collection-form" data-bk-url="{{ path(dashboard_routes.edit|default('nowo_breadcrumb_kit_dashboard_collections_edit'), { id: c.id }) }}?_partial=1" data-bk-title="{{ 'dashboard.edit_collection_modal_title'|trans({'%code%': c.code})|e('html_attr') }}" title="{{ 'dashboard.link_edit'|trans }}" aria-label="{{ 'dashboard.link_edit'|trans }}">{{ bk_icon.edit() }}</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger btn-bk-delete" data-id="{{ c.id }}" data-name="{{ c.code }}{% if c.name %} — {{ c.name }}{% endif %}" data-url="{{ path(dashboard_routes.delete|default('nowo_breadcrumb_kit_dashboard_collections_delete'), { id: c.id }) }}" data-token="{{ csrf_token('delete_collection_' ~ c.id) }}" data-bs-toggle="modal" data-bs-target="#modal-bk-delete" title="{{ 'dashboard.delete'|trans }}" aria-label="{{ 'dashboard.delete'|trans }}">{{ bk_icon.trash() }}</button>
+                        <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: c.id}) }}" class="btn btn-sm btn-outline-primary" title="{{ 'dashboard.link_items'|trans }}" aria-label="{{ 'dashboard.link_items'|trans }}">{{ bk_icon.items() }}</a>
+                        <a href="{{ path(dashboard_routes.export|default('nowo_breadcrumb_kit_dashboard_collections_export'), {id: c.id}) }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener noreferrer" title="{{ 'dashboard.link_export_json'|trans }}" aria-label="{{ 'dashboard.link_export_json'|trans }}">{{ bk_icon.export_json() }}</a>
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-bk-collection-form" data-bs-toggle="modal" data-bs-target="#modal-bk-collection-form" data-bk-url="{{ path(dashboard_routes.edit|default('nowo_breadcrumb_kit_dashboard_collections_edit'), {id: c.id}) }}?_partial=1" data-bk-title="{{ 'dashboard.edit_collection_modal_title'|trans({'%code%': c.code})|e('html_attr') }}" title="{{ 'dashboard.link_edit'|trans }}" aria-label="{{ 'dashboard.link_edit'|trans }}">{{ bk_icon.edit() }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-bk-delete" data-id="{{ c.id }}" data-name="{{ c.code }}{% if c.name %} — {{ c.name }}{% endif %}" data-url="{{ path(dashboard_routes.delete|default('nowo_breadcrumb_kit_dashboard_collections_delete'), {id: c.id}) }}" data-token="{{ csrf_token('delete_collection_' ~ c.id) }}" data-bs-toggle="modal" data-bs-target="#modal-bk-delete" title="{{ 'dashboard.delete'|trans }}" aria-label="{{ 'dashboard.delete'|trans }}">{{ bk_icon.trash() }}</button>
                     </div>
                 </li>
             {% endfor %}
@@ -46,23 +46,23 @@
             <nav aria-label="{{ 'dashboard.pagination_collections'|trans }}" class="mt-3">
                 <ul class="pagination pagination-sm flex-wrap">
                     {% set indexRoute = dashboard_routes.index|default('nowo_breadcrumb_kit_dashboard_collections_index') %}
-                    {% set queryParams = search is not empty ? { q: search } : {} %}
+                    {% set queryParams = search is not empty ? {q: search} : {} %}
                     <li class="page-item{% if pagination.current_page <= 1 %} disabled{% endif %}">
-                        <a class="page-link" href="{% if pagination.current_page > 1 %}{{ path(indexRoute, queryParams|merge({ page: pagination.current_page - 1 })) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.previous'|trans }}">«</a>
+                        <a class="page-link" href="{% if pagination.current_page > 1 %}{{ path(indexRoute, queryParams|merge({page: pagination.current_page - 1})) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.previous'|trans }}">«</a>
                     </li>
                     {% for p in 1..pagination.total_pages %}
                         <li class="page-item{% if p == pagination.current_page %} active{% endif %}">
-                            <a class="page-link" href="{{ path(indexRoute, queryParams|merge({ page: p })) }}">{{ p }}</a>
+                            <a class="page-link" href="{{ path(indexRoute, queryParams|merge({page: p})) }}">{{ p }}</a>
                         </li>
                     {% endfor %}
                     <li class="page-item{% if pagination.current_page >= pagination.total_pages %} disabled{% endif %}">
-                        <a class="page-link" href="{% if pagination.current_page < pagination.total_pages %}{{ path(indexRoute, queryParams|merge({ page: pagination.current_page + 1 })) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.next'|trans }}">»</a>
+                        <a class="page-link" href="{% if pagination.current_page < pagination.total_pages %}{{ path(indexRoute, queryParams|merge({page: pagination.current_page + 1})) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.next'|trans }}">»</a>
                     </li>
                 </ul>
                 <p class="small text-muted mt-1">
                     {% set from = collections|length > 0 ? (pagination.current_page - 1) * pagination.per_page + 1 : 0 %}
                     {% set to = (pagination.current_page - 1) * pagination.per_page + collections|length %}
-                    {{ 'dashboard.showing_from_to_of_total'|trans({ '%from%': from, '%to%': to, '%total%': pagination.total }) }}
+                    {{ 'dashboard.showing_from_to_of_total'|trans({'%from%': from, '%to%': to, '%total%': pagination.total}) }}
                 </p>
             </nav>
         {% endif %}

@@ -11,20 +11,20 @@
             <h1 class="h3 d-inline"><code>{{ collection.code }}</code>{% if collection.name %} <span class="text-muted">({{ collection.name }})</span>{% endif %}</h1>
         </div>
         <div class="d-flex flex-wrap align-items-center justify-content-end gap-1">
-            <a href="{{ path(dashboard_routes.export|default('nowo_breadcrumb_kit_dashboard_collections_export'), { id: collection.id }) }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">{{ 'dashboard.export_collection'|trans }}</a>
-            <button type="button" class="btn btn-outline-secondary btn-sm btn-bk-collection-form" data-bs-toggle="modal" data-bs-target="#modal-bk-collection-form" data-bk-url="{{ path(dashboard_routes.collections_edit|default('nowo_breadcrumb_kit_dashboard_collections_edit'), { id: collection.id }) }}?_partial=1" data-bk-title="{{ 'dashboard.collection_styles_modal_title'|trans({'%code%': collection.code})|e('html_attr') }}" title="{{ 'dashboard.collection_styles'|trans }}" aria-label="{{ 'dashboard.collection_styles'|trans }}">{{ bk_icon.config() }}</button>
-            <button type="button" class="btn btn-primary btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_new', { collectionId: collection.id }) }}?_partial=1" data-bk-title="{{ 'dashboard.new_item_modal_title'|trans|e('html_attr') }}">{{ 'dashboard.new_item'|trans }}</button>
+            <a href="{{ path(dashboard_routes.export|default('nowo_breadcrumb_kit_dashboard_collections_export'), {id: collection.id}) }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">{{ 'dashboard.export_collection'|trans }}</a>
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-bk-collection-form" data-bs-toggle="modal" data-bs-target="#modal-bk-collection-form" data-bk-url="{{ path(dashboard_routes.collections_edit|default('nowo_breadcrumb_kit_dashboard_collections_edit'), {id: collection.id}) }}?_partial=1" data-bk-title="{{ 'dashboard.collection_styles_modal_title'|trans({'%code%': collection.code})|e('html_attr') }}" title="{{ 'dashboard.collection_styles'|trans }}" aria-label="{{ 'dashboard.collection_styles'|trans }}">{{ bk_icon.config() }}</button>
+            <button type="button" class="btn btn-primary btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_new', {collectionId: collection.id}) }}?_partial=1" data-bk-title="{{ 'dashboard.new_item_modal_title'|trans|e('html_attr') }}">{{ 'dashboard.new_item'|trans }}</button>
         </div>
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-1 mb-2">
-        {{ form_start(search_form, { attr: { class: 'd-flex gap-1 flex-grow-1', role: 'search' } }) }}
-            {{ form_widget(search_form.q, { attr: { class: 'form-control', style: 'max-width: 20rem;', placeholder: 'dashboard.search_placeholder'|trans, 'aria-label': 'dashboard.search'|trans } }) }}
+        {{ form_start(search_form, {attr: {class: 'd-flex gap-1 flex-grow-1', role: 'search'}}) }}
+            {{ form_widget(search_form.q, {attr: {class: 'form-control', style: 'max-width: 20rem;', placeholder: 'dashboard.search_placeholder'|trans, 'aria-label': 'dashboard.search'|trans}}) }}
             <button type="submit" class="btn btn-outline-secondary">{{ 'dashboard.search'|trans }}</button>
             {% if search_query != '' %}
-                <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id }) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
+                <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id}) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
             {% endif %}
-        {{ form_end(search_form, { render_rest: false }) }}
+        {{ form_end(search_form, {render_rest: false}) }}
     </div>
 
     {% if search_query != '' %}
@@ -34,10 +34,10 @@
     {% if items is empty %}
         <p class="text-muted">
             {% if search_query != '' %}
-                {{ 'dashboard.empty_items_search'|trans }} <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id }) }}">{{ 'dashboard.view_all_link'|trans }}</a>.
+                {{ 'dashboard.empty_items_search'|trans }} <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id}) }}">{{ 'dashboard.view_all_link'|trans }}</a>.
             {% else %}
                 {{ 'dashboard.empty_items_none'|trans }}
-                <button type="button" class="btn btn-link p-0 align-baseline btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_new', { collectionId: collection.id }) }}?_partial=1" data-bk-title="{{ 'dashboard.new_item_modal_title'|trans|e('html_attr') }}">{{ 'dashboard.add_item_button'|trans }}</button>.
+                <button type="button" class="btn btn-link p-0 align-baseline btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_new', {collectionId: collection.id}) }}?_partial=1" data-bk-title="{{ 'dashboard.new_item_modal_title'|trans|e('html_attr') }}">{{ 'dashboard.add_item_button'|trans }}</button>.
             {% endif %}
         </p>
     {% else %}
@@ -57,9 +57,9 @@
                     <tr>
                         <td>
                             <div class="d-flex gap-1">
-                                <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id, q: it.routeName }) }}" class="btn btn-sm btn-outline-secondary" title="{{ 'dashboard.filter_by_route'|trans }}" aria-label="{{ 'dashboard.filter_by_route'|trans }}">{{ bk_icon.filter() }}</a>
-                                <button type="button" class="btn btn-sm btn-outline-primary btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_edit', { collectionId: collection.id, id: it.id }) }}?_partial=1" data-bk-title="{{ 'dashboard.edit_item_modal_title'|trans({'%id%': it.id})|e('html_attr') }}" title="{{ 'dashboard.link_edit'|trans }}" aria-label="{{ 'dashboard.link_edit'|trans }}">{{ bk_icon.edit() }}</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-bk-delete" data-id="{{ it.id }}" data-route="{{ it.routeName|e('html_attr') }}" data-url="{{ path('nowo_breadcrumb_kit_dashboard_items_delete', { collectionId: collection.id, id: it.id }) }}" data-token="{{ csrf_token('delete_item_' ~ it.id) }}" data-bs-toggle="modal" data-bs-target="#modal-bk-delete" title="{{ 'dashboard.delete'|trans }}" aria-label="{{ 'dashboard.delete'|trans }}">{{ bk_icon.trash() }}</button>
+                                <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id, q: it.routeName}) }}" class="btn btn-sm btn-outline-secondary" title="{{ 'dashboard.filter_by_route'|trans }}" aria-label="{{ 'dashboard.filter_by_route'|trans }}">{{ bk_icon.filter() }}</a>
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-bk-item-form" data-bs-toggle="modal" data-bs-target="#modal-bk-item-form" data-bk-url="{{ path('nowo_breadcrumb_kit_dashboard_items_edit', {collectionId: collection.id, id: it.id}) }}?_partial=1" data-bk-title="{{ 'dashboard.edit_item_modal_title'|trans({'%id%': it.id})|e('html_attr') }}" title="{{ 'dashboard.link_edit'|trans }}" aria-label="{{ 'dashboard.link_edit'|trans }}">{{ bk_icon.edit() }}</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bk-delete" data-id="{{ it.id }}" data-route="{{ it.routeName|e('html_attr') }}" data-url="{{ path('nowo_breadcrumb_kit_dashboard_items_delete', {collectionId: collection.id, id: it.id}) }}" data-token="{{ csrf_token('delete_item_' ~ it.id) }}" data-bs-toggle="modal" data-bs-target="#modal-bk-delete" title="{{ 'dashboard.delete'|trans }}" aria-label="{{ 'dashboard.delete'|trans }}">{{ bk_icon.trash() }}</button>
                             </div>
                         </td>
                         <td><code>{{ it.routeName }}</code></td>
