@@ -94,7 +94,6 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates |
 | `Notifications` | Slack / HTTP webhook destinations |
-| `Native` | Hotwire Native config (`/config/*_v1.json`) |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
 
 ## Spec-Driven Development
@@ -119,7 +118,7 @@ docker compose exec php php bin/phpunit
 - [Release checklist](docs/RELEASE.md)
 - [DSN / SDK](docs/dsn.md)
 - [Event context (timestamps, versions, user)](docs/event-context.md)
-- [Native mobile — create iOS/Android apps (Hotwire Native)](docs/native-mobile.md)
+- [Mobile / PWA (Hotwire Native removed)](docs/native-mobile.md)
 - [Legal pages & cookie consent](docs/legal-and-cookies.md)
 - [Production](docs/production.md)
 - [Contributing](docs/CONTRIBUTING.md)

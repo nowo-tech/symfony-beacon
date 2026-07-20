@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-07-20
+
+### Changed
+
+- Documentation: README architecture no longer lists a Hotwire Native module; first-install path uses `make bootstrap`
+- CHANGELOG / UPGRADING: clarify that **0.7.0** removed Turbo / UX Native and that demo seed includes N+1 + analytics samples
+
 ## [0.7.0] - 2026-07-20
 
 ### Added
@@ -18,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Login throttling via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle)
 - Docs: [product roadmap](ROADMAP.md), [notifications](notifications.md), [architecture](architecture.md); expanded [production](production.md)
 - Demo bootstrap: `make bootstrap` (migrate + seed); `app:seed-demo` writes `.demo-client.env` for BeaconBundle `make sync-beacon`
+- Demo seed samples: performance N+1 (`demo.nplus1.products`) and a 14-day analytics window
 
 ### Changed
 
@@ -25,9 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issues list: responsive filter grid and wrap-friendly title/culprit cells
 - Issue ingest reopens **ignored** issues to unresolved on a matching event (same as resolved), so regression alerts match the notifications spec
 
+### Removed
+
+- `symfony/ux-turbo` and `symfony/ux-native` (Hotwire Native shell). Prefer the PWA (`nowo-tech/pwa-bundle`); see [native-mobile.md](native-mobile.md)
+
 ### Fixed
 
-- Issues list → issue detail navigation under Turbo Drive (DataTables no longer rewrites `history` / client-side paging that blocked page swaps)
+- Issues list → issue detail navigation (full page loads; DataTables no longer rewrites `history` / client-side paging)
 
 ## [0.6.0] - 2026-07-20
 
@@ -144,7 +156,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.4.0...v0.5.0

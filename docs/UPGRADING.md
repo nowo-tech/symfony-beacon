@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.7.0 to the next release](#upgrading-from-070-to-the-next-release)
+- [Upgrading from 0.7.1 to the next release](#upgrading-from-071-to-the-next-release)
+- [Upgrading from 0.7.0 to 0.7.1](#upgrading-from-070-to-071)
 - [Upgrading from 0.6.0 to 0.7.0](#upgrading-from-060-to-070)
 - [Upgrading from 0.5.0 to 0.6.0](#upgrading-from-050-to-060)
 - [Upgrading from 0.4.0 to 0.5.0](#upgrading-from-040-to-050)
@@ -15,7 +16,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.7.0 to the next release
+## Upgrading from 0.7.1 to the next release
 
 When a newer tag exists:
 
@@ -25,6 +26,23 @@ When a newer tag exists:
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
 5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
 6. Run quality checks: `make qa` (or at least `make test`).
+
+---
+
+## Upgrading from 0.7.0 to 0.7.1
+
+Documentation and release-notes clarity only. **No schema, env, or Composer changes.**
+
+1. Pull `v0.7.1` (or merge `main`).
+2. Optional: re-read [native-mobile.md](native-mobile.md) if you still expected Hotwire Native — that stack was removed in **0.7.0**.
+3. Local BeaconBundle pairing remains: `make bootstrap` → demo `make sync-beacon` ([dsn.md](dsn.md)).
+
+```bash
+git fetch --tags
+git checkout v0.7.1
+```
+
+No migrations required.
 
 ---
 
@@ -70,7 +88,11 @@ Sort and paging are **server-side** again (column header links + `per_page` in t
 - Probes: `/health/live`, `/health/ready` — [production.md](production.md)
 - Login throttling defaults: see `config/packages/nowo_login_throttle.yaml`
 
-### 6. Local BeaconBundle demo (optional)
+### 6. Turbo / Hotwire Native removed
+
+`symfony/ux-turbo` and `symfony/ux-native` are gone. Use the PWA for installable mobile access ([native-mobile.md](native-mobile.md)). Full page loads replace Turbo Drive navigation.
+
+### 7. Local BeaconBundle demo (optional)
 
 ```bash
 make bootstrap   # migrate + seed + write .demo-client.env
@@ -78,7 +100,7 @@ make bootstrap   # migrate + seed + write .demo-client.env
 
 Then in `BeaconBundle/demo/symfony8`: `make sync-beacon` (see [dsn.md](dsn.md)).
 
-### 7. Verify
+### 8. Verify
 
 ```bash
 make qa
@@ -361,13 +383,13 @@ cd symfony-beacon
 cp .env.dist .env
 git config core.hooksPath .githooks   # optional: strip Cursor co-author trailers
 make up
-make console ARGS='doctrine:migrations:migrate -n'
+make bootstrap   # migrate + seed (or: make console ARGS='doctrine:migrations:migrate -n')
 ```
 
 Then either:
 
 - Register the first admin at https://localhost:9444/en/register, or
-- Seed demo data: `make console ARGS='app:seed-demo'` (login `admin@symfony-beacon.local` / `admin123`)
+- Use the seeded demo login from `make bootstrap` / `make seed`: `admin@symfony-beacon.local` / `admin123`
 
 Open https://localhost:9444/ (redirects to `/en/login`). After login you land on `/dashboard`.
 

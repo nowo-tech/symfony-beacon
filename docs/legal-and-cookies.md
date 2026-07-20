@@ -81,4 +81,4 @@ Do **not** load marketing/analytics tags before consent.
 ## References
 
 - Bundle docs: [CONFIGURATION](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/CONFIGURATION.md), [USAGE](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/USAGE.md)
-- Native mobile store reminder: [docs/native-mobile.md](native-mobile.md)
+- Mobile / PWA note: [docs/native-mobile.md](native-mobile.md)
