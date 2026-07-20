@@ -2,12 +2,361 @@ nav:
     projects: Projects
     new_project: New project
     log_out: Log out
+    main: Main navigation
+    account: Account menu
+    admin: Administration
+    admin_hub: Admin overview
+    users: Users
+    appearance: Appearance
+    menus: Menus
+    breadcrumbs: Breadcrumbs
+    toggle_sidebar: Toggle navigation
+    preferences: Preferences
+    account_settings: Account settings
+    dashboard: Dashboard
+    issues: Issues
+    performance: Performance
+    analytics: Analytics
+common:
+    filter: Filter
+    yes: 'yes'
+    na: n/a
+    unknown: unknown
 locale:
     nav: Language
     en: English
     es: Español
+theme:
+    day: Day
+    night: Night
+    switch_to_day: Switch to day mode
+    switch_to_night: Switch to night mode
 auth:
     tagline: Self-hosted error tracking for PHP & Symfony.
     brand_eyebrow: Error tracking
     bootstrap_eyebrow: Bootstrap
     bootstrap_hint: Create the first administrator account. Registration closes after this user exists.
+flash:
+    project:
+        created: Project created.
+        api_key_created: API key created.
+        history_cleared: Project history cleared.
+        deleted: Project deleted.
+        delete_confirmation_mismatch: Project name did not match. Nothing was deleted.
+    appearance:
+        saved: Appearance settings saved.
+    preferences:
+        saved: Preferences saved.
+        profile_saved: Profile saved.
+        password_saved: Password updated.
+        display_saved: Display preferences saved.
+project:
+    label: Project
+    no_description: No description
+    nav:
+        label: Project sections
+    settings:
+        title: Settings
+        nav: Settings
+        intro: API keys, members, and destructive project actions.
+    new:
+        title: New project
+        submit: Create project
+    name:
+        label: Name
+        placeholder: e.g. Billing API
+        help: Shown in the dashboard and used to derive the project slug.
+        required: Project name is required.
+    description:
+        label: Description
+        placeholder: Optional short summary
+        help: Helps your team recognize this project.
+    api_keys:
+        title: API keys / DSN
+        help: Use a DSN in BEACON_DSN so your app can send errors to this project.
+        inactive: inactive
+        public: 'public:'
+        label_placeholder: e.g. calm-otter
+        generate: Suggest name
+        generate_hint: Fill the label with a human-friendly adjective-noun name
+        add: Add key
+    members:
+        title: Members
+        your_role: 'Your role:'
+    danger:
+        title: Danger zone
+        intro: Irreversible actions for this project. Use with care.
+        cancel: Cancel
+        clear_open: Clear history…
+        clear_title: Clear project history?
+        clear_body: This permanently deletes issues, events, performance data, and analytics for this project. API keys and members are kept.
+        clear_confirm: Yes, clear history
+        delete_open: Delete project…
+        delete_title: Delete this project permanently?
+        delete_body: This permanently deletes “%name%” and all of its data (issues, events, performance, analytics, keys, and members). This cannot be undone.
+        delete_type_label: 'Type %name% to confirm:'
+        delete_confirm: Delete project
+projects:
+    title: Projects
+    intro: Filter and open projects you can access.
+    search_placeholder: Search projects…
+    empty: No projects yet.
+    create_first: Create your first project
+    errors_last_7_days: '%count% errors in last 7 days'
+issues:
+    title: Issues
+    search_placeholder: Search title…
+    empty: No issues match these filters.
+    back: ← Issues
+    back_to_issue: ← Issue
+    event_count: '%count% events'
+    latest_stack: Latest stack / payload
+    event: Event
+    recent_events: Recent events
+    no_events: No events stored.
+    event_detail: Event detail
+    context: Context
+    occurred_at: Occurred at
+    received_at: Received at
+    release: Release / version
+    php_version: PHP version
+    symfony_version: Symfony version
+    os: Operating system
+    user: User
+    server_name: Server
+    stacktrace: Stack trace
+    breadcrumbs: Breadcrumbs
+    raw_payload: Raw payload
+    filter:
+        any_level: Any level
+        any_status: any status
+        environment: Environment
+    col:
+        issue: Issue
+        level: Level
+        events: Events
+        last_seen: Last seen
+performance:
+    title: Performance
+    intro: Transactions and N+1 analysis
+    show_all: Show all
+    nplus1_only: N+1 only
+    empty: No transactions yet.
+    back: ← Performance
+    no_nplus1: no N+1 detected
+    nplus1_groups: '%count% N+1 group(s)'
+    spans_count: '%count% spans'
+    col:
+        transaction: Transaction
+        duration: Duration
+        spans: Spans
+        nplus1: N+1
+        received: Received
+        op: Op
+        description: Description
+analytics:
+    title: Analytics
+    intro: Daily error, transaction, and N+1 counts (last 30 days)
+    empty: No stats yet. Ingest events to populate this chart data.
+    col:
+        date: Date
+        errors: Errors
+        transactions: Transactions
+        nplus1_groups: N+1 groups
+appearance:
+    title: Appearance
+    intro: Customize brand name and accent colors for this Beacon instance. Only administrators can change these settings.
+    section:
+        light: Light theme accents
+        dark: Dark theme accents
+    submit: Save appearance
+    reset: Reset to defaults
+site_appearance:
+    brand_name:
+        label: Brand name
+        placeholder: symfony-beacon
+        help: Shown in the header and on the login page.
+    brand_eyebrow:
+        label: Brand eyebrow
+        placeholder: Error tracking
+        help: Short label above the brand on the login screen.
+    accent_color:
+        label: Accent
+        placeholder: '#1f6f54'
+        help: Primary accent (buttons, links) in light mode.
+    accent_deep_color:
+        label: Accent (hover)
+        placeholder: '#134736'
+        help: Darker accent for hover states in light mode.
+    accent_color_dark:
+        label: Accent (dark)
+        placeholder: '#4aad7f'
+        help: Primary accent in dark mode.
+    accent_deep_color_dark:
+        label: Accent hover (dark)
+        placeholder: '#6bc49a'
+        help: Lighter accent for hover states in dark mode.
+    color:
+        invalid: 'Use a hex color like #1f6f54.'
+users:
+    title: Users
+    intro: Accounts on this Beacon instance. Prefer nowo-tech/user-kit-bundle for enable/disable and richer account lifecycle.
+    col:
+        user: User
+        email: Email
+        roles: Roles
+    empty: No users yet.
+preferences:
+    title: Account settings
+    intro: Update your profile, password, language, and theme preferences.
+    nav:
+        profile: Profile
+        security: Security
+        display: Display
+    profile:
+        title: Profile
+        intro: Update your display name and sign-in email.
+        submit: Save profile
+    security:
+        title: Security
+        intro: Change your account password.
+        submit: Update password
+    display:
+        title: Display
+        intro: Choose language, theme, and content width for your account.
+        submit: Save display settings
+        pwa_title: Install app
+        pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
+        pwa_prompt_title: Install for quicker access
+        pwa_unavailable: Installation is not available in this browser right now. Try Chrome or Edge on desktop, or Safari’s Share → Add to Home Screen on iOS.
+    section:
+        profile: Profile
+        locale_theme: Language, theme, and layout
+        password: Password
+    locale_theme: Language, theme, and layout
+    password: Password
+    password_hint: Leave password fields empty to keep your current password.
+    submit: Save preferences
+    locale_auto: Auto (browser / session)
+    theme_auto: Auto (device / last choice)
+    theme_light: Day
+    theme_dark: Night
+    width_content: Content (centered)
+    width_full: Full width
+    error:
+        current_password: Current password is incorrect.
+        email_in_use: This email is already in use.
+        password_required: Enter a new password.
+user_preferences:
+    display_name:
+        label: Display name
+        placeholder: Your name
+        help: Shown in the avatar menu and member lists.
+    email:
+        label: Email
+        placeholder: you@example.com
+        help: Used to sign in.
+    preferred_locale:
+        label: Language
+        placeholder: Auto
+        help: Preferred UI language for this account.
+    preferred_theme:
+        label: Theme
+        placeholder: Auto
+        help: Preferred day or night appearance.
+    preferred_content_width:
+        label: Content width
+        placeholder: Content
+        help: Centered content column, or stretch the main area full width.
+    current_password:
+        label: Current password
+        help: Required only when setting a new password.
+        help_required: Confirm your current password to set a new one.
+    plain_password:
+        first:
+            label: New password
+        second:
+            label: Confirm new password
+        mismatch: The password fields must match.
+admin:
+    hub:
+        title: Administration
+        intro: Instance configuration for operators with elevated roles.
+        users: List accounts and roles on this instance.
+        appearance: Brand name and accent colors.
+        menus: Edit navigation menus.
+        breadcrumbs: Manage breadcrumb collections.
+legal:
+    nav:
+        label: Legal
+    last_updated: 'Last updated: %date%'
+    manage_cookies: Cookie settings
+    placeholder:
+        legal_name: 'Legal name: [Operator legal name — replace]'
+        address: 'Address: [Registered address — replace]'
+        contact_email: 'Contact: [privacy@example.com — replace]'
+        registration: 'Company registry / tax ID: [if applicable — replace]'
+    notice:
+        title: Legal notice
+        intro: 'This legal notice applies to the self-hosted %brand% instance you are visiting. Replace the placeholders below with the operator’s real details before public use.'
+        operator_heading: Operator
+        operator_body: The operator of this instance is responsible for the service and for the content they publish here.
+        hosting_heading: Hosting
+        hosting_body: This software may be hosted by the operator or a third-party infrastructure provider chosen by the operator. Hosting details should be completed by the operator.
+        liability_heading: Liability
+        liability_body: The software is provided as-is. The operator remains responsible for lawful use, data protection compliance, and the accuracy of operator-specific legal text on this instance.
+    privacy:
+        title: Privacy policy
+        intro: 'This privacy policy describes how personal data may be processed when you use this %brand% instance. Operators must adapt this text to their organisation and jurisdiction.'
+        controller_heading: Data controller
+        controller_body: The operator of this Beacon instance is the data controller for accounts and telemetry stored on their deployment. Fill in legal name and contact details in the Legal notice page.
+        data_heading: Data we process
+        data_body: Depending on how the operator configures and uses the instance, processing may include:
+        data_account: Account data (email, display name, password hash, roles, preferences)
+        data_telemetry: Application error and performance telemetry sent via project DSN / Envelope ingest
+        data_logs: Operational logs and optional cookie consent logs
+        data_cookies: Cookies and similar technologies described on the Cookies page
+        purpose_heading: Purposes
+        purpose_body: Data is processed to authenticate users, operate error tracking for configured projects, secure the service, and (where enabled) remember cookie preferences.
+        retention_heading: Retention
+        retention_body: Retention periods are defined by the operator (account lifecycle, project data retention, log retention). Replace this paragraph with your organisation’s retention schedule.
+        rights_heading: Your rights
+        rights_body: Depending on applicable law (for example GDPR), you may have rights of access, rectification, erasure, restriction, portability, and objection. Contact the operator using the details on the Legal notice page.
+        cookies_heading: Cookies
+        cookies_body: We use necessary cookies for sign-in and consent storage. Optional categories (preferences, analytics) are only activated after you allow them in the cookie banner.
+    terms:
+        title: Terms of use
+        intro: 'These terms govern use of this %brand% instance. Operators should replace this template with terms that match their offering (internal tool, customer SaaS, etc.).'
+        service_heading: Service
+        service_body: Beacon provides self-hosted error and performance tracking for projects configured by authorised users.
+        accounts_heading: Accounts
+        accounts_body: You must keep credentials confidential and use the service only for projects and data you are authorised to process.
+        accept_heading: Acceptable use
+        accept_body: Do not abuse the ingest API, attempt unauthorised access, or upload unlawful content. The operator may suspend accounts that violate these terms.
+        limitation_heading: Limitation of liability
+        limitation_body: To the extent permitted by law, the operator and software authors are not liable for indirect damages arising from use of the service. Operators should have counsel review this clause.
+        changes_heading: Changes
+        changes_body: The operator may update these terms. Continued use after notice constitutes acceptance of the updated terms where permitted by law.
+    cookies:
+        title: Cookies
+        intro: 'This page describes cookies and similar technologies used by this %brand% instance. Use Cookie settings to change optional categories.'
+        categories_heading: Categories
+        cat_required: Required
+        cat_required_help: Needed for sign-in, security, and storing your cookie choice.
+        cat_preferences: Preferences
+        cat_preferences_help: Optional features that remember non-essential presentation choices (when enabled by the operator).
+        cat_analytics: Analytics
+        cat_analytics_help: Optional measurement cookies (only if the operator enables analytics tooling later).
+        inventory_heading: Cookie inventory
+        col_name: Name
+        col_category: Category
+        col_duration: Duration
+        col_purpose: Purpose
+        duration_session: Session
+        duration_remember: Up to 7 days
+        duration_consent: About 1 year
+        purpose_session: PHP session cookie for authenticated browsing.
+        purpose_remember: Optional “Remember me” persistent login.
+        purpose_consent: Stores cookie category choices and an anonymized consent key for logging.
+        storage_heading: Local storage
+        storage_body: Theme (day/night) may be stored in the browser’s localStorage and is not a cookie. It does not require consent under typical ePrivacy guidance for strictly necessary UX, but operators should confirm for their jurisdiction.

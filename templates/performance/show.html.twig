@@ -3,14 +3,14 @@
 {% block title %}{{ transaction.transactionName }}{% endblock %}
 
 {% block body %}
-<a href="{{ path('performance_index', {id: project.id}) }}" class="text-sm no-underline">← Performance</a>
+<a href="{{ path('performance_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'performance.back'|trans }}</a>
 <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ transaction.transactionName }}</h1>
 <p class="mt-1 text-sm text-[var(--color-ink)]/65">
-    {{ transaction.durationMs|number_format(1) }} ms · {{ transaction.spanCount }} spans ·
+    {{ transaction.durationMs|number_format(1) }} ms · {{ 'performance.spans_count'|trans({'%count%': transaction.spanCount}) }} ·
     {% if transaction.nPlusOneCount > 0 %}
-        <span class="text-[var(--color-warn)]">{{ transaction.nPlusOneCount }} N+1 group(s)</span>
+        <span class="text-[var(--color-warn)]">{{ 'performance.nplus1_groups'|trans({'%count%': transaction.nPlusOneCount}) }}</span>
     {% else %}
-        no N+1 detected
+        {{ 'performance.no_nplus1'|trans }}
     {% endif %}
 </p>
 
@@ -18,10 +18,10 @@
     <table class="w-full text-left text-sm">
         <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
             <tr>
-                <th class="px-4 py-3">Op</th>
-                <th class="px-4 py-3">Description</th>
-                <th class="px-4 py-3">Duration</th>
-                <th class="px-4 py-3">N+1</th>
+                <th class="px-4 py-3">{{ 'performance.col.op'|trans }}</th>
+                <th class="px-4 py-3">{{ 'performance.col.description'|trans }}</th>
+                <th class="px-4 py-3">{{ 'performance.col.duration'|trans }}</th>
+                <th class="px-4 py-3">{{ 'performance.col.nplus1'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +30,7 @@
                     <td class="px-4 py-3 font-mono text-xs">{{ span.op }}</td>
                     <td class="px-4 py-3 font-mono text-xs">{{ span.description }}</td>
                     <td class="px-4 py-3">{{ span.durationMs|number_format(1) }} ms</td>
-                    <td class="px-4 py-3">{% if span.nPlusOneCandidate %}yes{% else %}—{% endif %}</td>
+                    <td class="px-4 py-3">{% if span.nPlusOneCandidate %}{{ 'common.yes'|trans }}{% else %}—{% endif %}</td>
                 </tr>
             {% endfor %}
         </tbody>

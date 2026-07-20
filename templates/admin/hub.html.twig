@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.hub.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin.hub.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin.hub.intro'|trans }}</p>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2">
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_users') }}">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.users'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.users'|trans }}</p>
+    </a>
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_appearance') }}">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.appearance'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.appearance'|trans }}</p>
+    </a>
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_dashboard_menu_dashboard_index') }}">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.menus'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.menus'|trans }}</p>
+    </a>
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_breadcrumb_kit_dashboard_collections_index') }}">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.breadcrumbs'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.breadcrumbs'|trans }}</p>
+    </a>
+</div>
+{% endblock %}

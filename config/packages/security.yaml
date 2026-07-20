@@ -13,7 +13,7 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         ingest:
-            pattern: ^/api/
+            pattern: ^/api/\d+/envelope
             security: false
         main:
             lazy: true
@@ -46,7 +46,15 @@ security:
         - { path: ^/(en|es)/register, roles: PUBLIC_ACCESS }
         - { path: ^/(en|es)/logout, roles: PUBLIC_ACCESS }
         # Envelope ingest (API key auth, not session)
-        - { path: ^/api/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/\d+/envelope, roles: PUBLIC_ACCESS }
+        # PWA assets (manifest, service worker, offline fallback)
+        - { path: ^/(manifest\.webmanifest|sw\.js|offline)$, roles: PUBLIC_ACCESS }
+        # Hotwire Native client configuration (Symfony UX Native)
+        - { path: ^/config/(ios|android)_v\d+\.json$, roles: PUBLIC_ACCESS }
+        # Legal pages + cookie consent modal (nowo-tech/cookie-consent-bundle)
+        - { path: ^/legal/, roles: PUBLIC_ACCESS }
+        - { path: ^/cookie_consent(_alt)?$, roles: PUBLIC_ACCESS }
+        - { path: ^/cookie-consent/config, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

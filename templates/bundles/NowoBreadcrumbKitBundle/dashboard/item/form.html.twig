@@ -1,0 +1,32 @@
+{% extends '@NowoBreadcrumbKitBundle/dashboard/base.html.twig' %}
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+{% set is_edit = item is defined and item.id is not null %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block breadcrumb_kit_body %}
+    <nav aria-label="{{ 'dashboard.breadcrumb_crumb_nav'|trans }}" class="mb-2 small">
+        <a href="{{ path(dashboard_routes.collections_index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="text-decoration-none">{{ 'dashboard.collections_heading'|trans }}</a>
+        <span class="text-muted"> / </span>
+        <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id }) }}" class="text-decoration-none"><code>{{ collection.code }}</code></a>
+        <span class="text-muted"> / </span>
+        <span>{{ title }}</span>
+    </nav>
+    <h1 class="h3 mb-3">{{ title }}</h1>
+
+    {{ form_start(form, { attr: { class: 'bk-dashboard-form' } }) }}
+        {{ form_row(form.routeName, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
+        {{ form_row(form.staticRouteParams, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' }, attr: { class: 'form-control font-monospace', rows: 3, spellcheck: 'false' } }) }}
+        {{ form_row(form.dynamicParamKeys, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' }, attr: { class: 'form-control font-monospace', rows: 2, spellcheck: 'false' } }) }}
+        {{ form_row(form.linkEnabled, { label_attr: { class: 'form-check-label' }, row_attr: { class: 'form-check mb-2' } }) }}
+        {{ form_row(form.label, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
+        {{ form_row(form.translations, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' }, attr: { class: 'form-control font-monospace', rows: 4, spellcheck: 'false' } }) }}
+        {{ form_row(form.icon, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
+        {{ form_row(form.parent, { label_attr: { class: 'form-label' }, row_attr: { class: 'mb-2' } }) }}
+        {{ form_rest(form) }}
+        <div class="d-flex gap-2 flex-wrap mt-3">
+            <button type="submit" class="btn btn-primary">{{ is_edit ? ('dashboard.form_update'|trans) : ('dashboard.form_create'|trans) }}</button>
+            <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', { collectionId: collection.id }) }}" class="btn btn-secondary">{{ 'dashboard.cancel'|trans }}</a>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

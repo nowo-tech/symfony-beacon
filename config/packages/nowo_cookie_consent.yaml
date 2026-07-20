@@ -1,0 +1,97 @@
+# nowo-tech/cookie-consent-bundle
+# https://github.com/nowo-tech/CookieConsentBundle
+nowo_cookie_consent:
+    doctrine:
+        table_prefix: ''
+
+    # Optional categories (required is always shown)
+    categories:
+        - analytics
+        - preferences
+
+    use_logger: true
+    use_database_config: false
+    use_cookie_inventory: true
+    granular_cookie_selection: false
+
+    # Match Beacon locales (en default, es)
+    default_locale: en
+    enabled_locales:
+        - en
+        - es
+    detect_locale_from_accept_language: true
+
+    # Beacon uses Tailwind 4
+    ui_theme: tailwind
+
+    # Floating cookie bubble only on login/register (included manually in AuthKit layout).
+    preferences_bubble_enabled: false
+    preferences_bubble_position: bottom-right
+
+    # Auto-open the consent modal only on auth entry points
+    route_targeting_mode: only
+    target_routes:
+        - nowo_auth_kit_login
+        - nowo_auth_kit_register
+
+    # Do not auto-open the modal on legal pages
+    disabled_routes:
+        - legal_privacy
+        - legal_notice
+        - legal_terms
+        - legal_cookies
+
+    csrf_protection: true
+    http_only: true
+    disable_page_interaction: false
+
+    # First-party cookies used by this Beacon instance
+    cookie_inventory:
+        - name: PHPSESSID
+          duration: Session
+          category: required
+          type: first_party
+          sort_order: 0
+          translations:
+              en:
+                  provider: This Beacon instance
+                  purpose: Keeps your signed-in session active.
+              es:
+                  provider: Esta instancia Beacon
+                  purpose: Mantiene activa tu sesión iniciada.
+        - name: REMEMBERME
+          duration: 7 days
+          category: required
+          type: first_party
+          sort_order: 10
+          translations:
+              en:
+                  provider: This Beacon instance
+                  purpose: Optional “Remember me” persistent login cookie.
+              es:
+                  provider: Esta instancia Beacon
+                  purpose: Cookie opcional de “Recordarme” para mantener la sesión.
+        - name: CookieConsent
+          duration: 1 year
+          category: required
+          type: first_party
+          sort_order: 20
+          translations:
+              en:
+                  provider: This Beacon instance
+                  purpose: Stores your cookie category choices.
+              es:
+                  provider: Esta instancia Beacon
+                  purpose: Guarda tus preferencias de categorías de cookies.
+        - name: CookieConsentKey
+          duration: 1 year
+          category: required
+          type: first_party
+          sort_order: 30
+          translations:
+              en:
+                  provider: This Beacon instance
+                  purpose: Links anonymized consent log entries to your choice.
+              es:
+                  provider: Esta instancia Beacon
+                  purpose: Vincula el registro anonimizado de consentimiento con tu elección.

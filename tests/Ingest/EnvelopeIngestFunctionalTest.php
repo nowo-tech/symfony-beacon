@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Ingest;
 
+use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Performance\Entity\PerfTransaction;
 use App\Tests\Shared\DatabaseWebTestCase;
@@ -34,6 +35,14 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
                 'level' => 'error',
                 'platform' => 'php',
                 'environment' => 'test',
+                'release' => '1.2.3',
+                'timestamp' => 1721491200.654321,
+                'datetime' => '2024-07-20T16:00:00.654321Z',
+                'user' => ['id' => 'user-42', 'email' => 'dev@example.com'],
+                'contexts' => [
+                    'runtime' => ['name' => 'php', 'version' => '8.4.1'],
+                    'framework' => ['name' => 'symfony', 'version' => '8.1.0'],
+                ],
                 'exception' => [
                     'values' => [[
                         'type' => 'RuntimeException',
@@ -65,6 +74,15 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertCount(1, $issues);
         self::assertStringContainsString('Something broke', $issues[0]->getTitle());
         self::assertSame(1, $issues[0]->getEventCount());
+
+        /** @var Event|null $stored */
+        $stored = $em->getRepository(Event::class)->findOneBy(['eventId' => $eventId]);
+        self::assertInstanceOf(Event::class, $stored);
+        self::assertSame('1.2.3', $stored->getReleaseVersion());
+        self::assertSame('8.4.1', $stored->getPhpVersion());
+        self::assertSame('8.1.0', $stored->getSymfonyVersion());
+        self::assertSame('user-42', $stored->getUserIdentifier());
+        self::assertSame('2024-07-20 16:00:00.654321', $stored->getEventTimestamp()->format('Y-m-d H:i:s.u'));
     }
 
     public function testIngestsTransactionWithNPlusOne(): void

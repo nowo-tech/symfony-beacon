@@ -1,0 +1,4 @@
+# nowo-tech/dashboard-menu-bundle — admin CRUD (Twig menus only; API routes not imported)
+nowo_dashboard_menu_dashboard:
+    resource: '@NowoDashboardMenuBundle/Resources/config/routes_dashboard.yaml'
+    prefix: /admin/menus

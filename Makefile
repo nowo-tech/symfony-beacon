@@ -1,4 +1,4 @@
-.PHONY: help up down build build-prod logs shell console classic worker restart mysql messenger-logs messenger-ping vite vite-build vite-watch pnpm specify-check \
+.PHONY: help up down build build-prod logs shell console seed classic worker restart mysql messenger-logs messenger-ping vite vite-build vite-watch pnpm specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa
 
 help:
@@ -19,6 +19,7 @@ help:
 	@echo "  make mysql           mysql CLI shell"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
+	@echo "  make seed            Seed demo user + project + DSN (app:seed-demo)"
 	@echo "  make restart         Restart php + messenger + vite"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
@@ -77,6 +78,9 @@ shell:
 
 console:
 	docker compose exec php bin/console $(ARGS)
+
+seed:
+	docker compose exec -T php bin/console app:seed-demo
 
 restart:
 	docker compose restart php messenger vite

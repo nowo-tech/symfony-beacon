@@ -1,0 +1,298 @@
+{# Loaded after Bootstrap CDN so Beacon tokens win over default btn colors. #}
+<style>
+/* —— Kit admin (Menus / Breadcrumbs) — button & chrome overrides —— */
+.kit-admin {
+  --bs-body-color: var(--beacon-ink);
+  --bs-body-bg: var(--beacon-surface);
+  --bs-border-color: var(--beacon-sand);
+  --bs-secondary-color: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  --bs-link-color: var(--beacon-moss);
+  --bs-link-hover-color: var(--beacon-moss-deep);
+  --bs-primary: var(--beacon-moss);
+  --bs-primary-rgb: 31, 111, 84;
+  --bs-danger: var(--beacon-alert);
+  --bs-focus-ring-color: color-mix(in srgb, var(--beacon-moss) 35%, transparent);
+}
+
+[data-theme="dark"] .kit-admin {
+  --bs-primary-rgb: 74, 173, 127;
+}
+
+.kit-admin .btn {
+  --bs-btn-font-weight: 500;
+  border-radius: 0.375rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Primary = Beacon moss (matches .btn-primary elsewhere) */
+.kit-admin .btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--beacon-moss);
+  --bs-btn-border-color: var(--beacon-moss);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--beacon-moss-deep);
+  --bs-btn-hover-border-color: var(--beacon-moss-deep);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--beacon-moss-deep);
+  --bs-btn-active-border-color: var(--beacon-moss-deep);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--beacon-moss);
+  --bs-btn-disabled-border-color: var(--beacon-moss);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .kit-admin .btn-primary {
+  --bs-btn-color: #0c1210;
+  --bs-btn-hover-color: #0c1210;
+  --bs-btn-active-color: #0c1210;
+  --bs-btn-disabled-color: #0c1210;
+}
+
+/* Ghost / secondary actions */
+.kit-admin .btn-outline-secondary,
+.kit-admin .btn-secondary {
+  --bs-btn-color: var(--beacon-ink);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--beacon-sand);
+  --bs-btn-hover-color: var(--beacon-ink);
+  --bs-btn-hover-bg: var(--beacon-surface);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand));
+  --bs-btn-active-color: var(--beacon-ink);
+  --bs-btn-active-bg: var(--beacon-mist);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand));
+  --bs-btn-disabled-color: color-mix(in srgb, var(--beacon-ink) 45%, transparent);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--beacon-sand);
+}
+
+.kit-admin .btn-secondary {
+  --bs-btn-bg: color-mix(in srgb, var(--beacon-surface) 85%, transparent);
+}
+
+/* Unify outline-primary / outline-info to moss (drop Bootstrap blue/cyan) */
+.kit-admin .btn-outline-primary,
+.kit-admin .btn-outline-info {
+  --bs-btn-color: var(--beacon-moss);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: color-mix(in srgb, var(--beacon-moss) 55%, var(--beacon-sand));
+  --bs-btn-hover-color: var(--beacon-moss-deep);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--beacon-moss) 12%, var(--beacon-surface));
+  --bs-btn-hover-border-color: var(--beacon-moss);
+  --bs-btn-active-color: var(--beacon-moss-deep);
+  --bs-btn-active-bg: color-mix(in srgb, var(--beacon-moss) 16%, var(--beacon-surface));
+  --bs-btn-active-border-color: var(--beacon-moss);
+  --bs-btn-disabled-color: color-mix(in srgb, var(--beacon-moss) 45%, transparent);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--beacon-sand);
+  color: var(--beacon-moss) !important;
+  border-color: color-mix(in srgb, var(--beacon-moss) 55%, var(--beacon-sand)) !important;
+  background-color: transparent !important;
+}
+.kit-admin .btn-outline-primary:hover,
+.kit-admin .btn-outline-info:hover,
+.kit-admin .btn-outline-primary:focus,
+.kit-admin .btn-outline-info:focus {
+  color: var(--beacon-moss-deep) !important;
+  border-color: var(--beacon-moss) !important;
+  background-color: color-mix(in srgb, var(--beacon-moss) 12%, var(--beacon-surface)) !important;
+}
+
+.kit-admin .btn-outline-secondary,
+.kit-admin .btn-secondary {
+  color: var(--beacon-ink) !important;
+  border-color: var(--beacon-sand) !important;
+  background-color: transparent !important;
+}
+.kit-admin .btn-outline-secondary:hover,
+.kit-admin .btn-secondary:hover {
+  color: var(--beacon-ink) !important;
+  border-color: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand)) !important;
+  background-color: var(--beacon-surface) !important;
+}
+
+.kit-admin .btn-link {
+  --bs-btn-color: var(--beacon-moss);
+  --bs-btn-hover-color: var(--beacon-moss-deep);
+  color: var(--beacon-moss) !important;
+  text-decoration: none;
+}
+.kit-admin .btn-link:hover {
+  color: var(--beacon-moss-deep) !important;
+}
+
+.kit-admin .btn-outline-danger {
+  --bs-btn-color: var(--beacon-alert);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: color-mix(in srgb, var(--beacon-alert) 55%, var(--beacon-sand));
+  --bs-btn-hover-color: var(--beacon-alert);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--beacon-alert) 12%, var(--beacon-surface));
+  --bs-btn-hover-border-color: var(--beacon-alert);
+  color: var(--beacon-alert) !important;
+  border-color: color-mix(in srgb, var(--beacon-alert) 55%, var(--beacon-sand)) !important;
+  background-color: transparent !important;
+}
+.kit-admin .btn-outline-danger:hover {
+  color: var(--beacon-alert) !important;
+  border-color: var(--beacon-alert) !important;
+  background-color: color-mix(in srgb, var(--beacon-alert) 12%, var(--beacon-surface)) !important;
+}
+
+.kit-admin .btn-danger {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--beacon-alert);
+  --bs-btn-border-color: var(--beacon-alert);
+  color: #fff !important;
+  background-color: var(--beacon-alert) !important;
+  border-color: var(--beacon-alert) !important;
+}
+
+.kit-admin .btn-sm {
+  --bs-btn-padding-y: 0.35rem;
+  --bs-btn-padding-x: 0.45rem;
+  --bs-btn-font-size: 0.8125rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.kit-admin .btn-sm svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.kit-admin-meta {
+  border: 1px solid var(--beacon-sand);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--beacon-mist) 55%, var(--beacon-surface));
+  color: color-mix(in srgb, var(--beacon-ink) 85%, transparent);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+.kit-admin-meta code {
+  color: var(--beacon-moss);
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
+.kit-admin .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--beacon-ink);
+  --bs-table-border-color: var(--beacon-sand);
+  --bs-table-hover-bg: color-mix(in srgb, var(--beacon-mist) 55%, transparent);
+  --bs-table-hover-color: var(--beacon-ink);
+  --bs-table-striped-bg: color-mix(in srgb, var(--beacon-mist) 35%, transparent);
+  color: var(--beacon-ink);
+}
+.kit-admin .table > :not(caption) > * > * {
+  background-color: transparent;
+  border-bottom-color: var(--beacon-sand);
+  color: var(--beacon-ink);
+}
+.kit-admin .table thead th {
+  color: color-mix(in srgb, var(--beacon-ink) 70%, transparent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kit-admin .alert-light {
+  background-color: color-mix(in srgb, var(--beacon-mist) 55%, var(--beacon-surface));
+  border-color: var(--beacon-sand);
+  color: var(--beacon-ink);
+}
+
+.kit-admin .alert-info {
+  background-color: color-mix(in srgb, var(--beacon-moss) 14%, var(--beacon-surface));
+  border-color: color-mix(in srgb, var(--beacon-moss) 35%, var(--beacon-sand));
+  color: var(--beacon-ink);
+}
+
+.kit-admin .btn-close {
+  filter: none;
+  opacity: 0.65;
+}
+[data-theme="dark"] .kit-admin .btn-close {
+  filter: invert(1) grayscale(100%);
+  opacity: 0.75;
+}
+
+.kit-admin .form-control,
+.kit-admin .form-select {
+  background-color: var(--beacon-surface);
+  border-color: var(--beacon-sand);
+  color: var(--beacon-ink);
+}
+.kit-admin .form-control:focus,
+.kit-admin .form-select:focus {
+  background-color: var(--beacon-surface);
+  border-color: var(--beacon-moss);
+  color: var(--beacon-ink);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--beacon-moss) 20%, transparent);
+}
+.kit-admin .form-control::placeholder {
+  color: color-mix(in srgb, var(--beacon-ink) 40%, transparent);
+}
+
+.kit-admin .list-group-item {
+  background-color: transparent;
+  border-color: var(--beacon-sand);
+  color: var(--beacon-ink);
+}
+
+.kit-admin .badge.bg-light {
+  background-color: var(--beacon-mist) !important;
+  color: var(--beacon-ink) !important;
+  border-color: var(--beacon-sand) !important;
+}
+
+.kit-admin .badge.bg-secondary {
+  background-color: color-mix(in srgb, var(--beacon-sand) 70%, var(--beacon-mist)) !important;
+  color: var(--beacon-ink) !important;
+}
+
+.kit-admin .pagination .page-link {
+  background-color: var(--beacon-surface);
+  border-color: var(--beacon-sand);
+  color: var(--beacon-moss);
+}
+.kit-admin .pagination .page-item.active .page-link {
+  background-color: var(--beacon-moss);
+  border-color: var(--beacon-moss);
+  color: #fff;
+}
+[data-theme="dark"] .kit-admin .pagination .page-item.active .page-link {
+  color: #0c1210;
+}
+.kit-admin .pagination .page-item.disabled .page-link {
+  background-color: transparent;
+  border-color: var(--beacon-sand);
+  color: color-mix(in srgb, var(--beacon-ink) 40%, transparent);
+}
+
+.kit-admin .modal-content {
+  background-color: var(--beacon-surface);
+  color: var(--beacon-ink);
+  border-color: var(--beacon-sand);
+}
+.kit-admin .modal-header,
+.kit-admin .modal-footer {
+  border-color: var(--beacon-sand);
+}
+.kit-admin .text-muted {
+  color: color-mix(in srgb, var(--beacon-ink) 55%, transparent) !important;
+}
+.kit-admin .alert-success {
+  background-color: var(--beacon-flash-ok-bg);
+  border-color: var(--beacon-flash-ok-border);
+  color: var(--beacon-flash-ok-text);
+}
+.kit-admin .alert-danger {
+  background-color: var(--beacon-flash-error-bg);
+  border-color: var(--beacon-flash-error-border);
+  color: var(--beacon-alert);
+}
+</style>

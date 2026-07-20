@@ -1,8 +1,14 @@
 twig:
     file_name_pattern: '*.twig'
+    form_themes:
+        - '@NowoFormKit/form/static_blocks.html.twig'
+        - 'form/beacon_theme.html.twig'
     globals:
         enabled_locales: '%kernel.enabled_locales%'
         default_locale: '%kernel.default_locale%'
+        site_appearance: '@App\Shared\Appearance\SiteAppearanceProvider'
+        app_section: '@App\Shared\Navigation\AppSectionResolver'
+
 
 when@dev:
     twig:

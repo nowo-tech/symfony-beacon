@@ -16,13 +16,18 @@ Artifacts under `specs/` are the source of truth; code must align with them.
 - FrankenPHP in **classic** or **worker** mode, switched only via `FRANKENPHP_MODE`
 - **MySQL 9.7**, Symfony Messenger (async ingest), Pentatrion Vite + **Tailwind CSS**
 - Modular Symfony layout under `src/{Identity,Project,Ingest,Issues,Performance,Analytics,Shared}`
+- Progressive Web App via `nowo-tech/pwa-bundle` for browser installability
+- Hotwire Native support via `symfony/ux-native` + `symfony/ux-turbo` (server-side shell contract; see `specs/008-ux-native`)
 
 Do not introduce alternate stacks (Nginx+FPM, Apache) without amending this constitution.
 Do not introduce full DDD/hexagonal layers; keep Symfony modular conventions.
+Do not replace the Twig app with a separate mobile-only UI stack without a new spec amending this principle.
 
 ### III. Product mission
 
-**symfony-beacon** is a self-hosted error-tracking server for PHP/Symfony that is **wire-compatible** with the Envelope ingest protocol so existing SDKs (and a future `symfony-beacon-bundle`) can send events without a SaaS account.
+**symfony-beacon** is a self-hosted error-tracking server for PHP/Symfony that is **wire-compatible** with the Envelope ingest protocol so existing SDKs and the Symfony client (`nowo-tech/beacon-bundle`, separate repository, DSN = host/port/project) can send events without a SaaS account.
+
+Operators may expose the same Twig UI to **native iOS/Android shells** (Hotwire Native) and/or browsers (PWA). Store-client source trees are optional companion projects; this repository owns the server contract.
 
 ### IV. Docker-first
 
@@ -53,7 +58,8 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Secrets: never in git. Version **only** `.env.dist`.
 - Ingest auth: Envelope-compatible (`X-Sentry-Auth` / query / envelope `dsn`) mapped to project API keys.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
-- The Symfony client bundle lives in a **separate repository** (out of scope here).
+- The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository** (out of scope here); configure via `BEACON_DSN`.
+- Native mobile shells consume `/config/ios_v1.json` and `/config/android_v1.json` (Hotwire Native); see `docs/native-mobile.md`.
 
 ## Development workflow (SDD)
 
@@ -73,4 +79,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Every significant PR/change must map to a spec under `specs/`.
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.0.1 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-19
+**Version**: 1.1.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-20

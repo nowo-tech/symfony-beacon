@@ -1,28 +1,47 @@
-{# Locale switcher — top-right dropdown (keeps current route, swaps _locale). #}
+{# Locale switcher: auth pages use path locale; app shell saves preference on the user. #}
 {% set route = app.request.attributes.get('_route') %}
 {% set route_params = app.request.attributes.get('_route_params')|default({}) %}
 {% set current_locale = app.request.locale|default(default_locale) %}
+{% set compact = compact|default(false) %}
 
-<div class="locale-switcher">
+<div class="locale-switcher{{ compact ? ' locale-switcher--compact' : '' }}">
     <details class="locale-switcher__details">
         <summary class="locale-switcher__summary" aria-label="{{ 'locale.nav'|trans }}">
             <span class="locale-switcher__code" lang="{{ current_locale }}">{{ current_locale|upper }}</span>
-            <span class="locale-switcher__label">{{ ('locale.' ~ current_locale)|trans }}</span>
+            {% if not compact %}
+                <span class="locale-switcher__label">{{ ('locale.' ~ current_locale)|trans }}</span>
+            {% endif %}
             <svg class="locale-switcher__chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
                 <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </summary>
         <ul class="locale-switcher__menu" role="listbox" aria-label="{{ 'locale.nav'|trans }}">
             {% for locale in enabled_locales %}
-                {% set params = route_params|merge({'_locale': locale}) %}
                 <li role="option" aria-selected="{{ locale == current_locale ? 'true' : 'false' }}">
-                    <a href="{{ path(route, params) }}"
-                       class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
-                       hreflang="{{ locale }}"
-                       lang="{{ locale }}">
-                        <span class="locale-switcher__code">{{ locale|upper }}</span>
-                        <span>{{ ('locale.' ~ locale)|trans }}</span>
-                    </a>
+                    {% if app.user %}
+                        <form method="post" action="{{ path('account_locale_switch', {locale: locale}) }}" class="m-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('account_locale') }}">
+                            <input type="hidden" name="redirect" value="{{ app.request.requestUri }}">
+                            <button
+                                type="submit"
+                                class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
+                                hreflang="{{ locale }}"
+                                lang="{{ locale }}"
+                            >
+                                <span class="locale-switcher__code">{{ locale|upper }}</span>
+                                <span>{{ ('locale.' ~ locale)|trans }}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        {% set params = route_params|merge({'_locale': locale}) %}
+                        <a href="{{ path(route, params) }}"
+                           class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
+                           hreflang="{{ locale }}"
+                           lang="{{ locale }}">
+                            <span class="locale-switcher__code">{{ locale|upper }}</span>
+                            <span>{{ ('locale.' ~ locale)|trans }}</span>
+                        </a>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

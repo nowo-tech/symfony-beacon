@@ -20,8 +20,8 @@ enum ProjectRole: string
         return self::Owner === $this || self::Admin === $this;
     }
 
-    public function canMutateProject(): bool
+    public function canDeleteProject(): bool
     {
-        return self::Owner === $this || self::Admin === $this;
+        return self::Owner === $this;
     }
 }

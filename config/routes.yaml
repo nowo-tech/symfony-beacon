@@ -35,3 +35,21 @@ controllers_analytics:
         path: ../src/Analytics/Controller/
         namespace: App\Analytics\Controller
     type: attribute
+
+controllers_appearance:
+    resource:
+        path: ../src/Shared/Appearance/Controller/
+        namespace: App\Shared\Appearance\Controller
+    type: attribute
+
+controllers_admin_hub:
+    resource:
+        path: ../src/Shared/Controller/
+        namespace: App\Shared\Controller
+    type: attribute
+
+controllers_legal:
+    resource:
+        path: ../src/Shared/Legal/Controller/
+        namespace: App\Shared\Legal\Controller
+    type: attribute

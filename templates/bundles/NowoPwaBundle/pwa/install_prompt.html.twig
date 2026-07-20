@@ -1,0 +1,33 @@
+{# Beacon-styled install prompt — tokens follow site appearance (--color-moss, etc.). #}
+{% set display = install_prompt.display|default('banner') %}
+{% set css_class = install_prompt.css_class|default('nowo-pwa-install') %}
+<div id="nowo-pwa-install"
+     class="{{ css_class }} {{ css_class }}--{{ display }} {{ css_class }}--{{ install_prompt.position|default('bottom') }} beacon-pwa-install"
+     hidden
+     role="dialog"
+     aria-labelledby="nowo-pwa-install-title"
+     aria-describedby="nowo-pwa-install-message"
+     aria-modal="{{ display == 'modal' ? 'true' : 'false' }}"
+     data-display="{{ display }}"
+     data-dismiss-key="{{ install_prompt.dismiss_key|default('nowo_pwa_install_dismissed') }}"
+     data-dismiss-days="{{ install_prompt.dismiss_days|default(7) }}"
+     data-never-dismiss-key="{{ install_prompt.never_dismiss_key|default('nowo_pwa_install_never') }}"
+     data-show-never-option="{{ install_prompt.show_never_option|default(true) ? '1' : '0' }}"
+     data-delay-ms="{{ install_prompt.delay_ms|default(0) }}"
+     data-visibility="{{ install_prompt.visibility|default('all') }}">
+    {% if display == 'modal' %}
+        <div class="{{ css_class }}__backdrop beacon-pwa-install__backdrop" data-pwa-install-action="dismiss-remind" aria-hidden="true"></div>
+    {% endif %}
+    <div class="{{ css_class }}__panel beacon-pwa-install__panel">
+        <p class="beacon-pwa-install__eyebrow">{{ site_appearance.brandName|default(manifest.short_name|default('Beacon')) }}</p>
+        <p id="nowo-pwa-install-title" class="beacon-pwa-install__title">{{ 'preferences.display.pwa_prompt_title'|trans }}</p>
+        <p id="nowo-pwa-install-message" class="beacon-pwa-install__message">{{ 'install.message'|trans({}, 'NowoPwaBundle') }}</p>
+        <div class="{{ css_class }}__actions beacon-pwa-install__actions">
+            <button type="button" class="btn-primary" data-pwa-install-action="install">{{ 'install.action'|trans({}, 'NowoPwaBundle') }}</button>
+            <button type="button" class="btn-ghost" data-pwa-install-action="dismiss-remind">{{ 'install.dismiss_remind'|trans({}, 'NowoPwaBundle') }}</button>
+            {% if install_prompt.show_never_option|default(true) %}
+                <button type="button" class="btn-ghost beacon-pwa-install__never" data-pwa-install-action="dismiss-never">{{ 'install.dismiss_never'|trans({}, 'NowoPwaBundle') }}</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

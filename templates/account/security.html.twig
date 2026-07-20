@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.security.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-xl">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.currentPassword) }}
+        {{ form_row(form.plainPassword) }}
+        <div class="border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'preferences.security.submit'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

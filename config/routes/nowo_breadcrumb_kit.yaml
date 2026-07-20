@@ -1,0 +1,5 @@
+# nowo-tech/breadcrumb-kit-bundle — admin CRUD (dashboard.enabled: true)
+nowo_breadcrumb_kit_dashboard:
+    resource: '@NowoBreadcrumbKitBundle/Resources/config/routing/dashboard.yaml'
+    type: yaml
+    prefix: '%nowo_breadcrumb_kit.dashboard.path_prefix%'

@@ -1,0 +1,32 @@
+# nowo-tech/dashboard-menu-bundle
+# https://github.com/nowo-tech/DashboardMenuBundle
+nowo_dashboard_menu:
+    locales: ['en', 'es']
+    default_locale: 'en'
+    cache:
+        ttl: 60
+        pool: cache.app
+    # Disabled: Envelope ingest already uses /api/*; menus are rendered via Twig.
+    api:
+        enabled: false
+        path_prefix: /api/menu
+    dashboard:
+        enabled: true
+        layout_template: 'kit/menu_dashboard_layout.html.twig'
+        route_name_exclude_patterns:
+            - '^_'
+            - '^web_profiler'
+            - '^nowo_auth_kit'
+            - '^ingest_'
+            - '^ux_'
+            - '^live_component'
+        pagination:
+            enabled: true
+            per_page: 20
+        id_options:
+            - 'main-menu-navigation'
+            - 'dashboard-menu-navigation'
+            - 'preferences-menu-navigation'
+            - 'administration-menu-navigation'
+        item_span_active: false
+        required_role: ROLE_ADMIN

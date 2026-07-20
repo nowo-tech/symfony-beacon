@@ -2,12 +2,361 @@ nav:
     projects: Proyectos
     new_project: Nuevo proyecto
     log_out: Cerrar sesión
+    main: Navegación principal
+    account: Menú de cuenta
+    admin: Administración
+    admin_hub: Resumen admin
+    users: Usuarios
+    appearance: Apariencia
+    menus: Menús
+    breadcrumbs: Migas
+    toggle_sidebar: Alternar navegación
+    preferences: Preferencias
+    account_settings: Ajustes de cuenta
+    dashboard: Panel
+    issues: Incidencias
+    performance: Rendimiento
+    analytics: Analítica
+common:
+    filter: Filtrar
+    yes: 'sí'
+    na: n/d
+    unknown: desconocido
 locale:
     nav: Idioma
     en: English
     es: Español
+theme:
+    day: Día
+    night: Noche
+    switch_to_day: Cambiar a modo día
+    switch_to_night: Cambiar a modo noche
 auth:
     tagline: Seguimiento de errores self-hosted para PHP y Symfony.
     brand_eyebrow: Seguimiento de errores
     bootstrap_eyebrow: Arranque
     bootstrap_hint: Crea la primera cuenta de administrador. El registro se cierra cuando exista este usuario.
+flash:
+    project:
+        created: Proyecto creado.
+        api_key_created: Clave API creada.
+        history_cleared: Historial del proyecto vaciado.
+        deleted: Proyecto eliminado.
+        delete_confirmation_mismatch: El nombre del proyecto no coincide. No se eliminó nada.
+    appearance:
+        saved: Apariencia guardada.
+    preferences:
+        saved: Preferencias guardadas.
+        profile_saved: Perfil guardado.
+        password_saved: Contraseña actualizada.
+        display_saved: Preferencias de interfaz guardadas.
+project:
+    label: Proyecto
+    no_description: Sin descripción
+    nav:
+        label: Secciones del proyecto
+    settings:
+        title: Configuración
+        nav: Configuración
+        intro: Claves API, miembros y acciones destructivas del proyecto.
+    new:
+        title: Nuevo proyecto
+        submit: Crear proyecto
+    name:
+        label: Nombre
+        placeholder: p. ej. Billing API
+        help: Se muestra en el panel y sirve para derivar el slug del proyecto.
+        required: El nombre del proyecto es obligatorio.
+    description:
+        label: Descripción
+        placeholder: Resumen opcional
+        help: Ayuda a tu equipo a reconocer este proyecto.
+    api_keys:
+        title: Claves API / DSN
+        help: Usa un DSN en BEACON_DSN para que tu app envíe errores a este proyecto.
+        inactive: inactiva
+        public: 'pública:'
+        label_placeholder: p. ej. calm-otter
+        generate: Sugerir nombre
+        generate_hint: Rellena la etiqueta con un nombre legible (adjetivo-sustantivo)
+        add: Añadir clave
+    members:
+        title: Miembros
+        your_role: 'Tu rol:'
+    danger:
+        title: Zona de peligro
+        intro: Acciones irreversibles para este proyecto. Úsalas con cuidado.
+        cancel: Cancelar
+        clear_open: Vaciar historial…
+        clear_title: ¿Vaciar el historial del proyecto?
+        clear_body: Esto elimina de forma permanente incidencias, eventos, datos de rendimiento y analítica de este proyecto. Se conservan las claves API y los miembros.
+        clear_confirm: Sí, vaciar historial
+        delete_open: Eliminar proyecto…
+        delete_title: ¿Eliminar este proyecto de forma permanente?
+        delete_body: Esto elimina de forma permanente “%name%” y todos sus datos (incidencias, eventos, rendimiento, analítica, claves y miembros). No se puede deshacer.
+        delete_type_label: 'Escribe %name% para confirmar:'
+        delete_confirm: Eliminar proyecto
+projects:
+    title: Proyectos
+    intro: Filtra y abre los proyectos a los que tienes acceso.
+    search_placeholder: Buscar proyectos…
+    empty: Aún no hay proyectos.
+    create_first: Crea tu primer proyecto
+    errors_last_7_days: '%count% errores en los últimos 7 días'
+issues:
+    title: Incidencias
+    search_placeholder: Buscar título…
+    empty: Ninguna incidencia coincide con estos filtros.
+    back: ← Incidencias
+    back_to_issue: ← Incidencia
+    event_count: '%count% eventos'
+    latest_stack: Último stack / payload
+    event: Evento
+    recent_events: Eventos recientes
+    no_events: No hay eventos guardados.
+    event_detail: Detalle del evento
+    context: Contexto
+    occurred_at: Ocurrido en
+    received_at: Recibido en
+    release: Release / versión
+    php_version: Versión de PHP
+    symfony_version: Versión de Symfony
+    os: Sistema operativo
+    user: Usuario
+    server_name: Servidor
+    stacktrace: Stack trace
+    breadcrumbs: Migas de contexto
+    raw_payload: Payload en bruto
+    filter:
+        any_level: Cualquier nivel
+        any_status: cualquier estado
+        environment: Entorno
+    col:
+        issue: Incidencia
+        level: Nivel
+        events: Eventos
+        last_seen: Última vez
+performance:
+    title: Rendimiento
+    intro: Transacciones y análisis N+1
+    show_all: Ver todas
+    nplus1_only: Solo N+1
+    empty: Aún no hay transacciones.
+    back: ← Rendimiento
+    no_nplus1: sin N+1 detectado
+    nplus1_groups: '%count% grupo(s) N+1'
+    spans_count: '%count% spans'
+    col:
+        transaction: Transacción
+        duration: Duración
+        spans: Spans
+        nplus1: N+1
+        received: Recibido
+        op: Op
+        description: Descripción
+analytics:
+    title: Analítica
+    intro: Conteos diarios de errores, transacciones y N+1 (últimos 30 días)
+    empty: Aún no hay estadísticas. Ingesta eventos para rellenar estos datos.
+    col:
+        date: Fecha
+        errors: Errores
+        transactions: Transacciones
+        nplus1_groups: Grupos N+1
+appearance:
+    title: Apariencia
+    intro: Personaliza el nombre de marca y los colores de acento de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
+    section:
+        light: Acentos modo día
+        dark: Acentos modo noche
+    submit: Guardar apariencia
+    reset: Restaurar valores
+site_appearance:
+    brand_name:
+        label: Nombre de marca
+        placeholder: symfony-beacon
+        help: Se muestra en la cabecera y en la página de acceso.
+    brand_eyebrow:
+        label: Etiqueta de marca
+        placeholder: Seguimiento de errores
+        help: Texto corto encima de la marca en la pantalla de acceso.
+    accent_color:
+        label: Acento
+        placeholder: '#1f6f54'
+        help: Acento principal (botones, enlaces) en modo día.
+    accent_deep_color:
+        label: Acento (hover)
+        placeholder: '#134736'
+        help: Acento más oscuro para hover en modo día.
+    accent_color_dark:
+        label: Acento (noche)
+        placeholder: '#4aad7f'
+        help: Acento principal en modo noche.
+    accent_deep_color_dark:
+        label: Acento hover (noche)
+        placeholder: '#6bc49a'
+        help: Acento más claro para hover en modo noche.
+    color:
+        invalid: 'Usa un color hexadecimal como #1f6f54.'
+users:
+    title: Usuarios
+    intro: Cuentas de esta instancia Beacon. Preferible nowo-tech/user-kit-bundle para activar/desactivar y ciclo de vida de cuenta.
+    col:
+        user: Usuario
+        email: Correo
+        roles: Roles
+    empty: Aún no hay usuarios.
+preferences:
+    title: Ajustes de cuenta
+    intro: Actualiza tu perfil, contraseña, idioma y preferencias de tema.
+    nav:
+        profile: Perfil
+        security: Seguridad
+        display: Interfaz
+    profile:
+        title: Perfil
+        intro: Actualiza tu nombre visible y el correo de acceso.
+        submit: Guardar perfil
+    security:
+        title: Seguridad
+        intro: Cambia la contraseña de tu cuenta.
+        submit: Actualizar contraseña
+    display:
+        title: Interfaz
+        intro: Elige idioma, tema y ancho del contenido para tu cuenta.
+        submit: Guardar interfaz
+        pwa_title: Instalar aplicación
+        pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
+        pwa_prompt_title: Instala para acceder antes
+        pwa_unavailable: La instalación no está disponible en este navegador ahora mismo. Prueba Chrome o Edge en escritorio, o en iOS usa Compartir → Añadir a pantalla de inicio.
+    section:
+        profile: Perfil
+        locale_theme: Idioma, tema y layout
+        password: Contraseña
+    locale_theme: Idioma, tema y layout
+    password: Contraseña
+    password_hint: Deja la contraseña en blanco para mantener la actual.
+    submit: Guardar preferencias
+    locale_auto: Automático (navegador / sesión)
+    theme_auto: Automático (dispositivo / última elección)
+    theme_light: Día
+    theme_dark: Noche
+    width_content: Contenido (centrado)
+    width_full: Ancho completo
+    error:
+        current_password: La contraseña actual no es correcta.
+        email_in_use: Este correo ya está en uso.
+        password_required: Introduce una nueva contraseña.
+user_preferences:
+    display_name:
+        label: Nombre visible
+        placeholder: Tu nombre
+        help: Se muestra en el menú del avatar y en las listas de miembros.
+    email:
+        label: Correo
+        placeholder: tu@ejemplo.com
+        help: Se usa para iniciar sesión.
+    preferred_locale:
+        label: Idioma
+        placeholder: Automático
+        help: Idioma preferido de la interfaz para esta cuenta.
+    preferred_theme:
+        label: Tema
+        placeholder: Automático
+        help: Apariencia preferida día o noche.
+    preferred_content_width:
+        label: Ancho del contenido
+        placeholder: Contenido
+        help: Columna centrada, o estirar el área principal a todo el ancho.
+    current_password:
+        label: Contraseña actual
+        help: Solo necesaria al establecer una nueva contraseña.
+        help_required: Confirma tu contraseña actual para establecer una nueva.
+    plain_password:
+        first:
+            label: Nueva contraseña
+        second:
+            label: Confirmar nueva contraseña
+        mismatch: Las contraseñas no coinciden.
+admin:
+    hub:
+        title: Administración
+        intro: Configuración de la instancia para operadores con roles elevados.
+        users: Listar cuentas y roles de esta instancia.
+        appearance: Nombre de marca y colores de acento.
+        menus: Editar menús de navegación.
+        breadcrumbs: Gestionar colecciones de migas.
+legal:
+    nav:
+        label: Legal
+    last_updated: 'Última actualización: %date%'
+    manage_cookies: Ajustes de cookies
+    placeholder:
+        legal_name: 'Nombre legal: [Nombre legal del operador — sustituir]'
+        address: 'Dirección: [Domicilio social — sustituir]'
+        contact_email: 'Contacto: [privacy@ejemplo.com — sustituir]'
+        registration: 'Registro mercantil / NIF: [si aplica — sustituir]'
+    notice:
+        title: Aviso legal
+        intro: 'Este aviso legal aplica a la instancia autoalojada de %brand% que estás visitando. Sustituye los marcadores siguientes por los datos reales del operador antes del uso público.'
+        operator_heading: Operador
+        operator_body: El operador de esta instancia es responsable del servicio y de los contenidos que publique aquí.
+        hosting_heading: Alojamiento
+        hosting_body: Este software puede alojarlo el operador o un proveedor de infraestructura elegido por el operador. Completa los detalles de hosting según tu despliegue.
+        liability_heading: Responsabilidad
+        liability_body: El software se ofrece tal cual. El operador sigue siendo responsable del uso lícito, del cumplimiento en protección de datos y de la exactitud de los textos legales específicos de esta instancia.
+    privacy:
+        title: Política de privacidad
+        intro: 'Esta política describe cómo pueden tratarse datos personales al usar esta instancia de %brand%. El operador debe adaptarla a su organización y jurisdicción.'
+        controller_heading: Responsable del tratamiento
+        controller_body: El operador de esta instancia Beacon es el responsable del tratamiento de las cuentas y la telemetría almacenadas en su despliegue. Completa nombre legal y contacto en la página de Aviso legal.
+        data_heading: Datos que tratamos
+        data_body: Según cómo configure y use la instancia el operador, el tratamiento puede incluir:
+        data_account: Datos de cuenta (correo, nombre visible, hash de contraseña, roles, preferencias)
+        data_telemetry: Telemetría de errores y rendimiento enviada vía DSN / Envelope
+        data_logs: Registros operativos y, opcionalmente, logs de consentimiento de cookies
+        data_cookies: Cookies y tecnologías similares descritas en la página de Cookies
+        purpose_heading: Finalidades
+        purpose_body: Los datos se tratan para autenticar usuarios, operar el seguimiento de errores de los proyectos configurados, asegurar el servicio y (si está activo) recordar preferencias de cookies.
+        retention_heading: Conservación
+        retention_body: Los plazos de conservación los define el operador (ciclo de vida de cuentas, retención de proyectos, logs). Sustituye este párrafo por el calendario de tu organización.
+        rights_heading: Tus derechos
+        rights_body: Según la normativa aplicable (por ejemplo el RGPD), puedes tener derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición. Contacta con el operador usando los datos del Aviso legal.
+        cookies_heading: Cookies
+        cookies_body: Usamos cookies necesarias para el acceso y el almacenamiento del consentimiento. Las categorías opcionales (preferencias, analítica) solo se activan si las permites en el banner de cookies.
+    terms:
+        title: Términos de uso
+        intro: 'Estos términos regulan el uso de esta instancia de %brand%. El operador debe sustituir esta plantilla por términos acordes a su oferta (herramienta interna, SaaS, etc.).'
+        service_heading: Servicio
+        service_body: Beacon ofrece seguimiento autoalojado de errores y rendimiento para proyectos configurados por usuarios autorizados.
+        accounts_heading: Cuentas
+        accounts_body: Debes mantener la confidencialidad de tus credenciales y usar el servicio solo para proyectos y datos que estés autorizado a tratar.
+        accept_heading: Uso aceptable
+        accept_body: No abuses de la API de ingest, no intentes accesos no autorizados ni subas contenido ilícito. El operador puede suspender cuentas que incumplan estos términos.
+        limitation_heading: Limitación de responsabilidad
+        limitation_body: En la medida permitida por la ley, el operador y los autores del software no responden de daños indirectos derivados del uso del servicio. Revisa esta cláusula con asesoramiento legal.
+        changes_heading: Cambios
+        changes_body: El operador puede actualizar estos términos. El uso continuado tras el aviso puede implicar la aceptación de los términos actualizados cuando la ley lo permita.
+    cookies:
+        title: Cookies
+        intro: 'Esta página describe las cookies y tecnologías similares usadas por esta instancia de %brand%. Usa Ajustes de cookies para cambiar las categorías opcionales.'
+        categories_heading: Categorías
+        cat_required: Necesarias
+        cat_required_help: Imprescindibles para el acceso, la seguridad y guardar tu elección de cookies.
+        cat_preferences: Preferencias
+        cat_preferences_help: Funciones opcionales que recuerdan opciones de presentación no esenciales (si el operador las habilita).
+        cat_analytics: Analítica
+        cat_analytics_help: Cookies de medición opcionales (solo si el operador activa herramientas de analítica más adelante).
+        inventory_heading: Inventario de cookies
+        col_name: Nombre
+        col_category: Categoría
+        col_duration: Duración
+        col_purpose: Finalidad
+        duration_session: Sesión
+        duration_remember: Hasta 7 días
+        duration_consent: Aprox. 1 año
+        purpose_session: Cookie de sesión PHP para la navegación autenticada.
+        purpose_remember: Login persistente opcional «Recordarme».
+        purpose_consent: Guarda las categorías de cookies elegidas y una clave anonimizada para el registro de consentimiento.
+        storage_heading: Almacenamiento local
+        storage_body: El tema (día/noche) puede guardarse en localStorage del navegador y no es una cookie. Suele considerarse necesario para la UX, pero el operador debe confirmarlo según su jurisdicción.

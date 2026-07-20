@@ -10,6 +10,8 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
+use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -19,13 +21,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(name: 'app:seed-demo', description: 'Seed a demo user, project, and API key')]
+#[AsCommand(name: 'app:seed-demo', description: 'Seed a demo user, project, API key, breadcrumbs, and main menu')]
 final class SeedDemoCommand extends Command
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly BreadcrumbDemoSeeder $breadcrumbDemoSeeder,
+        private readonly DashboardMenuDemoSeeder $dashboardMenuDemoSeeder,
     ) {
         parent::__construct();
     }
@@ -79,6 +83,18 @@ final class SeedDemoCommand extends Command
             $first = $project->getApiKeys()->first();
             $apiKey = $first instanceof ProjectApiKey ? $first : null;
             $io->note('Demo project already exists');
+        }
+
+        if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
+            $io->success('Seeded default breadcrumb collection');
+        } else {
+            $io->note('Default breadcrumb collection already exists');
+        }
+
+        if ($this->dashboardMenuDemoSeeder->seedIfEmpty()) {
+            $io->success('Seeded main navigation menu');
+        } else {
+            $io->note('Main navigation menu already exists');
         }
 
         if ($apiKey instanceof ProjectApiKey) {

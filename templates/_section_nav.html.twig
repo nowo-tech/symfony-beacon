@@ -1,0 +1,11 @@
+{# Sidebar nav for the current app section (dashboard | preferences | administration). #}
+{% set menuCode = app_section.current.menuCode %}
+{% set menuTree = dashboard_menu_tree(menuCode) %}
+{% set menuConfig = dashboard_menu_config(menuCode) %}
+{% if menuTree is not empty %}
+    {{ include('@NowoDashboardMenuBundle/menu.html.twig', {
+        menuTree: menuTree,
+        menuCode: menuCode,
+        menuConfig: menuConfig,
+    }) }}
+{% endif %}

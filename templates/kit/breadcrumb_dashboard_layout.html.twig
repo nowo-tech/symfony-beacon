@@ -1,0 +1,41 @@
+{# Beacon shell for nowo-tech/breadcrumb-kit-bundle CRUD (keeps Bootstrap for modals/forms). #}
+{% extends 'base.html.twig' %}
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+
+{% block title %}{% block dashboard_title %}{{ 'dashboard.title'|trans }}{% endblock %} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+    <style>
+        body > .ts-dropdown { z-index: 1060; }
+    </style>
+    {% block dashboard_head %}{% endblock %}
+{% endblock %}
+
+{% block app_flashes %}{% endblock %}
+
+{% block body %}
+    {% set _bk_dr = dashboard_routes|default({}) %}
+    <div class="kit-admin panel">
+        {% block nowo_breadcrumb_kit_content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block dashboard_scripts %}{% endblock %}
+    <script src="{{ asset('bundles/nowobreadcrumbkit/js/dashboard.js') }}" defer></script>
+    <script>
+    window.breadcrumbKitI18n = {
+        loading: {{ 'dashboard.loading'|trans|json_encode|raw }},
+        errorLoadingForm: {{ 'dashboard.error_loading_form'|trans|json_encode|raw }},
+        defaultCollectionModalTitle: {{ 'dashboard.collection_modal_title'|trans|json_encode|raw }},
+        defaultItemModalTitle: {{ 'dashboard.item_modal_title'|trans|json_encode|raw }},
+        deleteCollectionConfirm: {{ 'dashboard.delete_collection_confirm'|trans|json_encode|raw }},
+        deleteItemConfirm: {{ 'dashboard.delete_item_confirm'|trans|json_encode|raw }}
+    };
+    window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};
+    window.__breadcrumbKitDashboard.importPartialUrl = {{ (path(_bk_dr.import|default('nowo_breadcrumb_kit_dashboard_import')) ~ '?_partial=1')|json_encode|raw }};
+    window.__breadcrumbKitDashboard.dashboardBase = {{ path(_bk_dr.collections_index|default('nowo_breadcrumb_kit_dashboard_collections_index'))|json_encode|raw }};
+    </script>
+{% endblock %}

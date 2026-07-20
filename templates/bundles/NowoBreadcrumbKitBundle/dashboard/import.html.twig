@@ -1,0 +1,12 @@
+{% extends '@NowoBreadcrumbKitBundle/dashboard/base.html.twig' %}
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+
+{% block title %}{{ 'dashboard.import'|trans }}{% endblock %}
+
+{% block breadcrumb_kit_body %}
+    <div class="mx-auto" style="max-width: 42rem;">
+        <h1 class="h3 mb-3">{{ 'dashboard.import_page_title'|trans }}</h1>
+        <p class="text-muted"><a href="{{ path(dashboard_routes.collections_index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="btn btn-link text-decoration-none px-0">{{ 'dashboard.back_collections'|trans }}</a></p>
+        {% include '@NowoBreadcrumbKitBundle/dashboard/_import_partial.html.twig' %}
+    </div>
+{% endblock %}

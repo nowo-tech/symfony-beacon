@@ -1,0 +1,26 @@
+{% extends nowo_breadcrumb_kit_layout_template|default('@NowoBreadcrumbKitBundle/dashboard/layout.html.twig') %}
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+
+{% set dashboard_routes = dashboard_routes|default({
+    collections_index: 'nowo_breadcrumb_kit_dashboard_collections_index',
+    collections_edit: 'nowo_breadcrumb_kit_dashboard_collections_edit',
+    import: 'nowo_breadcrumb_kit_dashboard_import',
+    export_all: 'nowo_breadcrumb_kit_dashboard_export_all',
+}) %}
+
+{% block nowo_breadcrumb_kit_content %}
+    {% set modal_classes = modal_classes|default({}) %}
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success">{{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger">{{ msg }}</div>
+    {% endfor %}
+
+    {% block breadcrumb_kit_body %}{% endblock %}
+
+    {% include '@NowoBreadcrumbKitBundle/dashboard/_dashboard_modals.html.twig' %}
+{% endblock %}

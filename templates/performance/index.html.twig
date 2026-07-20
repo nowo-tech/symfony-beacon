@@ -1,31 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Performance — {{ project.name }}{% endblock %}
+{% block title %}{{ 'performance.title'|trans }} — {{ project.name }}{% endblock %}
 
 {% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'performance'} %}
+
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-    <div>
-        <a href="{{ path('project_show', {id: project.id}) }}" class="text-sm no-underline">← {{ project.name }}</a>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">Performance</h1>
-        <p class="text-[var(--color-ink)]/65">Transactions and N+1 analysis</p>
-    </div>
+    <p class="text-[var(--color-ink)]/65">{{ 'performance.intro'|trans }}</p>
     <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.id, nplus1: nPlusOneOnly ? 0 : 1}) }}">
-        {% if nPlusOneOnly %}Show all{% else %}N+1 only{% endif %}
+        {% if nPlusOneOnly %}{{ 'performance.show_all'|trans }}{% else %}{{ 'performance.nplus1_only'|trans }}{% endif %}
     </a>
 </div>
 
 {% if transactions is empty %}
-    <div class="panel text-[var(--color-ink)]/70">No transactions yet.</div>
+    <div class="panel text-[var(--color-ink)]/70">{{ 'performance.empty'|trans }}</div>
 {% else %}
     <div class="panel overflow-x-auto p-0">
         <table class="w-full text-left text-sm">
             <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
                 <tr>
-                    <th class="px-4 py-3">Transaction</th>
-                    <th class="px-4 py-3">Duration</th>
-                    <th class="px-4 py-3">Spans</th>
-                    <th class="px-4 py-3">N+1</th>
-                    <th class="px-4 py-3">Received</th>
+                    <th class="px-4 py-3">{{ 'performance.col.transaction'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'performance.col.duration'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'performance.col.spans'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'performance.col.nplus1'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'performance.col.received'|trans }}</th>
                 </tr>
             </thead>
             <tbody>

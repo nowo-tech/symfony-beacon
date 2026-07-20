@@ -1,0 +1,66 @@
+{% extends 'legal/layout.html.twig' %}
+
+{% block title %}{{ 'legal.cookies.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block legal_body %}
+<article class="legal-doc prose-legal">
+    <h1>{{ 'legal.cookies.title'|trans }}</h1>
+    <p class="legal-doc__meta">{{ 'legal.last_updated'|trans({'%date%': '2026-07-20'}) }}</p>
+
+    <p>{{ 'legal.cookies.intro'|trans({'%brand%': site_appearance.brandName}) }}</p>
+
+    <p>
+        <a class="btn-primary" href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
+    </p>
+
+    <h2>{{ 'legal.cookies.categories_heading'|trans }}</h2>
+    <ul>
+        <li><strong>{{ 'legal.cookies.cat_required'|trans }}</strong> — {{ 'legal.cookies.cat_required_help'|trans }}</li>
+        <li><strong>{{ 'legal.cookies.cat_preferences'|trans }}</strong> — {{ 'legal.cookies.cat_preferences_help'|trans }}</li>
+        <li><strong>{{ 'legal.cookies.cat_analytics'|trans }}</strong> — {{ 'legal.cookies.cat_analytics_help'|trans }}</li>
+    </ul>
+
+    <h2>{{ 'legal.cookies.inventory_heading'|trans }}</h2>
+    <div class="overflow-x-auto">
+        <table class="legal-cookie-table">
+            <thead>
+                <tr>
+                    <th>{{ 'legal.cookies.col_name'|trans }}</th>
+                    <th>{{ 'legal.cookies.col_category'|trans }}</th>
+                    <th>{{ 'legal.cookies.col_duration'|trans }}</th>
+                    <th>{{ 'legal.cookies.col_purpose'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>PHPSESSID</code></td>
+                    <td>{{ 'legal.cookies.cat_required'|trans }}</td>
+                    <td>{{ 'legal.cookies.duration_session'|trans }}</td>
+                    <td>{{ 'legal.cookies.purpose_session'|trans }}</td>
+                </tr>
+                <tr>
+                    <td><code>REMEMBERME</code></td>
+                    <td>{{ 'legal.cookies.cat_required'|trans }}</td>
+                    <td>{{ 'legal.cookies.duration_remember'|trans }}</td>
+                    <td>{{ 'legal.cookies.purpose_remember'|trans }}</td>
+                </tr>
+                <tr>
+                    <td><code>CookieConsent</code> / <code>CookieConsentKey</code></td>
+                    <td>{{ 'legal.cookies.cat_required'|trans }}</td>
+                    <td>{{ 'legal.cookies.duration_consent'|trans }}</td>
+                    <td>{{ 'legal.cookies.purpose_consent'|trans }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>{{ 'legal.cookies.storage_heading'|trans }}</h2>
+    <p>{{ 'legal.cookies.storage_body'|trans }}</p>
+
+    <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
+        <a href="{{ path('legal_notice') }}">{{ 'legal.notice.title'|trans }}</a>
+        <a href="{{ path('legal_privacy') }}">{{ 'legal.privacy.title'|trans }}</a>
+        <a href="{{ path('legal_terms') }}">{{ 'legal.terms.title'|trans }}</a>
+    </nav>
+</article>
+{% endblock %}

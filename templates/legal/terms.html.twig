@@ -1,0 +1,33 @@
+{% extends 'legal/layout.html.twig' %}
+
+{% block title %}{{ 'legal.terms.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block legal_body %}
+<article class="legal-doc prose-legal">
+    <h1>{{ 'legal.terms.title'|trans }}</h1>
+    <p class="legal-doc__meta">{{ 'legal.last_updated'|trans({'%date%': '2026-07-20'}) }}</p>
+
+    <p>{{ 'legal.terms.intro'|trans({'%brand%': site_appearance.brandName}) }}</p>
+
+    <h2>{{ 'legal.terms.service_heading'|trans }}</h2>
+    <p>{{ 'legal.terms.service_body'|trans }}</p>
+
+    <h2>{{ 'legal.terms.accounts_heading'|trans }}</h2>
+    <p>{{ 'legal.terms.accounts_body'|trans }}</p>
+
+    <h2>{{ 'legal.terms.accept_heading'|trans }}</h2>
+    <p>{{ 'legal.terms.accept_body'|trans }}</p>
+
+    <h2>{{ 'legal.terms.limitation_heading'|trans }}</h2>
+    <p>{{ 'legal.terms.limitation_body'|trans }}</p>
+
+    <h2>{{ 'legal.terms.changes_heading'|trans }}</h2>
+    <p>{{ 'legal.terms.changes_body'|trans }}</p>
+
+    <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
+        <a href="{{ path('legal_notice') }}">{{ 'legal.notice.title'|trans }}</a>
+        <a href="{{ path('legal_privacy') }}">{{ 'legal.privacy.title'|trans }}</a>
+        <a href="{{ path('legal_cookies') }}">{{ 'legal.cookies.title'|trans }}</a>
+    </nav>
+</article>
+{% endblock %}

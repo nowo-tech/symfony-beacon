@@ -3,18 +3,21 @@
 {% block title %}{{ issue.title }} — {{ project.name }}{% endblock %}
 
 {% block body %}
-<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">← Issues</a>
+<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
 <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ issue.title }}</h1>
-<p class="mt-1 text-[var(--color-ink)]/65">{{ issue.culprit }} · {{ issue.eventCount }} events · {{ issue.status.value }}</p>
+<p class="mt-1 text-[var(--color-ink)]/65">{{ issue.culprit }} · {{ 'issues.event_count'|trans({'%count%': issue.eventCount}) }} · {{ issue.status.value }}</p>
 
 {% set event = latestEvent %}
 {% if event %}
     <section class="panel mt-6">
-        <h2 class="mb-3 text-lg font-semibold">Latest stack / payload</h2>
+        <h2 class="mb-3 text-lg font-semibold">{{ 'issues.latest_stack'|trans }}</h2>
         <p class="mb-2 text-sm text-[var(--color-ink)]/60">
-            Event <a href="{{ path('event_show', {projectId: project.id, eventId: event.eventId}) }}">{{ event.eventId }}</a>
-            · {{ event.environment|default('n/a') }}
-            · {{ event.receivedAt|date('Y-m-d H:i:s') }}
+            {{ 'issues.event'|trans }} <a href="{{ path('event_show', {projectId: project.id, eventId: event.eventId}) }}">{{ event.eventId }}</a>
+            · {{ event.environment|default('common.na'|trans) }}
+            · {{ event.receivedAt|date('Y-m-d H:i:s.u') }}
+            {% if event.releaseVersion %}· {{ event.releaseVersion }}{% endif %}
+            {% if event.phpVersion %}· PHP {{ event.phpVersion }}{% endif %}
+            {% if event.symfonyVersion %}· Symfony {{ event.symfonyVersion }}{% endif %}
         </p>
         {% set exception = event.payload.exception.values[0]|default(null) %}
         {% if exception and exception.stacktrace.frames is defined %}
@@ -24,7 +27,7 @@
                         <span class="text-[var(--color-moss)]">{{ frame.filename|default(frame.abs_path|default('?')) }}</span>
                         :{{ frame.lineno|default('?') }}
                         <span class="text-[var(--color-ink)]/50">in</span>
-                        {{ frame.function|default('unknown') }}
+                        {{ frame.function|default('common.unknown'|trans) }}
                     </li>
                 {% endfor %}
             </ol>
@@ -35,15 +38,15 @@
 {% endif %}
 
 <section class="panel mt-6">
-    <h2 class="mb-3 text-lg font-semibold">Recent events</h2>
+    <h2 class="mb-3 text-lg font-semibold">{{ 'issues.recent_events'|trans }}</h2>
     <ul class="divide-y divide-[var(--color-sand)] text-sm">
         {% for e in events %}
             <li class="flex items-center justify-between py-2">
                 <a href="{{ path('event_show', {projectId: project.id, eventId: e.eventId}) }}">{{ e.eventId }}</a>
-                <span class="text-[var(--color-ink)]/55">{{ e.receivedAt|date('Y-m-d H:i:s') }}</span>
+                <span class="text-[var(--color-ink)]/55">{{ e.receivedAt|date('Y-m-d H:i:s.u') }}</span>
             </li>
         {% else %}
-            <li class="py-2 text-[var(--color-ink)]/60">No events stored.</li>
+            <li class="py-2 text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</li>
         {% endfor %}
     </ul>
 </section>

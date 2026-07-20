@@ -1,0 +1,31 @@
+# nowo-tech/form-kit-bundle
+# https://github.com/nowo-tech/FormKitBundle
+nowo_form_kit:
+    default_profile: beacon
+    css_framework: tailwind
+    profiles:
+        beacon:
+            alias: beacon
+            translation_domain: messages
+            required_label_suffix: null
+            defaults:
+                attr:
+                    class: 'input'
+                row_attr:
+                    class: 'space-y-1.5'
+            field_types:
+                textarea:
+                    attr:
+                        class: 'input'
+                        rows: 3
+                checkbox:
+                    attr:
+                        class: 'size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30'
+                    row_attr:
+                        class: 'flex items-center gap-2'
+                choice:
+                    attr:
+                        class: 'input'
+            help_modal:
+                framework: tailwind
+                icon_html: '<span aria-hidden="true">?</span>'

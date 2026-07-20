@@ -8,6 +8,7 @@
 6. Frontend: TypeScript + SCSS + Tailwind 4 under `assets/` (do not put Tailwind `@apply` inside SCSS).
 7. Run `make test` (and ideally `make qa`) before opening a PR.
 8. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
+9. Public-facing UI must include legal pages and cookie consent (`docs/legal-and-cookies.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
 
 The client Symfony bundle is **out of scope** for this repository.
 

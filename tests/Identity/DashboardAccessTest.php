@@ -43,6 +43,12 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', $project->getName());
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getId());
+        self::assertResponseRedirects('/projects/'.$project->getId().'/issues');
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Issues');
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getId().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'API keys');
     }
@@ -70,12 +76,18 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_POST, '/projects/new', [
-            'name' => 'Billing API',
-            'description' => 'Tracks billing errors',
+        $crawler = $client->request(Request::METHOD_GET, '/projects/new');
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Create project')->form([
+            'project[name]' => 'Billing API',
+            'project[description]' => 'Tracks billing errors',
         ]);
+        $client->submit($form);
         self::assertResponseRedirects();
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Billing API');
+        self::assertSelectorTextContains('body', 'API keys');
+        self::assertSelectorTextContains('body', 'Settings');
     }
 }

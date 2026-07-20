@@ -16,6 +16,7 @@ export default defineConfig({
         tailwindcss(),
         symfonyPlugin({
             viteDevServerHostname: process.env.VITE_DEV_SERVER_HOST || 'localhost',
+            stimulus: './assets/controllers.json',
         }),
     ],
     server: {

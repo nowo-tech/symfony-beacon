@@ -4,16 +4,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.3.0 to the next release](#upgrading-from-030-to-the-next-release)
+- [Upgrading from 0.4.0 to the next release](#upgrading-from-040-to-the-next-release)
+- [Upgrading from 0.3.0 to 0.4.0](#upgrading-from-030-to-040)
 - [Upgrading from 0.2.0 to 0.3.0](#upgrading-from-020-to-030)
 - [Upgrading from 0.1.0 to 0.2.0](#upgrading-from-010-to-020)
 - [First install (no previous version)](#first-install-no-previous-version)
 
 ---
 
-## Upgrading from 0.3.0 to the next release
+## Upgrading from 0.4.0 to the next release
 
-No further release yet. When upgrading past `v0.3.0`:
+No further release yet. When upgrading past `v0.4.0`:
 
 1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
 2. Diff env templates: compare your local `.env` against the new `.env.dist` and add any missing keys.
@@ -21,16 +22,80 @@ No further release yet. When upgrading past `v0.3.0`:
 4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
 5. Run quality checks: `make qa` (or at least `make test`).
 
-### Stack versions (0.3.0)
+### Stack versions (0.4.0)
 
 | Component | Constraint / image | Notes |
 |---|---|---|
 | PHP | `>=8.5` / `dunglas/frankenphp:1-php8.5` | Canonical image line |
 | Symfony | `8.1.*` (Flex) / exact pins in `composer.json` | Application framework |
 | MySQL | Compose service (see `compose.yaml`) | Default host port `3308` |
-| Auth | `nowo-tech/auth-kit-bundle` `1.5.1` | First-user registration + i18n |
-| Password UX | `password-toggle-bundle` `2.0.4`, `password-strength-bundle` `1.3.0` | Toggle + medium strength on register |
-| Vite / Tailwind / SCSS | `pentatrion/vite-bundle` `8.2.4`, Tailwind 4, Sass | Assets via HTTPS `/build` proxy |
+| Auth | `nowo-tech/auth-kit-bundle` | First-user registration + i18n |
+| Cookies / legal | `nowo-tech/cookie-consent-bundle` | Consent modal + legal pages |
+| Menus / breadcrumbs / forms / PWA | Nowo kit bundles | See README Features |
+| Vite / Tailwind / SCSS | Tailwind 4, Sass, Stimulus | Assets via HTTPS `/build` proxy |
+
+---
+
+## Upgrading from 0.3.0 to 0.4.0
+
+### 1. Pull and refresh
+
+```bash
+git fetch --tags
+git checkout v0.4.0   # or merge/rebase main
+make down && make up
+docker compose exec php composer install
+docker compose exec vite pnpm install
+make console ARGS='doctrine:migrations:migrate -n'
+make console ARGS='assets:install public -n'
+make seed   # refreshes breadcrumb/menu demos if needed
+```
+
+### 2. Database migrations (required)
+
+New tables/columns include cookie-consent storage, dashboard menu / breadcrumb kit tables, appearance, and rich event fields (`php_version`, `symfony_version`, `user_identifier`, `DATETIME(6)` timestamps). Always run:
+
+```bash
+make console ARGS='doctrine:migrations:migrate -n'
+```
+
+### 3. Project URLs (bookmarks)
+
+| Before (0.3.0) | After (0.4.0) |
+|---|---|
+| `/projects/{id}` (API keys + members) | Redirects to **`/projects/{id}/issues`** |
+| — | Settings: **`/projects/{id}/settings`** (keys, members, clear/delete) |
+
+Update any hard-coded links that expected the old project overview page.
+
+### 4. Docker / Envelope ingest
+
+Caddy now serves **`/api/*` over HTTP** for `host.docker.internal` and `127.0.0.1` (in addition to redirecting browsers from `http://localhost` to HTTPS). Restart PHP after pulling so the Caddyfile reloads:
+
+```bash
+docker compose restart php
+```
+
+BeaconBundle demos should use:
+
+```env
+BEACON_DSN=http://PUBLIC_KEY@host.docker.internal:9081/1
+```
+
+See [`dsn.md`](dsn.md).
+
+### 5. Legal / cookies
+
+Review public legal placeholders under `/legal/*` and cookie categories in `config/packages/nowo_cookie_consent.yaml`. Operators must replace placeholder operator text before production.
+
+### 6. Verify
+
+```bash
+make test
+# https://localhost:9444/dashboard → open a project → Issues
+# Project Settings → API keys / Danger zone
+# From BeaconBundle demo: http://localhost:8011/report → issue appears
+```
 
 ---
 

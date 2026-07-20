@@ -35,14 +35,23 @@ class Event
     #[ORM\Column(length: 40)]
     private string $platform = 'php';
 
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $phpVersion = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $symfonyVersion = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $userIdentifier = null;
+
     /** @var array<string, mixed> */
     #[ORM\Column(type: 'json')]
     private array $payload = [];
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime_immutable', precision: 6)]
     private DateTimeImmutable $eventTimestamp;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime_immutable', precision: 6)]
     private DateTimeImmutable $receivedAt;
 
     public function __construct()
@@ -112,6 +121,42 @@ class Event
     public function setPlatform(string $platform): self
     {
         $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getPhpVersion(): ?string
+    {
+        return $this->phpVersion;
+    }
+
+    public function setPhpVersion(?string $phpVersion): self
+    {
+        $this->phpVersion = $phpVersion;
+
+        return $this;
+    }
+
+    public function getSymfonyVersion(): ?string
+    {
+        return $this->symfonyVersion;
+    }
+
+    public function setSymfonyVersion(?string $symfonyVersion): self
+    {
+        $this->symfonyVersion = $symfonyVersion;
+
+        return $this;
+    }
+
+    public function getUserIdentifier(): ?string
+    {
+        return $this->userIdentifier;
+    }
+
+    public function setUserIdentifier(?string $userIdentifier): self
+    {
+        $this->userIdentifier = $userIdentifier;
 
         return $this;
     }

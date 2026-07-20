@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.display.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-xl">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.intro'|trans }}</p>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.preferredLocale) }}
+        {{ form_row(form.preferredTheme) }}
+        {{ form_row(form.preferredContentWidth) }}
+        <div class="border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+
+    {% if not ux_is_native() %}
+        <section class="panel mt-6 space-y-3" aria-labelledby="display-pwa-heading">
+            <div>
+                <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>
+            </div>
+            {{ nowo_pwa_install_links() }}
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

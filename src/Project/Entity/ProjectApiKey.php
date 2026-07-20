@@ -42,12 +42,12 @@ class ProjectApiKey
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public static function generate(Project $project, string $label = 'Default'): self
+    public static function generate(Project $project, string $label = 'Default', ?string $publicKey = null): self
     {
         $key = new self();
         $key->setProject($project);
         $key->setLabel($label);
-        $key->setPublicKey(bin2hex(random_bytes(16)));
+        $key->setPublicKey($publicKey ?? bin2hex(random_bytes(16)));
         $key->setSecretKey(bin2hex(random_bytes(16)));
 
         return $key;

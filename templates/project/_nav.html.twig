@@ -1,0 +1,35 @@
+{#
+  Shared project section navigation.
+  Expects: project, current (issues|performance|analytics|settings)
+#}
+<nav class="project-nav mb-6" aria-label="{{ 'project.nav.label'|trans }}">
+    <div class="mb-3">
+        <a href="{{ path('dashboard_home') }}" class="text-sm no-underline text-[var(--color-ink)]/55 hover:text-[var(--color-ink)]">{{ 'projects.title'|trans }}</a>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ project.name }}</h1>
+        {% if project.description %}
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ project.description }}</p>
+        {% endif %}
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a
+            class="btn-ghost no-underline{% if current == 'issues' %} is-active{% endif %}"
+            href="{{ path('issue_index', {id: project.id}) }}"
+            {% if current == 'issues' %}aria-current="page"{% endif %}
+        >{{ 'nav.issues'|trans }}</a>
+        <a
+            class="btn-ghost no-underline{% if current == 'performance' %} is-active{% endif %}"
+            href="{{ path('performance_index', {id: project.id}) }}"
+            {% if current == 'performance' %}aria-current="page"{% endif %}
+        >{{ 'nav.performance'|trans }}</a>
+        <a
+            class="btn-ghost no-underline{% if current == 'analytics' %} is-active{% endif %}"
+            href="{{ path('analytics_show', {id: project.id}) }}"
+            {% if current == 'analytics' %}aria-current="page"{% endif %}
+        >{{ 'nav.analytics'|trans }}</a>
+        <a
+            class="btn-ghost no-underline{% if current == 'settings' %} is-active{% endif %}"
+            href="{{ path('project_settings', {id: project.id}) }}"
+            {% if current == 'settings' %}aria-current="page"{% endif %}
+        >{{ 'project.settings.nav'|trans }}</a>
+    </div>
+</nav>

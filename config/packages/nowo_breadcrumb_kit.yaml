@@ -1,0 +1,20 @@
+# nowo-tech/breadcrumb-kit-bundle
+# https://github.com/nowo-tech/BreadcrumbKitBundle
+nowo_breadcrumb_kit:
+    locales: ['en', 'es']
+    default_locale: 'en'
+    default_collection: 'default'
+    cache:
+        ttl: 60
+        pool: cache.app
+    presentation:
+        home_icon: null
+        home_icon_replaces_label: true
+        hide_when_single_root: true
+    dashboard:
+        enabled: true
+        path_prefix: /breadcrumb-kit-admin
+        layout_template: 'kit/breadcrumb_dashboard_layout.html.twig'
+        pagination:
+            enabled: true
+            per_page: 20

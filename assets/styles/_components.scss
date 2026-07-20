@@ -1,5 +1,5 @@
 // Beacon UI components (plain SCSS — no Tailwind @apply).
-// Tokens come from assets/styles/tailwind.css (@theme).
+// Tokens come from assets/styles/tailwind.css (@theme + data-theme).
 
 .btn-primary {
   display: inline-flex;
@@ -12,12 +12,12 @@
   letter-spacing: 0.01em;
   color: #fff;
   background: var(--color-moss);
-  box-shadow: 0 1px 2px rgb(15 28 24 / 8%);
+  box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 8%);
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
     background: var(--color-moss-deep);
-    box-shadow: 0 2px 8px rgb(15 28 24 / 12%);
+    box-shadow: 0 2px 8px rgb(var(--beacon-shadow) / 12%);
   }
 
   &:focus-visible {
@@ -30,6 +30,10 @@
   }
 }
 
+[data-theme="dark"] .btn-primary {
+  color: #0c1210;
+}
+
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -40,26 +44,112 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-ink);
-  background: rgb(255 255 255 / 70%);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 
   &:hover {
     border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
-    background: #fff;
+    background: var(--color-surface);
   }
 
   &:focus-visible {
     outline: 2px solid var(--color-moss);
     outline-offset: 2px;
   }
+
+  &.is-active {
+    border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
+    background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
+    color: var(--color-moss-deep);
+    font-weight: 600;
+  }
+}
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  border: 1px solid color-mix(in srgb, var(--color-alert) 55%, var(--color-sand));
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-alert);
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-alert);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.panel--danger {
+  border-color: color-mix(in srgb, var(--color-alert) 35%, var(--color-sand));
+}
+
+.confirm-dialog {
+  margin: auto;
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: min(28rem, calc(100vw - 2rem));
+
+  &::backdrop {
+    background: rgb(12 18 16 / 55%);
+  }
+}
+
+.confirm-dialog__panel {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  padding: 1.25rem;
+  box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
+}
+
+.confirm-dialog__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.confirm-dialog__body {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+}
+
+.confirm-dialog__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .panel {
   border-radius: 0.75rem;
   border: 1px solid var(--color-sand);
-  background: rgb(255 255 255 / 85%);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   padding: 1.25rem;
-  box-shadow: 0 1px 2px rgb(15 28 24 / 6%);
+  box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 6%);
   backdrop-filter: blur(8px);
 }
 
@@ -67,7 +157,7 @@
   width: 100%;
   border-radius: 0.375rem;
   border: 1px solid var(--color-sand);
-  background: #fff;
+  background: var(--color-surface);
   padding: 0.625rem 0.75rem;
   font-size: 0.875rem;
   color: var(--color-ink);
@@ -84,6 +174,42 @@
   }
 }
 
+.input-color {
+  display: block;
+  width: 3.25rem;
+  height: 2.75rem;
+  padding: 0.2rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 0.25rem;
+  }
+
+  &::-moz-color-swatch {
+    border: none;
+    border-radius: 0.25rem;
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+  }
+
+  &:focus-visible {
+    border-color: var(--color-moss);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 20%, transparent);
+  }
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -95,14 +221,47 @@
   text-transform: uppercase;
 }
 
+.badge-error {
+  background: var(--beacon-badge-error-bg);
+  color: var(--beacon-badge-error-text);
+}
+
+.badge-warn {
+  background: var(--beacon-badge-warn-bg);
+  color: var(--beacon-badge-warn-text);
+}
+
+.flash {
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.flash-error {
+  border-color: var(--beacon-flash-error-border);
+  background: var(--beacon-flash-error-bg);
+  color: var(--color-alert);
+}
+
+.flash-success {
+  border-color: var(--beacon-flash-ok-border);
+  background: var(--beacon-flash-ok-bg);
+  color: var(--beacon-flash-ok-text);
+}
+
 .page-shell {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   background:
-    radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in srgb, var(--color-mist) 90%, white), transparent 55%),
-    radial-gradient(ellipse 70% 45% at 95% 0%, color-mix(in srgb, var(--color-sand) 70%, white), transparent 50%),
-    linear-gradient(165deg, #eef3f0 0%, var(--color-paper) 42%, #e8efe9 100%);
+    radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in srgb, var(--color-mist) 90%, var(--color-surface)), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 95% 0%, color-mix(in srgb, var(--color-sand) 70%, var(--color-surface)), transparent 50%),
+    linear-gradient(165deg, var(--beacon-shell-a) 0%, var(--color-paper) 42%, var(--beacon-shell-b) 100%);
 
   &::before {
     content: "";
@@ -118,23 +277,35 @@
   }
 }
 
+[data-theme="dark"] .page-shell::before {
+  opacity: 0.2;
+}
+
 /* Center auth panels when short; keep top reachable when the form is taller than the viewport */
 .auth-shell-main {
   align-items: safe center;
 }
 
-.locale-switcher {
+.top-controls {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.locale-switcher {
+  position: relative;
 }
 
 .locale-switcher__details {
   position: relative;
 }
 
-.locale-switcher__summary {
+.locale-switcher__summary,
+.theme-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -142,26 +313,18 @@
   cursor: pointer;
   border-radius: 0.375rem;
   border: 1px solid var(--color-sand);
-  background: rgb(255 255 255 / 85%);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   padding: 0.4rem 0.65rem;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-ink);
   backdrop-filter: blur(8px);
-  box-shadow: 0 1px 2px rgb(15 28 24 / 6%);
+  box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 6%);
   transition: border-color 0.15s ease, background-color 0.15s ease;
-
-  &::-webkit-details-marker {
-    display: none;
-  }
-
-  &::marker {
-    content: "";
-  }
 
   &:hover {
     border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
-    background: #fff;
+    background: var(--color-surface);
   }
 
   &:focus-visible {
@@ -170,9 +333,19 @@
   }
 }
 
+.locale-switcher__summary {
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::marker {
+    content: "";
+  }
+}
+
 .locale-switcher__details[open] .locale-switcher__summary {
   border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
-  background: #fff;
+  background: var(--color-surface);
 }
 
 .locale-switcher__details[open] .locale-switcher__chevron {
@@ -204,26 +377,34 @@
   position: absolute;
   top: calc(100% + 0.35rem);
   right: 0;
+  z-index: 80;
   min-width: 100%;
   margin: 0;
   padding: 0.25rem;
   list-style: none;
   border-radius: 0.5rem;
   border: 1px solid var(--color-sand);
-  background: rgb(255 255 255 / 96%);
-  box-shadow: 0 8px 24px rgb(15 28 24 / 10%);
-  backdrop-filter: blur(10px);
+  /* Opaque panel — never rely on a possibly tree-shaken Tailwind theme token alone. */
+  background-color: var(--beacon-surface);
+  background-color: var(--color-surface, var(--beacon-surface));
+  box-shadow: 0 8px 24px rgb(var(--beacon-shadow) / 16%);
 }
 
 .locale-switcher__option {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
+  border: 0;
   border-radius: 0.375rem;
   padding: 0.45rem 0.6rem;
+  font: inherit;
   font-size: 0.8125rem;
   color: var(--color-ink);
   text-decoration: none;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
   white-space: nowrap;
 
   &:hover {
@@ -232,9 +413,30 @@
   }
 
   &.is-active {
-    background: color-mix(in srgb, var(--color-moss) 12%, white);
+    background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
     font-weight: 600;
   }
+}
+
+.theme-toggle {
+  font: inherit;
+}
+
+.theme-toggle__icon {
+  display: none;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .theme-toggle__icon--moon,
+[data-theme="dark"] .theme-toggle__icon--sun {
+  display: block;
+}
+
+.theme-toggle__label {
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand-mark {
@@ -245,6 +447,365 @@
   text-decoration: none;
 }
 
+/* —— App shell (authenticated) —— */
+.page-shell--native {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.page-shell--native .app-header {
+  /* Native shell already draws a top chrome; keep a compact sticky bar. */
+  min-height: 3rem;
+}
+
+.app-shell {
+  --app-sidebar-width: 15.5rem;
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  /* header | body | legal footer */
+  grid-template-rows: auto 1fr auto;
+  min-height: 0;
+  width: 100%;
+  transition: grid-template-columns 0.22s ease;
+}
+
+.app-shell.is-sidebar-collapsed {
+  --app-sidebar-width: 0px;
+}
+
+.app-header {
+  grid-column: 1 / -1;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.app-header__start,
+.app-header__end {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.app-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-sand);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: var(--color-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+.app-sidebar {
+  grid-row: 2;
+  grid-column: 1;
+  border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.app-shell.is-sidebar-collapsed .app-sidebar {
+  opacity: 0;
+  pointer-events: none;
+  border-right-width: 0;
+}
+
+.app-sidebar__inner {
+  width: 15.5rem;
+  padding: 1rem 0.85rem 1.5rem;
+}
+
+.app-sidebar__label {
+  margin: 0 0 0.75rem;
+  padding: 0 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.app-main {
+  grid-row: 2;
+  grid-column: 2;
+  min-width: 0;
+}
+
+.app-main__inner {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 2.5rem;
+  transition: max-width 0.2s ease;
+}
+
+.app-shell.is-full-width .app-main__inner {
+  max-width: none;
+}
+
+.app-shell.is-content-width .app-main__inner {
+  max-width: 72rem;
+}
+
+.app-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    --app-sidebar-width: 0px;
+    grid-template-columns: 1fr;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    bottom: 0;
+    z-index: 35;
+    width: min(18rem, 86vw);
+    border-right: 1px solid var(--color-sand);
+    background: var(--color-surface);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease, opacity 0.22s ease;
+  }
+
+  .app-shell.is-sidebar-open .app-sidebar {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .app-shell.is-sidebar-collapsed .app-sidebar {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-100%);
+  }
+
+  .app-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 3.5rem 0 0;
+    z-index: 30;
+    background: rgb(15 28 24 / 35%);
+    backdrop-filter: blur(2px);
+  }
+
+  .app-sidebar-backdrop[hidden] {
+    display: none;
+  }
+}
+
+/* —— Sidebar nav (vertical) —— */
+.beacon-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.beacon-nav__link {
+  display: block;
+  border-radius: 0.375rem;
+  padding: 0.55rem 0.7rem;
+  color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &.is-current {
+    color: var(--color-moss);
+    background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface));
+  }
+}
+
+.beacon-nav__item:nth-child(2) .beacon-nav__link {
+  border: 1px solid var(--color-sand);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+
+  &:hover,
+  &.is-current {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+}
+
+/* —— User avatar menu —— */
+.user-menu {
+  position: relative;
+}
+
+.user-menu__details {
+  position: relative;
+}
+
+.user-menu__summary {
+  list-style: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::marker {
+    content: "";
+  }
+
+  &:focus-visible .user-avatar {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-moss) 35%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 16%, var(--color-surface));
+  color: var(--color-moss-deep);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  user-select: none;
+}
+
+.user-avatar--sm {
+  width: 1.85rem;
+  height: 1.85rem;
+  font-size: 0.625rem;
+}
+
+.user-menu__panel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 80;
+  width: min(17.5rem, calc(100vw - 1.5rem));
+  padding: 0.5rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-sand);
+  /* Solid opaque surface (avatar / locale menus must not see-through page content). */
+  background-color: var(--beacon-surface);
+  background-color: var(--color-surface, var(--beacon-surface));
+  box-shadow: 0 12px 28px rgb(var(--beacon-shadow) / 18%);
+  isolation: isolate;
+}
+
+.user-menu__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--color-sand);
+  margin-bottom: 0.35rem;
+}
+
+.user-menu__name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.user-menu__email {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  word-break: break-all;
+}
+
+.user-menu__section {
+  margin: 0.35rem 0.5rem 0.15rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.user-menu__link {
+  display: block;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-mist);
+    color: var(--color-ink);
+  }
+
+  &.is-current {
+    background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
+    font-weight: 600;
+    color: var(--color-moss);
+  }
+}
+
+.user-menu__footer {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--color-sand);
+}
+
+.user-menu__link--danger {
+  color: var(--color-alert);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-alert) 10%, var(--color-surface));
+    color: var(--color-alert);
+  }
+}
+
 .fade-up {
   animation: beacon-fade-up 0.55s ease-out both;
 }
@@ -252,3 +813,308 @@
 .fade-up-delay {
   animation: beacon-fade-up 0.65s ease-out 0.08s both;
 }
+
+.row-hover:hover {
+  background: color-mix(in srgb, var(--color-mist) 70%, transparent);
+}
+
+.beacon-breadcrumb-wrap {
+  /* reserved for spacing when a trail is rendered */
+}
+
+.beacon-breadcrumb {
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: var(--color-moss);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-moss-deep);
+      text-decoration: underline;
+    }
+  }
+
+  .is-current {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+}
+
+.beacon-breadcrumb__sep {
+  opacity: 0.55;
+  user-select: none;
+}
+
+/* Kit CRUD (Menus / Breadcrumbs) — structural chrome; button colors live in
+   templates/kit/_kit_admin_styles.html.twig (loaded after Bootstrap CDN). */
+.kit-admin {
+  color: var(--color-ink);
+}
+
+/* —— Legal footer & documents —— */
+.site-legal-footer {
+  margin-top: auto;
+  border-top: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  padding: 0.85rem 1.25rem;
+  padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
+  position: relative;
+  z-index: 10;
+}
+
+/* Inside authenticated app chrome: last grid row, full width under sidebar + main */
+.app-shell > .site-legal-footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin-top: 0;
+}
+
+.site-legal-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 72rem;
+  margin-inline: auto;
+  font-size: 0.8125rem;
+}
+
+.app-shell.is-full-width > .site-legal-footer .site-legal-footer__nav {
+  max-width: none;
+}
+
+.site-legal-footer__nav a {
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  text-decoration: none;
+}
+
+.site-legal-footer__nav a:hover {
+  color: var(--color-moss);
+  text-decoration: underline;
+}
+
+.legal-doc {
+  color: var(--color-ink);
+}
+
+.legal-doc h1 {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.legal-doc h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.legal-doc p,
+.legal-doc li {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+}
+
+.legal-doc ul {
+  margin: 0.5rem 0 0.75rem 1.25rem;
+  list-style: disc;
+}
+
+.legal-doc__meta {
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  margin-bottom: 1.25rem;
+}
+
+.legal-doc__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-sand);
+  font-size: 0.875rem;
+}
+
+.legal-doc__nav a {
+  color: var(--color-moss);
+}
+
+.legal-cookie-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  margin-top: 0.75rem;
+}
+
+.legal-cookie-table th,
+.legal-cookie-table td {
+  border: 1px solid var(--color-sand);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-cookie-table th {
+  background: color-mix(in srgb, var(--color-sand) 35%, var(--color-surface));
+  font-weight: 600;
+}
+
+/* —— PWA install (Beacon theme; overrides default slate/blue pwa.css) —— */
+.beacon-pwa-install,
+.nowo-pwa-install.beacon-pwa-install {
+  z-index: 1050;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sand) 85%, transparent);
+  border-radius: 0.75rem;
+  box-shadow:
+    0 1px 2px rgb(var(--beacon-shadow) / 8%),
+    0 12px 32px rgb(var(--beacon-shadow) / 14%);
+  backdrop-filter: blur(12px);
+}
+
+.nowo-pwa-install--banner.beacon-pwa-install {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.nowo-pwa-install--banner.nowo-pwa-install--bottom.beacon-pwa-install {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.nowo-pwa-install--banner.nowo-pwa-install--top.beacon-pwa-install {
+  top: max(1rem, env(safe-area-inset-top));
+}
+
+.beacon-pwa-install__panel,
+.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__panel {
+  padding: 1.1rem 1.2rem 1.15rem;
+}
+
+.beacon-pwa-install__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-moss);
+}
+
+.beacon-pwa-install__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.beacon-pwa-install__message {
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+}
+
+.beacon-pwa-install__actions,
+.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.95rem;
+}
+
+.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__actions button {
+  padding: unset;
+  font-weight: unset;
+  border: unset;
+  border-radius: unset;
+  cursor: pointer;
+  color: unset;
+  background: unset;
+}
+
+.beacon-pwa-install__never {
+  opacity: 0.85;
+}
+
+.nowo-pwa-install--modal.beacon-pwa-install {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.beacon-pwa-install__backdrop,
+.nowo-pwa-install--modal.beacon-pwa-install .nowo-pwa-install__backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.nowo-pwa-install--modal.beacon-pwa-install .beacon-pwa-install__panel,
+.nowo-pwa-install--modal.beacon-pwa-install .nowo-pwa-install__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 26rem);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  border: 1px solid var(--color-sand);
+  border-radius: 0.75rem;
+  box-shadow: 0 16px 40px rgb(var(--beacon-shadow) / 18%);
+}
+
+.beacon-pwa-install-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.beacon-pwa-install-links .btn-primary,
+.beacon-pwa-install-links .btn-ghost {
+  text-decoration: none;
+}
+
+.beacon-pwa-install-links__hint {
+  display: none;
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+}
+
+/* Show help only when neither install nor uninstall control is visible */
+.beacon-pwa-install-links:not(:has(.nowo-pwa-install-links__install:not([hidden]))):not(:has(.nowo-pwa-install-links__uninstall:not([hidden]))) .beacon-pwa-install-links__hint {
+  display: block;
+}
+
+

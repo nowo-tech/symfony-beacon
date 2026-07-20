@@ -1,0 +1,17 @@
+{# Inline install/uninstall controls — used from Preferences → Display (not a floating FAB). #}
+<div id="nowo-pwa-install-links"
+     class="{{ install_links.css_class|default('nowo-pwa-install-links') }} beacon-pwa-install-links"
+     data-visibility="{{ install_links.visibility|default('all') }}"
+     data-uninstall-help="{{ 'install.uninstall_help'|trans({}, 'NowoPwaBundle')|e('html_attr') }}">
+    <a href="#"
+       class="btn-primary nowo-pwa-install-links__install beacon-pwa-install-links__install"
+       data-pwa-install-action="install"
+       hidden>{{ 'install.link'|trans({}, 'NowoPwaBundle') }}</a>
+    <a href="#"
+       class="btn-ghost nowo-pwa-install-links__uninstall beacon-pwa-install-links__uninstall"
+       data-pwa-install-action="uninstall"
+       hidden>{{ 'install.uninstall_link'|trans({}, 'NowoPwaBundle') }}</a>
+    <p class="beacon-pwa-install-links__hint" data-pwa-install-hint>
+        {{ 'preferences.display.pwa_unavailable'|trans }}
+    </p>
+</div>

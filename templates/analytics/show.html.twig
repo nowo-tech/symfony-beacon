@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Analytics — {{ project.name }}{% endblock %}
+{% block title %}{{ 'analytics.title'|trans }} — {{ project.name }}{% endblock %}
 
 {% block body %}
-<a href="{{ path('project_show', {id: project.id}) }}" class="text-sm no-underline">← {{ project.name }}</a>
-<h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">Analytics</h1>
-<p class="text-[var(--color-ink)]/65">Daily error, transaction, and N+1 counts (last 30 days)</p>
+{% include 'project/_nav.html.twig' with {project: project, current: 'analytics'} %}
+
+<p class="mb-6 text-[var(--color-ink)]/65">{{ 'analytics.intro'|trans }}</p>
 
 {% if stats is empty %}
-    <div class="panel mt-6 text-[var(--color-ink)]/70">No stats yet. Ingest events to populate this chart data.</div>
+    <div class="panel text-[var(--color-ink)]/70">{{ 'analytics.empty'|trans }}</div>
 {% else %}
-    <div class="panel mt-6 overflow-x-auto p-0">
+    <div class="panel overflow-x-auto p-0">
         <table class="w-full text-left text-sm">
             <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
                 <tr>
-                    <th class="px-4 py-3">Date</th>
-                    <th class="px-4 py-3">Errors</th>
-                    <th class="px-4 py-3">Transactions</th>
-                    <th class="px-4 py-3">N+1 groups</th>
+                    <th class="px-4 py-3">{{ 'analytics.col.date'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'analytics.col.errors'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'analytics.col.transactions'|trans }}</th>
+                    <th class="px-4 py-3">{{ 'analytics.col.nplus1_groups'|trans }}</th>
                 </tr>
             </thead>
             <tbody>

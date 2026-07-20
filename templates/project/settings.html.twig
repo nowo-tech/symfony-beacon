@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'project.settings.title'|trans }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
+
+<p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'project.settings.intro'|trans }}</p>
+
+<div class="grid gap-6 lg:grid-cols-2">
+    <section class="panel">
+        <h2 class="mb-3 text-lg font-semibold">{{ 'project.api_keys.title'|trans }}</h2>
+        <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans }}</p>
+        <ul class="space-y-3">
+            {% for key in project.apiKeys %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
+                    <code class="mt-2 block break-all text-xs">{{ key.buildDsn(baseUrl) }}</code>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if membership.role.value in ['owner', 'admin'] %}
+            <form
+                method="post"
+                action="{{ path('project_keys_create', {id: project.id}) }}"
+                class="mt-4 flex flex-wrap gap-2"
+                data-controller="human-key-label"
+                data-human-key-label-adjectives-value="{{ labelAdjectives|json_encode|e('html_attr') }}"
+                data-human-key-label-nouns-value="{{ labelNouns|json_encode|e('html_attr') }}"
+            >
+                <input
+                    class="input min-w-40 flex-1"
+                    name="label"
+                    placeholder="{{ 'project.api_keys.label_placeholder'|trans }}"
+                    value="{{ suggestedLabel }}"
+                    data-human-key-label-target="label"
+                    autocomplete="off"
+                >
+                <button
+                    type="button"
+                    class="btn-ghost"
+                    data-action="human-key-label#generate"
+                    title="{{ 'project.api_keys.generate_hint'|trans }}"
+                >{{ 'project.api_keys.generate'|trans }}</button>
+                <button class="btn-primary" type="submit">{{ 'project.api_keys.add'|trans }}</button>
+            </form>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="mb-3 text-lg font-semibold">{{ 'project.members.title'|trans }}</h2>
+        <ul class="space-y-2 text-sm">
+            {% for member in project.memberships %}
+                <li class="flex items-center justify-between border-b border-[var(--color-sand)] py-2 last:border-0">
+                    <span>{{ member.user.email }}</span>
+                    <span class="badge bg-[var(--color-sand)]">{{ member.role.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.members.your_role'|trans }} {{ membership.role.value }}</p>
+    </section>
+</div>
+
+{% if membership.role.value in ['owner', 'admin'] %}
+<section class="panel panel--danger mt-6">
+    <h2 class="mb-2 text-lg font-semibold text-[var(--color-alert)]">{{ 'project.danger.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'project.danger.intro'|trans }}</p>
+
+    <div class="flex flex-wrap gap-3">
+        <div data-controller="confirm-dialog">
+            <button type="button" class="btn-ghost" data-action="confirm-dialog#open">{{ 'project.danger.clear_open'|trans }}</button>
+            <dialog
+                class="confirm-dialog"
+                data-confirm-dialog-target="dialog"
+                data-action="click->confirm-dialog#backdropClose"
+            >
+                <form method="post" action="{{ path('project_clear_history', {id: project.id}) }}" class="confirm-dialog__panel">
+                    <h3 class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h3>
+                    <p class="confirm-dialog__body">{{ 'project.danger.clear_body'|trans }}</p>
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_clear_' ~ project.id) }}">
+                    <div class="confirm-dialog__actions">
+                        <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                        <button type="submit" class="btn-danger">{{ 'project.danger.clear_confirm'|trans }}</button>
+                    </div>
+                </form>
+            </dialog>
+        </div>
+
+        {% if membership.role.value == 'owner' %}
+            <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name }}">
+                <button type="button" class="btn-danger" data-action="confirm-dialog#open">{{ 'project.danger.delete_open'|trans }}</button>
+                <dialog
+                    class="confirm-dialog"
+                    data-confirm-dialog-target="dialog"
+                    data-action="click->confirm-dialog#backdropClose"
+                >
+                    <form method="post" action="{{ path('project_delete', {id: project.id}) }}" class="confirm-dialog__panel">
+                        <h3 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h3>
+                        <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
+                        <label class="confirm-dialog__label" for="project-delete-confirm-{{ project.id }}">
+                            {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
+                        </label>
+                        <input
+                            id="project-delete-confirm-{{ project.id }}"
+                            class="input"
+                            name="confirmation"
+                            autocomplete="off"
+                            data-confirm-dialog-target="confirmInput"
+                            data-action="input->confirm-dialog#syncSubmit"
+                            required
+                        >
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_delete_' ~ project.id) }}">
+                        <div class="confirm-dialog__actions">
+                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                            <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
+                        </div>
+                    </form>
+                </dialog>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

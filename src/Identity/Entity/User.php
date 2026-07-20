@@ -36,6 +36,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password = '';
 
+    /** Preferred UI locale (`en` / `es`); null = follow request / browser. */
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $preferredLocale = null;
+
+    /** Preferred color theme (`light` / `dark`); null = follow device / localStorage. */
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $preferredTheme = null;
+
+    /** Main content width: `content` (centered max-width) or `full`. Null = content. */
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $preferredContentWidth = null;
+
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
@@ -78,6 +90,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Two-letter initials for the avatar bubble (from display name, else email).
+     */
+    public function getInitials(): string
+    {
+        $name = trim($this->displayName);
+        if ('' !== $name) {
+            $parts = preg_split('/\s+/u', $name) ?: [];
+            $parts = array_values(array_filter($parts, static fn (string $p): bool => '' !== $p));
+            if (\count($parts) >= 2) {
+                return mb_strtoupper(mb_substr($parts[0], 0, 1).mb_substr($parts[\count($parts) - 1], 0, 1));
+            }
+
+            return mb_strtoupper(mb_substr($name, 0, 2));
+        }
+
+        return mb_strtoupper(mb_substr($this->email, 0, 2));
+    }
+
     public function getUserIdentifier(): string
     {
         return $this->email;
@@ -112,6 +143,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPreferredLocale(): ?string
+    {
+        return $this->preferredLocale;
+    }
+
+    public function setPreferredLocale(?string $preferredLocale): self
+    {
+        $normalized = null !== $preferredLocale ? strtolower(trim($preferredLocale)) : null;
+        $this->preferredLocale = '' !== $normalized ? $normalized : null;
+
+        return $this;
+    }
+
+    public function getPreferredTheme(): ?string
+    {
+        return $this->preferredTheme;
+    }
+
+    public function setPreferredTheme(?string $preferredTheme): self
+    {
+        $normalized = null !== $preferredTheme ? strtolower(trim($preferredTheme)) : null;
+        if (null !== $normalized && !\in_array($normalized, ['light', 'dark'], true)) {
+            $normalized = null;
+        }
+        $this->preferredTheme = $normalized;
+
+        return $this;
+    }
+
+    public function getPreferredContentWidth(): string
+    {
+        return 'full' === $this->preferredContentWidth ? 'full' : 'content';
+    }
+
+    public function setPreferredContentWidth(?string $preferredContentWidth): self
+    {
+        $normalized = null !== $preferredContentWidth ? strtolower(trim($preferredContentWidth)) : null;
+        if (!\in_array($normalized, ['content', 'full'], true)) {
+            $normalized = null;
+        }
+        $this->preferredContentWidth = $normalized;
 
         return $this;
     }

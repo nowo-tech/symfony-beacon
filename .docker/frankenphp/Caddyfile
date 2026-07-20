@@ -11,9 +11,31 @@
 	frankenphp {
 		{$FRANKENPHP_CONFIG}
 	}
+
+	# Host maps container :80/:443 to HTTP_PORT/HTTPS_PORT (e.g. 9081/9444).
+	# Caddy's default HTTP→HTTPS redirect would send browsers to https://localhost/
+	# (port 443). Disable it and redirect to DEFAULT_URI instead.
+	auto_https disable_redirects
 }
 
 {$CADDY_EXTRA_CONFIG}
+
+# HTTP for local + Docker clients (BeaconBundle demo → host.docker.internal:9081).
+# Serve Envelope ingest on HTTP; redirect other browser traffic to HTTPS UI.
+http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
+	@ingest path /api/*
+
+	handle @ingest {
+		root * /app/public
+		encode zstd br gzip
+		{$CADDY_SERVER_EXTRA_DIRECTIVES}
+		php_server
+	}
+
+	handle {
+		redir {$DEFAULT_URI:https://localhost:9444}{uri} permanent
+	}
+}
 
 {$SERVER_NAME:localhost} {
 	log {

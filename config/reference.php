@@ -1472,6 +1472,478 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     ignore_not_found?: bool|Param, // Ignore error when an icon is not found. Set to 'true' to fail silently. // Default: false
  * }
+ * @psalm-type NowoBreadcrumbKitConfig = array{
+ *     project?: scalar|Param|null, // Optional project id when several apps share one DB. // Default: null
+ *     doctrine?: array{
+ *         connection?: scalar|Param|null, // Default: "default"
+ *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_breadcrumb_collection, dashboard_breadcrumb_item). Empty = no prefix. // Default: ""
+ *     },
+ *     cache?: array{
+ *         ttl?: int|Param, // Default: 60
+ *         pool?: scalar|Param|null, // PSR-6 pool service id, e.g. cache.app. Empty disables item-list cache. // Default: "cache.app"
+ *     },
+ *     locales?: list<scalar|Param|null>,
+ *     default_locale?: scalar|Param|null, // Default: null
+ *     default_collection?: scalar|Param|null, // Collection code used when none is passed to Twig/helpers. // Default: "default"
+ *     presentation?: array{ // Default trail presentation; collection homeIcon and responsiveConfig can override per collection.
+ *         home_icon?: scalar|Param|null, // Fallback home/root icon (HTML, emoji, or app-specific token) when the collection homeIcon is empty. // Default: null
+ *         home_icon_replaces_label?: bool|Param, // When true and a home icon is set, the first crumb shows the icon instead of its text label (label stays in aria-label). // Default: true
+ *         hide_when_single_root?: bool|Param, // When true, hides the trail on pages where the only crumb is the root item and it is the current page (typical home). // Default: false
+ *     },
+ *     dashboard?: array{
+ *         enabled?: bool|Param, // Registers CRUD controllers and forms; import bundle routing with path_prefix (see docs). // Default: false
+ *         path_prefix?: scalar|Param|null, // URL prefix for dashboard routes (leading slash, no trailing slash). Use the same value when importing routing in your app. // Default: "/breadcrumb-kit-admin"
+ *         layout_template?: scalar|Param|null, // Twig layout extended by dashboard pages (override in app like DashboardMenuBundle). // Default: "@NowoBreadcrumbKitBundle/dashboard/layout.html.twig"
+ *         import_max_bytes?: int|Param, // Max JSON upload size for dashboard import (default 2 MiB). // Default: 2097152
+ *         pagination?: array{ // Pagination for the collections list in the dashboard.
+ *             enabled?: bool|Param, // Default: true
+ *             per_page?: int|Param, // Default: 20
+ *         },
+ *         modals?: array{ // Modal dialog size per type: normal (default), lg, or xl (Bootstrap 5).
+ *             collection_form?: scalar|Param|null, // Default: "lg"
+ *             item_form?: scalar|Param|null, // Default: "lg"
+ *             import?: scalar|Param|null, // Default: "normal"
+ *             delete?: scalar|Param|null, // Default: "normal"
+ *         },
+ *     },
+ *     inline_edit?: array{
+ *         query_param?: scalar|Param|null, // Query parameter name; when present and truthy (1, true, yes, on), the default breadcrumb template may show an edit control if the collection enables a checker and the checker allows access. // Default: null
+ *         access_services?: array<string, scalar|Param|null>,
+ *     },
+ * }
+ * @psalm-type TwigComponentConfig = array{
+ *     defaults?: array<string, string|array{ // Default: []
+ *         template_directory?: scalar|Param|null, // Default: "components"
+ *         name_prefix?: scalar|Param|null, // Default: ""
+ *     }>,
+ *     anonymous_template_directory?: scalar|Param|null, // Defaults to `components`
+ *     profiler?: bool|array{ // Enables the profiler for Twig Component
+ *         enabled?: bool|Param, // Default: "%kernel.debug%"
+ *         collect_components?: bool|Param, // Collect components instances // Default: true
+ *     },
+ * }
+ * @psalm-type StimulusConfig = array{
+ *     controller_paths?: list<scalar|Param|null>,
+ *     controllers_json?: scalar|Param|null, // Default: "%kernel.project_dir%/assets/controllers.json"
+ * }
+ * @psalm-type LiveComponentConfig = array{
+ *     secret?: scalar|Param|null, // The secret used to compute fingerprints and checksums // Default: "%kernel.secret%"
+ *     fetch_credentials?: "same-origin"|"include"|"omit"|Param, // The default fetch credentials mode for all Live Components ('same-origin', 'include', 'omit') // Default: "same-origin"
+ * }
+ * @psalm-type NowoDashboardMenuConfig = array{
+ *     project?: scalar|Param|null, // Optional project identifier to differentiate menus when multiple apps share the same DB // Default: null
+ *     doctrine?: array{ // Doctrine DBAL connection and table prefix for menu entities.
+ *         connection?: scalar|Param|null, // Name of the Doctrine DBAL connection to use (e.g. default, or a custom connection). // Default: "default"
+ *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_menu, dashboard_menu_item). Empty = no prefix. // Default: ""
+ *     },
+ *     cache?: array{ // Cache for the resolved menu tree (avoids N+1 and repeated DB hits). Uses filesystem when cache_pool is the default.
+ *         ttl?: int|Param, // Time-to-live in seconds for the menu tree cache. Minimum 0 (0 = immediate expiry for saved items; behaviour depends on the PSR-6 pool). // Default: 60
+ *         pool?: scalar|Param|null, // Cache pool name (e.g. cache.app). Set to null or empty to disable tree cache. // Default: "cache.app"
+ *     },
+ *     icon_library_prefix_map?: array<string, scalar|Param|null>,
+ *     locales?: list<scalar|Param|null>,
+ *     default_locale?: scalar|Param|null, // Fallback locale when the request locale is not in locales. If null, the first entry in locales is used. // Default: null
+ *     permission_checker_choices?: list<scalar|Param|null>,
+ *     menu_link_resolver_choices?: list<scalar|Param|null>,
+ *     api?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/api/menu"
+ *     },
+ *     dashboard?: array{ // Admin dashboard to manage menus and items. Import routes with prefix (e.g. /admin/menus).
+ *         enabled?: bool|Param, // Default: false
+ *         layout_template?: scalar|Param|null, // Twig template that dashboard views extend (e.g. @App/base.html.twig). Must define block "nowo_dashboard_menu_content". If not set or template does not exist, the bundle layout is used. // Default: "@NowoDashboardMenuBundle/dashboard/layout.html.twig"
+ *         path_prefix?: scalar|Param|null, // Deprecated: The option "nowo_dashboard_menu.dashboard.path_prefix" is deprecated. Configure the dashboard URL prefix in your app routing (e.g. config/routes.yaml or config/routes_nowo_dashboard_menu.yaml) when importing @NowoDashboardMenuBundle/Resources/config/routes_dashboard.yaml. // Deprecated: set the dashboard URL prefix in config/routes.yaml when importing routes_dashboard.yaml (e.g. prefix: /admin/menus). // Default: "/admin/menus"
+ *         route_name_exclude_patterns?: list<scalar|Param|null>,
+ *         pagination?: array{ // Pagination for the menus list in the dashboard.
+ *             enabled?: bool|Param, // When true, the menus list is paginated. // Default: true
+ *             per_page?: int|Param, // Number of menus per page when pagination is enabled. // Default: 20
+ *         },
+ *         modals?: array{ // Modal dialog size per type: normal (default), lg, or xl (Bootstrap 5).
+ *             menu_form?: scalar|Param|null, // New menu and edit menu modals. // Default: "normal"
+ *             copy?: scalar|Param|null, // Copy menu modal. // Default: "normal"
+ *             item_form?: scalar|Param|null, // Add/edit item modal. // Default: "lg"
+ *             delete?: scalar|Param|null, // Delete confirmation modals. // Default: "normal"
+ *         },
+ *         icon_selector_script_url?: scalar|Param|null, // Optional URL of the icon-selector Stimulus/script asset. When set, the dashboard layout sets window.dashboardMenuIconSelectorScriptUrl so the item form modal can init the icon selector. Use with nowo-tech/icon-selector-bundle and Symfony UX (Stimulus). // Default: null
+ *         stimulus_script_url?: scalar|Param|null, // Optional URL of a script that loads Stimulus and the Live controller and sets window.Stimulus. When set, the dashboard layout includes this script so the item form Live Component works in the modal. Use the bundle default (null = use bundled script), or your app entry (e.g. Vite) that exposes window.Stimulus. // Default: null
+ *         import_max_bytes?: int|Param, // Maximum size in bytes for JSON import file uploads. Default 2 MiB. Prevents DoS from very large uploads. // Default: 2097152
+ *         position_step?: int|Param, // Gap used when re-indexing item positions from the menu detail dashboard (e.g. 100 → positions 100, 200, 300 per sibling group). Minimum 1. // Default: 100
+ *         required_role?: scalar|Param|null, // When set (e.g. ROLE_ADMIN), all dashboard routes require this role. Requires SecurityBundle. Leave null to rely on app access_control. // Default: null
+ *         import_export_rate_limit?: bool|array{ // Optional rate limit for import and export actions: limit requests per interval per user/IP. E.g. { limit: 10, interval: 60 } = 10 per minute.
+ *             enabled?: bool|Param, // Default: true
+ *             limit?: int|Param, // Default: 10
+ *             interval?: int|Param, // Time window in seconds. // Default: 60
+ *         },
+ *         permission_key_choices?: list<scalar|Param|null>,
+ *         id_options?: list<scalar|Param|null>,
+ *         icon_size?: scalar|Param|null, // CSS size used to render menu item icons (applied to SVG via width/height and to legacy icons via `font-size`). Example: `1em`, `16px`, `24px`. // Default: "1em"
+ *         item_span_active?: bool|Param, // When true, the item label (non-section items) is wrapped in an extra <span> element. This controls rendering of the wrapper in menu.html.twig. // Default: false
+ *         css_class_options?: array{ // Lists of CSS classes shown as selectors in the dashboard when editing a menu. Override in app config to customize options.
+ *             menu?: list<scalar|Param|null>,
+ *             item?: list<scalar|Param|null>,
+ *             link?: list<scalar|Param|null>,
+ *             children?: list<scalar|Param|null>,
+ *             section_children?: list<scalar|Param|null>,
+ *             section_child_item?: list<scalar|Param|null>,
+ *             section_child_link?: list<scalar|Param|null>,
+ *             section_label?: list<scalar|Param|null>,
+ *             section?: list<scalar|Param|null>,
+ *             divider?: list<scalar|Param|null>,
+ *             span?: list<scalar|Param|null>,
+ *             current?: list<scalar|Param|null>,
+ *             branch_expanded?: list<scalar|Param|null>,
+ *             has_children?: list<scalar|Param|null>,
+ *             expanded?: list<scalar|Param|null>,
+ *             collapsed?: list<scalar|Param|null>,
+ *         },
+ *     },
+ * }
+ * @psalm-type NowoFormKitConfig = array{
+ *     type_map?: array<string, scalar|Param|null>,
+ *     default_profile?: scalar|Param|null, // Name of the profile to use when no profile is specified (key in profiles) // Default: "default"
+ *     css_framework?: scalar|Param|null, // CSS framework for CssClassUtilities (column merge + class ordering): bootstrap, tailwind, foundation, none. // Default: "bootstrap"
+ *     profiles?: array<string, array{ // Default: []
+ *         alias?: scalar|Param|null, // Alias for this profile (e.g. for reference in form types)
+ *         translation_domain?: scalar|Param|null, // Default: "messages"
+ *         required_label_suffix?: scalar|Param|null, // Appended to the label when the field is required (e.g. " *"). Empty or null to disable. // Default: null
+ *         help_modal?: array{ // Default help modal configuration (used when the field option "help_modal" is enabled).
+ *             framework?: scalar|Param|null, // Modal framework to use when opening from frontend. // Default: "bootstrap5"
+ *             icon_html?: scalar|Param|null, // HTML snippet inserted next to the label to trigger the help modal (fallback when ux_icon is not used or UX Icons is unavailable). // Default: "<span class=\"nowo-help-modal-icon\" aria-hidden=\"true\">?</span>"
+ *             ux_icon?: scalar|Param|null, // Optional. Symfony UX Icons name (e.g. lucide:circle-help). Requires symfony/ux-icons; when set and IconRendererInterface is available, overrides icon_html. // Default: null
+ *             ux_icon_attributes?: array<string, scalar|Param|null>,
+ *             trigger_class?: scalar|Param|null, // CSS classes for the clickable trigger wrapper (after label text and required suffix). Default: circle button style. // Default: "nowo-help-modal-trigger nowo-help-modal-trigger--circle"
+ *         },
+ *         defaults?: array{
+ *             attr?: array<string, scalar|Param|null>,
+ *             row_attr?: array<string, scalar|Param|null>,
+ *         },
+ *         field_types?: array<string, array{ // Default: []
+ *             attr?: array<string, scalar|Param|null>,
+ *             row_attr?: array<string, scalar|Param|null>,
+ *             label?: scalar|Param|null,
+ *             placeholder?: scalar|Param|null,
+ *             help?: scalar|Param|null,
+ *             translation_domain?: scalar|Param|null,
+ *             constraints?: list<mixed>,
+ *         }>,
+ *         constraint_message_convention?: bool|Param, // When true, constraints without an explicit "message" get key {form_snake}.{field_snake}.constraints.{ConstraintName} (put translations in the validators catalog). Default: false. // Default: false
+ *         by_form?: array<string, array{ // Default: []
+ *             defaults?: array{
+ *                 attr?: array<string, scalar|Param|null>,
+ *                 row_attr?: array<string, scalar|Param|null>,
+ *             },
+ *             fields?: array<string, array{ // Default: []
+ *                 attr?: array<string, scalar|Param|null>,
+ *                 row_attr?: array<string, scalar|Param|null>,
+ *                 label?: scalar|Param|null,
+ *                 placeholder?: scalar|Param|null,
+ *                 help?: scalar|Param|null,
+ *                 translation_domain?: scalar|Param|null,
+ *                 constraints?: list<mixed>,
+ *             }>,
+ *         }>,
+ *     }>,
+ *     translation_domain?: scalar|Param|null, // (Legacy) Used when profiles is not set // Default: "messages"
+ *     required_label_suffix?: scalar|Param|null, // (Legacy) Suffix for required field labels when profiles is not set // Default: null
+ *     help_modal?: array{ // (Legacy) Default help modal configuration when profiles is not used.
+ *         framework?: scalar|Param|null, // Default: "bootstrap5"
+ *         icon_html?: scalar|Param|null, // Default: "<span class=\"nowo-help-modal-icon\" aria-hidden=\"true\">?</span>"
+ *         ux_icon?: scalar|Param|null, // Default: null
+ *         ux_icon_attributes?: array<string, scalar|Param|null>,
+ *         trigger_class?: scalar|Param|null, // Default: "nowo-help-modal-trigger nowo-help-modal-trigger--circle"
+ *     },
+ *     defaults?: array{
+ *         attr?: array<string, scalar|Param|null>,
+ *         row_attr?: array<string, scalar|Param|null>,
+ *     },
+ *     field_types?: array<string, array{ // Default: []
+ *         attr?: array<string, scalar|Param|null>,
+ *         row_attr?: array<string, scalar|Param|null>,
+ *         label?: scalar|Param|null,
+ *         placeholder?: scalar|Param|null,
+ *         help?: scalar|Param|null,
+ *         translation_domain?: scalar|Param|null,
+ *         constraints?: list<mixed>,
+ *     }>,
+ *     constraint_message_convention?: bool|Param, // (Legacy) Used when profiles is not set // Default: false
+ *     by_form?: array<string, array{ // Default: []
+ *         defaults?: array{
+ *             attr?: array<string, scalar|Param|null>,
+ *             row_attr?: array<string, scalar|Param|null>,
+ *         },
+ *         fields?: array<string, array{ // Default: []
+ *             attr?: array<string, scalar|Param|null>,
+ *             row_attr?: array<string, scalar|Param|null>,
+ *             label?: scalar|Param|null,
+ *             placeholder?: scalar|Param|null,
+ *             help?: scalar|Param|null,
+ *             translation_domain?: scalar|Param|null,
+ *             constraints?: list<mixed>,
+ *         }>,
+ *     }>,
+ * }
+ * @psalm-type NowoPwaConfig = array{
+ *     enabled?: bool|Param, // Master switch for PWA features (manifest, service worker, head tags). // Default: true
+ *     route_prefix?: scalar|Param|null, // Optional prefix prepended to all bundle PWA routes. // Default: ""
+ *     manifest?: array{
+ *         name?: scalar|Param|null, // Default: "My Application"
+ *         short_name?: scalar|Param|null, // Default: "App"
+ *         description?: scalar|Param|null, // Default: ""
+ *         lang?: scalar|Param|null, // Default: "en"
+ *         dir?: "ltr"|"rtl"|"auto"|Param, // Default: "ltr"
+ *         start_url?: scalar|Param|null, // Default: "/"
+ *         absolute_start_url?: bool|Param, // Default: true
+ *         scope?: scalar|Param|null, // Default: "/"
+ *         id?: scalar|Param|null, // Default: "/"
+ *         display?: "fullscreen"|"standalone"|"minimal-ui"|"browser"|Param, // Default: "standalone"
+ *         display_override?: list<scalar|Param|null>,
+ *         orientation?: "any"|"natural"|"landscape"|"portrait"|"portrait-primary"|"portrait-secondary"|"landscape-primary"|"landscape-secondary"|Param, // Default: "any"
+ *         theme_color?: scalar|Param|null, // Default: "#0f172a"
+ *         background_color?: scalar|Param|null, // Default: "#ffffff"
+ *         categories?: mixed, // Default: []
+ *         iarc_rating_id?: scalar|Param|null, // Default: null
+ *         prefer_related_applications?: bool|Param, // Default: false
+ *         icons?: list<array{ // Default: []
+ *             src?: scalar|Param|null,
+ *             sizes?: scalar|Param|null, // Default: "192x192"
+ *             type?: scalar|Param|null, // Default: "image/png"
+ *             purpose?: scalar|Param|null, // Default: "any"
+ *         }>,
+ *         screenshots?: list<array{ // Default: []
+ *             src?: scalar|Param|null,
+ *             sizes?: scalar|Param|null, // Default: "1280x720"
+ *             type?: scalar|Param|null, // Default: "image/png"
+ *             label?: scalar|Param|null, // Default: null
+ *             form_factor?: "narrow"|"wide"|Param, // Default: null
+ *         }>,
+ *         shortcuts?: list<array{ // Default: []
+ *             name?: scalar|Param|null,
+ *             short_name?: scalar|Param|null, // Default: null
+ *             url?: scalar|Param|null,
+ *             description?: scalar|Param|null, // Default: null
+ *             icons?: list<array{ // Default: []
+ *                 src?: scalar|Param|null,
+ *                 sizes?: scalar|Param|null, // Default: "96x96"
+ *                 type?: scalar|Param|null, // Default: "image/png"
+ *                 purpose?: scalar|Param|null, // Default: "any"
+ *             }>,
+ *         }>,
+ *         related_applications?: list<array{ // Default: []
+ *             platform?: scalar|Param|null,
+ *             url?: scalar|Param|null, // Default: null
+ *             id?: scalar|Param|null, // Default: null
+ *         }>,
+ *         scope_extensions?: list<array{ // Default: []
+ *             origin?: scalar|Param|null,
+ *             type?: scalar|Param|null, // Default: "origin"
+ *         }>,
+ *         launch_handler?: array{
+ *             client_mode?: "auto"|"navigate-existing"|"navigate-new"|"focus-existing"|Param, // Default: "auto"
+ *         },
+ *         protocol_handlers?: list<array{ // Default: []
+ *             protocol?: scalar|Param|null,
+ *             url?: scalar|Param|null,
+ *         }>,
+ *         file_handlers?: list<array{ // Default: []
+ *             action?: scalar|Param|null,
+ *             accept_map?: mixed, // Default: []
+ *             icons?: list<array{ // Default: []
+ *                 src?: scalar|Param|null,
+ *                 sizes?: scalar|Param|null, // Default: "96x96"
+ *                 type?: scalar|Param|null, // Default: "image/png"
+ *             }>,
+ *         }>,
+ *         share_target?: array{
+ *             action?: scalar|Param|null, // Default: null
+ *             method?: "GET"|"POST"|Param, // Default: "GET"
+ *             enctype?: "application/x-www-form-urlencoded"|"multipart/form-data"|Param, // Default: null
+ *             params?: array{
+ *                 title?: scalar|Param|null, // Default: null
+ *                 text?: scalar|Param|null, // Default: null
+ *                 url?: scalar|Param|null, // Default: null
+ *                 files?: scalar|Param|null, // Default: null
+ *             },
+ *         },
+ *         edge_side_panel?: array{
+ *             preferred_width?: scalar|Param|null, // Default: null
+ *         },
+ *     },
+ *     meta?: array{ // Additional HTML head tags (Apple, Microsoft, theme, viewport).
+ *         mobile_web_app_capable?: bool|Param, // Default: true
+ *         apple_mobile_web_app_capable?: bool|Param, // Default: true
+ *         apple_status_bar_style?: scalar|Param|null, // Default: "default"
+ *         apple_mobile_web_app_title?: scalar|Param|null, // Default: null
+ *         viewport_fit?: "auto"|"cover"|"contain"|Param, // Default: null
+ *         theme_color_light?: scalar|Param|null, // Default: null
+ *         theme_color_dark?: scalar|Param|null, // Default: null
+ *         color_scheme?: scalar|Param|null, // Default: null
+ *         msapplication_tile_color?: scalar|Param|null, // Default: null
+ *         msapplication_tile_image?: scalar|Param|null, // Default: null
+ *         msapplication_config?: scalar|Param|null, // Default: null
+ *         referrer?: scalar|Param|null, // Default: null
+ *         format_detection?: array{
+ *             telephone?: bool|Param|null, // Default: null
+ *             email?: bool|Param|null, // Default: null
+ *             address?: bool|Param|null, // Default: null
+ *         },
+ *         apple_touch_icons?: list<array{ // Default: []
+ *             href?: scalar|Param|null,
+ *             sizes?: scalar|Param|null, // Default: "180x180"
+ *         }>,
+ *         apple_startup_images?: list<array{ // Default: []
+ *             href?: scalar|Param|null,
+ *             media?: scalar|Param|null, // Default: null
+ *         }>,
+ *         mask_icon?: array{
+ *             href?: scalar|Param|null, // Default: null
+ *             color?: scalar|Param|null, // Default: null
+ *         },
+ *         extra_link_tags?: list<array{ // Default: []
+ *             rel?: scalar|Param|null,
+ *             href?: scalar|Param|null,
+ *             type?: scalar|Param|null, // Default: null
+ *             sizes?: scalar|Param|null, // Default: null
+ *         }>,
+ *     },
+ *     service_worker?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         scope?: scalar|Param|null, // Default: "/"
+ *         skip_waiting?: bool|Param, // Default: true
+ *         clients_claim?: bool|Param, // Default: true
+ *         navigation_preload?: bool|Param, // Default: false
+ *         cache_version?: scalar|Param|null, // Default: "v1"
+ *         cache_name_prefix?: scalar|Param|null, // Default: "nowo-pwa"
+ *         strategy?: "network-first"|"cache-first"|"stale-while-revalidate"|Param, // Default: "network-first"
+ *         precache_urls?: mixed, // Default: ["/"]
+ *         runtime_cache_patterns?: mixed, // Default: []
+ *         deny_cache_patterns?: mixed, // Default: []
+ *         offline_url?: scalar|Param|null, // Default: null
+ *         runtime_cache_max_entries?: int|Param, // Default: 0
+ *     },
+ *     install_prompt?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         display?: "banner"|"flash"|"modal"|Param, // banner: fixed bar; flash: inline alert; modal: centered dialog. // Default: "banner"
+ *         dismiss_key?: scalar|Param|null, // Default: "nowo_pwa_install_dismissed"
+ *         dismiss_days?: int|Param, // Default: 7
+ *         never_dismiss_key?: scalar|Param|null, // Default: "nowo_pwa_install_never"
+ *         show_never_option?: bool|Param, // Default: true
+ *         position?: "bottom"|"top"|Param, // Default: "bottom"
+ *         css_class?: scalar|Param|null, // Default: "nowo-pwa-install"
+ *         delay_ms?: int|Param, // Default: 0
+ *         visibility?: "all"|"mobile"|"desktop"|Param, // Default: "all"
+ *         route_targeting?: array{
+ *             match_by?: "name"|"path"|Param, // Match routes by Symfony route name or request path pattern. // Default: "name"
+ *             mode?: "all"|"only"|"except"|Param, // all: every page; only: listed routes/paths; except: all except listed. // Default: "all"
+ *             routes?: mixed, // Route names or path patterns (exact, prefix with trailing *, or /regex/). // Default: []
+ *         },
+ *     },
+ *     install_links?: array{ // Toggle install / uninstall links (one visible at a time).
+ *         enabled?: bool|Param, // Default: true
+ *         css_class?: scalar|Param|null, // Default: "nowo-pwa-install-links"
+ *         visibility?: "all"|"mobile"|"desktop"|Param, // Default: "all"
+ *         route_targeting?: array{
+ *             match_by?: "name"|"path"|Param, // Match routes by Symfony route name or request path pattern. // Default: "name"
+ *             mode?: "all"|"only"|"except"|Param, // all: every page; only: listed routes/paths; except: all except listed. // Default: "all"
+ *             routes?: mixed, // Route names or path patterns (exact, prefix with trailing *, or /regex/). // Default: []
+ *         },
+ *     },
+ *     route_targeting?: array{ // Limit where PWA head tags and client script are injected.
+ *         match_by?: "name"|"path"|Param, // Match routes by Symfony route name or request path pattern. // Default: "name"
+ *         mode?: "all"|"only"|"except"|Param, // all: every page; only: listed routes/paths; except: all except listed. // Default: "all"
+ *         routes?: mixed, // Route names or path patterns (exact, prefix with trailing *, or /regex/). // Default: []
+ *     },
+ *     client?: array{ // Browser client script behaviour (pwa.js).
+ *         register_on_load?: bool|Param, // Default: true
+ *         check_updates_on_visibility?: bool|Param, // Default: true
+ *         reload_on_update?: bool|Param, // Default: false
+ *     },
+ *     http?: array{ // HTTP cache headers for manifest and service worker responses.
+ *         manifest_cache_max_age?: int|Param, // Default: 3600
+ *         service_worker_cache_max_age?: int|Param, // Default: 0
+ *         manifest_public_cache?: bool|Param, // Default: true
+ *     },
+ *     routes?: array{
+ *         manifest?: array{
+ *             path?: scalar|Param|null, // Default: "/manifest.webmanifest"
+ *             name?: scalar|Param|null, // Default: "nowo_pwa_manifest"
+ *         },
+ *         service_worker?: array{
+ *             path?: scalar|Param|null, // Default: "/sw.js"
+ *             name?: scalar|Param|null, // Default: "nowo_pwa_service_worker"
+ *         },
+ *         offline?: array{
+ *             path?: scalar|Param|null, // Default: "/offline"
+ *             name?: scalar|Param|null, // Default: "nowo_pwa_offline"
+ *         },
+ *     },
+ *     templates?: array{
+ *         head?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/head.html.twig"
+ *         install_prompt?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/install_prompt.html.twig"
+ *         install_links?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/install_links.html.twig"
+ *         offline?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/offline.html.twig"
+ *     },
+ * }
+ * @psalm-type TurboConfig = array{
+ *     broadcast?: bool|array{
+ *         enabled?: bool|Param, // Default: true
+ *         entity_template_prefixes?: list<scalar|Param|null>,
+ *         doctrine_orm?: bool|array{ // Enable the Doctrine ORM integration
+ *             enabled?: bool|Param, // Default: true
+ *         },
+ *     },
+ *     default_transport?: scalar|Param|null, // Default: "default"
+ * }
+ * @psalm-type UxNativeConfig = array{
+ *     output_dir?: scalar|Param|null, // Directory where configuration JSON files are written. Defaults to %kernel.project_dir%/public. // Default: null
+ * }
+ * @psalm-type NowoCookieConsentConfig = array{
+ *     doctrine?: array{ // Doctrine DBAL connection and table prefix for cookie consent entities.
+ *         connection?: scalar|Param|null, // Name of the Doctrine DBAL connection to use (e.g. default, or a custom connection). // Default: "default"
+ *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_cookie_log, dashboard_cookie_config, …). Empty = no prefix. // Default: ""
+ *     },
+ *     table_prefix?: scalar|Param|null, // Deprecated: Use doctrine.table_prefix instead. // Deprecated. Use doctrine.table_prefix (e.g. "app_" yields app_dashboard_cookie_log). // Default: ""
+ *     categories?: mixed, // Cookie categories shown in the consent modal (excluding "required"). // Default: ["analytics","marketing","preferences"]
+ *     use_logger?: bool|Param, // Persist consent choices to the database when true. // Default: true
+ *     use_database_config?: bool|Param, // Load modal copy and display settings from CookieConsentConfig entities when true. // Default: false
+ *     use_cookie_inventory?: bool|Param, // Expose cookie definitions (name, category/block, duration, provider, purpose) in the preferences modal and legal pages. // Default: false
+ *     cookie_inventory?: list<array{ // Default: []
+ *         name?: scalar|Param|null,
+ *         duration?: scalar|Param|null, // Default: ""
+ *         category?: scalar|Param|null, // Default: "required"
+ *         type?: scalar|Param|null, // Default: "first_party"
+ *         sort_order?: int|Param, // Default: 0
+ *         provider?: scalar|Param|null, // Default: null
+ *         purpose?: scalar|Param|null, // Default: null
+ *         translations?: list<array{ // Default: []
+ *             provider?: scalar|Param|null, // Default: ""
+ *             purpose?: scalar|Param|null, // Default: ""
+ *         }>,
+ *     }>,
+ *     fetch_config_via_api?: bool|Param, // Expose GET /cookie-consent/config and let the frontend script load settings via fetch(). // Default: false
+ *     http_only?: bool|Param, // Set HttpOnly flag on consent cookies. // Default: true
+ *     form_action?: scalar|Param|null, // Optional route name used as the form action URL. // Default: null
+ *     csrf_protection?: bool|Param, // Enable CSRF protection on the consent form. // Default: true
+ *     disabled_routes?: mixed, // Route names where the modal must not open automatically. // Default: ["privacy","imprint"]
+ *     route_targeting_mode?: "all"|"only"|"except"|Param, // Controls where the modal auto-opens: all pages, only listed routes, or all except listed routes. // Default: "all"
+ *     target_routes?: mixed, // Route names used with route_targeting_mode (Symfony route names, one per line in the admin UI). // Default: []
+ *     default_locale?: scalar|Param|null, // Fallback locale when no supported language can be detected. // Default: "en"
+ *     enabled_locales?: mixed, // Locales supported by the cookie consent UI and locale detection. // Default: ["en","es","it","fr","de","pt","nl","pl","ca"]
+ *     detect_locale_from_accept_language?: bool|Param, // Use the Accept-Language request header when no explicit locale is available. // Default: true
+ *     ui_theme?: "bootstrap"|"tailwind"|Param, // UI framework used by the bundled cookie consent modal templates. // Default: "bootstrap"
+ *     color_theme?: "light"|"dark"|"dark-turquoise"|"light-funky"|"elegant-black"|Param, // Default: "light"
+ *     dark_mode_enabled?: bool|Param, // Default: false
+ *     disable_transitions?: bool|Param, // Default: false
+ *     disable_page_interaction?: bool|Param, // When true, adds a full-page overlay and blocks scrolling until the user chooses an option. // Default: false
+ *     two_step_modal?: bool|Param, // Default: false
+ *     open_preferences_modal?: bool|Param, // Default: false
+ *     manage_iframe_placeholders?: bool|Param, // Default: false
+ *     granular_cookie_selection?: bool|Param, // When true, optional cookies can be toggled individually inside each category block. // Default: false
+ *     preferences_bubble_enabled?: bool|Param, // Shows a floating cookie icon button to reopen the preferences modal after consent is saved. // Default: false
+ *     preferences_bubble_position?: "bottom-right"|"bottom-left"|"top-right"|"top-left"|Param, // Screen corner for the floating preferences bubble. // Default: "bottom-right"
+ *     preferences_bubble_border_color?: scalar|Param|null, // Hex color for the preferences bubble border and cookie icon (e.g. #30363c). // Default: null
+ *     preferences_bubble_icon?: scalar|Param|null, // Custom HTML or SVG markup for the preferences bubble icon. Leave empty for the default cookie SVG. // Default: null
+ *     preference_sections?: mixed, // Default: []
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1487,6 +1959,16 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_password_strength?: NowoPasswordStrengthConfig,
  *     nowo_password_toggle?: NowoPasswordToggleConfig,
  *     ux_icons?: UxIconsConfig,
+ *     nowo_breadcrumb_kit?: NowoBreadcrumbKitConfig,
+ *     twig_component?: TwigComponentConfig,
+ *     stimulus?: StimulusConfig,
+ *     live_component?: LiveComponentConfig,
+ *     nowo_dashboard_menu?: NowoDashboardMenuConfig,
+ *     nowo_form_kit?: NowoFormKitConfig,
+ *     nowo_pwa?: NowoPwaConfig,
+ *     turbo?: TurboConfig,
+ *     ux_native?: UxNativeConfig,
+ *     nowo_cookie_consent?: NowoCookieConsentConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1504,6 +1986,16 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
+ *         nowo_breadcrumb_kit?: NowoBreadcrumbKitConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         stimulus?: StimulusConfig,
+ *         live_component?: LiveComponentConfig,
+ *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
+ *         turbo?: TurboConfig,
+ *         ux_native?: UxNativeConfig,
+ *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1520,6 +2012,16 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
+ *         nowo_breadcrumb_kit?: NowoBreadcrumbKitConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         stimulus?: StimulusConfig,
+ *         live_component?: LiveComponentConfig,
+ *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
+ *         turbo?: TurboConfig,
+ *         ux_native?: UxNativeConfig,
+ *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1538,6 +2040,16 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
+ *         nowo_breadcrumb_kit?: NowoBreadcrumbKitConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         stimulus?: StimulusConfig,
+ *         live_component?: LiveComponentConfig,
+ *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
+ *         turbo?: TurboConfig,
+ *         ux_native?: UxNativeConfig,
+ *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

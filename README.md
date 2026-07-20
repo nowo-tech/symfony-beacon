@@ -6,19 +6,31 @@ Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **E
 
 Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
 
-> The Symfony instrumentation **bundle** lives in a separate repository and will be published later. Until then, configure the official PHP SDK DSN against this server.
+> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Until Packagist publish, path-repo / VCS install works; you can also point `sentry/sentry` at the same DSN.
+
 
 ## Features
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member`)
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
-- Projects with rotatable **API keys** and Envelope-compatible **DSN**
+- Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
+- Opening a project lands on **Issues**; configuration lives under **Settings**
 - `POST /api/{project_id}/envelope/` ingest (auth via `X-Sentry-Auth` / query / envelope `dsn`)
-- Fast ACK + async processing (Messenger)
+- Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Issue grouping (fingerprint), filters, event detail + stack trace
 - Daily analytics (errors, transactions, N+1 counts)
 - Performance transactions/spans with **N+1** detection
+- Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
+- Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
+- Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
+- Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt)
+- **Native mobile** via [`symfony/ux-native`](https://ux.symfony.com/native) + Turbo (Hotwire Native shell — how to create iOS/Android apps: [docs/native-mobile.md](docs/native-mobile.md))
+- **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
+- Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/legal-and-cookies.md](docs/legal-and-cookies.md)
+- App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
+- Account preferences at `/account/profile`, `/account/security`, `/account/display`
+- Admin hub at `/admin` for `ROLE_ADMIN` (users, appearance, menus, breadcrumbs)
 
 ## Requirements
 
@@ -35,7 +47,7 @@ make up
 make console ARGS='doctrine:migrations:migrate -n'
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
 # Option B — seed demo user + project + DSN:
-make console ARGS='app:seed-demo'
+make seed
 ```
 
 - HTTP: http://localhost:9081  
@@ -95,6 +107,9 @@ docker compose exec php php bin/phpunit
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)
 - [DSN / SDK](docs/dsn.md)
+- [Event context (timestamps, versions, user)](docs/event-context.md)
+- [Native mobile — create iOS/Android apps (Hotwire Native)](docs/native-mobile.md)
+- [Legal pages & cookie consent](docs/legal-and-cookies.md)
 - [Production](docs/production.md)
 - [Contributing](docs/CONTRIBUTING.md)
 

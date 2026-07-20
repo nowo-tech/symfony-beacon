@@ -1,0 +1,23 @@
+{# Day / night theme toggle. Preference is stored in localStorage (not a cookie). #}
+<button
+    type="button"
+    class="theme-toggle"
+    data-theme-toggle
+    data-label-light="{{ 'theme.day'|trans }}"
+    data-label-dark="{{ 'theme.night'|trans }}"
+    data-aria-to-light="{{ 'theme.switch_to_day'|trans }}"
+    data-aria-to-dark="{{ 'theme.switch_to_night'|trans }}"
+    aria-pressed="false"
+    aria-label="{{ 'theme.switch_to_night'|trans }}"
+>
+    <svg class="theme-toggle__icon theme-toggle__icon--sun" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.75"/>
+        <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.05 5.05l1.56 1.56M17.39 17.39l1.56 1.56M5.05 18.95l1.56-1.56M17.39 6.61l1.56-1.56" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+    </svg>
+    <svg class="theme-toggle__icon theme-toggle__icon--moon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M20.2 13.4A7.8 7.8 0 0 1 10.6 3.8 8.2 8.2 0 1 0 20.2 13.4Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+    </svg>
+    {% if not compact|default(false) %}
+        <span class="theme-toggle__label" data-theme-label>{{ 'theme.night'|trans }}</span>
+    {% endif %}
+</button>

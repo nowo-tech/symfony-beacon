@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-xl">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.brandName) }}
+        {{ form_row(form.brandEyebrow) }}
+
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.light'|trans }}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="space-y-1.5">
+                    {{ form_label(form.accentColor) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.accentColor) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentColor.vars.id }}">{{ form.accentColor.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.accentColor) }}
+                    {{ form_help(form.accentColor) }}
+                </div>
+                <div class="space-y-1.5">
+                    {{ form_label(form.accentDeepColor) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.accentDeepColor) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentDeepColor.vars.id }}">{{ form.accentDeepColor.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.accentDeepColor) }}
+                    {{ form_help(form.accentDeepColor) }}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.dark'|trans }}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="space-y-1.5">
+                    {{ form_label(form.accentColorDark) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.accentColorDark) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentColorDark.vars.id }}">{{ form.accentColorDark.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.accentColorDark) }}
+                    {{ form_help(form.accentColorDark) }}
+                </div>
+                <div class="space-y-1.5">
+                    {{ form_label(form.accentDeepColorDark) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.accentDeepColorDark) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentDeepColorDark.vars.id }}">{{ form.accentDeepColorDark.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.accentDeepColorDark) }}
+                    {{ form_help(form.accentDeepColorDark) }}
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
+            <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -4,14 +4,90 @@
   --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
   --font-display: "Source Serif 4", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --color-ink: #0f1c18;
-  --color-paper: #f3f6f4;
-  --color-moss: #1f6f54;
-  --color-moss-deep: #134736;
-  --color-sand: #d8e2dc;
-  --color-mist: #e7f0eb;
-  --color-alert: #b42318;
-  --color-warn: #b54708;
+  --color-ink: var(--beacon-ink);
+  --color-paper: var(--beacon-paper);
+  --color-moss: var(--beacon-moss);
+  --color-moss-deep: var(--beacon-moss-deep);
+  --color-sand: var(--beacon-sand);
+  --color-mist: var(--beacon-mist);
+  --color-alert: var(--beacon-alert);
+  --color-warn: var(--beacon-warn);
+  --color-surface: var(--beacon-surface);
+  --color-surface-muted: var(--beacon-surface-muted);
+}
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --beacon-ink: #0f1c18;
+  --beacon-paper: #f3f6f4;
+  --beacon-moss: #1f6f54;
+  --beacon-moss-deep: #134736;
+  --beacon-sand: #d8e2dc;
+  --beacon-mist: #e7f0eb;
+  --beacon-alert: #b42318;
+  --beacon-warn: #b54708;
+  --beacon-surface: #ffffff;
+  --beacon-surface-muted: #f7faf8;
+  --beacon-shell-a: #eef3f0;
+  --beacon-shell-b: #e8efe9;
+  --beacon-flash-error-bg: #fef2f2;
+  --beacon-flash-error-border: #fecaca;
+  --beacon-flash-ok-bg: #ecfdf5;
+  --beacon-flash-ok-border: #a7f3d0;
+  --beacon-flash-ok-text: #064e3b;
+  --beacon-badge-error-bg: #fee2e2;
+  --beacon-badge-error-text: #991b1b;
+  --beacon-badge-warn-bg: #fef3c7;
+  --beacon-badge-warn-text: #78350f;
+  --beacon-shadow: 15 28 24;
+  /* Aliases for SCSS (Tailwind @theme may tree-shake unused --color-* tokens). */
+  --color-ink: var(--beacon-ink);
+  --color-paper: var(--beacon-paper);
+  --color-moss: var(--beacon-moss);
+  --color-moss-deep: var(--beacon-moss-deep);
+  --color-sand: var(--beacon-sand);
+  --color-mist: var(--beacon-mist);
+  --color-alert: var(--beacon-alert);
+  --color-warn: var(--beacon-warn);
+  --color-surface: var(--beacon-surface);
+  --color-surface-muted: var(--beacon-surface-muted);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --beacon-ink: #e6eee9;
+  --beacon-paper: #0c1210;
+  --beacon-moss: #4aad7f;
+  --beacon-moss-deep: #6bc49a;
+  --beacon-sand: #2a3832;
+  --beacon-mist: #17201c;
+  --beacon-alert: #f97066;
+  --beacon-warn: #fdb022;
+  --beacon-surface: #151c19;
+  --beacon-surface-muted: #1a2320;
+  --beacon-shell-a: #101714;
+  --beacon-shell-b: #0e1512;
+  --beacon-flash-error-bg: color-mix(in srgb, var(--beacon-alert) 18%, var(--beacon-surface));
+  --beacon-flash-error-border: color-mix(in srgb, var(--beacon-alert) 40%, var(--beacon-sand));
+  --beacon-flash-ok-bg: color-mix(in srgb, var(--beacon-moss) 18%, var(--beacon-surface));
+  --beacon-flash-ok-border: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand));
+  --beacon-flash-ok-text: #b7e4cc;
+  --beacon-badge-error-bg: color-mix(in srgb, var(--beacon-alert) 22%, var(--beacon-surface));
+  --beacon-badge-error-text: #fecaca;
+  --beacon-badge-warn-bg: color-mix(in srgb, var(--beacon-warn) 22%, var(--beacon-surface));
+  --beacon-badge-warn-text: #fde68a;
+  --beacon-shadow: 0 0 0;
+  --color-ink: var(--beacon-ink);
+  --color-paper: var(--beacon-paper);
+  --color-moss: var(--beacon-moss);
+  --color-moss-deep: var(--beacon-moss-deep);
+  --color-sand: var(--beacon-sand);
+  --color-mist: var(--beacon-mist);
+  --color-alert: var(--beacon-alert);
+  --color-warn: var(--beacon-warn);
+  --color-surface: var(--beacon-surface);
+  --color-surface-muted: var(--beacon-surface-muted);
 }
 
 @layer base {

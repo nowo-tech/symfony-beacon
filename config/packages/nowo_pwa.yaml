@@ -1,0 +1,61 @@
+# nowo-tech/pwa-bundle
+# https://github.com/nowo-tech/PwaBundle
+nowo_pwa:
+    enabled: true
+
+    manifest:
+        name: symfony-beacon
+        short_name: Beacon
+        description: 'Self-hosted error tracking for PHP & Symfony'
+        lang: en
+        start_url: /dashboard
+        scope: /
+        display: standalone
+        theme_color: '#1f6f54'
+        background_color: '#f3f6f4'
+        icons:
+            - { src: '/icons/icon-192.png', sizes: '192x192', type: image/png, purpose: any }
+            - { src: '/icons/icon-512.png', sizes: '512x512', type: image/png, purpose: 'any maskable' }
+
+    meta:
+        apple_mobile_web_app_title: Beacon
+        theme_color_light: '#1f6f54'
+        theme_color_dark: '#4aad7f'
+        apple_touch_icons:
+            - { href: '/icons/apple-touch-icon.png', sizes: '180x180' }
+
+    service_worker:
+        enabled: true
+        strategy: network-first
+        cache_version: v1
+        cache_name_prefix: beacon-pwa
+        precache_urls:
+            - /en/login
+            - /offline
+        runtime_cache_patterns:
+            - '/build/'
+            - '/icons/'
+        deny_cache_patterns:
+            - '/api/'
+            - '/admin'
+            - '/account'
+            - '/_profiler'
+            - '/_wdt'
+            - '/breadcrumb-kit-admin'
+        offline_url: /offline
+        skip_waiting: true
+        clients_claim: true
+
+    install_prompt:
+        enabled: true
+        display: banner
+        position: bottom
+        visibility: all
+        dismiss_days: 14
+        css_class: nowo-pwa-install
+
+    install_links:
+        enabled: true
+        # Rendered only on Preferences → Display (not globally in base layout).
+        css_class: nowo-pwa-install-links
+        visibility: all

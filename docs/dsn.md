@@ -8,10 +8,16 @@ symfony-beacon accepts the **Envelope** wire protocol.
 https://<public_key>@<host>:<port>/<project_id>
 ```
 
-Example (local Docker):
+Example (local HTTPS UI):
 
 ```text
 https://9cb5e28adc3ed7a40052e2a17e327220@localhost:9444/1
+```
+
+Docker clients (BeaconBundle FrankenPHP demo) should prefer **HTTP ingest** on port `9081` via `host.docker.internal` — Caddy serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9444`.
+
+```text
+http://PUBLIC_KEY@host.docker.internal:9081/1
 ```
 
 Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo`.
@@ -49,4 +55,23 @@ The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMes
 
 ## Symfony bundle
 
-A dedicated `symfony-beacon-bundle` will live in a **separate repository**. Until then, use the official PHP SDK package `sentry/sentry` pointed at this server.
+Install [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) and set `BEACON_DSN` to this server (any host/port):
+
+```env
+BEACON_DSN=https://PUBLIC@localhost:9444/1
+```
+
+The bundle authenticates by embedding the DSN in the envelope header and uses `Content-Type: application/x-beacon-envelope`.
+
+Supported client capabilities (BeaconBundle):
+
+| Capability | Envelope | Beacon UI |
+|------------|----------|-----------|
+| Events (`captureMessage` / `captureException`) | item `type: event` | Issues |
+| User context (`send.user`) | payload `user` | Event detail |
+| Breadcrumbs (`addBreadcrumb`) | payload `breadcrumbs.values` | Event detail |
+| Performance (`captureTransaction`) | item `type: transaction` | Performance |
+| Contexts (PHP / Symfony / OS) | payload `contexts` | Event detail |
+
+From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC@host.docker.internal:9081/1`.
+

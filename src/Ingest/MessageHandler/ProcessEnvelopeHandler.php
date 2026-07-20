@@ -7,6 +7,7 @@ namespace App\Ingest\MessageHandler;
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\EventTimestampParser;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
@@ -25,6 +26,7 @@ final readonly class ProcessEnvelopeHandler
 {
     public function __construct(
         private EnvelopeParser $envelopeParser,
+        private EventTimestampParser $eventTimestampParser,
         private FingerprintCalculator $fingerprintCalculator,
         private NPlusOneDetector $nPlusOneDetector,
         private ProjectRepository $projectRepository,
@@ -103,12 +105,12 @@ final readonly class ProcessEnvelopeHandler
         $event->setEnvironment(isset($payload['environment']) ? (string) $payload['environment'] : null);
         $event->setReleaseVersion(isset($payload['release']) ? (string) $payload['release'] : null);
         $event->setPlatform(isset($payload['platform']) ? (string) $payload['platform'] : 'php');
+        $event->setPhpVersion($this->extractPhpVersion($payload));
+        $event->setSymfonyVersion($this->extractSymfonyVersion($payload));
+        $event->setUserIdentifier($this->extractUserIdentifier($payload));
         $event->setReceivedAt($receivedAt);
-        if (isset($payload['timestamp']) && is_numeric($payload['timestamp'])) {
-            $event->setEventTimestamp(new DateTimeImmutable()->setTimestamp((int) $payload['timestamp']));
-        } else {
-            $event->setEventTimestamp($receivedAt);
-        }
+        $eventTimestamp = $this->eventTimestampParser->parse($payload['timestamp'] ?? ($payload['datetime'] ?? null));
+        $event->setEventTimestamp($eventTimestamp ?? $receivedAt);
         $this->entityManager->persist($event);
 
         $stat = $this->dailyProjectStatRepository->findOrCreate($project, $receivedAt);
@@ -181,5 +183,54 @@ final readonly class ProcessEnvelopeHandler
         if ($detection['count'] > 0) {
             $stat->incrementNPlusOneCount($detection['count']);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function extractPhpVersion(array $payload): ?string
+    {
+        $runtime = $payload['contexts']['runtime'] ?? null;
+        if (\is_array($runtime) && isset($runtime['version']) && \is_scalar($runtime['version'])) {
+            return substr((string) $runtime['version'], 0, 40);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function extractSymfonyVersion(array $payload): ?string
+    {
+        $framework = $payload['contexts']['framework'] ?? null;
+        if (\is_array($framework)
+            && isset($framework['name'], $framework['version'])
+            && 'symfony' === strtolower((string) $framework['name'])
+            && \is_scalar($framework['version'])
+        ) {
+            return substr((string) $framework['version'], 0, 40);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function extractUserIdentifier(array $payload): ?string
+    {
+        $user = $payload['user'] ?? null;
+        if (!\is_array($user)) {
+            return null;
+        }
+
+        foreach (['id', 'username', 'email'] as $key) {
+            if (isset($user[$key]) && \is_scalar($user[$key]) && '' !== (string) $user[$key]) {
+                return substr((string) $user[$key], 0, 180);
+            }
+        }
+
+        return null;
     }
 }

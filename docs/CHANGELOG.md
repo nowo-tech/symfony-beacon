@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-20
+
+### Added
+
+- Rich event context: microsecond `event_timestamp` / `received_at`, promoted `php_version` / `symfony_version` / `user_identifier`, structured event detail UI (`docs/event-context.md`, spec `010-rich-event-context`)
+- Event detail UI renders `breadcrumbs.values` from Envelope payloads (BeaconBundle `addBreadcrumb`)
+- Project **Settings** (`/projects/{id}/settings`): API keys / DSN, members, danger zone
+- Project danger zone: clear history (owner/admin) and delete project with typed name confirmation (owner) — spec `011-project-danger-zone`
+- Human-friendly API key labels and public keys (`calm-otter-a3f2…`) with Suggest name control
+- Project section nav (Issues / Performance / Analytics / Settings); opening a project lands on Issues
+- Symfony UX Native + Turbo for Hotwire Native shells (`docs/native-mobile.md`)
+- Public legal pages + cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) (`docs/legal-and-cookies.md`)
+- Main nav / breadcrumbs / forms / PWA via Nowo kits (`dashboard-menu`, `breadcrumb-kit`, `form-kit`, `pwa-bundle`)
+- Account preferences split: `/account/profile`, `/account/security`, `/account/display`
+- Appearance settings for admins; admin hub at `/admin`
+- DSN docs: capability matrix and Docker HTTP ingest notes (`docs/dsn.md`)
+
+### Changed
+
+- Project show URL (`/projects/{id}`) redirects to Issues; configuration moved under Settings
+- After creating a project, redirect goes to Settings (DSN copy)
+- HTTP Caddy site serves Envelope ingest for `host.docker.internal` / `127.0.0.1` (Docker clients)
+
+### Fixed
+
+- BeaconBundle demo (and other Docker clients) no longer get a fake empty HTTP `200` on `:9081` when Host is not `localhost` — ingest now hits Symfony and Messenger
+
 ## [0.3.0] - 2026-07-19
 
 ### Added
@@ -62,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nowo-tech/symfony-beacon/releases/tag/v0.1.0

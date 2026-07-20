@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "492202248da6f713a9961b0eff3028e4",
+    "content-hash": "79307b2d363db353e04173642a25698a",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -1216,6 +1216,361 @@
             "time": "2026-07-16T18:58:00+00:00"
         },
         {
+            "name": "nowo-tech/breadcrumb-kit-bundle",
+            "version": "v2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/BreadcrumbKitBundle.git",
+                "reference": "916825a5bdf2800d4075136adaa1cfdaef57d42e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/BreadcrumbKitBundle/zipball/916825a5bdf2800d4075136adaa1cfdaef57d42e",
+                "reference": "916825a5bdf2800d4075136adaa1cfdaef57d42e",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.8 || ^3.0",
+                "doctrine/orm": "^2.13 || ^3.0",
+                "php": ">=8.2 <8.6",
+                "psr/cache": "^3.0",
+                "symfony/asset": "^7.0 || ^8.0",
+                "symfony/config": "^7.0 || ^8.0",
+                "symfony/dependency-injection": "^7.0 || ^8.0",
+                "symfony/form": "^7.0 || ^8.0",
+                "symfony/framework-bundle": "^7.0 || ^8.0",
+                "symfony/http-foundation": "^7.0 || ^8.0",
+                "symfony/http-kernel": "^7.0 || ^8.0",
+                "symfony/routing": "^7.0 || ^8.0",
+                "symfony/security-core": "^7.0 || ^8.0",
+                "symfony/security-csrf": "^7.0 || ^8.0",
+                "symfony/twig-bundle": "^7.0 || ^8.0",
+                "symfony/validator": "^7.0 || ^8.0",
+                "symfony/yaml": "^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0"
+            },
+            "suggest": {
+                "symfony/framework-bundle": "Profiler data collector (Symfony 7.2+): TemplateAwareDataCollectorInterface lives here.",
+                "symfony/web-profiler-bundle": "Registers the Breadcrumb Kit panel in the Symfony profiler (dev)."
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "files": [
+                    "src/polyfill-template-aware-data-collector.php"
+                ],
+                "psr-4": {
+                    "Nowo\\BreadcrumbKitBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Symfony bundle: configurable breadcrumb trails (route matching, i18n, optional links, collection-level presentation).",
+            "homepage": "https://github.com/nowo-tech/BreadcrumbKitBundle",
+            "keywords": [
+                "breadcrumb",
+                "i18n",
+                "navigation",
+                "symfony",
+                "symfony-bundle"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/BreadcrumbKitBundle/issues",
+                "source": "https://github.com/nowo-tech/BreadcrumbKitBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T19:00:06+00:00"
+        },
+        {
+            "name": "nowo-tech/cookie-consent-bundle",
+            "version": "v1.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/CookieConsentBundle.git",
+                "reference": "cab53bdc028cab238ab7f07a05587d4f4d188cac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/cab53bdc028cab238ab7f07a05587d4f4d188cac",
+                "reference": "cab53bdc028cab238ab7f07a05587d4f4d188cac",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.10 || ^3.0",
+                "doctrine/orm": "^2.15 || ^3.0",
+                "php": ">=8.1 <8.6",
+                "symfony/form": "^6.0 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.0 || ^7.0 || ^8.0",
+                "symfony/routing": "^6.0 || ^7.0 || ^8.0",
+                "symfony/translation": "^6.0 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/var-exporter": "^6.4 || ^7.0 || ^8.0",
+                "symfony/yaml": "^6.0 || ^7.0 || ^8.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\CookieConsentBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle providing a GDPR cookie consent modal with category toggles and optional consent logging",
+            "homepage": "https://github.com/nowo-tech/CookieConsentBundle",
+            "keywords": [
+                "bundle",
+                "consent",
+                "cookie",
+                "gdpr",
+                "modal",
+                "privacy",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/CookieConsentBundle/issues",
+                "source": "https://github.com/nowo-tech/CookieConsentBundle"
+            },
+            "time": "2026-07-20T07:18:05+00:00"
+        },
+        {
+            "name": "nowo-tech/dashboard-menu-bundle",
+            "version": "v0.3.45",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/DashboardMenuBundle.git",
+                "reference": "6f74861d6307f285541a43897dae2c7d2227255b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/DashboardMenuBundle/zipball/6f74861d6307f285541a43897dae2c7d2227255b",
+                "reference": "6f74861d6307f285541a43897dae2c7d2227255b",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.8 || ^3.0",
+                "doctrine/orm": "^2.13 || ^3.0",
+                "php": ">=8.1 <8.6",
+                "psr/cache": "^1.0 || ^2.0 || ^3.0",
+                "symfony/config": "^6.0 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.0 || ^7.0 || ^8.0",
+                "symfony/form": "^6.0 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/http-foundation": "^6.0 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.0 || ^7.0 || ^8.0",
+                "symfony/mime": "^6.0 || ^7.0 || ^8.0",
+                "symfony/routing": "^6.0 || ^7.0 || ^8.0",
+                "symfony/security-core": "^6.0 || ^7.0 || ^8.0",
+                "symfony/security-csrf": "^6.0 || ^7.0 || ^8.0",
+                "symfony/translation": "^6.0 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/ux-autocomplete": "^2.33 || ^3.0",
+                "symfony/ux-live-component": "^2.32 || ^3.0",
+                "symfony/validator": "^6.0 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0",
+                "symfony/browser-kit": "^6.0 || ^7.0 || ^8.0",
+                "symfony/dom-crawler": "^6.0 || ^7.0 || ^8.0",
+                "symfony/yaml": "^6.0 || ^7.0 || ^8.0"
+            },
+            "suggest": {
+                "doctrine/doctrine-migrations-bundle": "To run the migration generated by nowo_dashboard_menu:generate-migration",
+                "nowo-tech/icon-selector-bundle": "For the icon selector widget in the dashboard item form (requires Symfony ^7.0 || ^8.0)",
+                "symfony/ux-icons": "For icon support in menu items (heroicons, bootstrap icons, etc.)"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\DashboardMenuBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle for configurable dashboard menus with i18n (JSON translations), tree structure (parent/position), permissions, Twig and JSON API. No external ORM extensions.",
+            "homepage": "https://github.com/nowo-tech/DashboardMenuBundle",
+            "keywords": [
+                "api",
+                "dashboard",
+                "doctrine",
+                "json",
+                "menu",
+                "navigation",
+                "symfony",
+                "symfony-bundle",
+                "tree",
+                "twig"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/DashboardMenuBundle/issues",
+                "source": "https://github.com/nowo-tech/DashboardMenuBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-20T07:59:14+00:00"
+        },
+        {
+            "name": "nowo-tech/form-kit-bundle",
+            "version": "v2.0.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/FormKitBundle.git",
+                "reference": "70a8732e8cfd23f32d2c6dbe4875678f612aae8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/70a8732e8cfd23f32d2c6dbe4875678f612aae8e",
+                "reference": "70a8732e8cfd23f32d2c6dbe4875678f612aae8e",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": "^2.2",
+                "php": ">=8.2 <8.6",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/form": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/translation": "^7.4 || ^8.0",
+                "symfony/validator": "^7.4 || ^8.0",
+                "symfony/yaml": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.95.11",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/framework-bundle": "^7.4 || ^8.0"
+            },
+            "suggest": {
+                "a2lix/translation-form-bundle": "For the optional \"translations\" type in FormTypeMap (^3.2 on PHP 8.2/Symfony 7.4, ^4.0 on PHP 8.4+/Symfony 7.4|8)",
+                "friendsofsymfony/ckeditor-bundle": "For addCKEditorField() / addCKEditorFieldType() (CKEditor 4 in forms)",
+                "nowo-tech/select-all-choice-bundle": "For addMultiSelectSelectAll() / addMultiSelectSelectAllType() (\"Select all\" on ChoiceType multiple)",
+                "symfony/ux-autocomplete": "Entity autocomplete fields; use addAutocompleteField() / addAutocompleteFieldType() with your autocomplete FormType FQCN",
+                "symfony/ux-cropperjs": "For addCropper() / addCropperField() / addCropperFieldType() (image crop widget)",
+                "symfony/ux-dropzone": "For addDropzone() / addDropzoneField() / addDropzoneFieldType() (drag-and-drop file upload)",
+                "symfony/ux-icons": "For help_modal.ux_icon (IconRendererInterface) instead of icon_html only",
+                "symfony/ux-live-component": "Optional Live Component forms; see the demo /conditional-fields-live page and USAGE conditional-fields section"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\FormKitBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle to reduce repetitive form field options: convention-based labels/placeholder/help (form_snake.field_snake.*), configurable attr/row_attr/translation_domain, and cascading option merge (global → field type → form → field). Symfony 7.4|8.",
+            "homepage": "https://github.com/nowo-tech/FormKitBundle",
+            "keywords": [
+                "bundle",
+                "convention",
+                "form",
+                "form-type",
+                "help",
+                "label",
+                "options",
+                "placeholder",
+                "symfony",
+                "translation"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/FormKitBundle/issues",
+                "source": "https://github.com/nowo-tech/FormKitBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-20T08:50:24+00:00"
+        },
+        {
             "name": "nowo-tech/password-strength-bundle",
             "version": "v1.3.0",
             "source": {
@@ -1391,6 +1746,92 @@
                 }
             ],
             "time": "2026-07-16T11:53:52+00:00"
+        },
+        {
+            "name": "nowo-tech/pwa-bundle",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/PwaBundle.git",
+                "reference": "43c6963a77592ed1558fd51a1ad013572ea15429"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/PwaBundle/zipball/43c6963a77592ed1558fd51a1ad013572ea15429",
+                "reference": "43c6963a77592ed1558fd51a1ad013572ea15429",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/framework-bundle": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/routing": "^7.4 || ^8.0",
+                "symfony/twig-bundle": "^7.4 || ^8.0",
+                "symfony/yaml": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/browser-kit": "^7.4 || ^8.0",
+                "symfony/dom-crawler": "^7.4 || ^8.0",
+                "symfony/translation": "^7.4 || ^8.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "bundle": "Nowo\\PwaBundle\\PwaBundle"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\PwaBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle to turn any application into a fully configurable Progressive Web App (manifest, service worker, offline, install prompt)",
+            "homepage": "https://github.com/nowo-tech/PwaBundle",
+            "keywords": [
+                "offline",
+                "progressive-web-app",
+                "pwa",
+                "service-worker",
+                "symfony",
+                "symfony-bundle",
+                "web-app-manifest"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/PwaBundle/issues",
+                "source": "https://github.com/nowo-tech/PwaBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T11:20:08+00:00"
         },
         {
             "name": "pentatrion/vite-bundle",
@@ -3776,6 +4217,92 @@
             "time": "2026-06-16T19:38:37+00:00"
         },
         {
+            "name": "symfony/mime",
+            "version": "v8.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/mime.git",
+                "reference": "b164ae7e3f7915aacfe9ee155f2f358502440664"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/b164ae7e3f7915aacfe9ee155f2f358502440664",
+                "reference": "b164ae7e3f7915aacfe9ee155f2f358502440664",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4.1",
+                "symfony/polyfill-intl-idn": "^1.10",
+                "symfony/polyfill-mbstring": "^1.0"
+            },
+            "conflict": {
+                "egulias/email-validator": "~3.0.0",
+                "phpdocumentor/reflection-docblock": "<5.2|>=7",
+                "phpdocumentor/type-resolver": "<1.5.1"
+            },
+            "require-dev": {
+                "egulias/email-validator": "^2.1.10|^3.1|^4",
+                "league/html-to-markdown": "^5.0",
+                "phpdocumentor/reflection-docblock": "^5.2|^6.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/process": "^7.4|^8.0",
+                "symfony/property-access": "^7.4|^8.0",
+                "symfony/property-info": "^7.4|^8.0",
+                "symfony/serializer": "^7.4|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Mime\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Allows manipulating MIME messages",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "mime",
+                "mime-type"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/mime/tree/v8.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-05-29T05:06:50+00:00"
+        },
+        {
             "name": "symfony/options-resolver",
             "version": "v8.1.0",
             "source": {
@@ -4177,6 +4704,93 @@
             "time": "2026-05-25T11:52:53+00:00"
         },
         {
+            "name": "symfony/polyfill-intl-idn",
+            "version": "v1.38.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-intl-idn.git",
+                "reference": "dc21118016c039a66235cf93d96b435ffb282412"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-idn/zipball/dc21118016c039a66235cf93d96b435ffb282412",
+                "reference": "dc21118016c039a66235cf93d96b435ffb282412",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2",
+                "symfony/polyfill-intl-normalizer": "^1.10"
+            },
+            "suggest": {
+                "ext-intl": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Intl\\Idn\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Laurent Bassin",
+                    "email": "laurent@bassin.info"
+                },
+                {
+                    "name": "Trevor Rowbotham",
+                    "email": "trevor.rowbotham@pm.me"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for intl's idn_to_ascii and idn_to_utf8 functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "idn",
+                "intl",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.38.1"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-05-25T15:22:23+00:00"
+        },
+        {
             "name": "symfony/polyfill-intl-normalizer",
             "version": "v1.38.0",
             "source": {
@@ -4425,6 +5039,71 @@
                 }
             ],
             "time": "2026-05-26T02:25:22+00:00"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v8.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "c4a9e58f235a6bf7f97ffbfedae2687353ac79e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/c4a9e58f235a6bf7f97ffbfedae2687353ac79e5",
+                "reference": "c4a9e58f235a6bf7f97ffbfedae2687353ac79e5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Executes commands in sub-processes",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/process/tree/v8.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-05-29T05:06:50+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -5189,6 +5868,82 @@
             "time": "2026-06-16T09:55:08+00:00"
         },
         {
+            "name": "symfony/stimulus-bundle",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/stimulus-bundle.git",
+                "reference": "1a885a51d6bad71e869779da148dfef4fc8e5705"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/1a885a51d6bad71e869779da148dfef4fc8e5705",
+                "reference": "1a885a51d6bad71e869779da148dfef4fc8e5705",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/config": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/deprecation-contracts": "^2.0|^3.0",
+                "symfony/finder": "^7.4|^8.0",
+                "symfony/http-kernel": "^7.4|^8.0",
+                "twig/twig": "^2.15.3|^3.8"
+            },
+            "conflict": {
+                "symfony/asset-mapper": "<6.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/asset-mapper": "^7.4|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/twig-bundle": "^7.4|^8.0",
+                "zenstruck/browser": "^1.9"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\StimulusBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Integration with your Symfony app & Stimulus!",
+            "keywords": [
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/stimulus-bundle/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-13T16:10:12+00:00"
+        },
+        {
             "name": "symfony/stopwatch",
             "version": "v8.1.0",
             "source": {
@@ -5794,6 +6549,100 @@
             "time": "2026-05-29T05:06:50+00:00"
         },
         {
+            "name": "symfony/ux-autocomplete",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-autocomplete.git",
+                "reference": "5df840ed9aaafefc4ad852a0f9af19b1b5e268cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-autocomplete/zipball/5df840ed9aaafefc4ad852a0f9af19b1b5e268cb",
+                "reference": "5df840ed9aaafefc4ad852a0f9af19b1b5e268cb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/deprecation-contracts": "^2.5|^3",
+                "symfony/http-foundation": "^7.4|^8.0",
+                "symfony/http-kernel": "^7.4|^8.0",
+                "symfony/property-access": "^7.4|^8.0"
+            },
+            "conflict": {
+                "doctrine/orm": "2.9.0 || 2.9.1"
+            },
+            "require-dev": {
+                "doctrine/collections": "^1.6.8|^2.0",
+                "doctrine/doctrine-bundle": "^2.14|^3.0|^4.0",
+                "doctrine/orm": "^2.9.4|^3.0",
+                "fakerphp/faker": "^1.22",
+                "mtdowling/jmespath.php": "^2.6",
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/form": "^7.2|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/maker-bundle": "^1.40",
+                "symfony/options-resolver": "^7.4|^8.0",
+                "symfony/process": "^7.4|^8.0",
+                "symfony/security-bundle": "^7.4|^8.0",
+                "symfony/twig-bundle": "^7.4|^8.0",
+                "symfony/uid": "^7.4|^8.0",
+                "twig/twig": "^2.14.7|^3.0.4",
+                "zenstruck/browser": "^1.9",
+                "zenstruck/foundry": "^2.7"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Autocomplete\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "JavaScript Autocomplete functionality for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-autocomplete/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-09T05:17:17+00:00"
+        },
+        {
             "name": "symfony/ux-icons",
             "version": "v2.36.1",
             "source": {
@@ -5885,6 +6734,377 @@
                 }
             ],
             "time": "2026-06-16T05:43:46+00:00"
+        },
+        {
+            "name": "symfony/ux-live-component",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-live-component.git",
+                "reference": "120e6bec064e7f79efbb83a837cc07df37419076"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-live-component/zipball/120e6bec064e7f79efbb83a837cc07df37419076",
+                "reference": "120e6bec064e7f79efbb83a837cc07df37419076",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/deprecation-contracts": "^2.5|^3.0",
+                "symfony/property-access": "^7.4|^8.0",
+                "symfony/property-info": "^7.4|^8.0",
+                "symfony/stimulus-bundle": "^2.9|^3.0",
+                "symfony/type-info": "^7.4|^8.0",
+                "symfony/ux-twig-component": "^2.33.0|^3.0",
+                "twig/twig": "^3.10.3"
+            },
+            "conflict": {
+                "symfony/config": "<6.4"
+            },
+            "require-dev": {
+                "doctrine/annotations": "^1.0|^2.0",
+                "doctrine/collections": "^1.6.8|^2.0",
+                "doctrine/doctrine-bundle": "^2.14|^3.0|^4.0",
+                "doctrine/orm": "^2.9.4|^3.0",
+                "doctrine/persistence": "^2.5.2|^3.0|^4.0",
+                "phpdocumentor/reflection-docblock": "^5.6.2",
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/config": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/expression-language": "^7.4|^8.0",
+                "symfony/form": "^7.4|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/options-resolver": "^7.4|^8.0",
+                "symfony/security-bundle": "^7.4|^8.0",
+                "symfony/serializer": "^7.4|^8.0",
+                "symfony/twig-bundle": "^7.4|^8.0",
+                "symfony/uid": "^7.4|^8.0",
+                "symfony/validator": "^7.4|^8.0",
+                "zenstruck/browser": "^1.9",
+                "zenstruck/foundry": "^2.7"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\LiveComponent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Live components for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "components",
+                "symfony-ux",
+                "twig"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-live-component/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-10T15:47:13+00:00"
+        },
+        {
+            "name": "symfony/ux-native",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-native.git",
+                "reference": "646b01f4cfd748ed04fa6e97f561df7ed19c7c91"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-native/zipball/646b01f4cfd748ed04fa6e97f561df7ed19c7c91",
+                "reference": "646b01f4cfd748ed04fa6e97f561df7ed19c7c91",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/asset": "^7.4|^8.0",
+                "symfony/filesystem": "^7.4|^8.0",
+                "symfony/process": "^7.4|^8.0",
+                "symfony/stimulus-bundle": "^2.18.1|^3.0",
+                "symfony/ux-turbo": "^2.18.1|^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/browser-kit": "^7.4|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/maker-bundle": "^1.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Native\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Hotwire Native integration for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "hotwire",
+                "native",
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-native/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-09T05:17:17+00:00"
+        },
+        {
+            "name": "symfony/ux-turbo",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-turbo.git",
+                "reference": "505f246b967c39265ce7ec3b23273098bd787d31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/505f246b967c39265ce7ec3b23273098bd787d31",
+                "reference": "505f246b967c39265ce7ec3b23273098bd787d31",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/stimulus-bundle": "^2.9.1|^3.0"
+            },
+            "conflict": {
+                "symfony/flex": "<1.13",
+                "symfony/mercure": ">=0.7.0 <0.7.2"
+            },
+            "require-dev": {
+                "doctrine/doctrine-bundle": "^2.14|^3.0|^4.0",
+                "doctrine/orm": "^2.8|^3.0",
+                "phpstan/phpstan": "^2.1.17",
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/asset-mapper": "^7.4|^8.0",
+                "symfony/browser-kit": "^7.4|^8.0",
+                "symfony/debug-bundle": "^7.4|^8.0",
+                "symfony/expression-language": "^7.4|^8.0",
+                "symfony/form": "^7.4|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/mercure-bundle": "^0.3.7|^0.4.1",
+                "symfony/messenger": "^7.4|^8.0",
+                "symfony/property-access": "^7.4|^8.0",
+                "symfony/security-core": "^7.4|^8.0",
+                "symfony/stopwatch": "^7.4|^8.0",
+                "symfony/twig-bundle": "^7.4|^8.0",
+                "symfony/ux-twig-component": "^2.21|^3.0",
+                "symfony/web-profiler-bundle": "^7.4|^8.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Turbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kévin Dunglas",
+                    "email": "kevin@dunglas.fr"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Hotwire Turbo integration for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "hotwire",
+                "javascript",
+                "mercure",
+                "symfony-ux",
+                "turbo",
+                "turbo-stream"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-turbo/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-09T05:17:17+00:00"
+        },
+        {
+            "name": "symfony/ux-twig-component",
+            "version": "v3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-twig-component.git",
+                "reference": "2f3a1b74e3ee04daed1a303245998e7b799eb9dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/2f3a1b74e3ee04daed1a303245998e7b799eb9dc",
+                "reference": "2f3a1b74e3ee04daed1a303245998e7b799eb9dc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "psr/container": "^1.1|^2.0",
+                "symfony/deprecation-contracts": "^2.2|^3.0",
+                "symfony/event-dispatcher": "^7.4|^8.0",
+                "symfony/property-access": "^7.4|^8.0",
+                "twig/twig": "^3.10.3"
+            },
+            "conflict": {
+                "symfony/config": "<6.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.1|^12.0",
+                "symfony/console": "^7.4|^8.0",
+                "symfony/css-selector": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/dom-crawler": "^7.4|^8.0",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/stimulus-bundle": "^2.9.1|^3.0",
+                "symfony/twig-bundle": "^7.4|^8.0",
+                "twig/extra-bundle": "^3.10.3",
+                "twig/html-extra": "^3.10.3"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\TwigComponent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Twig components for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "components",
+                "symfony-ux",
+                "twig"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-twig-component/tree/v3.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-05T15:45:35+00:00"
         },
         {
             "name": "symfony/validator",
@@ -9932,71 +11152,6 @@
                 }
             ],
             "time": "2026-06-05T06:23:12+00:00"
-        },
-        {
-            "name": "symfony/process",
-            "version": "v8.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "c4a9e58f235a6bf7f97ffbfedae2687353ac79e5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/c4a9e58f235a6bf7f97ffbfedae2687353ac79e5",
-                "reference": "c4a9e58f235a6bf7f97ffbfedae2687353ac79e5",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.4.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Executes commands in sub-processes",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/process/tree/v8.1.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-05-29T05:06:50+00:00"
         },
         {
             "name": "symfony/web-profiler-bundle",

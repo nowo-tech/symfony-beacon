@@ -1,0 +1,4 @@
+# nowo-tech/pwa-bundle — manifest, service worker, offline page
+nowo_pwa:
+    resource: .
+    type: nowo_pwa
