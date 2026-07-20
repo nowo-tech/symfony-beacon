@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Ingest;
 
 use App\Ingest\Service\EventTimestampParser;
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 final class EventTimestampParserTest extends TestCase
@@ -24,7 +25,7 @@ final class EventTimestampParserTest extends TestCase
         $parsed = $parser->parse('2026-07-20T18:30:45.654321Z');
 
         self::assertNotNull($parsed);
-        self::assertSame('2026-07-20 18:30:45.654321', $parsed->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s.u'));
+        self::assertSame('2026-07-20 18:30:45.654321', $parsed->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s.u'));
     }
 
     public function testReturnsNullForInvalidValues(): void

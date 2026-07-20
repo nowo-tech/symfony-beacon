@@ -16,6 +16,7 @@ use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,7 +38,7 @@ final class NotificationDispatcherTest extends TestCase
 
         $bus = $this->createMock(MessageBusInterface::class);
         $dispatched = [];
-        $bus->method('dispatch')->willReturnCallback(function (object $message) use (&$dispatched): Envelope {
+        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$dispatched): Envelope {
             $dispatched[] = $message;
 
             return new Envelope($message);
@@ -80,7 +81,7 @@ final class NotificationDispatcherTest extends TestCase
 
         $bus = $this->createMock(MessageBusInterface::class);
         $count = 0;
-        $bus->method('dispatch')->willReturnCallback(function (object $message) use (&$count): Envelope {
+        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$count): Envelope {
             ++$count;
 
             return new Envelope($message);
@@ -122,7 +123,7 @@ final class NotificationDispatcherTest extends TestCase
         $destination->setEnabled($enabled);
         $destination->setCategories($categories);
 
-        $ref = new \ReflectionProperty($destination, 'id');
+        $ref = new ReflectionProperty($destination, 'id');
         $ref->setValue($destination, $id);
 
         return $destination;

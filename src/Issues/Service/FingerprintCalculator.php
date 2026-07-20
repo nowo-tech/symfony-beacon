@@ -126,8 +126,6 @@ final class FingerprintCalculator
     /**
      * Prefer the outermost in-app frame; fall back to the last frame.
      *
-     * @param mixed $frames
-     *
      * @return array<string, mixed>
      */
     private function topFrame(mixed $frames): array

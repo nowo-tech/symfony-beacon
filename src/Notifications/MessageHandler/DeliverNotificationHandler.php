@@ -8,9 +8,11 @@ use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 /**
  * Delivers one notification attempt to Slack or a generic HTTP webhook.
@@ -62,9 +64,9 @@ final readonly class DeliverNotificationHandler
 
             $status = $response->getStatusCode();
             if ($status < 200 || $status >= 300) {
-                throw new \RuntimeException(sprintf('Destination returned HTTP %d', $status));
+                throw new RuntimeException(\sprintf('Destination returned HTTP %d', $status));
             }
-        } catch (TransportExceptionInterface|\Throwable $e) {
+        } catch (TransportExceptionInterface|Throwable $e) {
             $this->logger->error('Notification delivery failed.', [
                 'destination_id' => $message->destinationId,
                 'exception' => $e->getMessage(),

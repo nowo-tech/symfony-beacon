@@ -15,6 +15,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -173,7 +174,7 @@ final class SeedDemoCommand extends Command
     ): void {
         $dir = \dirname($path);
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new \RuntimeException(\sprintf('Unable to create directory "%s".', $dir));
+            throw new RuntimeException(\sprintf('Unable to create directory "%s".', $dir));
         }
 
         $projectId = $apiKey->getProject()?->getId() ?? 0;
@@ -190,7 +191,7 @@ BEACON_LOGIN_PASSWORD={$password}
 ENV;
 
         if (false === file_put_contents($path, $contents)) {
-            throw new \RuntimeException(\sprintf('Unable to write "%s".', $path));
+            throw new RuntimeException(\sprintf('Unable to write "%s".', $path));
         }
     }
 }

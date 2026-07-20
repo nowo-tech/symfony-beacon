@@ -77,7 +77,7 @@ final readonly class RetentionPurger
         $stats = 0;
 
         if ($this->retentionDays >= 1) {
-            $cutoff = $now->modify(sprintf('-%d days', $this->retentionDays))->format('Y-m-d H:i:s');
+            $cutoff = $now->modify(\sprintf('-%d days', $this->retentionDays))->format('Y-m-d H:i:s');
 
             $events += (int) $connection->executeStatement(
                 'DELETE FROM event WHERE issue_id IN (SELECT id FROM issue WHERE project_id = ?) AND received_at < ?',
@@ -98,7 +98,7 @@ final readonly class RetentionPurger
             );
             $stats += (int) $connection->executeStatement(
                 'DELETE FROM daily_project_stat WHERE project_id = ? AND stat_date < ?',
-                [$projectId, $now->modify(sprintf('-%d days', $this->retentionDays))->format('Y-m-d')],
+                [$projectId, $now->modify(\sprintf('-%d days', $this->retentionDays))->format('Y-m-d')],
             );
         }
 

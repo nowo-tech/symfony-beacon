@@ -46,7 +46,7 @@ final readonly class NotificationPayloadBuilder
 
         return [
             'event' => 'performance.n_plus_one',
-            'summary' => sprintf(
+            'summary' => \sprintf(
                 'N+1 detected in %s (%d group(s))',
                 $transaction->getTransactionName(),
                 $transaction->getNPlusOneCount(),
@@ -75,7 +75,7 @@ final readonly class NotificationPayloadBuilder
     {
         return [
             'event' => 'test',
-            'summary' => sprintf('Test notification from %s (%s)', $project->getName(), $destinationLabel),
+            'summary' => \sprintf('Test notification from %s (%s)', $project->getName(), $destinationLabel),
             'project' => [
                 'id' => $project->getId() ?? 0,
                 'name' => $project->getName(),
@@ -97,7 +97,7 @@ final readonly class NotificationPayloadBuilder
 
         return [
             'event' => $event,
-            'summary' => sprintf('%s: [%s] %s', $summaryPrefix, $issue->getLevel(), $issue->getTitle()),
+            'summary' => \sprintf('%s: [%s] %s', $summaryPrefix, $issue->getLevel(), $issue->getTitle()),
             'project' => [
                 'id' => $projectId,
                 'name' => $project->getName(),

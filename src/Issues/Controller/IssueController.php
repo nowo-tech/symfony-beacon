@@ -104,7 +104,7 @@ final class IssueController extends AbstractController
             );
             $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($allIssues);
             $allIssues = $this->sortIssuesByOccurrence($allIssues, $occurrenceByIssue, $sort);
-            $issues = \array_values(\array_slice($allIssues, $offset, $perPage));
+            $issues = array_values(\array_slice($allIssues, $offset, $perPage));
             $pageIds = [];
             foreach ($issues as $issue) {
                 $id = $issue->getId();
@@ -112,7 +112,7 @@ final class IssueController extends AbstractController
                     $pageIds[$id] = true;
                 }
             }
-            $occurrenceByIssue = \array_intersect_key($occurrenceByIssue, $pageIds);
+            $occurrenceByIssue = array_intersect_key($occurrenceByIssue, $pageIds);
         } else {
             $issues = $this->issueRepository->search(
                 $project,

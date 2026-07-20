@@ -33,7 +33,7 @@ final class RetentionPurgeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->writeln(sprintf(
+        $io->writeln(\sprintf(
             'Retention policy: days=%d, max_events_per_project=%d (0 = disabled)',
             $this->retentionDays,
             $this->maxEventsPerProject,
@@ -52,7 +52,7 @@ final class RetentionPurgeCommand extends Command
         }
 
         $totals = $this->retentionPurger->purge();
-        $io->success(sprintf(
+        $io->success(\sprintf(
             'Purged across %d project(s): %d events, %d issues, %d transactions, %d daily stats.',
             $totals['projects'],
             $totals['events'],

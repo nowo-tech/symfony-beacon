@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Identity\Entity\User;
+use Closure;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\AbstractType;
@@ -45,7 +46,7 @@ final class ProjectMemberAutocompleteField extends AbstractType
                 'openOnFocus' => true,
                 'highlight' => true,
             ],
-            'filter_query' => static function (Options $options): \Closure {
+            'filter_query' => static function (Options $options): Closure {
                 $extra = $options['extra_options'];
                 $projectId = \is_array($extra) && isset($extra['project_id']) && is_numeric($extra['project_id'])
                     ? (int) $extra['project_id']
