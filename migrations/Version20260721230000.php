@@ -43,20 +43,27 @@ final class Version20260721230000 extends AbstractMigration
         $this->addSql('UPDATE event SET project_id = (SELECT project_id FROM issue WHERE issue.id = event.issue_id) WHERE project_id IS NULL');
         $this->addSql('DELETE FROM event WHERE project_id IS NULL');
 
+        // Re-introspect: adding project_id may have changed indexes (MDK/MySQL).
+        $eventTable = $sm->introspectTable('event');
+
         // Drop legacy global unique if still present (name varies by platform).
         foreach ($eventTable->getIndexes() as $index) {
-            if ('uniq_event_id' === $index->getName()
-                || (['event_id'] === $index->getColumns() && $index->isUnique() && !$index->isPrimary())
-            ) {
-                $this->applyMdk([
-                    MDK::TABLES => [
-                        'event' => [
-                            MDK::DROP_INDEXES => [$index->getName()],
-                        ],
-                    ],
-                ]);
+            $isLegacyEventIdUnique = 'uniq_event_id' === $index->getName()
+                || (['event_id'] === $index->getColumns() && $index->isUnique() && !$index->isPrimary());
+            if (!$isLegacyEventIdUnique) {
+                continue;
+            }
+            if (!$eventTable->hasIndex($index->getName())) {
                 break;
             }
+            $this->applyMdk([
+                MDK::TABLES => [
+                    'event' => [
+                        MDK::DROP_INDEXES => [$index->getName()],
+                    ],
+                ],
+            ]);
+            break;
         }
 
         // Refresh after possible DROP.
