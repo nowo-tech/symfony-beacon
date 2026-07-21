@@ -61,6 +61,7 @@ final readonly class DashboardMenuDemoSeeder
                 [27, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos', 'de' => 'Projekte', 'nl' => 'Projecten', 'fr' => 'Projets', 'it' => 'Progetti', 'pt' => 'Projetos'], 'admin_projects', 'ROLE_ADMIN'],
                 [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia', 'de' => 'Erscheinungsbild', 'nl' => 'Weergave', 'fr' => 'Apparence', 'it' => 'Aspetto', 'pt' => 'Aparência'], 'settings_appearance', 'ROLE_ADMIN'],
                 [35, 'Mailer', ['en' => 'Mailer', 'es' => 'Correo', 'de' => 'Mailer', 'nl' => 'Mailer', 'fr' => 'Mailer', 'it' => 'Mailer', 'pt' => 'Mailer'], 'settings_mailer', 'ROLE_ADMIN'],
+                [37, 'Mercure', ['en' => 'Mercure', 'es' => 'Mercure', 'de' => 'Mercure', 'nl' => 'Mercure', 'fr' => 'Mercure', 'it' => 'Mercure', 'pt' => 'Mercure'], 'settings_mercure', 'ROLE_ADMIN'],
                 [40, 'Menus', ['en' => 'Menus', 'es' => 'Menús', 'de' => 'Menüs', 'nl' => 'Menu’s', 'fr' => 'Menus', 'it' => 'Menu', 'pt' => 'Menus'], 'nowo_dashboard_menu_dashboard_index', 'ROLE_ADMIN'],
                 [50, 'Breadcrumbs', ['en' => 'Breadcrumbs', 'es' => 'Migas', 'de' => 'Brotkrumen', 'nl' => 'Broodkruimels', 'fr' => 'Fil d’Ariane', 'it' => 'Breadcrumb', 'pt' => 'Navegação'], 'nowo_breadcrumb_kit_dashboard_collections_index', 'ROLE_ADMIN'],
             ],

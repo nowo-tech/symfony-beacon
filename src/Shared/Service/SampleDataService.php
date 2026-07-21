@@ -12,11 +12,14 @@ use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\PerformanceDemoSeeder;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Mercure\MercureSampleSeeder;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
 /**
  * Sample telemetry profiles + purge for a target project (default slug=demo).
+ *
+ * Also applies default Mercure instance settings so live toasts work locally.
  */
 final readonly class SampleDataService
 {
@@ -33,6 +36,7 @@ final readonly class SampleDataService
         private IssueSampleSeeder $issueSampleSeeder,
         private AnalyticsDemoSeeder $analyticsDemoSeeder,
         private PerformanceDemoSeeder $performanceDemoSeeder,
+        private MercureSampleSeeder $mercureSampleSeeder,
     ) {
     }
 
@@ -47,7 +51,7 @@ final readonly class SampleDataService
     }
 
     /**
-     * @return array{issues: int, events: int, analytics: bool, performance: bool}
+     * @return array{issues: int, events: int, analytics: bool, performance: bool, mercure: bool}
      */
     public function seed(Project $project, string $profile): array
     {
@@ -59,12 +63,14 @@ final readonly class SampleDataService
         $counts = $this->issueSampleSeeder->seed($project, $cfg['issues'], $cfg['events']);
         $analytics = $this->analyticsDemoSeeder->seedWindow($project, $cfg['analytics_days']);
         $performance = $this->performanceDemoSeeder->seedIfEmpty($project);
+        $mercure = $this->mercureSampleSeeder->seedDefaults();
 
         return [
             'issues' => $counts['issues'],
             'events' => $counts['events'],
             'analytics' => $analytics,
             'performance' => $performance,
+            'mercure' => $mercure,
         ];
     }
 

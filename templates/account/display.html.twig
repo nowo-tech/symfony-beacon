@@ -10,39 +10,70 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('bundles/nowotaginput/tag-input.js') }}" defer></script>
+    <script defer src="{{ asset('/' ~ nowo_select_all_choice_asset_path('select-all-choice.js')) }}"></script>
 {% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-xl">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.intro'|trans }}</p>
+<div class="mx-auto max-w-xl space-y-4">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
+        <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.intro'|trans }}</p>
+    </div>
 
-    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
-        {{ form_row(form.preferredLocale) }}
-        {{ form_row(form.preferredTheme) }}
-        {{ form_row(form.preferredContentWidth) }}
-        {{ form_row(form.preferredUiDensity) }}
-        {{ form_row(form.preferredFontScale) }}
-        {{ form_row(form.preferredContrast) }}
-        {{ form_row(form.preferredSidebar) }}
-        {{ form_row(form.preferredMotion) }}
-        {{ form_row(form.preferredCollapsedIssuePanels) }}
-        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_ids_hint'|trans }}</p>
-        <ul class="issue-panel-prefs__legend" aria-label="{{ 'preferences.issue_panels_ids_legend'|trans }}">
-            {% for panelId in issue_panel_ids %}
-                <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
-            {% endfor %}
-        </ul>
-        {{ form_row(form.productTourSeen) }}
-        <div class="border-t border-[var(--color-sand)] pt-4">
+    {{ form_start(form) }}
+        <section class="panel space-y-4" aria-labelledby="display-prefs-heading">
+            <h2 id="display-prefs-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.section_layout'|trans }}</h2>
+            {{ form_row(form.preferredLocale) }}
+            {{ form_row(form.preferredTheme) }}
+            {{ form_row(form.preferredContentWidth) }}
+            {{ form_row(form.preferredUiDensity) }}
+            {{ form_row(form.preferredFontScale) }}
+            {{ form_row(form.preferredContrast) }}
+            {{ form_row(form.preferredSidebar) }}
+            {{ form_row(form.preferredMotion) }}
+            {{ form_row(form.preferredCollapsedIssuePanels) }}
+            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_ids_hint'|trans }}</p>
+            <ul class="issue-panel-prefs__legend" aria-label="{{ 'preferences.issue_panels_ids_legend'|trans }}">
+                {% for panelId in issue_panel_ids %}
+                    <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="panel mt-4 space-y-4" aria-labelledby="display-tour-heading">
+            <div>
+                <h2 id="display-tour-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.product_tour_title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.product_tour_intro'|trans }}</p>
+            </div>
+            {{ form_row(form.productTourEnabledPages) }}
+            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.product_tour_save_hint'|trans }}</p>
+        </section>
+
+        <section class="panel mt-4 space-y-3" aria-labelledby="display-push-heading">
+            <div>
+                <h2 id="display-push-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.push_title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.push_intro'|trans }}</p>
+            </div>
+            {% if push_available %}
+                {{ form_row(form.pushNotificationsEnabled) }}
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.push_privacy'|trans }}</p>
+            {% else %}
+                <div class="rounded-md border border-[var(--color-sand)] bg-[var(--color-sand)]/30 px-3 py-2 text-sm text-[var(--color-ink)]/65">
+                    <p class="font-medium text-[var(--color-ink)]">{{ 'preferences.push_unavailable_title'|trans }}</p>
+                    <p class="mt-1 text-xs">{{ 'preferences.push_unavailable_help'|trans }}</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <div class="mt-4 flex flex-wrap gap-2">
             <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
 
-    <section class="panel mt-4 space-y-3" aria-labelledby="display-tour-heading">
+    <section class="panel space-y-3" aria-labelledby="display-tour-replay-heading">
         <div>
-            <h2 id="display-tour-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.product_tour_title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.product_tour_intro'|trans }}</p>
+            <h2 id="display-tour-replay-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.product_tour_replay_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.product_tour_replay_intro'|trans }}</p>
         </div>
         <form method="post" action="{{ path('account_product_tour_replay') }}">
             <input type="hidden" name="_token" value="{{ csrf_token('account_product_tour_replay') }}">
@@ -50,7 +81,7 @@
         </form>
     </section>
 
-    <section class="panel mt-4 space-y-2">
+    <section class="panel space-y-2">
         <h2 class="text-sm font-semibold">{{ 'preferences.issue_panels_browser'|trans }}</h2>
         <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_browser_help'|trans }}</p>
         <button
@@ -60,7 +91,7 @@
         >{{ 'preferences.issue_panels_reset'|trans }}</button>
     </section>
 
-    <section class="panel mt-6 space-y-3" aria-labelledby="display-pwa-heading">
+    <section class="panel space-y-3" aria-labelledby="display-pwa-heading">
         <div>
             <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
             <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.6] - 2026-07-21
+
+### Added
+
+- Mercure hub (Compose + Caddy `/.well-known/mercure`) for **optional** live member alerts when a **new issue** is created on an associated project — enable under **Administration → Mercure** (off by default; URL/JWT from UI or `MERCURE_*` env); operator manual [MERCURE.md](MERCURE.md)
+- Optional PWA / browser **Web Push** (VAPID) opt-in under **Account → Display**; encrypted `push_subscription` storage and Messenger fan-out (`DeliverWebPushForProjectMessage`); service worker push handlers appended to `nowo-tech/pwa-bundle` SW
+- Account → Display **product tours** card: per-tour enable/disable with Select all (`nowo-tech/select-all-choice-bundle`)
+- Sample seed (`app:seed-sample` / Setup sample actions) enables Mercure with `MERCURE_*` env defaults when instance fields are empty
+
+### Changed
+
+- Instance Mailer **From** and Mercure **URL / public URL** stored encrypted at rest (with DSN + JWT secret); `mailer_from` widened to `text` (`Version20260721242000`)
+- Account → Display groups layout, product tours, and push notifications into separate panels
+
 ## [0.12.5] - 2026-07-21
 
 ### Added
@@ -453,7 +467,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...HEAD
+[0.12.6]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.2...v0.12.3

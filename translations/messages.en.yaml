@@ -120,6 +120,8 @@ flash:
         sample_unavailable: Save a deliverable encrypted Mailer DSN before sending a sample.
         sample_invalid_recipient: Enter a valid recipient email address.
         sample_failed: Sample email could not be sent. Check the Mailer DSN and server logs.
+    mercure:
+        saved: Mercure settings saved.
     preferences:
         saved: Preferences saved.
         profile_saved: Profile saved.
@@ -580,6 +582,41 @@ mailer_settings:
 
             If you received this, the encrypted Mailer DSN can deliver magic-login emails.
             From address: %from%
+mercure_settings:
+    title: Mercure
+    intro: Optional live alerts for signed-in members when a new issue is created. Disabled by default — enable only when a Mercure hub is available. Web Push remains a separate Account → Display opt-in.
+    manual_hint: 'Operator manual (hub, JWT secret, Compose, troubleshooting): docs/MERCURE.md in the repository.'
+    status:
+        active: Live Mercure alerts are enabled for members.
+        inactive: Mercure is off
+        inactive_help: Members will not open an EventSource until you enable Mercure here and provide a reachable hub URL + JWT secret (saved below or via environment).
+        url_database: Hub publish URL is stored in instance settings.
+        url_env: Hub publish URL falls back to MERCURE_URL from the environment.
+        url_missing: No hub publish URL configured (set below or MERCURE_URL).
+        secret_database: JWT secret is stored encrypted in instance settings.
+        secret_env: JWT secret falls back to MERCURE_JWT_SECRET from the environment.
+        secret_missing: No JWT secret configured (set below or MERCURE_JWT_SECRET).
+    public_url_preview: 'Browser hub URL: %url%'
+    push_note: Background PWA push is configured per user under Account → Display (requires VAPID_* keys). It does not depend on Mercure.
+    submit: Save Mercure settings
+instance_mercure:
+    enabled:
+        label: Enable Mercure live alerts
+        help: When on, signed-in members subscribe to private project topics for new-issue toasts while the app is open.
+    url:
+        label: Publish URL (server)
+        help: Leave blank to use MERCURE_URL (e.g. http://mercure/.well-known/mercure inside Compose).
+    public_url:
+        label: Public URL (browser)
+        help: Leave blank to use MERCURE_PUBLIC_URL (usually same-origin /.well-known/mercure via Caddy).
+    jwt_secret:
+        label: JWT secret
+        help: Leave blank to keep the current encrypted value or fall back to MERCURE_JWT_SECRET. Minimum 32 characters when set.
+        too_short: JWT secret must be at least 32 characters.
+        invalid: Enter a valid JWT secret string.
+    clear_secret:
+        label: Clear stored JWT secret
+        help: Removes the database secret and falls back to MERCURE_JWT_SECRET until you save a new one.
 instance_mailer:
     mailer_dsn:
         label: Mailer DSN
@@ -789,6 +826,7 @@ preferences:
         title: Display
         intro: Choose language, theme, layout density, text size, contrast, sidebar, motion, content width, and which issue panels start collapsed.
         submit: Save display settings
+        section_layout: Language, theme, and layout
         pwa_title: Install app
         pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
         pwa_prompt_title: Install for quicker access
@@ -821,10 +859,25 @@ preferences:
     motion_full: Full motion
 
     product_tour_title: Product tour
-    product_tour_intro: Tours run once per area after setup. They stay off until you replay them here.
-    product_tour_seen: Mark all tours as completed
-    product_tour_seen_help: Check and save to hide every product tour. To see them again, use Replay below (unchecking alone does not re-enable auto-start).
+    product_tour_intro: Choose which contextual tours may auto-start. Leave all unchecked to turn every tour off. Use Select all to enable every tour again (completed pages stay hidden until you Replay).
+    product_tour_enabled: Active tours
+    product_tour_enabled_help: Checked tours can auto-start once per area. Uncheck a tour to hide it; uncheck all to disable every tour.
+    product_tour_select_all: Select all tours
+    product_tour_save_hint: Click Save display settings below to apply tour changes.
+    product_tour_page:
+        dashboard: Dashboard
+        project_issues: Project issues
+        admin: Administration
+    product_tour_replay_title: Replay a tour
+    product_tour_replay_intro: Clears completion flags and opens the dashboard tour once. Enable the tours you want under Active tours first.
     product_tour_replay: Replay dashboard tour
+    push_notifications: Push notifications for new issues
+    push_notifications_help: Optional. When enabled, Beacon asks the browser for permission and can alert you about new issues on projects you belong to — even when the app is in the background (installed PWA or supported browser). Live in-app toasts require Administration → Mercure to be enabled separately.
+    push_title: Push notifications
+    push_intro: Enable the checkbox below, save, then allow notifications when your browser asks. Alerts cover new issues on projects you are associated with.
+    push_privacy: Browser push uses a device subscription endpoint (not marketing cookies). You can turn this off anytime; see Privacy and Cookie settings for related choices.
+    push_unavailable_title: Push notifications unavailable
+    push_unavailable_help: The operator has not configured VAPID keys (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY). Ask an administrator, or use Mercure live toasts when enabled under Administration → Mercure.
     issue_panels_collapsed: Issue panels collapsed by default
     issue_panels_help: Checked panels start collapsed on issue and event detail pages. Your browser remembers manual open/close overrides.
     issue_panels_browser: Browser panel layout
@@ -1052,7 +1105,7 @@ setup:
         platform_ok: Navigation catalogs updated.
         demo_ok: Demo user / project ready.
         demo_exists: Demo user and project already exist.
-        sample_ok: Sample telemetry loaded.
+        sample_ok: Sample telemetry loaded. Mercure live alerts were enabled with env defaults when needed.
         complete: Setup marked complete.
         unknown_action: Unknown setup action.
         failed: Setup action failed.

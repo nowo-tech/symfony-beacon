@@ -416,7 +416,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         log_channel?: scalar|Param|null, // The channel of log message. Null to let Symfony decide. // Default: null
  *     }>,
  *     web_link?: bool|array{ // Web links configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *     },
  *     lock?: bool|string|array{ // Lock configuration
  *         enabled?: bool|Param, // Default: false
@@ -2093,6 +2093,38 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  * }
+ * @psalm-type MercureConfig = array{
+ *     hubs?: array<string, array{ // Default: []
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
+ *         jwt?: string|array{ // JSON Web Token configuration.
+ *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
+ *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
+ *             factory?: scalar|Param|null, // The ID of a service to call to create the JSON Web Token.
+ *             publish?: list<scalar|Param|null>,
+ *             subscribe?: list<scalar|Param|null>,
+ *             secret?: scalar|Param|null, // The JWT Secret to use.
+ *             passphrase?: scalar|Param|null, // The JWT secret passphrase. // Default: ""
+ *             algorithm?: scalar|Param|null, // The algorithm to use to sign the JWT // Default: "hmac.sha256"
+ *         },
+ *         jwt_provider?: scalar|Param|null, // Deprecated: The child node "jwt_provider" at path "mercure.hubs..jwt_provider" is deprecated, use "jwt.provider" instead. // The ID of a service to call to generate the JSON Web Token.
+ *         bus?: scalar|Param|null, // Name of the Messenger bus where the handler for this hub must be registered. Default to the default bus if Messenger is enabled.
+ *     }>,
+ *     default_hub?: scalar|Param|null,
+ *     default_cookie_lifetime?: int|Param, // Default lifetime of the cookie containing the JWT, in seconds. Defaults to the value of "framework.session.cookie_lifetime". // Default: null
+ *     enable_profiler?: bool|Param, // Deprecated: The child node "enable_profiler" at path "mercure.enable_profiler" is deprecated. // Enable Symfony Web Profiler integration.
+ * }
+ * @psalm-type NowoSelectAllChoiceConfig = array{
+ *     default_label?: scalar|Param|null, // Default translation key for the "Select all" label when not overridden per field. // Default: "form.select_all"
+ *     default_position?: scalar|Param|null, // Default position of the toggle: "before" or "after" the choices. // Default: "before"
+ *     default_toggle_css_class?: scalar|Param|null, // Default CSS class for the "Select all" checkbox/input. // Default: "form-check-input"
+ *     default_wrapper_css_class?: scalar|Param|null, // Default CSS class for the wrapper div that contains the toggle checkbox and its label (e.g. form-check for Bootstrap). // Default: "form-check"
+ *     default_label_css_class?: scalar|Param|null, // Default CSS class for the "Select all" label (e.g. form-check-label for Bootstrap). // Default: "form-check-label"
+ *     default_container_css_class?: scalar|Param|null, // Default CSS class for the outer wrapper div (toggle + choices). // Default: "form-check mb-2"
+ *     translation_domain?: scalar|Param|null, // Default translation domain for the "Select all" label (bundle uses NowoSelectAllChoiceBundle). // Default: "NowoSelectAllChoiceBundle"
+ *     form_theme?: scalar|Param|null, // Base form layout template used for choice widgets. Must match one of Symfony's form themes (e.g. form_div_layout.html.twig, bootstrap_5_layout.html.twig). See docs/CONFIGURATION.md. // Default: "form_div_layout.html.twig"
+ *     debug?: bool|Param, // When true, the frontend logs all debug/info/warn messages to the console. When false, only the initial "script loaded" message is shown. // Default: false
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2124,6 +2156,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_migrations_kit?: NowoMigrationsKitConfig,
  *     nowo_tag_input?: NowoTagInputConfig,
  *     nelmio_api_doc?: NelmioApiDocConfig,
+ *     mercure?: MercureConfig,
+ *     nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2157,6 +2191,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_migrations_kit?: NowoMigrationsKitConfig,
  *         nowo_tag_input?: NowoTagInputConfig,
  *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         mercure?: MercureConfig,
+ *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2189,6 +2225,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_migrations_kit?: NowoMigrationsKitConfig,
  *         nowo_tag_input?: NowoTagInputConfig,
  *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         mercure?: MercureConfig,
+ *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2223,6 +2261,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_migrations_kit?: NowoMigrationsKitConfig,
  *         nowo_tag_input?: NowoTagInputConfig,
  *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         mercure?: MercureConfig,
+ *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

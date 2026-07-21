@@ -85,14 +85,16 @@ final class SeedSampleCommand extends Command
         }
 
         $io->success(\sprintf(
-            'Sample size "%s" on project "%s": +%d issues, +%d events (analytics %s, performance %s)',
+            'Sample size "%s" on project "%s": +%d issues, +%d events (analytics %s, performance %s, Mercure %s)',
             $profile,
             $slug,
             $result['issues'],
             $result['events'],
             $result['analytics'] ? 'updated' : 'unchanged',
             $result['performance'] ? 'seeded' : 'already present',
+            $result['mercure'] ? 'enabled/configured' : 'already configured',
         ));
+        $io->note('Mercure live alerts use Administration → Mercure (enabled by sample seed). See docs/MERCURE.md.');
 
         return Command::SUCCESS;
     }

@@ -7,7 +7,7 @@ Beacon separates **schema**, **platform catalogs**, **demo identity**, and **opt
 | Schema | `doctrine:migrations:migrate` | Database structure |
 | Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs (idempotent; safe after upgrades) |
 | Demo | `app:seed-demo` / `make seed` | Local admin + `demo` project + `.demo-client.env` |
-| Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`) |
+| Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](MERCURE.md)) |
 
 ## Fresh install
 

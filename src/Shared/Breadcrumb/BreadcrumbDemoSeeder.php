@@ -292,6 +292,16 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'settings_mercure',
+            'Mercure',
+            ['en' => 'Mercure', 'es' => 'Mercure', 'de' => 'Mercure', 'nl' => 'Mercure', 'fr' => 'Mercure', 'it' => 'Mercure', 'pt' => 'Mercure'],
+            $admin,
+            [],
+            $changed,
+        );
+
         $menus = $this->ensureItem(
             $collection,
             'nowo_dashboard_menu_dashboard_index',

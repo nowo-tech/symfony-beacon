@@ -9,6 +9,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationDispatcher;
@@ -49,7 +50,10 @@ final class NotificationDispatcherTest extends TestCase
             },
         );
 
-        $dispatcher = $this->dispatcher($repo, $bus);
+        $realtime = $this->createMock(MemberIssueRealtimeNotifierInterface::class);
+        $realtime->expects(self::once())->method('notifyNewIssue');
+
+        $dispatcher = $this->dispatcher($repo, $bus, $realtime);
 
         $issue = new Issue();
         $issue->setProject($project);
@@ -143,6 +147,7 @@ final class NotificationDispatcherTest extends TestCase
     private function dispatcher(
         NotificationDestinationRepository $repo,
         MessageBusInterface $bus,
+        ?MemberIssueRealtimeNotifierInterface $realtime = null,
     ): NotificationDispatcher {
         $urls = $this->createStub(UrlGeneratorInterface::class);
         $urls->method('generate')->willReturn('https://beacon.test/issue');
@@ -157,6 +162,7 @@ final class NotificationDispatcherTest extends TestCase
             new QuietHoursEvaluator(),
             $bus,
             $em,
+            $realtime ?? $this->createStub(MemberIssueRealtimeNotifierInterface::class),
         );
     }
 

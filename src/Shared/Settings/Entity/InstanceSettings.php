@@ -31,12 +31,33 @@ class InstanceSettings implements AuditableInterface
     #[Encrypted]
     private ?string $mailerDsn = null;
 
-    #[ORM\Column(length: 180, nullable: true)]
+    /** Mail From address (encrypted at rest). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
     private ?string $mailerFrom = null;
 
     /** When set, the first-run setup wizard is considered finished / dismissed. */
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $setupCompletedAt = null;
+
+    /** When true, members may receive Mercure live alerts for new issues. */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $mercureEnabled = false;
+
+    /** Optional publish URL override (encrypted; empty = use MERCURE_URL env). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $mercureUrl = null;
+
+    /** Optional browser hub URL override (encrypted; empty = use MERCURE_PUBLIC_URL env). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $mercurePublicUrl = null;
+
+    /** Optional JWT HMAC secret override (encrypted; empty = use MERCURE_JWT_SECRET env). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $mercureJwtSecret = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -153,6 +174,80 @@ class InstanceSettings implements AuditableInterface
         $this->setupCompletedAt = null;
 
         return $this;
+    }
+
+    public function isMercureEnabled(): bool
+    {
+        return $this->mercureEnabled;
+    }
+
+    public function setMercureEnabled(bool $mercureEnabled): self
+    {
+        $this->mercureEnabled = $mercureEnabled;
+
+        return $this;
+    }
+
+    public function getMercureUrl(): ?string
+    {
+        return $this->mercureUrl;
+    }
+
+    public function setMercureUrl(?string $mercureUrl): self
+    {
+        if (null === $mercureUrl) {
+            $this->mercureUrl = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($mercureUrl);
+        $this->mercureUrl = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getMercurePublicUrl(): ?string
+    {
+        return $this->mercurePublicUrl;
+    }
+
+    public function setMercurePublicUrl(?string $mercurePublicUrl): self
+    {
+        if (null === $mercurePublicUrl) {
+            $this->mercurePublicUrl = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($mercurePublicUrl);
+        $this->mercurePublicUrl = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getMercureJwtSecret(): ?string
+    {
+        return $this->mercureJwtSecret;
+    }
+
+    public function setMercureJwtSecret(?string $mercureJwtSecret): self
+    {
+        if (null === $mercureJwtSecret) {
+            $this->mercureJwtSecret = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($mercureJwtSecret);
+        $this->mercureJwtSecret = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function hasMercureJwtSecret(): bool
+    {
+        return null !== $this->mercureJwtSecret && '' !== $this->mercureJwtSecret;
     }
 
     public function getCreatedBy(): ?object

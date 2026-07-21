@@ -56,7 +56,7 @@ See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager i
 
 ## Field encryption key (Halite)
 
-Beacon encrypts API key secrets, notification webhook URLs, and the instance Mailer DSN with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
+Beacon encrypts API key secrets, notification webhook URLs, push subscription endpoints, and **instance Mailer + Mercure settings** (DSN, From, hub URLs, JWT secret) with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
 
 | Approach | Notes |
 |----------|--------|

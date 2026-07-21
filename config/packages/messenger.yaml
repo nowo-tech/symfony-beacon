@@ -22,6 +22,7 @@ framework:
         routing:
             App\Ingest\Message\ProcessEnvelopeMessage: async
             App\Notifications\Message\DeliverNotificationMessage: async
+            App\Notifications\Message\DeliverWebPushForProjectMessage: async
 
 when@test:
     framework:

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'mercure_settings.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-xl">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mercure_settings.title'|trans }}</h1>
+    <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'mercure_settings.intro'|trans }}</p>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/55">{{ 'mercure_settings.manual_hint'|trans }}</p>
+
+    <div class="panel mb-4 space-y-2 text-sm text-[var(--color-ink)]/75">
+        {% if mercure_active %}
+            <p class="font-medium text-[var(--color-moss)]">{{ 'mercure_settings.status.active'|trans }}</p>
+            {% if resolved_public_url %}
+                <p class="font-mono text-xs break-all">{{ 'mercure_settings.public_url_preview'|trans({'%url%': resolved_public_url}) }}</p>
+            {% endif %}
+        {% else %}
+            <p><span class="badge badge-error">{{ 'mercure_settings.status.inactive'|trans }}</span></p>
+            <p>{{ 'mercure_settings.status.inactive_help'|trans }}</p>
+        {% endif %}
+        <p>
+            {% if using_database_url %}
+                {{ 'mercure_settings.status.url_database'|trans }}
+            {% elseif env_url_configured %}
+                {{ 'mercure_settings.status.url_env'|trans }}
+            {% else %}
+                {{ 'mercure_settings.status.url_missing'|trans }}
+            {% endif %}
+        </p>
+        <p>
+            {% if using_database_secret %}
+                {{ 'mercure_settings.status.secret_database'|trans }}
+            {% elseif env_jwt_configured %}
+                {{ 'mercure_settings.status.secret_env'|trans }}
+            {% else %}
+                {{ 'mercure_settings.status.secret_missing'|trans }}
+            {% endif %}
+        </p>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'mercure_settings.push_note'|trans }}</p>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.mercureEnabled) }}
+        {{ form_row(form.mercureUrl) }}
+        {{ form_row(form.mercurePublicUrl) }}
+        {{ form_row(form.plainMercureJwtSecret) }}
+        {{ form_row(form.clearMercureJwtSecret) }}
+
+        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'mercure_settings.submit'|trans }}</button>
+            <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

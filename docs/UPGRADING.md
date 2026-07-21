@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.5 to the next release](#upgrading-from-0125-to-the-next-release)
+- [Upgrading from 0.12.6 to the next release](#upgrading-from-0126-to-the-next-release)
+- [Upgrading from 0.12.5 to 0.12.6](#upgrading-from-0125-to-0126)
 - [Upgrading from 0.12.4 to 0.12.5](#upgrading-from-0124-to-0125)
 - [Upgrading from 0.12.3 to 0.12.4](#upgrading-from-0123-to-0124)
 - [Upgrading from 0.12.2 to 0.12.3](#upgrading-from-0122-to-0123)
@@ -35,16 +36,57 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.5 to the next release
+## Upgrading from 0.12.6 to the next release
 
 ```bash
 git pull
 composer install
+docker compose up -d
 php bin/console doctrine:migrations:migrate --no-interaction
 php bin/console app:seed-platform
 pnpm install
 make vite-build
 ```
+
+## Upgrading from 0.12.5 to 0.12.6
+
+```bash
+git pull
+composer install
+# Ensure Mercure + VAPID env vars are set (see `.env.dist`: MERCURE_*, VAPID_*).
+# Mercure JWT / hub setup: docs/MERCURE.md
+# Generate VAPID keys if enabling Web Push:
+#   docker compose exec php php -r 'require "vendor/autoload.php"; print_r(Minishlink\WebPush\VAPID::createVapidKeys());'
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+# Encrypt any plaintext Mailer From / Mercure URL rows saved before this release:
+#   php bin/console doctrine:encrypt:database --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Member live alerts (Mercure) + Web Push
+
+- Compose `mercure` service + Caddy `/.well-known/mercure` (see [MERCURE.md](MERCURE.md)).
+- **Administration → Mercure** (`/settings/mercure`): master switch; optional URL / public URL / JWT overrides (env fallbacks).
+- Off by default until an admin enables it (or sample seed copies env defaults — see below).
+- Migrations: `Version20260721241000` (instance Mercure fields), `Version20260721240000` (`push_subscription` + user opt-in).
+- Members opt in to **Web Push** under **Account → Display → Push notifications** (requires `VAPID_*`).
+
+### Encrypted Mailer + Mercure instance settings
+
+- `instance_settings.mailer_from`, `mercure_url`, and `mercure_public_url` join `mailer_dsn` / `mercure_jwt_secret` as Halite-encrypted columns (`#[Encrypted]`).
+- Migration `Version20260721242000` widens `mailer_from` to `text` for ciphertext.
+- Existing plaintext values stay readable until the next save, or run `doctrine:encrypt:database` after migrate.
+
+### Sample seed enables Mercure
+
+- `app:seed-sample` / Setup → sample data enables Mercure and fills blank URL / public URL / JWT from `MERCURE_*` without overwriting existing DB values.
+
+### Product tours on Account → Display
+
+- Active tours multi-checkbox + Select all (`nowo-tech/select-all-choice-bundle`) replaces the previous “mark all completed” control.
 
 ## Upgrading from 0.12.4 to 0.12.5
 

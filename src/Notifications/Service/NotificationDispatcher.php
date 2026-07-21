@@ -11,6 +11,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Performance\Entity\PerfTransaction;
@@ -31,6 +32,7 @@ final readonly class NotificationDispatcher
         private QuietHoursEvaluator $quietHoursEvaluator,
         private MessageBusInterface $bus,
         private EntityManagerInterface $entityManager,
+        private MemberIssueRealtimeNotifierInterface $memberRealtimeNotifier,
     ) {
     }
 
@@ -41,6 +43,7 @@ final readonly class NotificationDispatcher
             $issue->getLevel(),
             $this->payloadBuilder->forNewIssue($project, $issue),
         );
+        $this->memberRealtimeNotifier->notifyNewIssue($project, $issue);
     }
 
     public function dispatchIssueRegression(Project $project, Issue $issue): void

@@ -31,4 +31,6 @@ return [
     Nowo\MigrationsKitBundle\NowoMigrationsKitBundle::class => ['all' => true],
     Nowo\TagInputBundle\NowoTagInputBundle::class => ['all' => true],
     Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
+    Symfony\Bundle\MercureBundle\MercureBundle::class => ['all' => true],
+    Nowo\SelectAllChoiceBundle\NowoSelectAllChoiceBundle::class => ['all' => true],
 ];

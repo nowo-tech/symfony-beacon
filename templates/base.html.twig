@@ -111,6 +111,7 @@
             </div>
             <div class="app-sidebar-backdrop" data-sidebar-backdrop hidden></div>
             {{ nowo_pwa_install_prompt() }}
+            {% include '_issue_realtime.html.twig' %}
         {% else %}
             </main>
             {{ nowo_pwa_install_prompt() }}

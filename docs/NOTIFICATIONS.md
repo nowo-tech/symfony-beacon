@@ -4,8 +4,38 @@ Beacon can notify external systems when a project records a **new issue**, an **
 
 Supported channels: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP**.
 
+In addition, **optional** member alerts for **new issues** on projects they belong to:
+
+| Channel | When | How to enable |
+|---|---|---|
+| Mercure (SSE) | App open (browser or installed PWA) | **Administration → Mercure** (off by default; **enabled automatically** when you run `app:seed-sample` / Setup sample data). Hub URL / JWT from that screen or `MERCURE_*` env — see [MERCURE.md](MERCURE.md) |
+| Web Push | Background / locked screen | **Account → Display → Push notifications** (off by default; requires `VAPID_*` env keys) |
+
+Neither channel is required for Envelope ingest or webhook destinations.
+
 See feature specs `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](ROADMAP.md).
 In the app, open **Project → Settings → Notifications → Setup guides** for the same manuals.
+
+## Member push (Mercure + Web Push)
+
+### Mercure hub
+
+Full operator manual (Compose hub, JWT secret, admin overrides, external hubs, troubleshooting): **[MERCURE.md](MERCURE.md)**.
+
+Summary:
+
+1. Optionally start the Compose `mercure` service and keep Caddy proxying `/.well-known/mercure`.
+2. Set a strong `MERCURE_JWT_SECRET` (≥ 32 chars) shared with the hub’s `MERCURE_*_JWT_KEY`.
+3. Open **Administration → Mercure**, enable live alerts, and set publish URL / public URL / JWT secret (or leave blank to use `MERCURE_URL`, `MERCURE_PUBLIC_URL`, `MERCURE_JWT_SECRET`).
+4. When enabled, each **new issue** publishes a **private** update on topic `/projects/{projectUuid}/issues`. Signed-in clients fetch a short-lived subscriber JWT from `GET /account/realtime/config` only if Mercure is enabled.
+
+### Web Push (PWA)
+
+1. Generate VAPID keys and set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` (e.g. `mailto:ops@example.com`). Leave keys empty to hide the Account push option.
+2. Members opt in under **Account → Display**. The browser service worker (`/sw.js`, extended with push handlers) shows notifications; taps open the issue URL.
+3. Subscription endpoints are stored encrypted in `push_subscription`. Opting out deletes stored subscriptions.
+
+**Privacy:** Web Push is a device subscription, not a marketing cookie. Still offer Privacy / Terms / Cookie settings for operators; use `nowo-tech/cookie-consent-bundle` when adding non-essential tracking.
 
 ## Configure (any channel)
 

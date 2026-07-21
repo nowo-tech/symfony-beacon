@@ -51,6 +51,12 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertStringEndsWith('<ENC>', $raw);
         self::assertStringNotContainsString('s3cret', $raw);
 
+        $rawFrom = $conn->fetchOne('SELECT mailer_from FROM instance_settings WHERE id = 1');
+        self::assertIsString($rawFrom);
+        self::assertNotSame('alerts@example.com', $rawFrom);
+        self::assertStringEndsWith('<ENC>', $rawFrom);
+        self::assertStringNotContainsString('alerts@example.com', $rawFrom);
+
         $em->clear();
         $settings = $em->find(InstanceSettings::class, 1);
         self::assertNotNull($settings);

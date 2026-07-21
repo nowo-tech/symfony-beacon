@@ -129,6 +129,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\Column(nullable: true)]
     private ?array $productTourSeenPages = null;
 
+    /** Opt-in for PWA / browser push alerts on new issues in associated projects. */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $pushNotificationsEnabled = false;
+
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
@@ -523,6 +527,70 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         if (\count($pages) >= \count($allowed)) {
             $this->productTourSeenAt ??= new DateTimeImmutable();
         }
+
+        return $this;
+    }
+
+    /**
+     * Tours the user still wants to allow (auto-start until completed once).
+     *
+     * @return list<string>
+     */
+    public function getEnabledProductTourPages(): array
+    {
+        $all = array_map(
+            static fn (ProductTourPage $page): string => $page->value,
+            ProductTourPage::all(),
+        );
+        if ($this->isProductTourSeen()) {
+            return [];
+        }
+
+        return array_values(array_diff($all, $this->getProductTourSeenPages()));
+    }
+
+    /**
+     * Persist which tours remain enabled; unselected pages are treated as completed/hidden.
+     *
+     * @param list<string>|array<int, mixed> $enabledPages
+     */
+    public function syncEnabledProductTourPages(array $enabledPages): self
+    {
+        $allowed = array_map(
+            static fn (ProductTourPage $page): string => $page->value,
+            ProductTourPage::all(),
+        );
+        $enabled = array_values(array_unique(array_filter(
+            $enabledPages,
+            static fn (mixed $id): bool => \is_string($id) && \in_array($id, $allowed, true),
+        )));
+        $completed = array_values(array_diff($allowed, $enabled));
+
+        if ([] === $completed) {
+            $this->productTourSeenAt = null;
+            $this->productTourSeenPages = null;
+
+            return $this;
+        }
+
+        $this->productTourSeenPages = $completed;
+        if (\count($completed) >= \count($allowed)) {
+            $this->productTourSeenAt = new DateTimeImmutable();
+        } else {
+            $this->productTourSeenAt = null;
+        }
+
+        return $this;
+    }
+
+    public function isPushNotificationsEnabled(): bool
+    {
+        return $this->pushNotificationsEnabled;
+    }
+
+    public function setPushNotificationsEnabled(bool $pushNotificationsEnabled): self
+    {
+        $this->pushNotificationsEnabled = $pushNotificationsEnabled;
 
         return $this;
     }

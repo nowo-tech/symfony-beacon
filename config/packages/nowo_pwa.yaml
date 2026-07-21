@@ -27,7 +27,7 @@ nowo_pwa:
     service_worker:
         enabled: true
         strategy: network-first
-        cache_version: v2
+        cache_version: v3
         cache_name_prefix: beacon-pwa
         precache_urls:
             - /en/login
@@ -39,6 +39,7 @@ nowo_pwa:
             - '/api/'
             - '/admin'
             - '/account'
+            - '/.well-known/mercure'
             - '/_profiler'
             - '/_wdt'
             - '/breadcrumb-kit-admin'

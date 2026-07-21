@@ -124,7 +124,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         self::assertNotContains('[data-tour="project-settings"]', $viewerSelectors);
     }
 
-    public function testDisplayCheckboxPersistsSeenFlag(): void
+    public function testDisplayTourMultiselectCanDisableAllTours(): void
     {
         [$client, $user] = $this->bootWithDemoProject('tour-prefs@example.com');
         $this->login($client, $user);
@@ -133,7 +133,9 @@ final class ProductTourTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save display settings')->form();
-        $form['user_preferences[productTourSeen]']->tick();
+        foreach ($form['user_preferences']['productTourEnabledPages'] as $checkbox) {
+            $checkbox->untick();
+        }
         $client->submit($form);
         self::assertResponseRedirects('/account/display');
 
@@ -145,9 +147,10 @@ final class ProductTourTest extends DatabaseWebTestCase
         self::assertTrue($reloaded->hasSeenTourPage('dashboard'));
         self::assertTrue($reloaded->hasSeenTourPage('project_issues'));
         self::assertTrue($reloaded->hasSeenTourPage('admin'));
+        self::assertSame([], $reloaded->getEnabledProductTourPages());
     }
 
-    public function testUncheckingTourPreferenceDoesNotReEnableAutoStart(): void
+    public function testEnablingSelectedToursReEnablesAutoStart(): void
     {
         [$client, $user] = $this->bootWithDemoProject('tour-uncheck@example.com');
         $user->markProductTourSeen();
@@ -156,7 +159,11 @@ final class ProductTourTest extends DatabaseWebTestCase
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/account/display');
         $form = $crawler->selectButton('Save display settings')->form();
-        $form['user_preferences[productTourSeen]']->untick();
+        foreach ($form['user_preferences']['productTourEnabledPages'] as $checkbox) {
+            $checkbox->untick();
+        }
+        $form['user_preferences']['productTourEnabledPages'][0]->tick(); // dashboard
+        $form['user_preferences']['productTourEnabledPages'][1]->tick(); // project_issues
         $client->submit($form);
         self::assertResponseRedirects('/account/display');
 
@@ -164,7 +171,11 @@ final class ProductTourTest extends DatabaseWebTestCase
         $em->clear();
         $reloaded = $em->find($user::class, $user->getId());
         self::assertNotNull($reloaded);
-        self::assertTrue($reloaded->isProductTourSeen());
+        self::assertFalse($reloaded->isProductTourSeen());
+        self::assertFalse($reloaded->hasSeenTourPage('dashboard'));
+        self::assertFalse($reloaded->hasSeenTourPage('project_issues'));
+        self::assertTrue($reloaded->hasSeenTourPage('admin'));
+        self::assertSame(['dashboard', 'project_issues'], $reloaded->getEnabledProductTourPages());
     }
 
     public function testReplayClearsSeenAndForcesTourQuery(): void

@@ -176,6 +176,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.4a | **Install / seed layers**: platform (menus) vs demo (identity+DSN) vs sample sizes; upgrade = migrate + platform seed (`055`) | Beacon | `055-install-seed-layers` | **Done** (v0.12.4) |
 | 6.4b | **Setup wizard UI**: `/setup` for admins (platform / demo / sample + dismiss); upgrade migration skips wizard (`056`) | Beacon | `056-setup-wizard` | **Done** (v0.12.4) |
 | 6.4c | **Product tour**: contextual driver.js (dashboard / project Issues / admin); role-aware steps; prefs mark-seen / replay (`057`) | Beacon | `057-product-tour` | **Done** (v0.12.5) |
+| 6.4d | **Member push**: Mercure hub + PWA Web Push for new issues on associated projects | Beacon | — | **Done** (v0.12.6) |
 
 ### Planned
 
@@ -241,6 +242,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.12.3** | Brand mark (tower + arcs), Montserrat UI font, docs/constitution PWA-only sync |
 | **v0.12.4** | Install seed layers (`055`) + setup wizard UI (`056`) |
 | **v0.12.5** | Product tour (`057`) + event tenancy / issue level hardening |
+| **v0.12.6** | Mercure live alerts + PWA Web Push; encrypted Mailer From / Mercure URLs; sample seed Mercure defaults; tour Select all |
 | **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`) |
 | **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`, after `045`–`048`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; headers/`api/doc` (`053`/`054`); SSO/OIDC when specified |
 
@@ -255,4 +257,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21 (v0.12.5: product tour `057` + event/issue schema hardening).
+Last updated: 2026-07-21 (v0.12.6: Mercure + PWA Web Push member alerts; encrypted instance Mailer/Mercure fields).

@@ -59,6 +59,11 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 
+	# Mercure hub (Compose service `mercure`) — same-origin SSE for the PWA UI.
+	handle /.well-known/mercure* {
+		reverse_proxy mercure:80
+	}
+
 	# Vite assets: prefer files already written under public/build/ (vite-build).
 	# Only proxy to the Vite container for missing paths (HMR / transformed modules).
 	# Blind reverse_proxy of all /build* hangs the browser when Vite is slow or when a

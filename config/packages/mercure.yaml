@@ -1,0 +1,18 @@
+mercure:
+    hubs:
+        default:
+            url: '%env(default::MERCURE_URL)%'
+            public_url: '%env(default::MERCURE_PUBLIC_URL)%'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                publish: '*'
+
+when@test:
+    mercure:
+        hubs:
+            default:
+                url: 'http://127.0.0.1/.well-known/mercure'
+                public_url: 'http://127.0.0.1/.well-known/mercure'
+                jwt:
+                    secret: '!ChangeThisMercureHubJWTSecretKey!'
+                    publish: '*'

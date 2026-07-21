@@ -784,6 +784,7 @@ preferences:
         title: Interfaz
         intro: Elige idioma, tema, densidad, tamaño de texto, contraste, barra lateral, movimiento, ancho del contenido y qué paneles de incidencia empiezan colapsados.
         submit: Guardar interfaz
+        section_layout: Idioma, tema y diseño
         pwa_title: Instalar aplicación
         pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
         pwa_prompt_title: Instala para acceder antes
@@ -816,10 +817,25 @@ preferences:
     motion_full: Movimiento completo
 
     product_tour_title: Tour del producto
-    product_tour_intro: Los tours se muestran una vez por área tras el setup. No vuelven hasta que los reproduzcas aquí.
-    product_tour_seen: Marcar todos los tours como completados
-    product_tour_seen_help: Marca y guarda para ocultar todos los tours. Para verlos otra vez usa Repetir abajo (desmarcar no vuelve a activar el auto-inicio).
+    product_tour_intro: Elige qué tours contextuales pueden iniciarse solos. Déjalos todos sin marcar para desactivar todos. Usa Seleccionar todos para volver a activarlos (las páginas ya completadas siguen ocultas hasta que uses Repetir).
+    product_tour_enabled: Tours activos
+    product_tour_enabled_help: Los tours marcados pueden iniciarse una vez por área. Desmarca uno para ocultarlo; desmarca todos para desactivar todos.
+    product_tour_select_all: Seleccionar todos los tours
+    product_tour_save_hint: Pulsa Guardar interfaz abajo para aplicar los cambios de tours.
+    product_tour_page:
+        dashboard: Panel
+        project_issues: Incidencias del proyecto
+        admin: Administración
+    product_tour_replay_title: Repetir un tour
+    product_tour_replay_intro: Borra las marcas de completado y abre el tour del panel una vez. Activa antes los tours que quieras en Tours activos.
     product_tour_replay: Repetir tour del panel
+    push_notifications: Notificaciones push de incidencias nuevas
+    push_notifications_help: Opcional. Si lo activas, Beacon pide permiso al navegador y puede avisarte de incidencias nuevas en proyectos a los que perteneces, también con la app en segundo plano (PWA o navegador compatible). Los toasts en vivo requieren que Administración → Mercure esté activado por separado.
+    push_title: Notificaciones push
+    push_intro: Activa la casilla de abajo, guarda y acepta el permiso cuando el navegador lo pida. Los avisos cubren incidencias nuevas en proyectos asociados.
+    push_privacy: El push del navegador usa un endpoint de suscripción del dispositivo (no cookies de marketing). Puedes desactivarlo cuando quieras; consulta Privacidad y Ajustes de cookies.
+    push_unavailable_title: Notificaciones push no disponibles
+    push_unavailable_help: El operador no ha configurado las claves VAPID (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY). Pide a un administrador, o usa toasts Mercure cuando estén activos en Administración → Mercure.
     issue_panels_collapsed: Paneles de incidencia colapsados por defecto
     issue_panels_help: Los paneles marcados empiezan colapsados en el detalle de incidencia/evento. El navegador recuerda si los abres o cierras a mano.
     issue_panels_browser: Diseño de paneles en el navegador
@@ -1047,7 +1063,7 @@ setup:
         platform_ok: Catálogos de navegación actualizados.
         demo_ok: Usuario / proyecto demo listos.
         demo_exists: El usuario y proyecto demo ya existen.
-        sample_ok: Telemetría de muestra cargada.
+        sample_ok: Telemetría de muestra cargada. Las alertas Mercure en vivo se activaron con los valores de entorno cuando hacía falta.
         complete: Configuración marcada como completa.
         unknown_action: Acción de setup desconocida.
         failed: Falló la acción de setup.

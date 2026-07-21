@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Instance Mailer settings (DSN stored encrypted; blank keeps current value).
+ * Instance Mailer settings (DSN and From stored encrypted; blank DSN keeps current value).
  *
  * @extends AbstractType<InstanceSettings>
  */

@@ -12,6 +12,8 @@ use App\Identity\Form\AccountSecurityType;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Issues\IssuePanelIds;
+use App\Notifications\Repository\PushSubscriptionRepository;
+use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Repository\ProjectMembershipRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -43,6 +45,8 @@ final class AccountPreferencesController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly ProjectMembershipRepository $projectMembershipRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly PushSubscriptionRepository $pushSubscriptionRepository,
+        private readonly WebPushClientFactory $webPushFactory,
         private readonly PasswordExpiryServiceInterface $passwordExpiryService,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
@@ -216,18 +220,23 @@ final class AccountPreferencesController extends AbstractController
 
         $form = $this->createForm(AccountDisplayType::class, $user, [
             'enabled_locales' => $enabledLocales,
+            'push_available' => $this->webPushFactory->isConfigured(),
         ]);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {
-            $form->get('productTourSeen')->setData($user->isProductTourSeen());
+            $form->get('productTourEnabledPages')->setData($user->getEnabledProductTourPages());
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Checking suppresses all tours. Unchecking alone does not re-enable —
-            // users must use Replay so tours never return accidentally.
-            if (true === $form->get('productTourSeen')->getData()) {
-                $user->markProductTourSeen();
+            /** @var list<string>|array<int, mixed> $enabledTours */
+            $enabledTours = $form->get('productTourEnabledPages')->getData() ?? [];
+            $user->syncEnabledProductTourPages(\is_array($enabledTours) ? $enabledTours : []);
+
+            if ($form->has('pushNotificationsEnabled') && !$user->isPushNotificationsEnabled()) {
+                foreach ($this->pushSubscriptionRepository->findByUser($user) as $subscription) {
+                    $this->entityManager->remove($subscription);
+                }
             }
 
             $this->entityManager->flush();
@@ -246,6 +255,7 @@ final class AccountPreferencesController extends AbstractController
         return $this->render('account/display.html.twig', [
             'form' => $form,
             'issue_panel_ids' => IssuePanelIds::all(),
+            'push_available' => $this->webPushFactory->isConfigured(),
         ]);
     }
 

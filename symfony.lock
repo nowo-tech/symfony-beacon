@@ -99,6 +99,9 @@
     "nowo-tech/pwa-bundle": {
         "version": "v1.1.2"
     },
+    "nowo-tech/select-all-choice-bundle": {
+        "version": "v1.4.11"
+    },
     "nowo-tech/tag-input-bundle": {
         "version": "v1.0.4"
     },
@@ -202,6 +205,18 @@
         },
         "files": [
             "config/packages/mailer.yaml"
+        ]
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.4",
+            "ref": "b141b8c8f13bc8c31d718a5488039b712c0d3592"
+        },
+        "files": [
+            "config/packages/mercure.yaml"
         ]
     },
     "symfony/messenger": {

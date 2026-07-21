@@ -13,12 +13,24 @@ parameters:
     env(BEACON_EVENT_QUOTA_DAILY): '0'
     env(BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS): '0'
     env(BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT): '20'
+    env(VAPID_PUBLIC_KEY): ''
+    env(VAPID_PRIVATE_KEY): ''
+    env(VAPID_SUBJECT): 'mailto:ops@localhost'
+    env(MERCURE_URL): ''
+    env(MERCURE_PUBLIC_URL): ''
+    env(MERCURE_JWT_SECRET): ''
     beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
     beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
     beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
     beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
     beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
     beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
+    beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
+    beacon.vapid.private_key: '%env(string:VAPID_PRIVATE_KEY)%'
+    beacon.vapid.subject: '%env(string:VAPID_SUBJECT)%'
+    beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
+    beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
+    beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
 
 services:
     # default configuration for services in *this* file
@@ -59,6 +71,24 @@ services:
     App\Notifications\Service\NotificationDeliveryHistoryRecorder:
         arguments:
             $historyLimit: '%beacon.notifications.delivery_history_limit%'
+
+    App\Notifications\Service\WebPushClientFactory:
+        arguments:
+            $vapidPublicKey: '%beacon.vapid.public_key%'
+            $vapidPrivateKey: '%beacon.vapid.private_key%'
+            $vapidSubject: '%beacon.vapid.subject%'
+
+    App\Shared\Mercure\ConfiguredMercure:
+        arguments:
+            $envUrl: '%beacon.mercure.env_url%'
+            $envPublicUrl: '%beacon.mercure.env_public_url%'
+            $envJwtSecret: '%beacon.mercure.env_jwt_secret%'
+
+    App\Shared\Mercure\MercureSampleSeeder:
+        arguments:
+            $envUrl: '%beacon.mercure.env_url%'
+            $envPublicUrl: '%beacon.mercure.env_public_url%'
+            $envJwtSecret: '%beacon.mercure.env_jwt_secret%'
 
     # Prefer encrypted instance_settings.mailer_dsn; MAILER_DSN env is bootstrap/fallback only.
     Symfony\Component\Mailer\MailerInterface: '@App\Shared\Mailer\ConfiguredMailer'

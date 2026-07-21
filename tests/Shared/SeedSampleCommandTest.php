@@ -46,6 +46,21 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
         $sampleTester = new CommandTester($application->find('app:seed-sample'));
         $sampleTester->execute(['--size' => 'dev', '--project' => 'demo']);
         self::assertSame(0, $sampleTester->getStatusCode(), $sampleTester->getDisplay());
+        self::assertStringContainsString('Mercure', $sampleTester->getDisplay());
+
+        $settings = static::getContainer()->get(\App\Shared\Settings\Repository\InstanceSettingsRepository::class)->getOrCreate();
+        self::assertTrue($settings->isMercureEnabled());
+        self::assertTrue($settings->hasMercureJwtSecret());
+        self::assertNotEmpty($settings->getMercureUrl());
+        self::assertNotEmpty($settings->getMercurePublicUrl());
+        self::assertTrue(static::getContainer()->get(\App\Shared\Mercure\ConfiguredMercure::class)->isEnabled());
+
+        $conn = $em->getConnection();
+        foreach (['mercure_url', 'mercure_public_url', 'mercure_jwt_secret'] as $column) {
+            $raw = $conn->fetchOne(\sprintf('SELECT %s FROM instance_settings WHERE id = 1', $column));
+            self::assertIsString($raw, $column);
+            self::assertStringEndsWith('<ENC>', $raw, $column);
+        }
 
         $demoIssueCount = (int) $em->createQuery(
             'SELECT COUNT(i.id) FROM '.Issue::class.' i WHERE i.project = :p',

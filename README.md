@@ -24,11 +24,11 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
 - **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` (AuthKit paths `/{locale}/…`); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
-- Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, **instance Mailer DSN**)
+- Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, push subscriptions, **instance Mailer DSN/From**, **Mercure URL/JWT**)
 - **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login
+- **Administration → Mercure** (`/settings/mercure`): optional live new-issue toasts (hub + JWT); see [docs/MERCURE.md](docs/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
-- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); optional **product tour** replay
-- Install seed layers + admin **Setup** wizard (`/setup`); contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
+- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install- Install seed layers + admin **Setup** wizard (`/setup`); contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
 - Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history, **transfer ownership**, delete)
 - Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
@@ -45,13 +45,13 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
-- Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt)
+- Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt); **optional** member alerts for new issues — Mercure live toasts via **Administration → Mercure** ([docs/MERCURE.md](docs/MERCURE.md)), Web Push via **Account → Display** ([docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md))
 - Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display`
-- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, Mailer, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
+- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, Mailer, Mercure, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
 Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). Auth is password (+ remember-me) or **magic login** (`/login/magic`); SSO is Later.
 
@@ -117,7 +117,7 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates + charts/filters (`025`); table + Chart.js |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history |
-| `Shared` | Appearance, menus/breadcrumbs glue, legal pages, instance Mailer |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal pages, instance Mailer / Mercure |
 
 ## Spec-Driven Development
 
@@ -138,6 +138,7 @@ docker compose exec php php bin/phpunit
 - [HTTP API overview](docs/API.md)
 - [Product roadmap](docs/ROADMAP.md)
 - [Project notifications](docs/NOTIFICATIONS.md)
+- [Mercure (live alerts, JWT)](docs/MERCURE.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)

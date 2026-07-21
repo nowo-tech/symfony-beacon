@@ -1,0 +1,11 @@
+# nowo-tech/select-all-choice-bundle
+# https://github.com/nowo-tech/SelectAllChoiceBundle
+nowo_select_all_choice:
+    form_theme: 'form_div_layout.html.twig'
+    default_label: 'form.select_all'
+    default_position: before
+    default_toggle_css_class: 'size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30'
+    default_wrapper_css_class: 'flex items-center gap-2'
+    default_label_css_class: 'text-sm font-medium text-[var(--color-ink)]'
+    default_container_css_class: 'space-y-2 mb-2'
+    translation_domain: NowoSelectAllChoiceBundle

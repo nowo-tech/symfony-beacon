@@ -1,0 +1,13 @@
+{# Mercure live issue toasts + optional Web Push sync for logged-in members. #}
+{% if app.user %}
+    <div
+        class="sr-only"
+        aria-hidden="true"
+        data-controller="issue-realtime"
+        data-issue-realtime-config-url-value="{{ path('account_realtime_config') }}"
+        data-issue-realtime-subscribe-url-value="{{ path('account_push_subscribe') }}"
+        data-issue-realtime-unsubscribe-url-value="{{ path('account_push_unsubscribe') }}"
+        data-issue-realtime-csrf-token-value="{{ csrf_token('account_push') }}"
+        data-issue-realtime-enabled-value="true"
+    ></div>
+{% endif %}

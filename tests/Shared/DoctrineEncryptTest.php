@@ -7,6 +7,8 @@ namespace App\Tests\Shared;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\ProjectApiKey;
+use App\Shared\Settings\Entity\InstanceSettings;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -66,5 +68,46 @@ final class DoctrineEncryptTest extends DatabaseWebTestCase
         $reloaded = $em->find(NotificationDestination::class, $id);
         self::assertNotNull($reloaded);
         self::assertSame('https://hooks.example.com/services/SECRET_TOKEN', $reloaded->getEndpointUrl());
+    }
+
+    public function testInstanceMailerAndMercureSettingsAreEncryptedInDatabase(): void
+    {
+        $this->bootWithDemoProject('encrypt-instance@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $repo = self::getContainer()->get(InstanceSettingsRepository::class);
+
+        $settings = $repo->getOrCreate();
+        $settings->setMailerDsn('smtp://user:s3cret@mail.example:587');
+        $settings->setMailerFrom('ops@example.com');
+        $settings->setMercureEnabled(true);
+        $settings->setMercureUrl('http://mercure/.well-known/mercure');
+        $settings->setMercurePublicUrl('https://beacon.example/.well-known/mercure');
+        $settings->setMercureJwtSecret('!ChangeThisMercureHubJWTSecretKey!');
+        $repo->save($settings);
+
+        $conn = $em->getConnection();
+        $columns = [
+            'mailer_dsn' => 's3cret',
+            'mailer_from' => 'ops@example.com',
+            'mercure_url' => 'http://mercure/.well-known/mercure',
+            'mercure_public_url' => 'https://beacon.example/.well-known/mercure',
+            'mercure_jwt_secret' => '!ChangeThisMercureHubJWTSecretKey!',
+        ];
+        foreach ($columns as $column => $plain) {
+            $raw = $conn->fetchOne(\sprintf('SELECT %s FROM instance_settings WHERE id = 1', $column));
+            self::assertIsString($raw, $column);
+            self::assertNotSame($plain, $raw, $column);
+            self::assertStringEndsWith('<ENC>', $raw, $column);
+            self::assertStringNotContainsString($plain, $raw, $column);
+        }
+
+        $em->clear();
+        $reloaded = $em->find(InstanceSettings::class, 1);
+        self::assertNotNull($reloaded);
+        self::assertSame('smtp://user:s3cret@mail.example:587', $reloaded->getMailerDsn());
+        self::assertSame('ops@example.com', $reloaded->getMailerFrom());
+        self::assertSame('http://mercure/.well-known/mercure', $reloaded->getMercureUrl());
+        self::assertSame('https://beacon.example/.well-known/mercure', $reloaded->getMercurePublicUrl());
+        self::assertSame('!ChangeThisMercureHubJWTSecretKey!', $reloaded->getMercureJwtSecret());
     }
 }

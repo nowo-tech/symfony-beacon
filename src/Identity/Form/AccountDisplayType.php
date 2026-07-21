@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Identity\Entity\User;
+use App\Identity\Tour\ProductTourPage;
 use App\Issues\IssuePanelIds;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\TagInputBundle\Form\TagType;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Account display preferences: locale, theme, layout, a11y, issue panels.
+ * Account display preferences: locale, theme, layout, a11y, issue panels, tours, push.
  */
 final class AccountDisplayType extends FormKitAbstractType
 {
@@ -29,8 +30,12 @@ final class AccountDisplayType extends FormKitAbstractType
         }
 
         $panelIds = IssuePanelIds::all();
+        $tourChoices = [];
+        foreach (ProductTourPage::all() as $page) {
+            $tourChoices['preferences.product_tour_page.'.$page->value] = $page->value;
+        }
 
-        $this->withBuilder($builder, function () use ($localeChoices): void {
+        $this->withBuilder($builder, function () use ($localeChoices, $tourChoices): void {
             $this->addChoiceField('preferredLocale', [
                 'choices' => $localeChoices,
                 'placeholder' => 'preferences.locale_auto',
@@ -95,6 +100,24 @@ final class AccountDisplayType extends FormKitAbstractType
                 'placeholder' => 'preferences.motion_system',
                 'required' => false,
             ]);
+
+            $this->addChoiceField('productTourEnabledPages', [
+                'mapped' => false,
+                'required' => false,
+                'expanded' => true,
+                'multiple' => true,
+                'choices' => $tourChoices,
+                'choice_translation_domain' => 'messages',
+                'label' => 'preferences.product_tour_enabled',
+                'help' => 'preferences.product_tour_enabled_help',
+                'select_all' => true,
+                'select_all_label' => 'preferences.product_tour_select_all',
+                'select_all_translation_domain' => 'messages',
+                'select_all_css_class' => 'size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30',
+                'select_all_wrapper_css_class' => 'flex items-center gap-2',
+                'select_all_label_css_class' => 'text-sm font-medium text-[var(--color-ink)]',
+                'select_all_container_css_class' => 'space-y-2',
+            ]);
         });
 
         $builder->add('preferredCollapsedIssuePanels', TagType::class, [
@@ -112,14 +135,14 @@ final class AccountDisplayType extends FormKitAbstractType
             'input_class' => 'input nowo-tag-input__field',
         ]);
 
-        $builder->add('productTourSeen', CheckboxType::class, [
-            'mapped' => false,
-            'required' => false,
-            'label' => 'preferences.product_tour_seen',
-            'help' => 'preferences.product_tour_seen_help',
-            'translation_domain' => 'messages',
-            'disabled' => false,
-        ]);
+        if ($options['push_available']) {
+            $builder->add('pushNotificationsEnabled', CheckboxType::class, [
+                'required' => false,
+                'label' => 'preferences.push_notifications',
+                'help' => 'preferences.push_notifications_help',
+                'translation_domain' => 'messages',
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -127,8 +150,10 @@ final class AccountDisplayType extends FormKitAbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'enabled_locales' => ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt'],
+            'push_available' => false,
         ]);
         $resolver->setAllowedTypes('enabled_locales', 'string[]');
+        $resolver->setAllowedTypes('push_available', 'bool');
     }
 
     #[Override]
