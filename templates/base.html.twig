@@ -67,6 +67,16 @@
                             {% if beacon_breadcrumbs %}
                                 <div class="beacon-breadcrumb-wrap mb-6">{{ beacon_breadcrumbs|raw }}</div>
                             {% endif %}
+                            {% if is_granted('ROLE_ADMIN') and app.session.get('_beacon_view_as_member') %}
+                                <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm" role="status">
+                                    <span>{{ 'admin_projects.view_as_banner'|trans }}</span>
+                                    <form method="post" action="{{ path('admin_view_as_member_disable') }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('admin_view_as_member_disable') }}">
+                                        <input type="hidden" name="redirect" value="{{ app.request.requestUri }}">
+                                        <button class="btn-ghost btn-sm" type="submit">{{ 'admin_projects.view_as_exit'|trans }}</button>
+                                    </form>
+                                </div>
+                            {% endif %}
                         {% endif %}
                         {% block app_flashes %}
                             {% include '_toasts.html.twig' %}

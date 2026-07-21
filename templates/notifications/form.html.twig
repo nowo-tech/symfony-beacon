@@ -17,6 +17,17 @@
     {{ form_row(form.endpointUrl) }}
     {{ form_row(form.enabled) }}
     {{ form_row(form.categories) }}
+    <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+        <legend class="text-sm font-semibold">{{ 'notifications.form.quiet_hours_legend'|trans }}</legend>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'notifications.form.pagerduty_note'|trans }}</p>
+        {{ form_row(form.quietHoursEnabled) }}
+        {{ form_row(form.quietHoursTimezone) }}
+        <div class="grid gap-3 sm:grid-cols-2">
+            {{ form_row(form.quietHoursStart) }}
+            {{ form_row(form.quietHoursEnd) }}
+        </div>
+        {{ form_row(form.digestEnabled) }}
+    </fieldset>
     <div class="flex flex-wrap gap-2 pt-2">
         <button class="btn-primary" type="submit">{{ 'notifications.save'|trans }}</button>
         <a class="btn-ghost" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'notifications.cancel'|trans }}</a>

@@ -11,11 +11,42 @@ final class NotificationCategories
 {
     public const string N_PLUS_ONE = 'n_plus_one';
 
+    public const string ISSUE_RESOLVED = 'issue.resolved';
+
+    public const string ISSUE_REOPENED = 'issue.reopened';
+
+    public const string ISSUE_ASSIGNED = 'issue.assigned';
+
+    public const string ISSUE_COMMENTED = 'issue.commented';
+
+    public const string ISSUE_DUPLICATED = 'issue.duplicated';
+
     /** @var list<string> */
     public const array ISSUE_LEVELS = ['fatal', 'error', 'warning', 'info', 'debug'];
 
     /** @var list<string> */
-    public const array ALL = ['fatal', 'error', 'warning', 'info', 'debug', self::N_PLUS_ONE];
+    public const array LIFECYCLE = [
+        self::ISSUE_RESOLVED,
+        self::ISSUE_REOPENED,
+        self::ISSUE_ASSIGNED,
+        self::ISSUE_COMMENTED,
+        self::ISSUE_DUPLICATED,
+    ];
+
+    /** @var list<string> */
+    public const array ALL = [
+        'fatal',
+        'error',
+        'warning',
+        'info',
+        'debug',
+        self::N_PLUS_ONE,
+        self::ISSUE_RESOLVED,
+        self::ISSUE_REOPENED,
+        self::ISSUE_ASSIGNED,
+        self::ISSUE_COMMENTED,
+        self::ISSUE_DUPLICATED,
+    ];
 
     /**
      * @param list<string> $categories
@@ -39,5 +70,10 @@ final class NotificationCategories
     public static function isIssueLevel(string $category): bool
     {
         return \in_array($category, self::ISSUE_LEVELS, true);
+    }
+
+    public static function isLifecycle(string $category): bool
+    {
+        return \in_array($category, self::LIFECYCLE, true);
     }
 }

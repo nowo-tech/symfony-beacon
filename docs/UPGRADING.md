@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.9.4 to the next release](#upgrading-from-094-to-the-next-release)
+- [Upgrading from 0.10.0 to the next release](#upgrading-from-0100-to-the-next-release)
+- [Upgrading from 0.9.4 to 0.10.0](#upgrading-from-094-to-0100)
 - [Upgrading from 0.9.3 to 0.9.4](#upgrading-from-093-to-094)
 - [Upgrading from 0.9.2 to 0.9.3](#upgrading-from-092-to-093)
 - [Upgrading from 0.9.1 to 0.9.2](#upgrading-from-091-to-092)
@@ -24,9 +25,43 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.9.4 to the next release
+## Upgrading from 0.10.0 to the next release
 
-No upgrade notes yet.
+No steps yet. When the next release ships, document migrations and breaking changes here.
+
+## Upgrading from 0.9.4 to 0.10.0
+
+Run migrations after pull (release fields, issue workflow, governance, digests, delivery health):
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+Migrations include `Version20260721160000` … `Version20260721165000`.
+
+Add to `.env` if missing (defaults match `.env.dist`):
+
+```bash
+BEACON_EVENT_QUOTA_DAILY=0
+```
+
+### Product depth (014–022)
+
+- **Releases**: denormalized `firstRelease` / `lastRelease` / `lastEnvironment`; filter `?release=`; compare environments.
+- **Issue workflow**: priority, comments, mark-as-duplicate (optional event merge into canonical), saved views.
+- **Search**: tag / URL / user filters; SQL occurrence sorts.
+- **Export**: `/projects/{uuid}/export/issues|events.{csv,json}` (owner/admin).
+- **Lifecycle webhooks**: opt-in categories `issue.resolved|reopened|assigned|commented|duplicated`.
+- **Governance**: per-project retention/rate/quota in Settings; API key revoke/rotate; `BEACON_EVENT_QUOTA_DAILY`.
+- **Admin ops**: project stats, suspend ingest, view-as-member.
+- **Digest / quiet hours**: configure on destinations; flush with `bin/console app:notifications:flush-digests` (schedule via cron).
+- **Health UI**: last delivery status on Settings / Admin project show.
+- **Client**: upgrade BeaconBundle for public tags, `before_send`, and opt-in Doctrine/HttpClient spans (see [EVENT-CONTEXT](EVENT-CONTEXT.md) / [DSN](DSN.md)).
+
+Re-run `make seed` if admin menu items are missing.
 
 ## Upgrading from 0.9.3 to 0.9.4
 

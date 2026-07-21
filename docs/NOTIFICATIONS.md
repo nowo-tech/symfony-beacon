@@ -1,10 +1,10 @@
 # Project notifications
 
-Beacon can notify external systems when a project records a **new issue**, an **issue regression**, or an **N+1** performance group.
+Beacon can notify external systems when a project records a **new issue**, an **issue regression**, an **N+1** performance group, or selected **issue lifecycle** changes (resolve, reopen, assign, comment, mark duplicate).
 
 Supported channels: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP**.
 
-See feature spec `specs/009-project-notifications/` and the product [ROADMAP](ROADMAP.md) (Phase 1).
+See feature specs `specs/009-project-notifications/` and `specs/017-export-webhooks/`, and the product [ROADMAP](ROADMAP.md) (Phase 1).
 In the app, open **Project → Settings → Notifications → Setup guides** for the same manuals.
 
 ## Configure (any channel)
@@ -12,7 +12,7 @@ In the app, open **Project → Settings → Notifications → Setup guides** for
 1. Open **Project → Settings**.
 2. Under **Notifications**, click **Add destination** (owner/admin only).
 3. Choose the channel **type** and paste the matching **endpoint** (see manuals below).
-4. Select alert categories (issue levels and/or N+1).
+4. Select alert categories (issue levels, N+1, and/or lifecycle events such as `issue.resolved`).
 5. Save, then optionally **Send test** to verify delivery.
 
 Endpoints are **encrypted at rest** and **masked** in the settings list (URLs, emails, and Telegram tokens).
@@ -128,7 +128,46 @@ Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against 
 | Another event on an already **unresolved** issue | No |
 | Event on a **resolved** or **ignored** issue (reopens to unresolved) | Yes (regression) |
 | Transaction with N+1 groups ≥ 1 (and category enabled) | Yes |
+| Member marks issue **resolved** (`issue.resolved` enabled) | Yes |
+| Member **reopens** issue to unresolved (`issue.reopened` enabled) | Yes |
+| Member **assigns** / unassigns (`issue.assigned` enabled) | Yes |
+| Member **comments** (`issue.commented` enabled) | Yes |
+| Member **marks duplicate** (`issue.duplicated` enabled) | Yes |
 | Disabled destination | No |
+
+Lifecycle categories are **opt-in** on each destination (they are not included in the default category set). Delivery uses the same Messenger `async` path and SSRF guards as other outbound notifications.
+
+## Quiet hours and digests
+
+Per destination (Settings → Notifications → Edit):
+
+| Setting | Behaviour |
+|--------|-----------|
+| Quiet hours | When enabled, matching alerts are **buffered** in `notification_digest_buffer` instead of immediate send |
+| Timezone / start / end | Window evaluated in the destination timezone (`HH:MM`, supports overnight ranges such as 22:00–07:00) |
+| Digest on flush | When enabled, `app:notifications:flush-digests` sends **one summary** per destination; when disabled, each held item is dispatched individually after the window |
+
+Schedule the flush (cron / Compose sidecar):
+
+```bash
+php bin/console app:notifications:flush-digests
+# optional: php bin/console app:notifications:flush-digests --force
+```
+
+**Send test** always bypasses quiet hours. There is **no** native PagerDuty connector; use a generic HTTP webhook if you need an incident bridge.
+
+## Project data export
+
+Project **owners** and **admins** can download filtered snapshots (same list filters as the issues index where applicable; max **1,000** rows):
+
+| Format | Path |
+|--------|------|
+| Issues CSV | `GET /projects/{uuid}/export/issues.csv` |
+| Issues JSON | `GET /projects/{uuid}/export/issues.json` |
+| Events CSV | `GET /projects/{uuid}/export/events.csv` |
+| Events JSON | `GET /projects/{uuid}/export/events.json` |
+
+CSV responses are streamed (`text/csv`). Exports omit raw Envelope payloads and secrets.
 
 ## Delivery
 
@@ -160,7 +199,9 @@ Ensure the Messenger worker is running (`make up` starts it in Docker).
 }
 ```
 
-Other `event` values: `issue.regression`, `performance.n_plus_one`, `test`.
+Other `event` values: `issue.regression`, `issue.resolved`, `issue.reopened`, `issue.assigned`, `issue.commented`, `issue.duplicated`, `performance.n_plus_one`, `test`.
+
+For `issue.assigned`, the payload may include `assignee.previous` / `assignee.current`. For `issue.commented`, a `comment` object (uuid, author, body preview). For `issue.duplicated`, a `canonical_issue` object.
 
 Channel-specific wrappers:
 

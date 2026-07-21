@@ -25,12 +25,15 @@ final readonly class IssueListSort
         'last_seen',
     ];
 
-    /** Fields sorted in SQL on the issue entity (or assignee join). */
+    /** Fields sorted in SQL on the issue entity (or assignee / event-count joins). */
     private const array SQL_FIELDS = [
         'title',
         'level',
         'assignee',
         'events',
+        'events_24h',
+        'events_7d',
+        'events_30d',
         'first_seen',
         'last_seen',
     ];

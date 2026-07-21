@@ -235,12 +235,26 @@
 
 {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'tags', title: 'issues.tags'|trans} %}
     {% block body %}
+        {% set customTags = payload.tags|default({}) %}
+        {% if customTags is iterable and customTags|length > 0 %}
+            <h3 class="issue-section__subtitle">{{ 'issues.tags_custom'|trans }}</h3>
+            <ul class="issue-tags issue-tags--custom">
+                {% for key, value in customTags %}
+                    <li>
+                        <span class="issue-tags__key">{{ key }}</span>
+                        <span class="issue-tags__val">{{ value is iterable ? value|json_encode : value }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <h3 class="issue-section__subtitle{% if customTags is iterable and customTags|length > 0 %} issue-section__subtitle--spaced{% endif %}">{{ 'issues.tags_system'|trans }}</h3>
         <ul class="issue-tags">
             <li><span class="issue-tags__key">environment</span><span class="issue-tags__val">{{ event.environment|default(payload.environment|default('—')) }}</span></li>
             <li><span class="issue-tags__key">level</span><span class="issue-tags__val">{{ levelLabel }}</span></li>
             <li><span class="issue-tags__key">platform</span><span class="issue-tags__val">{{ event.platform|default(payload.platform|default('php')) }}</span></li>
             {% if event.releaseVersion or payload.release is defined %}
-                <li><span class="issue-tags__key">release</span><span class="issue-tags__val">{{ event.releaseVersion|default(payload.release) }}</span></li>
+                <li><span class="issue-tags__key">release</span><span class="issue-tags__val">{% if event.releaseVersion %}{{ event.releaseVersion }}{% else %}{{ payload.release }}{% endif %}</span></li>
             {% endif %}
             {% if payload.server_name is defined %}
                 <li><span class="issue-tags__key">server_name</span><span class="issue-tags__val">{{ payload.server_name }}</span></li>
@@ -261,6 +275,7 @@
                 <li><span class="issue-tags__key">logger</span><span class="issue-tags__val">{{ payload.logger }}</span></li>
             {% endif %}
         </ul>
+        <p class="issue-tags__hint">{{ 'issues.tags_hint'|trans }}</p>
     {% endblock %}
 {% endembed %}
 

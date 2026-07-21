@@ -60,6 +60,33 @@ class NotificationDestination implements AuditableInterface
     #[ORM\Column(type: 'json')]
     private array $categories = ['error', 'warning', 'n_plus_one'];
 
+    #[ORM\Column]
+    private bool $quietHoursEnabled = false;
+
+    #[ORM\Column(length: 64)]
+    private string $quietHoursTimezone = 'UTC';
+
+    /** Quiet-hours start as HH:MM (24h) in quietHoursTimezone. */
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $quietHoursStart = null;
+
+    /** Quiet-hours end as HH:MM (24h) in quietHoursTimezone. */
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $quietHoursEnd = null;
+
+    /** When true, flush command sends one summary per destination; otherwise each buffered item is sent individually after quiet hours. */
+    #[ORM\Column]
+    private bool $digestEnabled = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $lastDeliveryAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $lastDeliverySuccess = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $lastDeliveryError = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -159,6 +186,109 @@ class NotificationDestination implements AuditableInterface
     public function matchesCategory(string $category): bool
     {
         return \in_array($category, $this->categories, true);
+    }
+
+    public function isQuietHoursEnabled(): bool
+    {
+        return $this->quietHoursEnabled;
+    }
+
+    public function setQuietHoursEnabled(bool $quietHoursEnabled): self
+    {
+        $this->quietHoursEnabled = $quietHoursEnabled;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function getQuietHoursTimezone(): string
+    {
+        return $this->quietHoursTimezone;
+    }
+
+    public function setQuietHoursTimezone(string $quietHoursTimezone): self
+    {
+        $tz = trim($quietHoursTimezone);
+        $this->quietHoursTimezone = '' !== $tz ? $tz : 'UTC';
+        $this->touch();
+
+        return $this;
+    }
+
+    public function getQuietHoursStart(): ?string
+    {
+        return $this->quietHoursStart;
+    }
+
+    public function setQuietHoursStart(?string $quietHoursStart): self
+    {
+        $value = null !== $quietHoursStart ? trim($quietHoursStart) : null;
+        $this->quietHoursStart = '' !== $value ? $value : null;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function getQuietHoursEnd(): ?string
+    {
+        return $this->quietHoursEnd;
+    }
+
+    public function setQuietHoursEnd(?string $quietHoursEnd): self
+    {
+        $value = null !== $quietHoursEnd ? trim($quietHoursEnd) : null;
+        $this->quietHoursEnd = '' !== $value ? $value : null;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function isDigestEnabled(): bool
+    {
+        return $this->digestEnabled;
+    }
+
+    public function setDigestEnabled(bool $digestEnabled): self
+    {
+        $this->digestEnabled = $digestEnabled;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function getLastDeliveryAt(): ?DateTimeImmutable
+    {
+        return $this->lastDeliveryAt;
+    }
+
+    public function isLastDeliverySuccess(): ?bool
+    {
+        return $this->lastDeliverySuccess;
+    }
+
+    public function getLastDeliveryError(): ?string
+    {
+        return $this->lastDeliveryError;
+    }
+
+    public function recordDeliverySuccess(): self
+    {
+        $this->lastDeliveryAt = new DateTimeImmutable();
+        $this->lastDeliverySuccess = true;
+        $this->lastDeliveryError = null;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function recordDeliveryFailure(string $error): self
+    {
+        $this->lastDeliveryAt = new DateTimeImmutable();
+        $this->lastDeliverySuccess = false;
+        $this->lastDeliveryError = mb_substr($error, 0, 2000);
+        $this->touch();
+
+        return $this;
     }
 
     public function maskedEndpointUrl(): string

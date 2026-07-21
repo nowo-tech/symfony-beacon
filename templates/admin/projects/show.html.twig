@@ -12,6 +12,9 @@
             {% if project.description %}
                 · {{ project.description }}
             {% endif %}
+            {% if not project.ingestEnabled %}
+                · <span class="text-[var(--color-alert)]">{{ 'admin_projects.ingest_suspended_badge'|trans }}</span>
+            {% endif %}
         </p>
     </div>
     <div class="flex flex-wrap gap-2">
@@ -20,6 +23,100 @@
         <a class="btn-ghost no-underline" href="{{ path('admin_projects_edit', {id: project.uuid}) }}">{{ 'admin_projects.edit'|trans }}</a>
     </div>
 </div>
+
+<section class="panel mb-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'admin_projects.stats_title'|trans }}</h2>
+    <dl class="grid gap-3 text-sm sm:grid-cols-3">
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'admin_projects.stats_open_issues_label'|trans }}</dt>
+            <dd class="mt-1 text-lg font-semibold">{{ opsStats.open_issues }}</dd>
+        </div>
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'admin_projects.stats_events_7d_label'|trans }}</dt>
+            <dd class="mt-1 text-lg font-semibold">{{ opsStats.events_last_7d }}</dd>
+        </div>
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'admin_projects.stats_last_ingest_label'|trans }}</dt>
+            <dd class="mt-1 text-lg font-semibold">
+                {% if opsStats.last_ingest_at %}
+                    {{ opsStats.last_ingest_at|date('Y-m-d H:i') }}
+                {% else %}
+                    {{ 'admin_projects.stats_never'|trans }}
+                {% endif %}
+            </dd>
+        </div>
+    </dl>
+    <form method="post" action="{{ path('admin_projects_ingest_toggle', {id: project.uuid}) }}" class="mt-4 flex flex-wrap items-center gap-2">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_ingest_' ~ project.id) }}">
+        {% if project.ingestEnabled %}
+            <input type="hidden" name="enabled" value="0">
+            <button class="btn-ghost" type="submit">{{ 'admin_projects.suspend_ingest'|trans }}</button>
+            <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.suspend_ingest_help'|trans }}</span>
+        {% else %}
+            <input type="hidden" name="enabled" value="1">
+            <button class="btn-primary" type="submit">{{ 'admin_projects.resume_ingest'|trans }}</button>
+            <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.resume_ingest_help'|trans }}</span>
+        {% endif %}
+    </form>
+    <form method="post" action="{{ path('admin_view_as_member_enable') }}" class="mt-3">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_view_as_member_enable') }}">
+        <input type="hidden" name="redirect" value="{{ path('project_settings', {id: project.uuid}) }}">
+        <button class="btn-ghost" type="submit">{{ 'admin_projects.view_as_member'|trans }}</button>
+    </form>
+</section>
+
+<section class="panel mb-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'project.health.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'project.health.intro'|trans }}</p>
+    <dl class="mb-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.messenger_pending'|trans }}</dt>
+            <dd class="mt-1 font-medium">
+                {% if messengerQueue.available %}
+                    {{ messengerQueue.pending }}
+                    <span class="text-xs font-normal text-[var(--color-ink)]/55">({{ 'project.health.instance_wide'|trans }})</span>
+                {% else %}
+                    {{ 'project.health.messenger_unavailable'|trans }}
+                    — <a href="{{ path('health_ready') }}">{{ 'project.health.ready_link'|trans }}</a>
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.ready_probe'|trans }}</dt>
+            <dd class="mt-1"><a href="{{ path('health_ready') }}">/health/ready</a></dd>
+        </div>
+    </dl>
+    <h3 class="mb-2 text-sm font-semibold">{{ 'project.health.destinations_title'|trans }}</h3>
+    {% set destinations = project.notificationDestinations %}
+    {% if destinations is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'project.health.destinations_empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-2 text-sm">
+            {% for destination in destinations %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                    <div class="font-medium">{{ destination.label }}</div>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                        {% if destination.lastDeliveryAt %}
+                            {{ 'project.health.last_delivery'|trans }}
+                            {{ destination.lastDeliveryAt|date('Y-m-d H:i') }}
+                            —
+                            {% if destination.lastDeliverySuccess %}
+                                <span class="text-emerald-700">{{ 'project.health.delivery_ok'|trans }}</span>
+                            {% else %}
+                                <span class="text-[var(--color-alert)]">{{ 'project.health.delivery_fail'|trans }}</span>
+                                {% if destination.lastDeliveryError %}
+                                    · {{ destination.lastDeliveryError }}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {{ 'project.health.never_delivered'|trans }}
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
 
 <section class="panel mb-6">
     <h2 class="mb-3 text-lg font-semibold">{{ 'admin_projects.members_title'|trans }}</h2>

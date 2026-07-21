@@ -49,6 +49,11 @@ flash:
     project:
         created: Proyecto creado.
         api_key_created: Clave API creada.
+        api_key_revoked: Clave API revocada.
+        api_key_rotated: Clave API rotada. Actualiza los clientes con el nuevo DSN.
+        governance_saved: Ajustes de gobernanza del proyecto guardados.
+        governance_invalid: Los valores de gobernanza deben estar vacíos (heredar) o ser enteros no negativos.
+        quota_approaching: Este proyecto se acerca a su cuota diaria de eventos.
         history_cleared: Historial del proyecto vaciado.
         deleted: Proyecto eliminado.
         delete_confirmation_mismatch: El nombre del proyecto no coincide. No se eliminó nada.
@@ -109,6 +114,10 @@ flash:
     admin_projects:
         name_required: El nombre del proyecto es obligatorio.
         updated: Proyecto actualizado.
+        ingest_suspended: Ingest suspendido para este proyecto.
+        ingest_resumed: Ingest reanudado para este proyecto.
+        view_as_enabled: Viendo proyectos como miembro. Las acciones privilegiadas están limitadas.
+        view_as_disabled: Modo ver-como-miembro desactivado.
 project:
     label: Proyecto
     no_description: Sin descripción
@@ -117,7 +126,32 @@ project:
     settings:
         title: Configuración
         nav: Configuración
-        intro: Claves API, miembros y acciones destructivas del proyecto.
+        intro: Claves API, miembros, gobernanza y acciones destructivas del proyecto.
+    governance:
+        title: Gobernanza
+        help: Retención, límites de tasa y cuotas diarias por proyecto. Deja un campo vacío para heredar el valor del servidor.
+        retention_days: Días de retención
+        retention_max_events: Máximo de eventos almacenados
+        ingest_rate_limit: Límite de ingest (por minuto)
+        event_quota_daily: Cuota diaria de eventos
+        inherit_hint: 'Vacío = heredar valor del servidor (%default%). Usa 0 para desactivar si el valor por defecto no es cero.'
+        save: Guardar gobernanza
+        quota_usage: 'Eventos hoy: %count% / %quota%'
+        ingest_disabled_banner: El ingest de Envelope está suspendido para este proyecto. Los datos existentes siguen siendo legibles.
+    health:
+        title: Salud
+        intro: Profundidad de la cola Messenger de la instancia y último estado de entrega de notificaciones de este proyecto.
+        messenger_pending: Mensajes async pendientes en Messenger
+        messenger_unavailable: Profundidad de cola no disponible
+        instance_wide: a nivel de instancia
+        ready_probe: Sonda de readiness
+        ready_link: Abrir /health/ready
+        destinations_title: Destinos de notificación
+        destinations_empty: No hay destinos de notificación configurados.
+        last_delivery: 'Última entrega:'
+        delivery_ok: Correcta
+        delivery_fail: Fallida
+        never_delivered: Aún no hay entregas.
     new:
         title: Nuevo proyecto
         submit: Crear proyecto
@@ -139,6 +173,9 @@ project:
         generate: Sugerir nombre
         generate_hint: Rellena la etiqueta con un nombre legible (adjetivo-sustantivo)
         add: Añadir clave
+        revoke: Revocar
+        revoke_confirm: ¿Revocar esta clave API? El ingest con este secreto fallará de inmediato.
+        rotate: Rotar
     members:
         title: Miembros
         help: Miembros directos de este proyecto. Propietarios y administradores gestionan la membresía. El acceso también puede venir de grupos vinculados.
@@ -243,6 +280,9 @@ issues:
     raw_payload: Payload en bruto
     highlights: Highlights
     tags: Tags
+    tags_custom: Tags del cliente
+    tags_system: Tags del sistema
+    tags_hint: Los tags del cliente vienen de BeaconBundle setTag/setTags. Usa before_send para eliminar datos sensibles antes del ingest.
     contexts: Contexts
     context_runtime: Runtime
     context_framework: Framework
@@ -265,6 +305,50 @@ issues:
     status_mark_ignored: Ignorar
     status_saved: Estado de la incidencia actualizado.
     status_invalid: No se pudo actualizar el estado de la incidencia.
+    priority:
+        low: Baja
+        medium: Media
+        high: Alta
+        critical: Crítica
+    priority_label: Prioridad
+    priority_help: Define la urgencia de esta incidencia para el triage.
+    priority_save: Guardar prioridad
+    priority_saved: Prioridad actualizada.
+    priority_invalid: No se pudo actualizar la prioridad.
+    comments_title: Comentarios
+    comments_empty: Aún no hay comentarios.
+    comment_body: Comentario
+    comment_placeholder: Añadir un comentario…
+    comment_submit: Publicar comentario
+    comment_saved: Comentario añadido.
+    comment_empty: El comentario no puede estar vacío.
+    comment_too_long: El comentario es demasiado largo.
+    comment_invalid: No se pudo añadir el comentario.
+    duplicate_of: 'Duplicado de'
+    duplicate_help: Marca esta incidencia como duplicado de otra del mismo proyecto (pasa a ignorada).
+    duplicate_canonical: Incidencia canónica
+    duplicate_choose: Elige la incidencia canónica…
+    duplicate_submit: Marcar como duplicado
+    duplicate_saved: Incidencia marcada como duplicado e ignorada.
+    merge_events_label: Fusionar también los eventos en la incidencia canónica
+    merge_events_help: Mueve todos los eventos a la incidencia seleccionada, recalcula contadores e ignora esta incidencia.
+    merge_saved: Eventos fusionados en la incidencia canónica.
+    merge_failed: No se pudieron fusionar estas incidencias.
+    duplicate_self: Una incidencia no puede ser duplicado de sí misma.
+    duplicate_circular: Eso crearía un enlace circular de duplicados.
+    duplicate_not_found: No se encontró la incidencia canónica en este proyecto.
+    duplicate_invalid: No se pudo marcar como duplicado.
+    views:
+        label: Vistas guardadas
+        choose: Abrir una vista guardada…
+        save_name: Nombre de la vista
+        save_placeholder: p. ej. Críticas sin resolver
+        save: Guardar vista
+        delete: Eliminar vista
+        saved: Vista guardada.
+        deleted: Vista eliminada.
+        name_empty: El nombre de la vista no puede estar vacío.
+        invalid: No se pudieron actualizar las vistas guardadas.
     history_title: Actividad
     history_empty: Aún no hay cambios de estado o asignación.
     history_assignee: Asignación
@@ -275,9 +359,24 @@ issues:
         any_level: Cualquier nivel
         any_status: cualquier estado
         any_assignee: Cualquier asignado
+        any_priority: Cualquier prioridad
         environment: Entorno
+        release: Release
+        tag: Etiqueta
+        url: URL de petición
+        user: Usuario del evento
         per_page: Resultados por página
         per_page_option: '%count% por página'
+    badge:
+        new_in_release: Nuevo en release
+    compare:
+        title: 'Comparar %a% vs %b%'
+        environment_b: Comparar con entorno…
+        hint: Indica Entorno y Comparar para ver incidencias solo en A, solo en B o en ambos
+        only_a: 'Solo en %env%'
+        only_b: 'Solo en %env%'
+        both: En ambos
+        empty: Ninguna incidencia en este conjunto
     sort_by: Ordenar por %column%
     pagination:
         showing: Mostrando %from%–%to% de %total%
@@ -430,11 +529,21 @@ users:
             'project.settings_viewed': Ajustes del proyecto vistos
             'project.created': Proyecto creado
             'project.api_key_created': Clave API creada
+            'project.api_key_revoked': Clave API revocada
+            'project.api_key_rotated': Clave API rotada
+            'project.suspended': Ingest del proyecto suspendido
+            'project.resumed': Ingest del proyecto reanudado
+            'project.view_as_started': Modo ver-como-miembro iniciado
+            'project.view_as_ended': Modo ver-como-miembro finalizado
             'project.history_cleared': Historial del proyecto vaciado
             'project.deleted': Proyecto eliminado
             'issue.opened': Incidencia abierta
             'issue.assigned': Asignación de incidencia cambiada
             'issue.status_changed': Estado de incidencia cambiado
+            'issue.priority_changed': Prioridad de incidencia cambiada
+            'issue.commented': Comentario en incidencia añadido
+            'issue.marked_duplicate': Incidencia marcada como duplicado
+            'issue.merged': Eventos de incidencia fusionados
             'event.opened': Evento abierto
             'performance.opened': Rendimiento abierto
             'analytics.opened': Analítica abierta
@@ -625,6 +734,21 @@ admin_projects:
     danger_title: Zona de peligro
     danger_intro: Elimina permanentemente este proyecto y todos sus datos. Los administradores de instancia pueden hacerlo sin ser miembros del proyecto.
     delete_open: Eliminar proyecto…
+    stats_title: Estadísticas ops
+    stats_open_issues: '%count% incidencias abiertas'
+    stats_events_7d: '%count% eventos (7d)'
+    stats_open_issues_label: Incidencias abiertas
+    stats_events_7d_label: Eventos (últimos 7 días)
+    stats_last_ingest_label: Último ingest
+    stats_never: Nunca
+    ingest_suspended_badge: Ingest suspendido
+    suspend_ingest: Suspender ingest
+    suspend_ingest_help: Rechaza nuevos envelopes y mantiene los datos legibles.
+    resume_ingest: Reanudar ingest
+    resume_ingest_help: Vuelve a permitir el ingest de Envelope.
+    view_as_member: Ver como miembro
+    view_as_banner: Estás viendo proyectos como miembro (los privilegios de administración en el proyecto están limitados).
+    view_as_exit: Salir de ver-como-miembro
 
 admin:
     hub:
@@ -737,6 +861,19 @@ notifications:
         endpoint_ssrf: El endpoint no puede apuntar a direcciones privadas, link-local o de metadatos cloud.
         enabled: Activado
         categories: Categorías de alerta
+        quiet_hours_legend: Horas silenciosas y digest
+        quiet_hours_enabled: Activar horas silenciosas
+        quiet_hours_help: Durante la ventana, las alertas se acumulan en lugar de enviarse al momento. Ejecuta app:notifications:flush-digests en un cron (o al terminar la ventana).
+        quiet_hours_timezone: Zona horaria
+        quiet_hours_start: Inicio de horas silenciosas (HH:MM)
+        quiet_hours_end: Fin de horas silenciosas (HH:MM)
+        quiet_hours_timezone_invalid: Identificador de zona horaria no válido.
+        quiet_hours_time_invalid: Usa el formato HH:MM de 24 horas (p. ej. 22:00).
+        quiet_hours_required: La hora de inicio y fin son obligatorias si las horas silenciosas están activas.
+        quiet_hours_range_invalid: La hora de inicio y fin deben ser distintas.
+        digest_enabled: Enviar resumen digest al vaciar
+        digest_help: Si está activo, el vaciado envía un resumen por destino. Si no, cada alerta retenida se envía por separado tras las horas silenciosas.
+        pagerduty_note: No hay integración nativa con PagerDuty; usa un webhook HTTP genérico si necesitas un puente de incidentes.
     type:
         slack: Slack Incoming Webhook
         discord: Webhook de Discord
@@ -751,6 +888,11 @@ notifications:
         info: Info
         debug: Debug
         n_plus_one: Detecciones N+1
+        issue.resolved: Issue resuelto
+        issue.reopened: Issue reabierto
+        issue.assigned: Issue asignado
+        issue.commented: Issue comentado
+        issue.duplicated: Issue marcado como duplicado
     flash:
         created: Destino de notificación creado.
         updated: Destino de notificación actualizado.

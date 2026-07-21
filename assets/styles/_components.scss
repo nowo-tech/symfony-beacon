@@ -719,6 +719,11 @@ $beacon-btn-sm-font-size: 0.8125rem;
   gap: 0.45rem;
 }
 
+.issue-tags--custom li {
+  border-color: color-mix(in srgb, var(--color-accent, #2f6fed) 35%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-accent, #2f6fed) 6%, var(--color-surface-muted));
+}
+
 .issue-tags li {
   display: flex;
   flex-direction: column;
@@ -741,6 +746,16 @@ $beacon-btn-sm-font-size: 0.8125rem;
   font-size: 0.78rem;
   font-family: var(--font-mono), ui-monospace, monospace;
   word-break: break-all;
+}
+
+.issue-tags__hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-section__subtitle--spaced {
+  margin-top: 1rem;
 }
 
 .issue-contexts {

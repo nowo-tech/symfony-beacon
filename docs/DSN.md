@@ -92,7 +92,12 @@ The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMes
 | Events (`captureMessage` / `captureException`) | item `type: event` | Issues |
 | User context (`send.user`) | payload `user` | Event detail |
 | Breadcrumbs (`addBreadcrumb`) | payload `breadcrumbs.values` | Event detail |
+| Tags (`setTag` / `setTags`) | payload `tags` | Event detail → Tags (client tags) |
+| `before_send` scrubbing | Mutates/drops payload pre-send | N/A (client-side) |
 | Performance (`captureTransaction`) | item `type: transaction` | Performance |
+| Doctrine / HttpClient spans (`instrumentation.*`) | transaction `spans` + breadcrumbs | Performance + event breadcrumbs |
 | Contexts (PHP / Symfony / OS) | payload `contexts` | Event detail |
+
+Details: [EVENT-CONTEXT.md](EVENT-CONTEXT.md#tags-and-before_send-beaconbundle), Bundle [USAGE.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/USAGE.md) / [CONFIGURATION.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md).
 
 From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC:SECRET@host.docker.internal:9081/1`.

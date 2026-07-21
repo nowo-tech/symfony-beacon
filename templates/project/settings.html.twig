@@ -7,6 +7,50 @@
 
 <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'project.settings.intro'|trans }}</p>
 
+{% if not project.ingestEnabled %}
+    <div class="mb-6 rounded-md border border-[var(--color-alert)] bg-[var(--color-alert)]/10 px-4 py-3 text-sm text-[var(--color-alert)]" role="status">
+        {{ 'project.governance.ingest_disabled_banner'|trans }}
+    </div>
+{% endif %}
+
+{% if membership.role.value in ['owner', 'admin'] %}
+<section class="panel mb-6">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'project.governance.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'project.governance.help'|trans }}</p>
+    {% if effectiveQuota > 0 %}
+        <p class="mb-4 text-xs text-[var(--color-ink)]/55">
+            {{ 'project.governance.quota_usage'|trans({'%count%': eventsToday, '%quota%': effectiveQuota}) }}
+        </p>
+    {% endif %}
+    <form method="post" action="{{ path('project_governance_save', {id: project.uuid}) }}" class="grid gap-4 sm:grid-cols-2">
+        <input type="hidden" name="_token" value="{{ csrf_token('project_governance_' ~ project.id) }}">
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="retention_days">{{ 'project.governance.retention_days'|trans }}</label>
+            <input class="input w-full" type="number" min="0" name="retention_days" id="retention_days" value="{{ project.retentionDays ?? '' }}" placeholder="{{ governanceDefaults.retention_days }}">
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.retention_days}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="retention_max_events">{{ 'project.governance.retention_max_events'|trans }}</label>
+            <input class="input w-full" type="number" min="0" name="retention_max_events" id="retention_max_events" value="{{ project.retentionMaxEvents ?? '' }}" placeholder="{{ governanceDefaults.retention_max_events }}">
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.retention_max_events}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="ingest_rate_limit_per_minute">{{ 'project.governance.ingest_rate_limit'|trans }}</label>
+            <input class="input w-full" type="number" min="0" name="ingest_rate_limit_per_minute" id="ingest_rate_limit_per_minute" value="{{ project.ingestRateLimitPerMinute ?? '' }}" placeholder="{{ governanceDefaults.ingest_rate_limit }}">
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.ingest_rate_limit}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="event_quota_daily">{{ 'project.governance.event_quota_daily'|trans }}</label>
+            <input class="input w-full" type="number" min="0" name="event_quota_daily" id="event_quota_daily" value="{{ project.eventQuotaDaily ?? '' }}" placeholder="{{ governanceDefaults.event_quota_daily }}">
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.event_quota_daily}) }}</p>
+        </div>
+        <div class="sm:col-span-2">
+            <button class="btn-primary" type="submit">{{ 'project.governance.save'|trans }}</button>
+        </div>
+    </form>
+</section>
+{% endif %}
+
 <div class="grid gap-6 lg:grid-cols-2">
     <section class="panel">
         <h2 class="mb-3 text-lg font-semibold">{{ 'project.api_keys.title'|trans }}</h2>
@@ -17,6 +61,18 @@
                     <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
                     <code class="mt-2 block break-all text-xs">{{ key.buildDsn(baseUrl) }}</code>
                     <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
+                    {% if membership.role.value in ['owner', 'admin'] and key.active %}
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <form method="post" action="{{ path('project_keys_rotate', {projectId: project.uuid, keyId: key.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('project_key_rotate_' ~ key.id) }}">
+                                <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.rotate'|trans }}</button>
+                            </form>
+                            <form method="post" action="{{ path('project_keys_revoke', {projectId: project.uuid, keyId: key.id}) }}" onsubmit="return confirm('{{ 'project.api_keys.revoke_confirm'|trans|e('js') }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('project_key_revoke_' ~ key.id) }}">
+                                <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.revoke'|trans }}</button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
@@ -332,6 +388,59 @@
         {% else %}
             <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.groups.none_available'|trans }}</p>
         {% endif %}
+    {% endif %}
+</section>
+
+<section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'project.health.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'project.health.intro'|trans }}</p>
+    <dl class="mb-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.messenger_pending'|trans }}</dt>
+            <dd class="mt-1 font-medium">
+                {% if messengerQueue.available %}
+                    {{ messengerQueue.pending }}
+                    <span class="text-xs font-normal text-[var(--color-ink)]/55">({{ 'project.health.instance_wide'|trans }})</span>
+                {% else %}
+                    {{ 'project.health.messenger_unavailable'|trans }}
+                    — <a href="{{ path('health_ready') }}">{{ 'project.health.ready_link'|trans }}</a>
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.ready_probe'|trans }}</dt>
+            <dd class="mt-1"><a href="{{ path('health_ready') }}">/health/ready</a></dd>
+        </div>
+    </dl>
+    <h3 class="mb-2 text-sm font-semibold">{{ 'project.health.destinations_title'|trans }}</h3>
+    {% set destinations = project.notificationDestinations %}
+    {% if destinations is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'project.health.destinations_empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-2 text-sm">
+            {% for destination in destinations %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                    <div class="font-medium">{{ destination.label }}</div>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                        {% if destination.lastDeliveryAt %}
+                            {{ 'project.health.last_delivery'|trans }}
+                            {{ destination.lastDeliveryAt|date('Y-m-d H:i') }}
+                            —
+                            {% if destination.lastDeliverySuccess %}
+                                <span class="text-emerald-700">{{ 'project.health.delivery_ok'|trans }}</span>
+                            {% else %}
+                                <span class="text-[var(--color-alert)]">{{ 'project.health.delivery_fail'|trans }}</span>
+                                {% if destination.lastDeliveryError %}
+                                    · {{ destination.lastDeliveryError }}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {{ 'project.health.never_delivered'|trans }}
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     {% endif %}
 </section>
 

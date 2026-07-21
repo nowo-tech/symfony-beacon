@@ -11,6 +11,7 @@ use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -18,10 +19,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * Enforces project access via direct membership and/or linked user groups.
  *
  * Instance ROLE_ADMIN receives effective owner access on every project
- * (for Administration and cross-project operator actions).
+ * (for Administration and cross-project operator actions), unless the
+ * `_beacon_view_as_member` session flag is set (then Member).
  */
 final readonly class ProjectAccessService
 {
+    public const string VIEW_AS_MEMBER_SESSION_KEY = '_beacon_view_as_member';
+
     private const ROLE_RANK = [
         'member' => 1,
         'admin' => 2,
@@ -32,6 +36,7 @@ final readonly class ProjectAccessService
         private ProjectMembershipRepository $membershipRepository,
         private ProjectGroupAccessRepository $groupAccessRepository,
         private AuthorizationCheckerInterface $authorizationChecker,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -53,7 +58,8 @@ final readonly class ProjectAccessService
 
     /**
      * Highest effective role from direct membership and linked groups, or null if none.
-     * Instance ROLE_ADMIN always resolves as owner (even without membership).
+     * Instance ROLE_ADMIN always resolves as owner (even without membership),
+     * unless view-as-member is active (then Member).
      */
     public function resolveAccess(Project $project, User $user): ?ProjectAccess
     {
@@ -61,8 +67,10 @@ final readonly class ProjectAccessService
         $groupRole = $this->groupAccessRepository->findHighestGroupRoleForUser($project, $user);
 
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            $role = $this->isViewAsMemberActive() ? ProjectRole::Member : ProjectRole::Owner;
+
             return new ProjectAccess(
-                role: ProjectRole::Owner,
+                role: $role,
                 directMembership: $direct,
                 viaGroup: null !== $groupRole,
             );
@@ -82,6 +90,16 @@ final readonly class ProjectAccessService
             directMembership: $direct,
             viaGroup: null !== $groupRole,
         );
+    }
+
+    public function isViewAsMemberActive(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request || !$request->hasSession()) {
+            return false;
+        }
+
+        return true === $request->getSession()->get(self::VIEW_AS_MEMBER_SESSION_KEY);
     }
 
     /**

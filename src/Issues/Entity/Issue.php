@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\PublicUuidTrait;
+use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,6 +25,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_project_last_seen', columns: ['project_id', 'last_seen'])]
 #[ORM\Index(name: 'idx_issue_project_status', columns: ['project_id', 'status'])]
 #[ORM\Index(name: 'idx_issue_project_assignee', columns: ['project_id', 'assignee_id'])]
+#[ORM\Index(name: 'idx_issue_project_last_release', columns: ['project_id', 'last_release'])]
+#[ORM\Index(name: 'idx_issue_project_priority', columns: ['project_id', 'priority'])]
 class Issue
 {
     use PublicUuidTrait;
@@ -56,6 +59,13 @@ class Issue
     #[ORM\Column(length: 20, enumType: IssueStatus::class)]
     private IssueStatus $status = IssueStatus::Unresolved;
 
+    #[ORM\Column(length: 20, enumType: IssuePriority::class)]
+    private IssuePriority $priority = IssuePriority::Medium;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'duplicate_of_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Issue $duplicateOf = null;
+
     #[ORM\Column]
     private int $eventCount = 0;
 
@@ -64,6 +74,15 @@ class Issue
 
     #[ORM\Column]
     private DateTimeImmutable $lastSeen;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $firstRelease = null;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $lastRelease = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $lastEnvironment = null;
 
     /** @var Collection<int, Event> */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true)]
@@ -74,6 +93,11 @@ class Issue
     #[ORM\OrderBy(['createdAt' => 'DESC', 'id' => 'DESC'])]
     private Collection $historyEntries;
 
+    /** @var Collection<int, IssueComment> */
+    #[ORM\OneToMany(targetEntity: IssueComment::class, mappedBy: 'issue', orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'ASC', 'id' => 'ASC'])]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->ensureUuid();
@@ -82,6 +106,7 @@ class Issue
         $this->lastSeen = $now;
         $this->events = new ArrayCollection();
         $this->historyEntries = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +198,30 @@ class Issue
         return $this;
     }
 
+    public function getPriority(): IssuePriority
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(IssuePriority $priority): self
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getDuplicateOf(): ?self
+    {
+        return $this->duplicateOf;
+    }
+
+    public function setDuplicateOf(?self $duplicateOf): self
+    {
+        $this->duplicateOf = $duplicateOf;
+
+        return $this;
+    }
+
     public function getEventCount(): int
     {
         return $this->eventCount;
@@ -181,6 +230,13 @@ class Issue
     public function incrementEventCount(): self
     {
         ++$this->eventCount;
+
+        return $this;
+    }
+
+    public function setEventCount(int $eventCount): self
+    {
+        $this->eventCount = max(0, $eventCount);
 
         return $this;
     }
@@ -209,6 +265,74 @@ class Issue
         return $this;
     }
 
+    public function getFirstRelease(): ?string
+    {
+        return $this->firstRelease;
+    }
+
+    public function setFirstRelease(?string $firstRelease): self
+    {
+        $this->firstRelease = self::normalizeRelease($firstRelease);
+
+        return $this;
+    }
+
+    public function getLastRelease(): ?string
+    {
+        return $this->lastRelease;
+    }
+
+    public function setLastRelease(?string $lastRelease): self
+    {
+        $this->lastRelease = self::normalizeRelease($lastRelease);
+
+        return $this;
+    }
+
+    public function getLastEnvironment(): ?string
+    {
+        return $this->lastEnvironment;
+    }
+
+    public function setLastEnvironment(?string $lastEnvironment): self
+    {
+        $this->lastEnvironment = self::normalizeEnvironment($lastEnvironment);
+
+        return $this;
+    }
+
+    /**
+     * Trim, empty → null, truncate to column length (120).
+     */
+    public static function normalizeRelease(?string $value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+        $trimmed = trim($value);
+        if ('' === $trimmed) {
+            return null;
+        }
+
+        return mb_substr($trimmed, 0, 120);
+    }
+
+    /**
+     * Trim, empty → null, truncate to column length (80).
+     */
+    public static function normalizeEnvironment(?string $value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+        $trimmed = trim($value);
+        if ('' === $trimmed) {
+            return null;
+        }
+
+        return mb_substr($trimmed, 0, 80);
+    }
+
     /**
      * @return Collection<int, Event>
      */
@@ -230,6 +354,24 @@ class Issue
         if (!$this->historyEntries->contains($entry)) {
             $this->historyEntries->add($entry);
             $entry->setIssue($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IssueComment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(IssueComment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setIssue($this);
         }
 
         return $this;

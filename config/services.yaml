@@ -10,10 +10,12 @@ parameters:
     env(BEACON_RETENTION_DAYS): '0'
     env(BEACON_RETENTION_MAX_EVENTS_PER_PROJECT): '0'
     env(BEACON_INGEST_RATE_LIMIT): '120'
+    env(BEACON_EVENT_QUOTA_DAILY): '0'
     env(BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS): '0'
     beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
     beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
     beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
+    beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
     beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
 
 services:
@@ -41,6 +43,13 @@ services:
         arguments:
             $limitPerMinute: '%beacon.ingest_rate_limit%'
 
+    App\Project\Service\ProjectGovernanceResolver:
+        arguments:
+            $defaultRetentionDays: '%beacon.retention_days%'
+            $defaultRetentionMaxEvents: '%beacon.retention_max_events%'
+            $defaultIngestRateLimit: '%beacon.ingest_rate_limit%'
+            $defaultEventQuotaDaily: '%beacon.event_quota_daily%'
+
     App\Notifications\Service\OutboundUrlGuard:
         arguments:
             $allowPrivateUrls: '%beacon.notifications.allow_private_urls%'
@@ -50,3 +59,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist, method: prePersist }
             - { name: doctrine.event_listener, event: preUpdate, method: preUpdate }
+
+when@test:
+    parameters:
+        # Override env default so local webhook hosts (example.test) skip DNS SSRF checks in PHPUnit.
+        beacon.notifications.allow_private_urls: true

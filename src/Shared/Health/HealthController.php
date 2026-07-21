@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Health;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +20,7 @@ final readonly class HealthController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private MessengerQueueHealth $messengerQueueHealth,
     ) {
     }
 
@@ -101,7 +101,8 @@ final readonly class HealthController
             $connection = $this->entityManager->getConnection();
             $connection->executeQuery('SELECT 1');
             $checks['database'] = true;
-            $checks['messenger_async_pending'] = $this->countAsyncMessages($connection);
+            $queue = $this->messengerQueueHealth->asyncPending();
+            $checks['messenger_async_pending'] = $queue['pending'];
         } catch (Throwable $e) {
             return new JsonResponse([
                 'status' => 'error',
@@ -114,22 +115,5 @@ final readonly class HealthController
             'status' => 'ok',
             'checks' => $checks,
         ]);
-    }
-
-    private function countAsyncMessages(Connection $connection): ?int
-    {
-        try {
-            if (!$connection->createSchemaManager()->tablesExist(['messenger_messages'])) {
-                return null;
-            }
-
-            $count = $connection->fetchOne(
-                "SELECT COUNT(*) FROM messenger_messages WHERE queue_name = 'async' AND delivered_at IS NULL",
-            );
-
-            return false === $count ? null : (int) $count;
-        } catch (Throwable) {
-            return null;
-        }
     }
 }

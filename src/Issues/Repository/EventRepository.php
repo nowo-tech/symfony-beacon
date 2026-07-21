@@ -7,6 +7,8 @@ namespace App\Issues\Repository;
 use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Project\Entity\Project;
+use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -116,5 +118,90 @@ class EventRepository extends ServiceEntityRepository
         }
 
         return $stats;
+    }
+
+    public function countReceivedTodayForProject(Project $project): int
+    {
+        $start = new DateTimeImmutable('today');
+
+        return $this->countReceivedSinceForProject($project, $start);
+    }
+
+    public function countReceivedSinceForProject(Project $project, DateTimeImmutable $since): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project = :project')
+            ->andWhere('e.receivedAt >= :since')
+            ->setParameter('project', $project)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findLastReceivedAtForProject(Project $project): ?DateTimeImmutable
+    {
+        $value = $this->createQueryBuilder('e')
+            ->select('MAX(e.receivedAt)')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if (null === $value || '' === $value) {
+            return null;
+        }
+
+        return $value instanceof DateTimeImmutable
+            ? $value
+            : new DateTimeImmutable((string) $value);
+    }
+
+    /**
+     * Filtered events for project export (joins issue; no raw payload).
+     *
+     * @return list<Event>
+     */
+    public function searchForExport(
+        Project $project,
+        ?string $query = null,
+        ?string $level = null,
+        ?IssueStatus $status = null,
+        ?string $environment = null,
+        ?string $release = null,
+        int $limit = 1000,
+    ): array {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.issue', 'i')
+            ->addSelect('i')
+            ->andWhere('i.project = :project')
+            ->setParameter('project', $project)
+            ->orderBy('e.receivedAt', 'DESC')
+            ->addOrderBy('e.id', 'DESC')
+            ->setMaxResults(max(1, $limit));
+
+        if (null !== $query && '' !== trim($query)) {
+            $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q OR e.eventId LIKE :q')
+                ->setParameter('q', '%'.trim($query).'%');
+        }
+        if (null !== $level && '' !== $level) {
+            $qb->andWhere('i.level = :level')->setParameter('level', $level);
+        }
+        if ($status instanceof IssueStatus) {
+            $qb->andWhere('i.status = :status')->setParameter('status', $status);
+        }
+        if (null !== $environment && '' !== $environment) {
+            $qb->andWhere('e.environment = :env')->setParameter('env', $environment);
+        }
+        if (null !== $release && '' !== trim($release)) {
+            $qb->andWhere('e.releaseVersion = :release')->setParameter('release', trim($release));
+        }
+
+        /** @var list<Event> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
     }
 }

@@ -49,6 +49,11 @@ flash:
     project:
         created: Project created.
         api_key_created: API key created.
+        api_key_revoked: API key revoked.
+        api_key_rotated: API key rotated. Update clients with the new DSN.
+        governance_saved: Project governance settings saved.
+        governance_invalid: Governance values must be empty (inherit) or non-negative integers.
+        quota_approaching: This project is approaching its daily event quota.
         history_cleared: Project history cleared.
         deleted: Project deleted.
         delete_confirmation_mismatch: Project name did not match. Nothing was deleted.
@@ -109,6 +114,10 @@ flash:
     admin_projects:
         name_required: Project name is required.
         updated: Project updated.
+        ingest_suspended: Ingest suspended for this project.
+        ingest_resumed: Ingest resumed for this project.
+        view_as_enabled: Viewing projects as a member. Privileged project actions are limited.
+        view_as_disabled: Exited view-as-member mode.
 project:
     label: Project
     no_description: No description
@@ -117,7 +126,32 @@ project:
     settings:
         title: Settings
         nav: Settings
-        intro: API keys, members, and destructive project actions.
+        intro: API keys, members, governance, and destructive project actions.
+    governance:
+        title: Governance
+        help: Per-project retention, rate limits, and daily quotas. Leave a field empty to inherit the server default.
+        retention_days: Retention days
+        retention_max_events: Max stored events
+        ingest_rate_limit: Ingest rate limit (per minute)
+        event_quota_daily: Daily event quota
+        inherit_hint: 'Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.'
+        save: Save governance
+        quota_usage: 'Events today: %count% / %quota%'
+        ingest_disabled_banner: Envelope ingest is suspended for this project. Existing data remains readable.
+    health:
+        title: Health
+        intro: Instance Messenger queue depth and last notification delivery status for this project’s destinations.
+        messenger_pending: Messenger async pending
+        messenger_unavailable: Queue depth unavailable
+        instance_wide: instance-wide
+        ready_probe: Readiness probe
+        ready_link: Open /health/ready
+        destinations_title: Notification destinations
+        destinations_empty: No notification destinations configured.
+        last_delivery: 'Last delivery:'
+        delivery_ok: Success
+        delivery_fail: Failed
+        never_delivered: No deliveries yet.
     new:
         title: New project
         submit: Create project
@@ -139,6 +173,9 @@ project:
         generate: Suggest name
         generate_hint: Fill the label with a human-friendly adjective-noun name
         add: Add key
+        revoke: Revoke
+        revoke_confirm: Revoke this API key? Ingest with this secret will fail immediately.
+        rotate: Rotate
     members:
         title: Members
         help: Direct members of this project. Owners and admins manage membership. Access can also come from linked groups below.
@@ -243,6 +280,9 @@ issues:
     raw_payload: Raw payload
     highlights: Highlights
     tags: Tags
+    tags_custom: Client tags
+    tags_system: System tags
+    tags_hint: Client tags come from BeaconBundle setTag/setTags. Scrub sensitive fields with before_send before ingest.
     contexts: Contexts
     context_runtime: Runtime
     context_framework: Framework
@@ -265,6 +305,50 @@ issues:
     status_mark_ignored: Ignore
     status_saved: Issue status updated.
     status_invalid: Could not update the issue status.
+    priority:
+        low: Low
+        medium: Medium
+        high: High
+        critical: Critical
+    priority_label: Priority
+    priority_help: Set how urgent this issue is for triage.
+    priority_save: Save priority
+    priority_saved: Priority updated.
+    priority_invalid: Could not update the priority.
+    comments_title: Comments
+    comments_empty: No comments yet.
+    comment_body: Comment
+    comment_placeholder: Add a comment…
+    comment_submit: Post comment
+    comment_saved: Comment added.
+    comment_empty: Comment cannot be empty.
+    comment_too_long: Comment is too long.
+    comment_invalid: Could not add the comment.
+    duplicate_of: 'Duplicate of'
+    duplicate_help: Mark this issue as a duplicate of another in the same project (sets status to ignored).
+    duplicate_canonical: Canonical issue
+    duplicate_choose: Choose canonical issue…
+    duplicate_submit: Mark as duplicate
+    duplicate_saved: Issue marked as duplicate and ignored.
+    merge_events_label: Also merge events into the canonical issue
+    merge_events_help: Moves all events to the selected issue, recalculates counts, then ignores this issue.
+    merge_saved: Events merged into the canonical issue.
+    merge_failed: Could not merge these issues.
+    duplicate_self: An issue cannot be a duplicate of itself.
+    duplicate_circular: That would create a circular duplicate link.
+    duplicate_not_found: Canonical issue was not found in this project.
+    duplicate_invalid: Could not mark as duplicate.
+    views:
+        label: Saved views
+        choose: Open a saved view…
+        save_name: View name
+        save_placeholder: e.g. Critical unresolved
+        save: Save view
+        delete: Delete view
+        saved: View saved.
+        deleted: View deleted.
+        name_empty: View name cannot be empty.
+        invalid: Could not update saved views.
     history_title: Activity
     history_empty: No status or assignee changes yet.
     history_assignee: Assignee
@@ -275,9 +359,24 @@ issues:
         any_level: Any level
         any_status: any status
         any_assignee: Any assignee
+        any_priority: Any priority
         environment: Environment
+        release: Release
+        tag: Tag
+        url: Request URL
+        user: Event user
         per_page: Results per page
         per_page_option: '%count% per page'
+    badge:
+        new_in_release: New in release
+    compare:
+        title: 'Compare %a% vs %b%'
+        environment_b: Compare with environment…
+        hint: Set Environment and Compare to see issues only in A, only in B, or in both
+        only_a: 'Only in %env%'
+        only_b: 'Only in %env%'
+        both: In both
+        empty: No issues in this set
     sort_by: Sort by %column%
     pagination:
         showing: Showing %from%–%to% of %total%
@@ -430,11 +529,21 @@ users:
             'project.settings_viewed': Project settings viewed
             'project.created': Project created
             'project.api_key_created': API key created
+            'project.api_key_revoked': API key revoked
+            'project.api_key_rotated': API key rotated
+            'project.suspended': Project ingest suspended
+            'project.resumed': Project ingest resumed
+            'project.view_as_started': View-as-member started
+            'project.view_as_ended': View-as-member ended
             'project.history_cleared': Project history cleared
             'project.deleted': Project deleted
             'issue.opened': Issue opened
             'issue.assigned': Issue assignee changed
             'issue.status_changed': Issue status changed
+            'issue.priority_changed': Issue priority changed
+            'issue.commented': Issue comment added
+            'issue.marked_duplicate': Issue marked as duplicate
+            'issue.merged': Issue events merged
             'event.opened': Event opened
             'performance.opened': Performance opened
             'analytics.opened': Analytics opened
@@ -625,6 +734,21 @@ admin_projects:
     danger_title: Danger zone
     danger_intro: Permanently delete this project and all of its data. Instance admins can do this without being a project member.
     delete_open: Delete project…
+    stats_title: Ops stats
+    stats_open_issues: '%count% open issues'
+    stats_events_7d: '%count% events (7d)'
+    stats_open_issues_label: Open issues
+    stats_events_7d_label: Events (last 7 days)
+    stats_last_ingest_label: Last ingest
+    stats_never: Never
+    ingest_suspended_badge: Ingest suspended
+    suspend_ingest: Suspend ingest
+    suspend_ingest_help: Reject new envelopes while keeping stored data readable.
+    resume_ingest: Resume ingest
+    resume_ingest_help: Allow Envelope ingest again.
+    view_as_member: View as member
+    view_as_banner: You are viewing projects as a member (admin privileges for project actions are limited).
+    view_as_exit: Exit view-as-member
 
 admin:
     hub:
@@ -737,6 +861,19 @@ notifications:
         endpoint_ssrf: Endpoint must not target private, link-local, or cloud metadata addresses.
         enabled: Enabled
         categories: Alert categories
+        quiet_hours_legend: Quiet hours & digest
+        quiet_hours_enabled: Enable quiet hours
+        quiet_hours_help: During the window, alerts are buffered instead of sent immediately. Run app:notifications:flush-digests on a schedule (or after the window).
+        quiet_hours_timezone: Timezone
+        quiet_hours_start: Quiet hours start (HH:MM)
+        quiet_hours_end: Quiet hours end (HH:MM)
+        quiet_hours_timezone_invalid: Invalid timezone identifier.
+        quiet_hours_time_invalid: Use 24-hour HH:MM format (e.g. 22:00).
+        quiet_hours_required: Start and end times are required when quiet hours are enabled.
+        quiet_hours_range_invalid: Start and end times must differ.
+        digest_enabled: Send digest summary on flush
+        digest_help: When enabled, flush sends one summary per destination. When disabled, each held alert is sent individually after quiet hours.
+        pagerduty_note: Native PagerDuty is not supported; use a generic HTTP webhook if you need an incident bridge.
     type:
         slack: Slack Incoming Webhook
         discord: Discord webhook
@@ -751,6 +888,11 @@ notifications:
         info: Info
         debug: Debug
         n_plus_one: N+1 detections
+        issue.resolved: Issue resolved
+        issue.reopened: Issue reopened
+        issue.assigned: Issue assigned
+        issue.commented: Issue commented
+        issue.duplicated: Issue marked duplicate
     flash:
         created: Notification destination created.
         updated: Notification destination updated.

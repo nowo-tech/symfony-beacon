@@ -35,6 +35,14 @@
                         {{ project.slug }}
                         · {{ 'admin_projects.member_count'|trans({'%count%': project.memberships|length}) }}
                         · {{ 'admin_projects.group_count'|trans({'%count%': project.groupAccesses|length}) }}
+                        {% set stats = opsStats[project.id] ?? null %}
+                        {% if stats %}
+                            · {{ 'admin_projects.stats_open_issues'|trans({'%count%': stats.open_issues}) }}
+                            · {{ 'admin_projects.stats_events_7d'|trans({'%count%': stats.events_last_7d}) }}
+                            {% if not project.ingestEnabled %}
+                                · <span class="text-[var(--color-alert)]">{{ 'admin_projects.ingest_suspended_badge'|trans }}</span>
+                            {% endif %}
+                        {% endif %}
                     </div>
                     {% if project.description %}
                         <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ project.description }}</p>

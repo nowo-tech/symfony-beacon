@@ -9,6 +9,7 @@ use App\Identity\Entity\User;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
@@ -16,8 +17,10 @@ use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectGovernanceResolver;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
+use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -43,10 +46,12 @@ final class ProjectController extends AbstractController
         private readonly ProjectAccessService $projectAccess,
         private readonly ProjectHistoryClearer $historyClearer,
         private readonly ProjectMembershipManager $membershipManager,
+        private readonly ProjectGovernanceResolver $governanceResolver,
         private readonly UserGroupRepository $userGroupRepository,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
+        private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -161,6 +166,8 @@ final class ProjectController extends AbstractController
             'project_name' => $project->getName(),
         ]);
 
+        $this->maybeFlashApproachingQuota($request, $project, $access);
+
         return $this->render('project/settings.html.twig', [
             'project' => $project,
             'access' => $access,
@@ -174,13 +181,59 @@ final class ProjectController extends AbstractController
             'availableGroups' => $this->availableGroupsForProject($project, $user),
             'ownerCount' => $this->countOwners($project),
             'transferCandidates' => $this->transferOwnershipCandidates($project, $user),
+            'governanceDefaults' => $this->governanceResolver->envDefaults(),
+            'eventsToday' => $this->governanceResolver->eventsReceivedToday($project),
+            'effectiveQuota' => $this->governanceResolver->effectiveEventQuotaDaily($project),
+            'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
         ]);
+    }
+
+    #[Route('/projects/{id}/governance', name: 'project_governance_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    public function saveGovernance(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+
+        if (!$this->isCsrfTokenValid('project_governance_'.$project->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $retentionDays = $this->parseOptionalNonNegativeInt($request->request->getString('retention_days'));
+        $retentionMaxEvents = $this->parseOptionalNonNegativeInt($request->request->getString('retention_max_events'));
+        $ingestRateLimit = $this->parseOptionalNonNegativeInt($request->request->getString('ingest_rate_limit_per_minute'));
+        $eventQuotaDaily = $this->parseOptionalNonNegativeInt($request->request->getString('event_quota_daily'));
+
+        if (
+            false === $retentionDays
+            || false === $retentionMaxEvents
+            || false === $ingestRateLimit
+            || false === $eventQuotaDaily
+        ) {
+            $this->addFlash('error', 'flash.project.governance_invalid');
+
+            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        }
+
+        $project->setRetentionDays($retentionDays);
+        $project->setRetentionMaxEvents($retentionMaxEvents);
+        $project->setIngestRateLimitPerMinute($ingestRateLimit);
+        $project->setEventQuotaDaily($eventQuotaDaily);
+        // ingestEnabled is toggled by platform admins (019); owners keep current value here.
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'flash.project.governance_saved');
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
     /**
      * Direct members eligible to receive ownership (everyone except the actor).
      *
-     * @return list<\App\Project\Entity\ProjectMembership>
+     * @return list<ProjectMembership>
      */
     private function transferOwnershipCandidates(Project $project, User $actor): array
     {
@@ -270,6 +323,120 @@ final class ProjectController extends AbstractController
         $this->addFlash('success', 'flash.project.api_key_created');
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
+    #[Route(
+        '/projects/{projectId}/keys/{keyId}/revoke',
+        name: 'project_keys_revoke',
+        requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function revokeKey(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        #[MapEntity(id: 'keyId')]
+        ProjectApiKey $apiKey,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->assertKeyBelongsToProject($apiKey, $project);
+
+        if (!$this->isCsrfTokenValid('project_key_revoke_'.$apiKey->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $apiKey->setActive(false);
+        $this->userActionRecorder->record(UserActionType::ProjectApiKeyRevoked, $user, $user, [
+            'project_uuid' => $project->getUuid(),
+            'project_name' => $project->getName(),
+            'label' => $apiKey->getLabel(),
+        ]);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'flash.project.api_key_revoked');
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
+    #[Route(
+        '/projects/{projectId}/keys/{keyId}/rotate',
+        name: 'project_keys_rotate',
+        requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function rotateKey(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        #[MapEntity(id: 'keyId')]
+        ProjectApiKey $apiKey,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->assertKeyBelongsToProject($apiKey, $project);
+
+        if (!$this->isCsrfTokenValid('project_key_rotate_'.$apiKey->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $label = $apiKey->getLabel();
+        $apiKey->setActive(false);
+        $newKey = $this->createApiKey($project, $label);
+        $project->addApiKey($newKey);
+        $this->userActionRecorder->record(UserActionType::ProjectApiKeyRotated, $user, $user, [
+            'project_uuid' => $project->getUuid(),
+            'project_name' => $project->getName(),
+            'label' => $label,
+        ]);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'flash.project.api_key_rotated');
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
+    private function assertKeyBelongsToProject(ProjectApiKey $apiKey, Project $project): void
+    {
+        if ($apiKey->getProject()?->getId() !== $project->getId()) {
+            throw $this->createNotFoundException();
+        }
+    }
+
+    /**
+     * Empty string → null (inherit env). Invalid / negative → false.
+     */
+    private function parseOptionalNonNegativeInt(string $raw): int|false|null
+    {
+        $trimmed = trim($raw);
+        if ('' === $trimmed) {
+            return null;
+        }
+        if (!ctype_digit($trimmed)) {
+            return false;
+        }
+
+        return (int) $trimmed;
+    }
+
+    private function maybeFlashApproachingQuota(Request $request, Project $project, ProjectAccess $access): void
+    {
+        if (!\in_array($access->role, [ProjectRole::Owner, ProjectRole::Admin], true)) {
+            return;
+        }
+        if (!$this->governanceResolver->isApproachingDailyQuota($project)) {
+            return;
+        }
+
+        $session = $request->getSession();
+        $flagKey = '_beacon_quota_warn_'.$project->getUuid();
+        if ($session->get($flagKey)) {
+            return;
+        }
+        $session->set($flagKey, true);
+        $this->addFlash('warning', 'flash.project.quota_approaching');
     }
 
     #[Route('/projects/{id}/clear-history', name: 'project_clear_history', requirements: ['id' => Requirement::UUID], methods: ['POST'])]

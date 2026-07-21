@@ -41,6 +41,26 @@ class Project implements AuditableInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    /** Per-project retention days; null inherits `beacon.retention_days`. */
+    #[ORM\Column(nullable: true)]
+    private ?int $retentionDays = null;
+
+    /** Per-project max stored events; null inherits `beacon.retention_max_events`. */
+    #[ORM\Column(nullable: true)]
+    private ?int $retentionMaxEvents = null;
+
+    /** Per-project ingest rate limit (per minute); null inherits `beacon.ingest_rate_limit`. */
+    #[ORM\Column(nullable: true)]
+    private ?int $ingestRateLimitPerMinute = null;
+
+    /** Daily event quota; null inherits `beacon.event_quota_daily`. */
+    #[ORM\Column(nullable: true)]
+    private ?int $eventQuotaDaily = null;
+
+    /** When false, Envelope ingest is rejected (admin suspend / governance). */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $ingestEnabled = true;
+
     /** @var Collection<int, ProjectApiKey> */
     #[ORM\OneToMany(targetEntity: ProjectApiKey::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $apiKeys;
@@ -116,6 +136,66 @@ class Project implements AuditableInterface
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRetentionDays(): ?int
+    {
+        return $this->retentionDays;
+    }
+
+    public function setRetentionDays(?int $retentionDays): self
+    {
+        $this->retentionDays = $retentionDays;
+
+        return $this;
+    }
+
+    public function getRetentionMaxEvents(): ?int
+    {
+        return $this->retentionMaxEvents;
+    }
+
+    public function setRetentionMaxEvents(?int $retentionMaxEvents): self
+    {
+        $this->retentionMaxEvents = $retentionMaxEvents;
+
+        return $this;
+    }
+
+    public function getIngestRateLimitPerMinute(): ?int
+    {
+        return $this->ingestRateLimitPerMinute;
+    }
+
+    public function setIngestRateLimitPerMinute(?int $ingestRateLimitPerMinute): self
+    {
+        $this->ingestRateLimitPerMinute = $ingestRateLimitPerMinute;
+
+        return $this;
+    }
+
+    public function getEventQuotaDaily(): ?int
+    {
+        return $this->eventQuotaDaily;
+    }
+
+    public function setEventQuotaDaily(?int $eventQuotaDaily): self
+    {
+        $this->eventQuotaDaily = $eventQuotaDaily;
+
+        return $this;
+    }
+
+    public function isIngestEnabled(): bool
+    {
+        return $this->ingestEnabled;
+    }
+
+    public function setIngestEnabled(bool $ingestEnabled): self
+    {
+        $this->ingestEnabled = $ingestEnabled;
 
         return $this;
     }

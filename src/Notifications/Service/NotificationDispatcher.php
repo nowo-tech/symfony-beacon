@@ -4,23 +4,32 @@ declare(strict_types=1);
 
 namespace App\Notifications\Service;
 
+use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
+use App\Issues\Entity\IssueComment;
+use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Queues outbound notifications for matching enabled destinations (never blocks Envelope ACK).
+ * During quiet hours, buffers instead of immediate Messenger dispatch (except send-test).
  */
 final readonly class NotificationDispatcher
 {
     public function __construct(
         private NotificationDestinationRepository $destinationRepository,
+        private NotificationDigestBufferRepository $bufferRepository,
         private NotificationPayloadBuilder $payloadBuilder,
+        private QuietHoursEvaluator $quietHoursEvaluator,
         private MessageBusInterface $bus,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -42,6 +51,55 @@ final readonly class NotificationDispatcher
         );
     }
 
+    public function dispatchIssueResolved(Project $project, Issue $issue): void
+    {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::ISSUE_RESOLVED,
+            $this->payloadBuilder->forIssueResolved($project, $issue),
+        );
+    }
+
+    public function dispatchIssueReopened(Project $project, Issue $issue): void
+    {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::ISSUE_REOPENED,
+            $this->payloadBuilder->forIssueReopened($project, $issue),
+        );
+    }
+
+    public function dispatchIssueAssigned(
+        Project $project,
+        Issue $issue,
+        ?User $previousAssignee,
+        ?User $newAssignee,
+    ): void {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::ISSUE_ASSIGNED,
+            $this->payloadBuilder->forIssueAssigned($project, $issue, $previousAssignee, $newAssignee),
+        );
+    }
+
+    public function dispatchIssueCommented(Project $project, Issue $issue, IssueComment $comment): void
+    {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::ISSUE_COMMENTED,
+            $this->payloadBuilder->forIssueCommented($project, $issue, $comment),
+        );
+    }
+
+    public function dispatchIssueDuplicated(Project $project, Issue $issue, Issue $canonical): void
+    {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::ISSUE_DUPLICATED,
+            $this->payloadBuilder->forIssueDuplicated($project, $issue, $canonical),
+        );
+    }
+
     public function dispatchNPlusOne(Project $project, PerfTransaction $transaction): void
     {
         if ($transaction->getNPlusOneCount() < 1) {
@@ -53,13 +111,15 @@ final readonly class NotificationDispatcher
             if (!$destination->matchesCategory(NotificationCategories::N_PLUS_ONE)) {
                 continue;
             }
-            $this->bus->dispatch(new DeliverNotificationMessage($destination->getId() ?? 0, $payload));
+            $this->enqueueOrBuffer($destination->getId() ?? 0, $destination, $payload);
         }
+        $this->entityManager->flush();
     }
 
     public function dispatchTest(Project $project, int $destinationId, string $label): void
     {
         $payload = $this->payloadBuilder->forTest($project, $label);
+        // Send-test always bypasses quiet hours.
         $this->bus->dispatch(new DeliverNotificationMessage($destinationId, $payload));
     }
 
@@ -74,15 +134,42 @@ final readonly class NotificationDispatcher
             $payload['category'] = $level;
         }
 
+        $this->dispatchCategoryPayload($project, $level, $payload);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function dispatchCategoryPayload(Project $project, string $category, array $payload): void
+    {
         foreach ($this->destinationRepository->findEnabledByProject($project) as $destination) {
-            if (!$destination->matchesCategory($level)) {
+            if (!$destination->matchesCategory($category)) {
                 continue;
             }
             $id = $destination->getId();
             if (null === $id) {
                 continue;
             }
-            $this->bus->dispatch(new DeliverNotificationMessage($id, $payload));
+            $this->enqueueOrBuffer($id, $destination, $payload);
         }
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function enqueueOrBuffer(int $destinationId, NotificationDestination $destination, array $payload): void
+    {
+        if ($destinationId < 1) {
+            return;
+        }
+
+        if ($this->quietHoursEvaluator->isQuietHoursActive($destination)) {
+            $this->bufferRepository->buffer($destination, $payload);
+
+            return;
+        }
+
+        $this->bus->dispatch(new DeliverNotificationMessage($destinationId, $payload));
     }
 }

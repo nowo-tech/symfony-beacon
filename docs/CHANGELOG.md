@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-07-21
+
+### Added
+
+- Issues list: tag / request URL / event-user filters; 24h / 7d / 30d occurrence sorts are SQL-backed with correct pagination (`016-issue-search`)
+- Notification **quiet hours** and **digest** flush (`020-notification-digest`): per-destination window/timezone, `notification_digest_buffer`, `app:notifications:flush-digests` (PagerDuty not included)
+- Project Settings / Admin project **Health** panel (`021-project-health-ui`): Messenger async pending + last delivery status per destination
+- Analytics and Performance **access** functional tests in the default PHPUnit / CI suite (`022-analytics-perf-ci`)
+- Project export (`017-export-webhooks`): owner/admin `GET /projects/{uuid}/export/issues.{csv,json}` and `events.{csv,json}` with issue-list filters (1,000-row cap; CSV streamed)
+- Lifecycle notification categories: `issue.resolved`, `issue.reopened`, `issue.assigned`, `issue.commented`, `issue.duplicated` (opt-in on destinations; dispatched from issue status/assign/comment/duplicate)
+- Project Settings → **Governance**: per-project retention, max events, ingest rate limit, and daily event quota (empty inherits env); approaching-quota warning at 80% (`018-project-governance`)
+- Project Settings → API keys: **Revoke** and **Rotate** (hard cutover; audit `project.api_key_revoked` / `project.api_key_rotated`)
+- Administration → Projects: ops stats (open issues, events last 7d, last ingest), **Suspend/Resume ingest**, and **View as member** (`019-admin-projects-ops`)
+- Env `BEACON_EVENT_QUOTA_DAILY` (default 0 = unlimited); Envelope returns `403 ingest disabled` when suspended and `429` when daily quota exceeded
+- Issue workflow (`015-issue-workflow`): priority (`low`/`medium`/`high`/`critical`, default medium), plain-text comments, mark-as-duplicate (link + ignored), optional **merge events** into the canonical issue (recomputes counts / seen / release fields), and per-user saved issue list views
+- Issues: denormalized `firstRelease` / `lastRelease` / `lastEnvironment` from ingest; filter by release; “New in release” badge; compare issues across two environments (`014-releases`)
+- Companion docs for BeaconBundle Phase 3.3–3.4: EVENT-CONTEXT / DSN cross-links for **tags**, **before_send**, and **Doctrine/HttpClient spans** (`023-client-tags-scrubbing`, `024-client-spans`)
+- Event detail Tags panel: distinct **Client tags** (`payload.tags`) vs system tags
+
+### Changed
+
+- Issues list occurrence window sorts (24h / 7d / 30d) run in SQL via correlated event counts; the controller no longer fetches all matches to sort in PHP
+
+### Fixed
+
+- Event detail Tags: release label no longer errors when `releaseVersion` is set but payload has no `release` key
+
 ## [0.9.4] - 2026-07-21
 
 ### Added
@@ -265,7 +292,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...v0.10.0
 [0.9.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.1...v0.9.2

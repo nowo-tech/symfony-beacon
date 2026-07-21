@@ -134,6 +134,8 @@ final readonly class ProcessEnvelopeHandler
         $event->setEventTimestamp($eventTimestamp ?? $receivedAt);
         $this->entityManager->persist($event);
 
+        $this->applyReleaseContext($issue, $payload);
+
         $stat = $this->dailyProjectStatRepository->findOrCreate($project, $receivedAt);
         $stat->incrementErrorCount();
 
@@ -217,6 +219,32 @@ final readonly class ProcessEnvelopeHandler
 
         if ($detection['count'] > 0) {
             $this->notificationDispatcher->dispatchNPlusOne($project, $tx);
+        }
+    }
+
+    /**
+     * Updates denormalized first/last release and last environment on the issue.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private function applyReleaseContext(Issue $issue, array $payload): void
+    {
+        $release = isset($payload['release']) && \is_scalar($payload['release'])
+            ? Issue::normalizeRelease((string) $payload['release'])
+            : null;
+        $environment = isset($payload['environment']) && \is_scalar($payload['environment'])
+            ? Issue::normalizeEnvironment((string) $payload['environment'])
+            : null;
+
+        if (null !== $release) {
+            if (null === $issue->getFirstRelease() || '' === $issue->getFirstRelease()) {
+                $issue->setFirstRelease($release);
+            }
+            $issue->setLastRelease($release);
+        }
+
+        if (null !== $environment) {
+            $issue->setLastEnvironment($environment);
         }
     }
 

@@ -10,11 +10,14 @@ use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
+use App\Notifications\Service\QuietHoursEvaluator;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Messenger\Envelope;
@@ -33,25 +36,20 @@ final class NotificationDispatcherTest extends TestCase
         $warningDest = $this->destination($project, ['warning'], true);
         $disabled = $this->destination($project, ['error'], false);
 
-        $repo = $this->createMock(NotificationDestinationRepository::class);
+        $repo = $this->createStub(NotificationDestinationRepository::class);
         $repo->method('findEnabledByProject')->willReturn([$errorDest, $warningDest]);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $dispatched = [];
-        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$dispatched): Envelope {
-            $dispatched[] = $message;
+        $bus->expects(self::atLeastOnce())->method('dispatch')->willReturnCallback(
+            static function (object $message) use (&$dispatched): Envelope {
+                $dispatched[] = $message;
 
-            return new Envelope($message);
-        });
-
-        $urls = $this->createMock(UrlGeneratorInterface::class);
-        $urls->method('generate')->willReturn('https://beacon.test/issue');
-
-        $dispatcher = new NotificationDispatcher(
-            $repo,
-            new NotificationPayloadBuilder($urls),
-            $bus,
+                return new Envelope($message);
+            },
         );
+
+        $dispatcher = $this->dispatcher($repo, $bus);
 
         $issue = new Issue();
         $issue->setProject($project);
@@ -69,6 +67,46 @@ final class NotificationDispatcherTest extends TestCase
         self::assertNotContains($disabled, [$errorDest, $warningDest]); // sanity
     }
 
+    public function testDispatchesLifecycleOnlyWhenCategoryEnabled(): void
+    {
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+
+        $resolvedDest = $this->destination($project, [NotificationCategories::ISSUE_RESOLVED], true);
+        $assignedOnly = $this->destination($project, [NotificationCategories::ISSUE_ASSIGNED], true);
+
+        $repo = $this->createStub(NotificationDestinationRepository::class);
+        $repo->method('findEnabledByProject')->willReturn([$resolvedDest, $assignedOnly]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $dispatched = [];
+        $bus->expects(self::once())->method('dispatch')->willReturnCallback(
+            static function (object $message) use (&$dispatched): Envelope {
+                $dispatched[] = $message;
+
+                return new Envelope($message);
+            },
+        );
+
+        $dispatcher = $this->dispatcher($repo, $bus);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setTitle('Boom');
+        $issue->setLevel('error');
+        $issue->setStatus(IssueStatus::Resolved);
+        $issue->setFingerprint('abc');
+
+        $dispatcher->dispatchIssueResolved($project, $issue);
+
+        self::assertCount(1, $dispatched);
+        self::assertInstanceOf(DeliverNotificationMessage::class, $dispatched[0]);
+        self::assertSame($resolvedDest->getId(), $dispatched[0]->destinationId);
+        self::assertSame('issue.resolved', $dispatched[0]->payload['event']);
+        self::assertSame(NotificationCategories::ISSUE_RESOLVED, $dispatched[0]->payload['category']);
+    }
+
     public function testNPlusOneRequiresCategory(): void
     {
         $project = new Project();
@@ -76,25 +114,20 @@ final class NotificationDispatcherTest extends TestCase
         $project->setSlug('acme');
 
         $dest = $this->destination($project, [NotificationCategories::N_PLUS_ONE], true);
-        $repo = $this->createMock(NotificationDestinationRepository::class);
+        $repo = $this->createStub(NotificationDestinationRepository::class);
         $repo->method('findEnabledByProject')->willReturn([$dest]);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $count = 0;
-        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$count): Envelope {
-            ++$count;
+        $bus->expects(self::once())->method('dispatch')->willReturnCallback(
+            static function (object $message) use (&$count): Envelope {
+                ++$count;
 
-            return new Envelope($message);
-        });
-
-        $urls = $this->createMock(UrlGeneratorInterface::class);
-        $urls->method('generate')->willReturn('https://beacon.test/perf');
-
-        $dispatcher = new NotificationDispatcher(
-            $repo,
-            new NotificationPayloadBuilder($urls),
-            $bus,
+                return new Envelope($message);
+            },
         );
+
+        $dispatcher = $this->dispatcher($repo, $bus);
 
         $tx = new PerfTransaction();
         $tx->setProject($project);
@@ -105,6 +138,26 @@ final class NotificationDispatcherTest extends TestCase
 
         $dispatcher->dispatchNPlusOne($project, $tx);
         self::assertSame(1, $count);
+    }
+
+    private function dispatcher(
+        NotificationDestinationRepository $repo,
+        MessageBusInterface $bus,
+    ): NotificationDispatcher {
+        $urls = $this->createStub(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('https://beacon.test/issue');
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::atLeastOnce())->method('flush');
+
+        return new NotificationDispatcher(
+            $repo,
+            $this->createStub(NotificationDigestBufferRepository::class),
+            new NotificationPayloadBuilder($urls),
+            new QuietHoursEvaluator(),
+            $bus,
+            $em,
+        );
     }
 
     /**

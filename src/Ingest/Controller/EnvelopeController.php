@@ -12,6 +12,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\ProjectGovernanceResolver;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
@@ -40,6 +41,7 @@ ENVELOPE;
         private ProjectRepository $projectRepository,
         private ProjectApiKeyRepository $apiKeyRepository,
         private IngestRateLimiter $ingestRateLimiter,
+        private ProjectGovernanceResolver $governanceResolver,
         private MessageBusInterface $bus,
     ) {
     }
@@ -196,6 +198,8 @@ MD,
             return new Response('forbidden', Response::HTTP_FORBIDDEN);
         }
 
+        $project = $apiKey->getProject();
+
         $storedSecret = $apiKey->getSecretKey();
         if (null !== $storedSecret && '' !== $storedSecret) {
             $providedSecret = $auth['secret_key'];
@@ -215,7 +219,18 @@ MD,
             return new Response('project not found', Response::HTTP_NOT_FOUND);
         }
 
-        if (!$this->ingestRateLimiter->accept($projectId)) {
+        if (!$project->isIngestEnabled()) {
+            return new Response('ingest disabled', Response::HTTP_FORBIDDEN);
+        }
+
+        if ($this->governanceResolver->isDailyQuotaExceeded($project)) {
+            return new Response('daily event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
+                'Retry-After' => '60',
+            ]);
+        }
+
+        $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
+        if (!$this->ingestRateLimiter->accept($projectId, $rateLimit)) {
             return new Response('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
                 'Retry-After' => '60',
             ]);

@@ -9,6 +9,8 @@ use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
+use DateTimeZone;
+use Exception;
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\Form\AbstractType;
@@ -94,12 +96,77 @@ final class NotificationDestinationFormType extends AbstractType
                 'constraints' => [
                     new Assert\Count(min: 1),
                 ],
+            ])
+            ->add('quietHoursEnabled', CheckboxType::class, [
+                'label' => 'notifications.form.quiet_hours_enabled',
+                'required' => false,
+                'help' => 'notifications.form.quiet_hours_help',
+            ])
+            ->add('quietHoursTimezone', TextType::class, [
+                'label' => 'notifications.form.quiet_hours_timezone',
+                'required' => false,
+                'empty_data' => 'UTC',
+                'constraints' => [
+                    new Assert\NotBlank(),
+                    new Assert\Length(max: 64),
+                ],
+            ])
+            ->add('quietHoursStart', TextType::class, [
+                'label' => 'notifications.form.quiet_hours_start',
+                'required' => false,
+                'attr' => ['placeholder' => '22:00'],
+            ])
+            ->add('quietHoursEnd', TextType::class, [
+                'label' => 'notifications.form.quiet_hours_end',
+                'required' => false,
+                'attr' => ['placeholder' => '07:00'],
+            ])
+            ->add('digestEnabled', CheckboxType::class, [
+                'label' => 'notifications.form.digest_enabled',
+                'required' => false,
+                'help' => 'notifications.form.digest_help',
             ]);
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             /** @var NotificationDestination $data */
             $data = $event->getData();
             $form = $event->getForm();
+
+            try {
+                new DateTimeZone($data->getQuietHoursTimezone());
+            } catch (Exception) {
+                $form->get('quietHoursTimezone')->addError(new FormError(
+                    $this->translator->trans('notifications.form.quiet_hours_timezone_invalid'),
+                ));
+            }
+
+            $start = $data->getQuietHoursStart();
+            $end = $data->getQuietHoursEnd();
+            $timePattern = '/^([01]\d|2[0-3]):[0-5]\d$/';
+
+            if (null !== $start && 1 !== preg_match($timePattern, $start)) {
+                $form->get('quietHoursStart')->addError(new FormError(
+                    $this->translator->trans('notifications.form.quiet_hours_time_invalid'),
+                ));
+            }
+            if (null !== $end && 1 !== preg_match($timePattern, $end)) {
+                $form->get('quietHoursEnd')->addError(new FormError(
+                    $this->translator->trans('notifications.form.quiet_hours_time_invalid'),
+                ));
+            }
+
+            if ($data->isQuietHoursEnabled()) {
+                if (null === $start || null === $end) {
+                    $form->get('quietHoursStart')->addError(new FormError(
+                        $this->translator->trans('notifications.form.quiet_hours_required'),
+                    ));
+                } elseif ($start === $end) {
+                    $form->get('quietHoursEnd')->addError(new FormError(
+                        $this->translator->trans('notifications.form.quiet_hours_range_invalid'),
+                    ));
+                }
+            }
+
             $endpoint = $data->getEndpointUrl();
             $type = $data->getType();
 

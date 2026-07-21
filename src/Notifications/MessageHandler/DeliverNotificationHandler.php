@@ -9,6 +9,7 @@ use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Mailer\MailerInterface;
@@ -30,6 +31,7 @@ final readonly class DeliverNotificationHandler
         private HttpClientInterface $httpClient,
         private MailerInterface $mailer,
         private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -45,6 +47,8 @@ final readonly class DeliverNotificationHandler
             $this->logger->warning('Notification destination has empty endpoint.', [
                 'destination_id' => $message->destinationId,
             ]);
+            $destination->recordDeliveryFailure('Empty endpoint');
+            $this->entityManager->flush();
 
             return;
         }
@@ -52,34 +56,38 @@ final readonly class DeliverNotificationHandler
         try {
             if (NotificationDestinationType::Email === $destination->getType()) {
                 $this->deliverEmail($endpoint, $message->payload);
+            } else {
+                $request = $this->outboundFormatter->httpRequest(
+                    $destination->getType(),
+                    $endpoint,
+                    $message->payload,
+                );
 
-                return;
+                if (NotificationDestinationType::Telegram !== $destination->getType()) {
+                    $this->outboundUrlGuard->assertSafeHttpUrl($request['url']);
+                }
+
+                $response = $this->httpClient->request('POST', $request['url'], [
+                    'json' => $request['json'],
+                    'timeout' => 10,
+                    'headers' => [
+                        'User-Agent' => 'symfony-beacon-notifications/1.0',
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $status = $response->getStatusCode();
+                if ($status < 200 || $status >= 300) {
+                    throw new RuntimeException(\sprintf('Destination returned HTTP %d', $status));
+                }
             }
 
-            $request = $this->outboundFormatter->httpRequest(
-                $destination->getType(),
-                $endpoint,
-                $message->payload,
-            );
-
-            if (NotificationDestinationType::Telegram !== $destination->getType()) {
-                $this->outboundUrlGuard->assertSafeHttpUrl($request['url']);
-            }
-
-            $response = $this->httpClient->request('POST', $request['url'], [
-                'json' => $request['json'],
-                'timeout' => 10,
-                'headers' => [
-                    'User-Agent' => 'symfony-beacon-notifications/1.0',
-                    'Content-Type' => 'application/json',
-                ],
-            ]);
-
-            $status = $response->getStatusCode();
-            if ($status < 200 || $status >= 300) {
-                throw new RuntimeException(\sprintf('Destination returned HTTP %d', $status));
-            }
+            $destination->recordDeliverySuccess();
+            $this->entityManager->flush();
         } catch (Throwable $e) {
+            $destination->recordDeliveryFailure($e->getMessage());
+            $this->entityManager->flush();
+
             $this->logger->error('Notification delivery failed.', [
                 'destination_id' => $message->destinationId,
                 'exception' => $e->getMessage(),
@@ -103,7 +111,7 @@ final readonly class DeliverNotificationHandler
 
         $email = (new Email())
             ->to($to)
-            ->subject($summary)
+            ->subject(mb_substr(str_replace("\n", ' ', $summary), 0, 200))
             ->text($body);
 
         $this->mailer->send($email);

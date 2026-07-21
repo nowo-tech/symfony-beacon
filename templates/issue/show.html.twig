@@ -15,6 +15,7 @@
     <p class="issue-hero__status">
         <span class="issue-badge issue-badge--status issue-badge--status-{{ issue.status.value }}">{{ ('issues.status.' ~ issue.status.value)|trans }}</span>
         <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
+        <span class="issue-badge issue-badge--priority issue-badge--priority-{{ issue.priority.value }}">{{ ('issues.priority.' ~ issue.priority.value)|trans }}</span>
     </p>
     <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
     {% if subtitle and subtitle != headline %}
@@ -22,6 +23,12 @@
     {% endif %}
     {% if issue.culprit %}
         <p class="issue-hero__culprit font-mono">{{ issue.culprit }}</p>
+    {% endif %}
+    {% if issue.duplicateOf %}
+        <p class="issue-hero__duplicate mt-2 text-sm" data-testid="duplicate-of">
+            {{ 'issues.duplicate_of'|trans }}
+            <a href="{{ path('issue_show', {projectId: project.uuid, id: issue.duplicateOf.uuid}) }}">{{ issue.duplicateOf.title }}</a>
+        </p>
     {% endif %}
 </header>
 
@@ -34,6 +41,31 @@
                 <p class="text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</p>
             </section>
         {% endif %}
+
+        <section class="panel mt-6 issue-comments" data-testid="issue-comments">
+            <h2 class="text-base font-medium mb-3">{{ 'issues.comments_title'|trans }}</h2>
+            {% if comments is empty %}
+                <p class="text-[var(--color-ink)]/55 text-sm mb-4">{{ 'issues.comments_empty'|trans }}</p>
+            {% else %}
+                <ol class="issue-comments__list list-none space-y-3 mb-4">
+                    {% for comment in comments %}
+                        <li class="issue-comments__item border-t border-[var(--color-ink)]/10 pt-3 first:border-0 first:pt-0">
+                            <div class="flex flex-wrap gap-2 text-xs text-[var(--color-ink)]/55 mb-1">
+                                <span class="font-medium text-[var(--color-ink)]">{{ comment.author.displayName ?: comment.author.email }}</span>
+                                <time datetime="{{ comment.createdAt|date('c') }}">{{ comment.createdAt|date('Y-m-d H:i') }}</time>
+                            </div>
+                            <p class="text-sm whitespace-pre-wrap">{{ comment.body }}</p>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+            <form method="post" action="{{ path('issue_comment_add', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-comments__form">
+                <input type="hidden" name="_token" value="{{ csrf_token('issue_comment') }}">
+                <label class="sr-only" for="issue-comment-body">{{ 'issues.comment_body'|trans }}</label>
+                <textarea id="issue-comment-body" class="input w-full mb-2" name="body" rows="3" maxlength="5000" required placeholder="{{ 'issues.comment_placeholder'|trans }}"></textarea>
+                <button type="submit" class="btn-primary">{{ 'issues.comment_submit'|trans }}</button>
+            </form>
+        </section>
     </div>
 
     <aside class="issue-layout__aside">
@@ -112,6 +144,38 @@
                             </form>
                         {% endif %}
                     </div>
+                </div>
+
+                <div class="issue-priority-actions mt-4">
+                    <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
+                    <form method="post" action="{{ path('issue_priority', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-priority-form flex flex-wrap gap-2 items-center">
+                        <input type="hidden" name="_token" value="{{ csrf_token('issue_priority') }}">
+                        <select class="input" name="priority" aria-label="{{ 'issues.priority_label'|trans }}">
+                            {% for p in priorities %}
+                                <option value="{{ p.value }}" {% if issue.priority.value == p.value %}selected{% endif %}>{{ ('issues.priority.' ~ p.value)|trans }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-primary">{{ 'issues.priority_save'|trans }}</button>
+                    </form>
+                </div>
+
+                <div class="issue-duplicate-actions mt-4" data-testid="mark-duplicate">
+                    <p class="issue-assignee-form__help">{{ 'issues.duplicate_help'|trans }}</p>
+                    <form method="post" action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-duplicate-form flex flex-col gap-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
+                        <select class="input" name="canonical_uuid" required aria-label="{{ 'issues.duplicate_canonical'|trans }}">
+                            <option value="">{{ 'issues.duplicate_choose'|trans }}</option>
+                            {% for candidate in duplicateCandidates|default([]) %}
+                                <option value="{{ candidate.uuid }}">{{ candidate.title }} ({{ candidate.uuid|slice(0, 8) }}…)</option>
+                            {% endfor %}
+                        </select>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" name="merge_events" value="1">
+                            {{ 'issues.merge_events_label'|trans }}
+                        </label>
+                        <p class="text-xs text-[var(--color-ink)]/55">{{ 'issues.merge_events_help'|trans }}</p>
+                        <button type="submit" class="btn-ghost">{{ 'issues.duplicate_submit'|trans }}</button>
+                    </form>
                 </div>
 
                 <div class="issue-history">

@@ -26,14 +26,14 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
 - Account Display collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify)
-- Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Project **Settings** with API keys, members, **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP), and danger zone (clear history, **transfer ownership**, delete)
-- Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive table (server-side sort + page in the URL)
-- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **resolve/reopen/ignore**, and **assignment & status history**
-- `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`)
+- Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
+- Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests), **health** (Messenger + last delivery), and danger zone (clear history, **transfer ownership**, delete)
+- Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
+- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
+- `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily analytics (errors, transactions, N+1 counts)
-- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
+- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
@@ -44,7 +44,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
-- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects**, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
+- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
 ## Requirements
 

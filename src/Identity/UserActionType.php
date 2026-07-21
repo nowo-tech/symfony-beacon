@@ -54,6 +54,24 @@ enum UserActionType: string
     /** Project API key created. */
     case ProjectApiKeyCreated = 'project.api_key_created';
 
+    /** Project API key revoked (inactive). */
+    case ProjectApiKeyRevoked = 'project.api_key_revoked';
+
+    /** Project API key rotated (new secret; previous deactivated). */
+    case ProjectApiKeyRotated = 'project.api_key_rotated';
+
+    /** Platform admin suspended Envelope ingest for a project. */
+    case ProjectSuspended = 'project.suspended';
+
+    /** Platform admin resumed Envelope ingest for a project. */
+    case ProjectResumed = 'project.resumed';
+
+    /** Platform admin entered view-as-member mode. */
+    case ProjectViewAsStarted = 'project.view_as_started';
+
+    /** Platform admin exited view-as-member mode. */
+    case ProjectViewAsEnded = 'project.view_as_ended';
+
     /** Project event/issue history cleared. */
     case ProjectHistoryCleared = 'project.history_cleared';
 
@@ -71,6 +89,18 @@ enum UserActionType: string
 
     /** Authenticated user opened an event detail page. */
     case EventOpened = 'event.opened';
+
+    /** Issue priority changed. */
+    case IssuePriorityChanged = 'issue.priority_changed';
+
+    /** Comment added on an issue. */
+    case IssueCommented = 'issue.commented';
+
+    /** Issue marked as duplicate of another. */
+    case IssueMarkedDuplicate = 'issue.marked_duplicate';
+
+    /** Duplicate issue events merged into a canonical issue. */
+    case IssueMerged = 'issue.merged';
 
     /** Authenticated user opened project performance. */
     case PerformanceOpened = 'performance.opened';

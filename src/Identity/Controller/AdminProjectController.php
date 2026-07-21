@@ -15,8 +15,11 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
+use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
+use App\Project\Service\ProjectOpsStatsService;
+use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -42,6 +45,8 @@ final class AdminProjectController extends AbstractController
         private readonly UserGroupRepository $userGroupRepository,
         private readonly ProjectMembershipManager $membershipManager,
         private readonly ProjectHistoryClearer $historyClearer,
+        private readonly ProjectOpsStatsService $opsStats,
+        private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
@@ -53,10 +58,12 @@ final class AdminProjectController extends AbstractController
     public function index(Request $request): Response
     {
         $query = $request->query->getString('q');
+        $projects = $this->projectRepository->findAllOrdered('' !== $query ? $query : null);
 
         return $this->render('admin/projects/index.html.twig', [
-            'projects' => $this->projectRepository->findAllOrdered('' !== $query ? $query : null),
+            'projects' => $projects,
             'q' => $query,
+            'opsStats' => $this->opsStats->forProjects($projects),
         ]);
     }
 
@@ -105,7 +112,83 @@ final class AdminProjectController extends AbstractController
             'assignableGroupRoles' => $this->membershipManager->assignableGroupRoles($actor, $project),
             'availableGroups' => $this->availableGroups($project),
             'ownerCount' => $this->countOwners($project),
+            'opsStats' => $this->opsStats->forProject($project),
+            'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
         ]);
+    }
+
+    /** Suspend or resume Envelope ingest for a project. */
+    #[Route('/admin/projects/{id}/ingest', name: 'admin_projects_ingest_toggle', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    public function toggleIngest(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): RedirectResponse {
+        if (!$this->isCsrfTokenValid('admin_project_ingest_'.$project->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $enable = '1' === $request->request->getString('enabled');
+        $project->setIngestEnabled($enable);
+        $this->actionRecorder->record(
+            $enable ? UserActionType::ProjectResumed : UserActionType::ProjectSuspended,
+            $actor,
+            $actor,
+            [
+                'project_uuid' => $project->getUuid(),
+                'project_name' => $project->getName(),
+            ],
+        );
+        $this->entityManager->flush();
+        $this->addFlash('success', $enable ? 'flash.admin_projects.ingest_resumed' : 'flash.admin_projects.ingest_suspended');
+
+        return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
+    }
+
+    /** Enter view-as-member mode (ROLE_ADMIN effective role forced to Member). */
+    #[Route('/admin/view-as-member/enable', name: 'admin_view_as_member_enable', methods: ['POST'])]
+    public function enableViewAsMember(Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('admin_view_as_member_enable', $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $request->getSession()->set(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY, true);
+        $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsStarted, $actor, $actor, []);
+        $this->addFlash('success', 'flash.admin_projects.view_as_enabled');
+
+        $redirect = $request->request->getString('redirect');
+        if ('' !== $redirect && str_starts_with($redirect, '/')) {
+            return $this->redirect($redirect);
+        }
+
+        return $this->redirectToRoute('admin_projects');
+    }
+
+    /** Exit view-as-member mode. */
+    #[Route('/admin/view-as-member/disable', name: 'admin_view_as_member_disable', methods: ['POST'])]
+    public function disableViewAsMember(Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('admin_view_as_member_disable', $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $request->getSession()->remove(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY);
+        $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsEnded, $actor, $actor, []);
+        $this->addFlash('success', 'flash.admin_projects.view_as_disabled');
+
+        $redirect = $request->request->getString('redirect');
+        if ('' !== $redirect && str_starts_with($redirect, '/')) {
+            return $this->redirect($redirect);
+        }
+
+        return $this->redirectToRoute('admin_projects');
     }
 
     /** Update project name and description. */

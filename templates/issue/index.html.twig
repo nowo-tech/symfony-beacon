@@ -10,13 +10,54 @@
     level: filters.level,
     status: filters.status,
     environment: filters.environment,
+    release: filters.release,
+    compare: filters.compare,
+    priority: filters.priority|default(''),
     assignee: filters.assignee,
+    tag: filters.tag|default(''),
+    url: filters.url|default(''),
+    user: filters.user|default(''),
     per_page: filters.per_page,
     sort: filters.sort,
     dir: filters.dir,
 } %}
 
-<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
+<div class="issue-saved-views panel mb-4 flex flex-wrap items-end gap-3">
+    <div class="grow min-w-[12rem]">
+        <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-select">{{ 'issues.views.label'|trans }}</label>
+        <select id="saved-view-select" class="input w-full" onchange="if (this.value) { window.location = this.value; }">
+            <option value="">{{ 'issues.views.choose'|trans }}</option>
+            {% for view in savedViews|default([]) %}
+                <option value="{{ path('issue_view_apply', {id: project.uuid, viewUuid: view.uuid}) }}">{{ view.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <form method="post" action="{{ path('issue_view_save', {id: project.uuid}) }}" class="flex flex-wrap items-end gap-2 grow">
+        <input type="hidden" name="_token" value="{{ csrf_token('issue_view_save') }}">
+        {% for key, value in filterQuery %}
+            {% if value is not same as('') and value is not null %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <div>
+            <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-name">{{ 'issues.views.save_name'|trans }}</label>
+            <input id="saved-view-name" class="input" type="text" name="name" maxlength="80" placeholder="{{ 'issues.views.save_placeholder'|trans }}" required>
+        </div>
+        <button class="btn-ghost" type="submit">{{ 'issues.views.save'|trans }}</button>
+    </form>
+    {% if savedViews|default([]) is not empty %}
+        <div class="flex flex-wrap gap-2">
+            {% for view in savedViews %}
+                <form method="post" action="{{ path('issue_view_delete', {id: project.uuid, viewUuid: view.uuid}) }}" class="inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('issue_view_delete') }}">
+                    <button type="submit" class="btn-ghost text-xs" title="{{ 'issues.views.delete'|trans }}">× {{ view.name }}</button>
+                </form>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <input type="hidden" name="sort" value="{{ filters.sort }}">
     <input type="hidden" name="dir" value="{{ filters.dir }}">
     <input type="hidden" name="page" value="1">
@@ -32,6 +73,12 @@
             <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status ? status : 'issues.filter.any_status'|trans }}</option>
         {% endfor %}
     </select>
+    <select class="input" name="priority">
+        <option value="">{{ 'issues.filter.any_priority'|trans }}</option>
+        {% for p in ['low', 'medium', 'high', 'critical'] %}
+            <option value="{{ p }}" {% if filters.priority|default('') == p %}selected{% endif %}>{{ ('issues.priority.' ~ p)|trans }}</option>
+        {% endfor %}
+    </select>
     <select class="input" name="assignee">
         <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
         <option value="unassigned" {% if filters.assignee == 'unassigned' %}selected{% endif %}>{{ 'issues.assignee_unassigned'|trans }}</option>
@@ -40,6 +87,11 @@
         {% endfor %}
     </select>
     <input class="input" name="environment" value="{{ filters.environment }}" placeholder="{{ 'issues.filter.environment'|trans }}">
+    <input class="input" name="compare" value="{{ filters.compare }}" placeholder="{{ 'issues.compare.environment_b'|trans }}" title="{{ 'issues.compare.hint'|trans }}">
+    <input class="input" name="release" value="{{ filters.release }}" placeholder="{{ 'issues.filter.release'|trans }}">
+    <input class="input" name="tag" value="{{ filters.tag|default('') }}" placeholder="{{ 'issues.filter.tag'|trans }}">
+    <input class="input" name="url" value="{{ filters.url|default('') }}" placeholder="{{ 'issues.filter.url'|trans }}">
+    <input class="input" name="user" value="{{ filters.user|default('') }}" placeholder="{{ 'issues.filter.user'|trans }}">
     <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
         {% for size in [10, 25, 50, 100] %}
             <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
@@ -47,6 +99,50 @@
     </select>
     <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
 </form>
+
+{% if compareResult is defined and compareResult %}
+    <div class="panel mb-6 issue-compare" data-testid="issue-compare">
+        <h2 class="text-base font-medium mb-3">{{ 'issues.compare.title'|trans({'%a%': compareResult.environmentA, '%b%': compareResult.environmentB}) }}</h2>
+        <div class="grid gap-4 md:grid-cols-3 text-sm">
+            <div>
+                <h3 class="font-medium mb-2">{{ 'issues.compare.only_a'|trans({'%env%': compareResult.environmentA}) }}</h3>
+                {% if compareResult.onlyA is empty %}
+                    <p class="text-[var(--color-ink)]/55">{{ 'issues.compare.empty'|trans }}</p>
+                {% else %}
+                    <ul class="list-none space-y-1">
+                        {% for issue in compareResult.onlyA %}
+                            <li><a class="no-underline" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="font-medium mb-2">{{ 'issues.compare.only_b'|trans({'%env%': compareResult.environmentB}) }}</h3>
+                {% if compareResult.onlyB is empty %}
+                    <p class="text-[var(--color-ink)]/55">{{ 'issues.compare.empty'|trans }}</p>
+                {% else %}
+                    <ul class="list-none space-y-1">
+                        {% for issue in compareResult.onlyB %}
+                            <li><a class="no-underline" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="font-medium mb-2">{{ 'issues.compare.both'|trans }}</h3>
+                {% if compareResult.both is empty %}
+                    <p class="text-[var(--color-ink)]/55">{{ 'issues.compare.empty'|trans }}</p>
+                {% else %}
+                    <ul class="list-none space-y-1">
+                        {% for issue in compareResult.both %}
+                            <li><a class="no-underline" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 {% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70">{{ 'issues.empty'|trans }}</div>
@@ -90,7 +186,18 @@
                     <tr>
                         <td class="issue-table__issue">
                             <a class="font-medium no-underline issue-table__title" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}" data-action="click->datatable#openIssue">{{ issue.title }}</a>
+                            <span class="badge ml-1 issue-badge--priority-{{ issue.priority.value }}">{{ ('issues.priority.' ~ issue.priority.value)|trans }}</span>
+                            {% if filters.release != '' and issue.firstRelease == filters.release %}
+                                <span class="badge badge-warn ml-1" data-testid="new-in-release">{{ 'issues.badge.new_in_release'|trans }}</span>
+                            {% endif %}
                             <div class="text-xs text-[var(--color-ink)]/55 issue-table__culprit">{{ issue.culprit }}</div>
+                            {% if issue.lastRelease or issue.lastEnvironment %}
+                                <div class="text-xs text-[var(--color-ink)]/45 issue-table__release">
+                                    {% if issue.lastRelease %}{{ issue.lastRelease }}{% endif %}
+                                    {% if issue.lastRelease and issue.lastEnvironment %} · {% endif %}
+                                    {% if issue.lastEnvironment %}{{ issue.lastEnvironment }}{% endif %}
+                                </div>
+                            {% endif %}
                         </td>
                         <td data-order="{{ issue.level }}">
                             <span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span>
