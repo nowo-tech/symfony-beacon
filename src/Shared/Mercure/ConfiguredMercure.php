@@ -58,6 +58,9 @@ final class ConfiguredMercure implements ResetInterface
         return '' !== $public ? $public : $this->resolvedUrl();
     }
 
+    /**
+     * @param list<string> $topics
+     */
     public function createSubscriberToken(array $topics): ?string
     {
         if (!$this->isEnabled() || [] === $topics) {

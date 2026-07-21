@@ -102,7 +102,7 @@ final readonly class RetentionPurger
                 [$projectId, $cutoff],
             );
             $events += $deleted;
-            $deletedEvents = $deletedEvents || $deleted > 0;
+            $deletedEvents = $deleted > 0;
             $issues += (int) $connection->executeStatement(
                 'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
                 [$projectId],

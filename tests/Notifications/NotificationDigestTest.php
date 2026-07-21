@@ -9,6 +9,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\NotificationDigestBuffer;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationDigestFlusher;
@@ -69,6 +70,7 @@ final class NotificationDigestTest extends TestCase
             new QuietHoursEvaluator(),
             $bus,
             $em,
+            $this->createStub(MemberIssueRealtimeNotifierInterface::class),
         );
 
         $issue = new Issue();
