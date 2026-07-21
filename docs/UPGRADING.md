@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.11.0 to the next release](#upgrading-from-0110-to-the-next-release)
+- [Upgrading from 0.11.1 to the next release](#upgrading-from-0111-to-the-next-release)
+- [Upgrading from 0.11.0 to 0.11.1](#upgrading-from-0110-to-0111)
 - [Upgrading from 0.10.2 to 0.11.0](#upgrading-from-0102-to-0110)
 - [Upgrading from 0.10.1 to 0.10.2](#upgrading-from-0101-to-0102)
 - [Upgrading from 0.10.0 to 0.10.1](#upgrading-from-0100-to-0101)
@@ -28,9 +29,51 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.11.0 to the next release
+## Upgrading from 0.11.1 to the next release
 
-No upgrade notes yet.
+No further operator steps documented yet.
+
+## Upgrading from 0.11.0 to 0.11.1
+
+Pull, install, migrate, and rebuild frontend assets:
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+Migration `Version20260721180000`: table `project_share_link`.
+
+Configure a real `MAILER_DSN` so magic-login emails deliver (null transport accepts messages but does not send).
+
+### Viewer role (`026`)
+
+- New project membership role **viewer** (below member): can open Issues / Performance / Analytics; cannot triage, comment, or change Settings/keys/memberships.
+- Groups may be linked as viewer / member / admin (still never owner).
+- Existing members are unchanged.
+
+### Magic login
+
+- Request a link at `/login/magic` (also linked from the password login page).
+- Defaults: lifetime **600 seconds**, **max_uses: 1**, IP rate limit 5 / 15 minutes (`limiter.magic_login`).
+- Disabled accounts cannot consume links.
+
+### Share links
+
+- Owners/admins create links under Project Settings → Share links (optional issue UUID; max 30 days).
+- Opening `/share/{token}` requires sign-in; grants session-scoped viewer access until the link expires.
+- Revoking a link invalidates future opens; raw token is shown once at creation.
+
+### View-as-member vs viewer
+
+- Instance admin **View as member** remains a temporary session demotion to member for UX testing.
+- **Viewer** is a lasting project membership (or share-link grant), not the same as view-as-member.
+
+### Golden Envelope contract (dev / QA)
+
+- Optional: `make check-envelope-goldens` when a sibling BeaconBundle checkout is present (Phase 3.6 fixtures).
 
 ## Upgrading from 0.10.2 to 0.11.0
 

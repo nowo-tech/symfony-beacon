@@ -62,7 +62,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 
 ---
 
-## Phase 3 — Client instrumentation depth (In progress; 3.1–3.5 Done)
+## Phase 3 — Client instrumentation depth (Done; 3.1–3.6)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -71,7 +71,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | 3.3 | Opt-in **Doctrine** + **HttpClient** breadcrumbs/spans | Bundle (+ Beacon UI) | `024-client-spans` | **Done** |
 | 3.4 | Public **`tags`** API + **`before_send`** scrubbing hook | Bundle (+ Beacon UI) | `023-client-tags-scrubbing` | **Done** |
 | 3.5 | Non-blocking client transport (async/queue) + versioned User-Agent | Bundle | — | **Done** (Bundle **v1.6.0**) |
-| 3.6 | Contract tests: golden Envelope ↔ Beacon `ProcessEnvelopeHandler` | Bundle (+ Beacon) | — | **Next** |
+| 3.6 | Contract tests: golden Envelope ↔ Beacon `ProcessEnvelopeHandler` | Bundle (+ Beacon) | — | **Done** |
 
 ---
 
@@ -150,13 +150,14 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **Bundle v1.4.0** | Phase 3.1–3.2 (Messenger + auto HTTP tx) |
 | **Bundle v1.5.0** | Phase 3.3–3.4 (spans, tags, before_send) |
 | **Bundle v1.6.0** | Phase 3.3–3.5 (spans, tags, before_send, transport sync/async/messenger + versioned UA) |
+| **Bundle v1.6.1** | Phase 3.6 golden Envelope contract fixtures + ingest tests |
 | **v0.9.0+** | Phase 4 slices; admin Projects; transfer ownership |
 | **v0.10.0** | Phase 4 product depth (`014`–`022`) + Bundle companion docs (`023`–`024`) |
 | **v0.10.1** | Issue aside / duplicate-modal UX; admin menu seeder sync; Phase 5 specs started |
 | **v0.10.2** | Phase 5 backlog specs `027`–`033`; unified confirm/kit modal chrome |
 | **v0.11.0** | Analytics charts (`025`); locales de/nl/fr/it/pt; UI density/motion; danger colors; shared table pagination |
-| **v0.11.1+** | Magic login + viewer + share links (`026`); then threshold alerts (`027`) |
-| **v0.12+** | Phase 5 medium: release health, FULLTEXT, delivery history, admin audit (`028`–`031`) |
+| **v0.11.1** | Magic login + viewer + share links (`026`); golden Envelope contract (3.6) |
+| **v0.12+** | Phase 5 medium: release health, FULLTEXT, delivery history, admin audit (`028`–`031`); threshold alerts (`027`) |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'auth.magic.title'|trans }} — {{ site_appearance.brandName|default('Beacon') }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-md py-10">
+    <h1 class="mb-2 text-xl font-semibold">{{ 'auth.magic.title'|trans }}</h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'auth.magic.intro'|trans }}</p>
+
+    <form method="post" class="panel space-y-4" action="{{ path('app_magic_login_request') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('magic_login') }}">
+        <label class="block text-sm">
+            <span class="mb-1 block">{{ 'auth.magic.email'|trans }}</span>
+            <input class="input w-full" type="email" name="email" required autocomplete="username" autofocus>
+        </label>
+        <button type="submit" class="btn-primary w-full">{{ 'auth.magic.submit'|trans }}</button>
+    </form>
+
+    <p class="mt-5 text-center text-sm text-[var(--color-ink)]/60">
+        <a href="{{ path('nowo_auth_kit_login') }}" class="no-underline">{{ 'auth.magic.back_to_password'|trans }}</a>
+    </p>
+</div>
+{% endblock %}

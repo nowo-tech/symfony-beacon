@@ -18,7 +18,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 
 ## Features
 
-- Dashboard login with project-scoped memberships (`owner` / `admin` / `member`)
+- Dashboard login with project-scoped memberships (`owner` / `admin` / `member` / `viewer`)
+- Password or **magic login** (`/login/magic`); project **share links** for time-limited viewer access
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
 - **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register, password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
@@ -46,7 +47,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
-Membership roles today: **owner** / **admin** / **member** (no viewer yet — see roadmap `026-magic-links-viewer`). Auth is password (+ remember-me); magic login links are planned (`026`), SSO is Later.
+Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). Auth is password (+ remember-me) or **magic login** (`/login/magic`); SSO is Later.
 
 ## Requirements
 

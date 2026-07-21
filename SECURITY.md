@@ -35,6 +35,15 @@ You should receive an acknowledgement within a few business days. We will work w
 - Misconfiguration of operator secrets (`.env`, Halite keys under `var/secrets/`, API keys) is an operational risk; see [PRODUCTION.md](docs/PRODUCTION.md) and [LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md).
 - Feature requests and non-security bugs belong in [GitHub Issues](https://github.com/nowo-tech/symfony-beacon/issues) using the templates.
 
+## Magic login and share links (`026`)
+
+| Mechanism | Defaults | Notes |
+| --- | --- | --- |
+| Magic login (`login_link`) | Lifetime **600s**, **max_uses: 1**, used-link cache `cache.app` | Request rate limit 5 / 15 minutes per IP; disabled accounts rejected |
+| Share links | Max **30 days**; SHA-256 hashed token | Grants session viewer access only; never embeds Envelope API secrets |
+
+Operators should keep `MAILER_DSN` and `kernel.secret` production-grade; rotating the secret invalidates outstanding magic links.
+
 ## Safe harbour
 
 We appreciate good-faith research. Avoid destructive testing against installations you do not operate, and do not exfiltrate personal data beyond what is needed to demonstrate the issue.

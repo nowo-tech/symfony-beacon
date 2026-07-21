@@ -88,7 +88,7 @@ Features are specified under `specs/` before large changes. That matches an open
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, seed | Auth boundary; kits + Security (magic links planned: `026`) |
+| `Identity` | Users, account prefs, magic login, seed | Auth boundary; kits + Security `login_link` (`026`) |
 | `Project` | Projects, keys, memberships (`owner`/`admin`/`member`; viewer planned in `026`), Settings / danger zone | Multi-tenant tenancy unit |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |

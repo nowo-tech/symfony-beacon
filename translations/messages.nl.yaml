@@ -210,6 +210,7 @@ project:
             owner: Eigenaar
             admin: Beheerder
             member: Lid
+            viewer: Viewer
     groups:
         title: Groepen
         help: Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt. Eigenaren moeten worden toegevoegd als individuele gebruikers.

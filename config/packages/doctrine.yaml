@@ -74,7 +74,8 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            url: 'sqlite:///%kernel.project_dir%/var/test.db'
+            # Writable under var/cache/test (avoids sticky root-owned var/test.db from earlier runs).
+            url: 'sqlite:///%kernel.project_dir%/var/cache/test/phpunit.db'
             dbname_suffix: ''
 
 when@prod:

@@ -107,4 +107,19 @@ enum UserActionType: string
 
     /** Authenticated user opened project analytics. */
     case AnalyticsOpened = 'analytics.opened';
+
+    /** Magic login link requested (email may have been sent). */
+    case MagicLoginRequested = 'auth.magic_login_requested';
+
+    /** Magic login link consumed successfully. */
+    case MagicLoginConsumed = 'auth.magic_login_consumed';
+
+    /** Project share link created. */
+    case ProjectShareLinkCreated = 'project.share_link_created';
+
+    /** Project share link revoked. */
+    case ProjectShareLinkRevoked = 'project.share_link_revoked';
+
+    /** Project share link opened (viewer grant applied). */
+    case ProjectShareLinkOpened = 'project.share_link_opened';
 }

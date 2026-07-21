@@ -53,6 +53,17 @@ theme:
     switch_to_day: Cambiar a modo día
     switch_to_night: Cambiar a modo noche
 auth:
+    magic:
+        title: Acceso con enlace mágico
+        intro: Introduce tu correo y te enviaremos un enlace de un solo uso (válido 10 minutos).
+        email: Correo
+        submit: Enviar enlace
+        sent: Si esa cuenta existe y está activa, el enlace está en camino.
+        throttled: Demasiadas solicitudes. Inténtalo más tarde.
+        invalid: No se pudo procesar la solicitud.
+        back_to_password: Entrar con contraseña
+        email_subject: Tu enlace mágico de Beacon
+        email_body: "Abre este enlace para entrar (caduca %expires%):\n\n%link%"
     tagline: Seguimiento de errores self-hosted para PHP y Symfony.
     brand_eyebrow: Seguimiento de errores
     bootstrap_eyebrow: Arranque
@@ -210,6 +221,7 @@ project:
             owner: Propietario
             admin: Administrador
             member: Miembro
+            viewer: Solo lectura
     groups:
         title: Grupos
         help: Vincula un grupo para que todos sus miembros reciban el rol elegido en este proyecto. Los propietarios se añaden como usuarios individuales.
@@ -251,8 +263,28 @@ projects:
     search_placeholder: Buscar proyectos…
     empty: Aún no hay proyectos.
     create_first: Crea tu primer proyecto
+    share:
+        title: Enlaces para compartir
+        help: Crea un enlace temporal de solo lectura al proyecto (o a un issue). El destinatario debe iniciar sesión.
+        days: Duración (días)
+        issue_uuid: UUID del issue (opcional)
+        issue_optional: Vacío = proyecto completo
+        create: Crear enlace
+        revoke: Revocar
+        empty: No hay enlaces activos.
+        expires: Caduca
+        scoped_issue: Acotado a un issue
+        created: Enlace creado — cópialo ahora; no se volverá a mostrar.
+        revoked: Enlace revocado.
+        invalid: Este enlace no es válido, ha caducado o fue revocado.
+        invalid_csrf: Token de seguridad no válido.
+        issue_not_found: Issue no encontrado en este proyecto.
+        expires_in_past: La caducidad debe ser futura.
+        expires_too_far: Los enlaces no pueden durar más de 30 días.
+        issue_wrong_project: Ese issue no pertenece a este proyecto.
     errors_last_7_days: '%count% errores en los últimos 7 días'
 issues:
+    viewer_readonly: Tienes acceso de solo lectura (viewer) en este proyecto.
     title: Incidencias
     search_placeholder: Buscar título…
     empty: Ninguna incidencia coincide con estos filtros.

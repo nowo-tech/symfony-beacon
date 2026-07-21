@@ -210,6 +210,7 @@ project:
             owner: Proprietario
             admin: Ammin
             member: Membro
+            viewer: Viewer
     groups:
         title: Gruppi
         help: Collega un gruppo in modo che ogni membro del gruppo ottenga il ruolo scelto in questo progetto. I proprietari devono essere aggiunti come singoli utenti.

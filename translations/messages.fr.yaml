@@ -210,6 +210,7 @@ project:
             owner: Propriétaire
             admin: Administrateur
             member: Membre
+            viewer: Viewer
     groups:
         title: Groupes
         help: Liez un groupe afin que chaque membre du groupe obtienne le rôle choisi sur ce projet. Les propriétaires doivent être ajoutés en tant qu'utilisateurs individuels.

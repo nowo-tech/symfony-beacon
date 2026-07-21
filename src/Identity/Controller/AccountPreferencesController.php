@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProfileType;
@@ -15,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

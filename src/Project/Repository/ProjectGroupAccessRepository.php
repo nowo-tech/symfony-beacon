@@ -53,7 +53,7 @@ class ProjectGroupAccessRepository extends ServiceEntityRepository
     /**
      * Highest project role granted to the user via any linked group, or null.
      *
-     * Owners are never stored on group links; values are admin or member only.
+     * Owners are never stored on group links; values are admin, member, or viewer.
      */
     public function findHighestGroupRoleForUser(Project $project, User $user): ?ProjectRole
     {
@@ -69,10 +69,9 @@ class ProjectGroupAccessRepository extends ServiceEntityRepository
             ->getResult();
 
         $best = null;
-        $rank = [ProjectRole::Member->value => 1, ProjectRole::Admin->value => 2, ProjectRole::Owner->value => 3];
         foreach ($rows as $row) {
             $role = $row->getRole();
-            if (null === $best || $rank[$role->value] > $rank[$best->value]) {
+            if (null === $best || $role->rank() > $best->rank()) {
                 $best = $role;
             }
         }

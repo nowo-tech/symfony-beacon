@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-07-21
+
+### Added
+
+- Project role **viewer** (read-only Issues / Performance / Analytics; no triage or Settings mutations) (`026-magic-links-viewer`)
+- Passwordless **magic login** via Symfony Security `login_link` at `/login/magic` (10-minute, single-use links; rate-limited; respects disabled accounts)
+- Project Settings **share links**: time-limited signed URLs for project or issue read-only access (session viewer grant; revocable)
+- Golden Envelope **contract fixtures** + `EnvelopeGoldenContractTest` mirrored from BeaconBundle (Phase 3.6); `make check-envelope-goldens`
+
+### Changed
+
+- Issue mutations (status, assignee, comments, priority, duplicate, saved views) require at least **member** (`requireTriage`)
+- Group-linked project roles may include **viewer** (owner still direct-only)
+- PHPUnit SQLite DB moved to `var/cache/test/phpunit.db` (more reliable wipe between tests)
+
 ## [0.11.0] - 2026-07-21
 
 ### Added
@@ -22,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Display preferences intro / i18n cover density and motion; site appearance form includes danger color pickers
 - Performance and Analytics list tables use the shared paginator (no DataTables paging; Issues already server-side, now shares the same partial)
+- PHPUnit `DatabaseWebTestCase` resets SQLite by deleting `var/test.db` (plus rate-limiter cache) each test for isolation; `memory_limit` 512M; `SiteAppearanceProvider` implements `ResetInterface`
 
 ## [0.10.2] - 2026-07-21
 
@@ -346,7 +362,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...v0.10.1

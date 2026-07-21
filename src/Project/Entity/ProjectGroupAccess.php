@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
 /**
- * Grants every member of a user group a project role (admin or member; owners stay direct).
+ * Grants every member of a user group a project role (admin, member, or viewer; owners stay direct).
  */
 #[ORM\Entity(repositoryClass: ProjectGroupAccessRepository::class)]
 #[ORM\Table(name: 'project_group_access')]

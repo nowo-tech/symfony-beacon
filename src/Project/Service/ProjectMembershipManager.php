@@ -343,7 +343,7 @@ final readonly class ProjectMembershipManager
     public function assignableRoles(User $actor, Project $project): array
     {
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member];
+            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
         }
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
@@ -352,10 +352,10 @@ final readonly class ProjectMembershipManager
         }
 
         if (ProjectRole::Owner === $access->role) {
-            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member];
+            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
         }
 
-        return [ProjectRole::Admin, ProjectRole::Member];
+        return [ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
     }
 
     /**

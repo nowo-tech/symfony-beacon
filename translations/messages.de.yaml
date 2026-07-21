@@ -210,6 +210,7 @@ project:
             owner: Eigentümer
             admin: Admin
             member: Mitglied
+            viewer: Viewer
     groups:
         title: Gruppen
         help: 'Verknüpfen Sie eine Gruppe, sodass jedes Gruppenmitglied die ausgewählte Rolle in diesem Projekt erhält. Besitzer müssen als einzelne Benutzer hinzugefügt werden.'

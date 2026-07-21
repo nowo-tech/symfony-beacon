@@ -38,4 +38,10 @@ final readonly class ProjectAccess
     {
         return $this->role->canDeleteProject();
     }
+
+    /** Whether the role may mutate issues / triage / comments / saved views. */
+    public function canTriageIssues(): bool
+    {
+        return $this->role->canTriageIssues();
+    }
 }

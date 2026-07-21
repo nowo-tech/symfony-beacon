@@ -1,6 +1,6 @@
 .PHONY: help up down build build-prod logs shell console seed bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa composer-outdated \
-	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa composer-outdated \
+	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
@@ -41,6 +41,7 @@ help:
 	@echo "Git hygiene:"
 	@echo "  make setup-hooks                    Install .githooks (strips Cursor co-authors)"
 	@echo "  make check-no-cursor-coauthor       Fail if Cursor trailers exist in history"
+	@echo "  make check-envelope-goldens         Diff Envelope fixtures vs sibling BeaconBundle"
 	@echo "  make strip-cursor-coauthor-from-history  Rewrite local history to remove them"
 
 setup-hooks:
@@ -51,6 +52,10 @@ setup-hooks:
 check-no-cursor-coauthor:
 	@chmod +x .scripts/check-no-cursor-coauthor.sh
 	@./.scripts/check-no-cursor-coauthor.sh HEAD
+
+check-envelope-goldens:
+	@chmod +x .scripts/check-envelope-goldens.sh
+	@./.scripts/check-envelope-goldens.sh
 
 strip-cursor-coauthor-from-history:
 	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
@@ -156,6 +161,9 @@ rector-fix:
 
 test:
 	docker compose exec -T php vendor/bin/phpunit
+
+test-coverage:
+	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-text --coverage-html var/coverage-html
 
 qa: cs twig-cs phpstan rector test
 

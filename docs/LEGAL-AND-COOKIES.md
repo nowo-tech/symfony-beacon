@@ -78,6 +78,10 @@ Gate any non-essential script with the Twig helper:
 
 Do **not** load marketing/analytics tags before consent.
 
+## Operational email (magic login)
+
+Magic-login messages sent via Symfony Mailer are **operational** account emails (not marketing) and do not add tracking cookies. Mention account-security email in the privacy policy when using a real `MAILER_DSN`. SSO/OIDC (roadmap Later) needs a separate privacy review.
+
 ## Field encryption (at rest)
 
 Beacon encrypts selected secrets with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite):

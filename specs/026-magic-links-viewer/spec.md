@@ -2,7 +2,7 @@
 
 **Feature Branch**: `026-magic-links-viewer`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Add passwordless magic-link login for users; optional signed share links to open a project or a specific issue; introduce a read-only **viewer** project role.
 

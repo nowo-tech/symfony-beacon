@@ -57,6 +57,17 @@ auth:
     brand_eyebrow: Error tracking
     bootstrap_eyebrow: Bootstrap
     bootstrap_hint: Create the first administrator account. Registration closes after this user exists.
+    magic:
+        title: Magic link sign-in
+        intro: Enter your email and we will send a one-time sign-in link (valid for 10 minutes).
+        email: Email
+        submit: Send magic link
+        sent: If that email has an enabled account, a magic link is on its way.
+        throttled: Too many magic-link requests. Try again later.
+        invalid: Could not process that request.
+        back_to_password: Sign in with password
+        email_subject: Your Beacon magic sign-in link
+        email_body: "Open this link to sign in (expires %expires%):\n\n%link%"
 flash:
     project:
         created: Project created.
@@ -210,6 +221,7 @@ project:
             owner: Owner
             admin: Admin
             member: Member
+            viewer: Viewer
     groups:
         title: Groups
         help: Link a group so every group member gets the chosen role on this project. Owners must be added as individual users.
@@ -252,7 +264,27 @@ projects:
     empty: No projects yet.
     create_first: Create your first project
     errors_last_7_days: '%count% errors in last 7 days'
+    share:
+        title: Share links
+        help: Create a time-limited link that grants read-only viewer access to this project (or one issue). Recipients must sign in.
+        days: Lifetime (days)
+        issue_uuid: Issue UUID (optional)
+        issue_optional: Leave empty for whole project
+        create: Create share link
+        revoke: Revoke
+        empty: No active share links.
+        expires: Expires
+        scoped_issue: Issue-scoped
+        created: Share link created — copy it now; it will not be shown again.
+        revoked: Share link revoked.
+        invalid: This share link is invalid, expired, or revoked.
+        invalid_csrf: Invalid security token.
+        issue_not_found: Issue not found in this project.
+        expires_in_past: Expiry must be in the future.
+        expires_too_far: Share links cannot last more than 30 days.
+        issue_wrong_project: That issue does not belong to this project.
 issues:
+    viewer_readonly: You have read-only (viewer) access on this project.
     title: Issues
     search_placeholder: Search title…
     empty: No issues match these filters.
@@ -601,6 +633,11 @@ users:
             'event.opened': Event opened
             'performance.opened': Performance opened
             'analytics.opened': Analytics opened
+            'auth.magic_login_requested': Magic login requested
+            'auth.magic_login_consumed': Magic login used
+            'project.share_link_created': Share link created
+            'project.share_link_revoked': Share link revoked
+            'project.share_link_opened': Share link opened
         context:
             email: Email
             role: Role

@@ -210,6 +210,7 @@ project:
             owner: Proprietário
             admin: Administrador
             member: Membro
+            viewer: Viewer
     groups:
         title: Grupos
         help: Vincule um grupo para que cada membro do grupo receba a função escolhida neste projeto. Os proprietários devem ser adicionados como usuários individuais.

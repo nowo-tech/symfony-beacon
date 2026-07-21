@@ -68,7 +68,7 @@ final class AnalyticsController extends AbstractController
             $release,
             $level,
         );
-        $hasVolume = array_any($seriesAsc, fn(AnalyticsDayPoint $point): bool => $point->errorCount > 0
+        $hasVolume = array_any($seriesAsc, static fn (AnalyticsDayPoint $point): bool => $point->errorCount > 0
             || ($point->transactionCount ?? 0) > 0
             || ($point->nPlusOneCount ?? 0) > 0);
 

@@ -250,6 +250,7 @@ final class IssueController extends AbstractController
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($project, $user);
+        $access = $this->projectAccess->resolveAccess($project, $user);
 
         $this->userActionRecorder->recordAndFlush(UserActionType::IssueOpened, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -281,6 +282,7 @@ final class IssueController extends AbstractController
             'comments' => $comments,
             'duplicateCandidates' => $duplicateCandidates,
             'priorities' => IssuePriority::cases(),
+            'can_triage' => $access?->canTriageIssues() ?? false,
         ]);
     }
 
@@ -297,7 +299,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         $previousAssignee = $issue->getAssignee();
 
@@ -365,7 +367,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         if (!$this->isCsrfTokenValid('issue_status', $request->request->getString('_token'))) {
             $this->addFlash('error', 'issues.status_invalid');
@@ -434,7 +436,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
 
@@ -487,7 +489,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
 
@@ -548,7 +550,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
 
@@ -651,7 +653,7 @@ final class IssueController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         if (!$this->isCsrfTokenValid('issue_view_save', $request->request->getString('_token'))) {
             $this->addFlash('error', 'issues.view_invalid');
@@ -720,7 +722,7 @@ final class IssueController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireMembership($project, $user);
+        $this->projectAccess->requireTriage($project, $user);
 
         if (!$this->isCsrfTokenValid('issue_view_delete', $request->request->getString('_token'))) {
             $this->addFlash('error', 'issues.view_invalid');

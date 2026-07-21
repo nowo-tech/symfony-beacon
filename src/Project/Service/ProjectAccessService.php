@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Enforces project access via direct membership and/or linked user groups.
+ * Enforces project access via direct membership, linked groups, and optional share-link grants.
  *
  * Instance ROLE_ADMIN receives effective owner access on every project
  * (for Administration and cross-project operator actions), unless the
@@ -28,11 +28,8 @@ final readonly class ProjectAccessService
 {
     public const string VIEW_AS_MEMBER_SESSION_KEY = '_beacon_view_as_member';
 
-    private const array ROLE_RANK = [
-        'member' => 1,
-        'admin' => 2,
-        'owner' => 3,
-    ];
+    /** @var string Session map: project uuid => ['expires' => int, 'issue' => ?string] */
+    public const string SHARE_ACCESS_SESSION_KEY = '_beacon_share_access';
 
     public function __construct(
         private ProjectMembershipRepository $membershipRepository,
@@ -57,7 +54,7 @@ final readonly class ProjectAccessService
     }
 
     /**
-     * Highest effective role from direct membership and linked groups, or null if none.
+     * Highest effective role from direct membership, linked groups, and active share grants.
      * Instance ROLE_ADMIN always resolves as owner (even without membership),
      * unless view-as-member is active (then Member).
      */
@@ -65,6 +62,7 @@ final readonly class ProjectAccessService
     {
         $direct = $this->getDirectMembership($project, $user);
         $groupRole = $this->groupAccessRepository->findHighestGroupRoleForUser($project, $user);
+        $shareViewer = $this->hasActiveShareGrant($project);
 
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             $role = $this->isViewAsMemberActive() ? ProjectRole::Member : ProjectRole::Owner;
@@ -76,7 +74,7 @@ final readonly class ProjectAccessService
             );
         }
 
-        if (!$direct instanceof ProjectMembership && !$groupRole instanceof ProjectRole) {
+        if (!$direct instanceof ProjectMembership && !$groupRole instanceof ProjectRole && !$shareViewer) {
             return null;
         }
 
@@ -84,6 +82,9 @@ final readonly class ProjectAccessService
             $direct?->getRole(),
             $groupRole,
         );
+        if ($shareViewer) {
+            $role = $this->maxRole($role, ProjectRole::Viewer);
+        }
 
         return new ProjectAccess(
             role: $role,
@@ -100,6 +101,51 @@ final readonly class ProjectAccessService
         }
 
         return true === $request->getSession()->get(self::VIEW_AS_MEMBER_SESSION_KEY);
+    }
+
+    /**
+     * Grant temporary viewer access from a share link (session-scoped).
+     */
+    public function grantShareAccess(Project $project, ?string $issueUuid, int $expiresAtUnix): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request instanceof Request || !$request->hasSession()) {
+            return;
+        }
+
+        $session = $request->getSession();
+        /** @var array<string, array{expires: int, issue: ?string}> $grants */
+        $grants = $session->get(self::SHARE_ACCESS_SESSION_KEY, []);
+        $grants[$project->getUuid()] = [
+            'expires' => $expiresAtUnix,
+            'issue' => $issueUuid,
+        ];
+        $session->set(self::SHARE_ACCESS_SESSION_KEY, $grants);
+    }
+
+    public function hasActiveShareGrant(Project $project): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request instanceof Request || !$request->hasSession()) {
+            return false;
+        }
+
+        /** @var array<string, array{expires?: int, issue?: ?string}> $grants */
+        $grants = $request->getSession()->get(self::SHARE_ACCESS_SESSION_KEY, []);
+        $entry = $grants[$project->getUuid()] ?? null;
+        if (!\is_array($entry)) {
+            return false;
+        }
+
+        $expires = (int) ($entry['expires'] ?? 0);
+        if ($expires < time()) {
+            unset($grants[$project->getUuid()]);
+            $request->getSession()->set(self::SHARE_ACCESS_SESSION_KEY, $grants);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -126,30 +172,45 @@ final readonly class ProjectAccessService
     }
 
     /**
-     * Requires effective access with at least the given role (member < admin < owner).
+     * Requires effective access with at least the given role (viewer < member < admin < owner).
      *
      * @throws AccessDeniedHttpException when access or role is insufficient
      */
     public function requireRole(Project $project, User $user, ProjectRole $minimum): ProjectAccess
     {
         $access = $this->requireAccess($project, $user);
-        if (self::ROLE_RANK[$access->role->value] < self::ROLE_RANK[$minimum->value]) {
+        if ($access->role->rank() < $minimum->rank()) {
             throw new AccessDeniedHttpException('Insufficient project permissions.');
         }
 
         return $access;
     }
 
-    /** Pick the higher of two roles (member < admin < owner). */
+    /**
+     * Requires membership that may triage issues (member+).
+     *
+     * @throws AccessDeniedHttpException
+     */
+    public function requireTriage(Project $project, User $user): ProjectAccess
+    {
+        $access = $this->requireAccess($project, $user);
+        if (!$access->canTriageIssues()) {
+            throw new AccessDeniedHttpException('Insufficient project permissions.');
+        }
+
+        return $access;
+    }
+
+    /** Pick the higher of two roles (viewer < member < admin < owner). */
     private function maxRole(?ProjectRole $a, ?ProjectRole $b): ProjectRole
     {
         if (!$a instanceof ProjectRole) {
-            return $b ?? ProjectRole::Member;
+            return $b ?? ProjectRole::Viewer;
         }
         if (!$b instanceof ProjectRole) {
             return $a;
         }
 
-        return self::ROLE_RANK[$a->value] >= self::ROLE_RANK[$b->value] ? $a : $b;
+        return $a->rank() >= $b->rank() ? $a : $b;
     }
 }

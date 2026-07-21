@@ -59,12 +59,16 @@
                     {% endfor %}
                 </ol>
             {% endif %}
+            {% if can_triage|default(false) %}
             <form method="post" action="{{ path('issue_comment_add', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-comments__form">
                 <input type="hidden" name="_token" value="{{ csrf_token('issue_comment') }}">
                 <label class="sr-only" for="issue-comment-body">{{ 'issues.comment_body'|trans }}</label>
                 <textarea id="issue-comment-body" class="input w-full mb-2" name="body" rows="3" maxlength="5000" required placeholder="{{ 'issues.comment_placeholder'|trans }}"></textarea>
                 <button type="submit" class="btn-primary">{{ 'issues.comment_submit'|trans }}</button>
             </form>
+            {% else %}
+                <p class="text-sm text-[var(--color-ink)]/55">{{ 'issues.viewer_readonly'|trans }}</p>
+            {% endif %}
         </section>
     </div>
 
@@ -110,6 +114,7 @@
             {% endblock %}
         {% endembed %}
 
+        {% if can_triage|default(false) %}
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
             {% block body %}
                 <div class="issue-triage">
@@ -269,6 +274,10 @@
                 </div>
             {% endblock %}
         {% endembed %}
+
+        {% else %}
+        <div class="panel mt-4 text-sm text-[var(--color-ink)]/55" data-testid="viewer-readonly">{{ 'issues.viewer_readonly'|trans }}</div>
+        {% endif %}
 
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'activity', title: 'issues.history_title'|trans} %}
             {% block body %}

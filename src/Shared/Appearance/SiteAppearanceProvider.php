@@ -6,17 +6,23 @@ namespace App\Shared\Appearance;
 
 use App\Shared\Appearance\Entity\SiteAppearance;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Resolves site look & feel for Twig (brand + CSS custom properties).
  */
-final class SiteAppearanceProvider
+final class SiteAppearanceProvider implements ResetInterface
 {
     private ?SiteAppearance $cached = null;
 
     public function __construct(
         private readonly SiteAppearanceRepository $repository,
     ) {
+    }
+
+    public function reset(): void
+    {
+        $this->cached = null;
     }
 
     public function get(): SiteAppearance
