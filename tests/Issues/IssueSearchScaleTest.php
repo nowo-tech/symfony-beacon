@@ -184,6 +184,32 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
         );
     }
 
+    public function testQueryTokenMatchesTitleWithLikeFallback(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('search-ft@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $em->persist($this->makeIssue($project, 'UniqueZebraToken crash'));
+        $em->persist($this->makeIssue($project, 'Unrelated giraffe noise'));
+        $em->flush();
+
+        $this->login($client, $user);
+        $crawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues?status=&q=UniqueZebraToken',
+        );
+        self::assertResponseIsSuccessful();
+        $body = $crawler->text();
+        self::assertStringContainsString('UniqueZebraToken crash', $body);
+        self::assertStringNotContainsString('Unrelated giraffe noise', $body);
+
+        /** @var IssueRepository $repo */
+        $repo = $em->getRepository(Issue::class);
+        $hits = $repo->search($project, query: 'UniqueZebraToken', limit: 20);
+        self::assertCount(1, $hits);
+        self::assertStringContainsString('UniqueZebraToken', $hits[0]->getTitle());
+    }
+
     private function seedIssueWithRecentEvents(
         EntityManagerInterface $em,
         Project $project,

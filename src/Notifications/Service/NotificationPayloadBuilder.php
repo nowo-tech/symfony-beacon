@@ -7,6 +7,7 @@ namespace App\Notifications\Service;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
+use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\NotificationCategories;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
@@ -157,6 +158,55 @@ final readonly class NotificationPayloadBuilder
                 'id' => $transaction->getUuid(),
             ]),
             'category' => NotificationCategories::N_PLUS_ONE,
+            'test' => false,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function forVolumeThreshold(Project $project, ProjectThresholdRule $rule, int $actualCount): array
+    {
+        $summary = \sprintf(
+            '%s: %d error/fatal event(s) in %d minute(s) (threshold %d)',
+            $project->getName(),
+            $actualCount,
+            $rule->getWindowMinutes(),
+            $rule->getErrorCount(),
+        );
+        if (null !== $rule->getLabel()) {
+            $summary = $rule->getLabel().' - '.$summary;
+        }
+
+        return [
+            'event' => NotificationCategories::VOLUME_THRESHOLD,
+            'summary' => $summary,
+            'project' => [
+                'id' => $project->getId() ?? 0,
+                'uuid' => $project->getUuid(),
+                'name' => $project->getName(),
+                'slug' => $project->getSlug(),
+            ],
+            'threshold_rule' => [
+                'id' => $rule->getId() ?? 0,
+                'uuid' => $rule->getUuid(),
+                'label' => $rule->getLabel(),
+                'enabled' => $rule->isEnabled(),
+                'threshold' => $rule->getErrorCount(),
+                'window_minutes' => $rule->getWindowMinutes(),
+                'cooldown_minutes' => $rule->getCooldownMinutes(),
+                'environment' => $rule->getEnvironment(),
+                'release' => $rule->getReleaseVersion(),
+                'last_fired_at' => $rule->getLastFiredAt()?->format(\DATE_ATOM),
+            ],
+            'count' => $actualCount,
+            'window_minutes' => $rule->getWindowMinutes(),
+            'threshold' => $rule->getErrorCount(),
+            'cooldown_minutes' => $rule->getCooldownMinutes(),
+            'environment' => $rule->getEnvironment(),
+            'release' => $rule->getReleaseVersion(),
+            'url' => $this->absoluteUrl('project_settings', ['id' => $project->getUuid()]),
+            'category' => NotificationCategories::VOLUME_THRESHOLD,
             'test' => false,
         ];
     }

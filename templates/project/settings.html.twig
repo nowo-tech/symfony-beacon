@@ -479,11 +479,114 @@
                             {{ 'project.health.never_delivered'|trans }}
                         {% endif %}
                     </div>
+                    {% set attempts = destination.deliveryAttempts %}
+                    <div class="mt-3">
+                        {% if attempts is empty %}
+                            <p class="text-xs text-[var(--color-ink)]/55">{{ 'project.health.history_empty'|trans }}</p>
+                        {% else %}
+                            <details class="group rounded-md border border-[var(--color-sand)]/70 bg-[var(--color-sand)]/20 p-2">
+                                <summary class="cursor-pointer list-none text-xs font-medium text-[var(--color-ink)]">
+                                    <span class="group-open:hidden">{{ 'project.health.history_show'|trans({'%count%': attempts|length}) }}</span>
+                                    <span class="hidden group-open:inline">{{ 'project.health.history_hide'|trans({'%count%': attempts|length}) }}</span>
+                                </summary>
+                                <ul class="mt-2 space-y-2 text-xs">
+                                    {% for attempt in attempts %}
+                                        <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] p-2">
+                                            <div class="font-medium">
+                                                {{ attempt.attemptedAt|date('Y-m-d H:i') }}
+                                                —
+                                                {% if attempt.successful %}
+                                                    <span class="text-emerald-700">{{ 'project.health.delivery_ok'|trans }}</span>
+                                                {% else %}
+                                                    <span class="text-[var(--color-alert)]">{{ 'project.health.delivery_fail'|trans }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if attempt.errorSnippet %}
+                                                <div class="mt-1 text-[var(--color-ink)]/65">{{ attempt.errorSnippet }}</div>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        {% endif %}
+                    </div>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
 </section>
+
+{% if membership.role.value in ['owner', 'admin'] %}
+<section class="panel mt-6">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+            <h2 class="text-lg font-semibold">{{ 'thresholds.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'thresholds.intro'|trans }}</p>
+            {% if not project.ingestEnabled %}
+                <p class="mt-2 text-xs text-[var(--color-alert)]">{{ 'thresholds.ingest_disabled'|trans }}</p>
+            {% endif %}
+        </div>
+        <a class="btn-primary" href="{{ path('project_threshold_rule_new', {id: project.uuid}) }}">{{ 'thresholds.add'|trans }}</a>
+    </div>
+    {% set thresholdRules = project.thresholdRules %}
+    {% if thresholdRules is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'thresholds.empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-3">
+            {% for rule in thresholdRules %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <div class="font-medium">
+                                {{ rule.label ?: 'thresholds.unnamed'|trans }}
+                                {% if not rule.enabled %}
+                                    <span class="badge badge-error">{{ 'thresholds.disabled'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                                {{ 'thresholds.summary'|trans({
+                                    '%count%': rule.errorCount,
+                                    '%window%': rule.windowMinutes,
+                                    '%cooldown%': rule.cooldownMinutes
+                                }) }}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% if rule.environment %}
+                                    <span>{{ 'thresholds.filter.environment'|trans({'%value%': rule.environment}) }}</span>
+                                {% endif %}
+                                {% if rule.releaseVersion %}
+                                    <span{% if rule.environment %} class="ml-2"{% endif %}>{{ 'thresholds.filter.release'|trans({'%value%': rule.releaseVersion}) }}</span>
+                                {% endif %}
+                                {% if not rule.environment and not rule.releaseVersion %}
+                                    <span>{{ 'thresholds.filter.all_events'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% if rule.lastFiredAt %}
+                                    {{ 'thresholds.last_fired'|trans }} {{ rule.lastFiredAt|date('Y-m-d H:i') }}
+                                {% else %}
+                                    {{ 'thresholds.never_fired'|trans }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <a class="btn-ghost" href="{{ path('project_threshold_rule_edit', {projectId: project.uuid, id: rule.uuid}) }}">{{ 'thresholds.edit'|trans }}</a>
+                            <form method="post" action="{{ path('project_threshold_rule_toggle', {projectId: project.uuid, id: rule.uuid}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('threshold_toggle_' ~ rule.id) }}">
+                                <button class="btn-ghost" type="submit">{{ rule.enabled ? 'thresholds.disable'|trans : 'thresholds.enable'|trans }}</button>
+                            </form>
+                            <form method="post" action="{{ path('project_threshold_rule_delete', {projectId: project.uuid, id: rule.uuid}) }}" onsubmit="return confirm('{{ 'thresholds.delete_confirm'|trans|e('js') }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('threshold_delete_' ~ rule.id) }}">
+                                <button class="btn-danger" type="submit">{{ 'thresholds.delete'|trans }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+{% endif %}
 
 <section class="panel mt-6">
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">

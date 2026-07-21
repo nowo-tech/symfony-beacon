@@ -164,6 +164,9 @@ project:
         delivery_ok: Succes
         delivery_fail: Mislukt
         never_delivered: Nog geen leveringen.
+        history_empty: Geen recente bezorgpogingen vastgelegd.
+        history_show: 'Recente pogingen tonen (%count%)'
+        history_hide: 'Recente pogingen verbergen (%count%)'
     new:
         title: Nieuw project
         submit: Project aanmaken

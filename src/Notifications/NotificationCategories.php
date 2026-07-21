@@ -11,6 +11,8 @@ final class NotificationCategories
 {
     public const string N_PLUS_ONE = 'n_plus_one';
 
+    public const string VOLUME_THRESHOLD = 'volume.threshold';
+
     public const string ISSUE_RESOLVED = 'issue.resolved';
 
     public const string ISSUE_REOPENED = 'issue.reopened';
@@ -41,6 +43,7 @@ final class NotificationCategories
         'info',
         'debug',
         self::N_PLUS_ONE,
+        self::VOLUME_THRESHOLD,
         self::ISSUE_RESOLVED,
         self::ISSUE_REOPENED,
         self::ISSUE_ASSIGNED,

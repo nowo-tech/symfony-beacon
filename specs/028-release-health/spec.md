@@ -2,7 +2,7 @@
 
 **Feature Branch**: `028-release-health`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: A project panel that shows release health using existing denormalized release fields (`014-releases`): new issues per release, comparison across releases/environments, without requiring operators to reconstruct it from the issue list alone.
 

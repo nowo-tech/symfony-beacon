@@ -19,6 +19,7 @@ nav:
     issues: Incidencias
     performance: Rendimiento
     analytics: Analítica
+    releases: Releases
 api_docs:
     title: Docs API
     intro: Explora el ingest Envelope y los endpoints HTTP relacionados. Usa Authorize con la cabecera X-Beacon-Auth (beacon_key y beacon_secret del DSN del proyecto).
@@ -163,7 +164,7 @@ project:
         ingest_disabled_banner: El ingest de Envelope está suspendido para este proyecto. Los datos existentes siguen siendo legibles.
     health:
         title: Salud
-        intro: Profundidad de la cola Messenger de la instancia y último estado de entrega de notificaciones de este proyecto.
+        intro: Profundidad de la cola Messenger de la instancia y estado reciente de entrega de notificaciones de los destinos de este proyecto.
         messenger_pending: Mensajes async pendientes en Messenger
         messenger_unavailable: Profundidad de cola no disponible
         instance_wide: a nivel de instancia
@@ -175,6 +176,9 @@ project:
         delivery_ok: Correcta
         delivery_fail: Fallida
         never_delivered: Aún no hay entregas.
+        history_empty: No hay intentos de entrega recientes.
+        history_show: 'Mostrar intentos recientes (%count%)'
+        history_hide: 'Ocultar intentos recientes (%count%)'
     new:
         title: Nuevo proyecto
         submit: Crear proyecto
@@ -498,6 +502,35 @@ analytics:
         errors: Errores
         transactions: Transacciones
         nplus1_groups: Grupos N+1
+releases:
+    title: Salud de releases
+    intro: Elige una release para ver cuántas incidencias aparecieron por primera vez en ella, comparar dos releases o saltar al compare existente del listado de incidencias.
+    empty: Aún no hay datos de releases para este proyecto.
+    focus:
+        label: Release
+        submit: Actualizar salud de releases
+    new_in_release:
+        title: 'Nuevas en %release%'
+        count: '%count% incidencias aparecieron por primera vez en esta release.'
+        open_issue_list: Abrir listado filtrado
+        empty: Ninguna incidencia apareció por primera vez en esta release.
+    compare:
+        label: Comparar con release
+        none: No comparar
+        help: Opcionalmente compara la release seleccionada con otra release usando el conjunto actual de incidencias.
+        summary_title: 'Comparar %a% vs %b%'
+        only_a: 'Solo en %release%'
+        only_b: 'Solo en %release%'
+        both: En ambas releases
+        empty: Ninguna incidencia en este conjunto
+    catalog:
+        title: Releases
+    environment_compare:
+        title: Comparar entornos
+        environment_a: Entorno A
+        environment_b: Entorno B
+        open_issue_list: Abrir compare en incidencias
+        help: Reutiliza el compare existente del listado de incidencias de `014`. Cuando eliges una release, el enlace mantiene ese filtro.
 appearance:
     title: Apariencia
     intro: Personaliza el nombre de marca, los colores de acento y los de peligro de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
@@ -851,6 +884,16 @@ admin_projects:
     view_as_member: Ver como miembro
     view_as_banner: Estás viendo proyectos como miembro (los privilegios de administración en el proyecto están limitados).
     view_as_exit: Salir de ver-como-miembro
+    audit_title: Línea de auditoría
+    audit_intro: Filtra las acciones administrativas registradas para este proyecto.
+    audit_reset: Restablecer filtros
+    audit_filter_action: Tipo de acción
+    audit_filter_all_actions: Todas las acciones
+    audit_filter_from: Desde
+    audit_filter_to: Hasta
+    audit_apply: Aplicar filtros
+    audit_clear: Limpiar
+    audit_empty: Ninguna acción registrada del proyecto coincide con los filtros actuales.
 
 admin:
     hub:
@@ -939,7 +982,7 @@ legal:
 
 notifications:
     title: Notificaciones
-    intro: Envía alertas a Slack, Discord, Teams, Telegram, email o un endpoint HTTP genérico cuando aparezcan incidencias nuevas, regresiones o grupos N+1.
+    intro: Envía alertas a Slack, Discord, Teams, Telegram, email o un endpoint HTTP genérico cuando aparezcan incidencias nuevas, regresiones, picos de volumen o grupos N+1.
     empty: Aún no hay destinos. Añade un canal para avisar a tu equipo.
     add: Añadir destino
     edit: Editar
@@ -990,6 +1033,7 @@ notifications:
         info: Info
         debug: Debug
         n_plus_one: Detecciones N+1
+        'volume.threshold': Umbrales de volumen
         issue.resolved: Issue resuelto
         issue.reopened: Issue reabierto
         issue.assigned: Issue asignado
@@ -1064,3 +1108,56 @@ notifications:
             step3: Confirma que tu servicio recibe el JSON canónico (event, summary, project, issue, url, category).
             payload: Payload JSON canónico como cuerpo de la petición (User-Agent symfony-beacon-notifications/1.0).
             tip: Prefiere HTTPS y autentica tu receptor. Evita apuntar a direcciones internas o de metadatos cloud.
+
+thresholds:
+    title: Alertas por umbral
+    intro: Crea alertas de volumen cuando los eventos error o fatal superen una cantidad configurada dentro de una ventana temporal.
+    ingest_disabled: La ingesta está suspendida para este proyecto, así que las reglas de umbral no se evalúan.
+    empty: Aún no hay reglas de umbral. Añade una para detectar picos repentinos.
+    add: Añadir regla
+    edit: Editar
+    enable: Activar
+    disable: Desactivar
+    disabled: Desactivada
+    delete: Eliminar
+    delete_confirm: ¿Eliminar esta regla de umbral?
+    save: Guardar regla
+    cancel: Cancelar
+    new_title: Nueva regla de umbral
+    edit_title: Editar regla de umbral
+    form_help: Configura una alerta de volumen para errores/fatales en una ventana móvil. Los filtros opcionales de entorno y release acotan el conteo antes de aplicar quiet hours, digests y el enrutado de notificaciones.
+    unnamed: Regla sin nombre
+    summary: '%count% eventos en %window% min · %cooldown% min de cooldown'
+    last_fired: Último disparo
+    never_fired: Aún no se ha disparado.
+    filter:
+        environment: 'Entorno: %value%'
+        release: 'Release: %value%'
+        all_events: Todos los entornos y releases
+    form:
+        label: Etiqueta
+        label_help: Nombre interno opcional mostrado en Ajustes y en los payloads.
+        enabled: Activada
+        error_count: Conteo de errores
+        error_count_help: Alerta cuando se reciben al menos este número de eventos error/fatal dentro de la ventana móvil.
+        window_minutes: Ventana (minutos)
+        window_minutes_help: Ventana de observación móvil de 1 a 1440 minutos.
+        cooldown_minutes: Cooldown (minutos)
+        cooldown_minutes_help: Suprime alertas duplicadas de esta regla durante la ventana de cooldown.
+        environment: Filtro de entorno
+        environment_help: Déjalo vacío para contar todos los entornos.
+        release: Filtro de release
+        release_help: Déjalo vacío para contar todas las releases.
+    flash:
+        created: Regla de umbral creada.
+        updated: Regla de umbral actualizada.
+        enabled: Regla de umbral activada.
+        disabled: Regla de umbral desactivada.
+        deleted: Regla de umbral eliminada.
+    validation:
+        label_length: La etiqueta debe tener como máximo 120 caracteres.
+        error_count_min: El conteo de errores debe ser al menos 1.
+        window_range: La ventana debe estar entre 1 y 1440 minutos.
+        cooldown_range: El cooldown debe estar entre 1 y 10080 minutos.
+        environment_length: El entorno debe tener como máximo 80 caracteres.
+        release_length: La release debe tener como máximo 120 caracteres.

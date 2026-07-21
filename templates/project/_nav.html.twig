@@ -1,6 +1,6 @@
 {#
   Shared project section navigation.
-  Expects: project, current (issues|performance|analytics|settings)
+  Expects: project, current (issues|performance|analytics|releases|settings)
 #}
 <nav class="project-nav mb-6" aria-label="{{ 'project.nav.label'|trans }}">
     <div class="mb-3">
@@ -26,6 +26,11 @@
             href="{{ path('analytics_show', {id: project.uuid}) }}"
             {% if current == 'analytics' %}aria-current="page"{% endif %}
         >{{ 'nav.analytics'|trans }}</a>
+        <a
+            class="btn-ghost no-underline{% if current == 'releases' %} is-active{% endif %}"
+            href="{{ path('project_releases', {id: project.uuid}) }}"
+            {% if current == 'releases' %}aria-current="page"{% endif %}
+        >{{ 'nav.releases'|trans }}</a>
         <a
             class="btn-ghost no-underline{% if current == 'settings' %} is-active{% endif %}"
             href="{{ path('project_settings', {id: project.uuid}) }}"

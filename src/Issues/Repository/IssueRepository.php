@@ -13,6 +13,7 @@ use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\QueryBuilder;
@@ -151,6 +152,154 @@ class IssueRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /**
+     * Distinct releases observed on issues (`firstRelease` or `lastRelease`), newest first.
+     *
+     * @return list<string>
+     */
+    public function findDistinctReleases(Project $project): array
+    {
+        $projectId = $project->getId();
+        if (null === $projectId) {
+            return [];
+        }
+
+        $sql = <<<'SQL'
+            SELECT release_value
+            FROM (
+                SELECT first_release AS release_value, last_seen AS seen_at
+                FROM issue
+                WHERE project_id = :projectId AND first_release IS NOT NULL
+                UNION ALL
+                SELECT last_release AS release_value, last_seen AS seen_at
+                FROM issue
+                WHERE project_id = :projectId AND last_release IS NOT NULL
+            ) releases
+            WHERE release_value <> ''
+            GROUP BY release_value
+            ORDER BY MAX(seen_at) DESC, release_value DESC
+            SQL;
+
+        /** @var list<int|string> $rows */
+        $rows = $this->getEntityManager()->getConnection()->fetchFirstColumn($sql, [
+            'projectId' => $projectId,
+        ], [
+            'projectId' => ParameterType::INTEGER,
+        ]);
+
+        $releases = [];
+        foreach ($rows as $row) {
+            $normalized = Issue::normalizeRelease((string) $row);
+            if (null === $normalized) {
+                continue;
+            }
+            $releases[] = $normalized;
+        }
+
+        return array_values(array_unique($releases));
+    }
+
+    /**
+     * Count issues whose `firstRelease` matches the given release.
+     */
+    public function countNewIssuesByFirstRelease(Project $project, string $release): int
+    {
+        $normalized = Issue::normalizeRelease($release);
+        if (null === $normalized) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.firstRelease = :release')
+            ->setParameter('project', $project)
+            ->setParameter('release', $normalized)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count new issues grouped by `firstRelease`.
+     *
+     * @return array<string, int>
+     */
+    public function countNewIssuesByFirstReleaseMap(Project $project): array
+    {
+        $rows = $this->createQueryBuilder('i')
+            ->select('i.firstRelease AS release_value, COUNT(i.id) AS issue_count')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.firstRelease IS NOT NULL')
+            ->setParameter('project', $project)
+            ->groupBy('i.firstRelease')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $normalized = Issue::normalizeRelease((string) ($row['release_value'] ?? ''));
+            if (null === $normalized) {
+                continue;
+            }
+            $counts[$normalized] = (int) ($row['issue_count'] ?? 0);
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Issues that belong to a release via `firstRelease` or `lastRelease`.
+     *
+     * @return list<Issue>
+     */
+    public function findByRelease(Project $project, string $release): array
+    {
+        $normalized = Issue::normalizeRelease($release);
+        if (null === $normalized) {
+            return [];
+        }
+
+        /** @var list<Issue> $result */
+        $result = $this->createQueryBuilder('i')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.firstRelease = :release OR i.lastRelease = :release')
+            ->setParameter('project', $project)
+            ->setParameter('release', $normalized)
+            ->orderBy('i.lastSeen', 'DESC')
+            ->addOrderBy('i.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
+     * Latest issues first seen in a release, for release-health previews.
+     *
+     * @return list<Issue>
+     */
+    public function findLatestNewIssuesByFirstRelease(Project $project, string $release, int $limit = 8): array
+    {
+        $normalized = Issue::normalizeRelease($release);
+        if (null === $normalized) {
+            return [];
+        }
+
+        /** @var list<Issue> $result */
+        $result = $this->createQueryBuilder('i')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.firstRelease = :release')
+            ->setParameter('project', $project)
+            ->setParameter('release', $normalized)
+            ->orderBy('i.lastSeen', 'DESC')
+            ->addOrderBy('i.id', 'DESC')
+            ->setMaxResults(max(1, $limit))
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
     public function findOneByProjectAndUuid(Project $project, string $uuid): ?Issue
     {
         return $this->findOneBy(['project' => $project, 'uuid' => $uuid]);
@@ -209,8 +358,7 @@ class IssueRepository extends ServiceEntityRepository
             ->setParameter('project', $project);
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $this->applyFullTextOrLikeQuery($qb, trim($query));
         }
         if (null !== $level && '' !== $level) {
             $qb->andWhere('i.level = :level')->setParameter('level', $level);
@@ -244,6 +392,52 @@ class IssueRepository extends ServiceEntityRepository
         $this->applyUserFilter($qb, $user);
 
         return $qb;
+    }
+
+    /**
+     * MySQL: FULLTEXT MATCH…AGAINST on title+culprit (BOOLEAN MODE).
+     * SQLite / other platforms: LIKE fallback (tests and non-MySQL).
+     */
+    private function applyFullTextOrLikeQuery(QueryBuilder $qb, string $query): void
+    {
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        if ($platform instanceof AbstractMySQLPlatform) {
+            $boolean = $this->toBooleanFulltextQuery($query);
+            if ('' === $boolean) {
+                $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
+                    ->setParameter('q', '%'.$query.'%');
+
+                return;
+            }
+            $qb->andWhere('MATCH(i.title, i.culprit) AGAINST (:ftq IN BOOLEAN MODE)')
+                ->setParameter('ftq', $boolean);
+
+            return;
+        }
+
+        $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
+            ->setParameter('q', '%'.$query.'%');
+    }
+
+    /**
+     * Build a conservative BOOLEAN MODE query (+token*) from free text.
+     * Strips FULLTEXT operators; skips tokens shorter than 2 chars (InnoDB default min is often 3 —
+     * shorter tokens still fall through LIKE if all tokens are dropped).
+     */
+    private function toBooleanFulltextQuery(string $query): string
+    {
+        $tokens = preg_split('/\s+/u', $query) ?: [];
+        $parts = [];
+        foreach ($tokens as $token) {
+            $clean = preg_replace('/[+\-><()~*"@]+/u', '', $token) ?? '';
+            $clean = trim($clean);
+            if (\strlen($clean) < 2) {
+                continue;
+            }
+            $parts[] = '+'.$clean.'*';
+        }
+
+        return implode(' ', $parts);
     }
 
     private function applyTagFilter(QueryBuilder $qb, Project $project, ?string $tag): void

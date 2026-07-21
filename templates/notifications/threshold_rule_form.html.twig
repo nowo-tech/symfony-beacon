@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ (is_edit ? 'thresholds.edit_title' : 'thresholds.new_title')|trans }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
+
+<h1 class="mb-2 text-2xl font-semibold">{{ (is_edit ? 'thresholds.edit_title' : 'thresholds.new_title')|trans }}</h1>
+<p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'thresholds.form_help'|trans }}</p>
+
+{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
+    {{ form_row(form.label) }}
+    {{ form_row(form.enabled) }}
+    <div class="grid gap-3 sm:grid-cols-3">
+        {{ form_row(form.errorCount) }}
+        {{ form_row(form.windowMinutes) }}
+        {{ form_row(form.cooldownMinutes) }}
+    </div>
+    <div class="grid gap-3 sm:grid-cols-2">
+        {{ form_row(form.environment) }}
+        {{ form_row(form.releaseVersion) }}
+    </div>
+    <div class="flex flex-wrap gap-2 pt-2">
+        <button class="btn-primary" type="submit">{{ 'thresholds.save'|trans }}</button>
+        <a class="btn-ghost" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'thresholds.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

@@ -6,6 +6,7 @@ namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
+use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
@@ -21,6 +22,7 @@ use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectOpsStatsService;
 use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\ProjectRole;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use RuntimeException;
@@ -40,9 +42,12 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminProjectController extends AbstractController
 {
+    private const int PROJECT_AUDIT_LIMIT = 100;
+
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly UserGroupRepository $userGroupRepository,
+        private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipManager $membershipManager,
         private readonly ProjectHistoryClearer $historyClearer,
         private readonly ProjectOpsStatsService $opsStats,
@@ -102,9 +107,13 @@ final class AdminProjectController extends AbstractController
     public function show(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
+        Request $request,
     ): Response {
         /** @var User $actor */
         $actor = $this->getUser();
+        $actionFilter = $this->resolveProjectAuditAction($request->query->getString('action'));
+        $fromFilter = $this->parseProjectAuditDate($request->query->getString('from'));
+        $toFilter = $this->parseProjectAuditDate($request->query->getString('to'), true);
 
         return $this->render('admin/projects/show.html.twig', [
             'project' => $project,
@@ -114,6 +123,20 @@ final class AdminProjectController extends AbstractController
             'ownerCount' => $this->countOwners($project),
             'opsStats' => $this->opsStats->forProject($project),
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
+            'projectAuditActions' => $this->projectAuditActionTypes(),
+            'projectAuditFilter' => [
+                'action' => $actionFilter instanceof UserActionType ? $actionFilter->value : '',
+                'from' => $request->query->getString('from'),
+                'to' => $request->query->getString('to'),
+            ],
+            'projectAuditEntries' => $this->userActionRepository->findForProject(
+                $project,
+                $this->projectAuditActionTypes(),
+                $actionFilter,
+                $fromFilter,
+                $toFilter,
+                self::PROJECT_AUDIT_LIMIT,
+            ),
         ]);
     }
 
@@ -158,7 +181,19 @@ final class AdminProjectController extends AbstractController
         /** @var User $actor */
         $actor = $this->getUser();
         $request->getSession()->set(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY, true);
-        $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsStarted, $actor, $actor, []);
+        $context = [];
+        $projectUuid = trim($request->request->getString('project_uuid'));
+        if ('' !== $projectUuid) {
+            $project = $this->projectRepository->findOneBy(['uuid' => $projectUuid]);
+            if ($project instanceof Project) {
+                $context = [
+                    'project_uuid' => $project->getUuid(),
+                    'project_name' => $project->getName(),
+                ];
+            }
+        }
+
+        $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsStarted, $actor, $actor, $context);
         $this->addFlash('success', 'flash.admin_projects.view_as_enabled');
 
         $redirect = $request->request->getString('redirect');
@@ -587,5 +622,62 @@ final class AdminProjectController extends AbstractController
             'group_link_forbidden' => 'flash.project.group_link_forbidden',
             default => 'flash.project.member_error',
         };
+    }
+
+    /**
+     * Administrative project actions shown on Admin -> Project audit timeline.
+     *
+     * @return list<UserActionType>
+     */
+    private function projectAuditActionTypes(): array
+    {
+        return [
+            UserActionType::ProjectCreated,
+            UserActionType::ProjectMemberAdded,
+            UserActionType::ProjectMemberRoleChanged,
+            UserActionType::ProjectMemberRemoved,
+            UserActionType::ProjectOwnershipTransferred,
+            UserActionType::ProjectGroupLinked,
+            UserActionType::ProjectGroupRoleChanged,
+            UserActionType::ProjectGroupUnlinked,
+            UserActionType::ProjectApiKeyCreated,
+            UserActionType::ProjectApiKeyRevoked,
+            UserActionType::ProjectApiKeyRotated,
+            UserActionType::ProjectSuspended,
+            UserActionType::ProjectResumed,
+            UserActionType::ProjectViewAsStarted,
+            UserActionType::ProjectHistoryCleared,
+            UserActionType::ProjectDeleted,
+        ];
+    }
+
+    private function resolveProjectAuditAction(string $raw): ?UserActionType
+    {
+        if ('' === $raw) {
+            return null;
+        }
+
+        foreach ($this->projectAuditActionTypes() as $action) {
+            if ($action->value === $raw) {
+                return $action;
+            }
+        }
+
+        return null;
+    }
+
+    private function parseProjectAuditDate(string $raw, bool $endOfDay = false): ?DateTimeImmutable
+    {
+        if ('' === $raw) {
+            return null;
+        }
+
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $raw);
+        $errors = DateTimeImmutable::getLastErrors();
+        if (false === $date || ($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0) {
+            return null;
+        }
+
+        return $endOfDay ? $date->setTime(23, 59, 59) : $date->setTime(0, 0, 0);
     }
 }

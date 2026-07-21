@@ -2,7 +2,7 @@
 
 **Feature Branch**: `029-issue-fulltext`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Replace (or upgrade) the issue list `q` filter from `LIKE` on title/culprit to real full-text search (MySQL FULLTEXT or equivalent), with a documented SQLite/`LIKE` fallback for tests.
 

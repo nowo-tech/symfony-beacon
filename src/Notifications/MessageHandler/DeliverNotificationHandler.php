@@ -7,6 +7,7 @@ namespace App\Notifications\MessageHandler;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\NotificationDeliveryHistoryRecorder;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,7 @@ final readonly class DeliverNotificationHandler
 {
     public function __construct(
         private NotificationDestinationRepository $destinationRepository,
+        private NotificationDeliveryHistoryRecorder $deliveryHistoryRecorder,
         private NotificationOutboundFormatter $outboundFormatter,
         private OutboundUrlGuard $outboundUrlGuard,
         private HttpClientInterface $httpClient,
@@ -47,7 +49,7 @@ final readonly class DeliverNotificationHandler
             $this->logger->warning('Notification destination has empty endpoint.', [
                 'destination_id' => $message->destinationId,
             ]);
-            $destination->recordDeliveryFailure('Empty endpoint');
+            $this->deliveryHistoryRecorder->recordFailure($destination, 'Empty endpoint');
             $this->entityManager->flush();
 
             return;
@@ -82,10 +84,10 @@ final readonly class DeliverNotificationHandler
                 }
             }
 
-            $destination->recordDeliverySuccess();
+            $this->deliveryHistoryRecorder->recordSuccess($destination);
             $this->entityManager->flush();
         } catch (Throwable $e) {
-            $destination->recordDeliveryFailure($e->getMessage());
+            $this->deliveryHistoryRecorder->recordFailure($destination, $e->getMessage());
             $this->entityManager->flush();
 
             $this->logger->error('Notification delivery failed.', [

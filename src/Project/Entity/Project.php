@@ -7,6 +7,7 @@ namespace App\Project\Entity;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Entity\ProjectThresholdRule;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Doctrine\PublicUuidTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -81,6 +82,10 @@ class Project implements AuditableInterface
     #[ORM\OneToMany(targetEntity: NotificationDestination::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $notificationDestinations;
 
+    /** @var Collection<int, ProjectThresholdRule> */
+    #[ORM\OneToMany(targetEntity: ProjectThresholdRule::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $thresholdRules;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -97,6 +102,7 @@ class Project implements AuditableInterface
         $this->groupAccesses = new ArrayCollection();
         $this->issues = new ArrayCollection();
         $this->notificationDestinations = new ArrayCollection();
+        $this->thresholdRules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -290,6 +296,31 @@ class Project implements AuditableInterface
             $this->notificationDestinations->add($destination);
             $destination->setProject($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectThresholdRule>
+     */
+    public function getThresholdRules(): Collection
+    {
+        return $this->thresholdRules;
+    }
+
+    public function addThresholdRule(ProjectThresholdRule $rule): self
+    {
+        if (!$this->thresholdRules->contains($rule)) {
+            $this->thresholdRules->add($rule);
+            $rule->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeThresholdRule(ProjectThresholdRule $rule): self
+    {
+        $this->thresholdRules->removeElement($rule);
 
         return $this;
     }

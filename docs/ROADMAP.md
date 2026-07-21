@@ -93,7 +93,7 @@ Ordered Speckit program (Beacon `014`→`022`; Bundle `023`/`024`):
 
 ---
 
-## Phase 5 — Access & insights (In progress)
+## Phase 5 — Access & insights (In progress — high/medium Done through v0.12.0)
 
 Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do not hand-roll auth. **SSO/OIDC** stays Later (separate from `026`).
 
@@ -103,16 +103,16 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 |---|------|------|------|--------|
 | 5.1 | **Analytics charts**: period presets / range + filters (env, release) | Beacon | `025-analytics-charts` | **Done** |
 | 5.2 | **Magic login links** + project **viewer** role; optional signed share links | Beacon | `026-magic-links-viewer` | **Done** |
-| 5.3 | **Threshold alerts**: e.g. &gt; N errors in M minutes (plus existing new/regression) | Beacon | `027-threshold-alerts` | **Next** |
+| 5.3 | **Threshold alerts**: e.g. &gt; N errors in M minutes (plus existing new/regression) | Beacon | `027-threshold-alerts` | **Done** |
 
 ### Medium impact
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 5.4 | **Release health** panel: new-in-release counts + compare (builds on `014`) | Beacon | `028-release-health` | **Planned** |
-| 5.5 | **Issue FULLTEXT** search (upgrade `016` `LIKE` path) | Beacon | `029-issue-fulltext` | **Planned** |
-| 5.6 | **Delivery history**: last N attempts per notification destination (extends `021`) | Beacon | `030-delivery-history` | **Planned** |
-| 5.7 | **Admin project audit timeline** on Admin → Project show (extends `019`) | Beacon | `031-admin-project-audit` | **Planned** |
+| 5.4 | **Release health** panel: new-in-release counts + compare (builds on `014`) | Beacon | `028-release-health` | **Done** |
+| 5.5 | **Issue FULLTEXT** search (upgrade `016` `LIKE` path) | Beacon | `029-issue-fulltext` | **Done** |
+| 5.6 | **Delivery history**: last N attempts per notification destination (extends `021`) | Beacon | `030-delivery-history` | **Done** |
+| 5.7 | **Admin project audit timeline** on Admin → Project show (extends `019`) | Beacon | `031-admin-project-audit` | **Done** |
 
 ### Later (still in backlog)
 
@@ -157,7 +157,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.10.2** | Phase 5 backlog specs `027`–`033`; unified confirm/kit modal chrome |
 | **v0.11.0** | Analytics charts (`025`); locales de/nl/fr/it/pt; UI density/motion; danger colors; shared table pagination |
 | **v0.11.1** | Magic login + viewer + share links (`026`); golden Envelope contract (3.6) |
-| **v0.12+** | Phase 5 medium: release health, FULLTEXT, delivery history, admin audit (`028`–`031`); threshold alerts (`027`) |
+| **v0.12.0** | Phase 5 high/medium: threshold alerts (`027`), release health (`028`), FULLTEXT (`029`), delivery history (`030`), admin audit (`031`) |
+| **v0.13+** | Phase 5 Later: monthly quota (`032`), CI coverage soft gate (`033`); SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

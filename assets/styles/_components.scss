@@ -2644,6 +2644,26 @@ body::-webkit-scrollbar-corner,
   color: var(--color-moss);
 }
 
+/* Saved views: keep select / name input / save button on one control height. */
+.issue-saved-views .input,
+.issue-saved-views__save {
+  box-sizing: border-box;
+  min-height: 2.55rem;
+}
+
+.issue-saved-views__save {
+  padding-block: 0.625rem;
+}
+
+html[data-ui-density='compact'] .issue-saved-views .input,
+html[data-ui-density='compact'] .issue-saved-views__save {
+  min-height: 2rem;
+}
+
+html[data-ui-density='compact'] .issue-saved-views__save {
+  padding-block: 0.5rem;
+}
+
 /* DataTables — Beacon theme overrides */
 .issue-filters {
   align-items: stretch;

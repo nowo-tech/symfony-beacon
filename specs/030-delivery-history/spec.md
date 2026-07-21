@@ -2,7 +2,7 @@
 
 **Feature Branch**: `030-delivery-history`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Persist and show the last N delivery attempts per notification destination (success/fail, timestamp, truncated error), not only the single last delivery fields from `021-project-health-ui`.
 

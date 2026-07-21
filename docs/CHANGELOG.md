@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-07-21
+
+### Added
+
+- Project Settings **threshold alerts**: per-project rolling error/fatal volume rules with optional environment/release filters, cooldown, `volume.threshold` notification category, and functional coverage for fire-once cooldown behaviour (`027-threshold-alerts`)
+- Project Settings **delivery history**: last N attempts per notification destination (success/fail, truncated error), pruned via `BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT` (default 20), with expandable Health UI (`030-delivery-history`)
+- Project **Release health** panel at `/projects/{uuid}/releases`: pick a release to see new-issue counts from `firstRelease`, preview matching issues, compare two releases, and deep-link to the existing issue-list environment compare (`028-release-health`)
+- Issue list `q` search uses MySQL **FULLTEXT** on title/culprit (BOOLEAN MODE); SQLite/tests keep `LIKE` fallback (`029-issue-fulltext`)
+- Admin → Project show now includes a filterable **audit timeline** backed by `user_action` (`context.project_uuid`) with action/date filters, empty state, and functional coverage (`031-admin-project-audit`)
+
+### Fixed
+
+- Issues **saved views**: **Save view** button height aligned with adjacent inputs / filter controls
+
 ## [0.11.1] - 2026-07-21
 
 ### Added
@@ -362,7 +376,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...v0.10.2

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.11.1 to the next release](#upgrading-from-0111-to-the-next-release)
+- [Upgrading from 0.12.0 to the next release](#upgrading-from-0120-to-the-next-release)
+- [Upgrading from 0.11.1 to 0.12.0](#upgrading-from-0111-to-0120)
 - [Upgrading from 0.11.0 to 0.11.1](#upgrading-from-0110-to-0111)
 - [Upgrading from 0.10.2 to 0.11.0](#upgrading-from-0102-to-0110)
 - [Upgrading from 0.10.1 to 0.10.2](#upgrading-from-0101-to-0102)
@@ -29,9 +30,47 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.11.1 to the next release
+## Upgrading from 0.12.0 to the next release
 
-No further operator steps documented yet.
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+No additional steps yet — this placeholder is filled when the next release ships.
+
+## Upgrading from 0.11.1 to 0.12.0
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+### Threshold alerts (`027`)
+
+- Migration `Version20260721190000`: table `project_threshold_rule`.
+- Configure under **Project → Settings → Threshold alerts**. Destinations must include category `volume.threshold`.
+
+### Issue FULLTEXT search (`029`)
+
+- Migration `Version20260721191000`: MySQL `FULLTEXT` index `idx_issue_title_culprit_ft` on `issue (title, culprit)`.
+- SQLite / tests keep a documented `LIKE` fallback (migration is skipped).
+- InnoDB typically ignores tokens shorter than `innodb_ft_min_token_size` (often **3**). BOOLEAN MODE uses `+token*` prefixes.
+
+### Delivery history (`030`)
+
+- Migration `Version20260721192000`: table `notification_delivery_attempt`.
+- Optional env `BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT` (default **20**) bounds retained attempts per destination.
+- Project Settings → Health shows expandable recent attempts (summary fields from `021` unchanged).
+
+### Release health (`028`) / Admin project audit (`031`)
+
+- Release health: **Project → Releases** (`/projects/{uuid}/releases`).
+- Admin audit timeline: **Administration → Projects → show** (filters by action / date).
 
 ## Upgrading from 0.11.0 to 0.11.1
 

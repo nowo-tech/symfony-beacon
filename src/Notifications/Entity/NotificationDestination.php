@@ -11,6 +11,8 @@ use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\PublicUuidTrait;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Nowo\AuditKitBundle\Model\AuditableInterface;
 use Nowo\AuditKitBundle\Model\TimestampableTrait;
@@ -40,6 +42,7 @@ class NotificationDestination implements AuditableInterface
     public function __construct()
     {
         $this->ensureUuid();
+        $this->deliveryAttempts = new ArrayCollection();
     }
 
     #[ORM\Column(length: 120)]
@@ -86,6 +89,11 @@ class NotificationDestination implements AuditableInterface
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $lastDeliveryError = null;
+
+    /** @var Collection<int, NotificationDeliveryAttempt> */
+    #[ORM\OneToMany(targetEntity: NotificationDeliveryAttempt::class, mappedBy: 'destination', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['attemptedAt' => 'DESC', 'id' => 'DESC'])]
+    private Collection $deliveryAttempts;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -271,9 +279,63 @@ class NotificationDestination implements AuditableInterface
         return $this->lastDeliveryError;
     }
 
-    public function recordDeliverySuccess(): self
+    /**
+     * @return Collection<int, NotificationDeliveryAttempt>
+     */
+    public function getDeliveryAttempts(): Collection
     {
-        $this->lastDeliveryAt = new DateTimeImmutable();
+        return $this->deliveryAttempts;
+    }
+
+    public function addDeliveryAttempt(NotificationDeliveryAttempt $attempt): self
+    {
+        if (!$this->deliveryAttempts->contains($attempt)) {
+            $this->deliveryAttempts->add($attempt);
+            $attempt->setDestination($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeliveryAttempt(NotificationDeliveryAttempt $attempt): self
+    {
+        if ($this->deliveryAttempts->removeElement($attempt) && $attempt->getDestination() === $this) {
+            $attempt->setDestination(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return list<NotificationDeliveryAttempt>
+     */
+    public function trimDeliveryAttempts(int $keep): array
+    {
+        $limit = max(1, $keep);
+        $attempts = $this->deliveryAttempts->toArray();
+        usort(
+            $attempts,
+            static function (NotificationDeliveryAttempt $left, NotificationDeliveryAttempt $right): int {
+                $byTime = $right->getAttemptedAt() <=> $left->getAttemptedAt();
+                if (0 !== $byTime) {
+                    return $byTime;
+                }
+
+                return ($right->getId() ?? \PHP_INT_MAX) <=> ($left->getId() ?? \PHP_INT_MAX);
+            },
+        );
+
+        $excess = \array_slice($attempts, $limit);
+        foreach ($excess as $attempt) {
+            $this->removeDeliveryAttempt($attempt);
+        }
+
+        return $excess;
+    }
+
+    public function recordDeliverySuccess(?DateTimeImmutable $deliveredAt = null): self
+    {
+        $this->lastDeliveryAt = $deliveredAt ?? new DateTimeImmutable();
         $this->lastDeliverySuccess = true;
         $this->lastDeliveryError = null;
         $this->touch();
@@ -281,9 +343,9 @@ class NotificationDestination implements AuditableInterface
         return $this;
     }
 
-    public function recordDeliveryFailure(string $error): self
+    public function recordDeliveryFailure(string $error, ?DateTimeImmutable $deliveredAt = null): self
     {
-        $this->lastDeliveryAt = new DateTimeImmutable();
+        $this->lastDeliveryAt = $deliveredAt ?? new DateTimeImmutable();
         $this->lastDeliverySuccess = false;
         $this->lastDeliveryError = mb_substr($error, 0, 2000);
         $this->touch();

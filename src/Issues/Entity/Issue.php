@@ -27,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_project_assignee', columns: ['project_id', 'assignee_id'])]
 #[ORM\Index(name: 'idx_issue_project_last_release', columns: ['project_id', 'last_release'])]
 #[ORM\Index(name: 'idx_issue_project_priority', columns: ['project_id', 'priority'])]
+#[ORM\Index(name: 'idx_issue_title_culprit_ft', columns: ['title', 'culprit'], flags: ['fulltext'])]
 class Issue
 {
     use PublicUuidTrait;

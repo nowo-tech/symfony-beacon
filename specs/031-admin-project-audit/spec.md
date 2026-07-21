@@ -2,7 +2,7 @@
 
 **Feature Branch**: `031-admin-project-audit`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: On Administration → Project show, display a filterable timeline of admin project actions already recorded in `user_action` (suspend, delete, membership/role changes, key revoke/rotate, view-as, etc. from `019-admin-projects-ops`).
 

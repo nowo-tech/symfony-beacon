@@ -1,10 +1,10 @@
 # Project notifications
 
-Beacon can notify external systems when a project records a **new issue**, an **issue regression**, an **N+1** performance group, or selected **issue lifecycle** changes (resolve, reopen, assign, comment, mark duplicate).
+Beacon can notify external systems when a project records a **new issue**, an **issue regression**, an **N+1** performance group, selected **issue lifecycle** changes (resolve, reopen, assign, comment, mark duplicate), or a **volume threshold** spike (`volume.threshold`).
 
 Supported channels: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP**.
 
-See feature specs `specs/009-project-notifications/` and `specs/017-export-webhooks/`, and the product [ROADMAP](ROADMAP.md) (Phase 1).
+See feature specs `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](ROADMAP.md).
 In the app, open **Project → Settings → Notifications → Setup guides** for the same manuals.
 
 ## Configure (any channel)
@@ -12,7 +12,7 @@ In the app, open **Project → Settings → Notifications → Setup guides** for
 1. Open **Project → Settings**.
 2. Under **Notifications**, click **Add destination** (owner/admin only).
 3. Choose the channel **type** and paste the matching **endpoint** (see manuals below).
-4. Select alert categories (issue levels, N+1, and/or lifecycle events such as `issue.resolved`).
+4. Select alert categories (issue levels, N+1, lifecycle events such as `issue.resolved`, and/or `volume.threshold`).
 5. Save, then optionally **Send test** to verify delivery.
 
 Endpoints are **encrypted at rest** and **masked** in the settings list (URLs, emails, and Telegram tokens).
@@ -133,9 +133,23 @@ Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against 
 | Member **assigns** / unassigns (`issue.assigned` enabled) | Yes |
 | Member **comments** (`issue.commented` enabled) | Yes |
 | Member **marks duplicate** (`issue.duplicated` enabled) | Yes |
+| Rolling **error/fatal** volume ≥ rule threshold (`volume.threshold` enabled) | Yes (after cooldown) |
 | Disabled destination | No |
 
-Lifecycle categories are **opt-in** on each destination (they are not included in the default category set). Delivery uses the same Messenger `async` path and SSRF guards as other outbound notifications.
+Lifecycle categories are **opt-in** on each destination (they are not included in the default category set). Subscribe destinations to **`volume.threshold`** to receive spike alerts. Delivery uses the same Messenger `async` path and SSRF guards as other outbound notifications.
+
+## Threshold alerts
+
+Configure rules under **Project → Settings → Threshold alerts** (owners/admins). Each rule defines:
+
+- `errorCount` — fire when at least N matching events are received
+- `windowMinutes` — rolling lookback window
+- `cooldownMinutes` — silence period after a fire
+- Optional `environment` / `releaseVersion` / `label`
+
+Beacon evaluates rules only after a newly ingested **`error`** or **`fatal`** event is persisted (count uses `event.received_at`). Suspended ingest skips evaluation.
+
+Canonical payload `event` is `volume.threshold` and includes `threshold_rule`, `count`, `threshold`, window/cooldown minutes, optional environment/release filters, and the project Settings URL. Quiet hours and digests apply the same as other categories.
 
 ## Quiet hours and digests
 
@@ -175,6 +189,7 @@ Outbound delivery runs on the **Messenger `async`** transport (`DeliverNotificat
 
 - Slack / Discord / Teams / Telegram / HTTP use `HttpClient` POSTs.
 - Email uses Symfony Mailer (`MAILER_DSN`).
+- Each attempt updates the destination **last delivery** summary and appends a bounded **delivery history** row (`notification_delivery_attempt`). Retention per destination defaults to **20** attempts (`BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`). Recent attempts appear under **Project → Settings → Health**.
 
 Ensure the Messenger worker is running (`make up` starts it in Docker).
 
@@ -199,9 +214,9 @@ Ensure the Messenger worker is running (`make up` starts it in Docker).
 }
 ```
 
-Other `event` values: `issue.regression`, `issue.resolved`, `issue.reopened`, `issue.assigned`, `issue.commented`, `issue.duplicated`, `performance.n_plus_one`, `test`.
+Other `event` values: `issue.regression`, `issue.resolved`, `issue.reopened`, `issue.assigned`, `issue.commented`, `issue.duplicated`, `performance.n_plus_one`, `volume.threshold`, `test`.
 
-For `issue.assigned`, the payload may include `assignee.previous` / `assignee.current`. For `issue.commented`, a `comment` object (uuid, author, body preview). For `issue.duplicated`, a `canonical_issue` object.
+For `issue.assigned`, the payload may include `assignee.previous` / `assignee.current`. For `issue.commented`, a `comment` object (uuid, author, body preview). For `issue.duplicated`, a `canonical_issue` object. For `volume.threshold`, see [Threshold alerts](#threshold-alerts).
 
 Channel-specific wrappers:
 

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `027-threshold-alerts`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Alert when error/event volume exceeds a configurable threshold in a short window (e.g. more than N errors in 15 minutes), in addition to existing `issue.new` / `issue.regression` notifications. Reuse digests, Messenger delivery, and project health signals.
 

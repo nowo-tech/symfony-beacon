@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'releases.title'|trans }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'releases'} %}
+
+<p class="mb-6 text-[var(--color-ink)]/65">{{ 'releases.intro'|trans }}</p>
+
+{% if releases is empty %}
+    <div class="panel text-[var(--color-ink)]/70">{{ 'releases.empty'|trans }}</div>
+{% else %}
+    <div class="mb-6 grid gap-6 lg:grid-cols-[16rem_1fr]">
+        <aside class="panel">
+            <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'releases.catalog.title'|trans }}</h2>
+            <ul class="space-y-1 text-sm">
+                {% for row in release_summaries %}
+                    <li>
+                        <a
+                            class="flex items-center justify-between gap-2 no-underline {% if row.release == selected_release %}font-semibold text-[var(--color-moss)]{% else %}text-[var(--color-ink)]{% endif %}"
+                            href="{{ path('project_releases', {id: project.uuid, release: row.release}) }}"
+                        >
+                            <span class="truncate">{{ row.release }}</span>
+                            <span class="font-mono text-xs text-[var(--color-ink)]/55">{{ row.new_issue_count }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <div class="space-y-6">
+            <form method="get" class="panel space-y-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="release-select">{{ 'releases.focus.label'|trans }}</label>
+                        <select id="release-select" class="input w-full" name="release">
+                            {% for release in releases %}
+                                <option value="{{ release }}" {% if release == selected_release %}selected{% endif %}>{{ release }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="compare-select">{{ 'releases.compare.label'|trans }}</label>
+                        <select id="compare-select" class="input w-full" name="compare">
+                            <option value="">{{ 'releases.compare.none'|trans }}</option>
+                            {% for release in releases %}
+                                {% if release != selected_release %}
+                                    <option value="{{ release }}" {% if release == compare_release %}selected{% endif %}>{{ release }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'releases.compare.help'|trans }}</p>
+                    </div>
+                </div>
+                <button class="btn-primary" type="submit">{{ 'releases.focus.submit'|trans }}</button>
+            </form>
+
+            {% if selected_release %}
+                <section class="panel">
+                    <h2 class="mb-2 text-lg font-semibold">{{ 'releases.new_in_release.title'|trans({'%release%': selected_release}) }}</h2>
+                    <p class="mb-3 text-sm text-[var(--color-ink)]/65">{{ 'releases.new_in_release.count'|trans({'%count%': selected_count}) }}</p>
+                    <a class="btn-ghost no-underline" href="{{ path('issue_index', {id: project.uuid, release: selected_release, status: ''}) }}">{{ 'releases.new_in_release.open_issue_list'|trans }}</a>
+                    {% if selected_issues is empty %}
+                        <p class="mt-4 text-sm text-[var(--color-ink)]/55">{{ 'releases.new_in_release.empty'|trans }}</p>
+                    {% else %}
+                        <ul class="mt-4 space-y-2 text-sm">
+                            {% for issue in selected_issues %}
+                                <li>
+                                    <a class="font-medium no-underline" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a>
+                                    <span class="text-[var(--color-ink)]/45"> · {{ issue.lastSeen|date('Y-m-d H:i') }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </section>
+            {% endif %}
+
+            {% if compare_result %}
+                <section class="panel">
+                    <h2 class="mb-3 text-lg font-semibold">{{ 'releases.compare.summary_title'|trans({'%a%': compare_result.releaseA, '%b%': compare_result.releaseB}) }}</h2>
+                    <div class="grid gap-4 md:grid-cols-3">
+                        {% for key, labelKey in {
+                            onlyA: 'releases.compare.only_a',
+                            onlyB: 'releases.compare.only_b',
+                            both: 'releases.compare.both'
+                        } %}
+                            {% set items = attribute(compare_result, key) %}
+                            {% set countKey = key ~ 'Count' %}
+                            <div>
+                                <h3 class="mb-2 text-sm font-semibold">
+                                    {% if key == 'both' %}
+                                        {{ labelKey|trans }}
+                                    {% else %}
+                                        {{ labelKey|trans({'%release%': key == 'onlyA' ? compare_result.releaseA : compare_result.releaseB}) }}
+                                    {% endif %}
+                                    <span class="font-mono text-[var(--color-ink)]/55">({{ attribute(compare_result, countKey) }})</span>
+                                </h3>
+                                {% if items is empty %}
+                                    <p class="text-sm text-[var(--color-ink)]/55">{{ 'releases.compare.empty'|trans }}</p>
+                                {% else %}
+                                    <ul class="space-y-1 text-sm">
+                                        {% for issue in items %}
+                                            <li><a class="no-underline" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            <section class="panel">
+                <h2 class="mb-2 text-lg font-semibold">{{ 'releases.environment_compare.title'|trans }}</h2>
+                <p class="mb-3 text-sm text-[var(--color-ink)]/65">{{ 'releases.environment_compare.help'|trans }}</p>
+                <form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="grid gap-3 sm:grid-cols-3">
+                    <input type="hidden" name="status" value="">
+                    {% if selected_release %}
+                        <input type="hidden" name="release" value="{{ selected_release }}">
+                    {% endif %}
+                    <div>
+                        <label class="mb-1 block text-xs uppercase tracking-wide text-[var(--color-ink)]/60" for="env-a">{{ 'releases.environment_compare.environment_a'|trans }}</label>
+                        <input id="env-a" class="input w-full" name="environment" value="{{ environment_a }}" placeholder="production">
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs uppercase tracking-wide text-[var(--color-ink)]/60" for="env-b">{{ 'releases.environment_compare.environment_b'|trans }}</label>
+                        <input id="env-b" class="input w-full" name="compare" value="{{ environment_b }}" placeholder="staging">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="btn-primary" type="submit">{{ 'releases.environment_compare.open_issue_list'|trans }}</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

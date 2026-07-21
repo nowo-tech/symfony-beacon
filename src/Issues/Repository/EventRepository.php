@@ -129,6 +129,48 @@ class EventRepository extends ServiceEntityRepository
         return $this->countReceivedSinceForProject($project, $start);
     }
 
+    /**
+     * Distinct release versions seen on events for a project, newest first.
+     *
+     * @return list<string>
+     */
+    public function findDistinctReleaseVersions(Project $project): array
+    {
+        $projectId = $project->getId();
+        if (null === $projectId) {
+            return [];
+        }
+
+        $sql = <<<'SQL'
+            SELECT e.release_version AS release_value
+            FROM event e
+            INNER JOIN issue i ON i.id = e.issue_id
+            WHERE i.project_id = :projectId
+              AND e.release_version IS NOT NULL
+              AND e.release_version <> ''
+            GROUP BY e.release_version
+            ORDER BY MAX(e.received_at) DESC, e.release_version DESC
+            SQL;
+
+        /** @var list<int|string> $rows */
+        $rows = $this->getEntityManager()->getConnection()->fetchFirstColumn($sql, [
+            'projectId' => $projectId,
+        ], [
+            'projectId' => ParameterType::INTEGER,
+        ]);
+
+        $releases = [];
+        foreach ($rows as $row) {
+            $normalized = Issue::normalizeRelease((string) $row);
+            if (null === $normalized) {
+                continue;
+            }
+            $releases[] = $normalized;
+        }
+
+        return array_values(array_unique($releases));
+    }
+
     public function countReceivedSinceForProject(Project $project, DateTimeImmutable $since): int
     {
         return (int) $this->createQueryBuilder('e')
@@ -140,6 +182,35 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('since', $since)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function countReceivedSince(
+        Project $project,
+        DateTimeImmutable $since,
+        ?string $environment,
+        ?string $release,
+    ): int {
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.level IN (:levels)')
+            ->andWhere('e.receivedAt >= :since')
+            ->setParameter('project', $project)
+            ->setParameter('levels', ['error', 'fatal'])
+            ->setParameter('since', $since);
+
+        if (null !== $environment && '' !== $environment) {
+            $qb->andWhere('e.environment = :environment')
+                ->setParameter('environment', $environment);
+        }
+
+        if (null !== $release && '' !== trim($release)) {
+            $qb->andWhere('e.releaseVersion = :release')
+                ->setParameter('release', trim($release));
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     public function findLastReceivedAtForProject(Project $project): ?DateTimeImmutable

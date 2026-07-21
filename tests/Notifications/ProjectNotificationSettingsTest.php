@@ -6,6 +6,7 @@ namespace App\Tests\Notifications;
 
 use App\Identity\Entity\User;
 use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
@@ -92,6 +93,45 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('https://exa', $client->getResponse()->getContent() ?: '');
         self::assertStringNotContainsString('very-secret-token-abcdef', $client->getResponse()->getContent() ?: '');
+    }
+
+    public function testOwnerCanCreateThresholdRuleAndMemberCannot(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('owner-threshold@example.com');
+        $this->login($client, $owner);
+
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        self::assertResponseIsSuccessful();
+
+        $token = $crawler->filter('input[name="project_threshold_rule[_token]"]')->attr('value');
+        self::assertNotEmpty($token);
+
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/threshold-rules/new', [
+            'project_threshold_rule' => [
+                '_token' => $token,
+                'label' => 'Production spike',
+                'enabled' => '1',
+                'errorCount' => '50',
+                'windowMinutes' => '15',
+                'cooldownMinutes' => '60',
+                'environment' => 'production',
+                'releaseVersion' => '1.2.3',
+            ],
+        ]);
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertSelectorTextContains('body', 'Production spike');
+
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $rules = $em->getRepository(ProjectThresholdRule::class)->findBy(['project' => $project]);
+        self::assertCount(1, $rules);
+        self::assertSame('production', $rules[0]->getEnvironment());
+        self::assertSame('1.2.3', $rules[0]->getReleaseVersion());
+
+        $member = $this->addMember($project, 'member-threshold@example.com', ProjectRole::Member);
+        $this->login($client, $member);
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        self::assertResponseStatusCodeSame(403);
     }
 
     private function addMember(Project $project, string $email, ProjectRole $role): User

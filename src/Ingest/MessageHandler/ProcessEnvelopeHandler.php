@@ -15,6 +15,7 @@ use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\FingerprintCalculator;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Notifications\Service\NotificationDispatcher;
+use App\Notifications\Service\VolumeThresholdEvaluator;
 use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
@@ -40,6 +41,7 @@ final readonly class ProcessEnvelopeHandler
         private EventRepository $eventRepository,
         private DailyProjectStatRepository $dailyProjectStatRepository,
         private NotificationDispatcher $notificationDispatcher,
+        private VolumeThresholdEvaluator $volumeThresholdEvaluator,
         private IssueHistoryRecorder $historyRecorder,
         private EntityManagerInterface $entityManager,
     ) {
@@ -145,6 +147,16 @@ final readonly class ProcessEnvelopeHandler
             $this->notificationDispatcher->dispatchNewIssue($project, $issue);
         } elseif ($isRegression) {
             $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
+        }
+
+        $level = strtolower((string) ($payload['level'] ?? 'error'));
+        if (\in_array($level, ['error', 'fatal'], true)) {
+            $this->volumeThresholdEvaluator->evaluate(
+                $project,
+                isset($payload['environment']) ? (string) $payload['environment'] : null,
+                isset($payload['release']) ? (string) $payload['release'] : null,
+                $receivedAt,
+            );
         }
     }
 

@@ -12,11 +12,13 @@ parameters:
     env(BEACON_INGEST_RATE_LIMIT): '120'
     env(BEACON_EVENT_QUOTA_DAILY): '0'
     env(BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS): '0'
+    env(BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT): '20'
     beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
     beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
     beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
     beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
     beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
+    beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -53,6 +55,10 @@ services:
     App\Notifications\Service\OutboundUrlGuard:
         arguments:
             $allowPrivateUrls: '%beacon.notifications.allow_private_urls%'
+
+    App\Notifications\Service\NotificationDeliveryHistoryRecorder:
+        arguments:
+            $historyLimit: '%beacon.notifications.delivery_history_limit%'
 
     # AuditKit ships entity:null tags; DoctrineBundle 3 skips attach — bridge as event listener.
     App\Shared\Audit\AuditableDoctrineBridge:

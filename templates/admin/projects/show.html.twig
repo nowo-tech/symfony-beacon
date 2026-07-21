@@ -60,6 +60,7 @@
     </form>
     <form method="post" action="{{ path('admin_view_as_member_enable') }}" class="mt-3">
         <input type="hidden" name="_token" value="{{ csrf_token('admin_view_as_member_enable') }}">
+        <input type="hidden" name="project_uuid" value="{{ project.uuid }}">
         <input type="hidden" name="redirect" value="{{ path('project_settings', {id: project.uuid}) }}">
         <button class="btn-ghost" type="submit">{{ 'admin_projects.view_as_member'|trans }}</button>
     </form>
@@ -168,6 +169,80 @@
         <button class="btn-primary" type="submit">{{ 'project.members.add'|trans }}</button>
     </form>
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.add_member_help'|trans }}</p>
+</section>
+
+<section class="panel mb-6">
+    <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+            <h2 class="text-lg font-semibold">{{ 'admin_projects.audit_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.audit_intro'|trans }}</p>
+        </div>
+        <a class="text-sm no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.audit_reset'|trans }}</a>
+    </div>
+
+    <form method="get" class="mb-4 grid gap-3 sm:grid-cols-4">
+        <div class="sm:col-span-2">
+            <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="project-audit-action">{{ 'admin_projects.audit_filter_action'|trans }}</label>
+            <select id="project-audit-action" class="input w-full" name="action">
+                <option value="">{{ 'admin_projects.audit_filter_all_actions'|trans }}</option>
+                {% for action in projectAuditActions %}
+                    <option value="{{ action.value }}" {% if projectAuditFilter.action == action.value %}selected{% endif %}>
+                        {{ ('users.activity.action.' ~ action.value)|trans }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="project-audit-from">{{ 'admin_projects.audit_filter_from'|trans }}</label>
+            <input id="project-audit-from" class="input w-full" type="date" name="from" value="{{ projectAuditFilter.from }}">
+        </div>
+        <div>
+            <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="project-audit-to">{{ 'admin_projects.audit_filter_to'|trans }}</label>
+            <input id="project-audit-to" class="input w-full" type="date" name="to" value="{{ projectAuditFilter.to }}">
+        </div>
+        <div class="flex flex-wrap items-end gap-2 sm:col-span-4">
+            <button class="btn-primary" type="submit">{{ 'admin_projects.audit_apply'|trans }}</button>
+            <a class="btn-ghost no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.audit_clear'|trans }}</a>
+        </div>
+    </form>
+
+    {% if projectAuditEntries is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin_projects.audit_empty'|trans }}</p>
+    {% else %}
+        <ul id="project-audit-timeline" class="space-y-3 text-sm">
+            {% for entry in projectAuditEntries %}
+                <li data-testid="project-audit-entry" class="border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
+                        <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                    </div>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/65">
+                        {% if entry.actor %}
+                            {{ 'users.activity.by'|trans({'%name%': entry.actor.displayName}) }}
+                        {% else %}
+                            {{ 'users.activity.by_system'|trans }}
+                        {% endif %}
+                        {% if entry.subjectUser and (not entry.actor or entry.subjectUser.id != entry.actor.id) %}
+                            · {{ 'users.activity.subject'|trans({'%name%': entry.subjectUser.displayName}) }}
+                        {% endif %}
+                        {% if entry.ipAddress %}
+                            · {{ entry.ipAddress }}
+                        {% endif %}
+                    </div>
+                    {% if entry.context is not empty %}
+                        <dl class="mt-2 grid gap-1 text-xs text-[var(--color-ink)]/60 sm:grid-cols-2">
+                            {% for key, value in entry.context %}
+                                <div>
+                                    <dt class="inline font-medium">{{ ('users.activity.context.' ~ key)|trans }}:</dt>
+                                    <dd class="inline">{{ value }}</dd>
+                                </div>
+                            {% endfor %}
+                        </dl>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </section>
 
 <section class="panel mb-6">

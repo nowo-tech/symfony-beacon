@@ -5,4 +5,4 @@
 
 - [x] Draft spec written in English
 - [x] Scope bounded; out-of-scope listed
-- [ ] Plan / clarify before implement
+- [x] Plan / clarify before implement

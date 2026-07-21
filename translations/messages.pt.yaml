@@ -164,6 +164,9 @@ project:
         delivery_ok: Sucesso
         delivery_fail: Fracassado
         never_delivered: Ainda não há entregas.
+        history_empty: Nenhuma tentativa de entrega recente registada.
+        history_show: 'Mostrar tentativas recentes (%count%)'
+        history_hide: 'Ocultar tentativas recentes (%count%)'
     new:
         title: Novo projeto
         submit: Criar projeto

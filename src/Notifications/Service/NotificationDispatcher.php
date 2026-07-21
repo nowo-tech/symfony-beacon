@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Repository\NotificationDestinationRepository;
@@ -114,6 +115,15 @@ final readonly class NotificationDispatcher
             $this->enqueueOrBuffer($destination->getId() ?? 0, $destination, $payload);
         }
         $this->entityManager->flush();
+    }
+
+    public function dispatchVolumeThreshold(Project $project, ProjectThresholdRule $rule, int $actualCount): void
+    {
+        $this->dispatchCategoryPayload(
+            $project,
+            NotificationCategories::VOLUME_THRESHOLD,
+            $this->payloadBuilder->forVolumeThreshold($project, $rule, $actualCount),
+        );
     }
 
     public function dispatchTest(Project $project, int $destinationId, string $label): void

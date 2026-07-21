@@ -19,6 +19,7 @@ nav:
     issues: Issues
     performance: Performance
     analytics: Analytics
+    releases: Releases
 api_docs:
     title: API docs
     intro: Explore Envelope ingest and related HTTP endpoints. Use Authorize with an X-Beacon-Auth header (beacon_key and beacon_secret from your project DSN).
@@ -163,7 +164,7 @@ project:
         ingest_disabled_banner: Envelope ingest is suspended for this project. Existing data remains readable.
     health:
         title: Health
-        intro: Instance Messenger queue depth and last notification delivery status for this project’s destinations.
+        intro: Instance Messenger queue depth and recent notification delivery status for this project’s destinations.
         messenger_pending: Messenger async pending
         messenger_unavailable: Queue depth unavailable
         instance_wide: instance-wide
@@ -175,6 +176,9 @@ project:
         delivery_ok: Success
         delivery_fail: Failed
         never_delivered: No deliveries yet.
+        history_empty: No recent delivery attempts recorded.
+        history_show: 'Show recent attempts (%count%)'
+        history_hide: 'Hide recent attempts (%count%)'
     new:
         title: New project
         submit: Create project
@@ -498,6 +502,35 @@ analytics:
         errors: Errors
         transactions: Transactions
         nplus1_groups: N+1 groups
+releases:
+    title: Release health
+    intro: Pick a release to see how many issues were first seen there, compare two releases, or jump into the existing issue-list compare.
+    empty: No release data is available for this project yet.
+    focus:
+        label: Release
+        submit: Update release health
+    new_in_release:
+        title: 'New in %release%'
+        count: '%count% issues were first seen in this release.'
+        open_issue_list: Open filtered issue list
+        empty: No issues were first seen in this release.
+    compare:
+        label: Compare with release
+        none: Do not compare
+        help: Optionally compare the selected release with another release using the current issue set.
+        summary_title: 'Compare %a% vs %b%'
+        only_a: 'Only in %release%'
+        only_b: 'Only in %release%'
+        both: In both releases
+        empty: No issues in this set
+    catalog:
+        title: Releases
+    environment_compare:
+        title: Environment compare
+        environment_a: Environment A
+        environment_b: Environment B
+        open_issue_list: Open compare on issue list
+        help: This reuses the existing `014` issue-list compare. When a release is selected, the link keeps that release filter.
 appearance:
     title: Appearance
     intro: Customize brand name, accent colors, and danger colors for this Beacon instance. Only administrators can change these settings.
@@ -856,6 +889,16 @@ admin_projects:
     view_as_member: View as member
     view_as_banner: You are viewing projects as a member (admin privileges for project actions are limited).
     view_as_exit: Exit view-as-member
+    audit_title: Audit timeline
+    audit_intro: Filter recorded administrative actions for this project.
+    audit_reset: Reset filters
+    audit_filter_action: Action type
+    audit_filter_all_actions: All actions
+    audit_filter_from: From
+    audit_filter_to: To
+    audit_apply: Apply filters
+    audit_clear: Clear
+    audit_empty: No recorded project actions match the current filters.
 
 admin:
     hub:
@@ -944,7 +987,7 @@ legal:
 
 notifications:
     title: Notifications
-    intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP endpoint when new issues, regressions, or N+1 groups appear.
+    intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP endpoint when new issues, regressions, threshold spikes, or N+1 groups appear.
     empty: No destinations yet. Add a channel to notify your team.
     add: Add destination
     edit: Edit
@@ -995,6 +1038,7 @@ notifications:
         info: Info
         debug: Debug
         n_plus_one: N+1 detections
+        'volume.threshold': Volume thresholds
         issue.resolved: Issue resolved
         issue.reopened: Issue reopened
         issue.assigned: Issue assigned
@@ -1069,3 +1113,56 @@ notifications:
             step3: Confirm your service receives the canonical JSON body (event, summary, project, issue, url, category).
             payload: Canonical JSON payload as the request body (User-Agent symfony-beacon-notifications/1.0).
             tip: Prefer HTTPS and authenticate your receiver. Avoid pointing at internal or cloud metadata addresses.
+
+thresholds:
+    title: Threshold alerts
+    intro: Create rolling volume alerts when error or fatal events exceed a configured count inside a time window.
+    ingest_disabled: Ingest is suspended for this project, so threshold rules are not evaluated.
+    empty: No threshold rules yet. Add one to catch sudden spikes.
+    add: Add rule
+    edit: Edit
+    enable: Enable
+    disable: Disable
+    disabled: Disabled
+    delete: Delete
+    delete_confirm: Delete this threshold rule?
+    save: Save rule
+    cancel: Cancel
+    new_title: New threshold rule
+    edit_title: Edit threshold rule
+    form_help: Configure a rolling error/fatal volume alert. Optional environment and release filters scope the count before notification routing, quiet hours, and digests apply.
+    unnamed: Unnamed rule
+    summary: '%count% events in %window% min · %cooldown% min cooldown'
+    last_fired: Last fired
+    never_fired: Never fired yet.
+    filter:
+        environment: 'Environment: %value%'
+        release: 'Release: %value%'
+        all_events: All environments and releases
+    form:
+        label: Label
+        label_help: Optional internal name shown in Settings and payloads.
+        enabled: Enabled
+        error_count: Error count
+        error_count_help: Alert when at least this many error/fatal events are received in the rolling window.
+        window_minutes: Window (minutes)
+        window_minutes_help: Rolling lookback window from 1 to 1440 minutes.
+        cooldown_minutes: Cooldown (minutes)
+        cooldown_minutes_help: Suppress duplicate alerts for this rule during the cooldown window.
+        environment: Environment filter
+        environment_help: Leave blank to count all environments.
+        release: Release filter
+        release_help: Leave blank to count all releases.
+    flash:
+        created: Threshold rule created.
+        updated: Threshold rule updated.
+        enabled: Threshold rule enabled.
+        disabled: Threshold rule disabled.
+        deleted: Threshold rule deleted.
+    validation:
+        label_length: Label must be at most 120 characters.
+        error_count_min: Error count must be at least 1.
+        window_range: Window must be between 1 and 1440 minutes.
+        cooldown_range: Cooldown must be between 1 and 10080 minutes.
+        environment_length: Environment must be at most 80 characters.
+        release_length: Release must be at most 120 characters.

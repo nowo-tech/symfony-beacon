@@ -43,7 +43,7 @@
             <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-name">{{ 'issues.views.save_name'|trans }}</label>
             <input id="saved-view-name" class="input" type="text" name="name" maxlength="80" placeholder="{{ 'issues.views.save_placeholder'|trans }}" required>
         </div>
-        <button class="btn-ghost" type="submit">{{ 'issues.views.save'|trans }}</button>
+        <button class="btn-ghost issue-saved-views__save" type="submit">{{ 'issues.views.save'|trans }}</button>
     </form>
     {% if savedViews|default([]) is not empty %}
         <div class="flex flex-wrap gap-2">
