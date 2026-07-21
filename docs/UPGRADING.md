@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.3 to the next release](#upgrading-from-0123-to-the-next-release)
+- [Upgrading from 0.12.4 to the next release](#upgrading-from-0124-to-the-next-release)
+- [Upgrading from 0.12.3 to 0.12.4](#upgrading-from-0123-to-0124)
 - [Upgrading from 0.12.2 to 0.12.3](#upgrading-from-0122-to-0123)
 - [Upgrading from 0.12.1 to 0.12.2](#upgrading-from-0121-to-0122)
 - [Upgrading from 0.12.0 to 0.12.1](#upgrading-from-0120-to-0121)
@@ -33,16 +34,33 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.3 to the next release
+## Upgrading from 0.12.4 to the next release
 
 ```bash
 git pull
 composer install
 php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
 make vite-build
 ```
 
-No additional steps documented yet.
+## Upgrading from 0.12.3 to 0.12.4
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+make vite-build
+```
+
+### Install / seed layers (`055`) + setup wizard (`056`)
+
+- **Platform seed** (`app:seed-platform` / `make seed-platform`) upserts menus and breadcrumbs. Use this after upgrades instead of re-running demo seed only for navigation.
+- **`make bootstrap`** = migrate + platform seed (no longer auto-creates the demo user).
+- **`make seed`** = platform + demo user/project + `.demo-client.env`.
+- **Sample telemetry** moved to `app:seed-sample` (`make seed-sample`, sizes `dev`/`load`/`huge`). See [INSTALL.md](INSTALL.md).
+- **Setup wizard** at `/setup` (Administration card + dashboard banner). Migration sets `setup_completed_at` on existing instances so upgrades are not interrupted.
 
 ## Upgrading from 0.12.2 to 0.12.3
 

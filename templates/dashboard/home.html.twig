@@ -7,6 +7,16 @@
     data-controller="confirm-dialog"
     data-confirm-dialog-open-on-connect-value="{{ openNewProject ? 'true' : 'false' }}"
 >
+    {% if showSetupBanner|default(false) %}
+        <div class="panel mb-6 flex flex-col gap-3 border-[var(--color-moss)]/35 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-[var(--color-ink)]">{{ 'setup.banner.title'|trans }}</p>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.banner.body'|trans }}</p>
+            </div>
+            <a class="btn-primary shrink-0 no-underline" href="{{ path('setup_wizard') }}">{{ 'setup.banner.cta'|trans }}</a>
+        </div>
+    {% endif %}
+
     <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div class="min-w-0">
             <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'projects.title'|trans }}</h1>

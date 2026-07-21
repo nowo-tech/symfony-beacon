@@ -34,6 +34,10 @@ class InstanceSettings implements AuditableInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $mailerFrom = null;
 
+    /** When set, the first-run setup wizard is considered finished / dismissed. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $setupCompletedAt = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -123,6 +127,30 @@ class InstanceSettings implements AuditableInterface
 
         $trimmed = trim($mailerFrom);
         $this->mailerFrom = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getSetupCompletedAt(): ?\DateTimeImmutable
+    {
+        return $this->setupCompletedAt;
+    }
+
+    public function isSetupCompleted(): bool
+    {
+        return null !== $this->setupCompletedAt;
+    }
+
+    public function markSetupCompleted(?\DateTimeImmutable $at = null): self
+    {
+        $this->setupCompletedAt = $at ?? new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function clearSetupCompleted(): self
+    {
+        $this->setupCompletedAt = null;
 
         return $this;
     }

@@ -24,7 +24,7 @@ Docker clients (BeaconBundle FrankenPHP demo) should prefer **HTTP ingest** on p
 http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9081/1
 ```
 
-Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo` / `make seed`.
+Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo` / `make seed` (after `make seed-platform` or `make bootstrap`).
 
 ### Local demo sync (BeaconBundle)
 

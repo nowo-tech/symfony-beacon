@@ -4,18 +4,10 @@ declare(strict_types=1);
 
 namespace App\Identity\Command;
 
-use App\Analytics\Service\AnalyticsDemoSeeder;
-use App\Identity\Entity\User;
-use App\Identity\Repository\UserRepository;
-use App\Performance\Service\PerformanceDemoSeeder;
-use App\Project\Entity\Project;
+use App\Identity\Service\DemoIdentitySeeder;
 use App\Project\Entity\ProjectApiKey;
-use App\Project\Entity\ProjectMembership;
-use App\Project\Repository\ProjectRepository;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
-use App\Shared\ProjectRole;
-use DateTime;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,14 +16,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Seeds a demo admin user, sample project/API key, menus, N+1 samples, and analytics.
+ * Seeds a demo admin user, sample project/API key, and optional client env for BeaconBundle.
  *
- * Writes {@see self::CLIENT_ENV_FILENAME} so the BeaconBundle FrankenPHP demo can sync BEACON_DSN.
+ * Navigation catalogs: `app:seed-platform`. Sample telemetry: `app:seed-sample`.
  */
-#[AsCommand(name: 'app:seed-demo', description: 'Seed a demo user, project, API key, breadcrumbs, menu, N+1 samples, and analytics')]
+#[AsCommand(
+    name: 'app:seed-demo',
+    description: 'Seed demo user + project + API key (+ optional .demo-client.env)',
+)]
 final class SeedDemoCommand extends Command
 {
     /**
@@ -46,13 +40,9 @@ final class SeedDemoCommand extends Command
     public const string CLIENT_ENV_FILENAME = '.demo-client.env';
 
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly ProjectRepository $projectRepository,
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly DemoIdentitySeeder $demoIdentitySeeder,
         private readonly BreadcrumbDemoSeeder $breadcrumbDemoSeeder,
         private readonly DashboardMenuDemoSeeder $dashboardMenuDemoSeeder,
-        private readonly PerformanceDemoSeeder $performanceDemoSeeder,
-        private readonly AnalyticsDemoSeeder $analyticsDemoSeeder,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {
@@ -66,7 +56,8 @@ final class SeedDemoCommand extends Command
             ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Demo user password', 'admin123')
             ->addOption('base-url', null, InputOption::VALUE_REQUIRED, 'Browser / UI base URL for DSN display', 'https://localhost:9444')
             ->addOption('ingest-base-url', null, InputOption::VALUE_REQUIRED, 'Docker client ingest base URL for BEACON_DSN', 'http://host.docker.internal:9081')
-            ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)');
+            ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)')
+            ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb seed');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -77,83 +68,37 @@ final class SeedDemoCommand extends Command
         $baseUrl = (string) $input->getOption('base-url');
         $ingestBaseUrl = (string) $input->getOption('ingest-base-url');
 
-        $user = $this->userRepository->findOneByEmail($email);
-        if (!$user instanceof User) {
-            $user = new User();
-            $user->setEmail($email);
-            $user->setDisplayName('Demo Admin');
-            $user->setRoles(['ROLE_ADMIN']);
-            $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-            $user->setPasswordChangedAt(new DateTime());
-            $this->userRepository->save($user);
+        if ((bool) $input->getOption('with-platform')) {
+            if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
+                $io->success('Seeded / updated default breadcrumb collection');
+            }
+            if ($this->dashboardMenuDemoSeeder->seedIfEmpty()) {
+                $io->success('Seeded / updated navigation menus');
+            }
+        }
+
+        $result = $this->demoIdentitySeeder->seed($email, $password);
+        if ($result['user_created']) {
             $io->success(\sprintf('Created user %s', $email));
         } else {
             $io->note(\sprintf('User %s already exists', $email));
         }
-
-        $project = $this->projectRepository->findOneBy(['slug' => 'demo']);
-        $apiKey = null;
-        if (null === $project) {
-            $project = new Project();
-            $project->setName('Demo');
-            $project->setSlug('demo');
-            $project->setDescription('Demo project for local ingest');
-
-            $membership = new ProjectMembership();
-            $membership->setUser($user);
-            $membership->setRole(ProjectRole::Owner);
-            $project->addMembership($membership);
-
-            $apiKey = ProjectApiKey::generate($project, 'Demo key', self::DEMO_PUBLIC_KEY);
-            $project->addApiKey($apiKey);
-            $this->projectRepository->save($project);
-            $io->success('Created demo project');
+        if ($result['project_created']) {
+            $io->success('Created demo project / API key');
         } else {
-            $first = $project->getApiKeys()->first();
-            $apiKey = $first instanceof ProjectApiKey ? $first : null;
-            if (!$apiKey instanceof ProjectApiKey) {
-                $apiKey = ProjectApiKey::generate($project, 'Demo key', self::DEMO_PUBLIC_KEY);
-                $project->addApiKey($apiKey);
-                $this->projectRepository->save($project);
-                $io->success('Created demo API key on existing project');
-            } else {
-                $io->note('Demo project already exists');
-            }
+            $io->note('Demo project already exists');
         }
 
-        if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
-            $io->success('Seeded default breadcrumb collection');
-        } else {
-            $io->note('Default breadcrumb collection already exists');
-        }
-
-        if ($this->dashboardMenuDemoSeeder->seedIfEmpty()) {
-            $io->success('Seeded main navigation menu');
-        } else {
-            $io->note('Main navigation menu already exists');
-        }
-
-        if ($project instanceof Project && $this->performanceDemoSeeder->seedIfEmpty($project)) {
-            $io->success('Seeded performance samples (including N+1). Open /projects/{uuid}/performance?nplus1=1');
-        } else {
-            $io->note('Performance N+1 demo samples already exist');
-        }
-
-        if ($project instanceof Project && $this->analyticsDemoSeeder->seedIfEmpty($project)) {
-            $io->success('Seeded analytics daily stats (14-day window). Open /projects/{uuid}/analytics');
-        } else {
-            $io->note('Analytics daily stats already cover the demo window');
-        }
-
+        $apiKey = $result['api_key'];
         $uiDsn = $apiKey->buildDsn($baseUrl);
         $clientDsn = $apiKey->buildDsn($ingestBaseUrl);
         $io->writeln('UI DSN: '.$uiDsn);
         $io->writeln('Client DSN (Docker / BeaconBundle demo): '.$clientDsn);
         $io->writeln('Public key: '.$apiKey->getPublicKey());
         $io->writeln(\sprintf('Login: %s / %s', $email, $password));
+        $io->note('Sample telemetry: bin/console app:seed-sample --size=dev');
 
         $writeOpt = $input->getOption('write-client-env');
-        // Skip only when explicitly empty; null (option omitted) writes the default path.
         if (!\is_string($writeOpt) || '' !== $writeOpt) {
             $path = \is_string($writeOpt) ? $writeOpt : $this->projectDir.'/'.self::CLIENT_ENV_FILENAME;
             $this->writeClientEnv($path, $clientDsn, $uiDsn, $apiKey, $email, $password);

@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'setup.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-2xl">
+    <div class="mb-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-moss)]">{{ 'setup.eyebrow'|trans }}</p>
+        <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'setup.title'|trans }}</h1>
+        <p class="mt-2 text-sm text-[var(--color-ink)]/65">{{ 'setup.intro'|trans }}</p>
+    </div>
+
+    {% if setupCompleted %}
+        <div class="panel mb-6 border-[var(--color-moss)]/40 bg-[var(--beacon-flash-ok-bg)] text-sm text-[var(--beacon-flash-ok-text)]">
+            {{ 'setup.already_done'|trans }}
+            <a class="ml-2 font-semibold underline" href="{{ path('dashboard_home') }}">{{ 'setup.back_dashboard'|trans }}</a>
+        </div>
+    {% endif %}
+
+    <ol class="grid gap-4">
+        <li class="panel">
+            <h2 class="text-lg font-semibold">1. {{ 'setup.step_platform.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_platform.body'|trans }}</p>
+            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                <input type="hidden" name="action" value="platform">
+                <button type="submit" class="btn-primary">{{ 'setup.step_platform.cta'|trans }}</button>
+            </form>
+        </li>
+
+        <li class="panel">
+            <h2 class="text-lg font-semibold">2. {{ 'setup.step_demo.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_demo.body'|trans }}</p>
+            {% if hasDemoProject %}
+                <p class="mt-2 text-sm text-[var(--color-moss)]">{{ 'setup.step_demo.exists'|trans }}</p>
+            {% endif %}
+            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                <input type="hidden" name="action" value="demo">
+                <button type="submit" class="btn-ghost">{{ 'setup.step_demo.cta'|trans }}</button>
+            </form>
+        </li>
+
+        <li class="panel">
+            <h2 class="text-lg font-semibold">3. {{ 'setup.step_sample.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_sample.body'|trans }}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <form method="post" action="{{ path('setup_wizard_run') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="sample_dev">
+                    <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.dev'|trans }}</button>
+                </form>
+                <form method="post" action="{{ path('setup_wizard_run') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="sample_load">
+                    <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.load'|trans }}</button>
+                </form>
+            </div>
+            {% if not hasDemoProject %}
+                <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'setup.step_sample.need_demo'|trans }}</p>
+            {% endif %}
+        </li>
+
+        <li class="panel">
+            <h2 class="text-lg font-semibold">4. {{ 'setup.step_done.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_done.body'|trans }}</p>
+            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4 flex flex-wrap gap-2">
+                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                <input type="hidden" name="action" value="complete">
+                <button type="submit" class="btn-primary">{{ 'setup.step_done.cta'|trans }}</button>
+                <a class="btn-ghost no-underline" href="{{ path('dashboard_home') }}">{{ 'setup.back_dashboard'|trans }}</a>
+            </form>
+        </li>
+    </ol>
+
+    <p class="mt-6 text-xs text-[var(--color-ink)]/50">{{ 'setup.cli_hint'|trans }}</p>
+</div>
+{% endblock %}

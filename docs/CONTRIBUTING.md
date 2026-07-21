@@ -18,6 +18,7 @@
 
 | Doc | Audience |
 |-----|----------|
+| [INSTALL.md](INSTALL.md) | First install + seed layers (platform / demo / sample) |
 | [README.md](../README.md) | Product overview + quick start |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Why modular Symfony / flows |
 | [API.md](API.md) | Ingest, health, OpenAPI pointer |

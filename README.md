@@ -66,10 +66,11 @@ git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
 cp .env.dist .env
 make up          # starts stack + builds frontend into public/build/
-make bootstrap   # migrate + seed demo user/project + write .demo-client.env
-# Optional live CSS/JS reload: make vite-hmr  (stop it + make vite-build when done)
+make bootstrap   # migrate + platform menus/breadcrumbs
+make seed        # optional: demo admin + project + .demo-client.env
+# Optional QA samples: make seed-sample
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
-# Option B — seed only (if migrate already done): make seed
+# Option B — demo login after make seed (see below)
 ```
 
 - HTTP: http://localhost:9081  
@@ -131,6 +132,7 @@ docker compose exec php php bin/phpunit
 
 ## Documentation
 
+- [Install & seed layers](docs/INSTALL.md)
 - [Architecture rationale](docs/ARCHITECTURE.md)
 - [HTTP API overview](docs/API.md)
 - [Product roadmap](docs/ROADMAP.md)

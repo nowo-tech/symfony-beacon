@@ -11,6 +11,7 @@ nav:
     admin_projects: Projects
     appearance: Appearance
     mailer: Mailer
+    setup: Setup
     menus: Menus
     breadcrumbs: Breadcrumbs
     toggle_sidebar: Toggle navigation
@@ -1008,8 +1009,48 @@ admin:
         projects: List all projects, manage members and group links, or delete a project.
         appearance: Brand name and accent colors.
         mailer: Encrypted Mailer DSN and From address for transactional email.
+        setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
+setup:
+    eyebrow: First run
+    title: Instance setup
+    intro: Install navigation catalogs and optional demo data. Same steps as the CLI seed layers.
+    already_done: Setup is marked complete.
+    back_dashboard: Back to dashboard
+    banner:
+        title: Finish instance setup
+        body: Install menus/breadcrumbs and optional demo samples for this Beacon instance.
+        cta: Open setup
+    step_platform:
+        title: Platform navigation
+        body: Upsert dashboard menus and breadcrumbs (safe to run again after upgrades).
+        cta: Install navigation
+    step_demo:
+        title: Demo project
+        body: Create the local demo admin (if missing) and demo project with an API key.
+        cta: Create demo project
+        exists: Demo project already present.
+    step_sample:
+        title: Sample telemetry
+        body: Load synthetic issues for QA. Requires the demo project. Huge size stays CLI-only.
+        dev: Load sample (dev)
+        load: Load sample (load)
+        need_demo: Create the demo project first.
+    step_done:
+        title: Done
+        body: Dismiss this wizard. You can reopen Setup from Administration anytime.
+        cta: Mark setup complete
+    cli_hint: 'CLI equivalent: make bootstrap && make seed && make seed-sample — see docs/INSTALL.md'
+    flash:
+        platform_ok: Navigation catalogs updated.
+        demo_ok: Demo user / project ready.
+        demo_exists: Demo user and project already exist.
+        sample_ok: Sample telemetry loaded.
+        complete: Setup marked complete.
+        unknown_action: Unknown setup action.
+        failed: Setup action failed.
+
 legal:
     nav:
         label: Legal

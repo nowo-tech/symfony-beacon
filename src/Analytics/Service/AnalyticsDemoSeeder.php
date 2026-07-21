@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final readonly class AnalyticsDemoSeeder
 {
-    private const int DAYS = 14;
+    private const int DEFAULT_DAYS = 14;
 
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -23,16 +23,27 @@ final readonly class AnalyticsDemoSeeder
     }
 
     /**
-     * Fills missing days in the last {@see DAYS} window (does not overwrite existing rows).
+     * Fills missing days in the last {@see DEFAULT_DAYS} window (does not overwrite existing rows).
      *
      * @return bool true when at least one day was inserted
      */
     public function seedIfEmpty(Project $project): bool
     {
+        return $this->seedWindow($project, self::DEFAULT_DAYS);
+    }
+
+    /**
+     * Fills missing days in the last $days window (does not overwrite existing rows).
+     *
+     * @return bool true when at least one day was inserted
+     */
+    public function seedWindow(Project $project, int $days): bool
+    {
+        $days = max(1, $days);
         $created = false;
         $today = new DateTimeImmutable('today');
 
-        for ($i = self::DAYS - 1; $i >= 0; --$i) {
+        for ($i = $days - 1; $i >= 0; --$i) {
             $day = $today->modify(\sprintf('-%d days', $i))->setTime(0, 0);
             $existing = $this->dailyProjectStatRepository->findOneBy([
                 'project' => $project,
@@ -50,6 +61,10 @@ final readonly class AnalyticsDemoSeeder
                 $stat->incrementNPlusOneCount($nPlusOne);
             }
             $created = true;
+
+            if (0 === $i % 30) {
+                $this->entityManager->flush();
+            }
         }
 
         if ($created) {

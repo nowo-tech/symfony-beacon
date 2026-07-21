@@ -1,4 +1,4 @@
-.PHONY: help up down build build-prod logs shell console seed bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
+.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa composer-outdated \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens
 
@@ -21,8 +21,10 @@ help:
 	@echo "  make mysql           mysql CLI shell"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
-	@echo "  make seed            Seed demo user + project + write .demo-client.env"
-	@echo "  make bootstrap       Migrate DB + seed (after make up)"
+	@echo "  make seed-platform   Upsert menus/breadcrumbs (safe after upgrades)"
+	@echo "  make seed            Platform seed + demo user/project + .demo-client.env"
+	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
+	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"
 	@echo "  make restart         Restart php + messenger"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
@@ -115,13 +117,21 @@ shell:
 console:
 	docker compose exec php bin/console $(ARGS)
 
-seed:
+seed-platform:
+	docker compose exec -T php bin/console app:seed-platform
+
+seed: seed-platform
 	docker compose exec -T php bin/console app:seed-demo
 	@echo "Client env: .demo-client.env — in BeaconBundle/demo/symfony8 run: make sync-beacon"
+	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
+
+seed-sample:
+	docker compose exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 
 bootstrap:
 	docker compose exec -T php bin/console doctrine:migrations:migrate -n
-	@$(MAKE) seed
+	@$(MAKE) seed-platform
+	@echo "Next: make seed (demo user) and/or make seed-sample — or register at /en/register"
 
 restart:
 	docker compose restart php messenger

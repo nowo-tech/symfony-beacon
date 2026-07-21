@@ -11,6 +11,7 @@ nav:
     admin_projects: Proyectos
     appearance: Apariencia
     mailer: Correo
+    setup: Configuración
     menus: Menús
     breadcrumbs: Migas
     toggle_sidebar: Alternar navegación
@@ -1003,8 +1004,48 @@ admin:
         projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
         appearance: Nombre de marca y colores de acento.
         mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
+        setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.
+setup:
+    eyebrow: Primer arranque
+    title: Configuración de la instancia
+    intro: Instala catálogos de navegación y datos demo opcionales. Son los mismos pasos que las capas CLI de seed.
+    already_done: La configuración ya está marcada como completa.
+    back_dashboard: Volver al panel
+    banner:
+        title: Termina la configuración
+        body: Instala menús/breadcrumbs y muestras demo opcionales para esta instancia Beacon.
+        cta: Abrir configuración
+    step_platform:
+        title: Navegación de plataforma
+        body: Actualiza menús y breadcrumbs (seguro repetirlo tras upgrades).
+        cta: Instalar navegación
+    step_demo:
+        title: Proyecto demo
+        body: Crea el admin demo (si falta) y el proyecto demo con API key.
+        cta: Crear proyecto demo
+        exists: El proyecto demo ya existe.
+    step_sample:
+        title: Telemetría de muestra
+        body: Carga issues sintéticos para QA. Requiere el proyecto demo. El tamaño huge solo por CLI.
+        dev: Cargar muestra (dev)
+        load: Cargar muestra (load)
+        need_demo: Crea primero el proyecto demo.
+    step_done:
+        title: Listo
+        body: Cierra este asistente. Puedes reabrir Setup desde Administración.
+        cta: Marcar como completo
+    cli_hint: 'Equivalente CLI: make bootstrap && make seed && make seed-sample — docs/INSTALL.md'
+    flash:
+        platform_ok: Catálogos de navegación actualizados.
+        demo_ok: Usuario / proyecto demo listos.
+        demo_exists: El usuario y proyecto demo ya existen.
+        sample_ok: Telemetría de muestra cargada.
+        complete: Configuración marcada como completa.
+        unknown_action: Acción de setup desconocida.
+        failed: Falló la acción de setup.
+
 legal:
     nav:
         label: Legal

@@ -173,6 +173,8 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.2 | **Admin identity audit timeline** for users & groups (extends blame fields + `UserAction` into Admin → User/Group show) | Beacon | `036-admin-identity-audit` | **Next** |
 | 6.3 | **Identity kit polish**: closer AuthKit / UserKit integration for remaining account chrome (password flows, profile surfaces) — AuthKit already owns login/register | Beacon | `037-authkit-identity-migration` | **Next** |
 | 6.4 | **Monthly event quota** (promote `032`) | Beacon | `032-monthly-quota` | **Next** |
+| 6.4a | **Install / seed layers**: platform (menus) vs demo (identity+DSN) vs sample sizes; upgrade = migrate + platform seed (`055`) | Beacon | `055-install-seed-layers` | **Done** (v0.12.4) |
+| 6.4b | **Setup wizard UI**: `/setup` for admins (platform / demo / sample + dismiss); upgrade migration skips wizard (`056`) | Beacon | `056-setup-wizard` | **Done** (v0.12.4) |
 
 ### Planned
 
@@ -235,6 +237,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.12.0** | Phase 5 high/medium: threshold alerts (`027`), release health (`028`), FULLTEXT (`029`), delivery history (`030`), admin audit (`031`) |
 | **v0.12.1** | Encrypted Mailer DSN (`034`); account appearance extras; admin user/group AuditKit meta; security/profile UX polish |
 | **v0.12.2** | Security hardening: High `045`–`048` + Medium `049`–`052` (query-auth deprecation, health errors, worker recheck, secret-always) + magic-login Mailer gate |
+| **v0.12.3** | Brand mark (tower + arcs), Montserrat UI font, docs/constitution PWA-only sync |
+| **v0.12.4** | Install seed layers (`055`) + setup wizard UI (`056`) |
 | **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`) |
 | **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`, after `045`–`048`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; headers/`api/doc` (`053`/`054`); SSO/OIDC when specified |
 
@@ -249,4 +253,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21 (v0.12.3: brand mark + Montserrat + docs/constitution PWA-only sync).
+Last updated: 2026-07-21 (v0.12.4: install seed layers `055` + setup wizard `056`).
