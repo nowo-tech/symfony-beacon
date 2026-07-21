@@ -114,7 +114,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-!ChangeMeRoot!}
     volumes:
-      - database_data:/var/lib/mysql
+      # Host-visible MySQL data (gitignored). Recreate DB: rm -rf .data/mysql && docker compose up -d database
+      - ./.data/mysql:/var/lib/mysql
     ports:
       - target: 3306
         published: ${MYSQL_PORT:-3307}
@@ -211,9 +212,6 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-  ###> doctrine/doctrine-bundle ###
-  database_data:
-  ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mercure-bundle ###
   mercure_data:

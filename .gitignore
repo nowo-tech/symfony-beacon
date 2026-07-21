@@ -59,6 +59,9 @@
 *.log
 composer.phar
 
+# Local Docker bind mounts (MySQL data, etc.)
+/.data/
+
 # Cursor: version Spec Kit skills, CLI attribution config, and rules
 .cursor/*
 !.cursor/skills/
