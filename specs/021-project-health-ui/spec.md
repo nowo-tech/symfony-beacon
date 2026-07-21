@@ -88,6 +88,10 @@ As a project admin, I browse recent successful and failed deliveries to confirm 
 ## Assumptions
 
 - Messenger (async workers) is already used for ingest/notifications; this feature observes rather than replaces workers.
-- Delivery history may reuse tables/logs from `009-project-notifications` / `017-export-webhooks`.
+- v1 may show only the **last** delivery per destination; **last N attempts** history is deferred to `030-delivery-history`.
 - Exact infrastructure metrics source (transport stats vs DB outbox) is an implementation choice.
 - Legal/ops: Health does not expose raw secrets or full webhook bodies by default.
+
+## Out of scope (deferred)
+
+- Bounded last-N delivery attempt history per destination → `030-delivery-history`.

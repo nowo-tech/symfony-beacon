@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
+use App\Identity\Entity\UserGroupMembership;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
@@ -33,14 +34,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 final readonly class ProjectMembershipManager
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly ProjectGroupAccessRepository $groupAccessRepository,
-        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
-        private readonly ProjectAccessService $projectAccess,
-        private readonly UserActionRecorder $actionRecorder,
-        private readonly AuthorizationCheckerInterface $authorizationChecker,
-        private readonly EntityManagerInterface $entityManager,
+        private UserRepository $userRepository,
+        private ProjectMembershipRepository $membershipRepository,
+        private ProjectGroupAccessRepository $groupAccessRepository,
+        private UserGroupMembershipRepository $userGroupMembershipRepository,
+        private ProjectAccessService $projectAccess,
+        private UserActionRecorder $actionRecorder,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -261,7 +262,7 @@ final readonly class ProjectMembershipManager
             return;
         }
 
-        if (null !== $this->userGroupMembershipRepository->findOneByGroupAndUser($group, $actor)) {
+        if ($this->userGroupMembershipRepository->findOneByGroupAndUser($group, $actor) instanceof UserGroupMembership) {
             return;
         }
 

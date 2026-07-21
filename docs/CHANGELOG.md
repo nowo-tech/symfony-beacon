@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-07-21
+
+### Added
+
+- Phase 5 backlog draft specs: threshold alerts (`027`), release health (`028`), issue FULLTEXT (`029`), delivery history (`030`), admin project audit timeline (`031`), monthly quota (`032`), CI coverage report (`033`); ROADMAP Phase 5 high / medium / later tables
+
+### Changed
+
+- Confirm / form modals share one visual system with kit Bootstrap modals (header / content / footer chrome, 32rem default width, 36rem wide, shared backdrop and shadow)
+- Issue mark-duplicate, new-project, admin delete, and Settings dialogs aligned to that modal chrome; kit admin modal widths/backdrop matched
+- Roadmap / ARCHITECTURE / README: Phase 5 backlog pointers (`025`–`033`); related specs (`016`/`018`/`019`/`021`/`022`) note deferred follow-ups
+
+### Fixed
+
+- CS / Rector tidy on OpenAPI attributes and a few Project / Health / Notifications call sites (no behaviour change)
+- Functional tests: mark-as-duplicate CSRF selector targets the confirm-dialog form; dashboard asserts `dialog.confirm-dialog` (dropped `--form` modifier)
+- Native tests updated for removed Hotwire Native (`/config/*` → 404; no `page-shell--native`)
+- LoginThrottleTest: unique email per run; assert lock on the 5th failure (`max_attempts: 5`)
+
 ## [0.10.1] - 2026-07-21
 
 ### Added
@@ -311,7 +330,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...v0.10.0
 [0.9.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...v0.9.4

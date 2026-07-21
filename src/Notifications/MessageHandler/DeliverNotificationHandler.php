@@ -109,7 +109,7 @@ final readonly class DeliverNotificationHandler
             $body .= "\n\n".$url;
         }
 
-        $email = (new Email())
+        $email = new Email()
             ->to($to)
             ->subject(mb_substr(str_replace("\n", ' ', $summary), 0, 200))
             ->text($body);

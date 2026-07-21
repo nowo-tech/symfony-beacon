@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.10.1 to the next release](#upgrading-from-0101-to-the-next-release)
+- [Upgrading from 0.10.2 to the next release](#upgrading-from-0102-to-the-next-release)
+- [Upgrading from 0.10.1 to 0.10.2](#upgrading-from-0101-to-0102)
 - [Upgrading from 0.10.0 to 0.10.1](#upgrading-from-0100-to-0101)
 - [Upgrading from 0.9.4 to 0.10.0](#upgrading-from-094-to-0100)
 - [Upgrading from 0.9.3 to 0.9.4](#upgrading-from-093-to-094)
@@ -26,9 +27,21 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.10.1 to the next release
+## Upgrading from 0.10.2 to the next release
 
 No steps yet. When the next release ships, document migrations and breaking changes here.
+
+## Upgrading from 0.10.1 to 0.10.2
+
+No database migrations. Pull, install, and rebuild frontend assets (modal CSS / kit admin styles):
+
+```bash
+git pull
+composer install
+make vite-build
+```
+
+Phase 5 product features (`025`–`033`) remain **specified only** — not shipped. See [ROADMAP](ROADMAP.md) Phase 5.
 
 ## Upgrading from 0.10.0 to 0.10.1
 

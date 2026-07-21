@@ -87,7 +87,7 @@ final class AdminUserController extends AbstractController
 
                 return $this->redirectToRoute('admin_users_new');
             }
-            if (null !== $this->userRepository->findOneByEmail($email)) {
+            if ($this->userRepository->findOneByEmail($email) instanceof User) {
                 $this->addFlash('error', 'flash.users.email_taken');
 
                 return $this->redirectToRoute('admin_users_new');

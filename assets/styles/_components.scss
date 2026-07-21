@@ -146,13 +146,25 @@ $beacon-btn-sm-font-size: 0.8125rem;
   border-color: color-mix(in srgb, var(--color-alert) 35%, var(--color-sand));
 }
 
+/*
+ * Beacon <dialog> modals — visual tokens shared with kit Bootstrap .modal
+ * (header / content / footer chrome, width, radius, shadow, backdrop).
+ */
 .confirm-dialog {
+  --cd-pad-x: 1.25rem;
+  --cd-pad-y: 1.15rem;
+  --cd-radius: 0.75rem;
+  --cd-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 22%);
+  --cd-width: min(32rem, calc(100vw - 2rem));
+  --cd-max-height: min(85vh, 40rem);
+
   margin: auto;
   border: none;
   padding: 0;
   background: transparent;
-  max-width: min(28rem, calc(100vw - 2rem));
-  width: min(28rem, calc(100vw - 2rem));
+  max-width: var(--cd-width);
+  width: var(--cd-width);
+  color: var(--color-ink);
 
   &:not([open]) {
     display: none !important;
@@ -164,22 +176,153 @@ $beacon-btn-sm-font-size: 0.8125rem;
   }
 
   &::backdrop {
-    background: rgb(12 18 16 / 55%);
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
   }
 
+  /* Aliases kept for existing markup */
   &--form {
-    max-width: min(32rem, calc(100vw - 2rem));
-    width: min(32rem, calc(100vw - 2rem));
+    --cd-width: min(32rem, calc(100vw - 2rem));
+  }
+
+  &--wide,
+  &--duplicate {
+    --cd-width: min(36rem, calc(100vw - 2rem));
   }
 }
 
 .confirm-dialog__panel {
-  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--cd-max-height);
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--cd-radius);
   border: 1px solid var(--color-sand);
   background: var(--color-surface);
   color: var(--color-ink);
-  padding: 1.25rem;
-  box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
+  box-shadow: var(--cd-shadow);
+}
+
+.confirm-dialog__header {
+  flex-shrink: 0;
+  padding: var(--cd-pad-y) var(--cd-pad-x) 0.9rem;
+  border-bottom: 1px solid var(--color-sand);
+  background: color-mix(in srgb, var(--color-mist) 35%, var(--color-surface));
+}
+
+.confirm-dialog__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.confirm-dialog__body {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+}
+
+.confirm-dialog__header .confirm-dialog__body:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.confirm-dialog__header .confirm-dialog__body + .confirm-dialog__body {
+  margin-top: 0.35rem;
+}
+
+.confirm-dialog__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  overflow: auto;
+  padding: 1.15rem var(--cd-pad-x) 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 28%, transparent) transparent;
+}
+
+.confirm-dialog__content > .confirm-dialog__label:first-child,
+.confirm-dialog__content > .confirm-dialog__body:first-child {
+  margin-top: 0;
+}
+
+.confirm-dialog__content .confirm-dialog__label.mt-3 {
+  margin-top: 0;
+}
+
+.confirm-dialog__label {
+  display: block;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.confirm-dialog__footer,
+.confirm-dialog__actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.9rem var(--cd-pad-x) 1.15rem;
+  border-top: 1px solid var(--color-sand);
+  background: color-mix(in srgb, var(--color-mist) 25%, var(--color-surface));
+}
+
+/*
+ * Flat panels (title / lead / fields / actions as direct children) get the same
+ * chrome as structured header/content/footer without rewriting every template.
+ */
+.confirm-dialog__panel:not(:has(> .confirm-dialog__header)) {
+  > .confirm-dialog__title {
+    padding: var(--cd-pad-y) var(--cd-pad-x) 0.35rem;
+    background: color-mix(in srgb, var(--color-mist) 35%, var(--color-surface));
+  }
+
+  > .confirm-dialog__title:has(+ :not(.confirm-dialog__body)) {
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--color-sand);
+  }
+
+  > .confirm-dialog__title + .confirm-dialog__body,
+  > .confirm-dialog__body + .confirm-dialog__body {
+    margin: 0;
+    padding: 0.15rem var(--cd-pad-x) 0.9rem;
+    background: color-mix(in srgb, var(--color-mist) 35%, var(--color-surface));
+    border-bottom: 1px solid var(--color-sand);
+  }
+
+  > .confirm-dialog__title + .confirm-dialog__body:has(+ .confirm-dialog__body),
+  > .confirm-dialog__body + .confirm-dialog__body:has(+ .confirm-dialog__body) {
+    padding-bottom: 0.35rem;
+    border-bottom: none;
+  }
+
+  > :not(.confirm-dialog__title):not(.confirm-dialog__body):not(.confirm-dialog__actions):not(.confirm-dialog__header):not(.confirm-dialog__content):not(.confirm-dialog__footer) {
+    margin-left: var(--cd-pad-x);
+    margin-right: var(--cd-pad-x);
+  }
+
+  > .confirm-dialog__label,
+  > .input,
+  > input.input,
+  > select.input {
+    margin-top: 0.75rem;
+  }
+
+  > .confirm-dialog__title + :not(.confirm-dialog__body):not(.confirm-dialog__actions),
+  > .confirm-dialog__body + :not(.confirm-dialog__body):not(.confirm-dialog__actions) {
+    margin-top: 1.15rem;
+  }
+
+  > .confirm-dialog__actions {
+    margin-top: 1.15rem;
+  }
 }
 
 /* Readable in light and dark themes (do not use --color-ink as background). */
@@ -196,65 +339,7 @@ $beacon-btn-sm-font-size: 0.8125rem;
   white-space: pre;
 }
 
-.confirm-dialog__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.confirm-dialog__body {
-  margin: 0 0 1rem;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
-}
-
-.confirm-dialog__label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-.confirm-dialog__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.confirm-dialog--duplicate {
-  max-width: min(36rem, calc(100vw - 2rem));
-  width: min(36rem, calc(100vw - 2rem));
-}
-
-.issue-duplicate-form {
-  display: flex;
-  flex-direction: column;
-  max-height: min(85vh, 40rem);
-  padding: 0;
-  overflow: hidden;
-}
-
-.issue-duplicate-form__header {
-  padding: 1.25rem 1.25rem 0;
-}
-
-.issue-duplicate-form__header .confirm-dialog__body {
-  margin-bottom: 0.75rem;
-}
-
-.issue-duplicate-form__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0 1.25rem 1rem;
-  overflow: auto;
-  min-height: 0;
-}
-
-.issue-duplicate-form__merge {
+.confirm-dialog__check {
   display: flex;
   align-items: flex-start;
   gap: 0.55rem;
@@ -268,23 +353,16 @@ $beacon-btn-sm-font-size: 0.8125rem;
   }
 }
 
-.issue-duplicate-form__merge-label {
+.confirm-dialog__check-label {
   display: block;
   font-weight: 500;
 }
 
-.issue-duplicate-form__merge-help {
+.confirm-dialog__check-help {
   display: block;
   margin-top: 0.2rem;
   font-size: 0.75rem;
   color: color-mix(in srgb, var(--color-ink) 55%, transparent);
-}
-
-.issue-duplicate-form__actions {
-  margin: 0;
-  padding: 0.85rem 1.25rem 1.15rem;
-  border-top: 1px solid var(--color-sand);
-  background: var(--color-surface);
 }
 
 .combobox {
@@ -1742,6 +1820,7 @@ body,
 .app-main__inner,
 .kit-admin,
 .modal-body,
+.confirm-dialog__content,
 .issue-layout__aside,
 .issue-section__body {
   scrollbar-width: thin;
@@ -1755,6 +1834,7 @@ body::-webkit-scrollbar,
 .app-main__inner::-webkit-scrollbar,
 .kit-admin::-webkit-scrollbar,
 .modal-body::-webkit-scrollbar,
+.confirm-dialog__content::-webkit-scrollbar,
 .issue-layout__aside::-webkit-scrollbar,
 .issue-section__body::-webkit-scrollbar {
   width: 6px;
@@ -1768,6 +1848,7 @@ body::-webkit-scrollbar-track,
 .app-main__inner::-webkit-scrollbar-track,
 .kit-admin::-webkit-scrollbar-track,
 .modal-body::-webkit-scrollbar-track,
+.confirm-dialog__content::-webkit-scrollbar-track,
 .issue-layout__aside::-webkit-scrollbar-track,
 .issue-section__body::-webkit-scrollbar-track {
   background: transparent;
@@ -1780,6 +1861,7 @@ body::-webkit-scrollbar-thumb,
 .app-main__inner::-webkit-scrollbar-thumb,
 .kit-admin::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb,
+.confirm-dialog__content::-webkit-scrollbar-thumb,
 .issue-layout__aside::-webkit-scrollbar-thumb,
 .issue-section__body::-webkit-scrollbar-thumb {
   background-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
@@ -1795,6 +1877,7 @@ body::-webkit-scrollbar-thumb:hover,
 .app-main__inner::-webkit-scrollbar-thumb:hover,
 .kit-admin::-webkit-scrollbar-thumb:hover,
 .modal-body::-webkit-scrollbar-thumb:hover,
+.confirm-dialog__content::-webkit-scrollbar-thumb:hover,
 .issue-layout__aside::-webkit-scrollbar-thumb:hover,
 .issue-section__body::-webkit-scrollbar-thumb:hover {
   background-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
@@ -1807,6 +1890,7 @@ body::-webkit-scrollbar-corner,
 .app-main__inner::-webkit-scrollbar-corner,
 .kit-admin::-webkit-scrollbar-corner,
 .modal-body::-webkit-scrollbar-corner,
+.confirm-dialog__content::-webkit-scrollbar-corner,
 .issue-layout__aside::-webkit-scrollbar-corner,
 .issue-section__body::-webkit-scrollbar-corner {
   background: transparent;
@@ -3068,11 +3152,11 @@ body::-webkit-scrollbar-corner,
 .nowo-pwa-install--modal.beacon-pwa-install .nowo-pwa-install__panel {
   position: relative;
   z-index: 1;
-  width: min(100%, 26rem);
-  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  width: min(100%, 32rem);
+  background: var(--color-surface);
   border: 1px solid var(--color-sand);
   border-radius: 0.75rem;
-  box-shadow: 0 16px 40px rgb(var(--beacon-shadow) / 18%);
+  box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 22%);
 }
 
 .beacon-pwa-install-links {

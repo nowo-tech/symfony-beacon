@@ -80,7 +80,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/dashboard?new=1');
         $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('dialog.confirm-dialog--form');
+        self::assertSelectorExists('dialog.confirm-dialog');
 
         $form = $crawler->selectButton('Create project')->form([
             'project[name]' => 'Billing API',

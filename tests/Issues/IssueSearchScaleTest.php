@@ -32,7 +32,7 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
         }
         $em->flush();
 
-        self::assertTrue((new IssueListSort('events_24h', 'desc'))->isSqlSortable());
+        self::assertTrue(new IssueListSort('events_24h', 'desc')->isSqlSortable());
 
         $this->login($client, $user);
 
@@ -67,7 +67,6 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
         $repo = $em->getRepository(Issue::class);
         $ordered = $repo->search(
             $project,
-            status: null,
             sort: new IssueListSort('events_24h', 'desc'),
             limit: 3,
             offset: 0,
@@ -169,7 +168,6 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
 
         $by7 = $repo->search(
             $project,
-            status: null,
             sort: new IssueListSort('events_7d', 'desc'),
             limit: 10,
         );
@@ -177,7 +175,6 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
 
         $by30 = $repo->search(
             $project,
-            status: null,
             sort: new IssueListSort('events_30d', 'desc'),
             limit: 10,
         );

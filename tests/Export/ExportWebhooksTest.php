@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Export;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
@@ -175,7 +176,7 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
             '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
         );
         $resolveForm = $crawler->filter('form.issue-status-actions__form')->reduce(
-            static fn ($node) => str_contains($node->html(), 'value="resolved"')
+            static fn ($node): bool => str_contains((string) $node->html(), 'value="resolved"')
         )->form();
         $client->submit($resolveForm);
         self::assertResponseRedirects();
@@ -211,7 +212,7 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
         );
-        $dupToken = $crawler->filter('form.issue-duplicate-form input[name="_token"]')->attr('value');
+        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/duplicate', [
             '_token' => $dupToken,
             'canonical_uuid' => $canonical->getUuid(),
@@ -221,7 +222,7 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
         self::assertStringContainsString($canonical->getUuid(), (string) $requests[\count($requests) - 1]['body']);
     }
 
-    private function streamedContent(\Symfony\Bundle\FrameworkBundle\KernelBrowser $client): string
+    private function streamedContent(KernelBrowser $client): string
     {
         $internal = $client->getInternalResponse();
         $content = $internal->getContent();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
+use App\Project\Access\ProjectAccess;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
@@ -317,7 +318,7 @@ final class IssueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $assignee = $issue->getAssignee();
-            if ($assignee instanceof User && null === $this->projectAccess->resolveAccess($project, $assignee)) {
+            if ($assignee instanceof User && !$this->projectAccess->resolveAccess($project, $assignee) instanceof ProjectAccess) {
                 $this->addFlash('error', 'issues.assignee_not_member');
                 $issue->setAssignee($previousAssignee);
             } else {

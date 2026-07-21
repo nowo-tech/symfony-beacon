@@ -47,11 +47,7 @@ ENVELOPE;
     }
 
     #[Route('/api/{projectId}/envelope/', name: 'ingest_envelope', requirements: ['projectId' => '\d+'], methods: ['POST'])]
-    #[OA\Post(
-        path: '/api/{projectId}/envelope/',
-        operationId: 'ingestEnvelope',
-        summary: 'Ingest a Beacon Envelope',
-        description: <<<'MD'
+    #[OA\Post(path: '/api/{projectId}/envelope/', operationId: 'ingestEnvelope', description: <<<'MD'
 Accepts an Envelope body (newline-separated JSON header, item header, and payload).
 
 **Auth (one of):**
@@ -60,19 +56,16 @@ Accepts an Envelope body (newline-separated JSON header, item header, and payloa
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
 
 The public key MUST belong to `{projectId}`. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
-MD,
-        security: [
-            ['BeaconAuth' => []],
-            ['BeaconKeyQuery' => [], 'BeaconSecretQuery' => []],
-        ],
-        tags: ['Ingest'],
-    )]
+MD, summary: 'Ingest a Beacon Envelope', security: [
+        ['BeaconAuth' => []],
+        ['BeaconKeyQuery' => [], 'BeaconSecretQuery' => []],
+    ], tags: ['Ingest'])]
     #[OA\Parameter(
         name: 'projectId',
         description: 'Numeric project id from the Beacon DSN path (not the project UUID).',
         in: 'path',
         required: true,
-        schema: new OA\Schema(type: 'integer', minimum: 1, example: 1),
+        schema: new OA\Schema(type: 'integer', example: 1, minimum: 1),
     )]
     #[OA\Parameter(
         name: 'beacon_key',
@@ -88,32 +81,28 @@ MD,
         required: false,
         schema: new OA\Schema(type: 'string'),
     )]
-    #[OA\RequestBody(
-        required: true,
-        description: 'Raw Envelope bytes. Preferred Content-Type: `application/x-beacon-envelope` (also accepts `application/octet-stream`).',
-        content: [
-            new OA\MediaType(
-                mediaType: 'application/x-beacon-envelope',
-                schema: new OA\Schema(
-                    type: 'string',
-                    format: 'binary',
-                    description: 'Newline-delimited Envelope (header JSON, item header JSON, payload).',
-                ),
-                example: self::ENVELOPE_EXAMPLE,
+    #[OA\RequestBody(description: 'Raw Envelope bytes. Preferred Content-Type: `application/x-beacon-envelope` (also accepts `application/octet-stream`).', required: true, content: [
+        new OA\MediaType(
+            mediaType: 'application/x-beacon-envelope',
+            schema: new OA\Schema(
+                description: 'Newline-delimited Envelope (header JSON, item header JSON, payload).',
+                type: 'string',
+                format: 'binary',
             ),
-            new OA\MediaType(
-                mediaType: 'application/octet-stream',
-                schema: new OA\Schema(type: 'string', format: 'binary'),
-                example: self::ENVELOPE_EXAMPLE,
-            ),
-        ],
-    )]
+            example: self::ENVELOPE_EXAMPLE,
+        ),
+        new OA\MediaType(
+            mediaType: 'application/octet-stream',
+            schema: new OA\Schema(type: 'string', format: 'binary'),
+            example: self::ENVELOPE_EXAMPLE,
+        ),
+    ])]
     #[OA\Response(
         response: 200,
         description: 'Envelope accepted; async processing queued. Empty body.',
         content: new OA\MediaType(
             mediaType: 'text/plain',
-            schema: new OA\Schema(type: 'string', maxLength: 0, example: ''),
+            schema: new OA\Schema(type: 'string', example: '', maxLength: 0),
         ),
     )]
     #[OA\Response(

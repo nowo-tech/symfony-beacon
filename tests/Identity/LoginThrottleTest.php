@@ -18,25 +18,27 @@ final class LoginThrottleTest extends DatabaseWebTestCase
         $em = self::getContainer()->get('doctrine')->getManager();
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
+        $email = sprintf('throttle-%s@example.com', bin2hex(random_bytes(4)));
         $user = new User();
-        $user->setEmail('throttle@example.com');
+        $user->setEmail($email);
         $user->setDisplayName('Throttle');
         $user->setPassword($hasher->hashPassword($user, 'CorrectHorse1!'));
         $em->persist($user);
         $em->flush();
 
-        for ($i = 0; $i < 5; ++$i) {
-            $this->submitFailedLogin($client, 'throttle@example.com');
+        // security.yaml login_throttling.max_attempts = 5 → lock on the 5th failure.
+        for ($i = 0; $i < 4; ++$i) {
+            $this->submitFailedLogin($client, $email);
             self::assertResponseIsSuccessful();
             self::assertSelectorExists('.flash-error');
             self::assertStringNotContainsString(
                 'Too many failed login attempts',
                 (string) $client->getResponse()->getContent(),
-                \sprintf('Attempt %d should not be throttled yet', $i + 1)
+                sprintf('Attempt %d should not be throttled yet', $i + 1)
             );
         }
 
-        $this->submitFailedLogin($client, 'throttle@example.com');
+        $this->submitFailedLogin($client, $email);
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.flash-error', 'Too many failed login attempts');
     }

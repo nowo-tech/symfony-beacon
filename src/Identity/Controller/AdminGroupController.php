@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
@@ -279,7 +280,7 @@ final class AdminGroupController extends AbstractController
         }
 
         $project = $access->getProject();
-        if (null === $project) {
+        if (!$project instanceof Project) {
             throw $this->createNotFoundException();
         }
 
@@ -301,7 +302,7 @@ final class AdminGroupController extends AbstractController
     /** ASCII slug for the group name (fallback random token if empty). */
     private function slugify(string $name): string
     {
-        $slug = strtolower((new AsciiSlugger())->slug($name)->toString());
+        $slug = strtolower(new AsciiSlugger()->slug($name)->toString());
 
         return '' !== $slug ? $slug : 'group-'.bin2hex(random_bytes(3));
     }

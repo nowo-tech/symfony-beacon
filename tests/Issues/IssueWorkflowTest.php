@@ -111,7 +111,7 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
-        $dupToken = $crawler->filter('form.issue-duplicate-form input[name="_token"]')->attr('value');
+        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/duplicate', [
             '_token' => $dupToken,
@@ -246,7 +246,7 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
-        $dupToken = $crawler->filter('form.issue-duplicate-form input[name="_token"]')->attr('value');
+        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/duplicate', [
             '_token' => $dupToken,

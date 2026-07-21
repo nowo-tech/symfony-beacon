@@ -125,7 +125,7 @@
                         </svg>
                     </button>
                     <dialog
-                        class="confirm-dialog confirm-dialog--form"
+                        class="confirm-dialog"
                         data-confirm-dialog-target="dialog">
 
                         <form
@@ -133,7 +133,7 @@
                             action="{{ path('project_members_add', {id: project.uuid}) }}"
                             class="confirm-dialog__panel"
                         >
-                            <h3 class="confirm-dialog__title">{{ 'project.members.add_title'|trans }}</h3>
+                            <h2 class="confirm-dialog__title">{{ 'project.members.add_title'|trans }}</h2>
                             <p class="confirm-dialog__body">{{ 'project.members.add_help'|trans }}</p>
                             <input type="hidden" name="_token" value="{{ csrf_token('project_member_add_' ~ project.id) }}">
                             <label class="confirm-dialog__label" for="member-email">{{ 'project.members.email_label'|trans }}</label>
@@ -146,7 +146,7 @@
                                 autocomplete="off"
                                 placeholder="{{ 'project.members.email_placeholder'|trans }}"
                             >
-                            <label class="confirm-dialog__label mt-3" for="member-add-role">{{ 'project.members.role_label'|trans }}</label>
+                            <label class="confirm-dialog__label" for="member-add-role">{{ 'project.members.role_label'|trans }}</label>
                             <select id="member-add-role" class="input w-full" name="role">
                                 {% for role in assignableRoles %}
                                     <option value="{{ role.value }}" {% if role.value == 'member' %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
@@ -192,7 +192,7 @@
                                         </svg>
                                     </button>
                                     <dialog
-                                        class="confirm-dialog confirm-dialog--form"
+                                        class="confirm-dialog"
                                         data-confirm-dialog-target="dialog">
 
                                         <form
@@ -200,7 +200,7 @@
                                             action="{{ path('project_members_role', {projectId: project.uuid, userId: memberUser.uuid}) }}"
                                             class="confirm-dialog__panel"
                                         >
-                                            <h3 class="confirm-dialog__title">{{ 'project.members.edit_role_title'|trans }}</h3>
+                                            <h2 class="confirm-dialog__title">{{ 'project.members.edit_role_title'|trans }}</h2>
                                             <p class="confirm-dialog__body">{{ 'project.members.edit_role_body'|trans({'%name%': memberUser.displayName, '%email%': memberUser.email}) }}</p>
                                             {% if isLastOwner %}
                                                 <p class="confirm-dialog__body">{{ 'project.members.last_owner_hint'|trans }}</p>
@@ -241,7 +241,7 @@
                                         </svg>
                                     </button>
                                     <dialog
-                                        class="confirm-dialog confirm-dialog--form"
+                                        class="confirm-dialog"
                                         data-confirm-dialog-target="dialog">
 
                                         <form
@@ -249,7 +249,7 @@
                                             action="{{ path('project_members_remove', {projectId: project.uuid, userId: memberUser.uuid}) }}"
                                             class="confirm-dialog__panel"
                                         >
-                                            <h3 class="confirm-dialog__title">{{ 'project.members.remove_title'|trans }}</h3>
+                                            <h2 class="confirm-dialog__title">{{ 'project.members.remove_title'|trans }}</h2>
                                             {% if isLastOwner %}
                                                 <p class="confirm-dialog__body">{{ 'project.members.last_owner_hint'|trans }}</p>
                                             {% else %}
@@ -303,7 +303,7 @@
                                     </svg>
                                 </button>
                                 <dialog
-                                    class="confirm-dialog confirm-dialog--form"
+                                    class="confirm-dialog"
                                     data-confirm-dialog-target="dialog">
 
                                     <form
@@ -311,7 +311,7 @@
                                         action="{{ path('project_groups_role', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
                                         class="confirm-dialog__panel"
                                     >
-                                        <h3 class="confirm-dialog__title">{{ 'project.groups.edit_role_title'|trans }}</h3>
+                                        <h2 class="confirm-dialog__title">{{ 'project.groups.edit_role_title'|trans }}</h2>
                                         <p class="confirm-dialog__body">{{ 'project.groups.edit_role_body'|trans({'%name%': linkedGroup.name}) }}</p>
                                         <input type="hidden" name="_token" value="{{ csrf_token('project_group_role_' ~ groupAccess.id) }}">
                                         <label class="confirm-dialog__label" for="group-role-{{ groupAccess.id }}">{{ 'project.members.role_label'|trans }}</label>
@@ -341,7 +341,7 @@
                                     </svg>
                                 </button>
                                 <dialog
-                                    class="confirm-dialog confirm-dialog--form"
+                                    class="confirm-dialog"
                                     data-confirm-dialog-target="dialog">
 
                                     <form
@@ -349,7 +349,7 @@
                                         action="{{ path('project_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
                                         class="confirm-dialog__panel"
                                     >
-                                        <h3 class="confirm-dialog__title">{{ 'project.groups.remove_title'|trans }}</h3>
+                                        <h2 class="confirm-dialog__title">{{ 'project.groups.remove_title'|trans }}</h2>
                                         <p class="confirm-dialog__body">{{ 'project.groups.remove_confirm'|trans({'%name%': linkedGroup.name}) }}</p>
                                         <input type="hidden" name="_token" value="{{ csrf_token('project_group_remove_' ~ groupAccess.id) }}">
                                         <div class="confirm-dialog__actions">
@@ -513,11 +513,11 @@
         <div data-controller="confirm-dialog">
             <button type="button" class="btn-ghost" data-action="confirm-dialog#open">{{ 'project.danger.clear_open'|trans }}</button>
             <dialog
-                class="confirm-dialog confirm-dialog--form"
+                class="confirm-dialog"
                 data-confirm-dialog-target="dialog">
 
                 <form method="post" action="{{ path('project_clear_history', {id: project.uuid}) }}" class="confirm-dialog__panel">
-                    <h3 class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h3>
+                    <h2 class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h2>
                     <p class="confirm-dialog__body">{{ 'project.danger.clear_body'|trans }}</p>
                     <input type="hidden" name="_token" value="{{ csrf_token('project_clear_' ~ project.id) }}">
                     <div class="confirm-dialog__actions">
@@ -537,11 +537,11 @@
                     title="{{ transferCandidates is empty ? 'project.danger.transfer_no_candidates'|trans : 'project.danger.transfer_open'|trans }}"
                 >{{ 'project.danger.transfer_open'|trans }}</button>
                 <dialog
-                    class="confirm-dialog confirm-dialog--form"
+                    class="confirm-dialog"
                     data-confirm-dialog-target="dialog"
                 >
                     <form method="post" action="{{ path('project_transfer_ownership', {projectId: project.uuid}) }}" class="confirm-dialog__panel">
-                        <h3 class="confirm-dialog__title">{{ 'project.danger.transfer_title'|trans }}</h3>
+                        <h2 class="confirm-dialog__title">{{ 'project.danger.transfer_title'|trans }}</h2>
                         {% if transferCandidates is empty %}
                             <p class="confirm-dialog__body">{{ 'project.danger.transfer_no_candidates'|trans }}</p>
                             <div class="confirm-dialog__actions">
@@ -562,12 +562,12 @@
                                     <option value="{{ candidate.user.uuid }}">{{ candidate.user.displayName }} ({{ candidate.user.email }}) — {{ ('project.members.role.' ~ candidate.role.value)|trans }}</option>
                                 {% endfor %}
                             </select>
-                            <label class="confirm-dialog__label mt-3" for="project-transfer-confirm-{{ project.id }}">
+                            <label class="confirm-dialog__label" for="project-transfer-confirm-{{ project.id }}">
                                 {{ 'project.danger.transfer_type_label'|trans({'%name%': project.name}) }}
                             </label>
                             <input
                                 id="project-transfer-confirm-{{ project.id }}"
-                                class="input"
+                                class="input w-full"
                                 name="confirmation"
                                 autocomplete="off"
                                 data-confirm-dialog-target="confirmInput"
@@ -585,18 +585,18 @@
             <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name|e('html_attr') }}">
                 <button type="button" class="btn-danger" data-action="confirm-dialog#open">{{ 'project.danger.delete_open'|trans }}</button>
                 <dialog
-                    class="confirm-dialog confirm-dialog--form"
+                    class="confirm-dialog"
                     data-confirm-dialog-target="dialog">
 
                     <form method="post" action="{{ path('project_delete', {id: project.uuid}) }}" class="confirm-dialog__panel">
-                        <h3 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h3>
+                        <h2 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h2>
                         <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
                         <label class="confirm-dialog__label" for="project-delete-confirm-{{ project.id }}">
                             {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
                         </label>
                         <input
                             id="project-delete-confirm-{{ project.id }}"
-                            class="input"
+                            class="input w-full"
                             name="confirmation"
                             autocomplete="off"
                             data-confirm-dialog-target="confirmInput"

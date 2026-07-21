@@ -92,6 +92,10 @@ As a project member, I sort the issues list by events in the last 24 hours, 7 da
 ## Assumptions
 
 - Builds on issues list from `004-issues` and release fields from `014-releases` (release filter may ship behind Releases).
-- Full-text backend may use database native search; exact engine is an implementation choice outside this spec's success metrics.
+- v1 implementation may use `LIKE` on title/culprit; **MySQL FULLTEXT** (or equivalent) is deferred to `029-issue-fulltext`.
 - Tag filter matches event/issue tags already stored by ingest.
 - No external search appliance (Elasticsearch, etc.) is required for v1.
+
+## Out of scope (deferred)
+
+- Production FULLTEXT indexes and ranking → `029-issue-fulltext`.

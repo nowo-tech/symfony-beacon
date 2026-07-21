@@ -25,14 +25,7 @@ final readonly class HealthController
     }
 
     #[Route('/health/live', name: 'health_live', methods: ['GET'])]
-    #[OA\Get(
-        path: '/health/live',
-        operationId: 'healthLive',
-        summary: 'Liveness probe',
-        description: 'Returns 200 when the PHP process can serve HTTP. Does not check the database.',
-        security: [],
-        tags: ['Health'],
-    )]
+    #[OA\Get(path: '/health/live', operationId: 'healthLive', description: 'Returns 200 when the PHP process can serve HTTP. Does not check the database.', summary: 'Liveness probe', security: [], tags: ['Health'])]
     #[OA\Response(
         response: 200,
         description: 'Process is alive.',
@@ -50,14 +43,7 @@ final readonly class HealthController
     }
 
     #[Route('/health/ready', name: 'health_ready', methods: ['GET'])]
-    #[OA\Get(
-        path: '/health/ready',
-        operationId: 'healthReady',
-        summary: 'Readiness probe',
-        description: 'Checks database connectivity and optionally reports pending Messenger `async` messages.',
-        security: [],
-        tags: ['Health'],
-    )]
+    #[OA\Get(path: '/health/ready', operationId: 'healthReady', description: 'Checks database connectivity and optionally reports pending Messenger `async` messages.', summary: 'Readiness probe', security: [], tags: ['Health'])]
     #[OA\Response(
         response: 200,
         description: 'Dependencies are ready.',
@@ -69,7 +55,7 @@ final readonly class HealthController
                     property: 'checks',
                     properties: [
                         new OA\Property(property: 'database', type: 'boolean', example: true),
-                        new OA\Property(property: 'messenger_async_pending', type: 'integer', nullable: true, example: 0),
+                        new OA\Property(property: 'messenger_async_pending', type: 'integer', example: 0, nullable: true),
                     ],
                     type: 'object',
                 ),

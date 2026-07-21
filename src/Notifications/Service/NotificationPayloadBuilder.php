@@ -220,13 +220,11 @@ final readonly class NotificationPayloadBuilder
                 'slug' => $project->getSlug(),
             ],
             'held_count' => $count,
-            'items' => array_map(static function (array $item): array {
-                return [
-                    'event' => $item['event'] ?? null,
-                    'summary' => $item['summary'] ?? null,
-                    'category' => $item['category'] ?? null,
-                ];
-            }, $heldPayloads),
+            'items' => array_map(static fn(array $item): array => [
+                'event' => $item['event'] ?? null,
+                'summary' => $item['summary'] ?? null,
+                'category' => $item['category'] ?? null,
+            ], $heldPayloads),
             'url' => $this->absoluteUrl('project_settings', ['id' => $project->getUuid()]),
             'category' => 'digest',
             'test' => false,

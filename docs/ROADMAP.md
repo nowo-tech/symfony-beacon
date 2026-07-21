@@ -95,24 +95,47 @@ Ordered Speckit program (Beacon `014`→`022`; Bundle `023`/`024`):
 
 ## Phase 5 — Access & insights (Next)
 
+Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do not hand-roll auth. **SSO/OIDC** stays Later (separate from `026`).
+
+### High impact
+
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 5.1 | **Analytics charts**: period presets / range + filters (env, release); keep or complement daily table | Beacon | `025-analytics-charts` | **Next** |
-| 5.2 | **Magic login links** + project **viewer** role; optional signed share links to project/issue (read-only) | Beacon | `026-magic-links-viewer` | **Planned** |
+| 5.1 | **Analytics charts**: period presets / range + filters (env, release) | Beacon | `025-analytics-charts` | **Next** |
+| 5.2 | **Magic login links** + project **viewer** role; optional signed share links | Beacon | `026-magic-links-viewer` | **Planned** |
+| 5.3 | **Threshold alerts**: e.g. &gt; N errors in M minutes (plus existing new/regression) | Beacon | `027-threshold-alerts` | **Planned** |
 
-Prefer AuthKit / Symfony login-link for 5.2; do not hand-roll auth. SSO/OIDC stays Later (separate from magic links).
+### Medium impact
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 5.4 | **Release health** panel: new-in-release counts + compare (builds on `014`) | Beacon | `028-release-health` | **Planned** |
+| 5.5 | **Issue FULLTEXT** search (upgrade `016` `LIKE` path) | Beacon | `029-issue-fulltext` | **Planned** |
+| 5.6 | **Delivery history**: last N attempts per notification destination (extends `021`) | Beacon | `030-delivery-history` | **Planned** |
+| 5.7 | **Admin project audit timeline** on Admin → Project show (extends `019`) | Beacon | `031-admin-project-audit` | **Planned** |
+
+### Later (still in backlog)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Later** |
+| 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Later** |
+| — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
+
+Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control plane — use HTTP webhooks + digests instead.
 
 ---
 
 ## Explicitly out of scope (for now)
 
 - Multi-region SaaS control plane / multi-org tenancy
-- **SSO/SAML/OIDC** (Later — dedicated spec when enterprise teams need it; not the same as magic links in `026`)
+- **SSO/SAML/OIDC** until an enterprise dedicated spec (AuthKit); not the same as magic links in `026`
 - Source maps / session replay / profiling
 - Uptime monitors / cron check-ins as first-class products
 - Native store apps inside this repo (server contract only)
 - **PagerDuty-native** (generic HTTP webhook / digests may still target it)
 - Public anonymous issue boards (share links in `026` still require constrained auth / viewer semantics)
+- Enforcing **100%** code coverage
 
 See `docs/ARCHITECTURE.md` non-goals and constitution.
 
@@ -128,8 +151,10 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **Bundle v1.5.0** | Phase 3.3–3.4 (spans, tags, before_send) |
 | **v0.9.0+** | Phase 4 slices; admin Projects; transfer ownership |
 | **v0.10.0** | Phase 4 product depth (`014`–`022`) + Bundle companion docs (`023`–`024`) |
-| **v0.10.1** | Issue aside / duplicate-modal UX; admin menu seeder sync; Phase 5 specs drafted |
-| **v0.11+** | Phase 5 — analytics charts (`025`); magic links / viewer (`026`) as capacity allows |
+| **v0.10.1** | Issue aside / duplicate-modal UX; admin menu seeder sync; Phase 5 specs started |
+| **v0.10.2** | Phase 5 backlog specs `027`–`033`; unified confirm/kit modal chrome |
+| **v0.11+** | Phase 5 high impact: charts (`025`), viewer/magic links (`026`), threshold alerts (`027`) |
+| **v0.12+** | Phase 5 medium: release health, FULLTEXT, delivery history, admin audit (`028`–`031`) |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

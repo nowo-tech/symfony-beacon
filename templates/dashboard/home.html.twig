@@ -48,22 +48,24 @@
     {% endif %}
 
     <dialog
-        class="confirm-dialog confirm-dialog--form"
+        class="confirm-dialog"
         data-confirm-dialog-target="dialog"
         aria-labelledby="new-project-dialog-title"
     >
-        <div class="confirm-dialog__panel">
-            <h2 id="new-project-dialog-title" class="confirm-dialog__title">{{ 'project.new.title'|trans }}</h2>
-            <p class="confirm-dialog__body">{{ 'project.name.help'|trans }}</p>
-            {{ form_start(newProjectForm, {action: path('project_new'), attr: {class: 'space-y-4'}}) }}
+        {{ form_start(newProjectForm, {action: path('project_new'), attr: {class: 'confirm-dialog__panel'}}) }}
+            <div class="confirm-dialog__header">
+                <h2 id="new-project-dialog-title" class="confirm-dialog__title">{{ 'project.new.title'|trans }}</h2>
+                <p class="confirm-dialog__body">{{ 'project.name.help'|trans }}</p>
+            </div>
+            <div class="confirm-dialog__content">
                 {{ form_row(newProjectForm.name) }}
                 {{ form_row(newProjectForm.description) }}
-                <div class="confirm-dialog__actions">
-                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
-                    <button class="btn-primary" type="submit">{{ 'project.new.submit'|trans }}</button>
-                </div>
-            {{ form_end(newProjectForm) }}
-        </div>
+            </div>
+            <div class="confirm-dialog__actions">
+                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
+                <button class="btn-primary" type="submit">{{ 'project.new.submit'|trans }}</button>
+            </div>
+        {{ form_end(newProjectForm) }}
     </dialog>
 </div>
 {% endblock %}

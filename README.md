@@ -32,7 +32,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
-- Daily analytics table (errors / transactions / N+1 for the last 30 days) at `/projects/{uuid}/analytics` — charts, custom periods, and filters are planned (`025-analytics-charts`)
+- Daily analytics table (errors / transactions / N+1 for the last 30 days) at `/projects/{uuid}/analytics` — charts, custom periods, and filters are planned (`025-analytics-charts`); see [ROADMAP](docs/ROADMAP.md) Phase 5 for threshold alerts, release health, and related backlog
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)

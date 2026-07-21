@@ -430,16 +430,21 @@
 
 .modal-backdrop {
   --bs-backdrop-zindex: 1070;
+  /* Align with Beacon <dialog>::backdrop */
+  --bs-backdrop-bg: color-mix(in srgb, var(--beacon-ink) 45%, transparent);
+  --bs-backdrop-opacity: 1;
   z-index: var(--bs-backdrop-zindex);
 }
 
 .modal .modal-dialog {
-  max-width: min(28rem, calc(100vw - 2rem));
+  /* Match Beacon .confirm-dialog default width */
+  max-width: min(32rem, calc(100vw - 2rem));
   margin: 1.25rem auto;
 }
 
 .modal .modal-dialog.modal-lg {
-  max-width: min(40rem, calc(100vw - 2rem));
+  /* Match Beacon .confirm-dialog--wide */
+  max-width: min(36rem, calc(100vw - 2rem));
 }
 
 .modal .modal-dialog.modal-xl {

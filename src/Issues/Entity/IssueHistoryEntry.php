@@ -43,10 +43,10 @@ class IssueHistoryEntry
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $toAssignee = null;
 
-    #[ORM\Column(length: 20, enumType: IssueStatus::class, nullable: true)]
+    #[ORM\Column(length: 20, nullable: true, enumType: IssueStatus::class)]
     private ?IssueStatus $fromStatus = null;
 
-    #[ORM\Column(length: 20, enumType: IssueStatus::class, nullable: true)]
+    #[ORM\Column(length: 20, nullable: true, enumType: IssueStatus::class)]
     private ?IssueStatus $toStatus = null;
 
     #[ORM\Column]

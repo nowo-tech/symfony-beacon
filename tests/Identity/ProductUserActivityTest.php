@@ -84,7 +84,7 @@ final class ProductUserActivityTest extends DatabaseWebTestCase
 
         $crawler = $client->getCrawler();
         $resolveForm = $crawler->filter('form.issue-status-actions__form')->reduce(
-            static fn ($node) => str_contains($node->html(), 'value="resolved"')
+            static fn ($node): bool => str_contains((string) $node->html(), 'value="resolved"')
         )->form();
         $client->submit($resolveForm);
         self::assertResponseRedirects();

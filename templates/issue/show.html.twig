@@ -184,22 +184,23 @@
                     {% endif %}
 
                     <dialog
-                        class="confirm-dialog confirm-dialog--form confirm-dialog--duplicate"
+                        class="confirm-dialog confirm-dialog--wide"
                         data-confirm-dialog-target="dialog"
+                        aria-labelledby="issue-duplicate-dialog-title"
                     >
                         <form
                             method="post"
                             action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}"
-                            class="confirm-dialog__panel issue-duplicate-form"
+                            class="confirm-dialog__panel"
                             data-controller="combobox"
                             data-action="submit->combobox#requireValue"
                         >
-                            <div class="issue-duplicate-form__header">
-                                <h3 class="confirm-dialog__title">{{ 'issues.duplicate_modal_title'|trans }}</h3>
+                            <div class="confirm-dialog__header">
+                                <h2 id="issue-duplicate-dialog-title" class="confirm-dialog__title">{{ 'issues.duplicate_modal_title'|trans }}</h2>
                                 <p class="confirm-dialog__body">{{ 'issues.duplicate_help'|trans }}</p>
                             </div>
 
-                            <div class="issue-duplicate-form__body">
+                            <div class="confirm-dialog__content">
                                 <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
                                 <input type="hidden" name="canonical_uuid" value="" data-combobox-target="value">
 
@@ -250,16 +251,16 @@
                                     </ul>
                                 </div>
 
-                                <label class="issue-duplicate-form__merge">
+                                <label class="confirm-dialog__check">
                                     <input type="checkbox" name="merge_events" value="1">
                                     <span>
-                                        <span class="issue-duplicate-form__merge-label">{{ 'issues.merge_events_label'|trans }}</span>
-                                        <span class="issue-duplicate-form__merge-help">{{ 'issues.merge_events_help'|trans }}</span>
+                                        <span class="confirm-dialog__check-label">{{ 'issues.merge_events_label'|trans }}</span>
+                                        <span class="confirm-dialog__check-help">{{ 'issues.merge_events_help'|trans }}</span>
                                     </span>
                                 </label>
                             </div>
 
-                            <div class="confirm-dialog__actions issue-duplicate-form__actions">
+                            <div class="confirm-dialog__actions">
                                 <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'issues.duplicate_cancel'|trans }}</button>
                                 <button type="submit" class="btn-primary">{{ 'issues.duplicate_submit'|trans }}</button>
                             </div>

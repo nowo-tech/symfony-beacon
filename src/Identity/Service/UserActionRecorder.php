@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Service;
 
+use Symfony\Component\HttpFoundation\Request;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\UserActionType;
@@ -42,7 +43,7 @@ final readonly class UserActionRecorder
         $entry->setContext($context);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (null !== $request) {
+        if ($request instanceof Request) {
             $entry->setIpAddress($request->getClientIp());
         }
 

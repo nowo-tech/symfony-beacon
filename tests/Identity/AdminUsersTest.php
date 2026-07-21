@@ -109,7 +109,7 @@ final class AdminUsersTest extends DatabaseWebTestCase
         );
         self::assertGreaterThanOrEqual(2, \count($actions));
         self::assertSame(UserActionType::UserCreated, $actions[0]->getAction());
-        self::assertSame(UserActionType::UserRoleChanged, $actions[array_key_last($actions)]->getAction());
+        self::assertSame(UserActionType::UserRoleChanged, array_last($actions)->getAction());
 
         $client->request(Request::METHOD_GET, '/admin/users/'.$reloaded->getUuid().'/activity');
         self::assertResponseIsSuccessful();

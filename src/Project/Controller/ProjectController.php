@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
+use App\Identity\Entity\UserGroup;
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserGroupRepository;
@@ -208,10 +209,7 @@ final class ProjectController extends AbstractController
         $eventQuotaDaily = $this->parseOptionalNonNegativeInt($request->request->getString('event_quota_daily'));
 
         if (
-            false === $retentionDays
-            || false === $retentionMaxEvents
-            || false === $ingestRateLimit
-            || false === $eventQuotaDaily
+            in_array(false, [$retentionDays, $retentionMaxEvents, $ingestRateLimit, $eventQuotaDaily], true)
         ) {
             $this->addFlash('error', 'flash.project.governance_invalid');
 
@@ -252,7 +250,7 @@ final class ProjectController extends AbstractController
     /**
      * Groups that the actor may link: all (owner / ROLE_ADMIN) or only groups they belong to (project admin).
      *
-     * @return list<\App\Identity\Entity\UserGroup>
+     * @return list<UserGroup>
      */
     private function availableGroupsForProject(Project $project, User $actor): array
     {

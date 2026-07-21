@@ -108,3 +108,8 @@ As a platform admin, I temporarily view a project as a specific member would, fo
 - Prefer `nowo-tech/audit-kit-bundle` or existing audit patterns for trail storage where suitable.
 - View-as is support-only; not a permanent membership grant.
 - Legal/privacy: operators should disclose impersonation in their policies when offering hosted Beacon.
+- Recording privileged actions is in scope here; a dedicated **Admin → Project show** audit timeline UI is deferred to `031-admin-project-audit`.
+
+## Out of scope (deferred)
+
+- Filterable audit timeline on Admin project show → `031-admin-project-audit`.

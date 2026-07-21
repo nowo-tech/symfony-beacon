@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Project;
 
+use App\Project\Entity\ProjectMembership;
+use App\Project\Service\ProjectMembershipManager;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
@@ -94,7 +96,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         $admin->setEmail('proj-admin@example.com');
         $admin->setDisplayName('Proj Admin');
         $admin->setPassword($hasher->hashPassword($admin, 'secret'));
-        $membership = new \App\Project\Entity\ProjectMembership();
+        $membership = new ProjectMembership();
         $membership->setUser($admin);
         $membership->setRole(ProjectRole::Admin);
         $project->addMembership($membership);
@@ -106,7 +108,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         $em->persist($group);
         $em->flush();
 
-        $manager = self::getContainer()->get(\App\Project\Service\ProjectMembershipManager::class);
+        $manager = self::getContainer()->get(ProjectMembershipManager::class);
         try {
             $manager->addGroup($project, $admin, $group, ProjectRole::Member);
             self::fail('Expected group_link_forbidden');

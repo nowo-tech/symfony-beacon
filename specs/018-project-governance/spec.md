@@ -94,3 +94,8 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 - Default retention/rate/quota come from sensible server defaults when unset.
 - Encryption of secrets continues via existing encrypt practices (`nowo-tech/doctrine-encrypt-bundle` where already used).
 - Warning threshold defaults to 80% unless configured.
+- Quotas in this feature are **daily** (and/or rate windows already documented); **monthly** caps are deferred to `032-monthly-quota`.
+
+## Out of scope (deferred)
+
+- Monthly event quota alongside daily → `032-monthly-quota`.

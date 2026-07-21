@@ -91,4 +91,9 @@ As a maintainer, Analytics and Performance functional tests run on every pull re
 - Builds on completed Analytics (`005-analytics`) and Performance (`006-performance`) product behaviour.
 - Uses the project's existing PHPUnit / functional testing harness and CI provider.
 - Does not expand product UI scope; test-only / quality feature.
+- “CI coverage” here means **functional suites run in CI**, not a code-coverage % gate.
 - Browser e2e (Playwright, etc.) is optional and out of scope unless already standard in repo.
+
+## Out of scope (deferred)
+
+- PHPUnit code-coverage report / soft threshold in CI → `033-coverage-ci`.

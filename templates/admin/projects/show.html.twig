@@ -238,26 +238,30 @@
         <dialog
             class="confirm-dialog"
             data-confirm-dialog-target="dialog"
-            data-action="click->confirm-dialog#backdropClose"
+            aria-labelledby="admin-project-delete-title-{{ project.id }}"
         >
             <form method="post" action="{{ path('admin_projects_delete', {id: project.uuid}) }}" class="confirm-dialog__panel">
-                <h3 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h3>
-                <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
-                <label class="confirm-dialog__label" for="admin-project-delete-confirm-{{ project.id }}">
-                    {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
-                </label>
-                <input
-                    id="admin-project-delete-confirm-{{ project.id }}"
-                    class="input"
-                    name="confirmation"
-                    autocomplete="off"
-                    data-confirm-dialog-target="confirmInput"
-                    data-action="input->confirm-dialog#syncSubmit"
-                    required
-                >
-                <input type="hidden" name="_token" value="{{ csrf_token('admin_project_delete_' ~ project.id) }}">
+                <div class="confirm-dialog__header">
+                    <h2 id="admin-project-delete-title-{{ project.id }}" class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h2>
+                    <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
+                </div>
+                <div class="confirm-dialog__content">
+                    <label class="confirm-dialog__label" for="admin-project-delete-confirm-{{ project.id }}">
+                        {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
+                    </label>
+                    <input
+                        id="admin-project-delete-confirm-{{ project.id }}"
+                        class="input w-full"
+                        name="confirmation"
+                        autocomplete="off"
+                        data-confirm-dialog-target="confirmInput"
+                        data-action="input->confirm-dialog#syncSubmit"
+                        required
+                    >
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_project_delete_' ~ project.id) }}">
+                </div>
                 <div class="confirm-dialog__actions">
-                    <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                     <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
                 </div>
             </form>

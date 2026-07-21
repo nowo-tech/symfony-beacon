@@ -36,7 +36,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorNotExists('.beacon-nav a[href="/projects/new"]');
         self::assertSelectorTextContains('.beacon-nav', 'API docs');
         self::assertSelectorExists('button[data-action="confirm-dialog#open"]');
-        self::assertSelectorExists('dialog.confirm-dialog--form');
+        self::assertSelectorExists('dialog.confirm-dialog');
         self::assertSelectorExists('.user-avatar');
         self::assertSelectorTextContains('.user-menu', 'Preferences');
         self::assertSelectorTextContains('.user-menu', 'Dashboard');

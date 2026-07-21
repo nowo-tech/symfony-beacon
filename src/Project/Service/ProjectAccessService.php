@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
+use Deprecated;
+use Symfony\Component\HttpFoundation\Request;
 use App\Identity\Entity\User;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
@@ -26,7 +28,7 @@ final readonly class ProjectAccessService
 {
     public const string VIEW_AS_MEMBER_SESSION_KEY = '_beacon_view_as_member';
 
-    private const ROLE_RANK = [
+    private const array ROLE_RANK = [
         'member' => 1,
         'admin' => 2,
         'owner' => 3,
@@ -48,9 +50,7 @@ final readonly class ProjectAccessService
         return $this->membershipRepository->findOneByProjectAndUser($project, $user);
     }
 
-    /**
-     * @deprecated Use getDirectMembership(); kept for callers that mean direct rows
-     */
+    #[Deprecated(message: 'Use getDirectMembership(); kept for callers that mean direct rows')]
     public function getMembership(Project $project, User $user): ?ProjectMembership
     {
         return $this->getDirectMembership($project, $user);
@@ -72,11 +72,11 @@ final readonly class ProjectAccessService
             return new ProjectAccess(
                 role: $role,
                 directMembership: $direct,
-                viaGroup: null !== $groupRole,
+                viaGroup: $groupRole instanceof ProjectRole,
             );
         }
 
-        if (!$direct instanceof ProjectMembership && null === $groupRole) {
+        if (!$direct instanceof ProjectMembership && !$groupRole instanceof ProjectRole) {
             return null;
         }
 
@@ -88,14 +88,14 @@ final readonly class ProjectAccessService
         return new ProjectAccess(
             role: $role,
             directMembership: $direct,
-            viaGroup: null !== $groupRole,
+            viaGroup: $groupRole instanceof ProjectRole,
         );
     }
 
     public function isViewAsMemberActive(): bool
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (null === $request || !$request->hasSession()) {
+        if (!$request instanceof Request || !$request->hasSession()) {
             return false;
         }
 
