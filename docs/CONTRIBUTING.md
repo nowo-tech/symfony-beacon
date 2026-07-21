@@ -61,14 +61,17 @@ The client Symfony bundle is **out of scope** for this repository.
 
 ## Internationalization
 
-AuthKit pages use Symfony Translator with **locale in the URL path**. Default and fallback locale is `en`. Current enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`.
+Public AuthKit and setup URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.in_path: both` + `unlocalized: serve` for AuthKit; `LocalizedPublicPath` for setup):
 
-| Locale | Example paths |
+| Context | Paths / behaviour |
 | --- | --- |
-| Default (`en`) | `/en/login`, `/en/register`, `/en/logout` |
-| Other (`es`, `de`, `nl`, `fr`, `it`, `pt`, …) | `/es/login`, `/de/login`, … |
+| Default locale (bare) | `/login`, `/register`, `/logout`, `/setup` serve that locale |
+| Other locales | `/{locale}/login`, `/{locale}/setup`, … |
+| Setup default-locale prefix | `/es/setup` → `/setup` when `DEFAULT_LOCALE=es` |
+| Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
+| App shell | `/dashboard`, `/account/…`, `/projects/…` (locale from account preference; no `_locale` in path) |
 
-Bare `/`, `/login`, `/register`, and `/logout` redirect to the default-locale AuthKit paths (`config/routes/auth_locale_redirects.yaml`). Authenticated app home is `/dashboard`.
+Guest language: path switcher or `GET|POST /locale/{locale}` (session). Signed-in users: `preferredLocale` via `POST /account/locale/{locale}`. Enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`. `.env.dist` defaults to `en`; this project’s local `.env` may use `es`.
 
 **Full operator/developer manual:** [ADDING-LOCALES.md](ADDING-LOCALES.md) (enable config lists, catalogues, security regexes, seeders, tests, smoke checklist).
 
@@ -79,6 +82,8 @@ Bare `/`, `/login`, `/register`, and `/logout` redirect to the default-locale Au
 | `translations/messages.{locale}.yaml` | App UI strings (nav, locale switcher labels, AuthKit page chrome) **and** password-strength requirement/generator strings when `PasswordStrengthType` uses `translation_domain: messages` (e.g. `/account/security`) |
 | `translations/NowoAuthKitBundle.{locale}.yaml` | AuthKit label overrides **and** password-strength requirement/generator strings (AuthKit sets its translation domain on those fields) |
 | Bundle catalogues in vendor | AuthKit / PasswordStrength / … defaults; override in `translations/` when needed |
+
+Ship complete `messages.*.yaml` catalogues for every enabled locale (key parity with English). Missing keys still fall back to `en` via translator `fallbacks`.
 
 Twig: use `|trans` / `trans` with the right domain. HTML documents keep `lang="{{ app.request.locale|default('en') }}"`. The locale switcher loops Twig global `enabled_locales`.
 

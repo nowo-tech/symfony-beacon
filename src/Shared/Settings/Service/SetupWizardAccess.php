@@ -11,25 +11,31 @@ use Symfony\Bundle\SecurityBundle\Security;
 /**
  * Who may open the first-run setup wizard.
  *
- * Anonymous bootstrap is allowed only while the instance has no users yet
- * (chicken-and-egg before login). After the first account exists, only admins.
+ * Anonymous bootstrap is allowed while the instance has no users yet
+ * (chicken-and-egg before login), including when platform catalogs are empty
+ * even if setup was marked complete. After the first account exists, only admins.
  */
 final readonly class SetupWizardAccess
 {
     public function __construct(
         private InstanceSettingsRepository $settingsRepository,
         private UserRepository $userRepository,
+        private PlatformBootstrapState $platformBootstrapState,
         private Security $security,
     ) {
     }
 
     public function isBootstrapOpen(): bool
     {
-        if ($this->settingsRepository->getOrCreate()->isSetupCompleted()) {
+        if (0 !== $this->userRepository->count([])) {
             return false;
         }
 
-        return 0 === $this->userRepository->count([]);
+        if ($this->platformBootstrapState->needsPlatformSeed()) {
+            return true;
+        }
+
+        return !$this->settingsRepository->getOrCreate()->isSetupCompleted();
     }
 
     public function canAccess(): bool

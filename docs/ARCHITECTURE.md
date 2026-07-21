@@ -242,7 +242,7 @@ flowchart TD
   Anon[Anonymous request] --> Gate{Authenticated?}
   Gate -->|no| Share{Valid share token?}
   Share -->|yes| Viewer[Viewer session]
-  Share -->|no| Login[AuthKit /en/login]
+  Share -->|no| Login[AuthKit /login]
   Login --> Dash[/dashboard]
   Gate -->|yes| Dash
   Viewer --> IssueOrProject[Issue show or project pages per grant]

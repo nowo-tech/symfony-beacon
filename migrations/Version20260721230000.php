@@ -93,11 +93,11 @@ final class Version20260721230000 extends AbstractMigration
             ];
         }
 
-        $tableDef = [
-            MDK::COLUMNS => [
-                ['name' => 'project_id', 'type' => 'integer', 'notnull' => true],
-            ],
-        ];
+        // Column already exists (nullable) after the block above — only tighten nullability.
+        // Do not pass MDK::COLUMNS again: MigrationsKit would try ADD COLUMN and fail.
+        $this->addSql('ALTER TABLE event MODIFY project_id INT NOT NULL');
+
+        $tableDef = [];
         if ([] !== $indexesToAdd) {
             $tableDef[MDK::INDEXES] = $indexesToAdd;
         }
@@ -105,11 +105,13 @@ final class Version20260721230000 extends AbstractMigration
             $tableDef[MDK::FOREIGN_KEYS] = $foreignKeys;
         }
 
-        $this->applyMdk([
-            MDK::TABLES => [
-                'event' => $tableDef,
-            ],
-        ]);
+        if ([] !== $tableDef) {
+            $this->applyMdk([
+                MDK::TABLES => [
+                    'event' => $tableDef,
+                ],
+            ]);
+        }
 
         $this->addSql("UPDATE issue SET level = 'error' WHERE level NOT IN ('fatal', 'error', 'warning', 'info', 'debug')");
     }

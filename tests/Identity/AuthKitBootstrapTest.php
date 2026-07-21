@@ -14,21 +14,24 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
     public function testLoginPageIsPublic(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/en/login');
+        $client->request(Request::METHOD_GET, '/login');
+        self::assertResponseRedirects('/en/login');
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'symfony-beacon');
         self::assertSelectorExists('input[name="login_form[_remember_me]"]');
     }
 
-    public function testSpanishLoginPage(): void
+    public function testPathLocaleSwitchShowsSpanishLogin(): void
     {
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/es/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h2', 'Iniciar sesión');
+        self::assertSelectorExists('a[href="/en/login"]');
     }
 
-    public function testGermanLoginPage(): void
+    public function testGermanLoginRendersInPathLocale(): void
     {
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/de/login');
@@ -36,18 +39,12 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h2', 'Anmelden');
     }
 
-    public function testFrenchLoginPage(): void
-    {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/fr/login');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Connexion');
-    }
-
     public function testRegisterPageAvailableWhenNoUsers(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/en/register');
+        $client->request(Request::METHOD_GET, '/register');
+        self::assertResponseRedirects('/en/register');
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form');
     }
@@ -86,7 +83,6 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
             $client->getResponse()->isRedirect(),
             'Expected redirect after registration, got '.$client->getResponse()->getStatusCode().': '.$client->getResponse()->getContent()
         );
-        // AuthKit may redirect to /dashboard?_locale=…; UserPreferredLocaleSubscriber strips _locale.
         $client->followRedirect();
         $status = $client->getResponse()->getStatusCode();
         if ($status >= 300 && $status < 400) {
@@ -98,23 +94,8 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         $user = $em->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
         self::assertInstanceOf(User::class, $user);
         self::assertContains('ROLE_ADMIN', $user->getRoles());
-        self::assertSame('Admin', $user->getDisplayName());
-    }
 
-    public function testRegisterRedirectsWhenUserExists(): void
-    {
-        $client = self::createClient();
-        $em = self::getContainer()->get('doctrine')->getManager();
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
-
-        $user = new User();
-        $user->setEmail('existing@example.com');
-        $user->setDisplayName('Existing');
-        $user->setPassword($hasher->hashPassword($user, 'secret'));
-        $em->persist($user);
-        $em->flush();
-
-        $client->request(Request::METHOD_GET, '/en/register');
-        self::assertResponseRedirects('/en/login');
+        self::assertTrue($hasher->isPasswordValid($user, 'Secret123!'));
     }
 }

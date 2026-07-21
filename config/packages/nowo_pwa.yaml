@@ -30,7 +30,7 @@ nowo_pwa:
         cache_version: v3
         cache_name_prefix: beacon-pwa
         precache_urls:
-            - /en/login
+            - /login
             - /offline
         runtime_cache_patterns:
             - '/build/'

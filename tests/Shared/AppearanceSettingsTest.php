@@ -99,6 +99,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         $em->persist($admin);
         $em->flush();
 
+        $this->seedPlatformCatalogs();
         $this->login($client, $admin);
         $crawler = $client->request(Request::METHOD_GET, '/settings/appearance');
         $form = $crawler->selectButton('Save appearance')->form([

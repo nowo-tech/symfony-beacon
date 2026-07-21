@@ -1,49 +1,51 @@
 nav:
     projects: Projecten
-    new_project: Nieuw project
+    new_project: 'Nieuw project'
     log_out: Uitloggen
     main: Hoofdnavigatie
     account: Accountmenu
     admin: Administratie
-    admin_hub: Beheerder overzicht
+    admin_hub: 'Beheerder overzicht'
     users: Gebruikers
     groups: Groepen
     admin_projects: Projecten
     appearance: Weergave
     mailer: Mailer
-    menus: Menu's
+    menus: "Menu's"
     breadcrumbs: Paneermeel
-    toggle_sidebar: Schakel navigatie in
+    toggle_sidebar: 'Schakel navigatie in'
     preferences: Voorkeuren
     account_settings: Accountinstellingen
     dashboard: Dashboard
     issues: Issues
     performance: Prestaties
     analytics: Analyses
+    setup: Configuratie
+    releases: Releases
 api_docs:
     title: API-documenten
-    intro: Ontdek Envelope-opname en gerelateerde HTTP-eindpunten. Gebruik Autoriseren met een X-Beacon-Auth-header (beacon_key en beacon_secret van uw project-DSN).
-    open_json: OpenAPI JSON
+    intro: 'Ontdek Envelope-opname en gerelateerde HTTP-eindpunten. Gebruik Autoriseren met een X-Beacon-Auth-header (beacon_key en beacon_secret van uw project-DSN).'
+    open_json: 'OpenAPI JSON'
 common:
     filter: Filter
-    clear_filters: Filters wissen
+    clear_filters: 'Filters wissen'
     cancel: Annuleren
-    yes: 'Ja'
+    'yes': Ja
     na: n.v.t
     unknown: onbekend
     audit:
         title: Audit
         created_at: Aangemaakt
         updated_at: Bijgewerkt
-        created_by: Aangemaakt door
-        updated_by: Bijgewerkt door
+        created_by: 'Aangemaakt door'
+        updated_by: 'Bijgewerkt door'
         by_system: Systeem
 pagination:
     showing: 'Toont %from%–%to% van %total%'
-    nav: Tabelpagina's
+    nav: "Tabelpagina's"
     previous: Vorig
     next: Volgende
-    per_page: Rijen per pagina
+    per_page: 'Rijen per pagina'
     per_page_option: '%count% / pagina'
 toast:
     dismiss: Afwijzen
@@ -59,101 +61,118 @@ locale:
 theme:
     day: Dag
     night: Nacht
-    switch_to_day: Schakel over naar de dagmodus
-    switch_to_night: Schakel over naar de nachtmodus
+    switch_to_day: 'Schakel over naar de dagmodus'
+    switch_to_night: 'Schakel over naar de nachtmodus'
 auth:
-    tagline: Zelfgehoste foutopsporing voor PHP en Symfony.
+    tagline: 'Zelfgehoste foutopsporing voor PHP en Symfony.'
     brand_eyebrow: Foutopsporing
     bootstrap_eyebrow: Bootstrap
-    bootstrap_hint: Maak het eerste beheerdersaccount aan. De registratie sluit nadat deze gebruiker bestaat.
+    bootstrap_hint: 'Maak het eerste beheerdersaccount aan. De registratie sluit nadat deze gebruiker bestaat.'
     magic:
-        title: Aanmelden met magic link
-        intro: Voer je e-mailadres in; we sturen een eenmalige aanmeldlink (geldig 10 minuten).
+        title: 'Aanmelden met magic link'
+        intro: 'Voer je e-mailadres in; we sturen een eenmalige aanmeldlink (geldig 10 minuten).'
         email: E-mail
-        submit: Magic link versturen
-        sent: Als dat account bestaat en actief is, is de link onderweg.
-        throttled: Te veel verzoeken. Probeer het later opnieuw.
-        invalid: Dat verzoek kon niet worden verwerkt.
-        unavailable: Magic-link aanmelden is niet beschikbaar totdat een beheerder Mailer (versleutelde DSN) configureert onder Beheer → Mailer.
-        back_to_password: Aanmelden met wachtwoord
-        email_subject: Je Beacon magic-aanmeldlink
-        email_body: "Open deze link om aan te melden (verloopt %expires%):\n\n%link%"
+        submit: 'Magic link versturen'
+        sent: 'Als dat account bestaat en actief is, is de link onderweg.'
+        throttled: 'Te veel verzoeken. Probeer het later opnieuw.'
+        invalid: 'Dat verzoek kon niet worden verwerkt.'
+        unavailable: 'Magic-link aanmelden is niet beschikbaar totdat een beheerder Mailer (versleutelde DSN) configureert onder Beheer → Mailer.'
+        back_to_password: 'Aanmelden met wachtwoord'
+        email_subject: 'Je Beacon magic-aanmeldlink'
+        email_body: |-
+            Open deze link om aan te melden (verloopt %expires%):
+
+            %link%
+    reset:
+        email_subject: 'Stel uw Beacon-wachtwoord opnieuw in'
+        email_body: |
+            Gebruik deze link om een nieuw wachtwoord te kiezen:
+
+            %link%
 flash:
     project:
-        created: Project gemaakt.
-        api_key_created: API-sleutel gemaakt.
-        api_key_revoked: API-sleutel ingetrokken.
-        api_key_rotated: API-sleutel gedraaid. Update clients met de nieuwe DSN.
-        governance_saved: Instellingen voor projectbeheer opgeslagen.
-        governance_invalid: Governance-waarden moeten leeg zijn (overnemen) of niet-negatieve gehele getallen zijn.
-        quota_approaching: Dit project nadert het dagelijkse evenementenquotum.
-        history_cleared: Projectgeschiedenis gewist.
-        deleted: Project verwijderd.
-        delete_confirmation_mismatch: De projectnaam kwam niet overeen. Er is niets verwijderd.
-        member_added: Lid toegevoegd aan het project.
-        member_role_updated: Rol van lid bijgewerkt.
-        member_removed: Lid verwijderd uit het project.
-        member_user_not_found: Er bestaat geen gebruiker met dat e-mailadres. Zij moeten zich eerst registreren.
-        member_user_disabled: Dat gebruikersaccount is uitgeschakeld.
-        member_already: Die gebruiker is al projectlid.
-        member_invalid_role: Ongeldige lidmaatschapsrol.
-        member_last_owner: Het project moet minimaal één eigenaar behouden.
-        member_cannot_manage_owner: Beheerders kunnen eigenaren niet wijzigen of verwijderen.
-        member_error: Kan projectleden niet updaten.
-        ownership_transferred: Projecteigendom overgedragen. U bent nu een beheerder.
-        transfer_confirmation_mismatch: De projectnaam kwam niet overeen. Het eigendom werd niet overgedragen.
-        transfer_to_self: U kunt het eigendom niet aan uzelf overdragen.
-        transfer_already_owner: Dat lid is al eigenaar.
-        group_added: Groep gekoppeld aan het project.
-        group_role_updated: Groepsrol bijgewerkt.
-        group_removed: Groep ontkoppeld van het project.
-        group_already: Die groep is al aan dit project gekoppeld.
-        group_not_found: Groep niet gevonden.
-        group_link_forbidden: U kunt alleen groepen koppelen waartoe u behoort (projecteigenaren en instantiebeheerders kunnen elke groep koppelen).
+        created: 'Project gemaakt.'
+        api_key_created: 'API-sleutel gemaakt.'
+        api_key_revoked: 'API-sleutel ingetrokken.'
+        api_key_rotated: 'API-sleutel gedraaid. Update clients met de nieuwe DSN.'
+        governance_saved: 'Instellingen voor projectbeheer opgeslagen.'
+        governance_invalid: 'Governance-waarden moeten leeg zijn (overnemen) of niet-negatieve gehele getallen zijn.'
+        quota_approaching: 'Dit project nadert het dagelijkse evenementenquotum.'
+        history_cleared: 'Projectgeschiedenis gewist.'
+        deleted: 'Project verwijderd.'
+        delete_confirmation_mismatch: 'De projectnaam kwam niet overeen. Er is niets verwijderd.'
+        member_added: 'Lid toegevoegd aan het project.'
+        member_role_updated: 'Rol van lid bijgewerkt.'
+        member_removed: 'Lid verwijderd uit het project.'
+        member_user_not_found: 'Er bestaat geen gebruiker met dat e-mailadres. Zij moeten zich eerst registreren.'
+        member_user_disabled: 'Dat gebruikersaccount is uitgeschakeld.'
+        member_already: 'Die gebruiker is al projectlid.'
+        member_invalid_role: 'Ongeldige lidmaatschapsrol.'
+        member_last_owner: 'Het project moet minimaal één eigenaar behouden.'
+        member_cannot_manage_owner: 'Beheerders kunnen eigenaren niet wijzigen of verwijderen.'
+        member_error: 'Kan projectleden niet updaten.'
+        ownership_transferred: 'Projecteigendom overgedragen. U bent nu een beheerder.'
+        transfer_confirmation_mismatch: 'De projectnaam kwam niet overeen. Het eigendom werd niet overgedragen.'
+        transfer_to_self: 'U kunt het eigendom niet aan uzelf overdragen.'
+        transfer_already_owner: 'Dat lid is al eigenaar.'
+        group_added: 'Groep gekoppeld aan het project.'
+        group_role_updated: 'Groepsrol bijgewerkt.'
+        group_removed: 'Groep ontkoppeld van het project.'
+        group_already: 'Die groep is al aan dit project gekoppeld.'
+        group_not_found: 'Groep niet gevonden.'
+        group_link_forbidden: 'U kunt alleen groepen koppelen waartoe u behoort (projecteigenaren en instantiebeheerders kunnen elke groep koppelen).'
     appearance:
-        saved: Weergave-instellingen opgeslagen.
+        saved: 'Weergave-instellingen opgeslagen.'
     preferences:
-        saved: Voorkeuren opgeslagen.
-        profile_saved: Profiel opgeslagen.
-        password_saved: Wachtwoord bijgewerkt.
-        display_saved: Weergavevoorkeuren opgeslagen.
-        locale_saved: Taal bijgewerkt.
+        saved: 'Voorkeuren opgeslagen.'
+        profile_saved: 'Profiel opgeslagen.'
+        password_saved: 'Wachtwoord bijgewerkt.'
+        display_saved: 'Weergavevoorkeuren opgeslagen.'
+        locale_saved: 'Taal bijgewerkt.'
     users:
-        enabled: Gebruikersaccount ingeschakeld.
-        disabled: Gebruikersaccount uitgeschakeld.
-        cannot_disable_self: U kunt uw eigen account niet uitschakelen.
-        created: Gebruikersaccount aangemaakt.
-        role_updated: Gebruikersrol bijgewerkt.
-        invalid_email: Voer een geldig e-mailadres in.
-        name_required: Weergavenaam is vereist.
-        password_too_short: Wachtwoord moet minimaal 8 tekens lang zijn.
-        email_taken: Dat e-mailadres is al geregistreerd.
-        invalid_role: Ongeldige rol.
-        cannot_change_own_role: Je eigen rol kun je niet veranderen.
-        last_admin: Het exemplaar moet ten minste één beheerder hebben.
-        project_unlink_forbidden: U mag dat projectlidmaatschap niet verwijderen.
-        project_unlink_error: Kan de gebruiker niet uit het project verwijderen.
+        enabled: 'Gebruikersaccount ingeschakeld.'
+        disabled: 'Gebruikersaccount uitgeschakeld.'
+        cannot_disable_self: 'U kunt uw eigen account niet uitschakelen.'
+        created: 'Gebruikersaccount aangemaakt.'
+        role_updated: 'Gebruikersrol bijgewerkt.'
+        invalid_email: 'Voer een geldig e-mailadres in.'
+        name_required: 'Weergavenaam is vereist.'
+        password_too_short: 'Wachtwoord moet minimaal 8 tekens lang zijn.'
+        email_taken: 'Dat e-mailadres is al geregistreerd.'
+        invalid_role: 'Ongeldige rol.'
+        cannot_change_own_role: 'Je eigen rol kun je niet veranderen.'
+        last_admin: 'Het exemplaar moet ten minste één beheerder hebben.'
+        project_unlink_forbidden: 'U mag dat projectlidmaatschap niet verwijderen.'
+        project_unlink_error: 'Kan de gebruiker niet uit het project verwijderen.'
     groups:
-        created: Groep gemaakt.
-        updated: Groep bijgewerkt.
-        deleted: Groep verwijderd.
-        name_required: Groepsnaam is vereist.
-        user_not_found: Er bestaat geen gebruiker met dat e-mailadres.
-        already_member: Die gebruiker zit al in de groep.
-        member_added: Gebruiker toegevoegd aan de groep.
-        member_removed: Gebruiker verwijderd uit de groep.
-        project_unlink_forbidden: U mag dat project niet ontkoppelen.
-        project_unlink_error: Kan het project niet ontkoppelen van de groep.
+        created: 'Groep gemaakt.'
+        updated: 'Groep bijgewerkt.'
+        deleted: 'Groep verwijderd.'
+        name_required: 'Groepsnaam is vereist.'
+        user_not_found: 'Er bestaat geen gebruiker met dat e-mailadres.'
+        already_member: 'Die gebruiker zit al in de groep.'
+        member_added: 'Gebruiker toegevoegd aan de groep.'
+        member_removed: 'Gebruiker verwijderd uit de groep.'
+        project_unlink_forbidden: 'U mag dat project niet ontkoppelen.'
+        project_unlink_error: 'Kan het project niet ontkoppelen van de groep.'
     admin_projects:
-        name_required: Projectnaam is vereist.
-        updated: Project bijgewerkt.
-        ingest_suspended: Ingest opgeschort voor dit project.
-        ingest_resumed: Ingest is hervat voor dit project.
-        view_as_enabled: Projecten bekijken als lid. Geprivilegieerde projectacties zijn beperkt.
-        view_as_disabled: Modus weergeven als lid verlaten.
+        name_required: 'Projectnaam is vereist.'
+        updated: 'Project bijgewerkt.'
+        ingest_suspended: 'Ingest opgeschort voor dit project.'
+        ingest_resumed: 'Ingest is hervat voor dit project.'
+        view_as_enabled: 'Projecten bekijken als lid. Geprivilegieerde projectacties zijn beperkt.'
+        view_as_disabled: 'Modus weergeven als lid verlaten.'
+    mailer:
+        saved: 'Mailer-instellingen opgeslagen.'
+        sample_sent: 'Voorbeeldmail verzonden. Controleer de inbox (en spam) voor de magic-login credentialstest.'
+        sample_unavailable: 'Sla eerst een bruikbare versleutelde Mailer-DSN op voordat u een voorbeeld verstuurt.'
+        sample_invalid_recipient: 'Voer een geldig e-mailadres van de ontvanger in.'
+        sample_failed: 'Voorbeeldmail kon niet worden verzonden. Controleer de Mailer-DSN en serverlogs.'
+    mercure:
+        saved: 'Mercure-instellingen opgeslagen.'
 project:
     label: Project
-    no_description: Geen beschrijving
+    no_description: 'Geen beschrijving'
     nav:
         label: Projectsecties
     settings:
@@ -163,73 +182,73 @@ project:
     governance:
         title: Bestuur
         help: 'Retentie per project, tarieflimieten en dagelijkse quota. Laat een veld leeg om de serverstandaard over te nemen.'
-        retention_days: Retentie dagen
-        retention_max_events: Max. opgeslagen gebeurtenissen
-        ingest_rate_limit: Limiet voor opnamesnelheid (per minuut)
-        event_quota_daily: Dagelijks evenementenquotum
+        retention_days: 'Retentie dagen'
+        retention_max_events: 'Max. opgeslagen gebeurtenissen'
+        ingest_rate_limit: 'Limiet voor opnamesnelheid (per minuut)'
+        event_quota_daily: 'Dagelijks evenementenquotum'
         inherit_hint: 'Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaardwaarde niet nul is.'
-        save: Bewaar het bestuur
+        save: 'Bewaar het bestuur'
         quota_usage: 'Evenementen vandaag: %count% / %quota%'
-        ingest_disabled_banner: De envelopopname is opgeschort voor dit project. Bestaande gegevens blijven leesbaar.
+        ingest_disabled_banner: 'De envelopopname is opgeschort voor dit project. Bestaande gegevens blijven leesbaar.'
     health:
         title: Gezondheid
-        intro: Instance Messenger-wachtrijdiepte en laatste meldingsstatus voor de bestemmingen van dit project.
-        messenger_pending: Messenger-asynchronisatie in behandeling
-        messenger_unavailable: Wachtrijdiepte niet beschikbaar
+        intro: 'Instance Messenger-wachtrijdiepte en laatste meldingsstatus voor de bestemmingen van dit project.'
+        messenger_pending: 'Messenger-asynchronisatie in behandeling'
+        messenger_unavailable: 'Wachtrijdiepte niet beschikbaar'
         instance_wide: exemplaar-breed
         ready_probe: Gereedheidssonde
-        ready_link: Open /gezondheid/klaar
+        ready_link: 'Open /gezondheid/klaar'
         destinations_title: Meldingsbestemmingen
-        destinations_empty: Geen meldingsbestemmingen geconfigureerd.
+        destinations_empty: 'Geen meldingsbestemmingen geconfigureerd.'
         last_delivery: 'Laatste levering:'
         delivery_ok: Succes
         delivery_fail: Mislukt
-        never_delivered: Nog geen leveringen.
-        history_empty: Geen recente bezorgpogingen vastgelegd.
+        never_delivered: 'Nog geen leveringen.'
+        history_empty: 'Geen recente bezorgpogingen vastgelegd.'
         history_show: 'Recente pogingen tonen (%count%)'
         history_hide: 'Recente pogingen verbergen (%count%)'
     new:
-        title: Nieuw project
-        submit: Project aanmaken
+        title: 'Nieuw project'
+        submit: 'Project aanmaken'
     name:
         label: Naam
-        placeholder: bijv. Facturerings-API
-        help: Wordt weergegeven in het dashboard en gebruikt om de projectslug af te leiden.
-        required: Projectnaam is vereist.
+        placeholder: 'bijv. Facturerings-API'
+        help: 'Wordt weergegeven in het dashboard en gebruikt om de projectslug af te leiden.'
+        required: 'Projectnaam is vereist.'
     description:
         label: Beschrijving
-        placeholder: Optionele korte samenvatting
-        help: Helpt uw ​​team dit project te herkennen.
+        placeholder: 'Optionele korte samenvatting'
+        help: 'Helpt uw ​​team dit project te herkennen.'
     api_keys:
-        title: API-sleutels / DSN
-        help: Gebruik een DSN in BEACON_DSN zodat uw app fouten naar dit project kan verzenden.
+        title: 'API-sleutels / DSN'
+        help: 'Gebruik een DSN in BEACON_DSN zodat uw app fouten naar dit project kan verzenden.'
         inactive: inactief
         public: 'publiek:'
-        label_placeholder: bijv. kalme otter
-        generate: Naam voorstellen
-        generate_hint: Vul het etiket met een mensvriendelijke naam voor het bijvoeglijk naamwoord
-        add: Sleutel toevoegen
+        label_placeholder: 'bijv. kalme otter'
+        generate: 'Naam voorstellen'
+        generate_hint: 'Vul het etiket met een mensvriendelijke naam voor het bijvoeglijk naamwoord'
+        add: 'Sleutel toevoegen'
         revoke: Herroepen
-        revoke_confirm: Deze API-sleutel intrekken? Inslikken met dit geheim zal onmiddellijk mislukken.
+        revoke_confirm: 'Deze API-sleutel intrekken? Inslikken met dit geheim zal onmiddellijk mislukken.'
         rotate: Draaien
     members:
         title: Leden
-        help: Directe leden van dit project. Eigenaren en beheerders beheren het lidmaatschap. Toegang kan ook afkomstig zijn van gekoppelde groepen hieronder.
+        help: 'Directe leden van dit project. Eigenaren en beheerders beheren het lidmaatschap. Toegang kan ook afkomstig zijn van gekoppelde groepen hieronder.'
         your_role: 'Jouw rol:'
-        email_label: E-mailadres van lid
-        email_placeholder: 'gebruiker@voorbeeld.com'
+        email_label: 'E-mailadres van lid'
+        email_placeholder: gebruiker@voorbeeld.com
         role_label: Rol
-        add: Lid toevoegen
-        add_title: Lid toevoegen
-        add_help: De persoon moet al een Beacon-account hebben (hetzelfde e-mailadres).
+        add: 'Lid toevoegen'
+        add_title: 'Lid toevoegen'
+        add_help: 'De persoon moet al een Beacon-account hebben (hetzelfde e-mailadres).'
         update_role: Update
         remove: Verwijderen
-        remove_title: Lid verwijderen?
+        remove_title: 'Lid verwijderen?'
         remove_confirm: '%email% uit dit project verwijderen?'
-        edit_role: Rol bewerken
-        edit_role_title: Wijzig de rol van het lid
+        edit_role: 'Rol bewerken'
+        edit_role_title: 'Wijzig de rol van het lid'
         edit_role_body: 'Kies een nieuwe rol voor %name% (%email%).'
-        last_owner_hint: Het project moet minimaal één eigenaar behouden.
+        last_owner_hint: 'Het project moet minimaal één eigenaar behouden.'
         role:
             owner: Eigenaar
             admin: Beheerder
@@ -237,63 +256,82 @@ project:
             viewer: Viewer
     groups:
         title: Groepen
-        help: Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt. Eigenaren moeten worden toegevoegd als individuele gebruikers.
-        empty: Er zijn nog geen groepen gekoppeld.
-        select: Selecteer een groep…
-        add: Link groep
+        help: 'Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt. Eigenaren moeten worden toegevoegd als individuele gebruikers.'
+        empty: 'Er zijn nog geen groepen gekoppeld.'
+        select: 'Selecteer een groep…'
+        add: 'Link groep'
         remove: Ontkoppelen
-        remove_title: Groep ontkoppelen?
+        remove_title: 'Groep ontkoppelen?'
         remove_confirm: 'Groep “%name%” ontkoppelen van dit project?'
-        edit_role: Groepsrol bewerken
-        edit_role_title: Groepsrol wijzigen
+        edit_role: 'Groepsrol bewerken'
+        edit_role_title: 'Groepsrol wijzigen'
         edit_role_body: 'Kies een nieuwe rol voor de groep “%name%”.'
         none_available: 'Alle groepen zijn al gekoppeld, of maak groepen aan onder Beheer → Groepen.'
         member_count: '%count% gebruikers in groep'
     danger:
         title: Gevarenzone
-        intro: Onomkeerbare acties voor dit project. Gebruik het met zorg.
+        intro: 'Onomkeerbare acties voor dit project. Gebruik het met zorg.'
         cancel: Annuleren
-        clear_open: Geschiedenis wissen…
-        clear_title: Projectgeschiedenis wissen?
+        clear_open: 'Geschiedenis wissen…'
+        clear_title: 'Projectgeschiedenis wissen?'
         clear_body: 'Hiermee worden problemen, gebeurtenissen, prestatiegegevens en analyses voor dit project permanent verwijderd. API-sleutels en leden worden bewaard.'
         clear_confirm: 'Ja, duidelijke geschiedenis'
-        delete_open: Project verwijderen…
-        delete_title: Dit project definitief verwijderen?
+        delete_open: 'Project verwijderen…'
+        delete_title: 'Dit project definitief verwijderen?'
         delete_body: 'Hierdoor worden “%name%” en alle bijbehorende gegevens (problemen, gebeurtenissen, prestaties, analyses, sleutels en leden) permanent verwijderd. Dit kan niet ongedaan worden gemaakt.'
         delete_type_label: 'Typ %name% om te bevestigen:'
-        delete_confirm: Project verwijderen
-        transfer_open: Eigendom overdragen…
-        transfer_title: Projecteigendom overdragen?
-        transfer_body: Het geselecteerde lid wordt de eigenaar. U wordt beheerder en verliest de mogelijkheid om het project te verwijderen.
-        transfer_member_label: Nieuwe eigenaar
-        transfer_member_placeholder: Selecteer een lid…
+        delete_confirm: 'Project verwijderen'
+        transfer_open: 'Eigendom overdragen…'
+        transfer_title: 'Projecteigendom overdragen?'
+        transfer_body: 'Het geselecteerde lid wordt de eigenaar. U wordt beheerder en verliest de mogelijkheid om het project te verwijderen.'
+        transfer_member_label: 'Nieuwe eigenaar'
+        transfer_member_placeholder: 'Selecteer een lid…'
         transfer_type_label: 'Typ %name% om te bevestigen:'
-        transfer_confirm: Eigendom overdragen
-        transfer_no_candidates: Voeg nog een direct lid toe voordat u het eigendom overdraagt.
+        transfer_confirm: 'Eigendom overdragen'
+        transfer_no_candidates: 'Voeg nog een direct lid toe voordat u het eigendom overdraagt.'
 projects:
     title: Projecten
-    intro: Filter en open projecten waartoe u toegang heeft.
-    search_placeholder: Zoek projecten…
-    empty: Nog geen projecten.
-    create_first: Maak uw eerste project
+    intro: 'Filter en open projecten waartoe u toegang heeft.'
+    search_placeholder: 'Zoek projecten…'
+    empty: 'Nog geen projecten.'
+    create_first: 'Maak uw eerste project'
     errors_last_7_days: '%count% fouten in de afgelopen 7 dagen'
+    share:
+        title: Deellinks
+        help: 'Maak een tijdelijke link met alleen-lezen viewer-toegang tot dit project (of één issue). Ontvangers moeten zich aanmelden.'
+        days: 'Geldigheid (dagen)'
+        issue_uuid: 'Issue-UUID (optioneel)'
+        issue_optional: 'Leeg laten voor het hele project'
+        create: 'Deellink maken'
+        revoke: Intrekken
+        empty: 'Geen actieve deellinks.'
+        expires: Verloopt
+        scoped_issue: 'Beperkt tot issue'
+        created: 'Deellink aangemaakt — kopieer hem nu; hij wordt niet opnieuw getoond.'
+        revoked: 'Deellink ingetrokken.'
+        invalid: 'Deze deellink is ongeldig, verlopen of ingetrokken.'
+        invalid_csrf: 'Ongeldig beveiligingstoken.'
+        issue_not_found: 'Issue niet gevonden in dit project.'
+        expires_in_past: 'De vervaldatum moet in de toekomst liggen.'
+        expires_too_far: 'Deellinks mogen maximaal 30 dagen geldig zijn.'
+        issue_wrong_project: 'Dat issue hoort niet bij dit project.'
 issues:
     title: Issues
-    search_placeholder: Titel zoeken…
-    empty: Er zijn geen problemen die overeenkomen met deze filters.
-    back: ← Problemen
-    back_to_issue: ← Probleem
+    search_placeholder: 'Titel zoeken…'
+    empty: 'Er zijn geen problemen die overeenkomen met deze filters.'
+    back: '← Problemen'
+    back_to_issue: '← Probleem'
     event_count: '%count% evenementen'
-    latest_stack: Nieuwste stapel / payload
-    latest_event: Laatste evenement
+    latest_stack: 'Nieuwste stapel / payload'
+    latest_event: 'Laatste evenement'
     event: Evenement
-    recent_events: Recente gebeurtenissen
-    no_events: Geen evenementen opgeslagen.
+    recent_events: 'Recente gebeurtenissen'
+    no_events: 'Geen evenementen opgeslagen.'
     event_detail: Evenementdetails
     context: Context
-    occurred_at: Voorgekomen bij
-    received_at: Ontvangen op
-    release: Uitgave / versie
+    occurred_at: 'Voorgekomen bij'
+    received_at: 'Ontvangen op'
+    release: 'Uitgave / versie'
     php_version: PHP-versie
     symfony_version: Symfonie-versie
     os: Besturingssysteem
@@ -307,19 +345,19 @@ issues:
     request_url: URL
     request_query: Zoekreeks
     request_headers: Kopteksten
-    extra: Aanvullende gegevens
+    extra: 'Aanvullende gegevens'
     stacktrace: Stapeltrace
     source_context: Bron
-    no_source_context: Geen broncontext voor dit frame.
-    copy_path: Kopieer pad
+    no_source_context: 'Geen broncontext voor dit frame.'
+    copy_path: 'Kopieer pad'
     path_copied: Gekopieerd
     breadcrumbs: Paneermeel
-    raw_payload: Ruwe lading
+    raw_payload: 'Ruwe lading'
     highlights: Hoogtepunten
     tags: Labels
     tags_custom: Klanttags
     tags_system: Systeemtags
-    tags_hint: Klanttags zijn afkomstig van BeaconBundle setTag/setTags. Scrub gevoelige velden met before_send vóór opname.
+    tags_hint: 'Klanttags zijn afkomstig van BeaconBundle setTag/setTags. Scrub gevoelige velden met before_send vóór opname.'
     contexts: Contexten
     context_runtime: Looptijd
     context_framework: Kader
@@ -328,105 +366,105 @@ issues:
     aside_triage: Triage
     aside_duplicate: Duplicaat
     assignee: Cessionaris
-    assignee_unassigned: Niet toegewezen
-    assignee_help: Kies een projectlid dat verantwoordelijk is voor het oplossen van dit probleem.
-    assignee_save: Toegewezene opslaan
-    assignee_saved: Toegewezene bijgewerkt.
-    assignee_not_member: Die gebruiker is geen lid van dit project.
-    assignee_invalid: Kan de toegewezen persoon niet updaten.
+    assignee_unassigned: 'Niet toegewezen'
+    assignee_help: 'Kies een projectlid dat verantwoordelijk is voor het oplossen van dit probleem.'
+    assignee_save: 'Toegewezene opslaan'
+    assignee_saved: 'Toegewezene bijgewerkt.'
+    assignee_not_member: 'Die gebruiker is geen lid van dit project.'
+    assignee_invalid: 'Kan de toegewezen persoon niet updaten.'
     status:
         unresolved: Onopgelost
         resolved: Opgelost
         ignored: Genegeerd
-    status_help: Wijzig hoe dit probleem wordt bijgehouden in de projectinbox.
-    status_mark_resolved: Mark opgelost
-    status_mark_unresolved: Markeer onopgelost
+    status_help: 'Wijzig hoe dit probleem wordt bijgehouden in de projectinbox.'
+    status_mark_resolved: 'Mark opgelost'
+    status_mark_unresolved: 'Markeer onopgelost'
     status_mark_ignored: Negeren
-    status_saved: Probleemstatus bijgewerkt.
-    status_invalid: Kan de probleemstatus niet bijwerken.
+    status_saved: 'Probleemstatus bijgewerkt.'
+    status_invalid: 'Kan de probleemstatus niet bijwerken.'
     priority:
         low: Laag
         medium: Medium
         high: Hoog
         critical: Kritisch
     priority_label: Prioriteit
-    priority_help: Stel in hoe urgent dit probleem is voor triage.
-    priority_save: Prioriteit opslaan
-    priority_saved: Prioriteit bijgewerkt.
-    priority_invalid: Kan de prioriteit niet bijwerken.
+    priority_help: 'Stel in hoe urgent dit probleem is voor triage.'
+    priority_save: 'Prioriteit opslaan'
+    priority_saved: 'Prioriteit bijgewerkt.'
+    priority_invalid: 'Kan de prioriteit niet bijwerken.'
     comments_title: Opmerkingen
-    comments_empty: Nog geen opmerkingen.
+    comments_empty: 'Nog geen opmerkingen.'
     comment_body: Opmerking
-    comment_placeholder: Voeg een reactie toe…
-    comment_submit: Reactie plaatsen
-    comment_saved: Commentaar toegevoegd.
-    comment_empty: Reactie mag niet leeg zijn.
-    comment_too_long: Commentaar is te lang.
-    comment_invalid: Kan de opmerking niet toevoegen.
+    comment_placeholder: 'Voeg een reactie toe…'
+    comment_submit: 'Reactie plaatsen'
+    comment_saved: 'Commentaar toegevoegd.'
+    comment_empty: 'Reactie mag niet leeg zijn.'
+    comment_too_long: 'Commentaar is te lang.'
+    comment_invalid: 'Kan de opmerking niet toevoegen.'
     duplicate_of: 'Duplicaat van'
-    duplicate_help: Markeer dit probleem als een duplicaat van een ander probleem in hetzelfde project (zet de status op genegeerd).
-    duplicate_aside_help: Koppel deze uitgave aan een canonieke uitgave in hetzelfde project.
-    duplicate_open: Markeren als duplicaat...
-    duplicate_modal_title: Markeer als duplicaat
-    duplicate_canonical: Canonieke kwestie
-    duplicate_choose: Kies een canonieke kwestie
-    duplicate_search_placeholder: Zoeken op titel of UUID…
-    duplicate_search_empty: Geen overeenkomende problemen
-    duplicate_no_candidates: Er zijn geen andere problemen in dit project die als canoniek kunnen worden gelinkt.
+    duplicate_help: 'Markeer dit probleem als een duplicaat van een ander probleem in hetzelfde project (zet de status op genegeerd).'
+    duplicate_aside_help: 'Koppel deze uitgave aan een canonieke uitgave in hetzelfde project.'
+    duplicate_open: 'Markeren als duplicaat...'
+    duplicate_modal_title: 'Markeer als duplicaat'
+    duplicate_canonical: 'Canonieke kwestie'
+    duplicate_choose: 'Kies een canonieke kwestie'
+    duplicate_search_placeholder: 'Zoeken op titel of UUID…'
+    duplicate_search_empty: 'Geen overeenkomende problemen'
+    duplicate_no_candidates: 'Er zijn geen andere problemen in dit project die als canoniek kunnen worden gelinkt.'
     duplicate_cancel: Annuleren
-    duplicate_submit: Markeer als duplicaat
-    duplicate_saved: Probleem gemarkeerd als duplicaat en genegeerd.
-    merge_events_label: Voeg ook gebeurtenissen samen in de canonieke kwestie
+    duplicate_submit: 'Markeer als duplicaat'
+    duplicate_saved: 'Probleem gemarkeerd als duplicaat en genegeerd.'
+    merge_events_label: 'Voeg ook gebeurtenissen samen in de canonieke kwestie'
     merge_events_help: 'Verplaatst alle gebeurtenissen naar het geselecteerde probleem, berekent de aantallen opnieuw en negeert dit probleem vervolgens.'
-    merge_saved: Gebeurtenissen samengevoegd tot de canonieke kwestie.
-    merge_failed: Kan deze problemen niet samenvoegen.
-    duplicate_self: Een probleem kan geen duplicaat van zichzelf zijn.
-    duplicate_circular: Dat zou een circulaire dubbele link creëren.
-    duplicate_not_found: Er is geen canoniek probleem gevonden in dit project.
-    duplicate_invalid: Kan niet markeren als duplicaat.
+    merge_saved: 'Gebeurtenissen samengevoegd tot de canonieke kwestie.'
+    merge_failed: 'Kan deze problemen niet samenvoegen.'
+    duplicate_self: 'Een probleem kan geen duplicaat van zichzelf zijn.'
+    duplicate_circular: 'Dat zou een circulaire dubbele link creëren.'
+    duplicate_not_found: 'Er is geen canoniek probleem gevonden in dit project.'
+    duplicate_invalid: 'Kan niet markeren als duplicaat.'
     views:
-        label: Opgeslagen weergaven
-        choose: Een opgeslagen weergave openen…
-        save_name: Naam bekijken
-        save_placeholder: bijv. Kritiek onopgelost
-        save: Weergave opslaan
-        delete: Weergave verwijderen
-        saved: Bekijk opgeslagen.
-        deleted: Bekijk verwijderd.
-        name_empty: Weergavenaam mag niet leeg zijn.
-        invalid: Kan opgeslagen weergaven niet bijwerken.
+        label: 'Opgeslagen weergaven'
+        choose: 'Een opgeslagen weergave openen…'
+        save_name: 'Naam bekijken'
+        save_placeholder: 'bijv. Kritiek onopgelost'
+        save: 'Weergave opslaan'
+        delete: 'Weergave verwijderen'
+        saved: 'Bekijk opgeslagen.'
+        deleted: 'Bekijk verwijderd.'
+        name_empty: 'Weergavenaam mag niet leeg zijn.'
+        invalid: 'Kan opgeslagen weergaven niet bijwerken.'
     history_title: Activiteit
-    history_empty: Er zijn nog geen status- of toewijzingswijzigingen.
+    history_empty: 'Er zijn nog geen status- of toewijzingswijzigingen.'
     history_assignee: Cessionaris
     history_status: Status
     history_by: 'door %name%'
-    history_by_system: per systeem
+    history_by_system: 'per systeem'
     filter:
-        any_level: Elk niveau
-        any_status: welke status dan ook
-        any_assignee: Elke rechtverkrijgende
-        any_priority: Enige prioriteit
+        any_level: 'Elk niveau'
+        any_status: 'welke status dan ook'
+        any_assignee: 'Elke rechtverkrijgende'
+        any_priority: 'Enige prioriteit'
         environment: Omgeving
         release: Uitgave
         tag: Label
         url: Aanvraag-URL
         user: Evenementgebruiker
-        per_page: Resultaten per pagina
+        per_page: 'Resultaten per pagina'
         per_page_option: '%count% per pagina'
     badge:
-        new_in_release: Nieuw in uitgave
+        new_in_release: 'Nieuw in uitgave'
     compare:
         title: 'Vergelijk %a% versus %b%'
-        environment_b: Vergelijk met de omgeving...
+        environment_b: 'Vergelijk met de omgeving...'
         hint: 'Stel Omgeving en Vergelijk in om problemen alleen in A, alleen in B of in beide te zien'
         only_a: 'Alleen in %env%'
         only_b: 'Alleen in %env%'
-        both: In beide
-        empty: Geen problemen in deze set
+        both: 'In beide'
+        empty: 'Geen problemen in deze set'
     sort_by: 'Sorteer op %column%'
     pagination:
         showing: 'Toont %from%–%to% van %total%'
-        nav: Pagina's met uitgiftelijsten
+        nav: "Pagina's met uitgiftelijsten"
         previous: Vorig
         next: Volgende
     col:
@@ -434,19 +472,20 @@ issues:
         level: Niveau
         assignee: Cessionaris
         events: Evenementen
-        events_24h: 24 uur
+        events_24h: '24 uur'
         events_7d: 7d
         events_30d: 30d
-        first_seen: Voor het eerst gezien
-        last_seen: Laatst gezien
+        first_seen: 'Voor het eerst gezien'
+        last_seen: 'Laatst gezien'
+    viewer_readonly: 'U hebt alleen-lezen (viewer-)toegang tot dit project.'
 performance:
     title: Prestatie
-    intro: Transacties en N+1-analyse
-    show_all: Toon alles
-    nplus1_only: Alleen N+1
-    empty: Nog geen transacties.
-    back: ← Prestaties
-    no_nplus1: geen N+1 gedetecteerd
+    intro: 'Transacties en N+1-analyse'
+    show_all: 'Toon alles'
+    nplus1_only: 'Alleen N+1'
+    empty: 'Nog geen transacties.'
+    back: '← Prestaties'
+    no_nplus1: 'geen N+1 gedetecteerd'
     nplus1_groups: '%count% N+1 groep(en)'
     nplus1_flag: N+1
     spans_count: '%count% spans'
@@ -460,26 +499,26 @@ performance:
         description: Beschrijving
 analytics:
     title: Analytics
-    intro: Dagelijks volume van fouten, transacties en N+1 — grafiek en tabel voor de geselecteerde periode
-    empty: Nog geen volume in deze periode. Ingest events om analytics te vullen.
-    timezone_help: Dagelijkse buckets gebruiken UTC-kalenderdagen.
-    filtered_note: Filters gelden alleen voor foutereignissen (transacties en N+1 zijn verborgen zolang filters actief zijn).
+    intro: 'Dagelijks volume van fouten, transacties en N+1 — grafiek en tabel voor de geselecteerde periode'
+    empty: 'Nog geen volume in deze periode. Ingest events om analytics te vullen.'
+    timezone_help: 'Dagelijkse buckets gebruiken UTC-kalenderdagen.'
+    filtered_note: 'Filters gelden alleen voor foutereignissen (transacties en N+1 zijn verborgen zolang filters actief zijn).'
     chart:
-        aria: Analytics-volume in de tijd
+        aria: 'Analytics-volume in de tijd'
     period:
         label: Periode
-        custom: Aangepast bereik
+        custom: 'Aangepast bereik'
         from: Van
         to: Tot
-        days_7: 7 dagen
-        days_14: 14 dagen
-        days_30: 30 dagen
-        days_90: 90 dagen
-        invalid: Onbekende periode; de laatste 30 dagen worden getoond.
-        custom_required: Kies zowel van- als tot-datum voor een aangepast bereik.
-        invalid_date: Gebruik datums als JJJJ-MM-DD.
-        end_before_start: De einddatum moet op of na de startdatum liggen.
-        too_long: Aangepaste bereiken mogen niet langer zijn dan 366 dagen.
+        days_7: '7 dagen'
+        days_14: '14 dagen'
+        days_30: '30 dagen'
+        days_90: '90 dagen'
+        invalid: 'Onbekende periode; de laatste 30 dagen worden getoond.'
+        custom_required: 'Kies zowel van- als tot-datum voor een aangepast bereik.'
+        invalid_date: 'Gebruik datums als JJJJ-MM-DD.'
+        end_before_start: 'De einddatum moet op of na de startdatum liggen.'
+        too_long: 'Aangepaste bereiken mogen niet langer zijn dan 366 dagen.'
     filter:
         environment: Omgeving
         release: Release
@@ -495,55 +534,55 @@ appearance:
     title: Verschijning
     intro: 'Pas de merknaam, accentkleuren en gevaarkleuren aan voor dit Beacon-exemplaar. Alleen beheerders kunnen deze instellingen wijzigen.'
     section:
-        light: Lichte thema-accenten
-        dark: Donkere thema-accenten
+        light: 'Lichte thema-accenten'
+        dark: 'Donkere thema-accenten'
         danger: Gevaar-/foutkleuren
-    submit: Bewaar uiterlijk
-    reset: Resetten naar standaardwaarden
+    submit: 'Bewaar uiterlijk'
+    reset: 'Resetten naar standaardwaarden'
 site_appearance:
     brand_name:
         label: Merknaam
         placeholder: symfonie-baken
-        help: Getoond in de koptekst en op de inlogpagina.
+        help: 'Getoond in de koptekst en op de inlogpagina.'
     brand_eyebrow:
-        label: Merk wenkbrauw
+        label: 'Merk wenkbrauw'
         placeholder: Foutopsporing
-        help: Kort label boven het merk op het inlogscherm.
+        help: 'Kort label boven het merk op het inlogscherm.'
     accent_color:
         label: Accent
         placeholder: '#1f6f54'
         help: 'Primair accent (knoppen, links) in lichtmodus.'
     accent_deep_color:
-        label: Accent (zweven)
+        label: 'Accent (zweven)'
         placeholder: '#134736'
-        help: Donkerder accent voor zweeftoestanden in de lichte modus.
+        help: 'Donkerder accent voor zweeftoestanden in de lichte modus.'
     accent_color_dark:
-        label: Accent (donker)
+        label: 'Accent (donker)'
         placeholder: '#4aad7f'
-        help: Primair accent in donkere modus.
+        help: 'Primair accent in donkere modus.'
     accent_deep_color_dark:
-        label: Accentzweven (donker)
+        label: 'Accentzweven (donker)'
         placeholder: '#6bc49a'
-        help: Lichter accent voor zweeftoestanden in de donkere modus.
+        help: 'Lichter accent voor zweeftoestanden in de donkere modus.'
     danger_color:
         label: Gevaar
         placeholder: '#b42318'
-        help: Fout / destructief accent in lichtmodus.
+        help: 'Fout / destructief accent in lichtmodus.'
     danger_color_dark:
-        label: Gevaar (donker)
+        label: 'Gevaar (donker)'
         placeholder: '#f97066'
-        help: Fout / destructief accent in donkere modus.
+        help: 'Fout / destructief accent in donkere modus.'
     color:
         invalid: 'Gebruik een hexadecimale kleur zoals #1f6f54.'
 users:
     title: Gebruikers
     intro: 'Maak accounts aan, wijs instantierollen toe en schakel inloggen in of uit (UserKit).'
-    create: Gebruiker toevoegen
-    create_intro: Maak een Beacon-account aan. Met dit e-mailadres en wachtwoord kan de persoon inloggen.
-    back: Terug naar gebruikers
+    create: 'Gebruiker toevoegen'
+    create_intro: 'Maak een Beacon-account aan. Met dit e-mailadres en wachtwoord kan de persoon inloggen.'
+    back: 'Terug naar gebruikers'
     cancel: Annuleren
     role_label: Rol
-    last_admin_hint: Houd minimaal één beheerder aan.
+    last_admin_hint: 'Houd minimaal één beheerder aan.'
     col:
         user: Gebruiker
         email: E-mail
@@ -565,86 +604,91 @@ users:
         email: E-mail
         display_name: Weergavenaam
         password: Wachtwoord
-        password_help: Minimaal 8 tekens.
-        enabled: Account ingeschakeld (kan inloggen)
+        password_help: 'Minimaal 8 tekens.'
+        enabled: 'Account ingeschakeld (kan inloggen)'
     actions:
         enable: Inschakelen
         disable: Uitzetten
         update_role: Update
-        self: Dit ben jij
+        self: 'Dit ben jij'
         activity: Activiteit
     projects_title: Projectlidmaatschappen
-    projects_intro: Directe projectrollen voor dit account (niet via groepen). Instantiebeheerders kunnen ze hier verwijderen.
-    projects_empty: Geen directe projectlidmaatschappen.
-    remove_from_project: Verwijderen uit project
+    projects_intro: 'Directe projectrollen voor dit account (niet via groepen). Instantiebeheerders kunnen ze hier verwijderen.'
+    projects_empty: 'Geen directe projectlidmaatschappen.'
+    remove_from_project: 'Verwijderen uit project'
     remove_from_project_confirm: 'Deze gebruiker verwijderen uit project “%project%”?'
     activity:
         title: Activiteitengeschiedenis
         intro: 'Acties waarbij %name% (%email%) betrokken is als onderwerp of actor (beheerder, lidmaatschap en productnavigatie).'
-        timeline_title: Tijdlijn van activiteiten
-        recent_title: Recente activiteit
+        timeline_title: 'Tijdlijn van activiteiten'
+        recent_title: 'Recente activiteit'
         recent_intro: 'Laatste administratieve, lidmaatschaps- en productacties voor het hele exemplaar.'
-        empty: Nog geen geregistreerde acties.
+        empty: 'Nog geen geregistreerde acties.'
         by: 'Door %name%'
-        by_system: Per systeem
+        by_system: 'Per systeem'
         subject: 'Onderwerp %name%'
         action:
-            'user.created': User created
-            'user.role_changed': User role changed
-            'user.enabled': User enabled
-            'user.disabled': User disabled
-            'group.created': Group created
-            'group.updated': Group updated
-            'group.deleted': Group deleted
-            'group.member_added': Group member added
-            'group.member_removed': Group member removed
-            'project.member_added': Project member added
-            'project.member_role_changed': Project member role changed
-            'project.member_removed': Project member removed
-            'project.ownership_transferred': Project ownership transferred
-            'project.group_linked': Project group linked
-            'project.group_role_changed': Project group role changed
-            'project.group_unlinked': Project group unlinked
-            'project.opened': Project opened
-            'project.settings_viewed': Project settings viewed
-            'project.created': Project created
-            'project.api_key_created': API key created
-            'project.api_key_revoked': API key revoked
-            'project.api_key_rotated': API key rotated
-            'project.suspended': Project ingest suspended
-            'project.resumed': Project ingest resumed
-            'project.view_as_started': View-as-member started
-            'project.view_as_ended': View-as-member ended
-            'project.history_cleared': Project history cleared
-            'project.deleted': Project deleted
-            'issue.opened': Issue opened
-            'issue.assigned': Issue assignee changed
-            'issue.status_changed': Issue status changed
-            'issue.priority_changed': Issue priority changed
-            'issue.commented': Issue comment added
-            'issue.marked_duplicate': Issue marked as duplicate
-            'issue.merged': Issue events merged
-            'event.opened': Event opened
-            'performance.opened': Performance opened
-            'analytics.opened': Analytics opened
+            user.created: 'User created'
+            user.role_changed: 'User role changed'
+            user.enabled: 'User enabled'
+            user.disabled: 'User disabled'
+            group.created: 'Group created'
+            group.updated: 'Group updated'
+            group.deleted: 'Group deleted'
+            group.member_added: 'Group member added'
+            group.member_removed: 'Group member removed'
+            project.member_added: 'Project member added'
+            project.member_role_changed: 'Project member role changed'
+            project.member_removed: 'Project member removed'
+            project.ownership_transferred: 'Project ownership transferred'
+            project.group_linked: 'Project group linked'
+            project.group_role_changed: 'Project group role changed'
+            project.group_unlinked: 'Project group unlinked'
+            project.opened: 'Project opened'
+            project.settings_viewed: 'Project settings viewed'
+            project.created: 'Project created'
+            project.api_key_created: 'API key created'
+            project.api_key_revoked: 'API key revoked'
+            project.api_key_rotated: 'API key rotated'
+            project.suspended: 'Project ingest suspended'
+            project.resumed: 'Project ingest resumed'
+            project.view_as_started: 'View-as-member started'
+            project.view_as_ended: 'View-as-member ended'
+            project.history_cleared: 'Project history cleared'
+            project.deleted: 'Project deleted'
+            issue.opened: 'Issue opened'
+            issue.assigned: 'Issue assignee changed'
+            issue.status_changed: 'Issue status changed'
+            issue.priority_changed: 'Issue priority changed'
+            issue.commented: 'Issue comment added'
+            issue.marked_duplicate: 'Issue marked as duplicate'
+            issue.merged: 'Issue events merged'
+            event.opened: 'Event opened'
+            performance.opened: 'Performance opened'
+            analytics.opened: 'Analytics opened'
+            auth.magic_login_requested: 'Magic login aangevraagd'
+            auth.magic_login_consumed: 'Magic login gebruikt'
+            project.share_link_created: 'Deellink aangemaakt'
+            project.share_link_revoked: 'Deellink ingetrokken'
+            project.share_link_opened: 'Deellink geopend'
         context:
             email: E-mail
             role: Rol
             enabled: Ingeschakeld
             from: Van
             to: Naar
-            actor_former_role: Je vroegere rol
-            actor_new_role: Jouw nieuwe rol
+            actor_former_role: 'Je vroegere rol'
+            actor_new_role: 'Jouw nieuwe rol'
             project: Project
             project_uuid: Project-UUID
             project_name: Project
             group: Groep
             group_uuid: Groeps-UUID
-            issue_uuid: UUID uitgeven
+            issue_uuid: 'UUID uitgeven'
             issue_title: Probleem
             event_id: Gebeurtenis-ID
             label: Label
-    empty: Nog geen gebruikers.
+    empty: 'Nog geen gebruikers.'
 preferences:
     title: Accountinstellingen
     intro: 'Update uw profiel-, wachtwoord-, taal- en themavoorkeuren.'
@@ -654,84 +698,82 @@ preferences:
         display: Weergave
     profile:
         title: Profiel
-        intro: Bekijk je accountgegevens en werk weergavenaam of inlog-e-mail bij.
-        submit: Profiel opslaan
-        edit_title: Profiel bewerken
+        intro: 'Bekijk je accountgegevens en werk weergavenaam of inlog-e-mail bij.'
+        submit: 'Profiel opslaan'
+        edit_title: 'Profiel bewerken'
         account_id: Account-ID
-        member_since: Lid sinds
-        last_activity: Laatste activiteit
-        last_activity_unknown: Geen recente activiteit geregistreerd
-        password_changed: Wachtwoord laatst gewijzigd
-        password_never_changed: Nog niet geregistreerd
+        member_since: 'Lid sinds'
+        last_activity: 'Laatste activiteit'
+        last_activity_unknown: 'Geen recente activiteit geregistreerd'
+        password_changed: 'Wachtwoord laatst gewijzigd'
+        password_never_changed: 'Nog niet geregistreerd'
         password_expiry: Wachtwoordverloop
-        password_expired: Wachtwoord is verlopen
+        password_expired: 'Wachtwoord is verlopen'
         password_expiry_unknown: 'Verloop start na je eerste wachtwoordwijziging (beleid: %policy% dagen).'
         password_days_remaining: '%count% dagen resterend · beleid %policy% dagen'
-        update_password: Wachtwoord bijwerken
+        update_password: 'Wachtwoord bijwerken'
         status_enabled: Actief
         status_disabled: Uitgeschakeld
         role_admin: Beheerder
         role_member: Lid
-        projects_title: Je projecten
-        projects_intro: Projecten via direct lidmaatschap.
-        projects_empty: Je bent nog geen direct lid van een project.
-        groups_title: Je groepen
-        groups_intro: Groepen die extra projecttoegang kunnen geven.
-        groups_empty: Je zit in geen enkele groep.
+        projects_title: 'Je projecten'
+        projects_intro: 'Projecten via direct lidmaatschap.'
+        projects_empty: 'Je bent nog geen direct lid van een project.'
+        groups_title: 'Je groepen'
+        groups_intro: 'Groepen die extra projecttoegang kunnen geven.'
+        groups_empty: 'Je zit in geen enkele groep.'
     security:
         title: Beveiliging
-        intro: Wijzig uw accountwachtwoord.
-        submit: Wachtwoord bijwerken
-        history_title: Geschiedenis van wachtwoordwijzigingen
-        history_intro: Recente wachtwoordupdates bewaard om hergebruik te voorkomen. Hashes worden nooit getoond.
+        intro: 'Wijzig uw accountwachtwoord.'
+        submit: 'Wachtwoord bijwerken'
+        history_title: 'Geschiedenis van wachtwoordwijzigingen'
+        history_intro: 'Recente wachtwoordupdates bewaard om hergebruik te voorkomen. Hashes worden nooit getoond.'
         history_current: 'Huidig wachtwoord ingesteld op:'
-        history_entry: Wachtwoord gewijzigd
-        history_empty: Nog geen wachtwoordwijzigingen geregistreerd.
+        history_entry: 'Wachtwoord gewijzigd'
+        history_empty: 'Nog geen wachtwoordwijzigingen geregistreerd.'
     display:
         title: Weergave
         intro: 'Kies taal, thema, dichtheid, tekstgrootte, contrast, zijbalk, beweging, inhoudsbreedte en samengevouwen issuepanelen.'
-        submit: Weergave-instellingen opslaan
-        pwa_title: Installeer app
+        submit: 'Weergave-instellingen opslaan'
+        pwa_title: 'Installeer app'
         pwa_intro: 'Voeg deze site toe aan uw apparaat voor een snellere, zelfstandige ervaring. Beschikbaarheid is afhankelijk van uw browser.'
-        pwa_prompt_title: Installeer voor snellere toegang
-        pwa_unavailable: 'Installatie is momenteel niet beschikbaar in deze browser. Probeer Chrome of Edge op desktop, of Safari''s Share → Toevoegen aan startscherm op iOS.'
+        pwa_prompt_title: 'Installeer voor snellere toegang'
+        pwa_unavailable: "Installatie is momenteel niet beschikbaar in deze browser. Probeer Chrome of Edge op desktop, of Safari's Share → Toevoegen aan startscherm op iOS."
+        section_layout: 'Taal, thema en lay-out'
     section:
         profile: Profiel
         locale_theme: 'Taal, thema en lay-out'
         password: Wachtwoord
     locale_theme: 'Taal, thema en lay-out'
     password: Wachtwoord
-    password_hint: Laat de wachtwoordvelden leeg om uw huidige wachtwoord te behouden.
-    submit: Bewaar voorkeuren
-    locale_auto: Automatisch (browser/sessie)
-    theme_auto: Auto (apparaat / laatste keuze)
+    password_hint: 'Laat de wachtwoordvelden leeg om uw huidige wachtwoord te behouden.'
+    submit: 'Bewaar voorkeuren'
+    locale_auto: 'Automatisch (browser/sessie)'
+    theme_auto: 'Auto (apparaat / laatste keuze)'
     theme_light: Dag
     theme_dark: Nacht
-    width_content: Inhoud (gecentreerd)
-    width_full: Volledige breedte
+    width_content: 'Inhoud (gecentreerd)'
+    width_full: 'Volledige breedte'
     density_comfortable: Comfortabel
     density_compact: Compact
     font_scale_sm: Klein
     font_scale_md: Medium
     font_scale_lg: Groot
-    contrast_system: Systeem (volg apparaat)
-    contrast_more: Meer contrast
+    contrast_system: 'Systeem (volg apparaat)'
+    contrast_more: 'Meer contrast'
     sidebar_expanded: Uitgevouwen
     sidebar_collapsed: Ingevouwen
-    motion_system: Systeem (volg apparaat)
-    motion_reduce: Verminder beweging
-    motion_full: Volledige beweging
-
-    product_tour_title: Product tour
-    product_tour_intro: Tours run once per area after setup. They stay off until you replay them here.
-    product_tour_seen: Mark all tours as completed
-    product_tour_seen_help: Check and save to hide every product tour. To see them again, use Replay below (unchecking alone does not re-enable auto-start).
-    product_tour_replay: Replay dashboard tour
-    issue_panels_collapsed: Probleempanelen zijn standaard samengevouwen
-    issue_panels_help: Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's. Uw browser onthoudt handmatige open-/sluitoverschrijvingen.
-    issue_panels_browser: Indeling browserpaneel
+    motion_system: 'Systeem (volg apparaat)'
+    motion_reduce: 'Verminder beweging'
+    motion_full: 'Volledige beweging'
+    product_tour_title: 'Product tour'
+    product_tour_intro: 'Tours run once per area after setup. They stay off until you replay them here.'
+    product_tour_replay: 'Replay dashboard tour'
+    issue_panels_collapsed: 'Probleempanelen zijn standaard samengevouwen'
+    issue_panels_help: "Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's. Uw browser onthoudt handmatige open-/sluitoverschrijvingen."
+    issue_panels_browser: 'Indeling browserpaneel'
     issue_panels_browser_help: 'Wis de open/gesloten statussen die in deze browser zijn opgeslagen, zodat de standaardvoorkeuren weer van toepassing zijn.'
-    issue_panels_reset: Wis opgeslagen paneelstatussen
+    issue_panels_reset: 'Wis opgeslagen paneelstatussen'
     issue_panels_reset_done: Gewist
     issue_panel:
         highlights: Hoogtepunten
@@ -741,72 +783,87 @@ preferences:
         request: HTTP-verzoek
         tags: Labels
         contexts: Contexten
-        extra: Aanvullende gegevens
-        raw: Ruwe lading
-        details: Details zijbalk
+        extra: 'Aanvullende gegevens'
+        raw: 'Ruwe lading'
+        details: 'Details zijbalk'
         triage: Triage
         assignee: Cessionaris
         duplicate: Duplicaat
         activity: Activiteit
-        recent_events: Recente gebeurtenissen
+        recent_events: 'Recente gebeurtenissen'
     error:
-        current_password: Het huidige wachtwoord is onjuist.
-        email_in_use: Dit e-mailadres is al in gebruik.
-        password_required: Voer een nieuw wachtwoord in.
+        current_password: 'Het huidige wachtwoord is onjuist.'
+        email_in_use: 'Dit e-mailadres is al in gebruik.'
+        password_required: 'Voer een nieuw wachtwoord in.'
+    product_tour_enabled: 'Actieve rondleidingen'
+    product_tour_enabled_help: 'Aangevinkte rondleidingen kunnen één keer per gebied automatisch starten. Vink uit om een rondleiding te verbergen; vink alles uit om elke rondleiding uit te schakelen.'
+    product_tour_select_all: 'Alle rondleidingen selecteren'
+    product_tour_save_hint: 'Klik hieronder op Weergave-instellingen opslaan om wijzigingen in rondleidingen toe te passen.'
+    product_tour_page:
+        dashboard: Dashboard
+        project_issues: Projectissues
+        admin: Administratie
+    product_tour_replay_title: 'Rondleiding opnieuw afspelen'
+    product_tour_replay_intro: 'Wist voltooiingsvlaggen en opent de dashboardrondleiding één keer. Schakel eerst de gewenste rondleidingen in onder Actieve rondleidingen.'
+    push_notifications: 'Pushmeldingen voor nieuwe issues'
+    push_notifications_help: 'Optioneel. Wanneer ingeschakeld, vraagt Beacon de browser om toestemming en kan u waarschuwen over nieuwe issues in projecten waartoe u behoort — ook op de achtergrond (geïnstalleerde PWA of ondersteunde browser). Live in-app toasts vereisen apart Administratie → Mercure.'
+    push_title: Pushmeldingen
+    push_intro: 'Schakel het vakje hieronder in, sla op en sta meldingen toe wanneer uw browser daarom vraagt. Meldingen betreffen nieuwe issues in projecten waaraan u bent gekoppeld.'
+    push_privacy: 'Browserpush gebruikt een apparaatabonnement-endpoint (geen marketingcookies). U kunt dit altijd uitschakelen; zie Privacy en cookie-instellingen voor gerelateerde keuzes.'
+    push_unavailable_title: 'Pushmeldingen niet beschikbaar'
+    push_unavailable_help: 'De beheerder heeft geen VAPID-sleutels geconfigureerd (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY). Vraag een administrator, of gebruik Mercure live-toasts wanneer ingeschakeld onder Administratie → Mercure.'
 user_preferences:
     display_name:
         label: Weergavenaam
-        placeholder: Jouw naam
-        help: Getoond in het avatarmenu en de ledenlijsten.
+        placeholder: 'Jouw naam'
+        help: 'Getoond in het avatarmenu en de ledenlijsten.'
     email:
         label: E-mail
-        placeholder: 'jij@voorbeeld.com'
-        help: Gebruikt om in te loggen.
+        placeholder: jij@voorbeeld.com
+        help: 'Gebruikt om in te loggen.'
     preferred_locale:
         label: Taal
         placeholder: Auto
-        help: Voorkeurstaal van de gebruikersinterface voor dit account.
+        help: 'Voorkeurstaal van de gebruikersinterface voor dit account.'
     preferred_theme:
         label: Thema
         placeholder: Auto
-        help: Gewenste verschijning overdag of 's nachts.
+        help: "Gewenste verschijning overdag of 's nachts."
     preferred_content_width:
-        label: Breedte inhoud
+        label: 'Breedte inhoud'
         placeholder: Inhoud
         help: 'Gecentreerde inhoudskolom, of rek het hoofdgebied over de volledige breedte uit.'
     preferred_ui_density:
         label: UI-dichtheid
         placeholder: Comfortabel
-        help: Comfortabele tussenruimte of een compactere bestuurdersindeling.
+        help: 'Comfortabele tussenruimte of een compactere bestuurdersindeling.'
     preferred_font_scale:
         label: Tekstgrootte
         placeholder: Medium
-        help: Schaald de interfacetekst kleiner of groter.
+        help: 'Schaald de interfacetekst kleiner of groter.'
     preferred_contrast:
         label: Contrast
         placeholder: Systeem
-        help: Volg het apparaatcontrast of forceer sterkere tekst en randen.
+        help: 'Volg het apparaatcontrast of forceer sterkere tekst en randen.'
     preferred_sidebar:
         label: Zijbalk
         placeholder: Uitgevouwen
-        help: Standaard op desktop als deze browser nog geen opgeslagen voorkeur heeft.
+        help: 'Standaard op desktop als deze browser nog geen opgeslagen voorkeur heeft.'
     preferred_motion:
         label: Beweging
         placeholder: Systeem
         help: 'Volg de apparaatvoorkeur, verminder animaties of houd volledige beweging.'
     current_password:
-        label: Huidig ​​wachtwoord
-        help: Alleen vereist bij het instellen van een nieuw wachtwoord.
-        help_required: Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te stellen.
+        label: 'Huidig ​​wachtwoord'
+        help: 'Alleen vereist bij het instellen van een nieuw wachtwoord.'
+        help_required: 'Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te stellen.'
     plain_password:
         first:
-            label: Nieuw wachtwoord
+            label: 'Nieuw wachtwoord'
         second:
-            label: Bevestig nieuw wachtwoord
-        mismatch: De wachtwoordvelden moeten overeenkomen.
+            label: 'Bevestig nieuw wachtwoord'
+        mismatch: 'De wachtwoordvelden moeten overeenkomen.'
         strength_invalid: 'Het wachtwoord voldoet niet aan de sterkte-eisen (%missing%).'
-
-# PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
 requirement.min_length: 'Minimaal %count% tekens'
 requirement.max_length: 'Maximaal %count% tekens'
 requirement.lowercase: 'Minimaal één kleine letter'
@@ -820,101 +877,110 @@ requirement.regex: 'Moet overeenkomen met het vereiste patroon'
 generator.button: 'Wachtwoord genereren'
 generator.modal_title: 'Voorgestelde wachtwoorden'
 generator.modal_hint: 'Deze wachtwoorden komen overeen met uw huidige beleid. Kopieer er een of pas deze toe op het veld.'
-generator.copy: 'Kopiëren'
-generator.copied: 'Gekopieerd!'
+generator.copy: Kopiëren
+generator.copied: Gekopieerd!
 generator.use_password: 'Gebruik dit wachtwoord'
-generator.close: 'Dichtbij'
+generator.close: Dichtbij
 generator.failed: 'Kan geen geldig wachtwoord genereren. Probeer het opnieuw of versoepel het beleid.'
-
 groups:
     title: Groepen
-    intro: Organiseer gebruikers in groepen en koppel groepen vervolgens aan projecten voor bulktoegang.
-    create: Nieuwe groep
-    empty: Nog geen groepen.
+    intro: 'Organiseer gebruikers in groepen en koppel groepen vervolgens aan projecten voor bulktoegang.'
+    create: 'Nieuwe groep'
+    empty: 'Nog geen groepen.'
     open: Open
-    back: Terug naar groepen
+    back: 'Terug naar groepen'
     edit: Bewerking
-    edit_title: Groep bewerken
-    save: Groep opslaan
+    edit_title: 'Groep bewerken'
+    save: 'Groep opslaan'
     cancel: Annuleren
-    delete: Groep verwijderen
-    delete_confirm: Deze groep verwijderen? Het wordt losgekoppeld van alle projecten.
+    delete: 'Groep verwijderen'
+    delete_confirm: 'Deze groep verwijderen? Het wordt losgekoppeld van alle projecten.'
     name_label: Naam
     description_label: Beschrijving
     members_title: Groepsleden
-    members_empty: Er zijn nog geen leden in deze groep.
-    add_member: Lid toevoegen
-    add_member_help: De persoon moet al een Beacon-account hebben.
+    members_empty: 'Er zijn nog geen leden in deze groep.'
+    add_member: 'Lid toevoegen'
+    add_member_help: 'De persoon moet al een Beacon-account hebben.'
     remove_member: Verwijderen
-    member_email_placeholder: 'gebruiker@voorbeeld.com'
+    member_email_placeholder: gebruiker@voorbeeld.com
     member_count: '%count% leden'
-    projects_title: Gekoppelde projecten
-    projects_intro: Projecten die toegang verlenen aan elk lid van deze groep. Ontkoppel om die toegang in te trekken.
-    projects_empty: Deze groep is nog aan geen enkel project gekoppeld.
+    projects_title: 'Gekoppelde projecten'
+    projects_intro: 'Projecten die toegang verlenen aan elk lid van deze groep. Ontkoppel om die toegang in te trekken.'
+    projects_empty: 'Deze groep is nog aan geen enkel project gekoppeld.'
     unlink_project: Ontkoppelen
     unlink_project_confirm: 'Deze groep ontkoppelen van project “%project%”?'
-
 admin_projects:
     title: Projecten
     intro: 'Beheer elk project op dit exemplaar: leden, groepslinks en verwijdering.'
-    create: Nieuw project
-    empty: Nog geen projecten.
+    create: 'Nieuw project'
+    empty: 'Nog geen projecten.'
     open: Beheren
-    back: Terug naar projecten
+    back: 'Terug naar projecten'
     edit: Bewerking
-    edit_title: Project bewerken
-    save: Project opslaan
+    edit_title: 'Project bewerken'
+    save: 'Project opslaan'
     cancel: Annuleren
-    search_placeholder: Zoek projecten…
+    search_placeholder: 'Zoek projecten…'
     member_count: '%count% leden'
     group_count: '%count% groepen'
     open_settings: Instellingen
     open_issues: Problemen
-    members_title: Directe leden
-    members_empty: Nog geen directe leden.
-    add_member_help: De persoon moet al een Beacon-account hebben.
+    members_title: 'Directe leden'
+    members_empty: 'Nog geen directe leden.'
+    add_member_help: 'De persoon moet al een Beacon-account hebben.'
     remove_member: Verwijderen
     remove_member_confirm: '%email% uit dit project verwijderen?'
-    groups_title: Gekoppelde groepen
-    groups_intro: Groepen die toegang verlenen aan elk groepslid. Eigenaren blijven directe gebruikers.
+    groups_title: 'Gekoppelde groepen'
+    groups_intro: 'Groepen die toegang verlenen aan elk groepslid. Eigenaren blijven directe gebruikers.'
     groups_none_available: 'Alle groepen zijn al gekoppeld, of maak groepen aan onder Beheer → Groepen.'
     unlink_group_confirm: 'Groep “%name%” ontkoppelen van dit project?'
     danger_title: Gevarenzone
-    danger_intro: Verwijder dit project en alle bijbehorende gegevens definitief. Instantiebeheerders kunnen dit doen zonder projectlid te zijn.
-    delete_open: Project verwijderen…
+    danger_intro: 'Verwijder dit project en alle bijbehorende gegevens definitief. Instantiebeheerders kunnen dit doen zonder projectlid te zijn.'
+    delete_open: 'Project verwijderen…'
     stats_title: Ops-statistieken
     stats_open_issues: '%count% openstaande problemen'
     stats_events_7d: '%count% gebeurtenissen (7d)'
-    stats_open_issues_label: Openstaande problemen
-    stats_events_7d_label: Evenementen (laatste 7 dagen)
-    stats_last_ingest_label: Laatste inname
+    stats_open_issues_label: 'Openstaande problemen'
+    stats_events_7d_label: 'Evenementen (laatste 7 dagen)'
+    stats_last_ingest_label: 'Laatste inname'
     stats_never: Nooit
-    ingest_suspended_badge: Inname opgeschort
-    suspend_ingest: Inname opschorten
-    suspend_ingest_help: Weiger nieuwe enveloppen terwijl de opgeslagen gegevens leesbaar blijven.
-    resume_ingest: Hervat de inname
-    resume_ingest_help: Sta envelopopname opnieuw toe.
-    view_as_member: Bekijk als lid
-    view_as_banner: U bekijkt projecten als lid (beheerdersrechten voor projectacties zijn beperkt).
-    view_as_exit: Sluit de weergave als lid af
-
+    ingest_suspended_badge: 'Inname opgeschort'
+    suspend_ingest: 'Inname opschorten'
+    suspend_ingest_help: 'Weiger nieuwe enveloppen terwijl de opgeslagen gegevens leesbaar blijven.'
+    resume_ingest: 'Hervat de inname'
+    resume_ingest_help: 'Sta envelopopname opnieuw toe.'
+    view_as_member: 'Bekijk als lid'
+    view_as_banner: 'U bekijkt projecten als lid (beheerdersrechten voor projectacties zijn beperkt).'
+    view_as_exit: 'Sluit de weergave als lid af'
+    audit_title: Audit-tijdlijn
+    audit_intro: 'Filter geregistreerde administratieve acties voor dit project.'
+    audit_reset: 'Filters resetten'
+    audit_filter_action: Actietype
+    audit_filter_all_actions: 'Alle acties'
+    audit_filter_from: Van
+    audit_filter_to: Tot
+    audit_apply: 'Filters toepassen'
+    audit_clear: Wissen
+    audit_empty: 'Geen geregistreerde projectacties komen overeen met de huidige filters.'
 admin:
     hub:
         title: Administratie
-        intro: Instantieconfiguratie voor operators met verhoogde rollen.
-        users: Geef accounts en rollen weer voor dit exemplaar.
-        groups: Creëer groepen en beheer hun leden voor projecttoegang.
+        intro: 'Instantieconfiguratie voor operators met verhoogde rollen.'
+        users: 'Geef accounts en rollen weer voor dit exemplaar.'
+        groups: 'Creëer groepen en beheer hun leden voor projecttoegang.'
         projects: 'Maak een lijst van alle projecten, beheer leden en groepslinks, of verwijder een project.'
-        appearance: Merknaam en accentkleuren.
-        menus: Navigatiemenu's bewerken.
-        breadcrumbs: Beheer broodkruimelverzamelingen.
+        appearance: 'Merknaam en accentkleuren.'
+        menus: "Navigatiemenu's bewerken."
+        breadcrumbs: 'Beheer broodkruimelverzamelingen.'
+        mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'
+        setup: 'Eerste platform-/demo-/sample-seedstappen.'
 tour:
     controls:
         next: Next
         previous: Back
         done: Done
         close: Close
-        progress: "{{current}} of {{total}}"
+        progress: '{{current}} of {{total}}'
     role:
         owner: owner
         admin: admin
@@ -923,62 +989,61 @@ tour:
     steps:
         dashboard:
             welcome:
-                title: Welcome to Beacon
-                description: A short tour of your dashboard — projects, navigation, and where to manage your account.
+                title: 'Welcome to Beacon'
+                description: 'A short tour of your dashboard — projects, navigation, and where to manage your account.'
             sidebar:
                 title: Navigation
-                description: Use the sidebar to move between dashboard sections for the current area of the app.
+                description: 'Use the sidebar to move between dashboard sections for the current area of the app.'
             projects:
-                title: Your projects
-                description: Each project collects errors, performance, and analytics from apps that send Envelope telemetry.
+                title: 'Your projects'
+                description: 'Each project collects errors, performance, and analytics from apps that send Envelope telemetry.'
             new_project:
-                title: Create a project
-                description: Add a project to get a DSN and API keys for your client SDKs.
+                title: 'Create a project'
+                description: 'Add a project to get a DSN and API keys for your client SDKs.'
             user_menu:
-                title: Account menu
-                description: Open preferences, return to the dashboard, or sign out from your avatar menu.
+                title: 'Account menu'
+                description: 'Open preferences, return to the dashboard, or sign out from your avatar menu.'
             admin:
                 title: Administration
-                description: Instance admins manage users, groups, appearance, mailer, and first-run setup from here.
+                description: 'Instance admins manage users, groups, appearance, mailer, and first-run setup from here.'
         project:
             welcome:
-                title: Project issues
+                title: 'Project issues'
                 description: 'You are viewing this project as %role%. Use Issues to triage errors from Envelope ingest.'
             nav:
-                title: Project sections
-                description: Switch between Issues, Performance, Analytics, Releases, and Settings for this project.
+                title: 'Project sections'
+                description: 'Switch between Issues, Performance, Analytics, Releases, and Settings for this project.'
             filters:
-                title: Filters and search
-                description: Narrow issues by level, status, environment, release, assignee, and more.
+                title: 'Filters and search'
+                description: 'Narrow issues by level, status, environment, release, assignee, and more.'
             saved_views:
-                title: Saved views
-                description: Save filter combinations and reopen them later for recurring triage workflows.
+                title: 'Saved views'
+                description: 'Save filter combinations and reopen them later for recurring triage workflows.'
             list:
-                title: Issue list
-                description: Open an issue to inspect stack traces, events, and triage status.
+                title: 'Issue list'
+                description: 'Open an issue to inspect stack traces, events, and triage status.'
             settings:
-                title: Project settings
-                description: As a project admin you can manage API keys, members, notifications, and governance.
+                title: 'Project settings'
+                description: 'As a project admin you can manage API keys, members, notifications, and governance.'
             settings_member:
-                title: Project settings
-                description: Review project configuration. Membership and API key changes require a project admin.
+                title: 'Project settings'
+                description: 'Review project configuration. Membership and API key changes require a project admin.'
         admin:
             welcome:
                 title: Administration
-                description: Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.
+                description: 'Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.'
             users:
                 title: Users
-                description: List accounts, roles, and enable or disable access on this Beacon instance.
+                description: 'List accounts, roles, and enable or disable access on this Beacon instance.'
             projects:
-                title: All projects
-                description: Cross-project ops — members, groups, and danger-zone actions for any project.
+                title: 'All projects'
+                description: 'Cross-project ops — members, groups, and danger-zone actions for any project.'
             mailer:
                 title: Mailer
-                description: Configure the encrypted Mailer DSN used for magic links and notification email.
+                description: 'Configure the encrypted Mailer DSN used for magic links and notification email.'
             setup:
-                title: Setup wizard
-                description: Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.
-
+                title: 'Setup wizard'
+                description: 'Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.'
 legal:
     nav:
         label: Legaal
@@ -990,30 +1055,30 @@ legal:
         contact_email: 'Contact: [privacy@example.com — vervangen]'
         registration: 'Bedrijfsregister/belastingnummer: [indien van toepassing — vervangen]'
     notice:
-        title: Juridische mededeling
+        title: 'Juridische mededeling'
         intro: 'Deze juridische kennisgeving is van toepassing op de zelfgehoste %brand%-instantie die u bezoekt. Vervang de onderstaande tijdelijke aanduidingen door de echte gegevens van de operator vóór openbaar gebruik.'
         operator_heading: Exploitant
-        operator_body: De exploitant van deze instantie is verantwoordelijk voor de dienst en voor de inhoud die zij hier publiceren.
+        operator_body: 'De exploitant van deze instantie is verantwoordelijk voor de dienst en voor de inhoud die zij hier publiceren.'
         hosting_heading: Hosten
-        hosting_body: Deze software kan worden gehost door de exploitant of door een door de exploitant gekozen externe infrastructuuraanbieder. De hostinggegevens moeten door de operator worden ingevuld.
+        hosting_body: 'Deze software kan worden gehost door de exploitant of door een door de exploitant gekozen externe infrastructuuraanbieder. De hostinggegevens moeten door de operator worden ingevuld.'
         liability_heading: Betrouwbaarheid
         liability_body: 'De software wordt geleverd zoals hij is. De exploitant blijft verantwoordelijk voor rechtmatig gebruik, naleving van de gegevensbescherming en de juistheid van exploitantspecifieke juridische teksten in dit geval.'
     privacy:
         title: Privacybeleid
         intro: 'Dit privacybeleid beschrijft hoe persoonlijke gegevens kunnen worden verwerkt wanneer u deze %brand%-instantie gebruikt. Exploitanten moeten deze tekst aanpassen aan hun organisatie en jurisdictie.'
         controller_heading: Gegevensbeheerder
-        controller_body: De operator van dit Beacon-exemplaar is de gegevensbeheerder voor accounts en telemetrie die in hun implementatie zijn opgeslagen. Vul de wettelijke naam en contactgegevens in op de pagina Juridische kennisgeving.
-        data_heading: Gegevens die wij verwerken
+        controller_body: 'De operator van dit Beacon-exemplaar is de gegevensbeheerder voor accounts en telemetrie die in hun implementatie zijn opgeslagen. Vul de wettelijke naam en contactgegevens in op de pagina Juridische kennisgeving.'
+        data_heading: 'Gegevens die wij verwerken'
         data_body: 'Afhankelijk van hoe de operator het exemplaar configureert en gebruikt, kan de verwerking het volgende omvatten:'
         data_account: 'Accountgegevens (e-mail, weergavenaam, wachtwoord-hash, rollen, voorkeuren)'
-        data_telemetry: Applicatiefout- en prestatietelemetrie verzonden via project-DSN/envelop-opname
-        data_logs: Operationele logboeken en optionele logboeken voor toestemming voor cookies
-        data_cookies: Cookies en soortgelijke technologieën beschreven op de Cookies-pagina
+        data_telemetry: 'Applicatiefout- en prestatietelemetrie verzonden via project-DSN/envelop-opname'
+        data_logs: 'Operationele logboeken en optionele logboeken voor toestemming voor cookies'
+        data_cookies: 'Cookies en soortgelijke technologieën beschreven op de Cookies-pagina'
         purpose_heading: Doeleinden
         purpose_body: 'Gegevens worden verwerkt om gebruikers te authenticeren, fouten bij te houden voor geconfigureerde projecten, de service te beveiligen en (indien ingeschakeld) cookievoorkeuren te onthouden.'
         retention_heading: Behoud
         retention_body: 'Bewaartermijnen worden gedefinieerd door de exploitant (accountlevenscyclus, bewaren van projectgegevens, bewaren van logbestanden). Vervang deze paragraaf door het bewaarschema van uw organisatie.'
-        rights_heading: Jouw rechten
+        rights_heading: 'Jouw rechten'
         rights_body: 'Afhankelijk van de toepasselijke wetgeving (bijvoorbeeld AVG) heeft u mogelijk recht op toegang, rectificatie, verwijdering, beperking, overdraagbaarheid en bezwaar. Neem contact op met de exploitant via de gegevens op de pagina Juridische kennisgeving.'
         cookies_heading: Koekjes
         cookies_body: 'We gebruiken noodzakelijke cookies voor aanmelding en opslag van toestemming. Optionele categorieën (voorkeuren, analyses) worden pas geactiveerd nadat u deze in de cookiebanner heeft toegestaan.'
@@ -1021,164 +1086,380 @@ legal:
         title: Gebruiksvoorwaarden
         intro: 'Deze voorwaarden zijn van toepassing op het gebruik van deze %brand%-instantie. Operators moeten dit sjabloon vervangen door termen die passen bij hun aanbod (interne tool, SaaS voor klanten, enz.).'
         service_heading: Dienst
-        service_body: Beacon biedt zelfgehoste fout- en prestatietracking voor projecten die zijn geconfigureerd door geautoriseerde gebruikers.
+        service_body: 'Beacon biedt zelfgehoste fout- en prestatietracking voor projecten die zijn geconfigureerd door geautoriseerde gebruikers.'
         accounts_heading: Rekeningen
-        accounts_body: U moet de inloggegevens vertrouwelijk houden en de service alleen gebruiken voor projecten en gegevens die u mag verwerken.
-        accept_heading: Acceptabel gebruik
+        accounts_body: 'U moet de inloggegevens vertrouwelijk houden en de service alleen gebruiken voor projecten en gegevens die u mag verwerken.'
+        accept_heading: 'Acceptabel gebruik'
         accept_body: 'Maak geen misbruik van de ingest-API, probeer geen ongeoorloofde toegang te verkrijgen of upload geen onwettige inhoud. De exploitant kan accounts opschorten die deze voorwaarden schenden.'
-        limitation_heading: Beperking van aansprakelijkheid
-        limitation_body: Voor zover wettelijk toegestaan ​​zijn de exploitant en de softwareauteurs niet aansprakelijk voor indirecte schade die voortvloeit uit het gebruik van de dienst. Exploitanten moeten deze clausule door een raadsman laten beoordelen.
+        limitation_heading: 'Beperking van aansprakelijkheid'
+        limitation_body: 'Voor zover wettelijk toegestaan ​​zijn de exploitant en de softwareauteurs niet aansprakelijk voor indirecte schade die voortvloeit uit het gebruik van de dienst. Exploitanten moeten deze clausule door een raadsman laten beoordelen.'
         changes_heading: Veranderingen
         changes_body: 'De exploitant kan deze voorwaarden bijwerken. Voortgezet gebruik na kennisgeving houdt aanvaarding in van de bijgewerkte voorwaarden, voor zover toegestaan ​​door de wet.'
     cookies:
         title: Cookiemelding
         intro: 'Deze pagina beschrijft de cookies en vergelijkbare technologieën die door deze %brand%-instantie worden gebruikt. Strikt noodzakelijke cookies ondersteunen authenticatie, beveiliging en vastlegging van toestemming. Optionele categorieën worden alleen gebruikt met uw voorafgaande toestemming. Gebruik Cookie-instellingen om uw selectie te allen tijde te bekijken of te wijzigen.'
         categories_heading: Categorieën
-        cat_required: Strikt noodzakelijk
-        cat_required_help: Essentieel voor authenticatie, beveiliging en vastlegging van uw toestemmingsbeslissing. Deze cookies kunnen niet worden uitgeschakeld.
+        cat_required: 'Strikt noodzakelijk'
+        cat_required_help: 'Essentieel voor authenticatie, beveiliging en vastlegging van uw toestemmingsbeslissing. Deze cookies kunnen niet worden uitgeschakeld.'
         cat_preferences: Voorkeuren
-        cat_preferences_help: Optionele cookies die niet-essentiële presentatie- of functiekeuzes opslaan wanneer de beheerder ze inschakelt en u toestemt.
+        cat_preferences_help: 'Optionele cookies die niet-essentiële presentatie- of functiekeuzes opslaan wanneer de beheerder ze inschakelt en u toestemt.'
         cat_analytics: Analyse
-        cat_analytics_help: Optionele meetcookies, alleen gebruikt als de beheerder analysetools inschakelt en u voorafgaande toestemming geeft.
+        cat_analytics_help: 'Optionele meetcookies, alleen gebruikt als de beheerder analysetools inschakelt en u voorafgaande toestemming geeft.'
         inventory_heading: Cookie-inventaris
         col_name: Naam
         col_category: Categorie
         col_duration: Duur
         col_purpose: Doel
         duration_session: Sessie
-        duration_remember: Tot 7 dagen
-        duration_consent: Ongeveer 1 jaar
-        purpose_session: Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde delen van de dienst te gebruiken.
-        purpose_remember: Maakt persistente authenticatie mogelijk wanneer bij het inloggen “Onthoud mij” wordt geselecteerd (veilig token; beperkte geldigheid).
-        purpose_consent: Slaat cookiecategoriekeuzes op en een geanonimiseerde toestemmingssleutel voor verantwoording en auditlogging.
-        storage_heading: Lokale opslag
+        duration_remember: 'Tot 7 dagen'
+        duration_consent: 'Ongeveer 1 jaar'
+        purpose_session: 'Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde delen van de dienst te gebruiken.'
+        purpose_remember: 'Maakt persistente authenticatie mogelijk wanneer bij het inloggen “Onthoud mij” wordt geselecteerd (veilig token; beperkte geldigheid).'
+        purpose_consent: 'Slaat cookiecategoriekeuzes op en een geanonimiseerde toestemmingssleutel voor verantwoording en auditlogging.'
+        storage_heading: 'Lokale opslag'
         storage_body: 'Themavoorkeur (licht/donker) kan worden opgeslagen in de localStorage van de browser en is geen HTTP-cookie. Volgens typische ePrivacy-richtlijnen kan dit als strikt noodzakelijk voor een coherente gebruikersinterface worden behandeld; beheerders moeten de toepasselijke regels in hun rechtsgebied bevestigen.'
-
 notifications:
     title: Meldingen
     intro: 'Stuur waarschuwingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek HTTP-eindpunt wanneer er nieuwe problemen, regressies of N+1-groepen verschijnen.'
-    empty: Nog geen bestemmingen. Voeg een kanaal toe om uw team op de hoogte te stellen.
-    add: Bestemming toevoegen
+    empty: 'Nog geen bestemmingen. Voeg een kanaal toe om uw team op de hoogte te stellen.'
+    add: 'Bestemming toevoegen'
     edit: Bewerking
     enable: Inschakelen
     disable: Uitzetten
     disabled: Gehandicapt
-    test: Test verzenden
+    test: 'Test verzenden'
     test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Verwijderen
-    delete_confirm: Deze meldingsbestemming verwijderen?
-    save: Bestemming opslaan
+    delete_confirm: 'Deze meldingsbestemming verwijderen?'
+    save: 'Bestemming opslaan'
     cancel: Annuleren
-    new_title: Nieuwe meldingsbestemming
-    edit_title: Meldingsbestemming bewerken
-    form_help: Kies een kanaaltype en plak het overeenkomende eindpunt. Geheimen worden gemaskeerd in de instellingenlijst.
+    new_title: 'Nieuwe meldingsbestemming'
+    edit_title: 'Meldingsbestemming bewerken'
+    form_help: 'Kies een kanaaltype en plak het overeenkomende eindpunt. Geheimen worden gemaskeerd in de instellingenlijst.'
     form:
         label: Label
         type: Type
         endpoint: Eindpunt
         endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-webhook-URL. E-mail: adres van de ontvanger. Telegram: bot_token@chat_id'
-        endpoint_invalid: Eindpunt komt niet overeen met het geselecteerde type.
+        endpoint_invalid: 'Eindpunt komt niet overeen met het geselecteerde type.'
         endpoint_ssrf: 'Het eindpunt mag zich niet richten op privé-, link-local- of cloud-metagegevensadressen.'
         enabled: Ingeschakeld
         categories: Waarschuwingscategorieën
-        quiet_hours_legend: Rustige uren en vertering
-        quiet_hours_enabled: Schakel stille uren in
+        quiet_hours_legend: 'Rustige uren en vertering'
+        quiet_hours_enabled: 'Schakel stille uren in'
         quiet_hours_help: 'Tijdens deze periode worden waarschuwingen gebufferd in plaats van onmiddellijk verzonden. Voer app:notifications:flush-digests uit volgens een schema (of na het venster).'
         quiet_hours_timezone: Tijdzone
         quiet_hours_start: 'Rustige uren beginnen (UU:MM)'
         quiet_hours_end: 'Einde stille uren (UU:MM)'
-        quiet_hours_timezone_invalid: Ongeldige tijdzone-ID.
+        quiet_hours_timezone_invalid: 'Ongeldige tijdzone-ID.'
         quiet_hours_time_invalid: 'Gebruik het 24-uurs HH:MM-formaat (bijvoorbeeld 22:00).'
-        quiet_hours_required: Begin- en eindtijden zijn vereist wanneer stille uren zijn ingeschakeld.
-        quiet_hours_range_invalid: Begin- en eindtijden moeten verschillen.
-        digest_enabled: Stuur een samenvatting van de samenvatting bij het doorspoelen
+        quiet_hours_required: 'Begin- en eindtijden zijn vereist wanneer stille uren zijn ingeschakeld.'
+        quiet_hours_range_invalid: 'Begin- en eindtijden moeten verschillen.'
+        digest_enabled: 'Stuur een samenvatting van de samenvatting bij het doorspoelen'
         digest_help: 'Indien ingeschakeld, verzendt Spoelen één samenvatting per bestemming. Indien uitgeschakeld, wordt elke vastgehouden waarschuwing na rustige uren afzonderlijk verzonden.'
-        pagerduty_note: Native PagerDuty wordt niet ondersteund; gebruik een generieke HTTP-webhook als u een incidentbrug nodig heeft.
+        pagerduty_note: 'Native PagerDuty wordt niet ondersteund; gebruik een generieke HTTP-webhook als u een incidentbrug nodig heeft.'
     type:
-        slack: Slappe inkomende webhook
+        slack: 'Slappe inkomende webhook'
         discord: Discord-webhook
-        teams: Microsoft Teams-webhook
+        teams: 'Microsoft Teams-webhook'
         telegram: Telegram-bot
         email: E-mail
-        http: Generieke HTTP-webhook
+        http: 'Generieke HTTP-webhook'
     category:
         fatal: Fataal
         error: Fout
         warning: Waarschuwing
         info: Info
         debug: Foutopsporing
-        n_plus_one: N+1 detecties
-        issue.resolved: Probleem opgelost
-        issue.reopened: Probleem heropend
-        issue.assigned: Probleem toegewezen
-        issue.commented: Probleem becommentarieerd
-        issue.duplicated: Uitgave gemarkeerd als duplicaat
+        n_plus_one: 'N+1 detecties'
+        issue.resolved: 'Probleem opgelost'
+        issue.reopened: 'Probleem heropend'
+        issue.assigned: 'Probleem toegewezen'
+        issue.commented: 'Probleem becommentarieerd'
+        issue.duplicated: 'Uitgave gemarkeerd als duplicaat'
+        volume.threshold: Volumedrempels
     flash:
-        created: Meldingsbestemming gemaakt.
-        updated: Meldingsbestemming bijgewerkt.
-        enabled: Bestemming ingeschakeld.
-        disabled: Bestemming uitgeschakeld.
-        deleted: Bestemming verwijderd.
-        test_queued: Kanaalspecifieke voorbeeldbemelding in wachtrij voor bezorging.
+        created: 'Meldingsbestemming gemaakt.'
+        updated: 'Meldingsbestemming bijgewerkt.'
+        enabled: 'Bestemming ingeschakeld.'
+        disabled: 'Bestemming uitgeschakeld.'
+        deleted: 'Bestemming verwijderd.'
+        test_queued: 'Kanaalspecifieke voorbeeldbemelding in wachtrij voor bezorging.'
     help:
-        title: Handleidingen voor het instellen van meldingen
+        title: 'Handleidingen voor het instellen van meldingen'
         link: Installatiehandleidingen
-        back: Terug naar instellingen
-        toc: Ga naar kanaal
+        back: 'Terug naar instellingen'
+        toc: 'Ga naar kanaal'
         intro: 'Stapsgewijze instructies om Slack, Discord, Microsoft Teams, Telegram, e-mail of een generieke HTTP-webhook aan dit project te koppelen.'
         payload_label: 'Beacon verzendt:'
         docs_hint: 'Volledige referentie (payloads, levering, machtigingen): docs/NOTIFICATIONS.md in de repository.'
         slack:
-            title: Slack (inkomende webhook)
-            lead: Maak een Slack-app Inkomende webhook en plak de HTTPS-URL in Beacon.
-            step1: Open api.slack.com/apps en maak een geheel nieuwe app voor uw werkruimte.
+            title: 'Slack (inkomende webhook)'
+            lead: 'Maak een Slack-app Inkomende webhook en plak de HTTPS-URL in Beacon.'
+            step1: 'Open api.slack.com/apps en maak een geheel nieuwe app voor uw werkruimte.'
             step2: 'Schakel inkomende webhooks in, voeg vervolgens een nieuwe webhook toe aan de werkruimte en kies een kanaal.'
             step3: 'Kopieer de webhook-URL (https://hooks.slack.com/services/…).'
             step4: 'Kies in Beacon Slack Incoming Webhook, plak de URL als eindpunt, selecteer categorieën en sla op.'
-            step5: Klik op Test verzenden en bevestig dat het bericht in Slack verschijnt.
-            payload: JSON met tekst (samenvatting) en een bakenobject dat de volledige payload van de gebeurtenis bevat.
-            tip: Geef de voorkeur aan een speciaal ops-kanaal. Draai de webhook in Slack als deze ooit lekt; update de bestemming in Beacon.
+            step5: 'Klik op Test verzenden en bevestig dat het bericht in Slack verschijnt.'
+            payload: 'JSON met tekst (samenvatting) en een bakenobject dat de volledige payload van de gebeurtenis bevat.'
+            tip: 'Geef de voorkeur aan een speciaal ops-kanaal. Draai de webhook in Slack als deze ooit lekt; update de bestemming in Beacon.'
         discord:
-            title: Onenigheid (webhook)
-            lead: Maak een kanaalwebhook in Discord en plak de URL ervan in Beacon.
-            step1: Open Serverinstellingen → Integraties → Webhooks (of het tabblad Kanaalintegraties).
+            title: 'Onenigheid (webhook)'
+            lead: 'Maak een kanaalwebhook in Discord en plak de URL ervan in Beacon.'
+            step1: 'Open Serverinstellingen → Integraties → Webhooks (of het tabblad Kanaalintegraties).'
             step2: 'Maak een nieuwe webhook, geef deze een naam (bijvoorbeeld Beacon) en kies het doelkanaal.'
             step3: 'Kopieer de webhook-URL (https://discord.com/api/webhooks/…).'
             step4: 'Kies in Beacon Discord-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
             payload: 'JSON met inhoud (samenvatting) en een insluitingsarray (titel, beschrijving, optionele probleem-URL).'
-            tip: Webhooks met onenigheidslimieten; Beacon levert asynchroon via Messenger.
+            tip: 'Webhooks met onenigheidslimieten; Beacon levert asynchroon via Messenger.'
         teams:
-            title: Microsoft Teams (inkomende webhook)
-            lead: Voeg een Inkomende Webhook-connector toe aan een Teams-kanaal en plak de URL in Beacon.
-            step1: Open in het Teams-kanaalmenu Connectors (of Kanaal beheren → Connectors).
+            title: 'Microsoft Teams (inkomende webhook)'
+            lead: 'Voeg een Inkomende Webhook-connector toe aan een Teams-kanaal en plak de URL in Beacon.'
+            step1: 'Open in het Teams-kanaalmenu Connectors (of Kanaal beheren → Connectors).'
             step2: 'Configureer Inkomende Webhook, geef het een naam en maak het.'
-            step3: Kopieer de webhook-URL die Teams levert.
+            step3: 'Kopieer de webhook-URL die Teams levert.'
             step4: 'Kies in Beacon de Microsoft Teams-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
             payload: 'Office 365 MessageCard JSON met samenvatting, titel, tekst en een actie Openen in Beacon wanneer er een URL bestaat.'
             tip: 'Als uw tenant alleen werkstromen toestaat in plaats van klassieke inkomende webhooks, wijs dan een algemene HTTP-bestemming naar een werkstroom die POST JSON accepteert.'
         telegram:
-            title: Telegram (bot)
+            title: 'Telegram (bot)'
             lead: 'Maak een bot met BotFather en sla bot_token@chat_id op als het Beacon-eindpunt.'
             step1: 'Open @BotFather in Telegram, voer /newbot uit en kopieer het bottoken.'
             step2: 'Start een privéchat met de bot, of voeg hem toe aan een groep en stuur een bericht.'
-            step3: Roep getUpdates aan op de Bot API en lees message.chat.id (groeps-ID's zijn vaak negatief).
+            step3: "Roep getUpdates aan op de Bot API en lees message.chat.id (groeps-ID's zijn vaak negatief)."
             step4: 'Kies in Beacon de Telegram-bot en stel het eindpunt in op bot_token@chat_id (bijvoorbeeld: 123:AA…@-1001234567890).'
-            step5: Test opslaan en verzenden.
-            payload: Bot API sendMessage met chat_id en tekst (alleen samenvatting; niet de volledige JSON-payload).
+            step5: 'Test opslaan en verzenden.'
+            payload: 'Bot API sendMessage met chat_id en tekst (alleen samenvatting; niet de volledige JSON-payload).'
             tip: 'De laatste @ in het eindpunt splitst token en chat-ID. Tokens worden in rust versleuteld, net als andere eindpunten.'
         email:
             title: E-mail
-            lead: Stuur waarschuwingen naar een mailbox via Symfony Mailer. Configureer eerst MAILER_DSN.
+            lead: 'Stuur waarschuwingen naar een mailbox via Symfony Mailer. Configureer eerst MAILER_DSN.'
             step1: 'Stel MAILER_DSN in .env of productiegeheimen in op een echt transport (SMTP, enz.). null://null levert niet op.'
-            step2: Kies in Beacon E-mail en stel het eindpunt in op het adres van de ontvanger.
+            step2: 'Kies in Beacon E-mail en stel het eindpunt in op het adres van de ontvanger.'
             step3: 'Categorieën selecteren, opslaan, test verzenden en inbox/spam controleren.'
             payload: 'E-mailonderwerp is gelijk aan de samenvatting; body is de samenvatting plus de probleem- of prestatie-URL, indien aanwezig.'
-            tip: Gebruik een gedeelde ops-alias. Voor rijkere samenvattingen geeft u de voorkeur aan Slack/Discord/Teams of een HTTP-bridge.
+            tip: 'Gebruik een gedeelde ops-alias. Voor rijkere samenvattingen geeft u de voorkeur aan Slack/Discord/Teams of een HTTP-bridge.'
         http:
-            title: Generieke HTTP-webhook
-            lead: POST de canonieke Beacon JSON-payload naar elk HTTPS-automatiseringseindpunt.
-            step1: Maak een HTTPS-URL beschikbaar die POST accepteert met Content-Type application/json.
+            title: 'Generieke HTTP-webhook'
+            lead: 'POST de canonieke Beacon JSON-payload naar elk HTTPS-automatiseringseindpunt.'
+            step1: 'Maak een HTTPS-URL beschikbaar die POST accepteert met Content-Type application/json.'
             step2: 'Kies in Beacon Generieke HTTP-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
             step3: 'Bevestig dat uw service de canonieke JSON-hoofdtekst ontvangt (gebeurtenis, samenvatting, project, probleem, URL, categorie).'
-            payload: Canonieke JSON-payload als verzoektekst (User-Agent symfony-beacon-notifications/1.0).
-            tip: Geef de voorkeur aan HTTPS en authenticeer uw ontvanger. Vermijd het verwijzen naar interne of cloud-metagegevensadressen.
+            payload: 'Canonieke JSON-payload als verzoektekst (User-Agent symfony-beacon-notifications/1.0).'
+            tip: 'Geef de voorkeur aan HTTPS en authenticeer uw ontvanger. Vermijd het verwijzen naar interne of cloud-metagegevensadressen.'
+releases:
+    title: Release-gezondheid
+    intro: 'Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien, vergelijk twee releases of ga naar de bestaande issue-lijstvergelijking.'
+    empty: 'Er zijn nog geen releasedata beschikbaar voor dit project.'
+    focus:
+        label: Release
+        submit: 'Release-gezondheid bijwerken'
+    new_in_release:
+        title: 'Nieuw in %release%'
+        count: '%count% issues zijn voor het eerst gezien in deze release.'
+        open_issue_list: 'Gefilterde issuelijst openen'
+        empty: 'Geen issues zijn voor het eerst gezien in deze release.'
+    compare:
+        label: 'Vergelijken met release'
+        none: 'Niet vergelijken'
+        help: 'Vergelijk optioneel de geselecteerde release met een andere release op basis van de huidige issues.'
+        summary_title: 'Vergelijk %a% vs %b%'
+        only_a: 'Alleen in %release%'
+        only_b: 'Alleen in %release%'
+        both: 'In beide releases'
+        empty: 'Geen issues in deze set'
+    catalog:
+        title: Releases
+    environment_compare:
+        title: Omgevingsvergelijking
+        environment_a: 'Omgeving A'
+        environment_b: 'Omgeving B'
+        open_issue_list: 'Vergelijking openen in issuelijst'
+        help: 'Hergebruikt de bestaande issue-lijstvergelijking uit `014`. Wanneer een release is geselecteerd, behoudt de link dat releasefilter.'
+mailer_settings:
+    title: Mailer
+    intro: 'Sla de Symfony Mailer-DSN versleuteld op in de database (niet in .env). Magic-link-aanmelding blijft verborgen tot hier een niet-null DSN is opgeslagen; e-mailnotificatiedoelen gebruiken ook dit transport.'
+    status:
+        database: 'Uitgaande mail gebruikt de DSN opgeslagen in de instance-instellingen. Magic-link-aanmelding is beschikbaar wanneer deze DSN geen null-transport is.'
+        env_fallback: 'Nog geen database-DSN — uitgaande mail valt terug op MAILER_DSN uit de omgeving (meestal null://null). Magic-link blijft uitgeschakeld tot u hier een versleutelde DSN opslaat.'
+    current_dsn: 'Huidige DSN:'
+    from_preview: 'From-adres: %from%'
+    submit: 'Mailer-instellingen opslaan'
+    magic_ready: 'Magic-link-e-mailcredentials zijn klaar'
+    magic_blocked: 'Magic-link-e-mail niet beschikbaar (sla een bruikbare versleutelde DSN op)'
+    sample:
+        title: 'Voorbeeldmail versturen'
+        intro: 'Levert een testbericht via de versleutelde Mailer-DSN (zelfde transport als magic-link-aanmelding).'
+        to_label: Ontvanger
+        submit: 'Voorbeeld versturen'
+        unavailable: 'Sla eerst een geldige versleutelde Mailer-DSN op (niet null://), daarna kunt u een voorbeeld versturen.'
+        email_subject: 'Beacon mailer-voorbeeld (magic-login credentials)'
+        email_body: |
+            Dit is een voorbeeldbericht van Administratie → Mailer.
+
+            Als u dit hebt ontvangen, kan de versleutelde Mailer-DSN magic-login-e-mails afleveren.
+            From-adres: %from%
+mercure_settings:
+    title: Mercure
+    intro: 'Optionele live meldingen voor aangemelde leden wanneer een nieuw issue wordt aangemaakt. Standaard uitgeschakeld — schakel alleen in wanneer een Mercure-hub beschikbaar is. Web Push blijft een aparte opt-in onder Account → Weergave.'
+    manual_hint: 'Handleiding voor beheerders (hub, JWT-geheim, Compose, probleemoplossing): docs/MERCURE.md in de repository.'
+    status:
+        active: 'Live Mercure-meldingen zijn ingeschakeld voor leden.'
+        inactive: 'Mercure is uit'
+        inactive_help: 'Leden openen geen EventSource tot u Mercure hier inschakelt en een bereikbare hub-URL plus JWT-geheim opgeeft (hieronder of via de omgeving).'
+        url_database: 'Hub publish-URL is opgeslagen in de instance-instellingen.'
+        url_env: 'Hub publish-URL valt terug op MERCURE_URL uit de omgeving.'
+        url_missing: 'Geen hub publish-URL geconfigureerd (stel hieronder of MERCURE_URL in).'
+        secret_database: 'JWT-geheim is versleuteld opgeslagen in de instance-instellingen.'
+        secret_env: 'JWT-geheim valt terug op MERCURE_JWT_SECRET uit de omgeving.'
+        secret_missing: 'Geen JWT-geheim geconfigureerd (stel hieronder of MERCURE_JWT_SECRET in).'
+    public_url_preview: 'Browser hub-URL: %url%'
+    push_note: 'Achtergrond-PWA-push wordt per gebruiker geconfigureerd onder Account → Weergave (vereist VAPID_*-sleutels). Onafhankelijk van Mercure.'
+    submit: 'Mercure-instellingen opslaan'
+instance_mercure:
+    enabled:
+        label: 'Mercure live-meldingen inschakelen'
+        help: 'Wanneer ingeschakeld, abonneren aangemelde leden zich op privé projecttopics voor toasts bij nieuwe issues zolang de app open is.'
+    url:
+        label: 'Publish-URL (server)'
+        help: 'Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure in Compose).'
+    public_url:
+        label: 'Publieke URL (browser)'
+        help: 'Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure via Caddy).'
+    jwt_secret:
+        label: JWT-geheim
+        help: 'Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET. Minimaal 32 tekens bij invoer.'
+        too_short: 'JWT-geheim moet minimaal 32 tekens bevatten.'
+        invalid: 'Voer een geldige JWT-geheimstring in.'
+    clear_secret:
+        label: 'Opgeslagen JWT-geheim wissen'
+        help: 'Verwijdert het databasegeheim en valt terug op MERCURE_JWT_SECRET tot u een nieuw geheim opslaat.'
+instance_mailer:
+    mailer_dsn:
+        label: Mailer-DSN
+        help: 'Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587 — null:// wordt geweigerd (gebruik Opgeslagen DSN wissen).'
+        placeholder: 'smtp://user:pass@mail.example:587'
+        invalid: 'Voer een geldige Symfony Mailer-DSN in (bijv. smtp://user:pass@host:587).'
+        null_transport: 'null:// kan geen mail afleveren. Plak een echte SMTP- (of andere) DSN, of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.'
+    clear_dsn:
+        label: 'Opgeslagen DSN wissen'
+        help: 'Verwijdert de database-DSN en valt terug op MAILER_DSN uit de omgeving tot u een nieuwe opslaat.'
+    mailer_from:
+        label: From-adres
+        help: 'Envelope From voor magic-login en notificatie-e-mails. Standaard beacon@localhost wanneer leeg.'
+setup:
+    eyebrow: 'Eerste start'
+    title: Instance-configuratie
+    intro: 'Installeer navigatiecatalogi en optionele demogegevens. Dezelfde stappen als de CLI-seedlagen.'
+    intro_required: "Navigatiecatalogi ontbreken. Installeer menu's, breadcrumbs en het cookieconsentprofiel voordat u verdergaat."
+    intro_bootstrap: 'Platformcatalogi zijn klaar. Registreer de eerste admin, laad optioneel sampletelemetrie en markeer de configuratie als voltooid.'
+    already_done: 'De configuratie is als voltooid gemarkeerd.'
+    back_dashboard: 'Terug naar dashboard'
+    login_setup_link: 'Eerste configuratie'
+    bootstrap_login_hint: 'Liever uw eigen admin aanmaken?'
+    bootstrap_login_link: Aanmelden
+    bootstrap_register_link: 'Eerste admin registreren'
+    banner:
+        title: 'Instance-configuratie afronden'
+        body: "Installeer menu's/breadcrumbs en optionele demosamples voor deze Beacon-instance."
+        cta: 'Configuratie openen'
+    step_platform:
+        title: 'Verplicht — platformcatalogi'
+        body: "Installeer dashboardmenu's, breadcrumbs en het cookieconsentprofiel/inventaris. Deze stap is verplicht voordat de rest van de app werkt."
+        item_menus: "Menu's (dashboard, preferences, administration)"
+        item_breadcrumbs: 'Breadcrumb-collectie (default)'
+        item_cookies: Cookieconsentprofiel
+        cta: "Menu's, breadcrumbs en cookies installeren"
+        cta_again: 'Platform-seed opnieuw uitvoeren'
+        done: 'Platformcatalogi zijn geïnstalleerd.'
+    step_options:
+        title: 'Optionele volgende stappen'
+        body: 'Maak het eerste adminaccount aan en/of laad een volledige sampledataset. Beide zijn optioneel.'
+        locked: 'Rond eerst de verplichte platforminstallatie af.'
+        register_title: 'Eerste gebruiker aanmaken'
+        register_body: 'Registreer uw eigen admin via AuthKit (registratie alleen voor de eerste gebruiker).'
+        register_cta: 'Eerste admin registreren'
+        register_done: 'Er bestaat al minstens één gebruiker.'
+        sample_title: 'Volledige sampleload'
+        sample_body: 'Maak indien nodig het demoproject aan en laad de grotere sampletelemetriedataset (load-profiel).'
+        sample_cta: 'Volledige sampleload installeren'
+        sample_note: 'Dit kan een minuut duren. Huge-datasets blijven alleen via CLI (`app:seed-sample --size=huge --force`). Als er nog geen gebruiker bestaat, kan een lokale demoadmin worden aangemaakt als eigenaar van het demoproject.'
+    step_demo:
+        title: Demoproject
+        body: 'Maak de lokale demoadmin aan (indien ontbrekend) en het demoproject met een API-sleutel.'
+        cta: 'Demoproject aanmaken'
+        exists: 'Demoproject is al aanwezig.'
+    step_sample:
+        title: Sampletelemetrie
+        body: 'Laad synthetische issues voor QA. Vereist het demoproject. Huge blijft alleen via CLI.'
+        dev: 'Sample laden (dev)'
+        load: 'Sample laden (load)'
+        need_demo: 'Maak eerst het demoproject aan.'
+    step_done:
+        title: Klaar
+        body: 'Sluit deze wizard. U kunt Configuratie altijd opnieuw openen via Administratie.'
+        cta: 'Configuratie als voltooid markeren'
+    cli_hint: 'CLI-equivalent: make bootstrap && make seed && make seed-sample — zie docs/INSTALL.md'
+    flash:
+        platform_ok: 'Navigatiecatalogi en cookieconsent bijgewerkt.'
+        platform_required: "Installeer eerst menu's, breadcrumbs en cookieconsent."
+        demo_ok: 'Demogebruiker / -project klaar.'
+        demo_exists: 'Demogebruiker en -project bestaan al.'
+        sample_ok: 'Sampletelemetrie geladen. Mercure live-meldingen zijn indien nodig ingeschakeld met omgevingsstandaarden.'
+        sample_demo_user: 'Lokale demoadmin admin@symfony-beacon.local / admin123 aangemaakt als eigenaar van het demoproject.'
+        complete: 'Configuratie als voltooid gemarkeerd.'
+        bootstrap_ready: 'Configuratie voltooid. Meld u aan of registreer de eerste admin om verder te gaan.'
+        unknown_action: 'Onbekende configuratieactie.'
+        failed: 'Configuratieactie mislukt.'
+thresholds:
+    title: Drempelmeldingen
+    intro: 'Maak rollende volumemeldingen wanneer error- of fatal-gebeurtenissen een geconfigureerd aantal overschrijden binnen een tijdvenster.'
+    ingest_disabled: 'Ingest is opgeschort voor dit project, dus drempelregels worden niet geëvalueerd.'
+    empty: 'Nog geen drempelregels. Voeg er een toe om plotselinge pieken te detecteren.'
+    add: 'Regel toevoegen'
+    edit: Bewerken
+    enable: Inschakelen
+    disable: Uitschakelen
+    disabled: Uitgeschakeld
+    delete: Verwijderen
+    delete_confirm: 'Deze drempelregel verwijderen?'
+    save: 'Regel opslaan'
+    cancel: Annuleren
+    new_title: 'Nieuwe drempelregel'
+    edit_title: 'Drempelregel bewerken'
+    form_help: 'Configureer een rollende error/fatal-volumemelding. Optionele omgevings- en releasefilters beperken de telling voordat notificatierouting, stille uren en digests worden toegepast.'
+    unnamed: 'Naamloze regel'
+    summary: '%count% gebeurtenissen in %window% min · %cooldown% min cooldown'
+    last_fired: 'Laatst geactiveerd'
+    never_fired: 'Nog nooit geactiveerd.'
+    filter:
+        environment: 'Omgeving: %value%'
+        release: 'Release: %value%'
+        all_events: 'Alle omgevingen en releases'
+    form:
+        label: Label
+        label_help: 'Optionele interne naam weergegeven in Instellingen en payloads.'
+        enabled: Ingeschakeld
+        error_count: 'Aantal fouten'
+        error_count_help: 'Melden wanneer minstens zoveel error/fatal-gebeurtenissen binnen het rollende venster worden ontvangen.'
+        window_minutes: 'Venster (minuten)'
+        window_minutes_help: 'Rollend terugkijkvenster van 1 tot 1440 minuten.'
+        cooldown_minutes: 'Cooldown (minuten)'
+        cooldown_minutes_help: 'Onderdruk dubbele meldingen voor deze regel tijdens het cooldownvenster.'
+        environment: Omgevingsfilter
+        environment_help: 'Leeg laten om alle omgevingen te tellen.'
+        release: Releasefilter
+        release_help: 'Leeg laten om alle releases te tellen.'
+    flash:
+        created: 'Drempelregel aangemaakt.'
+        updated: 'Drempelregel bijgewerkt.'
+        enabled: 'Drempelregel ingeschakeld.'
+        disabled: 'Drempelregel uitgeschakeld.'
+        deleted: 'Drempelregel verwijderd.'
+    validation:
+        label_length: 'Label mag maximaal 120 tekens bevatten.'
+        error_count_min: 'Aantal fouten moet minstens 1 zijn.'
+        window_range: 'Venster moet tussen 1 en 1440 minuten liggen.'
+        cooldown_range: 'Cooldown moet tussen 1 en 10080 minuten liggen.'
+        environment_length: 'Omgeving mag maximaal 80 tekens bevatten.'
+        release_length: 'Release mag maximaal 120 tekens bevatten.'

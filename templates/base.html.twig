@@ -80,6 +80,10 @@
                 <div class="app-main">
                     <main class="app-main__inner">
         {% else %}
+            <div class="top-controls">
+                {% include '_theme_toggle.html.twig' %}
+                {% include '_locale_switcher.html.twig' %}
+            </div>
             <main class="auth-shell-main relative z-10 mx-auto flex w-full max-w-6xl flex-1 justify-center px-4 py-12">
         {% endif %}
 

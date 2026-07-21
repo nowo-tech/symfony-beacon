@@ -1,49 +1,51 @@
 nav:
     projects: Projetos
-    new_project: Novo projeto
+    new_project: 'Novo projeto'
     log_out: Sair
-    main: Navegação principal
-    account: Menu da conta
+    main: 'Navegação principal'
+    account: 'Menu da conta'
     admin: Administração
-    admin_hub: Visão geral do administrador
+    admin_hub: 'Visão geral do administrador'
     users: Usuários
     groups: Grupos
     admin_projects: Projetos
     appearance: Aparência
     mailer: Mailer
     menus: Cardápios
-    breadcrumbs: Pão ralado
-    toggle_sidebar: Alternar navegação
+    breadcrumbs: 'Pão ralado'
+    toggle_sidebar: 'Alternar navegação'
     preferences: Preferências
-    account_settings: Configurações de Conta
+    account_settings: 'Configurações de Conta'
     dashboard: Painel
     issues: Incidentes
     performance: Desempenho
     analytics: Análise
+    setup: Configuração
+    releases: Releases
 api_docs:
-    title: Documentos da API
-    intro: Explore a ingestão de envelopes e endpoints HTTP relacionados. Use Authorize com um cabeçalho X-Beacon-Auth (beacon_key e beacon_secret do DSN do seu projeto).
-    open_json: JSON OpenAPI
+    title: 'Documentos da API'
+    intro: 'Explore a ingestão de envelopes e endpoints HTTP relacionados. Use Authorize com um cabeçalho X-Beacon-Auth (beacon_key e beacon_secret do DSN do seu projeto).'
+    open_json: 'JSON OpenAPI'
 common:
     filter: Filtro
-    clear_filters: Limpar filtros
+    clear_filters: 'Limpar filtros'
     cancel: Cancelar
-    yes: 'sim'
-    na: n / D
+    'yes': sim
+    na: 'n / D'
     unknown: desconhecido
     audit:
         title: Auditoria
         created_at: Criado
         updated_at: Atualizado
-        created_by: Criado por
-        updated_by: Atualizado por
+        created_by: 'Criado por'
+        updated_by: 'Atualizado por'
         by_system: Sistema
 pagination:
     showing: 'Exibindo %from%–%to% de %total%'
-    nav: Páginas de tabela
+    nav: 'Páginas de tabela'
     previous: Anterior
     next: Próximo
-    per_page: Linhas por página
+    per_page: 'Linhas por página'
     per_page_option: '%count% / página'
 toast:
     dismiss: Liberar
@@ -59,103 +61,120 @@ locale:
 theme:
     day: Dia
     night: Noite
-    switch_to_day: Mudar para o modo diurno
-    switch_to_night: Mudar para o modo noturno
+    switch_to_day: 'Mudar para o modo diurno'
+    switch_to_night: 'Mudar para o modo noturno'
 auth:
-    tagline: Rastreamento de erros auto-hospedado para PHP e Symfony.
-    brand_eyebrow: Rastreamento de erros
+    tagline: 'Rastreamento de erros auto-hospedado para PHP e Symfony.'
+    brand_eyebrow: 'Rastreamento de erros'
     bootstrap_eyebrow: Inicialização
-    bootstrap_hint: Crie a primeira conta de administrador. O registro é encerrado após a existência deste usuário.
+    bootstrap_hint: 'Crie a primeira conta de administrador. O registro é encerrado após a existência deste usuário.'
     magic:
-        title: Entrar com magic link
-        intro: Introduza o seu email; enviaremos um link de utilização única (válido 10 minutos).
+        title: 'Entrar com magic link'
+        intro: 'Introduza o seu email; enviaremos um link de utilização única (válido 10 minutos).'
         email: Email
-        submit: Enviar magic link
-        sent: Se essa conta existir e estiver ativa, o link está a caminho.
-        throttled: Demasiados pedidos. Tente mais tarde.
-        invalid: Não foi possível processar o pedido.
-        unavailable: O início de sessão por magic link fica indisponível até um administrador configurar o Mailer (DSN encriptado) em Administração → Mailer.
-        back_to_password: Entrar com palavra-passe
-        email_subject: O seu magic link Beacon
-        email_body: "Abra este link para entrar (expira %expires%):\n\n%link%"
+        submit: 'Enviar magic link'
+        sent: 'Se essa conta existir e estiver ativa, o link está a caminho.'
+        throttled: 'Demasiados pedidos. Tente mais tarde.'
+        invalid: 'Não foi possível processar o pedido.'
+        unavailable: 'O início de sessão por magic link fica indisponível até um administrador configurar o Mailer (DSN encriptado) em Administração → Mailer.'
+        back_to_password: 'Entrar com palavra-passe'
+        email_subject: 'O seu magic link Beacon'
+        email_body: |-
+            Abra este link para entrar (expira %expires%):
+
+            %link%
+    reset:
+        email_subject: 'Redefina a sua palavra-passe Beacon'
+        email_body: |
+            Utilize esta ligação para escolher uma nova palavra-passe:
+
+            %link%
 flash:
     project:
-        created: Projeto criado.
-        api_key_created: Chave de API criada.
-        api_key_revoked: Chave de API revogada.
-        api_key_rotated: Chave de API girada. Atualize os clientes com o novo DSN.
-        governance_saved: Configurações de governança do projeto salvas.
-        governance_invalid: Os valores de governança devem ser números inteiros vazios (herdados) ou não negativos.
-        quota_approaching: Este projeto está se aproximando de sua cota diária de eventos.
-        history_cleared: Histórico do projeto apagado.
-        deleted: Projeto excluído.
-        delete_confirmation_mismatch: O nome do projeto não corresponde. Nada foi excluído.
-        member_added: Membro adicionado ao projeto.
-        member_role_updated: Função do membro atualizada.
-        member_removed: Membro removido do projeto.
-        member_user_not_found: Não existe nenhum usuário com esse e-mail. Eles devem se registrar primeiro.
-        member_user_disabled: Essa conta de usuário está desativada.
-        member_already: Esse usuário já é membro do projeto.
-        member_invalid_role: Função de associação inválida.
-        member_last_owner: O projeto deve manter pelo menos um proprietário.
-        member_cannot_manage_owner: Os administradores não podem alterar ou remover proprietários.
-        member_error: Não foi possível atualizar os membros do projeto.
-        ownership_transferred: Propriedade do projeto transferida. Agora você é um administrador.
-        transfer_confirmation_mismatch: O nome do projeto não corresponde. A propriedade não foi transferida.
-        transfer_to_self: Você não pode transferir a propriedade para si mesmo.
-        transfer_already_owner: Esse membro já é proprietário.
-        group_added: Grupo vinculado ao projeto.
-        group_role_updated: Função do grupo atualizada.
-        group_removed: Grupo desvinculado do projeto.
-        group_already: Esse grupo já está vinculado a este projeto.
-        group_not_found: Grupo não encontrado.
-        group_link_forbidden: Você só pode vincular grupos aos quais pertence (proprietários de projetos e administradores de instância podem vincular qualquer grupo).
+        created: 'Projeto criado.'
+        api_key_created: 'Chave de API criada.'
+        api_key_revoked: 'Chave de API revogada.'
+        api_key_rotated: 'Chave de API girada. Atualize os clientes com o novo DSN.'
+        governance_saved: 'Configurações de governança do projeto salvas.'
+        governance_invalid: 'Os valores de governança devem ser números inteiros vazios (herdados) ou não negativos.'
+        quota_approaching: 'Este projeto está se aproximando de sua cota diária de eventos.'
+        history_cleared: 'Histórico do projeto apagado.'
+        deleted: 'Projeto excluído.'
+        delete_confirmation_mismatch: 'O nome do projeto não corresponde. Nada foi excluído.'
+        member_added: 'Membro adicionado ao projeto.'
+        member_role_updated: 'Função do membro atualizada.'
+        member_removed: 'Membro removido do projeto.'
+        member_user_not_found: 'Não existe nenhum usuário com esse e-mail. Eles devem se registrar primeiro.'
+        member_user_disabled: 'Essa conta de usuário está desativada.'
+        member_already: 'Esse usuário já é membro do projeto.'
+        member_invalid_role: 'Função de associação inválida.'
+        member_last_owner: 'O projeto deve manter pelo menos um proprietário.'
+        member_cannot_manage_owner: 'Os administradores não podem alterar ou remover proprietários.'
+        member_error: 'Não foi possível atualizar os membros do projeto.'
+        ownership_transferred: 'Propriedade do projeto transferida. Agora você é um administrador.'
+        transfer_confirmation_mismatch: 'O nome do projeto não corresponde. A propriedade não foi transferida.'
+        transfer_to_self: 'Você não pode transferir a propriedade para si mesmo.'
+        transfer_already_owner: 'Esse membro já é proprietário.'
+        group_added: 'Grupo vinculado ao projeto.'
+        group_role_updated: 'Função do grupo atualizada.'
+        group_removed: 'Grupo desvinculado do projeto.'
+        group_already: 'Esse grupo já está vinculado a este projeto.'
+        group_not_found: 'Grupo não encontrado.'
+        group_link_forbidden: 'Você só pode vincular grupos aos quais pertence (proprietários de projetos e administradores de instância podem vincular qualquer grupo).'
     appearance:
-        saved: Configurações de aparência salvas.
+        saved: 'Configurações de aparência salvas.'
     preferences:
-        saved: Preferências salvas.
-        profile_saved: Perfil salvo.
-        password_saved: Senha atualizada.
-        display_saved: Preferências de exibição salvas.
-        locale_saved: Idioma atualizado.
+        saved: 'Preferências salvas.'
+        profile_saved: 'Perfil salvo.'
+        password_saved: 'Senha atualizada.'
+        display_saved: 'Preferências de exibição salvas.'
+        locale_saved: 'Idioma atualizado.'
     users:
-        enabled: Conta de usuário habilitada.
-        disabled: Conta de usuário desativada.
-        cannot_disable_self: Você não pode desativar sua própria conta.
-        created: Conta de usuário criada.
-        role_updated: Função do usuário atualizada.
-        invalid_email: Insira um endereço de e-mail válido.
-        name_required: O nome de exibição é obrigatório.
-        password_too_short: A senha deve ter pelo menos 8 caracteres.
-        email_taken: Esse e-mail já está cadastrado.
-        invalid_role: Função inválida.
-        cannot_change_own_role: Você não pode mudar seu próprio papel.
-        last_admin: A instância deve manter pelo menos um administrador.
-        project_unlink_forbidden: Você não tem permissão para remover essa associação ao projeto.
-        project_unlink_error: Não foi possível remover o usuário do projeto.
+        enabled: 'Conta de usuário habilitada.'
+        disabled: 'Conta de usuário desativada.'
+        cannot_disable_self: 'Você não pode desativar sua própria conta.'
+        created: 'Conta de usuário criada.'
+        role_updated: 'Função do usuário atualizada.'
+        invalid_email: 'Insira um endereço de e-mail válido.'
+        name_required: 'O nome de exibição é obrigatório.'
+        password_too_short: 'A senha deve ter pelo menos 8 caracteres.'
+        email_taken: 'Esse e-mail já está cadastrado.'
+        invalid_role: 'Função inválida.'
+        cannot_change_own_role: 'Você não pode mudar seu próprio papel.'
+        last_admin: 'A instância deve manter pelo menos um administrador.'
+        project_unlink_forbidden: 'Você não tem permissão para remover essa associação ao projeto.'
+        project_unlink_error: 'Não foi possível remover o usuário do projeto.'
     groups:
-        created: Grupo criado.
-        updated: Grupo atualizado.
-        deleted: Grupo excluído.
-        name_required: O nome do grupo é obrigatório.
-        user_not_found: Não existe nenhum usuário com esse e-mail.
-        already_member: Esse usuário já está no grupo.
-        member_added: Usuário adicionado ao grupo.
-        member_removed: Usuário removido do grupo.
-        project_unlink_forbidden: Você não tem permissão para desvincular esse projeto.
-        project_unlink_error: Não foi possível desvincular o projeto do grupo.
+        created: 'Grupo criado.'
+        updated: 'Grupo atualizado.'
+        deleted: 'Grupo excluído.'
+        name_required: 'O nome do grupo é obrigatório.'
+        user_not_found: 'Não existe nenhum usuário com esse e-mail.'
+        already_member: 'Esse usuário já está no grupo.'
+        member_added: 'Usuário adicionado ao grupo.'
+        member_removed: 'Usuário removido do grupo.'
+        project_unlink_forbidden: 'Você não tem permissão para desvincular esse projeto.'
+        project_unlink_error: 'Não foi possível desvincular o projeto do grupo.'
     admin_projects:
-        name_required: O nome do projeto é obrigatório.
-        updated: Projeto atualizado.
-        ingest_suspended: Ingestão suspensa para este projeto.
-        ingest_resumed: A ingestão foi retomada para este projeto.
-        view_as_enabled: Visualizando projetos como membro. As ações privilegiadas do projeto são limitadas.
-        view_as_disabled: Saiu do modo visualizar como membro.
+        name_required: 'O nome do projeto é obrigatório.'
+        updated: 'Projeto atualizado.'
+        ingest_suspended: 'Ingestão suspensa para este projeto.'
+        ingest_resumed: 'A ingestão foi retomada para este projeto.'
+        view_as_enabled: 'Visualizando projetos como membro. As ações privilegiadas do projeto são limitadas.'
+        view_as_disabled: 'Saiu do modo visualizar como membro.'
+    mailer:
+        saved: 'Definições do mailer guardadas.'
+        sample_sent: 'E-mail de exemplo enviado. Verifique a caixa de entrada (e o spam) para o teste de credenciais magic login.'
+        sample_unavailable: 'Guarde um DSN Mailer encriptado utilizável antes de enviar um exemplo.'
+        sample_invalid_recipient: 'Introduza um endereço de e-mail de destinatário válido.'
+        sample_failed: 'Não foi possível enviar o e-mail de exemplo. Verifique o DSN Mailer e os registos do servidor.'
+    mercure:
+        saved: 'Definições Mercure guardadas.'
 project:
     label: Projeto
-    no_description: Sem descrição
+    no_description: 'Sem descrição'
     nav:
-        label: Seções do projeto
+        label: 'Seções do projeto'
     settings:
         title: Configurações
         nav: Configurações
@@ -163,73 +182,73 @@ project:
     governance:
         title: Governança
         help: 'Retenção por projeto, limites de taxas e cotas diárias. Deixe um campo vazio para herdar o padrão do servidor.'
-        retention_days: Dias de retenção
-        retention_max_events: Máximo de eventos armazenados
-        ingest_rate_limit: Limite de taxa de ingestão (por minuto)
-        event_quota_daily: Cota diária de eventos
+        retention_days: 'Dias de retenção'
+        retention_max_events: 'Máximo de eventos armazenados'
+        ingest_rate_limit: 'Limite de taxa de ingestão (por minuto)'
+        event_quota_daily: 'Cota diária de eventos'
         inherit_hint: 'Vazio = herda o padrão do servidor (%default%). Use 0 para desabilitar quando o padrão for diferente de zero.'
-        save: Salve a governança
+        save: 'Salve a governança'
         quota_usage: 'Eventos hoje: %count% / %quota%'
-        ingest_disabled_banner: A ingestão de envelopes está suspensa para este projeto. Os dados existentes permanecem legíveis.
+        ingest_disabled_banner: 'A ingestão de envelopes está suspensa para este projeto. Os dados existentes permanecem legíveis.'
     health:
         title: Saúde
-        intro: Profundidade da fila do Instance Messenger e status de entrega da última notificação para os destinos deste projeto.
-        messenger_pending: Assíncrono do Messenger pendente
-        messenger_unavailable: Profundidade da fila indisponível
-        instance_wide: em toda a instância
-        ready_probe: Sonda de prontidão
-        ready_link: Aberto /saúde/pronto
-        destinations_title: Destinos de notificação
-        destinations_empty: Nenhum destino de notificação configurado.
+        intro: 'Profundidade da fila do Instance Messenger e status de entrega da última notificação para os destinos deste projeto.'
+        messenger_pending: 'Assíncrono do Messenger pendente'
+        messenger_unavailable: 'Profundidade da fila indisponível'
+        instance_wide: 'em toda a instância'
+        ready_probe: 'Sonda de prontidão'
+        ready_link: 'Aberto /saúde/pronto'
+        destinations_title: 'Destinos de notificação'
+        destinations_empty: 'Nenhum destino de notificação configurado.'
         last_delivery: 'Última entrega:'
         delivery_ok: Sucesso
         delivery_fail: Fracassado
-        never_delivered: Ainda não há entregas.
-        history_empty: Nenhuma tentativa de entrega recente registada.
+        never_delivered: 'Ainda não há entregas.'
+        history_empty: 'Nenhuma tentativa de entrega recente registada.'
         history_show: 'Mostrar tentativas recentes (%count%)'
         history_hide: 'Ocultar tentativas recentes (%count%)'
     new:
-        title: Novo projeto
-        submit: Criar projeto
+        title: 'Novo projeto'
+        submit: 'Criar projeto'
     name:
         label: Nome
-        placeholder: por exemplo API de faturamento
-        help: Mostrado no painel e usado para derivar o slug do projeto.
-        required: O nome do projeto é obrigatório.
+        placeholder: 'por exemplo API de faturamento'
+        help: 'Mostrado no painel e usado para derivar o slug do projeto.'
+        required: 'O nome do projeto é obrigatório.'
     description:
         label: Descrição
-        placeholder: Breve resumo opcional
-        help: Ajuda sua equipe a reconhecer este projeto.
+        placeholder: 'Breve resumo opcional'
+        help: 'Ajuda sua equipe a reconhecer este projeto.'
     api_keys:
-        title: Chaves de API/DSN
-        help: Use um DSN em BEACON_DSN para que seu aplicativo possa enviar erros para este projeto.
+        title: 'Chaves de API/DSN'
+        help: 'Use um DSN em BEACON_DSN para que seu aplicativo possa enviar erros para este projeto.'
         inactive: inativo
         public: 'público:'
-        label_placeholder: por exemplo lontra calma
-        generate: Sugerir nome
-        generate_hint: Preencha o rótulo com um nome adjetivo-substantivo amigável
-        add: Adicionar chave
+        label_placeholder: 'por exemplo lontra calma'
+        generate: 'Sugerir nome'
+        generate_hint: 'Preencha o rótulo com um nome adjetivo-substantivo amigável'
+        add: 'Adicionar chave'
         revoke: Revogar
-        revoke_confirm: Revogar esta chave de API? A ingestão com este segredo falhará imediatamente.
+        revoke_confirm: 'Revogar esta chave de API? A ingestão com este segredo falhará imediatamente.'
         rotate: Girar
     members:
         title: Membros
-        help: Membros diretos deste projeto. Proprietários e administradores gerenciam a associação. O acesso também pode vir dos grupos vinculados abaixo.
+        help: 'Membros diretos deste projeto. Proprietários e administradores gerenciam a associação. O acesso também pode vir dos grupos vinculados abaixo.'
         your_role: 'Sua função:'
-        email_label: E-mail do membro
-        email_placeholder: 'usuário@exemplo.com'
+        email_label: 'E-mail do membro'
+        email_placeholder: usuário@exemplo.com
         role_label: Papel
-        add: Adicionar membro
-        add_title: Adicionar membro
-        add_help: A pessoa já deve ter uma conta Beacon (mesmo email).
+        add: 'Adicionar membro'
+        add_title: 'Adicionar membro'
+        add_help: 'A pessoa já deve ter uma conta Beacon (mesmo email).'
         update_role: Atualizar
         remove: Remover
-        remove_title: Remover membro?
+        remove_title: 'Remover membro?'
         remove_confirm: 'Remover %email% deste projeto?'
-        edit_role: Editar função
-        edit_role_title: Alterar função de membro
+        edit_role: 'Editar função'
+        edit_role_title: 'Alterar função de membro'
         edit_role_body: 'Escolha uma nova função para %name% (%email%).'
-        last_owner_hint: O projeto deve manter pelo menos um proprietário.
+        last_owner_hint: 'O projeto deve manter pelo menos um proprietário.'
         role:
             owner: Proprietário
             admin: Administrador
@@ -237,196 +256,215 @@ project:
             viewer: Viewer
     groups:
         title: Grupos
-        help: Vincule um grupo para que cada membro do grupo receba a função escolhida neste projeto. Os proprietários devem ser adicionados como usuários individuais.
-        empty: Nenhum grupo vinculado ainda.
-        select: Selecione um grupo…
-        add: Grupo de links
+        help: 'Vincule um grupo para que cada membro do grupo receba a função escolhida neste projeto. Os proprietários devem ser adicionados como usuários individuais.'
+        empty: 'Nenhum grupo vinculado ainda.'
+        select: 'Selecione um grupo…'
+        add: 'Grupo de links'
         remove: Desvincular
-        remove_title: Desvincular grupo?
+        remove_title: 'Desvincular grupo?'
         remove_confirm: 'Desvincular o grupo “%name%” deste projeto?'
-        edit_role: Editar função do grupo
-        edit_role_title: Alterar função do grupo
+        edit_role: 'Editar função do grupo'
+        edit_role_title: 'Alterar função do grupo'
         edit_role_body: 'Escolha uma nova função para o grupo “%name%”.'
-        none_available: Todos os grupos já estão vinculados ou crie grupos em Administração → Grupos.
+        none_available: 'Todos os grupos já estão vinculados ou crie grupos em Administração → Grupos.'
         member_count: '%count% usuários no grupo'
     danger:
-        title: Zona de perigo
-        intro: Ações irreversíveis para este projeto. Use com cuidado.
+        title: 'Zona de perigo'
+        intro: 'Ações irreversíveis para este projeto. Use com cuidado.'
         cancel: Cancelar
-        clear_open: Limpar histórico…
-        clear_title: Limpar histórico do projeto?
+        clear_open: 'Limpar histórico…'
+        clear_title: 'Limpar histórico do projeto?'
         clear_body: 'Isso exclui permanentemente problemas, eventos, dados de desempenho e análises deste projeto. As chaves e os membros da API são mantidos.'
         clear_confirm: 'Sim, limpar histórico'
-        delete_open: Excluir projeto…
-        delete_title: Excluir este projeto permanentemente?
+        delete_open: 'Excluir projeto…'
+        delete_title: 'Excluir este projeto permanentemente?'
         delete_body: 'Isso exclui permanentemente “%name%” e todos os seus dados (problemas, eventos, desempenho, análises, chaves e membros). Isto não pode ser desfeito.'
         delete_type_label: 'Digite %name% para confirmar:'
-        delete_confirm: Excluir projeto
-        transfer_open: Transferir propriedade…
-        transfer_title: Transferir a propriedade do projeto?
-        transfer_body: O membro selecionado se torna o proprietário. Você se torna um administrador e perde a capacidade de excluir o projeto.
-        transfer_member_label: Novo proprietário
-        transfer_member_placeholder: Selecione um membro…
+        delete_confirm: 'Excluir projeto'
+        transfer_open: 'Transferir propriedade…'
+        transfer_title: 'Transferir a propriedade do projeto?'
+        transfer_body: 'O membro selecionado se torna o proprietário. Você se torna um administrador e perde a capacidade de excluir o projeto.'
+        transfer_member_label: 'Novo proprietário'
+        transfer_member_placeholder: 'Selecione um membro…'
         transfer_type_label: 'Digite %name% para confirmar:'
-        transfer_confirm: Transferir propriedade
-        transfer_no_candidates: Adicione outro membro direto antes de transferir a propriedade.
+        transfer_confirm: 'Transferir propriedade'
+        transfer_no_candidates: 'Adicione outro membro direto antes de transferir a propriedade.'
 projects:
     title: Projetos
-    intro: Filtre e abra projetos que você pode acessar.
-    search_placeholder: Pesquisar projetos…
-    empty: Nenhum projeto ainda.
-    create_first: Crie seu primeiro projeto
+    intro: 'Filtre e abra projetos que você pode acessar.'
+    search_placeholder: 'Pesquisar projetos…'
+    empty: 'Nenhum projeto ainda.'
+    create_first: 'Crie seu primeiro projeto'
     errors_last_7_days: '%count% erros nos últimos 7 dias'
+    share:
+        title: 'Ligações de partilha'
+        help: 'Crie uma ligação temporária com acesso só de leitura (viewer) a este projeto (ou a uma issue). Os destinatários têm de iniciar sessão.'
+        days: 'Validade (dias)'
+        issue_uuid: 'UUID da issue (opcional)'
+        issue_optional: 'Deixe vazio para o projeto inteiro'
+        create: 'Criar ligação de partilha'
+        revoke: Revogar
+        empty: 'Nenhuma ligação de partilha ativa.'
+        expires: Expira
+        scoped_issue: 'Limitada a uma issue'
+        created: 'Ligação criada — copie-a agora; não será mostrada novamente.'
+        revoked: 'Ligação de partilha revogada.'
+        invalid: 'Esta ligação é inválida, expirou ou foi revogada.'
+        invalid_csrf: 'Token de segurança inválido.'
+        issue_not_found: 'Issue não encontrada neste projeto.'
+        expires_in_past: 'A expiração tem de ser no futuro.'
+        expires_too_far: 'As ligações de partilha não podem durar mais de 30 dias.'
+        issue_wrong_project: 'Essa issue não pertence a este projeto.'
 issues:
     title: Incidentes
-    search_placeholder: Título da pesquisa…
-    empty: Nenhum problema corresponde a esses filtros.
-    back: ← Problemas
-    back_to_issue: ← Problema
+    search_placeholder: 'Título da pesquisa…'
+    empty: 'Nenhum problema corresponde a esses filtros.'
+    back: '← Problemas'
+    back_to_issue: '← Problema'
     event_count: '%count% eventos'
-    latest_stack: Última pilha/carga útil
-    latest_event: Último evento
+    latest_stack: 'Última pilha/carga útil'
+    latest_event: 'Último evento'
     event: Evento
-    recent_events: Eventos recentes
-    no_events: Nenhum evento armazenado.
-    event_detail: Detalhe do evento
+    recent_events: 'Eventos recentes'
+    no_events: 'Nenhum evento armazenado.'
+    event_detail: 'Detalhe do evento'
     context: Contexto
-    occurred_at: Ocorreu em
-    received_at: Recebido em
+    occurred_at: 'Ocorreu em'
+    received_at: 'Recebido em'
     release: Lançamento/versão
-    php_version: Versão PHP
-    symfony_version: Versão Symfony
-    os: Sistema operacional
+    php_version: 'Versão PHP'
+    symfony_version: 'Versão Symfony'
+    os: 'Sistema operacional'
     user: Usuário
     server_name: Servidor
     logger: Registrador
     message: Mensagem
-    fingerprint: Impressão digital
-    request: Solicitação HTTP
+    fingerprint: 'Impressão digital'
+    request: 'Solicitação HTTP'
     request_method: Método
     request_url: URL
-    request_query: Cadeia de consulta
+    request_query: 'Cadeia de consulta'
     request_headers: Cabeçalhos
-    extra: Dados adicionais
-    stacktrace: Rastreamento de pilha
+    extra: 'Dados adicionais'
+    stacktrace: 'Rastreamento de pilha'
     source_context: Fonte
-    no_source_context: Nenhum contexto de origem para este quadro.
-    copy_path: Copiar caminho
+    no_source_context: 'Nenhum contexto de origem para este quadro.'
+    copy_path: 'Copiar caminho'
     path_copied: Copiado
-    breadcrumbs: Pão ralado
-    raw_payload: Carga útil bruta
+    breadcrumbs: 'Pão ralado'
+    raw_payload: 'Carga útil bruta'
     highlights: Destaques
     tags: Etiquetas
-    tags_custom: Tags de cliente
-    tags_system: Etiquetas do sistema
-    tags_hint: As tags do cliente vêm de BeaconBundle setTag/setTags. Limpe os campos confidenciais com before_send antes da ingestão.
+    tags_custom: 'Tags de cliente'
+    tags_system: 'Etiquetas do sistema'
+    tags_hint: 'As tags do cliente vêm de BeaconBundle setTag/setTags. Limpe os campos confidenciais com before_send antes da ingestão.'
     contexts: Contextos
-    context_runtime: Tempo de execução
+    context_runtime: 'Tempo de execução'
     context_framework: Estrutura
-    in_app: no aplicativo
+    in_app: 'no aplicativo'
     aside_details: Detalhes
     aside_triage: Triagem
     aside_duplicate: Duplicado
     assignee: Cessionário
-    assignee_unassigned: Não atribuído
-    assignee_help: Escolha um membro do projeto responsável por resolver esse problema.
-    assignee_save: Salvar responsável
-    assignee_saved: Cessionário atualizado.
-    assignee_not_member: Esse usuário não é membro deste projeto.
-    assignee_invalid: Não foi possível atualizar o responsável.
+    assignee_unassigned: 'Não atribuído'
+    assignee_help: 'Escolha um membro do projeto responsável por resolver esse problema.'
+    assignee_save: 'Salvar responsável'
+    assignee_saved: 'Cessionário atualizado.'
+    assignee_not_member: 'Esse usuário não é membro deste projeto.'
+    assignee_invalid: 'Não foi possível atualizar o responsável.'
     status:
-        unresolved: Não resolvido
+        unresolved: 'Não resolvido'
         resolved: Resolvido
         ignored: Ignorado
-    status_help: Altere a forma como esse problema é rastreado na caixa de entrada do projeto.
-    status_mark_resolved: Marcar como resolvido
-    status_mark_unresolved: Marcar como não resolvido
+    status_help: 'Altere a forma como esse problema é rastreado na caixa de entrada do projeto.'
+    status_mark_resolved: 'Marcar como resolvido'
+    status_mark_unresolved: 'Marcar como não resolvido'
     status_mark_ignored: Ignorar
-    status_saved: Status do problema atualizado.
-    status_invalid: Não foi possível atualizar o status do problema.
+    status_saved: 'Status do problema atualizado.'
+    status_invalid: 'Não foi possível atualizar o status do problema.'
     priority:
         low: Baixo
         medium: Médio
         high: Alto
         critical: Crítico
     priority_label: Prioridade
-    priority_help: Defina a urgência desse problema para triagem.
-    priority_save: Salvar prioridade
-    priority_saved: Prioridade atualizada.
-    priority_invalid: Não foi possível atualizar a prioridade.
+    priority_help: 'Defina a urgência desse problema para triagem.'
+    priority_save: 'Salvar prioridade'
+    priority_saved: 'Prioridade atualizada.'
+    priority_invalid: 'Não foi possível atualizar a prioridade.'
     comments_title: Comentários
-    comments_empty: Nenhum comentário ainda.
+    comments_empty: 'Nenhum comentário ainda.'
     comment_body: Comentário
-    comment_placeholder: Adicione um comentário…
-    comment_submit: Postar comentário
-    comment_saved: Comentário adicionado.
-    comment_empty: O comentário não pode ficar vazio.
-    comment_too_long: O comentário é muito longo.
-    comment_invalid: Não foi possível adicionar o comentário.
+    comment_placeholder: 'Adicione um comentário…'
+    comment_submit: 'Postar comentário'
+    comment_saved: 'Comentário adicionado.'
+    comment_empty: 'O comentário não pode ficar vazio.'
+    comment_too_long: 'O comentário é muito longo.'
+    comment_invalid: 'Não foi possível adicionar o comentário.'
     duplicate_of: 'Duplicado de'
-    duplicate_help: Marcar este problema como duplicado de outro no mesmo projeto (define o status como ignorado).
-    duplicate_aside_help: Vincule este problema a um problema canônico no mesmo projeto.
-    duplicate_open: Marcar como duplicado…
-    duplicate_modal_title: Marcar como duplicado
-    duplicate_canonical: Problema canônico
-    duplicate_choose: Escolha um problema canônico
-    duplicate_search_placeholder: Pesquise por título ou UUID…
-    duplicate_search_empty: Sem problemas de correspondência
-    duplicate_no_candidates: Nenhum outro problema neste projeto pode ser vinculado como canônico.
+    duplicate_help: 'Marcar este problema como duplicado de outro no mesmo projeto (define o status como ignorado).'
+    duplicate_aside_help: 'Vincule este problema a um problema canônico no mesmo projeto.'
+    duplicate_open: 'Marcar como duplicado…'
+    duplicate_modal_title: 'Marcar como duplicado'
+    duplicate_canonical: 'Problema canônico'
+    duplicate_choose: 'Escolha um problema canônico'
+    duplicate_search_placeholder: 'Pesquise por título ou UUID…'
+    duplicate_search_empty: 'Sem problemas de correspondência'
+    duplicate_no_candidates: 'Nenhum outro problema neste projeto pode ser vinculado como canônico.'
     duplicate_cancel: Cancelar
-    duplicate_submit: Marcar como duplicado
-    duplicate_saved: Problema marcado como duplicado e ignorado.
-    merge_events_label: Mescle também eventos na questão canônica
+    duplicate_submit: 'Marcar como duplicado'
+    duplicate_saved: 'Problema marcado como duplicado e ignorado.'
+    merge_events_label: 'Mescle também eventos na questão canônica'
     merge_events_help: 'Move todos os eventos para o problema selecionado, recalcula as contagens e depois ignora este problema.'
-    merge_saved: Eventos fundidos na questão canônica.
-    merge_failed: Não foi possível mesclar esses problemas.
-    duplicate_self: Um problema não pode ser uma duplicata de si mesmo.
-    duplicate_circular: Isso criaria um link duplicado circular.
-    duplicate_not_found: Problema canônico não foi encontrado neste projeto.
-    duplicate_invalid: Não foi possível marcar como duplicado.
+    merge_saved: 'Eventos fundidos na questão canônica.'
+    merge_failed: 'Não foi possível mesclar esses problemas.'
+    duplicate_self: 'Um problema não pode ser uma duplicata de si mesmo.'
+    duplicate_circular: 'Isso criaria um link duplicado circular.'
+    duplicate_not_found: 'Problema canônico não foi encontrado neste projeto.'
+    duplicate_invalid: 'Não foi possível marcar como duplicado.'
     views:
-        label: Visualizações salvas
-        choose: Abra uma visualização salva…
-        save_name: Ver nome
-        save_placeholder: por exemplo Crítico não resolvido
-        save: Salvar visualização
-        delete: Excluir visualização
-        saved: Visualização salva.
-        deleted: Visualização excluída.
-        name_empty: O nome da visualização não pode ficar vazio.
-        invalid: Não foi possível atualizar as visualizações salvas.
+        label: 'Visualizações salvas'
+        choose: 'Abra uma visualização salva…'
+        save_name: 'Ver nome'
+        save_placeholder: 'por exemplo Crítico não resolvido'
+        save: 'Salvar visualização'
+        delete: 'Excluir visualização'
+        saved: 'Visualização salva.'
+        deleted: 'Visualização excluída.'
+        name_empty: 'O nome da visualização não pode ficar vazio.'
+        invalid: 'Não foi possível atualizar as visualizações salvas.'
     history_title: Atividade
-    history_empty: Nenhum status ou mudança de responsável ainda.
+    history_empty: 'Nenhum status ou mudança de responsável ainda.'
     history_assignee: Cessionário
     history_status: Status
     history_by: 'por %name%'
-    history_by_system: por sistema
+    history_by_system: 'por sistema'
     filter:
-        any_level: Qualquer nível
-        any_status: qualquer status
-        any_assignee: Qualquer cessionário
-        any_priority: Qualquer prioridade
+        any_level: 'Qualquer nível'
+        any_status: 'qualquer status'
+        any_assignee: 'Qualquer cessionário'
+        any_priority: 'Qualquer prioridade'
         environment: Ambiente
         release: Liberar
         tag: Marcação
-        url: Solicitar URL
-        user: Usuário do evento
-        per_page: Resultados por página
+        url: 'Solicitar URL'
+        user: 'Usuário do evento'
+        per_page: 'Resultados por página'
         per_page_option: '%count% por página'
     badge:
-        new_in_release: Novidade no lançamento
+        new_in_release: 'Novidade no lançamento'
     compare:
         title: 'Compare %a% com %b%'
-        environment_b: Compare com o ambiente…
+        environment_b: 'Compare com o ambiente…'
         hint: 'Defina Ambiente e Comparação para ver problemas apenas em A, apenas em B ou em ambos'
         only_a: 'Somente em %env%'
         only_b: 'Somente em %env%'
-        both: Em ambos
-        empty: Sem problemas neste conjunto
+        both: 'Em ambos'
+        empty: 'Sem problemas neste conjunto'
     sort_by: 'Classificar por %column%'
     pagination:
         showing: 'Exibindo %from%–%to% de %total%'
-        nav: Páginas da lista de problemas
+        nav: 'Páginas da lista de problemas'
         previous: Anterior
         next: Próximo
     col:
@@ -437,16 +475,17 @@ issues:
         events_24h: 24h
         events_7d: 7d
         events_30d: 30d
-        first_seen: Visto pela primeira vez
-        last_seen: Visto pela última vez
+        first_seen: 'Visto pela primeira vez'
+        last_seen: 'Visto pela última vez'
+    viewer_readonly: 'Tem acesso só de leitura (viewer) a este projeto.'
 performance:
     title: Desempenho
-    intro: Transações e análise N+1
-    show_all: Mostrar tudo
-    nplus1_only: Somente N+1
-    empty: Nenhuma transação ainda.
-    back: ← Desempenho
-    no_nplus1: nenhum N+1 detectado
+    intro: 'Transações e análise N+1'
+    show_all: 'Mostrar tudo'
+    nplus1_only: 'Somente N+1'
+    empty: 'Nenhuma transação ainda.'
+    back: '← Desempenho'
+    no_nplus1: 'nenhum N+1 detectado'
     nplus1_groups: '%count% N+1 grupo(s)'
     nplus1_flag: N+1
     spans_count: '%count% spans'
@@ -460,26 +499,26 @@ performance:
         description: Descrição
 analytics:
     title: Analítica
-    intro: Volume diário de erros, transações e N+1 — gráfico e tabela do período selecionado
-    empty: Ainda sem volume neste período. Faça ingest de eventos para preencher a analítica.
-    timezone_help: Os buckets diários usam dias de calendário UTC.
-    filtered_note: Os filtros aplicam-se apenas a eventos de erro (transações e N+1 ficam ocultos enquanto há filtros ativos).
+    intro: 'Volume diário de erros, transações e N+1 — gráfico e tabela do período selecionado'
+    empty: 'Ainda sem volume neste período. Faça ingest de eventos para preencher a analítica.'
+    timezone_help: 'Os buckets diários usam dias de calendário UTC.'
+    filtered_note: 'Os filtros aplicam-se apenas a eventos de erro (transações e N+1 ficam ocultos enquanto há filtros ativos).'
     chart:
-        aria: Volume de analítica ao longo do tempo
+        aria: 'Volume de analítica ao longo do tempo'
     period:
         label: Período
-        custom: Intervalo personalizado
+        custom: 'Intervalo personalizado'
         from: De
         to: Até
-        days_7: 7 dias
-        days_14: 14 dias
-        days_30: 30 dias
-        days_90: 90 dias
-        invalid: Período desconhecido; a mostrar os últimos 30 dias.
-        custom_required: Escolha as datas de e até para um intervalo personalizado.
-        invalid_date: Use datas no formato AAAA-MM-DD.
-        end_before_start: A data final deve ser igual ou posterior à inicial.
-        too_long: Intervalos personalizados não podem exceder 366 dias.
+        days_7: '7 dias'
+        days_14: '14 dias'
+        days_30: '30 dias'
+        days_90: '90 dias'
+        invalid: 'Período desconhecido; a mostrar os últimos 30 dias.'
+        custom_required: 'Escolha as datas de e até para um intervalo personalizado.'
+        invalid_date: 'Use datas no formato AAAA-MM-DD.'
+        end_before_start: 'A data final deve ser igual ou posterior à inicial.'
+        too_long: 'Intervalos personalizados não podem exceder 366 dias.'
     filter:
         environment: Ambiente
         release: Release
@@ -490,60 +529,60 @@ analytics:
         date: Data
         errors: Erros
         transactions: Transações
-        nplus1_groups: Grupos N+1
+        nplus1_groups: 'Grupos N+1'
 appearance:
     title: Aparência
     intro: 'Personalize o nome da marca, cores de destaque e cores de perigo para esta instância do Beacon. Somente administradores podem alterar essas configurações.'
     section:
-        light: Acentos de tema claro
-        dark: Acentos de tema escuro
-        danger: Cores de perigo/erro
-    submit: Salvar aparência
-    reset: Redefinir para os padrões
+        light: 'Acentos de tema claro'
+        dark: 'Acentos de tema escuro'
+        danger: 'Cores de perigo/erro'
+    submit: 'Salvar aparência'
+    reset: 'Redefinir para os padrões'
 site_appearance:
     brand_name:
         label: Marca
         placeholder: symfony-beacon
-        help: Mostrado no cabeçalho e na página de login.
+        help: 'Mostrado no cabeçalho e na página de login.'
     brand_eyebrow:
-        label: Sobrancelha de marca
-        placeholder: Rastreamento de erros
-        help: Etiqueta curta acima da marca na tela de login.
+        label: 'Sobrancelha de marca'
+        placeholder: 'Rastreamento de erros'
+        help: 'Etiqueta curta acima da marca na tela de login.'
     accent_color:
         label: Sotaque
         placeholder: '#1f6f54'
         help: 'Acento primário (botões, links) no modo claro.'
     accent_deep_color:
-        label: Acento (passar o mouse)
+        label: 'Acento (passar o mouse)'
         placeholder: '#134736'
-        help: Acento mais escuro para estados de foco no modo claro.
+        help: 'Acento mais escuro para estados de foco no modo claro.'
     accent_color_dark:
-        label: Sotaque (escuro)
+        label: 'Sotaque (escuro)'
         placeholder: '#4aad7f'
-        help: Acento primário no modo escuro.
+        help: 'Acento primário no modo escuro.'
     accent_deep_color_dark:
-        label: Foco acentuado (escuro)
+        label: 'Foco acentuado (escuro)'
         placeholder: '#6bc49a'
-        help: Acento mais claro para estados de foco no modo escuro.
+        help: 'Acento mais claro para estados de foco no modo escuro.'
     danger_color:
         label: Perigo
         placeholder: '#b42318'
-        help: Erro/acento destrutivo no modo claro.
+        help: 'Erro/acento destrutivo no modo claro.'
     danger_color_dark:
-        label: Perigo (escuro)
+        label: 'Perigo (escuro)'
         placeholder: '#f97066'
-        help: Erro/acento destrutivo no modo escuro.
+        help: 'Erro/acento destrutivo no modo escuro.'
     color:
         invalid: 'Use uma cor hexadecimal como #1f6f54.'
 users:
     title: Usuários
     intro: 'Crie contas, atribua funções de instância e ative ou desative o login (UserKit).'
-    create: Adicionar usuário
-    create_intro: Crie uma conta Beacon. A pessoa pode entrar com este e-mail e senha.
-    back: Voltar para os usuários
+    create: 'Adicionar usuário'
+    create_intro: 'Crie uma conta Beacon. A pessoa pode entrar com este e-mail e senha.'
+    back: 'Voltar para os usuários'
     cancel: Cancelar
     role_label: Papel
-    last_admin_hint: Mantenha pelo menos um administrador.
+    last_admin_hint: 'Mantenha pelo menos um administrador.'
     col:
         user: Usuário
         email: E-mail
@@ -563,90 +602,95 @@ users:
         admin: Administrador
     form:
         email: E-mail
-        display_name: Nome de exibição
+        display_name: 'Nome de exibição'
         password: Senha
-        password_help: Pelo menos 8 caracteres.
-        enabled: Conta ativada (pode fazer login)
+        password_help: 'Pelo menos 8 caracteres.'
+        enabled: 'Conta ativada (pode fazer login)'
     actions:
         enable: Habilitar
         disable: Desativar
         update_role: Atualizar
-        self: Este é você
+        self: 'Este é você'
         activity: Atividade
-    projects_title: Associações ao projeto
-    projects_intro: Funções diretas do projeto para esta conta (não por meio de grupos). Os administradores da instância podem removê-los aqui.
-    projects_empty: Nenhuma associação direta ao projeto.
-    remove_from_project: Remover do projeto
+    projects_title: 'Associações ao projeto'
+    projects_intro: 'Funções diretas do projeto para esta conta (não por meio de grupos). Os administradores da instância podem removê-los aqui.'
+    projects_empty: 'Nenhuma associação direta ao projeto.'
+    remove_from_project: 'Remover do projeto'
     remove_from_project_confirm: 'Remover este usuário do projeto “%project%”?'
     activity:
-        title: Histórico de atividades
+        title: 'Histórico de atividades'
         intro: 'Ações envolvendo %name% (%email%) como sujeito ou ator (administrador, associação e navegação no produto).'
-        timeline_title: Cronograma de atividades
-        recent_title: Atividade recente
+        timeline_title: 'Cronograma de atividades'
+        recent_title: 'Atividade recente'
         recent_intro: 'Últimas ações administrativas, de associação e de produto em toda a instância.'
-        empty: Nenhuma ação registrada ainda.
+        empty: 'Nenhuma ação registrada ainda.'
         by: 'Por %name%'
-        by_system: Por sistema
+        by_system: 'Por sistema'
         subject: 'Assunto %name%'
         action:
-            'user.created': User created
-            'user.role_changed': User role changed
-            'user.enabled': User enabled
-            'user.disabled': User disabled
-            'group.created': Group created
-            'group.updated': Group updated
-            'group.deleted': Group deleted
-            'group.member_added': Group member added
-            'group.member_removed': Group member removed
-            'project.member_added': Project member added
-            'project.member_role_changed': Project member role changed
-            'project.member_removed': Project member removed
-            'project.ownership_transferred': Project ownership transferred
-            'project.group_linked': Project group linked
-            'project.group_role_changed': Project group role changed
-            'project.group_unlinked': Project group unlinked
-            'project.opened': Project opened
-            'project.settings_viewed': Project settings viewed
-            'project.created': Project created
-            'project.api_key_created': API key created
-            'project.api_key_revoked': API key revoked
-            'project.api_key_rotated': API key rotated
-            'project.suspended': Project ingest suspended
-            'project.resumed': Project ingest resumed
-            'project.view_as_started': View-as-member started
-            'project.view_as_ended': View-as-member ended
-            'project.history_cleared': Project history cleared
-            'project.deleted': Project deleted
-            'issue.opened': Issue opened
-            'issue.assigned': Issue assignee changed
-            'issue.status_changed': Issue status changed
-            'issue.priority_changed': Issue priority changed
-            'issue.commented': Issue comment added
-            'issue.marked_duplicate': Issue marked as duplicate
-            'issue.merged': Issue events merged
-            'event.opened': Event opened
-            'performance.opened': Performance opened
-            'analytics.opened': Analytics opened
+            user.created: 'User created'
+            user.role_changed: 'User role changed'
+            user.enabled: 'User enabled'
+            user.disabled: 'User disabled'
+            group.created: 'Group created'
+            group.updated: 'Group updated'
+            group.deleted: 'Group deleted'
+            group.member_added: 'Group member added'
+            group.member_removed: 'Group member removed'
+            project.member_added: 'Project member added'
+            project.member_role_changed: 'Project member role changed'
+            project.member_removed: 'Project member removed'
+            project.ownership_transferred: 'Project ownership transferred'
+            project.group_linked: 'Project group linked'
+            project.group_role_changed: 'Project group role changed'
+            project.group_unlinked: 'Project group unlinked'
+            project.opened: 'Project opened'
+            project.settings_viewed: 'Project settings viewed'
+            project.created: 'Project created'
+            project.api_key_created: 'API key created'
+            project.api_key_revoked: 'API key revoked'
+            project.api_key_rotated: 'API key rotated'
+            project.suspended: 'Project ingest suspended'
+            project.resumed: 'Project ingest resumed'
+            project.view_as_started: 'View-as-member started'
+            project.view_as_ended: 'View-as-member ended'
+            project.history_cleared: 'Project history cleared'
+            project.deleted: 'Project deleted'
+            issue.opened: 'Issue opened'
+            issue.assigned: 'Issue assignee changed'
+            issue.status_changed: 'Issue status changed'
+            issue.priority_changed: 'Issue priority changed'
+            issue.commented: 'Issue comment added'
+            issue.marked_duplicate: 'Issue marked as duplicate'
+            issue.merged: 'Issue events merged'
+            event.opened: 'Event opened'
+            performance.opened: 'Performance opened'
+            analytics.opened: 'Analytics opened'
+            auth.magic_login_requested: 'Magic login solicitado'
+            auth.magic_login_consumed: 'Magic login utilizado'
+            project.share_link_created: 'Ligação de partilha criada'
+            project.share_link_revoked: 'Ligação de partilha revogada'
+            project.share_link_opened: 'Ligação de partilha aberta'
         context:
             email: E-mail
             role: Papel
             enabled: Habilitado
             from: De
             to: Para
-            actor_former_role: Seu antigo papel
-            actor_new_role: Seu novo papel
+            actor_former_role: 'Seu antigo papel'
+            actor_new_role: 'Seu novo papel'
             project: Projeto
-            project_uuid: UUID do projeto
+            project_uuid: 'UUID do projeto'
             project_name: Projeto
             group: Grupo
-            group_uuid: UUID do grupo
-            issue_uuid: Emitir UUID
+            group_uuid: 'UUID do grupo'
+            issue_uuid: 'Emitir UUID'
             issue_title: Emitir
-            event_id: ID do evento
+            event_id: 'ID do evento'
             label: Rótulo
-    empty: Nenhum usuário ainda.
+    empty: 'Nenhum usuário ainda.'
 preferences:
-    title: Configurações de Conta
+    title: 'Configurações de Conta'
     intro: 'Atualize seu perfil, senha, idioma e preferências de tema.'
     nav:
         profile: Perfil
@@ -654,159 +698,172 @@ preferences:
         display: Mostrar
     profile:
         title: Perfil
-        intro: Reveja os dados da conta e atualize o nome de exibição ou o e-mail de acesso.
-        submit: Salvar perfil
-        edit_title: Editar perfil
-        account_id: ID da conta
-        member_since: Membro desde
-        last_activity: Última atividade
-        last_activity_unknown: Sem atividade recente registada
-        password_changed: Última alteração de senha
-        password_never_changed: Ainda não registada
-        password_expiry: Expiração da senha
-        password_expired: A senha expirou
+        intro: 'Reveja os dados da conta e atualize o nome de exibição ou o e-mail de acesso.'
+        submit: 'Salvar perfil'
+        edit_title: 'Editar perfil'
+        account_id: 'ID da conta'
+        member_since: 'Membro desde'
+        last_activity: 'Última atividade'
+        last_activity_unknown: 'Sem atividade recente registada'
+        password_changed: 'Última alteração de senha'
+        password_never_changed: 'Ainda não registada'
+        password_expiry: 'Expiração da senha'
+        password_expired: 'A senha expirou'
         password_expiry_unknown: 'A expiração começa após a primeira alteração de senha (política: %policy% dias).'
         password_days_remaining: '%count% dias restantes · política %policy% dias'
-        update_password: Atualizar senha
+        update_password: 'Atualizar senha'
         status_enabled: Ativa
         status_disabled: Desativada
         role_admin: Administrador
         role_member: Membro
-        projects_title: Os seus projetos
-        projects_intro: Projetos a que acede por membership direta.
-        projects_empty: Ainda não é membro direto de nenhum projeto.
-        groups_title: Os seus grupos
-        groups_intro: Grupos que podem dar acesso a mais projetos.
-        groups_empty: Não pertence a nenhum grupo.
+        projects_title: 'Os seus projetos'
+        projects_intro: 'Projetos a que acede por membership direta.'
+        projects_empty: 'Ainda não é membro direto de nenhum projeto.'
+        groups_title: 'Os seus grupos'
+        groups_intro: 'Grupos que podem dar acesso a mais projetos.'
+        groups_empty: 'Não pertence a nenhum grupo.'
     security:
         title: Segurança
-        intro: Altere a senha da sua conta.
-        submit: Atualizar senha
-        history_title: Histórico de alterações de senha
-        history_intro: Atualizações recentes guardadas para evitar reutilização. Os hashes nunca são mostrados.
+        intro: 'Altere a senha da sua conta.'
+        submit: 'Atualizar senha'
+        history_title: 'Histórico de alterações de senha'
+        history_intro: 'Atualizações recentes guardadas para evitar reutilização. Os hashes nunca são mostrados.'
         history_current: 'Senha atual definida em:'
-        history_entry: Senha alterada
-        history_empty: Ainda não há alterações de senha registadas.
+        history_entry: 'Senha alterada'
+        history_empty: 'Ainda não há alterações de senha registadas.'
     display:
         title: Mostrar
         intro: 'Escolha idioma, tema, densidade, tamanho do texto, contraste, barra lateral, movimento, largura e painéis recolhidos.'
-        submit: Salvar configurações de exibição
-        pwa_title: Instalar aplicativo
-        pwa_intro: Adicione este site ao seu dispositivo para uma experiência autônoma e mais rápida. A disponibilidade depende do seu navegador.
-        pwa_prompt_title: Instale para acesso mais rápido
-        pwa_unavailable: A instalação não está disponível neste navegador no momento. Experimente o Chrome ou Edge no desktop ou o Compartilhar → Adicionar à tela inicial do Safari no iOS.
+        submit: 'Salvar configurações de exibição'
+        pwa_title: 'Instalar aplicativo'
+        pwa_intro: 'Adicione este site ao seu dispositivo para uma experiência autônoma e mais rápida. A disponibilidade depende do seu navegador.'
+        pwa_prompt_title: 'Instale para acesso mais rápido'
+        pwa_unavailable: 'A instalação não está disponível neste navegador no momento. Experimente o Chrome ou Edge no desktop ou o Compartilhar → Adicionar à tela inicial do Safari no iOS.'
+        section_layout: 'Idioma, tema e disposição'
     section:
         profile: Perfil
         locale_theme: 'Idioma, tema e layout'
         password: Senha
     locale_theme: 'Idioma, tema e layout'
     password: Senha
-    password_hint: Deixe os campos de senha vazios para manter sua senha atual.
-    submit: Salvar preferências
-    locale_auto: Automático (navegador/sessão)
-    theme_auto: Automático (dispositivo/última escolha)
+    password_hint: 'Deixe os campos de senha vazios para manter sua senha atual.'
+    submit: 'Salvar preferências'
+    locale_auto: 'Automático (navegador/sessão)'
+    theme_auto: 'Automático (dispositivo/última escolha)'
     theme_light: Dia
     theme_dark: Noite
-    width_content: Conteúdo (centralizado)
-    width_full: Largura total
+    width_content: 'Conteúdo (centralizado)'
+    width_full: 'Largura total'
     density_comfortable: Confortável
     density_compact: Compactar
     font_scale_sm: Pequeno
     font_scale_md: Médio
     font_scale_lg: Grande
-    contrast_system: Sistema (seguir dispositivo)
-    contrast_more: Mais contraste
+    contrast_system: 'Sistema (seguir dispositivo)'
+    contrast_more: 'Mais contraste'
     sidebar_expanded: Expandida
     sidebar_collapsed: Recolhida
-    motion_system: Sistema (seguir dispositivo)
-    motion_reduce: Reduzir o movimento
-    motion_full: Movimento total
-
-    product_tour_title: Product tour
-    product_tour_intro: Tours run once per area after setup. They stay off until you replay them here.
-    product_tour_seen: Mark all tours as completed
-    product_tour_seen_help: Check and save to hide every product tour. To see them again, use Replay below (unchecking alone does not re-enable auto-start).
-    product_tour_replay: Replay dashboard tour
-    issue_panels_collapsed: Painéis de problemas recolhidos por padrão
-    issue_panels_help: Os painéis verificados começam recolhidos nas páginas de detalhes do problema e do evento. Seu navegador lembra substituições manuais de abertura/fechamento.
-    issue_panels_browser: Layout do painel do navegador
-    issue_panels_browser_help: Limpe os estados aberto/fechado salvos neste navegador para que os padrões de preferência sejam aplicados novamente.
-    issue_panels_reset: Limpar estados do painel salvos
+    motion_system: 'Sistema (seguir dispositivo)'
+    motion_reduce: 'Reduzir o movimento'
+    motion_full: 'Movimento total'
+    product_tour_title: 'Product tour'
+    product_tour_intro: 'Tours run once per area after setup. They stay off until you replay them here.'
+    product_tour_replay: 'Replay dashboard tour'
+    issue_panels_collapsed: 'Painéis de problemas recolhidos por padrão'
+    issue_panels_help: 'Os painéis verificados começam recolhidos nas páginas de detalhes do problema e do evento. Seu navegador lembra substituições manuais de abertura/fechamento.'
+    issue_panels_browser: 'Layout do painel do navegador'
+    issue_panels_browser_help: 'Limpe os estados aberto/fechado salvos neste navegador para que os padrões de preferência sejam aplicados novamente.'
+    issue_panels_reset: 'Limpar estados do painel salvos'
     issue_panels_reset_done: Desmarcado
     issue_panel:
         highlights: Destaques
-        stacktrace: Rastreamento de pilha
+        stacktrace: 'Rastreamento de pilha'
         message: Mensagem
-        breadcrumbs: Pão ralado
-        request: Solicitação HTTP
+        breadcrumbs: 'Pão ralado'
+        request: 'Solicitação HTTP'
         tags: Etiquetas
         contexts: Contextos
-        extra: Dados adicionais
-        raw: Carga útil bruta
-        details: Barra lateral de detalhes
+        extra: 'Dados adicionais'
+        raw: 'Carga útil bruta'
+        details: 'Barra lateral de detalhes'
         triage: Triagem
         assignee: Cessionário
         duplicate: Duplicado
         activity: Atividade
-        recent_events: Eventos recentes
+        recent_events: 'Eventos recentes'
     error:
-        current_password: A senha atual está incorreta.
-        email_in_use: Este e-mail já está em uso.
-        password_required: Digite uma nova senha.
+        current_password: 'A senha atual está incorreta.'
+        email_in_use: 'Este e-mail já está em uso.'
+        password_required: 'Digite uma nova senha.'
+    product_tour_enabled: 'Tours ativos'
+    product_tour_enabled_help: 'Os tours selecionados podem iniciar automaticamente uma vez por área. Desmarque um tour para o ocultar; desmarque todos para desativar cada tour.'
+    product_tour_select_all: 'Selecionar todos os tours'
+    product_tour_save_hint: 'Clique em Guardar definições de visualização abaixo para aplicar alterações aos tours.'
+    product_tour_page:
+        dashboard: Dashboard
+        project_issues: 'Issues do projeto'
+        admin: Administração
+    product_tour_replay_title: 'Repetir um tour'
+    product_tour_replay_intro: 'Limpa os indicadores de conclusão e abre o tour do dashboard uma vez. Ative primeiro os tours desejados em Tours ativos.'
+    push_notifications: 'Notificações push para novas issues'
+    push_notifications_help: 'Opcional. Quando ativado, o Beacon pede autorização ao browser e pode alertá-lo sobre novas issues nos projetos a que pertence — mesmo em segundo plano (PWA instalada ou browser suportado). Toasts em direto na app requerem separadamente Administração → Mercure.'
+    push_title: 'Notificações push'
+    push_intro: 'Ative a caixa abaixo, guarde e permita notificações quando o browser pedir. Os alertas cobrem novas issues nos projetos com que está associado.'
+    push_privacy: 'O push do browser usa um endpoint de subscrição do dispositivo (não cookies de marketing). Pode desativá-lo a qualquer momento; veja Privacidade e definições de cookies para escolhas relacionadas.'
+    push_unavailable_title: 'Notificações push indisponíveis'
+    push_unavailable_help: 'O operador não configurou as chaves VAPID (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY). Peça a um administrador, ou use toasts Mercure em direto quando ativados em Administração → Mercure.'
 user_preferences:
     display_name:
-        label: Nome de exibição
-        placeholder: Seu nome
-        help: Exibido no menu de avatar e nas listas de membros.
+        label: 'Nome de exibição'
+        placeholder: 'Seu nome'
+        help: 'Exibido no menu de avatar e nas listas de membros.'
     email:
         label: E-mail
-        placeholder: 'você@exemplo.com'
-        help: Usado para fazer login.
+        placeholder: você@exemplo.com
+        help: 'Usado para fazer login.'
     preferred_locale:
         label: Linguagem
         placeholder: Auto
-        help: Idioma de IU preferido para esta conta.
+        help: 'Idioma de IU preferido para esta conta.'
     preferred_theme:
         label: Tema
         placeholder: Auto
-        help: Aparência preferida de dia ou de noite.
+        help: 'Aparência preferida de dia ou de noite.'
     preferred_content_width:
-        label: Largura do conteúdo
+        label: 'Largura do conteúdo'
         placeholder: Contente
-        help: Coluna de conteúdo centralizada ou esticar a largura total da área principal.
+        help: 'Coluna de conteúdo centralizada ou esticar a largura total da área principal.'
     preferred_ui_density:
-        label: Densidade da IU
+        label: 'Densidade da IU'
         placeholder: Confortável
-        help: Espaçamento confortável ou layout do operador mais compacto.
+        help: 'Espaçamento confortável ou layout do operador mais compacto.'
     preferred_font_scale:
-        label: Tamanho do texto
+        label: 'Tamanho do texto'
         placeholder: Médio
-        help: Reduza ou aumente o texto da interface.
+        help: 'Reduza ou aumente o texto da interface.'
     preferred_contrast:
         label: Contraste
         placeholder: Sistema
-        help: Siga o contraste do dispositivo ou force texto e bordas mais marcados.
+        help: 'Siga o contraste do dispositivo ou force texto e bordas mais marcados.'
     preferred_sidebar:
-        label: Barra lateral
+        label: 'Barra lateral'
         placeholder: Expandida
-        help: Estado padrão no ambiente de trabalho se este browser ainda não tiver preferência guardada.
+        help: 'Estado padrão no ambiente de trabalho se este browser ainda não tiver preferência guardada.'
     preferred_motion:
         label: Movimento
         placeholder: Sistema
         help: 'Siga a preferência do dispositivo, reduza as animações ou mantenha o movimento total.'
     current_password:
-        label: Senha atual
-        help: Necessário apenas ao definir uma nova senha.
-        help_required: Confirme sua senha atual para definir uma nova.
+        label: 'Senha atual'
+        help: 'Necessário apenas ao definir uma nova senha.'
+        help_required: 'Confirme sua senha atual para definir uma nova.'
     plain_password:
         first:
-            label: Nova Senha
+            label: 'Nova Senha'
         second:
-            label: Confirme a nova senha
-        mismatch: Os campos de senha devem corresponder.
+            label: 'Confirme a nova senha'
+        mismatch: 'Os campos de senha devem corresponder.'
         strength_invalid: 'A senha não atende aos requisitos de segurança (%missing%).'
-
-# PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
 requirement.min_length: 'Pelo menos %count% caracteres'
 requirement.max_length: 'No máximo %count% caracteres'
 requirement.lowercase: 'Pelo menos uma letra minúscula'
@@ -820,101 +877,110 @@ requirement.regex: 'Deve corresponder ao padrão exigido'
 generator.button: 'Gerar senha'
 generator.modal_title: 'Senhas sugeridas'
 generator.modal_hint: 'Essas senhas correspondem à sua política atual. Copie um ou aplique-o ao campo.'
-generator.copy: 'Cópia'
-generator.copied: 'Copiado!'
+generator.copy: Cópia
+generator.copied: Copiado!
 generator.use_password: 'Use esta senha'
-generator.close: 'Fechar'
+generator.close: Fechar
 generator.failed: 'Não foi possível gerar uma senha válida. Tente novamente ou relaxe a política.'
-
 groups:
     title: Grupos
-    intro: Organize os usuários em grupos e vincule grupos a projetos para acesso em massa.
-    create: Novo grupo
-    empty: Ainda não há grupos.
+    intro: 'Organize os usuários em grupos e vincule grupos a projetos para acesso em massa.'
+    create: 'Novo grupo'
+    empty: 'Ainda não há grupos.'
     open: Abrir
-    back: Voltar aos grupos
+    back: 'Voltar aos grupos'
     edit: Editar
-    edit_title: Editar grupo
-    save: Salvar grupo
+    edit_title: 'Editar grupo'
+    save: 'Salvar grupo'
     cancel: Cancelar
-    delete: Excluir grupo
-    delete_confirm: Excluir este grupo? Ele será desvinculado de todos os projetos.
+    delete: 'Excluir grupo'
+    delete_confirm: 'Excluir este grupo? Ele será desvinculado de todos os projetos.'
     name_label: Nome
     description_label: Descrição
-    members_title: Membros do grupo
-    members_empty: Ainda não há membros neste grupo.
-    add_member: Adicionar membro
-    add_member_help: A pessoa já deve ter uma conta Beacon.
+    members_title: 'Membros do grupo'
+    members_empty: 'Ainda não há membros neste grupo.'
+    add_member: 'Adicionar membro'
+    add_member_help: 'A pessoa já deve ter uma conta Beacon.'
     remove_member: Remover
-    member_email_placeholder: 'usuário@exemplo.com'
+    member_email_placeholder: usuário@exemplo.com
     member_count: '%count% membros'
-    projects_title: Projetos vinculados
-    projects_intro: Projetos que concedem acesso a todos os membros deste grupo. Desvincule para revogar esse acesso.
-    projects_empty: Este grupo ainda não está vinculado a nenhum projeto.
+    projects_title: 'Projetos vinculados'
+    projects_intro: 'Projetos que concedem acesso a todos os membros deste grupo. Desvincule para revogar esse acesso.'
+    projects_empty: 'Este grupo ainda não está vinculado a nenhum projeto.'
     unlink_project: Desvincular
     unlink_project_confirm: 'Desvincular este grupo do projeto “%project%”?'
-
 admin_projects:
     title: Projetos
     intro: 'Gerencie todos os projetos nesta instância – membros, links de grupo e exclusão.'
-    create: Novo projeto
-    empty: Nenhum projeto ainda.
+    create: 'Novo projeto'
+    empty: 'Nenhum projeto ainda.'
     open: Gerenciar
-    back: Voltar aos projetos
+    back: 'Voltar aos projetos'
     edit: Editar
-    edit_title: Editar projeto
-    save: Salvar projeto
+    edit_title: 'Editar projeto'
+    save: 'Salvar projeto'
     cancel: Cancelar
-    search_placeholder: Pesquisar projetos…
+    search_placeholder: 'Pesquisar projetos…'
     member_count: '%count% membros'
     group_count: '%count% grupos'
     open_settings: Configurações
     open_issues: Problemas
-    members_title: Membros diretos
-    members_empty: Ainda não há membros diretos.
-    add_member_help: A pessoa já deve ter uma conta Beacon.
+    members_title: 'Membros diretos'
+    members_empty: 'Ainda não há membros diretos.'
+    add_member_help: 'A pessoa já deve ter uma conta Beacon.'
     remove_member: Remover
     remove_member_confirm: 'Remover %email% deste projeto?'
-    groups_title: Grupos vinculados
-    groups_intro: Grupos que concedem acesso a todos os membros do grupo. Os proprietários permanecem como usuários diretos.
-    groups_none_available: Todos os grupos já estão vinculados ou crie grupos em Administração → Grupos.
+    groups_title: 'Grupos vinculados'
+    groups_intro: 'Grupos que concedem acesso a todos os membros do grupo. Os proprietários permanecem como usuários diretos.'
+    groups_none_available: 'Todos os grupos já estão vinculados ou crie grupos em Administração → Grupos.'
     unlink_group_confirm: 'Desvincular o grupo “%name%” deste projeto?'
-    danger_title: Zona de perigo
-    danger_intro: Exclua permanentemente este projeto e todos os seus dados. Os administradores da instância podem fazer isso sem serem membros do projeto.
-    delete_open: Excluir projeto…
-    stats_title: Estatísticas de operações
+    danger_title: 'Zona de perigo'
+    danger_intro: 'Exclua permanentemente este projeto e todos os seus dados. Os administradores da instância podem fazer isso sem serem membros do projeto.'
+    delete_open: 'Excluir projeto…'
+    stats_title: 'Estatísticas de operações'
     stats_open_issues: '%count% questões abertas'
     stats_events_7d: '%count% eventos (7d)'
-    stats_open_issues_label: Problemas em aberto
-    stats_events_7d_label: Eventos (últimos 7 dias)
-    stats_last_ingest_label: Última ingestão
+    stats_open_issues_label: 'Problemas em aberto'
+    stats_events_7d_label: 'Eventos (últimos 7 dias)'
+    stats_last_ingest_label: 'Última ingestão'
     stats_never: Nunca
-    ingest_suspended_badge: Ingestão suspensa
-    suspend_ingest: Suspender ingestão
-    suspend_ingest_help: Rejeite novos envelopes enquanto mantém os dados armazenados legíveis.
-    resume_ingest: Retomar ingestão
-    resume_ingest_help: Permita a ingestão do envelope novamente.
-    view_as_member: Ver como membro
-    view_as_banner: Você está visualizando projetos como membro (os privilégios de administrador para ações do projeto são limitados).
-    view_as_exit: Sair da visualização como membro
-
+    ingest_suspended_badge: 'Ingestão suspensa'
+    suspend_ingest: 'Suspender ingestão'
+    suspend_ingest_help: 'Rejeite novos envelopes enquanto mantém os dados armazenados legíveis.'
+    resume_ingest: 'Retomar ingestão'
+    resume_ingest_help: 'Permita a ingestão do envelope novamente.'
+    view_as_member: 'Ver como membro'
+    view_as_banner: 'Você está visualizando projetos como membro (os privilégios de administrador para ações do projeto são limitados).'
+    view_as_exit: 'Sair da visualização como membro'
+    audit_title: 'Cronologia de auditoria'
+    audit_intro: 'Filtre ações administrativas registadas para este projeto.'
+    audit_reset: 'Repor filtros'
+    audit_filter_action: 'Tipo de ação'
+    audit_filter_all_actions: 'Todas as ações'
+    audit_filter_from: De
+    audit_filter_to: Até
+    audit_apply: 'Aplicar filtros'
+    audit_clear: Limpar
+    audit_empty: 'Nenhuma ação de projeto registada corresponde aos filtros atuais.'
 admin:
     hub:
         title: Administração
-        intro: Configuração de instância para operadores com funções elevadas.
-        users: Liste contas e funções nesta instância.
-        groups: Crie grupos e gerencie seus membros para acesso ao projeto.
+        intro: 'Configuração de instância para operadores com funções elevadas.'
+        users: 'Liste contas e funções nesta instância.'
+        groups: 'Crie grupos e gerencie seus membros para acesso ao projeto.'
         projects: 'Liste todos os projetos, gerencie membros e links de grupos ou exclua um projeto.'
-        appearance: Nome da marca e cores de destaque.
-        menus: Edite menus de navegação.
-        breadcrumbs: Gerenciar coleções de navegação estrutural.
+        appearance: 'Nome da marca e cores de destaque.'
+        menus: 'Edite menus de navegação.'
+        breadcrumbs: 'Gerenciar coleções de navegação estrutural.'
+        mailer: 'DSN Mailer encriptado e endereço From para e-mails transacionais.'
+        setup: 'Passos iniciais de plataforma / demo / seed de amostras.'
 tour:
     controls:
         next: Next
         previous: Back
         done: Done
         close: Close
-        progress: "{{current}} of {{total}}"
+        progress: '{{current}} of {{total}}'
     role:
         owner: owner
         admin: admin
@@ -923,262 +989,477 @@ tour:
     steps:
         dashboard:
             welcome:
-                title: Welcome to Beacon
-                description: A short tour of your dashboard — projects, navigation, and where to manage your account.
+                title: 'Welcome to Beacon'
+                description: 'A short tour of your dashboard — projects, navigation, and where to manage your account.'
             sidebar:
                 title: Navigation
-                description: Use the sidebar to move between dashboard sections for the current area of the app.
+                description: 'Use the sidebar to move between dashboard sections for the current area of the app.'
             projects:
-                title: Your projects
-                description: Each project collects errors, performance, and analytics from apps that send Envelope telemetry.
+                title: 'Your projects'
+                description: 'Each project collects errors, performance, and analytics from apps that send Envelope telemetry.'
             new_project:
-                title: Create a project
-                description: Add a project to get a DSN and API keys for your client SDKs.
+                title: 'Create a project'
+                description: 'Add a project to get a DSN and API keys for your client SDKs.'
             user_menu:
-                title: Account menu
-                description: Open preferences, return to the dashboard, or sign out from your avatar menu.
+                title: 'Account menu'
+                description: 'Open preferences, return to the dashboard, or sign out from your avatar menu.'
             admin:
                 title: Administration
-                description: Instance admins manage users, groups, appearance, mailer, and first-run setup from here.
+                description: 'Instance admins manage users, groups, appearance, mailer, and first-run setup from here.'
         project:
             welcome:
-                title: Project issues
+                title: 'Project issues'
                 description: 'You are viewing this project as %role%. Use Issues to triage errors from Envelope ingest.'
             nav:
-                title: Project sections
-                description: Switch between Issues, Performance, Analytics, Releases, and Settings for this project.
+                title: 'Project sections'
+                description: 'Switch between Issues, Performance, Analytics, Releases, and Settings for this project.'
             filters:
-                title: Filters and search
-                description: Narrow issues by level, status, environment, release, assignee, and more.
+                title: 'Filters and search'
+                description: 'Narrow issues by level, status, environment, release, assignee, and more.'
             saved_views:
-                title: Saved views
-                description: Save filter combinations and reopen them later for recurring triage workflows.
+                title: 'Saved views'
+                description: 'Save filter combinations and reopen them later for recurring triage workflows.'
             list:
-                title: Issue list
-                description: Open an issue to inspect stack traces, events, and triage status.
+                title: 'Issue list'
+                description: 'Open an issue to inspect stack traces, events, and triage status.'
             settings:
-                title: Project settings
-                description: As a project admin you can manage API keys, members, notifications, and governance.
+                title: 'Project settings'
+                description: 'As a project admin you can manage API keys, members, notifications, and governance.'
             settings_member:
-                title: Project settings
-                description: Review project configuration. Membership and API key changes require a project admin.
+                title: 'Project settings'
+                description: 'Review project configuration. Membership and API key changes require a project admin.'
         admin:
             welcome:
                 title: Administration
-                description: Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.
+                description: 'Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.'
             users:
                 title: Users
-                description: List accounts, roles, and enable or disable access on this Beacon instance.
+                description: 'List accounts, roles, and enable or disable access on this Beacon instance.'
             projects:
-                title: All projects
-                description: Cross-project ops — members, groups, and danger-zone actions for any project.
+                title: 'All projects'
+                description: 'Cross-project ops — members, groups, and danger-zone actions for any project.'
             mailer:
                 title: Mailer
-                description: Configure the encrypted Mailer DSN used for magic links and notification email.
+                description: 'Configure the encrypted Mailer DSN used for magic links and notification email.'
             setup:
-                title: Setup wizard
-                description: Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.
-
+                title: 'Setup wizard'
+                description: 'Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.'
 legal:
     nav:
         label: Jurídico
     last_updated: 'Última atualização: %date%'
-    manage_cookies: Definições de cookies
+    manage_cookies: 'Definições de cookies'
     placeholder:
         legal_name: 'Nome legal: [Nome legal do operador – substituir]'
         address: 'Endereço: [Endereço registrado – substituir]'
         contact_email: 'Contato: [privacy@example.com — substituir]'
         registration: 'Registro da empresa/CNPJ: [se aplicável – substituir]'
     notice:
-        title: Aviso legal
+        title: 'Aviso legal'
         intro: 'Este aviso legal se aplica à instância %brand% auto-hospedada que você está visitando. Substitua os espaços reservados abaixo pelos detalhes reais do operador antes do uso público.'
         operator_heading: Operador
-        operator_body: O operador desta instância é responsável pelo serviço e pelo conteúdo que aqui publica.
+        operator_body: 'O operador desta instância é responsável pelo serviço e pelo conteúdo que aqui publica.'
         hosting_heading: Hospedagem
-        hosting_body: Este software pode ser hospedado pela operadora ou por um provedor de infraestrutura terceirizado escolhido pela operadora. Os detalhes da hospedagem devem ser preenchidos pela operadora.
+        hosting_body: 'Este software pode ser hospedado pela operadora ou por um provedor de infraestrutura terceirizado escolhido pela operadora. Os detalhes da hospedagem devem ser preenchidos pela operadora.'
         liability_heading: Responsabilidade
         liability_body: 'O software é fornecido como está. O operador continua responsável pelo uso legal, pela conformidade com a proteção de dados e pela exatidão do texto jurídico específico do operador nesta instância.'
     privacy:
-        title: Política de Privacidade
+        title: 'Política de Privacidade'
         intro: 'Esta política de privacidade descreve como os dados pessoais podem ser processados ​​quando você usa esta instância %brand%. Os operadores devem adaptar este texto à sua organização e jurisdição.'
-        controller_heading: Controlador de dados
-        controller_body: O operador desta instância Beacon é o controlador de dados para contas e telemetria armazenadas em sua implantação. Preencha o nome legal e os dados de contato na página Aviso legal.
-        data_heading: Dados que processamos
+        controller_heading: 'Controlador de dados'
+        controller_body: 'O operador desta instância Beacon é o controlador de dados para contas e telemetria armazenadas em sua implantação. Preencha o nome legal e os dados de contato na página Aviso legal.'
+        data_heading: 'Dados que processamos'
         data_body: 'Dependendo de como o operador configura e utiliza a instância, o processamento pode incluir:'
         data_account: 'Dados da conta (e-mail, nome de exibição, hash de senha, funções, preferências)'
-        data_telemetry: Erro de aplicativo e telemetria de desempenho enviada por meio de ingestão de DSN/envelope do projeto
-        data_logs: Logs operacionais e logs de consentimento de cookies opcionais
-        data_cookies: Cookies e tecnologias semelhantes descritas na página Cookies
+        data_telemetry: 'Erro de aplicativo e telemetria de desempenho enviada por meio de ingestão de DSN/envelope do projeto'
+        data_logs: 'Logs operacionais e logs de consentimento de cookies opcionais'
+        data_cookies: 'Cookies e tecnologias semelhantes descritas na página Cookies'
         purpose_heading: Finalidades
         purpose_body: 'Os dados são processados ​​para autenticar usuários, operar o rastreamento de erros para projetos configurados, proteger o serviço e (quando habilitado) lembrar preferências de cookies.'
         retention_heading: Retenção
         retention_body: 'Os períodos de retenção são definidos pelo operador (ciclo de vida da conta, retenção de dados do projeto, retenção de log). Substitua este parágrafo pelo cronograma de retenção da sua organização.'
-        rights_heading: Seus direitos
+        rights_heading: 'Seus direitos'
         rights_body: 'Dependendo da lei aplicável (por exemplo, GDPR), você poderá ter direitos de acesso, retificação, apagamento, restrição, portabilidade e oposição. Contacte o operador através dos dados na página Aviso legal.'
         cookies_heading: Biscoitos
         cookies_body: 'Usamos cookies necessários para login e armazenamento de consentimento. Categorias opcionais (preferências, análises) só são ativadas depois que você as permite no banner de cookies.'
     terms:
-        title: Termos de uso
+        title: 'Termos de uso'
         intro: 'Estes termos regem o uso desta instância %brand%. As operadoras devem substituir este modelo por termos que correspondam à sua oferta (ferramenta interna, SaaS do cliente, etc.).'
         service_heading: Serviço
-        service_body: O Beacon fornece rastreamento de erros e desempenho auto-hospedado para projetos configurados por usuários autorizados.
+        service_body: 'O Beacon fornece rastreamento de erros e desempenho auto-hospedado para projetos configurados por usuários autorizados.'
         accounts_heading: Contas
-        accounts_body: Você deve manter as credenciais confidenciais e usar o serviço somente para projetos e dados que você está autorizado a processar.
-        accept_heading: Uso aceitável
+        accounts_body: 'Você deve manter as credenciais confidenciais e usar o serviço somente para projetos e dados que você está autorizado a processar.'
+        accept_heading: 'Uso aceitável'
         accept_body: 'Não abuse da API de ingestão, tente acesso não autorizado ou carregue conteúdo ilegal. A operadora pode suspender contas que violem estes termos.'
-        limitation_heading: Limitação de responsabilidade
+        limitation_heading: 'Limitação de responsabilidade'
         limitation_body: 'Na medida permitida por lei, o operador e os autores do software não são responsáveis ​​por danos indiretos decorrentes da utilização do serviço. As operadoras devem pedir a um advogado que analise esta cláusula.'
         changes_heading: Mudanças
-        changes_body: A operadora poderá atualizar estes termos. O uso continuado após aviso constitui aceitação dos termos atualizados quando permitido por lei.
+        changes_body: 'A operadora poderá atualizar estes termos. O uso continuado após aviso constitui aceitação dos termos atualizados quando permitido por lei.'
     cookies:
-        title: Aviso de cookies
+        title: 'Aviso de cookies'
         intro: 'Esta página descreve os cookies e tecnologias semelhantes utilizados por esta instância %brand%. Os cookies estritamente necessários suportam autenticação, segurança e registo do consentimento. As categorias opcionais são utilizadas apenas com o seu consentimento prévio. Utilize as Definições de cookies para rever ou alterar a sua seleção a qualquer momento.'
         categories_heading: Categorias
-        cat_required: Estritamente necessários
-        cat_required_help: Imprescindíveis para autenticação, segurança e registo da sua decisão de consentimento. Estes cookies não podem ser desativados.
+        cat_required: 'Estritamente necessários'
+        cat_required_help: 'Imprescindíveis para autenticação, segurança e registo da sua decisão de consentimento. Estes cookies não podem ser desativados.'
         cat_preferences: Preferências
-        cat_preferences_help: Cookies opcionais que armazenam escolhas de apresentação ou de funcionalidades não essenciais quando o operador as ativa e você consente.
+        cat_preferences_help: 'Cookies opcionais que armazenam escolhas de apresentação ou de funcionalidades não essenciais quando o operador as ativa e você consente.'
         cat_analytics: Analítica
-        cat_analytics_help: Cookies de medição opcionais, utilizados apenas se o operador ativar ferramentas de analítica e você der consentimento prévio.
-        inventory_heading: Inventário de cookies
+        cat_analytics_help: 'Cookies de medição opcionais, utilizados apenas se o operador ativar ferramentas de analítica e você der consentimento prévio.'
+        inventory_heading: 'Inventário de cookies'
         col_name: Nome
         col_category: Categoria
         col_duration: Duração
         col_purpose: Finalidade
         duration_session: Sessão
-        duration_remember: Até 7 dias
-        duration_consent: Aproximadamente 1 ano
-        purpose_session: Mantém a sessão HTTP autenticada necessária para aceder às áreas protegidas do serviço.
-        purpose_remember: Permite autenticação persistente quando “Lembrar-me” é selecionado no início de sessão (token seguro; validade limitada).
-        purpose_consent: Armazena decisões de categorias de cookies e uma chave de consentimento anonimizada para fins de responsabilização e auditoria.
-        storage_heading: Armazenamento local
+        duration_remember: 'Até 7 dias'
+        duration_consent: 'Aproximadamente 1 ano'
+        purpose_session: 'Mantém a sessão HTTP autenticada necessária para aceder às áreas protegidas do serviço.'
+        purpose_remember: 'Permite autenticação persistente quando “Lembrar-me” é selecionado no início de sessão (token seguro; validade limitada).'
+        purpose_consent: 'Armazena decisões de categorias de cookies e uma chave de consentimento anonimizada para fins de responsabilização e auditoria.'
+        storage_heading: 'Armazenamento local'
         storage_body: 'A preferência de tema (claro/escuro) pode ser armazenada no localStorage do navegador e não constitui um cookie HTTP. Segundo as orientações típicas de ePrivacy, pode ser tratada como estritamente necessária para uma interface coerente; os operadores devem confirmar as regras aplicáveis na sua jurisdição.'
-
 notifications:
     title: Notificações
     intro: 'Envie alertas para Slack, Discord, Teams, Telegram, email ou um endpoint HTTP genérico quando novos problemas, regressões ou grupos N+1 aparecerem.'
-    empty: Ainda não há destinos. Adicione um canal para notificar sua equipe.
-    add: Adicionar destino
+    empty: 'Ainda não há destinos. Adicione um canal para notificar sua equipe.'
+    add: 'Adicionar destino'
     edit: Editar
     enable: Habilitar
     disable: Desativar
     disabled: Desabilitado
-    test: Enviar teste
+    test: 'Enviar teste'
     test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Excluir
-    delete_confirm: Excluir este destino de notificação?
-    save: Salvar destino
+    delete_confirm: 'Excluir este destino de notificação?'
+    save: 'Salvar destino'
     cancel: Cancelar
-    new_title: Novo destino de notificação
-    edit_title: Editar destino da notificação
-    form_help: Escolha um tipo de canal e cole o endpoint correspondente. Os segredos são mascarados na lista de configurações.
+    new_title: 'Novo destino de notificação'
+    edit_title: 'Editar destino da notificação'
+    form_help: 'Escolha um tipo de canal e cole o endpoint correspondente. Os segredos são mascarados na lista de configurações.'
     form:
         label: Rótulo
         type: Tipo
-        endpoint: Ponto final
+        endpoint: 'Ponto final'
         endpoint_help: 'Slack/Discord/Teams/HTTP: URL do webhook HTTPS. E-mail: endereço do destinatário. Telegrama: bot_token@chat_id'
-        endpoint_invalid: O endpoint não corresponde ao tipo selecionado.
+        endpoint_invalid: 'O endpoint não corresponde ao tipo selecionado.'
         endpoint_ssrf: 'O endpoint não deve ter como destino endereços de metadados privados, de link local ou de nuvem.'
         enabled: Habilitado
-        categories: Categorias de alerta
-        quiet_hours_legend: Horas tranquilas e resumo
-        quiet_hours_enabled: Habilite horários silenciosos
+        categories: 'Categorias de alerta'
+        quiet_hours_legend: 'Horas tranquilas e resumo'
+        quiet_hours_enabled: 'Habilite horários silenciosos'
         quiet_hours_help: 'Durante a janela, os alertas são armazenados em buffer em vez de enviados imediatamente. Execute app:notifications:flush-digests de acordo com uma programação (ou após a janela).'
-        quiet_hours_timezone: Fuso horário
+        quiet_hours_timezone: 'Fuso horário'
         quiet_hours_start: 'Início do horário de silêncio (HH:MM)'
         quiet_hours_end: 'Fim do horário de silêncio (HH:MM)'
-        quiet_hours_timezone_invalid: Identificador de fuso horário inválido.
+        quiet_hours_timezone_invalid: 'Identificador de fuso horário inválido.'
         quiet_hours_time_invalid: 'Use o formato HH:MM de 24 horas (por exemplo, 22h).'
-        quiet_hours_required: Os horários de início e término são obrigatórios quando o horário de silêncio está ativado.
-        quiet_hours_range_invalid: Os horários de início e término devem ser diferentes.
-        digest_enabled: Enviar resumo do resumo na liberação
+        quiet_hours_required: 'Os horários de início e término são obrigatórios quando o horário de silêncio está ativado.'
+        quiet_hours_range_invalid: 'Os horários de início e término devem ser diferentes.'
+        digest_enabled: 'Enviar resumo do resumo na liberação'
         digest_help: 'Quando ativado, flush envia um resumo por destino. Quando desativado, cada alerta retido é enviado individualmente após o horário de silêncio.'
-        pagerduty_note: O PagerDuty nativo não é compatível; use um webhook HTTP genérico se precisar de uma ponte de incidentes.
+        pagerduty_note: 'O PagerDuty nativo não é compatível; use um webhook HTTP genérico se precisar de uma ponte de incidentes.'
     type:
-        slack: Webhook de entrada do Slack
-        discord: Webhook do Discord
-        teams: Webhook do Microsoft Teams
-        telegram: Bot de telegrama
+        slack: 'Webhook de entrada do Slack'
+        discord: 'Webhook do Discord'
+        teams: 'Webhook do Microsoft Teams'
+        telegram: 'Bot de telegrama'
         email: E-mail
-        http: Webhook HTTP genérico
+        http: 'Webhook HTTP genérico'
     category:
         fatal: Fatal
         error: Erro
         warning: Aviso
         info: Informações
         debug: Depurar
-        n_plus_one: Detecções N+1
-        issue.resolved: Problema resolvido
-        issue.reopened: Problema reaberto
-        issue.assigned: Problema atribuído
-        issue.commented: Problema comentado
-        issue.duplicated: Problema marcado como duplicado
+        n_plus_one: 'Detecções N+1'
+        issue.resolved: 'Problema resolvido'
+        issue.reopened: 'Problema reaberto'
+        issue.assigned: 'Problema atribuído'
+        issue.commented: 'Problema comentado'
+        issue.duplicated: 'Problema marcado como duplicado'
+        volume.threshold: 'Limites de volume'
     flash:
-        created: Destino de notificação criado.
-        updated: Destino da notificação atualizado.
-        enabled: Destino ativado.
-        disabled: Destino desativado.
-        deleted: Destino excluído.
-        test_queued: Notificação de amostra no formato do canal na fila para entrega.
+        created: 'Destino de notificação criado.'
+        updated: 'Destino da notificação atualizado.'
+        enabled: 'Destino ativado.'
+        disabled: 'Destino desativado.'
+        deleted: 'Destino excluído.'
+        test_queued: 'Notificação de amostra no formato do canal na fila para entrega.'
     help:
-        title: Guias de configuração de notificação
-        link: Guias de configuração
-        back: Voltar às configurações
-        toc: Ir para o canal
+        title: 'Guias de configuração de notificação'
+        link: 'Guias de configuração'
+        back: 'Voltar às configurações'
+        toc: 'Ir para o canal'
         intro: 'Instruções passo a passo para conectar Slack, Discord, Microsoft Teams, Telegram, email ou um webhook HTTP genérico a este projeto.'
         payload_label: 'O farol envia:'
         docs_hint: 'Referência completa (payloads, entrega, permissões): docs/NOTIFICATIONS.md no repositório.'
         slack:
-            title: Slack (webhook de entrada)
-            lead: Crie um Webhook de entrada do aplicativo Slack e cole o URL HTTPS no Beacon.
-            step1: Abra api.slack.com/apps e crie um aplicativo do zero para seu espaço de trabalho.
+            title: 'Slack (webhook de entrada)'
+            lead: 'Crie um Webhook de entrada do aplicativo Slack e cole o URL HTTPS no Beacon.'
+            step1: 'Abra api.slack.com/apps e crie um aplicativo do zero para seu espaço de trabalho.'
             step2: 'Habilite Webhooks de entrada, adicione novo webhook ao espaço de trabalho e escolha um canal.'
             step3: 'Copie o URL do webhook (https://hooks.slack.com/services/…).'
             step4: 'No Beacon, escolha Slack Incoming Webhook, cole o URL como endpoint, selecione categorias e salve.'
-            step5: Clique em Enviar teste e confirme se a mensagem aparece no Slack.
-            payload: JSON com texto (resumo) e um objeto beacon contendo a carga completa do evento.
-            tip: Prefira um canal de operações dedicado. Gire o webhook no Slack se ele vazar; atualize o destino no Beacon.
+            step5: 'Clique em Enviar teste e confirme se a mensagem aparece no Slack.'
+            payload: 'JSON com texto (resumo) e um objeto beacon contendo a carga completa do evento.'
+            tip: 'Prefira um canal de operações dedicado. Gire o webhook no Slack se ele vazar; atualize o destino no Beacon.'
         discord:
-            title: Discord (webhook)
-            lead: Crie um webhook de canal no Discord e cole seu URL no Beacon.
-            step1: Abra Configurações do servidor → Integrações → Webhooks (ou a guia Integrações do canal).
+            title: 'Discord (webhook)'
+            lead: 'Crie um webhook de canal no Discord e cole seu URL no Beacon.'
+            step1: 'Abra Configurações do servidor → Integrações → Webhooks (ou a guia Integrações do canal).'
             step2: 'Crie um novo Webhook, nomeie-o (por exemplo, Beacon) e escolha o canal de destino.'
             step3: 'Copie o URL do Webhook (https://discord.com/api/webhooks/…).'
             step4: 'No Beacon, escolha Discord webhook, cole o URL, selecione as categorias, salve e envie o teste.'
             payload: 'JSON com conteúdo (resumo) e um array de incorporações (título, descrição, URL de problema opcional).'
-            tip: Webhooks de limites de taxa de discórdia; Beacon entrega de forma assíncrona via Messenger.
+            tip: 'Webhooks de limites de taxa de discórdia; Beacon entrega de forma assíncrona via Messenger.'
         teams:
-            title: Microsoft Teams (Webhook de entrada)
-            lead: Adicione um conector Webhook de entrada a um canal do Teams e cole a URL no Beacon.
+            title: 'Microsoft Teams (Webhook de entrada)'
+            lead: 'Adicione um conector Webhook de entrada a um canal do Teams e cole a URL no Beacon.'
             step1: 'No menu do canal do Teams, abra Conectores (ou Gerenciar canal → Conectores).'
             step2: 'Configure o Incoming Webhook, dê um nome a ele e crie-o.'
-            step3: Copie o URL do webhook fornecido pelo Teams.
+            step3: 'Copie o URL do webhook fornecido pelo Teams.'
             step4: 'No Beacon, escolha o webhook do Microsoft Teams, cole o URL, selecione as categorias, salve e envie o teste.'
             payload: 'JSON do MessageCard do Office 365 com resumo, título, texto e uma ação Abrir no Beacon quando existe um URL.'
             tip: 'Se o seu locatário permitir apenas fluxos de trabalho em vez de Webhooks de entrada clássicos, aponte um destino HTTP genérico para um fluxo de trabalho que aceite POST JSON.'
         telegram:
-            title: Telegrama (bot)
+            title: 'Telegrama (bot)'
             lead: 'Crie um bot com BotFather e armazene bot_token@chat_id como endpoint do Beacon.'
             step1: 'Abra @BotFather no Telegram, execute /newbot e copie o token do bot.'
-            step2: Inicie um bate-papo privado com o bot ou adicione-o a um grupo e envie uma mensagem.
-            step3: Chame getUpdates na API do Bot e leia message.chat.id (os IDs de grupo geralmente são negativos).
+            step2: 'Inicie um bate-papo privado com o bot ou adicione-o a um grupo e envie uma mensagem.'
+            step3: 'Chame getUpdates na API do Bot e leia message.chat.id (os IDs de grupo geralmente são negativos).'
             step4: 'No Beacon, escolha o bot do Telegram e defina o endpoint como bot_token@chat_id (exemplo — 123:AA…@-1001234567890).'
-            step5: Salvar e enviar teste.
-            payload: Bot API sendMessage com chat_id e texto (somente resumo; não a carga JSON completa).
+            step5: 'Salvar e enviar teste.'
+            payload: 'Bot API sendMessage com chat_id e texto (somente resumo; não a carga JSON completa).'
             tip: 'O último @ no endpoint divide o token e o ID do chat. Os tokens são criptografados em repouso como outros endpoints.'
         email:
             title: E-mail
-            lead: Entregue alertas para uma caixa de correio via Symfony Mailer. Configure MAILER_DSN primeiro.
+            lead: 'Entregue alertas para uma caixa de correio via Symfony Mailer. Configure MAILER_DSN primeiro.'
             step1: 'Defina MAILER_DSN em .env ou segredos de produção para um transporte real (SMTP, etc.). null://null não entrega.'
             step2: 'No Beacon, escolha Email e defina o endpoint para o endereço do destinatário.'
             step3: 'Selecione categorias, salve, envie teste e verifique caixa de entrada/spam.'
             payload: 'O assunto do email é igual ao resumo; body é o resumo mais o URL do problema ou desempenho, quando presente.'
             tip: 'Use um alias de operações compartilhado. Para resumos mais ricos, prefira Slack/Discord/Teams ou uma ponte HTTP.'
         http:
-            title: Webhook HTTP genérico
-            lead: POST a carga canônica do Beacon JSON em qualquer endpoint de automação HTTPS.
-            step1: Exponha uma URL HTTPS que aceite POST com Content-Type application/json.
+            title: 'Webhook HTTP genérico'
+            lead: 'POST a carga canônica do Beacon JSON em qualquer endpoint de automação HTTPS.'
+            step1: 'Exponha uma URL HTTPS que aceite POST com Content-Type application/json.'
             step2: 'No Beacon, escolha webhook HTTP genérico, cole o URL, selecione categorias, salve e envie teste.'
             step3: 'Confirme se seu serviço recebe o corpo JSON canônico (evento, resumo, projeto, problema, URL, categoria).'
-            payload: Carga JSON canônica como corpo da solicitação (User-Agent symfony-beacon-notifications/1.0).
-            tip: Prefira HTTPS e autentique seu receptor. Evite apontar para endereços de metadados internos ou na nuvem.
+            payload: 'Carga JSON canônica como corpo da solicitação (User-Agent symfony-beacon-notifications/1.0).'
+            tip: 'Prefira HTTPS e autentique seu receptor. Evite apontar para endereços de metadados internos ou na nuvem.'
+releases:
+    title: 'Saúde das releases'
+    intro: 'Escolha uma release para ver quantas issues foram vistas pela primeira vez nela, compare duas releases ou abra a comparação existente na lista de issues.'
+    empty: 'Ainda não há dados de release disponíveis para este projeto.'
+    focus:
+        label: Release
+        submit: 'Atualizar saúde das releases'
+    new_in_release:
+        title: 'Novas em %release%'
+        count: '%count% issues foram vistas pela primeira vez nesta release.'
+        open_issue_list: 'Abrir lista de issues filtrada'
+        empty: 'Nenhuma issue foi vista pela primeira vez nesta release.'
+    compare:
+        label: 'Comparar com release'
+        none: 'Não comparar'
+        help: 'Compare opcionalmente a release selecionada com outra release usando o conjunto de issues atual.'
+        summary_title: 'Comparar %a% vs %b%'
+        only_a: 'Apenas em %release%'
+        only_b: 'Apenas em %release%'
+        both: 'Em ambas as releases'
+        empty: 'Nenhuma issue neste conjunto'
+    catalog:
+        title: Releases
+    environment_compare:
+        title: 'Comparação de ambientes'
+        environment_a: 'Ambiente A'
+        environment_b: 'Ambiente B'
+        open_issue_list: 'Abrir comparação na lista de issues'
+        help: 'Reutiliza a comparação da lista de issues `014`. Quando uma release está selecionada, a ligação mantém esse filtro de release.'
+mailer_settings:
+    title: Mailer
+    intro: 'Guarde o DSN Symfony Mailer encriptado na base de dados (não em .env). O início de sessão magic link permanece oculto até guardar aqui um DSN não nulo; os destinos de notificação por e-mail também usam este transporte.'
+    status:
+        database: 'O correio de saída usa o DSN guardado nas definições da instância. O magic link está disponível quando este DSN não é um transporte null.'
+        env_fallback: 'Ainda sem DSN na base de dados — o correio de saída recai em MAILER_DSN do ambiente (normalmente null://null). O magic link permanece desativado até guardar um DSN encriptado aqui.'
+    current_dsn: 'DSN atual:'
+    from_preview: 'Endereço From: %from%'
+    submit: 'Guardar definições do mailer'
+    magic_ready: 'Credenciais de e-mail magic link prontas'
+    magic_blocked: 'E-mail magic link indisponível (guarde um DSN encriptado utilizável)'
+    sample:
+        title: 'Enviar e-mail de exemplo'
+        intro: 'Envia uma mensagem de teste usando o DSN Mailer encriptado (mesmo transporte que o magic link).'
+        to_label: Destinatário
+        submit: 'Enviar exemplo'
+        unavailable: 'Guarde primeiro um DSN Mailer encriptado válido (não null://), depois poderá enviar um exemplo.'
+        email_subject: 'Exemplo mailer Beacon (credenciais magic login)'
+        email_body: |
+            Esta é uma mensagem de exemplo de Administração → Mailer.
+
+            Se a recebeu, o DSN Mailer encriptado consegue entregar e-mails magic login.
+            Endereço From: %from%
+mercure_settings:
+    title: Mercure
+    intro: 'Alertas em direto opcionais para membros autenticados quando uma nova issue é criada. Desativado por predefinição — ative apenas quando houver um hub Mercure disponível. Web Push continua a ser um opt-in separado em Conta → Visualização.'
+    manual_hint: 'Manual do operador (hub, segredo JWT, Compose, resolução de problemas): docs/MERCURE.md no repositório.'
+    status:
+        active: 'Os alertas Mercure em direto estão ativados para membros.'
+        inactive: 'Mercure está desativado'
+        inactive_help: 'Os membros não abrirão EventSource até ativar Mercure aqui e fornecer um URL de hub acessível e um segredo JWT (guardados abaixo ou via ambiente).'
+        url_database: 'O URL de publicação do hub está guardado nas definições da instância.'
+        url_env: 'O URL de publicação do hub recai em MERCURE_URL do ambiente.'
+        url_missing: 'Nenhum URL de publicação do hub configurado (defina abaixo ou MERCURE_URL).'
+        secret_database: 'O segredo JWT está guardado encriptado nas definições da instância.'
+        secret_env: 'O segredo JWT recai em MERCURE_JWT_SECRET do ambiente.'
+        secret_missing: 'Nenhum segredo JWT configurado (defina abaixo ou MERCURE_JWT_SECRET).'
+    public_url_preview: 'URL do hub no browser: %url%'
+    push_note: 'O push PWA em segundo plano configura-se por utilizador em Conta → Visualização (requer chaves VAPID_*). Não depende do Mercure.'
+    submit: 'Guardar definições Mercure'
+instance_mercure:
+    enabled:
+        label: 'Ativar alertas Mercure em direto'
+        help: 'Quando ativo, membros autenticados subscrevem tópicos privados do projeto para toasts de novas issues enquanto a app está aberta.'
+    url:
+        label: 'URL de publicação (servidor)'
+        help: 'Deixe vazio para usar MERCURE_URL (ex.: http://mercure/.well-known/mercure no Compose).'
+    public_url:
+        label: 'URL público (browser)'
+        help: 'Deixe vazio para usar MERCURE_PUBLIC_URL (normalmente same-origin /.well-known/mercure via Caddy).'
+    jwt_secret:
+        label: 'Segredo JWT'
+        help: 'Deixe vazio para manter o valor encriptado atual ou recair em MERCURE_JWT_SECRET. Mínimo de 32 caracteres quando definido.'
+        too_short: 'O segredo JWT tem de ter pelo menos 32 caracteres.'
+        invalid: 'Introduza uma cadeia de segredo JWT válida.'
+    clear_secret:
+        label: 'Limpar segredo JWT guardado'
+        help: 'Remove o segredo na base de dados e recai em MERCURE_JWT_SECRET até guardar um novo.'
+instance_mailer:
+    mailer_dsn:
+        label: 'DSN Mailer'
+        help: 'Deixe vazio para manter o valor encriptado atual. Exemplo smtp://user:pass@mail.example:587 — null:// é rejeitado (use Limpar DSN guardado).'
+        placeholder: 'smtp://user:pass@mail.example:587'
+        invalid: 'Introduza um DSN Symfony Mailer válido (ex.: smtp://user:pass@host:587).'
+        null_transport: 'null:// não consegue entregar correio. Cole um DSN SMTP (ou outro) real, ou use Limpar DSN guardado para recair no ambiente.'
+    clear_dsn:
+        label: 'Limpar DSN guardado'
+        help: 'Remove o DSN na base de dados e recai em MAILER_DSN do ambiente até guardar um novo.'
+    mailer_from:
+        label: 'Endereço From'
+        help: 'Envelope From para magic login e e-mails de notificação. Predefinição beacon@localhost quando vazio.'
+setup:
+    eyebrow: 'Primeira execução'
+    title: 'Configuração da instância'
+    intro: 'Instale catálogos de navegação e dados demo opcionais. Mesmos passos das camadas seed CLI.'
+    intro_required: 'Faltam catálogos de navegação. Instale menus, breadcrumbs e o perfil de consentimento de cookies antes de continuar.'
+    intro_bootstrap: 'Os catálogos de plataforma estão prontos. Registe o primeiro admin, carregue opcionalmente telemetria de amostra e marque a configuração como concluída.'
+    already_done: 'A configuração está marcada como concluída.'
+    back_dashboard: 'Voltar ao dashboard'
+    login_setup_link: 'Configuração inicial'
+    bootstrap_login_hint: 'Prefere criar o seu próprio admin?'
+    bootstrap_login_link: 'Iniciar sessão'
+    bootstrap_register_link: 'Registar primeiro admin'
+    banner:
+        title: 'Concluir configuração da instância'
+        body: 'Instale menus/breadcrumbs e amostras demo opcionais para esta instância Beacon.'
+        cta: 'Abrir configuração'
+    step_platform:
+        title: 'Obrigatório — catálogos de plataforma'
+        body: 'Instale menus do dashboard, breadcrumbs e o perfil/inventário de consentimento de cookies. Este passo é obrigatório antes do resto da app funcionar.'
+        item_menus: 'Menus (dashboard, preferences, administration)'
+        item_breadcrumbs: 'Coleção de breadcrumbs (default)'
+        item_cookies: 'Perfil de consentimento de cookies'
+        cta: 'Instalar menus, breadcrumbs e cookies'
+        cta_again: 'Executar novamente seed de plataforma'
+        done: 'Os catálogos de plataforma estão instalados.'
+    step_options:
+        title: 'Passos opcionais seguintes'
+        body: 'Crie a primeira conta admin e/ou carregue um conjunto de amostras completo. Pode ignorar um ou ambos.'
+        locked: 'Conclua primeiro a instalação obrigatória de plataforma.'
+        register_title: 'Criar primeiro utilizador'
+        register_body: 'Registe o seu admin via AuthKit (registo apenas para o primeiro utilizador).'
+        register_cta: 'Registar primeiro admin'
+        register_done: 'Já existe pelo menos um utilizador.'
+        sample_title: 'Carregamento completo de amostras'
+        sample_body: 'Crie o projeto demo se necessário e carregue o conjunto de telemetria de amostra maior (perfil load).'
+        sample_cta: 'Instalar carregamento completo de amostras'
+        sample_note: 'Isto pode demorar um minuto. Conjuntos huge permanecem apenas CLI (`app:seed-sample --size=huge --force`). Se ainda não existir utilizador, pode ser criado um admin demo local como proprietário do projeto demo.'
+    step_demo:
+        title: 'Projeto demo'
+        body: 'Crie o admin demo local (se em falta) e o projeto demo com uma chave API.'
+        cta: 'Criar projeto demo'
+        exists: 'Projeto demo já presente.'
+    step_sample:
+        title: 'Telemetria de amostra'
+        body: 'Carregue issues sintéticas para QA. Requer o projeto demo. O tamanho huge permanece apenas CLI.'
+        dev: 'Carregar amostra (dev)'
+        load: 'Carregar amostra (load)'
+        need_demo: 'Crie primeiro o projeto demo.'
+    step_done:
+        title: Concluído
+        body: 'Feche este assistente. Pode reabrir Configuração a partir de Administração a qualquer momento.'
+        cta: 'Marcar configuração como concluída'
+    cli_hint: 'Equivalente CLI: make bootstrap && make seed && make seed-sample — ver docs/INSTALL.md'
+    flash:
+        platform_ok: 'Catálogos de navegação e consentimento de cookies atualizados.'
+        platform_required: 'Instale primeiro menus, breadcrumbs e consentimento de cookies.'
+        demo_ok: 'Utilizador / projeto demo prontos.'
+        demo_exists: 'Utilizador e projeto demo já existem.'
+        sample_ok: 'Telemetria de amostra carregada. Alertas Mercure em direto foram ativados com predefinições do ambiente quando necessário.'
+        sample_demo_user: 'Admin demo local criado admin@symfony-beacon.local / admin123 como proprietário do projeto demo.'
+        complete: 'Configuração marcada como concluída.'
+        bootstrap_ready: 'Configuração concluída. Inicie sessão ou registe o primeiro admin para continuar.'
+        unknown_action: 'Ação de configuração desconhecida.'
+        failed: 'Ação de configuração falhou.'
+thresholds:
+    title: 'Alertas de limiar'
+    intro: 'Crie alertas de volume rolling quando eventos error ou fatal excedem uma contagem configurada numa janela temporal.'
+    ingest_disabled: 'O ingest está suspenso para este projeto, por isso as regras de limiar não são avaliadas.'
+    empty: 'Ainda não há regras de limiar. Adicione uma para detetar picos súbitos.'
+    add: 'Adicionar regra'
+    edit: Editar
+    enable: Ativar
+    disable: Desativar
+    disabled: Desativada
+    delete: Eliminar
+    delete_confirm: 'Eliminar esta regra de limiar?'
+    save: 'Guardar regra'
+    cancel: Cancelar
+    new_title: 'Nova regra de limiar'
+    edit_title: 'Editar regra de limiar'
+    form_help: 'Configure um alerta de volume error/fatal rolling. Filtros opcionais de ambiente e release limitam a contagem antes do encaminhamento de notificações, horas silenciosas e digests.'
+    unnamed: 'Regra sem nome'
+    summary: '%count% eventos em %window% min · cooldown %cooldown% min'
+    last_fired: 'Última ativação'
+    never_fired: 'Nunca ativada.'
+    filter:
+        environment: 'Ambiente: %value%'
+        release: 'Release: %value%'
+        all_events: 'Todos os ambientes e releases'
+    form:
+        label: Etiqueta
+        label_help: 'Nome interno opcional mostrado em Definições e payloads.'
+        enabled: Ativada
+        error_count: 'Contagem de erros'
+        error_count_help: 'Alertar quando pelo menos este número de eventos error/fatal é recebido na janela rolling.'
+        window_minutes: 'Janela (minutos)'
+        window_minutes_help: 'Janela rolling de 1 a 1440 minutos.'
+        cooldown_minutes: 'Cooldown (minutos)'
+        cooldown_minutes_help: 'Suprime alertas duplicados desta regra durante a janela de cooldown.'
+        environment: 'Filtro de ambiente'
+        environment_help: 'Deixe vazio para contar todos os ambientes.'
+        release: 'Filtro de release'
+        release_help: 'Deixe vazio para contar todas as releases.'
+    flash:
+        created: 'Regra de limiar criada.'
+        updated: 'Regra de limiar atualizada.'
+        enabled: 'Regra de limiar ativada.'
+        disabled: 'Regra de limiar desativada.'
+        deleted: 'Regra de limiar eliminada.'
+    validation:
+        label_length: 'A etiqueta deve ter no máximo 120 caracteres.'
+        error_count_min: 'A contagem de erros tem de ser pelo menos 1.'
+        window_range: 'A janela tem de estar entre 1 e 1440 minutos.'
+        cooldown_range: 'O cooldown tem de estar entre 1 e 10080 minutos.'
+        environment_length: 'O ambiente deve ter no máximo 80 caracteres.'
+        release_length: 'A release deve ter no máximo 120 caracteres.'

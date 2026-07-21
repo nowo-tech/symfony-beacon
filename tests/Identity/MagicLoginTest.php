@@ -20,13 +20,28 @@ final class MagicLoginTest extends DatabaseWebTestCase
         $client = self::createClient();
 
         $client->request(Request::METHOD_GET, '/login/magic');
+        self::assertResponseRedirects('/en/login/magic');
+        $client->followRedirect();
         self::assertResponseRedirects();
         $client->followRedirect();
         self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('a[href="/login/magic"]');
+        self::assertSelectorNotExists('a[href="/en/login/magic"]');
+        self::assertSelectorNotExists('a[href="/en/reset-password"]');
 
         $mailer = self::getContainer()->get(ConfiguredMailer::class);
         self::assertFalse($mailer->isMagicLoginAvailable());
+    }
+
+    public function testPasswordResetHiddenWithoutEncryptedMailerDsn(): void
+    {
+        $client = self::createClient();
+
+        $client->request(Request::METHOD_GET, '/reset-password');
+        self::assertResponseRedirects('/en/reset-password');
+        $client->followRedirect();
+        self::assertResponseRedirects();
+        $location = (string) $client->getResponse()->headers->get('Location');
+        self::assertStringContainsString('/login', $location);
     }
 
     public function testMagicLoginRequestAndConsume(): void
@@ -36,6 +51,8 @@ final class MagicLoginTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $this->enableEncryptedMailer();
+        // Keep the same kernel so encrypted InstanceSettings stay readable across requests.
+        $client->disableReboot();
 
         $user = new User();
         $user->setEmail('magic@example.com');
@@ -44,17 +61,28 @@ final class MagicLoginTest extends DatabaseWebTestCase
         $em->persist($user);
         $em->flush();
 
-        $crawler = $client->request(Request::METHOD_GET, '/en/login');
+        $client->request(Request::METHOD_GET, '/login');
+        self::assertResponseRedirects('/en/login');
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('a[href="/login/magic"]');
+        self::assertSelectorExists('a[href="/en/login/magic"]');
+        self::assertSelectorExists('a[href="/en/reset-password"]');
 
-        $crawler = $client->request(Request::METHOD_GET, '/login/magic');
+        $crawler = $client->request(Request::METHOD_GET, '/en/login/magic');
         self::assertResponseIsSuccessful();
-        $form = $crawler->filter('form')->form([
-            'email' => 'magic@example.com',
-        ]);
-        $client->submit($form);
-        self::assertResponseRedirects('/login/magic');
+        $form = $crawler->filter('form')->form();
+        $phpValues = $form->getPhpValues();
+        $root = (string) array_key_first($phpValues);
+        self::assertNotSame('', $root);
+        $phpValues[$root]['identifier'] = 'magic@example.com';
+        $client->request(
+            Request::METHOD_POST,
+            '/en/login/magic',
+            $phpValues,
+        );
+        self::assertResponseRedirects();
+        $location = (string) $client->getResponse()->headers->get('Location');
+        self::assertStringContainsString('/login', $location);
         $client->followRedirect();
         self::assertResponseIsSuccessful();
 
@@ -75,6 +103,7 @@ final class MagicLoginTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $this->enableEncryptedMailer();
+        $client->disableReboot();
 
         $user = new User();
         $user->setEmail('magic-disabled@example.com');
@@ -105,6 +134,8 @@ final class MagicLoginTest extends DatabaseWebTestCase
         self::assertFalse(self::getContainer()->get(ConfiguredMailer::class)->isMagicLoginAvailable());
 
         $client->request(Request::METHOD_GET, '/login/magic');
+        self::assertResponseRedirects('/en/login/magic');
+        $client->followRedirect();
         self::assertResponseRedirects();
     }
 

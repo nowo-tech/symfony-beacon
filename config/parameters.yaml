@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# Typed aliases for env vars defined in `.env` / `.env.dist`.
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    default_locale: '%env(DEFAULT_LOCALE)%'
+    # Catalogue fallbacks when a key is missing in the active locale (always keep English).
+    fallback_locales: [en, es, de, nl, fr, it, pt]
+    beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
+    beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
+    beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
+    beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
+    beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
+    beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
+    beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
+    beacon.vapid.private_key: '%env(string:VAPID_PRIVATE_KEY)%'
+    beacon.vapid.subject: '%env(string:VAPID_SUBJECT)%'
+    beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
+    beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
+    beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'

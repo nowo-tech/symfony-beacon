@@ -4,33 +4,8 @@
 # Files in the packages/ subdirectory configure your dependencies.
 # See also https://symfony.com/doc/current/service_container/import.html
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-parameters:
-    env(BEACON_RETENTION_DAYS): '0'
-    env(BEACON_RETENTION_MAX_EVENTS_PER_PROJECT): '0'
-    env(BEACON_INGEST_RATE_LIMIT): '120'
-    env(BEACON_EVENT_QUOTA_DAILY): '0'
-    env(BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS): '0'
-    env(BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT): '20'
-    env(VAPID_PUBLIC_KEY): ''
-    env(VAPID_PRIVATE_KEY): ''
-    env(VAPID_SUBJECT): 'mailto:ops@localhost'
-    env(MERCURE_URL): ''
-    env(MERCURE_PUBLIC_URL): ''
-    env(MERCURE_JWT_SECRET): ''
-    beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
-    beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
-    beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
-    beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
-    beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
-    beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
-    beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
-    beacon.vapid.private_key: '%env(string:VAPID_PRIVATE_KEY)%'
-    beacon.vapid.subject: '%env(string:VAPID_SUBJECT)%'
-    beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
-    beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
-    beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
+imports:
+    - { resource: parameters.yaml }
 
 services:
     # default configuration for services in *this* file
@@ -89,6 +64,42 @@ services:
             $envUrl: '%beacon.mercure.env_url%'
             $envPublicUrl: '%beacon.mercure.env_public_url%'
             $envJwtSecret: '%beacon.mercure.env_jwt_secret%'
+
+    App\Identity\Controller\GuestLocaleController:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Shared\Locale\BarePublicLocaleRedirectController:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Shared\Settings\Controller\SetupWizardController:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Identity\AuthKit\MailerGatedAuthKitRouteSubscriber:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Shared\Settings\EventSubscriber\PlatformSetupRedirectSubscriber:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Shared\Locale\LocalizedPublicPath:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+
+    App\Identity\EventSubscriber\GuestSessionLocaleSubscriber:
+        arguments:
+            $enabledLocales: '%kernel.enabled_locales%'
+            $defaultLocale: '%kernel.default_locale%'
+
+    Nowo\AuthKitBundle\MagicLogin\MagicLoginNotifierInterface: '@App\Identity\AuthKit\AuthKitMagicLoginMailNotifier'
+    Nowo\AuthKitBundle\PasswordReset\PasswordResetNotifierInterface: '@App\Identity\AuthKit\AuthKitPasswordResetMailNotifier'
+
+    Nowo\AuthKitBundle\MagicLogin\MagicLoginRequestHandler:
+        arguments:
+            $loginLinkHandler: '@security.authenticator.login_link_handler.main'
 
     # Prefer encrypted instance_settings.mailer_dsn; MAILER_DSN env is bootstrap/fallback only.
     Symfony\Component\Mailer\MailerInterface: '@App\Shared\Mailer\ConfiguredMailer'

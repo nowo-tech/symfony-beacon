@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.7 to the next release](#upgrading-from-0127-to-the-next-release)
+- [Upgrading from 0.12.8 to the next release](#upgrading-from-0128-to-the-next-release)
+- [Upgrading from 0.12.7 to 0.12.8](#upgrading-from-0127-to-0128)
 - [Upgrading from 0.12.6 to 0.12.7](#upgrading-from-0126-to-0127)
 - [Upgrading from 0.12.5 to 0.12.6](#upgrading-from-0125-to-0126)
 - [Upgrading from 0.12.4 to 0.12.5](#upgrading-from-0124-to-0125)
@@ -37,7 +38,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.7 to the next release
+## Upgrading from 0.12.8 to the next release
 
 ```bash
 git pull
@@ -48,6 +49,45 @@ php bin/console app:seed-platform
 pnpm install
 make vite-build
 ```
+
+## Upgrading from 0.12.7 to 0.12.8
+
+```bash
+git pull
+composer install
+# Recreate PHP container if you pull the FrankenPHP memory_limit mount (cache:clear OOM fix):
+docker compose up -d --force-recreate php
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Dual public URLs (AuthKit + setup)
+
+- **Default locale** (`DEFAULT_LOCALE`, e.g. `es` in this project’s `.env`, `en` in `.env.dist`): bare paths serve content — `/login`, `/register`, `/setup`.
+- **Other locales**: prefixed — `/en/login`, `/en/setup`.
+- Setup redirects a prefixed default-locale URL to bare (`/es/setup` → `/setup` when `DEFAULT_LOCALE=es`).
+- AuthKit uses `locale.in_path: both` + `unlocalized: serve` (see `config/packages/nowo_auth_kit.yaml`).
+- Legal pages still redirect bare → `/{DEFAULT_LOCALE}/legal/…`.
+- Dashboard / app shell URLs never include `_locale` (account `preferredLocale`).
+- Operator manual: [ADDING-LOCALES.md](ADDING-LOCALES.md).
+
+### Setup wizard (empty catalogs)
+
+- Missing menus / breadcrumbs / cookie consent force HTML visitors to setup (required platform step, then optional AuthKit register + Full sample load).
+- When no users exist, setup remains public; after users exist, only `ROLE_ADMIN`.
+- Details: [INSTALL.md](INSTALL.md), spec `056`.
+
+### AuthKit password reset + magic login
+
+- Password reset and magic login are AuthKit routes/templates (custom `MagicLoginController` removed).
+- Migration `Version20260721250000` adds `password_reset_token` / `password_reset_expires_at` on `app_user`.
+- Magic login / reset email still require a deliverable encrypted Mailer DSN under Administration → Mailer.
+
+### PHP memory for cache warm
+
+- Compose mounts `.docker/frankenphp/conf.d/10-app.ini` with `memory_limit = 512M` so prod `cache:clear` does not OOM on Twig kit themes.
 
 ## Upgrading from 0.12.6 to 0.12.7
 

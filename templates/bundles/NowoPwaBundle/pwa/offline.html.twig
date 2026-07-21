@@ -59,7 +59,7 @@
         <p class="eyebrow">{{ site_appearance.brandName|default(manifest_name) }}</p>
         <h1>{{ 'offline.heading'|trans({}, 'NowoPwaBundle') }}</h1>
         <p>{{ 'offline.body'|trans({}, 'NowoPwaBundle') }}</p>
-        <p><a href="{{ path('nowo_auth_kit_login', {_locale: app.request.locale|default('en')}) }}">{{ 'offline.retry'|trans({}, 'NowoPwaBundle') }}</a></p>
+        <p><a href="{{ path('nowo_auth_kit_login') }}">{{ 'offline.retry'|trans({}, 'NowoPwaBundle') }}</a></p>
     </div>
 </body>
 </html>

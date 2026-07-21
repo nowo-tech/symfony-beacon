@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ec557dd16104d68609fae7c0ba4e472",
+    "content-hash": "8937ab8aa9d9985c447e9b11e2207087",
     "packages": [
         {
             "name": "brick/math",
@@ -222,16 +222,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "4.4.3",
+            "version": "4.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec"
+                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/61e730f1658814821a85f2402c945f3883407dec",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
+                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
                 "shasum": ""
             },
             "require": {
@@ -308,7 +308,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/4.4.3"
+                "source": "https://github.com/doctrine/dbal/tree/4.4.4"
             },
             "funding": [
                 {
@@ -324,7 +324,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-20T08:52:12+00:00"
+            "time": "2026-07-21T14:34:40+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -2159,16 +2159,16 @@
         },
         {
             "name": "nowo-tech/auth-kit-bundle",
-            "version": "v1.5.1",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/AuthKitBundle.git",
-                "reference": "1946c97313ff1ce23ae5d649501b35a177526809"
+                "reference": "fc9fd9afbeb4f406139e95f1c6fae6a7a46b8a39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/1946c97313ff1ce23ae5d649501b35a177526809",
-                "reference": "1946c97313ff1ce23ae5d649501b35a177526809",
+                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/fc9fd9afbeb4f406139e95f1c6fae6a7a46b8a39",
+                "reference": "fc9fd9afbeb4f406139e95f1c6fae6a7a46b8a39",
                 "shasum": ""
             },
             "require": {
@@ -2249,7 +2249,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-16T18:58:00+00:00"
+            "time": "2026-07-21T18:12:32+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",

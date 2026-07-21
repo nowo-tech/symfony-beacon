@@ -41,6 +41,7 @@ services:
       # and worker mode fails with "has not reached frankenphp_handle_request()".
       - ./:/app
       - ./.docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./.docker/frankenphp/conf.d/10-app.ini:/usr/local/etc/php/app.conf.d/10-app.ini:ro
       - ./.docker/frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
       - /app/var
       - caddy_data:/data

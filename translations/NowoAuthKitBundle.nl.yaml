@@ -6,6 +6,8 @@ register:
     heading: Account aanmaken
     submit: Registreren
     login_link: Ik heb al een account
+    field:
+        displayName: Weergavenaam
 
 # Password strength requirement labels (AuthKit sets translation_domain on the field)
 requirement.min_length: 'Minimaal %count% tekens'

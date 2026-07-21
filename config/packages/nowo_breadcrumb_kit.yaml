@@ -1,8 +1,8 @@
 # nowo-tech/breadcrumb-kit-bundle
 # https://github.com/nowo-tech/BreadcrumbKitBundle
 nowo_breadcrumb_kit:
-    locales: ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt']
-    default_locale: 'en'
+    locales: '%fallback_locales%'
+    default_locale: '%default_locale%'
     default_collection: 'default'
     cache:
         ttl: 60

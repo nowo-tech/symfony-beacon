@@ -5,6 +5,10 @@
     'form/auth_kit_theme.html.twig'
 ] %}
 
+{% set outbound_mail_ready = beacon_magic_login_enabled() %}
+{% set show_magic_login = outbound_mail_ready and magic_login_enabled|default(false) %}
+{% set show_password_reset = outbound_mail_ready and password_reset_enabled|default(false) %}
+
 {% block title %}{{ 'login.title'|trans({}, 'NowoAuthKitBundle') }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
@@ -34,15 +38,15 @@
         <button type="submit" class="btn-primary w-full">{{ 'login.submit'|trans({}, 'NowoAuthKitBundle') }}</button>
     {{ form_end(login_form) }}
 
-    {% if beacon_magic_login_enabled() %}
+    {% if show_magic_login %}
         <p class="mt-4 text-center text-sm text-[var(--color-ink)]/60">
-            <a href="{{ path('app_magic_login_request') }}" class="no-underline font-medium">{{ 'auth.magic.title'|trans }}</a>
+            <a href="{{ path(magic_login_route, auth_kit_route_params()) }}" class="no-underline font-medium">{{ 'auth.magic.title'|trans }}</a>
         </p>
     {% endif %}
 
-    {% if password_reset_enabled|default(false) or registration_allowed|default(false) or beacon_setup_bootstrap_open() %}
+    {% if show_password_reset or registration_allowed|default(false) or beacon_setup_bootstrap_open() %}
         <p class="mt-5 text-center text-sm text-[var(--color-ink)]/60">
-            {% if password_reset_enabled|default(false) %}
+            {% if show_password_reset %}
                 <a href="{{ path(reset_password_route, auth_kit_route_params()) }}" class="no-underline">{{ 'login.forgot_password_link'|trans({}, 'NowoAuthKitBundle') }}</a>
                 {% if registration_allowed|default(false) or beacon_setup_bootstrap_open() %} · {% endif %}
             {% endif %}
@@ -51,7 +55,7 @@
                 {% if beacon_setup_bootstrap_open() %} · {% endif %}
             {% endif %}
             {% if beacon_setup_bootstrap_open() %}
-                <a href="{{ path('setup_wizard') }}" class="no-underline font-medium">{{ 'setup.login_setup_link'|trans }}</a>
+                <a href="{{ beacon_setup_path(app.request.locale|default(default_locale)) }}" class="no-underline font-medium">{{ 'setup.login_setup_link'|trans }}</a>
             {% endif %}
         </p>
     {% endif %}

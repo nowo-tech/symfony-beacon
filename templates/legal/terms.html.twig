@@ -25,9 +25,9 @@
     <p>{{ 'legal.terms.changes_body'|trans }}</p>
 
     <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
-        <a href="{{ path('legal_notice') }}">{{ 'legal.notice.title'|trans }}</a>
-        <a href="{{ path('legal_privacy') }}">{{ 'legal.privacy.title'|trans }}</a>
-        <a href="{{ path('legal_cookies') }}">{{ 'legal.cookies.title'|trans }}</a>
+        <a href="{{ path('legal_notice', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.notice.title'|trans }}</a>
+        <a href="{{ path('legal_privacy', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.privacy.title'|trans }}</a>
+        <a href="{{ path('legal_cookies', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.cookies.title'|trans }}</a>
     </nav>
 </article>
 {% endblock %}

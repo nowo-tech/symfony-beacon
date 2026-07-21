@@ -33,15 +33,15 @@
     <h2>{{ 'legal.privacy.cookies_heading'|trans }}</h2>
     <p>{{ 'legal.privacy.cookies_body'|trans }}</p>
     <p>
-        <a href="{{ path('legal_cookies') }}">{{ 'legal.cookies.title'|trans }}</a>
+        <a href="{{ path('legal_cookies', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.cookies.title'|trans }}</a>
         ·
         <a href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
     </p>
 
     <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
-        <a href="{{ path('legal_notice') }}">{{ 'legal.notice.title'|trans }}</a>
-        <a href="{{ path('legal_terms') }}">{{ 'legal.terms.title'|trans }}</a>
-        <a href="{{ path('legal_cookies') }}">{{ 'legal.cookies.title'|trans }}</a>
+        <a href="{{ path('legal_notice', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.notice.title'|trans }}</a>
+        <a href="{{ path('legal_terms', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.terms.title'|trans }}</a>
+        <a href="{{ path('legal_cookies', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.cookies.title'|trans }}</a>
     </nav>
 </article>
 {% endblock %}

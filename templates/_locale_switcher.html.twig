@@ -1,8 +1,27 @@
-{# Locale switcher: auth pages use path locale; app shell saves preference on the user. #}
+{# Locale switcher: path locale on public dual routes; account preference when signed-in; else guest session. #}
 {% set route = app.request.attributes.get('_route') %}
 {% set route_params = app.request.attributes.get('_route_params')|default({}) %}
 {% set current_locale = app.request.locale|default(default_locale) %}
 {% set compact = compact|default(false) %}
+{% set path_locale_routes = [
+    'setup_wizard',
+    'setup_wizard_run',
+    'setup_wizard_localized',
+    'setup_wizard_run_localized',
+    'legal_notice',
+    'legal_privacy',
+    'legal_terms',
+    'legal_cookies',
+    'nowo_auth_kit_login',
+    'nowo_auth_kit_register',
+    'nowo_auth_kit_logout',
+    'nowo_auth_kit_reset_password_request',
+    'nowo_auth_kit_reset_password',
+    'nowo_auth_kit_reset_password_code',
+    'nowo_auth_kit_magic_login_request',
+    'nowo_auth_kit_magic_login_check',
+] %}
+{% set use_path_locale = route in path_locale_routes %}
 
 <div class="locale-switcher{{ compact ? ' locale-switcher--compact' : '' }}">
     <details class="locale-switcher__details">
@@ -18,7 +37,7 @@
         <ul class="locale-switcher__menu" role="listbox" aria-label="{{ 'locale.nav'|trans }}">
             {% for locale in enabled_locales %}
                 <li role="option" aria-selected="{{ locale == current_locale ? 'true' : 'false' }}">
-                    {% if app.user %}
+                    {% if app.user and not use_path_locale %}
                         <form method="post" action="{{ path('account_locale_switch', {locale: locale}) }}" class="m-0">
                             <input type="hidden" name="_token" value="{{ csrf_token('account_locale') }}">
                             <input type="hidden" name="redirect" value="{{ app.request.requestUri }}">
@@ -32,9 +51,31 @@
                                 <span>{{ ('locale.' ~ locale)|trans }}</span>
                             </button>
                         </form>
+                    {% elseif use_path_locale or (route in path_locale_routes) %}
+                        {% set target_route = route %}
+                        {% if target_route in ['setup_wizard', 'setup_wizard_run', 'setup_wizard_localized', 'setup_wizard_run_localized'] %}
+                            <a href="{{ beacon_setup_path(locale) }}"
+                               class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
+                               hreflang="{{ locale }}"
+                               lang="{{ locale }}">
+                                <span class="locale-switcher__code">{{ locale|upper }}</span>
+                                <span>{{ ('locale.' ~ locale)|trans }}</span>
+                            </a>
+                        {% else %}
+                            {% if target_route ends with '_bare_redirect' or target_route == 'app_home_redirect' %}
+                                {% set target_route = 'nowo_auth_kit_login' %}
+                            {% endif %}
+                            {% set params = route_params|merge({'_locale': locale}) %}
+                            <a href="{{ path(target_route, params) }}"
+                               class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
+                               hreflang="{{ locale }}"
+                               lang="{{ locale }}">
+                                <span class="locale-switcher__code">{{ locale|upper }}</span>
+                                <span>{{ ('locale.' ~ locale)|trans }}</span>
+                            </a>
+                        {% endif %}
                     {% else %}
-                        {% set params = route_params|merge({'_locale': locale}) %}
-                        <a href="{{ path(route, params) }}"
+                        <a href="{{ path('guest_locale_switch', {locale: locale, redirect: app.request.requestUri}) }}"
                            class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
                            hreflang="{{ locale }}"
                            lang="{{ locale }}">

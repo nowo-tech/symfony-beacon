@@ -29,6 +29,10 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $user->setRoles(['ROLE_ADMIN']);
         $em->flush();
 
+        // Halite key is auto-created in memory when var/secrets is unavailable; keep the kernel
+        // so encrypted instance_settings stay readable across the save redirect.
+        $client->disableReboot();
+
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
         self::assertResponseIsSuccessful();
@@ -139,6 +143,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $repo->save($settings);
         self::getContainer()->get(ConfiguredMailer::class)->reset();
 
+        $client->disableReboot();
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
         self::assertResponseIsSuccessful();

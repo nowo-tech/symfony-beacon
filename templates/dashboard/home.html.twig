@@ -14,7 +14,7 @@
                 <p class="text-sm font-semibold text-[var(--color-ink)]">{{ 'setup.banner.title'|trans }}</p>
                 <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.banner.body'|trans }}</p>
             </div>
-            <a class="btn-primary shrink-0 no-underline" href="{{ path('setup_wizard') }}">{{ 'setup.banner.cta'|trans }}</a>
+            <a class="btn-primary shrink-0 no-underline" href="{{ beacon_setup_path(app.request.locale|default(default_locale)) }}">{{ 'setup.banner.cta'|trans }}</a>
         </div>
     {% endif %}
 

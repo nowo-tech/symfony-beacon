@@ -66,6 +66,12 @@ controllers_legal:
         namespace: App\Shared\Legal\Controller
     type: attribute
 
+controllers_public_locale:
+    resource:
+        path: ../src/Shared/Locale/
+        namespace: App\Shared\Locale
+    type: attribute
+
 controllers_health:
     resource:
         path: ../src/Shared/Health/

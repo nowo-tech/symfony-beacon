@@ -80,6 +80,9 @@ auth:
         back_to_password: Sign in with password
         email_subject: Your Beacon magic sign-in link
         email_body: "Open this link to sign in (expires %expires%):\n\n%link%"
+    reset:
+        email_subject: Reset your Beacon password
+        email_body: "Use this link to choose a new password:\n\n%link%\n"
 flash:
     project:
         created: Project created.
@@ -1075,7 +1078,8 @@ setup:
     eyebrow: First run
     title: Instance setup
     intro: Install navigation catalogs and optional demo data. Same steps as the CLI seed layers.
-    intro_bootstrap: This instance has no users yet. Choose a one-click bootstrap, then sign in with the demo admin — or register your own first admin instead.
+    intro_required: Navigation catalogs are missing. Install menus, breadcrumbs, and the cookie consent profile before continuing.
+    intro_bootstrap: Platform catalogs are ready. Register the first admin, optionally load sample telemetry, then mark setup complete.
     already_done: Setup is marked complete.
     back_dashboard: Back to dashboard
     login_setup_link: First-run setup
@@ -1086,23 +1090,27 @@ setup:
         title: Finish instance setup
         body: Install menus/breadcrumbs and optional demo samples for this Beacon instance.
         cta: Open setup
-    preset_minimum:
-        title: Minimum setup
-        body: Navigation catalogs, cookie consent, and the local demo admin account. No sample telemetry.
-        item_platform: Menus, breadcrumbs, and cookie consent profile
-        item_demo: 'Demo admin %email% / %password% and demo project with API key'
-        cta: Install minimum
-    preset_bulk:
-        title: Full sample load
-        body: Everything in minimum setup, plus a larger sample telemetry dataset for local QA.
-        item_minimum: Platform catalogs and demo admin / project
-        item_sample: Sample issues and charts (load profile)
-        cta: Install with sample data
-        note: This can take a minute. Huge datasets remain CLI-only (`app:seed-sample --size=huge --force`).
     step_platform:
-        title: Platform navigation
-        body: Upsert dashboard menus, breadcrumbs, and the cookie consent profile/inventory (safe to run again after upgrades).
-        cta: Install navigation
+        title: Required — platform catalogs
+        body: Install dashboard menus, breadcrumbs, and the cookie consent profile/inventory. This step is mandatory before the rest of the app works.
+        item_menus: Menus (dashboard, preferences, administration)
+        item_breadcrumbs: Breadcrumb collection (default)
+        item_cookies: Cookie consent profile
+        cta: Install menus, breadcrumbs, and cookies
+        cta_again: Re-run platform seed
+        done: Platform catalogs are installed.
+    step_options:
+        title: Optional next steps
+        body: Create the first admin account and/or load a full sample dataset. You can skip either.
+        locked: Finish the required platform install first.
+        register_title: Create first user
+        register_body: Register your own admin via AuthKit (first-user-only registration).
+        register_cta: Register first admin
+        register_done: At least one user already exists.
+        sample_title: Full sample load
+        sample_body: Create the demo project if needed and load the larger sample telemetry dataset (load profile).
+        sample_cta: Install full sample load
+        sample_note: This can take a minute. Huge datasets remain CLI-only (`app:seed-sample --size=huge --force`). If no user exists yet, a local demo admin may be created to own the demo project.
     step_demo:
         title: Demo project
         body: Create the local demo admin (if missing) and demo project with an API key.
@@ -1121,13 +1129,13 @@ setup:
     cli_hint: 'CLI equivalent: make bootstrap && make seed && make seed-sample — see docs/INSTALL.md'
     flash:
         platform_ok: Navigation catalogs and cookie consent updated.
+        platform_required: Install menus, breadcrumbs, and cookie consent first.
         demo_ok: Demo user / project ready.
         demo_exists: Demo user and project already exist.
         sample_ok: Sample telemetry loaded. Mercure live alerts were enabled with env defaults when needed.
+        sample_demo_user: 'Created local demo admin admin@symfony-beacon.local / admin123 to own the demo project.'
         complete: Setup marked complete.
-        minimum_ok: Minimum setup installed (platform + demo).
-        bulk_ok: Full sample load installed (platform + demo + load telemetry).
-        bootstrap_ready: 'Setup complete. Sign in with admin@symfony-beacon.local / admin123'
+        bootstrap_ready: Setup complete. Sign in or register the first admin to continue.
         unknown_action: Unknown setup action.
         failed: Setup action failed.
 

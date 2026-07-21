@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.8] - 2026-07-21
+
+### Added
+
+- Setup auto-redirect when platform catalogs are empty (menus / breadcrumbs / cookie consent) — HTML GETs go to locale-aware `/setup` (`PlatformBootstrapState` + `PlatformSetupRedirectSubscriber`) (`056`)
+- AuthKit **password reset** + **magic login** flows (bundle routes/templates; mail via instance Mailer; rate-limit + audit subscribers); migration `Version20260721250000` (`password_reset_token` / `password_reset_expires_at`)
+- Dual public URLs for AuthKit + setup: default locale bare (`/login`, `/setup`), other locales prefixed (`/en/login`, `/en/setup`); setup redirects prefixed default-locale URLs to bare (`LocalizedPublicPath`)
+- Full UI catalogue parity for enabled locales (`messages.{en,es,de,nl,fr,it,pt}.yaml`)
+- FrankenPHP / PHP `memory_limit = 512M` for Twig/kit `cache:clear` in prod (`.docker/frankenphp/conf.d/10-app.ini`)
+
+### Changed
+
+- Setup wizard: **required** platform install, then optional AuthKit first-admin register + Full sample load (no minimum/bulk one-click presets)
+- AuthKit `locale.in_path: both` + `unlocalized: serve` (was bare-only / redirect-centric); guest locale via path switcher or `/locale/{locale}`; dashboard URLs still never carry `_locale`
+- Legal pages keep bare → `/{DEFAULT_LOCALE}/legal/…` redirects (not yet aligned with AuthKit/setup serve pattern)
+
+### Fixed
+
+- Fresh-install `Version20260721230000` no longer re-ADDs `event.project_id` when the column already exists
+
 ## [0.12.7] - 2026-07-21
 
 ### Added
@@ -484,7 +504,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...HEAD
+[0.12.8]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.4...v0.12.5

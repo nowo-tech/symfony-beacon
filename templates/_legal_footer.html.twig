@@ -1,10 +1,11 @@
 {# Site-wide legal footer + cookie preferences link. #}
 <footer class="site-legal-footer" role="contentinfo">
     <nav class="site-legal-footer__nav" aria-label="{{ 'legal.nav.label'|trans }}">
-        <a href="{{ path('legal_notice') }}">{{ 'legal.notice.title'|trans }}</a>
-        <a href="{{ path('legal_privacy') }}">{{ 'legal.privacy.title'|trans }}</a>
-        <a href="{{ path('legal_terms') }}">{{ 'legal.terms.title'|trans }}</a>
-        <a href="{{ path('legal_cookies') }}">{{ 'legal.cookies.title'|trans }}</a>
+        {% set loc = app.request.locale|default(default_locale) %}
+        <a href="{{ path('legal_notice', {_locale: loc}) }}">{{ 'legal.notice.title'|trans }}</a>
+        <a href="{{ path('legal_privacy', {_locale: loc}) }}">{{ 'legal.privacy.title'|trans }}</a>
+        <a href="{{ path('legal_terms', {_locale: loc}) }}">{{ 'legal.terms.title'|trans }}</a>
+        <a href="{{ path('legal_cookies', {_locale: loc}) }}">{{ 'legal.cookies.title'|trans }}</a>
         <a href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
     </nav>
 </footer>

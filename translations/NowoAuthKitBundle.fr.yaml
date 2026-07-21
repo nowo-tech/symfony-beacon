@@ -6,6 +6,8 @@ register:
     heading: Créer un compte
     submit: S'inscrire
     login_link: J'ai déjà un compte
+    field:
+        displayName: Nom affiché
 
 # Password strength requirement labels (AuthKit sets translation_domain on the field)
 requirement.min_length: 'Au moins %count% caractères'

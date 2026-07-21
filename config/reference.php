@@ -1375,6 +1375,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             reset_request?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_request.html.twig"
  *             reset_password?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password.html.twig"
  *             reset_password_code?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password_code.html.twig"
+ *             magic_login_request?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/magic_login_request.html.twig"
  *         },
  *         embed?: array{
  *             mode?: "disabled"|"dropdown"|Param, // disabled: full-page routes only. dropdown: embed login/register via auth_kit_dropdown(). // Default: "disabled"
@@ -1394,6 +1395,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             code_charset?: "numeric"|"alphanumeric"|Param, // Default: "numeric"
  *             token_field?: scalar|Param|null, // User entity property storing the hashed reset credential. // Default: "passwordResetToken"
  *             token_expires_field?: scalar|Param|null, // User entity property storing credential expiry. // Default: "passwordResetExpiresAt"
+ *         },
+ *         magic_login?: array{
+ *             mode?: "disabled"|"enabled"|Param, // disabled: hide magic login. enabled: request form + Symfony login_link check route. // Default: "disabled"
+ *             lifetime?: int|Param, // Seconds until the magic login link expires (Symfony login_link lifetime). // Default: 600
+ *             max_uses?: int|Param, // How many times the signed login link can be used (Symfony login_link max_uses). // Default: 1
  *         },
  *         routes?: array{
  *             login?: array{
@@ -1420,13 +1426,27 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 path?: scalar|Param|null, // Default: "/reset-password/complete"
  *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_reset_password_code"
  *             },
+ *             magic_login_request?: array{
+ *                 path?: scalar|Param|null, // Default: "/magic-login"
+ *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_magic_login_request"
+ *             },
+ *             magic_login_check?: array{
+ *                 path?: scalar|Param|null, // Default: "/magic-login/check"
+ *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_magic_login_check"
+ *             },
  *         },
  *         firewall?: scalar|Param|null, // Symfony firewall name where form_login should point (documented for security.yaml). // Default: "main"
  *         login_success_route?: scalar|Param|null, // Route name after successful login. Null uses firewall default_target_path. // Default: null
  *     }>,
- *     default_locale?: scalar|Param|null, // Default: "en"
+ *     locale?: array{ // Auth route localization. Prefer this node over legacy default_locale / enabled_locales / locale_in_path.
+ *         in_path?: "never"|"always"|"both"|Param, // never: /login only. always: /{_locale}/login only. both: register both (see unlocalized). // Default: "never"
+ *         default?: scalar|Param|null, // Default locale for prefixed routes and bare serve/redirect. // Default: "en"
+ *         enabled?: list<scalar|Param|null>,
+ *         unlocalized?: "serve"|"redirect"|Param, // When in_path=both: serve bare URLs with default locale, or redirect to /{default}/… // Default: "redirect"
+ *     },
+ *     default_locale?: scalar|Param|null, // Deprecated: use locale.default. // Default: "en"
  *     enabled_locales?: list<scalar|Param|null>,
- *     locale_in_path?: bool|Param, // Prefix login, register, logout and password reset routes with /{_locale}. // Default: false
+ *     locale_in_path?: mixed, // Deprecated: use locale.in_path (never|always|both). Bool true/false still accepted. // Default: false
  * }
  * @psalm-type NowoPasswordStrengthConfig = array{
  *     form_theme?: scalar|Param|null, // Base Symfony form layout (must match twig.form_themes in the app). // Default: "form_div_layout.html.twig"

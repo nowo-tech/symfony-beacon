@@ -19,9 +19,13 @@ make seed               # optional: demo user + project
 make seed-sample        # optional: PROFILE=dev samples
 ```
 
-Or open **`/setup` before login** when the database has no users yet — choose **Minimum** (platform + demo admin) or **Full sample load** (minimum + `load` telemetry), then sign in with `admin@symfony-beacon.local` / `admin123`. Alternatively register the first admin at `/en/register`.
+Or open the app with an empty database: HTML pages redirect to the locale-aware **setup** URL while menus, breadcrumbs, or cookie consent are missing (bare `/setup` for `DEFAULT_LOCALE`, e.g. `/setup` when default is `es`; other locales use `/en/setup`). On that page:
 
-Once users exist, only `ROLE_ADMIN` can reopen `/setup` (dashboard banner until marked complete).
+1. **Required** — install platform catalogs (menus, breadcrumbs, cookie consent profile).
+2. **Optional** — register the first admin via AuthKit (bare `/register` or `/en/register`), and/or run **Full sample load**.
+3. **Done** — mark setup complete, then sign in.
+
+Once users exist, only `ROLE_ADMIN` can reopen setup (dashboard banner until marked complete). Empty platform catalogs still force admins (and anonymous visitors) back to setup.
 
 After setup, signed-in users get a one-time **product tour** on the dashboard (and later on project Issues / Administration when those pages are first opened). Tours respect role and project permissions; finish or close to dismiss — replay from Account → Display.
 

@@ -41,4 +41,4 @@ There is **no** public read API for issues yet (Planned: `042-read-api-tokens`).
 
 ## Auth for Twig UI
 
-Session auth via AuthKit (`/en/login`, …). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped).
+Session auth via AuthKit (`/login`). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped).

@@ -1,11 +1,13 @@
 # nowo-tech/auth-kit-bundle — first-user bootstrap + i18n + remember me
 # https://github.com/nowo-tech/AuthKitBundle
+# Dual auth URLs: bare /login serves DEFAULT_LOCALE (unlocalized: serve); /{_locale}/login for other locales.
 nowo_auth_kit:
     default_profile: default
-    default_locale: en
-    enabled_locales: [en, es, de, nl, fr, it, pt]
-    # Prefix auth routes with /{_locale} (e.g. /en/login, /de/login)
-    locale_in_path: true
+    locale:
+        in_path: both
+        default: '%default_locale%'
+        enabled: '%fallback_locales%'
+        unlocalized: serve
     profiles:
         default:
             user_class: App\Identity\Entity\User
@@ -31,13 +33,24 @@ nowo_auth_kit:
                 level: medium
                 policy_mode: level
             password_reset:
-                mode: disabled
+                mode: enabled
+                delivery: link
+                token_ttl: 3600
+                token_field: passwordResetToken
+                token_expires_field: passwordResetExpiresAt
+            magic_login:
+                mode: enabled
+                lifetime: 600
+                max_uses: 1
             embed:
                 mode: disabled
             templates:
                 layout: '@NowoAuthKitBundle/layout.html.twig'
                 login: '@NowoAuthKitBundle/security/login.html.twig'
                 register: '@NowoAuthKitBundle/security/register.html.twig'
+                magic_login_request: '@NowoAuthKitBundle/security/magic_login_request.html.twig'
+                reset_request: '@NowoAuthKitBundle/security/reset_request.html.twig'
+                reset_password: '@NowoAuthKitBundle/security/reset_password.html.twig'
             routes:
                 login:
                     path: /login
@@ -48,3 +61,15 @@ nowo_auth_kit:
                 register:
                     path: /register
                     name: nowo_auth_kit_register
+                reset_request:
+                    path: /reset-password
+                    name: nowo_auth_kit_reset_password_request
+                reset_password:
+                    path: /reset-password/reset/{token}
+                    name: nowo_auth_kit_reset_password
+                magic_login_request:
+                    path: /login/magic
+                    name: nowo_auth_kit_magic_login_request
+                magic_login_check:
+                    path: /login/magic/check
+                    name: nowo_auth_kit_magic_login_check

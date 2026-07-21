@@ -2,16 +2,45 @@
 
 English guide for enabling a new locale in **symfony-beacon**. Documentation, specs, and PHPDoc stay English; this manual covers **user-facing** UI catalogues and config.
 
-Default and fallback locale is always **`en`**.
+Default UI locale is controlled by **`DEFAULT_LOCALE`** in `.env` (feeds `framework.default_locale`).
+
+| Source | Value | Purpose |
+|--------|--------|---------|
+| `.env.dist` | `en` | Template for fresh clones / upstream distribution |
+| This project's `.env` | `es` | Operator default for this Beacon instance |
+| PHPUnit (`phpunit.dist.xml`) | `en` | Stable CI matching `.env.dist` |
+
+Translator catalogue **fallbacks** remain `[en]` so missing keys still resolve to English.
 
 ## Current locales
 
 | Code | Notes |
 |------|--------|
-| `en` | Default / fallback |
-| `es`, `de`, `nl`, `fr`, `it`, `pt` | Enabled alongside English |
+| `en` | Shipped in `.env.dist`; translator fallback catalogues |
+| `es` | This project's default via local `.env` (`DEFAULT_LOCALE=es`) |
+| `de`, `nl`, `fr`, `it`, `pt` | Enabled alongside English/Spanish |
 
-AuthKit routes use the locale in the path (`/en/login`, `/de/login`, …). After sign-in, the app shell stores the preferred locale on the user account (`POST /account/locale/{locale}`) and does **not** keep `_locale` in the URL.
+Public surfaces:
+
+| Surface | Behaviour |
+|---------|-----------|
+| AuthKit (login/register/logout/reset/magic) | `locale.in_path: both` + `unlocalized: serve` — bare serves `DEFAULT_LOCALE`; other locales use `/{_locale}/…` |
+| Setup | Same bare-vs-prefixed rule via `LocalizedPublicPath`; prefixed **default** locale redirects to bare |
+| Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
+
+Guests change language via the path switcher (links to another `/{locale}/…`) or `GET|POST /locale/{locale}?redirect=…` (session `_locale` + localize public paths). After sign-in, the app shell stores the preferred locale on the user account (`POST /account/locale/{locale}`) and does **not** put `_locale` in dashboard URLs.
+
+## Default locale (`.env`)
+
+```env
+# Distribution template (.env.dist):
+DEFAULT_LOCALE=en
+
+# This project (local .env):
+DEFAULT_LOCALE=es
+```
+
+This feeds `framework.default_locale` (`config/packages/translation.yaml`) and is reused by AuthKit, cookie consent, breadcrumb kit, and dashboard menu via `%kernel.default_locale%`. The value **must** be one of `framework.enabled_locales`.
 
 ## Checklist (summary)
 
@@ -19,7 +48,7 @@ AuthKit routes use the locale in the path (`/en/login`, `/de/login`, …). After
 2. Enable the locale in **all** config lists below (keep them in sync).
 3. Add translation catalogues under `translations/`.
 4. Add `locale.{code}` labels in every `messages.*.yaml`.
-5. Extend security firewall path regexes and `account_locale_switch` route requirements.
+5. Extend security firewall path regexes and `account_locale_switch` / `guest_locale_switch` / bare-redirect + prefixed public route requirements.
 6. Extend menu / breadcrumb seeder translation maps (and re-seed).
 7. Smoke-test AuthKit + app shell + cookie consent; extend PHPUnit if needed.
 8. Update this doc’s “Current locales” table and `docs/CHANGELOG.md` when shipping.
@@ -32,15 +61,16 @@ Update **every** list so Twig, AuthKit, consent, menus, and breadcrumbs agree:
 
 | File | Key |
 |------|-----|
-| `config/packages/translation.yaml` | `framework.enabled_locales` |
-| `config/packages/nowo_auth_kit.yaml` | `nowo_auth_kit.enabled_locales` |
+| `.env` / `.env.dist` | `DEFAULT_LOCALE` → `framework.default_locale` |
+| `config/packages/translation.yaml` | `framework.enabled_locales` (+ `default_locale: '%env(DEFAULT_LOCALE)%'`) |
+| `config/packages/nowo_auth_kit.yaml` | `nowo_auth_kit.locale.enabled` (+ `locale.default` / `in_path: both`) |
 | `config/packages/nowo_cookie_consent.yaml` | `nowo_cookie_consent.enabled_locales` |
 | `config/packages/nowo_breadcrumb_kit.yaml` | `nowo_breadcrumb_kit.locales` |
 | `config/packages/nowo_dashboard_menu.yaml` | `nowo_dashboard_menu.locales` |
 
 Twig already exposes `enabled_locales: '%kernel.enabled_locales%'` (`config/packages/twig.yaml`). The locale switcher loops that global — no template change if the lists stay aligned.
 
-Leave `default_locale: en` and translator `fallbacks: [en]` unchanged unless you deliberately change the product default (not recommended).
+Change the instance default with `DEFAULT_LOCALE` in `.env` (must stay in `enabled_locales`). Keep `.env.dist` at `en` for distribution. Translator `fallbacks` remain `[en]` so missing keys still resolve to English catalogues.
 
 ---
 
@@ -83,14 +113,14 @@ The switcher renders `('locale.' ~ locale)|trans`.
 In `config/packages/security.yaml`, extend the public AuthKit regexes so the new code is allowed:
 
 ```yaml
-- path: ^/(en|es|de|nl|fr|it|pt|pl)/login
-- path: ^/(en|es|de|nl|fr|it|pt|pl)/register
-- path: ^/(en|es|de|nl|fr|it|pt|pl)/logout
+- path: ^/(en|es|de|nl|fr|it|pt|pl)/(login|register|logout)
+- path: ^/(login|register|logout)
+- path: ^/locale/
 ```
 
-(Replace `pl` with your locale; keep the full pipe-separated list.)
+(Replace `pl` with your locale; keep the full pipe-separated list. Include both bare and prefixed AuthKit paths.)
 
-Bare `/login`, `/register`, `/logout` still redirect to the **default** locale via `config/routes/auth_locale_redirects.yaml` (`_locale: en`) — no change required for adding languages.
+Also extend requirements on `GuestLocaleController` (`guest_locale_switch`), setup/legal route locale requirements, and `account_locale_switch`.
 
 ### Authenticated switcher
 
@@ -176,7 +206,8 @@ make qa
 
 - **English** remains the source of truth for docs, specs, PHPDoc, and the default UI catalogue.
 - Prefer **endonyms** in `locale.{code}` (e.g. `Deutsch`, `Español`, `Polski`).
-- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit path locale + account preference.
+- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + setup `LocalizedPublicPath` + guest session locale + account preference (no `_locale` on dashboard paths).
+- Prefer shipping complete `messages.{locale}.yaml` catalogues (key parity with English); translator `fallbacks: [en]` covers gaps only as a safety net.
 - Legal / cookie UX: when adding locales, translate consent catalogues and keep [`LEGAL-AND-COOKIES.md`](LEGAL-AND-COOKIES.md) operator placeholders in English for docs.
 
 ## Related files (quick index)
@@ -189,8 +220,12 @@ config/packages/nowo_breadcrumb_kit.yaml
 config/packages/nowo_dashboard_menu.yaml
 config/packages/security.yaml
 config/packages/twig.yaml
-config/routes/auth_locale_redirects.yaml
+src/Shared/Locale/LocalizedPublicPath.php
+src/Shared/Locale/BarePublicLocaleRedirectController.php
 src/Identity/Controller/AccountLocaleController.php
+src/Identity/Controller/GuestLocaleController.php
+src/Identity/EventSubscriber/UserPreferredLocaleSubscriber.php
+src/Identity/EventSubscriber/GuestSessionLocaleSubscriber.php
 src/Shared/Menu/DashboardMenuDemoSeeder.php
 src/Shared/Breadcrumb/BreadcrumbDemoSeeder.php
 templates/_locale_switcher.html.twig

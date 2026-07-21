@@ -16,7 +16,7 @@ Add read-only **`ProjectRole::Viewer`**, passwordless **magic login** via Symfon
 | Viewer rank | `viewer=0 < member=1 < admin=2 < owner=3` |
 | Triage gate | Issue POST + saved-view mutations require `ProjectRole::Member` (`canTriageIssues`) |
 | Groups | May assign viewer / member / admin (still never owner) |
-| Magic login | Symfony `login_link` (lifetime 10m, max_uses 1, cache for used links) + Mailer via encrypted instance settings (`034`); request UI at `/login/magic` |
+| Magic login | Symfony `login_link` (lifetime 10m, max_uses 1, cache for used links) + Mailer via encrypted instance settings (`034`); request UI at `/{_locale}/login/magic` (bare `/login/magic` → `DEFAULT_LOCALE`) |
 | Throttle | Dedicated rate limiter on magic-link request by client IP |
 | Share links | `project_share_link` entity; hashed token; session grant `_beacon_share_access`; no API secrets |
 | Audit | `UserActionType` magic/share cases |

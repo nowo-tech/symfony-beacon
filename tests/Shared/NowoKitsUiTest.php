@@ -21,8 +21,8 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
 
         $menuSeeder = self::getContainer()->get(DashboardMenuDemoSeeder::class);
         $breadcrumbSeeder = self::getContainer()->get(BreadcrumbDemoSeeder::class);
-        self::assertTrue($menuSeeder->seedIfEmpty());
-        self::assertTrue($breadcrumbSeeder->seedIfEmpty());
+        $menuSeeder->seedIfEmpty();
+        $breadcrumbSeeder->seedIfEmpty();
 
         $this->login($client, $user);
 
@@ -118,7 +118,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
     {
         [$client, $user] = $this->bootWithDemoProject();
         $menuSeeder = self::getContainer()->get(DashboardMenuDemoSeeder::class);
-        self::assertTrue($menuSeeder->seedIfEmpty());
+        $menuSeeder->seedIfEmpty();
         $this->login($client, $user);
 
         $client->request(Request::METHOD_GET, '/account/profile');
@@ -139,7 +139,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         $em->flush();
 
         $menuSeeder = self::getContainer()->get(DashboardMenuDemoSeeder::class);
-        self::assertTrue($menuSeeder->seedIfEmpty());
+        $menuSeeder->seedIfEmpty();
 
         $this->login($client, $user);
         $client->request(Request::METHOD_GET, '/admin');

@@ -59,6 +59,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\Column]
     private string $password = '';
 
+    /** Hashed AuthKit password-reset credential (nullable when no active reset). */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    /** Expiry for {@see $passwordResetToken}. */
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $passwordResetExpiresAt = null;
+
     /**
      * Transient plain password for forms (never persisted).
      * Validated against password history via {@see PasswordPolicy}.
@@ -234,6 +242,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): self
+    {
+        $this->passwordResetToken = $passwordResetToken;
+
+        return $this;
+    }
+
+    public function getPasswordResetExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->passwordResetExpiresAt;
+    }
+
+    public function setPasswordResetExpiresAt(?DateTimeImmutable $passwordResetExpiresAt): self
+    {
+        $this->passwordResetExpiresAt = $passwordResetExpiresAt;
 
         return $this;
     }

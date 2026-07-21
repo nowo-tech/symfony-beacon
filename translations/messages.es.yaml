@@ -76,6 +76,9 @@ auth:
         back_to_password: Entrar con contraseña
         email_subject: Tu enlace mágico de Beacon
         email_body: "Abre este enlace para entrar (caduca %expires%):\n\n%link%"
+    reset:
+        email_subject: Restablece tu contraseña de Beacon
+        email_body: "Usa este enlace para elegir una contraseña nueva:\n\n%link%\n"
     tagline: Seguimiento de errores self-hosted para PHP y Symfony.
     brand_eyebrow: Seguimiento de errores
     bootstrap_eyebrow: Arranque
@@ -120,6 +123,8 @@ flash:
         sample_unavailable: Guarda un DSN de Mailer cifrado y usable antes de enviar una muestra.
         sample_invalid_recipient: Introduce una dirección de destinatario válida.
         sample_failed: No se pudo enviar el correo de muestra. Revisa el DSN de Mailer y los logs.
+    mercure:
+        saved: Ajustes de Mercure guardados.
     preferences:
         saved: Preferencias guardadas.
         profile_saved: Perfil guardado.
@@ -580,6 +585,41 @@ mailer_settings:
 
             Si lo has recibido, el DSN cifrado de Mailer puede entregar emails de magic login.
             Remitente: %from%
+mercure_settings:
+    title: Mercure
+    intro: Alertas en vivo opcionales para miembros conectados cuando se crea una incidencia nueva. Desactivado por defecto — actívalo solo si hay un hub Mercure disponible. El Web Push sigue siendo una opción aparte en Cuenta → Interfaz.
+    manual_hint: 'Manual del operador (hub, secreto JWT, Compose, resolución de problemas): docs/MERCURE.md en el repositorio.'
+    status:
+        active: Las alertas Mercure en vivo están activadas para los miembros.
+        inactive: Mercure está desactivado
+        inactive_help: Los miembros no abrirán un EventSource hasta que actives Mercure aquí y proporciones una URL de hub alcanzable + secreto JWT (guardados abajo o vía entorno).
+        url_database: La URL de publicación del hub se guarda en los ajustes de instancia.
+        url_env: La URL de publicación del hub usa MERCURE_URL del entorno como respaldo.
+        url_missing: No hay URL de publicación del hub configurada (indícala abajo o MERCURE_URL).
+        secret_database: El secreto JWT se guarda cifrado en los ajustes de instancia.
+        secret_env: El secreto JWT usa MERCURE_JWT_SECRET del entorno como respaldo.
+        secret_missing: No hay secreto JWT configurado (indícalo abajo o MERCURE_JWT_SECRET).
+    public_url_preview: 'URL del hub en el navegador: %url%'
+    push_note: El push PWA en segundo plano se configura por usuario en Cuenta → Interfaz (requiere claves VAPID_*). No depende de Mercure.
+    submit: Guardar ajustes de Mercure
+instance_mercure:
+    enabled:
+        label: Activar alertas Mercure en vivo
+        help: Si está activo, los miembros conectados se suscriben a topics privados del proyecto para toasts de incidencias nuevas mientras la app está abierta.
+    url:
+        label: URL de publicación (servidor)
+        help: Déjalo vacío para usar MERCURE_URL (p. ej. http://mercure/.well-known/mercure dentro de Compose).
+    public_url:
+        label: URL pública (navegador)
+        help: Déjalo vacío para usar MERCURE_PUBLIC_URL (normalmente same-origin /.well-known/mercure vía Caddy).
+    jwt_secret:
+        label: Secreto JWT
+        help: Déjalo vacío para conservar el valor cifrado actual o usar MERCURE_JWT_SECRET. Mínimo 32 caracteres al establecerlo.
+        too_short: El secreto JWT debe tener al menos 32 caracteres.
+        invalid: Introduce una cadena de secreto JWT válida.
+    clear_secret:
+        label: Borrar secreto JWT guardado
+        help: Elimina el secreto de la base de datos y vuelve a MERCURE_JWT_SECRET hasta que guardes uno nuevo.
 instance_mailer:
     mailer_dsn:
         label: DSN de Mailer
@@ -720,6 +760,11 @@ users:
             'event.opened': Evento abierto
             'performance.opened': Rendimiento abierto
             'analytics.opened': Analítica abierta
+            'auth.magic_login_requested': Magic login solicitado
+            'auth.magic_login_consumed': Magic login usado
+            'project.share_link_created': Enlace para compartir creado
+            'project.share_link_revoked': Enlace para compartir revocado
+            'project.share_link_opened': Enlace para compartir abierto
         context:
             email: Email
             role: Rol
@@ -1033,7 +1078,8 @@ setup:
     eyebrow: Primer arranque
     title: Configuración de la instancia
     intro: Instala catálogos de navegación y datos demo opcionales. Son los mismos pasos que las capas CLI de seed.
-    intro_bootstrap: Esta instancia aún no tiene usuarios. Elige un arranque en un clic y entra con el admin demo — o registra tu propio primer administrador.
+    intro_required: Faltan los catálogos de navegación. Instala menús, breadcrumbs y el perfil de consentimiento de cookies antes de continuar.
+    intro_bootstrap: Los catálogos de plataforma están listos. Registra el primer admin, opcionalmente carga telemetría de muestra y marca el setup como completo.
     already_done: La configuración ya está marcada como completa.
     back_dashboard: Volver al panel
     login_setup_link: Configuración inicial
@@ -1044,23 +1090,27 @@ setup:
         title: Termina la configuración
         body: Instala menús/breadcrumbs y muestras demo opcionales para esta instancia Beacon.
         cta: Abrir configuración
-    preset_minimum:
-        title: Configuración mínima
-        body: Catálogos de navegación, consentimiento de cookies y la cuenta admin demo local. Sin telemetría de muestra.
-        item_platform: Menús, breadcrumbs y perfil de consentimiento de cookies
-        item_demo: 'Admin demo %email% / %password% y proyecto demo con API key'
-        cta: Instalar mínimo
-    preset_bulk:
-        title: Carga completa de muestras
-        body: Todo lo del mínimo, más un conjunto mayor de telemetría de muestra para QA local.
-        item_minimum: Catálogos de plataforma y admin / proyecto demo
-        item_sample: Issues y gráficos de muestra (perfil load)
-        cta: Instalar con datos de muestra
-        note: Puede tardar un minuto. Los datasets huge siguen solo por CLI (`app:seed-sample --size=huge --force`).
     step_platform:
-        title: Navegación de plataforma
-        body: Actualiza menús, breadcrumbs y el perfil/inventario de consentimiento de cookies (seguro repetirlo tras upgrades).
-        cta: Instalar navegación
+        title: Obligatorio — catálogos de plataforma
+        body: Instala menús del dashboard, breadcrumbs y el perfil/inventario de consentimiento de cookies. Este paso es obligatorio para que el resto de la app funcione.
+        item_menus: Menús (dashboard, preferences, administration)
+        item_breadcrumbs: Colección de breadcrumbs (default)
+        item_cookies: Perfil de consentimiento de cookies
+        cta: Instalar menús, breadcrumbs y cookies
+        cta_again: Volver a ejecutar el seed de plataforma
+        done: Los catálogos de plataforma están instalados.
+    step_options:
+        title: Pasos opcionales
+        body: Crea la primera cuenta admin y/o carga un dataset de muestra completo. Puedes omitir cualquiera.
+        locked: Termina primero la instalación obligatoria de plataforma.
+        register_title: Crear primer usuario
+        register_body: Registra tu propio admin con AuthKit (registro solo del primer usuario).
+        register_cta: Registrar primer admin
+        register_done: Ya existe al menos un usuario.
+        sample_title: Carga completa de muestras
+        sample_body: Crea el proyecto demo si hace falta y carga el dataset de telemetría mayor (perfil load).
+        sample_cta: Instalar carga completa de muestras
+        sample_note: Puede tardar un minuto. Los datasets huge siguen solo por CLI (`app:seed-sample --size=huge --force`). Si aún no hay usuario, puede crearse un admin demo local como dueño del proyecto demo.
     step_demo:
         title: Proyecto demo
         body: Crea el admin demo (si falta) y el proyecto demo con API key.
@@ -1079,13 +1129,13 @@ setup:
     cli_hint: 'Equivalente CLI: make bootstrap && make seed && make seed-sample — docs/INSTALL.md'
     flash:
         platform_ok: Catálogos de navegación y consentimiento de cookies actualizados.
+        platform_required: Instala primero menús, breadcrumbs y consentimiento de cookies.
         demo_ok: Usuario / proyecto demo listos.
         demo_exists: El usuario y proyecto demo ya existen.
         sample_ok: Telemetría de muestra cargada. Las alertas Mercure en vivo se activaron con los valores de entorno cuando hacía falta.
+        sample_demo_user: 'Se creó el admin demo local admin@symfony-beacon.local / admin123 como dueño del proyecto demo.'
         complete: Configuración marcada como completa.
-        minimum_ok: Configuración mínima instalada (plataforma + demo).
-        bulk_ok: Carga completa instalada (plataforma + demo + telemetría load).
-        bootstrap_ready: 'Configuración lista. Entra con admin@symfony-beacon.local / admin123'
+        bootstrap_ready: Configuración lista. Inicia sesión o registra el primer admin para continuar.
         unknown_action: Acción de setup desconocida.
         failed: Falló la acción de setup.
 

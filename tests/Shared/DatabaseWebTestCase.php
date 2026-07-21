@@ -8,6 +8,9 @@ use App\Identity\Entity\User;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
+use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
+use App\Shared\CookieConsent\CookieConsentDemoSeeder;
+use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -119,6 +122,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
     protected function bootWithDemoProject(string $email = 'user@example.com', string $password = 'secret'): array
     {
         $client = static::createClient();
+        $this->seedPlatformCatalogs();
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
 
@@ -145,6 +149,16 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $em->flush();
 
         return [$client, $user, $project, $apiKey];
+    }
+
+    /**
+     * Install menus / breadcrumbs / cookie consent so admin HTML is not forced to /setup.
+     */
+    protected function seedPlatformCatalogs(): void
+    {
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(CookieConsentDemoSeeder::class)->seedIfEmpty();
     }
 
     protected function login(KernelBrowser $client, User $user): void

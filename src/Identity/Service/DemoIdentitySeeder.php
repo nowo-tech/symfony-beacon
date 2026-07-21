@@ -84,4 +84,59 @@ final readonly class DemoIdentitySeeder
             'user' => $user,
         ];
     }
+
+    /**
+     * Ensure the demo project exists for sample telemetry.
+     *
+     * When an owner is provided (or any admin already exists), the project is
+     * attached to that user. Otherwise falls back to {@see seed()} (creates the
+     * local demo admin) so sample load can run before AuthKit registration.
+     *
+     * @return array{user_created: bool, project_created: bool, project: Project}
+     */
+    public function ensureDemoProject(?User $owner = null): array
+    {
+        $existing = $this->projectRepository->findOneBy(['slug' => 'demo']);
+        if ($existing instanceof Project) {
+            return [
+                'user_created' => false,
+                'project_created' => false,
+                'project' => $existing,
+            ];
+        }
+
+        if (!$owner instanceof User) {
+            $owner = $this->userRepository->findOneBy([]);
+        }
+
+        if (!$owner instanceof User) {
+            $result = $this->seed();
+
+            return [
+                'user_created' => $result['user_created'],
+                'project_created' => $result['project_created'],
+                'project' => $result['project'],
+            ];
+        }
+
+        $project = new Project();
+        $project->setName('Demo');
+        $project->setSlug('demo');
+        $project->setDescription('Demo project for local ingest');
+
+        $membership = new ProjectMembership();
+        $membership->setUser($owner);
+        $membership->setRole(ProjectRole::Owner);
+        $project->addMembership($membership);
+
+        $apiKey = ProjectApiKey::generate($project, 'Demo key', SeedDemoCommand::DEMO_PUBLIC_KEY);
+        $project->addApiKey($apiKey);
+        $this->projectRepository->save($project);
+
+        return [
+            'user_created' => false,
+            'project_created' => true,
+            'project' => $project,
+        ];
+    }
 }

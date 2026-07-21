@@ -14,7 +14,9 @@ final class DashboardAccessTest extends DatabaseWebTestCase
     public function testLoginPageIsPublic(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/en/login');
+        $client->request(Request::METHOD_GET, '/login');
+        self::assertResponseRedirects('/en/login');
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'symfony-beacon');
     }

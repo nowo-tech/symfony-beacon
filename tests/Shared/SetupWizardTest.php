@@ -5,12 +5,52 @@ declare(strict_types=1);
 namespace App\Tests\Shared;
 
 use App\Identity\Repository\UserRepository;
+use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
+use App\Shared\CookieConsent\CookieConsentDemoSeeder;
+use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Settings\Service\PlatformBootstrapState;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class SetupWizardTest extends DatabaseWebTestCase
 {
+    public function testBareSetupServesDefaultLocale(): void
+    {
+        $client = static::createClient();
+
+        $client->request(Request::METHOD_GET, '/setup');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Instance setup');
+    }
+
+    public function testDefaultLocalePrefixedSetupRedirectsToBare(): void
+    {
+        $client = static::createClient();
+
+        $client->request(Request::METHOD_GET, '/en/setup');
+        self::assertResponseRedirects('/setup');
+    }
+
+    public function testHomeRedirectsToSetupWhenPlatformEmpty(): void
+    {
+        $client = static::createClient();
+
+        $client->request(Request::METHOD_GET, '/');
+        self::assertResponseRedirects('/setup');
+    }
+
+    public function testLoginAndHealthDoNotRedirectWhenPlatformEmpty(): void
+    {
+        $client = static::createClient();
+
+        $client->request(Request::METHOD_GET, '/en/login');
+        self::assertResponseIsSuccessful();
+
+        $client->request(Request::METHOD_GET, '/health/live');
+        self::assertResponseIsSuccessful();
+    }
+
     public function testAnonymousCanOpenBootstrapWhenNoUsers(): void
     {
         $client = static::createClient();
@@ -18,32 +58,57 @@ final class SetupWizardTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/setup');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Instance setup');
-        self::assertSelectorExists('input[name="action"][value="minimum"]');
-        self::assertSelectorExists('input[name="action"][value="bulk"]');
-        self::assertSelectorNotExists('input[name="action"][value="platform"]');
+        self::assertSelectorExists('input[name="action"][value="platform"]');
+        self::assertSelectorNotExists('input[name="action"][value="minimum"]');
+        self::assertSelectorNotExists('input[name="action"][value="bulk"]');
+        self::assertSelectorNotExists('a[href="/en/register"]');
+        self::assertSelectorExists('[data-theme-toggle]');
+        self::assertSelectorExists('.locale-switcher');
     }
 
-    public function testAnonymousMinimumBootstrapCreatesDemoAndRedirectsToLogin(): void
+    public function testSetupLocaleInPathSwitchesLanguage(): void
+    {
+        $client = static::createClient();
+
+        $client->request(Request::METHOD_GET, '/es/setup');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Configuración de la instancia');
+        self::assertSelectorExists('a[href="/setup"]');
+    }
+
+    public function testAnonymousPlatformInstallUnlocksRegisterLink(): void
     {
         $client = static::createClient();
 
         $crawler = $client->request(Request::METHOD_GET, '/setup');
-        $client->submit($crawler->filter('input[name="action"][value="minimum"]')->closest('form')->form());
-        self::assertResponseRedirects();
-        $location = (string) $client->getResponse()->headers->get('Location');
-        self::assertStringContainsString('/login', $location);
+        $client->submit($crawler->filter('input[name="action"][value="platform"]')->closest('form')->form());
+        self::assertResponseRedirects('/setup');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
 
-        $user = self::getContainer()->get(UserRepository::class)->findOneByEmail('admin@symfony-beacon.local');
-        self::assertNotNull($user);
-        self::assertContains('ROLE_ADMIN', $user->getRoles());
+        self::assertFalse(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
+        self::assertSelectorExists('a[href="/en/register"]');
+        self::assertSelectorExists('input[name="action"][value="sample_load"]');
+        self::assertSelectorExists('input[name="action"][value="complete"]');
+
+        self::assertSame(0, self::getContainer()->get(UserRepository::class)->count([]));
+    }
+
+    public function testAnonymousCompleteRedirectsToLogin(): void
+    {
+        $client = static::createClient();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(CookieConsentDemoSeeder::class)->seedIfEmpty();
+
+        $crawler = $client->request(Request::METHOD_GET, '/setup');
+        $client->submit($crawler->filter('input[name="action"][value="complete"]')->closest('form')->form());
+        self::assertResponseRedirects();
+        $location = (string) $client->getResponse()->headers->get('Location');
+        self::assertStringContainsString('/login', $location);
 
         $reloaded = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertTrue($reloaded->isSetupCompleted());
-
-        $client->request(Request::METHOD_GET, '/setup');
-        self::assertResponseRedirects();
     }
 
     public function testLoginShowsSetupLinkWhenBootstrapOpen(): void
@@ -87,8 +152,7 @@ final class SetupWizardTest extends DatabaseWebTestCase
         self::assertSelectorExists('.flash-success, .flash');
 
         $client->submit($client->getCrawler()->filter('input[name="action"][value="complete"]')->closest('form')->form());
-        self::assertResponseRedirects('/setup');
-        $client->followRedirect();
+        self::assertResponseRedirects('/dashboard');
 
         $reloaded = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertTrue($reloaded->isSetupCompleted());

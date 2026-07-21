@@ -1,0 +1,30 @@
+{% extends layout_template %}
+
+{% form_theme magic_login_form with [
+    'form/auth_kit_theme.html.twig'
+] %}
+
+{% block title %}{{ 'auth.magic.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="fade-up mb-8 text-center">
+    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">{{ site_appearance.brandEyebrow }}</p>
+    {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
+    <p class="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-[var(--color-ink)]/65">
+        {{ 'auth.magic.intro'|trans }}
+    </p>
+</div>
+
+<div class="fade-up-delay panel shadow-md">
+    <h2 class="mb-4 text-lg font-semibold text-[var(--color-ink)]">{{ 'auth.magic.title'|trans }}</h2>
+
+    {{ form_start(magic_login_form, {attr: {class: 'space-y-4'}}) }}
+        {{ form_row(magic_login_form.identifier) }}
+        <button type="submit" class="btn-primary w-full">{{ 'auth.magic.submit'|trans }}</button>
+    {{ form_end(magic_login_form) }}
+
+    <p class="mt-5 text-center text-sm text-[var(--color-ink)]/60">
+        <a href="{{ path(login_route, auth_kit_route_params()) }}" class="no-underline">{{ 'auth.magic.back_to_password'|trans }}</a>
+    </p>
+</div>
+{% endblock %}

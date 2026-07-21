@@ -15,7 +15,7 @@ There is no separate `src/Hardening` module—behaviour lives in Shared/Identity
 - Production image target `frankenphp_prod` and guidance in `docs/PRODUCTION.md`.
 - Secrets: version `.env.dist` only; never commit `.env`. Halite keys / encrypted Doctrine fields for API secrets and webhook URLs (`nowo-tech/doctrine-encrypt-bundle`).
 - CSRF on forms and on non-form mutating POSTs (e.g. **create API key**).
-- Cookie consent + legal/privacy/terms pages (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`).
+- Cookie consent + legal/privacy/terms pages at `/{_locale}/legal/…` (bare `/legal/…` redirects to `DEFAULT_LOCALE`; `docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`).
 - Login throttling with **database** storage shared across FrankenPHP workers / multi-pod (`login_attempts`, see `012-safe-self-hosting`).
 - UserKit `invalidate_sessions_on_disable: true`.
 - Outbound notification URL SSRF guard (private / link-local / metadata blocked in production).
@@ -32,7 +32,7 @@ There is no separate `src/Hardening` module—behaviour lives in Shared/Identity
 - **FR-001**: Document how to run the production image and configure secrets.
 - **FR-002**: Mutating UI actions MUST use CSRF tokens (including project API key create).
 - **FR-003**: When non-essential cookies or third-party scripts appear, cookie consent UX MUST be available.
-- **FR-004**: Legal notice / privacy / terms pages remain reachable for operators to customize.
+- **FR-004**: Legal notice / privacy / terms / cookies pages remain reachable (locale-prefixed and bare→`DEFAULT_LOCALE`) for operators to customize.
 - **FR-005**: Notification HTTP destinations MUST NOT target private, reserved, or cloud-metadata addresses unless explicitly allowed (`BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS` / `when@dev|test`).
 - **FR-006**: Disabling a user account MUST invalidate sessions.
 - **FR-007**: Login attempt counters MUST be shared across processes in default production config (database storage).

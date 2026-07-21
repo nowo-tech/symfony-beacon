@@ -13,11 +13,18 @@ final class LegalAndCookieConsentTest extends WebTestCase
     {
         $client = self::createClient();
 
-        foreach (['/legal/notice', '/legal/privacy', '/legal/terms', '/legal/cookies'] as $path) {
+        foreach (['/en/legal/notice', '/en/legal/privacy', '/en/legal/terms', '/en/legal/cookies'] as $path) {
             $client->request(Request::METHOD_GET, $path);
             self::assertResponseIsSuccessful($path);
             self::assertSelectorExists('footer.site-legal-footer', $path);
         }
+    }
+
+    public function testBareLegalRedirectsToDefaultLocale(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/legal/privacy');
+        self::assertResponseRedirects('/en/legal/privacy');
     }
 
     public function testCookieConsentModalEndpointIsPublic(): void
@@ -34,7 +41,7 @@ final class LegalAndCookieConsentTest extends WebTestCase
         self::assertResponseIsSuccessful();
         $content = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('data-nowo-open-consent', $content);
-        self::assertStringContainsString('/legal/privacy', $content);
+        self::assertStringContainsString('/en/legal/privacy', $content);
         self::assertStringContainsString('nowo-consent-modal', $content);
         self::assertStringContainsString('nowo-cookie-consent__preferences-bubble', $content);
     }
@@ -57,9 +64,7 @@ final class LegalAndCookieConsentTest extends WebTestCase
     public function testDashboardDoesNotEmbedCookiePreferencesBubble(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/en/login');
-        // Unauthenticated dashboard redirects; legal page uses base layout without bubble.
-        $client->request(Request::METHOD_GET, '/legal/cookies');
+        $client->request(Request::METHOD_GET, '/en/legal/cookies');
         self::assertResponseIsSuccessful();
         $content = $client->getResponse()->getContent() ?: '';
         self::assertStringNotContainsString('nowo-cookie-consent__preferences-bubble', $content);
