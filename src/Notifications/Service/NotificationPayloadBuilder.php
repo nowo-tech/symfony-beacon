@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Notifications\Entity\ProjectThresholdRule;
+use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
@@ -212,21 +213,49 @@ final readonly class NotificationPayloadBuilder
     }
 
     /**
+     * Sample payload for Send test — shaped like a real issue alert so each channel
+     * formatter can render a representative third-party message.
+     *
      * @return array<string, mixed>
      */
-    public function forTest(Project $project, string $destinationLabel): array
+    public function forTest(Project $project, string $destinationLabel, ?NotificationDestinationType $type = null): array
     {
+        $channel = $type instanceof NotificationDestinationType ? $type->value : 'http';
+        $channelLabel = match ($type) {
+            NotificationDestinationType::Slack => 'Slack',
+            NotificationDestinationType::Discord => 'Discord',
+            NotificationDestinationType::Teams => 'Microsoft Teams',
+            NotificationDestinationType::Telegram => 'Telegram',
+            NotificationDestinationType::Email => 'Email',
+            NotificationDestinationType::Http => 'HTTP webhook',
+            null => 'destination',
+        };
+
         return [
             'event' => 'test',
-            'summary' => \sprintf('Test notification from %s (%s)', $project->getName(), $destinationLabel),
+            'summary' => \sprintf(
+                '[TEST] %s sample from %s (%s)',
+                $channelLabel,
+                $project->getName(),
+                $destinationLabel,
+            ),
             'project' => [
                 'id' => $project->getId() ?? 0,
                 'uuid' => $project->getUuid(),
                 'name' => $project->getName(),
                 'slug' => $project->getSlug(),
             ],
+            'issue' => [
+                'id' => 0,
+                'uuid' => '00000000-0000-4000-8000-000000000001',
+                'title' => 'Sample exception for notification test',
+                'level' => 'error',
+                'status' => 'unresolved',
+                'culprit' => 'App\\Example\\SampleController::index',
+            ],
             'url' => $this->absoluteUrl('project_settings', ['id' => $project->getUuid()]),
             'category' => 'test',
+            'channel' => $channel,
             'test' => true,
         ];
     }

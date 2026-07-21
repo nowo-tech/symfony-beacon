@@ -23,6 +23,7 @@ use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectOpsStatsService;
 use App\Shared\Health\MessengerQueueHealth;
+use App\Shared\Http\SafeInternalRedirect;
 use App\Shared\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -228,12 +229,9 @@ final class AdminProjectController extends AbstractController
         $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsStarted, $actor, $actor, $context);
         $this->addFlash('success', 'flash.admin_projects.view_as_enabled');
 
-        $redirect = $request->request->getString('redirect');
-        if ('' !== $redirect && str_starts_with($redirect, '/')) {
-            return $this->redirect($redirect);
-        }
+        $fallback = $this->generateUrl('admin_projects');
 
-        return $this->redirectToRoute('admin_projects');
+        return $this->redirect(SafeInternalRedirect::resolve($request, $request->request->getString('redirect'), $fallback));
     }
 
     /** Exit view-as-member mode. */
@@ -250,12 +248,9 @@ final class AdminProjectController extends AbstractController
         $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsEnded, $actor, $actor, []);
         $this->addFlash('success', 'flash.admin_projects.view_as_disabled');
 
-        $redirect = $request->request->getString('redirect');
-        if ('' !== $redirect && str_starts_with($redirect, '/')) {
-            return $this->redirect($redirect);
-        }
+        $fallback = $this->generateUrl('admin_projects');
 
-        return $this->redirectToRoute('admin_projects');
+        return $this->redirect(SafeInternalRedirect::resolve($request, $request->request->getString('redirect'), $fallback));
     }
 
     /** Update project name and description. */

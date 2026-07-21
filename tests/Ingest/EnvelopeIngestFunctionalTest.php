@@ -203,4 +203,35 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertSame(1, $txs[0]->getNPlusOneCount());
         self::assertSame(6, $txs[0]->getSpanCount());
     }
+
+    public function testQueryAuthStillWorksWithDeprecationHeaders(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject('query-auth@example.com');
+
+        $eventId = bin2hex(random_bytes(16));
+        $body = implode("\n", [
+            json_encode(['event_id' => $eventId], \JSON_THROW_ON_ERROR),
+            json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR),
+            json_encode([
+                'event_id' => $eventId,
+                'message' => 'Query auth event',
+                'level' => 'error',
+                'platform' => 'php',
+            ], \JSON_THROW_ON_ERROR),
+        ]);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/?beacon_key='.rawurlencode($apiKey->getPublicKey())
+                .'&beacon_secret='.rawurlencode((string) $apiKey->getSecretKey()),
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/x-beacon-envelope'],
+            $body,
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('true', $client->getResponse()->headers->get('Deprecation'));
+        self::assertStringContainsString('deprecated', (string) $client->getResponse()->headers->get('Warning'));
+    }
 }

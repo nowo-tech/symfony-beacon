@@ -1197,71 +1197,236 @@ textarea.input {
   }
 }
 
+/* Password toggle (PasswordToggleBundle) — Bootstrap input-group without Bootstrap CSS */
+.input-group.form-password-toggle {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.input-group.form-password-toggle > input.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group.form-password-toggle > .input-group-text {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-sand);
+  border-left: 0;
+  border-radius: 0 0.375rem 0.375rem 0;
+  background: var(--color-surface);
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.input-group.form-password-toggle > .input-group-text:hover {
+  background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface));
+  color: var(--color-ink);
+}
+
+.input-group.form-password-toggle > input.input:focus {
+  position: relative;
+  z-index: 1;
+}
+
+.input-group.form-password-toggle > input.input:focus + .input-group-text {
+  border-color: var(--color-moss);
+}
+
 /* nowo-tech/password-strength-bundle generator (account security + AuthKit) */
+.password-strength-input-row {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.password-strength-input-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.password-strength-input-row--toggle .input-group {
+  width: 100%;
+}
+
 .password-strength-generate-btn {
-  border-color: var(--color-sand) !important;
+  @include beacon-btn-base;
+  flex: 0 0 auto;
+  align-self: stretch;
+  white-space: nowrap;
+  font-weight: 500;
+  min-height: 2.75rem;
+  padding-inline: 0.85rem;
+  border: 1px solid var(--color-sand) !important;
   background: var(--color-surface) !important;
   color: var(--color-ink) !important;
-  border-radius: 0.375rem;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  box-shadow: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .password-strength-generate-btn:hover,
 .password-strength-generate-btn:focus-visible {
-  border-color: var(--color-moss) !important;
+  border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand)) !important;
   background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface)) !important;
+  color: var(--color-ink) !important;
   outline: none;
 }
 
+.password-strength-generate-btn:focus-visible {
+  outline: 2px solid var(--color-moss);
+  outline-offset: 2px;
+}
+
+@media (max-width: 40rem) {
+  .password-strength-input-row {
+    flex-wrap: wrap;
+  }
+
+  .password-strength-generate-btn {
+    width: 100%;
+  }
+}
+
 .password-strength-modal-overlay {
-  background: color-mix(in srgb, var(--color-ink) 45%, transparent) !important;
-  backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--color-ink) 55%, transparent) !important;
+  backdrop-filter: blur(6px);
+  padding: 1rem !important;
 }
 
 .password-strength-modal {
   background: var(--color-paper) !important;
   color: var(--color-ink) !important;
-  border: 1px solid var(--color-sand);
-  border-radius: 0.5rem;
+  border: 1px solid var(--color-sand) !important;
+  border-radius: 0.75rem !important;
+  max-width: 28rem !important;
+  width: min(100%, 28rem) !important;
+  padding: 1.25rem 1.25rem 1rem !important;
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--color-ink) 8%, transparent),
-    0 16px 40px color-mix(in srgb, var(--color-ink) 18%, transparent);
+    0 20px 48px color-mix(in srgb, var(--color-ink) 28%, transparent) !important;
+}
+
+.password-strength-modal h2 {
+  margin: 0 0 0.35rem !important;
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: 1.25rem !important;
+  font-weight: 700;
+  color: var(--color-ink) !important;
 }
 
 .password-strength-modal-hint {
+  margin: 0 0 1rem !important;
   color: color-mix(in srgb, var(--color-ink) 65%, transparent) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.45;
+}
+
+.password-strength-modal-list {
+  list-style: none !important;
+  margin: 0 0 0.75rem !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.password-strength-modal-item {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 0.5rem !important;
+  margin: 0 !important;
+  padding: 0.75rem !important;
+  border: 1px solid var(--color-sand) !important;
+  border-radius: 0.5rem !important;
+  background: var(--color-surface) !important;
 }
 
 .password-strength-modal-item code {
-  background: var(--color-surface);
-  border: 1px solid var(--color-sand);
-  border-radius: 0.3rem;
-  color: var(--color-ink);
-  padding: 0.35rem 0.5rem;
-}
-
-.password-strength-modal-item button {
+  flex: 1 1 100% !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.65rem 0.75rem !important;
+  word-break: break-all !important;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.4;
+  background: var(--color-paper) !important;
+  color: var(--color-ink) !important;
+  border: 1px solid var(--color-sand) !important;
   border-radius: 0.375rem !important;
 }
 
+.password-strength-modal-item button {
+  @include beacon-btn-base;
+  flex: 1 1 calc(50% - 0.25rem);
+  min-width: 7rem;
+  border-radius: 0.375rem !important;
+  font-size: 0.8125rem !important;
+  padding: 0.45rem 0.75rem !important;
+}
+
 .password-strength-modal-item button.bg-blue-600,
-.password-strength-modal-item .password-strength-btn--primary {
+.password-strength-modal-item button.bg-blue-600.text-white,
+.password-strength-modal-item .password-strength-btn--primary,
+.password-strength-modal-item button:last-of-type {
   background: var(--color-moss) !important;
-  color: var(--color-paper) !important;
-  border: 0 !important;
+  color: #0c1210 !important;
+  border: 1px solid var(--color-moss) !important;
+  font-weight: 600;
 }
 
 .password-strength-modal-item button.bg-blue-600:hover,
-.password-strength-modal-item .password-strength-btn--primary:hover {
-  filter: brightness(1.05);
+.password-strength-modal-item .password-strength-btn--primary:hover,
+.password-strength-modal-item button:last-of-type:hover {
+  filter: brightness(1.06);
 }
 
 .password-strength-modal-item button.bg-white,
 .password-strength-modal-item .password-strength-btn--secondary,
-.password-strength-modal-actions button {
-  background: var(--color-surface) !important;
+.password-strength-modal-item button:first-of-type {
+  background: transparent !important;
   color: var(--color-ink) !important;
   border: 1px solid var(--color-sand) !important;
+  font-weight: 500;
+}
+
+.password-strength-modal-item button.bg-white:hover,
+.password-strength-modal-item .password-strength-btn--secondary:hover,
+.password-strength-modal-item button:first-of-type:hover {
+  background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface)) !important;
+  border-color: color-mix(in srgb, var(--color-moss) 35%, var(--color-sand)) !important;
+}
+
+.password-strength-modal-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+  margin-top: 0.25rem !important;
+  padding-top: 0.75rem !important;
+  border-top: 1px solid var(--color-sand);
+}
+
+.password-strength-modal-actions button {
+  @include beacon-btn-base;
+  font-weight: 500;
+  background: transparent !important;
+  color: var(--color-ink) !important;
+  border: 1px solid var(--color-sand) !important;
+}
+
+.password-strength-modal-actions button:hover {
+  background: var(--color-surface) !important;
 }
 
 .password-strength-requirement--met {

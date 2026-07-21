@@ -146,16 +146,16 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | Severity | Finding (summary) | Spec | Status |
 |----------|-------------------|------|--------|
-| **High** | **Webhook SSRF via redirects**: `OutboundUrlGuard` checks the initial URL; HttpClient still follows redirects → 302 to RFC1918/metadata | `045-webhook-ssrf-redirects` | **Next** |
-| **High** | **Share link issue scope not enforced**: session stores `issue` but `hasActiveShareGrant()` grants project-wide viewer | `046-share-link-issue-scope` | **Next** |
-| **High** | **Open redirect** on admin view-as-member (`redirect` accepts `//evil.com`; locale switch already rejects `//`) | `047-admin-safe-redirect` | **Next** |
-| **High** | **Encrypt key not durable in prod Compose**: `var/secrets` / Halite key not volume-mounted; container recreate loses decrypt ability | `048-prod-encrypt-key` | **Next** |
-| Medium | Deprecate / warn on ingest auth via **query string** (`beacon_secret` → proxy/access logs, Referer) | `049-deprecate-query-ingest-auth` | **Planned** |
-| Medium | **`/health/ready`** must not echo exception messages publicly | `050-health-error-hardening` | **Planned** |
+| **High** | **Webhook SSRF via redirects**: `OutboundUrlGuard` checks the initial URL; HttpClient still follows redirects → 302 to RFC1918/metadata | `045-webhook-ssrf-redirects` | **Done** |
+| **High** | **Share link issue scope not enforced**: session stores `issue` but `hasActiveShareGrant()` grants project-wide viewer | `046-share-link-issue-scope` | **Done** |
+| **High** | **Open redirect** on admin view-as-member (`redirect` accepts `//evil.com`; locale switch already rejects `//`) | `047-admin-safe-redirect` | **Done** |
+| **High** | **Encrypt key not durable in prod Compose**: `var/secrets` / Halite key not volume-mounted; container recreate loses decrypt ability | `048-prod-encrypt-key` | **Done** |
+| Medium | Deprecate / warn on ingest auth via **query string** (`beacon_secret` → proxy/access logs, Referer) | `049-deprecate-query-ingest-auth` | **Done** |
+| Medium | **`/health/ready`** must not echo exception messages publicly | `050-health-error-hardening` | **Done** |
 | Medium | SSRF **DNS rebinding / TOCTOU** (resolve-then-connect without pin) | extends `045` | **Planned** |
-| Medium | **Re-check ingest suspend** (and quota if needed) in `ProcessEnvelopeHandler` after ACK | `051-ingest-worker-recheck` | **Planned** |
-| Medium | Harden / document **public API key** handling (hash or treat as opaque id; secret always required) | `052-api-public-key-hardening` | **Planned** |
-| Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Planned** |
+| Medium | **Re-check ingest suspend** (and quota if needed) in `ProcessEnvelopeHandler` after ACK | `051-ingest-worker-recheck` | **Done** |
+| Medium | Harden / document **public API key** handling (hash or treat as opaque id; secret always required) | `052-api-public-key-hardening` | **Done** |
+| Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Done** (encrypt key; rest Planned) |
 | Low | Security **headers** in Caddy (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`) | `053-security-headers` | **Planned** |
 | Low | Restrict **Nelmio `/api/doc`** to `ROLE_ADMIN` | `054-api-doc-admin-only` | **Planned** |
 | Low | Generic client errors on Envelope parse (detail → logs only) | `051` / ingest | **Planned** |
@@ -163,7 +163,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Cookie-consent POST CSRF (or document SameSite-only trade-off) | kit config | **Later** |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** `045` → `047` (small) → `046` → `048` (ops), then Medium ingest/health items.
+**Suggested patch order:** High Done (`045`–`048`). Medium Done (`049`–`052`). Remaining: DNS-rebinding (extends `045`), PRODUCTION.md extras, Low (`053`/`054`).
 
 ### Next (immediate queue — product)
 
@@ -234,8 +234,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.11.1** | Magic login + viewer + share links (`026`); golden Envelope contract (3.6) |
 | **v0.12.0** | Phase 5 high/medium: threshold alerts (`027`), release health (`028`), FULLTEXT (`029`), delivery history (`030`), admin audit (`031`) |
 | **v0.12.1** | Encrypted Mailer DSN (`034`); account appearance extras; admin user/group AuditKit meta; security/profile UX polish |
-| **v0.12.2** | Security hardening High: webhook SSRF redirects (`045`), share issue-scope (`046`), admin safe redirect (`047`), prod encrypt key (`048`) |
-| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`); Medium security (`049`–`052`) |
+| **v0.12.2** | Security hardening: High `045`–`048` + Medium `049`–`052` (query-auth deprecation, health errors, worker recheck, secret-always) + magic-login Mailer gate |
+| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`) |
 | **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`, after `045`–`048`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; headers/`api/doc` (`053`/`054`); SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -244,9 +244,9 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pick the highest **In progress** / **Next** row that is unblocked — **security High items (`045`–`048`) outrank new product Next**.
+1. Pick the highest **In progress** / **Next** row that is unblocked — Phase 6 product Next (`035`–`037`, `032`) after security Medium; Low headers/`api/doc` when convenient.
 2. Ensure a feature spec exists (`/speckit-specify` or update existing).
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21 (v0.12.1 release; Phase 6 + security track documented).
+Last updated: 2026-07-21 (v0.12.2 release: security High/Medium `045`–`052` + Mailer/magic-login gate).

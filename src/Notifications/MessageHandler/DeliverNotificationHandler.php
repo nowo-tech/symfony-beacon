@@ -40,7 +40,9 @@ final readonly class DeliverNotificationHandler
     public function __invoke(DeliverNotificationMessage $message): void
     {
         $destination = $this->destinationRepository->find($message->destinationId);
-        if (null === $destination || !$destination->isEnabled()) {
+        $isSample = true === ($message->payload['test'] ?? false);
+        // Sample sends may target a disabled destination so operators can verify before enabling.
+        if (null === $destination || (!$destination->isEnabled() && !$isSample)) {
             return;
         }
 
@@ -72,6 +74,8 @@ final readonly class DeliverNotificationHandler
                 $response = $this->httpClient->request('POST', $request['url'], [
                     'json' => $request['json'],
                     'timeout' => 10,
+                    // Prevent SSRF via 30x to private/metadata hosts after the initial URL guard.
+                    'max_redirects' => 0,
                     'headers' => [
                         'User-Agent' => 'symfony-beacon-notifications/1.0',
                         'Content-Type' => 'application/json',
@@ -105,11 +109,7 @@ final readonly class DeliverNotificationHandler
     private function deliverEmail(string $to, array $payload): void
     {
         $summary = (string) ($payload['summary'] ?? 'Beacon notification');
-        $url = isset($payload['url']) ? (string) $payload['url'] : '';
-        $body = $summary;
-        if ('' !== $url) {
-            $body .= "\n\n".$url;
-        }
+        $body = $this->outboundFormatter->emailBody($payload);
 
         $email = new Email()
             ->from($this->mailer->getFromAddress())

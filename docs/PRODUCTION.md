@@ -54,6 +54,23 @@ docker compose -f compose.prod.yaml --env-file .env up --build -d
 
 See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager in production; do not reuse the `!ChangeMe!` placeholders from `.env.dist`.
 
+## Field encryption key (Halite)
+
+Beacon encrypts API key secrets, notification webhook URLs, and the instance Mailer DSN with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
+
+| Approach | Notes |
+|----------|--------|
+| **Volume `php_secrets`** (default in [`compose.prod.yaml`](../compose.prod.yaml)) | Mounts `/app/var/secrets` so `.Halite.default.key` survives container recreates. Share the same volume with the `messenger` service. |
+| **`APP_ENCRYPT_KEY`** | Optional: switch the encrypt profile to `secret_key_env_var` (see `config/packages/nowo_doctrine_encrypt.yaml` comments) and inject the key from your secret manager. |
+
+Without a durable key, recreating the PHP container generates a new Halite key and **breaks decryption** of existing ciphertext.
+
+Generate a key once (then back it up with other secrets):
+
+```bash
+docker compose -f compose.prod.yaml exec php bin/console doctrine:encrypt:generate-secret-key
+```
+
 ## Messenger in production
 
 Keep the **HTTP** container separate from the **`messenger:consume`** process (same as local Compose). Scale consumers independently; do not confuse them with `FRANKENPHP_MODE=worker`.
@@ -106,7 +123,8 @@ Minimum operator checklist:
 
 1. **MySQL**: scheduled `mysqldump` (or volume snapshots) of the Compose `database` data directory / managed DB.
 2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) separately from the DB dump.
-3. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.
+3. **Encrypt key**: include `var/secrets/.Halite.default.key` (or `APP_ENCRYPT_KEY`) with secret backups — see [Field encryption key](#field-encryption-key-halite).
+4. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.
 
 ## Out of scope (intentionally)
 

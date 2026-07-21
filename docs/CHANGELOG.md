@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-07-21
+
+### Security
+
+- Webhook delivery no longer follows HTTP redirects (`max_redirects: 0`), closing SSRF via 302-to-private after `OutboundUrlGuard` (`045`)
+- Issue-scoped share links no longer grant project-wide viewer access; list/analytics need a project-wide grant; issue detail uses `requireIssueRead` (`046`)
+- Admin view-as-member and account locale redirects reject open redirects (`//host`, scheme-relative, off-site) via `SafeInternalRedirect` (`047`)
+- Production Compose mounts durable `php_secrets` volume for Halite keys; PRODUCTION.md documents encrypt-key backup (`048`)
+- Query-string Envelope auth (`beacon_key` / `beacon_secret`) is deprecated: still accepted with `Deprecation` + `Warning` response headers and a server log (`049`)
+- `/health/ready` returns generic `error: unavailable` on failure (exception detail stays in logs only) (`050`)
+- `ProcessEnvelopeHandler` re-checks ingest suspend and daily quota after HTTP ACK and drops queued envelopes when blocked (`051`)
+- Ingest always requires a non-empty API secret (`hash_equals`); public key documented as opaque non-secret id (`052`)
+
+### Changed
+
+- Magic-link sign-in is available only when Administration → Mailer has an encrypted, non-null DSN; otherwise `/login/magic` redirects to password login and the login-page link is hidden (env `MAILER_DSN` alone does not enable it)
+- **Send test** notification samples are channel-native (Slack attachments, Discord embeds, Teams facts, richer Telegram/email text, HTTP canonical JSON with stub issue) and can deliver to disabled destinations
+- Administration → **Mailer**: DSN validation (reject invalid / `null://`) plus **Send sample email** to verify magic-login credentials
+
+### Fixed
+
+- Account → Security password generator control and suggested-password modal use Beacon styling (no Bootstrap/Tailwind kit leftovers)
+
 ## [0.12.1] - 2026-07-21
 
 ### Added
@@ -396,7 +419,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.2...HEAD
+[0.12.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...v0.11.1

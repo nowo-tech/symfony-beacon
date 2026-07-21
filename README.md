@@ -35,7 +35,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
 - Phase 5 product depth (v0.12.0): **threshold alerts**, **release health**, MySQL **FULLTEXT** issue search, notification **delivery history**, admin **project audit** timeline
-- v0.12.1: **encrypted instance Mailer**, richer account Display/Security/Profile, admin user/group audit meta — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next includes security hardening `045`–`048`, monthly quota, SSO Later)
+- v0.12.1: **encrypted instance Mailer**, richer account Display/Security/Profile, admin user/group audit meta
+- v0.12.2: **security hardening** (`045`–`052`), magic-login Mailer gate + sample send, channel-native notification tests — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next: ops overview, AuthKit migration, monthly quota; SSO Later)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)

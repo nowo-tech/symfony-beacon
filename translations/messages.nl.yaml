@@ -66,6 +66,18 @@ auth:
     brand_eyebrow: Foutopsporing
     bootstrap_eyebrow: Bootstrap
     bootstrap_hint: Maak het eerste beheerdersaccount aan. De registratie sluit nadat deze gebruiker bestaat.
+    magic:
+        title: Aanmelden met magic link
+        intro: Voer je e-mailadres in; we sturen een eenmalige aanmeldlink (geldig 10 minuten).
+        email: E-mail
+        submit: Magic link versturen
+        sent: Als dat account bestaat en actief is, is de link onderweg.
+        throttled: Te veel verzoeken. Probeer het later opnieuw.
+        invalid: Dat verzoek kon niet worden verwerkt.
+        unavailable: Magic-link aanmelden is niet beschikbaar totdat een beheerder Mailer (versleutelde DSN) configureert onder Beheer → Mailer.
+        back_to_password: Aanmelden met wachtwoord
+        email_subject: Je Beacon magic-aanmeldlink
+        email_body: "Open deze link om aan te melden (verloopt %expires%):\n\n%link%"
 flash:
     project:
         created: Project gemaakt.
@@ -975,6 +987,7 @@ notifications:
     disable: Uitzetten
     disabled: Gehandicapt
     test: Test verzenden
+    test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Verwijderen
     delete_confirm: Deze meldingsbestemming verwijderen?
     save: Bestemming opslaan
@@ -1029,7 +1042,7 @@ notifications:
         enabled: Bestemming ingeschakeld.
         disabled: Bestemming uitgeschakeld.
         deleted: Bestemming verwijderd.
-        test_queued: Testmelding in wachtrij voor bezorging.
+        test_queued: Kanaalspecifieke voorbeeldbemelding in wachtrij voor bezorging.
     help:
         title: Handleidingen voor het instellen van meldingen
         link: Installatiehandleidingen

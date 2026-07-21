@@ -6,6 +6,7 @@ namespace App\Shared\Health;
 
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -21,6 +22,7 @@ final readonly class HealthController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private MessengerQueueHealth $messengerQueueHealth,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -65,13 +67,13 @@ final readonly class HealthController
     )]
     #[OA\Response(
         response: 503,
-        description: 'Database (or other readiness check) failed.',
+        description: 'Database (or other readiness check) failed. Error detail is generic (no exception text).',
         content: new OA\JsonContent(
-            required: ['status', 'checks'],
+            required: ['status', 'checks', 'error'],
             properties: [
                 new OA\Property(property: 'status', type: 'string', example: 'error'),
                 new OA\Property(property: 'checks', type: 'object'),
-                new OA\Property(property: 'error', type: 'string'),
+                new OA\Property(property: 'error', type: 'string', example: 'unavailable'),
             ],
             type: 'object',
         ),
@@ -90,10 +92,14 @@ final readonly class HealthController
             $queue = $this->messengerQueueHealth->asyncPending();
             $checks['messenger_async_pending'] = $queue['pending'];
         } catch (Throwable $e) {
+            $this->logger->error('Readiness probe failed.', [
+                'exception' => $e,
+            ]);
+
             return new JsonResponse([
                 'status' => 'error',
                 'checks' => $checks,
-                'error' => $e->getMessage(),
+                'error' => 'unavailable',
             ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 

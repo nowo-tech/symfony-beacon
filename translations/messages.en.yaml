@@ -75,6 +75,7 @@ auth:
         sent: If that email has an enabled account, a magic link is on its way.
         throttled: Too many magic-link requests. Try again later.
         invalid: Could not process that request.
+        unavailable: Magic link sign-in is unavailable until an administrator configures Mailer (encrypted DSN) under Administration → Mailer.
         back_to_password: Sign in with password
         email_subject: Your Beacon magic sign-in link
         email_body: "Open this link to sign in (expires %expires%):\n\n%link%"
@@ -114,6 +115,10 @@ flash:
         saved: Appearance settings saved.
     mailer:
         saved: Mailer settings saved.
+        sample_sent: Sample email sent. Check the inbox (and spam) for the magic-login credentials test.
+        sample_unavailable: Save a deliverable encrypted Mailer DSN before sending a sample.
+        sample_invalid_recipient: Enter a valid recipient email address.
+        sample_failed: Sample email could not be sent. Check the Mailer DSN and server logs.
     preferences:
         saved: Preferences saved.
         profile_saved: Profile saved.
@@ -553,18 +558,34 @@ appearance:
     reset: Reset to defaults
 mailer_settings:
     title: Mailer
-    intro: Store the Symfony Mailer DSN encrypted in the database (not in .env). Used for magic-login and email notification destinations.
+    intro: Store the Symfony Mailer DSN encrypted in the database (not in .env). Magic-link sign-in stays hidden until a non-null DSN is saved here; email notification destinations also use this transport.
     status:
-        database: Outbound mail uses the DSN saved in instance settings.
-        env_fallback: No database DSN yet — outbound mail falls back to MAILER_DSN from the environment (typically null://null).
+        database: Outbound mail uses the DSN saved in instance settings. Magic-link sign-in is available when this DSN is not a null transport.
+        env_fallback: No database DSN yet — outbound mail falls back to MAILER_DSN from the environment (typically null://null). Magic-link sign-in stays disabled until you save an encrypted DSN here.
     current_dsn: 'Current DSN:'
     from_preview: 'From address: %from%'
     submit: Save mailer settings
+    magic_ready: Magic-link email credentials are ready
+    magic_blocked: Magic-link email is unavailable (save a deliverable encrypted DSN)
+    sample:
+        title: Send sample email
+        intro: Delivers a test message using the encrypted Mailer DSN (same transport as magic-link sign-in).
+        to_label: Recipient
+        submit: Send sample
+        unavailable: Save a valid encrypted Mailer DSN first (not null://), then you can send a sample.
+        email_subject: 'Beacon mailer sample (magic-login credentials)'
+        email_body: |
+            This is a sample message from Administration → Mailer.
+
+            If you received this, the encrypted Mailer DSN can deliver magic-login emails.
+            From address: %from%
 instance_mailer:
     mailer_dsn:
         label: Mailer DSN
-        help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587
+        help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587 — null:// is rejected (use Clear stored DSN instead).
         placeholder: smtp://user:pass@mail.example:587
+        invalid: Enter a valid Symfony Mailer DSN (for example smtp://user:pass@host:587).
+        null_transport: null:// cannot deliver mail. Paste a real SMTP (or other) DSN, or use Clear stored DSN to fall back to the environment.
     clear_dsn:
         label: Clear stored DSN
         help: Removes the database DSN and falls back to MAILER_DSN from the environment until you save a new one.
@@ -1074,6 +1095,7 @@ notifications:
     disable: Disable
     disabled: Disabled
     test: Send test
+    test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Delete
     delete_confirm: Delete this notification destination?
     save: Save destination
@@ -1129,7 +1151,7 @@ notifications:
         enabled: Destination enabled.
         disabled: Destination disabled.
         deleted: Destination deleted.
-        test_queued: Test notification queued for delivery.
+        test_queued: Channel-native sample notification queued for delivery.
     help:
         title: Notification setup guides
         link: Setup guides

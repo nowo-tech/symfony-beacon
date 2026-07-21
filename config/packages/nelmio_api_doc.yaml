@@ -47,17 +47,17 @@ nelmio_api_doc:
                     description: |
                         Beacon auth header. Example:
                         `Beacon beacon_key=PUBLIC, beacon_secret=SECRET`
-                        The secret is required whenever the project API key has one stored.
+                        The secret is always required. Prefer this over query auth.
                 BeaconKeyQuery:
                     type: apiKey
                     in: query
                     name: beacon_key
-                    description: Public key from the project DSN (use with beacon_secret).
+                    description: 'Deprecated: public key query parameter (prefer X-Beacon-Auth).'
                 BeaconSecretQuery:
                     type: apiKey
                     in: query
                     name: beacon_secret
-                    description: Secret key from the project DSN (required when the API key has a secret).
+                    description: 'Deprecated: secret in the query string leaks into logs; prefer X-Beacon-Auth. Always required.'
     areas:
         path_patterns:
             - ^/api(?!/doc)

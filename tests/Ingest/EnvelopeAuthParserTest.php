@@ -32,4 +32,15 @@ final class EnvelopeAuthParserTest extends TestCase
         self::assertSame('dsnkey', $fromDsn['public_key']);
         self::assertSame('dsnsecret', $fromDsn['secret_key']);
     }
+
+    public function testQueryContainsCredentials(): void
+    {
+        $parser = new EnvelopeAuthParser();
+
+        self::assertFalse($parser->queryContainsCredentials(''));
+        self::assertFalse($parser->queryContainsCredentials('foo=bar'));
+        self::assertTrue($parser->queryContainsCredentials('beacon_key=qkey'));
+        self::assertTrue($parser->queryContainsCredentials('beacon_secret=sec'));
+        self::assertTrue($parser->queryContainsCredentials('beacon_key=qkey&beacon_secret=sec'));
+    }
 }

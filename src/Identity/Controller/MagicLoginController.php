@@ -44,6 +44,12 @@ final class MagicLoginController extends AbstractController
             return $this->redirectToRoute('dashboard_home');
         }
 
+        if (!$this->mailer->isMagicLoginAvailable()) {
+            $this->addFlash('error', 'auth.magic.unavailable');
+
+            return $this->redirectToRoute('nowo_auth_kit_login');
+        }
+
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('magic_login', $request->request->getString('_token'))) {
                 $this->addFlash('error', 'auth.magic.invalid');

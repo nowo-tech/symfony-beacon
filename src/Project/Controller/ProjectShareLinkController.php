@@ -54,7 +54,7 @@ final class ProjectShareLinkController extends AbstractController
                 $request->getSession()->set('_security.main.target_path', $shareUrl);
             }
 
-            return $this->redirectToRoute('app_magic_login_request');
+            return $this->redirectToRoute('nowo_auth_kit_login');
         }
 
         $this->shareLinkManager->consume($link, $user);

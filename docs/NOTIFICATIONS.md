@@ -13,7 +13,7 @@ In the app, open **Project → Settings → Notifications → Setup guides** for
 2. Under **Notifications**, click **Add destination** (owner/admin only).
 3. Choose the channel **type** and paste the matching **endpoint** (see manuals below).
 4. Select alert categories (issue levels, N+1, lifecycle events such as `issue.resolved`, and/or `volume.threshold`).
-5. Save, then optionally **Send test** to verify delivery.
+5. Save, then optionally **Send test** to verify delivery. The sample is formatted for that destination’s channel (Slack attachment, Discord embed, Teams MessageCard, Telegram/email text, or raw JSON for HTTP) and includes a stub issue payload. Sample sends work even if the destination is temporarily disabled.
 
 Endpoints are **encrypted at rest** and **masked** in the settings list (URLs, emails, and Telegram tokens).
 

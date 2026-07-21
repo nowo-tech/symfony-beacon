@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
+use App\Shared\Http\SafeInternalRedirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -55,13 +56,8 @@ final class AccountLocaleController extends AbstractController
         if ('' === $target) {
             $target = $request->headers->get('Referer') ?? $this->generateUrl('dashboard_home');
         }
-        if (!str_starts_with($target, '/') || str_starts_with($target, '//')) {
-            // Allow absolute URLs only for this host; otherwise fall back.
-            $host = $request->getSchemeAndHttpHost();
-            if (!str_starts_with($target, $host.'/')) {
-                $target = $this->generateUrl('dashboard_home');
-            }
-        }
+        $fallback = $this->generateUrl('dashboard_home');
+        $target = SafeInternalRedirect::resolve($request, $target, $fallback);
 
         return $this->redirect($this->stripLocaleQuery($target));
     }

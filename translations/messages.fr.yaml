@@ -66,6 +66,18 @@ auth:
     brand_eyebrow: Suivi des erreurs
     bootstrap_eyebrow: Amorçage
     bootstrap_hint: Créez le premier compte administrateur. L'inscription se termine une fois que cet utilisateur existe.
+    magic:
+        title: Connexion par lien magique
+        intro: Saisissez votre e-mail ; nous enverrons un lien à usage unique (valable 10 minutes).
+        email: E-mail
+        submit: Envoyer le lien magique
+        sent: Si ce compte existe et est activé, le lien est en route.
+        throttled: Trop de demandes. Réessayez plus tard.
+        invalid: Impossible de traiter cette demande.
+        unavailable: La connexion par lien magique est indisponible tant qu'un administrateur n'a pas configuré le Mailer (DSN chiffré) sous Administration → Mailer.
+        back_to_password: Se connecter avec un mot de passe
+        email_subject: Votre lien magique Beacon
+        email_body: "Ouvrez ce lien pour vous connecter (expire %expires%) :\n\n%link%"
 flash:
     project:
         created: Projet créé.
@@ -975,6 +987,7 @@ notifications:
     disable: Désactiver
     disabled: Désactivé
     test: Envoyer le test
+    test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Supprimer
     delete_confirm: Supprimer cette destination de notification ?
     save: Enregistrer la destination
@@ -1029,7 +1042,7 @@ notifications:
         enabled: Destination activée.
         disabled: Destination désactivée.
         deleted: Destination supprimée.
-        test_queued: Notification de test en attente de livraison.
+        test_queued: Notification d’exemple au format du canal en attente de livraison.
     help:
         title: Guides de configuration des notifications
         link: Guides de configuration

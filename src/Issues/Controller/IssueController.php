@@ -249,8 +249,7 @@ final class IssueController extends AbstractController
         if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
-        $access = $this->projectAccess->resolveAccess($project, $user);
+        $access = $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
 
         $this->userActionRecorder->recordAndFlush(UserActionType::IssueOpened, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -282,7 +281,7 @@ final class IssueController extends AbstractController
             'comments' => $comments,
             'duplicateCandidates' => $duplicateCandidates,
             'priorities' => IssuePriority::cases(),
-            'can_triage' => $access?->canTriageIssues() ?? false,
+            'can_triage' => $access->canTriageIssues(),
         ]);
     }
 
@@ -779,14 +778,17 @@ final class IssueController extends AbstractController
         if (!$event instanceof Event || !$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
-        $this->projectAccess->requireMembership($project, $user);
-
         $issue = $event->getIssue();
+        if (!$issue instanceof Issue) {
+            throw $this->createNotFoundException();
+        }
+        $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
+
         $this->userActionRecorder->recordAndFlush(UserActionType::EventOpened, $user, $user, [
             'project_uuid' => $project->getUuid(),
             'project_name' => $project->getName(),
-            'issue_uuid' => $issue?->getUuid(),
-            'issue_title' => $issue?->getTitle(),
+            'issue_uuid' => $issue->getUuid(),
+            'issue_title' => $issue->getTitle(),
             'event_id' => $event->getEventId(),
         ]);
 

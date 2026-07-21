@@ -10,6 +10,22 @@ namespace App\Ingest\Service;
 final class EnvelopeAuthParser
 {
     /**
+     * True when the raw query string carries beacon_key and/or beacon_secret
+     * (deprecated: secrets leak into access logs and Referer).
+     */
+    public function queryContainsCredentials(string $queryString): bool
+    {
+        if ('' === $queryString) {
+            return false;
+        }
+
+        parse_str($queryString, $query);
+
+        return (isset($query['beacon_key']) && \is_string($query['beacon_key']) && '' !== $query['beacon_key'])
+            || (isset($query['beacon_secret']) && \is_string($query['beacon_secret']) && '' !== $query['beacon_secret']);
+    }
+
+    /**
      * @return array{public_key: ?string, secret_key: ?string}
      */
     public function parseFromRequest(?string $authHeader, string $queryString, ?string $envelopeDsn = null): array

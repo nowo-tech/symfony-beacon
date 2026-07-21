@@ -20,9 +20,11 @@ use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -44,6 +46,8 @@ final readonly class ProcessEnvelopeHandler
         private VolumeThresholdEvaluator $volumeThresholdEvaluator,
         private IssueHistoryRecorder $historyRecorder,
         private EntityManagerInterface $entityManager,
+        private ProjectGovernanceResolver $governanceResolver,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -51,6 +55,23 @@ final readonly class ProcessEnvelopeHandler
     {
         $project = $this->projectRepository->find($message->projectId);
         if (null === $project) {
+            return;
+        }
+
+        // Re-check governance after HTTP ACK (project may have been suspended / quota hit while queued).
+        if (!$project->isIngestEnabled()) {
+            $this->logger->info('Dropping queued Envelope: ingest disabled.', [
+                'project_id' => $message->projectId,
+            ]);
+
+            return;
+        }
+
+        if ($this->governanceResolver->isDailyQuotaExceeded($project)) {
+            $this->logger->info('Dropping queued Envelope: daily event quota exceeded.', [
+                'project_id' => $message->projectId,
+            ]);
+
             return;
         }
 

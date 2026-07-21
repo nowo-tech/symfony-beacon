@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
+use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Symfony\Component\Form\AbstractType;
@@ -11,8 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Instance Mailer settings (DSN stored encrypted; blank keeps current value).
@@ -21,6 +24,11 @@ use Symfony\Component\Validator\Constraints\Length;
  */
 final class InstanceMailerSettingsType extends AbstractType
 {
+    public function __construct(
+        private readonly MailerDsnValidator $dsnValidator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -35,6 +43,7 @@ final class InstanceMailerSettingsType extends AbstractType
                 ],
                 'constraints' => [
                     new Length(max: 2048),
+                    new Callback($this->validatePlainDsn(...)),
                 ],
             ])
             ->add('clearMailerDsn', CheckboxType::class, [
@@ -62,5 +71,23 @@ final class InstanceMailerSettingsType extends AbstractType
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
         ]);
+    }
+
+    public function validatePlainDsn(mixed $value, ExecutionContextInterface $context): void
+    {
+        if (!\is_string($value) && null !== $value) {
+            $context->buildViolation('instance_mailer.mailer_dsn.invalid')
+                ->setTranslationDomain('messages')
+                ->addViolation();
+
+            return;
+        }
+
+        $error = $this->dsnValidator->validatePlainDsn((string) ($value ?? ''));
+        if (null !== $error) {
+            $context->buildViolation($error)
+                ->setTranslationDomain('messages')
+                ->addViolation();
+        }
     }
 }

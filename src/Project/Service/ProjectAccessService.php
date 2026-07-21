@@ -62,7 +62,8 @@ final readonly class ProjectAccessService
     {
         $direct = $this->getDirectMembership($project, $user);
         $groupRole = $this->groupAccessRepository->findHighestGroupRoleForUser($project, $user);
-        $shareViewer = $this->hasActiveShareGrant($project);
+        // Issue-scoped share grants do not unlock project-wide surfaces (list, analytics, …).
+        $shareViewer = $this->hasProjectWideShareGrant($project);
 
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             $role = $this->isViewAsMemberActive() ? ProjectRole::Member : ProjectRole::Owner;
@@ -125,16 +126,76 @@ final readonly class ProjectAccessService
 
     public function hasActiveShareGrant(Project $project): bool
     {
+        return null !== $this->getActiveShareEntry($project);
+    }
+
+    /** Project-wide share grant (no issue UUID restriction). */
+    public function hasProjectWideShareGrant(Project $project): bool
+    {
+        $entry = $this->getActiveShareEntry($project);
+        if (null === $entry) {
+            return false;
+        }
+
+        $issue = $entry['issue'] ?? null;
+
+        return null === $issue || '' === $issue;
+    }
+
+    /** Share grant covers this issue (project-wide or matching issue UUID). */
+    public function hasShareGrantForIssue(Project $project, string $issueUuid): bool
+    {
+        $entry = $this->getActiveShareEntry($project);
+        if (null === $entry) {
+            return false;
+        }
+
+        $scoped = $entry['issue'] ?? null;
+        if (null === $scoped || '' === $scoped) {
+            return true;
+        }
+
+        return $scoped === $issueUuid;
+    }
+
+    /**
+     * Read access for a single issue: membership / group / project-wide share, or matching issue-scoped share.
+     *
+     * @throws AccessDeniedHttpException
+     */
+    public function requireIssueRead(Project $project, User $user, string $issueUuid): ProjectAccess
+    {
+        $access = $this->resolveAccess($project, $user);
+        if ($access instanceof ProjectAccess) {
+            return $access;
+        }
+
+        if ($this->hasShareGrantForIssue($project, $issueUuid)) {
+            return new ProjectAccess(
+                role: ProjectRole::Viewer,
+                directMembership: null,
+                viaGroup: false,
+            );
+        }
+
+        throw new AccessDeniedHttpException('You do not have access to this project.');
+    }
+
+    /**
+     * @return array{expires: int, issue: ?string}|null
+     */
+    private function getActiveShareEntry(Project $project): ?array
+    {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request instanceof Request || !$request->hasSession()) {
-            return false;
+            return null;
         }
 
         /** @var array<string, array{expires?: int, issue?: ?string}> $grants */
         $grants = $request->getSession()->get(self::SHARE_ACCESS_SESSION_KEY, []);
         $entry = $grants[$project->getUuid()] ?? null;
         if (!\is_array($entry)) {
-            return false;
+            return null;
         }
 
         $expires = (int) ($entry['expires'] ?? 0);
@@ -142,10 +203,15 @@ final readonly class ProjectAccessService
             unset($grants[$project->getUuid()]);
             $request->getSession()->set(self::SHARE_ACCESS_SESSION_KEY, $grants);
 
-            return false;
+            return null;
         }
 
-        return true;
+        return [
+            'expires' => $expires,
+            'issue' => isset($entry['issue']) && \is_string($entry['issue']) && '' !== $entry['issue']
+                ? $entry['issue']
+                : null,
+        ];
     }
 
     /**

@@ -43,7 +43,7 @@ final class AccountSecurityType extends FormKitAbstractType
                 'attr' => ['autocomplete' => 'new-password'],
                 'level' => 'strong',
                 'policy_mode' => 'level',
-                'ui_framework' => 'tailwind2',
+                'ui_framework' => 'default',
                 'use_password_toggle' => true,
                 'generator_mode' => 'modal',
                 'generator_count' => 3,

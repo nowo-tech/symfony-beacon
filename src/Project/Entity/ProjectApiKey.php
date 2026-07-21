@@ -11,6 +11,9 @@ use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
 
 /**
  * Project ingest credential (public/secret key pair) used in Envelope DSN auth.
+ *
+ * The public key is an opaque, non-secret identifier (shown in Settings / DSN).
+ * The secret is required for every ingest request and is encrypted at rest.
  */
 #[ORM\Entity(repositoryClass: ProjectApiKeyRepository::class)]
 #[ORM\Table(name: 'project_api_key')]

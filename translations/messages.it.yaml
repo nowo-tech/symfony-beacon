@@ -66,6 +66,18 @@ auth:
     brand_eyebrow: Tracciamento degli errori
     bootstrap_eyebrow: Bootstrap
     bootstrap_hint: Crea il primo account amministratore. La registrazione si chiude dopo che questo utente esiste.
+    magic:
+        title: Accesso con magic link
+        intro: Inserisci la tua email; invieremo un link monouso (valido 10 minuti).
+        email: Email
+        submit: Invia magic link
+        sent: Se quell'account esiste ed è attivo, il link è in arrivo.
+        throttled: Troppe richieste. Riprova più tardi.
+        invalid: Impossibile elaborare la richiesta.
+        unavailable: L'accesso con magic link non è disponibile finché un amministratore non configura il Mailer (DSN crittografato) in Amministrazione → Mailer.
+        back_to_password: Accedi con password
+        email_subject: Il tuo magic link Beacon
+        email_body: "Apri questo link per accedere (scade %expires%):\n\n%link%"
 flash:
     project:
         created: Progetto creato.
@@ -975,6 +987,7 @@ notifications:
     disable: Disabilita
     disabled: Disabilitato
     test: Invia prova
+    test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
     delete: Eliminare
     delete_confirm: Eliminare questa destinazione di notifica?
     save: Salva destinazione
@@ -1029,7 +1042,7 @@ notifications:
         enabled: Destinazione abilitata.
         disabled: Destinazione disabilitata.
         deleted: Destinazione eliminata.
-        test_queued: Notifica di prova in coda per la consegna.
+        test_queued: Notifica di esempio nel formato del canale in coda per la consegna.
     help:
         title: Guide all'impostazione delle notifiche
         link: Guide di installazione

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.1 to the next release](#upgrading-from-0121-to-the-next-release)
+- [Upgrading from 0.12.2 to the next release](#upgrading-from-0122-to-the-next-release)
+- [Upgrading from 0.12.1 to 0.12.2](#upgrading-from-0121-to-0122)
 - [Upgrading from 0.12.0 to 0.12.1](#upgrading-from-0120-to-0121)
 - [Upgrading from 0.11.1 to 0.12.0](#upgrading-from-0111-to-0120)
 - [Upgrading from 0.11.0 to 0.11.1](#upgrading-from-0110-to-0111)
@@ -31,7 +32,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.1 to the next release
+## Upgrading from 0.12.2 to the next release
 
 ```bash
 git pull
@@ -40,7 +41,38 @@ php bin/console doctrine:migrations:migrate --no-interaction
 make vite-build
 ```
 
-No additional steps yet — this placeholder is filled when the next release ships.
+No additional steps documented yet.
+
+## Upgrading from 0.12.1 to 0.12.2
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+### Security hardening (`045`–`052`)
+
+- **Webhooks**: delivery HTTP clients do not follow redirects. Update destinations that relied on 302 chains to point at the final HTTPS URL.
+- **Share links**: issue-scoped tokens unlock only that issue (and its events), not the project issue list / analytics. Create a project-wide share link when broader read access is needed.
+- **Admin / locale redirects**: `redirect` POST/query values must be same-origin relative paths; external URLs fall back to a safe default.
+- **Prod Compose**: pull the updated `compose.prod.yaml` so `php` and `messenger` share the `php_secrets` volume (`/app/var/secrets`). Back up `.Halite.default.key` (or set `APP_ENCRYPT_KEY`) before recreating containers — see [PRODUCTION.md](PRODUCTION.md#field-encryption-key-halite).
+- **Query ingest auth** (`049`): `?beacon_key=&beacon_secret=` still works but is deprecated (logs + `Deprecation`/`Warning` headers). Prefer `X-Beacon-Auth` or envelope `dsn` — see [DSN.md](DSN.md).
+- **Health** (`050`): `/health/ready` 503 bodies no longer include exception text.
+- **Worker governance** (`051`): envelopes already ACKed may be dropped if the project is suspended or daily quota is exceeded before the consumer runs.
+- **API secrets** (`052`): ingest always requires the secret; empty-secret keys are rejected.
+
+### Magic login requires encrypted Mailer DSN
+
+- `/login/magic` and the password-login link are enabled only when **Administration → Mailer** has a stored, encrypted DSN that is not a `null://` transport.
+- Env `MAILER_DSN` alone does **not** turn magic login on (it remains a fallback for other outbound mail).
+- After saving a real SMTP (or other) DSN under Mailer, magic login appears automatically; clearing the DSN hides it again.
+- Use **Send sample email** on the Mailer page to verify delivery; invalid DSNs and `null://` are rejected on save.
+
+### Notifications sample send
+
+- **Send test** on a destination now delivers a channel-native sample (and works while the destination is disabled). No configuration change required.
 
 ## Upgrading from 0.12.0 to 0.12.1
 
@@ -57,6 +89,7 @@ make vite-build
 - Configure under **Administration → Mailer** (`/settings/mailer`): paste SMTP (or other) DSN; it is encrypted at rest like API secrets / webhook URLs.
 - Optional **From** address (defaults to `beacon@localhost`).
 - Env `MAILER_DSN` is only a **fallback** when no DB DSN is stored (keep `null://null` for local/tests). After saving a DB DSN, you can remove secrets from `.env`.
+- **Magic-link sign-in** requires this encrypted DB DSN (non-null). Env fallback alone does not enable `/login/magic`.
 - Ensure the Halite encrypt key under `var/secrets/` (or `APP_ENCRYPT_KEY`) is durable across deploys — see [PRODUCTION.md](PRODUCTION.md) and ROADMAP `048`.
 - Re-run `app:seed-demo` (or sync menus) so Administration sidebar includes **Mailer**.
 
@@ -114,7 +147,7 @@ make vite-build
 
 Migration `Version20260721180000`: table `project_share_link`.
 
-Configure a real `MAILER_DSN` so magic-login emails deliver (null transport accepts messages but does not send).
+Configure outbound mail under **Administration → Mailer** (encrypted DSN). Env `MAILER_DSN` alone does not enable magic-link sign-in.
 
 ### Viewer role (`026`)
 

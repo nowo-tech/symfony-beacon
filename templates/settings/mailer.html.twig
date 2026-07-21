@@ -17,6 +17,13 @@
             <p>{{ 'mailer_settings.status.env_fallback'|trans }}</p>
         {% endif %}
         <p>{{ 'mailer_settings.from_preview'|trans({'%from%': settings.effectiveMailerFrom}) }}</p>
+        <p>
+            {% if magicLoginAvailable %}
+                <p class="font-medium text-[var(--color-moss)]">{{ 'mailer_settings.magic_ready'|trans }}</p>
+            {% else %}
+                <p><span class="badge badge-error">{{ 'mailer_settings.magic_blocked'|trans }}</span></p>
+            {% endif %}
+        </p>
     </div>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
@@ -29,5 +36,29 @@
             <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
         </div>
     {{ form_end(form) }}
+
+    <div class="panel mt-6 space-y-3">
+        <h2 class="text-lg font-semibold">{{ 'mailer_settings.sample.title'|trans }}</h2>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.sample.intro'|trans }}</p>
+        {% if magicLoginAvailable %}
+            <form method="post" action="{{ path('settings_mailer_test') }}" class="space-y-3">
+                <input type="hidden" name="_token" value="{{ csrf_token('mailer_sample') }}">
+                <label class="block text-sm font-medium" for="mailer-sample-to">{{ 'mailer_settings.sample.to_label'|trans }}</label>
+                <input
+                    id="mailer-sample-to"
+                    class="input w-full"
+                    type="email"
+                    name="to"
+                    value="{{ defaultSampleTo }}"
+                    required
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                >
+                <button class="btn-primary" type="submit">{{ 'mailer_settings.sample.submit'|trans }}</button>
+            </form>
+        {% else %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'mailer_settings.sample.unavailable'|trans }}</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

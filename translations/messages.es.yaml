@@ -71,6 +71,7 @@ auth:
         sent: Si esa cuenta existe y está activa, el enlace está en camino.
         throttled: Demasiadas solicitudes. Inténtalo más tarde.
         invalid: No se pudo procesar la solicitud.
+        unavailable: El acceso con enlace mágico no está disponible hasta que un administrador configure el Mailer (DSN cifrado) en Administración → Mailer.
         back_to_password: Entrar con contraseña
         email_subject: Tu enlace mágico de Beacon
         email_body: "Abre este enlace para entrar (caduca %expires%):\n\n%link%"
@@ -114,6 +115,10 @@ flash:
         saved: Apariencia guardada.
     mailer:
         saved: Ajustes de correo guardados.
+        sample_sent: Correo de muestra enviado. Revisa la bandeja (y spam) para la prueba de credenciales de magic login.
+        sample_unavailable: Guarda un DSN de Mailer cifrado y usable antes de enviar una muestra.
+        sample_invalid_recipient: Introduce una dirección de destinatario válida.
+        sample_failed: No se pudo enviar el correo de muestra. Revisa el DSN de Mailer y los logs.
     preferences:
         saved: Preferencias guardadas.
         profile_saved: Perfil guardado.
@@ -553,18 +558,34 @@ appearance:
     reset: Restaurar valores
 mailer_settings:
     title: Correo
-    intro: Guarda el DSN de Symfony Mailer cifrado en la base de datos (no en .env). Se usa para magic login y destinos de notificación por email.
+    intro: Guarda el DSN de Symfony Mailer cifrado en la base de datos (no en .env). El magic login permanece oculto hasta que haya un DSN distinto de null aquí; los destinos de notificación por email también usan este transporte.
     status:
-        database: El correo saliente usa el DSN guardado en los ajustes de instancia.
-        env_fallback: Aún no hay DSN en base de datos — se usa MAILER_DSN del entorno (normalmente null://null).
+        database: El correo saliente usa el DSN guardado en los ajustes de instancia. El magic login está disponible si ese DSN no es un transporte null.
+        env_fallback: Aún no hay DSN en base de datos — se usa MAILER_DSN del entorno (normalmente null://null). El magic login permanece desactivado hasta que guardes un DSN cifrado aquí.
     current_dsn: 'DSN actual:'
     from_preview: 'Dirección From: %from%'
     submit: Guardar correo
+    magic_ready: Credenciales de email para magic login listas
+    magic_blocked: Magic login por email no disponible (guarda un DSN cifrado usable)
+    sample:
+        title: Enviar correo de muestra
+        intro: Envía un mensaje de prueba con el DSN cifrado (el mismo transporte que el magic login).
+        to_label: Destinatario
+        submit: Enviar muestra
+        unavailable: Guarda primero un DSN de Mailer cifrado válido (no null://) para poder enviar una muestra.
+        email_subject: 'Muestra de correo Beacon (credenciales magic login)'
+        email_body: |
+            Este es un mensaje de muestra de Administración → Correo.
+
+            Si lo has recibido, el DSN cifrado de Mailer puede entregar emails de magic login.
+            Remitente: %from%
 instance_mailer:
     mailer_dsn:
         label: DSN de Mailer
-        help: Déjalo vacío para conservar el valor cifrado actual. Ejemplo smtp://user:pass@mail.example:587
+        help: Déjalo vacío para conservar el valor cifrado actual. Ejemplo smtp://user:pass@mail.example:587 — null:// se rechaza (usa Borrar DSN guardado).
         placeholder: smtp://user:pass@mail.example:587
+        invalid: Introduce un DSN de Symfony Mailer válido (por ejemplo smtp://user:pass@host:587).
+        null_transport: null:// no puede entregar correo. Pega un DSN SMTP (u otro) real, o usa Borrar DSN guardado para volver al entorno.
     clear_dsn:
         label: Borrar DSN guardado
         help: Elimina el DSN de la base de datos y vuelve a MAILER_DSN del entorno hasta que guardes uno nuevo.
@@ -1069,6 +1090,7 @@ notifications:
     disable: Desactivar
     disabled: Desactivado
     test: Enviar prueba
+    test_hint: 'Envía una notificación de muestra con el formato de %type% (también si el destino está desactivado)'
     delete: Eliminar
     delete_confirm: ¿Eliminar este destino de notificación?
     save: Guardar destino
@@ -1124,7 +1146,7 @@ notifications:
         enabled: Destino activado.
         disabled: Destino desactivado.
         deleted: Destino eliminado.
-        test_queued: Notificación de prueba encolada.
+        test_queued: Notificación de muestra (formato del canal) encolada.
     help:
         title: Guías de configuración de notificaciones
         link: Guías de configuración

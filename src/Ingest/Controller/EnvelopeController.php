@@ -16,6 +16,7 @@ use App\Project\Service\ProjectGovernanceResolver;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -35,6 +36,8 @@ final readonly class EnvelopeController
 {"event_id":"a1b2c3d4e5f6478899aabbccddeeff00","message":"Something broke","level":"error","platform":"php","timestamp":1721491200.0}
 ENVELOPE;
 
+    private const string QUERY_AUTH_WARNING = '299 - "Query string beacon_key/beacon_secret is deprecated; use X-Beacon-Auth or envelope dsn"';
+
     public function __construct(
         private EnvelopeAuthParser $authParser,
         private EnvelopeParser $envelopeParser,
@@ -43,6 +46,7 @@ ENVELOPE;
         private IngestRateLimiter $ingestRateLimiter,
         private ProjectGovernanceResolver $governanceResolver,
         private MessageBusInterface $bus,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -50,12 +54,12 @@ ENVELOPE;
     #[OA\Post(path: '/api/{projectId}/envelope/', operationId: 'ingestEnvelope', description: <<<'MD'
 Accepts an Envelope body (newline-separated JSON header, item header, and payload).
 
-**Auth (one of):**
-- `X-Beacon-Auth` header with `beacon_key` + `beacon_secret` (secret required when the API key has one)
-- Query `beacon_key` + `beacon_secret`
+**Auth (preferred first):**
+- `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
+- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`)
 
-The public key MUST belong to `{projectId}`. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
+The public key is an opaque identifier and MUST belong to `{projectId}`. Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [
         ['BeaconAuth' => []],
         ['BeaconKeyQuery' => [], 'BeaconSecretQuery' => []],
@@ -69,16 +73,18 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
     )]
     #[OA\Parameter(
         name: 'beacon_key',
-        description: 'Optional alternative to X-Beacon-Auth: public key query parameter.',
+        description: 'Deprecated: public key query parameter. Prefer X-Beacon-Auth.',
         in: 'query',
         required: false,
+        deprecated: true,
         schema: new OA\Schema(type: 'string'),
     )]
     #[OA\Parameter(
         name: 'beacon_secret',
-        description: 'Optional alternative to X-Beacon-Auth: secret key query parameter (required when the API key has a secret).',
+        description: 'Deprecated: secret key query parameter (leaks into access logs). Prefer X-Beacon-Auth. Always required with the public key.',
         in: 'query',
         required: false,
+        deprecated: true,
         schema: new OA\Schema(type: 'string'),
     )]
     #[OA\RequestBody(description: 'Raw Envelope bytes. Preferred Content-Type: `application/x-beacon-envelope` (also accepts `application/octet-stream`).', required: true, content: [
@@ -172,55 +178,64 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
             // Auth may still succeed via HTTP header.
         }
 
+        $queryString = $request->server->get('QUERY_STRING', '');
+        $usedQueryAuth = $this->authParser->queryContainsCredentials($queryString);
+        if ($usedQueryAuth) {
+            $this->logger->warning('Deprecated Envelope ingest auth via query string; prefer X-Beacon-Auth or envelope dsn.', [
+                'project_id' => $projectId,
+                'client_ip' => $request->getClientIp(),
+            ]);
+        }
+
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
-            $request->server->get('QUERY_STRING', ''),
+            $queryString,
             $envelopeDsn,
         );
 
         if (null === $auth['public_key']) {
-            return new Response('missing authorization information', Response::HTTP_UNAUTHORIZED);
+            return $this->ingestResponse('missing authorization information', Response::HTTP_UNAUTHORIZED, $usedQueryAuth);
         }
 
         $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['public_key']);
         if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
-            return new Response('forbidden', Response::HTTP_FORBIDDEN);
+            return $this->ingestResponse('forbidden', Response::HTTP_FORBIDDEN, $usedQueryAuth);
         }
 
         $project = $apiKey->getProject();
 
         $storedSecret = $apiKey->getSecretKey();
-        if (null !== $storedSecret && '' !== $storedSecret) {
-            $providedSecret = $auth['secret_key'];
-            if (null === $providedSecret || !hash_equals($storedSecret, $providedSecret)) {
-                return new Response('forbidden', Response::HTTP_FORBIDDEN);
-            }
+        $providedSecret = $auth['secret_key'];
+        if (null === $storedSecret || '' === $storedSecret
+            || null === $providedSecret || !hash_equals($storedSecret, $providedSecret)
+        ) {
+            return $this->ingestResponse('forbidden', Response::HTTP_FORBIDDEN, $usedQueryAuth);
         }
 
         // Validate parseability early (fail fast) without doing heavy work.
         try {
             $this->envelopeParser->parse($body);
         } catch (Throwable $e) {
-            return new Response('invalid envelope: '.$e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->ingestResponse('invalid envelope: '.$e->getMessage(), Response::HTTP_BAD_REQUEST, $usedQueryAuth);
         }
 
         if (null === $this->projectRepository->find($projectId)) {
-            return new Response('project not found', Response::HTTP_NOT_FOUND);
+            return $this->ingestResponse('project not found', Response::HTTP_NOT_FOUND, $usedQueryAuth);
         }
 
         if (!$project->isIngestEnabled()) {
-            return new Response('ingest disabled', Response::HTTP_FORBIDDEN);
+            return $this->ingestResponse('ingest disabled', Response::HTTP_FORBIDDEN, $usedQueryAuth);
         }
 
         if ($this->governanceResolver->isDailyQuotaExceeded($project)) {
-            return new Response('daily event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
+            return $this->ingestResponse('daily event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
                 'Retry-After' => '60',
             ]);
         }
 
         $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
         if (!$this->ingestRateLimiter->accept($projectId, $rateLimit)) {
-            return new Response('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
+            return $this->ingestResponse('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
                 'Retry-After' => '60',
             ]);
         }
@@ -231,6 +246,20 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
             new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ));
 
-        return new Response('', Response::HTTP_OK);
+        return $this->ingestResponse('', Response::HTTP_OK, $usedQueryAuth);
+    }
+
+    /**
+     * @param array<string, string> $extraHeaders
+     */
+    private function ingestResponse(string $content, int $status, bool $usedQueryAuth, array $extraHeaders = []): Response
+    {
+        $headers = $extraHeaders;
+        if ($usedQueryAuth) {
+            $headers['Deprecation'] = 'true';
+            $headers['Warning'] = self::QUERY_AUTH_WARNING;
+        }
+
+        return new Response($content, $status, $headers);
     }
 }

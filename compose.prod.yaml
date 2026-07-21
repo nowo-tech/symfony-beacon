@@ -28,6 +28,8 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      # Persist Halite field-encryption key across container recreates (API secrets, webhooks, Mailer DSN).
+      - php_secrets:/app/var/secrets
     ports:
       - target: 80
         published: ${HTTP_PORT:-9080}
@@ -81,6 +83,10 @@ services:
       APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
       DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      # Optional: inject Halite key material instead of (or in addition to) the php_secrets volume.
+      APP_ENCRYPT_KEY: ${APP_ENCRYPT_KEY:-}
+    volumes:
+      - php_secrets:/app/var/secrets
     command:
       [
         "php",
@@ -96,3 +102,4 @@ volumes:
   caddy_data:
   caddy_config:
   database_data:
+  php_secrets:

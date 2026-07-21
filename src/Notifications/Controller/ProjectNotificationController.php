@@ -156,7 +156,7 @@ final class ProjectNotificationController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $this->notificationDispatcher->dispatchTest($project, $id, $destination->getLabel());
+        $this->notificationDispatcher->dispatchTest($project, $destination);
         $this->addFlash('success', 'notifications.flash.test_queued');
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);

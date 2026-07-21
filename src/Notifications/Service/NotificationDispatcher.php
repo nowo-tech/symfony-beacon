@@ -126,11 +126,20 @@ final readonly class NotificationDispatcher
         );
     }
 
-    public function dispatchTest(Project $project, int $destinationId, string $label): void
+    public function dispatchTest(Project $project, NotificationDestination $destination): void
     {
-        $payload = $this->payloadBuilder->forTest($project, $label);
-        // Send-test always bypasses quiet hours.
-        $this->bus->dispatch(new DeliverNotificationMessage($destinationId, $payload));
+        $id = $destination->getId();
+        if (null === $id) {
+            return;
+        }
+
+        $payload = $this->payloadBuilder->forTest(
+            $project,
+            $destination->getLabel(),
+            $destination->getType(),
+        );
+        // Send-test always bypasses quiet hours and category filters.
+        $this->bus->dispatch(new DeliverNotificationMessage($id, $payload));
     }
 
     /**
