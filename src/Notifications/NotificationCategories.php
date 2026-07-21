@@ -9,13 +9,13 @@ namespace App\Notifications;
  */
 final class NotificationCategories
 {
-    public const N_PLUS_ONE = 'n_plus_one';
+    public const string N_PLUS_ONE = 'n_plus_one';
 
     /** @var list<string> */
-    public const ISSUE_LEVELS = ['fatal', 'error', 'warning', 'info', 'debug'];
+    public const array ISSUE_LEVELS = ['fatal', 'error', 'warning', 'info', 'debug'];
 
     /** @var list<string> */
-    public const ALL = ['fatal', 'error', 'warning', 'info', 'debug', self::N_PLUS_ONE];
+    public const array ALL = ['fatal', 'error', 'warning', 'info', 'debug', self::N_PLUS_ONE];
 
     /**
      * @param list<string> $categories

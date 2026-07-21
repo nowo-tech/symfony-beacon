@@ -69,13 +69,7 @@
                             {% endif %}
                         {% endif %}
                         {% block app_flashes %}
-                            {% for label, messages in app.flashes %}
-                                {% for message in messages %}
-                                    <div class="flash {% if label == 'error' %}flash-error{% else %}flash-success{% endif %}">
-                                        {{ message|trans }}
-                                    </div>
-                                {% endfor %}
-                            {% endfor %}
+                            {% include '_toasts.html.twig' %}
                         {% endblock %}
                         {% block body %}{% endblock %}
 

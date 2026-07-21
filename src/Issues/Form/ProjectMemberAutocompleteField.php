@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use Closure;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -74,6 +75,7 @@ final class ProjectMemberAutocompleteField extends AbstractType
         ]);
     }
 
+    #[Override]
     public function getParent(): string
     {
         return BaseEntityAutocompleteType::class;

@@ -1,6 +1,21 @@
 {% extends 'base.html.twig' %}
 
+{% form_theme form with [
+    '@PasswordStrengthBundle/Form/password_strength_theme_tailwind2.html.twig',
+    'form/auth_kit_theme.html.twig'
+] %}
+
 {% block title %}{{ 'preferences.security.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/toggle_password.css', 'nowo_password_toggle') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('password-strength.js', 'nowo_password_strength') }}" defer></script>
+{% endblock %}
 
 {% block body %}
 <div class="mx-auto max-w-xl">
@@ -10,6 +25,7 @@
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
         {{ form_row(form.currentPassword) }}
         {{ form_row(form.plainPassword) }}
+        {{ form_row(form.plainPassword_confirm) }}
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.security.submit'|trans }}</button>
         </div>

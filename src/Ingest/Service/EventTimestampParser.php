@@ -34,6 +34,6 @@ final class EventTimestampParser
             return $parsed->setTimezone(new DateTimeZone('UTC'));
         }
 
-        return (new DateTimeImmutable('@'.(int) $float))->setTimezone(new DateTimeZone('UTC'));
+        return new DateTimeImmutable('@'.(int) $float)->setTimezone(new DateTimeZone('UTC'));
     }
 }

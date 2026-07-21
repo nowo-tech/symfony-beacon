@@ -7,6 +7,7 @@ nav:
     admin: Administration
     admin_hub: Admin overview
     users: Users
+    groups: Groups
     appearance: Appearance
     menus: Menus
     breadcrumbs: Breadcrumbs
@@ -17,11 +18,18 @@ nav:
     issues: Issues
     performance: Performance
     analytics: Analytics
+api_docs:
+    title: API docs
+    intro: Explore Envelope ingest and related HTTP endpoints. Use Authorize with an X-Beacon-Auth header (beacon_key and beacon_secret from your project DSN).
+    open_json: OpenAPI JSON
 common:
     filter: Filter
+    cancel: Cancel
     yes: 'yes'
     na: n/a
     unknown: unknown
+toast:
+    dismiss: Dismiss
 locale:
     nav: Language
     en: English
@@ -43,6 +51,22 @@ flash:
         history_cleared: Project history cleared.
         deleted: Project deleted.
         delete_confirmation_mismatch: Project name did not match. Nothing was deleted.
+        member_added: Member added to the project.
+        member_role_updated: Member role updated.
+        member_removed: Member removed from the project.
+        member_user_not_found: No user exists with that email. They must register first.
+        member_user_disabled: That user account is disabled.
+        member_already: That user is already a project member.
+        member_invalid_role: Invalid membership role.
+        member_last_owner: The project must keep at least one owner.
+        member_cannot_manage_owner: Admins cannot change or remove owners.
+        member_error: Could not update project members.
+        group_added: Group linked to the project.
+        group_role_updated: Group role updated.
+        group_removed: Group unlinked from the project.
+        group_already: That group is already linked to this project.
+        group_not_found: Group not found.
+        group_link_forbidden: You can only link groups you belong to (project owners and instance admins may link any group).
     appearance:
         saved: Appearance settings saved.
     preferences:
@@ -50,6 +74,29 @@ flash:
         profile_saved: Profile saved.
         password_saved: Password updated.
         display_saved: Display preferences saved.
+        locale_saved: Language updated.
+    users:
+        enabled: User account enabled.
+        disabled: User account disabled.
+        cannot_disable_self: You cannot disable your own account.
+        created: User account created.
+        role_updated: User role updated.
+        invalid_email: Enter a valid email address.
+        name_required: Display name is required.
+        password_too_short: Password must be at least 8 characters.
+        email_taken: That email is already registered.
+        invalid_role: Invalid role.
+        cannot_change_own_role: You cannot change your own role.
+        last_admin: The instance must keep at least one administrator.
+    groups:
+        created: Group created.
+        updated: Group updated.
+        deleted: Group deleted.
+        name_required: Group name is required.
+        user_not_found: No user exists with that email.
+        already_member: That user is already in the group.
+        member_added: User added to the group.
+        member_removed: User removed from the group.
 project:
     label: Project
     no_description: No description
@@ -82,7 +129,40 @@ project:
         add: Add key
     members:
         title: Members
+        help: Direct members of this project. Owners and admins manage membership. Access can also come from linked groups below.
         your_role: 'Your role:'
+        email_label: Member email
+        email_placeholder: user@example.com
+        role_label: Role
+        add: Add member
+        add_title: Add member
+        add_help: The person must already have a Beacon account (same email).
+        update_role: Update
+        remove: Remove
+        remove_title: Remove member?
+        remove_confirm: Remove %email% from this project?
+        edit_role: Edit role
+        edit_role_title: Change member role
+        edit_role_body: 'Choose a new role for %name% (%email%).'
+        last_owner_hint: The project must keep at least one owner.
+        role:
+            owner: Owner
+            admin: Admin
+            member: Member
+    groups:
+        title: Groups
+        help: Link a group so every group member gets the chosen role on this project. Owners must be added as individual users.
+        empty: No groups linked yet.
+        select: Select a group…
+        add: Link group
+        remove: Unlink
+        remove_title: Unlink group?
+        remove_confirm: Unlink group “%name%” from this project?
+        edit_role: Edit group role
+        edit_role_title: Change group role
+        edit_role_body: 'Choose a new role for the group “%name%”.'
+        none_available: All groups are already linked, or create groups under Administration → Groups.
+        member_count: '%count% users in group'
     danger:
         title: Danger zone
         intro: Irreversible actions for this project. Use with care.
@@ -155,6 +235,22 @@ issues:
     assignee_saved: Assignee updated.
     assignee_not_member: That user is not a member of this project.
     assignee_invalid: Could not update the assignee.
+    status:
+        unresolved: Unresolved
+        resolved: Resolved
+        ignored: Ignored
+    status_help: Change how this issue is tracked in the project inbox.
+    status_mark_resolved: Mark resolved
+    status_mark_unresolved: Mark unresolved
+    status_mark_ignored: Ignore
+    status_saved: Issue status updated.
+    status_invalid: Could not update the issue status.
+    history_title: Activity
+    history_empty: No status or assignee changes yet.
+    history_assignee: Assignee
+    history_status: Status
+    history_by: 'by %name%'
+    history_by_system: by system
     filter:
         any_level: Any level
         any_status: any status
@@ -243,11 +339,93 @@ site_appearance:
         invalid: 'Use a hex color like #1f6f54.'
 users:
     title: Users
-    intro: Accounts on this Beacon instance. Prefer nowo-tech/user-kit-bundle for enable/disable and richer account lifecycle.
+    intro: Create accounts, assign instance roles, and enable or disable login (UserKit).
+    create: Add user
+    create_intro: Create a Beacon account. The person can sign in with this email and password.
+    back: Back to users
+    cancel: Cancel
+    role_label: Role
+    last_admin_hint: Keep at least one administrator.
     col:
         user: User
         email: Email
-        roles: Roles
+        status: Status
+        presence: Presence
+        roles: Role
+        actions: Actions
+    status:
+        enabled: Enabled
+        disabled: Disabled
+    presence:
+        online: Online
+        offline: Offline
+    role:
+        user: User
+        admin: Admin
+    form:
+        email: Email
+        display_name: Display name
+        password: Password
+        password_help: At least 8 characters.
+        enabled: Account enabled (can sign in)
+    actions:
+        enable: Enable
+        disable: Disable
+        update_role: Update
+        self: This is you
+        activity: Activity
+    activity:
+        title: Activity history
+        intro: 'Actions involving %name% (%email%) as subject or actor (admin, membership, and product navigation).'
+        recent_title: Recent activity
+        recent_intro: Latest administrative, membership, and product actions across the instance.
+        empty: No recorded actions yet.
+        by: 'By %name%'
+        by_system: By system
+        subject: 'Subject %name%'
+        action:
+            'user.created': User created
+            'user.role_changed': User role changed
+            'user.enabled': User enabled
+            'user.disabled': User disabled
+            'group.created': Group created
+            'group.updated': Group updated
+            'group.deleted': Group deleted
+            'group.member_added': Group member added
+            'group.member_removed': Group member removed
+            'project.member_added': Project member added
+            'project.member_role_changed': Project member role changed
+            'project.member_removed': Project member removed
+            'project.group_linked': Project group linked
+            'project.group_role_changed': Project group role changed
+            'project.group_unlinked': Project group unlinked
+            'project.opened': Project opened
+            'project.settings_viewed': Project settings viewed
+            'project.created': Project created
+            'project.api_key_created': API key created
+            'project.history_cleared': Project history cleared
+            'project.deleted': Project deleted
+            'issue.opened': Issue opened
+            'issue.assigned': Issue assignee changed
+            'issue.status_changed': Issue status changed
+            'event.opened': Event opened
+            'performance.opened': Performance opened
+            'analytics.opened': Analytics opened
+        context:
+            email: Email
+            role: Role
+            enabled: Enabled
+            from: From
+            to: To
+            project: Project
+            project_uuid: Project UUID
+            project_name: Project
+            group: Group
+            group_uuid: Group UUID
+            issue_uuid: Issue UUID
+            issue_title: Issue
+            event_id: Event ID
+            label: Label
     empty: No users yet.
 preferences:
     title: Account settings
@@ -340,11 +518,57 @@ user_preferences:
         second:
             label: Confirm new password
         mismatch: The password fields must match.
+        strength_invalid: 'The password does not meet the strength requirements (%missing%).'
+
+# PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
+requirement.min_length: 'At least %count% characters'
+requirement.max_length: 'At most %count% characters'
+requirement.lowercase: 'At least one lowercase letter'
+requirement.uppercase: 'At least one uppercase letter'
+requirement.digit: 'At least one number'
+requirement.special: 'At least one special character'
+requirement.no_whitespace: 'No whitespace allowed'
+requirement.not_contain: 'Must not contain forbidden text'
+requirement.min_unique_chars: 'At least %count% unique characters'
+requirement.regex: 'Must match the required pattern'
+generator.button: 'Generate password'
+generator.modal_title: 'Suggested passwords'
+generator.modal_hint: 'These passwords match your current policy. Copy one or apply it to the field.'
+generator.copy: 'Copy'
+generator.copied: 'Copied!'
+generator.use_password: 'Use this password'
+generator.close: 'Close'
+generator.failed: 'Could not generate a valid password. Try again or relax the policy.'
+
+groups:
+    title: Groups
+    intro: Organize users into groups, then link groups to projects for bulk access.
+    create: New group
+    empty: No groups yet.
+    open: Open
+    back: Back to groups
+    edit: Edit
+    edit_title: Edit group
+    save: Save group
+    cancel: Cancel
+    delete: Delete group
+    delete_confirm: Delete this group? It will be unlinked from all projects.
+    name_label: Name
+    description_label: Description
+    members_title: Group members
+    members_empty: No members in this group yet.
+    add_member: Add member
+    add_member_help: The person must already have a Beacon account.
+    remove_member: Remove
+    member_email_placeholder: user@example.com
+    member_count: '%count% members'
+
 admin:
     hub:
         title: Administration
         intro: Instance configuration for operators with elevated roles.
         users: List accounts and roles on this instance.
+        groups: Create groups and manage their members for project access.
         appearance: Brand name and accent colors.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
@@ -425,8 +649,8 @@ legal:
 
 notifications:
     title: Notifications
-    intro: Send alerts to Slack Incoming Webhooks or generic HTTP endpoints when new issues, regressions, or N+1 groups appear.
-    empty: No destinations yet. Add a Slack or HTTP webhook to notify your team.
+    intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP endpoint when new issues, regressions, or N+1 groups appear.
+    empty: No destinations yet. Add a channel to notify your team.
     add: Add destination
     edit: Edit
     enable: Enable
@@ -439,15 +663,22 @@ notifications:
     cancel: Cancel
     new_title: New notification destination
     edit_title: Edit notification destination
-    form_help: Paste an Incoming Webhook URL or any HTTPS endpoint that accepts JSON. Secrets in the URL are masked in the settings list.
+    form_help: Choose a channel type and paste the matching endpoint. Secrets are masked in the settings list.
     form:
         label: Label
         type: Type
-        endpoint: Webhook URL
+        endpoint: Endpoint
+        endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS webhook URL. Email: recipient address. Telegram: bot_token@chat_id'
+        endpoint_invalid: Endpoint does not match the selected type.
+        endpoint_ssrf: Endpoint must not target private, link-local, or cloud metadata addresses.
         enabled: Enabled
         categories: Alert categories
     type:
         slack: Slack Incoming Webhook
+        discord: Discord webhook
+        teams: Microsoft Teams webhook
+        telegram: Telegram bot
+        email: Email
         http: Generic HTTP webhook
     category:
         fatal: Fatal
@@ -463,3 +694,65 @@ notifications:
         disabled: Destination disabled.
         deleted: Destination deleted.
         test_queued: Test notification queued for delivery.
+    help:
+        title: Notification setup guides
+        link: Setup guides
+        back: Back to settings
+        toc: Jump to channel
+        intro: Step-by-step instructions to connect Slack, Discord, Microsoft Teams, Telegram, email, or a generic HTTP webhook to this project.
+        payload_label: 'Beacon sends:'
+        docs_hint: 'Full reference (payloads, delivery, permissions): docs/NOTIFICATIONS.md in the repository.'
+        slack:
+            title: Slack (Incoming Webhook)
+            lead: Create a Slack app Incoming Webhook and paste the HTTPS URL into Beacon.
+            step1: Open api.slack.com/apps and create an app From scratch for your workspace.
+            step2: Enable Incoming Webhooks, then Add New Webhook to Workspace and pick a channel.
+            step3: Copy the webhook URL (https://hooks.slack.com/services/…).
+            step4: In Beacon choose Slack Incoming Webhook, paste the URL as the endpoint, select categories, and save.
+            step5: Click Send test and confirm the message appears in Slack.
+            payload: JSON with text (summary) and a beacon object containing the full event payload.
+            tip: Prefer a dedicated ops channel. Rotate the webhook in Slack if it ever leaks; update the destination in Beacon.
+        discord:
+            title: Discord (webhook)
+            lead: Create a channel webhook in Discord and paste its URL into Beacon.
+            step1: Open Server settings → Integrations → Webhooks (or the channel Integrations tab).
+            step2: Create a New Webhook, name it (for example Beacon), and choose the target channel.
+            step3: Copy Webhook URL (https://discord.com/api/webhooks/…).
+            step4: In Beacon choose Discord webhook, paste the URL, select categories, save, then Send test.
+            payload: JSON with content (summary) and an embeds array (title, description, optional issue URL).
+            tip: Discord rate-limits webhooks; Beacon delivers asynchronously via Messenger.
+        teams:
+            title: Microsoft Teams (Incoming Webhook)
+            lead: Add an Incoming Webhook connector to a Teams channel and paste the URL into Beacon.
+            step1: In the Teams channel menu open Connectors (or Manage channel → Connectors).
+            step2: Configure Incoming Webhook, give it a name, and create it.
+            step3: Copy the webhook URL Teams provides.
+            step4: In Beacon choose Microsoft Teams webhook, paste the URL, select categories, save, then Send test.
+            payload: Office 365 MessageCard JSON with summary, title, text, and an Open in Beacon action when a URL exists.
+            tip: If your tenant only allows Workflows instead of classic Incoming Webhooks, point a Generic HTTP destination at a workflow that accepts POST JSON.
+        telegram:
+            title: Telegram (bot)
+            lead: Create a bot with BotFather and store bot_token@chat_id as the Beacon endpoint.
+            step1: Open @BotFather in Telegram, run /newbot, and copy the bot token.
+            step2: Start a private chat with the bot, or add it to a group and send a message.
+            step3: Call getUpdates on the Bot API and read message.chat.id (group ids are often negative).
+            step4: In Beacon choose Telegram bot and set the endpoint to bot_token@chat_id (example — 123:AA…@-1001234567890).
+            step5: Save and Send test.
+            payload: Bot API sendMessage with chat_id and text (summary only; not the full JSON payload).
+            tip: The last @ in the endpoint splits token and chat id. Tokens are encrypted at rest like other endpoints.
+        email:
+            title: Email
+            lead: Deliver alerts to a mailbox via Symfony Mailer. Configure MAILER_DSN first.
+            step1: Set MAILER_DSN in .env or production secrets to a real transport (SMTP, etc.). null://null does not deliver.
+            step2: In Beacon choose Email and set the endpoint to the recipient address.
+            step3: Select categories, save, Send test, and check inbox/spam.
+            payload: Email subject equals the summary; body is the summary plus the issue or performance URL when present.
+            tip: Use a shared ops alias. For richer digests, prefer Slack/Discord/Teams or an HTTP bridge.
+        http:
+            title: Generic HTTP webhook
+            lead: POST the canonical Beacon JSON payload to any HTTPS automation endpoint.
+            step1: Expose an HTTPS URL that accepts POST with Content-Type application/json.
+            step2: In Beacon choose Generic HTTP webhook, paste the URL, select categories, save, then Send test.
+            step3: Confirm your service receives the canonical JSON body (event, summary, project, issue, url, category).
+            payload: Canonical JSON payload as the request body (User-Agent symfony-beacon-notifications/1.0).
+            tip: Prefer HTTPS and authenticate your receiver. Avoid pointing at internal or cloud metadata addresses.

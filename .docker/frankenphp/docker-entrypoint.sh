@@ -64,6 +64,12 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ] || [ 
 		configure_frankenphp_mode
 	fi
 
+	# Bind-mount ./:/app is owned by the host UID; the container often runs as root.
+	# Git 2.35.2+ refuses that mismatch unless /app is marked safe.
+	if command -v git >/dev/null 2>&1; then
+		git config --global --add safe.directory /app 2>/dev/null || true
+	fi
+
 	# Ensure the Symfony front controller exists (not the image welcome page).
 	if [ "$1" = 'frankenphp' ] && [ ! -f public/index.php ]; then
 		echo "ERROR: missing public/index.php. Is the code mounted? (compose.yaml volumes: ./:/app)" >&2

@@ -28,7 +28,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | Item | Repo | Notes |
 |------|------|--------|
 | Envelope ingest + Messenger | Beacon | `003-ingest` |
-| Issues triage UI (fingerprint, assignee, DataTables) | Beacon | `004-issues` |
+| Issues triage UI (fingerprint, assignee, status, history, DataTables) | Beacon | `004-issues` |
 | Performance + N+1 UI | Beacon | `006-performance` |
 | Daily analytics | Beacon | `005-analytics` |
 | AuthKit, projects, Settings, danger zone | Beacon | `002`, `011` |
@@ -44,10 +44,11 @@ Goal: a team can be notified when something new or regressing happens, without b
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 1.1 | **Project notifications** (Slack Incoming Webhook + generic HTTP JSON) | Beacon | `009-project-notifications` | **Done** |
+| 1.1 | **Project notifications** (Slack, Discord, Teams, Telegram, email, generic HTTP) | Beacon | `009-project-notifications` | **Done** |
 | 1.2 | **Regression rules**: reopen `resolved` **and** `ignored` → unresolved on matching event; notify on new + regression only | Beacon | `009` / ingest | **Done** |
-| 1.3 | Settings UI: destinations CRUD, category filters, masked URLs, send-test | Beacon | `009` | **Done** |
-| 1.4 | Async delivery + bounded retries via Messenger | Beacon | `009` | **Done** |
+| 1.3 | Settings UI: destinations CRUD, category filters, masked URLs, send-test, **setup guides** | Beacon | `009` | **Done** |
+| 1.4 | Async delivery + bounded retries via Messenger + **SSRF guard** | Beacon | `009` | **Done** |
+| 1.5 | **API docs in Panel** (Nelmio OpenAPI / Swagger in app shell) | Beacon | `013-api-docs-panel` | **Done** |
 
 ### Exit criteria (Phase 1)
 
@@ -67,7 +68,7 @@ Goal: a team can be notified when something new or regressing happens, without b
 | 2.2 | **Ingest rate limit** per project / API key | Beacon | **Done** |
 | 2.3 | **Health / ready** endpoints + Messenger queue depth signal | Beacon | **Done** |
 | 2.4 | Production scaling / backup notes in `docs/PRODUCTION.md` | Beacon | **Done** |
-| 2.5 | `nowo-tech/login-throttle-bundle` (or equivalent) on AuthKit login | Beacon | **Done** |
+| 2.5 | `nowo-tech/login-throttle-bundle` on AuthKit login (**database** storage shared across workers) | Beacon | **Done** |
 
 ### Exit criteria (Phase 2)
 

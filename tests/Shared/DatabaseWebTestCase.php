@@ -67,4 +67,20 @@ abstract class DatabaseWebTestCase extends WebTestCase
     {
         $client->loginUser($user);
     }
+
+    /**
+     * Envelope auth headers including secret when the API key has one.
+     *
+     * @return array<string, string>
+     */
+    protected function beaconAuthHeaders(ProjectApiKey $apiKey): array
+    {
+        $header = 'Beacon beacon_key='.$apiKey->getPublicKey();
+        $secret = $apiKey->getSecretKey();
+        if (null !== $secret && '' !== $secret) {
+            $header .= ', beacon_secret='.$secret;
+        }
+
+        return ['HTTP_X_BEACON_AUTH' => $header];
+    }
 }

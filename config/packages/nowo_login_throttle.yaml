@@ -1,10 +1,18 @@
+# nowo-tech/login-throttle-bundle
+# https://github.com/nowo-tech/LoginThrottleBundle
+#
+# Wraps Symfony native `login_throttling` on the AuthKit `main` firewall.
+# Keep `security.yaml` firewalls.main.login_throttling in sync (max_attempts / interval).
+# Regenerate with: docker compose exec php bin/console nowo:login-throttle:configure-security --force
+#
+# storage: database — shared across FrankenPHP workers and multi-pod deployments.
 nowo_login_throttle:
     enabled: true
     max_count_attempts: 5
-    timeout: 900
-    watch_period: 3600
+    timeout: 900          # 15 minutes (maps to security login_throttling.interval)
+    watch_period: 3600    # DB cleanup / limiter ID grouping when storage=database
     firewall: main
-    storage: cache
+    storage: database
     rate_limiter: null
     cache_pool: cache.rate_limiter
     lock_factory: null

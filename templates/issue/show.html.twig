@@ -9,24 +9,24 @@
 {% set headline = exception.type|default(issue.title) %}
 {% set subtitle = exception.value|default(payload.message|default(issue.culprit)) %}
 
-<a href="{{ path('issue_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
+<a href="{{ path('issue_index', {id: project.uuid}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
 
-<div class="issue-layout mt-3">
+<header class="issue-hero mt-3">
+    <p class="issue-hero__status">
+        <span class="issue-badge issue-badge--status issue-badge--status-{{ issue.status.value }}">{{ ('issues.status.' ~ issue.status.value)|trans }}</span>
+        <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
+    </p>
+    <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
+    {% if subtitle and subtitle != headline %}
+        <p class="issue-hero__message">{{ subtitle }}</p>
+    {% endif %}
+    {% if issue.culprit %}
+        <p class="issue-hero__culprit font-mono">{{ issue.culprit }}</p>
+    {% endif %}
+</header>
+
+<div class="issue-layout">
     <div class="issue-layout__main">
-        <header class="issue-hero">
-            <p class="issue-hero__status">
-                <span class="issue-badge issue-badge--status">{{ issue.status.value }}</span>
-                <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
-            </p>
-            <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
-            {% if subtitle and subtitle != headline %}
-                <p class="issue-hero__message">{{ subtitle }}</p>
-            {% endif %}
-            {% if issue.culprit %}
-                <p class="issue-hero__culprit font-mono">{{ issue.culprit }}</p>
-            {% endif %}
-        </header>
-
         {% if event %}
             {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
         {% else %}
@@ -72,7 +72,7 @@
                     </div>
                     <div>
                         <dt>{{ 'projects.title'|trans }}</dt>
-                        <dd><a href="{{ path('issue_index', {id: project.id}) }}">{{ project.name }}</a></dd>
+                        <dd><a href="{{ path('issue_index', {id: project.uuid}) }}">{{ project.name }}</a></dd>
                     </div>
                 </dl>
             {% endblock %}
@@ -86,6 +86,72 @@
                     {{ form_errors(assigneeForm.assignee) }}
                     <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
                 {{ form_end(assigneeForm) }}
+
+                <div class="issue-status-actions">
+                    <p class="issue-assignee-form__help">{{ 'issues.status_help'|trans }}</p>
+                    <div class="issue-status-actions__buttons">
+                        {% if issue.status.value != 'resolved' %}
+                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                <input type="hidden" name="status" value="resolved">
+                                <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
+                            </form>
+                        {% endif %}
+                        {% if issue.status.value != 'unresolved' %}
+                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                <input type="hidden" name="status" value="unresolved">
+                                <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
+                            </form>
+                        {% endif %}
+                        {% if issue.status.value != 'ignored' %}
+                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                <input type="hidden" name="status" value="ignored">
+                                <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="issue-history">
+                    <h3 class="issue-history__title">{{ 'issues.history_title'|trans }}</h3>
+                    {% if issueHistory is empty %}
+                        <p class="issue-history__empty">{{ 'issues.history_empty'|trans }}</p>
+                    {% else %}
+                        <ol class="issue-history__list">
+                            {% for entry in issueHistory %}
+                                <li class="issue-history__item">
+                                    <time class="issue-history__when" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                                    <div class="issue-history__body">
+                                        {% if entry.kind.value == 'assignee_changed' %}
+                                            <span class="issue-history__kind">{{ 'issues.history_assignee'|trans }}</span>
+                                            <span>
+                                                {{ entry.fromAssignee ? entry.fromAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
+                                                →
+                                                {{ entry.toAssignee ? entry.toAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
+                                            </span>
+                                        {% else %}
+                                            <span class="issue-history__kind">{{ 'issues.history_status'|trans }}</span>
+                                            <span>
+                                                {{ entry.fromStatus ? ('issues.status.' ~ entry.fromStatus.value)|trans : '—' }}
+                                                →
+                                                {{ entry.toStatus ? ('issues.status.' ~ entry.toStatus.value)|trans : '—' }}
+                                            </span>
+                                        {% endif %}
+                                        <span class="issue-history__actor">
+                                            {% if entry.actor %}
+                                                {{ 'issues.history_by'|trans({'%name%': entry.actor.displayName}) }}
+                                            {% else %}
+                                                {{ 'issues.history_by_system'|trans }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
             {% endblock %}
         {% endembed %}
 
@@ -94,7 +160,7 @@
                 <ul class="issue-event-list">
                     {% for e in events %}
                         <li>
-                            <a href="{{ path('event_show', {projectId: project.id, eventId: e.eventId}) }}" class="font-mono text-xs">{{ e.eventId|slice(0, 12) }}…</a>
+                            <a href="{{ path('event_show', {projectId: project.uuid, eventId: e.eventId}) }}" class="font-mono text-xs">{{ e.eventId|slice(0, 12) }}…</a>
                             <span class="text-[var(--color-ink)]/50 text-xs">{{ e.receivedAt|date('H:i:s') }}</span>
                         </li>
                     {% else %}

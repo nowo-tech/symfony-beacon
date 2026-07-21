@@ -15,6 +15,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
+use DateTime;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -36,13 +37,13 @@ final class SeedDemoCommand extends Command
     /**
      * Stable public key for new demo projects (Envelope auth). Existing projects keep their key.
      */
-    public const DEMO_PUBLIC_KEY = 'd0e1b2eac0ffeedem0beac0nkey00001';
+    public const string DEMO_PUBLIC_KEY = 'd0e1b2eac0ffeedem0beac0nkey00001';
 
     /**
      * Env file consumed by BeaconBundle demo `make sync-beacon`.
      * Written under the project root (not var/) so the host bind-mount sees it — Compose shadows /app/var.
      */
-    public const CLIENT_ENV_FILENAME = '.demo-client.env';
+    public const string CLIENT_ENV_FILENAME = '.demo-client.env';
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -65,7 +66,7 @@ final class SeedDemoCommand extends Command
             ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Demo user password', 'admin123')
             ->addOption('base-url', null, InputOption::VALUE_REQUIRED, 'Browser / UI base URL for DSN display', 'https://localhost:9444')
             ->addOption('ingest-base-url', null, InputOption::VALUE_REQUIRED, 'Docker client ingest base URL for BEACON_DSN', 'http://host.docker.internal:9081')
-            ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)', null);
+            ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -83,6 +84,7 @@ final class SeedDemoCommand extends Command
             $user->setDisplayName('Demo Admin');
             $user->setRoles(['ROLE_ADMIN']);
             $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+            $user->setPasswordChangedAt(new DateTime());
             $this->userRepository->save($user);
             $io->success(\sprintf('Created user %s', $email));
         } else {
@@ -132,33 +134,30 @@ final class SeedDemoCommand extends Command
         }
 
         if ($project instanceof Project && $this->performanceDemoSeeder->seedIfEmpty($project)) {
-            $io->success('Seeded performance samples (including N+1). Open /projects/{id}/performance?nplus1=1');
+            $io->success('Seeded performance samples (including N+1). Open /projects/{uuid}/performance?nplus1=1');
         } else {
             $io->note('Performance N+1 demo samples already exist');
         }
 
         if ($project instanceof Project && $this->analyticsDemoSeeder->seedIfEmpty($project)) {
-            $io->success('Seeded analytics daily stats (14-day window). Open /projects/{id}/analytics');
+            $io->success('Seeded analytics daily stats (14-day window). Open /projects/{uuid}/analytics');
         } else {
             $io->note('Analytics daily stats already cover the demo window');
         }
 
-        if ($apiKey instanceof ProjectApiKey) {
-            $uiDsn = $apiKey->buildDsn($baseUrl);
-            $clientDsn = $apiKey->buildDsn($ingestBaseUrl);
-            $io->writeln('UI DSN: '.$uiDsn);
-            $io->writeln('Client DSN (Docker / BeaconBundle demo): '.$clientDsn);
-            $io->writeln('Public key: '.$apiKey->getPublicKey());
-            $io->writeln(\sprintf('Login: %s / %s', $email, $password));
+        $uiDsn = $apiKey->buildDsn($baseUrl);
+        $clientDsn = $apiKey->buildDsn($ingestBaseUrl);
+        $io->writeln('UI DSN: '.$uiDsn);
+        $io->writeln('Client DSN (Docker / BeaconBundle demo): '.$clientDsn);
+        $io->writeln('Public key: '.$apiKey->getPublicKey());
+        $io->writeln(\sprintf('Login: %s / %s', $email, $password));
 
-            $writeOpt = $input->getOption('write-client-env');
-            if ('' !== $writeOpt) {
-                $path = \is_string($writeOpt) && '' !== $writeOpt
-                    ? $writeOpt
-                    : $this->projectDir.'/'.self::CLIENT_ENV_FILENAME;
-                $this->writeClientEnv($path, $clientDsn, $uiDsn, $apiKey, $email, $password);
-                $io->success(\sprintf('Wrote %s (BeaconBundle demo: make sync-beacon)', $path));
-            }
+        $writeOpt = $input->getOption('write-client-env');
+        // Skip only when explicitly empty; null (option omitted) writes the default path.
+        if (!\is_string($writeOpt) || '' !== $writeOpt) {
+            $path = \is_string($writeOpt) ? $writeOpt : $this->projectDir.'/'.self::CLIENT_ENV_FILENAME;
+            $this->writeClientEnv($path, $clientDsn, $uiDsn, $apiKey, $email, $password);
+            $io->success(\sprintf('Wrote %s (BeaconBundle demo: make sync-beacon)', $path));
         }
 
         return Command::SUCCESS;

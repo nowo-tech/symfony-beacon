@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Project\Entity;
 
+use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Notifications\Entity\NotificationDestination;
 use App\Project\Repository\ProjectRepository;
-use DateTimeImmutable;
+use App\Shared\Doctrine\PublicUuidTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\AuditableInterface;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 
 /**
  * Telemetry project owning API keys, memberships, and ingested data.
@@ -18,8 +21,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'project')]
 #[ORM\UniqueConstraint(name: 'uniq_project_slug', columns: ['slug'])]
-class Project
+#[ORM\UniqueConstraint(name: 'uniq_project_uuid', columns: ['uuid'])]
+class Project implements AuditableInterface
 {
+    use PublicUuidTrait;
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -42,6 +49,10 @@ class Project
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $memberships;
 
+    /** @var Collection<int, ProjectGroupAccess> */
+    #[ORM\OneToMany(targetEntity: ProjectGroupAccess::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $groupAccesses;
+
     /** @var Collection<int, Issue> */
     #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'project')]
     private Collection $issues;
@@ -50,16 +61,22 @@ class Project
     #[ORM\OneToMany(targetEntity: NotificationDestination::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
     private Collection $notificationDestinations;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'updated_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $updatedBy = null;
 
     public function __construct()
     {
+        $this->ensureUuid();
         $this->apiKeys = new ArrayCollection();
         $this->memberships = new ArrayCollection();
+        $this->groupAccesses = new ArrayCollection();
         $this->issues = new ArrayCollection();
         $this->notificationDestinations = new ArrayCollection();
-        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -139,6 +156,38 @@ class Project
         return $this;
     }
 
+    public function removeMembership(ProjectMembership $membership): self
+    {
+        $this->memberships->removeElement($membership);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectGroupAccess>
+     */
+    public function getGroupAccesses(): Collection
+    {
+        return $this->groupAccesses;
+    }
+
+    public function addGroupAccess(ProjectGroupAccess $access): self
+    {
+        if (!$this->groupAccesses->contains($access)) {
+            $this->groupAccesses->add($access);
+            $access->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupAccess(ProjectGroupAccess $access): self
+    {
+        $this->groupAccesses->removeElement($access);
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Issue>
      */
@@ -165,8 +214,23 @@ class Project
         return $this;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedBy(): ?object
     {
-        return $this->createdAt;
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?object $createdBy): void
+    {
+        $this->createdBy = $createdBy instanceof User ? $createdBy : null;
+    }
+
+    public function getUpdatedBy(): ?object
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?object $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy instanceof User ? $updatedBy : null;
     }
 }

@@ -20,17 +20,22 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member`)
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
-- **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register
+- Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
+- **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register, password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
+- Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
+- Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs)
+- Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
+- Account Display collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify)
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Project **Settings** with API keys, members, **notification destinations** (Slack / HTTP), and danger zone
+- Project **Settings** with API keys, members, **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP), and danger zone
 - Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive table (server-side sort + page in the URL)
-- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts
+- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily analytics (errors, transactions, N+1 counts)
-- Project notifications (Slack Incoming Webhook + generic HTTP JSON)
+- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
-- Performance transactions/spans with **N+1** detection (`/projects/{id}/performance`, filter `?nplus1=1`)
+- Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
@@ -97,10 +102,10 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | `Identity` | Users (AuthKit login/register), account prefs, seed command |
 | `Project` | Projects, API keys, memberships, Settings / danger zone |
 | `Ingest` | Envelope API + async pipeline |
-| `Issues` | Grouping, list/filter, assignee, event detail |
+| `Issues` | Grouping, list/filter, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates |
-| `Notifications` | Slack / HTTP webhook destinations |
+| `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP destinations |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
 
 ## Spec-Driven Development
@@ -123,6 +128,7 @@ docker compose exec php php bin/phpunit
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)
+- [Security policy](SECURITY.md)
 - [DSN / SDK](docs/DSN.md)
 - [Event context (timestamps, versions, user)](docs/EVENT-CONTEXT.md)
 - [Mobile / PWA (Hotwire Native removed)](docs/NATIVE-MOBILE.md)

@@ -70,7 +70,12 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
             $client->getResponse()->isRedirect(),
             'Expected redirect after registration, got '.$client->getResponse()->getStatusCode().': '.$client->getResponse()->getContent()
         );
+        // AuthKit may redirect to /dashboard?_locale=…; UserPreferredLocaleSubscriber strips _locale.
         $client->followRedirect();
+        $status = $client->getResponse()->getStatusCode();
+        if ($status >= 300 && $status < 400) {
+            $client->followRedirect();
+        }
         self::assertResponseIsSuccessful();
 
         $em = self::getContainer()->get('doctrine')->getManager();

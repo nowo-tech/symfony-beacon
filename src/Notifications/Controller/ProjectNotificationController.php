@@ -12,10 +12,13 @@ use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -31,9 +34,12 @@ final class ProjectNotificationController extends AbstractController
     ) {
     }
 
-    #[Route('/projects/{id}/notifications/new', name: 'project_notification_new', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function new(Project $project, Request $request): Response
-    {
+    #[Route('/projects/{id}/notifications/new', name: 'project_notification_new', requirements: ['id' => Requirement::UUID], methods: ['GET', 'POST'])]
+    public function new(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
         $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
@@ -50,7 +56,7 @@ final class ProjectNotificationController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'notifications.flash.created');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getId()]);
+            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
         return $this->render('notifications/form.html.twig', [
@@ -61,11 +67,15 @@ final class ProjectNotificationController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/{projectId}/notifications/{id}/edit', name: 'project_notification_edit', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['GET', 'POST'])]
-    public function edit(int $projectId, NotificationDestination $destination, Request $request): Response
-    {
+    #[Route('/projects/{projectId}/notifications/{id}/edit', name: 'project_notification_edit', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET', 'POST'])]
+    public function edit(
+        string $projectId,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        NotificationDestination $destination,
+        Request $request,
+    ): Response {
         $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getId() !== $projectId) {
+        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
 
@@ -80,7 +90,7 @@ final class ProjectNotificationController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'notifications.flash.updated');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getId()]);
+            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
         return $this->render('notifications/form.html.twig', [
@@ -91,9 +101,13 @@ final class ProjectNotificationController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/{projectId}/notifications/{id}/toggle', name: 'project_notification_toggle', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['POST'])]
-    public function toggle(int $projectId, NotificationDestination $destination, Request $request): Response
-    {
+    #[Route('/projects/{projectId}/notifications/{id}/toggle', name: 'project_notification_toggle', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    public function toggle(
+        string $projectId,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        NotificationDestination $destination,
+        Request $request,
+    ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
         if (!$this->isCsrfTokenValid('notif_toggle_'.$destination->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException();
@@ -103,12 +117,16 @@ final class ProjectNotificationController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', $destination->isEnabled() ? 'notifications.flash.enabled' : 'notifications.flash.disabled');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getId()]);
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
-    #[Route('/projects/{projectId}/notifications/{id}/delete', name: 'project_notification_delete', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['POST'])]
-    public function delete(int $projectId, NotificationDestination $destination, Request $request): Response
-    {
+    #[Route('/projects/{projectId}/notifications/{id}/delete', name: 'project_notification_delete', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    public function delete(
+        string $projectId,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        NotificationDestination $destination,
+        Request $request,
+    ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
         if (!$this->isCsrfTokenValid('notif_delete_'.$destination->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException();
@@ -118,12 +136,16 @@ final class ProjectNotificationController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', 'notifications.flash.deleted');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getId()]);
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
-    #[Route('/projects/{projectId}/notifications/{id}/test', name: 'project_notification_test', requirements: ['projectId' => '\d+', 'id' => '\d+'], methods: ['POST'])]
-    public function test(int $projectId, NotificationDestination $destination, Request $request): Response
-    {
+    #[Route('/projects/{projectId}/notifications/{id}/test', name: 'project_notification_test', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    public function test(
+        string $projectId,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        NotificationDestination $destination,
+        Request $request,
+    ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
         if (!$this->isCsrfTokenValid('notif_test_'.$destination->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException();
@@ -137,13 +159,27 @@ final class ProjectNotificationController extends AbstractController
         $this->notificationDispatcher->dispatchTest($project, $id, $destination->getLabel());
         $this->addFlash('success', 'notifications.flash.test_queued');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getId()]);
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
-    private function requireManagedDestination(int $projectId, NotificationDestination $destination): Project
+    #[Route('/projects/{id}/notifications/help', name: 'project_notification_help', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    public function help(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->projectAccess->requireAccess($project, $user);
+
+        return $this->render('notifications/help.html.twig', [
+            'project' => $project,
+        ]);
+    }
+
+    private function requireManagedDestination(string $projectId, NotificationDestination $destination): Project
     {
         $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getId() !== $projectId) {
+        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
             throw $this->createNotFoundException();
         }
 

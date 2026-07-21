@@ -8,22 +8,22 @@
 {% set headline = exception.type|default(payload.message|default(issue.title)) %}
 {% set subtitle = exception.value|default(null) %}
 
-<a href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}" class="text-sm no-underline">{{ 'issues.back_to_issue'|trans }}</a>
+<a href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}" class="text-sm no-underline">{{ 'issues.back_to_issue'|trans }}</a>
 
-<div class="issue-layout mt-3">
+<header class="issue-hero mt-3">
+    <p class="issue-hero__status">
+        <span class="issue-badge">{{ 'issues.event'|trans }}</span>
+        <span class="issue-badge issue-badge--level">{{ payload.level|default(issue.level) }}</span>
+    </p>
+    <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
+    {% if subtitle %}
+        <p class="issue-hero__message">{{ subtitle }}</p>
+    {% endif %}
+    <p class="issue-hero__culprit font-mono text-xs">{{ event.eventId }} · {{ event.platform }} · {{ event.environment|default('common.na'|trans) }}</p>
+</header>
+
+<div class="issue-layout">
     <div class="issue-layout__main">
-        <header class="issue-hero">
-            <p class="issue-hero__status">
-                <span class="issue-badge">{{ 'issues.event'|trans }}</span>
-                <span class="issue-badge issue-badge--level">{{ payload.level|default(issue.level) }}</span>
-            </p>
-            <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
-            {% if subtitle %}
-                <p class="issue-hero__message">{{ subtitle }}</p>
-            {% endif %}
-            <p class="issue-hero__culprit font-mono text-xs">{{ event.eventId }} · {{ event.platform }} · {{ event.environment|default('common.na'|trans) }}</p>
-        </header>
-
         {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
     </div>
 
@@ -41,11 +41,11 @@
                     </div>
                     <div>
                         <dt>{{ 'projects.title'|trans }}</dt>
-                        <dd><a href="{{ path('issue_index', {id: project.id}) }}">{{ project.name }}</a></dd>
+                        <dd><a href="{{ path('issue_index', {id: project.uuid}) }}">{{ project.name }}</a></dd>
                     </div>
                     <div>
                         <dt>{{ 'issues.back_to_issue'|trans }}</dt>
-                        <dd><a href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}">#{{ issue.id }}</a></dd>
+                        <dd><a href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">#{{ issue.id }}</a></dd>
                     </div>
                 </dl>
             {% endblock %}

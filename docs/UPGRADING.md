@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.8.1 to the next release](#upgrading-from-081-to-the-next-release)
+- [Upgrading from 0.9.0 to the next release](#upgrading-from-090-to-the-next-release)
+- [Upgrading from 0.8.1 to 0.9.0](#upgrading-from-081-to-090)
 - [Upgrading from 0.8.0 to 0.8.1](#upgrading-from-080-to-081)
 - [Upgrading from 0.7.2 to 0.8.0](#upgrading-from-072-to-080)
 - [Upgrading from 0.7.1 to 0.7.2](#upgrading-from-071-to-072)
@@ -19,16 +20,87 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.8.1 to the next release
+## Upgrading from 0.9.0 to the next release
 
-When a newer tag exists:
+No upgrade notes yet.
 
-1. Read the new section in [`CHANGELOG.md`](CHANGELOG.md).
-2. Diff your `.env` against `.env.dist`.
-3. Rebuild containers if Docker/FrankenPHP/Node changed: `make down && make build && make up`.
-4. Run migrations: `make console ARGS='doctrine:migrations:migrate -n'`.
-5. Rebuild frontend assets if you deploy without Vite HMR: `make vite-build`.
-6. Run quality checks: `make qa` (or at least `make test`).
+## Upgrading from 0.8.1 to 0.9.0
+
+### 1. Pull and migrate
+
+```bash
+git pull
+composer install
+make console ARGS='doctrine:migrations:migrate -n'
+make vite-build
+```
+
+Migrations:
+
+- `Version20260721080000` — password policy (`password_changed_at`, `password_history`)
+- `Version20260721090000` — UserKit (`enabled`, `last_activity_at`, `updated_at` on `app_user`) + AuditKit blame/timestamp columns on `project`, `site_appearance`, `notification_destination`
+- `Version20260721100000` — widen `project_api_key.secret_key` and `notification_destination.endpoint_url` for Halite ciphertext
+- `Version20260721110000` — `issue_history` timeline for assignee and status changes
+- `Version20260721120000` — public `uuid` columns for UI routes (Project, Issue, PerfTransaction, NotificationDestination, User)
+- `Version20260721130000` — user groups (`user_group`, `user_group_membership`) and project↔group access (`project_group_access`)
+- `Version20260721140000` — user activity history (`user_action`) for admin, membership, and product actions
+- `Version20260721150000` — `login_attempts` table for login-throttle database storage (multi-worker)
+
+Existing users keep working: new users default to `enabled = 1`; `password_changed_at` / `last_activity_at` null until first change / request. Plaintext secrets/URLs already in the DB remain readable until the next update (then encrypted with the `<ENC>` marker).
+
+### Breaking: Envelope auth wire names
+
+Ingest auth uses Beacon-native names only:
+
+- Header: `X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET`
+- Or query: `?beacon_key=…&beacon_secret=…`
+- Or envelope header JSON `"dsn": "https://PUBLIC:SECRET@host/projectId"`
+
+Upgrade the client to [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) **1.5.0+** (required DSN secret + `X-Beacon-Auth`). See [DSN.md](DSN.md).
+
+### UI route UUIDs
+
+Dashboard URLs now use opaque UUID path segments (e.g. `/projects/{uuid}/issues/{uuid}`). Integer primary keys stay internal. **Envelope ingest is unchanged:** `/api/{projectId}/envelope/` still uses the numeric project id from the DSN. Update bookmarks and any hard-coded UI links after migrate.
+
+### Users and groups
+
+- **Administration → Groups**: create groups and add existing users by email.
+- **Project Settings**: add users one-to-one **or** link a group (role admin/member). Owners remain direct user memberships only.
+- **Administration → Users → Activity**: timeline of admin/membership/product actions (optional client IP — see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
+
+### Notification channels
+
+Project Settings → Notifications now supports **Discord**, **Microsoft Teams**, **Telegram** (`bot_token@chat_id`), and **email** in addition to Slack / generic HTTP. Email requires a real `MAILER_DSN`. See [NOTIFICATIONS.md](NOTIFICATIONS.md).
+
+### API docs
+
+Authenticated operators can open **Panel → API docs** (`/api/doc`). Authorize Try-it-out with `X-Beacon-Auth`.
+
+### Migrations Kit rewrite (no new schema from the rewrite itself)
+
+All files under `migrations/` were rewritten to the declarative MDK format of [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle). **Version class names are unchanged**, so already-applied installs do not re-run them.
+
+### Issue status UI + history
+
+Issue detail sidebar supports **Mark resolved**, **Reopen**, and **Ignore**. Assignee and status changes (including ingest reopen) are stored in `issue_history`.
+
+### 2. Behaviour
+
+- Changing password at `/account/security` rejects reuse of the last N hashes (`passwords_to_remember: 5`) and rejects the same as the current password.
+- Expiry flash (90 days after last change) on account + dashboard routes; see `config/packages/nowo_password_policy.yaml`.
+- Disabled accounts cannot log in. Admins toggle status at `/admin/users`.
+- AuditKit timestamps/blame via `App\Shared\Audit\AuditableDoctrineBridge`.
+- Field encryption (Halite): `ProjectApiKey.secretKey` and `NotificationDestination.endpointUrl`. Persist `var/secrets/.Halite.default.key` (or `APP_ENCRYPT_KEY`) before multi-node / prod deploy.
+
+### 3. Verify
+
+```bash
+make test
+# or
+docker compose exec php vendor/bin/phpunit tests/Identity/ tests/Ingest/EnvelopeAuthParserTest.php tests/Shared/ApiDocAccessTest.php
+```
+
+Log in, open `/api/doc`, and confirm OpenAPI title **Symfony Beacon API**. Send a test Envelope with BeaconBundle **1.5+**.
 
 ---
 
@@ -198,6 +270,11 @@ curl -fsS http://localhost:9081/health/live
 | MySQL | Compose service (see `compose.yaml`) | Default host port `3308` |
 | Auth | `nowo-tech/auth-kit-bundle` | First-user registration + i18n |
 | Login throttle | `nowo-tech/login-throttle-bundle` | Brute-force protection |
+| Password policy | `nowo-tech/password-policy-bundle` | History + expiry on account security |
+| User lifecycle | `nowo-tech/user-kit-bundle` | Enable/disable, last activity, online |
+| Audit fields | `nowo-tech/audit-kit-bundle` | created/updated + blame on opt-in entities |
+| Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite at-rest encryption for secrets |
+| Migrations | `nowo-tech/migrations-kit-bundle` | Declarative MDK definitions in `migrations/` |
 | Cookies / legal | `nowo-tech/cookie-consent-bundle` | Consent modal + legal pages |
 | Menus / breadcrumbs / forms / PWA | Nowo kit bundles | See README Features |
 | Autocomplete | `symfony/ux-autocomplete` | Issue assignee field |
@@ -338,7 +415,7 @@ docker compose restart php
 BeaconBundle demos should use:
 
 ```env
-BEACON_DSN=http://PUBLIC_KEY@host.docker.internal:9081/1
+BEACON_DSN=http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9081/1
 ```
 
 See [`DSN.md`](DSN.md).

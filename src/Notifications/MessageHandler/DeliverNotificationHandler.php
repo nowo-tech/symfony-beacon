@@ -7,22 +7,28 @@ namespace App\Notifications\MessageHandler;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\NotificationOutboundFormatter;
+use App\Notifications\Service\OutboundUrlGuard;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
 /**
- * Delivers one notification attempt to Slack or a generic HTTP webhook.
+ * Delivers one notification attempt (Slack, Discord, Teams, Telegram, email, or HTTP).
  */
 #[AsMessageHandler]
 final readonly class DeliverNotificationHandler
 {
     public function __construct(
         private NotificationDestinationRepository $destinationRepository,
+        private NotificationOutboundFormatter $outboundFormatter,
+        private OutboundUrlGuard $outboundUrlGuard,
         private HttpClientInterface $httpClient,
+        private MailerInterface $mailer,
         private LoggerInterface $logger,
     ) {
     }
@@ -34,9 +40,9 @@ final readonly class DeliverNotificationHandler
             return;
         }
 
-        $url = $destination->getEndpointUrl();
-        if ('' === $url) {
-            $this->logger->warning('Notification destination has empty URL.', [
+        $endpoint = $destination->getEndpointUrl();
+        if ('' === $endpoint) {
+            $this->logger->warning('Notification destination has empty endpoint.', [
                 'destination_id' => $message->destinationId,
             ]);
 
@@ -44,17 +50,24 @@ final readonly class DeliverNotificationHandler
         }
 
         try {
-            if (NotificationDestinationType::Slack === $destination->getType()) {
-                $body = [
-                    'text' => (string) ($message->payload['summary'] ?? 'Beacon notification'),
-                    'beacon' => $message->payload,
-                ];
-            } else {
-                $body = $message->payload;
+            if (NotificationDestinationType::Email === $destination->getType()) {
+                $this->deliverEmail($endpoint, $message->payload);
+
+                return;
             }
 
-            $response = $this->httpClient->request('POST', $url, [
-                'json' => $body,
+            $request = $this->outboundFormatter->httpRequest(
+                $destination->getType(),
+                $endpoint,
+                $message->payload,
+            );
+
+            if (NotificationDestinationType::Telegram !== $destination->getType()) {
+                $this->outboundUrlGuard->assertSafeHttpUrl($request['url']);
+            }
+
+            $response = $this->httpClient->request('POST', $request['url'], [
+                'json' => $request['json'],
                 'timeout' => 10,
                 'headers' => [
                     'User-Agent' => 'symfony-beacon-notifications/1.0',
@@ -66,7 +79,7 @@ final readonly class DeliverNotificationHandler
             if ($status < 200 || $status >= 300) {
                 throw new RuntimeException(\sprintf('Destination returned HTTP %d', $status));
             }
-        } catch (TransportExceptionInterface|Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error('Notification delivery failed.', [
                 'destination_id' => $message->destinationId,
                 'exception' => $e->getMessage(),
@@ -74,5 +87,25 @@ final readonly class DeliverNotificationHandler
 
             throw $e;
         }
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function deliverEmail(string $to, array $payload): void
+    {
+        $summary = (string) ($payload['summary'] ?? 'Beacon notification');
+        $url = isset($payload['url']) ? (string) $payload['url'] : '';
+        $body = $summary;
+        if ('' !== $url) {
+            $body .= "\n\n".$url;
+        }
+
+        $email = (new Email())
+            ->to($to)
+            ->subject($summary)
+            ->text($body);
+
+        $this->mailer->send($email);
     }
 }

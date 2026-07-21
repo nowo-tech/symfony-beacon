@@ -1,4 +1,5 @@
 {% use "form_div_layout.html.twig" %}
+{% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
 
 {%- block form_row -%}
     <div class="{{ row_attr.class|default('space-y-1.5') }}">
@@ -28,6 +29,11 @@
         {{- parent() -}}
     {% endif %}
 {%- endblock form_widget_simple -%}
+
+{%- block toggle_password_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
+    {{- parent() -}}
+{%- endblock toggle_password_widget -%}
 
 {%- block textarea_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}

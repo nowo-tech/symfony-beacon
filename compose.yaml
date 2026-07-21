@@ -26,6 +26,10 @@ services:
       FRANKENPHP_LOOP_MAX: ${FRANKENPHP_LOOP_MAX:-500}
       FRANKENPHP_RESET_KERNEL: ${FRANKENPHP_RESET_KERNEL:-false}
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      # Host bind-mount ./:/app is not owned by container root; silence Git "dubious ownership".
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /app
     volumes:
       # Bind-mount is required: without it, the image welcome index.php is served
       # and worker mode fails with "has not reached frankenphp_handle_request()".
@@ -73,6 +77,9 @@ services:
       VITE_USE_POLLING: ${VITE_USE_POLLING:-0}
       DEFAULT_URI: ${DEFAULT_URI:-https://localhost:9444}
       HTTPS_PORT: ${HTTPS_PORT:-9444}
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /app
     volumes:
       - ./:/app
       - /app/var
@@ -142,6 +149,9 @@ services:
       DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=1}
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /app
     volumes:
       - ./:/app
       - /app/var

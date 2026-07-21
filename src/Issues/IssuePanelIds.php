@@ -9,18 +9,18 @@ namespace App\Issues;
  */
 final class IssuePanelIds
 {
-    public const HIGHLIGHTS = 'highlights';
-    public const STACKTRACE = 'stacktrace';
-    public const MESSAGE = 'message';
-    public const BREADCRUMBS = 'breadcrumbs';
-    public const REQUEST = 'request';
-    public const TAGS = 'tags';
-    public const CONTEXTS = 'contexts';
-    public const EXTRA = 'extra';
-    public const RAW = 'raw';
-    public const DETAILS = 'details';
-    public const ASSIGNEE = 'assignee';
-    public const RECENT_EVENTS = 'recent_events';
+    public const string HIGHLIGHTS = 'highlights';
+    public const string STACKTRACE = 'stacktrace';
+    public const string MESSAGE = 'message';
+    public const string BREADCRUMBS = 'breadcrumbs';
+    public const string REQUEST = 'request';
+    public const string TAGS = 'tags';
+    public const string CONTEXTS = 'contexts';
+    public const string EXTRA = 'extra';
+    public const string RAW = 'raw';
+    public const string DETAILS = 'details';
+    public const string ASSIGNEE = 'assignee';
+    public const string RECENT_EVENTS = 'recent_events';
 
     /**
      * @return list<string>

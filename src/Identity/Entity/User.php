@@ -7,21 +7,38 @@ namespace App\Identity\Entity;
 use App\Identity\Repository\UserRepository;
 use App\Issues\IssuePanelIds;
 use App\Project\Entity\ProjectMembership;
-use DateTimeImmutable;
+use App\Shared\Doctrine\PublicUuidTrait;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
+use Nowo\AuditKitBundle\Model\TimestampableInterface;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
+use Nowo\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
+use Nowo\PasswordPolicyBundle\Model\PasswordHistoryInterface;
+use Nowo\PasswordPolicyBundle\Validator\PasswordPolicy;
+use Nowo\UserKitBundle\Model\AccountStatusInterface;
+use Nowo\UserKitBundle\Model\EnabledUserTrait;
+use Nowo\UserKitBundle\Model\LastActivityInterface;
+use Nowo\UserKitBundle\Model\LastActivityTrait;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Application user (AuthKit / Security) with locale, theme, and issue panel preferences.
+ * Application user (AuthKit / Security / UserKit) with locale, theme, and issue panel preferences.
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'app_user')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', columns: ['email'])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ORM\UniqueConstraint(name: 'uniq_app_user_uuid', columns: ['uuid'])]
+class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPasswordPolicyInterface, AccountStatusInterface, LastActivityInterface, TimestampableInterface
 {
+    use EnabledUserTrait;
+    use LastActivityTrait;
+    use PublicUuidTrait;
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -39,6 +56,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private string $password = '';
+
+    /**
+     * Transient plain password for forms (never persisted).
+     * Validated against password history via {@see PasswordPolicy}.
+     */
+    #[PasswordPolicy]
+    private ?string $plainPassword = null;
+
+    /** Last password change; null = never tracked (expiry skipped until first change). */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?DateTime $passwordChangedAt = null;
+
+    /** @var Collection<int, PasswordHistory> */
+    #[ORM\OneToMany(targetEntity: PasswordHistory::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $passwordHistory;
 
     /** Preferred UI locale (`en` / `es`); null = follow request / browser. */
     #[ORM\Column(length: 8, nullable: true)]
@@ -64,13 +96,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     public function __construct()
     {
+        $this->ensureUuid();
         $this->memberships = new ArrayCollection();
-        $this->createdAt = new DateTimeImmutable();
+        $this->passwordHistory = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,6 +189,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getPasswordChangedAt(): ?DateTime
+    {
+        return $this->passwordChangedAt;
+    }
+
+    public function setPasswordChangedAt(DateTime $dateTime): self
+    {
+        $this->passwordChangedAt = $dateTime;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PasswordHistoryInterface>
+     */
+    public function getPasswordHistory(): Collection
+    {
+        /** @var Collection<int, PasswordHistoryInterface> $history */
+        $history = $this->passwordHistory;
+
+        return $history;
+    }
+
+    public function addPasswordHistory(PasswordHistoryInterface $passwordHistory): static
+    {
+        if (!$passwordHistory instanceof PasswordHistory) {
+            throw new InvalidArgumentException(\sprintf('Expected %s, got %s.', PasswordHistory::class, $passwordHistory::class));
+        }
+
+        if (!$this->passwordHistory->contains($passwordHistory)) {
+            $this->passwordHistory->add($passwordHistory);
+            $passwordHistory->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePasswordHistory(PasswordHistoryInterface $passwordHistory): static
+    {
+        if ($passwordHistory instanceof PasswordHistory && $this->passwordHistory->removeElement($passwordHistory)) {
+            // Owning side stays on history; orphanRemoval cleans up on flush.
+        }
+
+        return $this;
+    }
+
     public function getPreferredLocale(): ?string
     {
         return $this->preferredLocale;
@@ -234,6 +322,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+        $this->plainPassword = null;
     }
 
     /**
@@ -242,10 +331,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMemberships(): Collection
     {
         return $this->memberships;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
     }
 }

@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'notifications.help.title'|trans }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+{% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
+
+<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+    <div>
+        <h1 class="notification-help__title text-2xl font-semibold">{{ 'notifications.help.title'|trans }}</h1>
+        <p class="mt-2 max-w-3xl text-sm text-[var(--color-ink)]/65">{{ 'notifications.help.intro'|trans }}</p>
+    </div>
+    <a class="btn-ghost" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'notifications.help.back'|trans }}</a>
+</div>
+
+<nav class="mb-8 flex flex-wrap gap-2 text-sm" aria-label="{{ 'notifications.help.toc'|trans }}">
+    {% for channel in ['slack', 'discord', 'teams', 'telegram', 'email', 'http'] %}
+        <a class="btn-ghost no-underline" href="#help-{{ channel }}">{{ ('notifications.type.' ~ channel)|trans }}</a>
+    {% endfor %}
+</nav>
+
+<div class="space-y-6">
+    {% for channel in ['slack', 'discord', 'teams', 'telegram', 'email', 'http'] %}
+        <section id="help-{{ channel }}" class="panel scroll-mt-6">
+            <h2 class="text-lg font-semibold">{{ ('notifications.help.' ~ channel ~ '.title')|trans }}</h2>
+            <p class="mt-2 text-sm text-[var(--color-ink)]/70">{{ ('notifications.help.' ~ channel ~ '.lead')|trans }}</p>
+            <ol class="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[var(--color-ink)]/85">
+                {% for step in 1..8 %}
+                    {% set stepKey = 'notifications.help.' ~ channel ~ '.step' ~ step %}
+                    {% set stepText = stepKey|trans %}
+                    {% if stepText != stepKey %}
+                        <li>{{ stepText }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+            <p class="mt-4 text-sm text-[var(--color-ink)]/65">
+                <span class="font-medium text-[var(--color-ink)]">{{ 'notifications.help.payload_label'|trans }}</span>
+                {{ ('notifications.help.' ~ channel ~ '.payload')|trans }}
+            </p>
+            {% set tipKey = 'notifications.help.' ~ channel ~ '.tip' %}
+            {% set tipText = tipKey|trans %}
+            {% if tipText != tipKey %}
+                <p class="mt-3 rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] px-3 py-2 text-sm text-[var(--color-ink)]/70">
+                    {{ tipText }}
+                </p>
+            {% endif %}
+        </section>
+    {% endfor %}
+</div>
+
+<p class="mt-8 text-sm text-[var(--color-ink)]/55">{{ 'notifications.help.docs_hint'|trans }}</p>
+{% endblock %}

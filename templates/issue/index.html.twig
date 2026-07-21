@@ -16,7 +16,7 @@
     dir: filters.dir,
 } %}
 
-<form method="get" action="{{ path('issue_index', {id: project.id}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
+<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
     <input type="hidden" name="sort" value="{{ filters.sort }}">
     <input type="hidden" name="dir" value="{{ filters.dir }}">
     <input type="hidden" name="page" value="1">
@@ -76,7 +76,7 @@
                         <th class="{{ column.head_class }}" data-priority="{{ column.priority }}">
                             <a
                                 class="issue-table__sort{% if filters.sort == column.key %} is-active is-{{ filters.dir }}{% endif %}"
-                                href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({sort: next.field, dir: next.direction, page: 1})) }}"
+                                href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({sort: next.field, dir: next.direction, page: 1})) }}"
                                 title="{{ 'issues.sort_by'|trans({'%column%': column.label|trans}) }}"
                             >{{ column.label|trans }}</a>
                         </th>
@@ -89,7 +89,7 @@
                     {% set assigneeLabel = issue.assignee ? (issue.assignee.displayName ?: issue.assignee.email) : ('issues.assignee_unassigned'|trans) %}
                     <tr>
                         <td class="issue-table__issue">
-                            <a class="font-medium no-underline issue-table__title" href="{{ path('issue_show', {projectId: project.id, id: issue.id}) }}" data-action="click->datatable#openIssue">{{ issue.title }}</a>
+                            <a class="font-medium no-underline issue-table__title" href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}" data-action="click->datatable#openIssue">{{ issue.title }}</a>
                             <div class="text-xs text-[var(--color-ink)]/55 issue-table__culprit">{{ issue.culprit }}</div>
                         </td>
                         <td data-order="{{ issue.level }}">
@@ -123,7 +123,7 @@
             {% if pagination.total_pages > 1 %}
                 <nav class="issue-pagination__nav" aria-label="{{ 'issues.pagination.nav'|trans }}">
                     {% if pagination.page > 1 %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: pagination.page - 1})) }}">{{ 'issues.pagination.previous'|trans }}</a>
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: pagination.page - 1})) }}">{{ 'issues.pagination.previous'|trans }}</a>
                     {% else %}
                         <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.previous'|trans }}</span>
                     {% endif %}
@@ -132,14 +132,14 @@
                         {% if p == pagination.page %}
                             <span class="issue-pagination__link is-active" aria-current="page">{{ p }}</span>
                         {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
-                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: p})) }}">{{ p }}</a>
+                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: p})) }}">{{ p }}</a>
                         {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
                             <span class="issue-pagination__ellipsis">…</span>
                         {% endif %}
                     {% endfor %}
 
                     {% if pagination.page < pagination.total_pages %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.id}|merge(filterQuery)|merge({page: pagination.page + 1})) }}">{{ 'issues.pagination.next'|trans }}</a>
+                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: pagination.page + 1})) }}">{{ 'issues.pagination.next'|trans }}</a>
                     {% else %}
                         <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.next'|trans }}</span>
                     {% endif %}

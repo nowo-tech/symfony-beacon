@@ -1,0 +1,25 @@
+name: Documentation
+description: Typo, unclear guide, or missing English docs/specs
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Where?
+      description: File path or URL (e.g. docs/PRODUCTION.md, specs/004-issues/spec.md).
+      placeholder: docs/UPGRADING.md § …
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing?
+      description: Quote the confusing part and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording (optional)
+      description: A short proposed fix helps a lot.

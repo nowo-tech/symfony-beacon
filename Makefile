@@ -1,5 +1,5 @@
 .PHONY: help up down build build-prod logs shell console seed bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test qa composer-outdated \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history
 
 help:
@@ -36,6 +36,7 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
+	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
 	@echo ""
 	@echo "Git hygiene:"
 	@echo "  make setup-hooks                    Install .githooks (strips Cursor co-authors)"
@@ -157,3 +158,8 @@ test:
 	docker compose exec -T php vendor/bin/phpunit
 
 qa: cs twig-cs phpstan rector test
+
+# Suggest pinned composer require commands for outdated direct deps (runs in php container).
+# The helper may exit non-zero when outdated packages are found; still print suggestions.
+composer-outdated:
+	-docker compose exec -T php bash ./generate-composer-require.sh

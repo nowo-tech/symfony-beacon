@@ -11,6 +11,60 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class AccountPreferencesTest extends DatabaseWebTestCase
 {
+    public function testUserCanChangePasswordAndCannotReusePrevious(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('pwd-policy@example.com', 'OldSecret1!Abc');
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/security');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.form-password-toggle');
+        self::assertSelectorExists('.password-strength-input');
+        self::assertCount(3, $crawler->filter('.form-password-toggle'));
+
+        $form = $crawler->selectButton('Update password')->form([
+            'user_preferences[currentPassword]' => 'OldSecret1!Abc',
+            'user_preferences[plainPassword]' => 'NewStrongPass1!',
+            'user_preferences[plainPassword_confirm]' => 'NewStrongPass1!',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/account/security');
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/security');
+        $form = $crawler->selectButton('Update password')->form([
+            'user_preferences[currentPassword]' => 'NewStrongPass1!',
+            'user_preferences[plainPassword]' => 'OldSecret1!Abc',
+            'user_preferences[plainPassword_confirm]' => 'OldSecret1!Abc',
+        ]);
+        $client->submit($form);
+        self::assertResponseStatusCodeSame(422);
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('old one', strtolower($html));
+    }
+
+    public function testAccountSecurityRejectsWeakNewPassword(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('pwd-weak@example.com', 'OldSecret1!Abc');
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/security');
+        $form = $crawler->selectButton('Update password')->form([
+            'user_preferences[currentPassword]' => 'OldSecret1!Abc',
+            'user_preferences[plainPassword]' => 'Weak1!',
+            'user_preferences[plainPassword_confirm]' => 'Weak1!',
+        ]);
+        $client->submit($form);
+        self::assertResponseStatusCodeSame(422);
+        $html = strtolower($client->getResponse()->getContent() ?: '');
+        self::assertTrue(
+            str_contains($html, 'strength') || str_contains($html, 'fortaleza') || str_contains($html, 'requirements'),
+            'Expected password strength validation error in response',
+        );
+    }
+
     public function testPreferencesIndexRedirectsToProfile(): void
     {
         [$client, $user] = $this->bootWithDemoProject('prefs-redirect@example.com');
@@ -66,7 +120,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $values['user_preferences']['preferredLocale'] = 'es';
         $values['user_preferences']['preferredTheme'] = 'dark';
         $values['user_preferences']['preferredContentWidth'] = 'full';
-        $values['user_preferences']['preferredCollapsedIssuePanels'] = ['raw', 'tags'];
+        $values['user_preferences']['preferredCollapsedIssuePanels'] = json_encode(['raw', 'tags'], \JSON_THROW_ON_ERROR);
         $client->request($form->getMethod(), $form->getUri(), $values);
         self::assertResponseRedirects('/account/display');
         $client->followRedirect();
@@ -77,6 +131,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertStringContainsString('__BEACON_ISSUE_PANEL_DEFAULTS__', $html);
         self::assertStringContainsString('"raw"', $html);
         self::assertStringContainsString('"tags"', $html);
+        self::assertStringContainsString('nowo-tag-input', $html);
+        self::assertStringContainsString('bundles/nowotaginput/tag-input.js', $html);
 
         $em = self::getContainer()->get('doctrine')->getManager();
         $em->clear();

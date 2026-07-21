@@ -1,0 +1,12 @@
+# nowo-tech/tag-input-bundle
+# https://github.com/nowo-tech/TagInputBundle
+#
+# Tagify multi-tag FormType. Used on Account Display (issue panels collapsed by default).
+# Assets: bundles/nowotaginput/tag-input.css + tag-input.js (see account/display.html.twig).
+nowo_tag_input:
+    value_format: array
+    trim: true
+    duplicates: false
+    dropdown_enabled: true
+    placeholder: ''
+    form_theme: 'tailwind_2_layout.html.twig'

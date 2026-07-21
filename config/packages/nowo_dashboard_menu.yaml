@@ -13,6 +13,11 @@ nowo_dashboard_menu:
     dashboard:
         enabled: true
         layout_template: 'kit/menu_dashboard_layout.html.twig'
+        modals:
+            menu_form: normal
+            copy: normal
+            item_form: normal
+            delete: normal
         route_name_exclude_patterns:
             - '^_'
             - '^web_profiler'
@@ -20,6 +25,7 @@ nowo_dashboard_menu:
             - '^ingest_'
             - '^ux_'
             - '^live_component'
+            - '^app\.swagger$'
         pagination:
             enabled: true
             per_page: 20

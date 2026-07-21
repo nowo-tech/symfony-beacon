@@ -128,6 +128,6 @@ final readonly class RetentionPurger
             }
         }
 
-        return compact('events', 'issues', 'transactions', 'stats');
+        return ['events' => $events, 'issues' => $issues, 'transactions' => $transactions, 'stats' => $stats];
     }
 }

@@ -1,0 +1,51 @@
+# Cursor indexing / context ignore (gitignore-style).
+# Keeps agent context on app code, specs, and docs — not dependency trees or build output.
+
+# Dependencies & package managers
+/vendor/
+/node_modules/
+/.pnpm-store/
+/composer.phar
+
+# Runtime / cache / secrets
+/var/
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.dev
+/.env.prod
+/.env.test
+/.demo-client.env
+/.Halite.key
+/.Defuse.key
+/.Halite.*.key
+/.Defuse.*.key
+/.MysqlAes.*.key
+/config/secrets/
+
+# Built frontend & published assets
+/public/build/
+/public/bundles/
+
+# Tool caches
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.php-cs-fixer.php
+/.twig-cs-fixer.cache
+/.twig-cs-fixer.php
+/.rector.cache/
+/phpunit.xml
+/phpstan.neon
+
+# IDE / OS noise
+/.idea/
+/.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Large lockfiles (optional: comment out if you want lock diffs in chat context)
+# /composer.lock
+# /pnpm-lock.yaml
+# /symfony.lock

@@ -7,8 +7,8 @@ namespace App\Identity\Controller;
 use App\Identity\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -23,8 +23,13 @@ final class AccountLocaleController extends AbstractController
     ) {
     }
 
-    #[Route('/account/locale/{locale}', name: 'account_locale_switch', methods: ['POST'], requirements: ['locale' => 'en|es'])]
-    public function switch(string $locale, Request $request): Response
+    /**
+     * Persist preferred locale and redirect back (strips `_locale` query params).
+     *
+     * @param string $locale Enabled locale code (`en` or `es`)
+     */
+    #[Route('/account/locale/{locale}', name: 'account_locale_switch', requirements: ['locale' => 'en|es'], methods: ['POST'])]
+    public function switch(string $locale, Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -41,22 +46,29 @@ final class AccountLocaleController extends AbstractController
 
         $user->setPreferredLocale($locale);
         $this->entityManager->flush();
+        $this->addFlash('success', 'flash.preferences.locale_saved');
 
         $request->setLocale($locale);
         $request->getSession()->set('_locale', $locale);
 
-        $target = $request->request->getString('redirect') ?: $request->headers->get('Referer') ?: $this->generateUrl('dashboard_home');
-        if (!\is_string($target) || !str_starts_with($target, '/') || str_starts_with($target, '//')) {
+        $target = $request->request->getString('redirect');
+        if ('' === $target) {
+            $target = $request->headers->get('Referer') ?? $this->generateUrl('dashboard_home');
+        }
+        if (!str_starts_with($target, '/') || str_starts_with($target, '//')) {
             // Allow absolute URLs only for this host; otherwise fall back.
             $host = $request->getSchemeAndHttpHost();
-            if (!\is_string($target) || !str_starts_with($target, $host.'/')) {
+            if (!str_starts_with($target, $host.'/')) {
                 $target = $this->generateUrl('dashboard_home');
             }
         }
 
-        return $this->redirect($this->stripLocaleQuery((string) $target));
+        return $this->redirect($this->stripLocaleQuery($target));
     }
 
+    /**
+     * Remove `_locale` from a relative or same-host absolute URL.
+     */
     private function stripLocaleQuery(string $url): string
     {
         $parts = parse_url($url);

@@ -1,0 +1,64 @@
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+{# Bootstrap modals (fetch ?_partial=1), aligned with Beacon kit chrome. #}
+<div class="modal fade kit-modal" id="modal-bk-collection-form" tabindex="-1" aria-labelledby="modal-bk-collection-form-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable {{ modal_classes.collection_form|default('') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-bk-collection-form-label">{{ 'dashboard.collection_modal_title'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'dashboard.close'|trans }}"></button>
+            </div>
+            <div class="modal-body" id="modal-bk-collection-form-body">
+                <div class="text-center py-4 text-muted">{{ 'dashboard.loading'|trans }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade kit-modal" id="modal-bk-item-form" tabindex="-1" aria-labelledby="modal-bk-item-form-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable {{ modal_classes.item_form|default('') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-bk-item-form-label">{{ 'dashboard.item_modal_title'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'dashboard.close'|trans }}"></button>
+            </div>
+            <div class="modal-body" id="modal-bk-item-form-body">
+                <div class="text-center py-4 text-muted">{{ 'dashboard.loading'|trans }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade kit-modal" id="modal-bk-import" tabindex="-1" aria-labelledby="modal-bk-import-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable {{ modal_classes.import|default('') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-bk-import-label">{{ 'dashboard.import_modal_title'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'dashboard.close'|trans }}"></button>
+            </div>
+            <div class="modal-body" id="modal-bk-import-body">
+                <div class="text-center py-4 text-muted">{{ 'dashboard.loading'|trans }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade kit-modal" id="modal-bk-delete" tabindex="-1" aria-labelledby="modal-bk-delete-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered {{ modal_classes.delete|default('') }}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-bk-delete-label">{{ 'dashboard.confirm_delete'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'dashboard.close'|trans }}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="kit-modal__lead" id="modal-bk-delete-message">{{ 'dashboard.delete_confirm_message'|trans }}</p>
+                <form id="form-bk-delete-confirm" method="post" action="" class="kit-modal__actions-form">
+                    <input type="hidden" name="_token" value="">
+                    <div class="kit-modal__actions">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'dashboard.cancel'|trans }}</button>
+                        <button type="submit" class="btn btn-danger">{{ 'dashboard.delete'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

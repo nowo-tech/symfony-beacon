@@ -13,17 +13,18 @@ final class EnvelopeAuthParserTest extends TestCase
     {
         $parser = new EnvelopeAuthParser();
         $result = $parser->parseFromRequest(
-            'Sentry sentry_version=7, sentry_key=publickey, sentry_client=php/4.0',
+            'Beacon beacon_key=publickey, beacon_secret=secret, beacon_client=php/1.5',
             '',
         );
 
         self::assertSame('publickey', $result['public_key']);
+        self::assertSame('secret', $result['secret_key']);
     }
 
     public function testParsesQueryAndDsn(): void
     {
         $parser = new EnvelopeAuthParser();
-        $fromQuery = $parser->parseFromRequest(null, 'sentry_key=qkey&sentry_secret=sec');
+        $fromQuery = $parser->parseFromRequest(null, 'beacon_key=qkey&beacon_secret=sec');
         self::assertSame('qkey', $fromQuery['public_key']);
         self::assertSame('sec', $fromQuery['secret_key']);
 

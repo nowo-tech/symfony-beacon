@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Regex;
  */
 final class SiteAppearanceType extends FormKitAbstractType
 {
-    private const HEX = '/^#[0-9a-fA-F]{6}$/';
+    private const string HEX = '/^#[0-9a-fA-F]{6}$/';
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

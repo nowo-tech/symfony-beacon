@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Menu;
 
+use Deprecated;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\DashboardMenuBundle\Entity\Menu;
 use Nowo\DashboardMenuBundle\Entity\MenuItem;
@@ -14,8 +15,8 @@ use Nowo\DashboardMenuBundle\Repository\MenuRepository;
  */
 final readonly class DashboardMenuDemoSeeder
 {
-    /** @deprecated Use AppSection::Dashboard->menuCode() */
-    public const MAIN_MENU_CODE = 'dashboard';
+    #[Deprecated(message: 'Use AppSection::Dashboard->menuCode()')]
+    public const string MAIN_MENU_CODE = 'dashboard';
 
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -28,16 +29,15 @@ final readonly class DashboardMenuDemoSeeder
      */
     public function seedIfEmpty(): bool
     {
-        $changed = false;
         $changed = $this->ensureMenu(
             'dashboard',
             'Dashboard',
             'dashboard-menu-navigation',
             [
                 [10, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos'], 'dashboard_home', null],
-                [20, 'New project', ['en' => 'New project', 'es' => 'Nuevo proyecto'], 'project_new', null],
+                [30, 'API docs', ['en' => 'API docs', 'es' => 'Docs API'], 'app.swagger_ui', null],
             ],
-        ) || $changed;
+        );
 
         $changed = $this->ensureMenu(
             'preferences',
@@ -57,6 +57,7 @@ final readonly class DashboardMenuDemoSeeder
             [
                 [10, 'Overview', ['en' => 'Overview', 'es' => 'Resumen'], 'admin_hub', 'ROLE_ADMIN'],
                 [20, 'Users', ['en' => 'Users', 'es' => 'Usuarios'], 'admin_users', 'ROLE_ADMIN'],
+                [25, 'Groups', ['en' => 'Groups', 'es' => 'Grupos'], 'admin_groups', 'ROLE_ADMIN'],
                 [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia'], 'settings_appearance', 'ROLE_ADMIN'],
                 [40, 'Menus', ['en' => 'Menus', 'es' => 'Menús'], 'nowo_dashboard_menu_dashboard_index', 'ROLE_ADMIN'],
                 [50, 'Breadcrumbs', ['en' => 'Breadcrumbs', 'es' => 'Migas'], 'nowo_breadcrumb_kit_dashboard_collections_index', 'ROLE_ADMIN'],

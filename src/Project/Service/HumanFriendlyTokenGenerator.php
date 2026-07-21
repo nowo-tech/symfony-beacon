@@ -12,7 +12,7 @@ namespace App\Project\Service;
 final class HumanFriendlyTokenGenerator
 {
     /** @var list<string> */
-    private const ADJECTIVES = [
+    private const array ADJECTIVES = [
         'amber', 'bold', 'calm', 'clear', 'crisp', 'eager', 'fair', 'fleet',
         'gentle', 'glad', 'golden', 'keen', 'kind', 'lively', 'lucid', 'merry',
         'neat', 'noble', 'plaid', 'plucky', 'proud', 'quick', 'quiet', 'rapid',
@@ -21,7 +21,7 @@ final class HumanFriendlyTokenGenerator
     ];
 
     /** @var list<string> */
-    private const NOUNS = [
+    private const array NOUNS = [
         'anchor', 'beacon', 'breeze', 'brook', 'canyon', 'cedar', 'comet', 'crane',
         'delta', 'ember', 'falcon', 'fjord', 'forest', 'glacier', 'harbor', 'heron',
         'island', 'lagoon', 'maple', 'meadow', 'nebula', 'orchid', 'otter', 'pine',

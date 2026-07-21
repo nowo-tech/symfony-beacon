@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-20
 
-**Status**: Completed (implementation on main; tag with next Beacon release — see [docs/ROADMAP.md](../../docs/ROADMAP.md) Phase 1)
+**Status**: Completed (as-built; channel manuals + SSRF guard — 2026-07-21)
 
 **Input**: User description: "Add the option to send notifications for errors, warnings, N+1, … to different destinations (Slack, …); must be configurable per project."
 
@@ -12,9 +12,14 @@
 
 ### Session 2026-07-20
 
-- **Q1 (destination types for v1)**: Slack Incoming Webhook **and** generic HTTP webhook (JSON). Discord/email/OAuth Slack apps out of scope for v1.
+- **Q1 (destination types for v1)**: Originally Slack Incoming Webhook **and** generic HTTP webhook. **As-built expansion**: also Discord, Microsoft Teams, Telegram (`bot_token@chat_id`), and email (`MAILER_DSN`).
 - **Q2 (issue occurrence rule)**: Notify on **first occurrence** of a new issue **and** on **regression** (issue was `resolved` or `ignored` and becomes active again). Do **not** notify on every duplicate event for an already-open issue.
 - **Implementation note (ingest)**: Matching events reopen both **`resolved` and `ignored`** issues to **unresolved**, and notify on new issue + regression only.
+
+### Session 2026-07-21
+
+- **Q3 (operator manuals)**: In-app setup guides at `/projects/{uuid}/notifications/help` (and `docs/NOTIFICATIONS.md`) document how to connect Slack, Discord, Teams, Telegram, email, and generic HTTP.
+- **Q4 (SSRF)**: Production blocks private/link-local/metadata URLs for Slack/Discord/Teams/HTTP destinations; Telegram uses Bot API host constructed by Beacon; email is Mailer-only.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -33,7 +38,8 @@ As a project owner or admin, I can add, edit, enable/disable, and remove notific
 3. **Given** I am a project member without manage rights, **When** I try to change notification settings, **Then** the system denies the change.
 4. **Given** an existing destination, **When** I disable it, **Then** it remains stored but stops receiving notifications until re-enabled.
 5. **Given** an existing destination, **When** I delete it, **Then** it no longer appears and no further notifications are sent to it.
-6. **Given** I choose destination type Slack or generic HTTP webhook, **When** I save with a valid endpoint URL, **Then** the destination is stored with that type.
+6. **Given** I choose Slack, Discord, Teams, Telegram, email, or generic HTTP, **When** I save with a valid endpoint for that type, **Then** the destination is stored with that type.
+7. **Given** Settings → Notifications, **When** I open **Setup guides**, **Then** I see step-by-step manuals for each channel (readable by members; manage still admin-only).
 
 ---
 
@@ -90,19 +96,19 @@ As a project admin, I can send a test notification to a configured destination s
 ### Edge Cases
 
 - Invalid or empty webhook URL must be rejected at save time with a clear validation message.
+- Private / link-local / metadata HTTP(S) endpoints MUST be rejected in production (SSRF guard); may be allowed in `dev`/`test` or via `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=1`.
 - Duplicate fingerprints for an already-open (`unresolved`) issue must **not** trigger another issue notification.
 - Regression (from `resolved`/`ignored` back to active) **must** trigger an issue notification when filters match.
 - Very high ingest volume must not create unbounded synchronous work on the ingest path; outbound work stays asynchronous.
-- Secrets in destination URLs (tokens in query strings) must not be shown in full in ordinary UI lists (mask or show last characters only).
+- Secrets in destination URLs (tokens in query strings) must not be shown in full in ordinary UI lists (mask or show last characters only); endpoints are encrypted at rest.
 - Deleting a project must remove or cascade its notification destinations so orphaned secrets do not remain.
-- Destinations pointing at non-HTTPS endpoints in production-like deployments may be allowed for self-hosted LAN use; operators accept that risk (documented assumption).
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST allow project owners and admins to manage notification destinations scoped to a single project.
-- **FR-002**: Each destination MUST support these types in the first release: **Slack Incoming Webhook** and **generic HTTP webhook** (stable JSON body). Email, Discord-native, and Slack OAuth apps are out of scope for v1.
+- **FR-002**: Each destination MUST support: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP** webhook.
 - **FR-003**: Each destination MUST store: display name/label, type, endpoint credentials/URL, enabled flag, and selected alert categories.
 - **FR-004**: Alert categories MUST include issue severity filters covering at least `error` and `warning` (and allow selecting other known levels the product already uses, such as `fatal` / `info` / `debug`), plus an N+1 performance category.
 - **FR-005**: System MUST attempt notifications only for enabled destinations whose selected categories match the ingested signal.
@@ -111,14 +117,16 @@ As a project admin, I can send a test notification to a configured destination s
 - **FR-008**: Outbound notification delivery MUST run asynchronously after ingest acknowledgment so destination latency cannot block Envelope ACK.
 - **FR-009**: Delivery failures MUST be retried with bounded attempts; permanent misconfiguration must not break ingest or issue persistence.
 - **FR-010**: Members without project manage rights MUST NOT create, edit, disable, enable, test, or delete destinations.
-- **FR-011**: System MUST provide a way to send a test notification for a saved destination (P2; may ship in the same release if low cost).
-- **FR-012**: Destination secrets MUST NOT be exposed in full in list views or ordinary page HTML where avoidable (masked display).
+- **FR-011**: System MUST provide a way to send a test notification for a saved destination.
+- **FR-012**: Destination secrets MUST NOT be exposed in full in list views or ordinary page HTML where avoidable (masked display); MUST be encryptable at rest.
 - **FR-013**: Automated tests MUST cover permission rules, filter matching (issue levels and N+1), first-occurrence vs duplicate silence, regression notify, and that ingest ACK does not depend on destination success.
 - **FR-014**: For issue signals, the system MUST notify on **new issue creation** and on **regression** (status was `resolved` or `ignored` and the issue becomes active again). The system MUST NOT notify on every subsequent event for an already-unresolved issue.
+- **FR-015**: System MUST provide English (and Spanish UI) setup guides for connecting each destination type (`docs/NOTIFICATIONS.md` + in-app help).
+- **FR-016**: Outbound HTTP destinations MUST be validated against SSRF rules before save and before delivery (except Telegram Bot API URLs constructed by the server).
 
 ### Key Entities
 
-- **Notification destination**: A per-project outbound channel (type: Slack or generic HTTP webhook, endpoint/secret, label, enabled, selected alert categories).
+- **Notification destination**: A per-project outbound channel (type, endpoint/secret, label, enabled, selected alert categories).
 - **Alert category**: A selectable filter such as issue levels (`fatal`, `error`, `warning`, …) or performance signals (`n_plus_one`).
 - **Notification attempt**: A logical delivery of one alert to one destination after a matching ingest signal (for async processing and retries).
 
@@ -126,28 +134,24 @@ As a project admin, I can send a test notification to a configured destination s
 
 ### Measurable Outcomes
 
-- **SC-001**: A project admin can add an enabled destination with filters in under 3 minutes without reading source code.
+- **SC-001**: A project admin can add an enabled destination with filters in under 3 minutes using the setup guides without reading source code.
 - **SC-002**: After a matching new problem (or regression) is ingested, a correctly configured destination receives (or is attempted) a notification without the Envelope client waiting on that delivery.
 - **SC-003**: Non-matching levels, disabled destinations, and duplicate events on open issues produce no notification attempt for that destination.
-- **SC-004**: A member without manage rights cannot change destinations (denied in UI and server-side checks).
-- **SC-005**: PHPUnit coverage for configuration permissions, filter matching, occurrence rules, and async/non-blocking ingest behaviour stays green in CI.
+- **SC-004**: A member without manage rights cannot change destinations (denied in UI and server-side checks) but can open setup guides.
+- **SC-005**: PHPUnit coverage for configuration permissions, filter matching, occurrence rules, async/non-blocking ingest, and SSRF rejection stays green in CI.
 
 ## Assumptions
 
-- First release targets self-hosted operators who already use Slack Incoming Webhooks or similar HTTP webhook consumers.
-- Slack OAuth “Add to Slack” marketplace apps are out of scope; operators paste an Incoming Webhook URL.
-- Notification content is English UI/product copy, consistent with the English-only product rule.
-- “Different destinations” means multiple destinations per project (e.g. one Slack for errors, one webhook for N+1), not only one global channel.
-- Email, Discord-native bots, and mobile push are out of scope for v1 (generic webhook can still target Discord/Teams if the operator’s URL accepts the documented JSON).
-- Hourly digests / rate-limit windows beyond the first-occurrence + regression rule are out of scope for v1.
-- Existing project roles (`owner` / `admin` can manage; `member` read-only for this feature) are reused.
-- Generic HTTP webhooks receive a stable JSON body documented for operators; Slack uses Slack-compatible webhook payload formatting.
+- Self-hosted operators paste webhook URLs or `bot_token@chat_id`; no global Slack/Discord/Telegram env vars.
+- Notification UI/docs copy is English in docs; Twig UI is i18n (`en` / `es`).
+- Multiple destinations per project are supported.
+- Email requires a real `MAILER_DSN` (default `null://null` does not deliver).
 
 ## Out of Scope
 
-- Native mobile push notifications (already out of scope in UX Native).
+- Native mobile push notifications.
 - Third-party OAuth “Add to Slack” marketplace apps.
 - On-call paging products (PagerDuty/Opsgenie) as first-class types.
 - Changing N+1 detection thresholds themselves (still product-wide defaults).
 - Per-user personal notification preferences (this feature is project-scoped team destinations only).
-- Email digest channels.
+- Hourly digests / rate-limit windows beyond the first-occurrence + regression rule.

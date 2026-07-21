@@ -78,6 +78,28 @@ Gate any non-essential script with the Twig helper:
 
 Do **not** load marketing/analytics tags before consent.
 
+## Field encryption (at rest)
+
+Beacon encrypts selected secrets with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite):
+
+| Entity field | Purpose |
+|--------------|---------|
+| `ProjectApiKey.secretKey` | Envelope DSN secret |
+| `NotificationDestination.endpointUrl` | Slack / HTTP webhook URL (often contains tokens) |
+
+Key material lives in `var/secrets/.Halite.default.key` by default (never commit). Document key handling and retention in your privacy / security notices when operating a public instance. Prefer `anonymize-bundle` for erasure workflows when personal data beyond auth essentials is stored.
+
+## Admin activity history
+
+Beacon stores an immutable **user action** trail (`user_action`) for:
+
+- Administrative and membership events (create/role/enable, group CRUD, project member/group link changes)
+- Explicit **product** actions (open project issues/settings/performance/analytics, open issue/event, create API key, clear/delete project, change issue assignee/status)
+
+Each row may include the actor, subject user, structured context (emails, roles, project/issue titles, status from/to), and the **client IP** of the request. Form bodies and secrets are not stored.
+
+Treat this as personal data: document it in your privacy policy, define retention, and restrict `/admin/users` (and per-user activity) to operators who need it. Per-issue assignee/status history (`issue_history`) remains on the issue page and is separate from this instance-wide timeline. AuditKit timestamps/blame on entities are also separate and do not replace this timeline.
+
 ## References
 
 - Bundle docs: [CONFIGURATION](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/CONFIGURATION.md), [USAGE](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/USAGE.md)

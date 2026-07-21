@@ -14,7 +14,9 @@
     {% block dashboard_head %}{% endblock %}
 {% endblock %}
 
-{% block app_flashes %}{% endblock %}
+{% block app_flashes %}
+    {{ parent() }}
+{% endblock %}
 
 {% block body %}
     {% set _bk_dr = dashboard_routes|default({}) %}
@@ -25,6 +27,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block dashboard_scripts %}{% endblock %}
     <script src="{{ asset('bundles/nowobreadcrumbkit/js/dashboard.js') }}" defer></script>
+    {% include 'kit/_kit_modal_body_portals.html.twig' %}
     <script>
     window.breadcrumbKitI18n = {
         loading: {{ 'dashboard.loading'|trans|json_encode|raw }},

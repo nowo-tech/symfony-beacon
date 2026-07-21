@@ -22,7 +22,7 @@ final class NotificationOnIngestTest extends DatabaseWebTestCase
     public function testNewIssueAndIgnoredRegressionSendHttpNotifications(): void
     {
         [, , $project] = $this->bootWithDemoProject('ingest-notif@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
@@ -41,14 +41,14 @@ final class NotificationOnIngestTest extends DatabaseWebTestCase
 
             return new MockResponse('ok', ['http_code' => 200]);
         });
-        static::getContainer()->set(HttpClientInterface::class, $mock);
+        self::getContainer()->set(HttpClientInterface::class, $mock);
 
-        $handler = static::getContainer()->get(ProcessEnvelopeHandler::class);
+        $handler = self::getContainer()->get(ProcessEnvelopeHandler::class);
 
         $handler(new ProcessEnvelopeMessage(
             $project->getId() ?? 0,
             $this->eventEnvelope('evt-1', 'TypeError: boom 1'),
-            (new DateTimeImmutable())->format(\DATE_ATOM),
+            new DateTimeImmutable()->format(\DATE_ATOM),
         ));
 
         self::assertCount(1, $requests);
@@ -63,7 +63,7 @@ final class NotificationOnIngestTest extends DatabaseWebTestCase
         $handler(new ProcessEnvelopeMessage(
             $project->getId() ?? 0,
             $this->eventEnvelope('evt-2', 'TypeError: boom 2'),
-            (new DateTimeImmutable())->format(\DATE_ATOM),
+            new DateTimeImmutable()->format(\DATE_ATOM),
         ));
 
         self::assertCount(2, $requests);
@@ -76,7 +76,7 @@ final class NotificationOnIngestTest extends DatabaseWebTestCase
     public function testDuplicateOpenIssueDoesNotNotify(): void
     {
         [, , $project] = $this->bootWithDemoProject('ingest-dup@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
@@ -95,21 +95,21 @@ final class NotificationOnIngestTest extends DatabaseWebTestCase
 
             return new MockResponse('ok', ['http_code' => 200]);
         });
-        static::getContainer()->set(HttpClientInterface::class, $mock);
+        self::getContainer()->set(HttpClientInterface::class, $mock);
 
-        $handler = static::getContainer()->get(ProcessEnvelopeHandler::class);
+        $handler = self::getContainer()->get(ProcessEnvelopeHandler::class);
 
         $handler(new ProcessEnvelopeMessage(
             $project->getId() ?? 0,
             $this->eventEnvelope('dup-1', 'SameError: id=1'),
-            (new DateTimeImmutable())->format(\DATE_ATOM),
+            new DateTimeImmutable()->format(\DATE_ATOM),
         ));
         self::assertCount(1, $requests);
 
         $handler(new ProcessEnvelopeMessage(
             $project->getId() ?? 0,
             $this->eventEnvelope('dup-2', 'SameError: id=2'),
-            (new DateTimeImmutable())->format(\DATE_ATOM),
+            new DateTimeImmutable()->format(\DATE_ATOM),
         ));
         self::assertCount(1, $requests);
     }

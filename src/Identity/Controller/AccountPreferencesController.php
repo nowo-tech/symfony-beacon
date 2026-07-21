@@ -9,9 +9,11 @@ use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProfileType;
 use App\Identity\Form\AccountSecurityType;
 use App\Identity\Repository\UserRepository;
+use App\Issues\IssuePanelIds;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -34,7 +36,7 @@ final class AccountPreferencesController extends AbstractController
     }
 
     #[Route('/account/preferences', name: 'account_preferences', methods: ['GET'])]
-    public function preferencesIndex(): Response
+    public function preferencesIndex(): RedirectResponse
     {
         return $this->redirectToRoute('account_profile');
     }
@@ -82,7 +84,7 @@ final class AccountPreferencesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData();
+            $plainPassword = $user->getPlainPassword();
             $currentPassword = (string) $form->get('currentPassword')->getData();
 
             if (!\is_string($plainPassword) || '' === $plainPassword) {
@@ -101,7 +103,16 @@ final class AccountPreferencesController extends AbstractController
                 ]);
             }
 
+            if ($this->passwordHasher->isPasswordValid($user, $plainPassword)) {
+                $form->get('plainPassword')->addError(new FormError($this->translator->trans('preferences.error.password_same_as_current')));
+
+                return $this->render('account/security.html.twig', [
+                    'form' => $form,
+                ]);
+            }
+
             $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
+            $user->eraseCredentials();
             $this->entityManager->flush();
             $this->addFlash('success', 'flash.preferences.password_saved');
 
@@ -143,6 +154,7 @@ final class AccountPreferencesController extends AbstractController
 
         return $this->render('account/display.html.twig', [
             'form' => $form,
+            'issue_panel_ids' => IssuePanelIds::all(),
         ]);
     }
 }

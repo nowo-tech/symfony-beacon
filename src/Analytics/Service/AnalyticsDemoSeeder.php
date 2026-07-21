@@ -66,7 +66,7 @@ final readonly class AnalyticsDemoSeeder
      */
     private function demoCountsForDay(int $daysAgo): array
     {
-        $weekday = (int) (new DateTimeImmutable('today'))->modify(\sprintf('-%d days', $daysAgo))->format('N');
+        $weekday = (int) new DateTimeImmutable('today')->modify(\sprintf('-%d days', $daysAgo))->format('N');
         $weekend = $weekday >= 6;
 
         $errors = $weekend ? 2 + ($daysAgo % 3) : 5 + ($daysAgo % 7) * 2;

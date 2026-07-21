@@ -1,0 +1,7 @@
+# nowo-tech/migrations-kit-bundle
+# https://github.com/nowo-tech/MigrationsKitBundle
+#
+# Declarative MDK definitions via CreateTablesService in Doctrine migrations.
+# See docs/DECLARATIVE_SCHEMA.md in the bundle and migrations/FieldDictionary/.
+nowo_migrations_kit:
+    connection: default

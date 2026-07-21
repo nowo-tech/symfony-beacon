@@ -6,6 +6,7 @@ namespace App\Performance\Entity;
 
 use App\Performance\Repository\PerfTransactionRepository;
 use App\Project\Entity\Project;
+use App\Shared\Doctrine\PublicUuidTrait;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,10 +17,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: PerfTransactionRepository::class)]
 #[ORM\Table(name: 'perf_transaction')]
+#[ORM\UniqueConstraint(name: 'uniq_perf_transaction_uuid', columns: ['uuid'])]
 #[ORM\Index(name: 'idx_tx_project_received', columns: ['project_id', 'received_at'])]
 #[ORM\Index(name: 'idx_tx_nplus1', columns: ['project_id', 'n_plus_one_count'])]
 class PerfTransaction
 {
+    use PublicUuidTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -57,6 +61,7 @@ class PerfTransaction
 
     public function __construct()
     {
+        $this->ensureUuid();
         $this->spans = new ArrayCollection();
         $this->receivedAt = new DateTimeImmutable();
     }

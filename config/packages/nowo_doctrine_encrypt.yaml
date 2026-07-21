@@ -1,0 +1,15 @@
+# nowo-tech/doctrine-encrypt-bundle
+# https://github.com/nowo-tech/DoctrineEncryptBundle
+#
+# Field-level encryption at rest (Halite). Key file is auto-created on first use
+# under var/secrets/ (gitignored via /var/). For production, prefer a stable key:
+#   docker compose exec php bin/console doctrine:encrypt:generate-secret-key
+# or set APP_ENCRYPT_KEY and switch the profile to secret_key_env_var (see docs/UPGRADING.md).
+nowo_doctrine_encrypt:
+    default_profile: default
+    batch_size: 20
+    profiles:
+        default:
+            encryptor_class: Halite
+            secret_directory_path: '%kernel.project_dir%/var/secrets'
+            secret_key_filename: .Halite.default.key

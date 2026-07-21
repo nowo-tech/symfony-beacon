@@ -7,6 +7,7 @@ namespace App\Project\Entity;
 use App\Project\Repository\ProjectApiKeyRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
 
 /**
  * Project ingest credential (public/secret key pair) used in Envelope DSN auth.
@@ -28,7 +29,9 @@ class ProjectApiKey
     #[ORM\Column(length: 64)]
     private string $publicKey = '';
 
-    #[ORM\Column(length: 64, nullable: true)]
+    /** Envelope secret (encrypted at rest via doctrine-encrypt-bundle). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
     private ?string $secretKey = null;
 
     #[ORM\Column(length: 80)]
@@ -127,7 +130,9 @@ class ProjectApiKey
     }
 
     /**
-     * Envelope-compatible DSN: https://{public}@{host}/{projectId}.
+     * Envelope-compatible DSN: https://{public}:{secret}@{host}/{projectId}.
+     *
+     * The secret is included whenever present so clients can satisfy ingest auth.
      */
     public function buildDsn(string $baseUrl): string
     {
@@ -136,7 +141,11 @@ class ProjectApiKey
         $scheme = parse_url(rtrim($baseUrl, '/'), \PHP_URL_SCHEME) ?: 'https';
         $port = parse_url(rtrim($baseUrl, '/'), \PHP_URL_PORT);
         $authority = $host.($port ? ':'.$port : '');
+        $userinfo = $this->publicKey;
+        if (null !== $this->secretKey && '' !== $this->secretKey) {
+            $userinfo .= ':'.$this->secretKey;
+        }
 
-        return \sprintf('%s://%s@%s/%d', $scheme, $this->publicKey, $authority, $projectId);
+        return \sprintf('%s://%s@%s/%d', $scheme, $userinfo, $authority, $projectId);
     }
 }

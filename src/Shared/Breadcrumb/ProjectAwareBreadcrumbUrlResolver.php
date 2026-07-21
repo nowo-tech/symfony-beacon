@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -64,7 +65,7 @@ final readonly class ProjectAwareBreadcrumbUrlResolver implements BreadcrumbUrlR
         }
 
         $route = $this->router->getRouteCollection()->get($routeName);
-        if (null === $route) {
+        if (!$route instanceof Route) {
             return $staticParams;
         }
 

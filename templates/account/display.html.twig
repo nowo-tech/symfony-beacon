@@ -2,6 +2,16 @@
 
 {% block title %}{{ 'preferences.display.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/nowotaginput/tag-input.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/nowotaginput/tag-input.js') }}" defer></script>
+{% endblock %}
+
 {% block body %}
 <div class="mx-auto max-w-xl">
     <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
@@ -11,14 +21,13 @@
         {{ form_row(form.preferredLocale) }}
         {{ form_row(form.preferredTheme) }}
         {{ form_row(form.preferredContentWidth) }}
-        <fieldset class="space-y-2 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-medium text-[var(--color-ink)]/85">{{ 'preferences.issue_panels_collapsed'|trans }}</legend>
-            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_help'|trans }}</p>
-            <div class="issue-panel-prefs">
-                {{ form_widget(form.preferredCollapsedIssuePanels) }}
-            </div>
-            {{ form_errors(form.preferredCollapsedIssuePanels) }}
-        </fieldset>
+        {{ form_row(form.preferredCollapsedIssuePanels) }}
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_ids_hint'|trans }}</p>
+        <ul class="issue-panel-prefs__legend" aria-label="{{ 'preferences.issue_panels_ids_legend'|trans }}">
+            {% for panelId in issue_panel_ids %}
+                <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
+            {% endfor %}
+        </ul>
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
         </div>

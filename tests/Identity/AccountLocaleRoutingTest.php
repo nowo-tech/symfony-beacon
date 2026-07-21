@@ -19,11 +19,15 @@ final class AccountLocaleRoutingTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/account/preferences?_locale=en');
         self::assertResponseRedirects('/account/preferences');
         $client->followRedirect();
+        // /account/preferences redirects to /account/profile
+        if ($client->getResponse()->isRedirect()) {
+            $client->followRedirect();
+        }
         self::assertResponseIsSuccessful();
         self::assertStringNotContainsString('_locale=', $client->getRequest()->getUri());
         self::assertSelectorTextContains('.locale-switcher__code', 'ES');
         self::assertSelectorTextContains('.app-sidebar__label', 'Preferencias');
-        self::assertSelectorTextContains('h1', 'Ajustes de cuenta');
+        self::assertSelectorTextContains('h1', 'Perfil');
     }
 
     public function testLocaleSwitcherPostsPreferenceWithoutQueryLocale(): void

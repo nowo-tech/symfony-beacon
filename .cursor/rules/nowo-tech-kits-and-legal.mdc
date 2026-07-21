@@ -22,6 +22,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
 | Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest |
+| Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
 
 Packagist vendor: https://packagist.org/packages/nowo-tech/

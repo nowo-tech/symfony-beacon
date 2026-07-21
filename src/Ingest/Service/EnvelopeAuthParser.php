@@ -6,8 +6,6 @@ namespace App\Ingest\Service;
 
 /**
  * Extracts public key / secret from Envelope auth mechanisms.
- *
- * Accepts historical Envelope wire field names in headers and query strings for client compatibility.
  */
 final class EnvelopeAuthParser
 {
@@ -19,19 +17,19 @@ final class EnvelopeAuthParser
         $key = null;
         $secret = null;
 
-        if (null !== $authHeader && str_starts_with($authHeader, 'Sentry ')) {
+        if (null !== $authHeader && str_starts_with($authHeader, 'Beacon ')) {
             $parts = $this->parseAuthPairs(substr($authHeader, 7));
-            $key = $parts['sentry_key'] ?? null;
-            $secret = $parts['sentry_secret'] ?? null;
+            $key = $parts['beacon_key'] ?? null;
+            $secret = $parts['beacon_secret'] ?? null;
         }
 
         if (null === $key && '' !== $queryString) {
             parse_str($queryString, $query);
-            if (isset($query['sentry_key']) && \is_string($query['sentry_key'])) {
-                $key = $query['sentry_key'];
+            if (isset($query['beacon_key']) && \is_string($query['beacon_key'])) {
+                $key = $query['beacon_key'];
             }
-            if (isset($query['sentry_secret']) && \is_string($query['sentry_secret'])) {
-                $secret = $query['sentry_secret'];
+            if (isset($query['beacon_secret']) && \is_string($query['beacon_secret'])) {
+                $secret = $query['beacon_secret'];
             }
         }
 

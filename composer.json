@@ -30,15 +30,22 @@
         "doctrine/doctrine-bundle": "3.2.4",
         "doctrine/doctrine-migrations-bundle": "4.0.0",
         "doctrine/orm": "3.6.7",
+        "nelmio/api-doc-bundle": "5.10.3",
+        "nowo-tech/audit-kit-bundle": "1.1.1",
         "nowo-tech/auth-kit-bundle": "1.5.1",
         "nowo-tech/breadcrumb-kit-bundle": "2.0.2",
         "nowo-tech/cookie-consent-bundle": "1.3.3",
         "nowo-tech/dashboard-menu-bundle": "0.3.45",
+        "nowo-tech/doctrine-encrypt-bundle": "2.3.1",
         "nowo-tech/form-kit-bundle": "2.0.15",
         "nowo-tech/login-throttle-bundle": "2.2.0",
+        "nowo-tech/migrations-kit-bundle": "2.0.17",
+        "nowo-tech/password-policy-bundle": "1.2.3",
         "nowo-tech/password-strength-bundle": "1.3.0",
         "nowo-tech/password-toggle-bundle": "2.0.4",
         "nowo-tech/pwa-bundle": "1.1.2",
+        "nowo-tech/tag-input-bundle": "1.0.4",
+        "nowo-tech/user-kit-bundle": "1.1.3",
         "pentatrion/vite-bundle": "8.2.4",
         "symfony/console": "8.1.1",
         "symfony/doctrine-messenger": "8.1.1",
@@ -47,6 +54,7 @@
         "symfony/form": "8.1.1",
         "symfony/framework-bundle": "8.1.1",
         "symfony/http-client": "8.1.1",
+        "symfony/mailer": "8.1.*",
         "symfony/messenger": "8.1.1",
         "symfony/password-hasher": "8.1.0",
         "symfony/rate-limiter": "8.1.1",
@@ -56,6 +64,7 @@
         "symfony/string": "8.1.0",
         "symfony/translation": "8.1.1",
         "symfony/twig-bundle": "8.1.0",
+        "symfony/uid": "8.1.*",
         "symfony/ux-icons": "2.36.1",
         "symfony/validator": "8.1.1",
         "symfony/yaml": "8.1.1",
@@ -64,6 +73,7 @@
     },
     "config": {
         "allow-plugins": {
+            "nowo-tech/composer-update-helper": true,
             "php-http/discovery": true,
             "symfony/flex": true,
             "symfony/runtime": true
@@ -73,7 +83,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "DoctrineMigrations\\FieldDictionary\\": "migrations/FieldDictionary/"
         }
     },
     "autoload-dev": {
@@ -128,10 +139,14 @@
             "allow-contrib": true,
             "require": "8.1.*",
             "docker": true
+        },
+        "composer-update-helper": {
+            "auto_update_wrapper": true
         }
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.95.15",
+        "nowo-tech/composer-update-helper": "2.0.31",
         "nowo-tech/twig-inspector-bundle": "1.0.36",
         "phpstan/phpstan": "2.2.5",
         "phpstan/phpstan-doctrine": "2.0.28",

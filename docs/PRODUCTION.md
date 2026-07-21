@@ -98,7 +98,7 @@ make console ARGS='app:retention:purge'
 
 ## Login throttling
 
-`nowo-tech/login-throttle-bundle` + Symfony `login_throttling` on the `main` firewall (default: 5 attempts / 15 minutes). Tune `config/packages/nowo_login_throttle.yaml` and `security.yaml`.
+`nowo-tech/login-throttle-bundle` + Symfony `login_throttling` on the `main` firewall (default: 5 attempts / 15 minutes). **Default storage is `database`** so counters are shared across FrankenPHP workers and multi-pod deployments (`login_attempts` table). Tune `config/packages/nowo_login_throttle.yaml` and keep `security.yaml` in sync (`nowo:login-throttle:configure-security --force`).
 
 ## Backups
 

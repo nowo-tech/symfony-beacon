@@ -7,15 +7,22 @@ namespace App\Notifications\Form;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
+use App\Notifications\Service\NotificationOutboundFormatter;
+use App\Notifications\Service\OutboundUrlGuard;
+use InvalidArgumentException;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Create/edit a project notification destination.
@@ -24,6 +31,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 final class NotificationDestinationFormType extends AbstractType
 {
+    public function __construct(
+        private readonly NotificationOutboundFormatter $outboundFormatter,
+        private readonly OutboundUrlGuard $outboundUrlGuard,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $categoryChoices = [];
@@ -45,12 +59,11 @@ final class NotificationDestinationFormType extends AbstractType
                 'choice_label' => static fn (NotificationDestinationType $type): string => 'notifications.type.'.$type->value,
                 'choice_translation_domain' => 'messages',
             ])
-            ->add('endpointUrl', UrlType::class, [
+            ->add('endpointUrl', TextType::class, [
                 'label' => 'notifications.form.endpoint',
-                'default_protocol' => 'https',
+                'help' => 'notifications.form.endpoint_help',
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Url(protocols: ['http', 'https']),
                     new Assert\Length(max: 2048),
                 ],
             ])
@@ -62,12 +75,67 @@ final class NotificationDestinationFormType extends AbstractType
                 'label' => 'notifications.form.categories',
                 'choices' => $categoryChoices,
                 'multiple' => true,
-                'expanded' => true,
+                'expanded' => false,
+                'autocomplete' => true,
                 'choice_translation_domain' => 'messages',
+                'attr' => [
+                    'data-notification-categories' => '1',
+                ],
+                'tom_select_options' => [
+                    'plugins' => ['remove_button'],
+                    'maxItems' => \count(NotificationCategories::ALL),
+                    'closeAfterSelect' => false,
+                    'openOnFocus' => true,
+                    'highlight' => true,
+                    'create' => false,
+                    'persist' => false,
+                ],
+                'preload' => 'focus',
                 'constraints' => [
                     new Assert\Count(min: 1),
                 ],
             ]);
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+            /** @var NotificationDestination $data */
+            $data = $event->getData();
+            $form = $event->getForm();
+            $endpoint = $data->getEndpointUrl();
+            $type = $data->getType();
+
+            $valid = match ($type) {
+                NotificationDestinationType::Email => false !== filter_var($endpoint, \FILTER_VALIDATE_EMAIL),
+                NotificationDestinationType::Telegram => $this->isValidTelegramEndpoint($endpoint),
+                NotificationDestinationType::Slack,
+                NotificationDestinationType::Discord,
+                NotificationDestinationType::Teams,
+                NotificationDestinationType::Http => (bool) filter_var($endpoint, \FILTER_VALIDATE_URL)
+                    && str_starts_with(strtolower($endpoint), 'http'),
+            };
+
+            if (!$valid) {
+                $form->get('endpointUrl')->addError(new FormError(
+                    $this->translator->trans('notifications.form.endpoint_invalid'),
+                ));
+
+                return;
+            }
+
+            if (\in_array($type, [
+                NotificationDestinationType::Slack,
+                NotificationDestinationType::Discord,
+                NotificationDestinationType::Teams,
+                NotificationDestinationType::Http,
+            ], true)) {
+                try {
+                    $this->outboundUrlGuard->assertSafeHttpUrl($endpoint);
+                } catch (InvalidArgumentException) {
+                    $form->get('endpointUrl')->addError(new FormError(
+                        $this->translator->trans('notifications.form.endpoint_ssrf'),
+                    ));
+                }
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -77,8 +145,20 @@ final class NotificationDestinationFormType extends AbstractType
         ]);
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'notification_destination';
+    }
+
+    private function isValidTelegramEndpoint(string $endpoint): bool
+    {
+        try {
+            $this->outboundFormatter->parseTelegramEndpoint($endpoint);
+
+            return true;
+        } catch (InvalidArgumentException) {
+            return false;
+        }
     }
 }

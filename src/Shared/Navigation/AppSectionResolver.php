@@ -9,10 +9,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Resolves which app section (and sidebar menu) the current request belongs to.
  */
-final class AppSectionResolver
+final readonly class AppSectionResolver
 {
     /** @var list<string> */
-    private const ADMINISTRATION_PREFIXES = [
+    private const array ADMINISTRATION_PREFIXES = [
         'admin_',
         'settings_',
         'nowo_dashboard_menu_',
@@ -20,12 +20,12 @@ final class AppSectionResolver
     ];
 
     /** @var list<string> */
-    private const PREFERENCES_PREFIXES = [
+    private const array PREFERENCES_PREFIXES = [
         'account_',
     ];
 
     public function __construct(
-        private readonly RequestStack $requestStack,
+        private RequestStack $requestStack,
     ) {
     }
 

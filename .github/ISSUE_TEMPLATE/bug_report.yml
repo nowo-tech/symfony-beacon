@@ -1,0 +1,63 @@
+name: Bug report
+description: Something is broken in self-hosted symfony-beacon
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Beacon. **Security issues** → [private advisory](https://github.com/nowo-tech/symfony-beacon/security/advisories/new), not this form.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Clear description of the bug and expected behaviour.
+      placeholder: When I open /projects/1/issues, …
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps starting from a clean or seeded install if possible.
+      placeholder: |
+        1. `make bootstrap`
+        2. Log in as demo user
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Git tag (e.g. v0.8.1), commit SHA, or Docker image tag.
+      placeholder: v0.8.1 / main@abcdef
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      multiple: true
+      options:
+        - Docker Compose (canonical)
+        - FrankenPHP classic
+        - FrankenPHP worker
+        - Other / unknown
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack traces
+      description: Relevant container or Messenger logs (redact secrets, DSNs, API keys).
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+        - label: This is not a security vulnerability (those go to Security Advisories)
+          required: true

@@ -1,0 +1,16 @@
+# nowo-tech/audit-kit-bundle
+# https://github.com/nowo-tech/AuditKitBundle
+nowo_audit_kit:
+    default_profile: default
+    profiles:
+        default:
+            enabled: true
+            user_class: App\Identity\Entity\User
+            timestamp_type: datetime_immutable
+            timestampable: true
+            blameable: true
+            fields:
+                created_at: createdAt
+                updated_at: updatedAt
+                created_by: createdBy
+                updated_by: updatedBy

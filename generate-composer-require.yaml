@@ -1,0 +1,23 @@
+# Composer Update Helper — https://github.com/nowo-tech/ComposerUpdateHelper
+# Suggests exact `composer require` commands from `composer outdated --direct`.
+# Beacon pins exact versions in composer.json; review Flex constraints before applying.
+#
+# Run: make composer-outdated
+# Or:  docker compose exec php bash ./generate-composer-require.sh
+#      docker compose exec php bash ./generate-composer-require.sh --release-detail
+
+language: en
+check-dependencies: true
+show-release-info: false
+show-release-detail: false
+show-impact-analysis: false
+save-impact-to-file: false
+verbose: false
+debug: false
+
+# Packages listed here are shown as outdated but omitted from suggested require commands.
+ignore:
+  # Keep empty unless a package must stay pinned for a known reason.
+
+# Force-include even if listed under ignore (include wins).
+include: []

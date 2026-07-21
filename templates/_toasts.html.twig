@@ -1,0 +1,33 @@
+{# Renders Symfony flash messages as fixed toasts (keeps .flash classes for tests). #}
+{% set toast_messages = app.flashes %}
+{% if toast_messages is not empty %}
+    <div
+        class="toast-stack"
+        data-controller="toast-stack"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-relevant="additions"
+    >
+        {% for label, messages in toast_messages %}
+            {% for message in messages %}
+                {% set isError = label in ['error', 'danger'] %}
+                <div
+                    class="flash flash-toast {% if isError %}flash-error{% elseif label == 'warning' %}flash-warning{% elseif label == 'info' %}flash-info{% else %}flash-success{% endif %}"
+                    role="{{ isError ? 'alert' : 'status' }}"
+                    data-toast-stack-target="toast"
+                    data-timeout="{{ isError ? 8000 : 5000 }}"
+                >
+                    <p class="flash__message">{{ message|trans }}</p>
+                    <button
+                        type="button"
+                        class="flash__dismiss"
+                        data-action="toast-stack#dismiss"
+                        aria-label="{{ 'toast.dismiss'|trans }}"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

@@ -15,6 +15,11 @@ nowo_breadcrumb_kit:
         enabled: true
         path_prefix: /breadcrumb-kit-admin
         layout_template: 'kit/breadcrumb_dashboard_layout.html.twig'
+        modals:
+            collection_form: normal
+            item_form: normal
+            import: normal
+            delete: normal
         pagination:
             enabled: true
             per_page: 20

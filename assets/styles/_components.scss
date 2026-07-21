@@ -1,22 +1,39 @@
 // Beacon UI components (plain SCSS — no Tailwind @apply).
 // Tokens come from assets/styles/tailwind.css (@theme + data-theme).
 
-.btn-primary {
+/* Shared control metrics — keep primary / ghost / danger / secondary aligned. */
+$beacon-btn-font-size: 0.875rem;
+$beacon-btn-padding-y: 0.5rem;
+$beacon-btn-padding-x: 1rem;
+$beacon-btn-radius: 0.375rem;
+$beacon-btn-sm-size: 2rem;
+$beacon-btn-sm-font-size: 0.8125rem;
+
+@mixin beacon-btn-base {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.375rem;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.35rem;
+  border-radius: $beacon-btn-radius;
+  padding: $beacon-btn-padding-y $beacon-btn-padding-x;
+  font-size: $beacon-btn-font-size;
+  line-height: 1.25;
   letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+  @include beacon-btn-base;
+  font-weight: 600;
   color: #fff;
   background: var(--color-moss);
+  border: 1px solid var(--color-moss);
   box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 8%);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
     background: var(--color-moss-deep);
+    border-color: var(--color-moss-deep);
     box-shadow: 0 2px 8px rgb(var(--beacon-shadow) / 12%);
   }
 
@@ -35,17 +52,11 @@
 }
 
 .btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.375rem;
-  border: 1px solid var(--color-sand);
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  @include beacon-btn-base;
   font-weight: 500;
+  border: 1px solid var(--color-sand);
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  transition: border-color 0.15s ease, background-color 0.15s ease;
 
   &:hover {
     border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
@@ -65,18 +76,35 @@
   }
 }
 
+.btn-secondary {
+  @include beacon-btn-base;
+  font-weight: 500;
+  border: 1px solid var(--color-sand);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: var(--color-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
 .btn-danger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.375rem;
-  border: 1px solid color-mix(in srgb, var(--color-alert) 55%, var(--color-sand));
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  @include beacon-btn-base;
   font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--color-alert) 55%, var(--color-sand));
   color: #fff;
   background: var(--color-alert);
-  transition: background-color 0.15s ease, opacity 0.15s ease;
 
   &:hover {
     filter: brightness(0.95);
@@ -93,6 +121,27 @@
   }
 }
 
+/* Compact controls for dense tables / toolbars (matches kit .btn-sm). */
+.btn-sm {
+  padding: 0.35rem 0.65rem;
+  min-height: $beacon-btn-sm-size;
+  font-size: $beacon-btn-sm-font-size;
+  line-height: 1.2;
+}
+
+.btn-icon {
+  width: $beacon-btn-sm-size;
+  min-width: $beacon-btn-sm-size;
+  height: $beacon-btn-sm-size;
+  padding: 0.35rem;
+}
+
+.btn-icon svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+
 .panel--danger {
   border-color: color-mix(in srgb, var(--color-alert) 35%, var(--color-sand));
 }
@@ -105,12 +154,22 @@
   max-width: min(28rem, calc(100vw - 2rem));
   width: min(28rem, calc(100vw - 2rem));
 
+  &:not([open]) {
+    display: none !important;
+    pointer-events: none;
+  }
+
   &[open] {
     display: block;
   }
 
   &::backdrop {
     background: rgb(12 18 16 / 55%);
+  }
+
+  &--form {
+    max-width: min(32rem, calc(100vw - 2rem));
+    width: min(32rem, calc(100vw - 2rem));
   }
 }
 
@@ -166,24 +225,82 @@
 }
 
 .panel {
+  position: relative;
+  isolation: isolate;
   border-radius: 0.75rem;
   border: 1px solid var(--color-sand);
   background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   padding: 1.25rem;
   box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 6%);
-  backdrop-filter: blur(8px);
+
+  /* Blur on a pseudo-element so <dialog> descendants are not trapped by backdrop-filter. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+  }
 }
 
 /* —— Issue detail layout —— */
 .issue-layout {
   display: grid;
   gap: 1.25rem;
+  margin-top: 1rem;
+  min-width: 0;
+}
+
+.issue-layout__main {
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
   .issue-layout {
     grid-template-columns: minmax(0, 1fr) 16.5rem;
     align-items: start;
+  }
+}
+
+/* On small screens, put assignee/status/details above the heavy payload. */
+@media (max-width: 1023px) {
+  .issue-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .issue-layout__aside {
+    order: -1;
+  }
+
+  .issue-status-actions__buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .issue-status-actions__form .btn-primary,
+  .issue-status-actions__form .btn-ghost {
+    width: 100%;
+  }
+
+  .issue-history__item {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .issue-aside-windows {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .issue-stack__summary-body {
+    min-width: 0;
+  }
+
+  .issue-section__title {
+    font-size: 0.75rem;
   }
 }
 
@@ -277,15 +394,38 @@
 }
 
 .issue-panel-prefs {
-  display: grid;
-  gap: 0.35rem;
+  width: 100%;
 }
 
-.issue-panel-prefs label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.issue-panel-prefs .tagify {
+  --tags-border-color: var(--color-sand);
+  --tags-hover-border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
+  --tags-focus-border-color: var(--color-moss);
+  --tag-bg: color-mix(in srgb, var(--color-moss) 12%, transparent);
+  --tag-hover: color-mix(in srgb, var(--color-moss) 20%, transparent);
+  --tag-text-color: var(--color-ink);
+  --tag-remove-bg: transparent;
+  --tag-remove-btn-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  width: 100%;
+  border-radius: 0.5rem;
+  background: var(--color-paper, #fff);
   font-size: 0.875rem;
+}
+
+.issue-panel-prefs__legend {
+  margin: 0.35rem 0 0;
+  display: grid;
+  gap: 0.2rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  list-style: none;
+  padding: 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-panel-prefs__legend code {
+  font-size: 0.7rem;
+  color: var(--color-moss);
 }
 
 .issue-section__subtitle {
@@ -722,6 +862,96 @@ textarea.input {
   width: 100%;
 }
 
+.issue-status-actions {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color-sand);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.issue-status-actions__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.issue-status-actions__form {
+  margin: 0;
+}
+
+.issue-status-actions__form .btn-primary,
+.issue-status-actions__form .btn-ghost {
+  width: auto;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.7rem;
+}
+
+.issue-history {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color-sand);
+}
+
+.issue-history__title {
+  margin: 0 0 0.55rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.issue-history__empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-history__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.issue-history__item {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.issue-history__when {
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.issue-history__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.issue-history__kind {
+  font-weight: 600;
+  color: var(--color-moss);
+}
+
+.issue-history__actor {
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+}
+
+.issue-badge--status-resolved {
+  background: color-mix(in srgb, var(--color-moss) 18%, transparent);
+  color: var(--color-moss);
+}
+
+.issue-badge--status-ignored {
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
 .issue-assignee-form .ts-wrapper {
   --ts-pr-caret: 1.7rem;
   --ts-pr-clear-button: 0px;
@@ -955,6 +1185,172 @@ textarea.input {
   color: color-mix(in srgb, var(--color-ink) 55%, transparent);
 }
 
+/* Notification categories — UX Autocomplete multi (chip-style Tom Select) */
+.notification-destination-form {
+  overflow: visible;
+}
+
+.notification-destination-form .ts-wrapper {
+  width: 100%;
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  min-height: 0;
+  line-height: normal;
+}
+
+.notification-destination-form .ts-hidden-accessible {
+  border: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  width: 1px !important;
+  white-space: nowrap !important;
+}
+
+.notification-destination-form .ts-control {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-height: 2.55rem;
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-sand);
+  background: var(--color-surface-muted);
+  box-shadow: none;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: var(--color-ink);
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.notification-destination-form .ts-wrapper.focus .ts-control,
+.notification-destination-form .ts-wrapper.dropdown-active .ts-control {
+  border-color: var(--color-moss);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 22%, transparent);
+}
+
+.notification-destination-form .ts-control > input {
+  flex: 1 1 5rem;
+  min-width: 5rem !important;
+  margin: 0 !important;
+  padding: 0.2rem 0.15rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-ink) !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+.notification-destination-form .ts-control > input::placeholder {
+  color: color-mix(in srgb, var(--color-ink) 42%, transparent);
+}
+
+.notification-destination-form .ts-control .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--color-moss) 28%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
+  color: var(--color-ink);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.notification-destination-form .ts-control .item .remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 0 0.1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.2rem;
+  background: transparent;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.notification-destination-form .ts-control .item .remove:hover {
+  color: var(--color-alert);
+  background: color-mix(in srgb, var(--color-alert) 10%, transparent);
+}
+
+.notification-destination-form .ts-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  margin-top: 0.3rem;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.55rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 0 14px 32px rgb(var(--beacon-shadow) / 22%);
+  overflow: hidden;
+}
+
+.notification-destination-form .ts-dropdown .ts-dropdown-content {
+  max-height: 14rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.3rem;
+}
+
+.notification-destination-form .ts-dropdown .option,
+.notification-destination-form .ts-dropdown .no-results {
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.notification-destination-form .ts-dropdown .option.active,
+.notification-destination-form .ts-dropdown .option:hover {
+  background: color-mix(in srgb, var(--color-moss) 14%, var(--color-surface));
+}
+
+.notification-destination-form .ts-dropdown .option.selected {
+  background: color-mix(in srgb, var(--color-moss) 18%, var(--color-surface));
+  font-weight: 500;
+}
+
+.notification-destination-form .ts-dropdown .option .highlight {
+  background: color-mix(in srgb, var(--color-moss) 28%, transparent);
+  border-radius: 0.15rem;
+  color: inherit;
+}
+
+.notification-destination-form .ts-dropdown .no-results {
+  cursor: default;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
 .input-color {
   display: block;
   width: 3.25rem;
@@ -1032,13 +1428,99 @@ textarea.input {
   color: var(--beacon-flash-ok-text);
 }
 
+.flash-warning {
+  border-color: color-mix(in srgb, var(--beacon-badge-warn-text) 35%, var(--beacon-sand));
+  background: var(--beacon-badge-warn-bg);
+  color: var(--beacon-badge-warn-text);
+}
+
+.flash-info {
+  border-color: color-mix(in srgb, var(--color-moss) 35%, var(--beacon-sand));
+  background: color-mix(in srgb, var(--color-mist) 70%, var(--color-surface));
+  color: var(--color-ink);
+}
+
+.toast-stack {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: min(22.5rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.page-shell--app .toast-stack {
+  top: max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.75rem));
+}
+
+.flash.flash-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0;
+  padding: 0.85rem 0.9rem;
+  pointer-events: auto;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-ink) 6%, transparent),
+    0 10px 28px color-mix(in srgb, var(--color-ink) 10%, transparent);
+  backdrop-filter: blur(8px);
+  animation: beacon-toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.flash.flash-toast.is-leaving {
+  animation: beacon-toast-out 0.28s ease forwards;
+}
+
+.flash__message {
+  flex: 1;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.flash__dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.2rem -0.25rem 0 0;
+  border: 0;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.flash__dismiss:hover,
+.flash__dismiss:focus-visible {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash.flash-toast,
+  .flash.flash-toast.is-leaving {
+    animation: none;
+  }
+}
+
 .page-shell {
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
+  /* clip avoids creating a scrollport that would break sticky sidebar */
+  overflow-x: clip;
   background:
     radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in srgb, var(--color-mist) 90%, var(--color-surface)), transparent 55%),
     radial-gradient(ellipse 70% 45% at 95% 0%, color-mix(in srgb, var(--color-sand) 70%, var(--color-surface)), transparent 50%),
@@ -1060,6 +1542,92 @@ textarea.input {
 
 [data-theme="dark"] .page-shell::before {
   opacity: 0.2;
+}
+
+.page-shell--app {
+  --app-header-height: 3.5rem;
+}
+
+/* Thin scrollbars (Firefox + Chromium/WebKit) */
+html,
+body,
+.app-sidebar,
+.app-main,
+.app-main__inner,
+.kit-admin,
+.modal-body,
+.issue-layout__aside,
+.issue-section__body {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 28%, transparent) transparent;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.app-sidebar::-webkit-scrollbar,
+.app-main::-webkit-scrollbar,
+.app-main__inner::-webkit-scrollbar,
+.kit-admin::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar,
+.issue-layout__aside::-webkit-scrollbar,
+.issue-section__body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.app-sidebar::-webkit-scrollbar-track,
+.app-main::-webkit-scrollbar-track,
+.app-main__inner::-webkit-scrollbar-track,
+.kit-admin::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track,
+.issue-layout__aside::-webkit-scrollbar-track,
+.issue-section__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.app-sidebar::-webkit-scrollbar-thumb,
+.app-main::-webkit-scrollbar-thumb,
+.app-main__inner::-webkit-scrollbar-thumb,
+.kit-admin::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb,
+.issue-layout__aside::-webkit-scrollbar-thumb,
+.issue-section__body::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+.app-sidebar::-webkit-scrollbar-thumb:hover,
+.app-main::-webkit-scrollbar-thumb:hover,
+.app-main__inner::-webkit-scrollbar-thumb:hover,
+.kit-admin::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover,
+.issue-layout__aside::-webkit-scrollbar-thumb:hover,
+.issue-section__body::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+.app-sidebar::-webkit-scrollbar-corner,
+.app-main::-webkit-scrollbar-corner,
+.app-main__inner::-webkit-scrollbar-corner,
+.kit-admin::-webkit-scrollbar-corner,
+.modal-body::-webkit-scrollbar-corner,
+.issue-layout__aside::-webkit-scrollbar-corner,
+.issue-section__body::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.app-sidebar {
+  scrollbar-gutter: stable;
 }
 
 /* Center auth panels when short; keep top reachable when the form is taller than the viewport */
@@ -1311,6 +1879,7 @@ textarea.input {
 
 /* —— App shell (authenticated) —— */
 .page-shell--native {
+  --app-header-height: 3rem;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -1319,7 +1888,8 @@ textarea.input {
 
 .page-shell--native .app-header {
   /* Native shell already draws a top chrome; keep a compact sticky bar. */
-  min-height: 3rem;
+  min-height: var(--app-header-height);
+  height: var(--app-header-height);
 }
 
 .app-shell {
@@ -1347,8 +1917,10 @@ textarea.input {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 3.5rem;
-  padding: 0.65rem 1rem;
+  box-sizing: border-box;
+  min-height: var(--app-header-height);
+  height: var(--app-header-height);
+  padding: 0 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
   background: color-mix(in srgb, var(--color-surface) 82%, transparent);
   backdrop-filter: blur(10px);
@@ -1388,14 +1960,23 @@ textarea.input {
 .app-sidebar {
   grid-row: 2;
   grid-column: 1;
+  position: fixed;
+  top: var(--app-header-height);
+  left: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 15.5rem;
   border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   backdrop-filter: blur(8px);
-  overflow: hidden;
-  transition: opacity 0.2s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: opacity 0.2s ease, width 0.22s ease;
 }
 
 .app-shell.is-sidebar-collapsed .app-sidebar {
+  width: 0;
   opacity: 0;
   pointer-events: none;
   border-right-width: 0;
@@ -1447,12 +2028,33 @@ textarea.input {
 @media (max-width: 900px) {
   .app-shell {
     --app-sidebar-width: 0px;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-main {
+    grid-column: 1;
+  }
+
+  .app-shell > .site-legal-footer {
+    grid-column: 1;
+  }
+
+  .app-main__inner {
+    padding: 1rem 0.85rem 2rem;
+  }
+
+  .app-header {
+    padding-inline: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .app-header__end {
+    gap: 0.35rem;
   }
 
   .app-sidebar {
     position: fixed;
-    top: 3.5rem;
+    top: var(--app-header-height);
     left: 0;
     bottom: 0;
     z-index: 35;
@@ -1480,7 +2082,7 @@ textarea.input {
   .app-sidebar-backdrop {
     display: block;
     position: fixed;
-    inset: 3.5rem 0 0;
+    inset: var(--app-header-height) 0 0;
     z-index: 30;
     background: rgb(15 28 24 / 35%);
     backdrop-filter: blur(2px);

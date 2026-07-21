@@ -33,14 +33,17 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorExists('#dashboard-menu-navigation');
         self::assertSelectorTextContains('.app-sidebar__label', 'Dashboard');
         self::assertSelectorTextContains('.beacon-nav', 'Projects');
-        self::assertSelectorTextContains('.beacon-nav', 'New project');
+        self::assertSelectorNotExists('.beacon-nav a[href="/projects/new"]');
+        self::assertSelectorTextContains('.beacon-nav', 'API docs');
+        self::assertSelectorExists('button[data-action="confirm-dialog#open"]');
+        self::assertSelectorExists('dialog.confirm-dialog--form');
         self::assertSelectorExists('.user-avatar');
         self::assertSelectorTextContains('.user-menu', 'Preferences');
         self::assertSelectorTextContains('.user-menu', 'Dashboard');
         self::assertSelectorNotExists('.user-menu a[href="/admin"]');
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId());
-        self::assertResponseRedirects('/projects/'.$project->getId().'/issues');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('#dashboard-menu-navigation');
@@ -55,7 +58,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.beacon-breadcrumb-wrap');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Projects');
@@ -94,21 +97,21 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         $em->persist($issue);
         $em->flush();
 
-        $projectId = (int) $project->getId();
-        $issueId = (int) $issue->getId();
-        self::assertNotSame($projectId, $issueId);
+        $projectUuid = $project->getUuid();
+        $issueUuid = $issue->getUuid();
+        self::assertNotSame($projectUuid, $issueUuid);
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectId.'/issues/'.$issueId);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/issues/'.$issueUuid);
         self::assertResponseIsSuccessful();
 
         $wrap = $crawler->filter('.beacon-breadcrumb-wrap');
         self::assertGreaterThan(0, $wrap->count());
         $html = $wrap->html();
-        self::assertStringContainsString('/projects/'.$projectId.'/issues"', $html);
-        self::assertStringContainsString('/projects/'.$projectId.'"', $html);
-        self::assertStringNotContainsString('/projects/'.$issueId.'"', $html);
-        self::assertStringNotContainsString('/projects/'.$issueId.'/issues', $html);
+        self::assertStringContainsString('/projects/'.$projectUuid.'/issues"', $html);
+        self::assertStringContainsString('/projects/'.$projectUuid.'"', $html);
+        self::assertStringNotContainsString('/projects/'.$issueUuid.'"', $html);
+        self::assertStringNotContainsString('/projects/'.$issueUuid.'/issues', $html);
     }
 
     public function testPreferencesSectionUsesPreferencesMenu(): void

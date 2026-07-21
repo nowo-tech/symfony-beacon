@@ -1,0 +1,71 @@
+# https://symfony.com/bundles/NelmioApiDocBundle/current/index.html
+nelmio_api_doc:
+    type_info: true
+    documentation:
+        info:
+            title: Symfony Beacon API
+            description: |
+                Self-hosted error tracking API for PHP/Symfony.
+
+                ## Envelope ingest
+                Clients (e.g. `nowo-tech/beacon-bundle`) POST Beacon Envelopes to
+                `POST /api/{projectId}/envelope/`. Authentication uses project API keys from the DSN:
+
+                ```
+                https://PUBLIC:SECRET@host/projectId
+                ```
+
+                When the API key stores a secret (default for keys created in Beacon), **both**
+                `beacon_key` and `beacon_secret` are required. Public-key-only requests receive HTTP 403.
+
+                Auth may be supplied via:
+                - Header `X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…`
+                - Query `?beacon_key=…&beacon_secret=…`
+                - Envelope header JSON line `"dsn": "https://public:secret@host/id"`
+
+                ## Health
+                Unauthenticated liveness/readiness probes for orchestrators.
+
+                ## Docs UI
+                Swagger UI at `/api/doc` requires a logged-in Beacon session; it documents these
+                HTTP APIs only (not the Twig dashboard).
+            version: '1.0.0'
+            contact:
+                name: Nowo.tech
+                url: https://nowo.tech
+        tags:
+            - name: Ingest
+              description: Envelope wire-protocol ingest (async processing via Messenger).
+            - name: Health
+              description: Liveness and readiness probes (no authentication).
+        components:
+            securitySchemes:
+                BeaconAuth:
+                    type: apiKey
+                    in: header
+                    name: X-Beacon-Auth
+                    description: |
+                        Beacon auth header. Example:
+                        `Beacon beacon_key=PUBLIC, beacon_secret=SECRET`
+                        The secret is required whenever the project API key has one stored.
+                BeaconKeyQuery:
+                    type: apiKey
+                    in: query
+                    name: beacon_key
+                    description: Public key from the project DSN (use with beacon_secret).
+                BeaconSecretQuery:
+                    type: apiKey
+                    in: query
+                    name: beacon_secret
+                    description: Secret key from the project DSN (required when the API key has a secret).
+    areas:
+        path_patterns:
+            - ^/api(?!/doc)
+            - ^/health/(live|ready)$
+    html_config:
+        assets_mode: cdn
+        swagger_ui_config:
+            deepLinking: true
+            displayRequestDuration: true
+            filter: true
+            tryItOutEnabled: true

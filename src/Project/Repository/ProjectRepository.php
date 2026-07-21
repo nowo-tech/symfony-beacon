@@ -20,13 +20,19 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * Projects the user can open via direct membership or a linked group.
+     *
      * @return list<Project>
      */
     public function findAccessibleByUser(User $user, ?string $query = null): array
     {
         $qb = $this->createQueryBuilder('p')
-            ->innerJoin('p.memberships', 'm')
-            ->andWhere('m.user = :user')
+            ->distinct()
+            ->leftJoin('p.memberships', 'm')
+            ->leftJoin('p.groupAccesses', 'ga')
+            ->leftJoin('ga.userGroup', 'g')
+            ->leftJoin('g.memberships', 'gm')
+            ->andWhere('m.user = :user OR gm.user = :user')
             ->setParameter('user', $user)
             ->orderBy('p.name', 'ASC');
 

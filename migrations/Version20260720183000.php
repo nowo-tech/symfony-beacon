@@ -6,12 +6,17 @@ namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use DoctrineMigrations\FieldDictionary\AppliesMdkDefinition;
+use Nowo\MigrationsKitBundle\FieldDictionary\IdField;
+use Nowo\MigrationsKitBundle\Migration\MigrationDefinitionKeys as MDK;
 
 /**
  * Cookie consent log (+ optional config/inventory tables mapped by nowo-tech/cookie-consent-bundle).
  */
 final class Version20260720183000 extends AbstractMigration
 {
+    use AppliesMdkDefinition;
+
     public function getDescription(): string
     {
         return 'Create nowo-tech cookie consent tables (log, config, definitions)';
@@ -19,25 +24,160 @@ final class Version20260720183000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE dashboard_cookie_log (id INT AUTO_INCREMENT NOT NULL, ip_address VARCHAR(255) NOT NULL, cookie_consent_key VARCHAR(255) NOT NULL, cookie_name VARCHAR(255) NOT NULL, cookie_value TINYINT(1) NOT NULL, timestamp DATETIME NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE dashboard_cookie_config (id INT AUTO_INCREMENT NOT NULL, enabled TINYINT(1) DEFAULT 1 NOT NULL, is_default TINYINT(1) DEFAULT 0 NOT NULL, auto_show TINYINT(1) DEFAULT 1 NOT NULL, revision INT DEFAULT 0 NOT NULL, manage_script_tags TINYINT(1) DEFAULT 0 NOT NULL, auto_clear_cookies TINYINT(1) DEFAULT 0 NOT NULL, hide_from_bots TINYINT(1) DEFAULT 1 NOT NULL, disable_page_interaction TINYINT(1) DEFAULT 0 NOT NULL, lazy_html_generation TINYINT(1) DEFAULT 0 NOT NULL, consent_modal_layout VARCHAR(20) DEFAULT \'box\' NOT NULL, consent_modal_variant VARCHAR(20) DEFAULT \'wide\' NOT NULL, consent_modal_position_y VARCHAR(20) DEFAULT \'bottom\' NOT NULL, consent_modal_position_x VARCHAR(20) DEFAULT \'center\', consent_modal_equal_weight_buttons TINYINT(1) DEFAULT 0 NOT NULL, consent_modal_flip_buttons TINYINT(1) DEFAULT 0 NOT NULL, auto_show_route_mode VARCHAR(20) DEFAULT \'all\' NOT NULL, auto_show_routes JSON NOT NULL, name VARCHAR(100) DEFAULT NULL, route_patterns JSON NOT NULL, priority INT DEFAULT 0 NOT NULL, preferences_modal_layout VARCHAR(20) DEFAULT \'box\' NOT NULL, preferences_modal_variant VARCHAR(20) DEFAULT \'wide\' NOT NULL, preferences_modal_position_y VARCHAR(20) DEFAULT \'middle\' NOT NULL, preferences_modal_position_x VARCHAR(20) DEFAULT \'center\', preferences_modal_equal_weight_buttons TINYINT(1) DEFAULT 0 NOT NULL, preferences_modal_flip_buttons TINYINT(1) DEFAULT 0 NOT NULL, color_theme VARCHAR(30) DEFAULT \'light\' NOT NULL, dark_mode_enabled TINYINT(1) DEFAULT 0 NOT NULL, disable_transitions TINYINT(1) DEFAULT 0 NOT NULL, two_step_modal TINYINT(1) DEFAULT 0 NOT NULL, open_preferences_modal TINYINT(1) DEFAULT 0 NOT NULL, manage_iframe_placeholders TINYINT(1) DEFAULT 0 NOT NULL, granular_cookie_selection TINYINT(1) DEFAULT 0 NOT NULL, preferences_bubble_enabled TINYINT(1) DEFAULT 0 NOT NULL, preferences_bubble_position VARCHAR(20) DEFAULT \'bottom-right\' NOT NULL, preferences_bubble_border_color VARCHAR(7) DEFAULT NULL, preferences_bubble_icon LONGTEXT DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE dashboard_cookie_config_translation (id INT AUTO_INCREMENT NOT NULL, locale VARCHAR(10) NOT NULL, consent_modal_label VARCHAR(100) DEFAULT NULL, consent_modal_title VARCHAR(100) NOT NULL, consent_modal_description LONGTEXT NOT NULL, consent_modal_accept_all_btn VARCHAR(30) NOT NULL, consent_modal_accept_necessary_btn VARCHAR(30) NOT NULL, consent_modal_show_preferences_btn VARCHAR(30) DEFAULT NULL, consent_modal_footer LONGTEXT DEFAULT NULL, preferences_modal_title VARCHAR(100) DEFAULT NULL, preferences_modal_accept_all_btn VARCHAR(30) DEFAULT NULL, preferences_modal_accept_necessary_btn VARCHAR(30) DEFAULT NULL, preferences_modal_save_preferences_btn VARCHAR(30) DEFAULT NULL, preferences_modal_close_icon_label VARCHAR(30) DEFAULT NULL, privacy_route VARCHAR(255) DEFAULT NULL, preference_sections JSON DEFAULT NULL, config_id INT NOT NULL, INDEX IDX_COOKIE_CONSENT_CFG_TR_CFG (config_id), UNIQUE INDEX uniq_cookie_consent_config_translation_locale (config_id, locale), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE dashboard_cookie_definition (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(120) NOT NULL, duration VARCHAR(60) NOT NULL, category VARCHAR(40) NOT NULL, type VARCHAR(20) NOT NULL, sort_order INT DEFAULT 0 NOT NULL, allowed_by_default TINYINT(1) DEFAULT 1 NOT NULL, config_id INT NOT NULL, INDEX IDX_COOKIE_DEF_CFG (config_id), UNIQUE INDEX uniq_cookie_definition_config_name (config_id, name), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE dashboard_cookie_definition_translation (id INT AUTO_INCREMENT NOT NULL, locale VARCHAR(10) NOT NULL, provider VARCHAR(120) NOT NULL, purpose LONGTEXT NOT NULL, definition_id INT NOT NULL, INDEX IDX_COOKIE_DEF_TR_DEF (definition_id), UNIQUE INDEX uniq_cookie_definition_translation_locale (definition_id, locale), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE dashboard_cookie_config_translation ADD CONSTRAINT FK_COOKIE_CONSENT_CFG_TR_CFG FOREIGN KEY (config_id) REFERENCES dashboard_cookie_config (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE dashboard_cookie_definition ADD CONSTRAINT FK_COOKIE_DEF_CFG FOREIGN KEY (config_id) REFERENCES dashboard_cookie_config (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE dashboard_cookie_definition_translation ADD CONSTRAINT FK_COOKIE_DEF_TR_DEF FOREIGN KEY (definition_id) REFERENCES dashboard_cookie_definition (id) ON DELETE CASCADE');
+        $this->applyMdk([
+            MDK::TABLES => [
+                'dashboard_cookie_log' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'ip_address', 'type' => 'string', 'length' => 255, 'notnull' => true],
+                        ['name' => 'cookie_consent_key', 'type' => 'string', 'length' => 255, 'notnull' => true],
+                        ['name' => 'cookie_name', 'type' => 'string', 'length' => 255, 'notnull' => true],
+                        ['name' => 'cookie_value', 'type' => 'boolean', 'notnull' => true],
+                        ['name' => 'timestamp', 'type' => 'datetime_immutable', 'notnull' => true],
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                ],
+                'dashboard_cookie_config' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'enabled', 'type' => 'boolean', 'notnull' => true, 'default' => true],
+                        ['name' => 'is_default', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'auto_show', 'type' => 'boolean', 'notnull' => true, 'default' => true],
+                        ['name' => 'revision', 'type' => 'integer', 'notnull' => true, 'default' => 0],
+                        ['name' => 'manage_script_tags', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'auto_clear_cookies', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'hide_from_bots', 'type' => 'boolean', 'notnull' => true, 'default' => true],
+                        ['name' => 'disable_page_interaction', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'lazy_html_generation', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'consent_modal_layout', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'box'],
+                        ['name' => 'consent_modal_variant', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'wide'],
+                        ['name' => 'consent_modal_position_y', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'bottom'],
+                        ['name' => 'consent_modal_position_x', 'type' => 'string', 'length' => 20, 'notnull' => false, 'default' => 'center'],
+                        ['name' => 'consent_modal_equal_weight_buttons', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'consent_modal_flip_buttons', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'auto_show_route_mode', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'all'],
+                        ['name' => 'auto_show_routes', 'type' => 'json', 'notnull' => true],
+                        ['name' => 'name', 'type' => 'string', 'length' => 100, 'notnull' => false],
+                        ['name' => 'route_patterns', 'type' => 'json', 'notnull' => true],
+                        ['name' => 'priority', 'type' => 'integer', 'notnull' => true, 'default' => 0],
+                        ['name' => 'preferences_modal_layout', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'box'],
+                        ['name' => 'preferences_modal_variant', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'wide'],
+                        ['name' => 'preferences_modal_position_y', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'middle'],
+                        ['name' => 'preferences_modal_position_x', 'type' => 'string', 'length' => 20, 'notnull' => false, 'default' => 'center'],
+                        ['name' => 'preferences_modal_equal_weight_buttons', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'preferences_modal_flip_buttons', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'color_theme', 'type' => 'string', 'length' => 30, 'notnull' => true, 'default' => 'light'],
+                        ['name' => 'dark_mode_enabled', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'disable_transitions', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'two_step_modal', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'open_preferences_modal', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'manage_iframe_placeholders', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'granular_cookie_selection', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'preferences_bubble_enabled', 'type' => 'boolean', 'notnull' => true, 'default' => false],
+                        ['name' => 'preferences_bubble_position', 'type' => 'string', 'length' => 20, 'notnull' => true, 'default' => 'bottom-right'],
+                        ['name' => 'preferences_bubble_border_color', 'type' => 'string', 'length' => 7, 'notnull' => false],
+                        ['name' => 'preferences_bubble_icon', 'type' => 'text', 'notnull' => false],
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                ],
+                'dashboard_cookie_config_translation' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'locale', 'type' => 'string', 'length' => 10, 'notnull' => true],
+                        ['name' => 'consent_modal_label', 'type' => 'string', 'length' => 100, 'notnull' => false],
+                        ['name' => 'consent_modal_title', 'type' => 'string', 'length' => 100, 'notnull' => true],
+                        ['name' => 'consent_modal_description', 'type' => 'text', 'notnull' => true],
+                        ['name' => 'consent_modal_accept_all_btn', 'type' => 'string', 'length' => 30, 'notnull' => true],
+                        ['name' => 'consent_modal_accept_necessary_btn', 'type' => 'string', 'length' => 30, 'notnull' => true],
+                        ['name' => 'consent_modal_show_preferences_btn', 'type' => 'string', 'length' => 30, 'notnull' => false],
+                        ['name' => 'consent_modal_footer', 'type' => 'text', 'notnull' => false],
+                        ['name' => 'preferences_modal_title', 'type' => 'string', 'length' => 100, 'notnull' => false],
+                        ['name' => 'preferences_modal_accept_all_btn', 'type' => 'string', 'length' => 30, 'notnull' => false],
+                        ['name' => 'preferences_modal_accept_necessary_btn', 'type' => 'string', 'length' => 30, 'notnull' => false],
+                        ['name' => 'preferences_modal_save_preferences_btn', 'type' => 'string', 'length' => 30, 'notnull' => false],
+                        ['name' => 'preferences_modal_close_icon_label', 'type' => 'string', 'length' => 30, 'notnull' => false],
+                        ['name' => 'privacy_route', 'type' => 'string', 'length' => 255, 'notnull' => false],
+                        ['name' => 'preference_sections', 'type' => 'json', 'notnull' => false],
+                        ['name' => 'config_id', 'type' => 'integer', 'notnull' => true],
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                    MDK::INDEXES => [
+                        ['columns' => ['config_id'], 'name' => 'IDX_COOKIE_CONSENT_CFG_TR_CFG'],
+                        ['columns' => ['config_id', 'locale'], 'unique' => true, 'name' => 'uniq_cookie_consent_config_translation_locale'],
+                    ],
+                    MDK::FOREIGN_KEYS => [
+                        [
+                            'columns' => ['config_id'],
+                            'foreign_table' => 'dashboard_cookie_config',
+                            'foreign_columns' => ['id'],
+                            'onDelete' => MDK::ON_DELETE_CASCADE,
+                            'name' => 'FK_COOKIE_CONSENT_CFG_TR_CFG',
+                        ],
+                    ],
+                ],
+                'dashboard_cookie_definition' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'name', 'type' => 'string', 'length' => 120, 'notnull' => true],
+                        ['name' => 'duration', 'type' => 'string', 'length' => 60, 'notnull' => true],
+                        ['name' => 'category', 'type' => 'string', 'length' => 40, 'notnull' => true],
+                        ['name' => 'type', 'type' => 'string', 'length' => 20, 'notnull' => true],
+                        ['name' => 'sort_order', 'type' => 'integer', 'notnull' => true, 'default' => 0],
+                        ['name' => 'allowed_by_default', 'type' => 'boolean', 'notnull' => true, 'default' => true],
+                        ['name' => 'config_id', 'type' => 'integer', 'notnull' => true],
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                    MDK::INDEXES => [
+                        ['columns' => ['config_id'], 'name' => 'IDX_COOKIE_DEF_CFG'],
+                        ['columns' => ['config_id', 'name'], 'unique' => true, 'name' => 'uniq_cookie_definition_config_name'],
+                    ],
+                    MDK::FOREIGN_KEYS => [
+                        [
+                            'columns' => ['config_id'],
+                            'foreign_table' => 'dashboard_cookie_config',
+                            'foreign_columns' => ['id'],
+                            'onDelete' => MDK::ON_DELETE_CASCADE,
+                            'name' => 'FK_COOKIE_DEF_CFG',
+                        ],
+                    ],
+                ],
+                'dashboard_cookie_definition_translation' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'locale', 'type' => 'string', 'length' => 10, 'notnull' => true],
+                        ['name' => 'provider', 'type' => 'string', 'length' => 120, 'notnull' => true],
+                        ['name' => 'purpose', 'type' => 'text', 'notnull' => true],
+                        ['name' => 'definition_id', 'type' => 'integer', 'notnull' => true],
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                    MDK::INDEXES => [
+                        ['columns' => ['definition_id'], 'name' => 'IDX_COOKIE_DEF_TR_DEF'],
+                        ['columns' => ['definition_id', 'locale'], 'unique' => true, 'name' => 'uniq_cookie_definition_translation_locale'],
+                    ],
+                    MDK::FOREIGN_KEYS => [
+                        [
+                            'columns' => ['definition_id'],
+                            'foreign_table' => 'dashboard_cookie_definition',
+                            'foreign_columns' => ['id'],
+                            'onDelete' => MDK::ON_DELETE_CASCADE,
+                            'name' => 'FK_COOKIE_DEF_TR_DEF',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE dashboard_cookie_config_translation DROP FOREIGN KEY FK_COOKIE_CONSENT_CFG_TR_CFG');
-        $this->addSql('ALTER TABLE dashboard_cookie_definition DROP FOREIGN KEY FK_COOKIE_DEF_CFG');
-        $this->addSql('ALTER TABLE dashboard_cookie_definition_translation DROP FOREIGN KEY FK_COOKIE_DEF_TR_DEF');
-        $this->addSql('DROP TABLE dashboard_cookie_definition_translation');
-        $this->addSql('DROP TABLE dashboard_cookie_definition');
-        $this->addSql('DROP TABLE dashboard_cookie_config_translation');
-        $this->addSql('DROP TABLE dashboard_cookie_config');
-        $this->addSql('DROP TABLE dashboard_cookie_log');
+        $this->applyMdk([
+            MDK::DROP_TABLES => [
+                'dashboard_cookie_definition_translation',
+                'dashboard_cookie_definition',
+                'dashboard_cookie_config_translation',
+                'dashboard_cookie_config',
+                'dashboard_cookie_log',
+            ],
+        ]);
     }
 }

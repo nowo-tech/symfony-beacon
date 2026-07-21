@@ -6,6 +6,7 @@ namespace App\Identity\Form;
 
 use App\Identity\Entity\User;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
@@ -36,6 +37,7 @@ final class AccountProfileType extends FormKitAbstractType
         ]);
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'user_preferences';

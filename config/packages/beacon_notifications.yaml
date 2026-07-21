@@ -1,0 +1,8 @@
+# Outbound notification SSRF guard (Slack / Discord / Teams / HTTP destinations).
+# Production keeps private/link-local/metadata hosts blocked.
+# Dev/test allow private URLs for local webhooks (host.docker.internal, etc.).
+when@dev: &beacon_notifications_private_urls
+    parameters:
+        beacon.notifications.allow_private_urls: true
+
+when@test: *beacon_notifications_private_urls

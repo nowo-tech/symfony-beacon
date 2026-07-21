@@ -6,6 +6,7 @@ namespace App\Tests\Shared;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Project\Repository\ProjectRepository;
 use App\Shared\IssueStatus;
 use App\Shared\Retention\RetentionPurger;
 use App\Tests\Shared\DatabaseWebTestCase as BaseDatabaseWebTestCase;
@@ -17,7 +18,7 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
     public function testPurgesEventsOlderThanRetentionDays(): void
     {
         [, , $project] = $this->bootWithDemoProject('retention@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $oldIssue = new Issue();
         $oldIssue->setProject($project);
@@ -56,7 +57,7 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
         $em->persist($newEvent);
         $em->flush();
 
-        $purger = new RetentionPurger($em, static::getContainer()->get(\App\Project\Repository\ProjectRepository::class), 30, 0);
+        $purger = new RetentionPurger($em, self::getContainer()->get(ProjectRepository::class), 30, 0);
         $result = $purger->purgeProject($project);
 
         self::assertGreaterThanOrEqual(1, $result['events']);

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'groups.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'groups.title'|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'groups.intro'|trans }}</p>
+    </div>
+    <a class="btn-primary no-underline" href="{{ path('admin_groups_new') }}">{{ 'groups.create'|trans }}</a>
+</div>
+
+{% if groups is empty %}
+    <p class="text-sm text-[var(--color-ink)]/55">{{ 'groups.empty'|trans }}</p>
+{% else %}
+    <ul class="space-y-3">
+        {% for group in groups %}
+            <li class="panel flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <a class="font-medium no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ group.name }}</a>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'groups.member_count'|trans({'%count%': group.memberships|length}) }}</div>
+                </div>
+                <a class="btn-ghost no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ 'groups.open'|trans }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

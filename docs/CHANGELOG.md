@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-21
+
+### Added
+
+- Password history + expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle) (`password_history` table, `password_changed_at` on `app_user`; account security form validates reuse)
+- Account enable/disable, last activity, and online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle) (admin users table)
+- Automatic timestamps + blame fields via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle) on `User`, `Project`, `SiteAppearance`, and `NotificationDestination`
+- Field encryption at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite; API key secrets + notification webhook URLs)
+- Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK definitions; existing versions rewritten in place)
+- Account Display issue-panel defaults via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify whitelist of panel ids)
+- Issue assignment & status history (`issue_history`): record assignee changes and resolve/reopen/ignore (including ingest reopen)
+- Public `uuid` columns (UUID v7) on Project, Issue, PerfTransaction, NotificationDestination, and User for opaque UI URLs
+- Project Settings membership management: add existing users by email with owner/admin/member roles, change role, remove (guards for last owner; admins cannot manage owners)
+- User **groups** (`user_group`): admin CRUD + members; projects can link groups with admin/member role so all group users gain access (owners stay direct users)
+- Administration → Users: create accounts, change instance role (User/Admin), enable/disable (UserKit)
+- User **activity history** (`user_action`): admin timeline of user/group/project membership actions and explicit product actions; per-user page at `/admin/users/{uuid}/activity`
+- Project notifications: Discord, Microsoft Teams, Telegram (`bot_token@chat_id`), and email (Symfony Mailer) destinations alongside Slack / HTTP
+- OpenAPI / Swagger UI in the Panel shell (`/api/doc`, `/api/doc.json`) via NelmioApiDocBundle (`specs/013-api-docs-panel`)
+- Shared login-throttle DB table `login_attempts` for multi-worker FrankenPHP / multi-pod deployments
+- GitHub community files: issue templates, PR template, `CODEOWNERS`, root [`SECURITY.md`](../SECURITY.md)
+- Dev tooling: [`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper) (`make composer-outdated`)
+- Functional coverage for AuthKit login lockout (`LoginThrottleTest`)
+
+### Changed
+
+- **Breaking (ingest auth):** Envelope auth uses Beacon-native wire names only — header `X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…`, query `beacon_key` / `beacon_secret`. Pair with [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) **≥ 1.5.0**.
+- UI routes use public **UUID** path segments (integer PKs remain internal; Envelope ingest `/api/{projectId}` stays numeric)
+- Project access resolves the highest role from direct membership **or** linked groups (`ProjectAccessService`)
+- App shell: fixed sidebar while scrolling; thinner scrollbars on shell / kit surfaces
+- Specs/docs: `004-issues` status UI + history; `003-ingest` / `013-api-docs-panel`; architecture Mermaid + README/ROADMAP/CONTRIBUTING (MDK migrations)
+
+### Fixed
+
+- Kit admin Bootstrap modals (Menus / Breadcrumbs): backdrop no longer covers the dialog (modals portaled to `document.body`)
+- Test env: `cache.rate_limiter` uses filesystem adapter so Symfony `login_throttling` state survives KernelBrowser request resets
+
 ## [0.8.1] - 2026-07-21
 
 ### Added
@@ -190,7 +226,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.1...v0.7.2

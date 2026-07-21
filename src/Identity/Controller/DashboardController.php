@@ -6,6 +6,7 @@ namespace App\Identity\Controller;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
+use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,6 +43,8 @@ final class DashboardController extends AbstractController
             'projects' => $projects,
             'query' => $query,
             'statsPreview' => $statsPreview,
+            'newProjectForm' => $this->createForm(ProjectType::class),
+            'openNewProject' => $request->query->getBoolean('new'),
         ]);
     }
 }

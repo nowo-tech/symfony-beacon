@@ -12,6 +12,7 @@ use App\Project\Entity\ProjectMembership;
 use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
@@ -21,13 +22,15 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-notif@example.com');
         $this->login($client, $owner);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/notifications/new');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/notifications/new');
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-controller*="symfony--ux-autocomplete--autocomplete"]');
+        self::assertSelectorExists('select[name="notification_destination[categories][]"][multiple]');
 
         $token = $crawler->filter('input[name="notification_destination[_token]"]')->attr('value');
         self::assertNotEmpty($token);
 
-        $client->request('POST', '/projects/'.$project->getId().'/notifications/new', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/notifications/new', [
             'notification_destination' => [
                 '_token' => $token,
                 'label' => 'Slack errors',
@@ -40,21 +43,38 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         self::assertResponseRedirects();
         $client->followRedirect();
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $destinations = $em->getRepository(NotificationDestination::class)->findBy(['project' => $project]);
         self::assertCount(1, $destinations);
         self::assertSame('Slack errors', $destinations[0]->getLabel());
 
         $member = $this->addMember($project, 'member-notif@example.com', ProjectRole::Member);
         $this->login($client, $member);
-        $client->request('GET', '/projects/'.$project->getId().'/notifications/new');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/notifications/new');
         self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testMemberCanOpenSetupGuides(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('owner-guides@example.com');
+        $member = $this->addMember($project, 'member-guides@example.com', ProjectRole::Member);
+        $this->login($client, $member);
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/notifications/help');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.notification-help__title', 'Notification setup guides');
+        self::assertSelectorExists('#help-slack');
+        self::assertSelectorExists('#help-telegram');
+        self::assertSelectorExists('#help-discord');
+        self::assertSelectorExists('#help-teams');
+        self::assertSelectorExists('#help-email');
+        self::assertSelectorExists('#help-http');
     }
 
     public function testSettingsListsMaskedUrl(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-mask@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
@@ -68,7 +88,7 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $client->request('GET', '/projects/'.$project->getId().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('https://exa', $client->getResponse()->getContent() ?: '');
         self::assertStringNotContainsString('very-secret-token-abcdef', $client->getResponse()->getContent() ?: '');
@@ -76,8 +96,8 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
 
     private function addMember(Project $project, string $email, ProjectRole $role): User
     {
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $user = new User();
         $user->setEmail($email);

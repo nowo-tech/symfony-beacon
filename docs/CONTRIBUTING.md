@@ -10,6 +10,13 @@
 8. Run `make test` (and ideally `make qa`) before opening a PR.
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
 10. Public-facing UI must include legal pages and cookie consent (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
+11. Dependency bumps: run `make composer-outdated` ([`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper)) and apply suggested exact pins carefully (Symfony Flex `extra.symfony.require` stays `8.1.*`).
+12. New Doctrine migrations MUST use [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) MDK definitions (`CreateTablesService` + `AppliesMdkDefinition` / `migrations/FieldDictionary/`). Prefer idempotent declarative tables/columns over raw `CREATE TABLE` SQL.
+13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
+
+## Pull requests
+
+PRs use [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md). Requested reviewers come from [`.github/CODEOWNERS`](../.github/CODEOWNERS).
 
 ## Git hygiene
 
@@ -52,7 +59,7 @@ Bare `/`, `/login`, `/register`, and `/logout` redirect to the default-locale Au
 
 | Domain / files | Purpose |
 | --- | --- |
-| `translations/messages.{locale}.yaml` | App UI strings (nav, locale switcher labels, AuthKit page chrome) |
+| `translations/messages.{locale}.yaml` | App UI strings (nav, locale switcher labels, AuthKit page chrome) **and** password-strength requirement/generator strings when `PasswordStrengthType` uses `translation_domain: messages` (e.g. `/account/security`) |
 | `translations/NowoAuthKitBundle.{locale}.yaml` | AuthKit label overrides **and** password-strength requirement/generator strings (AuthKit sets its translation domain on those fields) |
 | Bundle catalogues in vendor | AuthKit / PasswordStrength / … defaults; override in `translations/` when needed |
 

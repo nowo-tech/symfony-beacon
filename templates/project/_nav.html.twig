@@ -13,22 +13,22 @@
     <div class="flex flex-wrap gap-2">
         <a
             class="btn-ghost no-underline{% if current == 'issues' %} is-active{% endif %}"
-            href="{{ path('issue_index', {id: project.id}) }}"
+            href="{{ path('issue_index', {id: project.uuid}) }}"
             {% if current == 'issues' %}aria-current="page"{% endif %}
         >{{ 'nav.issues'|trans }}</a>
         <a
             class="btn-ghost no-underline{% if current == 'performance' %} is-active{% endif %}"
-            href="{{ path('performance_index', {id: project.id}) }}"
+            href="{{ path('performance_index', {id: project.uuid}) }}"
             {% if current == 'performance' %}aria-current="page"{% endif %}
         >{{ 'nav.performance'|trans }}</a>
         <a
             class="btn-ghost no-underline{% if current == 'analytics' %} is-active{% endif %}"
-            href="{{ path('analytics_show', {id: project.id}) }}"
+            href="{{ path('analytics_show', {id: project.uuid}) }}"
             {% if current == 'analytics' %}aria-current="page"{% endif %}
         >{{ 'nav.analytics'|trans }}</a>
         <a
             class="btn-ghost no-underline{% if current == 'settings' %} is-active{% endif %}"
-            href="{{ path('project_settings', {id: project.id}) }}"
+            href="{{ path('project_settings', {id: project.uuid}) }}"
             {% if current == 'settings' %}aria-current="page"{% endif %}
         >{{ 'project.settings.nav'|trans }}</a>
     </div>

@@ -107,6 +107,11 @@ function isMobileSidebar(): boolean {
 }
 
 function readSidebarCollapsed(): boolean {
+  if (isMobileSidebar()) {
+    // Drawer should start closed on phones; ignore desktop expanded preference.
+    return true;
+  }
+
   try {
     const stored = localStorage.getItem(SIDEBAR_KEY);
     if (stored === 'collapsed' || stored === 'expanded') {
@@ -116,10 +121,15 @@ function readSidebarCollapsed(): boolean {
     // Ignore.
   }
 
-  return isMobileSidebar();
+  return false;
 }
 
 function writeSidebarCollapsed(collapsed: boolean): void {
+  // Do not persist drawer open/closed across mobile navigations.
+  if (isMobileSidebar()) {
+    return;
+  }
+
   try {
     localStorage.setItem(SIDEBAR_KEY, collapsed ? 'collapsed' : 'expanded');
   } catch {
@@ -180,6 +190,17 @@ function initSidebar(): void {
     backdrop.addEventListener('click', () => {
       collapsed = true;
       writeSidebarCollapsed(collapsed);
+      applySidebar(collapsed);
+    });
+  });
+
+  // Close the drawer after choosing a destination on mobile.
+  shell.querySelectorAll('.app-sidebar a[href]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (!isMobileSidebar()) {
+        return;
+      }
+      collapsed = true;
       applySidebar(collapsed);
     });
   });

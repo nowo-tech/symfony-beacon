@@ -14,10 +14,10 @@ use Symfony\Bundle\SecurityBundle\Security;
  * Items without keys remain visible.
  */
 #[PermissionCheckerLabel('Symfony Security isGranted')]
-final class SecurityIsGrantedMenuPermissionChecker implements MenuPermissionCheckerInterface
+final readonly class SecurityIsGrantedMenuPermissionChecker implements MenuPermissionCheckerInterface
 {
     public function __construct(
-        private readonly Security $security,
+        private Security $security,
     ) {
     }
 
@@ -28,12 +28,6 @@ final class SecurityIsGrantedMenuPermissionChecker implements MenuPermissionChec
             return true;
         }
 
-        foreach ($keys as $key) {
-            if ($this->security->isGranted($key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key): bool => $this->security->isGranted($key));
     }
 }

@@ -47,6 +47,22 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "nelmio/api-doc-bundle": {
+        "version": "5.10",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "c8e0c38e1a280ab9e37587a8fa32b251d5bc1c94"
+        },
+        "files": [
+            "config/packages/nelmio_api_doc.yaml",
+            "config/routes/nelmio_api_doc.yaml"
+        ]
+    },
+    "nowo-tech/audit-kit-bundle": {
+        "version": "v1.1.1"
+    },
     "nowo-tech/auth-kit-bundle": {
         "version": "v1.5.1"
     },
@@ -59,11 +75,20 @@
     "nowo-tech/dashboard-menu-bundle": {
         "version": "v0.3.45"
     },
+    "nowo-tech/doctrine-encrypt-bundle": {
+        "version": "v2.3.1"
+    },
     "nowo-tech/form-kit-bundle": {
         "version": "v2.0.15"
     },
     "nowo-tech/login-throttle-bundle": {
         "version": "v2.2.0"
+    },
+    "nowo-tech/migrations-kit-bundle": {
+        "version": "v2.0.17"
+    },
+    "nowo-tech/password-policy-bundle": {
+        "version": "v1.2.3"
     },
     "nowo-tech/password-strength-bundle": {
         "version": "v1.3.0"
@@ -74,8 +99,14 @@
     "nowo-tech/pwa-bundle": {
         "version": "v1.1.2"
     },
+    "nowo-tech/tag-input-bundle": {
+        "version": "v1.0.4"
+    },
     "nowo-tech/twig-inspector-bundle": {
         "version": "v1.0.36"
+    },
+    "nowo-tech/user-kit-bundle": {
+        "version": "v1.1.3"
     },
     "pentatrion/vite-bundle": {
         "version": "8.2",
@@ -159,6 +190,18 @@
             "src/Controller/.gitignore",
             "src/Kernel.php",
             ".editorconfig"
+        ]
+    },
+    "symfony/mailer": {
+        "version": "8.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "09051cfde49476e3c12cd3a0e44289ace1c75a4f"
+        },
+        "files": [
+            "config/packages/mailer.yaml"
         ]
     },
     "symfony/messenger": {
@@ -251,6 +294,15 @@
             "config/packages/twig.yaml",
             "templates/base.html.twig"
         ]
+    },
+    "symfony/uid": {
+        "version": "8.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.0",
+            "ref": "0df5844274d871b37fc3816c57a768ffc60a43a5"
+        }
     },
     "symfony/ux-autocomplete": {
         "version": "3.3",

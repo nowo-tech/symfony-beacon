@@ -1,0 +1,159 @@
+/* Swagger UI embedded in Beacon app shell (Panel → API docs) */
+
+.api-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.api-docs__intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.api-docs__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+.api-docs__lead {
+  margin: 0.35rem 0 0;
+  max-width: 40rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 65%, transparent);
+}
+
+.api-docs__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.api-docs__panel {
+  padding: 0.75rem 1rem 1.25rem;
+  overflow: hidden;
+}
+
+/* Hide Swagger topbar; Beacon chrome already provides navigation */
+.api-docs__swagger .swagger-ui .topbar {
+  display: none;
+}
+
+.api-docs__swagger .swagger-ui {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color: var(--color-ink);
+}
+
+.api-docs__swagger .swagger-ui .info {
+  margin: 0.5rem 0 1.25rem;
+}
+
+.api-docs__swagger .swagger-ui .info .title {
+  font-family: var(--font-display);
+  color: var(--color-moss);
+  font-size: 1.5rem;
+}
+
+.api-docs__swagger .swagger-ui .info .description,
+.api-docs__swagger .swagger-ui .info p,
+.api-docs__swagger .swagger-ui .scheme-container,
+.api-docs__swagger .swagger-ui .opblock-tag,
+.api-docs__swagger .swagger-ui .opblock .opblock-summary-description,
+.api-docs__swagger .swagger-ui .tab li,
+.api-docs__swagger .swagger-ui label,
+.api-docs__swagger .swagger-ui .parameter__name,
+.api-docs__swagger .swagger-ui .parameter__type,
+.api-docs__swagger .swagger-ui .response-col_status,
+.api-docs__swagger .swagger-ui .response-col_description,
+.api-docs__swagger .swagger-ui table thead tr td,
+.api-docs__swagger .swagger-ui table thead tr th,
+.api-docs__swagger .swagger-ui .model-title,
+.api-docs__swagger .swagger-ui .prop-type {
+  color: var(--color-ink);
+}
+
+.api-docs__swagger .swagger-ui .scheme-container {
+  background: var(--color-paper);
+  box-shadow: none;
+  border: 1px solid var(--color-sand);
+  border-radius: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.api-docs__swagger .swagger-ui .btn.authorize {
+  border-color: var(--color-moss);
+  color: var(--color-moss);
+  background: transparent;
+}
+
+.api-docs__swagger .swagger-ui .btn.authorize svg {
+  fill: var(--color-moss);
+}
+
+.api-docs__swagger .swagger-ui .opblock-tag {
+  border-bottom-color: var(--color-sand);
+  font-family: var(--font-display);
+}
+
+.api-docs__swagger .swagger-ui .opblock {
+  border-radius: 0.5rem;
+  box-shadow: none;
+  margin: 0 0 0.75rem;
+  background: transparent;
+}
+
+.api-docs__swagger .swagger-ui .opblock .opblock-summary {
+  border-radius: 0.5rem;
+}
+
+.api-docs__swagger .swagger-ui .opblock.opblock-post {
+  border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 8%, var(--color-surface));
+}
+
+.api-docs__swagger .swagger-ui .opblock.opblock-post .opblock-summary-method {
+  background: var(--color-moss);
+}
+
+.api-docs__swagger .swagger-ui .opblock .opblock-section-header {
+  background: var(--color-paper);
+  box-shadow: none;
+  border-color: var(--color-sand);
+}
+
+.api-docs__swagger .swagger-ui input[type="text"],
+.api-docs__swagger .swagger-ui textarea,
+.api-docs__swagger .swagger-ui select {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-color: var(--color-sand);
+}
+
+.api-docs__swagger .swagger-ui .model-box,
+.api-docs__swagger .swagger-ui section.models {
+  background: var(--color-paper);
+  border-color: var(--color-sand);
+}
+
+.api-docs__swagger .swagger-ui .highlight-code,
+.api-docs__swagger .swagger-ui .microlight {
+  background: var(--color-surface-muted) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Full-bleed swagger within content width preference is intentional — keep panel in main column */
+
+@media (max-width: 640px) {
+  .api-docs__title {
+    font-size: 1.5rem;
+  }
+}

@@ -10,15 +10,6 @@
 
 {% block nowo_breadcrumb_kit_content %}
     {% set modal_classes = modal_classes|default({}) %}
-    {% for msg in app.flashes('success') %}
-        <div class="alert alert-success">{{ msg }}</div>
-    {% endfor %}
-    {% for msg in app.flashes('danger') %}
-        <div class="alert alert-danger">{{ msg }}</div>
-    {% endfor %}
-    {% for msg in app.flashes('error') %}
-        <div class="alert alert-danger">{{ msg }}</div>
-    {% endfor %}
 
     {% block breadcrumb_kit_body %}{% endblock %}
 

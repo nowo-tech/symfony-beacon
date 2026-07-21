@@ -7,7 +7,9 @@ namespace App\Identity\Form;
 use App\Identity\Entity\User;
 use App\Issues\IssuePanelIds;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Nowo\TagInputBundle\Form\TagType;
+use Nowo\TagInputBundle\Form\ValueFormat;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,10 +27,7 @@ final class AccountDisplayType extends FormKitAbstractType
             $localeChoices[strtoupper($locale)] = $locale;
         }
 
-        $panelChoices = [];
-        foreach (IssuePanelIds::all() as $panelId) {
-            $panelChoices['preferences.issue_panel.'.$panelId] = $panelId;
-        }
+        $panelIds = IssuePanelIds::all();
 
         $this->withBuilder($builder, function () use ($localeChoices): void {
             $this->addChoiceField('preferredLocale', [
@@ -55,14 +54,19 @@ final class AccountDisplayType extends FormKitAbstractType
             ]);
         });
 
-        $builder->add('preferredCollapsedIssuePanels', ChoiceType::class, [
-            'choices' => $panelChoices,
-            'choice_translation_domain' => 'messages',
-            'multiple' => true,
-            'expanded' => true,
+        $builder->add('preferredCollapsedIssuePanels', TagType::class, [
+            'value_format' => ValueFormat::ARRAY,
+            'whitelist' => $panelIds,
+            'max_tags' => \count($panelIds),
+            'duplicates' => false,
+            'dropdown_enabled' => true,
             'required' => false,
             'label' => 'preferences.issue_panels_collapsed',
             'help' => 'preferences.issue_panels_help',
+            'placeholder' => 'preferences.issue_panels_placeholder',
+            'translation_domain' => 'messages',
+            'container_class' => 'nowo-tag-input issue-panel-prefs',
+            'input_class' => 'input nowo-tag-input__field',
         ]);
     }
 
@@ -75,6 +79,7 @@ final class AccountDisplayType extends FormKitAbstractType
         $resolver->setAllowedTypes('enabled_locales', 'string[]');
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'user_preferences';

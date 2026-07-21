@@ -18,6 +18,7 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="page-shell">
+    {% include '_toasts.html.twig' %}
     <div class="top-controls">
         {% include '_theme_toggle.html.twig' %}
         {% include '_locale_switcher.html.twig' %}

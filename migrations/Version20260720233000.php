@@ -6,9 +6,15 @@ namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use DoctrineMigrations\FieldDictionary\AppliesMdkDefinition;
+use DoctrineMigrations\FieldDictionary\AuditFields;
+use Nowo\MigrationsKitBundle\FieldDictionary\IdField;
+use Nowo\MigrationsKitBundle\Migration\MigrationDefinitionKeys as MDK;
 
 final class Version20260720233000 extends AbstractMigration
 {
+    use AppliesMdkDefinition;
+
     public function getDescription(): string
     {
         return 'Add notification_destination table for project outbound alerts';
@@ -16,13 +22,42 @@ final class Version20260720233000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE notification_destination (id INT AUTO_INCREMENT NOT NULL, project_id INT NOT NULL, label VARCHAR(120) NOT NULL, type VARCHAR(20) NOT NULL, endpoint_url VARCHAR(2048) NOT NULL, enabled TINYINT(1) NOT NULL, categories JSON NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, INDEX idx_notif_dest_project_enabled (project_id, enabled), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('ALTER TABLE notification_destination ADD CONSTRAINT FK_NOTIF_DEST_PROJECT FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE');
+        $this->applyMdk([
+            MDK::TABLES => [
+                'notification_destination' => [
+                    MDK::COLUMNS => [
+                        IdField::column(),
+                        ['name' => 'project_id', 'type' => 'integer', 'notnull' => true],
+                        ['name' => 'label', 'type' => 'string', 'length' => 120, 'notnull' => true],
+                        ['name' => 'type', 'type' => 'string', 'length' => 20, 'notnull' => true],
+                        ['name' => 'endpoint_url', 'type' => 'string', 'length' => 2048, 'notnull' => true],
+                        ['name' => 'enabled', 'type' => 'boolean', 'notnull' => true],
+                        ['name' => 'categories', 'type' => 'json', 'notnull' => true],
+                        AuditFields::createdAt(true),
+                        AuditFields::updatedAt(true),
+                    ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
+                    MDK::INDEXES => [
+                        ['columns' => ['project_id', 'enabled'], 'name' => 'idx_notif_dest_project_enabled'],
+                    ],
+                    MDK::FOREIGN_KEYS => [
+                        [
+                            'columns' => ['project_id'],
+                            'foreign_table' => 'project',
+                            'foreign_columns' => ['id'],
+                            'onDelete' => MDK::ON_DELETE_CASCADE,
+                            'name' => 'FK_NOTIF_DEST_PROJECT',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE notification_destination DROP FOREIGN KEY FK_NOTIF_DEST_PROJECT');
-        $this->addSql('DROP TABLE notification_destination');
+        $this->applyMdk([
+            MDK::DROP_TABLES => ['notification_destination'],
+        ]);
     }
 }

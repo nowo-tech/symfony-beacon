@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/nowo-tech/symfony-beacon/security/advisories/new
+    about: Report a security issue privately (do not file a public bug).
+  - name: Contributing guide
+    url: https://github.com/nowo-tech/symfony-beacon/blob/main/docs/CONTRIBUTING.md
+    about: Spec-driven workflow, kits preference, and QA expectations.
+  - name: BeaconBundle (client)
+    url: https://github.com/nowo-tech/BeaconBundle/issues
+    about: Issues for the Symfony instrumentation client belong in BeaconBundle.

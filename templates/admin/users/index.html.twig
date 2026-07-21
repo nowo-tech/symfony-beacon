@@ -3,9 +3,12 @@
 {% block title %}{{ 'users.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mb-6">
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'users.title'|trans }}</h1>
-    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'users.intro'|trans }}</p>
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'users.title'|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'users.intro'|trans }}</p>
+    </div>
+    <a class="btn-primary no-underline" href="{{ path('admin_users_new') }}">{{ 'users.create'|trans }}</a>
 </div>
 
 <section class="panel overflow-x-auto">
@@ -14,11 +17,17 @@
             <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
                 <th class="px-2 py-2 font-medium">{{ 'users.col.user'|trans }}</th>
                 <th class="px-2 py-2 font-medium">{{ 'users.col.email'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'users.col.status'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'users.col.presence'|trans }}</th>
                 <th class="px-2 py-2 font-medium">{{ 'users.col.roles'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'users.col.actions'|trans }}</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
+                {% set isSelf = app.user and app.user.id == user.id %}
+                {% set isAdminRole = 'ROLE_ADMIN' in user.roles %}
+                {% set isLastAdmin = isAdminRole and adminCount <= 1 %}
                 <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
                     <td class="px-2 py-3">
                         <div class="flex items-center gap-2">
@@ -28,19 +37,92 @@
                     </td>
                     <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ user.email }}</td>
                     <td class="px-2 py-3">
-                        <div class="flex flex-wrap gap-1">
-                            {% for role in user.roles %}
-                                <span class="badge bg-[var(--color-sand)]">{{ role }}</span>
-                            {% endfor %}
+                        {% if user.enabled %}
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'users.status.enabled'|trans }}</span>
+                        {% else %}
+                            <span class="badge bg-[var(--color-alert)]/15 text-[var(--color-alert)]">{{ 'users.status.disabled'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        {% if user_is_online(user) %}
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'users.presence.online'|trans }}</span>
+                        {% else %}
+                            <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/65">{{ 'users.presence.offline'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        {% if isSelf %}
+                            <span class="badge bg-[var(--color-sand)]">{{ isAdminRole ? 'users.role.admin'|trans : 'users.role.user'|trans }}</span>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/45">{{ 'users.actions.self'|trans }}</div>
+                        {% else %}
+                            <form method="post" action="{{ path('admin_users_role', {id: user.uuid}) }}" class="flex flex-wrap items-center gap-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('admin_user_role_' ~ user.id) }}">
+                                <label class="sr-only" for="user-role-{{ user.id }}">{{ 'users.role_label'|trans }}</label>
+                                <select
+                                    id="user-role-{{ user.id }}"
+                                    class="input"
+                                    name="role"
+                                    {% if isLastAdmin %}disabled title="{{ 'users.last_admin_hint'|trans|e('html_attr') }}"{% endif %}
+                                >
+                                    <option value="user" {% if not isAdminRole %}selected{% endif %}>{{ 'users.role.user'|trans }}</option>
+                                    <option value="admin" {% if isAdminRole %}selected{% endif %}>{{ 'users.role.admin'|trans }}</option>
+                                </select>
+                                <button class="btn-ghost btn-sm" type="submit" {% if isLastAdmin %}disabled{% endif %}>{{ 'users.actions.update_role'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_users_activity', {id: user.uuid}) }}">{{ 'users.actions.activity'|trans }}</a>
+                            {% if isSelf %}
+                                <span class="text-xs text-[var(--color-ink)]/45">{{ 'users.actions.self'|trans }}</span>
+                            {% else %}
+                                <form method="post" action="{{ path('admin_users_toggle_enabled', {id: user.uuid}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_user_' ~ user.id) }}">
+                                    <button type="submit" class="btn-secondary btn-sm">
+                                        {% if user.enabled %}
+                                            {{ 'users.actions.disable'|trans }}
+                                        {% else %}
+                                            {{ 'users.actions.enable'|trans }}
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="3">{{ 'users.empty'|trans }}</td>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="6">{{ 'users.empty'|trans }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+</section>
+
+<section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'users.activity.recent_title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'users.activity.recent_intro'|trans }}</p>
+    {% if recentActions is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'users.activity.empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-2 text-sm">
+            {% for entry in recentActions %}
+                <li class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
+                    <span>
+                        <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
+                        {% if entry.subjectUser %}
+                            — <a class="no-underline" href="{{ path('admin_users_activity', {id: entry.subjectUser.uuid}) }}">{{ entry.subjectUser.displayName }}</a>
+                        {% elseif entry.context.group is defined %}
+                            — {{ entry.context.group }}
+                        {% elseif entry.context.project is defined %}
+                            — {{ entry.context.project }}
+                        {% endif %}
+                    </span>
+                    <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </section>
 {% endblock %}

@@ -53,16 +53,21 @@ final readonly class NotificationPayloadBuilder
             ),
             'project' => [
                 'id' => $projectId,
+                'uuid' => $project->getUuid(),
                 'name' => $project->getName(),
                 'slug' => $project->getSlug(),
             ],
             'transaction' => [
                 'id' => $txId,
+                'uuid' => $transaction->getUuid(),
                 'name' => $transaction->getTransactionName(),
                 'n_plus_one_count' => $transaction->getNPlusOneCount(),
                 'span_count' => $transaction->getSpanCount(),
             ],
-            'url' => $this->absoluteUrl('performance_show', ['projectId' => $projectId, 'id' => $txId]),
+            'url' => $this->absoluteUrl('performance_show', [
+                'projectId' => $project->getUuid(),
+                'id' => $transaction->getUuid(),
+            ]),
             'category' => NotificationCategories::N_PLUS_ONE,
             'test' => false,
         ];
@@ -78,10 +83,11 @@ final readonly class NotificationPayloadBuilder
             'summary' => \sprintf('Test notification from %s (%s)', $project->getName(), $destinationLabel),
             'project' => [
                 'id' => $project->getId() ?? 0,
+                'uuid' => $project->getUuid(),
                 'name' => $project->getName(),
                 'slug' => $project->getSlug(),
             ],
-            'url' => $this->absoluteUrl('project_settings', ['id' => $project->getId() ?? 0]),
+            'url' => $this->absoluteUrl('project_settings', ['id' => $project->getUuid()]),
             'category' => 'test',
             'test' => true,
         ];
@@ -100,17 +106,22 @@ final readonly class NotificationPayloadBuilder
             'summary' => \sprintf('%s: [%s] %s', $summaryPrefix, $issue->getLevel(), $issue->getTitle()),
             'project' => [
                 'id' => $projectId,
+                'uuid' => $project->getUuid(),
                 'name' => $project->getName(),
                 'slug' => $project->getSlug(),
             ],
             'issue' => [
                 'id' => $issueId,
+                'uuid' => $issue->getUuid(),
                 'title' => $issue->getTitle(),
                 'level' => $issue->getLevel(),
                 'status' => $issue->getStatus()->value,
                 'culprit' => $issue->getCulprit(),
             ],
-            'url' => $this->absoluteUrl('issue_show', ['projectId' => $projectId, 'id' => $issueId]),
+            'url' => $this->absoluteUrl('issue_show', [
+                'projectId' => $project->getUuid(),
+                'id' => $issue->getUuid(),
+            ]),
             'category' => $issue->getLevel(),
             'test' => false,
         ];

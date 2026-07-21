@@ -13,6 +13,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\FingerprintCalculator;
+use App\Issues\Service\IssueHistoryRecorder;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
@@ -39,6 +40,7 @@ final readonly class ProcessEnvelopeHandler
         private EventRepository $eventRepository,
         private DailyProjectStatRepository $dailyProjectStatRepository,
         private NotificationDispatcher $notificationDispatcher,
+        private IssueHistoryRecorder $historyRecorder,
         private EntityManagerInterface $entityManager,
     ) {
     }
@@ -113,6 +115,7 @@ final readonly class ProcessEnvelopeHandler
             || IssueStatus::Ignored === $previousStatus
         )) {
             $issue->setStatus(IssueStatus::Unresolved);
+            $this->historyRecorder->recordStatusChange($issue, $previousStatus, IssueStatus::Unresolved, null);
             $isRegression = true;
         }
 

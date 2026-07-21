@@ -7,6 +7,7 @@ namespace App\Issues\Entity;
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
+use App\Shared\Doctrine\PublicUuidTrait;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,12 +19,15 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[ORM\Table(name: 'issue')]
+#[ORM\UniqueConstraint(name: 'uniq_issue_uuid', columns: ['uuid'])]
 #[ORM\UniqueConstraint(name: 'uniq_project_fingerprint', columns: ['project_id', 'fingerprint'])]
 #[ORM\Index(name: 'idx_issue_project_last_seen', columns: ['project_id', 'last_seen'])]
 #[ORM\Index(name: 'idx_issue_project_status', columns: ['project_id', 'status'])]
 #[ORM\Index(name: 'idx_issue_project_assignee', columns: ['project_id', 'assignee_id'])]
 class Issue
 {
+    use PublicUuidTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -65,12 +69,19 @@ class Issue
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true)]
     private Collection $events;
 
+    /** @var Collection<int, IssueHistoryEntry> */
+    #[ORM\OneToMany(targetEntity: IssueHistoryEntry::class, mappedBy: 'issue', orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'DESC', 'id' => 'DESC'])]
+    private Collection $historyEntries;
+
     public function __construct()
     {
+        $this->ensureUuid();
         $now = new DateTimeImmutable();
         $this->firstSeen = $now;
         $this->lastSeen = $now;
         $this->events = new ArrayCollection();
+        $this->historyEntries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,5 +215,23 @@ class Issue
     public function getEvents(): Collection
     {
         return $this->events;
+    }
+
+    /**
+     * @return Collection<int, IssueHistoryEntry>
+     */
+    public function getHistoryEntries(): Collection
+    {
+        return $this->historyEntries;
+    }
+
+    public function addHistoryEntry(IssueHistoryEntry $entry): self
+    {
+        if (!$this->historyEntries->contains($entry)) {
+            $this->historyEntries->add($entry);
+            $entry->setIssue($this);
+        }
+
+        return $this;
     }
 }

@@ -9,13 +9,14 @@ use App\Project\Entity\Project;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
 {
     public function testSortAndSearchPersistInQueryString(): void
     {
         [$client, $user, $project] = $this->bootWithDemoProject('sort-issues@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $older = $this->makeIssue($project, 'Alpha issue', new DateTimeImmutable('-2 days'));
         $newer = $this->makeIssue($project, 'Bravo issue', new DateTimeImmutable('-1 hour'));
@@ -25,7 +26,7 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=asc&q=issue&page=1&per_page=25');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=asc&q=issue&page=1&per_page=25');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('sort=title', (string) $client->getRequest()->getRequestUri());
         self::assertStringContainsString('dir=asc', (string) $client->getRequest()->getRequestUri());
@@ -42,7 +43,7 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
         );
         self::assertSame(['Alpha issue', 'Bravo issue'], $titles);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=desc&q=issue');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=desc&q=issue');
         $titles = $crawler->filter('table.issue-table tbody tr td:first-child a')->each(
             static fn ($node): string => trim($node->text()),
         );
@@ -56,7 +57,7 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
     public function testServerSidePaginationLimitsRows(): void
     {
         [$client, $user, $project] = $this->bootWithDemoProject('page-issues@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
         for ($i = 1; $i <= 12; ++$i) {
             $em->persist($this->makeIssue(
@@ -69,13 +70,13 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=asc&per_page=10&page=1');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=asc&per_page=10&page=1');
         self::assertResponseIsSuccessful();
         self::assertCount(10, $crawler->filter('table.issue-table tbody tr'));
         self::assertSelectorExists('.issue-pagination');
         self::assertSelectorExists('a.issue-pagination__link[href*="page=2"]');
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues?sort=title&dir=asc&per_page=10&page=2');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=asc&per_page=10&page=2');
         self::assertCount(2, $crawler->filter('table.issue-table tbody tr'));
     }
 

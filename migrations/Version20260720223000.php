@@ -6,12 +6,16 @@ namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use DoctrineMigrations\FieldDictionary\AppliesMdkDefinition;
+use Nowo\MigrationsKitBundle\Migration\MigrationDefinitionKeys as MDK;
 
 /**
  * User preference: which issue detail panels start collapsed.
  */
 final class Version20260720223000 extends AbstractMigration
 {
+    use AppliesMdkDefinition;
+
     public function getDescription(): string
     {
         return 'Add app_user.preferred_collapsed_issue_panels JSON column';
@@ -19,11 +23,25 @@ final class Version20260720223000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE app_user ADD preferred_collapsed_issue_panels JSON DEFAULT NULL');
+        $this->applyMdk([
+            MDK::TABLES => [
+                'app_user' => [
+                    MDK::COLUMNS => [
+                        ['name' => 'preferred_collapsed_issue_panels', 'type' => 'json', 'notnull' => false],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE app_user DROP preferred_collapsed_issue_panels');
+        $this->applyMdk([
+            MDK::TABLES => [
+                'app_user' => [
+                    MDK::DROP_COLUMNS => ['preferred_collapsed_issue_panels'],
+                ],
+            ],
+        ]);
     }
 }

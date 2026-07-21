@@ -11,6 +11,8 @@ use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
@@ -18,8 +20,8 @@ final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
     public function testAssignsProjectMemberAndRejectsOutsider(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-assign@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $member = new User();
         $member->setEmail('member-assign@example.com');
@@ -51,17 +53,19 @@ final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues/'.$issue->getId());
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Assignable issue');
         self::assertSelectorExists('select[name="issue_assignee[assignee]"]');
         self::assertSelectorExists('[data-controller*="symfony--ux-autocomplete--autocomplete"]');
 
         $form = $crawler->filter('form.issue-assignee-form')->form();
-        $form['issue_assignee[assignee]']->disableValidation();
-        $form['issue_assignee[assignee]']->setValue((string) $member->getId());
+        $assigneeField = $form->get('issue_assignee[assignee]');
+        self::assertInstanceOf(ChoiceFormField::class, $assigneeField);
+        $assigneeField->disableValidation();
+        $assigneeField->setValue((string) $member->getId());
         $client->submit($form);
-        self::assertResponseRedirects('/projects/'.$project->getId().'/issues/'.$issue->getId());
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Resolver');
 
@@ -70,13 +74,13 @@ final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
         $reloaded = $em->getRepository(Issue::class)->find($issue->getId());
         self::assertSame($member->getId(), $reloaded->getAssignee()?->getId());
 
-        $client->request('GET', '/projects/'.$project->getId().'/issues?assignee='.$member->getId());
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?assignee='.$member->getId());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Assignable issue');
 
         // Direct POST with outsider id must not stick (membership guard).
         $token = $crawler->filter('form.issue-assignee-form input[name="issue_assignee[_token]"]')->attr('value');
-        $client->request('POST', '/projects/'.$project->getId().'/issues/'.$issue->getId().'/assign', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/assign', [
             'issue_assignee' => [
                 'assignee' => (string) $outsider->getId(),
                 '_token' => $token,
@@ -88,10 +92,10 @@ final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
         self::assertSame($member->getId(), $reloaded->getAssignee()?->getId());
 
         // Autocomplete endpoint lists project members only.
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/issues/'.$issue->getId());
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
         $autocompleteUrl = $crawler->filter('select[name="issue_assignee[assignee]"]')->attr('data-symfony--ux-autocomplete--autocomplete-url-value');
         self::assertNotNull($autocompleteUrl);
-        $client->request('GET', $autocompleteUrl.(str_contains($autocompleteUrl, '?') ? '&' : '?').'query=Resolver');
+        $client->request(Request::METHOD_GET, $autocompleteUrl.(str_contains($autocompleteUrl, '?') ? '&' : '?').'query=Resolver');
         self::assertResponseIsSuccessful();
         /** @var array{results?: list<array{text?: string}>} $payload */
         $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);

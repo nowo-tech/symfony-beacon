@@ -5,7 +5,7 @@
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'performance'} %}
 
-<a href="{{ path('performance_index', {id: project.id}) }}" class="text-sm no-underline">{{ 'performance.back'|trans }}</a>
+<a href="{{ path('performance_index', {id: project.uuid}) }}" class="text-sm no-underline">{{ 'performance.back'|trans }}</a>
 
 <header class="perf-tx-hero mt-3">
     <h1 class="perf-tx-hero__title font-[family-name:var(--font-display)]">{{ transaction.transactionName }}</h1>

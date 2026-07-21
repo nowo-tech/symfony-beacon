@@ -1,0 +1,14 @@
+# CODEOWNERS — https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Reviewers are requested automatically on PRs that touch matching paths.
+# Maintainer: Héctor Franco (@HecFranco) / Nowo.tech
+
+*       @HecFranco
+
+/.github/               @HecFranco
+/docs/                  @HecFranco
+/specs/                 @HecFranco
+/composer.json          @HecFranco
+/composer.lock          @HecFranco
+/config/packages/security.yaml @HecFranco
+/SECURITY.md            @HecFranco

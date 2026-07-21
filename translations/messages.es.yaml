@@ -7,6 +7,7 @@ nav:
     admin: Administración
     admin_hub: Resumen admin
     users: Usuarios
+    groups: Grupos
     appearance: Apariencia
     menus: Menús
     breadcrumbs: Migas
@@ -17,11 +18,18 @@ nav:
     issues: Incidencias
     performance: Rendimiento
     analytics: Analítica
+api_docs:
+    title: Docs API
+    intro: Explora el ingest Envelope y los endpoints HTTP relacionados. Usa Authorize con la cabecera X-Beacon-Auth (beacon_key y beacon_secret del DSN del proyecto).
+    open_json: OpenAPI JSON
 common:
     filter: Filtrar
+    cancel: Cancelar
     yes: 'sí'
     na: n/d
     unknown: desconocido
+toast:
+    dismiss: Cerrar
 locale:
     nav: Idioma
     en: English
@@ -43,6 +51,22 @@ flash:
         history_cleared: Historial del proyecto vaciado.
         deleted: Proyecto eliminado.
         delete_confirmation_mismatch: El nombre del proyecto no coincide. No se eliminó nada.
+        member_added: Miembro añadido al proyecto.
+        member_role_updated: Rol del miembro actualizado.
+        member_removed: Miembro eliminado del proyecto.
+        member_user_not_found: No existe un usuario con ese email. Debe registrarse antes.
+        member_user_disabled: Esa cuenta de usuario está desactivada.
+        member_already: Ese usuario ya es miembro del proyecto.
+        member_invalid_role: Rol de membresía no válido.
+        member_last_owner: El proyecto debe conservar al menos un propietario.
+        member_cannot_manage_owner: Los administradores no pueden cambiar ni eliminar propietarios.
+        member_error: No se pudieron actualizar los miembros del proyecto.
+        group_added: Grupo vinculado al proyecto.
+        group_role_updated: Rol del grupo actualizado.
+        group_removed: Grupo desvinculado del proyecto.
+        group_already: Ese grupo ya está vinculado a este proyecto.
+        group_not_found: Grupo no encontrado.
+        group_link_forbidden: Solo puedes vincular grupos a los que perteneces (los propietarios del proyecto y los administradores de instancia pueden vincular cualquiera).
     appearance:
         saved: Apariencia guardada.
     preferences:
@@ -50,6 +74,29 @@ flash:
         profile_saved: Perfil guardado.
         password_saved: Contraseña actualizada.
         display_saved: Preferencias de interfaz guardadas.
+        locale_saved: Idioma actualizado.
+    users:
+        enabled: Cuenta de usuario activada.
+        disabled: Cuenta de usuario desactivada.
+        cannot_disable_self: No puedes desactivar tu propia cuenta.
+        created: Cuenta de usuario creada.
+        role_updated: Rol de usuario actualizado.
+        invalid_email: Introduce un email válido.
+        name_required: El nombre visible es obligatorio.
+        password_too_short: La contraseña debe tener al menos 8 caracteres.
+        email_taken: Ese email ya está registrado.
+        invalid_role: Rol no válido.
+        cannot_change_own_role: No puedes cambiar tu propio rol.
+        last_admin: La instancia debe conservar al menos un administrador.
+    groups:
+        created: Grupo creado.
+        updated: Grupo actualizado.
+        deleted: Grupo eliminado.
+        name_required: El nombre del grupo es obligatorio.
+        user_not_found: No existe un usuario con ese email.
+        already_member: Ese usuario ya está en el grupo.
+        member_added: Usuario añadido al grupo.
+        member_removed: Usuario eliminado del grupo.
 project:
     label: Proyecto
     no_description: Sin descripción
@@ -82,7 +129,40 @@ project:
         add: Añadir clave
     members:
         title: Miembros
+        help: Miembros directos de este proyecto. Propietarios y administradores gestionan la membresía. El acceso también puede venir de grupos vinculados.
         your_role: 'Tu rol:'
+        email_label: Email del miembro
+        email_placeholder: usuario@ejemplo.com
+        role_label: Rol
+        add: Añadir miembro
+        add_title: Añadir miembro
+        add_help: La persona debe tener ya una cuenta en Beacon (mismo email).
+        update_role: Actualizar
+        remove: Quitar
+        remove_title: ¿Quitar miembro?
+        remove_confirm: ¿Quitar a %email% de este proyecto?
+        edit_role: Editar rol
+        edit_role_title: Cambiar rol del miembro
+        edit_role_body: 'Elige un nuevo rol para %name% (%email%).'
+        last_owner_hint: El proyecto debe conservar al menos un propietario.
+        role:
+            owner: Propietario
+            admin: Administrador
+            member: Miembro
+    groups:
+        title: Grupos
+        help: Vincula un grupo para que todos sus miembros reciban el rol elegido en este proyecto. Los propietarios se añaden como usuarios individuales.
+        empty: Aún no hay grupos vinculados.
+        select: Selecciona un grupo…
+        add: Vincular grupo
+        remove: Desvincular
+        remove_title: ¿Desvincular grupo?
+        remove_confirm: ¿Desvincular el grupo “%name%” de este proyecto?
+        edit_role: Editar rol del grupo
+        edit_role_title: Cambiar rol del grupo
+        edit_role_body: 'Elige un nuevo rol para el grupo “%name%”.'
+        none_available: Todos los grupos ya están vinculados, o créalos en Administración → Grupos.
+        member_count: '%count% usuarios en el grupo'
     danger:
         title: Zona de peligro
         intro: Acciones irreversibles para este proyecto. Úsalas con cuidado.
@@ -155,6 +235,22 @@ issues:
     assignee_saved: Asignación actualizada.
     assignee_not_member: Ese usuario no es miembro de este proyecto.
     assignee_invalid: No se pudo actualizar la asignación.
+    status:
+        unresolved: Sin resolver
+        resolved: Resuelta
+        ignored: Ignorada
+    status_help: Cambia cómo se sigue esta incidencia en la bandeja del proyecto.
+    status_mark_resolved: Marcar como resuelta
+    status_mark_unresolved: Marcar como sin resolver
+    status_mark_ignored: Ignorar
+    status_saved: Estado de la incidencia actualizado.
+    status_invalid: No se pudo actualizar el estado de la incidencia.
+    history_title: Actividad
+    history_empty: Aún no hay cambios de estado o asignación.
+    history_assignee: Asignación
+    history_status: Estado
+    history_by: 'por %name%'
+    history_by_system: por el sistema
     filter:
         any_level: Cualquier nivel
         any_status: cualquier estado
@@ -243,11 +339,93 @@ site_appearance:
         invalid: 'Usa un color hexadecimal como #1f6f54.'
 users:
     title: Usuarios
-    intro: Cuentas de esta instancia Beacon. Preferible nowo-tech/user-kit-bundle para activar/desactivar y ciclo de vida de cuenta.
+    intro: Crea cuentas, asigna roles de instancia y activa o desactiva el acceso (UserKit).
+    create: Añadir usuario
+    create_intro: Crea una cuenta Beacon. La persona podrá iniciar sesión con este email y contraseña.
+    back: Volver a usuarios
+    cancel: Cancelar
+    role_label: Rol
+    last_admin_hint: Debe quedar al menos un administrador.
     col:
         user: Usuario
         email: Correo
-        roles: Roles
+        status: Estado
+        presence: Presencia
+        roles: Rol
+        actions: Acciones
+    status:
+        enabled: Activo
+        disabled: Desactivado
+    presence:
+        online: En línea
+        offline: Desconectado
+    role:
+        user: Usuario
+        admin: Admin
+    form:
+        email: Email
+        display_name: Nombre visible
+        password: Contraseña
+        password_help: Mínimo 8 caracteres.
+        enabled: Cuenta activa (puede iniciar sesión)
+    actions:
+        enable: Activar
+        disable: Desactivar
+        update_role: Actualizar
+        self: Eres tú
+        activity: Actividad
+    activity:
+        title: Historial de actividad
+        intro: 'Acciones que involucran a %name% (%email%) como sujeto o actor (admin, membresía y navegación de producto).'
+        recent_title: Actividad reciente
+        recent_intro: Últimas acciones administrativas, de membresía y de producto en la instancia.
+        empty: Aún no hay acciones registradas.
+        by: 'Por %name%'
+        by_system: Por el sistema
+        subject: 'Sujeto %name%'
+        action:
+            'user.created': Usuario creado
+            'user.role_changed': Rol de usuario cambiado
+            'user.enabled': Usuario activado
+            'user.disabled': Usuario desactivado
+            'group.created': Grupo creado
+            'group.updated': Grupo actualizado
+            'group.deleted': Grupo eliminado
+            'group.member_added': Miembro añadido al grupo
+            'group.member_removed': Miembro eliminado del grupo
+            'project.member_added': Miembro añadido al proyecto
+            'project.member_role_changed': Rol de miembro del proyecto cambiado
+            'project.member_removed': Miembro eliminado del proyecto
+            'project.group_linked': Grupo vinculado al proyecto
+            'project.group_role_changed': Rol del grupo en el proyecto cambiado
+            'project.group_unlinked': Grupo desvinculado del proyecto
+            'project.opened': Proyecto abierto
+            'project.settings_viewed': Ajustes del proyecto vistos
+            'project.created': Proyecto creado
+            'project.api_key_created': Clave API creada
+            'project.history_cleared': Historial del proyecto vaciado
+            'project.deleted': Proyecto eliminado
+            'issue.opened': Incidencia abierta
+            'issue.assigned': Asignación de incidencia cambiada
+            'issue.status_changed': Estado de incidencia cambiado
+            'event.opened': Evento abierto
+            'performance.opened': Rendimiento abierto
+            'analytics.opened': Analítica abierta
+        context:
+            email: Email
+            role: Rol
+            enabled: Activo
+            from: Desde
+            to: Hasta
+            project: Proyecto
+            project_uuid: UUID del proyecto
+            project_name: Proyecto
+            group: Grupo
+            group_uuid: UUID del grupo
+            issue_uuid: UUID de la incidencia
+            issue_title: Incidencia
+            event_id: ID del evento
+            label: Etiqueta
     empty: Aún no hay usuarios.
 preferences:
     title: Ajustes de cuenta
@@ -340,11 +518,57 @@ user_preferences:
         second:
             label: Confirmar nueva contraseña
         mismatch: Las contraseñas no coinciden.
+        strength_invalid: 'La contraseña no cumple los requisitos de fortaleza (%missing%).'
+
+# PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
+requirement.min_length: 'Al menos %count% caracteres'
+requirement.max_length: 'Como máximo %count% caracteres'
+requirement.lowercase: 'Al menos una letra minúscula'
+requirement.uppercase: 'Al menos una letra mayúscula'
+requirement.digit: 'Al menos un número'
+requirement.special: 'Al menos un carácter especial'
+requirement.no_whitespace: 'No se permiten espacios en blanco'
+requirement.not_contain: 'No debe contener texto prohibido'
+requirement.min_unique_chars: 'Al menos %count% caracteres únicos'
+requirement.regex: 'Debe coincidir con el patrón requerido'
+generator.button: 'Generar contraseña'
+generator.modal_title: 'Contraseñas sugeridas'
+generator.modal_hint: 'Estas contraseñas cumplen la política actual. Cópiala o aplícala al campo.'
+generator.copy: 'Copiar'
+generator.copied: '¡Copiado!'
+generator.use_password: 'Usar esta contraseña'
+generator.close: 'Cerrar'
+generator.failed: 'No se pudo generar una contraseña válida. Inténtalo de nuevo o relaja la política.'
+
+groups:
+    title: Grupos
+    intro: Organiza usuarios en grupos y vincúlalos a proyectos para acceso masivo.
+    create: Nuevo grupo
+    empty: Aún no hay grupos.
+    open: Abrir
+    back: Volver a grupos
+    edit: Editar
+    edit_title: Editar grupo
+    save: Guardar grupo
+    cancel: Cancelar
+    delete: Eliminar grupo
+    delete_confirm: ¿Eliminar este grupo? Se desvinculará de todos los proyectos.
+    name_label: Nombre
+    description_label: Descripción
+    members_title: Miembros del grupo
+    members_empty: Aún no hay miembros en este grupo.
+    add_member: Añadir miembro
+    add_member_help: La persona debe tener ya una cuenta en Beacon.
+    remove_member: Quitar
+    member_email_placeholder: usuario@ejemplo.com
+    member_count: '%count% miembros'
+
 admin:
     hub:
         title: Administración
         intro: Configuración de la instancia para operadores con roles elevados.
         users: Listar cuentas y roles de esta instancia.
+        groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
         appearance: Nombre de marca y colores de acento.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.
@@ -425,8 +649,8 @@ legal:
 
 notifications:
     title: Notificaciones
-    intro: Envía alertas a Slack Incoming Webhooks o endpoints HTTP genéricos cuando aparezcan incidencias nuevas, regresiones o grupos N+1.
-    empty: Aún no hay destinos. Añade un webhook de Slack o HTTP para avisar a tu equipo.
+    intro: Envía alertas a Slack, Discord, Teams, Telegram, email o un endpoint HTTP genérico cuando aparezcan incidencias nuevas, regresiones o grupos N+1.
+    empty: Aún no hay destinos. Añade un canal para avisar a tu equipo.
     add: Añadir destino
     edit: Editar
     enable: Activar
@@ -439,15 +663,22 @@ notifications:
     cancel: Cancelar
     new_title: Nuevo destino de notificación
     edit_title: Editar destino de notificación
-    form_help: Pega una URL de Incoming Webhook o cualquier endpoint HTTPS que acepte JSON. Los secretos de la URL se enmascaran en la lista de ajustes.
+    form_help: Elige el tipo de canal y pega el endpoint correspondiente. Los secretos se enmascaran en la lista de ajustes.
     form:
         label: Etiqueta
         type: Tipo
-        endpoint: URL del webhook
+        endpoint: Endpoint
+        endpoint_help: 'Slack / Discord / Teams / HTTP: URL HTTPS del webhook. Email: dirección del destinatario. Telegram: bot_token@chat_id'
+        endpoint_invalid: El endpoint no coincide con el tipo seleccionado.
+        endpoint_ssrf: El endpoint no puede apuntar a direcciones privadas, link-local o de metadatos cloud.
         enabled: Activado
         categories: Categorías de alerta
     type:
         slack: Slack Incoming Webhook
+        discord: Webhook de Discord
+        teams: Webhook de Microsoft Teams
+        telegram: Bot de Telegram
+        email: Email
         http: Webhook HTTP genérico
     category:
         fatal: Fatal
@@ -463,3 +694,65 @@ notifications:
         disabled: Destino desactivado.
         deleted: Destino eliminado.
         test_queued: Notificación de prueba encolada.
+    help:
+        title: Guías de configuración de notificaciones
+        link: Guías de configuración
+        back: Volver a configuración
+        toc: Ir al canal
+        intro: Instrucciones paso a paso para conectar Slack, Discord, Microsoft Teams, Telegram, email o un webhook HTTP genérico a este proyecto.
+        payload_label: 'Beacon envía:'
+        docs_hint: 'Referencia completa (payloads, entrega, permisos): docs/NOTIFICATIONS.md en el repositorio.'
+        slack:
+            title: Slack (Incoming Webhook)
+            lead: Crea un Incoming Webhook de app de Slack y pega la URL HTTPS en Beacon.
+            step1: Abre api.slack.com/apps y crea una app From scratch para tu workspace.
+            step2: Activa Incoming Webhooks, luego Add New Webhook to Workspace y elige un canal.
+            step3: Copia la URL del webhook (https://hooks.slack.com/services/…).
+            step4: En Beacon elige Slack Incoming Webhook, pega la URL como endpoint, selecciona categorías y guarda.
+            step5: Pulsa Enviar prueba y confirma el mensaje en Slack.
+            payload: JSON con text (resumen) y un objeto beacon con el payload completo del evento.
+            tip: Prefiere un canal de ops dedicado. Rota el webhook en Slack si se filtra y actualiza el destino en Beacon.
+        discord:
+            title: Discord (webhook)
+            lead: Crea un webhook de canal en Discord y pega su URL en Beacon.
+            step1: Abre Ajustes del servidor → Integraciones → Webhooks (o Integraciones del canal).
+            step2: Crea un webhook nuevo, nómbralo (por ejemplo Beacon) y elige el canal.
+            step3: Copia la URL del webhook (https://discord.com/api/webhooks/…).
+            step4: En Beacon elige Webhook de Discord, pega la URL, selecciona categorías, guarda y Enviar prueba.
+            payload: JSON con content (resumen) y un array embeds (title, description, URL opcional de la incidencia).
+            tip: Discord limita la tasa de webhooks; Beacon entrega de forma asíncrona vía Messenger.
+        teams:
+            title: Microsoft Teams (Incoming Webhook)
+            lead: Añade un conector Incoming Webhook a un canal de Teams y pega la URL en Beacon.
+            step1: En el menú del canal de Teams abre Conectores (o Administrar canal → Conectores).
+            step2: Configura Incoming Webhook, asígnale un nombre y créalo.
+            step3: Copia la URL del webhook que proporciona Teams.
+            step4: En Beacon elige Webhook de Microsoft Teams, pega la URL, selecciona categorías, guarda y Enviar prueba.
+            payload: JSON MessageCard de Office 365 con summary, title, text y acción Abrir en Beacon si hay URL.
+            tip: Si tu tenant solo permite Workflows en lugar de Incoming Webhooks clásicos, apunta un destino HTTP genérico a un flujo que acepte POST JSON.
+        telegram:
+            title: Telegram (bot)
+            lead: Crea un bot con BotFather y guarda bot_token@chat_id como endpoint en Beacon.
+            step1: Abre @BotFather en Telegram, ejecuta /newbot y copia el token del bot.
+            step2: Inicia un chat privado con el bot, o añádelo a un grupo y envía un mensaje.
+            step3: Llama a getUpdates en la Bot API y lee message.chat.id (los grupos suelen ser negativos).
+            step4: En Beacon elige Bot de Telegram y pon el endpoint como bot_token@chat_id (ejemplo — 123:AA…@-1001234567890).
+            step5: Guarda y Enviar prueba.
+            payload: sendMessage de la Bot API con chat_id y text (solo el resumen; no el JSON completo).
+            tip: El último @ del endpoint separa token y chat id. Los tokens se cifran en reposo como el resto de endpoints.
+        email:
+            title: Email
+            lead: Entrega alertas a un buzón vía Symfony Mailer. Configura MAILER_DSN antes.
+            step1: Define MAILER_DSN en .env o secretos de producción con un transporte real (SMTP, etc.). null://null no entrega.
+            step2: En Beacon elige Email y pon como endpoint la dirección del destinatario.
+            step3: Selecciona categorías, guarda, Enviar prueba y revisa bandeja/spam.
+            payload: El asunto es el resumen; el cuerpo es el resumen más la URL de la incidencia o rendimiento si existe.
+            tip: Usa un alias compartido de ops. Para digests más ricos, prefiere Slack/Discord/Teams o un puente HTTP.
+        http:
+            title: Webhook HTTP genérico
+            lead: Envía por POST el JSON canónico de Beacon a cualquier endpoint HTTPS de automatización.
+            step1: Expón una URL HTTPS que acepte POST con Content-Type application/json.
+            step2: En Beacon elige Webhook HTTP genérico, pega la URL, selecciona categorías, guarda y Enviar prueba.
+            step3: Confirma que tu servicio recibe el JSON canónico (event, summary, project, issue, url, category).
+            payload: Payload JSON canónico como cuerpo de la petición (User-Agent symfony-beacon-notifications/1.0).
+            tip: Prefiere HTTPS y autentica tu receptor. Evita apuntar a direcciones internas o de metadatos cloud.

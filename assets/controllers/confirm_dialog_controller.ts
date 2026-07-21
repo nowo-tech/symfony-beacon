@@ -11,6 +11,7 @@ export default class extends Controller {
 
   static values = {
     expected: String,
+    openOnConnect: Boolean,
   };
 
   declare readonly dialogTarget: HTMLDialogElement;
@@ -20,9 +21,16 @@ export default class extends Controller {
   declare readonly submitTarget: HTMLButtonElement;
   declare readonly hasExpectedValue: boolean;
   declare readonly expectedValue: string;
+  declare readonly openOnConnectValue: boolean;
 
   /** Ignore backdrop clicks that belong to the same gesture that opened the dialog. */
   private ignoreBackdropUntil = 0;
+
+  connect(): void {
+    if (this.openOnConnectValue) {
+      this.open();
+    }
+  }
 
   open(event?: Event): void {
     event?.preventDefault();
@@ -34,9 +42,9 @@ export default class extends Controller {
     this.syncSubmit();
 
     // Opening synchronously from a click can deliver that same click to the
-    // newly shown modal backdrop (danger-zone buttons sit under the overlay),
-    // which would close the dialog immediately via backdropClose.
-    this.ignoreBackdropUntil = Date.now() + 350;
+    // newly shown modal backdrop (buttons under the overlay), which would
+    // close the dialog immediately via backdropClose.
+    this.ignoreBackdropUntil = Date.now() + 400;
     requestAnimationFrame(() => {
       if (!this.dialogTarget.open) {
         this.dialogTarget.showModal();

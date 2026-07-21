@@ -576,7 +576,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     mailer?: bool|array{ // Mailer configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         message_bus?: scalar|Param|null, // The message bus to use. Defaults to the default bus if the Messenger component is installed. // Default: null
  *         dsn?: scalar|Param|null, // Default: null
  *         transports?: array<string, scalar|Param|null>,
@@ -646,7 +646,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     uid?: bool|array{ // Uid configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         default_uuid_version?: 7|6|4|1|Param, // Default: 7
  *         name_based_uuid_version?: 5|3|Param, // Default: 5
  *         name_based_uuid_namespace?: scalar|Param|null,
@@ -1952,6 +1952,147 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         lock_factory?: scalar|Param|null, // Lock factory service ID for rate limiter (optional, only used when storage=cache) // Default: null
  *     }>,
  * }
+ * @psalm-type NowoPasswordPolicyConfig = array{
+ *     entities?: array<string, array{ // Default: []
+ *         password_field?: scalar|Param|null, // The name of the password field in the entity. This field will be monitored for changes to track password history. // Default: "password"
+ *         password_history_field?: scalar|Param|null, // The name of the password history collection field in the entity. This should be a OneToMany or ManyToMany relationship to a PasswordHistoryInterface entity. // Default: "passwordHistory"
+ *         passwords_to_remember?: int|Param, // The maximum number of previous passwords to keep in history. When this limit is exceeded, the oldest passwords are automatically removed. // Default: 3
+ *         expiry_days?: int|Param, // Number of days after which a password expires. After this period, users will be notified or redirected to change their password. // Default: 90
+ *         reset_password_route_name?: scalar|Param|null, // Route name used as fallback for password reset (required). When redirect_on_expiry is enabled, URLs are generated with this name unless reset_password_route_pattern resolves another name.
+ *         reset_password_route_pattern?: scalar|Param|null, // Optional pattern (glob with * and ?, or PCRE wrapped in the same delimiter e.g. ~^app_reset~). When set, the bundle picks the first registered route name matching the pattern in alphabetical order; if none match, reset_password_route_name is used. // Default: null
+ *         notified_routes?: list<scalar|Param|null>,
+ *         excluded_notified_routes?: list<scalar|Param|null>,
+ *         detect_password_extensions?: bool|Param, // If true, detects when a new password is an extension of an old password (e.g., "password123" is an extension of "password"). This helps prevent users from simply adding numbers or characters to their old passwords. // Default: false
+ *         extension_min_length?: int|Param, // Minimum length of the base password to consider for extension detection. Only passwords longer than this value will be checked for extensions. Default is 4. // Default: 4
+ *     }>,
+ *     expiry_listener?: array{ // Configuration for the password expiry event listener that checks for expired passwords on each request.
+ *         priority?: int|Param, // Priority of the expiry listener. Higher values mean the listener runs earlier. Default is 0. // Default: 0
+ *         lock_route?: scalar|Param|null, // (Deprecated) Route to redirect when password is expired. Use redirect_on_expiry and reset_password_route_name instead.
+ *         redirect_on_expiry?: bool|Param, // If true, automatically redirects users to the reset_password_route_name when their password expires. If false, only shows a flash message without redirecting. // Default: false
+ *         flash_strategy?: "always"|"once_per_session"|"interval"|"never"|Param, // Controls how often the expiry flash is added: always (every locked request after the flash was consumed), once_per_session, interval, or never. // Default: "always"
+ *         flash_interval_minutes?: int|Param, // Minutes between expiry flash messages when flash_strategy is interval. Default is 30. // Default: 30
+ *         flash_throttle_storage?: "session"|"cache"|Param, // Where to store expiry flash throttle state for once_per_session and interval. Use cache (Redis/Memcached via cache.app) for FrankenPHP workers or Kubernetes multi-pod. // Default: "session"
+ *         flash_throttle_cache_service?: scalar|Param|null, // Symfony cache pool service id used when flash_throttle_storage is cache. Point to a Redis or Memcached adapter (framework.cache.app). // Default: "cache.app"
+ *         flash_throttle_cache_ttl?: int|Param, // TTL in seconds for cache-backed throttle entries. For once_per_session, align with session lifetime (default 86400). // Default: 86400
+ *         flash_throttle_storage_service?: scalar|Param|null, // Optional custom service id implementing ExpiryFlashThrottleStorageInterface. When set, flash_throttle_storage is ignored. // Default: null
+ *         error_msg?: array{ // Configuration for error messages displayed when password expires.
+ *             text?: mixed, // Error message text. Can be a string or an array with "title" and "message" keys. Supports translation keys. // Default: {"title":"nowo_password_policy.title","message":"nowo_password_policy.message"}
+ *             type?: scalar|Param|null, // Flash message type. Common values: "error", "warning", "info", "success". This determines the CSS class and styling of the flash message. // Default: "error"
+ *         },
+ *     },
+ *     log_level?: scalar|Param|null, // Logging level for password policy events. Valid values: "debug", "info", "notice", "warning", "error". All password policy events (expiry detection, password changes, reuse attempts) will be logged at this level. // Default: "info"
+ *     enable_logging?: bool|Param, // Enable or disable logging for password policy events. When enabled, important events like password expiry, password changes, and reuse attempts will be logged using Symfony Logger. // Default: true
+ *     enable_cache?: bool|Param, // Enable caching for password expiry checks. When enabled, expiry status is cached per user to improve performance. Cache is automatically invalidated when password changes. // Default: false
+ *     cache_ttl?: scalar|Param|null, // Cache time-to-live in seconds. Default is 3600 (1 hour). Only used when enable_cache is true. // Default: 3600
+ * }
+ * @psalm-type NowoAuditKitConfig = array{
+ *     default_profile?: scalar|Param|null, // Profile name used when no profile is resolved from the authenticated user. // Default: "default"
+ *     profiles?: array<string, array{ // Default: []
+ *         enabled?: bool|Param, // Enable auditing for this profile. // Default: true
+ *         user_class?: scalar|Param|null, // FQCN used for createdBy / updatedBy references. // Default: null
+ *         fields?: array{
+ *             created_at?: scalar|Param|null, // Default: "createdAt"
+ *             updated_at?: scalar|Param|null, // Default: "updatedAt"
+ *             created_by?: scalar|Param|null, // Default: "createdBy"
+ *             updated_by?: scalar|Param|null, // Default: "updatedBy"
+ *         },
+ *         timestamp_type?: "datetime_immutable"|"datetime"|Param, // Default: "datetime_immutable"
+ *         blameable?: bool|Param, // When false, blame fields are not managed for this profile. // Default: true
+ *         timestampable?: bool|Param, // When false, timestamp fields are not managed for this profile. // Default: true
+ *     }>,
+ * }
+ * @psalm-type NowoUserKitConfig = array{
+ *     default_profile?: scalar|Param|null, // Profile name used when no profile is specified explicitly. // Default: "default"
+ *     profiles?: array<string, array{ // Default: []
+ *         user_class?: scalar|Param|null, // FQCN of the application user entity for this profile. // Default: null
+ *         account_status?: array{
+ *             enabled?: bool|Param, // Register AccountStatusUserChecker for this profile when true. // Default: true
+ *             field?: scalar|Param|null, // Default: "enabled"
+ *             invalidate_sessions_on_disable?: bool|Param, // Default: false
+ *         },
+ *         last_activity?: array{
+ *             enabled?: bool|Param, // Default: false
+ *             field?: scalar|Param|null, // Default: "lastActivityAt"
+ *             online_threshold?: int|Param, // Default: 300
+ *             update_throttle?: int|Param, // Default: 30
+ *         },
+ *     }>,
+ *     twig?: bool|Param, // Register user_is_online Twig helper when Twig is installed. // Default: true
+ * }
+ * @psalm-type NowoDoctrineEncryptConfig = array{
+ *     default_profile?: scalar|Param|null, // Profile name to use when #[Encrypted] has no alias or uses "default". // Default: "default"
+ *     batch_size?: int|Param, // Default batch size for doctrine:decrypt:database and doctrine:encrypt:database (raw SQL). Overridable per run via the batchSize argument. // Default: 5
+ *     profiles?: array<string, array{ // Default: []
+ *         encryptor_class?: scalar|Param|null, // Default: "Halite"
+ *         secret_directory_path?: scalar|Param|null, // Directory for the key file. Required unless secret_key_env_var is set. // Default: null
+ *         secret_key_filename?: scalar|Param|null, // Optional custom key filename (e.g. .my_app.key). Only used when secret_directory_path is set. // Default: null
+ *         secret_key_env_var?: scalar|Param|null, // Key content from env: use %env(APP_ENCRYPT_KEY)% so Symfony resolves it at config load and the bundle receives the value. When set, secret_directory_path and secret_key_filename are not allowed. // Default: null
+ *     }>,
+ * }
+ * @psalm-type NowoMigrationsKitConfig = array{
+ *     connection?: scalar|Param|null, // Doctrine connection name used by CreateTablesService when injected from the container // Default: "default"
+ * }
+ * @psalm-type NowoTagInputConfig = array{
+ *     value_format?: "array"|"string"|Param, // Default: "array"
+ *     trim?: bool|Param, // Default: true
+ *     pattern?: scalar|Param|null, // Default: null
+ *     whitelist?: list<scalar|Param|null>,
+ *     duplicates?: bool|Param, // Default: false
+ *     max_tags?: int|Param, // Default: null
+ *     dropdown_enabled?: bool|Param, // Default: true
+ *     placeholder?: scalar|Param|null, // Default: ""
+ *     form_theme?: scalar|Param|null, // Default: "form_div_layout.html.twig"
+ * }
+ * @psalm-type NelmioApiDocConfig = array{
+ *     type_info?: bool|Param, // Use the symfony/type-info component for determining types. // Default: true
+ *     use_validation_groups?: bool|Param, // If true, `groups` passed to #[Model] attributes will be used to limit validation constraints // Default: false
+ *     operation_id_generation?: \Nelmio\ApiDocBundle\Describer\OperationIdGeneration::ALWAYS_PREPEND|\Nelmio\ApiDocBundle\Describer\OperationIdGeneration::CONDITIONALLY_PREPEND|\Nelmio\ApiDocBundle\Describer\OperationIdGeneration::NO_PREPEND|"always_prepend"|"conditionally_prepend"|"no_prepend"|Param, // How to generate operation ids // Default: "always_prepend"
+ *     cache?: array{
+ *         pool?: scalar|Param|null, // define cache pool to use // Default: null
+ *         item_id?: scalar|Param|null, // define cache item id // Default: null
+ *     },
+ *     documentation?: array<string, mixed>,
+ *     media_types?: list<scalar|Param|null>,
+ *     html_config?: array{ // UI configuration options
+ *         assets_mode?: scalar|Param|null, // Default: "cdn"
+ *         swagger_ui_config?: array<mixed>,
+ *         redocly_config?: array<mixed>,
+ *         scalar_config?: array<mixed>,
+ *         stoplight_config?: array<mixed>,
+ *     },
+ *     areas?: array<string, array{ // Default: {"default":{"path_patterns":[],"host_patterns":[],"with_attribute":false,"documentation":[],"name_patterns":[],"disable_default_routes":false,"cache":[],"security":[]}}
+ *         path_patterns?: list<scalar|Param|null>,
+ *         host_patterns?: list<scalar|Param|null>,
+ *         name_patterns?: list<scalar|Param|null>,
+ *         security?: array<string, array{ // Default: []
+ *             type?: scalar|Param|null,
+ *             scheme?: scalar|Param|null,
+ *             in?: scalar|Param|null,
+ *             name?: scalar|Param|null,
+ *             description?: scalar|Param|null,
+ *             openIdConnectUrl?: scalar|Param|null,
+ *             ...<string, mixed>
+ *         }>,
+ *         with_attribute?: bool|Param, // whether to filter by attributes // Default: false
+ *         disable_default_routes?: bool|Param, // if set disables default routes without attributes // Default: false
+ *         documentation?: array<string, mixed>,
+ *         cache?: array{
+ *             pool?: scalar|Param|null, // define cache pool to use // Default: null
+ *             item_id?: scalar|Param|null, // define cache item id // Default: null
+ *         },
+ *     }>,
+ *     models?: array{
+ *         use_jms?: bool|Param, // Default: false
+ *         names?: list<array{ // Default: []
+ *             alias?: scalar|Param|null,
+ *             type?: scalar|Param|null,
+ *             groups?: mixed, // Default: null
+ *             options?: mixed, // Default: null
+ *             serializationContext?: list<mixed>,
+ *             areas?: list<scalar|Param|null>,
+ *         }>,
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1976,6 +2117,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_pwa?: NowoPwaConfig,
  *     nowo_cookie_consent?: NowoCookieConsentConfig,
  *     nowo_login_throttle?: NowoLoginThrottleConfig,
+ *     nowo_password_policy?: NowoPasswordPolicyConfig,
+ *     nowo_audit_kit?: NowoAuditKitConfig,
+ *     nowo_user_kit?: NowoUserKitConfig,
+ *     nowo_doctrine_encrypt?: NowoDoctrineEncryptConfig,
+ *     nowo_migrations_kit?: NowoMigrationsKitConfig,
+ *     nowo_tag_input?: NowoTagInputConfig,
+ *     nelmio_api_doc?: NelmioApiDocConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2002,6 +2150,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
+ *         nowo_password_policy?: NowoPasswordPolicyConfig,
+ *         nowo_audit_kit?: NowoAuditKitConfig,
+ *         nowo_user_kit?: NowoUserKitConfig,
+ *         nowo_doctrine_encrypt?: NowoDoctrineEncryptConfig,
+ *         nowo_migrations_kit?: NowoMigrationsKitConfig,
+ *         nowo_tag_input?: NowoTagInputConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2027,6 +2182,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
+ *         nowo_password_policy?: NowoPasswordPolicyConfig,
+ *         nowo_audit_kit?: NowoAuditKitConfig,
+ *         nowo_user_kit?: NowoUserKitConfig,
+ *         nowo_doctrine_encrypt?: NowoDoctrineEncryptConfig,
+ *         nowo_migrations_kit?: NowoMigrationsKitConfig,
+ *         nowo_tag_input?: NowoTagInputConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2054,6 +2216,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
+ *         nowo_password_policy?: NowoPasswordPolicyConfig,
+ *         nowo_audit_kit?: NowoAuditKitConfig,
+ *         nowo_user_kit?: NowoUserKitConfig,
+ *         nowo_doctrine_encrypt?: NowoDoctrineEncryptConfig,
+ *         nowo_migrations_kit?: NowoMigrationsKitConfig,
+ *         nowo_tag_input?: NowoTagInputConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

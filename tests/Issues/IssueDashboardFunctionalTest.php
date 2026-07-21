@@ -36,17 +36,17 @@ final class IssueDashboardFunctionalTest extends DatabaseWebTestCase
             '/api/'.$project->getId().'/envelope/',
             [],
             [],
-            ['HTTP_X_SENTRY_AUTH' => 'Sentry sentry_version=7, sentry_key='.$apiKey->getPublicKey()],
+            $this->beaconAuthHeaders($apiKey),
             $body,
         );
         self::assertResponseIsSuccessful();
 
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId().'/issues');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Dashboard visible error');
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId().'/analytics');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/analytics');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Analytics');
     }

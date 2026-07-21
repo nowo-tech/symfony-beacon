@@ -23,12 +23,13 @@
         {% if membership.role.value in ['owner', 'admin'] %}
             <form
                 method="post"
-                action="{{ path('project_keys_create', {id: project.id}) }}"
+                action="{{ path('project_keys_create', {id: project.uuid}) }}"
                 class="mt-4 flex flex-wrap gap-2"
                 data-controller="human-key-label"
                 data-human-key-label-adjectives-value="{{ labelAdjectives|json_encode|e('html_attr') }}"
                 data-human-key-label-nouns-value="{{ labelNouns|json_encode|e('html_attr') }}"
             >
+                <input type="hidden" name="_token" value="{{ csrf_token('project_key_create_' ~ project.id) }}">
                 <input
                     class="input min-w-40 flex-1"
                     name="label"
@@ -49,25 +50,305 @@
     </section>
 
     <section class="panel">
-        <h2 class="mb-3 text-lg font-semibold">{{ 'project.members.title'|trans }}</h2>
-        <ul class="space-y-2 text-sm">
+        <div class="mb-3 flex flex-wrap items-start justify-between gap-2">
+            <div>
+                <h2 class="text-lg font-semibold">{{ 'project.members.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'project.members.help'|trans }}</p>
+            </div>
+            {% if assignableRoles is not empty %}
+                <div data-controller="confirm-dialog">
+                    <button
+                        type="button"
+                        class="btn-primary btn-sm btn-icon"
+                        data-action="confirm-dialog#open"
+                        title="{{ 'project.members.add'|trans }}"
+                        aria-label="{{ 'project.members.add'|trans }}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                    </button>
+                    <dialog
+                        class="confirm-dialog"
+                        data-confirm-dialog-target="dialog"
+                        data-action="click->confirm-dialog#backdropClose"
+                    >
+                        <form
+                            method="post"
+                            action="{{ path('project_members_add', {id: project.uuid}) }}"
+                            class="confirm-dialog__panel"
+                        >
+                            <h3 class="confirm-dialog__title">{{ 'project.members.add_title'|trans }}</h3>
+                            <p class="confirm-dialog__body">{{ 'project.members.add_help'|trans }}</p>
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_member_add_' ~ project.id) }}">
+                            <label class="confirm-dialog__label" for="member-email">{{ 'project.members.email_label'|trans }}</label>
+                            <input
+                                id="member-email"
+                                class="input w-full"
+                                type="email"
+                                name="email"
+                                required
+                                autocomplete="off"
+                                placeholder="{{ 'project.members.email_placeholder'|trans }}"
+                            >
+                            <label class="confirm-dialog__label mt-3" for="member-add-role">{{ 'project.members.role_label'|trans }}</label>
+                            <select id="member-add-role" class="input w-full" name="role">
+                                {% for role in assignableRoles %}
+                                    <option value="{{ role.value }}" {% if role.value == 'member' %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="confirm-dialog__actions">
+                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                <button class="btn-primary" type="submit">{{ 'project.members.add'|trans }}</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </div>
+            {% endif %}
+        </div>
+        <ul class="space-y-3 text-sm">
             {% for member in project.memberships %}
-                <li class="flex items-center justify-between border-b border-[var(--color-sand)] py-2 last:border-0">
-                    <span>{{ member.user.email }}</span>
-                    <span class="badge bg-[var(--color-sand)]">{{ member.role.value }}</span>
+                {% set memberUser = member.user %}
+                {% set isLastOwner = member.role.value == 'owner' and ownerCount <= 1 %}
+                {% set actorIsOwner = membership.role.value == 'owner' %}
+                {% set canManageThis = assignableRoles is not empty
+                    and (actorIsOwner or member.role.value != 'owner') %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="font-medium">{{ memberUser.displayName }}</div>
+                            <div class="text-xs text-[var(--color-ink)]/60">{{ memberUser.email }}</div>
+                            <div class="mt-1">
+                                <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ member.role.value)|trans }}</span>
+                            </div>
+                        </div>
+                        {% if canManageThis %}
+                            <div class="flex shrink-0 items-center gap-1">
+                                <div data-controller="confirm-dialog">
+                                    <button
+                                        type="button"
+                                        class="btn-ghost btn-sm btn-icon"
+                                        data-action="confirm-dialog#open"
+                                        title="{{ 'project.members.edit_role'|trans }}"
+                                        aria-label="{{ 'project.members.edit_role'|trans }}"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.83H5v-.92l9.06-9.06.92.92L5.92 20.08zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                        </svg>
+                                    </button>
+                                    <dialog
+                                        class="confirm-dialog"
+                                        data-confirm-dialog-target="dialog"
+                                        data-action="click->confirm-dialog#backdropClose"
+                                    >
+                                        <form
+                                            method="post"
+                                            action="{{ path('project_members_role', {projectId: project.uuid, userId: memberUser.uuid}) }}"
+                                            class="confirm-dialog__panel"
+                                        >
+                                            <h3 class="confirm-dialog__title">{{ 'project.members.edit_role_title'|trans }}</h3>
+                                            <p class="confirm-dialog__body">{{ 'project.members.edit_role_body'|trans({'%name%': memberUser.displayName, '%email%': memberUser.email}) }}</p>
+                                            {% if isLastOwner %}
+                                                <p class="confirm-dialog__body">{{ 'project.members.last_owner_hint'|trans }}</p>
+                                            {% endif %}
+                                            <input type="hidden" name="_token" value="{{ csrf_token('project_member_role_' ~ member.id) }}">
+                                            <label class="confirm-dialog__label" for="member-role-{{ member.id }}">{{ 'project.members.role_label'|trans }}</label>
+                                            <select
+                                                id="member-role-{{ member.id }}"
+                                                class="input w-full"
+                                                name="role"
+                                                {% if isLastOwner %}disabled{% endif %}
+                                            >
+                                                {% for role in assignableRoles %}
+                                                    <option value="{{ role.value }}" {% if member.role == role %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
+                                                {% endfor %}
+                                                {% if member.role.value == 'owner' and not actorIsOwner %}
+                                                    <option value="owner" selected>{{ 'project.members.role.owner'|trans }}</option>
+                                                {% endif %}
+                                            </select>
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                                <button class="btn-primary" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.update_role'|trans }}</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </div>
+
+                                <div data-controller="confirm-dialog">
+                                    <button
+                                        type="button"
+                                        class="btn-ghost btn-sm btn-icon"
+                                        data-action="confirm-dialog#open"
+                                        title="{{ 'project.members.remove'|trans }}"
+                                        aria-label="{{ 'project.members.remove'|trans }}"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </button>
+                                    <dialog
+                                        class="confirm-dialog"
+                                        data-confirm-dialog-target="dialog"
+                                        data-action="click->confirm-dialog#backdropClose"
+                                    >
+                                        <form
+                                            method="post"
+                                            action="{{ path('project_members_remove', {projectId: project.uuid, userId: memberUser.uuid}) }}"
+                                            class="confirm-dialog__panel"
+                                        >
+                                            <h3 class="confirm-dialog__title">{{ 'project.members.remove_title'|trans }}</h3>
+                                            {% if isLastOwner %}
+                                                <p class="confirm-dialog__body">{{ 'project.members.last_owner_hint'|trans }}</p>
+                                            {% else %}
+                                                <p class="confirm-dialog__body">{{ 'project.members.remove_confirm'|trans({'%email%': memberUser.email}) }}</p>
+                                            {% endif %}
+                                            <input type="hidden" name="_token" value="{{ csrf_token('project_member_remove_' ~ member.id) }}">
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                                <button class="btn-danger" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.remove'|trans }}</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
                 </li>
             {% endfor %}
         </ul>
-        <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.members.your_role'|trans }} {{ membership.role.value }}</p>
+        <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.members.your_role'|trans }} {{ ('project.members.role.' ~ membership.role.value)|trans }}</p>
     </section>
 </div>
 
 <section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'project.groups.title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.groups.help'|trans }}</p>
+    <ul class="space-y-3 text-sm">
+        {% for groupAccess in project.groupAccesses %}
+            {% set linkedGroup = groupAccess.userGroup %}
+            <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-medium">{{ linkedGroup.name }}</div>
+                        <div class="text-xs text-[var(--color-ink)]/60">{{ 'project.groups.member_count'|trans({'%count%': linkedGroup.memberships|length}) }}</div>
+                        <div class="mt-1">
+                            <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ groupAccess.role.value)|trans }}</span>
+                        </div>
+                    </div>
+                    {% if assignableGroupRoles is not empty %}
+                        <div class="flex shrink-0 items-center gap-1">
+                            <div data-controller="confirm-dialog">
+                                <button
+                                    type="button"
+                                    class="btn-ghost btn-sm btn-icon"
+                                    data-action="confirm-dialog#open"
+                                    title="{{ 'project.groups.edit_role'|trans }}"
+                                    aria-label="{{ 'project.groups.edit_role'|trans }}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.83H5v-.92l9.06-9.06.92.92L5.92 20.08zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                    </svg>
+                                </button>
+                                <dialog
+                                    class="confirm-dialog"
+                                    data-confirm-dialog-target="dialog"
+                                    data-action="click->confirm-dialog#backdropClose"
+                                >
+                                    <form
+                                        method="post"
+                                        action="{{ path('project_groups_role', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
+                                        class="confirm-dialog__panel"
+                                    >
+                                        <h3 class="confirm-dialog__title">{{ 'project.groups.edit_role_title'|trans }}</h3>
+                                        <p class="confirm-dialog__body">{{ 'project.groups.edit_role_body'|trans({'%name%': linkedGroup.name}) }}</p>
+                                        <input type="hidden" name="_token" value="{{ csrf_token('project_group_role_' ~ groupAccess.id) }}">
+                                        <label class="confirm-dialog__label" for="group-role-{{ groupAccess.id }}">{{ 'project.members.role_label'|trans }}</label>
+                                        <select id="group-role-{{ groupAccess.id }}" class="input w-full" name="role">
+                                            {% for role in assignableGroupRoles %}
+                                                <option value="{{ role.value }}" {% if groupAccess.role == role %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                            <button class="btn-primary" type="submit">{{ 'project.members.update_role'|trans }}</button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            </div>
+
+                            <div data-controller="confirm-dialog">
+                                <button
+                                    type="button"
+                                    class="btn-ghost btn-sm btn-icon"
+                                    data-action="confirm-dialog#open"
+                                    title="{{ 'project.groups.remove'|trans }}"
+                                    aria-label="{{ 'project.groups.remove'|trans }}"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                    </svg>
+                                </button>
+                                <dialog
+                                    class="confirm-dialog"
+                                    data-confirm-dialog-target="dialog"
+                                    data-action="click->confirm-dialog#backdropClose"
+                                >
+                                    <form
+                                        method="post"
+                                        action="{{ path('project_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
+                                        class="confirm-dialog__panel"
+                                    >
+                                        <h3 class="confirm-dialog__title">{{ 'project.groups.remove_title'|trans }}</h3>
+                                        <p class="confirm-dialog__body">{{ 'project.groups.remove_confirm'|trans({'%name%': linkedGroup.name}) }}</p>
+                                        <input type="hidden" name="_token" value="{{ csrf_token('project_group_remove_' ~ groupAccess.id) }}">
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                            <button class="btn-danger" type="submit">{{ 'project.groups.remove'|trans }}</button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'project.groups.empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if assignableGroupRoles is not empty %}
+        {% if availableGroups is not empty %}
+            <form method="post" action="{{ path('project_groups_add', {id: project.uuid}) }}" class="mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                <input type="hidden" name="_token" value="{{ csrf_token('project_group_add_' ~ project.id) }}">
+                <select class="input" name="group" required>
+                    <option value="">{{ 'project.groups.select'|trans }}</option>
+                    {% for g in availableGroups %}
+                        <option value="{{ g.uuid }}">{{ g.name }} ({{ g.memberships|length }})</option>
+                    {% endfor %}
+                </select>
+                <select class="input" name="role">
+                    {% for role in assignableGroupRoles %}
+                        <option value="{{ role.value }}" {% if role.value == 'member' %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn-primary" type="submit">{{ 'project.groups.add'|trans }}</button>
+            </form>
+        {% else %}
+            <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.groups.none_available'|trans }}</p>
+        {% endif %}
+    {% endif %}
+</section>
+
+<section class="panel mt-6">
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-lg font-semibold">{{ 'notifications.title'|trans }}</h2>
-        {% if membership.role.value in ['owner', 'admin'] %}
-            <a class="btn-primary" href="{{ path('project_notification_new', {id: project.id}) }}">{{ 'notifications.add'|trans }}</a>
-        {% endif %}
+        <div class="flex flex-wrap gap-2">
+            <a class="btn-ghost" href="{{ path('project_notification_help', {id: project.uuid}) }}">{{ 'notifications.help.link'|trans }}</a>
+            {% if membership.role.value in ['owner', 'admin'] %}
+                <a class="btn-primary" href="{{ path('project_notification_new', {id: project.uuid}) }}">{{ 'notifications.add'|trans }}</a>
+            {% endif %}
+        </div>
     </div>
     <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'notifications.intro'|trans }}</p>
     {% set destinations = project.notificationDestinations %}
@@ -97,16 +378,16 @@
                         </div>
                         {% if membership.role.value in ['owner', 'admin'] %}
                             <div class="flex flex-wrap gap-2">
-                                <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.id, id: destination.id}) }}">{{ 'notifications.edit'|trans }}</a>
-                                <form method="post" action="{{ path('project_notification_toggle', {projectId: project.id, id: destination.id}) }}">
+                                <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.uuid, id: destination.uuid}) }}">{{ 'notifications.edit'|trans }}</a>
+                                <form method="post" action="{{ path('project_notification_toggle', {projectId: project.uuid, id: destination.uuid}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_toggle_' ~ destination.id) }}">
                                     <button class="btn-ghost" type="submit">{{ destination.enabled ? 'notifications.disable'|trans : 'notifications.enable'|trans }}</button>
                                 </form>
-                                <form method="post" action="{{ path('project_notification_test', {projectId: project.id, id: destination.id}) }}">
+                                <form method="post" action="{{ path('project_notification_test', {projectId: project.uuid, id: destination.uuid}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_test_' ~ destination.id) }}">
                                     <button class="btn-ghost" type="submit">{{ 'notifications.test'|trans }}</button>
                                 </form>
-                                <form method="post" action="{{ path('project_notification_delete', {projectId: project.id, id: destination.id}) }}" onsubmit="return confirm('{{ 'notifications.delete_confirm'|trans|e('js') }}')">
+                                <form method="post" action="{{ path('project_notification_delete', {projectId: project.uuid, id: destination.uuid}) }}" onsubmit="return confirm('{{ 'notifications.delete_confirm'|trans|e('js') }}')">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_' ~ destination.id) }}">
                                     <button class="btn-danger" type="submit">{{ 'notifications.delete'|trans }}</button>
                                 </form>
@@ -132,7 +413,7 @@
                 data-confirm-dialog-target="dialog"
                 data-action="click->confirm-dialog#backdropClose"
             >
-                <form method="post" action="{{ path('project_clear_history', {id: project.id}) }}" class="confirm-dialog__panel">
+                <form method="post" action="{{ path('project_clear_history', {id: project.uuid}) }}" class="confirm-dialog__panel">
                     <h3 class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h3>
                     <p class="confirm-dialog__body">{{ 'project.danger.clear_body'|trans }}</p>
                     <input type="hidden" name="_token" value="{{ csrf_token('project_clear_' ~ project.id) }}">
@@ -152,7 +433,7 @@
                     data-confirm-dialog-target="dialog"
                     data-action="click->confirm-dialog#backdropClose"
                 >
-                    <form method="post" action="{{ path('project_delete', {id: project.id}) }}" class="confirm-dialog__panel">
+                    <form method="post" action="{{ path('project_delete', {id: project.uuid}) }}" class="confirm-dialog__panel">
                         <h3 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h3>
                         <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
                         <label class="confirm-dialog__label" for="project-delete-confirm-{{ project.id }}">

@@ -7,7 +7,7 @@
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <p class="text-[var(--color-ink)]/65">{{ 'performance.intro'|trans }}</p>
-    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.id, nplus1: nPlusOneOnly ? 0 : 1}) }}">
+    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid, nplus1: nPlusOneOnly ? 0 : 1}) }}">
         {% if nPlusOneOnly %}{{ 'performance.show_all'|trans }}{% else %}{{ 'performance.nplus1_only'|trans }}{% endif %}
     </a>
 </div>
@@ -30,7 +30,7 @@
                 {% for tx in transactions %}
                     <tr class="border-b border-[var(--color-sand)] last:border-0">
                         <td class="px-4 py-3">
-                            <a class="font-medium no-underline" href="{{ path('performance_show', {projectId: project.id, id: tx.id}) }}">{{ tx.transactionName }}</a>
+                            <a class="font-medium no-underline" href="{{ path('performance_show', {projectId: project.uuid, id: tx.uuid}) }}">{{ tx.transactionName }}</a>
                         </td>
                         <td class="px-4 py-3">{{ tx.durationMs|number_format(1) }} ms</td>
                         <td class="px-4 py-3">{{ tx.spanCount }}</td>

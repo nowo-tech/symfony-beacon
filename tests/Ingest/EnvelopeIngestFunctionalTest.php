@@ -6,6 +6,7 @@ namespace App\Tests\Ingest;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Repository\EventRepository;
 use App\Performance\Entity\PerfTransaction;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,22 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], [], '{}');
 
         self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testForbiddenWithoutSecretWhenKeyHasSecret(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject('secret-required@example.com');
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/',
+            [],
+            [],
+            ['HTTP_X_BEACON_AUTH' => 'Beacon beacon_key='.$apiKey->getPublicKey()],
+            "{}\n".json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR)."\n{}",
+        );
+
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function testIngestsEventAndCreatesIssue(): void
@@ -62,7 +79,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
             '/api/'.$project->getId().'/envelope/',
             [],
             [],
-            ['HTTP_X_SENTRY_AUTH' => 'Sentry sentry_version=7, sentry_key='.$apiKey->getPublicKey()],
+            $this->beaconAuthHeaders($apiKey),
             $body,
         );
 
@@ -88,7 +105,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
     public function testGroupsSimilarEventsAndCountsOccurrences(): void
     {
         [$client, , $project, $apiKey] = $this->bootWithDemoProject();
-        $headers = ['HTTP_X_SENTRY_AUTH' => 'Sentry sentry_version=7, sentry_key='.$apiKey->getPublicKey()];
+        $headers = $this->beaconAuthHeaders($apiKey);
 
         foreach ([10, 99] as $i => $userId) {
             $eventId = bin2hex(random_bytes(16));
@@ -132,7 +149,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertNotNull($issues[0]->getFirstSeen());
         self::assertNotNull($issues[0]->getLastSeen());
 
-        $stats = self::getContainer()->get(\App\Issues\Repository\EventRepository::class)
+        $stats = self::getContainer()->get(EventRepository::class)
             ->occurrenceStatsForIssue($issues[0]);
         self::assertSame(2, $stats->total);
         self::assertSame(2, $stats->last24h);
@@ -173,7 +190,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
             '/api/'.$project->getId().'/envelope/',
             [],
             [],
-            ['HTTP_X_SENTRY_AUTH' => 'Sentry sentry_version=7, sentry_key='.$apiKey->getPublicKey()],
+            $this->beaconAuthHeaders($apiKey),
             $body,
         );
 

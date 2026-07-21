@@ -3,36 +3,68 @@
 {% block title %}{{ 'projects.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-    <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'projects.title'|trans }}</h1>
-        <p class="mt-1 text-[var(--color-ink)]/65">{{ 'projects.intro'|trans }}</p>
+<div
+    data-controller="confirm-dialog"
+    data-confirm-dialog-open-on-connect-value="{{ openNewProject ? 'true' : 'false' }}"
+>
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'projects.title'|trans }}</h1>
+            <p class="mt-1 text-[var(--color-ink)]/65">{{ 'projects.intro'|trans }}</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <form method="get" action="{{ path('dashboard_home') }}" class="flex gap-2">
+                <input class="input min-w-64" type="search" name="q" value="{{ query }}" placeholder="{{ 'projects.search_placeholder'|trans }}">
+                <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
+            </form>
+            <button type="button" class="btn-primary" data-action="confirm-dialog#open">
+                {{ 'nav.new_project'|trans }}
+            </button>
+        </div>
     </div>
-    <form method="get" class="flex gap-2">
-        <input class="input min-w-64" type="search" name="q" value="{{ query }}" placeholder="{{ 'projects.search_placeholder'|trans }}">
-        <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
-    </form>
-</div>
 
-{% if projects is empty %}
-    <div class="panel text-center">
-        <p class="mb-4 text-[var(--color-ink)]/70">{{ 'projects.empty'|trans }}</p>
-        <a class="btn-primary no-underline" href="{{ path('project_new') }}">{{ 'projects.create_first'|trans }}</a>
-    </div>
-{% else %}
-    <div class="grid gap-4 md:grid-cols-2">
-        {% for project in projects %}
-            <a href="{{ path('project_show', {id: project.id}) }}" class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md">
-                <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ project.name }}</h2>
-                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ project.slug }}</p>
-                {% set days = statsPreview[project.id]|default([]) %}
-                {% if days %}
-                    {% set errors = 0 %}
-                    {% for day in days %}{% set errors = errors + day.errorCount %}{% endfor %}
-                    <p class="mt-3 text-sm text-[var(--color-moss)]">{{ 'projects.errors_last_7_days'|trans({'%count%': errors}) }}</p>
-                {% endif %}
-            </a>
-        {% endfor %}
-    </div>
-{% endif %}
+    {% if projects is empty %}
+        <div class="panel text-center">
+            <p class="mb-4 text-[var(--color-ink)]/70">{{ 'projects.empty'|trans }}</p>
+            <button type="button" class="btn-primary" data-action="confirm-dialog#open">
+                {{ 'projects.create_first'|trans }}
+            </button>
+        </div>
+    {% else %}
+        <div class="grid gap-4 md:grid-cols-2">
+            {% for project in projects %}
+                <a href="{{ path('project_show', {id: project.uuid}) }}" class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+                    <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ project.name }}</h2>
+                    <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ project.slug }}</p>
+                    {% set days = statsPreview[project.id]|default([]) %}
+                    {% if days %}
+                        {% set errors = 0 %}
+                        {% for day in days %}{% set errors = errors + day.errorCount %}{% endfor %}
+                        <p class="mt-3 text-sm text-[var(--color-moss)]">{{ 'projects.errors_last_7_days'|trans({'%count%': errors}) }}</p>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <dialog
+        class="confirm-dialog confirm-dialog--form"
+        data-confirm-dialog-target="dialog"
+        data-action="click->confirm-dialog#backdropClose"
+        aria-labelledby="new-project-dialog-title"
+    >
+        <div class="confirm-dialog__panel">
+            <h2 id="new-project-dialog-title" class="confirm-dialog__title">{{ 'project.new.title'|trans }}</h2>
+            <p class="confirm-dialog__body">{{ 'project.name.help'|trans }}</p>
+            {{ form_start(newProjectForm, {action: path('project_new'), attr: {class: 'space-y-4'}}) }}
+                {{ form_row(newProjectForm.name) }}
+                {{ form_row(newProjectForm.description) }}
+                <div class="confirm-dialog__actions">
+                    <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'common.cancel'|trans }}</button>
+                    <button class="btn-primary" type="submit">{{ 'project.new.submit'|trans }}</button>
+                </div>
+            {{ form_end(newProjectForm) }}
+        </div>
+    </dialog>
+</div>
 {% endblock %}

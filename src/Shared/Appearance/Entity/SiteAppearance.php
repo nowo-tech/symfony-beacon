@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Entity;
 
+use App\Identity\Entity\User;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\AuditableInterface;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 
 /**
  * Singleton row for operator-customizable look & feel (ROLE_ADMIN).
  */
 #[ORM\Entity(repositoryClass: SiteAppearanceRepository::class)]
 #[ORM\Table(name: 'site_appearance')]
-class SiteAppearance
+class SiteAppearance implements AuditableInterface
 {
+    use TimestampableTrait;
+
     public const DEFAULT_BRAND_NAME = 'symfony-beacon';
     public const DEFAULT_BRAND_EYEBROW = 'Error tracking';
     public const DEFAULT_ACCENT = '#1f6f54';
@@ -42,6 +47,14 @@ class SiteAppearance
 
     #[ORM\Column(length: 7)]
     private string $accentDeepColorDark = self::DEFAULT_ACCENT_DEEP_DARK;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'updated_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $updatedBy = null;
 
     public static function defaults(): self
     {
@@ -135,5 +148,25 @@ class SiteAppearance
         $this->accentDeepColorDark = self::DEFAULT_ACCENT_DEEP_DARK;
 
         return $this;
+    }
+
+    public function getCreatedBy(): ?object
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?object $createdBy): void
+    {
+        $this->createdBy = $createdBy instanceof User ? $createdBy : null;
+    }
+
+    public function getUpdatedBy(): ?object
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?object $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy instanceof User ? $updatedBy : null;
     }
 }

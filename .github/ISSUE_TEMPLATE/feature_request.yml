@@ -1,0 +1,53 @@
+name: Feature request
+description: Propose a product or DX improvement for self-hosted Beacon
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prefer linking a Spec Kit feature under `specs/` for large work. Client SDK requests belong in [BeaconBundle](https://github.com/nowo-tech/BeaconBundle).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What operator or developer pain does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should it work? Mention nowo-tech kits if relevant (AuthKit, Migrations Kit, …).
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you rejected and why (optional).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Issues / triage
+        - Ingest / Envelope
+        - Notifications
+        - Identity / auth
+        - Performance / analytics
+        - Self-hosting / ops
+        - Docs / specs
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I checked ROADMAP.md / existing specs for overlap
+          required: true
+        - label: This request is for the Beacon **server** (not BeaconBundle alone)
+          required: true

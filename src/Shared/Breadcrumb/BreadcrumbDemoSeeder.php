@@ -62,6 +62,16 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'app.swagger_ui',
+            'API docs',
+            ['en' => 'API docs', 'es' => 'Docs API'],
+            $projects,
+            [],
+            $changed,
+        );
+
         $project = $this->ensureItem(
             $collection,
             'project_show',
@@ -72,12 +82,32 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
-        $this->ensureItem(
+        $settings = $this->ensureItem(
             $collection,
             'project_settings',
             'Settings',
             ['en' => 'Settings', 'es' => 'Configuración'],
             $project,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_notification_help',
+            'Notification guides',
+            ['en' => 'Notification guides', 'es' => 'Guías de notificaciones'],
+            $settings,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_notification_new',
+            'New notification',
+            ['en' => 'New notification', 'es' => 'Nueva notificación'],
+            $settings,
             ['id'],
             $changed,
         );

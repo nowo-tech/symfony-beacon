@@ -29,6 +29,10 @@ final readonly class ProjectHistoryClearer
         $connection = $this->entityManager->getConnection();
 
         $connection->executeStatement(
+            'DELETE FROM issue_history WHERE issue_id IN (SELECT id FROM issue WHERE project_id = ?)',
+            [$projectId],
+        );
+        $connection->executeStatement(
             'DELETE FROM event WHERE issue_id IN (SELECT id FROM issue WHERE project_id = ?)',
             [$projectId],
         );

@@ -31,5 +31,6 @@
 
 ## Notes
 
-- Clarifications resolved 2026-07-20: destination types = Slack + generic HTTP webhook; issue rule = first occurrence + regression.
-- Ready for `/speckit-plan`.
+- Clarifications 2026-07-20: occurrence = first + regression; types started as Slack + HTTP.
+- Clarifications 2026-07-21: as-built types expanded (Discord/Teams/Telegram/email); in-app manuals; SSRF guard.
+- Spec updated to match as-built product; planning artifacts under `plan.md` / `tasks.md` remain historical for v1 slice.

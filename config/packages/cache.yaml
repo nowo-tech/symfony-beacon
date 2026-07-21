@@ -9,5 +9,7 @@ when@test:
         cache:
             app: cache.adapter.array
             pools:
+                # Filesystem (not ArrayAdapter): ArrayAdapter implements ResetInterface and is
+                # cleared between KernelBrowser requests, which would wipe login_throttling state.
                 cache.rate_limiter:
-                    adapter: cache.adapter.array
+                    adapter: cache.adapter.filesystem

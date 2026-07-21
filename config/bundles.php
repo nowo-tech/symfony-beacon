@@ -24,4 +24,11 @@ return [
     Nowo\PwaBundle\PwaBundle::class => ['all' => true],
     Nowo\CookieConsentBundle\NowoCookieConsentBundle::class => ['all' => true],
     Nowo\LoginThrottleBundle\NowoLoginThrottleBundle::class => ['all' => true],
+    Nowo\PasswordPolicyBundle\PasswordPolicyBundle::class => ['all' => true],
+    Nowo\AuditKitBundle\NowoAuditKitBundle::class => ['all' => true],
+    Nowo\UserKitBundle\NowoUserKitBundle::class => ['all' => true],
+    Nowo\DoctrineEncryptBundle\NowoDoctrineEncryptBundle::class => ['all' => true],
+    Nowo\MigrationsKitBundle\NowoMigrationsKitBundle::class => ['all' => true],
+    Nowo\TagInputBundle\NowoTagInputBundle::class => ['all' => true],
+    Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
 ];

@@ -1,69 +1,73 @@
 security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-
-    providers:
-        app_user_provider:
-            entity:
-                class: App\Identity\Entity\User
-                property: email
-
-    firewalls:
-        dev:
-            pattern: ^/(_profiler|_wdt|assets|build)/
-            security: false
-        ingest:
-            pattern: ^/api/\d+/envelope
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: nowo_auth_kit_login
-                check_path: nowo_auth_kit_login
-                enable_csrf: true
-                default_target_path: dashboard_home
-                username_parameter: login_form[_username]
-                password_parameter: login_form[_password]
-                csrf_parameter: login_form[_csrf_token]
-                csrf_token_id: authenticate
-            remember_me:
-                secret: '%kernel.secret%'
-                lifetime: 604800
-                path: /
-                remember_me_parameter: login_form[_remember_me]
-            login_throttling:
-                max_attempts: 5
-                interval: '15 minutes'
-            logout:
-                path: nowo_auth_kit_logout
-                target: nowo_auth_kit_login
-                invalidate_session: true
-
-    access_control:
-        # Root and bare auth paths redirect to /en/… (public)
-        - { path: ^/$, roles: PUBLIC_ACCESS }
-        - { path: ^/(login|register|logout)$, roles: PUBLIC_ACCESS }
-        # Locale-prefixed AuthKit routes (locale_in_path: true)
-        - { path: ^/(en|es)/login, roles: PUBLIC_ACCESS }
-        - { path: ^/(en|es)/register, roles: PUBLIC_ACCESS }
-        - { path: ^/(en|es)/logout, roles: PUBLIC_ACCESS }
-        # Envelope ingest (API key auth, not session)
-        - { path: ^/api/\d+/envelope, roles: PUBLIC_ACCESS }
-        # PWA assets (manifest, service worker, offline fallback)
-        - { path: ^/(manifest\.webmanifest|sw\.js|offline)$, roles: PUBLIC_ACCESS }
-        # Legal pages + cookie consent modal (nowo-tech/cookie-consent-bundle)
-        - { path: ^/legal/, roles: PUBLIC_ACCESS }
-        - { path: ^/cookie_consent(_alt)?$, roles: PUBLIC_ACCESS }
-        - { path: ^/cookie-consent/config, roles: PUBLIC_ACCESS }
-        - { path: ^/health/(live|ready)$, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: ROLE_USER }
-
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: auto
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Identity\Entity\User
+        property: email
+  firewalls:
+    dev:
+      pattern: ^/(_profiler|_wdt|assets|build)/
+      security: false
+    ingest:
+      pattern: ^/api/\d+/envelope
+      security: false
+    main:
+      lazy: true
+      provider: app_user_provider
+      form_login:
+        login_path: nowo_auth_kit_login
+        check_path: nowo_auth_kit_login
+        enable_csrf: true
+        default_target_path: dashboard_home
+        username_parameter: 'login_form[_username]'
+        password_parameter: 'login_form[_password]'
+        csrf_parameter: 'login_form[_csrf_token]'
+        csrf_token_id: authenticate
+      remember_me:
+        secret: '%kernel.secret%'
+        lifetime: 604800
+        path: /
+        remember_me_parameter: 'login_form[_remember_me]'
+      login_throttling:
+        max_attempts: 5
+        interval: '15 minutes'
+        limiter: nowo_login_throttle.database_rate_limiter
+      logout:
+        path: nowo_auth_kit_logout
+        target: nowo_auth_kit_login
+        invalidate_session: true
+  access_control:
+    - path: ^/$
+      roles: PUBLIC_ACCESS
+    - path: ^/(login|register|logout)$
+      roles: PUBLIC_ACCESS
+    - path: ^/(en|es)/login
+      roles: PUBLIC_ACCESS
+    - path: ^/(en|es)/register
+      roles: PUBLIC_ACCESS
+    - path: ^/(en|es)/logout
+      roles: PUBLIC_ACCESS
+    - path: ^/api/\d+/envelope
+      roles: PUBLIC_ACCESS
+    - path: ^/(manifest\.webmanifest|sw\.js|offline)$
+      roles: PUBLIC_ACCESS
+    - path: ^/legal/
+      roles: PUBLIC_ACCESS
+    - path: '^/cookie_consent(_alt)?$'
+      roles: PUBLIC_ACCESS
+    - path: ^/cookie-consent/config
+      roles: PUBLIC_ACCESS
+    - path: ^/health/(live|ready)$
+      roles: PUBLIC_ACCESS
+    - path: ^/
+      roles: ROLE_USER
 when@test:
-    security:
-        password_hashers:
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4
-                time_cost: 3
-                memory_cost: 10
+  security:
+    password_hashers:
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4
+        time_cost: 3
+        memory_cost: 10

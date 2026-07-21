@@ -1,0 +1,17 @@
+# nowo-tech/user-kit-bundle
+# https://github.com/nowo-tech/UserKitBundle
+nowo_user_kit:
+    default_profile: default
+    twig: true
+    profiles:
+        default:
+            user_class: App\Identity\Entity\User
+            account_status:
+                enabled: true
+                field: enabled
+                invalidate_sessions_on_disable: true
+            last_activity:
+                enabled: true
+                field: lastActivityAt
+                online_threshold: 300
+                update_throttle: 30

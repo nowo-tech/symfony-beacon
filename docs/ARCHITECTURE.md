@@ -91,7 +91,7 @@ Features are specified under `specs/` before large changes. That matches an open
 | `Identity` | Users, account prefs, seed | Auth boundary; kits + Security |
 | `Project` | Projects, keys, memberships, Settings / danger zone | Multi-tenant tenancy unit |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
-| `Issues` | Fingerprint grouping, list/detail, assignee | Primary debugging UX |
+| `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
 | `Analytics` | Daily aggregates | Read models derived from ingest |
 | `Notifications` | Slack / HTTP webhook destinations | Outbound alerts after ingest |
@@ -176,7 +176,7 @@ sequenceDiagram
 
   Client->>HTTP: POST /api/{project_id}/envelope/
   HTTP->>Auth: parse Envelope auth header / query / dsn
-  Auth-->>HTTP: public_key (+ optional secret)
+  Auth-->>HTTP: public_key + required secret
   HTTP->>Keys: findActiveByPublicKey
   alt missing or wrong project key
     HTTP-->>Client: 401 / 403
@@ -192,7 +192,7 @@ sequenceDiagram
 
 ### Event item → issue grouping
 
-After dequeue, event items update (or create) an `Issue` by fingerprint, store `Event`, and bump daily error stats. Resolved issues reopen; ignored do not.
+After dequeue, event items update (or create) an `Issue` by fingerprint, store `Event`, and bump daily error stats. Matching events reopen **resolved** and **ignored** issues to **unresolved** and append a system row to `issue_history`.
 
 ```mermaid
 flowchart TD
@@ -203,9 +203,9 @@ flowchart TD
   Lookup -->|no| Create[Create Issue unresolved]
   Lookup -->|yes| Touch[Update title / culprit / lastSeen / eventCount]
   Create --> Status
-  Touch --> Status{Status is resolved?}
-  Status -->|yes| Reopen[Set unresolved]
-  Status -->|no / ignored| Keep[Keep status]
+  Touch --> Status{Status is resolved or ignored?}
+  Status -->|yes| Reopen[Set unresolved + issue_history]
+  Status -->|no unresolved| Keep[Keep status]
   Reopen --> Persist[Persist Event + promote columns]
   Keep --> Persist
   Persist --> Stats[DailyProjectStat errorCount++]

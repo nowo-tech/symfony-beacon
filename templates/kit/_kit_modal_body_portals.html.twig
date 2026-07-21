@@ -1,0 +1,24 @@
+{#
+  Bootstrap appends .modal-backdrop to <body>, but kit modals live under
+  .app-main__inner / .page-shell (stacking contexts). Reparent so the dialog
+  paints above the backdrop.
+#}
+<style>
+  body > .modal {
+    --bs-modal-zindex: 1080;
+    z-index: 1080;
+  }
+  body > .modal-backdrop {
+    --bs-backdrop-zindex: 1070;
+    z-index: 1070;
+  }
+</style>
+<script>
+(function () {
+  document.querySelectorAll('.kit-modal.modal').forEach(function (el) {
+    if (el.parentElement !== document.body) {
+      document.body.appendChild(el);
+    }
+  });
+})();
+</script>

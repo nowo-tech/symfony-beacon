@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'users.create'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <a href="{{ path('admin_users') }}" class="text-sm no-underline">{{ 'users.back'|trans }}</a>
+    <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'users.create'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'users.create_intro'|trans }}</p>
+</div>
+
+<form method="post" class="panel max-w-xl space-y-4">
+    <input type="hidden" name="_token" value="{{ csrf_token('admin_user_new') }}">
+
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="user-email">{{ 'users.form.email'|trans }}</label>
+        <input id="user-email" class="input w-full" type="email" name="email" required autocomplete="off">
+    </div>
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="user-display-name">{{ 'users.form.display_name'|trans }}</label>
+        <input id="user-display-name" class="input w-full" type="text" name="display_name" required autocomplete="off">
+    </div>
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="user-password">{{ 'users.form.password'|trans }}</label>
+        <input id="user-password" class="input w-full" type="password" name="password" required minlength="8" autocomplete="new-password">
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'users.form.password_help'|trans }}</p>
+    </div>
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="user-role">{{ 'users.role_label'|trans }}</label>
+        <select id="user-role" class="input w-full" name="role">
+            <option value="user" selected>{{ 'users.role.user'|trans }}</option>
+            <option value="admin">{{ 'users.role.admin'|trans }}</option>
+        </select>
+    </div>
+    <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="enabled" value="1" checked>
+        <span>{{ 'users.form.enabled'|trans }}</span>
+    </label>
+
+    <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" type="submit">{{ 'users.create'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ path('admin_users') }}">{{ 'users.cancel'|trans }}</a>
+    </div>
+</form>
+{% endblock %}

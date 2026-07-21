@@ -16,6 +16,7 @@ use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class ProjectDangerZoneTest extends DatabaseWebTestCase
@@ -26,21 +27,21 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->seedHistory($project);
         $this->login($client, $user);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Danger zone');
         self::assertSelectorExists('form[action$="/clear-history"]');
         self::assertSelectorExists('form[action$="/delete"]');
 
         $token = $crawler->filter('form[action$="/clear-history"] input[name="_token"]')->attr('value');
-        $client->request('POST', '/projects/'.$project->getId().'/clear-history', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/clear-history', [
             '_token' => $token,
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getId().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project history cleared.');
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         self::assertSame(0, (int) $em->getRepository(Issue::class)->count(['project' => $project]));
         self::assertSame(0, (int) $em->getRepository(PerfTransaction::class)->count(['project' => $project]));
         self::assertSame(0, (int) $em->getRepository(DailyProjectStat::class)->count(['project' => $project]));
@@ -52,18 +53,18 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         [$client, $user, $project] = $this->bootWithDemoProject('owner-del@example.com');
         $this->login($client, $user);
 
-        $crawler = $client->request('GET', '/projects/'.$project->getId().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         $token = $crawler->filter('form[action$="/delete"] input[name="_token"]')->attr('value');
 
-        $client->request('POST', '/projects/'.$project->getId().'/delete', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/delete', [
             '_token' => $token,
             'confirmation' => 'Wrong Name',
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getId().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project name did not match');
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         self::assertNotNull($em->getRepository(Project::class)->find($project->getId()));
     }
 
@@ -71,13 +72,14 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
     {
         [$client, $user, $project] = $this->bootWithDemoProject('owner-gone@example.com');
         $projectId = $project->getId();
+        $projectUuid = $project->getUuid();
         $this->seedHistory($project);
         $this->login($client, $user);
 
-        $crawler = $client->request('GET', '/projects/'.$projectId.'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/settings');
         $token = $crawler->filter('form[action$="/delete"] input[name="_token"]')->attr('value');
 
-        $client->request('POST', '/projects/'.$projectId.'/delete', [
+        $client->request(Request::METHOD_POST, '/projects/'.$projectUuid.'/delete', [
             '_token' => $token,
             'confirmation' => 'Acme',
         ]);
@@ -85,7 +87,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project deleted.');
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         self::assertNull($em->getRepository(Project::class)->find($projectId));
         self::assertSame(0, (int) $em->getRepository(Issue::class)->count([]));
     }
@@ -93,8 +95,8 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
     public function testMemberCannotClearOrDelete(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-member@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
         $member = new User();
         $member->setEmail('member-danger@example.com');
@@ -108,20 +110,20 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $member);
-        $client->request('GET', '/projects/'.$project->getId().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('form[action$="/clear-history"]');
         self::assertSelectorNotExists('form[action$="/delete"]');
 
-        $client->request('GET', '/projects/'.$project->getId());
-        self::assertResponseRedirects('/projects/'.$project->getId().'/issues');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
 
-        $client->request('POST', '/projects/'.$project->getId().'/clear-history', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/clear-history', [
             '_token' => 'x',
         ]);
         self::assertResponseStatusCodeSame(403);
 
-        $client->request('POST', '/projects/'.$project->getId().'/delete', [
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/delete', [
             '_token' => 'x',
             'confirmation' => 'Acme',
         ]);
@@ -132,7 +134,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
 
     private function seedHistory(Project $project): void
     {
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $now = new DateTimeImmutable();
 
         $issue = new Issue();

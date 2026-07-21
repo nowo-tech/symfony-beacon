@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ is_edit ? 'groups.edit_title'|trans : 'groups.create'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ is_edit ? 'groups.edit_title'|trans : 'groups.create'|trans }}</h1>
+</div>
+
+<form method="post" class="panel max-w-xl space-y-4">
+    <input type="hidden" name="_token" value="{{ csrf_token(is_edit ? 'admin_group_edit_' ~ group.id : 'admin_group_new') }}">
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="group-name">{{ 'groups.name_label'|trans }}</label>
+        <input id="group-name" class="input w-full" name="name" required value="{{ group ? group.name : '' }}">
+    </div>
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="group-description">{{ 'groups.description_label'|trans }}</label>
+        <textarea id="group-description" class="input w-full" name="description" rows="3">{{ group ? group.description : '' }}</textarea>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" type="submit">{{ is_edit ? 'groups.save'|trans : 'groups.create'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ is_edit ? path('admin_groups_show', {id: group.uuid}) : path('admin_groups') }}">{{ 'groups.cancel'|trans }}</a>
+    </div>
+</form>
+{% endblock %}

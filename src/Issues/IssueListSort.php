@@ -7,13 +7,13 @@ namespace App\Issues;
 /**
  * Validated list sorting for the project issues index (query string `sort` / `dir`).
  */
-final class IssueListSort
+final readonly class IssueListSort
 {
-    public const DEFAULT_FIELD = 'last_seen';
-    public const DEFAULT_DIRECTION = 'desc';
+    public const string DEFAULT_FIELD = 'last_seen';
+    public const string DEFAULT_DIRECTION = 'desc';
 
     /** @var list<string> */
-    public const FIELDS = [
+    public const array FIELDS = [
         'title',
         'level',
         'assignee',
@@ -26,7 +26,7 @@ final class IssueListSort
     ];
 
     /** Fields sorted in SQL on the issue entity (or assignee join). */
-    private const SQL_FIELDS = [
+    private const array SQL_FIELDS = [
         'title',
         'level',
         'assignee',
@@ -36,8 +36,8 @@ final class IssueListSort
     ];
 
     public function __construct(
-        public readonly string $field,
-        public readonly string $direction,
+        public string $field,
+        public string $direction,
     ) {
     }
 

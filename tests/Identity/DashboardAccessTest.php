@@ -42,13 +42,13 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', $project->getName());
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId());
-        self::assertResponseRedirects('/projects/'.$project->getId().'/issues');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Issues');
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'API keys');
     }
@@ -67,7 +67,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $stranger);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getId());
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -76,8 +76,11 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject();
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/new');
+        $client->request(Request::METHOD_GET, '/projects/new');
+        self::assertResponseRedirects('/dashboard?new=1');
+        $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('dialog.confirm-dialog--form');
 
         $form = $crawler->selectButton('Create project')->form([
             'project[name]' => 'Billing API',

@@ -20,11 +20,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Must run after the firewall (user available) and re-sync LocaleAware services
  * (Translator), because LocaleAwareListener already ran earlier with the default locale.
  */
-final class UserPreferredLocaleSubscriber implements EventSubscriberInterface
+final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
-        private readonly TranslatorInterface $translator,
+        private TokenStorageInterface $tokenStorage,
+        private TranslatorInterface $translator,
     ) {
     }
 
