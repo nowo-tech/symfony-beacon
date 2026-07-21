@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-07-21
+
+### Added
+
+- Issue detail sidebar panel ids for **Triage**, **Duplicate**, and **Activity** (account Display collapsed-panel prefs)
+- Combobox Stimulus controller for searchable pickers (used by mark-as-duplicate)
+- Phase 5 specs (not implemented yet): `025-analytics-charts`, `026-magic-links-viewer`
+
+### Changed
+
+- Issue detail aside: split the overloaded Assignee card into **Triage** (status + priority), **Assignee**, **Duplicate**, and **Activity**
+- Mark-as-duplicate: open a modal with autocomplete canonical-issue search (optional merge-events checkbox); modal layout keeps Cancel / Submit visible
+- Administration sidebar seeder syncs existing menu item position / label / permission on `app:seed-demo` (ensures **Projects** appears under Administration after upgrade)
+- Roadmap / README / ARCHITECTURE: document Analytics table limits and Phase 5 Next (`025` / `026`)
+
+### Fixed
+
+- CS: import `InvalidArgumentException` in `IssueController` (merge path)
+
 ## [0.10.0] - 2026-07-21
 
 ### Added
@@ -292,7 +311,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...v0.10.0
 [0.9.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.2...v0.9.3

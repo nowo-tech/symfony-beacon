@@ -27,6 +27,7 @@ use App\Project\Service\ProjectAccessService;
 use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -596,7 +597,7 @@ final class IssueController extends AbstractController
         if ($mergeEvents) {
             try {
                 $moved = $this->issueMergeService->mergeIntoCanonical($issue, $canonical, $user);
-            } catch (\InvalidArgumentException) {
+            } catch (InvalidArgumentException) {
                 $this->addFlash('error', 'issues.merge_failed');
 
                 return $this->redirectToRoute('issue_show', $showParams);

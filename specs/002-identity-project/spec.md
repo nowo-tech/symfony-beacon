@@ -8,6 +8,8 @@
 
 Identity uses [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) for login, first-user registration, remember-me, and locale-prefixed routes. Password UX uses PasswordToggle + PasswordStrength on AuthKit forms. Account enable/disable uses [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle) with **session invalidation when an account is disabled**. Projects, memberships (`owner` / `admin` / `member`), and API keys live under `src/Project`. Account preferences and admin appearance live under Identity.
 
+**Not in scope of this completed feature (see Phase 5):** passwordless **magic login links**, project **viewer** role, or signed share links to a project/issue — tracked in `026-magic-links-viewer`. **SSO/OIDC** remains roadmap Later (separate from magic links).
+
 Prefer AuthKit / UserKit / AuditKit over hand-rolled auth CRUD when extending this area (see workspace nowo-tech kit guidance).
 
 ## User Scenarios & Testing *(mandatory)*

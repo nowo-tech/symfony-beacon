@@ -93,14 +93,26 @@ Ordered Speckit program (Beacon `014`→`022`; Bundle `023`/`024`):
 
 ---
 
+## Phase 5 — Access & insights (Next)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 5.1 | **Analytics charts**: period presets / range + filters (env, release); keep or complement daily table | Beacon | `025-analytics-charts` | **Next** |
+| 5.2 | **Magic login links** + project **viewer** role; optional signed share links to project/issue (read-only) | Beacon | `026-magic-links-viewer` | **Planned** |
+
+Prefer AuthKit / Symfony login-link for 5.2; do not hand-roll auth. SSO/OIDC stays Later (separate from magic links).
+
+---
+
 ## Explicitly out of scope (for now)
 
 - Multi-region SaaS control plane / multi-org tenancy
-- **SSO/SAML/OIDC** (Later — dedicated spec when enterprise teams need it)
+- **SSO/SAML/OIDC** (Later — dedicated spec when enterprise teams need it; not the same as magic links in `026`)
 - Source maps / session replay / profiling
 - Uptime monitors / cron check-ins as first-class products
 - Native store apps inside this repo (server contract only)
 - **PagerDuty-native** (generic HTTP webhook / digests may still target it)
+- Public anonymous issue boards (share links in `026` still require constrained auth / viewer semantics)
 
 See `docs/ARCHITECTURE.md` non-goals and constitution.
 
@@ -116,6 +128,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **Bundle v1.5.0** | Phase 3.3–3.4 (spans, tags, before_send) |
 | **v0.9.0+** | Phase 4 slices; admin Projects; transfer ownership |
 | **v0.10.0** | Phase 4 product depth (`014`–`022`) + Bundle companion docs (`023`–`024`) |
+| **v0.10.1** | Issue aside / duplicate-modal UX; admin menu seeder sync; Phase 5 specs drafted |
+| **v0.11+** | Phase 5 — analytics charts (`025`); magic links / viewer (`026`) as capacity allows |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

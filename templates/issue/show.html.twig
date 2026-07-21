@@ -110,6 +110,52 @@
             {% endblock %}
         {% endembed %}
 
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
+            {% block body %}
+                <div class="issue-triage">
+                    <div class="issue-status-actions">
+                        <p class="issue-assignee-form__help">{{ 'issues.status_help'|trans }}</p>
+                        <div class="issue-status-actions__buttons">
+                            {% if issue.status.value != 'resolved' %}
+                                <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                    <input type="hidden" name="status" value="resolved">
+                                    <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
+                                </form>
+                            {% endif %}
+                            {% if issue.status.value != 'unresolved' %}
+                                <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                    <input type="hidden" name="status" value="unresolved">
+                                    <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
+                                </form>
+                            {% endif %}
+                            {% if issue.status.value != 'ignored' %}
+                                <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
+                                    <input type="hidden" name="status" value="ignored">
+                                    <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="issue-priority-actions">
+                        <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
+                        <form method="post" action="{{ path('issue_priority', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-priority-form">
+                            <input type="hidden" name="_token" value="{{ csrf_token('issue_priority') }}">
+                            <select class="input" name="priority" aria-label="{{ 'issues.priority_label'|trans }}">
+                                {% for p in priorities %}
+                                    <option value="{{ p.value }}" {% if issue.priority.value == p.value %}selected{% endif %}>{{ ('issues.priority.' ~ p.value)|trans }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn-primary">{{ 'issues.priority_save'|trans }}</button>
+                        </form>
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'assignee', title: 'issues.assignee'|trans} %}
             {% block body %}
                 <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
@@ -118,68 +164,114 @@
                     {{ form_errors(assigneeForm.assignee) }}
                     <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
                 {{ form_end(assigneeForm) }}
+            {% endblock %}
+        {% endembed %}
 
-                <div class="issue-status-actions">
-                    <p class="issue-assignee-form__help">{{ 'issues.status_help'|trans }}</p>
-                    <div class="issue-status-actions__buttons">
-                        {% if issue.status.value != 'resolved' %}
-                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
-                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
-                                <input type="hidden" name="status" value="resolved">
-                                <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
-                            </form>
-                        {% endif %}
-                        {% if issue.status.value != 'unresolved' %}
-                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
-                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
-                                <input type="hidden" name="status" value="unresolved">
-                                <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
-                            </form>
-                        {% endif %}
-                        {% if issue.status.value != 'ignored' %}
-                            <form method="post" action="{{ path('issue_status', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-status-actions__form">
-                                <input type="hidden" name="_token" value="{{ csrf_token('issue_status') }}">
-                                <input type="hidden" name="status" value="ignored">
-                                <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
-                            </form>
-                        {% endif %}
-                    </div>
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'duplicate', title: 'issues.aside_duplicate'|trans} %}
+            {% block body %}
+                <div class="issue-duplicate-actions" data-testid="mark-duplicate" data-controller="confirm-dialog">
+                    <p class="issue-assignee-form__help">{{ 'issues.duplicate_aside_help'|trans }}</p>
+                    <button
+                        type="button"
+                        class="btn-ghost w-full"
+                        data-action="confirm-dialog#open"
+                        {% if duplicateCandidates is empty %}disabled{% endif %}
+                    >
+                        {{ 'issues.duplicate_open'|trans }}
+                    </button>
+                    {% if duplicateCandidates is empty %}
+                        <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'issues.duplicate_no_candidates'|trans }}</p>
+                    {% endif %}
+
+                    <dialog
+                        class="confirm-dialog confirm-dialog--form confirm-dialog--duplicate"
+                        data-confirm-dialog-target="dialog"
+                    >
+                        <form
+                            method="post"
+                            action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}"
+                            class="confirm-dialog__panel issue-duplicate-form"
+                            data-controller="combobox"
+                            data-action="submit->combobox#requireValue"
+                        >
+                            <div class="issue-duplicate-form__header">
+                                <h3 class="confirm-dialog__title">{{ 'issues.duplicate_modal_title'|trans }}</h3>
+                                <p class="confirm-dialog__body">{{ 'issues.duplicate_help'|trans }}</p>
+                            </div>
+
+                            <div class="issue-duplicate-form__body">
+                                <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
+                                <input type="hidden" name="canonical_uuid" value="" data-combobox-target="value">
+
+                                <label class="confirm-dialog__label" for="issue-duplicate-query">{{ 'issues.duplicate_canonical'|trans }}</label>
+                                <div class="combobox combobox--stacked">
+                                    <input
+                                        id="issue-duplicate-query"
+                                        type="search"
+                                        class="input w-full"
+                                        autocomplete="off"
+                                        placeholder="{{ 'issues.duplicate_search_placeholder'|trans }}"
+                                        data-combobox-target="query"
+                                        data-confirm-dialog-target="confirmInput"
+                                        data-required-message="{{ 'issues.duplicate_choose'|trans }}"
+                                        data-action="input->combobox#filter focus->combobox#onQueryFocus keydown->combobox#onQueryKeydown"
+                                        aria-autocomplete="list"
+                                        aria-controls="issue-duplicate-options"
+                                    >
+                                    <ul
+                                        id="issue-duplicate-options"
+                                        class="combobox__list"
+                                        role="listbox"
+                                        data-combobox-target="list"
+                                        hidden
+                                    >
+                                        {% for candidate in duplicateCandidates|default([]) %}
+                                            <li role="presentation">
+                                                <button
+                                                    type="button"
+                                                    class="combobox__option"
+                                                    role="option"
+                                                    data-combobox-target="option"
+                                                    data-action="combobox#select"
+                                                    data-value="{{ candidate.uuid }}"
+                                                    data-label="{{ candidate.title|e('html_attr') }}"
+                                                    data-search="{{ (candidate.title ~ ' ' ~ candidate.uuid)|e('html_attr') }}"
+                                                >
+                                                    <span class="combobox__option-title">{{ candidate.title }}</span>
+                                                    <span class="combobox__option-meta">{{ candidate.uuid|slice(0, 8) }}…</span>
+                                                </button>
+                                            </li>
+                                        {% endfor %}
+                                        <li
+                                            class="combobox__empty"
+                                            data-combobox-target="empty"
+                                            hidden
+                                        >{{ 'issues.duplicate_search_empty'|trans }}</li>
+                                    </ul>
+                                </div>
+
+                                <label class="issue-duplicate-form__merge">
+                                    <input type="checkbox" name="merge_events" value="1">
+                                    <span>
+                                        <span class="issue-duplicate-form__merge-label">{{ 'issues.merge_events_label'|trans }}</span>
+                                        <span class="issue-duplicate-form__merge-help">{{ 'issues.merge_events_help'|trans }}</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="confirm-dialog__actions issue-duplicate-form__actions">
+                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'issues.duplicate_cancel'|trans }}</button>
+                                <button type="submit" class="btn-primary">{{ 'issues.duplicate_submit'|trans }}</button>
+                            </div>
+                        </form>
+                    </dialog>
                 </div>
+            {% endblock %}
+        {% endembed %}
 
-                <div class="issue-priority-actions mt-4">
-                    <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
-                    <form method="post" action="{{ path('issue_priority', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-priority-form flex flex-wrap gap-2 items-center">
-                        <input type="hidden" name="_token" value="{{ csrf_token('issue_priority') }}">
-                        <select class="input" name="priority" aria-label="{{ 'issues.priority_label'|trans }}">
-                            {% for p in priorities %}
-                                <option value="{{ p.value }}" {% if issue.priority.value == p.value %}selected{% endif %}>{{ ('issues.priority.' ~ p.value)|trans }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn-primary">{{ 'issues.priority_save'|trans }}</button>
-                    </form>
-                </div>
-
-                <div class="issue-duplicate-actions mt-4" data-testid="mark-duplicate">
-                    <p class="issue-assignee-form__help">{{ 'issues.duplicate_help'|trans }}</p>
-                    <form method="post" action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-duplicate-form flex flex-col gap-2">
-                        <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
-                        <select class="input" name="canonical_uuid" required aria-label="{{ 'issues.duplicate_canonical'|trans }}">
-                            <option value="">{{ 'issues.duplicate_choose'|trans }}</option>
-                            {% for candidate in duplicateCandidates|default([]) %}
-                                <option value="{{ candidate.uuid }}">{{ candidate.title }} ({{ candidate.uuid|slice(0, 8) }}…)</option>
-                            {% endfor %}
-                        </select>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="checkbox" name="merge_events" value="1">
-                            {{ 'issues.merge_events_label'|trans }}
-                        </label>
-                        <p class="text-xs text-[var(--color-ink)]/55">{{ 'issues.merge_events_help'|trans }}</p>
-                        <button type="submit" class="btn-ghost">{{ 'issues.duplicate_submit'|trans }}</button>
-                    </form>
-                </div>
-
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'activity', title: 'issues.history_title'|trans} %}
+            {% block body %}
                 <div class="issue-history">
-                    <h3 class="issue-history__title">{{ 'issues.history_title'|trans }}</h3>
                     {% if issueHistory is empty %}
                         <p class="issue-history__empty">{{ 'issues.history_empty'|trans }}</p>
                     {% else %}

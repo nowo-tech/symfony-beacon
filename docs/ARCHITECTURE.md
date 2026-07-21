@@ -88,12 +88,12 @@ Features are specified under `specs/` before large changes. That matches an open
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, seed | Auth boundary; kits + Security |
-| `Project` | Projects, keys, memberships, Settings / danger zone (clear, transfer ownership, delete) | Multi-tenant tenancy unit |
+| `Identity` | Users, account prefs, seed | Auth boundary; kits + Security (magic links planned: `026`) |
+| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`; viewer planned in `026`), Settings / danger zone | Multi-tenant tenancy unit |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
-| `Analytics` | Daily aggregates | Read models derived from ingest |
+| `Analytics` | Daily aggregates (table; charts/filters: `025`) | Read models derived from ingest |
 | `Notifications` | Slack / HTTP webhook destinations | Outbound alerts after ingest |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal | Cross-cutting presentation |
 
@@ -241,7 +241,7 @@ flowchart TD
   Dash --> Pick[Open project]
   Pick --> Home[Redirect to Issues]
   Home --> Access[ProjectAccessService.requireMembership]
-  Access -->|member+| UI[Issues / Performance / Analytics / Settings]
+  Access -->|member+ today; viewer planned| UI[Issues / Performance / Analytics / Settings]
   Access -->|not a member| Deny[403]
   UI --> Role{Action needs elevated role?}
   Role -->|clear history: owner/admin| OK1[Allowed]

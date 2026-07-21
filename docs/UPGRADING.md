@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.10.0 to the next release](#upgrading-from-0100-to-the-next-release)
+- [Upgrading from 0.10.1 to the next release](#upgrading-from-0101-to-the-next-release)
+- [Upgrading from 0.10.0 to 0.10.1](#upgrading-from-0100-to-0101)
 - [Upgrading from 0.9.4 to 0.10.0](#upgrading-from-094-to-0100)
 - [Upgrading from 0.9.3 to 0.9.4](#upgrading-from-093-to-094)
 - [Upgrading from 0.9.2 to 0.9.3](#upgrading-from-092-to-093)
@@ -25,9 +26,36 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.10.0 to the next release
+## Upgrading from 0.10.1 to the next release
 
 No steps yet. When the next release ships, document migrations and breaking changes here.
+
+## Upgrading from 0.10.0 to 0.10.1
+
+No database migrations. Pull, install, and rebuild frontend assets:
+
+```bash
+git pull
+composer install
+make vite-build
+```
+
+Re-run demo/menu seed if the Administration sidebar is missing **Projects**:
+
+```bash
+php bin/console app:seed-demo --no-interaction
+# or: make seed
+```
+
+The menu seeder now updates position/label/permission for existing items (not only missing routes).
+
+### Issue detail UX
+
+- Aside panels: **Triage**, **Assignee**, **Duplicate**, **Activity** (plus Details / Recent events).
+- Mark-as-duplicate opens a modal with searchable canonical issue picker.
+- Account → Display: new collapsible panel ids (`triage`, `duplicate`, `activity`). Clear saved browser panel states if an old layout looks wrong.
+
+Phase 5 product work (`025-analytics-charts`, `026-magic-links-viewer`) is specified on the roadmap but **not** shipped in 0.10.1.
 
 ## Upgrading from 0.9.4 to 0.10.0
 

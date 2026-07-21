@@ -288,6 +288,8 @@ issues:
     context_framework: Framework
     in_app: in-app
     aside_details: Detalles
+    aside_triage: Triage
+    aside_duplicate: Duplicado
     assignee: Asignado a
     assignee_unassigned: Sin asignar
     assignee_help: Elige un miembro del proyecto responsable de resolver esta incidencia.
@@ -326,8 +328,15 @@ issues:
     comment_invalid: No se pudo añadir el comentario.
     duplicate_of: 'Duplicado de'
     duplicate_help: Marca esta incidencia como duplicado de otra del mismo proyecto (pasa a ignorada).
+    duplicate_aside_help: Enlaza esta incidencia con una canónica del mismo proyecto.
+    duplicate_open: Marcar como duplicado…
+    duplicate_modal_title: Marcar como duplicado
     duplicate_canonical: Incidencia canónica
-    duplicate_choose: Elige la incidencia canónica…
+    duplicate_choose: Elige una incidencia canónica
+    duplicate_search_placeholder: Buscar por título o UUID…
+    duplicate_search_empty: No hay incidencias coincidentes
+    duplicate_no_candidates: No hay otras incidencias en este proyecto para enlazar como canónica.
+    duplicate_cancel: Cancelar
     duplicate_submit: Marcar como duplicado
     duplicate_saved: Incidencia marcada como duplicado e ignorada.
     merge_events_label: Fusionar también los eventos en la incidencia canónica
@@ -619,7 +628,10 @@ preferences:
         extra: Datos adicionales
         raw: Payload en bruto
         details: Detalles (sidebar)
+        triage: Triage
         assignee: Asignado a
+        duplicate: Duplicado
+        activity: Actividad
         recent_events: Eventos recientes
     error:
         current_password: La contraseña actual no es correcta.

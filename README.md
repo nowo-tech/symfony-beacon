@@ -32,7 +32,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
-- Daily analytics (errors, transactions, N+1 counts)
+- Daily analytics table (errors / transactions / N+1 for the last 30 days) at `/projects/{uuid}/analytics` — charts, custom periods, and filters are planned (`025-analytics-charts`)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
@@ -45,6 +45,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
+
+Membership roles today: **owner** / **admin** / **member** (no viewer yet — see roadmap `026-magic-links-viewer`). Auth is password (+ remember-me); magic login links are planned (`026`), SSO is Later.
 
 ## Requirements
 
@@ -104,7 +106,7 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | `Ingest` | Envelope API + async pipeline |
 | `Issues` | Grouping, list/filter, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |
-| `Analytics` | Daily aggregates |
+| `Analytics` | Daily aggregates (table, last 30 days); charts/filters planned (`025`) |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP destinations |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
 

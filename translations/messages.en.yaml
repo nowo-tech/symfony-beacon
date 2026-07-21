@@ -288,6 +288,8 @@ issues:
     context_framework: Framework
     in_app: in-app
     aside_details: Details
+    aside_triage: Triage
+    aside_duplicate: Duplicate
     assignee: Assignee
     assignee_unassigned: Unassigned
     assignee_help: Choose a project member responsible for resolving this issue.
@@ -326,8 +328,15 @@ issues:
     comment_invalid: Could not add the comment.
     duplicate_of: 'Duplicate of'
     duplicate_help: Mark this issue as a duplicate of another in the same project (sets status to ignored).
+    duplicate_aside_help: Link this issue to a canonical issue in the same project.
+    duplicate_open: Mark as duplicate…
+    duplicate_modal_title: Mark as duplicate
     duplicate_canonical: Canonical issue
-    duplicate_choose: Choose canonical issue…
+    duplicate_choose: Choose a canonical issue
+    duplicate_search_placeholder: Search by title or UUID…
+    duplicate_search_empty: No matching issues
+    duplicate_no_candidates: No other issues in this project to link as canonical.
+    duplicate_cancel: Cancel
     duplicate_submit: Mark as duplicate
     duplicate_saved: Issue marked as duplicate and ignored.
     merge_events_label: Also merge events into the canonical issue
@@ -619,7 +628,10 @@ preferences:
         extra: Additional data
         raw: Raw payload
         details: Details sidebar
+        triage: Triage
         assignee: Assignee
+        duplicate: Duplicate
+        activity: Activity
         recent_events: Recent events
     error:
         current_password: Current password is incorrect.

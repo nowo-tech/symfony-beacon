@@ -114,7 +114,11 @@ final readonly class DashboardMenuDemoSeeder
         $wantedRoutes = [];
         foreach ($definitions as [$position, $label, $translations, $routeName, $permission]) {
             $wantedRoutes[] = $routeName;
-            if ($this->menuHasRoute($menu, $routeName)) {
+            $existing = $this->findItemByRoute($menu, $routeName);
+            if ($existing instanceof MenuItem) {
+                if ($this->syncItem($existing, $position, $label, $translations, $permission)) {
+                    $changed = true;
+                }
                 continue;
             }
             $item = $this->link($menu, $position, $label, $translations, $routeName);
@@ -136,15 +140,47 @@ final readonly class DashboardMenuDemoSeeder
         return $changed;
     }
 
-    private function menuHasRoute(Menu $menu, string $routeName): bool
+    private function findItemByRoute(Menu $menu, string $routeName): ?MenuItem
     {
         foreach ($menu->getItems() as $item) {
             if ($item->getRouteName() === $routeName) {
-                return true;
+                return $item;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    /**
+     * @param array<string, string> $translations
+     */
+    private function syncItem(
+        MenuItem $item,
+        int $position,
+        string $label,
+        array $translations,
+        ?string $permission,
+    ): bool {
+        $changed = false;
+        if ($item->getPosition() !== $position) {
+            $item->setPosition($position);
+            $changed = true;
+        }
+        if ($item->getLabel() !== $label) {
+            $item->setLabel($label);
+            $changed = true;
+        }
+        if ($item->getTranslations() !== $translations) {
+            $item->setTranslations($translations);
+            $changed = true;
+        }
+        $wantedPermission = \is_string($permission) ? $permission : null;
+        if ($item->getPermissionKey() !== $wantedPermission) {
+            $item->setPermissionKey($wantedPermission);
+            $changed = true;
+        }
+
+        return $changed;
     }
 
     /**
