@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.9.2 to the next release](#upgrading-from-092-to-the-next-release)
+- [Upgrading from 0.9.3 to the next release](#upgrading-from-093-to-the-next-release)
+- [Upgrading from 0.9.2 to 0.9.3](#upgrading-from-092-to-093)
 - [Upgrading from 0.9.1 to 0.9.2](#upgrading-from-091-to-092)
 - [Upgrading from 0.9.0 to 0.9.1](#upgrading-from-090-to-091)
 - [Upgrading from 0.8.1 to 0.9.0](#upgrading-from-081-to-090)
@@ -22,9 +23,18 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.9.2 to the next release
+## Upgrading from 0.9.3 to the next release
 
 No upgrade notes yet.
+
+## Upgrading from 0.9.2 to 0.9.3
+
+No database migrations. Pull and rebuild frontend assets (confirm-dialog Stimulus portal fix):
+
+```bash
+git pull
+make vite-build
+```
 
 ## Upgrading from 0.9.1 to 0.9.2
 

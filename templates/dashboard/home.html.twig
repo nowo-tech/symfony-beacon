@@ -50,7 +50,6 @@
     <dialog
         class="confirm-dialog confirm-dialog--form"
         data-confirm-dialog-target="dialog"
-        data-action="click->confirm-dialog#backdropClose"
         aria-labelledby="new-project-dialog-title"
     >
         <div class="confirm-dialog__panel">
@@ -60,7 +59,7 @@
                 {{ form_row(newProjectForm.name) }}
                 {{ form_row(newProjectForm.description) }}
                 <div class="confirm-dialog__actions">
-                    <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'common.cancel'|trans }}</button>
+                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
                     <button class="btn-primary" type="submit">{{ 'project.new.submit'|trans }}</button>
                 </div>
             {{ form_end(newProjectForm) }}

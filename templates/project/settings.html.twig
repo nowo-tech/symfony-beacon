@@ -69,10 +69,9 @@
                         </svg>
                     </button>
                     <dialog
-                        class="confirm-dialog"
-                        data-confirm-dialog-target="dialog"
-                        data-action="click->confirm-dialog#backdropClose"
-                    >
+                        class="confirm-dialog confirm-dialog--form"
+                        data-confirm-dialog-target="dialog">
+
                         <form
                             method="post"
                             action="{{ path('project_members_add', {id: project.uuid}) }}"
@@ -98,7 +97,7 @@
                                 {% endfor %}
                             </select>
                             <div class="confirm-dialog__actions">
-                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                 <button class="btn-primary" type="submit">{{ 'project.members.add'|trans }}</button>
                             </div>
                         </form>
@@ -137,10 +136,9 @@
                                         </svg>
                                     </button>
                                     <dialog
-                                        class="confirm-dialog"
-                                        data-confirm-dialog-target="dialog"
-                                        data-action="click->confirm-dialog#backdropClose"
-                                    >
+                                        class="confirm-dialog confirm-dialog--form"
+                                        data-confirm-dialog-target="dialog">
+
                                         <form
                                             method="post"
                                             action="{{ path('project_members_role', {projectId: project.uuid, userId: memberUser.uuid}) }}"
@@ -167,7 +165,7 @@
                                                 {% endif %}
                                             </select>
                                             <div class="confirm-dialog__actions">
-                                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                                 <button class="btn-primary" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.update_role'|trans }}</button>
                                             </div>
                                         </form>
@@ -187,10 +185,9 @@
                                         </svg>
                                     </button>
                                     <dialog
-                                        class="confirm-dialog"
-                                        data-confirm-dialog-target="dialog"
-                                        data-action="click->confirm-dialog#backdropClose"
-                                    >
+                                        class="confirm-dialog confirm-dialog--form"
+                                        data-confirm-dialog-target="dialog">
+
                                         <form
                                             method="post"
                                             action="{{ path('project_members_remove', {projectId: project.uuid, userId: memberUser.uuid}) }}"
@@ -204,7 +201,7 @@
                                             {% endif %}
                                             <input type="hidden" name="_token" value="{{ csrf_token('project_member_remove_' ~ member.id) }}">
                                             <div class="confirm-dialog__actions">
-                                                <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                                 <button class="btn-danger" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.remove'|trans }}</button>
                                             </div>
                                         </form>
@@ -250,10 +247,9 @@
                                     </svg>
                                 </button>
                                 <dialog
-                                    class="confirm-dialog"
-                                    data-confirm-dialog-target="dialog"
-                                    data-action="click->confirm-dialog#backdropClose"
-                                >
+                                    class="confirm-dialog confirm-dialog--form"
+                                    data-confirm-dialog-target="dialog">
+
                                     <form
                                         method="post"
                                         action="{{ path('project_groups_role', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
@@ -269,7 +265,7 @@
                                             {% endfor %}
                                         </select>
                                         <div class="confirm-dialog__actions">
-                                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                             <button class="btn-primary" type="submit">{{ 'project.members.update_role'|trans }}</button>
                                         </div>
                                     </form>
@@ -289,10 +285,9 @@
                                     </svg>
                                 </button>
                                 <dialog
-                                    class="confirm-dialog"
-                                    data-confirm-dialog-target="dialog"
-                                    data-action="click->confirm-dialog#backdropClose"
-                                >
+                                    class="confirm-dialog confirm-dialog--form"
+                                    data-confirm-dialog-target="dialog">
+
                                     <form
                                         method="post"
                                         action="{{ path('project_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
@@ -302,7 +297,7 @@
                                         <p class="confirm-dialog__body">{{ 'project.groups.remove_confirm'|trans({'%name%': linkedGroup.name}) }}</p>
                                         <input type="hidden" name="_token" value="{{ csrf_token('project_group_remove_' ~ groupAccess.id) }}">
                                         <div class="confirm-dialog__actions">
-                                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                             <button class="btn-danger" type="submit">{{ 'project.groups.remove'|trans }}</button>
                                         </div>
                                     </form>
@@ -409,16 +404,15 @@
         <div data-controller="confirm-dialog">
             <button type="button" class="btn-ghost" data-action="confirm-dialog#open">{{ 'project.danger.clear_open'|trans }}</button>
             <dialog
-                class="confirm-dialog"
-                data-confirm-dialog-target="dialog"
-                data-action="click->confirm-dialog#backdropClose"
-            >
+                class="confirm-dialog confirm-dialog--form"
+                data-confirm-dialog-target="dialog">
+
                 <form method="post" action="{{ path('project_clear_history', {id: project.uuid}) }}" class="confirm-dialog__panel">
                     <h3 class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h3>
                     <p class="confirm-dialog__body">{{ 'project.danger.clear_body'|trans }}</p>
                     <input type="hidden" name="_token" value="{{ csrf_token('project_clear_' ~ project.id) }}">
                     <div class="confirm-dialog__actions">
-                        <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                        <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                         <button type="submit" class="btn-danger">{{ 'project.danger.clear_confirm'|trans }}</button>
                     </div>
                 </form>
@@ -426,7 +420,13 @@
         </div>
 
         {% if membership.role.value == 'owner' %}
-            {% set transferCandidates = project.memberships|filter(m => m.user.id != app.user.id) %}
+            {% set transferBag = {candidates: []} %}
+            {% for m in project.memberships %}
+                {% if m.user and app.user and m.user.id != app.user.id %}
+                    {% set transferBag = transferBag|merge({candidates: transferBag.candidates|merge([m])}) %}
+                {% endif %}
+            {% endfor %}
+            {% set transferCandidates = transferBag.candidates %}
             <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name|e('html_attr') }}">
                 <button
                     type="button"
@@ -436,10 +436,9 @@
                     title="{{ transferCandidates is empty ? 'project.danger.transfer_no_candidates'|trans : 'project.danger.transfer_open'|trans }}"
                 >{{ 'project.danger.transfer_open'|trans }}</button>
                 <dialog
-                    class="confirm-dialog"
-                    data-confirm-dialog-target="dialog"
-                    data-action="click->confirm-dialog#backdropClose"
-                >
+                    class="confirm-dialog confirm-dialog--form"
+                    data-confirm-dialog-target="dialog">
+
                     <form method="post" action="{{ path('project_transfer_ownership', {projectId: project.uuid}) }}" class="confirm-dialog__panel">
                         <h3 class="confirm-dialog__title">{{ 'project.danger.transfer_title'|trans }}</h3>
                         <p class="confirm-dialog__body">{{ 'project.danger.transfer_body'|trans }}</p>
@@ -466,12 +465,12 @@
                             name="confirmation"
                             autocomplete="off"
                             data-confirm-dialog-target="confirmInput"
-                            data-action="input->confirm-dialog#syncSubmit"
+
                             required
                             {% if transferCandidates is empty %}disabled{% endif %}
                         >
                         <div class="confirm-dialog__actions">
-                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                             <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.transfer_confirm'|trans }}</button>
                         </div>
                     </form>
@@ -481,10 +480,9 @@
             <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name|e('html_attr') }}">
                 <button type="button" class="btn-danger" data-action="confirm-dialog#open">{{ 'project.danger.delete_open'|trans }}</button>
                 <dialog
-                    class="confirm-dialog"
-                    data-confirm-dialog-target="dialog"
-                    data-action="click->confirm-dialog#backdropClose"
-                >
+                    class="confirm-dialog confirm-dialog--form"
+                    data-confirm-dialog-target="dialog">
+
                     <form method="post" action="{{ path('project_delete', {id: project.uuid}) }}" class="confirm-dialog__panel">
                         <h3 class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h3>
                         <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
@@ -497,12 +495,12 @@
                             name="confirmation"
                             autocomplete="off"
                             data-confirm-dialog-target="confirmInput"
-                            data-action="input->confirm-dialog#syncSubmit"
+
                             required
                         >
                         <input type="hidden" name="_token" value="{{ csrf_token('project_delete_' ~ project.id) }}">
                         <div class="confirm-dialog__actions">
-                            <button type="button" class="btn-ghost" data-action="confirm-dialog#close">{{ 'project.danger.cancel'|trans }}</button>
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                             <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
                         </div>
                     </form>

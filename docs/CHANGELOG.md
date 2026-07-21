@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-07-21
+
+### Fixed
+
+- Confirm dialogs (including **Transfer ownership**) open reliably: portal `<dialog>` to `document.body` so `.panel` isolation / overflow cannot trap `showModal()`
+
 ## [0.9.2] - 2026-07-21
 
 ### Added
@@ -249,7 +255,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.1...v0.9.0
