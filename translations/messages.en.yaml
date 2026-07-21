@@ -88,6 +88,8 @@ flash:
         invalid_role: Invalid role.
         cannot_change_own_role: You cannot change your own role.
         last_admin: The instance must keep at least one administrator.
+        project_unlink_forbidden: You are not allowed to remove that project membership.
+        project_unlink_error: Could not remove the user from the project.
     groups:
         created: Group created.
         updated: Group updated.
@@ -97,6 +99,8 @@ flash:
         already_member: That user is already in the group.
         member_added: User added to the group.
         member_removed: User removed from the group.
+        project_unlink_forbidden: You are not allowed to unlink that project.
+        project_unlink_error: Could not unlink the project from the group.
 project:
     label: Project
     no_description: No description
@@ -374,9 +378,15 @@ users:
         update_role: Update
         self: This is you
         activity: Activity
+    projects_title: Project memberships
+    projects_intro: Direct project roles for this account (not via groups). Instance admins can remove them here.
+    projects_empty: No direct project memberships.
+    remove_from_project: Remove from project
+    remove_from_project_confirm: 'Remove this user from project “%project%”?'
     activity:
         title: Activity history
         intro: 'Actions involving %name% (%email%) as subject or actor (admin, membership, and product navigation).'
+        timeline_title: Activity timeline
         recent_title: Recent activity
         recent_intro: Latest administrative, membership, and product actions across the instance.
         empty: No recorded actions yet.
@@ -562,6 +572,11 @@ groups:
     remove_member: Remove
     member_email_placeholder: user@example.com
     member_count: '%count% members'
+    projects_title: Linked projects
+    projects_intro: Projects that grant access to every member of this group. Unlink to revoke that access.
+    projects_empty: This group is not linked to any project yet.
+    unlink_project: Unlink
+    unlink_project_confirm: 'Unlink this group from project “%project%”?'
 
 admin:
     hub:

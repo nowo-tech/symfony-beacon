@@ -12,7 +12,12 @@ use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Project\Entity\ProjectGroupAccess;
+use App\Project\Repository\ProjectGroupAccessRepository;
+use App\Project\Service\ProjectMembershipManager;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -33,6 +38,8 @@ final class AdminGroupController extends AbstractController
         private readonly UserGroupRepository $groupRepository,
         private readonly UserGroupMembershipRepository $groupMembershipRepository,
         private readonly UserRepository $userRepository,
+        private readonly ProjectGroupAccessRepository $projectGroupAccessRepository,
+        private readonly ProjectMembershipManager $projectMembershipManager,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -88,7 +95,7 @@ final class AdminGroupController extends AbstractController
         ]);
     }
 
-    /** Group detail: members and project links summary. */
+    /** Group detail: members and linked projects. */
     #[Route('/admin/groups/{id}', name: 'admin_groups_show', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
     public function show(
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -96,6 +103,7 @@ final class AdminGroupController extends AbstractController
     ): Response {
         return $this->render('admin/groups/show.html.twig', [
             'group' => $group,
+            'projectAccesses' => $this->projectGroupAccessRepository->findByUserGroup($group),
         ]);
     }
 
@@ -245,6 +253,47 @@ final class AdminGroupController extends AbstractController
         );
         $this->entityManager->flush();
         $this->addFlash('success', 'flash.groups.member_removed');
+
+        return $this->redirectToRoute('admin_groups_show', ['id' => $group->getUuid()]);
+    }
+
+    /** Unlink a project from this group (instance admin). */
+    #[Route(
+        '/admin/groups/{groupId}/projects/{accessId}/remove',
+        name: 'admin_groups_projects_remove',
+        requirements: ['groupId' => Requirement::UUID, 'accessId' => Requirement::UUID],
+        methods: ['POST'],
+    )]
+    public function removeProject(
+        #[MapEntity(mapping: ['groupId' => 'uuid'])]
+        UserGroup $group,
+        #[MapEntity(mapping: ['accessId' => 'uuid'])]
+        ProjectGroupAccess $access,
+        Request $request,
+    ): RedirectResponse {
+        if ($access->getUserGroup()?->getId() !== $group->getId()) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('admin_group_project_remove_'.$access->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $project = $access->getProject();
+        if (null === $project) {
+            throw $this->createNotFoundException();
+        }
+
+        /** @var User $actor */
+        $actor = $this->getUser();
+        try {
+            $this->projectMembershipManager->removeGroup($project, $actor, $access);
+            $this->addFlash('success', 'flash.project.group_removed');
+        } catch (InvalidArgumentException|RuntimeException $e) {
+            $this->addFlash('error', match ($e->getMessage()) {
+                'forbidden' => 'flash.groups.project_unlink_forbidden',
+                default => 'flash.groups.project_unlink_error',
+            });
+        }
 
         return $this->redirectToRoute('admin_groups_show', ['id' => $group->getUuid()]);
     }

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-21
+
+### Added
+
+- Administration → Groups: list linked projects and **unlink** a group from a project
+- Administration → Users → Activity: list direct project memberships and **remove** a user from a project (last owner still protected)
+- Demo breadcrumbs for admin group routes (`admin_groups`, `_new`, `_show`, `_edit`)
+
+### Changed
+
+- Instance `ROLE_ADMIN` may manage project memberships and group links without being a project member (`ProjectMembershipManager`)
+
+### Fixed
+
+- Twig CS spacing in dashboard menu kit override (`dashboard/index.html.twig`)
+- `PublicUuidListener`: drop redundant `is_object` check before `method_exists`
+
 ## [0.9.0] - 2026-07-21
 
 ### Added
@@ -226,7 +243,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.7.2...v0.8.0

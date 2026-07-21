@@ -7,9 +7,14 @@ namespace App\Tests\Identity;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\UserActionType;
+use App\Project\Entity\Project;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
+use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class AdminUsersTest extends DatabaseWebTestCase
 {
@@ -111,6 +116,61 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h1', 'Activity history');
         self::assertSelectorTextContains('body', 'User created');
         self::assertSelectorTextContains('body', 'User role changed');
+    }
+
+    public function testAdminCanRemoveUserFromProjectAndBlocksLastOwner(): void
+    {
+        [$client, $admin, $project] = $this->bootWithDemoProject('admin-project-unlink@example.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $member = new User();
+        $member->setEmail('project-member@example.com');
+        $member->setDisplayName('Project Member');
+        $member->setPassword($hasher->hashPassword($member, 'secret'));
+        $membership = new ProjectMembership();
+        $membership->setUser($member);
+        $membership->setRole(ProjectRole::Member);
+        $project->addMembership($membership);
+        $em->persist($member);
+        $em->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+
+        $this->login($client, $admin);
+
+        $crawler = $client->request(Request::METHOD_GET, '/admin/users/'.$member->getUuid().'/activity');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Acme');
+
+        $form = $crawler->selectButton('Remove from project')->form();
+        $client->submit($form);
+        self::assertResponseRedirects('/admin/users/'.$member->getUuid().'/activity');
+        $client->followRedirect();
+        self::assertSelectorTextContains('body', 'No direct project memberships.');
+
+        $em->clear();
+        $gone = self::getContainer()->get(ProjectMembershipRepository::class)->findOneByProjectAndUser(
+            $em->getRepository(Project::class)->find($project->getId()),
+            $em->getRepository(User::class)->find($member->getId()),
+        );
+        self::assertNull($gone);
+
+        $crawler = $client->request(Request::METHOD_GET, '/admin/users/'.$admin->getUuid().'/activity');
+        self::assertResponseIsSuccessful();
+        $form = $crawler->selectButton('Remove from project')->form();
+        $client->submit($form);
+        self::assertResponseRedirects('/admin/users/'.$admin->getUuid().'/activity');
+        $client->followRedirect();
+        self::assertSelectorTextContains('body', 'The project must keep at least one owner.');
+
+        $em->clear();
+        $stillOwner = self::getContainer()->get(ProjectMembershipRepository::class)->findOneByProjectAndUser(
+            $em->getRepository(Project::class)->find($project->getId()),
+            $em->getRepository(User::class)->find($admin->getId()),
+        );
+        self::assertInstanceOf(ProjectMembership::class, $stillOwner);
+        self::assertSame(ProjectRole::Owner, $stillOwner->getRole());
     }
 
     public function testProjectPersistSetsAuditTimestamps(): void

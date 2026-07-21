@@ -31,6 +31,26 @@ class ProjectGroupAccessRepository extends ServiceEntityRepository
     }
 
     /**
+     * All project links for a user group, newest project name first.
+     *
+     * @return list<ProjectGroupAccess>
+     */
+    public function findByUserGroup(UserGroup $group): array
+    {
+        /** @var list<ProjectGroupAccess> $rows */
+        $rows = $this->createQueryBuilder('a')
+            ->innerJoin('a.project', 'p')
+            ->addSelect('p')
+            ->andWhere('a.userGroup = :group')
+            ->setParameter('group', $group)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $rows;
+    }
+
+    /**
      * Highest project role granted to the user via any linked group, or null.
      *
      * Owners are never stored on group links; values are admin or member only.

@@ -88,6 +88,8 @@ flash:
         invalid_role: Rol no válido.
         cannot_change_own_role: No puedes cambiar tu propio rol.
         last_admin: La instancia debe conservar al menos un administrador.
+        project_unlink_forbidden: No tienes permiso para quitar esa membresía de proyecto.
+        project_unlink_error: No se pudo quitar al usuario del proyecto.
     groups:
         created: Grupo creado.
         updated: Grupo actualizado.
@@ -97,6 +99,8 @@ flash:
         already_member: Ese usuario ya está en el grupo.
         member_added: Usuario añadido al grupo.
         member_removed: Usuario eliminado del grupo.
+        project_unlink_forbidden: No tienes permiso para desvincular ese proyecto.
+        project_unlink_error: No se pudo desvincular el proyecto del grupo.
 project:
     label: Proyecto
     no_description: Sin descripción
@@ -374,9 +378,15 @@ users:
         update_role: Actualizar
         self: Eres tú
         activity: Actividad
+    projects_title: Membresías de proyecto
+    projects_intro: Roles directos en proyectos de esta cuenta (no vía grupos). Los administradores de instancia pueden quitarlos aquí.
+    projects_empty: Sin membresías directas en proyectos.
+    remove_from_project: Quitar del proyecto
+    remove_from_project_confirm: '¿Quitar a este usuario del proyecto «%project%»?'
     activity:
         title: Historial de actividad
         intro: 'Acciones que involucran a %name% (%email%) como sujeto o actor (admin, membresía y navegación de producto).'
+        timeline_title: Línea de tiempo
         recent_title: Actividad reciente
         recent_intro: Últimas acciones administrativas, de membresía y de producto en la instancia.
         empty: Aún no hay acciones registradas.
@@ -562,6 +572,11 @@ groups:
     remove_member: Quitar
     member_email_placeholder: usuario@ejemplo.com
     member_count: '%count% miembros'
+    projects_title: Proyectos vinculados
+    projects_intro: Proyectos que otorgan acceso a todos los miembros de este grupo. Desvincula para revocar ese acceso.
+    projects_empty: Este grupo aún no está vinculado a ningún proyecto.
+    unlink_project: Desvincular
+    unlink_project_confirm: '¿Desvincular este grupo del proyecto «%project%»?'
 
 admin:
     hub:

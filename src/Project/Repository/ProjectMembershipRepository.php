@@ -28,6 +28,26 @@ class ProjectMembershipRepository extends ServiceEntityRepository
     }
 
     /**
+     * Direct project memberships for a user (not via groups).
+     *
+     * @return list<ProjectMembership>
+     */
+    public function findByUser(User $user): array
+    {
+        /** @var list<ProjectMembership> $rows */
+        $rows = $this->createQueryBuilder('m')
+            ->innerJoin('m.project', 'p')
+            ->addSelect('p')
+            ->andWhere('m.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $rows;
+    }
+
+    /**
      * Users with access via direct membership or a linked group.
      *
      * @return list<User>

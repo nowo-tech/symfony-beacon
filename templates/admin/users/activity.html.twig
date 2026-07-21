@@ -11,7 +11,29 @@
     </p>
 </div>
 
+<section class="panel mb-6">
+    <h2 class="mb-1 text-lg font-semibold">{{ 'users.projects_title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'users.projects_intro'|trans }}</p>
+    <ul class="space-y-2 text-sm">
+        {% for membership in memberships %}
+            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
+                <div>
+                    <a class="font-medium no-underline" href="{{ path('project_settings', {id: membership.project.uuid}) }}">{{ membership.project.name }}</a>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ ('project.members.role.' ~ membership.role.value)|trans }}</div>
+                </div>
+                <form method="post" action="{{ path('admin_users_projects_remove', {userId: user.uuid, projectId: membership.project.uuid}) }}" onsubmit="return confirm('{{ 'users.remove_from_project_confirm'|trans({'%project%': membership.project.name})|e('js') }}')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_user_project_remove_' ~ membership.id) }}">
+                    <button class="btn-ghost" type="submit">{{ 'users.remove_from_project'|trans }}</button>
+                </form>
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'users.projects_empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+</section>
+
 <section class="panel">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'users.activity.timeline_title'|trans }}</h2>
     {% if actions is empty %}
         <p class="text-sm text-[var(--color-ink)]/55">{{ 'users.activity.empty'|trans }}</p>
     {% else %}

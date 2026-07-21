@@ -41,10 +41,10 @@
                         {% endif %}
                     </div>
                     <div class="d-flex gap-1">
-                        <a href="{{ path(dashboard_show_route|default(dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show')), { id: menu.id }) }}" class="btn btn-sm btn-outline-primary" title="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}">
+                        <a href="{{ path(dashboard_show_route|default(dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show')), {id: menu.id}) }}" class="btn btn-sm btn-outline-primary" title="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"/></svg>
                         </a>
-                        <button type="button" class="btn btn-sm btn-outline-info btn-copy-menu" data-id="{{ menu.id }}" data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), { id: menu.id }) }}" data-bs-toggle="modal" data-bs-target="#modal-menu-copy" title="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}">
+                        <button type="button" class="btn btn-sm btn-outline-info btn-copy-menu" data-id="{{ menu.id }}" data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), {id: menu.id}) }}" data-bs-toggle="modal" data-bs-target="#modal-menu-copy" title="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-primary btn-edit-menu" data-id="{{ menu.id }}" data-section="basic" data-bs-toggle="modal" data-bs-target="#modal-menu-form" title="{{ 'dashboard.edit_identity'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_identity'|trans({}, 'NowoDashboardMenuBundle') }}">
@@ -56,7 +56,7 @@
                             </button>
                         {% endif %}
                         {% if not menu.base %}
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-menu" data-id="{{ menu.id }}" data-name="{{ menu.code }}{% if menu.name %} — {{ menu.name }}{% endif %}" data-url="{{ path(dashboard_routes.menu_delete|default('nowo_dashboard_menu_dashboard_menu_delete'), { id: menu.id }) }}" data-token="{{ csrf_token('delete_menu_' ~ menu.id) }}" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" title="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}">
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-menu" data-id="{{ menu.id }}" data-name="{{ menu.code }}{% if menu.name %} — {{ menu.name }}{% endif %}" data-url="{{ path(dashboard_routes.menu_delete|default('nowo_dashboard_menu_dashboard_menu_delete'), {id: menu.id}) }}" data-token="{{ csrf_token('delete_menu_' ~ menu.id) }}" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" title="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
                             </button>
                         {% endif %}
@@ -68,23 +68,23 @@
             <nav aria-label="{{ 'dashboard.pagination_menus'|trans({}, 'NowoDashboardMenuBundle') }}" class="mt-3">
                 <ul class="pagination pagination-sm flex-wrap">
                     {% set indexRoute = dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index') %}
-                    {% set queryParams = search is not empty ? { q: search } : {} %}
+                    {% set queryParams = search is not empty ? {q: search} : {} %}
                     <li class="page-item{% if pagination.current_page <= 1 %} disabled{% endif %}">
-                        <a class="page-link" href="{% if pagination.current_page > 1 %}{{ path(indexRoute, queryParams|merge({ page: pagination.current_page - 1 })) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.previous'|trans({}, 'NowoDashboardMenuBundle') }}">«</a>
+                        <a class="page-link" href="{% if pagination.current_page > 1 %}{{ path(indexRoute, queryParams|merge({page: pagination.current_page - 1})) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.previous'|trans({}, 'NowoDashboardMenuBundle') }}">«</a>
                     </li>
                     {% for p in 1..pagination.total_pages %}
                         <li class="page-item{% if p == pagination.current_page %} active{% endif %}">
-                            <a class="page-link" href="{{ path(indexRoute, queryParams|merge({ page: p })) }}">{{ p }}</a>
+                            <a class="page-link" href="{{ path(indexRoute, queryParams|merge({page: p})) }}">{{ p }}</a>
                         </li>
                     {% endfor %}
                     <li class="page-item{% if pagination.current_page >= pagination.total_pages %} disabled{% endif %}">
-                        <a class="page-link" href="{% if pagination.current_page < pagination.total_pages %}{{ path(indexRoute, queryParams|merge({ page: pagination.current_page + 1 })) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.next'|trans({}, 'NowoDashboardMenuBundle') }}">»</a>
+                        <a class="page-link" href="{% if pagination.current_page < pagination.total_pages %}{{ path(indexRoute, queryParams|merge({page: pagination.current_page + 1})) }}{% else %}#{% endif %}" aria-label="{{ 'dashboard.next'|trans({}, 'NowoDashboardMenuBundle') }}">»</a>
                     </li>
                 </ul>
                 <p class="small text-muted mt-1">
                     {% set from = menus|length > 0 ? (pagination.current_page - 1) * pagination.per_page + 1 : 0 %}
                     {% set to = (pagination.current_page - 1) * pagination.per_page + menus|length %}
-                    {{ 'dashboard.showing_from_to_of_total'|trans({ '%from%': from, '%to%': to, '%total%': pagination.total }) }}
+                    {{ 'dashboard.showing_from_to_of_total'|trans({'%from%': from, '%to%': to, '%total%': pagination.total}) }}
                 </p>
             </nav>
         {% endif %}
@@ -99,7 +99,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'dashboard.close'|trans({}, 'NowoDashboardMenuBundle') }}"></button>
                 </div>
                 <div class="modal-body">
-                    {{ include('@NowoDashboardMenuBundle/dashboard/_menu_form_partial.html.twig', { form: new_menu_form, is_edit: false }) }}
+                    {{ include('@NowoDashboardMenuBundle/dashboard/_menu_form_partial.html.twig', {form: new_menu_form, is_edit: false}) }}
                 </div>
             </div>
         </div>
@@ -174,7 +174,7 @@
 
     <script>
     window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
-        dashboardBase: {{ path(dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index')) |json_encode|raw }}
+        dashboardBase: {{ path(dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index'))|json_encode|raw }}
     });
     </script>
 {% endblock %}

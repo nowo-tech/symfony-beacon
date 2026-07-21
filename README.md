@@ -44,7 +44,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
-- Admin hub at `/admin` for `ROLE_ADMIN` (users, appearance, menus, breadcrumbs)
+- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
 ## Requirements
 

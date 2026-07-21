@@ -17,7 +17,7 @@ final class PublicUuidListener
     public function prePersist(PrePersistEventArgs $args): void
     {
         $entity = $args->getObject();
-        if (\is_object($entity) && method_exists($entity, 'ensureUuid')) {
+        if (method_exists($entity, 'ensureUuid')) {
             $entity->ensureUuid();
         }
     }

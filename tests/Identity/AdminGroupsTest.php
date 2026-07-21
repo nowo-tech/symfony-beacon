@@ -6,7 +6,10 @@ namespace App\Tests\Identity;
 
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
+use App\Project\Entity\ProjectGroupAccess;
+use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
+use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,5 +57,40 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/admin/groups/'.$group->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'group-user@example.com');
+    }
+
+    public function testAdminCanUnlinkProjectFromGroup(): void
+    {
+        [$client, $admin, $project] = $this->bootWithDemoProject('admin-group-unlink@example.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $group = new UserGroup();
+        $group->setName('Ops');
+        $group->setSlug('ops');
+        $access = new ProjectGroupAccess();
+        $access->setUserGroup($group);
+        $access->setRole(ProjectRole::Member);
+        $project->addGroupAccess($access);
+        $em->persist($group);
+        $em->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+
+        $this->login($client, $admin);
+        $crawler = $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Acme');
+
+        $form = $crawler->selectButton('Unlink')->form();
+        $client->submit($form);
+        self::assertResponseRedirects('/admin/groups/'.$group->getUuid());
+        $client->followRedirect();
+        self::assertSelectorTextContains('body', 'This group is not linked to any project yet.');
+
+        $em->clear();
+        $remaining = self::getContainer()->get(ProjectGroupAccessRepository::class)->findByUserGroup(
+            $em->getRepository(UserGroup::class)->find($group->getId()),
+        );
+        self::assertSame([], $remaining);
     }
 }

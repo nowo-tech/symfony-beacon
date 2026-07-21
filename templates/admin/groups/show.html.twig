@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<section class="panel">
+<section class="panel mb-6">
     <h2 class="mb-3 text-lg font-semibold">{{ 'groups.members_title'|trans }}</h2>
     <ul class="space-y-2 text-sm">
         {% for membership in group.memberships %}
@@ -45,5 +45,26 @@
         <button class="btn-primary" type="submit">{{ 'groups.add_member'|trans }}</button>
     </form>
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'groups.add_member_help'|trans }}</p>
+</section>
+
+<section class="panel">
+    <h2 class="mb-1 text-lg font-semibold">{{ 'groups.projects_title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'groups.projects_intro'|trans }}</p>
+    <ul class="space-y-2 text-sm">
+        {% for access in projectAccesses %}
+            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
+                <div>
+                    <a class="font-medium no-underline" href="{{ path('project_settings', {id: access.project.uuid}) }}">{{ access.project.name }}</a>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ ('project.members.role.' ~ access.role.value)|trans }}</div>
+                </div>
+                <form method="post" action="{{ path('admin_groups_projects_remove', {groupId: group.uuid, accessId: access.uuid}) }}" onsubmit="return confirm('{{ 'groups.unlink_project_confirm'|trans({'%project%': access.project.name})|e('js') }}')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_group_project_remove_' ~ access.id) }}">
+                    <button class="btn-ghost" type="submit">{{ 'groups.unlink_project'|trans }}</button>
+                </form>
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'groups.projects_empty'|trans }}</li>
+        {% endfor %}
+    </ul>
 </section>
 {% endblock %}

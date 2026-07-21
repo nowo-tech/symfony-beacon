@@ -192,6 +192,46 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $groups = $this->ensureItem(
+            $collection,
+            'admin_groups',
+            'Groups',
+            ['en' => 'Groups', 'es' => 'Grupos'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_groups_new',
+            'New group',
+            ['en' => 'New group', 'es' => 'Nuevo grupo'],
+            $groups,
+            [],
+            $changed,
+        );
+
+        $groupShow = $this->ensureItem(
+            $collection,
+            'admin_groups_show',
+            'Group',
+            ['en' => 'Group', 'es' => 'Grupo'],
+            $groups,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_groups_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar'],
+            $groupShow,
+            ['id'],
+            $changed,
+        );
+
         $this->ensureItem(
             $collection,
             'settings_appearance',

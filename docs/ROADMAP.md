@@ -56,7 +56,7 @@ Goal: a team can be notified when something new or regressing happens, without b
 - [x] New issue and regression notify; duplicates on open issues stay silent.
 - [x] Ingest ACK does not wait on destination HTTP.
 - [x] PHPUnit covers permissions, filters, occurrence rules, async dispatch.
-- [ ] Changelog / upgrading notes for the release that ships 009 (Unreleased until tag).
+- [x] Changelog / upgrading notes for the release that ships 009 (Unreleased until tag).
 
 ---
 
@@ -128,7 +128,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.8.0** | Phase 2 — retention, rate limit, health |
 | **Bundle v1.4.0** | Phase 3.1–3.2 (Messenger + auto HTTP tx) |
 | **Bundle v1.5.0** | Phase 3.3–3.5 (spans, tags, async transport) |
-| **v0.9.0+** | Phase 4 slices as capacity allows |
+| **v0.9.0+** | Phase 4 slices as capacity allows; **v0.9.1** admin unlink projects from users/groups |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

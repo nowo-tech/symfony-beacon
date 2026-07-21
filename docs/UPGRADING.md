@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.9.0 to the next release](#upgrading-from-090-to-the-next-release)
+- [Upgrading from 0.9.1 to the next release](#upgrading-from-091-to-the-next-release)
+- [Upgrading from 0.9.0 to 0.9.1](#upgrading-from-090-to-091)
 - [Upgrading from 0.8.1 to 0.9.0](#upgrading-from-081-to-090)
 - [Upgrading from 0.8.0 to 0.8.1](#upgrading-from-080-to-081)
 - [Upgrading from 0.7.2 to 0.8.0](#upgrading-from-072-to-080)
@@ -20,9 +21,27 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.9.0 to the next release
+## Upgrading from 0.9.1 to the next release
 
 No upgrade notes yet.
+
+## Upgrading from 0.9.0 to 0.9.1
+
+No database migrations. Pull, install, and rebuild assets:
+
+```bash
+git pull
+composer install
+make vite-build
+```
+
+### Admin: unlink projects from users and groups
+
+- **Administration → Groups → (group)**: linked projects with an unlink action (same domain rules as Project Settings).
+- **Administration → Users → Activity**: direct project memberships with remove (cannot remove the last project owner).
+- Instance `ROLE_ADMIN` can perform these actions without being a member of the project.
+
+Re-run `make seed` (or `app:seed-demo`) if you want demo breadcrumbs for the admin group routes.
 
 ## Upgrading from 0.8.1 to 0.9.0
 

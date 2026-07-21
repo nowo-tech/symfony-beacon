@@ -314,6 +314,10 @@ final readonly class ProjectMembershipManager
     /** @throws RuntimeException when the actor cannot manage members */
     private function assertActorCanManage(Project $project, User $actor): void
     {
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess || !$access->canManageMembers()) {
             throw new RuntimeException('forbidden');
@@ -345,12 +349,16 @@ final readonly class ProjectMembershipManager
     }
 
     /**
-     * Admins cannot mutate owner memberships.
+     * Admins cannot mutate owner memberships (instance ROLE_ADMIN may).
      *
      * @throws RuntimeException
      */
     private function assertCanMutateTarget(User $actor, Project $project, ProjectMembership $target): void
     {
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess) {
             throw new RuntimeException('forbidden');

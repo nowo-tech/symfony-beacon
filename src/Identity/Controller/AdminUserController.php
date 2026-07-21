@@ -9,8 +9,14 @@ use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Project\Entity\Project;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Service\ProjectMembershipManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,6 +36,8 @@ final class AdminUserController extends AbstractController
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserActionRepository $userActionRepository,
+        private readonly ProjectMembershipRepository $projectMembershipRepository,
+        private readonly ProjectMembershipManager $projectMembershipManager,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -134,7 +142,46 @@ final class AdminUserController extends AbstractController
         return $this->render('admin/users/activity.html.twig', [
             'user' => $user,
             'actions' => $this->userActionRepository->findForUser($user),
+            'memberships' => $this->projectMembershipRepository->findByUser($user),
         ]);
+    }
+
+    /** Remove a direct project membership (instance admin). */
+    #[Route(
+        '/admin/users/{userId}/projects/{projectId}/remove',
+        name: 'admin_users_projects_remove',
+        requirements: ['userId' => Requirement::UUID, 'projectId' => Requirement::UUID],
+        methods: ['POST'],
+    )]
+    public function removeProject(
+        #[MapEntity(mapping: ['userId' => 'uuid'])]
+        User $user,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): RedirectResponse {
+        $membership = $this->projectMembershipRepository->findOneByProjectAndUser($project, $user);
+        if (!$membership instanceof ProjectMembership) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('admin_user_project_remove_'.$membership->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        /** @var User $actor */
+        $actor = $this->getUser();
+        try {
+            $this->projectMembershipManager->remove($project, $actor, $membership);
+            $this->addFlash('success', 'flash.project.member_removed');
+        } catch (InvalidArgumentException|RuntimeException $e) {
+            $this->addFlash('error', match ($e->getMessage()) {
+                'last_owner' => 'flash.project.member_last_owner',
+                'forbidden' => 'flash.users.project_unlink_forbidden',
+                default => 'flash.users.project_unlink_error',
+            });
+        }
+
+        return $this->redirectToRoute('admin_users_activity', ['id' => $user->getUuid()]);
     }
 
     /**
