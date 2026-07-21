@@ -62,7 +62,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 
 ---
 
-## Phase 3 — Client instrumentation depth (In progress; 3.1–3.4 Done)
+## Phase 3 — Client instrumentation depth (In progress; 3.1–3.5 Done)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -70,8 +70,8 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | 3.2 | **Auto HTTP transaction** (route/controller + duration) | Bundle | — | **Done** (opt-in) |
 | 3.3 | Opt-in **Doctrine** + **HttpClient** breadcrumbs/spans | Bundle (+ Beacon UI) | `024-client-spans` | **Done** |
 | 3.4 | Public **`tags`** API + **`before_send`** scrubbing hook | Bundle (+ Beacon UI) | `023-client-tags-scrubbing` | **Done** |
-| 3.5 | Non-blocking client transport (async/queue) + versioned User-Agent | Bundle | — | **Planned** |
-| 3.6 | Contract tests: golden Envelope ↔ Beacon `ProcessEnvelopeHandler` | Bundle (+ Beacon) | — | **Planned** |
+| 3.5 | Non-blocking client transport (async/queue) + versioned User-Agent | Bundle | — | **Done** (Bundle **v1.6.0**) |
+| 3.6 | Contract tests: golden Envelope ↔ Beacon `ProcessEnvelopeHandler` | Bundle (+ Beacon) | — | **Next** |
 
 ---
 
@@ -102,8 +102,8 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | 5.1 | **Analytics charts**: period presets / range + filters (env, release) | Beacon | `025-analytics-charts` | **Done** |
-| 5.2 | **Magic login links** + project **viewer** role; optional signed share links | Beacon | `026-magic-links-viewer` | **Next** |
-| 5.3 | **Threshold alerts**: e.g. &gt; N errors in M minutes (plus existing new/regression) | Beacon | `027-threshold-alerts` | **Planned** |
+| 5.2 | **Magic login links** + project **viewer** role; optional signed share links | Beacon | `026-magic-links-viewer` | **Done** |
+| 5.3 | **Threshold alerts**: e.g. &gt; N errors in M minutes (plus existing new/regression) | Beacon | `027-threshold-alerts` | **Next** |
 
 ### Medium impact
 
@@ -149,12 +149,13 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.8.0** | Phase 2 — retention, rate limit, health |
 | **Bundle v1.4.0** | Phase 3.1–3.2 (Messenger + auto HTTP tx) |
 | **Bundle v1.5.0** | Phase 3.3–3.4 (spans, tags, before_send) |
+| **Bundle v1.6.0** | Phase 3.3–3.5 (spans, tags, before_send, transport sync/async/messenger + versioned UA) |
 | **v0.9.0+** | Phase 4 slices; admin Projects; transfer ownership |
 | **v0.10.0** | Phase 4 product depth (`014`–`022`) + Bundle companion docs (`023`–`024`) |
 | **v0.10.1** | Issue aside / duplicate-modal UX; admin menu seeder sync; Phase 5 specs started |
 | **v0.10.2** | Phase 5 backlog specs `027`–`033`; unified confirm/kit modal chrome |
 | **v0.11.0** | Analytics charts (`025`); locales de/nl/fr/it/pt; UI density/motion; danger colors; shared table pagination |
-| **v0.11+** | Phase 5 high impact continued: viewer/magic links (`026`), threshold alerts (`027`) |
+| **v0.11.1+** | Magic login + viewer + share links (`026`); then threshold alerts (`027`) |
 | **v0.12+** | Phase 5 medium: release health, FULLTEXT, delivery history, admin audit (`028`–`031`) |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
