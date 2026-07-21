@@ -33,10 +33,22 @@
                 <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
             {% endfor %}
         </ul>
+        {{ form_row(form.productTourSeen) }}
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
+
+    <section class="panel mt-4 space-y-3" aria-labelledby="display-tour-heading">
+        <div>
+            <h2 id="display-tour-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.product_tour_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.product_tour_intro'|trans }}</p>
+        </div>
+        <form method="post" action="{{ path('account_product_tour_replay') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('account_product_tour_replay') }}">
+            <button type="submit" class="btn-ghost">{{ 'preferences.product_tour_replay'|trans }}</button>
+        </form>
+    </section>
 
     <section class="panel mt-4 space-y-2">
         <h2 class="text-sm font-semibold">{{ 'preferences.issue_panels_browser'|trans }}</h2>

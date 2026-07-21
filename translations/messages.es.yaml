@@ -814,6 +814,12 @@ preferences:
     motion_system: Sistema (seguir dispositivo)
     motion_reduce: Reducir movimiento
     motion_full: Movimiento completo
+
+    product_tour_title: Tour del producto
+    product_tour_intro: Los tours se muestran una vez por área tras el setup. No vuelven hasta que los reproduzcas aquí.
+    product_tour_seen: Marcar todos los tours como completados
+    product_tour_seen_help: Marca y guarda para ocultar todos los tours. Para verlos otra vez usa Repetir abajo (desmarcar no vuelve a activar el auto-inicio).
+    product_tour_replay: Repetir tour del panel
     issue_panels_collapsed: Paneles de incidencia colapsados por defecto
     issue_panels_help: Los paneles marcados empiezan colapsados en el detalle de incidencia/evento. El navegador recuerda si los abres o cierras a mano.
     issue_panels_browser: Diseño de paneles en el navegador
@@ -1045,6 +1051,77 @@ setup:
         complete: Configuración marcada como completa.
         unknown_action: Acción de setup desconocida.
         failed: Falló la acción de setup.
+
+tour:
+    controls:
+        next: Siguiente
+        previous: Atrás
+        done: Listo
+        close: Cerrar
+        progress: "{{current}} de {{total}}"
+    role:
+        owner: propietario
+        admin: administrador
+        member: miembro
+        viewer: visor
+    steps:
+        dashboard:
+            welcome:
+                title: Bienvenido a Beacon
+                description: Un recorrido breve por tu panel — proyectos, navegación y dónde gestionar tu cuenta.
+            sidebar:
+                title: Navegación
+                description: Usa la barra lateral para moverte entre las secciones del área actual de la app.
+            projects:
+                title: Tus proyectos
+                description: Cada proyecto recoge errores, rendimiento y analítica de las apps que envían telemetría Envelope.
+            new_project:
+                title: Crear un proyecto
+                description: Añade un proyecto para obtener un DSN y claves API para tus SDKs cliente.
+            user_menu:
+                title: Menú de cuenta
+                description: Abre preferencias, vuelve al panel o cierra sesión desde el menú del avatar.
+            admin:
+                title: Administración
+                description: Los administradores gestionan usuarios, grupos, apariencia, mailer y el setup inicial desde aquí.
+        project:
+            welcome:
+                title: Issues del proyecto
+                description: 'Estás viendo este proyecto como %role%. Usa Issues para triar errores del ingest Envelope.'
+            nav:
+                title: Secciones del proyecto
+                description: Cambia entre Issues, Performance, Analytics, Releases y Settings de este proyecto.
+            filters:
+                title: Filtros y búsqueda
+                description: Acota issues por nivel, estado, entorno, release, asignado y más.
+            saved_views:
+                title: Vistas guardadas
+                description: Guarda combinaciones de filtros y reábrelas en flujos de triage recurrentes.
+            list:
+                title: Lista de issues
+                description: Abre un issue para inspeccionar stack traces, eventos y estado de triage.
+            settings:
+                title: Ajustes del proyecto
+                description: Como admin del proyecto puedes gestionar API keys, miembros, notificaciones y gobernanza.
+            settings_member:
+                title: Ajustes del proyecto
+                description: Revisa la configuración. Cambiar miembros o API keys requiere un admin del proyecto.
+        admin:
+            welcome:
+                title: Administración
+                description: Controles de instancia para operadores. Solo ROLE_ADMIN puede abrir este hub.
+            users:
+                title: Usuarios
+                description: Lista cuentas, roles y habilita o deshabilita el acceso en esta instancia Beacon.
+            projects:
+                title: Todos los proyectos
+                description: Operaciones cruzadas — miembros, grupos y zona de peligro para cualquier proyecto.
+            mailer:
+                title: Mailer
+                description: Configura el DSN de Mailer cifrado usado para magic links y correo de notificaciones.
+            setup:
+                title: Asistente de setup
+                description: Vuelve a ejecutar seed de plataforma, proyecto demo o telemetría de muestra al onboardear un entorno.
 
 legal:
     nav:

@@ -81,7 +81,8 @@ when@test:
     doctrine:
         dbal:
             # Writable under var/cache/test (avoids sticky root-owned var/test.db from earlier runs).
-            url: 'sqlite:///%kernel.project_dir%/var/cache/test/phpunit.db'
+            # Prefer /tmp in Docker/WSL — var/cache SQLite often hits readonly / disk I/O errors on bind mounts.
+            url: 'sqlite:////dev/shm/symfony-beacon-phpunit.db'
             dbname_suffix: ''
 
 when@prod:

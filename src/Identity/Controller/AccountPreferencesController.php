@@ -219,7 +219,17 @@ final class AccountPreferencesController extends AbstractController
         ]);
         $form->handleRequest($request);
 
+        if (!$form->isSubmitted()) {
+            $form->get('productTourSeen')->setData($user->isProductTourSeen());
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
+            // Checking suppresses all tours. Unchecking alone does not re-enable —
+            // users must use Replay so tours never return accidentally.
+            if (true === $form->get('productTourSeen')->getData()) {
+                $user->markProductTourSeen();
+            }
+
             $this->entityManager->flush();
 
             $locale = $user->getPreferredLocale();
@@ -237,6 +247,70 @@ final class AccountPreferencesController extends AbstractController
             'form' => $form,
             'issue_panel_ids' => IssuePanelIds::all(),
         ]);
+    }
+
+    /**
+     * Mark or clear the dashboard product tour as seen (JSON).
+     */
+    #[Route('/account/product-tour/seen', name: 'account_product_tour_seen', methods: ['POST'])]
+    public function productTourSeen(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('account_product_tour', $request->headers->get('X-CSRF-TOKEN', ''))) {
+            return $this->json(['ok' => false, 'error' => 'invalid_csrf'], Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            /** @var array{seen?: mixed, page?: mixed} $payload */
+            $payload = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $this->json(['ok' => false, 'error' => 'invalid_json'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $seen = $payload['seen'] ?? null;
+        if (!\is_bool($seen)) {
+            return $this->json(['ok' => false, 'error' => 'invalid_seen'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $page = $payload['page'] ?? null;
+        if ($seen) {
+            if (\is_string($page) && '' !== $page) {
+                $user->markTourPageSeen($page);
+            } else {
+                $user->markProductTourSeen();
+            }
+        } else {
+            $user->clearProductTourSeen();
+        }
+        $this->entityManager->flush();
+
+        return $this->json([
+            'ok' => true,
+            'seen' => $seen,
+            'page' => \is_string($page) ? $page : null,
+            'pages' => $user->getProductTourSeenPages(),
+        ]);
+    }
+
+    /**
+     * Clear tour flag and open the dashboard tour once.
+     */
+    #[Route('/account/product-tour/replay', name: 'account_product_tour_replay', methods: ['POST'])]
+    public function productTourReplay(Request $request): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('account_product_tour_replay', $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $user->clearProductTourSeen();
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('dashboard_home', ['tour' => 1]);
     }
 
     /**

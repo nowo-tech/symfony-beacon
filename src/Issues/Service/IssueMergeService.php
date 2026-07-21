@@ -8,6 +8,8 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
+use App\Issues\Repository\IssueRepository;
+use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -19,9 +21,44 @@ final readonly class IssueMergeService
 {
     public function __construct(
         private EventRepository $eventRepository,
+        private IssueRepository $issueRepository,
         private IssueHistoryRecorder $historyRecorder,
         private EntityManagerInterface $entityManager,
     ) {
+    }
+
+    /**
+     * Ensure $source may point at $canonical as duplicateOf (same project, no cycles).
+     *
+     * @throws InvalidArgumentException with codes: cannot_merge_self, wrong_project, circular
+     */
+    public function assertCanMarkAsDuplicate(Issue $source, Issue $canonical): void
+    {
+        if ($source->getId() !== null && $source->getId() === $canonical->getId()) {
+            throw new InvalidArgumentException('cannot_merge_self');
+        }
+        if ($source->getUuid() === $canonical->getUuid()) {
+            throw new InvalidArgumentException('cannot_merge_self');
+        }
+        if ($source->getProject()?->getId() !== $canonical->getProject()?->getId()) {
+            throw new InvalidArgumentException('wrong_project');
+        }
+
+        $seen = [];
+        $cursor = $canonical;
+        while ($cursor instanceof Issue) {
+            $id = $cursor->getId();
+            if (null !== $id && $id === $source->getId()) {
+                throw new InvalidArgumentException('circular');
+            }
+            if (null !== $id) {
+                if (isset($seen[$id])) {
+                    break;
+                }
+                $seen[$id] = true;
+            }
+            $cursor = $cursor->getDuplicateOf();
+        }
     }
 
     /**
@@ -31,15 +68,7 @@ final readonly class IssueMergeService
      */
     public function mergeIntoCanonical(Issue $source, Issue $canonical, ?User $actor = null): int
     {
-        if ($source->getId() === $canonical->getId()) {
-            throw new InvalidArgumentException('cannot_merge_self');
-        }
-        if ($source->getProject()?->getId() !== $canonical->getProject()?->getId()) {
-            throw new InvalidArgumentException('wrong_project');
-        }
-        if ($canonical->getDuplicateOf()?->getId() === $source->getId()) {
-            throw new InvalidArgumentException('circular');
-        }
+        $this->assertCanMarkAsDuplicate($source, $canonical);
 
         $sourceEvents = $this->eventRepository->findBy(['issue' => $source]);
         $canonicalEvents = $this->eventRepository->findBy(['issue' => $canonical]);
@@ -86,6 +115,26 @@ final readonly class IssueMergeService
             }
         }
         $this->applyAggregatesFromEvents($issue, $events);
+    }
+
+    /**
+     * Recompute denormalized counters for every remaining issue in a project (after retention purge).
+     */
+    public function recomputeAggregatesForProject(Project $project): int
+    {
+        $updated = 0;
+        foreach ($this->issueRepository->findBy(['project' => $project]) as $issue) {
+            if (!$issue instanceof Issue) {
+                continue;
+            }
+            $this->recomputeAggregates($issue);
+            ++$updated;
+        }
+        if ($updated > 0) {
+            $this->entityManager->flush();
+        }
+
+        return $updated;
     }
 
     /**

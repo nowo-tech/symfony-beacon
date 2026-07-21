@@ -74,6 +74,8 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $projectDir = \dirname(__DIR__, 2);
         $candidates[] = $projectDir.'/var/cache/test/phpunit.db';
         $candidates[] = $projectDir.'/var/test.db';
+        $candidates[] = '/tmp/symfony-beacon-phpunit.db';
+        $candidates[] = '/dev/shm/symfony-beacon-phpunit.db';
 
         foreach (array_unique($candidates) as $file) {
             $dir = \dirname($file);

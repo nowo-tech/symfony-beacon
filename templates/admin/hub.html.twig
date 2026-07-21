@@ -3,13 +3,14 @@
 {% block title %}{{ 'admin.hub.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
+{% include '_product_tour.html.twig' %}
 <div class="mb-6">
     <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin.hub.title'|trans }}</h1>
     <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin.hub.intro'|trans }}</p>
 </div>
 
 <div class="grid gap-4 sm:grid-cols-2">
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_users') }}">
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_users') }}" data-tour="admin-users">
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.users'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.users'|trans }}</p>
     </a>
@@ -17,7 +18,7 @@
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.groups'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.groups'|trans }}</p>
     </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_projects') }}">
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_projects') }}" data-tour="admin-projects">
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.admin_projects'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.projects'|trans }}</p>
     </a>
@@ -25,11 +26,11 @@
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.appearance'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.appearance'|trans }}</p>
     </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_mailer') }}">
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_mailer') }}" data-tour="admin-mailer">
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.mailer'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.mailer'|trans }}</p>
     </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('setup_wizard') }}">
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('setup_wizard') }}" data-tour="admin-setup">
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.setup'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.setup'|trans }}</p>
     </a>

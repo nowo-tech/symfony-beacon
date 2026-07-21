@@ -5,22 +5,32 @@ declare(strict_types=1);
 namespace App\Issues\Entity;
 
 use App\Issues\Repository\EventRepository;
+use App\Project\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Stored Envelope event (full payload plus promoted context columns).
+ *
+ * {@see project} is denormalized from the parent issue so event_id uniqueness
+ * and retention queries are scoped per tenant without always joining issue.
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: 'event')]
-#[ORM\UniqueConstraint(name: 'uniq_event_id', columns: ['event_id'])]
+#[ORM\UniqueConstraint(name: 'uniq_project_event_id', columns: ['project_id', 'event_id'])]
 #[ORM\Index(name: 'idx_event_issue_received', columns: ['issue_id', 'received_at'])]
+#[ORM\Index(name: 'idx_event_issue_environment', columns: ['issue_id', 'environment'])]
+#[ORM\Index(name: 'idx_event_issue_release', columns: ['issue_id', 'release_version'])]
 class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Project $project = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -68,6 +78,18 @@ class Event
         return $this->id;
     }
 
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): self
+    {
+        $this->project = $project;
+
+        return $this;
+    }
+
     public function getIssue(): ?Issue
     {
         return $this->issue;
@@ -76,6 +98,12 @@ class Event
     public function setIssue(?Issue $issue): self
     {
         $this->issue = $issue;
+        if ($issue instanceof Issue) {
+            $project = $issue->getProject();
+            if ($project instanceof Project) {
+                $this->project = $project;
+            }
+        }
 
         return $this;
     }

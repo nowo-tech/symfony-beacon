@@ -117,10 +117,15 @@ final readonly class ProjectShareLinkManager
             throw new RuntimeException('missing_project');
         }
 
+        $issue = $link->getIssue();
+        if ($issue instanceof Issue && $issue->getProject()?->getId() !== $project->getId()) {
+            throw new RuntimeException('issue_wrong_project');
+        }
+
         $link->markUsed();
         $this->projectAccess->grantShareAccess(
             $project,
-            $link->getIssue()?->getUuid(),
+            $issue?->getUuid(),
             $link->getExpiresAt()->getTimestamp(),
         );
         $this->userActionRecorder->record(

@@ -1,0 +1,48 @@
+/* Align driver.js popover with Beacon tokens (avoid default purple look). */
+.beacon-driver-popover.driver-popover {
+  background: var(--color-paper, #fffaf3);
+  color: var(--color-ink, #1c1917);
+  border: 1px solid color-mix(in srgb, var(--color-sand, #d6d3d1) 80%, transparent);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--color-ink, #1c1917) 18%, transparent);
+  max-width: 22rem;
+}
+
+.beacon-driver-popover .driver-popover-title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink, #1c1917);
+}
+
+.beacon-driver-popover .driver-popover-description {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink, #1c1917) 70%, transparent);
+}
+
+.beacon-driver-popover .driver-popover-progress-text {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-ink, #1c1917) 55%, transparent);
+}
+
+.beacon-driver-popover .driver-popover-next-btn,
+.beacon-driver-popover .driver-popover-done-btn {
+  background: var(--color-moss, #3f6212) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 0.5rem !important;
+  text-shadow: none !important;
+}
+
+.beacon-driver-popover .driver-popover-prev-btn {
+  background: transparent !important;
+  color: var(--color-ink, #1c1917) !important;
+  border: 1px solid color-mix(in srgb, var(--color-sand, #d6d3d1) 90%, transparent) !important;
+  border-radius: 0.5rem !important;
+  text-shadow: none !important;
+}
+
+.beacon-driver-popover .driver-popover-close-btn {
+  color: color-mix(in srgb, var(--color-ink, #1c1917) 55%, transparent);
+}

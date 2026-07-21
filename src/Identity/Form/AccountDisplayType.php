@@ -10,6 +10,7 @@ use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\TagInputBundle\Form\TagType;
 use Nowo\TagInputBundle\Form\ValueFormat;
 use Override;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -109,6 +110,15 @@ final class AccountDisplayType extends FormKitAbstractType
             'translation_domain' => 'messages',
             'container_class' => 'nowo-tag-input issue-panel-prefs',
             'input_class' => 'input nowo-tag-input__field',
+        ]);
+
+        $builder->add('productTourSeen', CheckboxType::class, [
+            'mapped' => false,
+            'required' => false,
+            'label' => 'preferences.product_tour_seen',
+            'help' => 'preferences.product_tour_seen_help',
+            'translation_domain' => 'messages',
+            'disabled' => false,
         ]);
     }
 

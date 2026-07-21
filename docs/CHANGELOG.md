@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.5] - 2026-07-21
+
+### Added
+
+- Product tour (`057`): contextual driver.js walks on dashboard, project Issues, and admin hub — steps filtered by instance role and project permissions; per-page seen tracking (`product_tour_seen_pages`); finish/close hides that tour until Account → Display → Replay
+- Indexes `idx_event_issue_environment` and `idx_event_issue_release` for filtered event queries
+
+### Changed
+
+- `event.event_id` uniqueness is scoped per project (`uniq_project_event_id`); `event.project_id` denormalized for tenant queries (`Version20260721230000`)
+- `issue.level` is a typed whitelist (`fatal` / `error` / `warning` / `info` / `debug`); unknown ingest values map to `error`
+- Retention purge recomputes issue aggregates (`event_count`, first/last seen, release/env) after deleting events
+- Duplicate marking walks the `duplicateOf` chain to reject longer cycles; share-link consume re-checks issue/project match; assignee assignment centralized in `IssueAssigneeGuard`
+
+### Fixed
+
+- PHPUnit SQLite database path uses `/dev/shm` in Docker to avoid readonly / disk I/O failures on bind-mounted `var/cache`
+
 ## [0.12.4] - 2026-07-21
 
 ### Changed
@@ -435,7 +453,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...HEAD
+[0.12.5]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.1...v0.12.2

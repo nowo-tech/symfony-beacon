@@ -47,6 +47,11 @@ class EventRepository extends ServiceEntityRepository
         return $this->findOneBy(['eventId' => $eventId]);
     }
 
+    public function findOneByProjectAndEventId(Project $project, string $eventId): ?Event
+    {
+        return $this->findOneBy(['project' => $project, 'eventId' => $eventId]);
+    }
+
     public function occurrenceStatsForIssue(Issue $issue, ?DateTimeImmutable $now = null): IssueOccurrenceStats
     {
         $map = $this->occurrenceStatsForIssues([$issue], $now);
@@ -144,8 +149,7 @@ class EventRepository extends ServiceEntityRepository
         $sql = <<<'SQL'
             SELECT e.release_version AS release_value
             FROM event e
-            INNER JOIN issue i ON i.id = e.issue_id
-            WHERE i.project_id = :projectId
+            WHERE e.project_id = :projectId
               AND e.release_version IS NOT NULL
               AND e.release_version <> ''
             GROUP BY e.release_version
@@ -175,8 +179,7 @@ class EventRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('e')
             ->select('COUNT(e.id)')
-            ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project = :project')
+            ->andWhere('e.project = :project')
             ->andWhere('e.receivedAt >= :since')
             ->setParameter('project', $project)
             ->setParameter('since', $since)
@@ -197,13 +200,12 @@ class EventRepository extends ServiceEntityRepository
 
         /** @var list<array{projectId: int|string, cnt: int|string}> $rows */
         $rows = $this->createQueryBuilder('e')
-            ->select('IDENTITY(i.project) AS projectId, COUNT(e.id) AS cnt')
-            ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project IN (:projects)')
+            ->select('IDENTITY(e.project) AS projectId, COUNT(e.id) AS cnt')
+            ->andWhere('e.project IN (:projects)')
             ->andWhere('e.receivedAt >= :since')
             ->setParameter('projects', $projectIds)
             ->setParameter('since', $since)
-            ->groupBy('i.project')
+            ->groupBy('e.project')
             ->getQuery()
             ->getArrayResult();
 
@@ -219,8 +221,7 @@ class EventRepository extends ServiceEntityRepository
     {
         $value = $this->createQueryBuilder('e')
             ->select('MAX(e.receivedAt)')
-            ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project = :project')
+            ->andWhere('e.project = :project')
             ->setParameter('project', $project)
             ->getQuery()
             ->getSingleScalarResult();
@@ -247,11 +248,10 @@ class EventRepository extends ServiceEntityRepository
 
         /** @var list<array{projectId: int|string, lastAt: mixed}> $rows */
         $rows = $this->createQueryBuilder('e')
-            ->select('IDENTITY(i.project) AS projectId, MAX(e.receivedAt) AS lastAt')
-            ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project IN (:projects)')
+            ->select('IDENTITY(e.project) AS projectId, MAX(e.receivedAt) AS lastAt')
+            ->andWhere('e.project IN (:projects)')
             ->setParameter('projects', $projectIds)
-            ->groupBy('i.project')
+            ->groupBy('e.project')
             ->getQuery()
             ->getArrayResult();
 
@@ -278,7 +278,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('e')
             ->select('COUNT(e.id)')
             ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project = :project')
+            ->andWhere('e.project = :project')
             ->andWhere('i.level IN (:levels)')
             ->andWhere('e.receivedAt >= :since')
             ->setParameter('project', $project)
@@ -315,7 +315,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.issue', 'i')
             ->addSelect('i')
-            ->andWhere('i.project = :project')
+            ->andWhere('e.project = :project')
             ->setParameter('project', $project)
             ->orderBy('e.receivedAt', 'DESC')
             ->addOrderBy('e.id', 'DESC')
@@ -369,7 +369,7 @@ class EventRepository extends ServiceEntityRepository
             SELECT DATE(e.received_at) AS day_key, COUNT(e.id) AS cnt
             FROM event e
             INNER JOIN issue i ON e.issue_id = i.id
-            WHERE i.project_id = :projectId
+            WHERE e.project_id = :projectId
               AND e.received_at >= :fromStart
               AND e.received_at < :toExclusive
             SQL;

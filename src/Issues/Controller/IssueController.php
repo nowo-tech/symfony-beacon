@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
+use App\Identity\Service\ProductTourStepsBuilder;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
@@ -18,13 +19,14 @@ use App\Issues\Repository\IssueCommentRepository;
 use App\Issues\Repository\IssueHistoryEntryRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
+use App\Issues\Service\IssueAssigneeGuard;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
 use App\Notifications\Service\NotificationDispatcher;
-use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Shared\IssueLevel;
 use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use App\Shared\Pagination\PagePagination;
@@ -59,11 +61,13 @@ final class IssueController extends AbstractController
         private readonly IssueSavedViewRepository $savedViewRepository,
         private readonly IssueHistoryRecorder $historyRecorder,
         private readonly IssueMergeService $issueMergeService,
+        private readonly IssueAssigneeGuard $assigneeGuard,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
         private readonly NotificationDispatcher $notificationDispatcher,
         private readonly EntityManagerInterface $entityManager,
+        private readonly ProductTourStepsBuilder $productTourStepsBuilder,
     ) {
     }
 
@@ -160,6 +164,12 @@ final class IssueController extends AbstractController
 
         $savedViews = $this->savedViewRepository->findForUserAndProject($user, $project);
 
+        $tourVars = $this->productTourStepsBuilder->twigVars(
+            $this->productTourStepsBuilder->contextForProjectIssues($project, $user),
+            $user,
+            $request,
+        );
+
         return $this->render('issue/index.html.twig', [
             'project' => $project,
             'issues' => $issues,
@@ -169,6 +179,7 @@ final class IssueController extends AbstractController
             'compareResult' => $compareResult,
             'savedViews' => $savedViews,
             'pagination' => $pagination,
+            'levels' => IssueLevel::values(),
             'filters' => [
                 'q' => $request->query->getString('q'),
                 'level' => $request->query->getString('level'),
@@ -186,6 +197,7 @@ final class IssueController extends AbstractController
                 'page' => $page,
                 'per_page' => $perPage,
             ],
+            ...$tourVars,
         ]);
     }
 
@@ -309,35 +321,42 @@ final class IssueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $assignee = $issue->getAssignee();
-            if ($assignee instanceof User && !$this->projectAccess->resolveAccess($project, $assignee) instanceof ProjectAccess) {
+            try {
+                $this->assigneeGuard->assertAssignable($project, $assignee);
+            } catch (InvalidArgumentException) {
                 $this->addFlash('error', 'issues.assignee_not_member');
                 $issue->setAssignee($previousAssignee);
-            } else {
-                $this->historyRecorder->recordAssigneeChange($issue, $previousAssignee, $assignee, $user);
-                if ($previousAssignee?->getId() !== $assignee?->getId()) {
-                    $this->userActionRecorder->record(
-                        UserActionType::IssueAssigned,
-                        $user,
-                        $assignee ?? $user,
-                        [
-                            'project_uuid' => $project->getUuid(),
-                            'project_name' => $project->getName(),
-                            'issue_uuid' => $issue->getUuid(),
-                            'issue_title' => $issue->getTitle(),
-                            'from' => $previousAssignee?->getDisplayName(),
-                            'to' => $assignee?->getDisplayName(),
-                        ],
-                    );
-                    $this->notificationDispatcher->dispatchIssueAssigned(
-                        $project,
-                        $issue,
-                        $previousAssignee,
-                        $assignee,
-                    );
-                }
-                $this->entityManager->flush();
-                $this->addFlash('success', 'issues.assignee_saved');
+
+                return $this->redirectToRoute('issue_show', [
+                    'projectId' => $project->getUuid(),
+                    'id' => $issue->getUuid(),
+                ]);
             }
+
+            $this->historyRecorder->recordAssigneeChange($issue, $previousAssignee, $assignee, $user);
+            if ($previousAssignee?->getId() !== $assignee?->getId()) {
+                $this->userActionRecorder->record(
+                    UserActionType::IssueAssigned,
+                    $user,
+                    $assignee ?? $user,
+                    [
+                        'project_uuid' => $project->getUuid(),
+                        'project_name' => $project->getName(),
+                        'issue_uuid' => $issue->getUuid(),
+                        'issue_title' => $issue->getTitle(),
+                        'from' => $previousAssignee?->getDisplayName(),
+                        'to' => $assignee?->getDisplayName(),
+                    ],
+                );
+                $this->notificationDispatcher->dispatchIssueAssigned(
+                    $project,
+                    $issue,
+                    $previousAssignee,
+                    $assignee,
+                );
+            }
+            $this->entityManager->flush();
+            $this->addFlash('success', 'issues.assignee_saved');
 
             return $this->redirectToRoute('issue_show', [
                 'projectId' => $project->getUuid(),
@@ -579,8 +598,15 @@ final class IssueController extends AbstractController
             return $this->redirectToRoute('issue_show', $showParams);
         }
 
-        if ($canonical->getDuplicateOf()?->getId() === $issue->getId()) {
-            $this->addFlash('error', 'issues.duplicate_circular');
+        try {
+            $this->issueMergeService->assertCanMarkAsDuplicate($issue, $canonical);
+        } catch (InvalidArgumentException $e) {
+            $flash = match ($e->getMessage()) {
+                'circular' => 'issues.duplicate_circular',
+                'wrong_project' => 'issues.duplicate_not_found',
+                default => 'issues.duplicate_invalid',
+            };
+            $this->addFlash('error', $flash);
 
             return $this->redirectToRoute('issue_show', $showParams);
         }

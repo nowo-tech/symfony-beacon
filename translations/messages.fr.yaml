@@ -721,6 +721,12 @@ preferences:
     motion_system: Système (suivre l'appareil)
     motion_reduce: Réduire les mouvements
     motion_full: Mouvement complet
+
+    product_tour_title: Product tour
+    product_tour_intro: Tours run once per area after setup. They stay off until you replay them here.
+    product_tour_seen: Mark all tours as completed
+    product_tour_seen_help: Check and save to hide every product tour. To see them again, use Replay below (unchecking alone does not re-enable auto-start).
+    product_tour_replay: Replay dashboard tour
     issue_panels_collapsed: Les panneaux de problèmes sont réduits par défaut
     issue_panels_help: Les panneaux cochés commencent par être réduits sur les pages de détails des problèmes et des événements. Votre navigateur mémorise les remplacements d'ouverture/fermeture manuels.
     issue_panels_browser: Disposition du panneau du navigateur
@@ -902,6 +908,77 @@ admin:
         appearance: Nom de la marque et couleurs d’accent.
         menus: Modifier les menus de navigation.
         breadcrumbs: Gérer les collections de fils d'Ariane.
+tour:
+    controls:
+        next: Next
+        previous: Back
+        done: Done
+        close: Close
+        progress: "{{current}} of {{total}}"
+    role:
+        owner: owner
+        admin: admin
+        member: member
+        viewer: viewer
+    steps:
+        dashboard:
+            welcome:
+                title: Welcome to Beacon
+                description: A short tour of your dashboard — projects, navigation, and where to manage your account.
+            sidebar:
+                title: Navigation
+                description: Use the sidebar to move between dashboard sections for the current area of the app.
+            projects:
+                title: Your projects
+                description: Each project collects errors, performance, and analytics from apps that send Envelope telemetry.
+            new_project:
+                title: Create a project
+                description: Add a project to get a DSN and API keys for your client SDKs.
+            user_menu:
+                title: Account menu
+                description: Open preferences, return to the dashboard, or sign out from your avatar menu.
+            admin:
+                title: Administration
+                description: Instance admins manage users, groups, appearance, mailer, and first-run setup from here.
+        project:
+            welcome:
+                title: Project issues
+                description: 'You are viewing this project as %role%. Use Issues to triage errors from Envelope ingest.'
+            nav:
+                title: Project sections
+                description: Switch between Issues, Performance, Analytics, Releases, and Settings for this project.
+            filters:
+                title: Filters and search
+                description: Narrow issues by level, status, environment, release, assignee, and more.
+            saved_views:
+                title: Saved views
+                description: Save filter combinations and reopen them later for recurring triage workflows.
+            list:
+                title: Issue list
+                description: Open an issue to inspect stack traces, events, and triage status.
+            settings:
+                title: Project settings
+                description: As a project admin you can manage API keys, members, notifications, and governance.
+            settings_member:
+                title: Project settings
+                description: Review project configuration. Membership and API key changes require a project admin.
+        admin:
+            welcome:
+                title: Administration
+                description: Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.
+            users:
+                title: Users
+                description: List accounts, roles, and enable or disable access on this Beacon instance.
+            projects:
+                title: All projects
+                description: Cross-project ops — members, groups, and danger-zone actions for any project.
+            mailer:
+                title: Mailer
+                description: Configure the encrypted Mailer DSN used for magic links and notification email.
+            setup:
+                title: Setup wizard
+                description: Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.
+
 legal:
     nav:
         label: Légal

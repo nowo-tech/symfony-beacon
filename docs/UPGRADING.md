@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.4 to the next release](#upgrading-from-0124-to-the-next-release)
+- [Upgrading from 0.12.5 to the next release](#upgrading-from-0125-to-the-next-release)
+- [Upgrading from 0.12.4 to 0.12.5](#upgrading-from-0124-to-0125)
 - [Upgrading from 0.12.3 to 0.12.4](#upgrading-from-0123-to-0124)
 - [Upgrading from 0.12.2 to 0.12.3](#upgrading-from-0122-to-0123)
 - [Upgrading from 0.12.1 to 0.12.2](#upgrading-from-0121-to-0122)
@@ -34,15 +35,43 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.4 to the next release
+## Upgrading from 0.12.5 to the next release
 
 ```bash
 git pull
 composer install
 php bin/console doctrine:migrations:migrate --no-interaction
 php bin/console app:seed-platform
+pnpm install
 make vite-build
 ```
+
+## Upgrading from 0.12.4 to 0.12.5
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Product tour (`057`)
+
+- Migrations `Version20260721220000` / `Version20260721221000` add `app_user.product_tour_seen_at` and `product_tour_seen_pages`.
+- Tours auto-start once per page (`dashboard`, `project_issues`, `admin`) after setup is complete; steps respect `ROLE_ADMIN` and project role capabilities.
+- Finishing or closing a tour marks that page as seen — it will not auto-start again until Account → Display → **Replay**.
+- Frontend depends on `driver.js` — run `pnpm install` (or `make pnpm ARGS='install'`) before `make vite-build`.
+
+### Schema hardening (`event` tenancy + issue level)
+
+- Migration `Version20260721230000`:
+  - Ensures `event.project_id` (backfill from issue) with `NOT NULL` + FK CASCADE to `project`.
+  - Replaces global `uniq_event_id` with `uniq_project_event_id` (`project_id`, `event_id`).
+  - Adds `(issue_id, environment)` and `(issue_id, release_version)` indexes.
+  - Normalizes unknown `issue.level` values to `error` (allowed: `fatal`, `error`, `warning`, `info`, `debug`).
+- After retention purge, issue counters are recomputed from remaining events (no manual fix-up needed).
 
 ## Upgrading from 0.12.3 to 0.12.4
 

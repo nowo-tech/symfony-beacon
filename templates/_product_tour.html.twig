@@ -1,0 +1,14 @@
+{# Mounts the contextual product tour (driver.js). Expects productTour* vars from ProductTourStepsBuilder::twigVars(). #}
+{% if productTourSteps is defined %}
+<div
+    data-controller="product-tour"
+    data-product-tour-auto-start-value="{{ autoStartProductTour|default(false) ? 'true' : 'false' }}"
+    data-product-tour-force-value="{{ forceProductTour|default(false) ? 'true' : 'false' }}"
+    data-product-tour-page-value="{{ productTourPage|default('dashboard') }}"
+    data-product-tour-mark-url-value="{{ path('account_product_tour_seen') }}"
+    data-product-tour-mark-token-value="{{ csrf_token('account_product_tour') }}"
+    data-product-tour-steps-value="{{ productTourSteps|default([])|json_encode|e('html_attr') }}"
+    data-product-tour-labels-value="{{ productTourLabels|default({})|json_encode|e('html_attr') }}"
+    hidden
+></div>
+{% endif %}

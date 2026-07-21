@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Identity\Entity;
 
 use App\Identity\Repository\UserRepository;
+use App\Identity\Tour\ProductTourPage;
 use App\Issues\IssuePanelIds;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\Doctrine\PublicUuidTrait;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -114,6 +116,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     #[ORM\Column(nullable: true)]
     private ?array $preferredCollapsedIssuePanels = null;
+
+    /** When set, all product tours are suppressed (Account → Display checkbox). */
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $productTourSeenAt = null;
+
+    /**
+     * Tour page ids already completed (e.g. dashboard, project_issues, admin).
+     *
+     * @var list<string>|null
+     */
+    #[ORM\Column(nullable: true)]
+    private ?array $productTourSeenPages = null;
 
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
@@ -427,6 +441,88 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         }
 
         $this->preferredCollapsedIssuePanels = IssuePanelIds::sanitize($preferredCollapsedIssuePanels);
+
+        return $this;
+    }
+
+    public function getProductTourSeenAt(): ?DateTimeImmutable
+    {
+        return $this->productTourSeenAt;
+    }
+
+    public function isProductTourSeen(): bool
+    {
+        return null !== $this->productTourSeenAt;
+    }
+
+    public function markProductTourSeen(?DateTimeImmutable $at = null): self
+    {
+        $this->productTourSeenAt = $at ?? new DateTimeImmutable();
+        $pages = [];
+        foreach (ProductTourPage::all() as $page) {
+            $pages[] = $page->value;
+        }
+        $this->productTourSeenPages = $pages;
+
+        return $this;
+    }
+
+    public function clearProductTourSeen(): self
+    {
+        $this->productTourSeenAt = null;
+        $this->productTourSeenPages = null;
+
+        return $this;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getProductTourSeenPages(): array
+    {
+        if (null === $this->productTourSeenPages) {
+            return [];
+        }
+
+        $allowed = array_map(
+            static fn (ProductTourPage $page): string => $page->value,
+            ProductTourPage::all(),
+        );
+
+        return array_values(array_unique(array_filter(
+            $this->productTourSeenPages,
+            static fn (mixed $id): bool => \is_string($id) && \in_array($id, $allowed, true),
+        )));
+    }
+
+    public function hasSeenTourPage(string $page): bool
+    {
+        if ($this->isProductTourSeen()) {
+            return true;
+        }
+
+        return \in_array($page, $this->getProductTourSeenPages(), true);
+    }
+
+    public function markTourPageSeen(string $page): self
+    {
+        $allowed = array_map(
+            static fn (ProductTourPage $p): string => $p->value,
+            ProductTourPage::all(),
+        );
+        if (!\in_array($page, $allowed, true)) {
+            return $this;
+        }
+
+        $pages = $this->getProductTourSeenPages();
+        if (!\in_array($page, $pages, true)) {
+            $pages[] = $page;
+        }
+        $this->productTourSeenPages = $pages;
+
+        if (\count($pages) >= \count($allowed)) {
+            $this->productTourSeenAt ??= new DateTimeImmutable();
+        }
 
         return $this;
     }

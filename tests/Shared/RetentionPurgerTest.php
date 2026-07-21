@@ -6,6 +6,7 @@ namespace App\Tests\Shared;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Service\IssueMergeService;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\IssueStatus;
 use App\Shared\Retention\RetentionPurger;
@@ -57,11 +58,67 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
         $em->persist($newEvent);
         $em->flush();
 
-        $purger = new RetentionPurger($em, self::getContainer()->get(ProjectRepository::class), 30, 0);
+        $purger = new RetentionPurger(
+            $em,
+            self::getContainer()->get(ProjectRepository::class),
+            self::getContainer()->get(IssueMergeService::class),
+            30,
+            0,
+        );
         $result = $purger->purgeProject($project);
 
         self::assertGreaterThanOrEqual(1, $result['events']);
         self::assertNull($em->getRepository(Event::class)->findOneBy(['eventId' => $oldEvent->getEventId()]));
         self::assertNotNull($em->getRepository(Event::class)->findOneBy(['eventId' => $newEvent->getEventId()]));
+    }
+
+    public function testRecomputesEventCountAfterPartialPurge(): void
+    {
+        [, , $project] = $this->bootWithDemoProject('retention-recount@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint('recount-fp');
+        $issue->setTitle('Recount');
+        $issue->setLevel('error');
+        $issue->setStatus(IssueStatus::Unresolved);
+        $issue->setFirstSeen(new DateTimeImmutable('-40 days'));
+        $issue->setLastSeen(new DateTimeImmutable('-1 day'));
+        $issue->setEventCount(2);
+        $em->persist($issue);
+
+        $old = new Event();
+        $old->setIssue($issue);
+        $old->setEventId('old-recount');
+        $old->setPayload(['message' => 'old']);
+        $old->setReceivedAt(new DateTimeImmutable('-40 days'));
+        $old->setEventTimestamp(new DateTimeImmutable('-40 days'));
+        $em->persist($old);
+
+        $fresh = new Event();
+        $fresh->setIssue($issue);
+        $fresh->setEventId('fresh-recount');
+        $fresh->setPayload(['message' => 'fresh']);
+        $fresh->setReceivedAt(new DateTimeImmutable('-1 day'));
+        $fresh->setEventTimestamp(new DateTimeImmutable('-1 day'));
+        $em->persist($fresh);
+        $em->flush();
+        $issueId = $issue->getId();
+
+        $purger = new RetentionPurger(
+            $em,
+            self::getContainer()->get(ProjectRepository::class),
+            self::getContainer()->get(IssueMergeService::class),
+            30,
+            0,
+        );
+        $purger->purgeProject($project);
+
+        $reloaded = $em->getRepository(Issue::class)->find($issueId);
+        self::assertInstanceOf(Issue::class, $reloaded);
+        self::assertSame(1, $reloaded->getEventCount());
+        self::assertNull($em->getRepository(Event::class)->findOneBy(['eventId' => 'old-recount']));
+        self::assertNotNull($em->getRepository(Event::class)->findOneBy(['eventId' => 'fresh-recount']));
     }
 }

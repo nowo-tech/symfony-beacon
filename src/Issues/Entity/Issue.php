@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\PublicUuidTrait;
+use App\Shared\IssueLevel;
 use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
@@ -54,8 +55,8 @@ class Issue
     #[ORM\Column(length: 40)]
     private string $culprit = '';
 
-    #[ORM\Column(length: 20)]
-    private string $level = 'error';
+    #[ORM\Column(length: 20, enumType: IssueLevel::class)]
+    private IssueLevel $level = IssueLevel::Error;
 
     #[ORM\Column(length: 20, enumType: IssueStatus::class)]
     private IssueStatus $status = IssueStatus::Unresolved;
@@ -175,14 +176,22 @@ class Issue
         return $this;
     }
 
+    /**
+     * String value for Twig / exports (backed enum).
+     */
     public function getLevel(): string
+    {
+        return $this->level->value;
+    }
+
+    public function getLevelEnum(): IssueLevel
     {
         return $this->level;
     }
 
-    public function setLevel(string $level): self
+    public function setLevel(IssueLevel|string $level): self
     {
-        $this->level = $level;
+        $this->level = $level instanceof IssueLevel ? $level : IssueLevel::normalize($level);
 
         return $this;
     }

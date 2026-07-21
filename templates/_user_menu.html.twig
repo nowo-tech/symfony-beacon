@@ -1,6 +1,6 @@
 {# Avatar dropdown: three section entry points (+ logout). #}
 {% set user = app.user %}
-<div class="user-menu" data-user-menu>
+<div class="user-menu" data-user-menu data-tour="user-menu">
     <details class="user-menu__details">
         <summary class="user-menu__summary" aria-label="{{ 'nav.account'|trans }}">
             <span class="user-avatar" aria-hidden="true">{{ user.initials }}</span>
@@ -17,7 +17,7 @@
             <a class="user-menu__link{{ app_section.current.value == 'preferences' ? ' is-current' : '' }}" role="menuitem" href="{{ path('account_profile') }}">{{ 'nav.preferences'|trans }}</a>
             <a class="user-menu__link{{ app_section.current.value == 'dashboard' ? ' is-current' : '' }}" role="menuitem" href="{{ path('dashboard_home') }}">{{ 'nav.dashboard'|trans }}</a>
             {% if is_granted('ROLE_ADMIN') %}
-                <a class="user-menu__link{{ app_section.current.value == 'administration' ? ' is-current' : '' }}" role="menuitem" href="{{ path('admin_hub') }}">{{ 'nav.admin'|trans }}</a>
+                <a class="user-menu__link{{ app_section.current.value == 'administration' ? ' is-current' : '' }}" role="menuitem" data-tour="admin-link" href="{{ path('admin_hub') }}">{{ 'nav.admin'|trans }}</a>
             {% endif %}
 
             <div class="user-menu__footer">

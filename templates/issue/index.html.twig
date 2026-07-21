@@ -3,6 +3,7 @@
 {% block title %}{{ 'issues.title'|trans }} — {{ project.name }}{% endblock %}
 
 {% block body %}
+{% include '_product_tour.html.twig' %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'issues'} %}
 
 {% set filterQuery = {
@@ -22,7 +23,7 @@
     dir: filters.dir,
 } %}
 
-<div class="issue-saved-views panel mb-4 flex flex-wrap items-end gap-3">
+<div class="issue-saved-views panel mb-4 flex flex-wrap items-end gap-3" data-tour="issue-saved-views">
     <div class="grow min-w-[12rem]">
         <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-select">{{ 'issues.views.label'|trans }}</label>
         <select id="saved-view-select" class="input w-full" onchange="if (this.value) { window.location = this.value; }">
@@ -57,14 +58,14 @@
     {% endif %}
 </div>
 
-<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-tour="issue-filters">
     <input type="hidden" name="sort" value="{{ filters.sort }}">
     <input type="hidden" name="dir" value="{{ filters.dir }}">
     <input type="hidden" name="page" value="1">
     <input class="input issue-filters__search" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
     <select class="input" name="level">
         <option value="">{{ 'issues.filter.any_level'|trans }}</option>
-        {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
+        {% for level in levels|default(['fatal', 'error', 'warning', 'info', 'debug']) %}
             <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
         {% endfor %}
     </select>
@@ -150,7 +151,7 @@
 {% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70">{{ 'issues.empty'|trans }}</div>
 {% else %}
-    <div class="panel issue-table-panel" data-controller="datatable">
+    <div class="panel issue-table-panel" data-controller="datatable" data-tour="issue-list">
         <div class="issue-table-scroll">
         <table
             class="issue-table display w-full text-left text-sm"

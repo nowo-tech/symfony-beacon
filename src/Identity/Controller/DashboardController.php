@@ -6,6 +6,7 @@ namespace App\Identity\Controller;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
+use App\Identity\Service\ProductTourStepsBuilder;
 use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -25,6 +26,7 @@ final class DashboardController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly InstanceSettingsRepository $instanceSettingsRepository,
+        private readonly ProductTourStepsBuilder $productTourStepsBuilder,
     ) {
     }
 
@@ -39,8 +41,14 @@ final class DashboardController extends AbstractController
         $previewProjects = \array_slice($projects, 0, 5);
         $statsPreview = $this->dailyProjectStatRepository->findLastDaysForProjects($previewProjects, 7);
 
-        $showSetupBanner = $this->isGranted('ROLE_ADMIN')
-            && !$this->instanceSettingsRepository->getOrCreate()->isSetupCompleted();
+        $setupCompleted = $this->instanceSettingsRepository->getOrCreate()->isSetupCompleted();
+        $showSetupBanner = $this->isGranted('ROLE_ADMIN') && !$setupCompleted;
+
+        $tourVars = $this->productTourStepsBuilder->twigVars(
+            $this->productTourStepsBuilder->contextForDashboard(),
+            $user,
+            $request,
+        );
 
         return $this->render('dashboard/home.html.twig', [
             'projects' => $projects,
@@ -49,6 +57,7 @@ final class DashboardController extends AbstractController
             'newProjectForm' => $this->createForm(ProjectType::class),
             'openNewProject' => $request->query->getBoolean('new'),
             'showSetupBanner' => $showSetupBanner,
+            ...$tourVars,
         ]);
     }
 }

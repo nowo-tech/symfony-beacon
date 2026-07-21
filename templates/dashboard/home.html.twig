@@ -3,6 +3,7 @@
 {% block title %}{{ 'projects.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
+{% include '_product_tour.html.twig' %}
 <div
     data-controller="confirm-dialog"
     data-confirm-dialog-open-on-connect-value="{{ openNewProject ? 'true' : 'false' }}"
@@ -18,7 +19,7 @@
     {% endif %}
 
     <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div class="min-w-0">
+        <div class="min-w-0" data-tour="projects">
             <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'projects.title'|trans }}</h1>
             <p class="mt-1 text-[var(--color-ink)]/65">{{ 'projects.intro'|trans }}</p>
         </div>
@@ -41,21 +42,21 @@
                 <button class="btn-ghost shrink-0" type="submit">{{ 'common.filter'|trans }}</button>
                 <a class="btn-ghost shrink-0 no-underline" href="{{ path('dashboard_home') }}">{{ 'common.clear_filters'|trans }}</a>
             </form>
-            <button type="button" class="btn-primary shrink-0 sm:self-auto" data-action="confirm-dialog#open">
+            <button type="button" class="btn-primary shrink-0 sm:self-auto" data-tour="new-project" data-action="confirm-dialog#open">
                 {{ 'nav.new_project'|trans }}
             </button>
         </div>
     </div>
 
     {% if projects is empty %}
-        <div class="panel text-center">
+        <div class="panel text-center" data-tour="projects-list">
             <p class="mb-4 text-[var(--color-ink)]/70">{{ 'projects.empty'|trans }}</p>
             <button type="button" class="btn-primary" data-action="confirm-dialog#open">
                 {{ 'projects.create_first'|trans }}
             </button>
         </div>
     {% else %}
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid gap-4 md:grid-cols-2" data-tour="projects-list">
             {% for project in projects %}
                 <a href="{{ path('project_show', {id: project.uuid}) }}" class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md">
                     <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ project.name }}</h2>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Retention;
 
+use App\Issues\Service\IssueMergeService;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use DateTimeImmutable;
@@ -14,12 +15,14 @@ use Doctrine\ORM\EntityManagerInterface;
  *
  * Prefers per-project overrides, then env defaults (`beacon.retention_*`).
  * Uses portable SQL (MySQL + SQLite tests). Does not remove projects, keys, or memberships.
+ * After deleting events, recomputes issue denormalized aggregates so counters stay truthful.
  */
 final readonly class RetentionPurger
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ProjectRepository $projectRepository,
+        private IssueMergeService $issueMergeService,
         private int $retentionDays,
         private int $maxEventsPerProject,
     ) {
@@ -39,6 +42,7 @@ final readonly class RetentionPurger
             'stats' => 0,
         ];
 
+        $projectIds = [];
         foreach ($this->projectRepository->findAll() as $project) {
             if (!$project instanceof Project || null === $project->getId()) {
                 continue;
@@ -46,6 +50,14 @@ final readonly class RetentionPurger
             $days = $this->effectiveRetentionDays($project);
             $maxEvents = $this->effectiveMaxEvents($project);
             if ($days < 1 && $maxEvents < 1) {
+                continue;
+            }
+            $projectIds[] = $project->getId();
+        }
+
+        foreach ($projectIds as $projectId) {
+            $project = $this->projectRepository->find($projectId);
+            if (!$project instanceof Project) {
                 continue;
             }
             ++$totals['projects'];
@@ -80,14 +92,17 @@ final readonly class RetentionPurger
         $issues = 0;
         $transactions = 0;
         $stats = 0;
+        $deletedEvents = false;
 
         if ($retentionDays >= 1) {
             $cutoff = $now->modify(\sprintf('-%d days', $retentionDays))->format('Y-m-d H:i:s');
 
-            $events += (int) $connection->executeStatement(
+            $deleted = (int) $connection->executeStatement(
                 'DELETE FROM event WHERE issue_id IN (SELECT id FROM issue WHERE project_id = ?) AND received_at < ?',
                 [$projectId, $cutoff],
             );
+            $events += $deleted;
+            $deletedEvents = $deletedEvents || $deleted > 0;
             $issues += (int) $connection->executeStatement(
                 'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
                 [$projectId],
@@ -121,15 +136,26 @@ final readonly class RetentionPurger
                 );
                 if ([] !== $ids) {
                     $placeholders = implode(',', array_fill(0, \count($ids), '?'));
-                    $events += (int) $connection->executeStatement(
+                    $deleted = (int) $connection->executeStatement(
                         'DELETE FROM event WHERE id IN ('.$placeholders.')',
                         $ids,
                     );
+                    $events += $deleted;
+                    $deletedEvents = $deletedEvents || $deleted > 0;
                     $issues += (int) $connection->executeStatement(
                         'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
                         [$projectId],
                     );
                 }
+            }
+        }
+
+        if ($deletedEvents) {
+            // Raw DELETE bypasses the unit of work; refresh before recomputing aggregates.
+            $this->entityManager->clear();
+            $reloaded = $this->projectRepository->find($projectId);
+            if ($reloaded instanceof Project) {
+                $this->issueMergeService->recomputeAggregatesForProject($reloaded);
             }
         }
 

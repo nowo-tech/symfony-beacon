@@ -23,6 +23,8 @@ Or register the first admin at `/en/register` after `make bootstrap` (no demo se
 
 Admins can also use the **Setup** wizard at `/setup` (banner on the dashboard until marked complete).
 
+After setup, signed-in users get a one-time **product tour** on the dashboard (and later on project Issues / Administration when those pages are first opened). Tours respect role and project permissions; finish or close to dismiss — replay from Account → Display.
+
 See also [README](../README.md) and [quickstart](../specs/055-install-seed-layers/quickstart.md).
 
 ## Upgrade

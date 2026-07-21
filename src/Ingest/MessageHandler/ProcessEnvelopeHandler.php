@@ -107,7 +107,7 @@ final readonly class ProcessEnvelopeHandler
         }
 
         $eventId = (string) ($payload['event_id'] ?? bin2hex(random_bytes(16)));
-        if ($this->eventRepository->findOneByEventId($eventId) instanceof Event) {
+        if ($this->eventRepository->findOneByProjectAndEventId($project, $eventId) instanceof Event) {
             return;
         }
 
@@ -131,6 +131,7 @@ final readonly class ProcessEnvelopeHandler
         $issue->incrementEventCount();
         $issue->setTitle($this->fingerprintCalculator->title($payload));
         $issue->setCulprit($this->fingerprintCalculator->culprit($payload));
+        $issue->setLevel((string) ($payload['level'] ?? $issue->getLevel()));
 
         $isRegression = false;
         if (!$isNew && (
@@ -144,6 +145,7 @@ final readonly class ProcessEnvelopeHandler
 
         $event = new Event();
         $event->setIssue($issue);
+        $event->setProject($project);
         $event->setEventId($eventId);
         $event->setPayload($payload);
         $event->setEnvironment(isset($payload['environment']) ? (string) $payload['environment'] : null);

@@ -2,7 +2,7 @@
   Shared project section navigation.
   Expects: project, current (issues|performance|analytics|releases|settings)
 #}
-<nav class="project-nav mb-6" aria-label="{{ 'project.nav.label'|trans }}">
+<nav class="project-nav mb-6" data-tour="project-nav" aria-label="{{ 'project.nav.label'|trans }}">
     <div class="mb-3">
         <a href="{{ path('dashboard_home') }}" class="text-sm no-underline text-[var(--color-ink)]/55 hover:text-[var(--color-ink)]">{{ 'projects.title'|trans }}</a>
         <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ project.name }}</h1>
@@ -34,6 +34,7 @@
         <a
             class="btn-ghost no-underline{% if current == 'settings' %} is-active{% endif %}"
             href="{{ path('project_settings', {id: project.uuid}) }}"
+            data-tour="project-settings"
             {% if current == 'settings' %}aria-current="page"{% endif %}
         >{{ 'project.settings.nav'|trans }}</a>
     </div>
