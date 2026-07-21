@@ -1031,15 +1031,15 @@ legal:
         changes_heading: Veranderingen
         changes_body: 'De exploitant kan deze voorwaarden bijwerken. Voortgezet gebruik na kennisgeving houdt aanvaarding in van de bijgewerkte voorwaarden, voor zover toegestaan ​​door de wet.'
     cookies:
-        title: Koekjes
-        intro: 'Op deze pagina worden cookies en vergelijkbare technologieën beschreven die door deze %brand%-instantie worden gebruikt. Gebruik Cookie-instellingen om optionele categorieën te wijzigen.'
+        title: Cookiemelding
+        intro: 'Deze pagina beschrijft de cookies en vergelijkbare technologieën die door deze %brand%-instantie worden gebruikt. Strikt noodzakelijke cookies ondersteunen authenticatie, beveiliging en vastlegging van toestemming. Optionele categorieën worden alleen gebruikt met uw voorafgaande toestemming. Gebruik Cookie-instellingen om uw selectie te allen tijde te bekijken of te wijzigen.'
         categories_heading: Categorieën
-        cat_required: Vereist
-        cat_required_help: 'Nodig voor inloggen, beveiliging en het opslaan van uw cookiekeuze.'
+        cat_required: Strikt noodzakelijk
+        cat_required_help: Essentieel voor authenticatie, beveiliging en vastlegging van uw toestemmingsbeslissing. Deze cookies kunnen niet worden uitgeschakeld.
         cat_preferences: Voorkeuren
-        cat_preferences_help: Optionele functies die niet-essentiële presentatiekeuzes onthouden (indien ingeschakeld door de operator).
-        cat_analytics: Analyses
-        cat_analytics_help: Optionele meetcookies (alleen als de operator later analysetools inschakelt).
+        cat_preferences_help: Optionele cookies die niet-essentiële presentatie- of functiekeuzes opslaan wanneer de beheerder ze inschakelt en u toestemt.
+        cat_analytics: Analyse
+        cat_analytics_help: Optionele meetcookies, alleen gebruikt als de beheerder analysetools inschakelt en u voorafgaande toestemming geeft.
         inventory_heading: Cookie-inventaris
         col_name: Naam
         col_category: Categorie
@@ -1048,11 +1048,11 @@ legal:
         duration_session: Sessie
         duration_remember: Tot 7 dagen
         duration_consent: Ongeveer 1 jaar
-        purpose_session: PHP-sessiecookie voor geverifieerd browsen.
-        purpose_remember: Optionele “Onthoud mij” permanente login.
-        purpose_consent: Slaat cookiecategoriekeuzes op en een geanonimiseerde toestemmingssleutel voor loggen.
+        purpose_session: Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde delen van de dienst te gebruiken.
+        purpose_remember: Maakt persistente authenticatie mogelijk wanneer bij het inloggen “Onthoud mij” wordt geselecteerd (veilig token; beperkte geldigheid).
+        purpose_consent: Slaat cookiecategoriekeuzes op en een geanonimiseerde toestemmingssleutel voor verantwoording en auditlogging.
         storage_heading: Lokale opslag
-        storage_body: 'Thema (dag/nacht) kan worden opgeslagen in de lokale opslag van de browser en is geen cookie. Volgens de typische ePrivacy-richtlijnen is er geen toestemming vereist voor strikt noodzakelijke UX, maar operators moeten dit bevestigen voor hun rechtsgebied.'
+        storage_body: 'Themavoorkeur (licht/donker) kan worden opgeslagen in de localStorage van de browser en is geen HTTP-cookie. Volgens typische ePrivacy-richtlijnen kan dit als strikt noodzakelijk voor een coherente gebruikersinterface worden behandeld; beheerders moeten de toepasselijke regels in hun rechtsgebied bevestigen.'
 
 notifications:
     title: Meldingen

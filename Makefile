@@ -21,7 +21,7 @@ help:
 	@echo "  make mysql           mysql CLI shell"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
-	@echo "  make seed-platform   Upsert menus/breadcrumbs (safe after upgrades)"
+	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
 	@echo "  make seed            Platform seed + demo user/project + .demo-client.env"
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
 	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"

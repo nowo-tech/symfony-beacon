@@ -1031,28 +1031,28 @@ legal:
         changes_heading: Changements
         changes_body: L'opérateur peut mettre à jour ces conditions. L'utilisation continue après notification constitue l'acceptation des conditions mises à jour lorsque la loi le permet.
     cookies:
-        title: Cookies
-        intro: 'Cette page décrit les cookies et technologies similaires utilisés par cette instance %brand%. Utilisez les paramètres des cookies pour modifier les catégories facultatives.'
+        title: Avis relatif aux cookies
+        intro: 'Cette page décrit les cookies et technologies similaires utilisés par cette instance %brand%. Les cookies strictement nécessaires soutiennent l’authentification, la sécurité et l’enregistrement du consentement. Les catégories facultatives ne sont utilisées qu’avec votre consentement préalable. Utilisez les Paramètres des cookies pour consulter ou modifier votre sélection à tout moment.'
         categories_heading: Catégories
-        cat_required: Requis
-        cat_required_help: 'Nécessaire pour la connexion, la sécurité et le stockage de votre choix de cookies.'
+        cat_required: Strictement nécessaires
+        cat_required_help: Indispensables à l’authentification, à la sécurité et à l’enregistrement de votre décision de consentement. Ces cookies ne peuvent pas être désactivés.
         cat_preferences: Préférences
-        cat_preferences_help: Fonctionnalités facultatives qui mémorisent les choix de présentation non essentiels (lorsqu'elles sont activées par l'opérateur).
+        cat_preferences_help: Cookies facultatifs qui mémorisent des choix de présentation ou de fonctionnalités non essentiels lorsque l’opérateur les active et que vous y consentez.
         cat_analytics: Analytique
-        cat_analytics_help: Cookies de mesure facultatifs (uniquement si l'opérateur active ultérieurement les outils d'analyse).
+        cat_analytics_help: Cookies de mesure facultatifs, utilisés uniquement si l’opérateur active des outils d’analytique et que vous donnez votre consentement préalable.
         inventory_heading: Inventaire des cookies
         col_name: Nom
         col_category: Catégorie
         col_duration: Durée
-        col_purpose: But
+        col_purpose: Finalité
         duration_session: Session
-        duration_remember: Jusqu'à 7 jours
+        duration_remember: Jusqu’à 7 jours
         duration_consent: Environ 1 an
-        purpose_session: Cookie de session PHP pour une navigation authentifiée.
-        purpose_remember: Connexion persistante facultative « Se souvenir de moi ».
-        purpose_consent: Stocke les choix de catégories de cookies et une clé de consentement anonymisée pour la connexion.
+        purpose_session: Maintient la session HTTP authentifiée nécessaire pour accéder aux zones protégées du service.
+        purpose_remember: Permet une authentification persistante lorsque « Se souvenir de moi » est sélectionné à la connexion (jeton sécurisé ; durée limitée).
+        purpose_consent: Enregistre les décisions relatives aux catégories de cookies et une clé de consentement anonymisée à des fins de responsabilité et d’audit.
         storage_heading: Stockage local
-        storage_body: 'Le thème (jour/nuit) peut être stocké dans le localStorage du navigateur et n’est pas un cookie. Selon les directives typiques d''ePrivacy, il ne nécessite pas de consentement pour l''UX strictement nécessaire, mais les opérateurs doivent confirmer leur juridiction.'
+        storage_body: 'La préférence de thème (clair/sombre) peut être stockée dans le localStorage du navigateur et ne constitue pas un cookie HTTP. Selon les orientations ePrivacy habituelles, cela peut être traité comme strictement nécessaire pour une interface cohérente ; les opérateurs doivent confirmer les règles applicables dans leur juridiction.'
 
 notifications:
     title: Notifications

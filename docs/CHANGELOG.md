@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.7] - 2026-07-21
+
+### Added
+
+- Database schema documentation with Mermaid ER diagrams: [DATABASE.md](DATABASE.md)
+- Platform seed (`app:seed-platform` / Setup platform step) also seeds cookie consent profile + inventory (`CookieConsentDemoSeeder`); `use_database_config: true`
+
+### Changed
+
+- Setup wizard (`/setup`) is public **before the first user** with two one-click presets (minimum vs full sample load); after users exist, only `ROLE_ADMIN` (login links to setup while bootstrap is open)
+- Local Compose MySQL data uses host bind mount `./.data/mysql` (gitignored) instead of a named Docker volume
+- Professional cookie-consent copy (modal, inventory, legal page, category labels)
+
+### Fixed
+
+- Fresh-install migrations: re-introspect before dropping `uniq_event_id`; only stamp `setup_completed_at` when users exist; clear setup flag when no users; idempotent AuditKit indexes on concurrent migrate (`Version20260721195000`)
+
 ## [0.12.6] - 2026-07-21
 
 ### Added
@@ -467,7 +484,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...HEAD
+[0.12.7]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.3...v0.12.4

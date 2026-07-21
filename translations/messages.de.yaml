@@ -1031,15 +1031,15 @@ legal:
         changes_heading: Änderungen
         changes_body: 'Der Betreiber kann diese Bedingungen aktualisieren. Die fortgesetzte Nutzung nach der Benachrichtigung stellt die Annahme der aktualisierten Bedingungen dar, sofern dies gesetzlich zulässig ist.'
     cookies:
-        title: Kekse
-        intro: 'Auf dieser Seite werden Cookies und ähnliche Technologien beschrieben, die von dieser %brand%-Instanz verwendet werden. Verwenden Sie die Cookie-Einstellungen, um optionale Kategorien zu ändern.'
+        title: Cookie-Hinweis
+        intro: 'Auf dieser Seite werden die Cookies und ähnlichen Technologien beschrieben, die von dieser %brand%-Instanz verwendet werden. Unbedingt erforderliche Cookies unterstützen Authentifizierung, Sicherheit und die Speicherung Ihrer Einwilligung. Optionale Kategorien werden nur mit Ihrer vorherigen Einwilligung eingesetzt. Über die Cookie-Einstellungen können Sie Ihre Auswahl jederzeit einsehen oder ändern.'
         categories_heading: Kategorien
-        cat_required: Erforderlich
-        cat_required_help: 'Wird für die Anmeldung, Sicherheit und Speicherung Ihrer Cookie-Auswahl benötigt.'
+        cat_required: Unbedingt erforderlich
+        cat_required_help: Unerlässlich für Authentifizierung, Sicherheit und Speicherung Ihrer Einwilligungsentscheidung. Diese Cookies können nicht deaktiviert werden.
         cat_preferences: Präferenzen
-        cat_preferences_help: 'Optionale Funktionen, die sich nicht wesentliche Präsentationsoptionen merken (sofern vom Bediener aktiviert).'
-        cat_analytics: Analytik
-        cat_analytics_help: Optionale Mess-Cookies (nur wenn der Betreiber später Analysetools aktiviert).
+        cat_preferences_help: Optionale Cookies, die nicht wesentliche Darstellungs- oder Funktionseinstellungen speichern, sofern der Betreiber sie aktiviert und Sie zustimmen.
+        cat_analytics: Analyse
+        cat_analytics_help: Optionale Mess-Cookies, die nur eingesetzt werden, wenn der Betreiber Analysetools aktiviert und Sie zuvor einwilligen.
         inventory_heading: Cookie-Inventar
         col_name: Name
         col_category: Kategorie
@@ -1047,12 +1047,12 @@ legal:
         col_purpose: Zweck
         duration_session: Sitzung
         duration_remember: Bis zu 7 Tage
-        duration_consent: Ungefähr 1 Jahr
-        purpose_session: PHP-Sitzungscookie für authentifiziertes Surfen.
-        purpose_remember: Optionale dauerhafte Anmeldung „Angemeldet bleiben“.
-        purpose_consent: Speichert die Auswahl von Cookie-Kategorien und einen anonymisierten Zustimmungsschlüssel für die Protokollierung.
+        duration_consent: Etwa 1 Jahr
+        purpose_session: Erhält die authentifizierte HTTP-Sitzung aufrecht, die für den Zugriff auf geschützte Bereiche des Dienstes erforderlich ist.
+        purpose_remember: Ermöglicht dauerhafte Authentifizierung, wenn bei der Anmeldung „Angemeldet bleiben“ gewählt wird (sicheres Token; begrenzte Laufzeit).
+        purpose_consent: Speichert Cookie-Kategorieentscheidungen und einen anonymisierten Einwilligungsschlüssel zu Nachweis- und Prüfzwecken.
         storage_heading: Lokaler Speicher
-        storage_body: 'Das Thema (Tag/Nacht) kann im LocalStorage des Browsers gespeichert werden und ist kein Cookie. Für unbedingt erforderliche UX ist gemäß den typischen ePrivacy-Richtlinien keine Einwilligung erforderlich, die Betreiber sollten jedoch ihre Zuständigkeit bestätigen.'
+        storage_body: 'Die Theme-Präferenz (hell/dunkel) kann im LocalStorage des Browsers gespeichert werden und ist kein HTTP-Cookie. Nach typischer ePrivacy-Orientierung kann dies als unbedingt erforderlich für eine kohärente Benutzeroberfläche gelten; Betreiber sollten die in ihrer Rechtsordnung geltenden Vorgaben prüfen.'
 
 notifications:
     title: Benachrichtigungen

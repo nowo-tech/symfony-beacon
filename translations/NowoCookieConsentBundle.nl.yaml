@@ -1,2 +1,39 @@
-# Link the consent modal “privacy” control to Beacon’s privacy page.
+# Overrides for nowo-tech/cookie-consent-bundle (category labels + YAML fallbacks).
 nowo_cookie_consent.privacy_route: 'legal_privacy'
+
+nowo_cookie_consent.title: 'Cookiemelding'
+nowo_cookie_consent.intro: 'Deze dienst gebruikt cookies en vergelijkbare technologieën om veilig te functioneren en uw keuzes te onthouden. Strikt noodzakelijke cookies zijn vereist voor kernfunctionaliteit en kunnen niet worden uitgeschakeld. Optionele cookies worden alleen gebruikt met uw voorafgaande toestemming.'
+nowo_cookie_consent.read_more: 'Privacybeleid'
+nowo_cookie_consent.show_preferences: 'Cookie-instellingen'
+nowo_cookie_consent.save: 'Selectie bevestigen'
+nowo_cookie_consent.use_only_functional_cookies: 'Alleen noodzakelijke cookies'
+nowo_cookie_consent.use_all_cookies: 'Alle cookies accepteren'
+nowo_cookie_consent.manage_link: 'Cookie-instellingen'
+nowo_cookie_consent.preferences_bubble.label: 'Cookie-instellingen openen'
+
+nowo_cookie_consent.required.title: 'Strikt noodzakelijk'
+nowo_cookie_consent.required.description: 'Cookies die essentieel zijn voor authenticatie, beveiliging en vastlegging van uw toestemming. Deze blijven altijd actief en kunnen niet worden uitgeschakeld.'
+nowo_cookie_consent.required.always_on: 'Altijd actief'
+
+nowo_cookie_consent.preferences.title: 'Voorkeuren'
+nowo_cookie_consent.preferences.close: 'Terug'
+nowo_cookie_consent.preferences.usage_title: 'Gebruik van cookies'
+nowo_cookie_consent.preferences.usage_description: 'Wij gebruiken cookies en vergelijkbare technologieën. Strikt noodzakelijke cookies blijven actief omdat ze essentieel zijn voor het functioneren van de dienst (beveiliging, sessiebeheer en vastlegging van uw toestemming). Analyse- en voorkeurscookies zijn optioneel en worden alleen met uw voorafgaande toestemming geactiveerd. U kunt alle categorieën accepteren, niet-essentiële weigeren of elke categorie beoordelen. U kunt uw toestemming te allen tijde intrekken of wijzigen via Cookie-instellingen.'
+nowo_cookie_consent.preferences.description: 'Optionele cookies die niet-essentiële presentatie- of functiekeuzes opslaan wanneer u deze categorie inschakelt.'
+
+nowo_cookie_consent.functionality.title: 'Functionaliteit'
+nowo_cookie_consent.functionality.description: 'Optionele cookies die uitgebreide functies mogelijk maken naast de kernwerking van de dienst.'
+
+nowo_cookie_consent.analytics.title: 'Analyse'
+nowo_cookie_consent.analytics.description: 'Optionele cookies om het gebruik te meten en de dienst te verbeteren. Ze worden alleen geplaatst als u toestemt en de beheerder analysetools heeft ingeschakeld.'
+
+nowo_cookie_consent.marketing.title: 'Marketing'
+nowo_cookie_consent.marketing.description: 'Optionele cookies voor reclame of remarketing. Ze worden alleen met uw voorafgaande toestemming geplaatst.'
+
+nowo_cookie_consent.inventory.caption: 'Cookie-inventaris'
+nowo_cookie_consent.inventory.name: 'Naam'
+nowo_cookie_consent.inventory.provider: 'Aanbieder'
+nowo_cookie_consent.inventory.purpose: 'Doel'
+nowo_cookie_consent.inventory.duration: 'Duur'
+nowo_cookie_consent.inventory.allow: 'Toestaan'
+nowo_cookie_consent.granular.help: 'Schakel een hele categorie in of uit, of selecteer individuele cookies waar beschikbaar.'

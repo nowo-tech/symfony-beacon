@@ -75,6 +75,9 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/health/(live|ready)$
       roles: PUBLIC_ACCESS
+    # First-run wizard (controller still denies when setup is complete / users exist)
+    - path: ^/setup
+      roles: PUBLIC_ACCESS
     - path: ^/
       roles: ROLE_USER
 when@test:

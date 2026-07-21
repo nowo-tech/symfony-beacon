@@ -1,2 +1,40 @@
-# Link the consent modal “privacy” control to Beacon’s privacy page.
+# Overrides for nowo-tech/cookie-consent-bundle (category labels + YAML fallbacks).
+# Modal body/buttons for the default profile are seeded in CookieConsentDemoSeeder.
 nowo_cookie_consent.privacy_route: 'legal_privacy'
+
+nowo_cookie_consent.title: 'Cookie notice'
+nowo_cookie_consent.intro: 'This service uses cookies and similar technologies to operate securely and to remember your choices. Strictly necessary cookies are required for core functionality and cannot be disabled. Optional cookies are used only with your prior consent.'
+nowo_cookie_consent.read_more: 'Privacy policy'
+nowo_cookie_consent.show_preferences: 'Cookie settings'
+nowo_cookie_consent.save: 'Confirm selection'
+nowo_cookie_consent.use_only_functional_cookies: 'Necessary cookies only'
+nowo_cookie_consent.use_all_cookies: 'Accept all cookies'
+nowo_cookie_consent.manage_link: 'Cookie settings'
+nowo_cookie_consent.preferences_bubble.label: 'Open cookie settings'
+
+nowo_cookie_consent.required.title: 'Strictly necessary'
+nowo_cookie_consent.required.description: 'Cookies that are essential for authentication, security, and recording your consent. These are always active and cannot be switched off.'
+nowo_cookie_consent.required.always_on: 'Always active'
+
+nowo_cookie_consent.preferences.title: 'Preferences'
+nowo_cookie_consent.preferences.close: 'Back'
+nowo_cookie_consent.preferences.usage_title: 'How we use cookies'
+nowo_cookie_consent.preferences.usage_description: 'We use cookies and similar technologies. Strictly necessary cookies remain active because they are essential for the service to function (security, session management, and storing your consent). Analytics and preference cookies are optional and are activated only with your prior consent. You may accept all categories, refuse non-essential cookies, or review each category. You may withdraw or change your consent at any time via Cookie settings.'
+nowo_cookie_consent.preferences.description: 'Optional cookies that store non-essential presentation or feature choices when you enable this category.'
+
+nowo_cookie_consent.functionality.title: 'Functionality'
+nowo_cookie_consent.functionality.description: 'Optional cookies that enable enhanced features beyond core operation of the service.'
+
+nowo_cookie_consent.analytics.title: 'Analytics'
+nowo_cookie_consent.analytics.description: 'Optional cookies used to measure usage and improve the service. They are set only if you consent and the operator has enabled analytics tooling.'
+
+nowo_cookie_consent.marketing.title: 'Marketing'
+nowo_cookie_consent.marketing.description: 'Optional cookies used for advertising or remarketing. They are set only with your prior consent.'
+
+nowo_cookie_consent.inventory.caption: 'Cookie inventory'
+nowo_cookie_consent.inventory.name: 'Name'
+nowo_cookie_consent.inventory.provider: 'Provider'
+nowo_cookie_consent.inventory.purpose: 'Purpose'
+nowo_cookie_consent.inventory.duration: 'Duration'
+nowo_cookie_consent.inventory.allow: 'Allow'
+nowo_cookie_consent.granular.help: 'Enable or disable an entire category, or select individual cookies where available.'

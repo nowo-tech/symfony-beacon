@@ -33,5 +33,15 @@ final class SeedPlatformCommandTest extends DatabaseWebTestCase
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $count = (int) $em->createQuery('SELECT COUNT(u.id) FROM '.User::class.' u')->getSingleScalarResult();
         self::assertSame(0, $count);
+
+        $configCount = (int) $em->createQuery(
+            'SELECT COUNT(c.id) FROM Nowo\CookieConsentBundle\Entity\CookieConsentConfig c',
+        )->getSingleScalarResult();
+        self::assertGreaterThanOrEqual(1, $configCount);
+
+        $definitionCount = (int) $em->createQuery(
+            'SELECT COUNT(d.id) FROM Nowo\CookieConsentBundle\Entity\CookieDefinition d',
+        )->getSingleScalarResult();
+        self::assertGreaterThanOrEqual(4, $definitionCount);
     }
 }

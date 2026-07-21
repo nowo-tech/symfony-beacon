@@ -983,7 +983,7 @@ legal:
     nav:
         label: Jurídico
     last_updated: 'Última atualização: %date%'
-    manage_cookies: Configurações de cookies
+    manage_cookies: Definições de cookies
     placeholder:
         legal_name: 'Nome legal: [Nome legal do operador – substituir]'
         address: 'Endereço: [Endereço registrado – substituir]'
@@ -1031,28 +1031,28 @@ legal:
         changes_heading: Mudanças
         changes_body: A operadora poderá atualizar estes termos. O uso continuado após aviso constitui aceitação dos termos atualizados quando permitido por lei.
     cookies:
-        title: Biscoitos
-        intro: 'Esta página descreve cookies e tecnologias semelhantes usadas por esta instância %brand%. Use as configurações de cookies para alterar categorias opcionais.'
+        title: Aviso de cookies
+        intro: 'Esta página descreve os cookies e tecnologias semelhantes utilizados por esta instância %brand%. Os cookies estritamente necessários suportam autenticação, segurança e registo do consentimento. As categorias opcionais são utilizadas apenas com o seu consentimento prévio. Utilize as Definições de cookies para rever ou alterar a sua seleção a qualquer momento.'
         categories_heading: Categorias
-        cat_required: Obrigatório
-        cat_required_help: 'Necessário para login, segurança e armazenamento de sua escolha de cookies.'
+        cat_required: Estritamente necessários
+        cat_required_help: Imprescindíveis para autenticação, segurança e registo da sua decisão de consentimento. Estes cookies não podem ser desativados.
         cat_preferences: Preferências
-        cat_preferences_help: Recursos opcionais que lembram opções de apresentação não essenciais (quando habilitados pelo operador).
-        cat_analytics: Análise
-        cat_analytics_help: Cookies de medição opcionais (somente se o operador ativar as ferramentas de análise posteriormente).
+        cat_preferences_help: Cookies opcionais que armazenam escolhas de apresentação ou de funcionalidades não essenciais quando o operador as ativa e você consente.
+        cat_analytics: Analítica
+        cat_analytics_help: Cookies de medição opcionais, utilizados apenas se o operador ativar ferramentas de analítica e você der consentimento prévio.
         inventory_heading: Inventário de cookies
         col_name: Nome
         col_category: Categoria
         col_duration: Duração
-        col_purpose: Propósito
+        col_purpose: Finalidade
         duration_session: Sessão
         duration_remember: Até 7 dias
-        duration_consent: Cerca de 1 ano
-        purpose_session: Cookie de sessão PHP para navegação autenticada.
-        purpose_remember: Login persistente opcional “Lembrar-me”.
-        purpose_consent: Armazena opções de categorias de cookies e uma chave de consentimento anônima para registro.
+        duration_consent: Aproximadamente 1 ano
+        purpose_session: Mantém a sessão HTTP autenticada necessária para aceder às áreas protegidas do serviço.
+        purpose_remember: Permite autenticação persistente quando “Lembrar-me” é selecionado no início de sessão (token seguro; validade limitada).
+        purpose_consent: Armazena decisões de categorias de cookies e uma chave de consentimento anonimizada para fins de responsabilização e auditoria.
         storage_heading: Armazenamento local
-        storage_body: 'O tema (dia/noite) pode ser armazenado no localStorage do navegador e não é um cookie. Não é necessário consentimento sob as orientações típicas de ePrivacy para UX estritamente necessária, mas os operadores devem confirmar sua jurisdição.'
+        storage_body: 'A preferência de tema (claro/escuro) pode ser armazenada no localStorage do navegador e não constitui um cookie HTTP. Segundo as orientações típicas de ePrivacy, pode ser tratada como estritamente necessária para uma interface coerente; os operadores devem confirmar as regras aplicáveis na sua jurisdição.'
 
 notifications:
     title: Notificações

@@ -7,7 +7,13 @@
     <div class="mb-6">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-moss)]">{{ 'setup.eyebrow'|trans }}</p>
         <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'setup.title'|trans }}</h1>
-        <p class="mt-2 text-sm text-[var(--color-ink)]/65">{{ 'setup.intro'|trans }}</p>
+        <p class="mt-2 text-sm text-[var(--color-ink)]/65">
+            {% if bootstrapMode %}
+                {{ 'setup.intro_bootstrap'|trans }}
+            {% else %}
+                {{ 'setup.intro'|trans }}
+            {% endif %}
+        </p>
     </div>
 
     {% if setupCompleted %}
@@ -17,61 +23,101 @@
         </div>
     {% endif %}
 
-    <ol class="grid gap-4">
-        <li class="panel">
-            <h2 class="text-lg font-semibold">1. {{ 'setup.step_platform.title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_platform.body'|trans }}</p>
-            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
-                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
-                <input type="hidden" name="action" value="platform">
-                <button type="submit" class="btn-primary">{{ 'setup.step_platform.cta'|trans }}</button>
-            </form>
-        </li>
-
-        <li class="panel">
-            <h2 class="text-lg font-semibold">2. {{ 'setup.step_demo.title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_demo.body'|trans }}</p>
-            {% if hasDemoProject %}
-                <p class="mt-2 text-sm text-[var(--color-moss)]">{{ 'setup.step_demo.exists'|trans }}</p>
-            {% endif %}
-            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
-                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
-                <input type="hidden" name="action" value="demo">
-                <button type="submit" class="btn-ghost">{{ 'setup.step_demo.cta'|trans }}</button>
-            </form>
-        </li>
-
-        <li class="panel">
-            <h2 class="text-lg font-semibold">3. {{ 'setup.step_sample.title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_sample.body'|trans }}</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-                <form method="post" action="{{ path('setup_wizard_run') }}">
+    {% if bootstrapMode %}
+        <div class="grid gap-4">
+            <div class="panel">
+                <h2 class="text-lg font-semibold">{{ 'setup.preset_minimum.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.preset_minimum.body'|trans }}</p>
+                <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-[var(--color-ink)]/70">
+                    <li>{{ 'setup.preset_minimum.item_platform'|trans }}</li>
+                    <li>{{ 'setup.preset_minimum.item_demo'|trans({'%email%': demoEmail, '%password%': demoPassword}) }}</li>
+                </ul>
+                <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
                     <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
-                    <input type="hidden" name="action" value="sample_dev">
-                    <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.dev'|trans }}</button>
-                </form>
-                <form method="post" action="{{ path('setup_wizard_run') }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
-                    <input type="hidden" name="action" value="sample_load">
-                    <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.load'|trans }}</button>
+                    <input type="hidden" name="action" value="minimum">
+                    <button type="submit" class="btn-primary">{{ 'setup.preset_minimum.cta'|trans }}</button>
                 </form>
             </div>
-            {% if not hasDemoProject %}
-                <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'setup.step_sample.need_demo'|trans }}</p>
-            {% endif %}
-        </li>
 
-        <li class="panel">
-            <h2 class="text-lg font-semibold">4. {{ 'setup.step_done.title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_done.body'|trans }}</p>
-            <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4 flex flex-wrap gap-2">
-                <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
-                <input type="hidden" name="action" value="complete">
-                <button type="submit" class="btn-primary">{{ 'setup.step_done.cta'|trans }}</button>
-                <a class="btn-ghost no-underline" href="{{ path('dashboard_home') }}">{{ 'setup.back_dashboard'|trans }}</a>
-            </form>
-        </li>
-    </ol>
+            <div class="panel">
+                <h2 class="text-lg font-semibold">{{ 'setup.preset_bulk.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.preset_bulk.body'|trans }}</p>
+                <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-[var(--color-ink)]/70">
+                    <li>{{ 'setup.preset_bulk.item_minimum'|trans }}</li>
+                    <li>{{ 'setup.preset_bulk.item_sample'|trans }}</li>
+                </ul>
+                <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="bulk">
+                    <button type="submit" class="btn-ghost">{{ 'setup.preset_bulk.cta'|trans }}</button>
+                </form>
+                <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'setup.preset_bulk.note'|trans }}</p>
+            </div>
+        </div>
+
+        <p class="mt-6 text-sm text-[var(--color-ink)]/60">
+            {{ 'setup.bootstrap_login_hint'|trans }}
+            <a class="font-medium underline" href="{{ path('nowo_auth_kit_login', {_locale: app.request.locale|default('en')}) }}">{{ 'setup.bootstrap_login_link'|trans }}</a>
+            ·
+            <a class="font-medium underline" href="{{ path('nowo_auth_kit_register', {_locale: app.request.locale|default('en')}) }}">{{ 'setup.bootstrap_register_link'|trans }}</a>
+        </p>
+    {% else %}
+        <ol class="grid gap-4">
+            <li class="panel">
+                <h2 class="text-lg font-semibold">1. {{ 'setup.step_platform.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_platform.body'|trans }}</p>
+                <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="platform">
+                    <button type="submit" class="btn-primary">{{ 'setup.step_platform.cta'|trans }}</button>
+                </form>
+            </li>
+
+            <li class="panel">
+                <h2 class="text-lg font-semibold">2. {{ 'setup.step_demo.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_demo.body'|trans }}</p>
+                {% if hasDemoProject %}
+                    <p class="mt-2 text-sm text-[var(--color-moss)]">{{ 'setup.step_demo.exists'|trans }}</p>
+                {% endif %}
+                <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="demo">
+                    <button type="submit" class="btn-ghost">{{ 'setup.step_demo.cta'|trans }}</button>
+                </form>
+            </li>
+
+            <li class="panel">
+                <h2 class="text-lg font-semibold">3. {{ 'setup.step_sample.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_sample.body'|trans }}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <form method="post" action="{{ path('setup_wizard_run') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                        <input type="hidden" name="action" value="sample_dev">
+                        <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.dev'|trans }}</button>
+                    </form>
+                    <form method="post" action="{{ path('setup_wizard_run') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                        <input type="hidden" name="action" value="sample_load">
+                        <button type="submit" class="btn-ghost" {% if not hasDemoProject %}disabled{% endif %}>{{ 'setup.step_sample.load'|trans }}</button>
+                    </form>
+                </div>
+                {% if not hasDemoProject %}
+                    <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'setup.step_sample.need_demo'|trans }}</p>
+                {% endif %}
+            </li>
+
+            <li class="panel">
+                <h2 class="text-lg font-semibold">4. {{ 'setup.step_done.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'setup.step_done.body'|trans }}</p>
+                <form method="post" action="{{ path('setup_wizard_run') }}" class="mt-4 flex flex-wrap gap-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('setup_wizard') }}">
+                    <input type="hidden" name="action" value="complete">
+                    <button type="submit" class="btn-primary">{{ 'setup.step_done.cta'|trans }}</button>
+                    <a class="btn-ghost no-underline" href="{{ path('dashboard_home') }}">{{ 'setup.back_dashboard'|trans }}</a>
+                </form>
+            </li>
+        </ol>
+    {% endif %}
 
     <p class="mt-6 text-xs text-[var(--color-ink)]/50">{{ 'setup.cli_hint'|trans }}</p>
 </div>

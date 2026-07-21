@@ -5,7 +5,7 @@ Beacon separates **schema**, **platform catalogs**, **demo identity**, and **opt
 | Layer | Command / Make | Purpose |
 |-------|----------------|---------|
 | Schema | `doctrine:migrations:migrate` | Database structure |
-| Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs (idempotent; safe after upgrades) |
+| Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs + cookie consent profile/inventory (idempotent; safe after upgrades) |
 | Demo | `app:seed-demo` / `make seed` | Local admin + `demo` project + `.demo-client.env` |
 | Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](MERCURE.md)) |
 
@@ -19,9 +19,9 @@ make seed               # optional: demo user + project
 make seed-sample        # optional: PROFILE=dev samples
 ```
 
-Or register the first admin at `/en/register` after `make bootstrap` (no demo seed required).
+Or open **`/setup` before login** when the database has no users yet — choose **Minimum** (platform + demo admin) or **Full sample load** (minimum + `load` telemetry), then sign in with `admin@symfony-beacon.local` / `admin123`. Alternatively register the first admin at `/en/register`.
 
-Admins can also use the **Setup** wizard at `/setup` (banner on the dashboard until marked complete).
+Once users exist, only `ROLE_ADMIN` can reopen `/setup` (dashboard banner until marked complete).
 
 After setup, signed-in users get a one-time **product tour** on the dashboard (and later on project Issues / Administration when those pages are first opened). Tours respect role and project permissions; finish or close to dismiss — replay from Account → Display.
 

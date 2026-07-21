@@ -28,7 +28,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login
 - **Administration → Mercure** (`/settings/mercure`): optional live new-issue toasts (hub + JWT); see [docs/MERCURE.md](docs/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
-- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install- Install seed layers + admin **Setup** wizard (`/setup`); contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
+- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install
+- Install seed layers + **Setup** wizard (`/setup`, public one-click bootstrap when no users yet); contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
 - Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history, **transfer ownership**, delete)
 - Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
@@ -106,7 +107,7 @@ Application code is written for worker safety (`ResetInterface` when needed). Se
 
 ## Architecture
 
-Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). **Tables / ER diagrams:** [docs/DATABASE.md](docs/DATABASE.md).
 
 | Module | Responsibility |
 |--------|----------------|
@@ -135,6 +136,7 @@ docker compose exec php php bin/phpunit
 
 - [Install & seed layers](docs/INSTALL.md)
 - [Architecture rationale](docs/ARCHITECTURE.md)
+- [Database schema (Mermaid ER)](docs/DATABASE.md)
 - [HTTP API overview](docs/API.md)
 - [Product roadmap](docs/ROADMAP.md)
 - [Project notifications](docs/NOTIFICATIONS.md)

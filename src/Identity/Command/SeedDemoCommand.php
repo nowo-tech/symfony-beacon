@@ -7,6 +7,7 @@ namespace App\Identity\Command;
 use App\Identity\Service\DemoIdentitySeeder;
 use App\Project\Entity\ProjectApiKey;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
+use App\Shared\CookieConsent\CookieConsentDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -43,6 +44,7 @@ final class SeedDemoCommand extends Command
         private readonly DemoIdentitySeeder $demoIdentitySeeder,
         private readonly BreadcrumbDemoSeeder $breadcrumbDemoSeeder,
         private readonly DashboardMenuDemoSeeder $dashboardMenuDemoSeeder,
+        private readonly CookieConsentDemoSeeder $cookieConsentDemoSeeder,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {
@@ -57,7 +59,7 @@ final class SeedDemoCommand extends Command
             ->addOption('base-url', null, InputOption::VALUE_REQUIRED, 'Browser / UI base URL for DSN display', 'https://localhost:9444')
             ->addOption('ingest-base-url', null, InputOption::VALUE_REQUIRED, 'Docker client ingest base URL for BEACON_DSN', 'http://host.docker.internal:9081')
             ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)')
-            ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb seed');
+            ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb/cookie-consent seed');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -74,6 +76,9 @@ final class SeedDemoCommand extends Command
             }
             if ($this->dashboardMenuDemoSeeder->seedIfEmpty()) {
                 $io->success('Seeded / updated navigation menus');
+            }
+            if ($this->cookieConsentDemoSeeder->seedIfEmpty()) {
+                $io->success('Seeded / updated cookie consent profile and inventory');
             }
         }
 

@@ -1075,15 +1075,33 @@ setup:
     eyebrow: First run
     title: Instance setup
     intro: Install navigation catalogs and optional demo data. Same steps as the CLI seed layers.
+    intro_bootstrap: This instance has no users yet. Choose a one-click bootstrap, then sign in with the demo admin — or register your own first admin instead.
     already_done: Setup is marked complete.
     back_dashboard: Back to dashboard
+    login_setup_link: First-run setup
+    bootstrap_login_hint: Prefer to create your own admin?
+    bootstrap_login_link: Sign in
+    bootstrap_register_link: Register first admin
     banner:
         title: Finish instance setup
         body: Install menus/breadcrumbs and optional demo samples for this Beacon instance.
         cta: Open setup
+    preset_minimum:
+        title: Minimum setup
+        body: Navigation catalogs, cookie consent, and the local demo admin account. No sample telemetry.
+        item_platform: Menus, breadcrumbs, and cookie consent profile
+        item_demo: 'Demo admin %email% / %password% and demo project with API key'
+        cta: Install minimum
+    preset_bulk:
+        title: Full sample load
+        body: Everything in minimum setup, plus a larger sample telemetry dataset for local QA.
+        item_minimum: Platform catalogs and demo admin / project
+        item_sample: Sample issues and charts (load profile)
+        cta: Install with sample data
+        note: This can take a minute. Huge datasets remain CLI-only (`app:seed-sample --size=huge --force`).
     step_platform:
         title: Platform navigation
-        body: Upsert dashboard menus and breadcrumbs (safe to run again after upgrades).
+        body: Upsert dashboard menus, breadcrumbs, and the cookie consent profile/inventory (safe to run again after upgrades).
         cta: Install navigation
     step_demo:
         title: Demo project
@@ -1102,11 +1120,14 @@ setup:
         cta: Mark setup complete
     cli_hint: 'CLI equivalent: make bootstrap && make seed && make seed-sample — see docs/INSTALL.md'
     flash:
-        platform_ok: Navigation catalogs updated.
+        platform_ok: Navigation catalogs and cookie consent updated.
         demo_ok: Demo user / project ready.
         demo_exists: Demo user and project already exist.
         sample_ok: Sample telemetry loaded. Mercure live alerts were enabled with env defaults when needed.
         complete: Setup marked complete.
+        minimum_ok: Minimum setup installed (platform + demo).
+        bulk_ok: Full sample load installed (platform + demo + load telemetry).
+        bootstrap_ready: 'Setup complete. Sign in with admin@symfony-beacon.local / admin123'
         unknown_action: Unknown setup action.
         failed: Setup action failed.
 
@@ -1233,15 +1254,15 @@ legal:
         changes_heading: Changes
         changes_body: The operator may update these terms. Continued use after notice constitutes acceptance of the updated terms where permitted by law.
     cookies:
-        title: Cookies
-        intro: 'This page describes cookies and similar technologies used by this %brand% instance. Use Cookie settings to change optional categories.'
+        title: Cookie notice
+        intro: 'This page describes the cookies and similar technologies used by this %brand% instance. Strictly necessary cookies support authentication, security, and consent recording. Optional categories are used only with your prior consent. Use Cookie settings to review or change your selection at any time.'
         categories_heading: Categories
-        cat_required: Required
-        cat_required_help: Needed for sign-in, security, and storing your cookie choice.
+        cat_required: Strictly necessary
+        cat_required_help: Essential for authentication, security, and recording your consent decision. These cookies cannot be disabled.
         cat_preferences: Preferences
-        cat_preferences_help: Optional features that remember non-essential presentation choices (when enabled by the operator).
+        cat_preferences_help: Optional cookies that store non-essential presentation or feature choices when enabled by the operator and accepted by you.
         cat_analytics: Analytics
-        cat_analytics_help: Optional measurement cookies (only if the operator enables analytics tooling later).
+        cat_analytics_help: Optional measurement cookies used only if the operator enables analytics tooling and you give prior consent.
         inventory_heading: Cookie inventory
         col_name: Name
         col_category: Category
@@ -1249,12 +1270,12 @@ legal:
         col_purpose: Purpose
         duration_session: Session
         duration_remember: Up to 7 days
-        duration_consent: About 1 year
-        purpose_session: PHP session cookie for authenticated browsing.
-        purpose_remember: Optional “Remember me” persistent login.
-        purpose_consent: Stores cookie category choices and an anonymized consent key for logging.
+        duration_consent: Approximately 1 year
+        purpose_session: Maintains the authenticated HTTP session required to access protected areas of the service.
+        purpose_remember: Enables persistent authentication when “Remember me” is selected at sign-in (secure token; limited lifetime).
+        purpose_consent: Stores cookie-category decisions and an anonymized consent key for accountability and audit logging.
         storage_heading: Local storage
-        storage_body: Theme (day/night) may be stored in the browser’s localStorage and is not a cookie. It does not require consent under typical ePrivacy guidance for strictly necessary UX, but operators should confirm for their jurisdiction.
+        storage_body: Theme preference (light/dark) may be stored in the browser’s localStorage and is not a HTTP cookie. Under typical ePrivacy guidance this may be treated as strictly necessary for a coherent user interface; operators should confirm the applicable rules in their jurisdiction.
 
 notifications:
     title: Notifications

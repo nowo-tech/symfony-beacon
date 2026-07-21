@@ -1033,15 +1033,33 @@ setup:
     eyebrow: Primer arranque
     title: Configuración de la instancia
     intro: Instala catálogos de navegación y datos demo opcionales. Son los mismos pasos que las capas CLI de seed.
+    intro_bootstrap: Esta instancia aún no tiene usuarios. Elige un arranque en un clic y entra con el admin demo — o registra tu propio primer administrador.
     already_done: La configuración ya está marcada como completa.
     back_dashboard: Volver al panel
+    login_setup_link: Configuración inicial
+    bootstrap_login_hint: ¿Prefieres crear tu propio admin?
+    bootstrap_login_link: Iniciar sesión
+    bootstrap_register_link: Registrar primer admin
     banner:
         title: Termina la configuración
         body: Instala menús/breadcrumbs y muestras demo opcionales para esta instancia Beacon.
         cta: Abrir configuración
+    preset_minimum:
+        title: Configuración mínima
+        body: Catálogos de navegación, consentimiento de cookies y la cuenta admin demo local. Sin telemetría de muestra.
+        item_platform: Menús, breadcrumbs y perfil de consentimiento de cookies
+        item_demo: 'Admin demo %email% / %password% y proyecto demo con API key'
+        cta: Instalar mínimo
+    preset_bulk:
+        title: Carga completa de muestras
+        body: Todo lo del mínimo, más un conjunto mayor de telemetría de muestra para QA local.
+        item_minimum: Catálogos de plataforma y admin / proyecto demo
+        item_sample: Issues y gráficos de muestra (perfil load)
+        cta: Instalar con datos de muestra
+        note: Puede tardar un minuto. Los datasets huge siguen solo por CLI (`app:seed-sample --size=huge --force`).
     step_platform:
         title: Navegación de plataforma
-        body: Actualiza menús y breadcrumbs (seguro repetirlo tras upgrades).
+        body: Actualiza menús, breadcrumbs y el perfil/inventario de consentimiento de cookies (seguro repetirlo tras upgrades).
         cta: Instalar navegación
     step_demo:
         title: Proyecto demo
@@ -1060,11 +1078,14 @@ setup:
         cta: Marcar como completo
     cli_hint: 'Equivalente CLI: make bootstrap && make seed && make seed-sample — docs/INSTALL.md'
     flash:
-        platform_ok: Catálogos de navegación actualizados.
+        platform_ok: Catálogos de navegación y consentimiento de cookies actualizados.
         demo_ok: Usuario / proyecto demo listos.
         demo_exists: El usuario y proyecto demo ya existen.
         sample_ok: Telemetría de muestra cargada. Las alertas Mercure en vivo se activaron con los valores de entorno cuando hacía falta.
         complete: Configuración marcada como completa.
+        minimum_ok: Configuración mínima instalada (plataforma + demo).
+        bulk_ok: Carga completa instalada (plataforma + demo + telemetría load).
+        bootstrap_ready: 'Configuración lista. Entra con admin@symfony-beacon.local / admin123'
         unknown_action: Acción de setup desconocida.
         failed: Falló la acción de setup.
 
@@ -1143,7 +1164,7 @@ legal:
     nav:
         label: Legal
     last_updated: 'Última actualización: %date%'
-    manage_cookies: Ajustes de cookies
+    manage_cookies: Configuración de cookies
     placeholder:
         legal_name: 'Nombre legal: [Nombre legal del operador — sustituir]'
         address: 'Dirección: [Domicilio social — sustituir]'
@@ -1191,15 +1212,15 @@ legal:
         changes_heading: Cambios
         changes_body: El operador puede actualizar estos términos. El uso continuado tras el aviso puede implicar la aceptación de los términos actualizados cuando la ley lo permita.
     cookies:
-        title: Cookies
-        intro: 'Esta página describe las cookies y tecnologías similares usadas por esta instancia de %brand%. Usa Ajustes de cookies para cambiar las categorías opcionales.'
+        title: Aviso de cookies
+        intro: 'Esta página describe las cookies y tecnologías similares utilizadas por esta instancia de %brand%. Las cookies estrictamente necesarias sustentan la autenticación, la seguridad y el registro del consentimiento. Las categorías opcionales se utilizan únicamente con su consentimiento previo. Use Configuración de cookies para revisar o modificar su selección en cualquier momento.'
         categories_heading: Categorías
-        cat_required: Necesarias
-        cat_required_help: Imprescindibles para el acceso, la seguridad y guardar tu elección de cookies.
+        cat_required: Estrictamente necesarias
+        cat_required_help: Imprescindibles para la autenticación, la seguridad y el registro de su decisión de consentimiento. Estas cookies no pueden desactivarse.
         cat_preferences: Preferencias
-        cat_preferences_help: Funciones opcionales que recuerdan opciones de presentación no esenciales (si el operador las habilita).
+        cat_preferences_help: Cookies opcionales que almacenan elecciones de presentación o de funciones no esenciales cuando el operador las habilita y usted las acepta.
         cat_analytics: Analítica
-        cat_analytics_help: Cookies de medición opcionales (solo si el operador activa herramientas de analítica más adelante).
+        cat_analytics_help: Cookies de medición opcionales, utilizadas solo si el operador activa herramientas de analítica y usted otorga su consentimiento previo.
         inventory_heading: Inventario de cookies
         col_name: Nombre
         col_category: Categoría
@@ -1207,12 +1228,12 @@ legal:
         col_purpose: Finalidad
         duration_session: Sesión
         duration_remember: Hasta 7 días
-        duration_consent: Aprox. 1 año
-        purpose_session: Cookie de sesión PHP para la navegación autenticada.
-        purpose_remember: Login persistente opcional «Recordarme».
-        purpose_consent: Guarda las categorías de cookies elegidas y una clave anonimizada para el registro de consentimiento.
+        duration_consent: Aproximadamente 1 año
+        purpose_session: Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio.
+        purpose_remember: Permite la autenticación persistente cuando se selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada).
+        purpose_consent: Almacena las decisiones sobre categorías de cookies y una clave anonimizada con fines de responsabilidad y auditoría.
         storage_heading: Almacenamiento local
-        storage_body: El tema (día/noche) puede guardarse en localStorage del navegador y no es una cookie. Suele considerarse necesario para la UX, pero el operador debe confirmarlo según su jurisdicción.
+        storage_body: La preferencia de tema (claro/oscuro) puede guardarse en el localStorage del navegador y no constituye una cookie HTTP. Según la orientación habitual sobre ePrivacy, puede tratarse como estrictamente necesaria para una interfaz coherente; el operador debe confirmar las normas aplicables en su jurisdicción.
 
 notifications:
     title: Notificaciones

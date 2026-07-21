@@ -12,6 +12,8 @@ use Nowo\MigrationsKitBundle\Migration\MigrationDefinitionKeys as MDK;
 
 /**
  * AuditKit blame (+ updated_at on groups) for admin users and groups.
+ *
+ * Idempotent: concurrent migrate (entrypoint + CLI) may have already added indexes.
  */
 final class Version20260721195000 extends AbstractMigration
 {
@@ -24,40 +26,73 @@ final class Version20260721195000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        $sm = $this->connection->createSchemaManager();
+
+        $appUser = $sm->introspectTable('app_user');
+        $appUserDef = [
+            MDK::COLUMNS => [
+                AuditFields::createdAt(),
+                ...AuditFields::blameColumns(),
+            ],
+        ];
+        $appUserIndexes = [];
+        if (!$appUser->hasIndex('IDX_APP_USER_CREATED_BY')) {
+            $appUserIndexes[] = ['columns' => ['created_by_id'], 'name' => 'IDX_APP_USER_CREATED_BY'];
+        }
+        if (!$appUser->hasIndex('IDX_APP_USER_UPDATED_BY')) {
+            $appUserIndexes[] = ['columns' => ['updated_by_id'], 'name' => 'IDX_APP_USER_UPDATED_BY'];
+        }
+        if ([] !== $appUserIndexes) {
+            $appUserDef[MDK::INDEXES] = $appUserIndexes;
+        }
+        $appUserFks = array_map(static fn ($fk) => $fk->getName(), $appUser->getForeignKeys());
+        $appUserFkDefs = [];
+        if (!\in_array('FK_APP_USER_CREATED_BY', $appUserFks, true) || !\in_array('FK_APP_USER_UPDATED_BY', $appUserFks, true)) {
+            foreach (AuditFields::blameForeignKeys('app_user', 'FK_APP_USER_CREATED_BY', 'FK_APP_USER_UPDATED_BY') as $fk) {
+                if (!\in_array($fk['name'], $appUserFks, true)) {
+                    $appUserFkDefs[] = $fk;
+                }
+            }
+        }
+        if ([] !== $appUserFkDefs) {
+            $appUserDef[MDK::FOREIGN_KEYS] = $appUserFkDefs;
+        }
+
+        $userGroup = $sm->introspectTable('user_group');
+        $userGroupDef = [
+            MDK::COLUMNS => [
+                AuditFields::createdAt(),
+                AuditFields::updatedAt(),
+                ...AuditFields::blameColumns(),
+            ],
+        ];
+        $userGroupIndexes = [];
+        if (!$userGroup->hasIndex('IDX_USER_GROUP_CREATED_BY')) {
+            $userGroupIndexes[] = ['columns' => ['created_by_id'], 'name' => 'IDX_USER_GROUP_CREATED_BY'];
+        }
+        if (!$userGroup->hasIndex('IDX_USER_GROUP_UPDATED_BY')) {
+            $userGroupIndexes[] = ['columns' => ['updated_by_id'], 'name' => 'IDX_USER_GROUP_UPDATED_BY'];
+        }
+        if ([] !== $userGroupIndexes) {
+            $userGroupDef[MDK::INDEXES] = $userGroupIndexes;
+        }
+        $userGroupFks = array_map(static fn ($fk) => $fk->getName(), $userGroup->getForeignKeys());
+        $userGroupFkDefs = [];
+        if (!\in_array('FK_USER_GROUP_CREATED_BY', $userGroupFks, true) || !\in_array('FK_USER_GROUP_UPDATED_BY', $userGroupFks, true)) {
+            foreach (AuditFields::blameForeignKeys('app_user', 'FK_USER_GROUP_CREATED_BY', 'FK_USER_GROUP_UPDATED_BY') as $fk) {
+                if (!\in_array($fk['name'], $userGroupFks, true)) {
+                    $userGroupFkDefs[] = $fk;
+                }
+            }
+        }
+        if ([] !== $userGroupFkDefs) {
+            $userGroupDef[MDK::FOREIGN_KEYS] = $userGroupFkDefs;
+        }
+
         $this->applyMdk([
             MDK::TABLES => [
-                'app_user' => [
-                    MDK::COLUMNS => [
-                        // Align NOT NULL created_at with AuditKit TimestampableTrait (nullable).
-                        AuditFields::createdAt(),
-                        ...AuditFields::blameColumns(),
-                    ],
-                    MDK::INDEXES => [
-                        ['columns' => ['created_by_id'], 'name' => 'IDX_APP_USER_CREATED_BY'],
-                        ['columns' => ['updated_by_id'], 'name' => 'IDX_APP_USER_UPDATED_BY'],
-                    ],
-                    MDK::FOREIGN_KEYS => AuditFields::blameForeignKeys(
-                        'app_user',
-                        'FK_APP_USER_CREATED_BY',
-                        'FK_APP_USER_UPDATED_BY',
-                    ),
-                ],
-                'user_group' => [
-                    MDK::COLUMNS => [
-                        AuditFields::createdAt(),
-                        AuditFields::updatedAt(),
-                        ...AuditFields::blameColumns(),
-                    ],
-                    MDK::INDEXES => [
-                        ['columns' => ['created_by_id'], 'name' => 'IDX_USER_GROUP_CREATED_BY'],
-                        ['columns' => ['updated_by_id'], 'name' => 'IDX_USER_GROUP_UPDATED_BY'],
-                    ],
-                    MDK::FOREIGN_KEYS => AuditFields::blameForeignKeys(
-                        'app_user',
-                        'FK_USER_GROUP_CREATED_BY',
-                        'FK_USER_GROUP_UPDATED_BY',
-                    ),
-                ],
+                'app_user' => $appUserDef,
+                'user_group' => $userGroupDef,
             ],
         ]);
     }

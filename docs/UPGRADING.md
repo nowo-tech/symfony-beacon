@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.6 to the next release](#upgrading-from-0126-to-the-next-release)
+- [Upgrading from 0.12.7 to the next release](#upgrading-from-0127-to-the-next-release)
+- [Upgrading from 0.12.6 to 0.12.7](#upgrading-from-0126-to-0127)
 - [Upgrading from 0.12.5 to 0.12.6](#upgrading-from-0125-to-0126)
 - [Upgrading from 0.12.4 to 0.12.5](#upgrading-from-0124-to-0125)
 - [Upgrading from 0.12.3 to 0.12.4](#upgrading-from-0123-to-0124)
@@ -36,7 +37,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.6 to the next release
+## Upgrading from 0.12.7 to the next release
 
 ```bash
 git pull
@@ -47,6 +48,40 @@ php bin/console app:seed-platform
 pnpm install
 make vite-build
 ```
+
+## Upgrading from 0.12.6 to 0.12.7
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Setup wizard before login
+
+- When the instance has **no users**, `/setup` is public and offers **Minimum** (platform + demo admin) or **Full sample load** (minimum + `load` telemetry).
+- After either preset, sign in with `admin@symfony-beacon.local` / `admin123` (or register your own first admin).
+- Once users exist, only `ROLE_ADMIN` can reopen `/setup` (granular steps + dashboard banner until dismissed).
+- Login shows a **First-run setup** link while bootstrap is open.
+
+### Cookie consent from platform seed
+
+- `app:seed-platform` / Setup platform step seeds the default cookie consent profile + inventory (`CookieConsentDemoSeeder`).
+- `use_database_config: true` — re-run `make seed-platform` after upgrade to refresh professional modal copy.
+- Details: [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md).
+
+### Database docs + Compose MySQL path
+
+- Schema overview: [DATABASE.md](DATABASE.md).
+- Local Compose MySQL data directory is `./.data/mysql` (gitignored). If you previously used a named Docker volume, migrate data or accept a fresh local DB.
+
+### Fresh-install migration hardening
+
+- Safer concurrent migrate / empty-DB setup stamps (`Version20260721195000` idempotent indexes; setup completion only when users exist).
 
 ## Upgrading from 0.12.5 to 0.12.6
 

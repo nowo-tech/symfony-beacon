@@ -10,7 +10,7 @@ nowo_cookie_consent:
         - preferences
 
     use_logger: true
-    use_database_config: false
+    use_database_config: true
     use_cookie_inventory: true
     granular_cookie_selection: false
 
@@ -61,7 +61,7 @@ nowo_cookie_consent:
     # (e.g. /en/login → 400) and the modal never closes.
     form_action: nowo_cookie_consent.show
 
-    # First-party cookies used by this Beacon instance
+    # First-party cookies used by this Beacon instance (YAML fallback when DB inventory is empty)
     cookie_inventory:
         - name: PHPSESSID
           duration: Session
@@ -70,11 +70,11 @@ nowo_cookie_consent:
           sort_order: 0
           translations:
               en:
-                  provider: This Beacon instance
-                  purpose: Keeps your signed-in session active.
+                  provider: Beacon (first-party)
+                  purpose: Maintains the authenticated HTTP session required to access protected areas of the service.
               es:
-                  provider: Esta instancia Beacon
-                  purpose: Mantiene activa tu sesión iniciada.
+                  provider: Beacon (primera parte)
+                  purpose: Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio.
         - name: REMEMBERME
           duration: 7 days
           category: required
@@ -82,11 +82,11 @@ nowo_cookie_consent:
           sort_order: 10
           translations:
               en:
-                  provider: This Beacon instance
-                  purpose: Optional “Remember me” persistent login cookie.
+                  provider: Beacon (first-party)
+                  purpose: Enables persistent authentication when the user selects “Remember me” at sign-in (secure token; limited lifetime).
               es:
-                  provider: Esta instancia Beacon
-                  purpose: Cookie opcional de “Recordarme” para mantener la sesión.
+                  provider: Beacon (primera parte)
+                  purpose: Permite la autenticación persistente cuando el usuario selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada).
         - name: CookieConsent
           duration: 1 year
           category: required
@@ -94,11 +94,11 @@ nowo_cookie_consent:
           sort_order: 20
           translations:
               en:
-                  provider: This Beacon instance
-                  purpose: Stores your cookie category choices.
+                  provider: Beacon (first-party)
+                  purpose: Stores the user’s cookie-category decisions so that the consent banner is not shown again until preferences change or expire.
               es:
-                  provider: Esta instancia Beacon
-                  purpose: Guarda tus preferencias de categorías de cookies.
+                  provider: Beacon (primera parte)
+                  purpose: Almacena las decisiones del usuario sobre categorías de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias.
         - name: CookieConsentKey
           duration: 1 year
           category: required
@@ -106,8 +106,8 @@ nowo_cookie_consent:
           sort_order: 30
           translations:
               en:
-                  provider: This Beacon instance
-                  purpose: Links anonymized consent log entries to your choice.
+                  provider: Beacon (first-party)
+                  purpose: Associates anonymized consent-log records with the user’s selection for accountability and audit purposes.
               es:
-                  provider: Esta instancia Beacon
-                  purpose: Vincula el registro anonimizado de consentimiento con tu elección.
+                  provider: Beacon (primera parte)
+                  purpose: Asocia registros anonimizados del consentimiento con la selección del usuario, con fines de responsabilidad y auditoría.

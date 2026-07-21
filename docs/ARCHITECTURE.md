@@ -97,7 +97,9 @@ Features are specified under `specs/` before large changes. That matches an open
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
 | `Analytics` | Daily aggregates + period charts/filters (`025`) | Read models from `DailyProjectStat`; filtered errors from `Event` |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history | Outbound alerts after ingest |
-| `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer settings | Cross-cutting presentation / instance config |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer / Mercure settings | Cross-cutting presentation / instance config |
+
+Entity tables, columns, and FK relationships (Mermaid ER): [DATABASE.md](DATABASE.md).
 
 ## Flows (Mermaid)
 

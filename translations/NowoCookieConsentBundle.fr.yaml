@@ -1,2 +1,39 @@
-# Link the consent modal “privacy” control to Beacon’s privacy page.
+# Overrides for nowo-tech/cookie-consent-bundle (category labels + YAML fallbacks).
 nowo_cookie_consent.privacy_route: 'legal_privacy'
+
+nowo_cookie_consent.title: 'Avis relatif aux cookies'
+nowo_cookie_consent.intro: 'Ce service utilise des cookies et des technologies similaires afin de fonctionner de manière sécurisée et de mémoriser vos choix. Les cookies strictement nécessaires sont indispensables au fonctionnement essentiel et ne peuvent pas être désactivés. Les cookies facultatifs ne sont utilisés qu’avec votre consentement préalable.'
+nowo_cookie_consent.read_more: 'Politique de confidentialité'
+nowo_cookie_consent.show_preferences: 'Paramètres des cookies'
+nowo_cookie_consent.save: 'Confirmer la sélection'
+nowo_cookie_consent.use_only_functional_cookies: 'Cookies nécessaires uniquement'
+nowo_cookie_consent.use_all_cookies: 'Accepter tous les cookies'
+nowo_cookie_consent.manage_link: 'Paramètres des cookies'
+nowo_cookie_consent.preferences_bubble.label: 'Ouvrir les paramètres des cookies'
+
+nowo_cookie_consent.required.title: 'Strictement nécessaires'
+nowo_cookie_consent.required.description: 'Cookies indispensables à l’authentification, à la sécurité et à l’enregistrement de votre consentement. Ils restent toujours actifs et ne peuvent pas être désactivés.'
+nowo_cookie_consent.required.always_on: 'Toujours actifs'
+
+nowo_cookie_consent.preferences.title: 'Préférences'
+nowo_cookie_consent.preferences.close: 'Retour'
+nowo_cookie_consent.preferences.usage_title: 'Utilisation des cookies'
+nowo_cookie_consent.preferences.usage_description: 'Nous utilisons des cookies et des technologies similaires. Les cookies strictement nécessaires restent actifs car ils sont essentiels au fonctionnement du service (sécurité, gestion de session et enregistrement de votre consentement). Les cookies d’analyse et de préférences sont facultatifs et ne sont activés qu’avec votre consentement préalable. Vous pouvez accepter toutes les catégories, refuser les cookies non essentiels ou examiner chaque catégorie. Vous pouvez retirer ou modifier votre consentement à tout moment via les Paramètres des cookies.'
+nowo_cookie_consent.preferences.description: 'Cookies facultatifs qui mémorisent des choix de présentation ou de fonctionnalités non essentiels lorsque vous activez cette catégorie.'
+
+nowo_cookie_consent.functionality.title: 'Fonctionnalité'
+nowo_cookie_consent.functionality.description: 'Cookies facultatifs qui activent des fonctionnalités avancées au-delà du fonctionnement essentiel du service.'
+
+nowo_cookie_consent.analytics.title: 'Analytique'
+nowo_cookie_consent.analytics.description: 'Cookies facultatifs utilisés pour mesurer l’utilisation et améliorer le service. Ils ne sont déposés que si vous y consentez et que l’opérateur a activé des outils d’analytique.'
+
+nowo_cookie_consent.marketing.title: 'Marketing'
+nowo_cookie_consent.marketing.description: 'Cookies facultatifs utilisés à des fins publicitaires ou de remarketing. Ils ne sont déposés qu’avec votre consentement préalable.'
+
+nowo_cookie_consent.inventory.caption: 'Inventaire des cookies'
+nowo_cookie_consent.inventory.name: 'Nom'
+nowo_cookie_consent.inventory.provider: 'Fournisseur'
+nowo_cookie_consent.inventory.purpose: 'Finalité'
+nowo_cookie_consent.inventory.duration: 'Durée'
+nowo_cookie_consent.inventory.allow: 'Autoriser'
+nowo_cookie_consent.granular.help: 'Activez ou désactivez une catégorie entière, ou sélectionnez des cookies individuels lorsque cela est disponible.'

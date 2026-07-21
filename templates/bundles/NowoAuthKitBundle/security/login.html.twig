@@ -40,14 +40,18 @@
         </p>
     {% endif %}
 
-    {% if password_reset_enabled|default(false) or registration_allowed|default(false) %}
+    {% if password_reset_enabled|default(false) or registration_allowed|default(false) or beacon_setup_bootstrap_open() %}
         <p class="mt-5 text-center text-sm text-[var(--color-ink)]/60">
             {% if password_reset_enabled|default(false) %}
                 <a href="{{ path(reset_password_route, auth_kit_route_params()) }}" class="no-underline">{{ 'login.forgot_password_link'|trans({}, 'NowoAuthKitBundle') }}</a>
-                {% if registration_allowed|default(false) %} · {% endif %}
+                {% if registration_allowed|default(false) or beacon_setup_bootstrap_open() %} · {% endif %}
             {% endif %}
             {% if registration_allowed|default(false) %}
                 <a href="{{ path(register_route, auth_kit_route_params()) }}" class="no-underline font-medium">{{ 'login.register_link'|trans({}, 'NowoAuthKitBundle') }}</a>
+                {% if beacon_setup_bootstrap_open() %} · {% endif %}
+            {% endif %}
+            {% if beacon_setup_bootstrap_open() %}
+                <a href="{{ path('setup_wizard') }}" class="no-underline font-medium">{{ 'setup.login_setup_link'|trans }}</a>
             {% endif %}
         </p>
     {% endif %}

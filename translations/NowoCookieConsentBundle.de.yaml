@@ -1,2 +1,39 @@
-# Link the consent modal “privacy” control to Beacon’s privacy page.
+# Overrides for nowo-tech/cookie-consent-bundle (category labels + YAML fallbacks).
 nowo_cookie_consent.privacy_route: 'legal_privacy'
+
+nowo_cookie_consent.title: 'Cookie-Hinweis'
+nowo_cookie_consent.intro: 'Dieser Dienst verwendet Cookies und ähnliche Technologien, um sicher zu funktionieren und Ihre Auswahl zu speichern. Unbedingt erforderliche Cookies sind für Kernfunktionen notwendig und können nicht deaktiviert werden. Optionale Cookies werden nur mit Ihrer vorherigen Einwilligung eingesetzt.'
+nowo_cookie_consent.read_more: 'Datenschutzerklärung'
+nowo_cookie_consent.show_preferences: 'Cookie-Einstellungen'
+nowo_cookie_consent.save: 'Auswahl bestätigen'
+nowo_cookie_consent.use_only_functional_cookies: 'Nur notwendige Cookies'
+nowo_cookie_consent.use_all_cookies: 'Alle Cookies akzeptieren'
+nowo_cookie_consent.manage_link: 'Cookie-Einstellungen'
+nowo_cookie_consent.preferences_bubble.label: 'Cookie-Einstellungen öffnen'
+
+nowo_cookie_consent.required.title: 'Unbedingt erforderlich'
+nowo_cookie_consent.required.description: 'Cookies, die für Authentifizierung, Sicherheit und Speicherung Ihrer Einwilligung unerlässlich sind. Sie bleiben stets aktiv und können nicht deaktiviert werden.'
+nowo_cookie_consent.required.always_on: 'Immer aktiv'
+
+nowo_cookie_consent.preferences.title: 'Präferenzen'
+nowo_cookie_consent.preferences.close: 'Zurück'
+nowo_cookie_consent.preferences.usage_title: 'Verwendung von Cookies'
+nowo_cookie_consent.preferences.usage_description: 'Wir verwenden Cookies und ähnliche Technologien. Unbedingt erforderliche Cookies bleiben aktiv, weil sie für den Betrieb des Dienstes unerlässlich sind (Sicherheit, Sitzungsverwaltung und Speicherung Ihrer Einwilligung). Analyse- und Präferenz-Cookies sind optional und werden nur mit Ihrer vorherigen Einwilligung aktiviert. Sie können alle Kategorien akzeptieren, nicht erforderliche ablehnen oder jede Kategorie prüfen. Sie können Ihre Einwilligung jederzeit über die Cookie-Einstellungen widerrufen oder ändern.'
+nowo_cookie_consent.preferences.description: 'Optionale Cookies, die nicht wesentliche Darstellungs- oder Funktionseinstellungen speichern, wenn Sie diese Kategorie aktivieren.'
+
+nowo_cookie_consent.functionality.title: 'Funktionalität'
+nowo_cookie_consent.functionality.description: 'Optionale Cookies, die erweiterte Funktionen über den Kernbetrieb des Dienstes hinaus ermöglichen.'
+
+nowo_cookie_consent.analytics.title: 'Analyse'
+nowo_cookie_consent.analytics.description: 'Optionale Cookies zur Messung der Nutzung und zur Verbesserung des Dienstes. Sie werden nur gesetzt, wenn Sie einwilligen und der Betreiber Analyse-Tools aktiviert hat.'
+
+nowo_cookie_consent.marketing.title: 'Marketing'
+nowo_cookie_consent.marketing.description: 'Optionale Cookies für Werbung oder Remarketing. Sie werden nur mit Ihrer vorherigen Einwilligung gesetzt.'
+
+nowo_cookie_consent.inventory.caption: 'Cookie-Inventar'
+nowo_cookie_consent.inventory.name: 'Name'
+nowo_cookie_consent.inventory.provider: 'Anbieter'
+nowo_cookie_consent.inventory.purpose: 'Zweck'
+nowo_cookie_consent.inventory.duration: 'Dauer'
+nowo_cookie_consent.inventory.allow: 'Erlauben'
+nowo_cookie_consent.granular.help: 'Aktivieren oder deaktivieren Sie eine gesamte Kategorie oder wählen Sie einzelne Cookies, sofern verfügbar.'

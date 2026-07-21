@@ -23,12 +23,13 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 |---------|----------------|
 | `ui_theme` | `tailwind` |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
+| `use_database_config` | `true` (modal copy + display from DB; seeded by `app:seed-platform`) |
 | `csrf_protection` | `false` (vendor modal JS posts via XHR without firing `submit`, so Symfony stateless CSRF never hydrates) |
 | `color_theme` | `light` (Beacon SCSS remaps to moss tokens; follows `data-theme`) |
 | `disable_page_interaction` | `true` (dimmed overlay until choice) |
 | `categories` | `analytics`, `preferences` (plus always-on required) |
 | `use_logger` | `true` (writes `dashboard_cookie_log`) |
-| `use_cookie_inventory` | `true` (YAML inventory for session / remember-me / consent cookies) |
+| `use_cookie_inventory` | `true` (DB inventory after platform seed; YAML fallback until then) |
 | `preferences_bubble_enabled` | `false` (AuthKit layout can include the bubble manually) |
 | `enabled_locales` | `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` |
 | `disabled_routes` | legal pages (banner does not auto-open there) |
@@ -50,11 +51,15 @@ Footer links and `data-nowo-open-consent` appear on app + AuthKit layouts (`temp
 
 ### Database
 
-Run migrations so consent logging tables exist:
+Run migrations so consent logging / config tables exist, then seed the default profile:
 
 ```bash
 make console ARGS='doctrine:migrations:migrate -n'
+make seed-platform
+# or Setup wizard → step 1 (platform)
 ```
+
+`CookieConsentDemoSeeder` creates the default enabled profile (`dashboard_cookie_config`), locale copy (`en`/`es`/`de`/`nl`/`fr`/`it`/`pt`), and first-party cookie definitions (`PHPSESSID`, `REMEMBERME`, `CookieConsent`, `CookieConsentKey`). YAML `cookie_inventory` remains a fallback until the DB inventory exists.
 
 ### Assets
 
