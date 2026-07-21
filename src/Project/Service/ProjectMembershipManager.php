@@ -151,6 +151,61 @@ final readonly class ProjectMembershipManager
     }
 
     /**
+     * Transfer project ownership to another direct member.
+     *
+     * Promotes the target to owner. If the actor has a direct owner membership,
+     * demotes the actor to admin so ownership is handed off atomically.
+     *
+     * @throws InvalidArgumentException when the target cannot receive ownership
+     * @throws RuntimeException         when the actor cannot transfer ownership
+     */
+    public function transferOwnership(Project $project, User $actor, ProjectMembership $target): void
+    {
+        $this->assertActorCanTransferOwnership($project, $actor);
+        $this->assertSameProject($project, $target);
+
+        $newOwner = $target->getUser();
+        if ($newOwner->getId() === $actor->getId()) {
+            throw new InvalidArgumentException('cannot_transfer_to_self');
+        }
+        if (!$newOwner->isEnabled()) {
+            throw new InvalidArgumentException('user_disabled');
+        }
+
+        $actorMembership = $this->membershipRepository->findOneByProjectAndUser($project, $actor);
+        $actorWillDemote = $actorMembership instanceof ProjectMembership
+            && ProjectRole::Owner === $actorMembership->getRole();
+
+        if (ProjectRole::Owner === $target->getRole() && !$actorWillDemote) {
+            throw new InvalidArgumentException('already_owner');
+        }
+
+        $fromRole = $target->getRole()->value;
+        $target->setRole(ProjectRole::Owner);
+
+        $actorFormerRole = null;
+        if ($actorWillDemote && $actorMembership instanceof ProjectMembership) {
+            $actorFormerRole = $actorMembership->getRole()->value;
+            $actorMembership->setRole(ProjectRole::Admin);
+        }
+
+        $this->actionRecorder->record(
+            UserActionType::ProjectOwnershipTransferred,
+            $actor,
+            $newOwner,
+            [
+                'project' => $project->getName(),
+                'project_uuid' => $project->getUuid(),
+                'from' => $fromRole,
+                'to' => ProjectRole::Owner->value,
+                'actor_former_role' => $actorFormerRole,
+                'actor_new_role' => $actorWillDemote ? ProjectRole::Admin->value : null,
+            ],
+        );
+        $this->entityManager->flush();
+    }
+
+    /**
      * Link a user group to the project (admin/member only).
      *
      * @throws InvalidArgumentException|RuntimeException
@@ -320,6 +375,19 @@ final readonly class ProjectMembershipManager
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess || !$access->canManageMembers()) {
+            throw new RuntimeException('forbidden');
+        }
+    }
+
+    /** @throws RuntimeException when the actor cannot transfer project ownership */
+    private function assertActorCanTransferOwnership(Project $project, User $actor): void
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        $access = $this->projectAccess->resolveAccess($project, $actor);
+        if (!$access instanceof ProjectAccess || ProjectRole::Owner !== $access->role) {
             throw new RuntimeException('forbidden');
         }
     }

@@ -34,6 +34,9 @@ enum UserActionType: string
     case ProjectMemberRoleChanged = 'project.member_role_changed';
     case ProjectMemberRemoved = 'project.member_removed';
 
+    /** Project ownership transferred to another direct member. */
+    case ProjectOwnershipTransferred = 'project.ownership_transferred';
+
     /** User group linked to a project (admin/member role only). */
     case ProjectGroupLinked = 'project.group_linked';
     case ProjectGroupRoleChanged = 'project.group_role_changed';

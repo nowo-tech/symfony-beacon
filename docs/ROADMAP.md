@@ -128,7 +128,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.8.0** | Phase 2 — retention, rate limit, health |
 | **Bundle v1.4.0** | Phase 3.1–3.2 (Messenger + auto HTTP tx) |
 | **Bundle v1.5.0** | Phase 3.3–3.5 (spans, tags, async transport) |
-| **v0.9.0+** | Phase 4 slices as capacity allows; **v0.9.1** admin unlink projects from users/groups |
+| **v0.9.0+** | Phase 4 slices as capacity allows; **v0.9.1** admin unlink; **v0.9.2** transfer project ownership |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -141,4 +141,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-20.
+Last updated: 2026-07-21.

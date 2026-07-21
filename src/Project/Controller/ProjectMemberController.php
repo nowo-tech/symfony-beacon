@@ -156,6 +156,66 @@ final class ProjectMemberController extends AbstractController
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
+    /**
+     * Transfer project ownership to another direct member (owner or instance ROLE_ADMIN).
+     */
+    #[Route(
+        '/projects/{projectId}/transfer-ownership',
+        name: 'project_transfer_ownership',
+        requirements: ['projectId' => Requirement::UUID],
+        methods: ['POST'],
+    )]
+    public function transferOwnership(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $this->projectAccess->requireRole($project, $actor, ProjectRole::Owner);
+
+        if (!$this->isCsrfTokenValid('project_transfer_ownership_'.$project->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $confirmation = $request->request->getString('confirmation');
+        if ($confirmation !== $project->getName()) {
+            $this->addFlash('error', 'flash.project.transfer_confirmation_mismatch');
+
+            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        }
+
+        $memberUuid = $request->request->getString('user');
+        $memberUser = null;
+        foreach ($project->getMemberships() as $membership) {
+            if ($membership->getUser()->getUuid() === $memberUuid) {
+                $memberUser = $membership->getUser();
+                break;
+            }
+        }
+        if (!$memberUser instanceof User) {
+            $this->addFlash('error', 'flash.project.member_user_not_found');
+
+            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        }
+
+        $target = $this->requireTargetMembership($project, $memberUser);
+
+        try {
+            $this->membershipManager->transferOwnership($project, $actor, $target);
+            $this->addFlash('success', 'flash.project.ownership_transferred');
+        } catch (RuntimeException $e) {
+            if ('forbidden' === $e->getMessage()) {
+                throw $this->createAccessDeniedException();
+            }
+            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+        }
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
     /** Link a user group to the project with admin or member role. */
     #[Route('/projects/{id}/groups', name: 'project_groups_add', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
     public function addGroup(
@@ -300,6 +360,8 @@ final class ProjectMemberController extends AbstractController
             'invalid_role' => 'flash.project.member_invalid_role',
             'last_owner' => 'flash.project.member_last_owner',
             'cannot_manage_owner' => 'flash.project.member_cannot_manage_owner',
+            'cannot_transfer_to_self' => 'flash.project.transfer_to_self',
+            'already_owner' => 'flash.project.transfer_already_owner',
             'group_already_linked' => 'flash.project.group_already',
             'group_link_forbidden' => 'flash.project.group_link_forbidden',
             default => 'flash.project.member_error',

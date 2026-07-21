@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.9.1 to the next release](#upgrading-from-091-to-the-next-release)
+- [Upgrading from 0.9.2 to the next release](#upgrading-from-092-to-the-next-release)
+- [Upgrading from 0.9.1 to 0.9.2](#upgrading-from-091-to-092)
 - [Upgrading from 0.9.0 to 0.9.1](#upgrading-from-090-to-091)
 - [Upgrading from 0.8.1 to 0.9.0](#upgrading-from-081-to-090)
 - [Upgrading from 0.8.0 to 0.8.1](#upgrading-from-080-to-081)
@@ -21,9 +22,29 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.9.1 to the next release
+## Upgrading from 0.9.2 to the next release
 
 No upgrade notes yet.
+
+## Upgrading from 0.9.1 to 0.9.2
+
+No database migrations. Pull, install, and rebuild assets:
+
+```bash
+git pull
+composer install
+make vite-build
+```
+
+### Transfer project ownership
+
+Project Settings → Danger zone includes **Transfer ownership…** (owners only):
+
+- Pick another **direct** project member as the new owner.
+- Confirm by typing the project name (same pattern as delete).
+- The selected member becomes **owner**; you become **admin** (you can no longer delete the project unless promoted again).
+- The action is disabled until at least one other direct member exists.
+- Recorded in user activity as `project.ownership_transferred`.
 
 ## Upgrading from 0.9.0 to 0.9.1
 

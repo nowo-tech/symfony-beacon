@@ -89,7 +89,7 @@ Features are specified under `specs/` before large changes. That matches an open
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
 | `Identity` | Users, account prefs, seed | Auth boundary; kits + Security |
-| `Project` | Projects, keys, memberships, Settings / danger zone | Multi-tenant tenancy unit |
+| `Project` | Projects, keys, memberships, Settings / danger zone (clear, transfer ownership, delete) | Multi-tenant tenancy unit |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |

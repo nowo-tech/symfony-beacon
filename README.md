@@ -27,7 +27,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
 - Account Display collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify)
 - Projects with rotatable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Project **Settings** with API keys, members, **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP), and danger zone
+- Project **Settings** with API keys, members, **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP), and danger zone (clear history, **transfer ownership**, delete)
 - Issue list with filters, **assignee**, similarity fingerprint, 24h / 7d / 30d windows, and a **DataTables** responsive table (server-side sort + page in the URL)
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`)
@@ -100,7 +100,7 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | Module | Responsibility |
 |--------|----------------|
 | `Identity` | Users (AuthKit login/register), account prefs, seed command |
-| `Project` | Projects, API keys, memberships, Settings / danger zone |
+| `Project` | Projects, API keys, memberships, Settings / danger zone (clear, transfer ownership, delete) |
 | `Ingest` | Envelope API + async pipeline |
 | `Issues` | Grouping, list/filter, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |

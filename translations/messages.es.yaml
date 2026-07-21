@@ -61,6 +61,10 @@ flash:
         member_last_owner: El proyecto debe conservar al menos un propietario.
         member_cannot_manage_owner: Los administradores no pueden cambiar ni eliminar propietarios.
         member_error: No se pudieron actualizar los miembros del proyecto.
+        ownership_transferred: Propiedad del proyecto cedida. Ahora eres administrador.
+        transfer_confirmation_mismatch: El nombre del proyecto no coincide. No se cedió la propiedad.
+        transfer_to_self: No puedes ceder la propiedad a ti mismo.
+        transfer_already_owner: Ese miembro ya es propietario.
         group_added: Grupo vinculado al proyecto.
         group_role_updated: Rol del grupo actualizado.
         group_removed: Grupo desvinculado del proyecto.
@@ -180,6 +184,14 @@ project:
         delete_body: Esto elimina de forma permanente “%name%” y todos sus datos (incidencias, eventos, rendimiento, analítica, claves y miembros). No se puede deshacer.
         delete_type_label: 'Escribe %name% para confirmar:'
         delete_confirm: Eliminar proyecto
+        transfer_open: Ceder propiedad…
+        transfer_title: ¿Ceder la propiedad del proyecto?
+        transfer_body: El miembro seleccionado pasa a ser propietario. Tú pasas a administrador y pierdes la capacidad de eliminar el proyecto.
+        transfer_member_label: Nuevo propietario
+        transfer_member_placeholder: Selecciona un miembro…
+        transfer_type_label: 'Escribe %name% para confirmar:'
+        transfer_confirm: Ceder propiedad
+        transfer_no_candidates: Añade otro miembro directo antes de ceder la propiedad.
 projects:
     title: Proyectos
     intro: Filtra y abre los proyectos a los que tienes acceso.
@@ -406,6 +418,7 @@ users:
             'project.member_added': Miembro añadido al proyecto
             'project.member_role_changed': Rol de miembro del proyecto cambiado
             'project.member_removed': Miembro eliminado del proyecto
+            'project.ownership_transferred': Propiedad del proyecto cedida
             'project.group_linked': Grupo vinculado al proyecto
             'project.group_role_changed': Rol del grupo en el proyecto cambiado
             'project.group_unlinked': Grupo desvinculado del proyecto
@@ -427,6 +440,8 @@ users:
             enabled: Activo
             from: Desde
             to: Hasta
+            actor_former_role: Tu rol anterior
+            actor_new_role: Tu rol nuevo
             project: Proyecto
             project_uuid: UUID del proyecto
             project_name: Proyecto

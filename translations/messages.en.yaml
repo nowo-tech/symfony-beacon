@@ -61,6 +61,10 @@ flash:
         member_last_owner: The project must keep at least one owner.
         member_cannot_manage_owner: Admins cannot change or remove owners.
         member_error: Could not update project members.
+        ownership_transferred: Project ownership transferred. You are now an admin.
+        transfer_confirmation_mismatch: Project name did not match. Ownership was not transferred.
+        transfer_to_self: You cannot transfer ownership to yourself.
+        transfer_already_owner: That member is already an owner.
         group_added: Group linked to the project.
         group_role_updated: Group role updated.
         group_removed: Group unlinked from the project.
@@ -180,6 +184,14 @@ project:
         delete_body: This permanently deletes “%name%” and all of its data (issues, events, performance, analytics, keys, and members). This cannot be undone.
         delete_type_label: 'Type %name% to confirm:'
         delete_confirm: Delete project
+        transfer_open: Transfer ownership…
+        transfer_title: Transfer project ownership?
+        transfer_body: The selected member becomes the owner. You become an admin and lose the ability to delete the project.
+        transfer_member_label: New owner
+        transfer_member_placeholder: Select a member…
+        transfer_type_label: 'Type %name% to confirm:'
+        transfer_confirm: Transfer ownership
+        transfer_no_candidates: Add another direct member before transferring ownership.
 projects:
     title: Projects
     intro: Filter and open projects you can access.
@@ -406,6 +418,7 @@ users:
             'project.member_added': Project member added
             'project.member_role_changed': Project member role changed
             'project.member_removed': Project member removed
+            'project.ownership_transferred': Project ownership transferred
             'project.group_linked': Project group linked
             'project.group_role_changed': Project group role changed
             'project.group_unlinked': Project group unlinked
@@ -427,6 +440,8 @@ users:
             enabled: Enabled
             from: From
             to: To
+            actor_former_role: Your former role
+            actor_new_role: Your new role
             project: Project
             project_uuid: Project UUID
             project_name: Project
