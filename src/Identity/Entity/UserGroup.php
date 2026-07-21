@@ -6,10 +6,11 @@ namespace App\Identity\Entity;
 
 use App\Identity\Repository\UserGroupRepository;
 use App\Shared\Doctrine\PublicUuidTrait;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\AuditableInterface;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 
 /**
  * Named user group for bulk project access.
@@ -18,9 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'user_group')]
 #[ORM\UniqueConstraint(name: 'uniq_user_group_slug', columns: ['slug'])]
 #[ORM\UniqueConstraint(name: 'uniq_user_group_uuid', columns: ['uuid'])]
-class UserGroup
+class UserGroup implements AuditableInterface
 {
     use PublicUuidTrait;
+    use TimestampableTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,17 +38,21 @@ class UserGroup
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     /** @var Collection<int, UserGroupMembership> */
     #[ORM\OneToMany(targetEntity: UserGroupMembership::class, mappedBy: 'userGroup', cascade: ['persist'], orphanRemoval: true)]
     private Collection $memberships;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'updated_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $updatedBy = null;
+
     public function __construct()
     {
         $this->ensureUuid();
-        $this->createdAt = new DateTimeImmutable();
         $this->memberships = new ArrayCollection();
     }
 
@@ -91,11 +97,6 @@ class UserGroup
         return $this;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
     /**
      * @return Collection<int, UserGroupMembership>
      */
@@ -130,5 +131,25 @@ class UserGroup
         }
 
         return false;
+    }
+
+    public function getCreatedBy(): ?object
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?object $createdBy): void
+    {
+        $this->createdBy = $createdBy instanceof User ? $createdBy : null;
+    }
+
+    public function getUpdatedBy(): ?object
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?object $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy instanceof User ? $updatedBy : null;
     }
 }

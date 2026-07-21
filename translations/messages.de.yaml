@@ -10,6 +10,7 @@ nav:
     groups: Gruppen
     admin_projects: Projekte
     appearance: Erscheinungsbild
+    mailer: Mailer
     menus: Menüs
     breadcrumbs: Paniermehl
     toggle_sidebar: Navigation umschalten
@@ -25,10 +26,18 @@ api_docs:
     open_json: OpenAPI JSON
 common:
     filter: Filter
+    clear_filters: Filter zurücksetzen
     cancel: Stornieren
     yes: 'Ja'
     na: n / A
     unknown: unbekannt
+    audit:
+        title: Audit
+        created_at: Erstellt
+        updated_at: Aktualisiert
+        created_by: Erstellt von
+        updated_by: Aktualisiert von
+        by_system: System
 pagination:
     showing: 'Zeigt %from%–%to% von %total%'
     nav: Tabellenseiten
@@ -529,6 +538,7 @@ users:
         status: Status
         presence: Gegenwart
         roles: Rolle
+        audit: Audit
         actions: Aktionen
     status:
         enabled: Ermöglicht
@@ -632,15 +642,42 @@ preferences:
         display: Anzeige
     profile:
         title: Profil
-        intro: Aktualisieren Sie Ihren Anzeigenamen und Ihre Anmelde-E-Mail-Adresse.
+        intro: Prüfen Sie Ihre Kontodaten und aktualisieren Sie Anzeigename oder Anmelde-E-Mail.
         submit: Profil speichern
+        edit_title: Profil bearbeiten
+        account_id: Konto-ID
+        member_since: Mitglied seit
+        last_activity: Letzte Aktivität
+        last_activity_unknown: Keine aktuelle Aktivität erfasst
+        password_changed: Passwort zuletzt geändert
+        password_never_changed: Noch nicht erfasst
+        password_expiry: Passwortablauf
+        password_expired: Das Passwort ist abgelaufen
+        password_expiry_unknown: 'Der Ablauf beginnt nach der ersten Passwortänderung (Richtlinie: %policy% Tage).'
+        password_days_remaining: '%count% Tage verbleibend · Richtlinie %policy% Tage'
+        update_password: Passwort aktualisieren
+        status_enabled: Aktiv
+        status_disabled: Deaktiviert
+        role_admin: Administrator
+        role_member: Mitglied
+        projects_title: Ihre Projekte
+        projects_intro: Projekte mit direkter Mitgliedschaft.
+        projects_empty: Sie sind noch kein direktes Mitglied eines Projekts.
+        groups_title: Ihre Gruppen
+        groups_intro: Gruppen, die zusätzlichen Projektzugriff gewähren können.
+        groups_empty: Sie gehören keiner Gruppe an.
     security:
         title: Sicherheit
         intro: Ändern Sie Ihr Kontopasswort.
         submit: Passwort aktualisieren
+        history_title: Verlauf der Passwortänderungen
+        history_intro: Kürzliche Passwortänderungen zur Wiederverwendungsprävention. Hashes werden nie angezeigt.
+        history_current: 'Aktuelles Passwort gesetzt am:'
+        history_entry: Passwort geändert
+        history_empty: Noch keine Passwortänderungen erfasst.
     display:
         title: Anzeige
-        intro: 'Wählen Sie Sprache, Thema, Layoutdichte, Bewegung, Inhaltsbreite und die zu minimierenden Ausgabebereiche.'
+        intro: 'Wählen Sie Sprache, Thema, Dichte, Textgröße, Kontrast, Seitenleiste, Bewegung, Inhaltsbreite und kollabierte Issue-Panels.'
         submit: Anzeigeeinstellungen speichern
         pwa_title: App installieren
         pwa_intro: 'Fügen Sie diese Website für ein schnelleres, eigenständiges Erlebnis zu Ihrem Gerät hinzu. Die Verfügbarkeit hängt von Ihrem Browser ab.'
@@ -662,6 +699,13 @@ preferences:
     width_full: Volle Breite
     density_comfortable: Komfortabel
     density_compact: Kompakt
+    font_scale_sm: Klein
+    font_scale_md: Mittel
+    font_scale_lg: Groß
+    contrast_system: System (Gerät folgen)
+    contrast_more: Mehr Kontrast
+    sidebar_expanded: Erweitert
+    sidebar_collapsed: Eingeklappt
     motion_system: System (Gerät folgen)
     motion_reduce: Bewegung reduzieren
     motion_full: Volle Bewegung
@@ -716,6 +760,18 @@ user_preferences:
         label: UI-Dichte
         placeholder: Komfortabel
         help: Bequemer Abstand oder eine kompaktere Bedieneranordnung.
+    preferred_font_scale:
+        label: Textgröße
+        placeholder: Mittel
+        help: Skalieren Sie die Oberflächentextgröße.
+    preferred_contrast:
+        label: Kontrast
+        placeholder: System
+        help: Gerätekontrast folgen oder stärkere Texte und Ränder erzwingen.
+    preferred_sidebar:
+        label: Seitenleiste
+        placeholder: Erweitert
+        help: Desktop-Standard, wenn dieser Browser noch keine gespeicherte Einstellung hat.
     preferred_motion:
         label: Bewegung
         placeholder: System

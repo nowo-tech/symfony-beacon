@@ -4,16 +4,23 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProfileType;
 use App\Identity\Form\AccountSecurityType;
+use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Issues\IssuePanelIds;
+use App\Project\Repository\ProjectMembershipRepository;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
+use Nowo\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,8 +36,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_USER')]
 final class AccountPreferencesController extends AbstractController
 {
+    /** Mirrors config/packages/nowo_password_policy.yaml expiry_days for profile summary. */
+    private const int PASSWORD_EXPIRY_DAYS = 90;
+
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly ProjectMembershipRepository $projectMembershipRepository,
+        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly PasswordExpiryServiceInterface $passwordExpiryService,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
@@ -59,9 +72,7 @@ final class AccountPreferencesController extends AbstractController
                 if ($conflict instanceof User && $conflict->getId() !== $user->getId()) {
                     $form->get('email')->addError(new FormError($this->translator->trans('preferences.error.email_in_use')));
 
-                    return $this->render('account/profile.html.twig', [
-                        'form' => $form,
-                    ]);
+                    return $this->renderProfile($form, $user);
                 }
             }
 
@@ -71,8 +82,46 @@ final class AccountPreferencesController extends AbstractController
             return $this->redirectToRoute('account_profile');
         }
 
+        return $this->renderProfile($form, $user);
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    private function renderProfile(FormInterface $form, User $user): Response
+    {
+        $passwordChangedAt = $user->getPasswordChangedAt();
+        $passwordExpiresAt = null;
+        $passwordDaysRemaining = null;
+        if ($passwordChangedAt instanceof DateTimeInterface) {
+            $passwordExpiresAt = DateTimeImmutable::createFromInterface($passwordChangedAt)
+                ->modify('+'.self::PASSWORD_EXPIRY_DAYS.' days');
+            $now = new DateTimeImmutable();
+            $passwordDaysRemaining = (int) $now->diff($passwordExpiresAt)->format('%r%a');
+        }
+
+        $roleLabels = [];
+        foreach ($user->getRoles() as $role) {
+            if ('ROLE_USER' === $role) {
+                continue;
+            }
+            $roleLabels[] = match ($role) {
+                'ROLE_ADMIN' => 'preferences.profile.role_admin',
+                default => $role,
+            };
+        }
+
         return $this->render('account/profile.html.twig', [
             'form' => $form,
+            'profile_user' => $user,
+            'profile_roles' => $roleLabels,
+            'project_memberships' => $this->projectMembershipRepository->findByUser($user),
+            'group_memberships' => $this->userGroupMembershipRepository->findByUser($user),
+            'password_changed_at' => $passwordChangedAt,
+            'password_expires_at' => $passwordExpiresAt,
+            'password_days_remaining' => $passwordDaysRemaining,
+            'password_expired' => $this->passwordExpiryService->isPasswordExpired(),
+            'password_expiry_days' => self::PASSWORD_EXPIRY_DAYS,
         ]);
     }
 
@@ -92,25 +141,19 @@ final class AccountPreferencesController extends AbstractController
             if (!\is_string($plainPassword) || '' === $plainPassword) {
                 $form->get('plainPassword')->addError(new FormError($this->translator->trans('preferences.error.password_required')));
 
-                return $this->render('account/security.html.twig', [
-                    'form' => $form,
-                ]);
+                return $this->renderSecurity($form, $user);
             }
 
             if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
                 $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
 
-                return $this->render('account/security.html.twig', [
-                    'form' => $form,
-                ]);
+                return $this->renderSecurity($form, $user);
             }
 
             if ($this->passwordHasher->isPasswordValid($user, $plainPassword)) {
                 $form->get('plainPassword')->addError(new FormError($this->translator->trans('preferences.error.password_same_as_current')));
 
-                return $this->render('account/security.html.twig', [
-                    'form' => $form,
-                ]);
+                return $this->renderSecurity($form, $user);
             }
 
             $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
@@ -121,9 +164,45 @@ final class AccountPreferencesController extends AbstractController
             return $this->redirectToRoute('account_security');
         }
 
+        return $this->renderSecurity($form, $user);
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    private function renderSecurity(FormInterface $form, User $user): Response
+    {
         return $this->render('account/security.html.twig', [
             'form' => $form,
+            'password_changed_at' => $user->getPasswordChangedAt(),
+            'password_change_history' => $this->passwordChangeHistoryFor($user),
         ]);
+    }
+
+    /**
+     * Timestamps of retained password changes (hashes never exposed).
+     *
+     * @return list<DateTimeInterface>
+     */
+    private function passwordChangeHistoryFor(User $user): array
+    {
+        $dates = [];
+        foreach ($user->getPasswordHistory() as $entry) {
+            if (!$entry instanceof PasswordHistory) {
+                continue;
+            }
+            $createdAt = $entry->getCreatedAt();
+            if ($createdAt instanceof DateTimeInterface) {
+                $dates[] = $createdAt;
+            }
+        }
+
+        usort(
+            $dates,
+            static fn (DateTimeInterface $a, DateTimeInterface $b): int => $b <=> $a,
+        );
+
+        return $dates;
     }
 
     #[Route('/account/display', name: 'account_display', methods: ['GET', 'POST'])]

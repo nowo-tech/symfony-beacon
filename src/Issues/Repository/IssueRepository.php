@@ -71,6 +71,9 @@ class IssueRepository extends ServiceEntityRepository
             user: $user,
         );
 
+        // Always hydrate assignee for list/export Twig (avoids N+1 per row).
+        $qb->leftJoin('i.assignee', 'assignee_user')->addSelect('assignee_user');
+
         $this->applySqlSort($qb, $sort);
 
         if (null !== $limit) {
@@ -318,6 +321,38 @@ class IssueRepository extends ServiceEntityRepository
     }
 
     /**
+     * Open/unresolved (or other status) counts for many projects in one query.
+     *
+     * @param list<int> $projectIds
+     *
+     * @return array<int, int> project id => count
+     */
+    public function countByStatusForProjectIds(array $projectIds, IssueStatus $status): array
+    {
+        if ([] === $projectIds) {
+            return [];
+        }
+
+        /** @var list<array{projectId: int|string, cnt: int|string}> $rows */
+        $rows = $this->createQueryBuilder('i')
+            ->select('IDENTITY(i.project) AS projectId, COUNT(i.id) AS cnt')
+            ->andWhere('i.project IN (:projects)')
+            ->andWhere('i.status = :status')
+            ->setParameter('projects', $projectIds)
+            ->setParameter('status', $status)
+            ->groupBy('i.project')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['projectId']] = (int) $row['cnt'];
+        }
+
+        return $map;
+    }
+
+    /**
      * Other issues in the project for duplicate target selection (excludes $exclude).
      *
      * @return list<Issue>
@@ -549,8 +584,6 @@ class IssueRepository extends ServiceEntityRepository
             'first_seen' => $qb->orderBy('i.firstSeen', $dir)->addOrderBy('i.id', 'DESC'),
             'last_seen' => $qb->orderBy('i.lastSeen', $dir)->addOrderBy('i.id', 'DESC'),
             'assignee' => $qb
-                ->leftJoin('i.assignee', 'assignee_user')
-                ->addSelect('assignee_user')
                 ->orderBy('assignee_user.displayName', $dir)
                 ->addOrderBy('assignee_user.email', $dir)
                 ->addOrderBy('i.lastSeen', 'DESC'),

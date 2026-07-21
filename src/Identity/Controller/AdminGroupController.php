@@ -50,8 +50,18 @@ final class AdminGroupController extends AbstractController
     #[Route('/admin/groups', name: 'admin_groups', methods: ['GET'])]
     public function index(): Response
     {
+        $groups = $this->groupRepository->findAllOrdered();
+        $groupIds = [];
+        foreach ($groups as $group) {
+            $id = $group->getId();
+            if (null !== $id) {
+                $groupIds[] = $id;
+            }
+        }
+
         return $this->render('admin/groups/index.html.twig', [
-            'groups' => $this->groupRepository->findAllOrdered(),
+            'groups' => $groups,
+            'member_counts' => $this->groupMembershipRepository->countByGroupIds($groupIds),
         ]);
     }
 
@@ -102,6 +112,8 @@ final class AdminGroupController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         UserGroup $group,
     ): Response {
+        $this->groupRepository->hydrateMembers($group);
+
         return $this->render('admin/groups/show.html.twig', [
             'group' => $group,
             'projectAccesses' => $this->projectGroupAccessRepository->findByUserGroup($group),
@@ -145,6 +157,8 @@ final class AdminGroupController extends AbstractController
 
             return $this->redirectToRoute('admin_groups_show', ['id' => $group->getUuid()]);
         }
+
+        $this->groupRepository->hydrateAudit($group);
 
         return $this->render('admin/groups/form.html.twig', [
             'group' => $group,

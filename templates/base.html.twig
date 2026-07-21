@@ -10,6 +10,9 @@
             <script>
                 window.__BEACON_USER_DENSITY__ = {{ app.user.preferredUiDensity|json_encode|raw }};
                 window.__BEACON_USER_MOTION__ = {{ app.user.preferredMotion|json_encode|raw }};
+                window.__BEACON_USER_FONT_SCALE__ = {{ app.user.preferredFontScale|json_encode|raw }};
+                window.__BEACON_USER_CONTRAST__ = {{ app.user.preferredContrast|json_encode|raw }};
+                window.__BEACON_USER_SIDEBAR__ = {{ app.user.preferredSidebar|json_encode|raw }};
             </script>
         {% endif %}
         <script>
@@ -30,10 +33,13 @@
     <body class="page-shell{% if app.user %} page-shell--app{% endif %}">
         {% if app.user %}
             <div
-                class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}"
+                class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}{% if app.user.preferredSidebar == 'collapsed' %} is-sidebar-collapsed{% endif %}"
                 data-app-shell
                 data-content-width="{{ app.user.preferredContentWidth }}"
                 data-ui-density="{{ app.user.preferredUiDensity }}"
+                data-font-scale="{{ app.user.preferredFontScale }}"
+                data-contrast="{{ app.user.preferredContrast|default('system') }}"
+                data-sidebar-default="{{ app.user.preferredSidebar }}"
                 data-theme-sync-url="{{ path('account_theme') }}"
                 data-theme-sync-token="{{ csrf_token('account_theme') }}"
             >

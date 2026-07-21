@@ -48,6 +48,12 @@ controllers_appearance:
         namespace: App\Shared\Appearance\Controller
     type: attribute
 
+controllers_settings:
+    resource:
+        path: ../src/Shared/Settings/Controller/
+        namespace: App\Shared\Settings\Controller
+    type: attribute
+
 controllers_admin_hub:
     resource:
         path: ../src/Shared/Controller/

@@ -7,9 +7,11 @@ namespace App\Identity\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserActionRepository;
+use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectGroupAccess;
@@ -47,6 +49,8 @@ final class AdminProjectController extends AbstractController
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly UserGroupRepository $userGroupRepository,
+        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
         private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipManager $membershipManager,
         private readonly ProjectHistoryClearer $historyClearer,
@@ -64,11 +68,19 @@ final class AdminProjectController extends AbstractController
     {
         $query = $request->query->getString('q');
         $projects = $this->projectRepository->findAllOrdered('' !== $query ? $query : null);
+        $projectIds = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null !== $id) {
+                $projectIds[] = $id;
+            }
+        }
 
         return $this->render('admin/projects/index.html.twig', [
             'projects' => $projects,
             'q' => $query,
             'opsStats' => $this->opsStats->forProjects($projects),
+            'access_counts' => $this->projectRepository->countAccessByProjectIds($projectIds),
         ]);
     }
 
@@ -115,11 +127,31 @@ final class AdminProjectController extends AbstractController
         $fromFilter = $this->parseProjectAuditDate($request->query->getString('from'));
         $toFilter = $this->parseProjectAuditDate($request->query->getString('to'), true);
 
+        $this->projectRepository->hydrateAccessGraph($project);
+        $availableGroups = $this->availableGroups($project);
+        $groupIds = [];
+        foreach ($project->getGroupAccesses() as $accessRow) {
+            $groupId = $accessRow->getUserGroup()?->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+        foreach ($availableGroups as $group) {
+            $groupId = $group->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+        $groupIds = array_values(array_unique($groupIds));
+        $destinations = $project->getNotificationDestinations()->toArray();
+
         return $this->render('admin/projects/show.html.twig', [
             'project' => $project,
             'assignableRoles' => $this->membershipManager->assignableRoles($actor, $project),
             'assignableGroupRoles' => $this->membershipManager->assignableGroupRoles($actor, $project),
-            'availableGroups' => $this->availableGroups($project),
+            'availableGroups' => $availableGroups,
+            'group_member_counts' => $this->userGroupMembershipRepository->countByGroupIds($groupIds),
+            'delivery_attempts_by_destination' => $this->deliveryAttemptRepository->findRecentByDestinations($destinations),
             'ownerCount' => $this->countOwners($project),
             'opsStats' => $this->opsStats->forProject($project),
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),

@@ -21,6 +21,10 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.form-password-toggle');
         self::assertSelectorExists('.password-strength-input');
+        self::assertSelectorExists('.password-strength-generate-btn');
+        self::assertSelectorTextContains('.password-strength-generate-btn', 'Generate password');
+        self::assertSelectorExists('[data-testid="password-change-history"]');
+        self::assertSelectorTextContains('[data-testid="password-change-history"]', 'No password changes recorded yet');
         self::assertCount(3, $crawler->filter('.form-password-toggle'));
 
         $form = $crawler->selectButton('Update password')->form([
@@ -32,6 +36,12 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/account/security');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="password-change-entry"]');
+        self::assertSelectorTextContains('[data-testid="password-change-history"]', 'Password changed');
+        self::assertSelectorTextContains('[data-testid="password-change-history"]', 'Current password set on');
+        $historyHtml = $client->getResponse()->getContent() ?: '';
+        self::assertStringNotContainsString('$2y$', $historyHtml);
+        self::assertStringNotContainsString('$argon', $historyHtml);
 
         $crawler = $client->request(Request::METHOD_GET, '/account/security');
         $form = $crawler->selectButton('Update password')->form([
@@ -92,6 +102,12 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="profile-overview"]');
+        self::assertSelectorExists('[data-testid="profile-account-meta"]');
+        self::assertSelectorExists('[data-testid="profile-projects"]');
+        self::assertSelectorExists('[data-testid="profile-groups"]');
+        self::assertSelectorTextContains('[data-testid="profile-overview"]', 'prefs@example.com');
+        self::assertSelectorTextContains('[data-testid="profile-projects"]', 'Acme');
 
         $form = $crawler->selectButton('Save profile')->form([
             'user_preferences[displayName]' => 'Updated Prefs',
@@ -101,6 +117,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/account/profile');
         $client->followRedirect();
         self::assertSelectorTextContains('.user-menu__name', 'Updated Prefs');
+        self::assertSelectorTextContains('[data-testid="profile-overview"]', 'Updated Prefs');
     }
 
     public function testUserCanUpdateDisplayPreferences(): void
@@ -121,6 +138,9 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $values['user_preferences']['preferredTheme'] = 'dark';
         $values['user_preferences']['preferredContentWidth'] = 'full';
         $values['user_preferences']['preferredUiDensity'] = 'compact';
+        $values['user_preferences']['preferredFontScale'] = 'lg';
+        $values['user_preferences']['preferredContrast'] = 'more';
+        $values['user_preferences']['preferredSidebar'] = 'collapsed';
         $values['user_preferences']['preferredMotion'] = 'reduce';
         $values['user_preferences']['preferredCollapsedIssuePanels'] = json_encode(['raw', 'tags'], \JSON_THROW_ON_ERROR);
         $client->request($form->getMethod(), $form->getUri(), $values);
@@ -128,6 +148,9 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $client->followRedirect();
         self::assertSelectorExists('[data-app-shell].is-full-width');
         self::assertSelectorExists('[data-app-shell][data-ui-density="compact"]');
+        self::assertSelectorExists('[data-app-shell][data-font-scale="lg"]');
+        self::assertSelectorExists('[data-app-shell][data-contrast="more"]');
+        self::assertSelectorExists('[data-app-shell][data-sidebar-default="collapsed"]');
         $html = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('__BEACON_USER_THEME__', $html);
         self::assertStringContainsString('dark', $html);
@@ -135,6 +158,12 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertStringContainsString('compact', $html);
         self::assertStringContainsString('__BEACON_USER_MOTION__', $html);
         self::assertStringContainsString('reduce', $html);
+        self::assertStringContainsString('__BEACON_USER_FONT_SCALE__', $html);
+        self::assertStringContainsString('"lg"', $html);
+        self::assertStringContainsString('__BEACON_USER_CONTRAST__', $html);
+        self::assertStringContainsString('"more"', $html);
+        self::assertStringContainsString('__BEACON_USER_SIDEBAR__', $html);
+        self::assertStringContainsString('"collapsed"', $html);
         self::assertStringContainsString('__BEACON_ISSUE_PANEL_DEFAULTS__', $html);
         self::assertStringContainsString('"raw"', $html);
         self::assertStringContainsString('"tags"', $html);
@@ -146,6 +175,9 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $reloaded = $em->getRepository(User::class)->find($user->getId());
         self::assertNotNull($reloaded);
         self::assertSame(['raw', 'tags'], $reloaded->getPreferredCollapsedIssuePanels());
+        self::assertSame('lg', $reloaded->getPreferredFontScale());
+        self::assertSame('more', $reloaded->getPreferredContrast());
+        self::assertSame('collapsed', $reloaded->getPreferredSidebar());
     }
 
     public function testPreferencesSidebarHasSplitMenuItems(): void

@@ -21,9 +21,7 @@
         {{ form_start(search_form, {attr: {class: 'd-flex gap-1 flex-grow-1', role: 'search'}}) }}
             {{ form_widget(search_form.q, {attr: {class: 'form-control', style: 'max-width: 20rem;', placeholder: 'dashboard.search_placeholder'|trans, 'aria-label': 'dashboard.search'|trans}}) }}
             <button type="submit" class="btn btn-outline-secondary">{{ 'dashboard.search'|trans }}</button>
-            {% if search_query != '' %}
-                <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id}) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
-            {% endif %}
+            <a href="{{ path('nowo_breadcrumb_kit_dashboard_items_index', {collectionId: collection.id}) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
         {{ form_end(search_form, {render_rest: false}) }}
     </div>
 

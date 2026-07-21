@@ -282,6 +282,16 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'settings_mailer',
+            'Mailer',
+            ['en' => 'Mailer', 'es' => 'Correo', 'de' => 'Mailer', 'nl' => 'Mailer', 'fr' => 'Mailer', 'it' => 'Mailer', 'pt' => 'Mailer'],
+            $admin,
+            [],
+            $changed,
+        );
+
         $menus = $this->ensureItem(
             $collection,
             'nowo_dashboard_menu_dashboard_index',

@@ -8,12 +8,12 @@ use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Mailer\ConfiguredMailer;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,7 +29,7 @@ final class MagicLoginController extends AbstractController
         #[Autowire(service: 'security.authenticator.login_link_handler.main')]
         private readonly LoginLinkHandlerInterface $loginLinkHandler,
         private readonly UserRepository $userRepository,
-        private readonly MailerInterface $mailer,
+        private readonly ConfiguredMailer $mailer,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly TranslatorInterface $translator,
         #[Autowire(service: 'limiter.magic_login')]
@@ -64,7 +64,7 @@ final class MagicLoginController extends AbstractController
                 if ($user instanceof User && $user->isEnabled()) {
                     $details = $this->loginLinkHandler->createLoginLink($user, $request);
                     $message = new Email()
-                        ->from('beacon@localhost')
+                        ->from($this->mailer->getFromAddress())
                         ->to($user->getEmail())
                         ->subject($this->translator->trans('auth.magic.email_subject'))
                         ->text($this->translator->trans('auth.magic.email_body', [

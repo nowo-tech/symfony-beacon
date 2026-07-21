@@ -22,4 +22,11 @@
         <a class="btn-ghost no-underline" href="{{ is_edit ? path('admin_groups_show', {id: group.uuid}) : path('admin_groups') }}">{{ 'groups.cancel'|trans }}</a>
     </div>
 </form>
+
+{% if is_edit and group %}
+    <section class="panel mt-6 max-w-xl">
+        <h2 class="mb-3 text-lg font-semibold">{{ 'common.audit.title'|trans }}</h2>
+        {% include 'shared/_audit_meta.html.twig' with { entity: group, class: 'sm:grid-cols-2' } only %}
+    </section>
+{% endif %}
 {% endblock %}

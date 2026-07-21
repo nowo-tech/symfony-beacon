@@ -52,6 +52,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Shared/Appearance/Entity'
                 prefix: 'App\Shared\Appearance\Entity'
                 alias: SharedAppearance
+            SharedSettings:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Shared/Settings/Entity'
+                prefix: 'App\Shared\Settings\Entity'
+                alias: SharedSettings
             NowoBreadcrumbKitBundle:
                 type: attribute
                 is_bundle: true

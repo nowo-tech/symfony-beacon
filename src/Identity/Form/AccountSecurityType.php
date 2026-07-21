@@ -16,7 +16,8 @@ use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Account security: change password with PasswordToggle on all fields and strong PasswordStrength on the new password.
+ * Account security: change password with PasswordToggle, PasswordStrength (strong),
+ * and password generator modal (nowo-tech/password-strength-bundle).
  */
 final class AccountSecurityType extends FormKitAbstractType
 {
@@ -44,6 +45,8 @@ final class AccountSecurityType extends FormKitAbstractType
                 'policy_mode' => 'level',
                 'ui_framework' => 'tailwind2',
                 'use_password_toggle' => true,
+                'generator_mode' => 'modal',
+                'generator_count' => 3,
                 'constraints' => [
                     new NotBlank(message: 'preferences.error.password_required'),
                     $this->strongPasswordConstraint(),

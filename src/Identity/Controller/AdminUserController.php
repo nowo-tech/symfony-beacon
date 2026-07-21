@@ -49,7 +49,7 @@ final class AdminUserController extends AbstractController
     public function index(): Response
     {
         return $this->render('admin/users/index.html.twig', [
-            'users' => $this->userRepository->findBy([], ['email' => 'ASC']),
+            'users' => $this->userRepository->findAllForAdminDirectory(),
             'adminCount' => $this->countAdmins(),
             'recentActions' => $this->userActionRepository->findLatest(25),
         ]);

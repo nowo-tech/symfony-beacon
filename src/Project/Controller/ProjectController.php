@@ -7,9 +7,11 @@ namespace App\Project\Controller;
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
+use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
@@ -50,6 +52,8 @@ final class ProjectController extends AbstractController
         private readonly ProjectMembershipManager $membershipManager,
         private readonly ProjectGovernanceResolver $governanceResolver,
         private readonly UserGroupRepository $userGroupRepository,
+        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
@@ -127,10 +131,8 @@ final class ProjectController extends AbstractController
         $query = $request->query->getString('q');
         $projects = $this->projectRepository->findAccessibleByUser($user, '' !== $query ? $query : null);
 
-        $statsPreview = [];
-        foreach (\array_slice($projects, 0, 5) as $project) {
-            $statsPreview[$project->getId() ?? 0] = $this->dailyProjectStatRepository->findLastDays($project, 7);
-        }
+        $previewProjects = \array_slice($projects, 0, 5);
+        $statsPreview = $this->dailyProjectStatRepository->findLastDaysForProjects($previewProjects, 7);
 
         return $this->render('dashboard/home.html.twig', [
             'projects' => $projects,
@@ -171,6 +173,25 @@ final class ProjectController extends AbstractController
 
         $this->maybeFlashApproachingQuota($request, $project, $access);
 
+        $this->projectRepository->hydrateAccessGraph($project);
+        $availableGroups = $this->availableGroupsForProject($project, $user);
+        $groupIds = [];
+        foreach ($project->getGroupAccesses() as $accessRow) {
+            $groupId = $accessRow->getUserGroup()?->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+        foreach ($availableGroups as $group) {
+            $groupId = $group->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+        $groupIds = array_values(array_unique($groupIds));
+
+        $destinations = $project->getNotificationDestinations()->toArray();
+
         return $this->render('project/settings.html.twig', [
             'project' => $project,
             'access' => $access,
@@ -181,7 +202,9 @@ final class ProjectController extends AbstractController
             'suggestedLabel' => $this->tokenGenerator->generateLabel(),
             'assignableRoles' => $this->membershipManager->assignableRoles($user, $project),
             'assignableGroupRoles' => $this->membershipManager->assignableGroupRoles($user, $project),
-            'availableGroups' => $this->availableGroupsForProject($project, $user),
+            'availableGroups' => $availableGroups,
+            'group_member_counts' => $this->userGroupMembershipRepository->countByGroupIds($groupIds),
+            'delivery_attempts_by_destination' => $this->deliveryAttemptRepository->findRecentByDestinations($destinations),
             'ownerCount' => $this->countOwners($project),
             'transferCandidates' => $this->transferOwnershipCandidates($project, $user),
             'governanceDefaults' => $this->governanceResolver->envDefaults(),

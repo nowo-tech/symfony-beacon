@@ -1,4 +1,4 @@
-{# Apply theme / density / motion before paint to avoid flash. #}
+{# Apply theme / density / motion / font / contrast before paint to avoid flash. #}
 <script>
     (() => {
         try {
@@ -25,10 +25,30 @@
             } else {
                 root.dataset.motion = 'system';
             }
+
+            const fontScale = window.__BEACON_USER_FONT_SCALE__;
+            root.dataset.fontScale = (fontScale === 'sm' || fontScale === 'lg') ? fontScale : 'md';
+
+            const contrast = window.__BEACON_USER_CONTRAST__;
+            if (contrast === 'more') {
+                root.dataset.contrast = 'more';
+            } else if (window.matchMedia('(prefers-contrast: more)').matches) {
+                root.dataset.contrast = 'more';
+            } else {
+                root.dataset.contrast = 'system';
+            }
+
+            const sidebarKey = 'beacon-sidebar';
+            const userSidebar = window.__BEACON_USER_SIDEBAR__;
+            if ((userSidebar === 'collapsed' || userSidebar === 'expanded') && !localStorage.getItem(sidebarKey)) {
+                localStorage.setItem(sidebarKey, userSidebar);
+            }
         } catch (e) {
             document.documentElement.dataset.theme = 'light';
             document.documentElement.dataset.uiDensity = 'comfortable';
             document.documentElement.dataset.motion = 'system';
+            document.documentElement.dataset.fontScale = 'md';
+            document.documentElement.dataset.contrast = 'system';
         }
     })();
 </script>

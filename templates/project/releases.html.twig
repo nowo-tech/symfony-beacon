@@ -52,7 +52,10 @@
                         <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'releases.compare.help'|trans }}</p>
                     </div>
                 </div>
-                <button class="btn-primary" type="submit">{{ 'releases.focus.submit'|trans }}</button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button class="btn-primary" type="submit">{{ 'releases.focus.submit'|trans }}</button>
+                    <a class="btn-ghost no-underline" href="{{ path('project_releases', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
+                </div>
             </form>
 
             {% if selected_release %}

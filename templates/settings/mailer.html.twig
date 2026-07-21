@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'mailer_settings.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-xl">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mailer_settings.title'|trans }}</h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.intro'|trans }}</p>
+
+    <div class="panel mb-4 space-y-2 text-sm text-[var(--color-ink)]/75">
+        {% if usingDatabaseDsn %}
+            <p>{{ 'mailer_settings.status.database'|trans }}</p>
+            {% if settings.maskedMailerDsn %}
+                <p class="font-mono text-xs">{{ 'mailer_settings.current_dsn'|trans }} {{ settings.maskedMailerDsn }}</p>
+            {% endif %}
+        {% else %}
+            <p>{{ 'mailer_settings.status.env_fallback'|trans }}</p>
+        {% endif %}
+        <p>{{ 'mailer_settings.from_preview'|trans({'%from%': settings.effectiveMailerFrom}) }}</p>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.plainMailerDsn) }}
+        {{ form_row(form.clearMailerDsn) }}
+        {{ form_row(form.mailerFrom) }}
+
+        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'mailer_settings.submit'|trans }}</button>
+            <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

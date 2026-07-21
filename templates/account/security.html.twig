@@ -15,12 +15,40 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('password-strength.js', 'nowo_password_strength') }}" defer></script>
+    {# Mirror generator “Use this password” into the confirm field (kit only fills the strength input). #}
+    <script>
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) {
+                return;
+            }
+            const item = target.closest('.password-strength-modal-item');
+            if (!item) {
+                return;
+            }
+            const useBtn = item.querySelector('button:last-of-type');
+            if (!(useBtn instanceof HTMLElement) || target.closest('button') !== useBtn) {
+                return;
+            }
+            window.requestAnimationFrame(() => {
+                const input = document.querySelector('form[name="user_preferences"] input.password-strength-input');
+                const confirm = document.querySelector('form[name="user_preferences"] input[name="user_preferences[plainPassword_confirm]"]');
+                if (input instanceof HTMLInputElement && confirm instanceof HTMLInputElement && input.value !== '') {
+                    confirm.value = input.value;
+                    confirm.dispatchEvent(new Event('input', { bubbles: true }));
+                    confirm.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-xl">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>
+<div class="mx-auto max-w-xl space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>
+    </div>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
         {{ form_row(form.currentPassword) }}
@@ -30,5 +58,30 @@
             <button class="btn-primary" type="submit">{{ 'preferences.security.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
+
+    <section class="panel" data-testid="password-change-history" aria-labelledby="password-history-heading">
+        <h2 id="password-history-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.security.history_title'|trans }}</h2>
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.history_intro'|trans }}</p>
+
+        {% if password_changed_at %}
+            <p class="mb-4 text-sm">
+                <span class="font-medium">{{ 'preferences.security.history_current'|trans }}</span>
+                <time class="text-[var(--color-ink)]/70" datetime="{{ password_changed_at|date('c') }}">{{ password_changed_at|date('Y-m-d H:i') }}</time>
+            </p>
+        {% endif %}
+
+        {% if password_change_history is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.security.history_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-3 text-sm">
+                {% for changed_at in password_change_history %}
+                    <li class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0" data-testid="password-change-entry">
+                        <span class="font-medium">{{ 'preferences.security.history_entry'|trans }}</span>
+                        <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ changed_at|date('c') }}">{{ changed_at|date('Y-m-d H:i') }}</time>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

@@ -10,6 +10,7 @@ nav:
     groups: Gruppi
     admin_projects: Progetti
     appearance: Aspetto
+    mailer: Mailer
     menus: Menù
     breadcrumbs: Pangrattato
     toggle_sidebar: Attiva/disattiva la navigazione
@@ -25,10 +26,18 @@ api_docs:
     open_json: OpenAPI JSON
 common:
     filter: Filtro
+    clear_filters: Cancella filtri
     cancel: Cancellare
     yes: 'SÌ'
     na: n / a
     unknown: sconosciuto
+    audit:
+        title: Audit
+        created_at: Creato
+        updated_at: Aggiornato
+        created_by: Creato da
+        updated_by: Aggiornato da
+        by_system: Sistema
 pagination:
     showing: 'Mostrando %from%–%to% di %total%'
     nav: Pagine della tabella
@@ -529,6 +538,7 @@ users:
         status: Stato
         presence: Presenza
         roles: Ruolo
+        audit: Audit
         actions: Azioni
     status:
         enabled: Abilitato
@@ -632,15 +642,42 @@ preferences:
         display: Display
     profile:
         title: Profilo
-        intro: Aggiorna il nome visualizzato e l'e-mail di accesso.
+        intro: Controlla i dettagli dell’account e aggiorna nome visualizzato o e-mail di accesso.
         submit: Salva profilo
+        edit_title: Modifica profilo
+        account_id: ID account
+        member_since: Membro dal
+        last_activity: Ultima attività
+        last_activity_unknown: Nessuna attività recente registrata
+        password_changed: Ultima modifica password
+        password_never_changed: Non ancora registrata
+        password_expiry: Scadenza password
+        password_expired: La password è scaduta
+        password_expiry_unknown: 'La scadenza inizia dopo la prima modifica della password (policy: %policy% giorni).'
+        password_days_remaining: '%count% giorni rimanenti · policy %policy% giorni'
+        update_password: Aggiorna password
+        status_enabled: Attivo
+        status_disabled: Disabilitato
+        role_admin: Amministratore
+        role_member: Membro
+        projects_title: I tuoi progetti
+        projects_intro: Progetti a cui accedi con membership diretta.
+        projects_empty: Non sei ancora membro diretto di alcun progetto.
+        groups_title: I tuoi gruppi
+        groups_intro: Gruppi che possono concedere accesso ad altri progetti.
+        groups_empty: Non appartieni ad alcun gruppo.
     security:
         title: Sicurezza
         intro: Cambia la password del tuo account.
         submit: Aggiorna password
+        history_title: Cronologia modifiche password
+        history_intro: Aggiornamenti recenti conservati per prevenire il riutilizzo. Gli hash non vengono mai mostrati.
+        history_current: 'Password attuale impostata il:'
+        history_entry: Password modificata
+        history_empty: Nessuna modifica della password registrata.
     display:
         title: Display
-        intro: 'Scegli la lingua, il tema, la densità del layout, il movimento, la larghezza del contenuto e quali pannelli dei problemi iniziano a essere compressi.'
+        intro: 'Scegli lingua, tema, densità, dimensione testo, contrasto, barra laterale, movimento, larghezza e pannelli compressi.'
         submit: Salva le impostazioni di visualizzazione
         pwa_title: Installa l'app
         pwa_intro: Aggiungi questo sito al tuo dispositivo per un'esperienza più veloce e autonoma. La disponibilità dipende dal tuo browser.
@@ -662,6 +699,13 @@ preferences:
     width_full: Tutta la larghezza
     density_comfortable: Comodo
     density_compact: Compatto
+    font_scale_sm: Piccolo
+    font_scale_md: Medio
+    font_scale_lg: Grande
+    contrast_system: Sistema (segui dispositivo)
+    contrast_more: Più contrasto
+    sidebar_expanded: Espansa
+    sidebar_collapsed: Compressa
     motion_system: Sistema (segui dispositivo)
     motion_reduce: Ridurre il movimento
     motion_full: Movimento completo
@@ -716,6 +760,18 @@ user_preferences:
         label: Densità dell'interfaccia utente
         placeholder: Comodo
         help: Spaziatura confortevole o disposizione dell'operatore più compatta.
+    preferred_font_scale:
+        label: Dimensione del testo
+        placeholder: Medio
+        help: Riduci o ingrandisci il testo dell'interfaccia.
+    preferred_contrast:
+        label: Contrasto
+        placeholder: Sistema
+        help: Segui il contrasto del dispositivo oppure forza testo e bordi più marcati.
+    preferred_sidebar:
+        label: Barra laterale
+        placeholder: Espansa
+        help: Stato predefinito su desktop se questo browser non ha ancora una preferenza salvata.
     preferred_motion:
         label: Movimento
         placeholder: Sistema

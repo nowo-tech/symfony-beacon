@@ -21,6 +21,7 @@
         autocomplete="off"
     >
     <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
+    <a class="btn-ghost no-underline" href="{{ path('admin_projects') }}">{{ 'common.clear_filters'|trans }}</a>
 </form>
 
 {% if projects is empty %}
@@ -33,8 +34,8 @@
                     <a class="font-medium no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ project.name }}</a>
                     <div class="text-xs text-[var(--color-ink)]/55">
                         {{ project.slug }}
-                        · {{ 'admin_projects.member_count'|trans({'%count%': project.memberships|length}) }}
-                        · {{ 'admin_projects.group_count'|trans({'%count%': project.groupAccesses|length}) }}
+                        · {{ 'admin_projects.member_count'|trans({'%count%': access_counts[project.id].members|default(0)}) }}
+                        · {{ 'admin_projects.group_count'|trans({'%count%': access_counts[project.id].groups|default(0)}) }}
                         {% set stats = opsStats[project.id] ?? null %}
                         {% if stats %}
                             · {{ 'admin_projects.stats_open_issues'|trans({'%count%': stats.open_issues}) }}

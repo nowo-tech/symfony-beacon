@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.0 to the next release](#upgrading-from-0120-to-the-next-release)
+- [Upgrading from 0.12.1 to the next release](#upgrading-from-0121-to-the-next-release)
+- [Upgrading from 0.12.0 to 0.12.1](#upgrading-from-0120-to-0121)
 - [Upgrading from 0.11.1 to 0.12.0](#upgrading-from-0111-to-0120)
 - [Upgrading from 0.11.0 to 0.11.1](#upgrading-from-0110-to-0111)
 - [Upgrading from 0.10.2 to 0.11.0](#upgrading-from-0102-to-0110)
@@ -30,7 +31,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.0 to the next release
+## Upgrading from 0.12.1 to the next release
 
 ```bash
 git pull
@@ -40,6 +41,34 @@ make vite-build
 ```
 
 No additional steps yet — this placeholder is filled when the next release ships.
+
+## Upgrading from 0.12.0 to 0.12.1
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+### Encrypted Mailer DSN (`034`)
+
+- Migration `Version20260721193000`: table `instance_settings` (singleton id=1).
+- Configure under **Administration → Mailer** (`/settings/mailer`): paste SMTP (or other) DSN; it is encrypted at rest like API secrets / webhook URLs.
+- Optional **From** address (defaults to `beacon@localhost`).
+- Env `MAILER_DSN` is only a **fallback** when no DB DSN is stored (keep `null://null` for local/tests). After saving a DB DSN, you can remove secrets from `.env`.
+- Ensure the Halite encrypt key under `var/secrets/` (or `APP_ENCRYPT_KEY`) is durable across deploys — see [PRODUCTION.md](PRODUCTION.md) and ROADMAP `048`.
+- Re-run `app:seed-demo` (or sync menus) so Administration sidebar includes **Mailer**.
+
+### Account appearance extras
+
+- Migration `Version20260721194000`: `app_user.preferred_font_scale`, `preferred_contrast`, `preferred_sidebar`.
+- Users set them under **Account → Display**; existing accounts keep defaults (medium font, system contrast, expanded sidebar).
+
+### Admin users / groups audit columns
+
+- Migration `Version20260721195000`: blame columns on `app_user` and `user_group`, plus `user_group.updated_at`.
+- Admin lists/detail show AuditKit created/updated meta; historical rows may show **System** until the next update by an authenticated admin.
 
 ## Upgrading from 0.11.1 to 0.12.0
 

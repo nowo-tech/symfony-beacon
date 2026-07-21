@@ -48,8 +48,18 @@ final class AdminGroupsTest extends DatabaseWebTestCase
 
         $group = $em->getRepository(UserGroup::class)->findOneBy(['slug' => 'platform']);
         self::assertInstanceOf(UserGroup::class, $group);
+        self::assertNotNull($group->getCreatedAt());
+        self::assertNotNull($group->getUpdatedAt());
+        self::assertSame($admin->getId(), $group->getCreatedBy()?->getId());
+        self::assertSame($admin->getId(), $group->getUpdatedBy()?->getId());
+
+        $client->request(Request::METHOD_GET, '/admin/groups');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="audit-meta"]');
+        self::assertSelectorTextContains('body', 'Test User');
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
+        self::assertSelectorExists('[data-testid="audit-meta"]');
         $form = $crawler->selectButton('Add member')->form([
             'email' => 'group-user@example.com',
         ]);

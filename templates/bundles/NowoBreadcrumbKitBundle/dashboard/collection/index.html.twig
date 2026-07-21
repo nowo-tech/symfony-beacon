@@ -9,9 +9,7 @@
         <form method="get" action="{{ path(dashboard_routes.index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="d-flex gap-1 flex-grow-1" role="search">
             <input type="search" name="q" value="{{ search|e('html_attr') }}" class="form-control" placeholder="{{ 'dashboard.search_placeholder'|trans }}" aria-label="{{ 'dashboard.search'|trans }}" style="max-width: 20rem;">
             <button type="submit" class="btn btn-outline-secondary">{{ 'dashboard.search'|trans }}</button>
-            {% if search is not empty %}
-                <a href="{{ path(dashboard_routes.index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
-            {% endif %}
+            <a href="{{ path(dashboard_routes.index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="btn btn-outline-secondary">{{ 'dashboard.clear'|trans }}</a>
         </form>
         <a href="{{ path(dashboard_routes.export_all|default('nowo_breadcrumb_kit_dashboard_export_all')) }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">{{ 'dashboard.export_all'|trans }}</a>
         <button type="button" class="btn btn-outline-secondary btn-bk-import" data-bs-toggle="modal" data-bs-target="#modal-bk-import" data-bk-import-url="{{ path(dashboard_routes.import|default('nowo_breadcrumb_kit_dashboard_import')) }}?_partial=1">{{ 'dashboard.import'|trans }}</button>

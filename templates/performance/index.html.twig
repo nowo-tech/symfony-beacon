@@ -7,9 +7,12 @@
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <p class="text-[var(--color-ink)]/65">{{ 'performance.intro'|trans }}</p>
-    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid, nplus1: nPlusOneOnly ? 0 : 1, per_page: pagination.per_page}) }}">
-        {% if nPlusOneOnly %}{{ 'performance.show_all'|trans }}{% else %}{{ 'performance.nplus1_only'|trans }}{% endif %}
-    </a>
+    <div class="flex flex-wrap items-center gap-2">
+        <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid, nplus1: nPlusOneOnly ? 0 : 1, per_page: pagination.per_page}) }}">
+            {% if nPlusOneOnly %}{{ 'performance.show_all'|trans }}{% else %}{{ 'performance.nplus1_only'|trans }}{% endif %}
+        </a>
+        <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
 </div>
 
 {% if pagination.total == 0 %}

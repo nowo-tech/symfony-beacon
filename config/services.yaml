@@ -60,6 +60,9 @@ services:
         arguments:
             $historyLimit: '%beacon.notifications.delivery_history_limit%'
 
+    # Prefer encrypted instance_settings.mailer_dsn; MAILER_DSN env is bootstrap/fallback only.
+    Symfony\Component\Mailer\MailerInterface: '@App\Shared\Mailer\ConfiguredMailer'
+
     # AuditKit ships entity:null tags; DoctrineBundle 3 skips attach — bridge as event listener.
     App\Shared\Audit\AuditableDoctrineBridge:
         tags:

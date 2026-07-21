@@ -10,6 +10,7 @@ nav:
     groups: Groupes
     admin_projects: Projets
     appearance: Apparence
+    mailer: Mailer
     menus: Menus
     breadcrumbs: Fil d'Ariane
     toggle_sidebar: Basculer la navigation
@@ -25,10 +26,18 @@ api_docs:
     open_json: OuvrirAPI JSON
 common:
     filter: Filtre
+    clear_filters: Effacer les filtres
     cancel: Annuler
     yes: 'Oui'
     na: n / A
     unknown: inconnu
+    audit:
+        title: Audit
+        created_at: Créé
+        updated_at: Mis à jour
+        created_by: Créé par
+        updated_by: Mis à jour par
+        by_system: Système
 pagination:
     showing: 'Affichage de %from% à %to% sur %total%'
     nav: Pages de tableau
@@ -529,6 +538,7 @@ users:
         status: Statut
         presence: Présence
         roles: Rôle
+        audit: Audit
         actions: Actes
     status:
         enabled: Activé
@@ -632,15 +642,42 @@ preferences:
         display: Afficher
     profile:
         title: Profil
-        intro: Mettez à jour votre nom d’affichage et votre adresse e-mail de connexion.
+        intro: Consultez les détails de votre compte et mettez à jour le nom d’affichage ou l’e-mail de connexion.
         submit: Enregistrer le profil
+        edit_title: Modifier le profil
+        account_id: ID du compte
+        member_since: Membre depuis
+        last_activity: Dernière activité
+        last_activity_unknown: Aucune activité récente enregistrée
+        password_changed: Dernier changement de mot de passe
+        password_never_changed: Pas encore enregistré
+        password_expiry: Expiration du mot de passe
+        password_expired: Le mot de passe a expiré
+        password_expiry_unknown: 'L’expiration commence après le premier changement de mot de passe (politique : %policy% jours).'
+        password_days_remaining: '%count% jours restants · politique %policy% jours'
+        update_password: Mettre à jour le mot de passe
+        status_enabled: Actif
+        status_disabled: Désactivé
+        role_admin: Administrateur
+        role_member: Membre
+        projects_title: Vos projets
+        projects_intro: Projets accessibles via une appartenance directe.
+        projects_empty: Vous n’êtes membre direct d’aucun projet pour le moment.
+        groups_title: Vos groupes
+        groups_intro: Groupes pouvant donner accès à d’autres projets.
+        groups_empty: Vous n’appartenez à aucun groupe.
     security:
         title: Sécurité
         intro: Changez le mot de passe de votre compte.
         submit: Mettre à jour le mot de passe
+        history_title: Historique des changements de mot de passe
+        history_intro: Mises à jour récentes conservées pour empêcher la réutilisation. Les hachages ne sont jamais affichés.
+        history_current: 'Mot de passe actuel défini le :'
+        history_entry: Mot de passe modifié
+        history_empty: Aucun changement de mot de passe enregistré pour le moment.
     display:
         title: Afficher
-        intro: 'Choisissez la langue, le thème, la densité de la mise en page, le mouvement, la largeur du contenu et les panneaux de problèmes qui commencent à être réduits.'
+        intro: 'Choisissez la langue, le thème, la densité, la taille du texte, le contraste, la barre latérale, le mouvement, la largeur et les panneaux réduits.'
         submit: Enregistrer les paramètres d'affichage
         pwa_title: Installer l'application
         pwa_intro: Ajoutez ce site à votre appareil pour une expérience autonome plus rapide. La disponibilité dépend de votre navigateur.
@@ -662,6 +699,13 @@ preferences:
     width_full: Pleine largeur
     density_comfortable: Confortable
     density_compact: Compact
+    font_scale_sm: Petit
+    font_scale_md: Moyen
+    font_scale_lg: Grand
+    contrast_system: Système (suivre l'appareil)
+    contrast_more: Plus de contraste
+    sidebar_expanded: Développée
+    sidebar_collapsed: Réduite
     motion_system: Système (suivre l'appareil)
     motion_reduce: Réduire les mouvements
     motion_full: Mouvement complet
@@ -716,6 +760,18 @@ user_preferences:
         label: Densité de l'interface utilisateur
         placeholder: Confortable
         help: Espacement confortable ou disposition de l'opérateur plus compacte.
+    preferred_font_scale:
+        label: Taille du texte
+        placeholder: Moyen
+        help: Réduisez ou agrandissez le texte de l'interface.
+    preferred_contrast:
+        label: Contraste
+        placeholder: Système
+        help: Suivre le contraste de l'appareil ou forcer un texte et des bordures plus marqués.
+    preferred_sidebar:
+        label: Barre latérale
+        placeholder: Développée
+        help: État par défaut sur bureau si ce navigateur n'a pas encore de préférence enregistrée.
     preferred_motion:
         label: Mouvement
         placeholder: Système

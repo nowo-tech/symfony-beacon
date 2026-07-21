@@ -10,6 +10,7 @@ nav:
     groups: Grupos
     admin_projects: Proyectos
     appearance: Apariencia
+    mailer: Correo
     menus: Menús
     breadcrumbs: Migas
     toggle_sidebar: Alternar navegación
@@ -26,10 +27,18 @@ api_docs:
     open_json: OpenAPI JSON
 common:
     filter: Filtrar
+    clear_filters: Limpiar filtros
     cancel: Cancelar
     yes: 'sí'
     na: n/d
     unknown: desconocido
+    audit:
+        title: Auditoría
+        created_at: Creado
+        updated_at: Actualizado
+        created_by: Creado por
+        updated_by: Actualizado por
+        by_system: Sistema
 pagination:
     showing: Mostrando %from%–%to% de %total%
     nav: Páginas de la tabla
@@ -103,6 +112,8 @@ flash:
         group_link_forbidden: Solo puedes vincular grupos a los que perteneces (los propietarios del proyecto y los administradores de instancia pueden vincular cualquiera).
     appearance:
         saved: Apariencia guardada.
+    mailer:
+        saved: Ajustes de correo guardados.
     preferences:
         saved: Preferencias guardadas.
         profile_saved: Perfil guardado.
@@ -540,6 +551,26 @@ appearance:
         danger: Colores de peligro / error
     submit: Guardar apariencia
     reset: Restaurar valores
+mailer_settings:
+    title: Correo
+    intro: Guarda el DSN de Symfony Mailer cifrado en la base de datos (no en .env). Se usa para magic login y destinos de notificación por email.
+    status:
+        database: El correo saliente usa el DSN guardado en los ajustes de instancia.
+        env_fallback: Aún no hay DSN en base de datos — se usa MAILER_DSN del entorno (normalmente null://null).
+    current_dsn: 'DSN actual:'
+    from_preview: 'Dirección From: %from%'
+    submit: Guardar correo
+instance_mailer:
+    mailer_dsn:
+        label: DSN de Mailer
+        help: Déjalo vacío para conservar el valor cifrado actual. Ejemplo smtp://user:pass@mail.example:587
+        placeholder: smtp://user:pass@mail.example:587
+    clear_dsn:
+        label: Borrar DSN guardado
+        help: Elimina el DSN de la base de datos y vuelve a MAILER_DSN del entorno hasta que guardes uno nuevo.
+    mailer_from:
+        label: Dirección From
+        help: Remitente para magic login y notificaciones por email. Por defecto beacon@localhost si está vacío.
 site_appearance:
     brand_name:
         label: Nombre de marca
@@ -590,6 +621,7 @@ users:
         status: Estado
         presence: Presencia
         roles: Rol
+        audit: Auditoría
         actions: Acciones
     status:
         enabled: Activo
@@ -693,15 +725,42 @@ preferences:
         display: Interfaz
     profile:
         title: Perfil
-        intro: Actualiza tu nombre visible y el correo de acceso.
+        intro: Revisa los datos de tu cuenta y actualiza el nombre visible o el correo de acceso.
         submit: Guardar perfil
+        edit_title: Editar perfil
+        account_id: ID de cuenta
+        member_since: Miembro desde
+        last_activity: Última actividad
+        last_activity_unknown: Sin actividad reciente registrada
+        password_changed: Último cambio de contraseña
+        password_never_changed: Aún no registrado
+        password_expiry: Caducidad de la contraseña
+        password_expired: La contraseña ha caducado
+        password_expiry_unknown: 'La caducidad empieza tras el primer cambio de contraseña (política: %policy% días).'
+        password_days_remaining: '%count% días restantes · política %policy% días'
+        update_password: Actualizar contraseña
+        status_enabled: Activa
+        status_disabled: Desactivada
+        role_admin: Administrador
+        role_member: Miembro
+        projects_title: Tus proyectos
+        projects_intro: Proyectos a los que accedes por membresía directa.
+        projects_empty: Aún no eres miembro directo de ningún proyecto.
+        groups_title: Tus grupos
+        groups_intro: Grupos que pueden dar acceso a más proyectos.
+        groups_empty: No perteneces a ningún grupo.
     security:
         title: Seguridad
         intro: Cambia la contraseña de tu cuenta.
         submit: Actualizar contraseña
+        history_title: Historial de cambios de contraseña
+        history_intro: Actualizaciones recientes conservadas para evitar reutilizar contraseñas. Los hashes nunca se muestran.
+        history_current: 'Contraseña actual establecida el:'
+        history_entry: Contraseña cambiada
+        history_empty: Aún no hay cambios de contraseña registrados.
     display:
         title: Interfaz
-        intro: Elige idioma, tema, densidad, movimiento, ancho del contenido y qué paneles de incidencia empiezan colapsados.
+        intro: Elige idioma, tema, densidad, tamaño de texto, contraste, barra lateral, movimiento, ancho del contenido y qué paneles de incidencia empiezan colapsados.
         submit: Guardar interfaz
         pwa_title: Instalar aplicación
         pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
@@ -723,6 +782,13 @@ preferences:
     width_full: Ancho completo
     density_comfortable: Cómoda
     density_compact: Compacta
+    font_scale_sm: Pequeño
+    font_scale_md: Mediano
+    font_scale_lg: Grande
+    contrast_system: Sistema (seguir dispositivo)
+    contrast_more: Más contraste
+    sidebar_expanded: Expandida
+    sidebar_collapsed: Colapsada
     motion_system: Sistema (seguir dispositivo)
     motion_reduce: Reducir movimiento
     motion_full: Movimiento completo
@@ -777,6 +843,18 @@ user_preferences:
         label: Densidad de la interfaz
         placeholder: Cómoda
         help: Espaciado cómodo, o un layout de operador más compacto.
+    preferred_font_scale:
+        label: Tamaño del texto
+        placeholder: Mediano
+        help: Escala el texto de la interfaz más pequeño o más grande.
+    preferred_contrast:
+        label: Contraste
+        placeholder: Sistema
+        help: Seguir el contraste del dispositivo, o forzar texto y bordes más marcados.
+    preferred_sidebar:
+        label: Barra lateral
+        placeholder: Expandida
+        help: Estado inicial en escritorio cuando este navegador aún no tiene preferencia guardada.
     preferred_motion:
         label: Movimiento
         placeholder: Sistema
@@ -903,6 +981,7 @@ admin:
         groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
         projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
         appearance: Nombre de marca y colores de acento.
+        mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.
 legal:
@@ -1094,8 +1173,8 @@ notifications:
             tip: El último @ del endpoint separa token y chat id. Los tokens se cifran en reposo como el resto de endpoints.
         email:
             title: Email
-            lead: Entrega alertas a un buzón vía Symfony Mailer. Configura MAILER_DSN antes.
-            step1: Define MAILER_DSN en .env o secretos de producción con un transporte real (SMTP, etc.). null://null no entrega.
+            lead: Entrega alertas a un buzón vía Symfony Mailer. Configura el DSN en Administración → Correo antes.
+            step1: 'Abre Administración → Correo y guarda un DSN cifrado (smtp://…). MAILER_DSN en el entorno es solo fallback de arranque; null://null no entrega.'
             step2: En Beacon elige Email y pon como endpoint la dirección del destinatario.
             step3: Selecciona categorías, guarda, Enviar prueba y revisa bandeja/spam.
             payload: El asunto es el resumen; el cuerpo es el resumen más la URL de la incidencia o rendimiento si existe.

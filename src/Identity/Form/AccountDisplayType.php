@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Account display preferences: locale, theme, layout density, motion, issue panels.
+ * Account display preferences: locale, theme, layout, a11y, issue panels.
  */
 final class AccountDisplayType extends FormKitAbstractType
 {
@@ -56,6 +56,31 @@ final class AccountDisplayType extends FormKitAbstractType
                 'choices' => [
                     'preferences.density_comfortable' => 'comfortable',
                     'preferences.density_compact' => 'compact',
+                ],
+                'choice_translation_domain' => 'messages',
+                'required' => true,
+            ]);
+            $this->addChoiceField('preferredFontScale', [
+                'choices' => [
+                    'preferences.font_scale_sm' => 'sm',
+                    'preferences.font_scale_md' => 'md',
+                    'preferences.font_scale_lg' => 'lg',
+                ],
+                'choice_translation_domain' => 'messages',
+                'required' => true,
+            ]);
+            $this->addChoiceField('preferredContrast', [
+                'choices' => [
+                    'preferences.contrast_more' => 'more',
+                ],
+                'choice_translation_domain' => 'messages',
+                'placeholder' => 'preferences.contrast_system',
+                'required' => false,
+            ]);
+            $this->addChoiceField('preferredSidebar', [
+                'choices' => [
+                    'preferences.sidebar_expanded' => 'expanded',
+                    'preferences.sidebar_collapsed' => 'collapsed',
                 ],
                 'choice_translation_domain' => 'messages',
                 'required' => true,

@@ -20,6 +20,7 @@
                 <th class="px-2 py-2 font-medium">{{ 'users.col.status'|trans }}</th>
                 <th class="px-2 py-2 font-medium">{{ 'users.col.presence'|trans }}</th>
                 <th class="px-2 py-2 font-medium">{{ 'users.col.roles'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'users.col.audit'|trans }}</th>
                 <th class="px-2 py-2 font-medium">{{ 'users.col.actions'|trans }}</th>
             </tr>
         </thead>
@@ -71,6 +72,9 @@
                             </form>
                         {% endif %}
                     </td>
+                    <td class="px-2 py-3 align-top">
+                        {% include 'shared/_audit_meta.html.twig' with { entity: user } only %}
+                    </td>
                     <td class="px-2 py-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_users_activity', {id: user.uuid}) }}">{{ 'users.actions.activity'|trans }}</a>
@@ -93,7 +97,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="6">{{ 'users.empty'|trans }}</td>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="7">{{ 'users.empty'|trans }}</td>
                 </tr>
             {% endfor %}
         </tbody>

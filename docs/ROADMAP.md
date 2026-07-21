@@ -93,7 +93,7 @@ Ordered Speckit program (Beacon `014`→`022`; Bundle `023`/`024`):
 
 ---
 
-## Phase 5 — Access & insights (In progress — high/medium Done through v0.12.0)
+## Phase 5 — Access & insights (Done — high/medium through v0.12.x)
 
 Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do not hand-roll auth. **SSO/OIDC** stays Later (separate from `026`).
 
@@ -113,8 +113,18 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 | 5.5 | **Issue FULLTEXT** search (upgrade `016` `LIKE` path) | Beacon | `029-issue-fulltext` | **Done** |
 | 5.6 | **Delivery history**: last N attempts per notification destination (extends `021`) | Beacon | `030-delivery-history` | **Done** |
 | 5.7 | **Admin project audit timeline** on Admin → Project show (extends `019`) | Beacon | `031-admin-project-audit` | **Done** |
+| 5.7a | **Encrypted instance Mailer DSN** (Admin → Mailer; env fallback only) | Beacon | `034-encrypted-mailer-dsn` | **Done** |
 
-### Later (still in backlog)
+### Unspecced polish (shipped alongside Phase 5)
+
+| Item | Notes | Status |
+|------|--------|--------|
+| Account **appearance** extras (font scale, contrast, sidebar default) | `/account/display` + theme boot | **Done** |
+| Admin **users / groups** AuditKit meta (`createdAt` / `updatedAt` / blame) | Extends `audit-kit-bundle` usage | **Done** |
+| Password generator + password-change history on `/account/security` | PasswordStrength + `password_history` | **Done** |
+| Richer `/account/profile` (roles, UUID, memberships, groups) | Account overview | **Done** |
+
+### Later (still in backlog — pull into Phase 6 when prioritized)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -123,6 +133,71 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 | — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
 
 Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control plane — use HTTP webhooks + digests instead.
+
+---
+
+## Phase 6 — Operator platform & triage depth (Next)
+
+Focus: make multi-project self-hosting easier to run, close remaining Identity/kit debt, and deepen issue collaboration — without SaaS multi-tenant or SSO until specified.
+
+### Security hardening (priority track — platform review 2026-07-21)
+
+Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privileged POSTs, Halite encryption for API secrets / webhooks / Mailer DSN, ingest `hash_equals` + project binding, share-token hashing, Twig auto-escape on issue/comment bodies. No anonymous auth bypass found. Prioritize the High items below before net-new product surface (especially before read API / Prometheus).
+
+| Severity | Finding (summary) | Spec | Status |
+|----------|-------------------|------|--------|
+| **High** | **Webhook SSRF via redirects**: `OutboundUrlGuard` checks the initial URL; HttpClient still follows redirects → 302 to RFC1918/metadata | `045-webhook-ssrf-redirects` | **Next** |
+| **High** | **Share link issue scope not enforced**: session stores `issue` but `hasActiveShareGrant()` grants project-wide viewer | `046-share-link-issue-scope` | **Next** |
+| **High** | **Open redirect** on admin view-as-member (`redirect` accepts `//evil.com`; locale switch already rejects `//`) | `047-admin-safe-redirect` | **Next** |
+| **High** | **Encrypt key not durable in prod Compose**: `var/secrets` / Halite key not volume-mounted; container recreate loses decrypt ability | `048-prod-encrypt-key` | **Next** |
+| Medium | Deprecate / warn on ingest auth via **query string** (`beacon_secret` → proxy/access logs, Referer) | `049-deprecate-query-ingest-auth` | **Planned** |
+| Medium | **`/health/ready`** must not echo exception messages publicly | `050-health-error-hardening` | **Planned** |
+| Medium | SSRF **DNS rebinding / TOCTOU** (resolve-then-connect without pin) | extends `045` | **Planned** |
+| Medium | **Re-check ingest suspend** (and quota if needed) in `ProcessEnvelopeHandler` after ACK | `051-ingest-worker-recheck` | **Planned** |
+| Medium | Harden / document **public API key** handling (hash or treat as opaque id; secret always required) | `052-api-public-key-hardening` | **Planned** |
+| Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Planned** |
+| Low | Security **headers** in Caddy (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`) | `053-security-headers` | **Planned** |
+| Low | Restrict **Nelmio `/api/doc`** to `ROLE_ADMIN` | `054-api-doc-admin-only` | **Planned** |
+| Low | Generic client errors on Envelope parse (detail → logs only) | `051` / ingest | **Planned** |
+| Low | Prefer POST-only magic-login consume + `Referrer-Policy` (reduce GET token leakage) | extends AuthKit / `026` | **Later** |
+| Low | Cookie-consent POST CSRF (or document SameSite-only trade-off) | kit config | **Later** |
+| Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
+
+**Suggested patch order:** `045` → `047` (small) → `046` → `048` (ops), then Medium ingest/health items.
+
+### Next (immediate queue — product)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.1 | **Ops overview dashboard**: cross-project error spikes, open issues, failed deliveries (instance admin + optional project filter) | Beacon | `035-ops-overview` | **Next** |
+| 6.2 | **Admin identity audit timeline** for users & groups (extends blame fields + `UserAction` into Admin → User/Group show) | Beacon | `036-admin-identity-audit` | **Next** |
+| 6.3 | **AuthKit / UserKit Identity migration**: retire bootstrap `SecurityController` / bespoke account chrome where kits cover it | Beacon | `037-authkit-identity-migration` | **Next** |
+| 6.4 | **Monthly event quota** (promote `032`) | Beacon | `032-monthly-quota` | **Next** |
+
+### Planned
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.5 | **Prometheus metrics** scrape (`/metrics` or `/health/metrics`): ingest ACK rate, Messenger depth, notification failures — **auth or network-restrict** this endpoint | Beacon | `038-prometheus-metrics` | **Planned** |
+| 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Planned** |
+| 6.7 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Planned** |
+| 6.8 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Planned** |
+| 6.9 | **Read API + project tokens**: authenticated JSON for issues list/detail/export (automation; not public boards) — ship **after** `045`–`048` | Beacon | `042-read-api-tokens` | **Planned** |
+| 6.10 | **GDPR helpers**: account data export + soft-delete / anonymize path (prefer `nowo-tech` anonymize kit if available) | Beacon | `043-gdpr-user-export` | **Planned** |
+| 6.11 | **CI coverage soft gate** (promote `033`) | Beacon | `033-coverage-ci` | **Planned** |
+| 6.12 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Planned** |
+| 6.13 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
+| 6.14 | **Instance settings export/import** (appearance, mailer metadata flags, non-secret config JSON) for backup drills | Beacon | `044-instance-config-export` | **Planned** |
+
+### Later (Phase 6+)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| — | **SSO/SAML/OIDC** via AuthKit | Beacon | — | **Later** |
+| — | **WebAuthn / passkeys** if AuthKit supports | Beacon | — | **Later** |
+| — | **OTLP / OpenTelemetry** ingest adapter (alongside Envelope) | Beacon (+ optional Bundle) | — | **Later** |
+| — | Slack/Teams **interactive** resolve / assign actions | Beacon | — | **Later** |
+| — | **Inbound email → issue comment** | Beacon | — | **Later** |
 
 ---
 
@@ -158,7 +233,10 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.11.0** | Analytics charts (`025`); locales de/nl/fr/it/pt; UI density/motion; danger colors; shared table pagination |
 | **v0.11.1** | Magic login + viewer + share links (`026`); golden Envelope contract (3.6) |
 | **v0.12.0** | Phase 5 high/medium: threshold alerts (`027`), release health (`028`), FULLTEXT (`029`), delivery history (`030`), admin audit (`031`) |
-| **v0.13+** | Phase 5 Later: monthly quota (`032`), CI coverage soft gate (`033`); SSO/OIDC when specified |
+| **v0.12.1** | Encrypted Mailer DSN (`034`); account appearance extras; admin user/group AuditKit meta; security/profile UX polish |
+| **v0.12.2** | Security hardening High: webhook SSRF redirects (`045`), share issue-scope (`046`), admin safe redirect (`047`), prod encrypt key (`048`) |
+| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`); Medium security (`049`–`052`) |
+| **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`, after `045`–`048`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; headers/`api/doc` (`053`/`054`); SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -166,9 +244,9 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pick the highest **In progress** / **Next** row that is unblocked.
+1. Pick the highest **In progress** / **Next** row that is unblocked — **security High items (`045`–`048`) outrank new product Next**.
 2. Ensure a feature spec exists (`/speckit-specify` or update existing).
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21.
+Last updated: 2026-07-21 (v0.12.1 release; Phase 6 + security track documented).

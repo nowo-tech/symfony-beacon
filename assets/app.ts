@@ -147,6 +147,11 @@ function readSidebarCollapsed(): boolean {
     // Ignore.
   }
 
+  const userSidebar = (window as Window & { __BEACON_USER_SIDEBAR__?: string }).__BEACON_USER_SIDEBAR__;
+  if (userSidebar === 'collapsed' || userSidebar === 'expanded') {
+    return userSidebar === 'collapsed';
+  }
+
   return false;
 }
 

@@ -19,7 +19,8 @@
             <li class="panel flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <a class="font-medium no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ group.name }}</a>
-                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'groups.member_count'|trans({'%count%': group.memberships|length}) }}</div>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'groups.member_count'|trans({'%count%': member_counts[group.id]|default(0)}) }}</div>
+                    {% include 'shared/_audit_meta.html.twig' with { entity: group, class: 'mt-2 sm:grid-cols-2' } only %}
                 </div>
                 <a class="btn-ghost no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ 'groups.open'|trans }}</a>
             </li>

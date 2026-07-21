@@ -12,14 +12,18 @@
 
 ### Session 2026-07-20
 
-- **Q1 (destination types for v1)**: Originally Slack Incoming Webhook **and** generic HTTP webhook. **As-built expansion**: also Discord, Microsoft Teams, Telegram (`bot_token@chat_id`), and email (`MAILER_DSN`).
+- **Q1 (destination types for v1)**: Originally Slack Incoming Webhook **and** generic HTTP webhook. **As-built expansion**: also Discord, Microsoft Teams, Telegram (`bot_token@chat_id`), and email (instance Mailer DSN; see `034-encrypted-mailer-dsn`).
 - **Q2 (issue occurrence rule)**: Notify on **first occurrence** of a new issue **and** on **regression** (issue was `resolved` or `ignored` and becomes active again). Do **not** notify on every duplicate event for an already-open issue.
 - **Implementation note (ingest)**: Matching events reopen both **`resolved` and `ignored`** issues to **unresolved**, and notify on new issue + regression only.
 
 ### Session 2026-07-21
 
 - **Q3 (operator manuals)**: In-app setup guides at `/projects/{uuid}/notifications/help` (and `docs/NOTIFICATIONS.md`) document how to connect Slack, Discord, Teams, Telegram, email, and generic HTTP.
-- **Q4 (SSRF)**: Production blocks private/link-local/metadata URLs for Slack/Discord/Teams/HTTP destinations; Telegram uses Bot API host constructed by Beacon; email is Mailer-only.
+- **Q4 (SSRF)**: Production blocks private/link-local/metadata URLs for Slack/Discord/Teams/HTTP destinations; Telegram uses Bot API host constructed by Beacon; email is Mailer-only (encrypted instance DSN via `034`).
+
+### Session 2026-07-21 (Mailer settings)
+
+- **Q5 (Mailer secret location)**: Email transport DSN is stored encrypted in `instance_settings` (Administration → Mailer). Env `MAILER_DSN` remains bootstrap/fallback only (`null://null` by default). See `034-encrypted-mailer-dsn`.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -145,7 +149,7 @@ As a project admin, I can send a test notification to a configured destination s
 - Self-hosted operators paste webhook URLs or `bot_token@chat_id`; no global Slack/Discord/Telegram env vars.
 - Notification UI/docs copy is English in docs; Twig UI is i18n (`en` / `es`).
 - Multiple destinations per project are supported.
-- Email requires a real `MAILER_DSN` (default `null://null` does not deliver).
+- Email requires a configured instance Mailer DSN under **Administration → Mailer** (encrypted). Env `MAILER_DSN` is fallback only; default `null://null` does not deliver. See `034-encrypted-mailer-dsn`.
 
 ## Out of Scope
 

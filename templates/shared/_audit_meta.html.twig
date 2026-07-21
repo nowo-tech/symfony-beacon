@@ -1,0 +1,37 @@
+{# Compact AuditKit timestamps + blame for admin lists/detail. Expects `entity` with createdAt/updatedAt/createdBy/updatedBy. #}
+{% set created_by = entity.createdBy ?? null %}
+{% set updated_by = entity.updatedBy ?? null %}
+<dl class="audit-meta grid gap-2 text-xs text-[var(--color-ink)]/65 {{ class|default('') }}" data-testid="audit-meta">
+    <div>
+        <dt class="font-medium text-[var(--color-ink)]/55">{{ 'common.audit.created_at'|trans }}</dt>
+        <dd class="mt-0.5">
+            {% if entity.createdAt %}
+                <time datetime="{{ entity.createdAt|date('c') }}">{{ entity.createdAt|date('Y-m-d H:i') }}</time>
+            {% else %}
+                {{ 'common.na'|trans }}
+            {% endif %}
+            <span class="text-[var(--color-ink)]/45">·</span>
+            {% if created_by %}
+                {{ created_by.displayName }}
+            {% else %}
+                {{ 'common.audit.by_system'|trans }}
+            {% endif %}
+        </dd>
+    </div>
+    <div>
+        <dt class="font-medium text-[var(--color-ink)]/55">{{ 'common.audit.updated_at'|trans }}</dt>
+        <dd class="mt-0.5">
+            {% if entity.updatedAt %}
+                <time datetime="{{ entity.updatedAt|date('c') }}">{{ entity.updatedAt|date('Y-m-d H:i') }}</time>
+            {% else %}
+                {{ 'common.na'|trans }}
+            {% endif %}
+            <span class="text-[var(--color-ink)]/45">·</span>
+            {% if updated_by %}
+                {{ updated_by.displayName }}
+            {% else %}
+                {{ 'common.audit.by_system'|trans }}
+            {% endif %}
+        </dd>
+    </div>
+</dl>

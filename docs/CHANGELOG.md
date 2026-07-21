@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-07-21
+
+### Added
+
+- Administration → **Mailer**: store Symfony `MAILER_DSN` encrypted in `instance_settings` (Halite / doctrine-encrypt-bundle) with optional From address; runtime mailer prefers DB over env fallback (`034-encrypted-mailer-dsn`)
+- Developer manual **[Adding a UI language](ADDING-LOCALES.md)** (enable locales, catalogues, security, seeders, tests)
+- Account → Display: **font scale**, **contrast**, and **sidebar** default preferences (theme boot + CSS)
+- Admin → Users / Groups: AuditKit **created / updated** timestamps and **created by / updated by** meta
+- Account → Security: password **generator** (PasswordStrength modal) and **password-change history** dates from `password_history`
+- Account → Profile: richer overview (avatar/roles, UUID, member since, last activity, password changed, projects, groups)
+- ROADMAP **Phase 6** (ops/product backlog) plus a **security hardening** track from the platform review (`045`–`054`)
+
+### Changed
+
+- Magic login and email notification delivery read Mailer DSN/From from instance settings (`ConfiguredMailer`); `.env` `MAILER_DSN` remains bootstrap/fallback only (`null://null` by default)
+- Password-policy flash messages use structured toast title/body overrides (`PasswordPolicyBundle.*.yaml`)
+- Filter UIs always expose **Clear filters**; dashboard project list keeps search / filter / clear / new-project on one toolbar
+- Batch-load Doctrine associations on several admin, issue, notification, and dashboard paths (fewer N+1 queries)
+- SECURITY.md: operators configure Mailer via Administration (encrypted), not only env
+
 ## [0.12.0] - 2026-07-21
 
 ### Added
@@ -376,7 +396,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...v0.11.0

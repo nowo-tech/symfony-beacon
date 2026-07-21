@@ -10,6 +10,7 @@ nav:
     groups: Grupos
     admin_projects: Projetos
     appearance: Aparência
+    mailer: Mailer
     menus: Cardápios
     breadcrumbs: Pão ralado
     toggle_sidebar: Alternar navegação
@@ -25,10 +26,18 @@ api_docs:
     open_json: JSON OpenAPI
 common:
     filter: Filtro
+    clear_filters: Limpar filtros
     cancel: Cancelar
     yes: 'sim'
     na: n / D
     unknown: desconhecido
+    audit:
+        title: Auditoria
+        created_at: Criado
+        updated_at: Atualizado
+        created_by: Criado por
+        updated_by: Atualizado por
+        by_system: Sistema
 pagination:
     showing: 'Exibindo %from%–%to% de %total%'
     nav: Páginas de tabela
@@ -529,6 +538,7 @@ users:
         status: Status
         presence: Presença
         roles: Papel
+        audit: Auditoria
         actions: Ações
     status:
         enabled: Habilitado
@@ -632,15 +642,42 @@ preferences:
         display: Mostrar
     profile:
         title: Perfil
-        intro: Atualize seu nome de exibição e e-mail de login.
+        intro: Reveja os dados da conta e atualize o nome de exibição ou o e-mail de acesso.
         submit: Salvar perfil
+        edit_title: Editar perfil
+        account_id: ID da conta
+        member_since: Membro desde
+        last_activity: Última atividade
+        last_activity_unknown: Sem atividade recente registada
+        password_changed: Última alteração de senha
+        password_never_changed: Ainda não registada
+        password_expiry: Expiração da senha
+        password_expired: A senha expirou
+        password_expiry_unknown: 'A expiração começa após a primeira alteração de senha (política: %policy% dias).'
+        password_days_remaining: '%count% dias restantes · política %policy% dias'
+        update_password: Atualizar senha
+        status_enabled: Ativa
+        status_disabled: Desativada
+        role_admin: Administrador
+        role_member: Membro
+        projects_title: Os seus projetos
+        projects_intro: Projetos a que acede por membership direta.
+        projects_empty: Ainda não é membro direto de nenhum projeto.
+        groups_title: Os seus grupos
+        groups_intro: Grupos que podem dar acesso a mais projetos.
+        groups_empty: Não pertence a nenhum grupo.
     security:
         title: Segurança
         intro: Altere a senha da sua conta.
         submit: Atualizar senha
+        history_title: Histórico de alterações de senha
+        history_intro: Atualizações recentes guardadas para evitar reutilização. Os hashes nunca são mostrados.
+        history_current: 'Senha atual definida em:'
+        history_entry: Senha alterada
+        history_empty: Ainda não há alterações de senha registadas.
     display:
         title: Mostrar
-        intro: 'Escolha o idioma, o tema, a densidade do layout, o movimento, a largura do conteúdo e quais painéis de problemas começam a ser recolhidos.'
+        intro: 'Escolha idioma, tema, densidade, tamanho do texto, contraste, barra lateral, movimento, largura e painéis recolhidos.'
         submit: Salvar configurações de exibição
         pwa_title: Instalar aplicativo
         pwa_intro: Adicione este site ao seu dispositivo para uma experiência autônoma e mais rápida. A disponibilidade depende do seu navegador.
@@ -662,6 +699,13 @@ preferences:
     width_full: Largura total
     density_comfortable: Confortável
     density_compact: Compactar
+    font_scale_sm: Pequeno
+    font_scale_md: Médio
+    font_scale_lg: Grande
+    contrast_system: Sistema (seguir dispositivo)
+    contrast_more: Mais contraste
+    sidebar_expanded: Expandida
+    sidebar_collapsed: Recolhida
     motion_system: Sistema (seguir dispositivo)
     motion_reduce: Reduzir o movimento
     motion_full: Movimento total
@@ -716,6 +760,18 @@ user_preferences:
         label: Densidade da IU
         placeholder: Confortável
         help: Espaçamento confortável ou layout do operador mais compacto.
+    preferred_font_scale:
+        label: Tamanho do texto
+        placeholder: Médio
+        help: Reduza ou aumente o texto da interface.
+    preferred_contrast:
+        label: Contraste
+        placeholder: Sistema
+        help: Siga o contraste do dispositivo ou force texto e bordas mais marcados.
+    preferred_sidebar:
+        label: Barra lateral
+        placeholder: Expandida
+        help: Estado padrão no ambiente de trabalho se este browser ainda não tiver preferência guardada.
     preferred_motion:
         label: Movimento
         placeholder: Sistema

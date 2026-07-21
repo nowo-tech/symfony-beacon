@@ -59,6 +59,52 @@ final class NotificationDeliveryAttemptRepository extends ServiceEntityRepositor
     }
 
     /**
+     * Recent attempts for many destinations (avoids N+1 on project settings).
+     *
+     * @param list<NotificationDestination> $destinations
+     *
+     * @return array<int, list<NotificationDeliveryAttempt>> keyed by destination id
+     */
+    public function findRecentByDestinations(array $destinations, int $limitPerDestination = 25): array
+    {
+        $map = [];
+        $ids = [];
+        foreach ($destinations as $destination) {
+            $id = $destination->getId();
+            if (null === $id) {
+                continue;
+            }
+            $ids[] = $id;
+            $map[$id] = [];
+        }
+        if ([] === $ids) {
+            return $map;
+        }
+
+        /** @var list<NotificationDeliveryAttempt> $rows */
+        $rows = $this->createQueryBuilder('a')
+            ->andWhere('a.destination IN (:destinations)')
+            ->setParameter('destinations', $ids)
+            ->orderBy('a.attemptedAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($rows as $attempt) {
+            $destinationId = $attempt->getDestination()?->getId();
+            if (null === $destinationId) {
+                continue;
+            }
+            if (\count($map[$destinationId]) >= $limitPerDestination) {
+                continue;
+            }
+            $map[$destinationId][] = $attempt;
+        }
+
+        return $map;
+    }
+
+    /**
      * @param list<NotificationDeliveryAttempt> $attempts
      */
     public function removeAll(array $attempts): void

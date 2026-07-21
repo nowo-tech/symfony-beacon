@@ -42,7 +42,7 @@ You should receive an acknowledgement within a few business days. We will work w
 | Magic login (`login_link`) | Lifetime **600s**, **max_uses: 1**, used-link cache `cache.app` | Request rate limit 5 / 15 minutes per IP; disabled accounts rejected |
 | Share links | Max **30 days**; SHA-256 hashed token | Grants session viewer access only; never embeds Envelope API secrets |
 
-Operators should keep `MAILER_DSN` and `kernel.secret` production-grade; rotating the secret invalidates outstanding magic links.
+Operators should keep the **Mailer DSN** (Administration → Mailer, encrypted at rest) and `kernel.secret` production-grade; rotating the secret invalidates outstanding magic links. Env `MAILER_DSN` is only a fallback when no database DSN is configured.
 
 ## Safe harbour
 

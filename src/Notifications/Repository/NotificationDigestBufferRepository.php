@@ -57,10 +57,12 @@ class NotificationDigestBufferRepository extends ServiceEntityRepository
     {
         /** @var list<NotificationDestination> $result */
         $result = $this->getEntityManager()->createQueryBuilder()
-            ->select('DISTINCT d')
-            ->from(NotificationDigestBuffer::class, 'b')
-            ->innerJoin('b.destination', 'd')
+            ->select('d', 'p')
+            ->from(NotificationDestination::class, 'd')
+            ->innerJoin('d.project', 'p')
+            ->innerJoin(NotificationDigestBuffer::class, 'b', 'WITH', 'b.destination = d')
             ->orderBy('d.id', 'ASC')
+            ->distinct()
             ->getQuery()
             ->getResult();
 

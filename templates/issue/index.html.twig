@@ -97,7 +97,10 @@
             <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
         {% endfor %}
     </select>
-    <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+    <div class="issue-filters__actions">
+        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('issue_index', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
 </form>
 
 {% if compareResult is defined and compareResult %}

@@ -184,6 +184,91 @@ class EventRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param list<int> $projectIds
+     *
+     * @return array<int, int> project id => event count since $since
+     */
+    public function countReceivedSinceForProjectIds(array $projectIds, DateTimeImmutable $since): array
+    {
+        if ([] === $projectIds) {
+            return [];
+        }
+
+        /** @var list<array{projectId: int|string, cnt: int|string}> $rows */
+        $rows = $this->createQueryBuilder('e')
+            ->select('IDENTITY(i.project) AS projectId, COUNT(e.id) AS cnt')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project IN (:projects)')
+            ->andWhere('e.receivedAt >= :since')
+            ->setParameter('projects', $projectIds)
+            ->setParameter('since', $since)
+            ->groupBy('i.project')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['projectId']] = (int) $row['cnt'];
+        }
+
+        return $map;
+    }
+
+    public function findLastReceivedAtForProject(Project $project): ?DateTimeImmutable
+    {
+        $value = $this->createQueryBuilder('e')
+            ->select('MAX(e.receivedAt)')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if (null === $value || '' === $value) {
+            return null;
+        }
+
+        return $value instanceof DateTimeImmutable
+            ? $value
+            : new DateTimeImmutable((string) $value);
+    }
+
+    /**
+     * @param list<int> $projectIds
+     *
+     * @return array<int, DateTimeImmutable> project id => last received at
+     */
+    public function findLastReceivedAtForProjectIds(array $projectIds): array
+    {
+        if ([] === $projectIds) {
+            return [];
+        }
+
+        /** @var list<array{projectId: int|string, lastAt: mixed}> $rows */
+        $rows = $this->createQueryBuilder('e')
+            ->select('IDENTITY(i.project) AS projectId, MAX(e.receivedAt) AS lastAt')
+            ->innerJoin('e.issue', 'i')
+            ->andWhere('i.project IN (:projects)')
+            ->setParameter('projects', $projectIds)
+            ->groupBy('i.project')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $value = $row['lastAt'];
+            if (null === $value || '' === $value) {
+                continue;
+            }
+            $map[(int) $row['projectId']] = $value instanceof DateTimeImmutable
+                ? $value
+                : new DateTimeImmutable((string) $value);
+        }
+
+        return $map;
+    }
+
     public function countReceivedSince(
         Project $project,
         DateTimeImmutable $since,
@@ -211,25 +296,6 @@ class EventRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
-    }
-
-    public function findLastReceivedAtForProject(Project $project): ?DateTimeImmutable
-    {
-        $value = $this->createQueryBuilder('e')
-            ->select('MAX(e.receivedAt)')
-            ->innerJoin('e.issue', 'i')
-            ->andWhere('i.project = :project')
-            ->setParameter('project', $project)
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        if (null === $value || '' === $value) {
-            return null;
-        }
-
-        return $value instanceof DateTimeImmutable
-            ? $value
-            : new DateTimeImmutable((string) $value);
     }
 
     /**

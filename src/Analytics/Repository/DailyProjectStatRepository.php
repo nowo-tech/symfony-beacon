@@ -57,6 +57,52 @@ class DailyProjectStatRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /**
+     * Batch variant of {@see findLastDays()} (avoids N+1 on dashboard).
+     *
+     * @param list<Project> $projects
+     *
+     * @return array<int, list<DailyProjectStat>> keyed by project id
+     */
+    public function findLastDaysForProjects(array $projects, int $days = 14): array
+    {
+        $map = [];
+        $ids = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null === $id) {
+                continue;
+            }
+            $ids[] = $id;
+            $map[$id] = [];
+        }
+        if ([] === $ids) {
+            return $map;
+        }
+
+        $from = $this->fromDateForLastDays($days);
+
+        /** @var list<DailyProjectStat> $rows */
+        $rows = $this->createQueryBuilder('s')
+            ->andWhere('s.project IN (:projects)')
+            ->andWhere('s.statDate >= :from')
+            ->setParameter('projects', $ids)
+            ->setParameter('from', $from)
+            ->orderBy('s.statDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($rows as $stat) {
+            $projectId = $stat->getProject()?->getId();
+            if (null === $projectId) {
+                continue;
+            }
+            $map[$projectId][] = $stat;
+        }
+
+        return $map;
+    }
+
     public function countLastDays(Project $project, int $days): int
     {
         $from = $this->fromDateForLastDays($days);

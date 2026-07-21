@@ -27,4 +27,54 @@ class UserGroupMembershipRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['userGroup' => $group, 'user' => $user]);
     }
+
+    /**
+     * Groups the user belongs to (hydrates group entity).
+     *
+     * @return list<UserGroupMembership>
+     */
+    public function findByUser(User $user): array
+    {
+        /** @var list<UserGroupMembership> $rows */
+        $rows = $this->createQueryBuilder('m')
+            ->innerJoin('m.userGroup', 'g')->addSelect('g')
+            ->andWhere('m.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('g.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $rows;
+    }
+
+    /**
+     * @param list<int> $groupIds
+     *
+     * @return array<int, int> group id => member count
+     */
+    public function countByGroupIds(array $groupIds): array
+    {
+        $map = [];
+        foreach ($groupIds as $id) {
+            $map[$id] = 0;
+        }
+        if ([] === $groupIds) {
+            return $map;
+        }
+
+        /** @var list<array{groupId: int|string, cnt: int|string}> $rows */
+        $rows = $this->createQueryBuilder('m')
+            ->select('IDENTITY(m.userGroup) AS groupId, COUNT(m.id) AS cnt')
+            ->andWhere('m.userGroup IN (:groups)')
+            ->setParameter('groups', $groupIds)
+            ->groupBy('m.userGroup')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($rows as $row) {
+            $map[(int) $row['groupId']] = (int) $row['cnt'];
+        }
+
+        return $map;
+    }
 }

@@ -6,6 +6,8 @@ namespace App\Project\Repository;
 
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
+use App\Project\Entity\ProjectGroupAccess;
+use App\Project\Entity\ProjectMembership;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -66,6 +68,83 @@ class ProjectRepository extends ServiceEntityRepository
         $result = $qb->getQuery()->getResult();
 
         return $result;
+    }
+
+    /**
+     * Hydrate settings/admin associations without cartesian products across collections.
+     */
+    public function hydrateAccessGraph(Project $project): void
+    {
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.memberships', 'm')->addSelect('m')
+            ->leftJoin('m.user', 'mu')->addSelect('mu')
+            ->andWhere('p = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getResult();
+
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.groupAccesses', 'ga')->addSelect('ga')
+            ->leftJoin('ga.userGroup', 'g')->addSelect('g')
+            ->andWhere('p = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getResult();
+
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.notificationDestinations', 'd')->addSelect('d')
+            ->andWhere('p = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Member and linked-group counts for admin project lists (avoids |length N+1).
+     *
+     * @param list<int> $projectIds
+     *
+     * @return array<int, array{members: int, groups: int}>
+     */
+    public function countAccessByProjectIds(array $projectIds): array
+    {
+        $map = [];
+        foreach ($projectIds as $id) {
+            $map[$id] = ['members' => 0, 'groups' => 0];
+        }
+        if ([] === $projectIds) {
+            return $map;
+        }
+
+        $em = $this->getEntityManager();
+
+        /** @var list<array{projectId: int|string, cnt: int|string}> $memberRows */
+        $memberRows = $em->createQueryBuilder()
+            ->select('IDENTITY(m.project) AS projectId, COUNT(m.id) AS cnt')
+            ->from(ProjectMembership::class, 'm')
+            ->andWhere('m.project IN (:projects)')
+            ->setParameter('projects', $projectIds)
+            ->groupBy('m.project')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($memberRows as $row) {
+            $map[(int) $row['projectId']]['members'] = (int) $row['cnt'];
+        }
+
+        /** @var list<array{projectId: int|string, cnt: int|string}> $groupRows */
+        $groupRows = $em->createQueryBuilder()
+            ->select('IDENTITY(ga.project) AS projectId, COUNT(ga.id) AS cnt')
+            ->from(ProjectGroupAccess::class, 'ga')
+            ->andWhere('ga.project IN (:projects)')
+            ->setParameter('projects', $projectIds)
+            ->groupBy('ga.project')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($groupRows as $row) {
+            $map[(int) $row['projectId']]['groups'] = (int) $row['cnt'];
+        }
+
+        return $map;
     }
 
     public function save(Project $project, bool $flush = true): void

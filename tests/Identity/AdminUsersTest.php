@@ -91,8 +91,16 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::assertInstanceOf(User::class, $created);
         self::assertNotContains('ROLE_ADMIN', $created->getRoles());
         self::assertTrue($created->isEnabled());
+        self::assertNotNull($created->getCreatedAt());
+        self::assertNotNull($created->getUpdatedAt());
+        self::assertSame($admin->getId(), $created->getCreatedBy()?->getId());
+        self::assertSame($admin->getId(), $created->getUpdatedBy()?->getId());
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/users');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="audit-meta"]');
+        self::assertSelectorTextContains('table', 'Test User');
+
         $form = $crawler->filter('form[action$="/admin/users/'.$created->getUuid().'/role"]')->form([
             'role' => 'admin',
         ]);

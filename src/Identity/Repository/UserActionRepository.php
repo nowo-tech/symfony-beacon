@@ -38,6 +38,8 @@ class UserActionRepository extends ServiceEntityRepository
     {
         /** @var list<UserAction> $rows */
         $rows = $this->createQueryBuilder('a')
+            ->leftJoin('a.actor', 'actor')->addSelect('actor')
+            ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
             ->andWhere('a.subjectUser = :user OR a.actor = :user')
             ->setParameter('user', $user)
             ->orderBy('a.createdAt', 'DESC')
@@ -58,6 +60,8 @@ class UserActionRepository extends ServiceEntityRepository
     {
         /** @var list<UserAction> $rows */
         $rows = $this->createQueryBuilder('a')
+            ->leftJoin('a.actor', 'actor')->addSelect('actor')
+            ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
             ->orderBy('a.createdAt', 'DESC')
             ->addOrderBy('a.id', 'DESC')
             ->setMaxResults($limit)
@@ -139,6 +143,8 @@ class UserActionRepository extends ServiceEntityRepository
         $orderedIds = array_map(static fn (int|string $id): int => (int) $id, $rawIds);
         /** @var list<UserAction> $rows */
         $rows = $this->createQueryBuilder('a')
+            ->leftJoin('a.actor', 'actor')->addSelect('actor')
+            ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
             ->andWhere('a.id IN (:ids)')
             ->setParameter('ids', $orderedIds)
             ->getQuery()

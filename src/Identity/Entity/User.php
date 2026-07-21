@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
-use Nowo\AuditKitBundle\Model\TimestampableInterface;
+use Nowo\AuditKitBundle\Model\AuditableInterface;
 use Nowo\AuditKitBundle\Model\TimestampableTrait;
 use Nowo\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use Nowo\PasswordPolicyBundle\Model\PasswordHistoryInterface;
@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'app_user')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', columns: ['email'])]
 #[ORM\UniqueConstraint(name: 'uniq_app_user_uuid', columns: ['uuid'])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPasswordPolicyInterface, AccountStatusInterface, LastActivityInterface, TimestampableInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPasswordPolicyInterface, AccountStatusInterface, LastActivityInterface, AuditableInterface
 {
     use EnabledUserTrait;
     use LastActivityTrait;
@@ -70,6 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     /** @var Collection<int, PasswordHistory> */
     #[ORM\OneToMany(targetEntity: PasswordHistory::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $passwordHistory;
 
     /** Preferred UI locale (`en` / `es` / `de` / `nl` / `fr` / `it` / `pt`); null = follow request / browser. */
@@ -94,6 +95,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\Column(length: 16, nullable: true)]
     private ?string $preferredMotion = null;
 
+    /** Root font scale: `sm` | `md` (default) | `lg`. Null = md. */
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $preferredFontScale = null;
+
+    /** Contrast: null = system, `more` = stronger ink/borders. */
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $preferredContrast = null;
+
+    /** Desktop sidebar default: `expanded` (default) or `collapsed`. Null = expanded. */
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $preferredSidebar = null;
+
     /**
      * Issue/event panel ids that should start collapsed (browser can override via localStorage).
      *
@@ -105,6 +118,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'updated_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $updatedBy = null;
 
     public function __construct()
     {
@@ -334,6 +355,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
+    public function getPreferredFontScale(): string
+    {
+        return \in_array($this->preferredFontScale, ['sm', 'lg'], true) ? $this->preferredFontScale : 'md';
+    }
+
+    public function setPreferredFontScale(?string $preferredFontScale): self
+    {
+        $normalized = null !== $preferredFontScale ? strtolower(trim($preferredFontScale)) : null;
+        if (!\in_array($normalized, ['sm', 'md', 'lg'], true)) {
+            $normalized = null;
+        }
+        $this->preferredFontScale = $normalized;
+
+        return $this;
+    }
+
+    public function getPreferredContrast(): ?string
+    {
+        return $this->preferredContrast;
+    }
+
+    public function setPreferredContrast(?string $preferredContrast): self
+    {
+        $normalized = null !== $preferredContrast ? strtolower(trim($preferredContrast)) : null;
+        if (null !== $normalized && 'more' !== $normalized) {
+            $normalized = null;
+        }
+        $this->preferredContrast = $normalized;
+
+        return $this;
+    }
+
+    public function getPreferredSidebar(): string
+    {
+        return 'collapsed' === $this->preferredSidebar ? 'collapsed' : 'expanded';
+    }
+
+    public function setPreferredSidebar(?string $preferredSidebar): self
+    {
+        $normalized = null !== $preferredSidebar ? strtolower(trim($preferredSidebar)) : null;
+        if (!\in_array($normalized, ['expanded', 'collapsed'], true)) {
+            $normalized = null;
+        }
+        $this->preferredSidebar = $normalized;
+
+        return $this;
+    }
+
     /**
      * @return list<string>
      */
@@ -373,5 +442,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function getMemberships(): Collection
     {
         return $this->memberships;
+    }
+
+    public function getCreatedBy(): ?object
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?object $createdBy): void
+    {
+        $this->createdBy = $createdBy instanceof self ? $createdBy : null;
+    }
+
+    public function getUpdatedBy(): ?object
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?object $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy instanceof self ? $updatedBy : null;
     }
 }

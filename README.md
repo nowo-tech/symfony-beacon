@@ -34,7 +34,8 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
-- Phase 5 product depth (v0.12.0): **threshold alerts**, **release health**, MySQL **FULLTEXT** issue search, notification **delivery history**, admin **project audit** timeline — see [ROADMAP](docs/ROADMAP.md) (Later: monthly quota, coverage soft gate, SSO)
+- Phase 5 product depth (v0.12.0): **threshold alerts**, **release health**, MySQL **FULLTEXT** issue search, notification **delivery history**, admin **project audit** timeline
+- v0.12.1: **encrypted instance Mailer**, richer account Display/Security/Profile, admin user/group audit meta — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next includes security hardening `045`–`048`, monthly quota, SSO Later)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
@@ -137,6 +138,7 @@ docker compose exec php php bin/phpunit
 - [Event context (timestamps, versions, user)](docs/EVENT-CONTEXT.md)
 - [Mobile / PWA (Hotwire Native removed)](docs/NATIVE-MOBILE.md)
 - [Legal pages & cookie consent](docs/LEGAL-AND-COOKIES.md)
+- [Adding a UI language](docs/ADDING-LOCALES.md)
 - [Production](docs/PRODUCTION.md)
 - [Contributing](docs/CONTRIBUTING.md)
 

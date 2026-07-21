@@ -34,10 +34,8 @@ final class DashboardController extends AbstractController
         $query = $request->query->getString('q');
         $projects = $this->projectRepository->findAccessibleByUser($user, '' !== $query ? $query : null);
 
-        $statsPreview = [];
-        foreach (\array_slice($projects, 0, 5) as $project) {
-            $statsPreview[$project->getId() ?? 0] = $this->dailyProjectStatRepository->findLastDays($project, 7);
-        }
+        $previewProjects = \array_slice($projects, 0, 5);
+        $statsPreview = $this->dailyProjectStatRepository->findLastDaysForProjects($previewProjects, 7);
 
         return $this->render('dashboard/home.html.twig', [
             'projects' => $projects,

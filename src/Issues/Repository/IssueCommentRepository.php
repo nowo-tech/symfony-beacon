@@ -26,6 +26,7 @@ class IssueCommentRepository extends ServiceEntityRepository
     {
         /** @var list<IssueComment> $result */
         $result = $this->createQueryBuilder('c')
+            ->leftJoin('c.author', 'author')->addSelect('author')
             ->andWhere('c.issue = :issue')
             ->setParameter('issue', $issue)
             ->orderBy('c.createdAt', 'ASC')

@@ -10,10 +10,10 @@ use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\NotificationDeliveryHistoryRecorder;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
+use App\Shared\Mailer\ConfiguredMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -31,7 +31,7 @@ final readonly class DeliverNotificationHandler
         private NotificationOutboundFormatter $outboundFormatter,
         private OutboundUrlGuard $outboundUrlGuard,
         private HttpClientInterface $httpClient,
-        private MailerInterface $mailer,
+        private ConfiguredMailer $mailer,
         private LoggerInterface $logger,
         private EntityManagerInterface $entityManager,
     ) {
@@ -112,6 +112,7 @@ final readonly class DeliverNotificationHandler
         }
 
         $email = new Email()
+            ->from($this->mailer->getFromAddress())
             ->to($to)
             ->subject(mb_substr(str_replace("\n", ' ', $summary), 0, 200))
             ->text($body);

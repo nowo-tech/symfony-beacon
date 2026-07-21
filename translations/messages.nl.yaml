@@ -10,6 +10,7 @@ nav:
     groups: Groepen
     admin_projects: Projecten
     appearance: Weergave
+    mailer: Mailer
     menus: Menu's
     breadcrumbs: Paneermeel
     toggle_sidebar: Schakel navigatie in
@@ -25,10 +26,18 @@ api_docs:
     open_json: OpenAPI JSON
 common:
     filter: Filter
+    clear_filters: Filters wissen
     cancel: Annuleren
     yes: 'Ja'
     na: n.v.t
     unknown: onbekend
+    audit:
+        title: Audit
+        created_at: Aangemaakt
+        updated_at: Bijgewerkt
+        created_by: Aangemaakt door
+        updated_by: Bijgewerkt door
+        by_system: Systeem
 pagination:
     showing: 'Toont %from%–%to% van %total%'
     nav: Tabelpagina's
@@ -529,6 +538,7 @@ users:
         status: Status
         presence: Aanwezigheid
         roles: Rol
+        audit: Audit
         actions: Acties
     status:
         enabled: Ingeschakeld
@@ -632,15 +642,42 @@ preferences:
         display: Weergave
     profile:
         title: Profiel
-        intro: Update uw weergavenaam en inlog-e-mailadres.
+        intro: Bekijk je accountgegevens en werk weergavenaam of inlog-e-mail bij.
         submit: Profiel opslaan
+        edit_title: Profiel bewerken
+        account_id: Account-ID
+        member_since: Lid sinds
+        last_activity: Laatste activiteit
+        last_activity_unknown: Geen recente activiteit geregistreerd
+        password_changed: Wachtwoord laatst gewijzigd
+        password_never_changed: Nog niet geregistreerd
+        password_expiry: Wachtwoordverloop
+        password_expired: Wachtwoord is verlopen
+        password_expiry_unknown: 'Verloop start na je eerste wachtwoordwijziging (beleid: %policy% dagen).'
+        password_days_remaining: '%count% dagen resterend · beleid %policy% dagen'
+        update_password: Wachtwoord bijwerken
+        status_enabled: Actief
+        status_disabled: Uitgeschakeld
+        role_admin: Beheerder
+        role_member: Lid
+        projects_title: Je projecten
+        projects_intro: Projecten via direct lidmaatschap.
+        projects_empty: Je bent nog geen direct lid van een project.
+        groups_title: Je groepen
+        groups_intro: Groepen die extra projecttoegang kunnen geven.
+        groups_empty: Je zit in geen enkele groep.
     security:
         title: Beveiliging
         intro: Wijzig uw accountwachtwoord.
         submit: Wachtwoord bijwerken
+        history_title: Geschiedenis van wachtwoordwijzigingen
+        history_intro: Recente wachtwoordupdates bewaard om hergebruik te voorkomen. Hashes worden nooit getoond.
+        history_current: 'Huidig wachtwoord ingesteld op:'
+        history_entry: Wachtwoord gewijzigd
+        history_empty: Nog geen wachtwoordwijzigingen geregistreerd.
     display:
         title: Weergave
-        intro: 'Kies de taal, het thema, de dichtheid van de lay-out, de beweging, de breedte van de inhoud en welke deelvensters samengevouwen beginnen.'
+        intro: 'Kies taal, thema, dichtheid, tekstgrootte, contrast, zijbalk, beweging, inhoudsbreedte en samengevouwen issuepanelen.'
         submit: Weergave-instellingen opslaan
         pwa_title: Installeer app
         pwa_intro: 'Voeg deze site toe aan uw apparaat voor een snellere, zelfstandige ervaring. Beschikbaarheid is afhankelijk van uw browser.'
@@ -662,6 +699,13 @@ preferences:
     width_full: Volledige breedte
     density_comfortable: Comfortabel
     density_compact: Compact
+    font_scale_sm: Klein
+    font_scale_md: Medium
+    font_scale_lg: Groot
+    contrast_system: Systeem (volg apparaat)
+    contrast_more: Meer contrast
+    sidebar_expanded: Uitgevouwen
+    sidebar_collapsed: Ingevouwen
     motion_system: Systeem (volg apparaat)
     motion_reduce: Verminder beweging
     motion_full: Volledige beweging
@@ -716,6 +760,18 @@ user_preferences:
         label: UI-dichtheid
         placeholder: Comfortabel
         help: Comfortabele tussenruimte of een compactere bestuurdersindeling.
+    preferred_font_scale:
+        label: Tekstgrootte
+        placeholder: Medium
+        help: Schaald de interfacetekst kleiner of groter.
+    preferred_contrast:
+        label: Contrast
+        placeholder: Systeem
+        help: Volg het apparaatcontrast of forceer sterkere tekst en randen.
+    preferred_sidebar:
+        label: Zijbalk
+        placeholder: Uitgevouwen
+        help: Standaard op desktop als deze browser nog geen opgeslagen voorkeur heeft.
     preferred_motion:
         label: Beweging
         placeholder: Systeem

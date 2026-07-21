@@ -23,6 +23,24 @@ class UserRepository extends ServiceEntityRepository
         return $this->findOneBy(['email' => strtolower(trim($email))]);
     }
 
+    /**
+     * Admin directory with AuditKit blame users eager-loaded (avoids N+1).
+     *
+     * @return list<User>
+     */
+    public function findAllForAdminDirectory(): array
+    {
+        /** @var list<User> $users */
+        $users = $this->createQueryBuilder('u')
+            ->leftJoin('u.createdBy', 'cb')->addSelect('cb')
+            ->leftJoin('u.updatedBy', 'ub')->addSelect('ub')
+            ->orderBy('u.email', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $users;
+    }
+
     public function save(User $user, bool $flush = true): void
     {
         $this->getEntityManager()->persist($user);

@@ -29,6 +29,8 @@ class UserGroupRepository extends ServiceEntityRepository
     {
         /** @var list<UserGroup> $groups */
         $groups = $this->createQueryBuilder('g')
+            ->leftJoin('g.createdBy', 'cb')->addSelect('cb')
+            ->leftJoin('g.updatedBy', 'ub')->addSelect('ub')
             ->orderBy('g.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -40,5 +42,31 @@ class UserGroupRepository extends ServiceEntityRepository
     public function findOneBySlug(string $slug): ?UserGroup
     {
         return $this->findOneBy(['slug' => strtolower(trim($slug))]);
+    }
+
+    /** Load memberships + users for a group detail page (avoids N+1). */
+    public function hydrateMembers(UserGroup $group): void
+    {
+        $this->createQueryBuilder('g')
+            ->leftJoin('g.memberships', 'm')->addSelect('m')
+            ->leftJoin('m.user', 'u')->addSelect('u')
+            ->leftJoin('g.createdBy', 'cb')->addSelect('cb')
+            ->leftJoin('g.updatedBy', 'ub')->addSelect('ub')
+            ->andWhere('g = :group')
+            ->setParameter('group', $group)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** Eager-load AuditKit blame users for edit/detail (avoids N+1). */
+    public function hydrateAudit(UserGroup $group): void
+    {
+        $this->createQueryBuilder('g')
+            ->leftJoin('g.createdBy', 'cb')->addSelect('cb')
+            ->leftJoin('g.updatedBy', 'ub')->addSelect('ub')
+            ->andWhere('g = :group')
+            ->setParameter('group', $group)
+            ->getQuery()
+            ->getResult();
     }
 }

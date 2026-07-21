@@ -202,7 +202,7 @@
         </div>
         <div class="flex flex-wrap items-end gap-2 sm:col-span-4">
             <button class="btn-primary" type="submit">{{ 'admin_projects.audit_apply'|trans }}</button>
-            <a class="btn-ghost no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.audit_clear'|trans }}</a>
+            <a class="btn-ghost no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
         </div>
     </form>
 
@@ -254,7 +254,7 @@
             <li class="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--color-sand)] py-2 last:border-0">
                 <div class="min-w-0">
                     <a class="font-medium no-underline" href="{{ path('admin_groups_show', {id: linkedGroup.uuid}) }}">{{ linkedGroup.name }}</a>
-                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'project.groups.member_count'|trans({'%count%': linkedGroup.memberships|length}) }}</div>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'project.groups.member_count'|trans({'%count%': group_member_counts[linkedGroup.id]|default(0)}) }}</div>
                     <div class="mt-1">
                         <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ groupAccess.role.value)|trans }}</span>
                     </div>
@@ -290,7 +290,7 @@
             <select class="input" name="group" required>
                 <option value="">{{ 'project.groups.select'|trans }}</option>
                 {% for g in availableGroups %}
-                    <option value="{{ g.uuid }}">{{ g.name }} ({{ g.memberships|length }})</option>
+                    <option value="{{ g.uuid }}">{{ g.name }} ({{ group_member_counts[g.id]|default(0) }})</option>
                 {% endfor %}
             </select>
             <select class="input" name="role">

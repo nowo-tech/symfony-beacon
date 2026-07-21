@@ -3,16 +3,141 @@
 {% block title %}{{ 'preferences.profile.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-xl">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.profile.title'|trans }}</h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.intro'|trans }}</p>
+<div class="mx-auto max-w-2xl space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.profile.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.intro'|trans }}</p>
+    </div>
+
+    <section class="panel" data-testid="profile-overview" aria-labelledby="profile-overview-heading">
+        <div class="mb-4 flex flex-wrap items-center gap-4">
+            <div
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-moss)] text-lg font-semibold text-[var(--color-paper)]"
+                aria-hidden="true"
+            >{{ profile_user.initials }}</div>
+            <div class="min-w-0">
+                <h2 id="profile-overview-heading" class="text-lg font-semibold">{{ profile_user.displayName }}</h2>
+                <p class="text-sm text-[var(--color-ink)]/65">{{ profile_user.email }}</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    {% if profile_user.enabled %}
+                        <span class="badge bg-[var(--color-sand)]">{{ 'preferences.profile.status_enabled'|trans }}</span>
+                    {% else %}
+                        <span class="badge bg-[var(--color-alert)]/15 text-[var(--color-alert)]">{{ 'preferences.profile.status_disabled'|trans }}</span>
+                    {% endif %}
+                    {% for role_key in profile_roles %}
+                        <span class="badge bg-[var(--color-sand)]">{{ role_key|trans }}</span>
+                    {% else %}
+                        <span class="badge bg-[var(--color-sand)]">{{ 'preferences.profile.role_member'|trans }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <dl class="grid gap-3 text-sm sm:grid-cols-2" data-testid="profile-account-meta">
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'preferences.profile.account_id'|trans }}</dt>
+                <dd class="mt-1 break-all font-mono text-xs text-[var(--color-ink)]/80">{{ profile_user.uuid }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'preferences.profile.member_since'|trans }}</dt>
+                <dd class="mt-1">
+                    {% if profile_user.createdAt %}
+                        <time datetime="{{ profile_user.createdAt|date('c') }}">{{ profile_user.createdAt|date('Y-m-d H:i') }}</time>
+                    {% else %}
+                        {{ 'common.na'|trans }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'preferences.profile.last_activity'|trans }}</dt>
+                <dd class="mt-1">
+                    {% if profile_user.lastActivityAt %}
+                        <time datetime="{{ profile_user.lastActivityAt|date('c') }}">{{ profile_user.lastActivityAt|date('Y-m-d H:i') }}</time>
+                    {% else %}
+                        {{ 'preferences.profile.last_activity_unknown'|trans }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'preferences.profile.password_changed'|trans }}</dt>
+                <dd class="mt-1">
+                    {% if password_changed_at %}
+                        <time datetime="{{ password_changed_at|date('c') }}">{{ password_changed_at|date('Y-m-d H:i') }}</time>
+                    {% else %}
+                        {{ 'preferences.profile.password_never_changed'|trans }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="sm:col-span-2">
+                <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'preferences.profile.password_expiry'|trans }}</dt>
+                <dd class="mt-1">
+                    {% if password_expired %}
+                        <span class="text-[var(--color-alert)]">{{ 'preferences.profile.password_expired'|trans }}</span>
+                        — <a class="no-underline" href="{{ path('account_security') }}">{{ 'preferences.profile.update_password'|trans }}</a>
+                    {% elseif password_expires_at %}
+                        <time datetime="{{ password_expires_at|date('c') }}">{{ password_expires_at|date('Y-m-d') }}</time>
+                        <span class="text-[var(--color-ink)]/60">
+                            ({{ 'preferences.profile.password_days_remaining'|trans({'%count%': password_days_remaining, '%policy%': password_expiry_days}) }})
+                        </span>
+                    {% else %}
+                        {{ 'preferences.profile.password_expiry_unknown'|trans({'%policy%': password_expiry_days}) }}
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+
+        <div class="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+            <a class="btn-ghost no-underline" href="{{ path('account_security') }}">{{ 'preferences.nav.security'|trans }}</a>
+            <a class="btn-ghost no-underline" href="{{ path('account_display') }}">{{ 'preferences.nav.display'|trans }}</a>
+        </div>
+    </section>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        <h2 class="text-lg font-semibold">{{ 'preferences.profile.edit_title'|trans }}</h2>
         {{ form_row(form.displayName) }}
         {{ form_row(form.email) }}
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.profile.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
+
+    <section class="panel" data-testid="profile-projects" aria-labelledby="profile-projects-heading">
+        <h2 id="profile-projects-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.profile.projects_title'|trans }}</h2>
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.projects_intro'|trans }}</p>
+        {% if project_memberships is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.profile.projects_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-2 text-sm">
+                {% for membership in project_memberships %}
+                    <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
+                        <div class="min-w-0">
+                            <a class="font-medium no-underline" href="{{ path('project_show', {id: membership.project.uuid}) }}">{{ membership.project.name }}</a>
+                            <div class="text-xs text-[var(--color-ink)]/55">{{ membership.project.slug }}</div>
+                        </div>
+                        <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ membership.role.value)|trans }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <section class="panel" data-testid="profile-groups" aria-labelledby="profile-groups-heading">
+        <h2 id="profile-groups-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.profile.groups_title'|trans }}</h2>
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.groups_intro'|trans }}</p>
+        {% if group_memberships is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.profile.groups_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-2 text-sm">
+                {% for membership in group_memberships %}
+                    <li class="border-b border-[var(--color-sand)] py-2 last:border-0">
+                        <div class="font-medium">{{ membership.userGroup.name }}</div>
+                        {% if membership.userGroup.description %}
+                            <div class="text-xs text-[var(--color-ink)]/55">{{ membership.userGroup.description }}</div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

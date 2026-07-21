@@ -26,6 +26,9 @@ final class IssueHistoryEntryRepository extends ServiceEntityRepository
     {
         /** @var list<IssueHistoryEntry> $rows */
         $rows = $this->createQueryBuilder('h')
+            ->leftJoin('h.actor', 'actor')->addSelect('actor')
+            ->leftJoin('h.fromAssignee', 'fromAssignee')->addSelect('fromAssignee')
+            ->leftJoin('h.toAssignee', 'toAssignee')->addSelect('toAssignee')
             ->andWhere('h.issue = :issue')
             ->setParameter('issue', $issue)
             ->orderBy('h.createdAt', 'DESC')

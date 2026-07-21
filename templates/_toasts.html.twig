@@ -1,4 +1,6 @@
-{# Renders Symfony flash messages as fixed toasts (keeps .flash classes for tests). #}
+{# Renders Symfony flash messages as fixed toasts (keeps .flash classes for tests).
+   Supports string keys (translated here) and structured arrays from kits such as
+   nowo-tech/password-policy-bundle: { title: …, message: … } (already translated). #}
 {% set toast_messages = app.flashes %}
 {% if toast_messages is not empty %}
     <div
@@ -11,13 +13,25 @@
         {% for label, messages in toast_messages %}
             {% for message in messages %}
                 {% set isError = label in ['error', 'danger'] %}
+                {% set isWarning = label == 'warning' %}
+                {% set structured = message is iterable and message.title is defined %}
                 <div
-                    class="flash flash-toast {% if isError %}flash-error{% elseif label == 'warning' %}flash-warning{% elseif label == 'info' %}flash-info{% else %}flash-success{% endif %}"
-                    role="{{ isError ? 'alert' : 'status' }}"
+                    class="flash flash-toast {% if isError %}flash-error{% elseif isWarning %}flash-warning{% elseif label == 'info' %}flash-info{% else %}flash-success{% endif %}"
+                    role="{{ isError or isWarning ? 'alert' : 'status' }}"
                     data-toast-stack-target="toast"
-                    data-timeout="{{ isError ? 8000 : 5000 }}"
+                    data-timeout="{{ isError or isWarning ? 8000 : 5000 }}"
+                    {% if structured %}data-testid="flash-structured"{% endif %}
                 >
-                    <p class="flash__message">{{ message|trans }}</p>
+                    <div class="flash__content">
+                        {% if structured %}
+                            <p class="flash__title">{{ message.title }}</p>
+                            {% if message.message is defined and message.message is not empty %}
+                                <p class="flash__message">{{ message.message }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="flash__message">{{ message|trans }}</p>
+                        {% endif %}
+                    </div>
                     <button
                         type="button"
                         class="flash__dismiss"

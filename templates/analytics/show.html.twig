@@ -45,7 +45,7 @@
         </label>
         <div class="analytics-filters__actions">
             <button type="submit" class="btn-primary">{{ 'analytics.filter.apply'|trans }}</button>
-            <a class="btn-ghost" href="{{ path('analytics_show', {id: project.uuid}) }}">{{ 'analytics.filter.clear'|trans }}</a>
+            <a class="btn-ghost no-underline" href="{{ path('analytics_show', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
         </div>
     </div>
 </form>

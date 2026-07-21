@@ -49,13 +49,28 @@ final readonly class ProjectOpsStatsService
      */
     public function forProjects(array $projects): array
     {
-        $map = [];
+        $ids = [];
         foreach ($projects as $project) {
             $id = $project->getId();
-            if (null === $id) {
-                continue;
+            if (null !== $id) {
+                $ids[] = $id;
             }
-            $map[$id] = $this->forProject($project);
+        }
+
+        $openByProject = $this->issueRepository->countByStatusForProjectIds($ids, IssueStatus::Unresolved);
+        $eventsByProject = $this->eventRepository->countReceivedSinceForProjectIds(
+            $ids,
+            new DateTimeImmutable('-7 days'),
+        );
+        $lastIngestByProject = $this->eventRepository->findLastReceivedAtForProjectIds($ids);
+
+        $map = [];
+        foreach ($ids as $id) {
+            $map[$id] = [
+                'open_issues' => $openByProject[$id] ?? 0,
+                'events_last_7d' => $eventsByProject[$id] ?? 0,
+                'last_ingest_at' => $lastIngestByProject[$id] ?? null,
+            ];
         }
 
         return $map;

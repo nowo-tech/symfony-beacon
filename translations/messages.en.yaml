@@ -10,6 +10,7 @@ nav:
     groups: Groups
     admin_projects: Projects
     appearance: Appearance
+    mailer: Mailer
     menus: Menus
     breadcrumbs: Breadcrumbs
     toggle_sidebar: Toggle navigation
@@ -26,10 +27,18 @@ api_docs:
     open_json: OpenAPI JSON
 common:
     filter: Filter
+    clear_filters: Clear filters
     cancel: Cancel
     yes: 'yes'
     na: n/a
     unknown: unknown
+    audit:
+        title: Audit
+        created_at: Created
+        updated_at: Updated
+        created_by: Created by
+        updated_by: Updated by
+        by_system: System
 pagination:
     showing: Showing %from%–%to% of %total%
     nav: Table pages
@@ -103,6 +112,8 @@ flash:
         group_link_forbidden: You can only link groups you belong to (project owners and instance admins may link any group).
     appearance:
         saved: Appearance settings saved.
+    mailer:
+        saved: Mailer settings saved.
     preferences:
         saved: Preferences saved.
         profile_saved: Profile saved.
@@ -540,6 +551,26 @@ appearance:
         danger: Danger / error colors
     submit: Save appearance
     reset: Reset to defaults
+mailer_settings:
+    title: Mailer
+    intro: Store the Symfony Mailer DSN encrypted in the database (not in .env). Used for magic-login and email notification destinations.
+    status:
+        database: Outbound mail uses the DSN saved in instance settings.
+        env_fallback: No database DSN yet — outbound mail falls back to MAILER_DSN from the environment (typically null://null).
+    current_dsn: 'Current DSN:'
+    from_preview: 'From address: %from%'
+    submit: Save mailer settings
+instance_mailer:
+    mailer_dsn:
+        label: Mailer DSN
+        help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587
+        placeholder: smtp://user:pass@mail.example:587
+    clear_dsn:
+        label: Clear stored DSN
+        help: Removes the database DSN and falls back to MAILER_DSN from the environment until you save a new one.
+    mailer_from:
+        label: From address
+        help: Envelope From for magic-login and notification emails. Defaults to beacon@localhost when empty.
 site_appearance:
     brand_name:
         label: Brand name
@@ -590,6 +621,7 @@ users:
         status: Status
         presence: Presence
         roles: Role
+        audit: Audit
         actions: Actions
     status:
         enabled: Enabled
@@ -698,15 +730,42 @@ preferences:
         display: Display
     profile:
         title: Profile
-        intro: Update your display name and sign-in email.
+        intro: Review your account details and update your display name or sign-in email.
         submit: Save profile
+        edit_title: Edit profile
+        account_id: Account ID
+        member_since: Member since
+        last_activity: Last activity
+        last_activity_unknown: No recent activity recorded
+        password_changed: Password last changed
+        password_never_changed: Not recorded yet
+        password_expiry: Password expiry
+        password_expired: Password has expired
+        password_expiry_unknown: 'Expiry starts after your first password change (policy: %policy% days).'
+        password_days_remaining: '%count% days remaining · policy %policy% days'
+        update_password: Update password
+        status_enabled: Active
+        status_disabled: Disabled
+        role_admin: Administrator
+        role_member: Member
+        projects_title: Your projects
+        projects_intro: Projects you can open through a direct membership.
+        projects_empty: You are not a direct member of any project yet.
+        groups_title: Your groups
+        groups_intro: Groups that may grant access to additional projects.
+        groups_empty: You are not in any group.
     security:
         title: Security
         intro: Change your account password.
         submit: Update password
+        history_title: Password change history
+        history_intro: Recent password updates kept for reuse prevention. Hashes are never shown.
+        history_current: 'Current password set on:'
+        history_entry: Password changed
+        history_empty: No password changes recorded yet.
     display:
         title: Display
-        intro: Choose language, theme, layout density, motion, content width, and which issue panels start collapsed.
+        intro: Choose language, theme, layout density, text size, contrast, sidebar, motion, content width, and which issue panels start collapsed.
         submit: Save display settings
         pwa_title: Install app
         pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
@@ -728,6 +787,13 @@ preferences:
     width_full: Full width
     density_comfortable: Comfortable
     density_compact: Compact
+    font_scale_sm: Small
+    font_scale_md: Medium
+    font_scale_lg: Large
+    contrast_system: System (follow device)
+    contrast_more: More contrast
+    sidebar_expanded: Expanded
+    sidebar_collapsed: Collapsed
     motion_system: System (follow device)
     motion_reduce: Reduce motion
     motion_full: Full motion
@@ -782,6 +848,18 @@ user_preferences:
         label: UI density
         placeholder: Comfortable
         help: Comfortable spacing, or a more compact operator layout.
+    preferred_font_scale:
+        label: Text size
+        placeholder: Medium
+        help: Scale the interface text smaller or larger.
+    preferred_contrast:
+        label: Contrast
+        placeholder: System
+        help: Follow the device contrast preference, or force stronger text and borders.
+    preferred_sidebar:
+        label: Sidebar
+        placeholder: Expanded
+        help: Default desktop sidebar state when this browser has no saved preference yet.
     preferred_motion:
         label: Motion
         placeholder: System
@@ -908,6 +986,7 @@ admin:
         groups: Create groups and manage their members for project access.
         projects: List all projects, manage members and group links, or delete a project.
         appearance: Brand name and accent colors.
+        mailer: Encrypted Mailer DSN and From address for transactional email.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
 legal:
@@ -1099,8 +1178,8 @@ notifications:
             tip: The last @ in the endpoint splits token and chat id. Tokens are encrypted at rest like other endpoints.
         email:
             title: Email
-            lead: Deliver alerts to a mailbox via Symfony Mailer. Configure MAILER_DSN first.
-            step1: Set MAILER_DSN in .env or production secrets to a real transport (SMTP, etc.). null://null does not deliver.
+            lead: Deliver alerts to a mailbox via Symfony Mailer. Configure the Mailer DSN under Administration → Mailer first.
+            step1: 'Open Administration → Mailer and save an encrypted DSN (smtp://…). Environment MAILER_DSN is only a bootstrap fallback; null://null does not deliver.'
             step2: In Beacon choose Email and set the endpoint to the recipient address.
             step3: Select categories, save, Send test, and check inbox/spam.
             payload: Email subject equals the summary; body is the summary plus the issue or performance URL when present.

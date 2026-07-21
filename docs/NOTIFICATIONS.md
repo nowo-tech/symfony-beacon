@@ -17,7 +17,7 @@ In the app, open **Project → Settings → Notifications → Setup guides** for
 
 Endpoints are **encrypted at rest** and **masked** in the settings list (URLs, emails, and Telegram tokens).
 
-There are **no** global `SLACK_*` / `DISCORD_*` / `TELEGRAM_*` environment variables — each destination stores its own endpoint on the project. Email delivery also needs `MAILER_DSN` (see [Email](#email)).
+There are **no** global `SLACK_*` / `DISCORD_*` / `TELEGRAM_*` environment variables — each destination stores its own endpoint on the project. Email delivery uses the instance **Mailer** settings (encrypted DSN in the database); see [Email](#email).
 
 Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against an SSRF guard: private, link-local, and cloud-metadata addresses are blocked in production. Set `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=1` (or the `when@dev` / `when@test` defaults) only for local webhooks.
 
@@ -92,17 +92,12 @@ Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against 
 
 ### Email
 
-1. Configure Symfony Mailer with a real transport in `.env` / production secrets, e.g.:
+1. Open **Administration → Mailer** and save a real Symfony Mailer DSN (encrypted at rest), e.g. `smtp://user:pass@mail.example:587`. Optionally set the **From** address.
+2. Env `MAILER_DSN` (default `null://null`) is only a bootstrap fallback when no database DSN is stored — it does **not** deliver mail.
+3. In Beacon: type **Email**, set endpoint to the **recipient address** (e.g. `ops@example.com`).
+4. Choose categories, save, **Send test**, and check the inbox (and spam).
 
-   ```env
-   MAILER_DSN=smtp://user:pass@mail.example:587
-   ```
-
-   The default `null://null` accepts messages but does **not** deliver them.
-2. In Beacon: type **Email**, set endpoint to the **recipient address** (e.g. `ops@example.com`).
-3. Choose categories, save, **Send test**, and check the inbox (and spam).
-
-**What Beacon sends:** email subject = summary; body = summary plus the issue/performance URL when present.
+**What Beacon sends:** email subject = summary; body = summary plus the issue/performance URL when present. From address comes from Mailer settings.
 
 **Tips:** Use a shared ops alias. For richer HTML digests, prefer Slack/Discord/Teams or a generic HTTP bridge into your mail tool.
 
@@ -188,7 +183,7 @@ CSV responses are streamed (`text/csv`). Exports omit raw Envelope payloads and 
 Outbound delivery runs on the **Messenger `async`** transport (`DeliverNotificationMessage`), with the same retry policy as envelope processing. Envelope **ACK never waits** on external channels.
 
 - Slack / Discord / Teams / Telegram / HTTP use `HttpClient` POSTs.
-- Email uses Symfony Mailer (`MAILER_DSN`).
+- Email uses Symfony Mailer via encrypted instance Mailer settings (env `MAILER_DSN` fallback only).
 - Each attempt updates the destination **last delivery** summary and appends a bounded **delivery history** row (`notification_delivery_attempt`). Retention per destination defaults to **20** attempts (`BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`). Recent attempts appear under **Project → Settings → Health**.
 
 Ensure the Messenger worker is running (`make up` starts it in Docker).
