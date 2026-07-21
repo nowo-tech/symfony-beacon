@@ -420,59 +420,55 @@
         </div>
 
         {% if membership.role.value == 'owner' %}
-            {% set transferBag = {candidates: []} %}
-            {% for m in project.memberships %}
-                {% if m.user and app.user and m.user.id != app.user.id %}
-                    {% set transferBag = transferBag|merge({candidates: transferBag.candidates|merge([m])}) %}
-                {% endif %}
-            {% endfor %}
-            {% set transferCandidates = transferBag.candidates %}
             <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="{{ project.name|e('html_attr') }}">
                 <button
                     type="button"
                     class="btn-ghost"
                     data-action="confirm-dialog#open"
-                    {% if transferCandidates is empty %}disabled{% endif %}
                     title="{{ transferCandidates is empty ? 'project.danger.transfer_no_candidates'|trans : 'project.danger.transfer_open'|trans }}"
                 >{{ 'project.danger.transfer_open'|trans }}</button>
                 <dialog
                     class="confirm-dialog confirm-dialog--form"
-                    data-confirm-dialog-target="dialog">
-
+                    data-confirm-dialog-target="dialog"
+                >
                     <form method="post" action="{{ path('project_transfer_ownership', {projectId: project.uuid}) }}" class="confirm-dialog__panel">
                         <h3 class="confirm-dialog__title">{{ 'project.danger.transfer_title'|trans }}</h3>
-                        <p class="confirm-dialog__body">{{ 'project.danger.transfer_body'|trans }}</p>
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_transfer_ownership_' ~ project.id) }}">
-                        <label class="confirm-dialog__label" for="project-transfer-user-{{ project.id }}">{{ 'project.danger.transfer_member_label'|trans }}</label>
-                        <select
-                            id="project-transfer-user-{{ project.id }}"
-                            class="input w-full"
-                            name="user"
-                            required
-                            {% if transferCandidates is empty %}disabled{% endif %}
-                        >
-                            <option value="">{{ 'project.danger.transfer_member_placeholder'|trans }}</option>
-                            {% for candidate in transferCandidates %}
-                                <option value="{{ candidate.user.uuid }}">{{ candidate.user.displayName }} ({{ candidate.user.email }}) — {{ ('project.members.role.' ~ candidate.role.value)|trans }}</option>
-                            {% endfor %}
-                        </select>
-                        <label class="confirm-dialog__label mt-3" for="project-transfer-confirm-{{ project.id }}">
-                            {{ 'project.danger.transfer_type_label'|trans({'%name%': project.name}) }}
-                        </label>
-                        <input
-                            id="project-transfer-confirm-{{ project.id }}"
-                            class="input"
-                            name="confirmation"
-                            autocomplete="off"
-                            data-confirm-dialog-target="confirmInput"
-
-                            required
-                            {% if transferCandidates is empty %}disabled{% endif %}
-                        >
-                        <div class="confirm-dialog__actions">
-                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
-                            <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.transfer_confirm'|trans }}</button>
-                        </div>
+                        {% if transferCandidates is empty %}
+                            <p class="confirm-dialog__body">{{ 'project.danger.transfer_no_candidates'|trans }}</p>
+                            <div class="confirm-dialog__actions">
+                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                            </div>
+                        {% else %}
+                            <p class="confirm-dialog__body">{{ 'project.danger.transfer_body'|trans }}</p>
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_transfer_ownership_' ~ project.id) }}">
+                            <label class="confirm-dialog__label" for="project-transfer-user-{{ project.id }}">{{ 'project.danger.transfer_member_label'|trans }}</label>
+                            <select
+                                id="project-transfer-user-{{ project.id }}"
+                                class="input w-full"
+                                name="user"
+                                required
+                            >
+                                <option value="">{{ 'project.danger.transfer_member_placeholder'|trans }}</option>
+                                {% for candidate in transferCandidates %}
+                                    <option value="{{ candidate.user.uuid }}">{{ candidate.user.displayName }} ({{ candidate.user.email }}) — {{ ('project.members.role.' ~ candidate.role.value)|trans }}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="confirm-dialog__label mt-3" for="project-transfer-confirm-{{ project.id }}">
+                                {{ 'project.danger.transfer_type_label'|trans({'%name%': project.name}) }}
+                            </label>
+                            <input
+                                id="project-transfer-confirm-{{ project.id }}"
+                                class="input"
+                                name="confirmation"
+                                autocomplete="off"
+                                data-confirm-dialog-target="confirmInput"
+                                required
+                            >
+                            <div class="confirm-dialog__actions">
+                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.transfer_confirm'|trans }}</button>
+                            </div>
+                        {% endif %}
                     </form>
                 </dialog>
             </div>

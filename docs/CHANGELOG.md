@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.4] - 2026-07-21
+
+### Added
+
+- Administration → **Projects**: list/search all projects, create/edit, manage direct members and group links, delete with typed confirmation (instance `ROLE_ADMIN` gets effective owner access on every project)
+
+### Fixed
+
+- Confirm dialogs: portal `<dialog>` to `document.body` on open (not on connect) so Stimulus targets stay valid until `showModal()`
+
 ## [0.9.3] - 2026-07-21
 
 ### Fixed
@@ -255,7 +265,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...HEAD
+[0.9.4]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.0...v0.9.1

@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin_projects.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin_projects.title'|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin_projects.intro'|trans }}</p>
+    </div>
+    <a class="btn-primary no-underline" href="{{ path('admin_projects_new') }}">{{ 'admin_projects.create'|trans }}</a>
+</div>
+
+<form method="get" action="{{ path('admin_projects') }}" class="mb-4 flex flex-wrap gap-2">
+    <input
+        class="input min-w-56 flex-1"
+        type="search"
+        name="q"
+        value="{{ q }}"
+        placeholder="{{ 'admin_projects.search_placeholder'|trans }}"
+        autocomplete="off"
+    >
+    <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
+</form>
+
+{% if projects is empty %}
+    <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin_projects.empty'|trans }}</p>
+{% else %}
+    <ul class="space-y-3">
+        {% for project in projects %}
+            <li class="panel flex flex-wrap items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <a class="font-medium no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ project.name }}</a>
+                    <div class="text-xs text-[var(--color-ink)]/55">
+                        {{ project.slug }}
+                        · {{ 'admin_projects.member_count'|trans({'%count%': project.memberships|length}) }}
+                        · {{ 'admin_projects.group_count'|trans({'%count%': project.groupAccesses|length}) }}
+                    </div>
+                    {% if project.description %}
+                        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ project.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a class="btn-ghost no-underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'admin_projects.open_settings'|trans }}</a>
+                    <a class="btn-ghost no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.open'|trans }}</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

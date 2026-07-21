@@ -20,6 +20,27 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * All projects ordered by name (instance admin lists).
+     *
+     * @return list<Project>
+     */
+    public function findAllOrdered(?string $query = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.name', 'ASC');
+
+        if (null !== $query && '' !== trim($query)) {
+            $qb->andWhere('p.name LIKE :q OR p.slug LIKE :q')
+                ->setParameter('q', '%'.trim($query).'%');
+        }
+
+        /** @var list<Project> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
+
+    /**
      * Projects the user can open via direct membership or a linked group.
      *
      * @return list<Project>

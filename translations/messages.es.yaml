@@ -8,6 +8,7 @@ nav:
     admin_hub: Resumen admin
     users: Usuarios
     groups: Grupos
+    admin_projects: Proyectos
     appearance: Apariencia
     menus: Menús
     breadcrumbs: Migas
@@ -105,6 +106,9 @@ flash:
         member_removed: Usuario eliminado del grupo.
         project_unlink_forbidden: No tienes permiso para desvincular ese proyecto.
         project_unlink_error: No se pudo desvincular el proyecto del grupo.
+    admin_projects:
+        name_required: El nombre del proyecto es obligatorio.
+        updated: Proyecto actualizado.
 project:
     label: Proyecto
     no_description: Sin descripción
@@ -593,12 +597,42 @@ groups:
     unlink_project: Desvincular
     unlink_project_confirm: '¿Desvincular este grupo del proyecto «%project%»?'
 
+admin_projects:
+    title: Proyectos
+    intro: Gestiona todos los proyectos de esta instancia — miembros, grupos vinculados y eliminación.
+    create: Nuevo proyecto
+    empty: Aún no hay proyectos.
+    open: Gestionar
+    back: Volver a proyectos
+    edit: Editar
+    edit_title: Editar proyecto
+    save: Guardar proyecto
+    cancel: Cancelar
+    search_placeholder: Buscar proyectos…
+    member_count: '%count% miembros'
+    group_count: '%count% grupos'
+    open_settings: Configuración
+    open_issues: Incidencias
+    members_title: Miembros directos
+    members_empty: Aún no hay miembros directos.
+    add_member_help: La persona debe tener ya una cuenta en Beacon.
+    remove_member: Quitar
+    remove_member_confirm: '¿Quitar a %email% de este proyecto?'
+    groups_title: Grupos vinculados
+    groups_intro: Grupos que otorgan acceso a todos sus miembros. Los propietarios siguen siendo usuarios directos.
+    groups_none_available: Todos los grupos ya están vinculados, o créalos en Administración → Grupos.
+    unlink_group_confirm: '¿Desvincular el grupo «%name%» de este proyecto?'
+    danger_title: Zona de peligro
+    danger_intro: Elimina permanentemente este proyecto y todos sus datos. Los administradores de instancia pueden hacerlo sin ser miembros del proyecto.
+    delete_open: Eliminar proyecto…
+
 admin:
     hub:
         title: Administración
         intro: Configuración de la instancia para operadores con roles elevados.
         users: Listar cuentas y roles de esta instancia.
         groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
+        projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
         appearance: Nombre de marca y colores de acento.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.

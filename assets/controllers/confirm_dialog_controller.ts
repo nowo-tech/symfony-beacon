@@ -3,8 +3,9 @@ import { Controller } from "@hotwired/stimulus";
 /**
  * Accessible <dialog> helpers for destructive confirmations.
  *
- * Dialogs are portaled to document.body so panel isolation / overflow / blur
- * cannot trap or hide showModal() top-layer UI.
+ * Dialogs are moved to document.body only when opened (not on connect), so
+ * Stimulus targets stay valid until showModal(), and panel isolation cannot
+ * trap the top-layer UI.
  *
  * Optional typed confirmation: enable the submit button only when the input
  * matches `expectedValue` (exact string).
@@ -33,108 +34,140 @@ export default class extends Controller {
   private dialogEl: HTMLDialogElement | null = null;
   private confirmInputEl: HTMLInputElement | null = null;
   private submitEl: HTMLButtonElement | null = null;
-  private readonly abort = new AbortController();
+  private portaled = false;
+  private readonly onDialogClick = (event: MouseEvent): void => this.handleDialogClick(event);
+  private readonly onConfirmInput = (): void => this.syncSubmit();
 
   connect(): void {
-    if (!this.hasDialogTarget) {
-      return;
-    }
-
-    this.dialogEl = this.dialogTarget;
-    this.confirmInputEl = this.hasConfirmInputTarget ? this.confirmInputTarget : null;
-    this.submitEl = this.hasSubmitTarget ? this.submitTarget : null;
-
-    // Portal once so stacking contexts (.panel isolation, overflow clip) cannot hide the modal.
-    if (this.dialogEl.parentElement !== document.body) {
-      document.body.appendChild(this.dialogEl);
-    }
-
-    const { signal } = this.abort;
-    this.dialogEl.addEventListener("click", (event) => this.onDialogClick(event), { signal });
-    this.confirmInputEl?.addEventListener("input", () => this.syncSubmit(), { signal });
-
+    this.cacheElements();
     if (this.openOnConnectValue) {
       this.open();
     }
   }
 
   disconnect(): void {
-    this.abort.abort();
-    const dialog = this.dialogEl;
+    this.teardownPortaledListeners();
+    const dialog = this.resolveDialog();
     if (dialog?.open) {
       dialog.close();
     }
-    // Keep portaled node if the host is gone; remove orphan dialogs on full teardown.
-    if (dialog && !this.element.isConnected) {
+    if (this.portaled && dialog && !this.element.isConnected) {
       dialog.remove();
     }
     this.dialogEl = null;
     this.confirmInputEl = null;
     this.submitEl = null;
+    this.portaled = false;
   }
 
   open(event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
 
-    const dialog = this.dialogEl ?? (this.hasDialogTarget ? this.dialogTarget : null);
+    this.cacheElements();
+    const dialog = this.resolveDialog();
     if (!(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    this.dialogEl = dialog;
 
-    if (dialog.parentElement !== document.body) {
-      document.body.appendChild(dialog);
-    }
+    this.portalDialog(dialog);
 
     if (this.confirmInputEl) {
       this.confirmInputEl.value = "";
+      this.confirmInputEl.disabled = false;
     }
     this.syncSubmit();
 
     // Opening synchronously from a click can deliver that same click to the
-    // newly shown modal backdrop (pointer under the overlay), which would
-    // close the dialog immediately via backdropClose.
-    this.ignoreBackdropUntil = Date.now() + 400;
+    // newly shown modal backdrop; defer showModal and ignore backdrop briefly.
+    this.ignoreBackdropUntil = Date.now() + 500;
     requestAnimationFrame(() => {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-      this.confirmInputEl?.focus();
+      requestAnimationFrame(() => {
+        try {
+          if (!dialog.open) {
+            dialog.showModal();
+          }
+        } catch {
+          // InvalidStateError if already open / not connected — ignore.
+        }
+        this.confirmInputEl?.focus();
+      });
     });
   }
 
   close(event?: Event): void {
     event?.preventDefault();
-    this.dialogEl?.close();
-  }
-
-  backdropClose(event: MouseEvent): void {
-    if (Date.now() < this.ignoreBackdropUntil) {
-      return;
-    }
-    if (event.target === this.dialogEl) {
-      this.dialogEl?.close();
-    }
+    this.resolveDialog()?.close();
   }
 
   syncSubmit(): void {
-    if (!this.submitEl) {
+    const submit = this.submitEl ?? (this.hasSubmitTarget ? this.submitTarget : null);
+    if (!(submit instanceof HTMLButtonElement)) {
       return;
     }
+    this.submitEl = submit;
+
     if (!this.hasExpectedValue || this.expectedValue === "") {
-      this.submitEl.disabled = false;
+      submit.disabled = false;
       return;
     }
-    if (!this.confirmInputEl) {
-      this.submitEl.disabled = true;
+    const input = this.confirmInputEl;
+    if (!(input instanceof HTMLInputElement)) {
+      submit.disabled = true;
       return;
     }
-    this.submitEl.disabled = this.confirmInputEl.value !== this.expectedValue;
+    submit.disabled = input.value !== this.expectedValue;
   }
 
-  /** Delegated clicks: backdrop dismiss + Cancel buttons after portal to body. */
-  private onDialogClick(event: MouseEvent): void {
+  private cacheElements(): void {
+    const dialog = this.resolveDialog();
+    if (dialog) {
+      this.dialogEl = dialog;
+    }
+    if (this.hasConfirmInputTarget) {
+      this.confirmInputEl = this.confirmInputTarget;
+    } else if (dialog) {
+      const input = dialog.querySelector<HTMLInputElement>("[data-confirm-dialog-target='confirmInput']");
+      this.confirmInputEl = input;
+    }
+    if (this.hasSubmitTarget) {
+      this.submitEl = this.submitTarget;
+    } else if (dialog) {
+      const submit = dialog.querySelector<HTMLButtonElement>("[data-confirm-dialog-target='submit']");
+      this.submitEl = submit;
+    }
+  }
+
+  private resolveDialog(): HTMLDialogElement | null {
+    if (this.dialogEl instanceof HTMLDialogElement) {
+      return this.dialogEl;
+    }
+    if (this.hasDialogTarget) {
+      return this.dialogTarget;
+    }
+    const nested = this.element.querySelector("dialog.confirm-dialog");
+    return nested instanceof HTMLDialogElement ? nested : null;
+  }
+
+  private portalDialog(dialog: HTMLDialogElement): void {
+    if (dialog.parentElement !== document.body) {
+      document.body.appendChild(dialog);
+      this.portaled = true;
+    }
+    dialog.removeEventListener("click", this.onDialogClick);
+    dialog.addEventListener("click", this.onDialogClick);
+    if (this.confirmInputEl) {
+      this.confirmInputEl.removeEventListener("input", this.onConfirmInput);
+      this.confirmInputEl.addEventListener("input", this.onConfirmInput);
+    }
+  }
+
+  private teardownPortaledListeners(): void {
+    this.dialogEl?.removeEventListener("click", this.onDialogClick);
+    this.confirmInputEl?.removeEventListener("input", this.onConfirmInput);
+  }
+
+  private handleDialogClick(event: MouseEvent): void {
     const target = event.target;
     if (!(target instanceof Element)) {
       return;
@@ -145,6 +178,11 @@ export default class extends Controller {
       return;
     }
 
-    this.backdropClose(event);
+    if (Date.now() < this.ignoreBackdropUntil) {
+      return;
+    }
+    if (event.target === this.resolveDialog()) {
+      this.resolveDialog()?.close();
+    }
   }
 }

@@ -232,6 +232,46 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $adminProjects = $this->ensureItem(
+            $collection,
+            'admin_projects',
+            'Projects',
+            ['en' => 'Projects', 'es' => 'Proyectos'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_projects_new',
+            'New project',
+            ['en' => 'New project', 'es' => 'Nuevo proyecto'],
+            $adminProjects,
+            [],
+            $changed,
+        );
+
+        $adminProjectShow = $this->ensureItem(
+            $collection,
+            'admin_projects_show',
+            'Project',
+            ['en' => 'Project', 'es' => 'Proyecto'],
+            $adminProjects,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_projects_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar'],
+            $adminProjectShow,
+            ['id'],
+            $changed,
+        );
+
         $this->ensureItem(
             $collection,
             'settings_appearance',

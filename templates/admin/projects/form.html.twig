@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ is_edit ? 'admin_projects.edit_title'|trans : 'admin_projects.create'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <a href="{{ is_edit ? path('admin_projects_show', {id: project.uuid}) : path('admin_projects') }}" class="text-sm no-underline">{{ 'admin_projects.back'|trans }}</a>
+    <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">
+        {{ is_edit ? 'admin_projects.edit_title'|trans : 'admin_projects.create'|trans }}
+    </h1>
+</div>
+
+<form
+    method="post"
+    action="{{ is_edit ? path('admin_projects_edit', {id: project.uuid}) : path('admin_projects_new') }}"
+    class="panel max-w-xl space-y-4"
+>
+    <input type="hidden" name="_token" value="{{ csrf_token(is_edit ? 'admin_project_edit_' ~ project.id : 'admin_project_new') }}">
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="project-name">{{ 'project.name.label'|trans }}</label>
+        <input
+            id="project-name"
+            class="input w-full"
+            type="text"
+            name="name"
+            required
+            value="{{ project ? project.name : '' }}"
+            placeholder="{{ 'project.name.placeholder'|trans }}"
+            autocomplete="off"
+        >
+    </div>
+    <div>
+        <label class="mb-1 block text-sm font-medium" for="project-description">{{ 'project.description.label'|trans }}</label>
+        <textarea
+            id="project-description"
+            class="input w-full"
+            name="description"
+            rows="3"
+            placeholder="{{ 'project.description.placeholder'|trans }}"
+        >{{ project ? project.description : '' }}</textarea>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" type="submit">{{ is_edit ? 'admin_projects.save'|trans : 'admin_projects.create'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ is_edit ? path('admin_projects_show', {id: project.uuid}) : path('admin_projects') }}">{{ 'admin_projects.cancel'|trans }}</a>
+    </div>
+</form>
+{% endblock %}

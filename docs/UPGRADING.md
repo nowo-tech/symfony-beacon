@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.9.3 to the next release](#upgrading-from-093-to-the-next-release)
+- [Upgrading from 0.9.4 to the next release](#upgrading-from-094-to-the-next-release)
+- [Upgrading from 0.9.3 to 0.9.4](#upgrading-from-093-to-094)
 - [Upgrading from 0.9.2 to 0.9.3](#upgrading-from-092-to-093)
 - [Upgrading from 0.9.1 to 0.9.2](#upgrading-from-091-to-092)
 - [Upgrading from 0.9.0 to 0.9.1](#upgrading-from-090-to-091)
@@ -23,9 +24,31 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.9.3 to the next release
+## Upgrading from 0.9.4 to the next release
 
 No upgrade notes yet.
+
+## Upgrading from 0.9.3 to 0.9.4
+
+No database migrations. Pull, install, and rebuild assets:
+
+```bash
+git pull
+composer install
+make vite-build
+```
+
+### Administration → Projects
+
+Instance admins get **Administration → Projects** (`/admin/projects`):
+
+- List / search every project on the instance
+- Create and edit name/description
+- Manage direct members (add / change role / remove) and linked groups
+- Delete a project with typed name confirmation (same semantics as project Settings danger zone)
+- Open product Settings / Issues for any project — instance `ROLE_ADMIN` now resolves as effective **owner** on all projects (`ProjectAccessService`)
+
+Re-run `make seed` (or `app:seed-demo`) to pick up the admin Projects menu item and breadcrumbs.
 
 ## Upgrading from 0.9.2 to 0.9.3
 

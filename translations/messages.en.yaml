@@ -8,6 +8,7 @@ nav:
     admin_hub: Admin overview
     users: Users
     groups: Groups
+    admin_projects: Projects
     appearance: Appearance
     menus: Menus
     breadcrumbs: Breadcrumbs
@@ -105,6 +106,9 @@ flash:
         member_removed: User removed from the group.
         project_unlink_forbidden: You are not allowed to unlink that project.
         project_unlink_error: Could not unlink the project from the group.
+    admin_projects:
+        name_required: Project name is required.
+        updated: Project updated.
 project:
     label: Project
     no_description: No description
@@ -593,12 +597,42 @@ groups:
     unlink_project: Unlink
     unlink_project_confirm: 'Unlink this group from project “%project%”?'
 
+admin_projects:
+    title: Projects
+    intro: Manage every project on this instance — members, group links, and deletion.
+    create: New project
+    empty: No projects yet.
+    open: Manage
+    back: Back to projects
+    edit: Edit
+    edit_title: Edit project
+    save: Save project
+    cancel: Cancel
+    search_placeholder: Search projects…
+    member_count: '%count% members'
+    group_count: '%count% groups'
+    open_settings: Settings
+    open_issues: Issues
+    members_title: Direct members
+    members_empty: No direct members yet.
+    add_member_help: The person must already have a Beacon account.
+    remove_member: Remove
+    remove_member_confirm: 'Remove %email% from this project?'
+    groups_title: Linked groups
+    groups_intro: Groups that grant access to every group member. Owners stay as direct users.
+    groups_none_available: All groups are already linked, or create groups under Administration → Groups.
+    unlink_group_confirm: 'Unlink group “%name%” from this project?'
+    danger_title: Danger zone
+    danger_intro: Permanently delete this project and all of its data. Instance admins can do this without being a project member.
+    delete_open: Delete project…
+
 admin:
     hub:
         title: Administration
         intro: Instance configuration for operators with elevated roles.
         users: List accounts and roles on this instance.
         groups: Create groups and manage their members for project access.
+        projects: List all projects, manage members and group links, or delete a project.
         appearance: Brand name and accent colors.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.

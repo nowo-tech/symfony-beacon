@@ -58,6 +58,7 @@ final readonly class DashboardMenuDemoSeeder
                 [10, 'Overview', ['en' => 'Overview', 'es' => 'Resumen'], 'admin_hub', 'ROLE_ADMIN'],
                 [20, 'Users', ['en' => 'Users', 'es' => 'Usuarios'], 'admin_users', 'ROLE_ADMIN'],
                 [25, 'Groups', ['en' => 'Groups', 'es' => 'Grupos'], 'admin_groups', 'ROLE_ADMIN'],
+                [27, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos'], 'admin_projects', 'ROLE_ADMIN'],
                 [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia'], 'settings_appearance', 'ROLE_ADMIN'],
                 [40, 'Menus', ['en' => 'Menus', 'es' => 'Menús'], 'nowo_dashboard_menu_dashboard_index', 'ROLE_ADMIN'],
                 [50, 'Breadcrumbs', ['en' => 'Breadcrumbs', 'es' => 'Migas'], 'nowo_breadcrumb_kit_dashboard_collections_index', 'ROLE_ADMIN'],

@@ -12,9 +12,13 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Enforces project access via direct membership and/or linked user groups.
+ *
+ * Instance ROLE_ADMIN receives effective owner access on every project
+ * (for Administration and cross-project operator actions).
  */
 final readonly class ProjectAccessService
 {
@@ -27,6 +31,7 @@ final readonly class ProjectAccessService
     public function __construct(
         private ProjectMembershipRepository $membershipRepository,
         private ProjectGroupAccessRepository $groupAccessRepository,
+        private AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 
@@ -48,11 +53,20 @@ final readonly class ProjectAccessService
 
     /**
      * Highest effective role from direct membership and linked groups, or null if none.
+     * Instance ROLE_ADMIN always resolves as owner (even without membership).
      */
     public function resolveAccess(Project $project, User $user): ?ProjectAccess
     {
         $direct = $this->getDirectMembership($project, $user);
         $groupRole = $this->groupAccessRepository->findHighestGroupRoleForUser($project, $user);
+
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return new ProjectAccess(
+                role: ProjectRole::Owner,
+                directMembership: $direct,
+                viaGroup: null !== $groupRole,
+            );
+        }
 
         if (!$direct instanceof ProjectMembership && null === $groupRole) {
             return null;

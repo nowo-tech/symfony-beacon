@@ -173,7 +173,27 @@ final class ProjectController extends AbstractController
             'assignableGroupRoles' => $this->membershipManager->assignableGroupRoles($user, $project),
             'availableGroups' => $this->availableGroupsForProject($project, $user),
             'ownerCount' => $this->countOwners($project),
+            'transferCandidates' => $this->transferOwnershipCandidates($project, $user),
         ]);
+    }
+
+    /**
+     * Direct members eligible to receive ownership (everyone except the actor).
+     *
+     * @return list<\App\Project\Entity\ProjectMembership>
+     */
+    private function transferOwnershipCandidates(Project $project, User $actor): array
+    {
+        $candidates = [];
+        foreach ($project->getMemberships() as $membership) {
+            $member = $membership->getUser();
+            if (null === $member || $member->getId() === $actor->getId()) {
+                continue;
+            }
+            $candidates[] = $membership;
+        }
+
+        return $candidates;
     }
 
     /**
