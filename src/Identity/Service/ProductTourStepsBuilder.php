@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Service;
 
+use App\Project\Access\ProjectAccess;
 use App\Identity\Entity\User;
 use App\Identity\Tour\ProductTourContext;
 use App\Identity\Tour\ProductTourPage;
@@ -20,13 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @phpstan-type TourStep array{element?: string, popover: array{title: string, description: string, side?: string, align?: string}}
  */
-final class ProductTourStepsBuilder
+final readonly class ProductTourStepsBuilder
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly Security $security,
-        private readonly ProjectAccessService $projectAccess,
-        private readonly InstanceSettingsRepository $instanceSettingsRepository,
+        private TranslatorInterface $translator,
+        private Security $security,
+        private ProjectAccessService $projectAccess,
+        private InstanceSettingsRepository $instanceSettingsRepository,
     ) {
     }
 
@@ -42,7 +43,7 @@ final class ProductTourStepsBuilder
     public function contextForProjectIssues(Project $project, User $user): ProductTourContext
     {
         $access = $this->projectAccess->resolveAccess($project, $user);
-        if (null === $access) {
+        if (!$access instanceof ProjectAccess) {
             $access = $this->projectAccess->requireMembership($project, $user);
         }
 

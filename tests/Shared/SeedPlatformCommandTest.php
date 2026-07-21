@@ -14,7 +14,7 @@ final class SeedPlatformCommandTest extends DatabaseWebTestCase
 {
     public function testPlatformSeedIsIdempotentAndCreatesNoDemoUser(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $application = new Application($client->getKernel());
         $command = $application->find('app:seed-platform');
         $tester = new CommandTester($command);
@@ -25,12 +25,12 @@ final class SeedPlatformCommandTest extends DatabaseWebTestCase
         $tester->execute([]);
         self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
 
-        $users = static::getContainer()->get(UserRepository::class)->findBy([
+        $users = self::getContainer()->get(UserRepository::class)->findBy([
             'email' => 'admin@symfony-beacon.local',
         ]);
         self::assertSame([], $users);
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $count = (int) $em->createQuery('SELECT COUNT(u.id) FROM '.User::class.' u')->getSingleScalarResult();
         self::assertSame(0, $count);
     }

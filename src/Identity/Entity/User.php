@@ -456,7 +456,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function isProductTourSeen(): bool
     {
-        return null !== $this->productTourSeenAt;
+        return $this->productTourSeenAt instanceof DateTimeImmutable;
     }
 
     public function markProductTourSeen(?DateTimeImmutable $at = null): self
@@ -574,11 +574,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         }
 
         $this->productTourSeenPages = $completed;
-        if (\count($completed) >= \count($allowed)) {
-            $this->productTourSeenAt = new DateTimeImmutable();
-        } else {
-            $this->productTourSeenAt = null;
-        }
+        $this->productTourSeenAt = \count($completed) >= \count($allowed) ? new DateTimeImmutable() : null;
 
         return $this;
     }

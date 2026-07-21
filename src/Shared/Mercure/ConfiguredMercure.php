@@ -94,7 +94,7 @@ final class ConfiguredMercure implements ResetInterface
 
     public function isUsingDatabaseUrl(): bool
     {
-        return null !== $this->settings()->getMercureUrl() && '' !== (string) $this->settings()->getMercureUrl();
+        return null !== $this->settings()->getMercureUrl() && '' !== $this->settings()->getMercureUrl();
     }
 
     public function envUrlConfigured(): bool

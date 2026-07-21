@@ -160,7 +160,7 @@ class InstanceSettings implements AuditableInterface
 
     public function isSetupCompleted(): bool
     {
-        return null !== $this->setupCompletedAt;
+        return $this->setupCompletedAt instanceof DateTimeImmutable;
     }
 
     public function markSetupCompleted(?DateTimeImmutable $at = null): self

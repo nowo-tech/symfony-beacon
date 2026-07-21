@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Identity\Service\DemoIdentitySeeder;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
@@ -46,7 +47,7 @@ final class SetupWizardController extends AbstractController
     }
 
     #[Route('/setup/run', name: 'setup_wizard_run', methods: ['POST'])]
-    public function run(Request $request): Response
+    public function run(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('setup_wizard', (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');

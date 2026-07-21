@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared;
 
+use App\Identity\Repository\UserRepository;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Mercure\ConfiguredMercure;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
@@ -16,19 +19,19 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
 {
     public function testDevSampleThenPurgeLeavesOtherProjectIntact(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $application = new Application($client->getKernel());
 
         $demoTester = new CommandTester($application->find('app:seed-demo'));
         $demoTester->execute(['--write-client-env' => '']);
         self::assertSame(0, $demoTester->getStatusCode(), $demoTester->getDisplay());
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $other = new Project();
         $other->setName('Other');
         $other->setSlug('other-keep');
         $membership = new ProjectMembership();
-        $membership->setUser(static::getContainer()->get(\App\Identity\Repository\UserRepository::class)->findOneByEmail('admin@symfony-beacon.local'));
+        $membership->setUser(self::getContainer()->get(UserRepository::class)->findOneByEmail('admin@symfony-beacon.local'));
         $membership->setRole(ProjectRole::Owner);
         $other->addMembership($membership);
         $em->persist($other);
@@ -48,12 +51,12 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
         self::assertSame(0, $sampleTester->getStatusCode(), $sampleTester->getDisplay());
         self::assertStringContainsString('Mercure', $sampleTester->getDisplay());
 
-        $settings = static::getContainer()->get(\App\Shared\Settings\Repository\InstanceSettingsRepository::class)->getOrCreate();
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertTrue($settings->isMercureEnabled());
         self::assertTrue($settings->hasMercureJwtSecret());
         self::assertNotEmpty($settings->getMercureUrl());
         self::assertNotEmpty($settings->getMercurePublicUrl());
-        self::assertTrue(static::getContainer()->get(\App\Shared\Mercure\ConfiguredMercure::class)->isEnabled());
+        self::assertTrue(self::getContainer()->get(ConfiguredMercure::class)->isEnabled());
 
         $conn = $em->getConnection();
         foreach (['mercure_url', 'mercure_public_url', 'mercure_jwt_secret'] as $column) {
@@ -85,9 +88,9 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
 
     public function testHugeRequiresForce(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $application = new Application($client->getKernel());
-        (new CommandTester($application->find('app:seed-demo')))->execute(['--write-client-env' => '']);
+        new CommandTester($application->find('app:seed-demo'))->execute(['--write-client-env' => '']);
 
         $tester = new CommandTester($application->find('app:seed-sample'));
         $tester->execute(['--size' => 'huge']);

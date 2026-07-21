@@ -19,7 +19,7 @@ final class SeedDemoCommandTest extends DatabaseWebTestCase
 {
     public function testDemoSeedCreatesUserOnceWithoutSampleTelemetry(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $application = new Application($client->getKernel());
         $command = $application->find('app:seed-demo');
         $tester = new CommandTester($command);
@@ -30,15 +30,15 @@ final class SeedDemoCommandTest extends DatabaseWebTestCase
         $tester->execute(['--write-client-env' => '']);
         self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
 
-        $users = static::getContainer()->get(UserRepository::class)->findBy([
+        $users = self::getContainer()->get(UserRepository::class)->findBy([
             'email' => 'admin@symfony-beacon.local',
         ]);
         self::assertCount(1, $users);
 
-        $project = static::getContainer()->get(ProjectRepository::class)->findOneBy(['slug' => 'demo']);
+        $project = self::getContainer()->get(ProjectRepository::class)->findOneBy(['slug' => 'demo']);
         self::assertNotNull($project);
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $stats = (int) $em->createQuery('SELECT COUNT(s.id) FROM '.DailyProjectStat::class.' s')->getSingleScalarResult();
         self::assertSame(0, $stats);
 

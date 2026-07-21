@@ -32,11 +32,11 @@ final class ProductTourTest extends DatabaseWebTestCase
     public function testMarkSeenPageStopsAutoStartOnDashboardOnly(): void
     {
         [$client, $user] = $this->bootWithDemoProject('tour-mark@example.com');
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
 
-        $settings = static::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         $settings->markSetupCompleted();
-        static::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
+        self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
 
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/dashboard');
@@ -78,7 +78,7 @@ final class ProductTourTest extends DatabaseWebTestCase
 
     public function testDashboardTourOmitsAdminStepForNonAdmin(): void
     {
-        $builder = static::getContainer()->get(ProductTourStepsBuilder::class);
+        $builder = self::getContainer()->get(ProductTourStepsBuilder::class);
         $steps = $builder->build(new ProductTourContext(
             page: ProductTourPage::Dashboard,
             isInstanceAdmin: false,
@@ -94,7 +94,7 @@ final class ProductTourTest extends DatabaseWebTestCase
 
     public function testProjectTourVariesByRole(): void
     {
-        $builder = static::getContainer()->get(ProductTourStepsBuilder::class);
+        $builder = self::getContainer()->get(ProductTourStepsBuilder::class);
 
         $viewer = $builder->build(new ProductTourContext(
             page: ProductTourPage::ProjectIssues,
@@ -139,7 +139,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         $client->submit($form);
         self::assertResponseRedirects('/account/display');
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $reloaded = $em->find($user::class, $user->getId());
         self::assertNotNull($reloaded);
@@ -154,7 +154,7 @@ final class ProductTourTest extends DatabaseWebTestCase
     {
         [$client, $user] = $this->bootWithDemoProject('tour-uncheck@example.com');
         $user->markProductTourSeen();
-        static::getContainer()->get(EntityManagerInterface::class)->flush();
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
 
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/account/display');
@@ -167,7 +167,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         $client->submit($form);
         self::assertResponseRedirects('/account/display');
 
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $reloaded = $em->find($user::class, $user->getId());
         self::assertNotNull($reloaded);
@@ -182,7 +182,7 @@ final class ProductTourTest extends DatabaseWebTestCase
     {
         [$client, $user] = $this->bootWithDemoProject('tour-replay@example.com');
         $user->markProductTourSeen();
-        static::getContainer()->get(EntityManagerInterface::class)->flush();
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
 
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/account/display');

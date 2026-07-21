@@ -14,7 +14,7 @@ final class SetupWizardTest extends DatabaseWebTestCase
     {
         [$client, $user] = $this->bootWithDemoProject('member@example.com');
         $user->setRoles(['ROLE_USER']);
-        static::getContainer()->get(EntityManagerInterface::class)->flush();
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
         $this->login($client, $user);
 
         $client->request(Request::METHOD_GET, '/setup');
@@ -25,12 +25,12 @@ final class SetupWizardTest extends DatabaseWebTestCase
     {
         [$client, $user] = $this->bootWithDemoProject('admin-setup@example.com');
         $user->setRoles(['ROLE_ADMIN']);
-        static::getContainer()->get(EntityManagerInterface::class)->flush();
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
         $this->login($client, $user);
 
-        $settings = static::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         $settings->clearSetupCompleted();
-        static::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
+        self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
 
         $crawler = $client->request(Request::METHOD_GET, '/setup');
         self::assertResponseIsSuccessful();
@@ -45,7 +45,7 @@ final class SetupWizardTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/setup');
         $client->followRedirect();
 
-        $reloaded = static::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $reloaded = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertTrue($reloaded->isSetupCompleted());
     }
 }

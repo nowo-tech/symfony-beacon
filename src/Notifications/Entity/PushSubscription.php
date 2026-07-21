@@ -24,10 +24,6 @@ class PushSubscription
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private User $user;
-
     /** SHA-256 hex of the endpoint (unique lookup without decrypting). */
     #[ORM\Column(length: 64)]
     private string $endpointHash = '';
@@ -56,9 +52,10 @@ class PushSubscription
     #[ORM\Column]
     private DateTimeImmutable $updatedAt;
 
-    public function __construct(User $user)
+    public function __construct(#[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private User $user)
     {
-        $this->user = $user;
         $now = new DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;

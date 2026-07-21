@@ -37,7 +37,7 @@ final readonly class MercureSampleSeeder
 
         $envUrl = trim($this->envUrl);
         if (
-            (null === $settings->getMercureUrl() || '' === trim((string) $settings->getMercureUrl()))
+            (null === $settings->getMercureUrl() || '' === trim($settings->getMercureUrl()))
             && '' !== $envUrl
         ) {
             $settings->setMercureUrl($envUrl);
@@ -46,7 +46,7 @@ final readonly class MercureSampleSeeder
 
         $envPublic = trim($this->envPublicUrl);
         if (
-            (null === $settings->getMercurePublicUrl() || '' === trim((string) $settings->getMercurePublicUrl()))
+            (null === $settings->getMercurePublicUrl() || '' === trim($settings->getMercurePublicUrl()))
             && '' !== $envPublic
         ) {
             $settings->setMercurePublicUrl($envPublic);
