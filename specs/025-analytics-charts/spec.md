@@ -2,7 +2,7 @@
 
 **Feature Branch**: `025-analytics-charts`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Upgrade project Analytics from a fixed 30-day table to period-based charts of received issues/errors (and related series), with optional filters.
 

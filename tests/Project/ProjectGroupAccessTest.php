@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Project;
 
-use App\Project\Entity\ProjectMembership;
-use App\Project\Service\ProjectMembershipManager;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
 use App\Project\Entity\ProjectGroupAccess;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Service\ProjectMembershipManager;
 use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;

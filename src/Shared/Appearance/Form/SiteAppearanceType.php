@@ -45,6 +45,12 @@ final class SiteAppearanceType extends FormKitAbstractType
             $this->addNamedField('accentDeepColorDark', 'color', [
                 'constraints' => $hex,
             ]);
+            $this->addNamedField('dangerColor', 'color', [
+                'constraints' => $hex,
+            ]);
+            $this->addNamedField('dangerColorDark', 'color', [
+                'constraints' => $hex,
+            ]);
         });
     }
 

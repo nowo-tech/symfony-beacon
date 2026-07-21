@@ -221,38 +221,14 @@
         </table>
         </div>
 
-        {% set from = (pagination.page - 1) * pagination.per_page + 1 %}
-        {% set to = (pagination.page - 1) * pagination.per_page + issues|length %}
-        <div class="issue-pagination">
-            <p class="issue-pagination__info">
-                {{ 'issues.pagination.showing'|trans({'%from%': from, '%to%': to, '%total%': pagination.total}) }}
-            </p>
-            {% if pagination.total_pages > 1 %}
-                <nav class="issue-pagination__nav" aria-label="{{ 'issues.pagination.nav'|trans }}">
-                    {% if pagination.page > 1 %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: pagination.page - 1})) }}">{{ 'issues.pagination.previous'|trans }}</a>
-                    {% else %}
-                        <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.previous'|trans }}</span>
-                    {% endif %}
-
-                    {% for p in 1..pagination.total_pages %}
-                        {% if p == pagination.page %}
-                            <span class="issue-pagination__link is-active" aria-current="page">{{ p }}</span>
-                        {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
-                            <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: p})) }}">{{ p }}</a>
-                        {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
-                            <span class="issue-pagination__ellipsis">…</span>
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if pagination.page < pagination.total_pages %}
-                        <a class="issue-pagination__link" href="{{ path('issue_index', {id: project.uuid}|merge(filterQuery)|merge({page: pagination.page + 1})) }}">{{ 'issues.pagination.next'|trans }}</a>
-                    {% else %}
-                        <span class="issue-pagination__link is-disabled">{{ 'issues.pagination.next'|trans }}</span>
-                    {% endif %}
-                </nav>
-            {% endif %}
-        </div>
+        {% include 'shared/_table_pagination.html.twig' with {
+            pagination: pagination,
+            item_count: issues|length,
+            route: 'issue_index',
+            route_params: {id: project.uuid},
+            query: filterQuery,
+            nav_label: 'issues.pagination.nav'
+        } %}
     </div>
 {% endif %}
 {% endblock %}

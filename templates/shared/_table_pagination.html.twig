@@ -1,0 +1,49 @@
+{#
+  Server-side table pagination (never DataTables paging).
+
+  Required:
+    - pagination: {page, per_page, total, total_pages}
+    - item_count: number of rows on the current page
+    - route: route name for page links
+    - route_params: path params (e.g. {id: project.uuid})
+
+  Optional:
+    - query: extra query params preserved across pages (filters)
+    - nav_label: aria-label translation key (default pagination.nav)
+#}
+{% set query = query|default({}) %}
+{% set nav_label = nav_label|default('pagination.nav') %}
+{% if pagination.total > 0 %}
+    {% set from = (pagination.page - 1) * pagination.per_page + 1 %}
+    {% set to = (pagination.page - 1) * pagination.per_page + item_count %}
+    <div class="table-pagination">
+        <p class="table-pagination__info">
+            {{ 'pagination.showing'|trans({'%from%': from, '%to%': to, '%total%': pagination.total}) }}
+        </p>
+        {% if pagination.total_pages > 1 %}
+            <nav class="table-pagination__nav" aria-label="{{ nav_label|trans }}">
+                {% if pagination.page > 1 %}
+                    <a class="table-pagination__link" href="{{ path(route, route_params|merge(query)|merge({page: pagination.page - 1, per_page: pagination.per_page})) }}">{{ 'pagination.previous'|trans }}</a>
+                {% else %}
+                    <span class="table-pagination__link is-disabled">{{ 'pagination.previous'|trans }}</span>
+                {% endif %}
+
+                {% for p in 1..pagination.total_pages %}
+                    {% if p == pagination.page %}
+                        <span class="table-pagination__link is-active" aria-current="page">{{ p }}</span>
+                    {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
+                        <a class="table-pagination__link" href="{{ path(route, route_params|merge(query)|merge({page: p, per_page: pagination.per_page})) }}">{{ p }}</a>
+                    {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
+                        <span class="table-pagination__ellipsis">…</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.page < pagination.total_pages %}
+                    <a class="table-pagination__link" href="{{ path(route, route_params|merge(query)|merge({page: pagination.page + 1, per_page: pagination.per_page})) }}">{{ 'pagination.next'|trans }}</a>
+                {% else %}
+                    <span class="table-pagination__link is-disabled">{{ 'pagination.next'|trans }}</span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </div>
+{% endif %}

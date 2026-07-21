@@ -14,11 +14,16 @@ nowo_cookie_consent:
     use_cookie_inventory: true
     granular_cookie_selection: false
 
-    # Match Beacon locales (en default, es)
+    # Match Beacon locales (en default + es/de/nl/fr/it/pt)
     default_locale: en
     enabled_locales:
         - en
         - es
+        - de
+        - nl
+        - fr
+        - it
+        - pt
     detect_locale_from_accept_language: true
 
     # Beacon uses Tailwind 4

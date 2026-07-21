@@ -30,7 +30,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | `use_logger` | `true` (writes `dashboard_cookie_log`) |
 | `use_cookie_inventory` | `true` (YAML inventory for session / remember-me / consent cookies) |
 | `preferences_bubble_enabled` | `false` (AuthKit layout can include the bubble manually) |
-| `enabled_locales` | `en`, `es` |
+| `enabled_locales` | `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` |
 | `disabled_routes` | legal pages (banner does not auto-open there) |
 
 Twig overrides live under `templates/bundles/NowoCookieConsentBundle/` (registered in `config/packages/twig.yaml`) and style tokens in `assets/styles/_cookie_consent.scss`.

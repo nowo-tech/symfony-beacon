@@ -73,8 +73,8 @@ final class IssueIndexSortFunctionalTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=asc&per_page=10&page=1');
         self::assertResponseIsSuccessful();
         self::assertCount(10, $crawler->filter('table.issue-table tbody tr'));
-        self::assertSelectorExists('.issue-pagination');
-        self::assertSelectorExists('a.issue-pagination__link[href*="page=2"]');
+        self::assertSelectorExists('.table-pagination');
+        self::assertSelectorExists('a.table-pagination__link[href*="page=2"]');
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?sort=title&dir=asc&per_page=10&page=2');
         self::assertCount(2, $crawler->filter('table.issue-table tbody tr'));

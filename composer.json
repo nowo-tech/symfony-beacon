@@ -124,10 +124,10 @@
         "rector-fix": "rector process",
         "test": "phpunit",
         "qa": [
-            "@cs-check",
-            "@twig-cs",
+            "@cs-fix",
+            "@twig-cs-fix",
             "@phpstan",
-            "@rector",
+            "@rector-fix",
             "@test"
         ]
     },

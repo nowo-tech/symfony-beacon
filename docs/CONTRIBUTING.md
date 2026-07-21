@@ -46,12 +46,12 @@ The client Symfony bundle is **out of scope** for this repository.
 
 ## Internationalization
 
-AuthKit pages use Symfony Translator with **locale in the URL path**. Default and fallback locale is `en`. Current enabled locales: `en`, `es`.
+AuthKit pages use Symfony Translator with **locale in the URL path**. Default and fallback locale is `en`. Current enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`.
 
 | Locale | Example paths |
 | --- | --- |
 | Default (`en`) | `/en/login`, `/en/register`, `/en/logout` |
-| Other (`es`, …) | `/es/login`, `/es/register`, `/es/logout` |
+| Other (`es`, `de`, `nl`, `fr`, `it`, `pt`, …) | `/es/login`, `/de/login`, … |
 
 Bare `/`, `/login`, `/register`, and `/logout` redirect to the default-locale AuthKit paths (`config/routes/auth_locale_redirects.yaml`). Authenticated app home is `/dashboard`.
 
@@ -75,7 +75,7 @@ Twig: use `|trans` / `trans` with the right domain. HTML documents keep `lang="{
    - Copy `NowoAuthKitBundle.en.yaml` → `NowoAuthKitBundle.fr.yaml` and translate values (include password-strength keys if that file has them).
    - Optionally override other bundle domains the same way (`VendorBundle.fr.yaml`).
 3. **Switcher labels** — add `locale.fr: Français` (and keep `locale.nav`) in every `messages.*.yaml`. The switcher already loops `enabled_locales`.
-4. **Security** — extend the public AuthKit path regex in `config/packages/security.yaml`, e.g. `^/(en|es|fr)/login` (same for `register` / `logout`).
+4. **Security** — extend the public AuthKit path regex in `config/packages/security.yaml`, e.g. `^/(en|es|de|nl|fr|it|pt|xx)/login` (same for `register` / `logout`). Also update `account_locale_switch` route requirements, cookie-consent / breadcrumb / dashboard-menu locale lists, and seeder translation maps.
 5. **Smoke-check** — open `/en/login`, `/fr/login`, `/fr/register`, switch locales, submit forms, and confirm strength requirement strings are translated.
 6. **Tests** — extend AuthKit/locale coverage if you add assertions for the new locale (see `tests/Identity/AuthKitBootstrapTest.php`).
 

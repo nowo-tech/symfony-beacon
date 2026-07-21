@@ -1,0 +1,29 @@
+login:
+    heading: Inloggen
+    submit: Inloggen
+    register_link: Eerste account aanmaken
+register:
+    heading: Account aanmaken
+    submit: Registreren
+    login_link: Ik heb al een account
+
+# Password strength requirement labels (AuthKit sets translation_domain on the field)
+requirement.min_length: 'Minimaal %count% tekens'
+requirement.max_length: 'Maximaal %count% tekens'
+requirement.lowercase: 'Minimaal één kleine letter'
+requirement.uppercase: 'Minimaal één hoofdletter'
+requirement.digit: 'Minimaal één cijfer'
+requirement.special: 'Minimaal één speciaal teken'
+requirement.no_whitespace: 'Geen spaties toegestaan'
+requirement.not_contain: 'Mag geen verboden tekst bevatten'
+requirement.min_unique_chars: 'Minimaal %count% unieke tekens'
+requirement.regex: 'Moet aan het vereiste patroon voldoen'
+password_strength.invalid: 'Het wachtwoord voldoet niet aan de eisen (%missing%).'
+generator.button: 'Wachtwoord genereren'
+generator.modal_title: 'Voorgestelde wachtwoorden'
+generator.modal_hint: 'Deze wachtwoorden voldoen aan je huidige beleid. Kopieer er een of gebruik het in het veld.'
+generator.copy: 'Kopiëren'
+generator.copied: 'Gekopieerd!'
+generator.use_password: 'Dit wachtwoord gebruiken'
+generator.close: 'Sluiten'
+generator.failed: 'Kon geen geldig wachtwoord genereren. Probeer opnieuw of versoepel het beleid.'

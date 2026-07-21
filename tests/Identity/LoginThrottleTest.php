@@ -18,7 +18,7 @@ final class LoginThrottleTest extends DatabaseWebTestCase
         $em = self::getContainer()->get('doctrine')->getManager();
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
-        $email = sprintf('throttle-%s@example.com', bin2hex(random_bytes(4)));
+        $email = \sprintf('throttle-%s@example.com', bin2hex(random_bytes(4)));
         $user = new User();
         $user->setEmail($email);
         $user->setDisplayName('Throttle');
@@ -34,7 +34,7 @@ final class LoginThrottleTest extends DatabaseWebTestCase
             self::assertStringNotContainsString(
                 'Too many failed login attempts',
                 (string) $client->getResponse()->getContent(),
-                sprintf('Attempt %d should not be throttled yet', $i + 1)
+                \sprintf('Attempt %d should not be throttled yet', $i + 1)
             );
         }
 

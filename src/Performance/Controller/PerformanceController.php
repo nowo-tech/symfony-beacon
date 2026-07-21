@@ -11,6 +11,7 @@ use App\Performance\Entity\PerfTransaction;
 use App\Performance\Repository\PerfTransactionRepository;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
+use App\Shared\Pagination\PagePagination;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,12 +49,20 @@ final class PerformanceController extends AbstractController
         ]);
 
         $nPlusOneOnly = $request->query->getBoolean('nplus1');
-        $transactions = $this->transactionRepository->findForProject($project, $nPlusOneOnly);
+        $total = $this->transactionRepository->countForProject($project, $nPlusOneOnly);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $transactions = $this->transactionRepository->findPageForProject(
+            $project,
+            $nPlusOneOnly,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
 
         return $this->render('performance/index.html.twig', [
             'project' => $project,
             'transactions' => $transactions,
             'nPlusOneOnly' => $nPlusOneOnly,
+            'pagination' => $pagination,
         ]);
     }
 

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-07-21
+
+### Added
+
+- Project **Analytics charts**: Chart.js time series with period presets (7/14/30/90), custom UTC date range (max 366 days), and filters (environment / release / level); table remains with zero-filled days (`025-analytics-charts`)
+- Account → Display: **UI density** (comfortable / compact) and **motion** (system / reduce / full)
+- Administration → Appearance: **danger / error** colors for light and dark themes (`--beacon-alert`)
+- Header theme toggle persists day/night to the account (`POST /account/theme`) when signed in
+- Shared server-side table pagination (`PagePagination` + `shared/_table_pagination.html.twig`) for project Issues, Performance, and Analytics lists (`page` / `per_page` query params)
+- UI locales **German** (`de`), **Dutch** (`nl`), **French** (`fr`), **Italian** (`it`), and **Portuguese** (`pt`) alongside `en` / `es` (catalogues, AuthKit paths, cookie consent, breadcrumb/menu seeders)
+
+### Changed
+
+- Display preferences intro / i18n cover density and motion; site appearance form includes danger color pickers
+- Performance and Analytics list tables use the shared paginator (no DataTables paging; Issues already server-side, now shares the same partial)
+
 ## [0.10.2] - 2026-07-21
 
 ### Added
@@ -330,7 +346,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.9.4...v0.10.0

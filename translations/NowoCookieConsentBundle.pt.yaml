@@ -1,0 +1,2 @@
+# Link the consent modal “privacy” control to Beacon’s privacy page.
+nowo_cookie_consent.privacy_route: 'legal_privacy'

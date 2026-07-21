@@ -146,6 +146,71 @@ $beacon-btn-sm-font-size: 0.8125rem;
   border-color: color-mix(in srgb, var(--color-alert) 35%, var(--color-sand));
 }
 
+/* —— Account display: density + motion —— */
+html[data-ui-density='compact'] {
+  --beacon-density-pad: 0.85;
+  --beacon-density-font: 0.9375;
+}
+
+html[data-ui-density='comfortable'],
+html:not([data-ui-density]) {
+  --beacon-density-pad: 1;
+  --beacon-density-font: 1;
+}
+
+html[data-ui-density='compact'] .panel {
+  padding: calc(1rem * var(--beacon-density-pad)) calc(1.15rem * var(--beacon-density-pad));
+}
+
+html[data-ui-density='compact'] .app-header {
+  --app-header-height: 3rem;
+}
+
+html[data-ui-density='compact'] .app-sidebar {
+  width: 14.25rem;
+}
+
+html[data-ui-density='compact'] .app-shell {
+  --app-sidebar-width: 14.25rem;
+}
+
+html[data-ui-density='compact'] .btn-primary,
+html[data-ui-density='compact'] .btn-ghost,
+html[data-ui-density='compact'] .btn-danger,
+html[data-ui-density='compact'] .theme-toggle,
+html[data-ui-density='compact'] .input {
+  min-height: 2rem;
+  font-size: 0.8125rem;
+}
+
+html[data-ui-density='compact'] .app-main__inner {
+  padding-block: 1rem;
+}
+
+html[data-ui-density='compact'] body {
+  font-size: calc(1rem * var(--beacon-density-font));
+}
+
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] *::before,
+html[data-motion='reduce'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion='system'] *,
+  html[data-motion='system'] *::before,
+  html[data-motion='system'] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /*
  * Beacon <dialog> modals — visual tokens shared with kit Bootstrap .modal
  * (header / content / footer chrome, width, radius, shadow, backdrop).
@@ -2599,6 +2664,74 @@ body::-webkit-scrollbar-corner,
   }
 }
 
+.analytics-filters__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.analytics-filters__preset.is-active {
+  background: color-mix(in srgb, var(--color-moss) 14%, transparent);
+  border-color: var(--color-moss);
+  color: var(--color-moss-deep, var(--color-moss));
+  font-weight: 600;
+}
+
+.analytics-filters__preset-label {
+  margin-left: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  opacity: 0.55;
+}
+
+.analytics-filters__row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .analytics-filters__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .analytics-filters__row {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    align-items: end;
+  }
+}
+
+.analytics-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  opacity: 0.85;
+}
+
+.analytics-filters__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.analytics-chart__canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 16rem;
+}
+
+.analytics-chart__empty {
+  margin-top: 0.75rem;
+}
+
 .issue-table-panel {
   padding: 1rem;
   overflow: hidden;
@@ -2726,6 +2859,8 @@ body::-webkit-scrollbar-corner,
   white-space: nowrap;
 }
 
+/* Server-side list pagination (Issues / Performance / Analytics). Never DataTables paging. */
+.table-pagination,
 .issue-pagination {
   display: flex;
   flex-wrap: wrap;
@@ -2737,12 +2872,14 @@ body::-webkit-scrollbar-corner,
   border-top: 1px solid var(--color-sand);
 }
 
+.table-pagination__info,
 .issue-pagination__info {
   margin: 0;
   color: color-mix(in srgb, var(--color-ink) 65%, transparent);
   font-size: 0.8125rem;
 }
 
+.table-pagination__nav,
 .issue-pagination__nav {
   display: flex;
   flex-wrap: wrap;
@@ -2750,6 +2887,7 @@ body::-webkit-scrollbar-corner,
   gap: 0.25rem;
 }
 
+.table-pagination__link,
 .issue-pagination__link {
   display: inline-flex;
   align-items: center;
@@ -2764,11 +2902,13 @@ body::-webkit-scrollbar-corner,
   text-decoration: none;
 }
 
+.table-pagination__link:hover,
 .issue-pagination__link:hover {
   border-color: var(--color-moss);
   color: var(--color-moss);
 }
 
+.table-pagination__link.is-active,
 .issue-pagination__link.is-active {
   border-color: var(--color-moss);
   background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
@@ -2776,11 +2916,13 @@ body::-webkit-scrollbar-corner,
   font-weight: 600;
 }
 
+.table-pagination__link.is-disabled,
 .issue-pagination__link.is-disabled {
   opacity: 0.45;
   pointer-events: none;
 }
 
+.table-pagination__ellipsis,
 .issue-pagination__ellipsis {
   padding: 0 0.25rem;
   color: color-mix(in srgb, var(--color-ink) 45%, transparent);

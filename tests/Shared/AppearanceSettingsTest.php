@@ -38,13 +38,51 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
             'site_appearance[accentDeepColor]' => '#0f766e',
             'site_appearance[accentColorDark]' => '#2dd4bf',
             'site_appearance[accentDeepColorDark]' => '#5eead4',
+            'site_appearance[dangerColor]' => '#c2410c',
+            'site_appearance[dangerColorDark]' => '#fb923c',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/settings/appearance');
         $client->followRedirect();
         self::assertSelectorTextContains('a.brand-mark', 'Acme Beacon');
         self::assertSelectorExists('style');
-        self::assertStringContainsString('--beacon-moss: #0d9488', $client->getResponse()->getContent() ?: '');
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('--beacon-moss: #0d9488', $html);
+        self::assertStringContainsString('--beacon-alert: #c2410c', $html);
+    }
+
+    public function testUserCanPersistThemeToggleChoice(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('theme-sync@example.com');
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/dashboard');
+        self::assertResponseIsSuccessful();
+        $shell = $crawler->filter('[data-app-shell][data-theme-sync-token]');
+        self::assertGreaterThan(0, $shell->count());
+        $token = (string) $shell->attr('data-theme-sync-token');
+        self::assertNotSame('', $token);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/account/theme',
+            server: [
+                'HTTP_X_CSRF_TOKEN' => $token,
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            content: json_encode(['theme' => 'dark'], \JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent() ?: '', true);
+        self::assertIsArray($payload);
+        self::assertTrue($payload['ok'] ?? false);
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('dark', $reloaded->getPreferredTheme());
     }
 
     public function testLoginShowsCustomBrand(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProfileType;
@@ -11,6 +12,7 @@ use App\Identity\Form\AccountSecurityType;
 use App\Identity\Repository\UserRepository;
 use App\Issues\IssuePanelIds;
 use Doctrine\ORM\EntityManagerInterface;
+use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -156,5 +158,36 @@ final class AccountPreferencesController extends AbstractController
             'form' => $form,
             'issue_panel_ids' => IssuePanelIds::all(),
         ]);
+    }
+
+    /**
+     * Persist day/night choice from the header theme toggle (JSON).
+     */
+    #[Route('/account/theme', name: 'account_theme', methods: ['POST'])]
+    public function theme(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('account_theme', $request->headers->get('X-CSRF-TOKEN', ''))) {
+            return $this->json(['ok' => false, 'error' => 'invalid_csrf'], Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            /** @var array{theme?: mixed} $payload */
+            $payload = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $this->json(['ok' => false, 'error' => 'invalid_json'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $theme = $payload['theme'] ?? null;
+        if (!\is_string($theme) || !\in_array($theme, ['light', 'dark'], true)) {
+            return $this->json(['ok' => false, 'error' => 'invalid_theme'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user->setPreferredTheme($theme);
+        $this->entityManager->flush();
+
+        return $this->json(['ok' => true, 'theme' => $theme]);
     }
 }

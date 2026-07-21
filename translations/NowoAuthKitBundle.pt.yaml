@@ -1,0 +1,29 @@
+login:
+    heading: Iniciar sessão
+    submit: Iniciar sessão
+    register_link: Criar a primeira conta
+register:
+    heading: Criar conta
+    submit: Registar
+    login_link: Já tenho uma conta
+
+# Password strength requirement labels (AuthKit sets translation_domain on the field)
+requirement.min_length: 'Pelo menos %count% caracteres'
+requirement.max_length: 'No máximo %count% caracteres'
+requirement.lowercase: 'Pelo menos uma letra minúscula'
+requirement.uppercase: 'Pelo menos uma letra maiúscula'
+requirement.digit: 'Pelo menos um número'
+requirement.special: 'Pelo menos um carácter especial'
+requirement.no_whitespace: 'Não são permitidos espaços'
+requirement.not_contain: 'Não deve conter texto proibido'
+requirement.min_unique_chars: 'Pelo menos %count% caracteres únicos'
+requirement.regex: 'Deve corresponder ao padrão exigido'
+password_strength.invalid: 'A palavra-passe não cumpre os requisitos (%missing%).'
+generator.button: 'Gerar palavra-passe'
+generator.modal_title: 'Palavras-passe sugeridas'
+generator.modal_hint: 'Estas palavras-passe cumprem a política atual. Copie uma ou aplique-a ao campo.'
+generator.copy: 'Copiar'
+generator.copied: 'Copiado!'
+generator.use_password: 'Usar esta palavra-passe'
+generator.close: 'Fechar'
+generator.failed: 'Não foi possível gerar uma palavra-passe válida. Tente novamente ou relaxe a política.'

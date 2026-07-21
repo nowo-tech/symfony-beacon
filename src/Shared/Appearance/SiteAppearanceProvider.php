@@ -61,6 +61,16 @@ final class SiteAppearanceProvider
         return $this->get()->getAccentDeepColorDark();
     }
 
+    public function getDangerColor(): string
+    {
+        return $this->get()->getDangerColor();
+    }
+
+    public function getDangerColorDark(): string
+    {
+        return $this->get()->getDangerColorDark();
+    }
+
     /**
      * Inline CSS that overrides Beacon accent tokens for light and dark themes.
      */
@@ -72,10 +82,12 @@ final class SiteAppearanceProvider
             ':root, [data-theme="light"] {',
             \sprintf('  --beacon-moss: %s;', $a->getAccentColor()),
             \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColor()),
+            \sprintf('  --beacon-alert: %s;', $a->getDangerColor()),
             '}',
             '[data-theme="dark"] {',
             \sprintf('  --beacon-moss: %s;', $a->getAccentColorDark()),
             \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColorDark()),
+            \sprintf('  --beacon-alert: %s;', $a->getDangerColorDark()),
             '}',
         ]);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
-use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
@@ -13,6 +12,7 @@ use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Service\ProjectMembershipManager;

@@ -29,12 +29,24 @@ common:
     yes: 'sí'
     na: n/d
     unknown: desconocido
+pagination:
+    showing: Mostrando %from%–%to% de %total%
+    nav: Páginas de la tabla
+    previous: Anterior
+    next: Siguiente
+    per_page: Filas por página
+    per_page_option: '%count% / página'
 toast:
     dismiss: Cerrar
 locale:
     nav: Idioma
     en: English
     es: Español
+    de: Deutsch
+    nl: Nederlands
+    fr: Français
+    it: Italiano
+    pt: Português
 theme:
     day: Día
     night: Noche
@@ -423,8 +435,32 @@ performance:
         description: Descripción
 analytics:
     title: Analítica
-    intro: Conteos diarios de errores, transacciones y N+1 (últimos 30 días)
-    empty: Aún no hay estadísticas. Ingesta eventos para rellenar estos datos.
+    intro: Volumen diario de errores, transacciones y N+1 — gráfico y tabla del periodo seleccionado
+    empty: Aún no hay volumen en este periodo. Ingesta eventos para rellenar la analítica.
+    timezone_help: Los buckets diarios usan días de calendario UTC.
+    filtered_note: Los filtros se aplican solo a eventos de error (transacciones y N+1 se ocultan mientras hay filtros activos).
+    chart:
+        aria: Volumen de analítica en el tiempo
+    period:
+        label: Periodo
+        custom: Rango personalizado
+        from: Desde
+        to: Hasta
+        days_7: 7 días
+        days_14: 14 días
+        days_30: 30 días
+        days_90: 90 días
+        invalid: Periodo desconocido; se muestran los últimos 30 días.
+        custom_required: Elige fechas desde y hasta para un rango personalizado.
+        invalid_date: Usa fechas en formato AAAA-MM-DD.
+        end_before_start: La fecha final debe ser igual o posterior a la inicial.
+        too_long: Los rangos personalizados no pueden superar 366 días.
+    filter:
+        environment: Entorno
+        release: Release
+        level: Nivel
+        apply: Aplicar
+        clear: Limpiar
     col:
         date: Fecha
         errors: Errores
@@ -432,10 +468,11 @@ analytics:
         nplus1_groups: Grupos N+1
 appearance:
     title: Apariencia
-    intro: Personaliza el nombre de marca y los colores de acento de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
+    intro: Personaliza el nombre de marca, los colores de acento y los de peligro de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
     section:
         light: Acentos modo día
         dark: Acentos modo noche
+        danger: Colores de peligro / error
     submit: Guardar apariencia
     reset: Restaurar valores
 site_appearance:
@@ -463,6 +500,14 @@ site_appearance:
         label: Acento hover (noche)
         placeholder: '#6bc49a'
         help: Acento más claro para hover en modo noche.
+    danger_color:
+        label: Peligro
+        placeholder: '#b42318'
+        help: Acento de error / destructivo en modo día.
+    danger_color_dark:
+        label: Peligro (noche)
+        placeholder: '#f97066'
+        help: Acento de error / destructivo en modo noche.
     color:
         invalid: 'Usa un color hexadecimal como #1f6f54.'
 users:
@@ -591,7 +636,7 @@ preferences:
         submit: Actualizar contraseña
     display:
         title: Interfaz
-        intro: Elige idioma, tema, ancho del contenido y qué paneles de incidencia empiezan colapsados.
+        intro: Elige idioma, tema, densidad, movimiento, ancho del contenido y qué paneles de incidencia empiezan colapsados.
         submit: Guardar interfaz
         pwa_title: Instalar aplicación
         pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
@@ -611,6 +656,11 @@ preferences:
     theme_dark: Noche
     width_content: Contenido (centrado)
     width_full: Ancho completo
+    density_comfortable: Cómoda
+    density_compact: Compacta
+    motion_system: Sistema (seguir dispositivo)
+    motion_reduce: Reducir movimiento
+    motion_full: Movimiento completo
     issue_panels_collapsed: Paneles de incidencia colapsados por defecto
     issue_panels_help: Los paneles marcados empiezan colapsados en el detalle de incidencia/evento. El navegador recuerda si los abres o cierras a mano.
     issue_panels_browser: Diseño de paneles en el navegador
@@ -658,6 +708,14 @@ user_preferences:
         label: Ancho del contenido
         placeholder: Contenido
         help: Columna centrada, o estirar el área principal a todo el ancho.
+    preferred_ui_density:
+        label: Densidad de la interfaz
+        placeholder: Cómoda
+        help: Espaciado cómodo, o un layout de operador más compacto.
+    preferred_motion:
+        label: Movimiento
+        placeholder: Sistema
+        help: Seguir el dispositivo, reducir animaciones, o mantener el movimiento completo.
     current_password:
         label: Contraseña actual
         help: Solo necesaria al establecer una nueva contraseña.

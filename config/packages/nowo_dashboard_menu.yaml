@@ -1,7 +1,7 @@
 # nowo-tech/dashboard-menu-bundle
 # https://github.com/nowo-tech/DashboardMenuBundle
 nowo_dashboard_menu:
-    locales: ['en', 'es']
+    locales: ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt']
     default_locale: 'en'
     cache:
         ttl: 60

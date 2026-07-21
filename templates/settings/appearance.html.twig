@@ -59,6 +59,30 @@
             </div>
         </fieldset>
 
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.danger'|trans }}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="space-y-1.5">
+                    {{ form_label(form.dangerColor) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.dangerColor) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.dangerColor.vars.id }}">{{ form.dangerColor.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.dangerColor) }}
+                    {{ form_help(form.dangerColor) }}
+                </div>
+                <div class="space-y-1.5">
+                    {{ form_label(form.dangerColorDark) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.dangerColorDark) }}
+                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.dangerColorDark.vars.id }}">{{ form.dangerColorDark.vars.value }}</span>
+                    </div>
+                    {{ form_errors(form.dangerColorDark) }}
+                    {{ form_help(form.dangerColorDark) }}
+                </div>
+            </div>
+        </fieldset>
+
         <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
             <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>

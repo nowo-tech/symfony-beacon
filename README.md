@@ -32,7 +32,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
-- Daily analytics table (errors / transactions / N+1 for the last 30 days) at `/projects/{uuid}/analytics` — charts, custom periods, and filters are planned (`025-analytics-charts`); see [ROADMAP](docs/ROADMAP.md) Phase 5 for threshold alerts, release health, and related backlog
+- Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`); see [ROADMAP](docs/ROADMAP.md) Phase 5 for threshold alerts, release health, and related backlog
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
@@ -106,7 +106,7 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | `Ingest` | Envelope API + async pipeline |
 | `Issues` | Grouping, list/filter, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |
-| `Analytics` | Daily aggregates (table, last 30 days); charts/filters planned (`025`) |
+| `Analytics` | Daily aggregates + charts/filters (`025`); table + Chart.js |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP destinations |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
 

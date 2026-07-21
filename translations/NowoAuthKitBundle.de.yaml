@@ -1,0 +1,29 @@
+login:
+    heading: Anmelden
+    submit: Anmelden
+    register_link: Erstes Konto erstellen
+register:
+    heading: Konto erstellen
+    submit: Registrieren
+    login_link: Ich habe bereits ein Konto
+
+# Password strength requirement labels (AuthKit sets translation_domain on the field)
+requirement.min_length: 'Mindestens %count% Zeichen'
+requirement.max_length: 'Höchstens %count% Zeichen'
+requirement.lowercase: 'Mindestens ein Kleinbuchstabe'
+requirement.uppercase: 'Mindestens ein Großbuchstabe'
+requirement.digit: 'Mindestens eine Zahl'
+requirement.special: 'Mindestens ein Sonderzeichen'
+requirement.no_whitespace: 'Keine Leerzeichen erlaubt'
+requirement.not_contain: 'Darf keinen verbotenen Text enthalten'
+requirement.min_unique_chars: 'Mindestens %count% unterschiedliche Zeichen'
+requirement.regex: 'Muss dem erforderlichen Muster entsprechen'
+password_strength.invalid: 'Das Passwort erfüllt die Anforderungen nicht (%missing%).'
+generator.button: 'Passwort generieren'
+generator.modal_title: 'Vorgeschlagene Passwörter'
+generator.modal_hint: 'Diese Passwörter entsprechen Ihrer aktuellen Richtlinie. Kopieren oder übernehmen Sie eines.'
+generator.copy: 'Kopieren'
+generator.copied: 'Kopiert!'
+generator.use_password: 'Dieses Passwort verwenden'
+generator.close: 'Schließen'
+generator.failed: 'Es konnte kein gültiges Passwort erzeugt werden. Bitte erneut versuchen oder die Richtlinie lockern.'

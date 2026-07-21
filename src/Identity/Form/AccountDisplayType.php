@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Account display preferences: locale, theme, content width, issue panels.
+ * Account display preferences: locale, theme, layout density, motion, issue panels.
  */
 final class AccountDisplayType extends FormKitAbstractType
 {
@@ -52,6 +52,23 @@ final class AccountDisplayType extends FormKitAbstractType
                 'choice_translation_domain' => 'messages',
                 'required' => true,
             ]);
+            $this->addChoiceField('preferredUiDensity', [
+                'choices' => [
+                    'preferences.density_comfortable' => 'comfortable',
+                    'preferences.density_compact' => 'compact',
+                ],
+                'choice_translation_domain' => 'messages',
+                'required' => true,
+            ]);
+            $this->addChoiceField('preferredMotion', [
+                'choices' => [
+                    'preferences.motion_reduce' => 'reduce',
+                    'preferences.motion_full' => 'full',
+                ],
+                'choice_translation_domain' => 'messages',
+                'placeholder' => 'preferences.motion_system',
+                'required' => false,
+            ]);
         });
 
         $builder->add('preferredCollapsedIssuePanels', TagType::class, [
@@ -74,7 +91,7 @@ final class AccountDisplayType extends FormKitAbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'enabled_locales' => ['en', 'es'],
+            'enabled_locales' => ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt'],
         ]);
         $resolver->setAllowedTypes('enabled_locales', 'string[]');
     }

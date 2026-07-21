@@ -19,15 +19,34 @@ class PerfTransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, PerfTransaction::class);
     }
 
+    public function countForProject(Project $project, bool $nPlusOneOnly = false): int
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->andWhere('t.project = :project')
+            ->setParameter('project', $project);
+
+        if ($nPlusOneOnly) {
+            $qb->andWhere('t.nPlusOneCount > 0');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     /**
      * @return list<PerfTransaction>
      */
-    public function findForProject(Project $project, bool $nPlusOneOnly = false, int $limit = 100): array
-    {
+    public function findPageForProject(
+        Project $project,
+        bool $nPlusOneOnly,
+        int $limit,
+        int $offset,
+    ): array {
         $qb = $this->createQueryBuilder('t')
             ->andWhere('t.project = :project')
             ->setParameter('project', $project)
             ->orderBy('t.receivedAt', 'DESC')
+            ->setFirstResult($offset)
             ->setMaxResults($limit);
 
         if ($nPlusOneOnly) {

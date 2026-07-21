@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * For authenticated users, locale comes from the account preference (not URL _locale).
- * AuthKit routes keep locale_in_path (/en/login, /es/login).
+ * AuthKit routes keep locale_in_path (/en/login, /es/login, /de/login, …).
  *
  * Must run after the firewall (user available) and re-sync LocaleAware services
  * (Translator), because LocaleAwareListener already ran earlier with the default locale.

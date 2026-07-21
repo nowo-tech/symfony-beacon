@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Identity\Service;
 
-use Symfony\Component\HttpFoundation\Request;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\UserActionType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

@@ -6,6 +6,12 @@
         {% if app.user and app.user.preferredTheme %}
             <script>window.__BEACON_USER_THEME__ = {{ app.user.preferredTheme|json_encode|raw }};</script>
         {% endif %}
+        {% if app.user %}
+            <script>
+                window.__BEACON_USER_DENSITY__ = {{ app.user.preferredUiDensity|json_encode|raw }};
+                window.__BEACON_USER_MOTION__ = {{ app.user.preferredMotion|json_encode|raw }};
+            </script>
+        {% endif %}
         <script>
             window.__BEACON_ISSUE_PANEL_DEFAULTS__ = {{ (app.user ? app.user.preferredCollapsedIssuePanels : ['raw', 'extra'])|json_encode|raw }};
         </script>
@@ -23,7 +29,14 @@
     </head>
     <body class="page-shell{% if app.user %} page-shell--app{% endif %}">
         {% if app.user %}
-            <div class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}" data-app-shell data-content-width="{{ app.user.preferredContentWidth }}">
+            <div
+                class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}"
+                data-app-shell
+                data-content-width="{{ app.user.preferredContentWidth }}"
+                data-ui-density="{{ app.user.preferredUiDensity }}"
+                data-theme-sync-url="{{ path('account_theme') }}"
+                data-theme-sync-token="{{ csrf_token('account_theme') }}"
+            >
                 <header class="app-header">
                     <div class="app-header__start">
                         <button

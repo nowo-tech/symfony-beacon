@@ -28,6 +28,22 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h2', 'Iniciar sesión');
     }
 
+    public function testGermanLoginPage(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/de/login');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h2', 'Anmelden');
+    }
+
+    public function testFrenchLoginPage(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/fr/login');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h2', 'Connexion');
+    }
+
     public function testRegisterPageAvailableWhenNoUsers(): void
     {
         $client = self::createClient();

@@ -93,7 +93,7 @@ Features are specified under `specs/` before large changes. That matches an open
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
-| `Analytics` | Daily aggregates (table; charts/filters: `025`) | Read models derived from ingest; Phase 5 backlog in [ROADMAP](ROADMAP.md) |
+| `Analytics` | Daily aggregates + period charts/filters (`025`) | Read models from `DailyProjectStat`; filtered errors from `Event` |
 | `Notifications` | Slack / HTTP webhook destinations | Outbound alerts after ingest |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal | Cross-cutting presentation |
 

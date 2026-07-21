@@ -6,7 +6,8 @@ import "datatables.net-responsive-dt/css/responsive.dataTables.min.css";
 
 /**
  * DataTables for issues index — responsive layout only.
- * Sorting and paging are server-side (filter form + query string).
+ * Sorting and paging are ALWAYS server-side (filter form + query string).
+ * Never enable DataTables paging/searching/ordering (paging: false).
  *
  * Controller lives on a stable wrapper (not the <table>): DataTables wraps/moves
  * the table node on init, which would otherwise Stimulus-disconnect/reconnect.

@@ -25,6 +25,8 @@ class SiteAppearance implements AuditableInterface
     public const DEFAULT_ACCENT_DEEP = '#134736';
     public const DEFAULT_ACCENT_DARK = '#4aad7f';
     public const DEFAULT_ACCENT_DEEP_DARK = '#6bc49a';
+    public const DEFAULT_DANGER = '#b42318';
+    public const DEFAULT_DANGER_DARK = '#f97066';
 
     #[ORM\Id]
     #[ORM\Column]
@@ -47,6 +49,12 @@ class SiteAppearance implements AuditableInterface
 
     #[ORM\Column(length: 7)]
     private string $accentDeepColorDark = self::DEFAULT_ACCENT_DEEP_DARK;
+
+    #[ORM\Column(length: 7)]
+    private string $dangerColor = self::DEFAULT_DANGER;
+
+    #[ORM\Column(length: 7)]
+    private string $dangerColorDark = self::DEFAULT_DANGER_DARK;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -138,6 +146,30 @@ class SiteAppearance implements AuditableInterface
         return $this;
     }
 
+    public function getDangerColor(): string
+    {
+        return $this->dangerColor;
+    }
+
+    public function setDangerColor(string $dangerColor): self
+    {
+        $this->dangerColor = strtolower(trim($dangerColor));
+
+        return $this;
+    }
+
+    public function getDangerColorDark(): string
+    {
+        return $this->dangerColorDark;
+    }
+
+    public function setDangerColorDark(string $dangerColorDark): self
+    {
+        $this->dangerColorDark = strtolower(trim($dangerColorDark));
+
+        return $this;
+    }
+
     public function resetToDefaults(): self
     {
         $this->brandName = self::DEFAULT_BRAND_NAME;
@@ -146,6 +178,8 @@ class SiteAppearance implements AuditableInterface
         $this->accentDeepColor = self::DEFAULT_ACCENT_DEEP;
         $this->accentColorDark = self::DEFAULT_ACCENT_DARK;
         $this->accentDeepColorDark = self::DEFAULT_ACCENT_DEEP_DARK;
+        $this->dangerColor = self::DEFAULT_DANGER;
+        $this->dangerColorDark = self::DEFAULT_DANGER_DARK;
 
         return $this;
     }

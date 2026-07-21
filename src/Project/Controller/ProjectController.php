@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
-use App\Identity\Entity\UserGroup;
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
@@ -209,7 +209,7 @@ final class ProjectController extends AbstractController
         $eventQuotaDaily = $this->parseOptionalNonNegativeInt($request->request->getString('event_quota_daily'));
 
         if (
-            in_array(false, [$retentionDays, $retentionMaxEvents, $ingestRateLimit, $eventQuotaDaily], true)
+            \in_array(false, [$retentionDays, $retentionMaxEvents, $ingestRateLimit, $eventQuotaDaily], true)
         ) {
             $this->addFlash('error', 'flash.project.governance_invalid');
 

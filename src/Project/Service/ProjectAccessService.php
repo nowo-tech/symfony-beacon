@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
-use Deprecated;
-use Symfony\Component\HttpFoundation\Request;
 use App\Identity\Entity\User;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
@@ -13,6 +11,8 @@ use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\ProjectRole;
+use Deprecated;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;

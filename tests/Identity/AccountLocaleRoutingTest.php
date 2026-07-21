@@ -55,4 +55,27 @@ final class AccountLocaleRoutingTest extends DatabaseWebTestCase
         $reloaded = $em->getRepository($user::class)->find($user->getId());
         self::assertSame('es', $reloaded?->getPreferredLocale());
     }
+
+    public function testLocaleSwitcherSupportsGerman(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('locale-de@example.com');
+        $user->setPreferredLocale('en');
+        self::getContainer()->get('doctrine')->getManager()->flush();
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/dashboard');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form[action$="/account/locale/de"]');
+        self::assertSelectorExists('form[action$="/account/locale/nl"]');
+        self::assertSelectorExists('form[action$="/account/locale/fr"]');
+        self::assertSelectorExists('form[action$="/account/locale/it"]');
+        self::assertSelectorExists('form[action$="/account/locale/pt"]');
+
+        $form = $crawler->filter('form[action$="/account/locale/de"]')->form();
+        $client->submit($form);
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.locale-switcher__code', 'DE');
+    }
 }

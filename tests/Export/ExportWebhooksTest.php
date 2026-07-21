@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Export;
 
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
@@ -18,6 +17,7 @@ use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;

@@ -29,12 +29,24 @@ common:
     yes: 'yes'
     na: n/a
     unknown: unknown
+pagination:
+    showing: Showing %from%–%to% of %total%
+    nav: Table pages
+    previous: Previous
+    next: Next
+    per_page: Rows per page
+    per_page_option: '%count% / page'
 toast:
     dismiss: Dismiss
 locale:
     nav: Language
     en: English
     es: Español
+    de: Deutsch
+    nl: Nederlands
+    fr: Français
+    it: Italiano
+    pt: Português
 theme:
     day: Day
     night: Night
@@ -423,8 +435,32 @@ performance:
         description: Description
 analytics:
     title: Analytics
-    intro: Daily error, transaction, and N+1 counts (last 30 days)
-    empty: No stats yet. Ingest events to populate this chart data.
+    intro: Daily error, transaction, and N+1 volume — chart and table for the selected period
+    empty: No volume in this period yet. Ingest events to populate analytics.
+    timezone_help: Daily buckets use UTC calendar days.
+    filtered_note: Filters are applied to error events only (transactions and N+1 are hidden while filters are active).
+    chart:
+        aria: Analytics volume over time
+    period:
+        label: Period
+        custom: Custom range
+        from: From
+        to: To
+        days_7: 7 days
+        days_14: 14 days
+        days_30: 30 days
+        days_90: 90 days
+        invalid: Unknown period; showing the last 30 days.
+        custom_required: Choose both from and to dates for a custom range.
+        invalid_date: Use dates as YYYY-MM-DD.
+        end_before_start: The end date must be on or after the start date.
+        too_long: Custom ranges cannot exceed 366 days.
+    filter:
+        environment: Environment
+        release: Release
+        level: Level
+        apply: Apply
+        clear: Clear
     col:
         date: Date
         errors: Errors
@@ -432,10 +468,11 @@ analytics:
         nplus1_groups: N+1 groups
 appearance:
     title: Appearance
-    intro: Customize brand name and accent colors for this Beacon instance. Only administrators can change these settings.
+    intro: Customize brand name, accent colors, and danger colors for this Beacon instance. Only administrators can change these settings.
     section:
         light: Light theme accents
         dark: Dark theme accents
+        danger: Danger / error colors
     submit: Save appearance
     reset: Reset to defaults
 site_appearance:
@@ -463,6 +500,14 @@ site_appearance:
         label: Accent hover (dark)
         placeholder: '#6bc49a'
         help: Lighter accent for hover states in dark mode.
+    danger_color:
+        label: Danger
+        placeholder: '#b42318'
+        help: Error / destructive accent in light mode.
+    danger_color_dark:
+        label: Danger (dark)
+        placeholder: '#f97066'
+        help: Error / destructive accent in dark mode.
     color:
         invalid: 'Use a hex color like #1f6f54.'
 users:
@@ -591,7 +636,7 @@ preferences:
         submit: Update password
     display:
         title: Display
-        intro: Choose language, theme, content width, and which issue panels start collapsed.
+        intro: Choose language, theme, layout density, motion, content width, and which issue panels start collapsed.
         submit: Save display settings
         pwa_title: Install app
         pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
@@ -611,6 +656,11 @@ preferences:
     theme_dark: Night
     width_content: Content (centered)
     width_full: Full width
+    density_comfortable: Comfortable
+    density_compact: Compact
+    motion_system: System (follow device)
+    motion_reduce: Reduce motion
+    motion_full: Full motion
     issue_panels_collapsed: Issue panels collapsed by default
     issue_panels_help: Checked panels start collapsed on issue and event detail pages. Your browser remembers manual open/close overrides.
     issue_panels_browser: Browser panel layout
@@ -658,6 +708,14 @@ user_preferences:
         label: Content width
         placeholder: Content
         help: Centered content column, or stretch the main area full width.
+    preferred_ui_density:
+        label: UI density
+        placeholder: Comfortable
+        help: Comfortable spacing, or a more compact operator layout.
+    preferred_motion:
+        label: Motion
+        placeholder: System
+        help: Follow the device preference, reduce animations, or keep full motion.
     current_password:
         label: Current password
         help: Required only when setting a new password.

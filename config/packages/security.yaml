@@ -43,11 +43,11 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/(login|register|logout)$
       roles: PUBLIC_ACCESS
-    - path: ^/(en|es)/login
+    - path: ^/(en|es|de|nl|fr|it|pt)/login
       roles: PUBLIC_ACCESS
-    - path: ^/(en|es)/register
+    - path: ^/(en|es|de|nl|fr|it|pt)/register
       roles: PUBLIC_ACCESS
-    - path: ^/(en|es)/logout
+    - path: ^/(en|es|de|nl|fr|it|pt)/logout
       roles: PUBLIC_ACCESS
     - path: ^/api/\d+/envelope
       roles: PUBLIC_ACCESS

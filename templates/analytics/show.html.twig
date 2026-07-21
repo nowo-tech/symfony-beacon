@@ -5,32 +5,108 @@
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'analytics'} %}
 
-<p class="mb-6 text-[var(--color-ink)]/65">{{ 'analytics.intro'|trans }}</p>
+<p class="mb-4 text-[var(--color-ink)]/65">{{ 'analytics.intro'|trans }}</p>
+<p class="mb-6 text-sm text-[var(--color-ink)]/55">{{ 'analytics.timezone_help'|trans }}</p>
 
-{% if stats is empty %}
-    <div class="panel text-[var(--color-ink)]/70">{{ 'analytics.empty'|trans }}</div>
-{% else %}
-    <div class="panel overflow-x-auto p-0">
-        <table class="w-full text-left text-sm">
-            <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
-                <tr>
-                    <th class="px-4 py-3">{{ 'analytics.col.date'|trans }}</th>
-                    <th class="px-4 py-3">{{ 'analytics.col.errors'|trans }}</th>
+<form method="get" action="{{ path('analytics_show', {id: project.uuid}) }}" class="analytics-filters panel mb-6">
+    <div class="analytics-filters__presets" role="group" aria-label="{{ 'analytics.period.label'|trans }}">
+        {% for p in presets %}
+            {% set preset_query = filter_query|merge({period: p}) %}
+            {% set preset_query = preset_query|filter((v, k) => k != 'from' and k != 'to') %}
+            <a
+                class="btn-ghost analytics-filters__preset{% if period == p %} is-active{% endif %}"
+                href="{{ path('analytics_show', {id: project.uuid}|merge(preset_query)) }}"
+            >{{ ('analytics.period.days_' ~ p)|trans }}</a>
+        {% endfor %}
+        <span class="analytics-filters__preset-label">{{ 'analytics.period.custom'|trans }}</span>
+    </div>
+
+    <div class="analytics-filters__row">
+        <label class="analytics-filters__field">
+            <span>{{ 'analytics.period.from'|trans }}</span>
+            <input type="date" name="from" value="{{ from|date('Y-m-d') }}" class="input">
+        </label>
+        <label class="analytics-filters__field">
+            <span>{{ 'analytics.period.to'|trans }}</span>
+            <input type="date" name="to" value="{{ to|date('Y-m-d') }}" class="input">
+        </label>
+        <input type="hidden" name="period" value="custom">
+        <label class="analytics-filters__field">
+            <span>{{ 'analytics.filter.environment'|trans }}</span>
+            <input type="text" name="environment" value="{{ environment }}" class="input" placeholder="prod" autocomplete="off">
+        </label>
+        <label class="analytics-filters__field">
+            <span>{{ 'analytics.filter.release'|trans }}</span>
+            <input type="text" name="release" value="{{ release }}" class="input" placeholder="1.2.0" autocomplete="off">
+        </label>
+        <label class="analytics-filters__field">
+            <span>{{ 'analytics.filter.level'|trans }}</span>
+            <input type="text" name="level" value="{{ level }}" class="input" placeholder="error" autocomplete="off">
+        </label>
+        <div class="analytics-filters__actions">
+            <button type="submit" class="btn-primary">{{ 'analytics.filter.apply'|trans }}</button>
+            <a class="btn-ghost" href="{{ path('analytics_show', {id: project.uuid}) }}">{{ 'analytics.filter.clear'|trans }}</a>
+        </div>
+    </div>
+</form>
+
+{% if filtered %}
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'analytics.filtered_note'|trans }}</p>
+{% endif %}
+
+<div
+    class="panel analytics-chart mb-6"
+    data-controller="analytics-chart"
+    data-analytics-chart-points-value="{{ chart_points|json_encode|e('html_attr') }}"
+    data-analytics-chart-filtered-value="{{ filtered ? 'true' : 'false' }}"
+    data-analytics-chart-label-errors-value="{{ 'analytics.col.errors'|trans|e('html_attr') }}"
+    data-analytics-chart-label-transactions-value="{{ 'analytics.col.transactions'|trans|e('html_attr') }}"
+    data-analytics-chart-label-nplus1-value="{{ 'analytics.col.nplus1_groups'|trans|e('html_attr') }}"
+>
+    <div class="analytics-chart__canvas-wrap">
+        <canvas data-analytics-chart-target="canvas" aria-label="{{ 'analytics.chart.aria'|trans }}" role="img"></canvas>
+    </div>
+    {% if not has_volume %}
+        <p class="analytics-chart__empty text-sm text-[var(--color-ink)]/60">{{ 'analytics.empty'|trans }}</p>
+    {% endif %}
+</div>
+
+<div class="panel overflow-x-auto p-0">
+    <table class="w-full text-left text-sm">
+        <thead class="border-b border-[var(--color-sand)] bg-[var(--color-paper)] text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
+            <tr>
+                <th class="px-4 py-3">{{ 'analytics.col.date'|trans }}</th>
+                <th class="px-4 py-3">{{ 'analytics.col.errors'|trans }}</th>
+                {% if not filtered %}
                     <th class="px-4 py-3">{{ 'analytics.col.transactions'|trans }}</th>
                     <th class="px-4 py-3">{{ 'analytics.col.nplus1_groups'|trans }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in stats %}
-                    <tr class="border-b border-[var(--color-sand)] last:border-0">
-                        <td class="px-4 py-3">{{ row.statDate|date('Y-m-d') }}</td>
-                        <td class="px-4 py-3">{{ row.errorCount }}</td>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in stats %}
+                <tr class="border-b border-[var(--color-sand)] last:border-0">
+                    <td class="px-4 py-3">{{ row.date|date('Y-m-d') }}</td>
+                    <td class="px-4 py-3">{{ row.errorCount }}</td>
+                    {% if not filtered %}
                         <td class="px-4 py-3">{{ row.transactionCount }}</td>
                         <td class="px-4 py-3">{{ row.nPlusOneCount }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-4 py-3 text-[var(--color-ink)]/60" colspan="{{ filtered ? 2 : 4 }}">{{ 'analytics.empty'|trans }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include 'shared/_table_pagination.html.twig' with {
+        pagination: pagination,
+        item_count: stats|length,
+        route: 'analytics_show',
+        route_params: {id: project.uuid},
+        query: filter_query,
+        nav_label: 'pagination.nav'
+    } %}
+</div>
 {% endblock %}

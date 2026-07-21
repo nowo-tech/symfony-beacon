@@ -63,9 +63,35 @@ function applyTheme(theme: Theme, persist: boolean): void {
     } catch {
       // Ignore storage errors.
     }
+    syncThemeToAccount(theme);
   }
   syncThemeControls(theme);
   syncCookieConsentTheme(theme);
+}
+
+function syncThemeToAccount(theme: Theme): void {
+  const shell = document.querySelector<HTMLElement>('[data-app-shell][data-theme-sync-url]');
+  if (!(shell instanceof HTMLElement)) {
+    return;
+  }
+  const url = shell.dataset.themeSyncUrl;
+  const token = shell.dataset.themeSyncToken;
+  if (!url || !token) {
+    return;
+  }
+
+  void fetch(url, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-CSRF-TOKEN': token,
+    },
+    body: JSON.stringify({ theme }),
+  }).catch(() => {
+    // Preference remains in localStorage if the network call fails.
+  });
 }
 
 function initTheme(): void

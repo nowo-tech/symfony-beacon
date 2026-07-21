@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
-use App\Identity\Entity\UserGroupMembership;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
+use App\Identity\Entity\UserGroupMembership;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.10.2 to the next release](#upgrading-from-0102-to-the-next-release)
+- [Upgrading from 0.11.0 to the next release](#upgrading-from-0110-to-the-next-release)
+- [Upgrading from 0.10.2 to 0.11.0](#upgrading-from-0102-to-0110)
 - [Upgrading from 0.10.1 to 0.10.2](#upgrading-from-0101-to-0102)
 - [Upgrading from 0.10.0 to 0.10.1](#upgrading-from-0100-to-0101)
 - [Upgrading from 0.9.4 to 0.10.0](#upgrading-from-094-to-0100)
@@ -27,9 +28,45 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.10.2 to the next release
+## Upgrading from 0.11.0 to the next release
 
-No steps yet. When the next release ships, document migrations and breaking changes here.
+No upgrade notes yet.
+
+## Upgrading from 0.10.2 to 0.11.0
+
+Pull, install, migrate, and rebuild frontend assets:
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+Migration `Version20260721170000`: `preferred_ui_density` / `preferred_motion` on `app_user`; `danger_color` / `danger_color_dark` on `site_appearance`.
+
+Frontend: `chart.js` is a new dependency — run `pnpm install` (or rely on the image/`make vite-build` path) before building assets.
+
+### Appearance / display
+
+- Account → Display: UI density (comfortable / compact) and motion (system / reduce / full).
+- Administration → Appearance: danger / error color pickers for light and dark (`--beacon-alert`).
+- Theme toggle for signed-in users writes `preferred_theme` via `POST /account/theme`.
+
+### Analytics charts (`025`)
+
+Project Analytics (`/projects/{uuid}/analytics`) now includes:
+
+- Chart.js time series (errors; transactions / N+1 when unfiltered)
+- Period presets `7` / `14` / `30` / `90` and custom `from`/`to` (`Y-m-d`, UTC days, max **366** days)
+- Optional filters: `environment`, `release`, `level` (error events only; tx/N+1 hidden while filters are active)
+- Shareable query string; invalid custom ranges flash a warning and fall back to 30 days
+- Daily table remains (zero-filled calendar days for the selected window)
+
+### Locales and pagination
+
+- Enabled locales now include `de`, `nl`, `fr`, `it`, `pt` (with AuthKit / cookie-consent catalogues). Re-run `make seed` if demo menus/breadcrumbs should pick up locale labels.
+- Issues, Performance, and Analytics lists share server-side `page` / `per_page` pagination.
 
 ## Upgrading from 0.10.1 to 0.10.2
 
@@ -617,7 +654,7 @@ Update bookmarks, reverse proxies, and any hard-coded links to use `/dashboard` 
 
 ### 4. i18n
 
-- `framework.enabled_locales` and `nowo_auth_kit.enabled_locales` must stay in sync (`en`, `es` by default).
+- `framework.enabled_locales` and `nowo_auth_kit.enabled_locales` must stay in sync (`en`, `es`, `de`, `nl`, `fr`, `it`, `pt` by default).
 - Security `access_control` patterns must include every enabled locale prefix (see [`CONTRIBUTING.md`](CONTRIBUTING.md)).
 - Locale switcher is a top-right dropdown on AuthKit layouts.
 

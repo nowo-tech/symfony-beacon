@@ -10,7 +10,9 @@ use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -203,5 +205,82 @@ class EventRepository extends ServiceEntityRepository
         $result = $qb->getQuery()->getResult();
 
         return $result;
+    }
+
+    /**
+     * Daily error (event) counts for Analytics filters. UTC calendar days.
+     *
+     * @return array<string, int> keyed by Y-m-d
+     */
+    public function countErrorsByDay(
+        Project $project,
+        DateTimeImmutable $from,
+        DateTimeImmutable $to,
+        ?string $environment = null,
+        ?string $release = null,
+        ?string $level = null,
+    ): array {
+        $projectId = $project->getId();
+        if (null === $projectId) {
+            return [];
+        }
+
+        $fromStart = $from->setTime(0, 0);
+        $toExclusive = $to->setTime(0, 0)->modify('+1 day');
+
+        $sql = <<<'SQL'
+            SELECT DATE(e.received_at) AS day_key, COUNT(e.id) AS cnt
+            FROM event e
+            INNER JOIN issue i ON e.issue_id = i.id
+            WHERE i.project_id = :projectId
+              AND e.received_at >= :fromStart
+              AND e.received_at < :toExclusive
+            SQL;
+
+        $params = [
+            'projectId' => $projectId,
+            'fromStart' => $fromStart->format('Y-m-d H:i:s.u'),
+            'toExclusive' => $toExclusive->format('Y-m-d H:i:s.u'),
+        ];
+        $types = [
+            'projectId' => ParameterType::INTEGER,
+            'fromStart' => ParameterType::STRING,
+            'toExclusive' => ParameterType::STRING,
+        ];
+
+        if (null !== $environment && '' !== $environment) {
+            $sql .= ' AND e.environment = :environment';
+            $params['environment'] = $environment;
+            $types['environment'] = ParameterType::STRING;
+        }
+        if (null !== $release && '' !== trim($release)) {
+            $sql .= ' AND e.release_version = :release';
+            $params['release'] = trim($release);
+            $types['release'] = ParameterType::STRING;
+        }
+        if (null !== $level && '' !== $level) {
+            $sql .= ' AND i.level = :level';
+            $params['level'] = $level;
+            $types['level'] = ParameterType::STRING;
+        }
+
+        $sql .= ' GROUP BY day_key ORDER BY day_key ASC';
+
+        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative($sql, $params, $types);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $key = (string) ($row['day_key'] ?? '');
+            if ('' === $key) {
+                continue;
+            }
+            // MySQL may return DateTime objects depending on platform config.
+            if ($row['day_key'] instanceof DateTimeInterface) {
+                $key = $row['day_key']->format('Y-m-d');
+            }
+            $map[$key] = (int) $row['cnt'];
+        }
+
+        return $map;
     }
 }

@@ -7,12 +7,12 @@
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <p class="text-[var(--color-ink)]/65">{{ 'performance.intro'|trans }}</p>
-    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid, nplus1: nPlusOneOnly ? 0 : 1}) }}">
+    <a class="btn-ghost no-underline" href="{{ path('performance_index', {id: project.uuid, nplus1: nPlusOneOnly ? 0 : 1, per_page: pagination.per_page}) }}">
         {% if nPlusOneOnly %}{{ 'performance.show_all'|trans }}{% else %}{{ 'performance.nplus1_only'|trans }}{% endif %}
     </a>
 </div>
 
-{% if transactions is empty %}
+{% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70">{{ 'performance.empty'|trans }}</div>
 {% else %}
     <div class="panel overflow-x-auto p-0">
@@ -46,6 +46,14 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% include 'shared/_table_pagination.html.twig' with {
+            pagination: pagination,
+            item_count: transactions|length,
+            route: 'performance_index',
+            route_params: {id: project.uuid},
+            query: nPlusOneOnly ? {nplus1: 1} : {},
+            nav_label: 'pagination.nav'
+        } %}
     </div>
 {% endif %}
 {% endblock %}

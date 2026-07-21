@@ -1,0 +1,29 @@
+login:
+    heading: Connexion
+    submit: Se connecter
+    register_link: Créer le premier compte
+register:
+    heading: Créer un compte
+    submit: S'inscrire
+    login_link: J'ai déjà un compte
+
+# Password strength requirement labels (AuthKit sets translation_domain on the field)
+requirement.min_length: 'Au moins %count% caractères'
+requirement.max_length: 'Au plus %count% caractères'
+requirement.lowercase: 'Au moins une lettre minuscule'
+requirement.uppercase: 'Au moins une lettre majuscule'
+requirement.digit: 'Au moins un chiffre'
+requirement.special: 'Au moins un caractère spécial'
+requirement.no_whitespace: 'Espaces non autorisés'
+requirement.not_contain: 'Ne doit pas contenir de texte interdit'
+requirement.min_unique_chars: 'Au moins %count% caractères uniques'
+requirement.regex: 'Doit correspondre au modèle requis'
+password_strength.invalid: 'Le mot de passe ne respecte pas les exigences (%missing%).'
+generator.button: 'Générer un mot de passe'
+generator.modal_title: 'Mots de passe suggérés'
+generator.modal_hint: 'Ces mots de passe respectent votre politique actuelle. Copiez-en un ou appliquez-le au champ.'
+generator.copy: 'Copier'
+generator.copied: 'Copié !'
+generator.use_password: 'Utiliser ce mot de passe'
+generator.close: 'Fermer'
+generator.failed: 'Impossible de générer un mot de passe valide. Réessayez ou assouplissez la politique.'

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
-use App\Project\Access\ProjectAccess;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
@@ -22,11 +21,13 @@ use App\Issues\Repository\IssueSavedViewRepository;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
 use App\Notifications\Service\NotificationDispatcher;
+use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
+use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -104,12 +105,6 @@ final class IssueController extends AbstractController
             $request->query->getString('dir') ?: null,
         );
 
-        $perPage = $request->query->getInt('per_page', 25);
-        if (!\in_array($perPage, [10, 25, 50, 100], true)) {
-            $perPage = 25;
-        }
-        $page = max(1, $request->query->getInt('page', 1));
-
         $q = $request->query->getString('q') ?: null;
         $level = $request->query->getString('level') ?: null;
         $environment = $request->query->getString('environment') ?: null;
@@ -135,9 +130,9 @@ final class IssueController extends AbstractController
             url: $url,
             user: $userFilter,
         );
-        $totalPages = max(1, (int) ceil($total / $perPage));
-        $page = min($page, $totalPages);
-        $offset = ($page - 1) * $perPage;
+        $pagination = PagePagination::fromRequest($request, $total);
+        $page = $pagination['page'];
+        $perPage = $pagination['per_page'];
 
         $issues = $this->issueRepository->search(
             $project,
@@ -151,7 +146,7 @@ final class IssueController extends AbstractController
             $unassignedOnly,
             $sort,
             $perPage,
-            $offset,
+            $pagination['offset'],
             tag: $tag,
             url: $url,
             user: $userFilter,
@@ -173,12 +168,7 @@ final class IssueController extends AbstractController
             'sort' => $sort,
             'compareResult' => $compareResult,
             'savedViews' => $savedViews,
-            'pagination' => [
-                'page' => $page,
-                'per_page' => $perPage,
-                'total' => $total,
-                'total_pages' => $totalPages,
-            ],
+            'pagination' => $pagination,
             'filters' => [
                 'q' => $request->query->getString('q'),
                 'level' => $request->query->getString('level'),

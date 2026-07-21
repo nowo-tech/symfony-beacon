@@ -26,9 +26,9 @@ final class AccountLocaleController extends AbstractController
     /**
      * Persist preferred locale and redirect back (strips `_locale` query params).
      *
-     * @param string $locale Enabled locale code (`en` or `es`)
+     * @param string $locale Enabled locale code (e.g. en, es, de, nl, fr, it, pt)
      */
-    #[Route('/account/locale/{locale}', name: 'account_locale_switch', requirements: ['locale' => 'en|es'], methods: ['POST'])]
+    #[Route('/account/locale/{locale}', name: 'account_locale_switch', requirements: ['locale' => 'en|es|de|nl|fr|it|pt'], methods: ['POST'])]
     public function switch(string $locale, Request $request): RedirectResponse
     {
         /** @var User $user */

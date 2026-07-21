@@ -34,8 +34,8 @@ final readonly class DashboardMenuDemoSeeder
             'Dashboard',
             'dashboard-menu-navigation',
             [
-                [10, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos'], 'dashboard_home', null],
-                [30, 'API docs', ['en' => 'API docs', 'es' => 'Docs API'], 'app.swagger_ui', null],
+                [10, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos', 'de' => 'Projekte', 'nl' => 'Projecten', 'fr' => 'Projets', 'it' => 'Progetti', 'pt' => 'Projetos'], 'dashboard_home', null],
+                [30, 'API docs', ['en' => 'API docs', 'es' => 'Docs API', 'de' => 'API-Doku', 'nl' => 'API-docs', 'fr' => 'Docs API', 'it' => 'Documentazione API', 'pt' => 'Docs da API'], 'app.swagger_ui', null],
             ],
         );
 
@@ -44,9 +44,9 @@ final readonly class DashboardMenuDemoSeeder
             'Preferences',
             'preferences-menu-navigation',
             [
-                [10, 'Profile', ['en' => 'Profile', 'es' => 'Perfil'], 'account_profile', null],
-                [20, 'Security', ['en' => 'Security', 'es' => 'Seguridad'], 'account_security', null],
-                [30, 'Display', ['en' => 'Display', 'es' => 'Interfaz'], 'account_display', null],
+                [10, 'Profile', ['en' => 'Profile', 'es' => 'Perfil', 'de' => 'Profil', 'nl' => 'Profiel', 'fr' => 'Profil', 'it' => 'Profilo', 'pt' => 'Perfil'], 'account_profile', null],
+                [20, 'Security', ['en' => 'Security', 'es' => 'Seguridad', 'de' => 'Sicherheit', 'nl' => 'Beveiliging', 'fr' => 'Sécurité', 'it' => 'Sicurezza', 'pt' => 'Segurança'], 'account_security', null],
+                [30, 'Display', ['en' => 'Display', 'es' => 'Interfaz', 'de' => 'Anzeige', 'nl' => 'Weergave', 'fr' => 'Affichage', 'it' => 'Visualizzazione', 'pt' => 'Interface'], 'account_display', null],
             ],
         ) || $changed;
 
@@ -55,13 +55,13 @@ final readonly class DashboardMenuDemoSeeder
             'Administration',
             'administration-menu-navigation',
             [
-                [10, 'Overview', ['en' => 'Overview', 'es' => 'Resumen'], 'admin_hub', 'ROLE_ADMIN'],
-                [20, 'Users', ['en' => 'Users', 'es' => 'Usuarios'], 'admin_users', 'ROLE_ADMIN'],
-                [25, 'Groups', ['en' => 'Groups', 'es' => 'Grupos'], 'admin_groups', 'ROLE_ADMIN'],
-                [27, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos'], 'admin_projects', 'ROLE_ADMIN'],
-                [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia'], 'settings_appearance', 'ROLE_ADMIN'],
-                [40, 'Menus', ['en' => 'Menus', 'es' => 'Menús'], 'nowo_dashboard_menu_dashboard_index', 'ROLE_ADMIN'],
-                [50, 'Breadcrumbs', ['en' => 'Breadcrumbs', 'es' => 'Migas'], 'nowo_breadcrumb_kit_dashboard_collections_index', 'ROLE_ADMIN'],
+                [10, 'Overview', ['en' => 'Overview', 'es' => 'Resumen', 'de' => 'Übersicht', 'nl' => 'Overzicht', 'fr' => 'Aperçu', 'it' => 'Panoramica', 'pt' => 'Resumo'], 'admin_hub', 'ROLE_ADMIN'],
+                [20, 'Users', ['en' => 'Users', 'es' => 'Usuarios', 'de' => 'Benutzer', 'nl' => 'Gebruikers', 'fr' => 'Utilisateurs', 'it' => 'Utenti', 'pt' => 'Utilizadores'], 'admin_users', 'ROLE_ADMIN'],
+                [25, 'Groups', ['en' => 'Groups', 'es' => 'Grupos', 'de' => 'Gruppen', 'nl' => 'Groepen', 'fr' => 'Groupes', 'it' => 'Gruppi', 'pt' => 'Grupos'], 'admin_groups', 'ROLE_ADMIN'],
+                [27, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos', 'de' => 'Projekte', 'nl' => 'Projecten', 'fr' => 'Projets', 'it' => 'Progetti', 'pt' => 'Projetos'], 'admin_projects', 'ROLE_ADMIN'],
+                [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia', 'de' => 'Erscheinungsbild', 'nl' => 'Weergave', 'fr' => 'Apparence', 'it' => 'Aspetto', 'pt' => 'Aparência'], 'settings_appearance', 'ROLE_ADMIN'],
+                [40, 'Menus', ['en' => 'Menus', 'es' => 'Menús', 'de' => 'Menüs', 'nl' => 'Menu’s', 'fr' => 'Menus', 'it' => 'Menu', 'pt' => 'Menus'], 'nowo_dashboard_menu_dashboard_index', 'ROLE_ADMIN'],
+                [50, 'Breadcrumbs', ['en' => 'Breadcrumbs', 'es' => 'Migas', 'de' => 'Brotkrumen', 'nl' => 'Broodkruimels', 'fr' => 'Fil d’Ariane', 'it' => 'Breadcrumb', 'pt' => 'Navegação'], 'nowo_breadcrumb_kit_dashboard_collections_index', 'ROLE_ADMIN'],
             ],
         ) || $changed;
 

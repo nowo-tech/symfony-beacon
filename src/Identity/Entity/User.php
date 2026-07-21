@@ -72,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\OneToMany(targetEntity: PasswordHistory::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $passwordHistory;
 
-    /** Preferred UI locale (`en` / `es`); null = follow request / browser. */
+    /** Preferred UI locale (`en` / `es` / `de` / `nl` / `fr` / `it` / `pt`); null = follow request / browser. */
     #[ORM\Column(length: 8, nullable: true)]
     private ?string $preferredLocale = null;
 
@@ -83,6 +83,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     /** Main content width: `content` (centered max-width) or `full`. Null = content. */
     #[ORM\Column(length: 8, nullable: true)]
     private ?string $preferredContentWidth = null;
+
+    /** UI density: `comfortable` (default) or `compact`. Null = comfortable. */
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $preferredUiDensity = null;
+
+    /**
+     * Motion preference: null = follow OS, `reduce` = minimize motion, `full` = allow motion.
+     */
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $preferredMotion = null;
 
     /**
      * Issue/event panel ids that should start collapsed (browser can override via localStorage).
@@ -288,6 +298,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
             $normalized = null;
         }
         $this->preferredContentWidth = $normalized;
+
+        return $this;
+    }
+
+    public function getPreferredUiDensity(): string
+    {
+        return 'compact' === $this->preferredUiDensity ? 'compact' : 'comfortable';
+    }
+
+    public function setPreferredUiDensity(?string $preferredUiDensity): self
+    {
+        $normalized = null !== $preferredUiDensity ? strtolower(trim($preferredUiDensity)) : null;
+        if (!\in_array($normalized, ['comfortable', 'compact'], true)) {
+            $normalized = null;
+        }
+        $this->preferredUiDensity = $normalized;
+
+        return $this;
+    }
+
+    public function getPreferredMotion(): ?string
+    {
+        return $this->preferredMotion;
+    }
+
+    public function setPreferredMotion(?string $preferredMotion): self
+    {
+        $normalized = null !== $preferredMotion ? strtolower(trim($preferredMotion)) : null;
+        if (null !== $normalized && !\in_array($normalized, ['reduce', 'full'], true)) {
+            $normalized = null;
+        }
+        $this->preferredMotion = $normalized;
 
         return $this;
     }
