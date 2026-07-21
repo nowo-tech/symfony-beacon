@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Stored Envelope event (full payload plus promoted context columns).
  *
- * {@see project} is denormalized from the parent issue so event_id uniqueness
+ * {@see Project} is denormalized from the parent issue so event_id uniqueness
  * and retention queries are scoped per tenant without always joining issue.
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]

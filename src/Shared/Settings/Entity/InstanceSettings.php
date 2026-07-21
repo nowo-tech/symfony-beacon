@@ -6,6 +6,7 @@ namespace App\Shared\Settings\Entity;
 
 use App\Identity\Entity\User;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Nowo\AuditKitBundle\Model\AuditableInterface;
 use Nowo\AuditKitBundle\Model\TimestampableTrait;
@@ -38,7 +39,7 @@ class InstanceSettings implements AuditableInterface
 
     /** When set, the first-run setup wizard is considered finished / dismissed. */
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $setupCompletedAt = null;
+    private ?DateTimeImmutable $setupCompletedAt = null;
 
     /** When true, members may receive Mercure live alerts for new issues. */
     #[ORM\Column(options: ['default' => false])]
@@ -152,7 +153,7 @@ class InstanceSettings implements AuditableInterface
         return $this;
     }
 
-    public function getSetupCompletedAt(): ?\DateTimeImmutable
+    public function getSetupCompletedAt(): ?DateTimeImmutable
     {
         return $this->setupCompletedAt;
     }
@@ -162,9 +163,9 @@ class InstanceSettings implements AuditableInterface
         return null !== $this->setupCompletedAt;
     }
 
-    public function markSetupCompleted(?\DateTimeImmutable $at = null): self
+    public function markSetupCompleted(?DateTimeImmutable $at = null): self
     {
-        $this->setupCompletedAt = $at ?? new \DateTimeImmutable();
+        $this->setupCompletedAt = $at ?? new DateTimeImmutable();
 
         return $this;
     }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Notifications;
 
-use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
+use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;

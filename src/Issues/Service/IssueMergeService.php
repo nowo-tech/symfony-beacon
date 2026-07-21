@@ -34,7 +34,7 @@ final readonly class IssueMergeService
      */
     public function assertCanMarkAsDuplicate(Issue $source, Issue $canonical): void
     {
-        if ($source->getId() !== null && $source->getId() === $canonical->getId()) {
+        if (null !== $source->getId() && $source->getId() === $canonical->getId()) {
             throw new InvalidArgumentException('cannot_merge_self');
         }
         if ($source->getUuid() === $canonical->getUuid()) {

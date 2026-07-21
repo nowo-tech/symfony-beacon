@@ -11,6 +11,6 @@ final class IssueRealtimeTopics
 {
     public static function forProject(string $projectUuid): string
     {
-        return sprintf('/projects/%s/issues', $projectUuid);
+        return \sprintf('/projects/%s/issues', $projectUuid);
     }
 }

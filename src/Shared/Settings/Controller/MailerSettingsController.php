@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Identity\Entity\User;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Settings\Form\InstanceMailerSettingsType;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

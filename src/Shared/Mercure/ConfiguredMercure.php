@@ -6,6 +6,7 @@ namespace App\Shared\Mercure;
 
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\Jwt\FactoryTokenProvider;
@@ -112,7 +113,7 @@ final class ConfiguredMercure implements ResetInterface
         $secret = $this->resolvedJwtSecret();
         $url = $this->resolvedUrl();
         if ('' === $secret || '' === $url) {
-            throw new \RuntimeException('Mercure is not configured.');
+            throw new RuntimeException('Mercure is not configured.');
         }
 
         /** @var non-empty-string $secret */
