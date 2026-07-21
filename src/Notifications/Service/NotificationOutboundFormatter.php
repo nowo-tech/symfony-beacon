@@ -117,7 +117,7 @@ final class NotificationOutboundFormatter
      */
     private function discordEmbed(array $payload, string $summary): array
     {
-        $embed = array_filter([
+        return array_filter([
             'title' => (string) ($payload['event'] ?? 'Beacon'),
             'description' => $summary,
             'url' => isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']
@@ -129,8 +129,6 @@ final class NotificationOutboundFormatter
                 'text' => true === ($payload['test'] ?? false) ? 'Beacon · sample send' : 'Beacon',
             ],
         ], static fn (mixed $v): bool => null !== $v && [] !== $v);
-
-        return $embed;
     }
 
     /**

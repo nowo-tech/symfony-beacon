@@ -13,42 +13,44 @@ Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **E
 
 Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
 
-> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Until Packagist publish, path-repo / VCS install works.
+> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Install from Packagist or VCS as documented in that repo.
 
 
 ## Features
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member` / `viewer`)
-- Password or **magic login** (`/login/magic`); project **share links** for time-limited viewer access
+- Password or **magic login** (`/login/magic`, requires encrypted instance Mailer); project **share links** for time-limited viewer access (project-wide or issue-scoped)
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
-- **i18n** auth routes (`/en/…`, `/es/…`), remember me, password toggle + strength on register, password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
+- **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` (AuthKit paths `/{locale}/…`); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
-- Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs)
+- Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, **instance Mailer DSN**)
+- **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
-- Account Display collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify)
+- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify)
 - Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests), **health** (Messenger + last delivery), and danger zone (clear history, **transfer ownership**, delete)
-- Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
+- Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history, **transfer ownership**, delete)
+- Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
-- `POST /api/{project_id}/envelope/` ingest (Envelope auth header / query / envelope `dsn`); per-project suspend + daily quota
+- `POST /api/{project_id}/envelope/` ingest (`X-Beacon-Auth` / envelope `dsn`; query auth **deprecated**); per-project suspend + daily quota; secret always required
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
-- Phase 5 product depth (v0.12.0): **threshold alerts**, **release health**, MySQL **FULLTEXT** issue search, notification **delivery history**, admin **project audit** timeline
-- v0.12.1: **encrypted instance Mailer**, richer account Display/Security/Profile, admin user/group audit meta
-- v0.12.2: **security hardening** (`045`–`052`), magic-login Mailer gate + sample send, channel-native notification tests — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next: ops overview, AuthKit migration, monthly quota; SSO Later)
-- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories — setup guides in Settings and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
+- **Release health** at `/projects/{uuid}/releases` (new-in-release counts + compare)
+- Operator **OpenAPI** panel at `/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
+- Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit** timeline, **encrypted Mailer**, **security hardening** (`045`–`052`) — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next: ops overview, identity audit, Identity kit polish, monthly quota; SSO Later)
+- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories and channel-native **Send test** — [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt)
+- Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
-- Account preferences at `/account/profile`, `/account/security`, `/account/display` (including default collapsed issue panels)
-- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
+- Account preferences at `/account/profile`, `/account/security`, `/account/display`
+- Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, Mailer, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
 Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). Auth is password (+ remember-me) or **magic login** (`/login/magic`); SSO is Later.
 
@@ -76,10 +78,11 @@ make bootstrap   # migrate + seed demo user/project + write .demo-client.env
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
 - After seed, open Performance with N+1 filter: `/projects/1/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/1/analytics` (14 days of error / transaction / N+1 counters)
-- First-user registration (empty DB only): https://localhost:9444/en/register (Spanish: `/es/register`)
+- First-user registration (empty DB only): https://localhost:9444/en/register (other locales: `/es/register`, `/de/register`, …)
 - Login: https://localhost:9444/en/login (includes **Remember me**)
+- OpenAPI (after login): https://localhost:9444/api/doc
 
-> After the first user exists, `/en/register` redirects to `/en/login`. Auth routes use `/{_locale}` (`en` default). Bare `/`, `/login`, `/register`, and `/logout` redirect to the English AuthKit paths. After sign-in, the app home is **`/dashboard`**.
+> After the first user exists, `/en/register` redirects to `/en/login`. Auth routes use `/{_locale}` (`en` default; also `es`, `de`, `nl`, `fr`, `it`, `pt`). Bare `/`, `/login`, `/register`, and `/logout` redirect to the English AuthKit paths. After sign-in, the app home is **`/dashboard`**.
 
 Seed prints DSNs and writes `.demo-client.env` for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
 
@@ -105,14 +108,14 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 
 | Module | Responsibility |
 |--------|----------------|
-| `Identity` | Users (AuthKit login/register), account prefs, seed command |
-| `Project` | Projects, API keys, memberships, Settings / danger zone (clear, transfer ownership, delete) |
+| `Identity` | Users (AuthKit login/register), account prefs, magic login, seed command |
+| `Project` | Projects, API keys, memberships (`viewer` + share links), Settings / danger zone |
 | `Ingest` | Envelope API + async pipeline |
-| `Issues` | Grouping, list/filter, assignee, status + history, event detail |
+| `Issues` | Grouping, list/filter, FULLTEXT, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates + charts/filters (`025`); table + Chart.js |
-| `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP destinations |
-| `Shared` | Appearance, menus/breadcrumbs glue, legal pages |
+| `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal pages, instance Mailer |
 
 ## Spec-Driven Development
 
@@ -129,6 +132,7 @@ docker compose exec php php bin/phpunit
 ## Documentation
 
 - [Architecture rationale](docs/ARCHITECTURE.md)
+- [HTTP API overview](docs/API.md)
 - [Product roadmap](docs/ROADMAP.md)
 - [Project notifications](docs/NOTIFICATIONS.md)
 - [Changelog](docs/CHANGELOG.md)
@@ -141,7 +145,9 @@ docker compose exec php php bin/phpunit
 - [Legal pages & cookie consent](docs/LEGAL-AND-COOKIES.md)
 - [Adding a UI language](docs/ADDING-LOCALES.md)
 - [Production](docs/PRODUCTION.md)
+- [FrankenPHP coding (worker safety)](docs/FRANKENPHP-CODING.md)
 - [Contributing](docs/CONTRIBUTING.md)
+- [Funding](docs/FUNDING.md)
 
 ## License
 

@@ -173,7 +173,6 @@ final readonly class ProjectAccessService
         if ($this->hasShareGrantForIssue($project, $issueUuid)) {
             return new ProjectAccess(
                 role: ProjectRole::Viewer,
-                directMembership: null,
                 viaGroup: false,
             );
         }

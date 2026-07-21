@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.2 to the next release](#upgrading-from-0122-to-the-next-release)
+- [Upgrading from 0.12.3 to the next release](#upgrading-from-0123-to-the-next-release)
+- [Upgrading from 0.12.2 to 0.12.3](#upgrading-from-0122-to-0123)
 - [Upgrading from 0.12.1 to 0.12.2](#upgrading-from-0121-to-0122)
 - [Upgrading from 0.12.0 to 0.12.1](#upgrading-from-0120-to-0121)
 - [Upgrading from 0.11.1 to 0.12.0](#upgrading-from-0111-to-0120)
@@ -32,7 +33,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.2 to the next release
+## Upgrading from 0.12.3 to the next release
 
 ```bash
 git pull
@@ -42,6 +43,22 @@ make vite-build
 ```
 
 No additional steps documented yet.
+
+## Upgrading from 0.12.2 to 0.12.3
+
+```bash
+git pull
+composer install
+php bin/console doctrine:migrations:migrate --no-interaction
+make vite-build
+```
+
+### Brand & typography
+
+- UI typeface is **Montserrat** (replaces Source Serif 4 / IBM Plex Sans for chrome). Code blocks still use IBM Plex Mono.
+- Favicon / PWA icons under `public/brand/` and `public/icons/` use the tower + three-arc beacon mark.
+- Rebuild frontend assets (`make vite-build`) and hard-refresh browsers / reinstall the PWA so cached icons and CSS update (`nowo_pwa` `cache_version` is now `v2`).
+- No database migration is required for this release.
 
 ## Upgrading from 0.12.1 to 0.12.2
 

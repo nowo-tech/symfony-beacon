@@ -22,7 +22,9 @@
         <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
         <style>{{ site_appearance.cssOverrides|raw }}</style>
         {{ nowo_pwa_head() }}
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
         {% block stylesheets %}
             {{ vite_entry_link_tags('app') }}
         {% endblock %}

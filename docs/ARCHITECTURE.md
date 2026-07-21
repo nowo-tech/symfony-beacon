@@ -42,9 +42,10 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Choice | Rationale |
 |--------|-----------|
 | `POST /api/{project_id}/envelope/` | Envelope-compatible URL shape; SDKs and `nowo-tech/beacon-bundle` can point a DSN at any host/port. |
-| Auth via Envelope auth header / query / envelope `dsn` | Wire compatibility with Envelope clients; mapped to project API keys. |
+| Auth via `X-Beacon-Auth` and/or envelope `dsn` (query string **deprecated**) | Wire compatibility with Envelope clients; mapped to project API keys. See [DSN.md](DSN.md). |
 | Messenger (`ProcessEnvelopeMessage`) | Grouping, fingerprinting, N+1 detection, and daily stats are CPU/DB heavy — they must not block the ACK. |
 | Separate `messenger` Compose service | Ingest HTTP workers stay responsive while a dedicated consumer drains the queue. |
+| Worker re-check (`051`) | After ACK, the consumer re-validates ingest suspend + daily quota before persisting. |
 
 ## Why Twig + Vite/Stimulus (not a separate SPA)
 
@@ -53,19 +54,20 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Server-rendered Twig | Auth, CSRF, flash messages, and permission checks stay in one stack; good fit for an operator console. |
 | Stimulus | Progressive enhancement for interactive widgets (DataTables, clipboard, collapse panels). |
 | Vite + TypeScript + Tailwind 4 | Modern asset pipeline without splitting the product into “API repo + frontend repo”. |
-| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](NATIVE-MOBILE.md) for removed Hotwire Native notes). |
+| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](NATIVE-MOBILE.md) — Hotwire Native removed). |
+| Montserrat | Brand wordmarks and app chrome share one geometric sans (self-hosted). |
 
 A dedicated SPA would force a second auth model, duplicated validation, and larger ops surface for little benefit on CRUD-heavy admin screens.
 
 ## Why Nowo.tech kits over hand-rolled auth/legal UX
 
-Login, registration, cookies, menus, and forms are solved problems. Prefering [`nowo-tech/*`](https://packagist.org/packages/nowo-tech/) kits:
+Login, registration, cookies, menus, and forms are solved problems. Preferring [`nowo-tech/*`](https://packagist.org/packages/nowo-tech/) kits:
 
 - Keeps Beacon focused on **telemetry** (ingest, grouping, performance, analytics).
-- Reuses tested AuthKit / cookie-consent / dashboard-menu / form-kit behaviour.
+- Reuses tested AuthKit / UserKit / AuditKit / cookie-consent / dashboard-menu / form-kit behaviour.
 - Leaves room for operator legal pages without inventing a consent stack ([LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
 
-Identity in this repo owns **User** persistence and project membership; AuthKit owns the login/register chrome.
+Identity in this repo owns **User** persistence, account preferences, magic-login gating, and project membership; AuthKit owns the login/register chrome.
 
 ## Why Envelope compatibility (and a separate BeaconBundle)
 
@@ -88,14 +90,14 @@ Features are specified under `specs/` before large changes. That matches an open
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, magic login, seed | Auth boundary; kits + Security `login_link` (`026`) |
-| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`; viewer planned in `026`), Settings / danger zone | Multi-tenant tenancy unit |
+| `Identity` | Users, account prefs, magic login (Mailer-gated), seed | Auth boundary; AuthKit + Security `login_link` (`026`) |
+| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links | Multi-tenant tenancy unit |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
-| `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history` | Primary debugging UX |
+| `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
 | `Analytics` | Daily aggregates + period charts/filters (`025`) | Read models from `DailyProjectStat`; filtered errors from `Event` |
-| `Notifications` | Slack / HTTP webhook destinations | Outbound alerts after ingest |
-| `Shared` | Appearance, menus/breadcrumbs glue, legal | Cross-cutting presentation |
+| `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history | Outbound alerts after ingest |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer settings | Cross-cutting presentation / instance config |
 
 ## Flows (Mermaid)
 
@@ -148,7 +150,7 @@ flowchart TB
   Ingest -->|events / grouping| Issues
   Ingest -->|transactions / spans| Perf
   Ingest -->|daily counters| Analytics
-  Ingest -->|new / regression / N+1| Notifications
+  Ingest -->|new / regression / N+1 / thresholds| Notifications
   Ingest -->|API key auth| Project
 
   Issues -->|membership| Project
@@ -157,7 +159,7 @@ flowchart TB
   Notifications -->|destinations| Project
   Project -->|members| Identity
 
-  Shared -->|appearance / legal / menus| Identity
+  Shared -->|appearance / legal / menus / mailer| Identity
 ```
 
 ### Envelope ingest (fast ACK)
@@ -175,7 +177,7 @@ sequenceDiagram
   participant Handler as ProcessEnvelopeHandler
 
   Client->>HTTP: POST /api/{project_id}/envelope/
-  HTTP->>Auth: parse Envelope auth header / query / dsn
+  HTTP->>Auth: parse X-Beacon-Auth / dsn (query deprecated)
   Auth-->>HTTP: public_key + required secret
   HTTP->>Keys: findActiveByPublicKey
   alt missing or wrong project key
@@ -186,6 +188,7 @@ sequenceDiagram
     Bus->>Q: enqueue
     HTTP-->>Client: 200 ACK
     Q->>Handler: consume
+    Handler->>Handler: re-check suspend + daily quota
     Handler->>Handler: persist event or transaction
   end
 ```
@@ -230,18 +233,21 @@ flowchart TD
 
 ### Operator UI access
 
-Session login (AuthKit) then project-scoped membership checks on every project page.
+Session login (AuthKit) then project-scoped membership checks on every project page. Share links grant time-limited **viewer** access (project-wide or issue-scoped).
 
 ```mermaid
 flowchart TD
   Anon[Anonymous request] --> Gate{Authenticated?}
-  Gate -->|no| Login[AuthKit /en/login]
+  Gate -->|no| Share{Valid share token?}
+  Share -->|yes| Viewer[Viewer session]
+  Share -->|no| Login[AuthKit /en/login]
   Login --> Dash[/dashboard]
   Gate -->|yes| Dash
+  Viewer --> IssueOrProject[Issue show or project pages per grant]
   Dash --> Pick[Open project]
   Pick --> Home[Redirect to Issues]
-  Home --> Access[ProjectAccessService.requireMembership]
-  Access -->|member+ today; viewer planned| UI[Issues / Performance / Analytics / Settings]
+  Home --> Access[ProjectAccessService]
+  Access -->|owner/admin/member/viewer| UI[Issues / Performance / Analytics / Settings]
   Access -->|not a member| Deny[403]
   UI --> Role{Action needs elevated role?}
   Role -->|clear history: owner/admin| OK1[Allowed]
@@ -269,7 +275,7 @@ flowchart LR
 
 - **Not** a multi-region SaaS control plane.
 - **Not** a generic observability backend (metrics/logs/traces as first-class products).
-- **Not** a mobile-only API + React Native client in this repository.
+- **Not** a mobile-only API + React Native / Hotwire Native client in this repository.
 - **Not** replacing Envelope with a proprietary ingest protocol.
 
 When a change would violate these non-goals or the constitution stack, amend the constitution and add a feature spec first.

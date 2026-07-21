@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Notifications;
 
+use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\NotificationPayloadBuilder;
-use App\Project\Entity\Project;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -62,7 +62,7 @@ final class NotificationSampleSendTest extends DatabaseWebTestCase
 
         // Exercise delivery path directly (sync messenger in test) so the mock replaces HttpClient
         // before DeliverNotificationHandler is constructed.
-        $dispatcher = self::getContainer()->get(\App\Notifications\Service\NotificationDispatcher::class);
+        $dispatcher = self::getContainer()->get(NotificationDispatcher::class);
         $dispatcher->dispatchTest($project, $destination);
 
         self::assertCount(1, $requests);

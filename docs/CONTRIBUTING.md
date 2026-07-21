@@ -14,6 +14,20 @@
 12. New Doctrine migrations MUST use [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) MDK definitions (`CreateTablesService` + `AppliesMdkDefinition` / `migrations/FieldDictionary/`). Prefer idempotent declarative tables/columns over raw `CREATE TABLE` SQL.
 13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
 
+## Documentation map
+
+| Doc | Audience |
+|-----|----------|
+| [README.md](../README.md) | Product overview + quick start |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Why modular Symfony / flows |
+| [API.md](API.md) | Ingest, health, OpenAPI pointer |
+| [DSN.md](DSN.md) | Client DSN + auth |
+| [NOTIFICATIONS.md](NOTIFICATIONS.md) | Outbound channels |
+| [PRODUCTION.md](PRODUCTION.md) | Self-host ops |
+| [ROADMAP.md](ROADMAP.md) / [CHANGELOG.md](CHANGELOG.md) / [UPGRADING.md](UPGRADING.md) | Plan / history / upgrades |
+| [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md) / [ADDING-LOCALES.md](ADDING-LOCALES.md) | Compliance / i18n |
+| `specs/NNN-*` | Feature SDD artifacts |
+
 ## Pull requests
 
 PRs use [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md). Requested reviewers come from [`.github/CODEOWNERS`](../.github/CODEOWNERS).

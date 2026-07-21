@@ -2,7 +2,9 @@
 
 **Feature Branch**: `008-ux-native`  
 **Created**: 2026-07-20  
-**Status**: Completed  
+**Status**: **Superseded / Removed** (Hotwire Native dropped; PWA remains)
+
+> **Historical spec.** The server contract (`/config/ios_v1.json`, `/config/android_v1.json`, `ux-native` / `ux-turbo`) was removed. Operators should use the **PWA** (`nowo-tech/pwa-bundle`). See [docs/NATIVE-MOBILE.md](../../docs/NATIVE-MOBILE.md) and constitution v1.2.0+.
 
 **Input**: User description: "Pass the project to Symfony UX Native so we can have a mobile application."
 

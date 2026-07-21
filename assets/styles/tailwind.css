@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
-  --font-display: "Source Serif 4 Variable", "Source Serif 4", Georgia, serif;
+  --font-sans: "Montserrat", "Segoe UI", sans-serif;
+  --font-display: "Montserrat", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --color-ink: var(--beacon-ink);
   --color-paper: var(--beacon-paper);

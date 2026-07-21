@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.3] - 2026-07-21
+
+### Changed
+
+- Brand mark refreshed (tower + three signal arcs): SVG wordmarks/mark, `favicon.ico`, and PWA icons under `public/brand/` and `public/icons/`
+- UI typeface aligned with brand wordmarks: **Montserrat** replaces Source Serif 4 / IBM Plex Sans (mono remains IBM Plex Mono)
+- PWA service-worker `cache_version` bumped to `v2` so installed clients pick up new icons and CSS
+- Docs/constitution product sync: PWA-only (Hotwire removed from constitution), ARCHITECTURE viewer/auth/notifications, README coverage (Mailer, `/api/doc`, locales), `docs/API.md`, retrospective specs `045`–`052`, `008` marked superseded
+
 ## [0.12.2] - 2026-07-21
 
 ### Security
@@ -419,7 +428,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.3...HEAD
+[0.12.3]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.11.1...v0.12.0

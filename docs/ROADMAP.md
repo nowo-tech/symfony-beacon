@@ -33,7 +33,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | Daily analytics | Beacon | `005-analytics` |
 | AuthKit, projects, Settings, danger zone | Beacon | `002`, `011` |
 | Rich event context + stack source context | Beacon + Bundle | `010`, Bundle ≥ 1.3.0 |
-| PWA + Hotwire Native server contract | Beacon | `008-ux-native` |
+| PWA (browser installability) | Beacon | `nowo-tech/pwa-bundle` (Hotwire Native `008` removed — see `docs/NATIVE-MOBILE.md`) |
 | Architecture rationale + Mermaid flows | Beacon | `docs/ARCHITECTURE.md` |
 
 ---
@@ -128,7 +128,7 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Later** |
+| 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Next** (see Phase 6.4) |
 | 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Later** |
 | — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
 
@@ -171,7 +171,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.1 | **Ops overview dashboard**: cross-project error spikes, open issues, failed deliveries (instance admin + optional project filter) | Beacon | `035-ops-overview` | **Next** |
 | 6.2 | **Admin identity audit timeline** for users & groups (extends blame fields + `UserAction` into Admin → User/Group show) | Beacon | `036-admin-identity-audit` | **Next** |
-| 6.3 | **AuthKit / UserKit Identity migration**: retire bootstrap `SecurityController` / bespoke account chrome where kits cover it | Beacon | `037-authkit-identity-migration` | **Next** |
+| 6.3 | **Identity kit polish**: closer AuthKit / UserKit integration for remaining account chrome (password flows, profile surfaces) — AuthKit already owns login/register | Beacon | `037-authkit-identity-migration` | **Next** |
 | 6.4 | **Monthly event quota** (promote `032`) | Beacon | `032-monthly-quota` | **Next** |
 
 ### Planned
@@ -249,4 +249,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21 (v0.12.2 release: security High/Medium `045`–`052` + Mailer/magic-login gate).
+Last updated: 2026-07-21 (v0.12.3: brand mark + Montserrat + docs/constitution PWA-only sync).

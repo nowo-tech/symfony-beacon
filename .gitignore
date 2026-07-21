@@ -71,3 +71,6 @@ composer.phar
 
 # Env template (only versioned env file)
 !.env.dist
+
+# Local package downloads
+*.deb

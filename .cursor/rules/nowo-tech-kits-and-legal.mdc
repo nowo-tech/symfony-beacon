@@ -22,7 +22,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
 | Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest |
-| Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs |
+| Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs + Mailer DSN |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
 
 Packagist vendor: https://packagist.org/packages/nowo-tech/
@@ -33,11 +33,11 @@ Packagist vendor: https://packagist.org/packages/nowo-tech/
 2. Prefer integrating those bundles (Flex recipes, template overrides) over growing `src/Identity` with bespoke login/register CRUD.
 3. Use `audit-kit-bundle` for entity timestamps/blame instead of copying trait logic.
 
-## Legal / aviso legal (ALWAYS remind)
+## Legal notice / privacy / terms (ALWAYS remind)
 
 When touching public UI, marketing pages, cookies, analytics, contact forms, or self-hosted SaaS surfaces, **remind the user** and propose:
 
-- Legal notice / privacy / terms pages (aviso legal, privacy policy, terms of use) as English UI copy (`lang="en"`), with room for operator-specific text.
+- Legal notice / privacy / terms pages as English UI copy (`lang="en"`), with room for operator-specific text.
 - Cookie consent via `nowo-tech/cookie-consent-bundle` when any non-essential cookie or third-party script appears (Vite analytics, embeds, etc.).
 - GDPR-oriented data handling (`anonymize-bundle`, encrypt-bundle) when storing personal data beyond auth essentials.
 
@@ -45,7 +45,7 @@ Do **not** silently ship tracking or optional cookies without consent UX.
 
 ## Current project status (honest baseline)
 
-`symfony-beacon` v1 Identity is a **minimal custom** login (`SecurityController` + `User` entity). That was a bootstrap shortcut for Envelope ingest MVP — **not** a reason to keep duplicating AuthKit/UserKit/AuditKit. When auth/user/audit work comes up, propose migrating to the kits above.
+Identity already uses **AuthKit** for login/registration (`registration_mode: first_user_only`), plus UserKit / AuditKit / password kits for account lifecycle. Remaining Phase 6 work (`037`) is kit polish on account chrome — **not** a greenfield AuthKit migration. Do not reintroduce a custom `SecurityController`.
 
 ## Agent behaviour
 

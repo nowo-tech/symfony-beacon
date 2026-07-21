@@ -18,7 +18,7 @@
             display: grid;
             place-items: center;
             padding: 2rem;
-            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            font-family: "Montserrat", "Segoe UI", sans-serif;
             background: var(--beacon-paper);
             color: var(--beacon-ink);
             text-align: center;
@@ -33,7 +33,7 @@
         }
         h1 {
             margin: 0;
-            font-family: "Source Serif 4 Variable", "Source Serif 4", Georgia, serif;
+            font-family: "Montserrat", "Segoe UI", sans-serif;
             font-size: 1.75rem;
         }
         p {
@@ -55,7 +55,7 @@
 </head>
 <body>
     <div>
-        <img src="{{ asset('brand/beacon-mark.svg') }}" alt="" width="40" height="47" style="display:block;margin:0 auto 1rem">
+        <img src="{{ asset('brand/beacon-mark.svg') }}" alt="" width="40" height="40" style="display:block;margin:0 auto 1rem">
         <p class="eyebrow">{{ site_appearance.brandName|default(manifest_name) }}</p>
         <h1>{{ 'offline.heading'|trans({}, 'NowoPwaBundle') }}</h1>
         <p>{{ 'offline.body'|trans({}, 'NowoPwaBundle') }}</p>

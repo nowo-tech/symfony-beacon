@@ -6,6 +6,7 @@ namespace App\Shared\Mailer;
 
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Mailer;
@@ -15,7 +16,6 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use RuntimeException;
 
 /**
  * Resolves Symfony Mailer from encrypted instance settings (DB), with env fallback.

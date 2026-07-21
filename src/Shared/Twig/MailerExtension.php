@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Twig;
 
+use Override;
 use App\Shared\Mailer\ConfiguredMailer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -16,6 +17,7 @@ final class MailerExtension extends AbstractExtension
     ) {
     }
 
+    #[Override]
     public function getFunctions(): array
     {
         return [

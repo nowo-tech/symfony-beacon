@@ -216,8 +216,10 @@ html[data-ui-density='compact'] .btn-primary,
 html[data-ui-density='compact'] .btn-ghost,
 html[data-ui-density='compact'] .btn-danger,
 html[data-ui-density='compact'] .theme-toggle,
+html[data-ui-density='compact'] .locale-switcher__summary,
 html[data-ui-density='compact'] .input {
   min-height: 2rem;
+  height: 2rem;
   font-size: 0.8125rem;
 }
 
@@ -1317,7 +1319,7 @@ textarea.input {
 
 .password-strength-modal h2 {
   margin: 0 0 0.35rem !important;
-  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-family: var(--font-display), "Segoe UI", sans-serif;
   font-size: 1.25rem !important;
   font-weight: 700;
   color: var(--color-ink) !important;
@@ -2303,14 +2305,19 @@ body::-webkit-scrollbar-corner,
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
   list-style: none;
   cursor: pointer;
   border-radius: 0.375rem;
   border: 1px solid var(--color-sand);
   background: color-mix(in srgb, var(--color-surface) 85%, transparent);
-  padding: 0.4rem 0.65rem;
+  padding: 0 0.65rem;
+  font-family: inherit;
   font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1;
   color: var(--color-ink);
   backdrop-filter: blur(8px);
   box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 6%);
@@ -2413,7 +2420,9 @@ body::-webkit-scrollbar-corner,
 }
 
 .theme-toggle {
-  font: inherit;
+  /* Keep shared height/typography from .locale-switcher__summary,.theme-toggle */
+  appearance: none;
+  margin: 0;
 }
 
 .theme-toggle__icon {
@@ -2443,7 +2452,7 @@ body::-webkit-scrollbar-corner,
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
   color: var(--color-ink);
   text-decoration: none;
   line-height: 1.1;
@@ -2471,7 +2480,11 @@ body::-webkit-scrollbar-corner,
 }
 
 .brand-mark__arc--inner {
-  opacity: 0.9;
+  opacity: 0.95;
+}
+
+.brand-mark__arc--mid {
+  opacity: 0.75;
 }
 
 .brand-mark__arc--outer {

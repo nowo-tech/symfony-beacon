@@ -83,7 +83,7 @@ final class InstanceMailerSettingsType extends AbstractType
             return;
         }
 
-        $error = $this->dsnValidator->validatePlainDsn((string) ($value ?? ''));
+        $error = $this->dsnValidator->validatePlainDsn($value ?? '');
         if (null !== $error) {
             $context->buildViolation($error)
                 ->setTranslationDomain('messages')

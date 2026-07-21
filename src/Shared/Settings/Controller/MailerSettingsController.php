@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Identity\Entity\User;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Settings\Form\InstanceMailerSettingsType;
@@ -69,7 +70,7 @@ final class MailerSettingsController extends AbstractController
     }
 
     #[Route('/settings/mailer/test', name: 'settings_mailer_test', methods: ['POST'])]
-    public function sendSample(Request $request): Response
+    public function sendSample(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('mailer_sample', $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException();

@@ -633,7 +633,7 @@
                                 </form>
                                 <form method="post" action="{{ path('project_notification_test', {projectId: project.uuid, id: destination.uuid}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_test_' ~ destination.id) }}">
-                                    <button class="btn-ghost" type="submit" title="{{ 'notifications.test_hint'|trans({ '%type%': ('notifications.type.' ~ destination.type.value)|trans }) }}">{{ 'notifications.test'|trans }}</button>
+                                    <button class="btn-ghost" type="submit" title="{{ 'notifications.test_hint'|trans({'%type%': ('notifications.type.' ~ destination.type.value)|trans}) }}">{{ 'notifications.test'|trans }}</button>
                                 </form>
                                 <form method="post" action="{{ path('project_notification_delete', {projectId: project.uuid, id: destination.uuid}) }}" onsubmit="return confirm('{{ 'notifications.delete_confirm'|trans|e('js') }}')">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_' ~ destination.id) }}">

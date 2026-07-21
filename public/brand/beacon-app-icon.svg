@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Beacon">
-  <!-- Beacon mark: emitter + tower + three concentric signal arcs. -->
-  <g fill="#4aad7f" stroke="#4aad7f">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Beacon">
+  <rect width="512" height="512" fill="#0a120e"/>
+  <g transform="translate(256 256) scale(6.2) translate(-32 -32)" fill="#4aad7f" stroke="#4aad7f">
     <!-- Arcs: half-opening 50° from bottom; clockwise large arc through top -->
     <path d="M23.42 33.20 A11.2 11.2 0 1 1 40.58 33.20" fill="none" stroke-width="3.2" stroke-linecap="round"/>
     <path d="M18.52 37.32 A17.6 17.6 0 1 1 45.48 37.32" fill="none" stroke-width="3.2" stroke-linecap="round"/>
