@@ -6,6 +6,7 @@ nav:
     account: Accountmenu
     admin: Administratie
     admin_hub: 'Beheerder overzicht'
+    ops: Ops-overzicht
     users: Gebruikers
     groups: Groepen
     admin_projects: Projecten
@@ -26,6 +27,12 @@ api_docs:
     title: API-documenten
     intro: 'Ontdek Envelope-opname en gerelateerde HTTP-eindpunten. Gebruik Autoriseren met een X-Beacon-Auth-header (beacon_key en beacon_secret van uw project-DSN).'
     open_json: 'OpenAPI JSON'
+magic_login:
+    confirm:
+        title: Doorgaan met inloggen
+        heading: Magic login afronden
+        help: Bevestig om wachtwoordloos inloggen te voltooien. Deze pagina stuurt de eenmalige link via POST zodat het token niet als GET-navigatie meegaat.
+        submit: Doorgaan
 common:
     filter: Filter
     clear_filters: 'Filters wissen'
@@ -63,6 +70,11 @@ theme:
     night: Nacht
     switch_to_day: 'Schakel over naar de dagmodus'
     switch_to_night: 'Schakel over naar de nachtmodus'
+layout:
+    width_content: Inhoud
+    width_full: Volledige breedte
+    switch_to_content: Overschakelen naar gecentreerde inhoudsbreedte
+    switch_to_full: Overschakelen naar inhoud over de volle breedte
 auth:
     tagline: 'Zelfgehoste foutopsporing voor PHP en Symfony.'
     brand_eyebrow: Foutopsporing
@@ -89,6 +101,10 @@ auth:
             Gebruik deze link om een nieuw wachtwoord te kiezen:
 
             %link%
+
+            Of voer deze eenmalige code in op het resetformulier:
+
+            %code%
 flash:
     project:
         created: 'Project gemaakt.'
@@ -98,6 +114,7 @@ flash:
         governance_saved: 'Instellingen voor projectbeheer opgeslagen.'
         governance_invalid: 'Governance-waarden moeten leeg zijn (overnemen) of niet-negatieve gehele getallen zijn.'
         quota_approaching: 'Dit project nadert het dagelijkse evenementenquotum.'
+        quota_monthly_approaching: Dit project nadert het maandelijkse evenementenquotum.
         history_cleared: 'Projectgeschiedenis gewist.'
         deleted: 'Project verwijderd.'
         delete_confirmation_mismatch: 'De projectnaam kwam niet overeen. Er is niets verwijderd.'
@@ -186,6 +203,9 @@ project:
         retention_max_events: 'Max. opgeslagen gebeurtenissen'
         ingest_rate_limit: 'Limiet voor opnamesnelheid (per minuut)'
         event_quota_daily: 'Dagelijks evenementenquotum'
+        event_quota_monthly: Maandelijks evenementenquotum
+        quota_usage_monthly: '%count% / %quota% gebeurtenissen deze maand (UTC)'
+        month_utc_hint: Maandgrens is UTC
         inherit_hint: 'Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaardwaarde niet nul is.'
         save: 'Bewaar het bestuur'
         quota_usage: 'Evenementen vandaag: %count% / %quota%'
@@ -351,6 +371,12 @@ issues:
     no_source_context: 'Geen broncontext voor dit frame.'
     copy_path: 'Kopieer pad'
     path_copied: Gekopieerd
+    aside_ai_export: AI-export
+    export_for_ai: Kopiëren voor AI
+    export_for_ai_copied: Gekopieerd
+    export_for_ai_md: Markdown downloaden
+    export_for_ai_json: JSON downloaden
+    export_for_ai_help: Opgeschoonde stack en request in beacon-ai-export/v1-formaat om in een AI-assistent te plakken.
     breadcrumbs: Paneermeel
     raw_payload: 'Ruwe lading'
     highlights: Hoogtepunten
@@ -578,11 +604,14 @@ users:
     title: Gebruikers
     intro: 'Maak accounts aan, wijs instantierollen toe en schakel inloggen in of uit (UserKit).'
     create: 'Gebruiker toevoegen'
+    search_placeholder: 'Zoeken op naam of e-mail…'
     create_intro: 'Maak een Beacon-account aan. Met dit e-mailadres en wachtwoord kan de persoon inloggen.'
     back: 'Terug naar gebruikers'
     cancel: Annuleren
     role_label: Rol
     last_admin_hint: 'Houd minimaal één beheerder aan.'
+    edit_role_title: Gebruikersrol wijzigen
+    edit_role_body: 'Kies een nieuwe rol voor %name% (%email%).'
     col:
         user: Gebruiker
         email: E-mail
@@ -610,6 +639,7 @@ users:
         enable: Inschakelen
         disable: Uitzetten
         update_role: Update
+        edit_role: Rol bewerken
         self: 'Dit ben jij'
         activity: Activiteit
     projects_title: Projectlidmaatschappen
@@ -623,51 +653,54 @@ users:
         timeline_title: 'Tijdlijn van activiteiten'
         recent_title: 'Recente activiteit'
         recent_intro: 'Laatste administratieve, lidmaatschaps- en productacties voor het hele exemplaar.'
+        audit_intro: Identiteits- en lidmaatschapsacties voor dit account (filters komen overeen met Admin-projectaudit).
+        audit_empty: Geen geregistreerde identiteitsacties komen overeen met de huidige filters.
         empty: 'Nog geen geregistreerde acties.'
         by: 'Door %name%'
         by_system: 'Per systeem'
         subject: 'Onderwerp %name%'
         action:
-            user.created: 'User created'
-            user.role_changed: 'User role changed'
-            user.enabled: 'User enabled'
-            user.disabled: 'User disabled'
-            group.created: 'Group created'
-            group.updated: 'Group updated'
-            group.deleted: 'Group deleted'
-            group.member_added: 'Group member added'
-            group.member_removed: 'Group member removed'
-            project.member_added: 'Project member added'
-            project.member_role_changed: 'Project member role changed'
-            project.member_removed: 'Project member removed'
-            project.ownership_transferred: 'Project ownership transferred'
-            project.group_linked: 'Project group linked'
-            project.group_role_changed: 'Project group role changed'
-            project.group_unlinked: 'Project group unlinked'
-            project.opened: 'Project opened'
-            project.settings_viewed: 'Project settings viewed'
-            project.created: 'Project created'
-            project.api_key_created: 'API key created'
-            project.api_key_revoked: 'API key revoked'
-            project.api_key_rotated: 'API key rotated'
-            project.suspended: 'Project ingest suspended'
-            project.resumed: 'Project ingest resumed'
-            project.view_as_started: 'View-as-member started'
-            project.view_as_ended: 'View-as-member ended'
-            project.history_cleared: 'Project history cleared'
-            project.deleted: 'Project deleted'
-            issue.opened: 'Issue opened'
-            issue.assigned: 'Issue assignee changed'
-            issue.status_changed: 'Issue status changed'
-            issue.priority_changed: 'Issue priority changed'
-            issue.commented: 'Issue comment added'
-            issue.marked_duplicate: 'Issue marked as duplicate'
-            issue.merged: 'Issue events merged'
-            event.opened: 'Event opened'
-            performance.opened: 'Performance opened'
-            analytics.opened: 'Analytics opened'
+            user.created: 'Gebruiker aangemaakt'
+            user.role_changed: 'Gebruikersrol gewijzigd'
+            user.enabled: 'Gebruiker ingeschakeld'
+            user.disabled: 'Gebruiker uitgeschakeld'
+            group.created: 'Groep aangemaakt'
+            group.updated: 'Groep bijgewerkt'
+            group.deleted: 'Groep verwijderd'
+            group.member_added: 'Groepslid toegevoegd'
+            group.member_removed: 'Groepslid verwijderd'
+            project.member_added: 'Projectlid toegevoegd'
+            project.member_role_changed: 'Rol van projectlid gewijzigd'
+            project.member_removed: 'Projectlid verwijderd'
+            project.ownership_transferred: 'Projecteigendom overgedragen'
+            project.group_linked: 'Projectgroep gekoppeld'
+            project.group_role_changed: 'Rol van projectgroep gewijzigd'
+            project.group_unlinked: 'Projectgroep losgekoppeld'
+            project.opened: 'Project geopend'
+            project.settings_viewed: 'Projectinstellingen bekeken'
+            project.created: 'Project aangemaakt'
+            project.api_key_created: 'API-sleutel aangemaakt'
+            project.api_key_revoked: 'API-sleutel ingetrokken'
+            project.api_key_rotated: 'API-sleutel geroteerd'
+            project.suspended: 'Project-ingest opgeschort'
+            project.resumed: 'Project-ingest hervat'
+            project.view_as_started: 'Weergeven-als-lid gestart'
+            project.view_as_ended: 'Weergeven-als-lid beeindigd'
+            project.history_cleared: 'Projectgeschiedenis gewist'
+            project.deleted: 'Project verwijderd'
+            issue.opened: 'Issue geopend'
+            issue.assigned: 'Issue-toegewezene gewijzigd'
+            issue.status_changed: 'Issue-status gewijzigd'
+            issue.priority_changed: 'Issue-prioriteit gewijzigd'
+            issue.commented: 'Issue-opmerking toegevoegd'
+            issue.marked_duplicate: 'Issue als duplicaat gemarkeerd'
+            issue.merged: 'Issue-events samengevoegd'
+            event.opened: 'Event geopend'
+            performance.opened: 'Performance geopend'
+            analytics.opened: 'Analytics geopend'
             auth.magic_login_requested: 'Magic login aangevraagd'
             auth.magic_login_consumed: 'Magic login gebruikt'
+            auth.password_reset_requested: 'Wachtwoordreset aangevraagd'
             project.share_link_created: 'Deellink aangemaakt'
             project.share_link_revoked: 'Deellink ingetrokken'
             project.share_link_opened: 'Deellink geopend'
@@ -694,11 +727,22 @@ preferences:
     intro: 'Update uw profiel-, wachtwoord-, taal- en themavoorkeuren.'
     nav:
         profile: Profiel
+        projects: Mijn projecten
+        groups: Mijn groepen
         security: Beveiliging
+        password: Wachtwoord wijzigen
+        password_history: Wijzigingsgeschiedenis
+        security_activity: Activiteit
+        area_label: Accountsecties
         display: Weergave
+        appearance: Weergave
+        panels: Issuepanelen
+        tours: Tours
+        notifications: Meldingen
     profile:
         title: Profiel
         intro: 'Bekijk je accountgegevens en werk weergavenaam of inlog-e-mail bij.'
+        tabs_label: Profielsecties
         submit: 'Profiel opslaan'
         edit_title: 'Profiel bewerken'
         account_id: Account-ID
@@ -725,16 +769,32 @@ preferences:
     security:
         title: Beveiliging
         intro: 'Wijzig uw accountwachtwoord.'
+        tabs_label: Beveiligingssecties
         submit: 'Wachtwoord bijwerken'
         history_title: 'Geschiedenis van wachtwoordwijzigingen'
         history_intro: 'Recente wachtwoordupdates bewaard om hergebruik te voorkomen. Hashes worden nooit getoond.'
         history_current: 'Huidig wachtwoord ingesteld op:'
         history_entry: 'Wachtwoord gewijzigd'
         history_empty: 'Nog geen wachtwoordwijzigingen geregistreerd.'
+        social_title: Gekoppelde social accounts
+        social_intro: OAuth-providers gekoppeld aan dit Beacon-account.
+        social_disabled: Social login is niet ingeschakeld op deze instance.
+        social_empty: Er zijn nog geen social accounts gekoppeld. Meld je aan met een provider op de loginpagina om er een te koppelen wanneer social login is ingeschakeld.
+        social_unlink_note: Providers ontkoppelen vanaf deze pagina is nog niet beschikbaar. Neem contact op met een instance-admin als een koppeling moet worden verwijderd.
+        activity_title: Beveiligingsactiviteit
+        activity_intro: Recente wachtwoordreset- en magic-login-gebeurtenissen voor je account.
+        activity_empty: Nog geen beveiligingsgebeurtenissen geregistreerd.
     display:
         title: Weergave
-        intro: 'Kies taal, thema, dichtheid, tekstgrootte, contrast, zijbalk, beweging, inhoudsbreedte en samengevouwen issuepanelen.'
+        intro: Kies taal, thema, dichtheid, tekstgrootte, contrast, zijbalk, beweging en inhoudsbreedte.
+        tabs_label: Weergavesecties
         submit: 'Weergave-instellingen opslaan'
+        panels_title: Issuepanelen
+        panels_intro: Kies welke issuepanelen standaard zijn ingeklapt en wis browseroverschrijvingen.
+        tours_title: Tours
+        tours_intro: Bepaal welke producttours automatisch mogen starten en speel de dashboardtour opnieuw af.
+        notifications_title: Meldingen
+        notifications_intro: Optionele pushmeldingen voor nieuwe issues en Beacon als app installeren.
         pwa_title: 'Installeer app'
         pwa_intro: 'Voeg deze site toe aan uw apparaat voor een snellere, zelfstandige ervaring. Beschikbaarheid is afhankelijk van uw browser.'
         pwa_prompt_title: 'Installeer voor snellere toegang'
@@ -766,9 +826,9 @@ preferences:
     motion_system: 'Systeem (volg apparaat)'
     motion_reduce: 'Verminder beweging'
     motion_full: 'Volledige beweging'
-    product_tour_title: 'Product tour'
-    product_tour_intro: 'Tours run once per area after setup. They stay off until you replay them here.'
-    product_tour_replay: 'Replay dashboard tour'
+    product_tour_title: 'Productrondleiding'
+    product_tour_intro: 'Rondleidingen draaien één keer per gebied na de setup. Ze blijven uit tot u ze hier opnieuw afspeelt.'
+    product_tour_replay: 'Dashboardrondleiding opnieuw afspelen'
     issue_panels_collapsed: 'Probleempanelen zijn standaard samengevouwen'
     issue_panels_help: "Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's. Uw browser onthoudt handmatige open-/sluitoverschrijvingen."
     issue_panels_browser: 'Indeling browserpaneel'
@@ -798,7 +858,7 @@ preferences:
     product_tour_enabled: 'Actieve rondleidingen'
     product_tour_enabled_help: 'Aangevinkte rondleidingen kunnen één keer per gebied automatisch starten. Vink uit om een rondleiding te verbergen; vink alles uit om elke rondleiding uit te schakelen.'
     product_tour_select_all: 'Alle rondleidingen selecteren'
-    product_tour_save_hint: 'Klik hieronder op Weergave-instellingen opslaan om wijzigingen in rondleidingen toe te passen.'
+    product_tour_save_hint: Klik op Weergave-instellingen opslaan om tourwijzigingen toe te passen.
     product_tour_page:
         dashboard: Dashboard
         project_issues: Projectissues
@@ -864,30 +924,20 @@ user_preferences:
             label: 'Bevestig nieuw wachtwoord'
         mismatch: 'De wachtwoordvelden moeten overeenkomen.'
         strength_invalid: 'Het wachtwoord voldoet niet aan de sterkte-eisen (%missing%).'
-requirement.min_length: 'Minimaal %count% tekens'
-requirement.max_length: 'Maximaal %count% tekens'
-requirement.lowercase: 'Minimaal één kleine letter'
-requirement.uppercase: 'Minimaal één hoofdletter'
-requirement.digit: 'Minstens één nummer'
-requirement.special: 'Minimaal één speciaal karakter'
-requirement.no_whitespace: 'Geen witruimte toegestaan'
-requirement.not_contain: 'Mag geen verboden tekst bevatten'
-requirement.min_unique_chars: 'Minimaal %count% unieke tekens'
-requirement.regex: 'Moet overeenkomen met het vereiste patroon'
-generator.button: 'Wachtwoord genereren'
-generator.modal_title: 'Voorgestelde wachtwoorden'
-generator.modal_hint: 'Deze wachtwoorden komen overeen met uw huidige beleid. Kopieer er een of pas deze toe op het veld.'
-generator.copy: Kopiëren
-generator.copied: Gekopieerd!
-generator.use_password: 'Gebruik dit wachtwoord'
-generator.close: Dichtbij
-generator.failed: 'Kan geen geldig wachtwoord genereren. Probeer het opnieuw of versoepel het beleid.'
 groups:
     title: Groepen
     intro: 'Organiseer gebruikers in groepen en koppel groepen vervolgens aan projecten voor bulktoegang.'
     create: 'Nieuwe groep'
+    search_placeholder: 'Zoeken op naam, slug of beschrijving…'
     empty: 'Nog geen groepen.'
     open: Open
+    col:
+        group: Groep
+        slug: Slug
+        members: Leden
+        description: Beschrijving
+        audit: Audit
+        actions: Acties
     back: 'Terug naar groepen'
     edit: Bewerking
     edit_title: 'Groep bewerken'
@@ -897,6 +947,9 @@ groups:
     delete_confirm: 'Deze groep verwijderen? Het wordt losgekoppeld van alle projecten.'
     name_label: Naam
     description_label: Beschrijving
+    audit_title: Audit-tijdlijn
+    audit_intro: Groepsgerelateerde beheerdersacties (aanmaken/bijwerken, leden, projectlinks). De AuditKit-tijdstempels hierboven blijven de snapshot van de laatste bewerker.
+    audit_empty: Geen geregistreerde groepsacties komen overeen met de huidige filters.
     members_title: Groepsleden
     members_empty: 'Er zijn nog geen leden in deze groep.'
     add_member: 'Lid toevoegen'
@@ -915,6 +968,17 @@ admin_projects:
     create: 'Nieuw project'
     empty: 'Nog geen projecten.'
     open: Beheren
+    col:
+        project: Project
+        slug: Slug
+        members: Leden
+        groups: Groepen
+        activity: Activiteit
+        status: Status
+        audit: Audit
+        actions: Acties
+    status:
+        active: Ingest actief
     back: 'Terug naar projecten'
     edit: Bewerking
     edit_title: 'Project bewerken'
@@ -969,81 +1033,100 @@ admin:
         users: 'Geef accounts en rollen weer voor dit exemplaar.'
         groups: 'Creëer groepen en beheer hun leden voor projecttoegang.'
         projects: 'Maak een lijst van alle projecten, beheer leden en groepslinks, of verwijder een project.'
+        ops: Projectoverschrijdende pieken, open issues en mislukte leveringen.
         appearance: 'Merknaam en accentkleuren.'
         menus: "Navigatiemenu's bewerken."
         breadcrumbs: 'Beheer broodkruimelverzamelingen.'
         mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'
         setup: 'Eerste platform-/demo-/sample-seedstappen.'
+    ops:
+        title: Ops-overzicht
+        intro: Instance-brede gezondheidssignalen over projecten. Messenger-wachtrijdiepte is altijd instance-breed.
+        filter_project: Projectfilter
+        filter_all: Alle projecten
+        queue_title: Messenger-wachtrij
+        queue_instance_wide: Instance-brede async pending (niet projectgebonden)
+        open_issues_title: Open issues
+        suspended_title: Ingest gepauzeerd
+        suspended_list_title: Gepauzeerde projecten
+        spikes_title: Foutspikes
+        spikes_help: 'Projecten waar de fouten van vandaag max(3, 2 × 7-daags daggemiddelde) overschrijden.'
+        spikes_empty: Geen foutspikes op dit moment.
+        spikes_metric: '%today% vandaag (7d gem. %avg%, drempel %threshold%)'
+        failed_title: Mislukte leveringen
+        failed_empty: Geen bestemmingen met een mislukte laatste levering.
+        open_by_project_title: Open issues per project
+        open_by_project_empty: Geen open issues in bereik.
 tour:
     controls:
-        next: Next
-        previous: Back
-        done: Done
-        close: Close
-        progress: '{{current}} of {{total}}'
+        next: Volgende
+        previous: Terug
+        done: Klaar
+        close: Sluiten
+        progress: "{{current}} van {{total}}"
     role:
-        owner: owner
-        admin: admin
-        member: member
-        viewer: viewer
+        owner: eigenaar
+        admin: beheerder
+        member: lid
+        viewer: kijker
     steps:
         dashboard:
             welcome:
-                title: 'Welcome to Beacon'
-                description: 'A short tour of your dashboard — projects, navigation, and where to manage your account.'
+                title: Welkom bij Beacon
+                description: Korte rondleiding door je dashboard - projecten, navigatie en waar je je account beheert.
             sidebar:
-                title: Navigation
-                description: 'Use the sidebar to move between dashboard sections for the current area of the app.'
+                title: Navigatie
+                description: Gebruik de zijbalk om tussen dashboardsecties voor het huidige deel van de app te bewegen.
             projects:
-                title: 'Your projects'
-                description: 'Each project collects errors, performance, and analytics from apps that send Envelope telemetry.'
+                title: Je projecten
+                description: Elk project verzamelt fouten, performance en analytics van apps die Envelope-telemetrie verzenden.
             new_project:
-                title: 'Create a project'
-                description: 'Add a project to get a DSN and API keys for your client SDKs.'
+                title: Een project maken
+                description: Voeg een project toe om een DSN en API-sleutels voor je client-SDK's te krijgen.
             user_menu:
-                title: 'Account menu'
-                description: 'Open preferences, return to the dashboard, or sign out from your avatar menu.'
+                title: Accountmenu
+                description: Open voorkeuren, ga terug naar het dashboard of meld je af via je avatarmenu.
             admin:
-                title: Administration
-                description: 'Instance admins manage users, groups, appearance, mailer, and first-run setup from here.'
+                title: Beheer
+                description: Instantiebeheerders beheren hier gebruikers, groepen, uiterlijk, Mailer en de eerste configuratie.
         project:
             welcome:
-                title: 'Project issues'
-                description: 'You are viewing this project as %role%. Use Issues to triage errors from Envelope ingest.'
+                title: Projectissues
+                description: "Je bekijkt dit project als %role%. Gebruik Issues om fouten uit Envelope-ingest te triageren."
             nav:
-                title: 'Project sections'
-                description: 'Switch between Issues, Performance, Analytics, Releases, and Settings for this project.'
+                title: Projectsecties
+                description: Wissel voor dit project tussen Issues, Performance, Analytics, Releases en Settings.
             filters:
-                title: 'Filters and search'
-                description: 'Narrow issues by level, status, environment, release, assignee, and more.'
+                title: Filters en zoeken
+                description: Beperk issues op niveau, status, omgeving, release, toegewezene en meer.
             saved_views:
-                title: 'Saved views'
-                description: 'Save filter combinations and reopen them later for recurring triage workflows.'
+                title: Opgeslagen weergaven
+                description: Sla filtercombinaties op en open ze later opnieuw voor terugkerende triageworkflows.
             list:
-                title: 'Issue list'
-                description: 'Open an issue to inspect stack traces, events, and triage status.'
+                title: Issuelijst
+                description: Open een issue om stack traces, events en de triagestatus te bekijken.
             settings:
-                title: 'Project settings'
-                description: 'As a project admin you can manage API keys, members, notifications, and governance.'
+                title: Projectinstellingen
+                description: Als projectbeheerder kun je API-sleutels, leden, meldingen en governance beheren.
             settings_member:
-                title: 'Project settings'
-                description: 'Review project configuration. Membership and API key changes require a project admin.'
+                title: Projectinstellingen
+                description: Bekijk de projectconfiguratie. Wijzigingen aan lidmaatschappen en API-sleutels vereisen een projectbeheerder.
         admin:
             welcome:
-                title: Administration
-                description: 'Instance-wide controls for operators. Only ROLE_ADMIN can open this hub.'
+                title: Beheer
+                description: Instantiebrede bediening voor operators. Alleen ROLE_ADMIN kan deze hub openen.
             users:
-                title: Users
-                description: 'List accounts, roles, and enable or disable access on this Beacon instance.'
+                title: Gebruikers
+                description: Toon accounts en rollen, en schakel toegang op deze Beacon-instantie in of uit.
             projects:
-                title: 'All projects'
-                description: 'Cross-project ops — members, groups, and danger-zone actions for any project.'
+                title: Alle projecten
+                description: Projectoverstijgende ops - leden, groepen en danger-zone-acties voor elk project.
             mailer:
                 title: Mailer
-                description: 'Configure the encrypted Mailer DSN used for magic links and notification email.'
+                description: Configureer de versleutelde Mailer-DSN die voor magic links en e-mailmeldingen wordt gebruikt.
             setup:
-                title: 'Setup wizard'
-                description: 'Re-run platform seed, demo project, or sample telemetry when onboarding a new environment.'
+                title: Setup-wizard
+                description: Voer platform seed, demoproject of voorbeeldtelemetrie opnieuw uit bij het onboarden van een nieuwe omgeving.
 legal:
     nav:
         label: Legaal
@@ -1115,154 +1198,28 @@ legal:
         duration_consent: 'Ongeveer 1 jaar'
         purpose_session: 'Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde delen van de dienst te gebruiken.'
         purpose_remember: 'Maakt persistente authenticatie mogelijk wanneer bij het inloggen “Onthoud mij” wordt geselecteerd (veilig token; beperkte geldigheid).'
-        purpose_consent: 'Slaat cookiecategoriekeuzes op en een geanonimiseerde toestemmingssleutel voor verantwoording en auditlogging.'
-        storage_heading: 'Lokale opslag'
-        storage_body: 'Themavoorkeur (licht/donker) kan worden opgeslagen in de localStorage van de browser en is geen HTTP-cookie. Volgens typische ePrivacy-richtlijnen kan dit als strikt noodzakelijk voor een coherente gebruikersinterface worden behandeld; beheerders moeten de toepasselijke regels in hun rechtsgebied bevestigen.'
-notifications:
-    title: Meldingen
-    intro: 'Stuur waarschuwingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek HTTP-eindpunt wanneer er nieuwe problemen, regressies of N+1-groepen verschijnen.'
-    empty: 'Nog geen bestemmingen. Voeg een kanaal toe om uw team op de hoogte te stellen.'
-    add: 'Bestemming toevoegen'
-    edit: Bewerking
-    enable: Inschakelen
-    disable: Uitzetten
-    disabled: Gehandicapt
-    test: 'Test verzenden'
-    test_hint: 'Send a %type%-formatted sample notification (works even if the destination is disabled)'
-    delete: Verwijderen
-    delete_confirm: 'Deze meldingsbestemming verwijderen?'
-    save: 'Bestemming opslaan'
-    cancel: Annuleren
-    new_title: 'Nieuwe meldingsbestemming'
-    edit_title: 'Meldingsbestemming bewerken'
-    form_help: 'Kies een kanaaltype en plak het overeenkomende eindpunt. Geheimen worden gemaskeerd in de instellingenlijst.'
-    form:
-        label: Label
-        type: Type
-        endpoint: Eindpunt
-        endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-webhook-URL. E-mail: adres van de ontvanger. Telegram: bot_token@chat_id'
-        endpoint_invalid: 'Eindpunt komt niet overeen met het geselecteerde type.'
-        endpoint_ssrf: 'Het eindpunt mag zich niet richten op privé-, link-local- of cloud-metagegevensadressen.'
-        enabled: Ingeschakeld
-        categories: Waarschuwingscategorieën
-        quiet_hours_legend: 'Rustige uren en vertering'
-        quiet_hours_enabled: 'Schakel stille uren in'
-        quiet_hours_help: 'Tijdens deze periode worden waarschuwingen gebufferd in plaats van onmiddellijk verzonden. Voer app:notifications:flush-digests uit volgens een schema (of na het venster).'
-        quiet_hours_timezone: Tijdzone
-        quiet_hours_start: 'Rustige uren beginnen (UU:MM)'
-        quiet_hours_end: 'Einde stille uren (UU:MM)'
-        quiet_hours_timezone_invalid: 'Ongeldige tijdzone-ID.'
-        quiet_hours_time_invalid: 'Gebruik het 24-uurs HH:MM-formaat (bijvoorbeeld 22:00).'
-        quiet_hours_required: 'Begin- en eindtijden zijn vereist wanneer stille uren zijn ingeschakeld.'
-        quiet_hours_range_invalid: 'Begin- en eindtijden moeten verschillen.'
-        digest_enabled: 'Stuur een samenvatting van de samenvatting bij het doorspoelen'
-        digest_help: 'Indien ingeschakeld, verzendt Spoelen één samenvatting per bestemming. Indien uitgeschakeld, wordt elke vastgehouden waarschuwing na rustige uren afzonderlijk verzonden.'
-        pagerduty_note: 'Native PagerDuty wordt niet ondersteund; gebruik een generieke HTTP-webhook als u een incidentbrug nodig heeft.'
-    type:
-        slack: 'Slappe inkomende webhook'
-        discord: Discord-webhook
-        teams: 'Microsoft Teams-webhook'
-        telegram: Telegram-bot
-        email: E-mail
-        http: 'Generieke HTTP-webhook'
-    category:
-        fatal: Fataal
-        error: Fout
-        warning: Waarschuwing
-        info: Info
-        debug: Foutopsporing
-        n_plus_one: 'N+1 detecties'
-        issue.resolved: 'Probleem opgelost'
-        issue.reopened: 'Probleem heropend'
-        issue.assigned: 'Probleem toegewezen'
-        issue.commented: 'Probleem becommentarieerd'
-        issue.duplicated: 'Uitgave gemarkeerd als duplicaat'
-        volume.threshold: Volumedrempels
-    flash:
-        created: 'Meldingsbestemming gemaakt.'
-        updated: 'Meldingsbestemming bijgewerkt.'
-        enabled: 'Bestemming ingeschakeld.'
-        disabled: 'Bestemming uitgeschakeld.'
-        deleted: 'Bestemming verwijderd.'
-        test_queued: 'Kanaalspecifieke voorbeeldbemelding in wachtrij voor bezorging.'
-    help:
-        title: 'Handleidingen voor het instellen van meldingen'
-        link: Installatiehandleidingen
-        back: 'Terug naar instellingen'
-        toc: 'Ga naar kanaal'
-        intro: 'Stapsgewijze instructies om Slack, Discord, Microsoft Teams, Telegram, e-mail of een generieke HTTP-webhook aan dit project te koppelen.'
-        payload_label: 'Beacon verzendt:'
-        docs_hint: 'Volledige referentie (payloads, levering, machtigingen): docs/NOTIFICATIONS.md in de repository.'
-        slack:
-            title: 'Slack (inkomende webhook)'
-            lead: 'Maak een Slack-app Inkomende webhook en plak de HTTPS-URL in Beacon.'
-            step1: 'Open api.slack.com/apps en maak een geheel nieuwe app voor uw werkruimte.'
-            step2: 'Schakel inkomende webhooks in, voeg vervolgens een nieuwe webhook toe aan de werkruimte en kies een kanaal.'
-            step3: 'Kopieer de webhook-URL (https://hooks.slack.com/services/…).'
-            step4: 'Kies in Beacon Slack Incoming Webhook, plak de URL als eindpunt, selecteer categorieën en sla op.'
-            step5: 'Klik op Test verzenden en bevestig dat het bericht in Slack verschijnt.'
-            payload: 'JSON met tekst (samenvatting) en een bakenobject dat de volledige payload van de gebeurtenis bevat.'
-            tip: 'Geef de voorkeur aan een speciaal ops-kanaal. Draai de webhook in Slack als deze ooit lekt; update de bestemming in Beacon.'
-        discord:
-            title: 'Onenigheid (webhook)'
-            lead: 'Maak een kanaalwebhook in Discord en plak de URL ervan in Beacon.'
-            step1: 'Open Serverinstellingen → Integraties → Webhooks (of het tabblad Kanaalintegraties).'
-            step2: 'Maak een nieuwe webhook, geef deze een naam (bijvoorbeeld Beacon) en kies het doelkanaal.'
-            step3: 'Kopieer de webhook-URL (https://discord.com/api/webhooks/…).'
-            step4: 'Kies in Beacon Discord-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
-            payload: 'JSON met inhoud (samenvatting) en een insluitingsarray (titel, beschrijving, optionele probleem-URL).'
-            tip: 'Webhooks met onenigheidslimieten; Beacon levert asynchroon via Messenger.'
-        teams:
-            title: 'Microsoft Teams (inkomende webhook)'
-            lead: 'Voeg een Inkomende Webhook-connector toe aan een Teams-kanaal en plak de URL in Beacon.'
-            step1: 'Open in het Teams-kanaalmenu Connectors (of Kanaal beheren → Connectors).'
-            step2: 'Configureer Inkomende Webhook, geef het een naam en maak het.'
-            step3: 'Kopieer de webhook-URL die Teams levert.'
-            step4: 'Kies in Beacon de Microsoft Teams-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
-            payload: 'Office 365 MessageCard JSON met samenvatting, titel, tekst en een actie Openen in Beacon wanneer er een URL bestaat.'
-            tip: 'Als uw tenant alleen werkstromen toestaat in plaats van klassieke inkomende webhooks, wijs dan een algemene HTTP-bestemming naar een werkstroom die POST JSON accepteert.'
-        telegram:
-            title: 'Telegram (bot)'
-            lead: 'Maak een bot met BotFather en sla bot_token@chat_id op als het Beacon-eindpunt.'
-            step1: 'Open @BotFather in Telegram, voer /newbot uit en kopieer het bottoken.'
-            step2: 'Start een privéchat met de bot, of voeg hem toe aan een groep en stuur een bericht.'
-            step3: "Roep getUpdates aan op de Bot API en lees message.chat.id (groeps-ID's zijn vaak negatief)."
-            step4: 'Kies in Beacon de Telegram-bot en stel het eindpunt in op bot_token@chat_id (bijvoorbeeld: 123:AA…@-1001234567890).'
-            step5: 'Test opslaan en verzenden.'
-            payload: 'Bot API sendMessage met chat_id en tekst (alleen samenvatting; niet de volledige JSON-payload).'
-            tip: 'De laatste @ in het eindpunt splitst token en chat-ID. Tokens worden in rust versleuteld, net als andere eindpunten.'
-        email:
-            title: E-mail
-            lead: 'Stuur waarschuwingen naar een mailbox via Symfony Mailer. Configureer eerst MAILER_DSN.'
-            step1: 'Stel MAILER_DSN in .env of productiegeheimen in op een echt transport (SMTP, enz.). null://null levert niet op.'
-            step2: 'Kies in Beacon E-mail en stel het eindpunt in op het adres van de ontvanger.'
-            step3: 'Categorieën selecteren, opslaan, test verzenden en inbox/spam controleren.'
-            payload: 'E-mailonderwerp is gelijk aan de samenvatting; body is de samenvatting plus de probleem- of prestatie-URL, indien aanwezig.'
-            tip: 'Gebruik een gedeelde ops-alias. Voor rijkere samenvattingen geeft u de voorkeur aan Slack/Discord/Teams of een HTTP-bridge.'
-        http:
-            title: 'Generieke HTTP-webhook'
-            lead: 'POST de canonieke Beacon JSON-payload naar elk HTTPS-automatiseringseindpunt.'
-            step1: 'Maak een HTTPS-URL beschikbaar die POST accepteert met Content-Type application/json.'
-            step2: 'Kies in Beacon Generieke HTTP-webhook, plak de URL, selecteer categorieën, sla op en verzend vervolgens de test.'
-            step3: 'Bevestig dat uw service de canonieke JSON-hoofdtekst ontvangt (gebeurtenis, samenvatting, project, probleem, URL, categorie).'
-            payload: 'Canonieke JSON-payload als verzoektekst (User-Agent symfony-beacon-notifications/1.0).'
-            tip: 'Geef de voorkeur aan HTTPS en authenticeer uw ontvanger. Vermijd het verwijzen naar interne of cloud-metagegevensadressen.'
+        purpose_csrf: 'Kortdurende double-submit CSRF-cookie die Symfony zet bij het verzenden van beveiligde formulieren (patroon csrf-token_<token>; __Host- prefix op HTTPS).'
+        purpose_consent: 'Cookie_Consent en Cookie_Consent_Key registreren dat een toestemmingskeuze is gemaakt en koppelen een anonieme sleutel aan het server-side auditlogboek.'
+        purpose_category: 'Cookie_Category_analytics en Cookie_Category_preferences slaan op of elke optionele categorie is geaccepteerd of geweigerd (toestemmingsmechanisme, geen trackers).'
+        storage_heading: Lokale opslag
+        storage_body: 'Themavoorkeur (licht/donker) en sommige UI-lay-outkeuzes kunnen worden opgeslagen in de localStorage van de browser en zijn geen HTTP-cookies. Volgens typische ePrivacy-richtlijnen kan dit als strikt noodzakelijk voor een coherente gebruikersinterface worden behandeld; beheerders moeten de toepasselijke regels in hun rechtsgebied bevestigen.'
+
 releases:
-    title: Release-gezondheid
-    intro: 'Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien, vergelijk twee releases of ga naar de bestaande issue-lijstvergelijking.'
-    empty: 'Er zijn nog geen releasedata beschikbaar voor dit project.'
+    title: 'Release-gezondheid'
+    intro: 'Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien, twee releases te vergelijken of direct naar de bestaande compare van de issuelijst te gaan.'
+    empty: 'Er zijn nog geen releasegegevens beschikbaar voor dit project.'
     focus:
         label: Release
         submit: 'Release-gezondheid bijwerken'
     new_in_release:
         title: 'Nieuw in %release%'
-        count: '%count% issues zijn voor het eerst gezien in deze release.'
+        count: '%count% issues zijn voor het eerst in deze release gezien.'
         open_issue_list: 'Gefilterde issuelijst openen'
-        empty: 'Geen issues zijn voor het eerst gezien in deze release.'
+        empty: 'Er zijn geen issues voor het eerst in deze release gezien.'
     compare:
-        label: 'Vergelijken met release'
+        label: 'Vergelijk met release'
         none: 'Niet vergelijken'
-        help: 'Vergelijk optioneel de geselecteerde release met een andere release op basis van de huidige issues.'
+        help: 'Vergelijk de geselecteerde release optioneel met een andere release met behulp van de huidige set issues.'
         summary_title: 'Vergelijk %a% vs %b%'
         only_a: 'Alleen in %release%'
         only_b: 'Alleen in %release%'
@@ -1271,151 +1228,305 @@ releases:
     catalog:
         title: Releases
     environment_compare:
-        title: Omgevingsvergelijking
+        title: 'Omgevingsvergelijking'
         environment_a: 'Omgeving A'
         environment_b: 'Omgeving B'
-        open_issue_list: 'Vergelijking openen in issuelijst'
-        help: 'Hergebruikt de bestaande issue-lijstvergelijking uit `014`. Wanneer een release is geselecteerd, behoudt de link dat releasefilter.'
+        open_issue_list: 'Vergelijking openen in de issuelijst'
+        help: 'Dit hergebruikt de bestaande `014` compare van de issuelijst. Wanneer een release is geselecteerd, behoudt de link dat releasefilter.'
 mailer_settings:
     title: Mailer
-    intro: 'Sla de Symfony Mailer-DSN versleuteld op in de database (niet in .env). Magic-link-aanmelding blijft verborgen tot hier een niet-null DSN is opgeslagen; e-mailnotificatiedoelen gebruiken ook dit transport.'
+    intro: 'Sla de Symfony Mailer-DSN versleuteld op in de database (niet in .env). Inloggen met magic link blijft verborgen totdat hier een niet-nul-DSN is opgeslagen; e-mailnotificatiedoelen gebruiken ook dit transport.'
     status:
-        database: 'Uitgaande mail gebruikt de DSN opgeslagen in de instance-instellingen. Magic-link-aanmelding is beschikbaar wanneer deze DSN geen null-transport is.'
-        env_fallback: 'Nog geen database-DSN — uitgaande mail valt terug op MAILER_DSN uit de omgeving (meestal null://null). Magic-link blijft uitgeschakeld tot u hier een versleutelde DSN opslaat.'
+        database: 'Uitgaande e-mail gebruikt de DSN die in de instantie-instellingen is opgeslagen. Inloggen met magic link is beschikbaar wanneer deze DSN geen null-transport is.'
+        env_fallback: 'Nog geen database-DSN - uitgaande e-mail valt terug op MAILER_DSN uit de omgeving (meestal null://null). Inloggen met magic link blijft uitgeschakeld totdat je hier een versleutelde DSN opslaat.'
     current_dsn: 'Huidige DSN:'
     from_preview: 'From-adres: %from%'
     submit: 'Mailer-instellingen opslaan'
-    magic_ready: 'Magic-link-e-mailcredentials zijn klaar'
-    magic_blocked: 'Magic-link-e-mail niet beschikbaar (sla een bruikbare versleutelde DSN op)'
+    magic_ready: 'E-mailreferenties voor magic link zijn gereed'
+    magic_blocked: 'Magic-link-e-mail is niet beschikbaar (sla een afleverbare versleutelde DSN op)'
     sample:
-        title: 'Voorbeeldmail versturen'
-        intro: 'Levert een testbericht via de versleutelde Mailer-DSN (zelfde transport als magic-link-aanmelding).'
+        title: 'Voorbeeldmail verzenden'
+        intro: 'Verstuurt een testbericht met de versleutelde Mailer-DSN (hetzelfde transport als voor inloggen met magic link).'
         to_label: Ontvanger
-        submit: 'Voorbeeld versturen'
-        unavailable: 'Sla eerst een geldige versleutelde Mailer-DSN op (niet null://), daarna kunt u een voorbeeld versturen.'
-        email_subject: 'Beacon mailer-voorbeeld (magic-login credentials)'
+        submit: 'Voorbeeld verzenden'
+        unavailable: 'Sla eerst een geldige versleutelde Mailer-DSN op (niet null://), daarna kun je een voorbeeld verzenden.'
+        email_subject: 'Beacon Mailer-voorbeeld (magic-loginreferenties)'
         email_body: |
-            Dit is een voorbeeldbericht van Administratie → Mailer.
+            Dit is een voorbeeldbericht uit Beheer -> Mailer.
 
-            Als u dit hebt ontvangen, kan de versleutelde Mailer-DSN magic-login-e-mails afleveren.
+            Als je dit hebt ontvangen, kan de versleutelde Mailer-DSN magic-loginmails afleveren.
             From-adres: %from%
 mercure_settings:
     title: Mercure
-    intro: 'Optionele live meldingen voor aangemelde leden wanneer een nieuw issue wordt aangemaakt. Standaard uitgeschakeld — schakel alleen in wanneer een Mercure-hub beschikbaar is. Web Push blijft een aparte opt-in onder Account → Weergave.'
-    manual_hint: 'Handleiding voor beheerders (hub, JWT-geheim, Compose, probleemoplossing): docs/MERCURE.md in de repository.'
+    intro: 'Optionele livemeldingen voor aangemelde leden wanneer een nieuwe issue wordt aangemaakt. Standaard uitgeschakeld - alleen inschakelen wanneer een Mercure-hub beschikbaar is. Web Push blijft een aparte opt-in onder Account -> Weergave.'
+    manual_hint: 'Operatorhandleiding (hub, JWT-secret, Compose, probleemoplossing): docs/MERCURE.md in de repository.'
     status:
         active: 'Live Mercure-meldingen zijn ingeschakeld voor leden.'
-        inactive: 'Mercure is uit'
-        inactive_help: 'Leden openen geen EventSource tot u Mercure hier inschakelt en een bereikbare hub-URL plus JWT-geheim opgeeft (hieronder of via de omgeving).'
-        url_database: 'Hub publish-URL is opgeslagen in de instance-instellingen.'
-        url_env: 'Hub publish-URL valt terug op MERCURE_URL uit de omgeving.'
-        url_missing: 'Geen hub publish-URL geconfigureerd (stel hieronder of MERCURE_URL in).'
-        secret_database: 'JWT-geheim is versleuteld opgeslagen in de instance-instellingen.'
-        secret_env: 'JWT-geheim valt terug op MERCURE_JWT_SECRET uit de omgeving.'
-        secret_missing: 'Geen JWT-geheim geconfigureerd (stel hieronder of MERCURE_JWT_SECRET in).'
-    public_url_preview: 'Browser hub-URL: %url%'
-    push_note: 'Achtergrond-PWA-push wordt per gebruiker geconfigureerd onder Account → Weergave (vereist VAPID_*-sleutels). Onafhankelijk van Mercure.'
+        inactive: 'Mercure staat uit'
+        inactive_help: 'Leden openen geen EventSource totdat je Mercure hier inschakelt en een bereikbare hub-URL + JWT-secret opgeeft (hieronder opgeslagen of via de omgeving).'
+        url_database: 'De hub publish-URL is opgeslagen in de instantie-instellingen.'
+        url_env: 'De hub publish-URL valt terug op MERCURE_URL uit de omgeving.'
+        url_missing: 'Geen hub publish-URL geconfigureerd (stel hieronder in of gebruik MERCURE_URL).'
+        secret_database: 'Het JWT-secret is versleuteld opgeslagen in de instantie-instellingen.'
+        secret_env: 'Het JWT-secret valt terug op MERCURE_JWT_SECRET uit de omgeving.'
+        secret_missing: 'Geen JWT-secret geconfigureerd (stel hieronder in of gebruik MERCURE_JWT_SECRET).'
+    public_url_preview: 'Browser-hub-URL: %url%'
+    push_note: 'PWA-push op de achtergrond wordt per gebruiker ingesteld onder Account -> Weergave (vereist VAPID_*-sleutels). Het hangt niet af van Mercure.'
     submit: 'Mercure-instellingen opslaan'
 instance_mercure:
     enabled:
-        label: 'Mercure live-meldingen inschakelen'
-        help: 'Wanneer ingeschakeld, abonneren aangemelde leden zich op privé projecttopics voor toasts bij nieuwe issues zolang de app open is.'
+        label: 'Mercure-livemeldingen inschakelen'
+        help: 'Wanneer ingeschakeld abonneren aangemelde leden zich op prive-projecttopics voor nieuwe-issue-toasts zolang de app open is.'
     url:
         label: 'Publish-URL (server)'
-        help: 'Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure in Compose).'
+        help: 'Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure binnen Compose).'
     public_url:
         label: 'Publieke URL (browser)'
         help: 'Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure via Caddy).'
     jwt_secret:
-        label: JWT-geheim
-        help: 'Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET. Minimaal 32 tekens bij invoer.'
-        too_short: 'JWT-geheim moet minimaal 32 tekens bevatten.'
-        invalid: 'Voer een geldige JWT-geheimstring in.'
+        label: 'JWT-secret'
+        help: 'Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET. Minimaal 32 tekens indien ingesteld.'
+        too_short: 'JWT-secret moet minimaal 32 tekens bevatten.'
+        invalid: 'Voer een geldige JWT-secretstring in.'
     clear_secret:
-        label: 'Opgeslagen JWT-geheim wissen'
-        help: 'Verwijdert het databasegeheim en valt terug op MERCURE_JWT_SECRET tot u een nieuw geheim opslaat.'
+        label: 'Opgeslagen JWT-secret wissen'
+        help: 'Verwijdert het secret uit de database en valt terug op MERCURE_JWT_SECRET totdat je een nieuwe opslaat.'
 instance_mailer:
     mailer_dsn:
-        label: Mailer-DSN
-        help: 'Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587 — null:// wordt geweigerd (gebruik Opgeslagen DSN wissen).'
+        label: 'Mailer-DSN'
+        help: 'Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587 - null:// wordt afgewezen (gebruik in plaats daarvan Opgeslagen DSN wissen).'
         placeholder: 'smtp://user:pass@mail.example:587'
-        invalid: 'Voer een geldige Symfony Mailer-DSN in (bijv. smtp://user:pass@host:587).'
-        null_transport: 'null:// kan geen mail afleveren. Plak een echte SMTP- (of andere) DSN, of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.'
+        invalid: 'Voer een geldige Symfony Mailer-DSN in (bijvoorbeeld smtp://user:pass@host:587).'
+        null_transport: 'null:// kan geen e-mail afleveren. Plak een echte SMTP-DSN (of andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.'
     clear_dsn:
         label: 'Opgeslagen DSN wissen'
-        help: 'Verwijdert de database-DSN en valt terug op MAILER_DSN uit de omgeving tot u een nieuwe opslaat.'
+        help: 'Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving totdat je een nieuwe opslaat.'
     mailer_from:
-        label: From-adres
-        help: 'Envelope From voor magic-login en notificatie-e-mails. Standaard beacon@localhost wanneer leeg.'
+        label: 'From-adres'
+        help: 'Envelope From voor magic login en notificatiemails. Standaard beacon@localhost wanneer leeg.'
 setup:
-    eyebrow: 'Eerste start'
-    title: Instance-configuratie
-    intro: 'Installeer navigatiecatalogi en optionele demogegevens. Dezelfde stappen als de CLI-seedlagen.'
-    intro_required: "Navigatiecatalogi ontbreken. Installeer menu's, breadcrumbs en het cookieconsentprofiel voordat u verdergaat."
-    intro_bootstrap: 'Platformcatalogi zijn klaar. Registreer de eerste admin, laad optioneel sampletelemetrie en markeer de configuratie als voltooid.'
-    already_done: 'De configuratie is als voltooid gemarkeerd.'
+    eyebrow: 'Eerste keer'
+    title: 'Instantie-setup'
+    intro: 'Installeer navigatiecatalogi en optionele demogegevens. Dezelfde stappen als in de CLI-seedlagen.'
+    intro_required: 'Navigatiecatalogi ontbreken. Installeer menu''s, breadcrumbs en het cookie-consentprofiel voordat je doorgaat.'
+    intro_bootstrap: 'Platformcatalogi zijn gereed. Registreer de eerste beheerder, laad optioneel voorbeeldtelemetrie en markeer de setup daarna als voltooid.'
+    already_done: 'De setup is gemarkeerd als voltooid.'
     back_dashboard: 'Terug naar dashboard'
-    login_setup_link: 'Eerste configuratie'
-    bootstrap_login_hint: 'Liever uw eigen admin aanmaken?'
-    bootstrap_login_link: Aanmelden
-    bootstrap_register_link: 'Eerste admin registreren'
+    login_setup_link: 'Eerste setup'
+    progress_of: 'Stap %current% van %total%'
+    log:
+        tabs_label: 'Setup-voortgang'
+        tab: Log
+        completed: Voltooid
+    admin:
+        email: E-mail
+        password: Wachtwoord
+    token:
+        title: 'Setup-token vereist'
+        body: 'Open %path% met de geconfigureerde setup.setup_token.'
+    reason:
+        heading: 'Setup is vereist'
+        db_connection: 'De database is niet bereikbaar met de huidige DATABASE_URL (ontbreekt, onjuist of de DB-service is niet beschikbaar).'
+        db_connection_hint: 'Configureer een werkende DATABASE_URL in de databasestap voordat je doorgaat. Overslaan blijft uitgeschakeld totdat de verbinding werkt.'
+        db_connection_form: 'Databaseverbinding mislukt. Voer een geldige DATABASE_URL in (wordt geschreven naar .env.local). Je kunt deze stap niet overslaan totdat de database antwoordt.'
+        db_schema_empty: 'De database verbindt wel, maar bevat nog geen tabellen - migraties / import maken het schema aan.'
+        db_schema_hint: 'Ga verder met de wizard om migraties uit te voeren (of een volledige dump te importeren). Je hoeft DATABASE_URL niet te wijzigen als de verbinding al werkt.'
+        marker_required: 'Er is een setup.required-marker aanwezig (cold start of na restore).'
+        marker_done_missing: 'setup.done ontbreekt terwijl require_done_marker is ingeschakeld.'
+        incomplete: 'Wizard in uitvoering: %detail%'
+    database:
+        intro: 'Optioneel - leeg laten en overslaan als DATABASE_URL uit de omgeving al werkt.'
+    bootstrap_login_hint: 'Maak je liever je eigen beheerder aan?'
+    bootstrap_login_link: 'Inloggen'
+    bootstrap_register_link: 'Eerste beheerder registreren'
     banner:
-        title: 'Instance-configuratie afronden'
-        body: "Installeer menu's/breadcrumbs en optionele demosamples voor deze Beacon-instance."
-        cta: 'Configuratie openen'
+        title: 'Instantie-setup afronden'
+        body: 'Installeer menu''s/breadcrumbs en optionele demovoorbeelden voor deze Beacon-instantie.'
+        cta: 'Setup openen'
     step_platform:
-        title: 'Verplicht — platformcatalogi'
-        body: "Installeer dashboardmenu's, breadcrumbs en het cookieconsentprofiel/inventaris. Deze stap is verplicht voordat de rest van de app werkt."
-        item_menus: "Menu's (dashboard, preferences, administration)"
-        item_breadcrumbs: 'Breadcrumb-collectie (default)'
-        item_cookies: Cookieconsentprofiel
-        cta: "Menu's, breadcrumbs en cookies installeren"
+        title: 'Verplicht - platformcatalogi'
+        body: 'Installeer dashboardmenu''s, breadcrumbs en het cookie-consentprofiel/-overzicht. Deze stap is verplicht voordat de rest van de app werkt.'
+        item_menus: 'Menu''s (dashboard, preferences, administration)'
+        item_breadcrumbs: 'Breadcrumbverzameling (standaard)'
+        item_cookies: 'Cookie-consentprofiel'
+        cta: 'Menu''s, breadcrumbs en cookies installeren'
         cta_again: 'Platform-seed opnieuw uitvoeren'
-        done: 'Platformcatalogi zijn geïnstalleerd.'
+        done: 'Platformcatalogi zijn geinstalleerd.'
     step_options:
         title: 'Optionele volgende stappen'
-        body: 'Maak het eerste adminaccount aan en/of laad een volledige sampledataset. Beide zijn optioneel.'
+        body: 'Maak het eerste beheerdersaccount en/of laad een volledige voorbeelddataset. Je kunt beide overslaan.'
         locked: 'Rond eerst de verplichte platforminstallatie af.'
-        register_title: 'Eerste gebruiker aanmaken'
-        register_body: 'Registreer uw eigen admin via AuthKit (registratie alleen voor de eerste gebruiker).'
-        register_cta: 'Eerste admin registreren'
-        register_done: 'Er bestaat al minstens één gebruiker.'
-        sample_title: 'Volledige sampleload'
-        sample_body: 'Maak indien nodig het demoproject aan en laad de grotere sampletelemetriedataset (load-profiel).'
-        sample_cta: 'Volledige sampleload installeren'
-        sample_note: 'Dit kan een minuut duren. Huge-datasets blijven alleen via CLI (`app:seed-sample --size=huge --force`). Als er nog geen gebruiker bestaat, kan een lokale demoadmin worden aangemaakt als eigenaar van het demoproject.'
+        register_title: 'Eerste gebruiker maken'
+        register_body: 'Registreer je eigen beheerder via AuthKit (registratie alleen voor de eerste gebruiker).'
+        register_cta: 'Eerste beheerder registreren'
+        register_done: 'Er bestaat al minstens een gebruiker.'
+        sample_title: 'Volledige voorbeeldlading'
+        sample_body: 'Maak indien nodig het demoproject aan en laad de grotere voorbeeldtelemetrieset (load-profiel).'
+        sample_cta: 'Volledige voorbeeldlading installeren'
+        sample_note: 'Dit kan een minuut duren. Huge-datasets blijven alleen beschikbaar via CLI (`app:seed-sample --size=huge --force`).'
+        sample_requires_register: 'Registreer de eerste beheerder voordat je voorbeeldtelemetrie laadt (het demoproject is eigendom van jouw account).'
     step_demo:
-        title: Demoproject
-        body: 'Maak de lokale demoadmin aan (indien ontbrekend) en het demoproject met een API-sleutel.'
-        cta: 'Demoproject aanmaken'
+        title: 'Demoproject'
+        body: 'Maak de lokale demobeheerder aan (indien afwezig) en het demoproject met een API-sleutel.'
+        cta: 'Demoproject maken'
         exists: 'Demoproject is al aanwezig.'
     step_sample:
-        title: Sampletelemetrie
-        body: 'Laad synthetische issues voor QA. Vereist het demoproject. Huge blijft alleen via CLI.'
-        dev: 'Sample laden (dev)'
-        load: 'Sample laden (load)'
+        title: 'Voorbeeldtelemetrie'
+        body: 'Laad synthetische issues voor QA. Vereist het demoproject. Huge-grootte blijft alleen CLI.'
+        dev: 'Voorbeeld laden (dev)'
+        load: 'Voorbeeld laden (load)'
         need_demo: 'Maak eerst het demoproject aan.'
     step_done:
         title: Klaar
-        body: 'Sluit deze wizard. U kunt Configuratie altijd opnieuw openen via Administratie.'
-        cta: 'Configuratie als voltooid markeren'
-    cli_hint: 'CLI-equivalent: make bootstrap && make seed && make seed-sample — zie docs/INSTALL.md'
+        body: 'Sluit deze wizard. Je kunt Setup op elk moment opnieuw openen vanuit Beheer.'
+        cta: 'Setup als voltooid markeren'
+    cli_hint: 'CLI-equivalent: make bootstrap && make seed && make seed-sample - zie docs/INSTALL.md'
     flash:
-        platform_ok: 'Navigatiecatalogi en cookieconsent bijgewerkt.'
-        platform_required: "Installeer eerst menu's, breadcrumbs en cookieconsent."
-        demo_ok: 'Demogebruiker / -project klaar.'
-        demo_exists: 'Demogebruiker en -project bestaan al.'
-        sample_ok: 'Sampletelemetrie geladen. Mercure live-meldingen zijn indien nodig ingeschakeld met omgevingsstandaarden.'
-        sample_demo_user: 'Lokale demoadmin admin@symfony-beacon.local / admin123 aangemaakt als eigenaar van het demoproject.'
-        complete: 'Configuratie als voltooid gemarkeerd.'
-        bootstrap_ready: 'Configuratie voltooid. Meld u aan of registreer de eerste admin om verder te gaan.'
-        unknown_action: 'Onbekende configuratieactie.'
-        failed: 'Configuratieactie mislukt.'
+        platform_ok: 'Navigatiecatalogi en cookie-consent bijgewerkt.'
+        platform_required: 'Installeer eerst menu''s, breadcrumbs en cookie-consent.'
+        demo_ok: 'Demogebruiker / project gereed.'
+        demo_exists: 'Demogebruiker en demoproject bestaan al.'
+        sample_ok: 'Voorbeeldtelemetrie geladen. Live Mercure-meldingen zijn indien nodig ingeschakeld met standaard omgevingswaarden.'
+        sample_requires_user: 'Log in of registreer de eerste beheerder voordat je voorbeeldgegevens laadt.'
+        sample_demo_user: 'Lokale demobeheerder admin@symfony-beacon.local / admin123 gemaakt als eigenaar van het demoproject.'
+        complete: 'Setup als voltooid gemarkeerd.'
+        bootstrap_ready: 'Setup voltooid. Log in of registreer de eerste beheerder om verder te gaan.'
+        unknown_action: 'Onbekende setup-actie.'
+        failed: 'Setup-actie mislukt.'
+notifications:
+    title: Meldingen
+    intro: 'Stuur meldingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek HTTP-endpoint wanneer nieuwe issues, regressies, drempelpieken of N+1-groepen verschijnen.'
+    empty: 'Nog geen bestemmingen. Voeg een kanaal toe om je team te waarschuwen.'
+    add: 'Bestemming toevoegen'
+    edit: Bewerken
+    enable: Inschakelen
+    disable: Uitschakelen
+    disabled: Uitgeschakeld
+    test: 'Test verzenden'
+    test_hint: 'Verzend een voorbeeldmelding in %type%-indeling (werkt ook als de bestemming is uitgeschakeld)'
+    delete: Verwijderen
+    delete_confirm: 'Deze meldingsbestemming verwijderen?'
+    save: 'Bestemming opslaan'
+    cancel: Annuleren
+    new_title: 'Nieuwe meldingsbestemming'
+    edit_title: 'Meldingsbestemming bewerken'
+    form_help: 'Kies een kanaaltype en plak het bijbehorende endpoint. Geheimen worden in de instellingenlijst gemaskeerd.'
+    form:
+        label: Label
+        type: Type
+        endpoint: Endpoint
+        endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-webhook-URL. E-mail: ontvangeradres. Telegram: bot_token@chat_id'
+        endpoint_invalid: 'Endpoint komt niet overeen met het geselecteerde type.'
+        endpoint_ssrf: 'Endpoint mag niet verwijzen naar private, link-local- of cloudmetadata-adressen.'
+        enabled: Ingeschakeld
+        categories: 'Meldingscategorieen'
+        quiet_hours_legend: 'Stille uren en digest'
+        quiet_hours_enabled: 'Stille uren inschakelen'
+        quiet_hours_help: 'Tijdens dit venster worden meldingen gebufferd in plaats van direct verzonden. Voer app:notifications:flush-digests volgens schema uit (of na het venster).'
+        quiet_hours_timezone: Tijdzone
+        quiet_hours_start: 'Begin stille uren (HH:MM)'
+        quiet_hours_end: 'Einde stille uren (HH:MM)'
+        quiet_hours_timezone_invalid: 'Ongeldige tijdzone-id.'
+        quiet_hours_time_invalid: 'Gebruik 24-uursindeling HH:MM (bijv. 22:00).'
+        quiet_hours_required: 'Start- en eindtijd zijn verplicht wanneer stille uren zijn ingeschakeld.'
+        quiet_hours_range_invalid: 'Start- en eindtijd moeten verschillen.'
+        digest_enabled: 'Digestsamenvatting verzenden bij flush'
+        digest_help: 'Wanneer ingeschakeld verzendt flush een samenvatting per bestemming. Wanneer uitgeschakeld wordt elke vastgehouden melding afzonderlijk verzonden na de stille uren.'
+        pagerduty_note: 'Native PagerDuty wordt niet ondersteund; gebruik een generieke HTTP-webhook als je een incidentbrug nodig hebt.'
+    type:
+        slack: 'Slack Incoming Webhook'
+        discord: 'Discord-webhook'
+        teams: 'Microsoft Teams-webhook'
+        telegram: 'Telegram-bot'
+        email: E-mail
+        http: 'Generieke HTTP-webhook'
+    category:
+        fatal: Fatal
+        error: Fout
+        warning: Waarschuwing
+        info: Info
+        debug: Debug
+        n_plus_one: 'N+1-detecties'
+        'volume.threshold': 'Volumedrempels'
+        issue.resolved: 'Issue opgelost'
+        issue.reopened: 'Issue heropend'
+        issue.assigned: 'Issue toegewezen'
+        issue.commented: 'Issue becommentarieerd'
+        issue.duplicated: 'Issue als duplicaat gemarkeerd'
+    flash:
+        created: 'Meldingsbestemming aangemaakt.'
+        updated: 'Meldingsbestemming bijgewerkt.'
+        enabled: 'Bestemming ingeschakeld.'
+        disabled: 'Bestemming uitgeschakeld.'
+        deleted: 'Bestemming verwijderd.'
+        test_queued: 'Kanaaleigen voorbeeldmelding in wachtrij geplaatst voor levering.'
+    help:
+        title: 'Handleidingen voor notificatie-setup'
+        link: 'Setup-handleidingen'
+        back: 'Terug naar instellingen'
+        toc: 'Ga naar kanaal'
+        intro: 'Stapsgewijze instructies om Slack, Discord, Microsoft Teams, Telegram, e-mail of een generieke HTTP-webhook met dit project te verbinden.'
+        payload_label: 'Beacon verzendt:'
+        docs_hint: 'Volledige referentie (payloads, levering, rechten): docs/NOTIFICATIONS.md in de repository.'
+        slack:
+            title: 'Slack (Incoming Webhook)'
+            lead: 'Maak een Incoming Webhook voor een Slack-app aan en plak de HTTPS-URL in Beacon.'
+            step1: 'Open api.slack.com/apps en maak een app From scratch voor je workspace.'
+            step2: 'Schakel Incoming Webhooks in, kies daarna Add New Webhook to Workspace en selecteer een kanaal.'
+            step3: 'Kopieer de webhook-URL (https://hooks.slack.com/services/...).'
+            step4: 'Kies in Beacon Slack Incoming Webhook, plak de URL als endpoint, selecteer categorieen en sla op.'
+            step5: 'Klik op Test verzenden en controleer of het bericht in Slack verschijnt.'
+            payload: 'JSON met text (samenvatting) en een beacon-object met de volledige eventpayload.'
+            tip: 'Gebruik bij voorkeur een apart ops-kanaal. Roteer de webhook in Slack als die ooit uitlekt en werk de bestemming in Beacon bij.'
+        discord:
+            title: 'Discord (webhook)'
+            lead: 'Maak een kanaalwebhook in Discord aan en plak de URL in Beacon.'
+            step1: 'Open Serverinstellingen -> Integraties -> Webhooks (of het tabblad Integraties van het kanaal).'
+            step2: 'Maak een nieuwe webhook, geef die een naam (bijvoorbeeld Beacon) en kies het doelkanaal.'
+            step3: 'Kopieer de webhook-URL (https://discord.com/api/webhooks/...).'
+            step4: 'Kies in Beacon Discord-webhook, plak de URL, selecteer categorieen, sla op en verzend daarna een test.'
+            payload: 'JSON met content (samenvatting) en een embeds-array (title, description, optionele issue-URL).'
+            tip: 'Discord beperkt webhooks; Beacon levert asynchroon via Messenger.'
+        teams:
+            title: 'Microsoft Teams (Incoming Webhook)'
+            lead: 'Voeg een Incoming Webhook-connector toe aan een Teams-kanaal en plak de URL in Beacon.'
+            step1: 'Open in het Teams-kanaalmenu Connectors (of Kanaal beheren -> Connectors).'
+            step2: 'Configureer Incoming Webhook, geef deze een naam en maak deze aan.'
+            step3: 'Kopieer de webhook-URL die Teams verstrekt.'
+            step4: 'Kies in Beacon Microsoft Teams-webhook, plak de URL, selecteer categorieen, sla op en verzend daarna een test.'
+            payload: 'Office 365 MessageCard-JSON met summary, title, text en een Open in Beacon-actie wanneer een URL bestaat.'
+            tip: 'Als je tenant alleen Workflows toestaat in plaats van klassieke Incoming Webhooks, laat dan een generieke HTTP-bestemming wijzen naar een workflow die POST-JSON accepteert.'
+        telegram:
+            title: 'Telegram (bot)'
+            lead: 'Maak een bot met BotFather en sla bot_token@chat_id op als Beacon-endpoint.'
+            step1: 'Open @BotFather in Telegram, voer /newbot uit en kopieer het bottoken.'
+            step2: 'Start een privechat met de bot, of voeg hem toe aan een groep en stuur een bericht.'
+            step3: 'Roep getUpdates aan op de Bot API en lees message.chat.id uit (groeps-id''s zijn vaak negatief).'
+            step4: 'Kies in Beacon Telegram-bot en stel het endpoint in op bot_token@chat_id (voorbeeld - 123:AA...@-1001234567890).'
+            step5: 'Opslaan en Test verzenden.'
+            payload: 'Bot API sendMessage met chat_id en text (alleen de samenvatting; niet de volledige JSON-payload).'
+            tip: 'De laatste @ in het endpoint splitst token en chat-id. Tokens worden net als andere endpoints versleuteld in rust opgeslagen.'
+        email:
+            title: E-mail
+            lead: 'Lever meldingen af in een mailbox via Symfony Mailer. Configureer eerst de Mailer-DSN onder Beheer -> Mailer.'
+            step1: 'Open Beheer -> Mailer en sla een versleutelde DSN op (smtp://...). MAILER_DSN uit de omgeving is alleen een bootstrapfallback; null://null levert niets af.'
+            step2: 'Kies in Beacon E-mail en stel het endpoint in op het ontvangeradres.'
+            step3: 'Selecteer categorieen, sla op, verzend een test en controleer inbox/spam.'
+            payload: 'Het e-mailonderwerp is gelijk aan de samenvatting; de berichttekst is de samenvatting plus de issue- of performance-URL wanneer aanwezig.'
+            tip: 'Gebruik een gedeelde ops-alias. Voor rijkere digests zijn Slack/Discord/Teams of een HTTP-bridge beter.'
+        http:
+            title: 'Generieke HTTP-webhook'
+            lead: 'POST de canonieke Beacon-JSON-payload naar elk HTTPS-automatiseringsendpoint.'
+            step1: 'Bied een HTTPS-URL aan die POST met Content-Type application/json accepteert.'
+            step2: 'Kies in Beacon Generieke HTTP-webhook, plak de URL, selecteer categorieen, sla op en verzend daarna een test.'
+            step3: 'Controleer of je service de canonieke JSON-body ontvangt (event, summary, project, issue, url, category).'
+            payload: 'Canonieke JSON-payload als requestbody (User-Agent symfony-beacon-notifications/1.0).'
+            tip: 'Gebruik bij voorkeur HTTPS en autenticeer je ontvanger. Vermijd interne of cloudmetadata-adressen.'
 thresholds:
-    title: Drempelmeldingen
-    intro: 'Maak rollende volumemeldingen wanneer error- of fatal-gebeurtenissen een geconfigureerd aantal overschrijden binnen een tijdvenster.'
-    ingest_disabled: 'Ingest is opgeschort voor dit project, dus drempelregels worden niet geëvalueerd.'
-    empty: 'Nog geen drempelregels. Voeg er een toe om plotselinge pieken te detecteren.'
+    title: 'Drempelmeldingen'
+    intro: 'Maak rollende volumemeldingen wanneer error- of fatal-events een geconfigureerd aantal overschrijden binnen een tijdvenster.'
+    ingest_disabled: 'Ingest is opgeschort voor dit project, dus drempelregels worden niet geevalueerd.'
+    empty: 'Nog geen drempelregels. Voeg er een toe om plotselinge pieken op te vangen.'
     add: 'Regel toevoegen'
     edit: Bewerken
     enable: Inschakelen
@@ -1427,7 +1538,7 @@ thresholds:
     cancel: Annuleren
     new_title: 'Nieuwe drempelregel'
     edit_title: 'Drempelregel bewerken'
-    form_help: 'Configureer een rollende error/fatal-volumemelding. Optionele omgevings- en releasefilters beperken de telling voordat notificatierouting, stille uren en digests worden toegepast.'
+    form_help: 'Configureer een rollende error/fatal-volumemelding. Optionele filters voor omgeving en release beperken de telling voordat routering, stille uren en digests worden toegepast.'
     unnamed: 'Naamloze regel'
     summary: '%count% gebeurtenissen in %window% min · %cooldown% min cooldown'
     last_fired: 'Laatst geactiveerd'
@@ -1438,17 +1549,17 @@ thresholds:
         all_events: 'Alle omgevingen en releases'
     form:
         label: Label
-        label_help: 'Optionele interne naam weergegeven in Instellingen en payloads.'
+        label_help: 'Optionele interne naam die wordt getoond in Settings en payloads.'
         enabled: Ingeschakeld
         error_count: 'Aantal fouten'
-        error_count_help: 'Melden wanneer minstens zoveel error/fatal-gebeurtenissen binnen het rollende venster worden ontvangen.'
+        error_count_help: 'Waarschuw wanneer minstens zoveel error/fatal-events binnen het rollende venster worden ontvangen.'
         window_minutes: 'Venster (minuten)'
         window_minutes_help: 'Rollend terugkijkvenster van 1 tot 1440 minuten.'
         cooldown_minutes: 'Cooldown (minuten)'
-        cooldown_minutes_help: 'Onderdruk dubbele meldingen voor deze regel tijdens het cooldownvenster.'
-        environment: Omgevingsfilter
+        cooldown_minutes_help: 'Onderdrukt dubbele meldingen voor deze regel tijdens het cooldownvenster.'
+        environment: 'Omgevingsfilter'
         environment_help: 'Leeg laten om alle omgevingen te tellen.'
-        release: Releasefilter
+        release: 'Releasefilter'
         release_help: 'Leeg laten om alle releases te tellen.'
     flash:
         created: 'Drempelregel aangemaakt.'
@@ -1458,7 +1569,7 @@ thresholds:
         deleted: 'Drempelregel verwijderd.'
     validation:
         label_length: 'Label mag maximaal 120 tekens bevatten.'
-        error_count_min: 'Aantal fouten moet minstens 1 zijn.'
+        error_count_min: 'Aantal fouten moet minimaal 1 zijn.'
         window_range: 'Venster moet tussen 1 en 1440 minuten liggen.'
         cooldown_range: 'Cooldown moet tussen 1 en 10080 minuten liggen.'
         environment_length: 'Omgeving mag maximaal 80 tekens bevatten.'

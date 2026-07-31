@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Mercure;
 
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Enables Mercure with Compose/env defaults when sample telemetry is loaded.
@@ -16,8 +17,11 @@ final readonly class MercureSampleSeeder
     public function __construct(
         private InstanceSettingsRepository $settingsRepository,
         private ConfiguredMercure $configuredMercure,
+        #[Autowire('%beacon.mercure.env_url%')]
         private string $envUrl,
+        #[Autowire('%beacon.mercure.env_public_url%')]
         private string $envPublicUrl,
+        #[Autowire('%beacon.mercure.env_jwt_secret%')]
         private string $envJwtSecret,
     ) {
     }

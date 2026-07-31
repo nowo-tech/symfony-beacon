@@ -7,6 +7,7 @@ namespace App\Notifications\Service;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use DateTimeImmutable;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Appends bounded delivery history and keeps the summary fields in sync.
@@ -15,6 +16,7 @@ final readonly class NotificationDeliveryHistoryRecorder
 {
     public function __construct(
         private NotificationDeliveryAttemptRepository $attemptRepository,
+        #[Autowire('%beacon.notifications.delivery_history_limit%')]
         private int $historyLimit,
     ) {
     }

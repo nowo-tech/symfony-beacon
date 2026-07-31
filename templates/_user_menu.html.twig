@@ -21,7 +21,11 @@
             {% endif %}
 
             <div class="user-menu__footer">
-                <a class="user-menu__link user-menu__link--danger" role="menuitem" href="{{ path('nowo_auth_kit_logout', auth_kit_route_params()) }}">{{ 'nav.log_out'|trans }}</a>
+                <a
+                    class="user-menu__link user-menu__link--danger"
+                    role="menuitem"
+                    href="{{ path('nowo_auth_kit_logout', auth_kit_route_params()|merge({_csrf_token: csrf_token('logout')})) }}"
+                >{{ 'nav.log_out'|trans }}</a>
             </div>
         </div>
     </details>

@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Nowo\AuthKitBundle\MagicLogin\MagicLoginNotifierInterface: '@App\Identity\AuthKit\AuthKitMagicLoginMailNotifier'
+    Nowo\AuthKitBundle\PasswordReset\PasswordResetNotifierInterface: '@App\Identity\AuthKit\AuthKitPasswordResetMailNotifier'
+
+    Nowo\AuthKitBundle\MagicLogin\MagicLoginRequestHandler:
+        arguments:
+            $loginLinkHandler: '@security.authenticator.login_link_handler.main'
+
+    # Decorates AuthKitRouteLoader only — must not also register as a second routing.loader.
+    App\Identity\Routing\MagicLoginCheckRouteLoaderDecorator:
+        autoconfigure: false
+        decorates: Nowo\AuthKitBundle\Routing\AuthKitRouteLoader

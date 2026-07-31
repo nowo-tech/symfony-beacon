@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.display.notifications_title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-4">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
+        <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.notifications_intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_display_tabs.html.twig' %}
+
+    {% if form.pushNotificationsEnabled is defined %}
+        {{ form_start(form) }}
+            <section class="panel space-y-3" aria-labelledby="display-push-heading">
+                <div>
+                    <h2 id="display-push-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.push_title'|trans }}</h2>
+                    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.push_intro'|trans }}</p>
+                </div>
+                {{ form_row(form.pushNotificationsEnabled) }}
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.push_privacy'|trans }}</p>
+            </section>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
+            </div>
+        {{ form_end(form) }}
+    {% else %}
+        <section class="panel space-y-3" aria-labelledby="display-push-heading">
+            <div>
+                <h2 id="display-push-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.push_title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.push_intro'|trans }}</p>
+            </div>
+            <div class="rounded-md border border-[var(--color-sand)] bg-[var(--color-sand)]/30 px-3 py-2 text-sm text-[var(--color-ink)]/65">
+                <p class="font-medium text-[var(--color-ink)]">{{ 'preferences.push_unavailable_title'|trans }}</p>
+                <p class="mt-1 text-xs">{{ 'preferences.push_unavailable_help'|trans }}</p>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="panel space-y-3" aria-labelledby="display-pwa-heading">
+        <div>
+            <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>
+        </div>
+        {{ nowo_pwa_install_links() }}
+    </section>
+</div>
+{% endblock %}

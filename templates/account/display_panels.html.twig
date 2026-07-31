@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.display.panels_title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/nowotaginput/tag-input.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/nowotaginput/tag-input.js') }}" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-4">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
+        <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.panels_intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_display_tabs.html.twig' %}
+
+    {{ form_start(form) }}
+        <section class="panel space-y-4" aria-labelledby="display-panels-heading">
+            <h2 id="display-panels-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.panels_title'|trans }}</h2>
+            {{ form_row(form.preferredCollapsedIssuePanels) }}
+            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_ids_hint'|trans }}</p>
+            <ul class="issue-panel-prefs__legend" aria-label="{{ 'preferences.issue_panels_ids_legend'|trans }}">
+                {% for panelId in issue_panel_ids %}
+                    <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+            <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+
+    <section class="panel space-y-2">
+        <h2 class="text-sm font-semibold">{{ 'preferences.issue_panels_browser'|trans }}</h2>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_browser_help'|trans }}</p>
+        <button
+            type="button"
+            class="btn-ghost"
+            data-reset-issue-panels
+        >{{ 'preferences.issue_panels_reset'|trans }}</button>
+    </section>
+</div>
+<script>
+(() => {
+  const btn = document.querySelector('[data-reset-issue-panels]');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    try {
+      localStorage.removeItem('beacon.issuePanelState');
+    } catch (_) {}
+    btn.textContent = {{ 'preferences.issue_panels_reset_done'|trans|json_encode|raw }};
+  });
+})();
+</script>
+{% endblock %}

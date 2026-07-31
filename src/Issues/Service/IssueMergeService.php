@@ -11,6 +11,7 @@ use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
@@ -104,17 +105,60 @@ final readonly class IssueMergeService
 
     /**
      * Recalculate eventCount, first/last seen, and release/environment denormalized fields from events.
+     *
+     * Uses SQL aggregates so retention purge does not hydrate every event into PHP.
      */
     public function recomputeAggregates(Issue $issue): void
     {
-        /** @var list<Event> $events */
-        $events = [];
-        foreach ($this->eventRepository->findBy(['issue' => $issue], ['receivedAt' => 'ASC']) as $event) {
-            if ($event instanceof Event) {
-                $events[] = $event;
+        $issueId = $issue->getId();
+        if (null === $issueId) {
+            return;
+        }
+
+        $connection = $this->entityManager->getConnection();
+        $row = $connection->fetchAssociative(
+            'SELECT COUNT(*) AS cnt, MIN(received_at) AS first_seen, MAX(received_at) AS last_seen FROM event WHERE issue_id = ?',
+            [$issueId],
+        );
+
+        $count = (int) ($row['cnt'] ?? 0);
+        $issue->setEventCount($count);
+
+        if (0 === $count) {
+            return;
+        }
+
+        $firstSeen = $row['first_seen'] ?? null;
+        $lastSeen = $row['last_seen'] ?? null;
+        if (\is_string($firstSeen) && '' !== $firstSeen) {
+            $issue->setFirstSeen(new DateTimeImmutable($firstSeen));
+        }
+        if (\is_string($lastSeen) && '' !== $lastSeen) {
+            $issue->setLastSeen(new DateTimeImmutable($lastSeen));
+        }
+
+        $firstRelease = $connection->fetchOne(
+            'SELECT release_version FROM event WHERE issue_id = ? AND release_version IS NOT NULL AND TRIM(release_version) <> \'\' ORDER BY received_at ASC, id ASC LIMIT 1',
+            [$issueId],
+        );
+        if (\is_string($firstRelease) && '' !== trim($firstRelease)) {
+            $issue->setFirstRelease(Issue::normalizeRelease($firstRelease));
+        }
+
+        $lastMeta = $connection->fetchAssociative(
+            'SELECT release_version, environment FROM event WHERE issue_id = ? ORDER BY received_at DESC, id DESC LIMIT 1',
+            [$issueId],
+        );
+        if (\is_array($lastMeta)) {
+            $lastRelease = $lastMeta['release_version'] ?? null;
+            if (\is_string($lastRelease) && '' !== trim($lastRelease)) {
+                $issue->setLastRelease(Issue::normalizeRelease($lastRelease));
+            }
+            $lastEnv = $lastMeta['environment'] ?? null;
+            if (\is_string($lastEnv) && '' !== trim($lastEnv)) {
+                $issue->setLastEnvironment(Issue::normalizeEnvironment($lastEnv));
             }
         }
-        $this->applyAggregatesFromEvents($issue, $events);
     }
 
     /**

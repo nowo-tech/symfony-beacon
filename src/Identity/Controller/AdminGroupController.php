@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Identity\AdminAuditFilter;
+use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
+use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
@@ -42,15 +45,17 @@ final class AdminGroupController extends AbstractController
         private readonly ProjectGroupAccessRepository $projectGroupAccessRepository,
         private readonly ProjectMembershipManager $projectMembershipManager,
         private readonly UserActionRecorder $actionRecorder,
+        private readonly UserActionRepository $userActionRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
-    /** List all user groups (ordered by name). */
+    /** List all user groups (ordered by name; optional search). */
     #[Route('/admin/groups', name: 'admin_groups', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $groups = $this->groupRepository->findAllOrdered();
+        $query = $request->query->getString('q');
+        $groups = $this->groupRepository->findAllOrdered('' !== $query ? $query : null);
         $groupIds = [];
         foreach ($groups as $group) {
             $id = $group->getId();
@@ -61,6 +66,7 @@ final class AdminGroupController extends AbstractController
 
         return $this->render('admin/groups/index.html.twig', [
             'groups' => $groups,
+            'q' => $query,
             'member_counts' => $this->groupMembershipRepository->countByGroupIds($groupIds),
         ]);
     }
@@ -106,17 +112,30 @@ final class AdminGroupController extends AbstractController
         ]);
     }
 
-    /** Group detail: members and linked projects. */
+    /** Group detail: members, linked projects, and filterable audit timeline. */
     #[Route('/admin/groups/{id}', name: 'admin_groups_show', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
     public function show(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         UserGroup $group,
+        Request $request,
     ): Response {
         $this->groupRepository->hydrateMembers($group);
+        $auditActions = AdminIdentityAudit::groupTimelineActions();
+        $audit = AdminAuditFilter::fromRequest($request, $auditActions);
 
         return $this->render('admin/groups/show.html.twig', [
             'group' => $group,
             'projectAccesses' => $this->projectGroupAccessRepository->findByUserGroup($group),
+            'groupAuditActions' => $auditActions,
+            'groupAuditFilter' => $audit['filter'],
+            'groupAuditEntries' => $this->userActionRepository->findForGroup(
+                $group,
+                $auditActions,
+                $audit['action'],
+                $audit['from'],
+                $audit['to'],
+                AdminIdentityAudit::TIMELINE_LIMIT,
+            ),
         ]);
     }
 

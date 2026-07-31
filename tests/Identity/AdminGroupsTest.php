@@ -58,6 +58,15 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-testid="audit-meta"]');
         self::assertSelectorTextContains('body', 'Test User');
 
+        $client->request(Request::METHOD_GET, '/admin/groups', ['q' => 'Platform']);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form[action$="/admin/groups"] input[name="q"]');
+        self::assertSelectorTextContains('body', 'Platform');
+
+        $client->request(Request::METHOD_GET, '/admin/groups', ['q' => 'no-such-group-zzz']);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'No groups yet');
+
         $crawler = $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
         self::assertSelectorExists('[data-testid="audit-meta"]');
         $form = $crawler->selectButton('Add member')->form([
@@ -67,6 +76,32 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/admin/groups/'.$group->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'group-user@example.com');
+        self::assertSelectorExists('[data-testid="group-audit-entry"]');
+        self::assertSelectorTextContains('#group-audit-timeline', 'Group member added');
+        self::assertSelectorTextContains('#group-audit-timeline', 'Group created');
+
+        $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid(), [
+            'action' => 'group.member_added',
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="group-audit-entry"]');
+        self::assertSelectorTextContains('#group-audit-timeline', 'Group member added');
+        self::assertSelectorTextNotContains('#group-audit-timeline', 'Group created');
+    }
+
+    public function testNonAdminCannotOpenGroupShow(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('admin-groups-denied@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $group = new UserGroup();
+        $group->setName('Secret');
+        $group->setSlug('secret-group-denied');
+        $em->persist($group);
+        $em->flush();
+
+        $this->login($client, $user);
+        $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function testAdminCanUnlinkProjectFromGroup(): void

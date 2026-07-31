@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,12 +13,13 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Guest locale helpers for public pages that support optional /{_locale} prefixes.
  *
- * - GET /locale/{locale}?redirect=… — sticky session + redirect (legacy / session fallback)
- * Bare AuthKit URLs are handled by AuthKit (locale.in_path=both). Legal/setup bare URLs redirect via BarePublicLocaleRedirectController / SetupWizardController.
+ * Guests change language via path switcher (AuthKit/legal) or POST /locale/{locale} (CSRF).
+ * Bare AuthKit URLs are handled by AuthKit (locale.in_path=both). Legal bare URLs redirect via BarePublicLocaleRedirectController.
  */
 final class GuestLocaleController extends AbstractController
 {
     public function __construct(
+        #[Autowire('%kernel.default_locale%')]
         private readonly string $defaultLocale,
     ) {
     }
@@ -29,14 +31,14 @@ final class GuestLocaleController extends AbstractController
     {
         $enabled = $this->getParameter('kernel.enabled_locales');
 
-        return \is_array($enabled) ? array_values(array_map('strval', $enabled)) : [$this->defaultLocale];
+        return \is_array($enabled) ? array_values(array_map(strval(...), $enabled)) : [$this->defaultLocale];
     }
 
     #[Route(
         '/locale/{locale}',
         name: 'guest_locale_switch',
         requirements: ['locale' => 'en|es|de|nl|fr|it|pt'],
-        methods: ['GET', 'POST'],
+        methods: ['POST'],
     )]
     public function switch(Request $request, string $locale): RedirectResponse
     {
@@ -44,8 +46,7 @@ final class GuestLocaleController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if ($request->isMethod(Request::METHOD_POST)
-            && !$this->isCsrfTokenValid('guest_locale', (string) $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('guest_locale', (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -121,7 +122,12 @@ final class GuestLocaleController extends AbstractController
             return null;
         }
 
-        // Default locale stays unprefixed (/setup); others use /{locale}/setup.
+        // SiteBackup setup has a single path (no locale prefix).
+        if ('/setup' === $rest || str_starts_with($rest, '/setup/')) {
+            return $rest.$suffix;
+        }
+
+        // Default locale stays unprefixed for AuthKit dual URLs; others use /{locale}/….
         if ($locale === $this->defaultLocale) {
             return $rest.$suffix;
         }

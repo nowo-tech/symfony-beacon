@@ -95,7 +95,7 @@ Ordered Speckit program (Beacon `014`→`022`; Bundle `023`/`024`):
 
 ## Phase 5 — Access & insights (Done — high/medium through v0.12.x)
 
-Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do not hand-roll auth. **SSO/OIDC** stays Later (separate from `026`).
+Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do not hand-roll auth. **Social OAuth** (Google/GitHub/Microsoft via AuthKit) is `060`. Enterprise **SSO/SAML/OIDC** stays Later (separate from `026` / `060`).
 
 ### High impact
 
@@ -128,7 +128,7 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Next** (see Phase 6.4) |
+| 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Done** (v0.13.0; see Phase 6.4) |
 | 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Later** |
 | — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
 
@@ -152,33 +152,38 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | **High** | **Encrypt key not durable in prod Compose**: `var/secrets` / Halite key not volume-mounted; container recreate loses decrypt ability | `048-prod-encrypt-key` | **Done** |
 | Medium | Deprecate / warn on ingest auth via **query string** (`beacon_secret` → proxy/access logs, Referer) | `049-deprecate-query-ingest-auth` | **Done** |
 | Medium | **`/health/ready`** must not echo exception messages publicly | `050-health-error-hardening` | **Done** |
-| Medium | SSRF **DNS rebinding / TOCTOU** (resolve-then-connect without pin) | extends `045` | **Planned** |
+| Medium | SSRF **DNS rebinding / TOCTOU** (resolve-then-connect without pin) | extends `045` | **Done** (v0.13.0) |
 | Medium | **Re-check ingest suspend** (and quota if needed) in `ProcessEnvelopeHandler` after ACK | `051-ingest-worker-recheck` | **Done** |
 | Medium | Harden / document **public API key** handling (hash or treat as opaque id; secret always required) | `052-api-public-key-hardening` | **Done** |
-| Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Done** (encrypt key; rest Planned) |
-| Low | Security **headers** in Caddy (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`) | `053-security-headers` | **Planned** |
-| Low | Restrict **Nelmio `/api/doc`** to `ROLE_ADMIN` | `054-api-doc-admin-only` | **Planned** |
+| Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Done** (encrypt key; headers baseline v0.13.0) |
+| Low | Security **headers** in Caddy (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`) | `053-security-headers` | **Done** (v0.13.0; HSTS via extra directives) |
+| Low | Restrict **Nelmio `/api/doc`** to `ROLE_ADMIN` | `054-api-doc-admin-only` | **Done** (v0.13.0) |
 | Low | Generic client errors on Envelope parse (detail → logs only) | `051` / ingest | **Planned** |
-| Low | Prefer POST-only magic-login consume + `Referrer-Policy` (reduce GET token leakage) | extends AuthKit / `026` | **Later** |
-| Low | Cookie-consent POST CSRF (or document SameSite-only trade-off) | kit config | **Later** |
+| Low | Prefer POST-only magic-login consume + `Referrer-Policy` (reduce GET token leakage) | extends AuthKit / `026` | **Done** (v0.13.0) |
+| Low | Cookie-consent POST CSRF (double-submit header; kit ≥ 1.4.8) | kit config | **Done** |
+| Med | SiteBackup local defaults on public `/setup` + `/_site_backup` | `SITE_SETUP_TOKEN` + guard | **Done** |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** High Done (`045`–`048`). Medium Done (`049`–`052`). Remaining: DNS-rebinding (extends `045`), PRODUCTION.md extras, Low (`053`/`054`).
+**Suggested patch order:** High/Medium security Done through DNS pin + query-auth reject + headers/`api/doc`. Remaining product: Planned 6.5+ (`038`–`044`, `033`).
 
 ### Next (immediate queue — product)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.1 | **Ops overview dashboard**: cross-project error spikes, open issues, failed deliveries (instance admin + optional project filter) | Beacon | `035-ops-overview` | **Next** |
-| 6.2 | **Admin identity audit timeline** for users & groups (extends blame fields + `UserAction` into Admin → User/Group show) | Beacon | `036-admin-identity-audit` | **Next** |
-| 6.3 | **Identity kit polish**: closer AuthKit / UserKit integration for remaining account chrome (password flows, profile surfaces) — AuthKit already owns login/register | Beacon | `037-authkit-identity-migration` | **Next** |
-| 6.4 | **Monthly event quota** (promote `032`) | Beacon | `032-monthly-quota` | **Next** |
+| 6.1 | **Ops overview dashboard**: cross-project error spikes, open issues, failed deliveries (instance admin + optional project filter) | Beacon | `035-ops-overview` | **Done** (v0.13.0) |
+| 6.2 | **Admin identity audit timeline** for users & groups (extends blame fields + `UserAction` into Admin → User/Group show) | Beacon | `036-admin-identity-audit` | **Done** (v0.13.0) |
+| 6.3 | **Identity kit polish**: remaining account chrome (area nav, social links, security activity) — AuthKit already owns login/register; **not** a greenfield AuthKit migration | Beacon | `037-authkit-identity-migration` | **Done** (v0.13.0) |
+| 6.4 | **Monthly event quota** (promote `032`) | Beacon | `032-monthly-quota` | **Done** (v0.13.0) |
 | 6.4a | **Install / seed layers**: platform (menus) vs demo (identity+DSN) vs sample sizes; upgrade = migrate + platform seed (`055`) | Beacon | `055-install-seed-layers` | **Done** (v0.12.4) |
-| 6.4b | **Setup wizard UI**: locale-aware `/setup` (bare default locale); auto-redirect when catalogs empty; required platform + optional register/sample; public when no users (`056`) | Beacon | `056-setup-wizard` | **Done** (v0.12.4–v0.12.8) |
+| 6.4b | **Setup / cold-start**: SiteBackupBundle `/setup` + `/_site_backup`; catalog-empty redirect; `AdminUserProvisioner`; marker → `setup_completed_at` (`056`) | Beacon | `056-setup-wizard` | **Done** (v0.12.4–v0.12.8; SiteBackup v0.13.0) |
 | 6.4c | **Product tour**: contextual driver.js (dashboard / project Issues / admin); role-aware steps; prefs mark-seen / replay (`057`) | Beacon | `057-product-tour` | **Done** (v0.12.5) |
 | 6.4d | **Member push**: Mercure hub + PWA Web Push for new issues on associated projects | Beacon | — | **Done** (v0.12.6) |
 | 6.4e | **Cookie consent seed + DB config**; schema ER docs (`DATABASE.md`) | Beacon | — | **Done** (v0.12.7) |
-| 6.4f | **Dual public URLs** (AuthKit `unlocalized: serve` + setup bare default); AuthKit password reset/magic; catalogue parity de/nl/fr/it/pt | Beacon | `056` / ADDING-LOCALES | **Done** (v0.12.8) |
+| 6.4f | **Dual public URLs** (AuthKit `unlocalized: serve`); AuthKit password reset/magic; catalogue parity de/nl/fr/it/pt | Beacon | `026` / ADDING-LOCALES | **Done** (v0.12.8) |
+| 6.4g | **Self Beacon client** (dogfood): Packagist `beacon-bundle`; `make ready` / `make dogfood` → `BEACON_DSN` | Beacon | `058-self-beacon-client` | **Done** |
+| 6.4h | **AuthKit social OAuth** (DB credentials; Google/GitHub/Microsoft); `create_user_if_missing: false` | Beacon | `060-authkit-social-login` | **Done** |
+| 6.4i | **Mailer-gated AuthKit magic/reset UI** (encrypted deliverable DSN required) | Beacon | extends `034` / `026` | **Done** |
+| 6.4j | **AI issue export** (`beacon-ai-export/v1` Markdown/JSON; scrubbed headers) | Beacon | `059-ai-issue-export` | **Done** |
 
 ### Planned
 
@@ -200,6 +205,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | — | **SSO/SAML/OIDC** via AuthKit | Beacon | — | **Later** |
+| — | **QR phone login** (AuthKit design; runtime not shipped) | AuthKit / Beacon | — | **Later** |
 | — | **WebAuthn / passkeys** if AuthKit supports | Beacon | — | **Later** |
 | — | **OTLP / OpenTelemetry** ingest adapter (alongside Envelope) | Beacon (+ optional Bundle) | — | **Later** |
 | — | Slack/Teams **interactive** resolve / assign actions | Beacon | — | **Later** |
@@ -210,7 +216,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 ## Explicitly out of scope (for now)
 
 - Multi-region SaaS control plane / multi-org tenancy
-- **SSO/SAML/OIDC** until an enterprise dedicated spec (AuthKit); not the same as magic links in `026`
+- **SSO/SAML/OIDC** until an enterprise dedicated spec (AuthKit); not the same as magic links (`026`) or social OAuth (`060`)
 - Source maps / session replay / profiling
 - Uptime monitors / cron check-ins as first-class products
 - Native store apps inside this repo (server contract only)
@@ -247,8 +253,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.12.6** | Mercure live alerts + PWA Web Push; encrypted Mailer From / Mercure URLs; sample seed Mercure defaults; tour Select all |
 | **v0.12.7** | Public setup bootstrap (min / bulk); cookie consent platform seed + professional copy; DATABASE.md ER docs; Compose MySQL bind mount; fresh-install migration hardening |
 | **v0.12.8** | Dual AuthKit/setup public URLs (bare `DEFAULT_LOCALE`); empty-catalog setup redirect; AuthKit password reset/magic; catalogue parity for all enabled locales; PHP 512M cache:clear |
-| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit Identity migration (`037`), monthly quota (`032`) |
-| **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`, after `045`–`048`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; headers/`api/doc` (`053`/`054`); SSO/OIDC when specified |
+| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit identity polish (`037`), monthly quota (`032`); SiteBackup setup, dogfood (`058`), AI export (`059`), social login (`060`); security residual (DNS pin, query-auth reject, Web Push allowlist, POST magic login, Caddy headers, `/api/doc` admin-only) |
+| **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -256,9 +262,9 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pick the highest **In progress** / **Next** row that is unblocked — Phase 6 product Next (`035`–`037`, `032`) after security Medium; Low headers/`api/doc` when convenient.
+1. Pick the highest **In progress** / **Next** row that is unblocked — Phase 6 product Next is **Done (v0.13.0)**; prefer Planned (`038`+).
 2. Ensure a feature spec exists (`/speckit-specify` or update existing).
 3. Plan → tasks → implement → tests → changelog/upgrading.
 4. Mark the row **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-21 (v0.12.8: dual public URLs; setup auto-redirect; AuthKit reset/magic; i18n catalogue parity).
+Last updated: 2026-07-31 (released **v0.13.0**; Next = Planned `038`+).

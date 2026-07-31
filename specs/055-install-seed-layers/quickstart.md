@@ -9,13 +9,14 @@
 
 ```bash
 make bootstrap
-# → migrations + app:seed-platform
+# → ensure-halite-secrets + migrations + app:seed-platform
 ```
 
 Then either:
 
-- Register first admin: `https://localhost:9444/en/register`, or
-- `make seed` for demo admin + project + `.demo-client.env`
+- Open cold-start UI: `https://localhost:9444/setup` ([SiteBackupBundle](https://packagist.org/packages/nowo-tech/site-backup-bundle); see `056`), or
+- Register first admin: `https://localhost:9444/register` (AuthKit; locale-prefixed variants also work), or
+- `make seed` for demo admin + Symfony Beacon project + `.demo-client.env`
 
 Expected: Administration sidebar and breadcrumbs work after login; no sample issues until sample seed.
 
@@ -31,7 +32,18 @@ make seed-sample          # PROFILE=dev
 Expected:
 
 - Login `admin@symfony-beacon.local` / `admin123`
+- Project slug `symfony-beacon` (legacy `demo` is upgraded on seed)
 - Issues list has dozens of rows; Analytics has a multi-day series; Performance `?nplus1=1` shows demo N+1
+
+## Dogfood server DSN only
+
+```bash
+make dogfood
+# → ensure-halite-secrets + app:seed-demo --skip-demo-user
+# restart php if BEACON_DSN was written
+```
+
+Expected: Symfony Beacon project + API key for existing admins; server `BEACON_DSN` loopback when previously empty (`058`).
 
 ## Upgrade navigation only
 
@@ -45,10 +57,10 @@ Expected: new menu items (e.g. Mailer) appear without recreating demo user.
 ## Purge sample telemetry
 
 ```bash
-docker compose exec -T php bin/console app:seed-sample --purge --project=demo
+docker compose exec -T php bin/console app:seed-sample --purge --project=symfony-beacon
 ```
 
-Expected: demo project remains; issues/events/perf/stats for that project gone; menus unchanged.
+Expected: project remains; issues/events/perf/stats for that project gone; menus unchanged.
 
 ## Load / huge (QA)
 

@@ -156,3 +156,4 @@ That implies it also works in classic and with reset-true.
 - [Symfony `ResetInterface`](https://github.com/symfony/contracts/blob/main/Service/ResetInterface.php)
 - Runtime: `Symfony\Component\Runtime\Runner\FrankenPhpWorkerRunner`
 - Spec: [`specs/001-bootstrap/spec.md`](../specs/001-bootstrap/spec.md)
+- PHPStan rules: [`nowo-tech/phpstan-frankenphp`](https://packagist.org/packages/nowo-tech/phpstan-frankenphp) (`ruleset-classic` + `ruleset-worker` + `ruleset-hardening` in `phpstan.neon.dist`)

@@ -1,41 +1,32 @@
-{# Override AuthKit layout — Tailwind shell aligned with app base. #}
-<!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    {% if app.user and app.user.preferredTheme %}
-        <script>window.__BEACON_USER_THEME__ = {{ app.user.preferredTheme|json_encode|raw }};</script>
-    {% endif %}
-    {% include '_theme_boot.html.twig' %}
-    <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
-    <style>{{ site_appearance.cssOverrides|raw }}</style>
-    {{ nowo_pwa_head() }}
-    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
-    {{ vite_entry_link_tags('app') }}
-    {{ vite_entry_script_tags('app') }}
+{# AuthKit host layout — guest shell + brand chrome; vendor security pages fill auth_panel. #}
+{% extends 'layouts/guest_shell.html.twig' %}
+
+{% block guest_shell_width %}max-w-md{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/nowo-auth-kit.css', 'nowo_auth_kit') }}">
     <link rel="stylesheet" href="{{ asset('css/toggle_password.css', 'nowo_password_toggle') }}">
-    {% block stylesheets %}{% endblock %}
-</head>
-<body class="page-shell">
-    {% include '_toasts.html.twig' %}
-    <div class="top-controls">
-        {% include '_theme_toggle.html.twig' %}
-        {% include '_locale_switcher.html.twig' %}
-    </div>
-    <main class="auth-shell-main relative z-10 mx-auto flex w-full max-w-6xl flex-1 justify-center px-4 py-12">
-        <div class="w-full max-w-md">
-            {% block body %}{% endblock %}
-        </div>
-    </main>
+{% endblock %}
+
+{% block javascripts %}
     <script src="{{ asset('password-strength.js', 'nowo_password_strength') }}" defer></script>
-    {% block javascripts %}{% endblock %}
-    {{ nowo_pwa_install_prompt() }}
-    {% include '_legal_footer.html.twig' %}
-    {# Always embed CMP on login/register; floating bubble only here. #}
-    {{ render(path('nowo_cookie_consent.show')) }}
+    {{ parent() }}
+{% endblock %}
+
+{% block cookie_consent_extras %}
     {% include '@NowoCookieConsentBundle/cookie_consent_preferences_bubble.html.twig' %}
-</body>
-</html>
+{% endblock %}
+
+{% block body %}
+    {% block auth_brand %}
+        <div class="fade-up mb-8 text-center">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">{{ site_appearance.brandEyebrow }}</p>
+            {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
+            <p class="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-[var(--color-ink)]/65">
+                {{ 'auth.tagline'|trans }}
+            </p>
+        </div>
+    {% endblock %}
+    {% block auth_panel %}{% endblock %}
+{% endblock %}

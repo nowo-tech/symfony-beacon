@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Shared\Audit;
 
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Events;
 use Nowo\AuditKitBundle\Doctrine\AuditableEntityListener;
 
 /**
@@ -15,6 +17,8 @@ use Nowo\AuditKitBundle\Doctrine\AuditableEntityListener;
  * DoctrineBundle 3 does not attach to any entity metadata. This bridge
  * registers as a global event listener instead.
  */
+#[AsDoctrineListener(event: Events::prePersist)]
+#[AsDoctrineListener(event: Events::preUpdate)]
 final readonly class AuditableDoctrineBridge
 {
     public function __construct(

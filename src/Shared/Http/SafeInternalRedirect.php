@@ -7,12 +7,15 @@ namespace App\Shared\Http;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Rejects open redirects (protocol-relative //evil.com) while allowing same-app paths.
+ * Rejects open redirects while allowing same-app relative paths.
  */
 final class SafeInternalRedirect
 {
     /**
-     * Returns a safe relative path or same-host absolute URL; otherwise $fallback.
+     * Returns a safe relative path; otherwise $fallback.
+     *
+     * Absolute same-host URLs are reduced to their path+query. Protocol-relative
+     * URLs, backslashes, encoded separators, and control characters are rejected.
      */
     public static function resolve(Request $request, string $target, string $fallback): string
     {
@@ -21,15 +24,33 @@ final class SafeInternalRedirect
             return $fallback;
         }
 
-        if (str_starts_with($target, '/') && !str_starts_with($target, '//')) {
-            return $target;
+        if (preg_match('/[\x00-\x1f\x7f]/', $target)) {
+            return $fallback;
         }
 
         $host = $request->getSchemeAndHttpHost();
         if (str_starts_with($target, $host.'/')) {
-            return $target;
+            $target = substr($target, \strlen($host)) ?: '/';
         }
 
-        return $fallback;
+        if (!str_starts_with($target, '/')) {
+            return $fallback;
+        }
+
+        if (str_starts_with($target, '//') || str_starts_with($target, '/\\')) {
+            return $fallback;
+        }
+
+        if (str_contains($target, '\\') || str_contains(strtolower($target), '%5c')) {
+            return $fallback;
+        }
+
+        // Reject "/\evil" and similar after decoding one level of common encodings.
+        $decoded = rawurldecode($target);
+        if ($decoded !== $target && (str_contains($decoded, '\\') || str_starts_with($decoded, '//'))) {
+            return $fallback;
+        }
+
+        return $target;
     }
 }

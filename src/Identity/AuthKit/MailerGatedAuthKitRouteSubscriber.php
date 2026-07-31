@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\AuthKit;
 
 use App\Shared\Mailer\ConfiguredMailer;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -14,9 +15,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Hides AuthKit magic-login / password-reset until encrypted Mailer DSN can deliver mail.
  */
-final class MailerGatedAuthKitRouteSubscriber implements EventSubscriberInterface
+final readonly class MailerGatedAuthKitRouteSubscriber implements EventSubscriberInterface
 {
-    private const array GATED_ROUTES = [
+    /** Base AuthKit route names (also match `*_unlocalized` dual-URL variants). */
+    private const array GATED_ROUTE_BASES = [
         'nowo_auth_kit_magic_login_request',
         'nowo_auth_kit_reset_password_request',
         'nowo_auth_kit_reset_password',
@@ -24,9 +26,10 @@ final class MailerGatedAuthKitRouteSubscriber implements EventSubscriberInterfac
     ];
 
     public function __construct(
-        private readonly ConfiguredMailer $mailer,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly string $defaultLocale = 'en',
+        private ConfiguredMailer $mailer,
+        private UrlGeneratorInterface $urlGenerator,
+        #[Autowire('%kernel.default_locale%')]
+        private string $defaultLocale = 'en',
     ) {
     }
 
@@ -43,7 +46,7 @@ final class MailerGatedAuthKitRouteSubscriber implements EventSubscriberInterfac
 
         $request = $event->getRequest();
         $route = (string) $request->attributes->get('_route');
-        if (!\in_array($route, self::GATED_ROUTES, true)) {
+        if (!$this->isGatedRoute($route)) {
             return;
         }
 
@@ -59,5 +62,14 @@ final class MailerGatedAuthKitRouteSubscriber implements EventSubscriberInterfac
         $event->setResponse(new RedirectResponse($this->urlGenerator->generate('nowo_auth_kit_login', [
             '_locale' => $locale,
         ])));
+    }
+
+    private function isGatedRoute(string $route): bool
+    {
+        $base = str_ends_with($route, '_unlocalized')
+            ? substr($route, 0, -\strlen('_unlocalized'))
+            : $route;
+
+        return \in_array($base, self::GATED_ROUTE_BASES, true);
     }
 }

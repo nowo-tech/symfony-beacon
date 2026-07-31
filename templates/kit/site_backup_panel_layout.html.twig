@@ -1,0 +1,26 @@
+{# Beacon host layout for SiteBackup ops panel (1.5+).
+   Bundle pages extend nowo_site_backup_panel_layout_template and fill
+   nowo_site_backup_panel_content (under nowo_ui_content).
+   Panel uses its own password gate (PUBLIC_ACCESS) — guest shell, not dashboard. #}
+{% extends 'layouts/guest_shell.html.twig' %}
+
+{% set brand = site_appearance.brandName|default(brandName|default('Beacon')) %}
+
+{% block title %}{{ brand }} — Site Backup{% endblock %}
+
+{% block guest_shell_width %}max-w-4xl{% endblock %}
+
+{% block body %}
+<div class="fade-up mb-6 text-center">
+    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">
+        {{ 'nav.setup'|trans }}
+    </p>
+    {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
+</div>
+
+<div class="fade-up-delay panel shadow-md nowo-site-backup-panel">
+    {% block nowo_ui_content %}
+        {% block nowo_site_backup_panel_content %}{% endblock %}
+    {% endblock %}
+</div>
+{% endblock %}

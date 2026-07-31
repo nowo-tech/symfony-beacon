@@ -2,7 +2,7 @@
 
 **Feature Branch**: `014-releases`  
 **Created**: 2026-07-21  
-**Status**: In progress  
+**Status**: Implemented (compare/release query caps — 2026-07-22)  
 
 **Input**: Denormalize release context on Issues (`lastRelease`, `lastEnvironment`, `firstRelease`); filter issues by release; show a "New in release" badge; compare issue sets across environments.
 
@@ -85,6 +85,7 @@ As a project member, I compare which issues appear in one environment versus ano
 - **FR-005**: UI MUST show a "New in release" badge when an issue's first release matches the focused release context.
 - **FR-006**: System MUST provide an environment comparison view (issues only-A / only-B / both).
 - **FR-007**: Project members MUST be able to read release fields; only ingest (or equivalent system path) MAY write denormalized release fields.
+- **FR-008**: Release/environment compare and `findByRelease` result sets MUST be capped (500 rows) to bound memory on large projects.
 
 ### Key Entities
 
@@ -107,4 +108,5 @@ As a project member, I compare which issues appear in one environment versus ano
 - "Focused release" defaults to the most recently seen project release when not explicitly selected.
 - Filter matches against last release by default; first-release-only filter may be added later.
 - Compare is limited to two environments per view.
+- Compare / `findByRelease` queries are capped at 500 issues for memory safety on large tenants.
 - Builds on completed Issues (`004-issues`) and ingest (`003-ingest`).

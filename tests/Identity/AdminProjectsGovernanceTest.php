@@ -173,6 +173,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
             'retention_max_events' => '',
             'ingest_rate_limit_per_minute' => '30',
             'event_quota_daily' => '100',
+            'event_quota_monthly' => '500',
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
 
@@ -183,6 +184,42 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         self::assertNull($project->getRetentionMaxEvents());
         self::assertSame(30, $project->getIngestRateLimitPerMinute());
         self::assertSame(100, $project->getEventQuotaDaily());
+        self::assertSame(500, $project->getEventQuotaMonthly());
+    }
+
+    public function testMonthlyQuotaApproachingWarning(): void
+    {
+        [$client, $admin, $project] = $this->bootWithDemoProject('admin-gov-monthly@example.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint('gov-mfp');
+        $issue->setTitle('Monthly Quota');
+        $issue->setLevel('error');
+        $issue->setStatus(IssueStatus::Unresolved);
+        $issue->setFirstSeen(new DateTimeImmutable());
+        $issue->setLastSeen(new DateTimeImmutable());
+        $em->persist($issue);
+        for ($i = 0; $i < 8; ++$i) {
+            $event = new Event();
+            $event->setIssue($issue);
+            $event->setEventId(bin2hex(random_bytes(8)));
+            $event->setPayload(['message' => 'm'.$i]);
+            $event->setReceivedAt(new DateTimeImmutable());
+            $event->setEventTimestamp(new DateTimeImmutable());
+            $em->persist($event);
+        }
+        $project->setEventQuotaMonthly(10);
+        $em->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+
+        $this->login($client, $admin);
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.flash', 'approaching its monthly event quota');
+        self::assertSelectorExists('#event_quota_monthly');
     }
 
     public function testViewAsMemberForcesMemberRole(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Identity\AdminAuditFilter;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserActionRepository;
@@ -25,7 +26,6 @@ use App\Project\Service\ProjectOpsStatsService;
 use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\Http\SafeInternalRedirect;
 use App\Shared\ProjectRole;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use RuntimeException;
@@ -124,9 +124,8 @@ final class AdminProjectController extends AbstractController
     ): Response {
         /** @var User $actor */
         $actor = $this->getUser();
-        $actionFilter = $this->resolveProjectAuditAction($request->query->getString('action'));
-        $fromFilter = $this->parseProjectAuditDate($request->query->getString('from'));
-        $toFilter = $this->parseProjectAuditDate($request->query->getString('to'), true);
+        $auditActions = $this->projectAuditActionTypes();
+        $audit = AdminAuditFilter::fromRequest($request, $auditActions);
 
         $this->projectRepository->hydrateAccessGraph($project);
         $availableGroups = $this->availableGroups($project);
@@ -156,18 +155,14 @@ final class AdminProjectController extends AbstractController
             'ownerCount' => $this->countOwners($project),
             'opsStats' => $this->opsStats->forProject($project),
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
-            'projectAuditActions' => $this->projectAuditActionTypes(),
-            'projectAuditFilter' => [
-                'action' => $actionFilter instanceof UserActionType ? $actionFilter->value : '',
-                'from' => $request->query->getString('from'),
-                'to' => $request->query->getString('to'),
-            ],
+            'projectAuditActions' => $auditActions,
+            'projectAuditFilter' => $audit['filter'],
             'projectAuditEntries' => $this->userActionRepository->findForProject(
                 $project,
-                $this->projectAuditActionTypes(),
-                $actionFilter,
-                $fromFilter,
-                $toFilter,
+                $auditActions,
+                $audit['action'],
+                $audit['from'],
+                $audit['to'],
                 self::PROJECT_AUDIT_LIMIT,
             ),
         ]);
@@ -676,35 +671,5 @@ final class AdminProjectController extends AbstractController
             UserActionType::ProjectHistoryCleared,
             UserActionType::ProjectDeleted,
         ];
-    }
-
-    private function resolveProjectAuditAction(string $raw): ?UserActionType
-    {
-        if ('' === $raw) {
-            return null;
-        }
-
-        foreach ($this->projectAuditActionTypes() as $action) {
-            if ($action->value === $raw) {
-                return $action;
-            }
-        }
-
-        return null;
-    }
-
-    private function parseProjectAuditDate(string $raw, bool $endOfDay = false): ?DateTimeImmutable
-    {
-        if ('' === $raw) {
-            return null;
-        }
-
-        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $raw);
-        $errors = DateTimeImmutable::getLastErrors();
-        if (false === $date || ($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0) {
-            return null;
-        }
-
-        return $endOfDay ? $date->setTime(23, 59, 59) : $date->setTime(0, 0, 0);
     }
 }

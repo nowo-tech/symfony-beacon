@@ -22,6 +22,18 @@ nowo_cookie_consent:
     # Beacon uses Tailwind 4
     ui_theme: tailwind
 
+    # Admin Web UI (1.4+) — host shell only; do not fork admin/*.twig
+    web_ui:
+        enabled: true
+        path_prefix: /cookie-consent-config
+        layout_template: 'kit/cookie_consent_admin_layout.html.twig'
+        css_framework: bootstrap5
+        icon_set: bootstrap-icons
+        list_page_size: 20
+    security:
+        access_roles: [ROLE_ADMIN]
+        allow_unauthenticated: false
+
     # Skin follows Beacon via CSS (`assets/styles/_cookie_consent.scss`) + data-theme sync.
     color_theme: light
     dark_mode_enabled: false
@@ -44,17 +56,17 @@ nowo_cookie_consent:
         - legal_terms
         - legal_cookies
 
-    # Vendor nowo-consent-modal.js posts via XHR (no submit event), so Symfony's
-    # stateless CSRF Stimulus never runs and the form stays invalid. Prefer a
-    # dedicated action URL without CSRF over POSTing to /login (400).
-    csrf_protection: false
+    # CSRF enabled: modal JS (bundle ≥1.4.8) prepares Symfony SameOrigin double-submit
+    # for XHR (native submit never fires). Keep aligned with framework.csrf_protection.
+    csrf_protection: true
     http_only: true
 
     # Without this, the form has no action → browser/XHR POSTs to the current page
     # (e.g. /login → 400) and the modal never closes.
     form_action: nowo_cookie_consent.show
 
-    # First-party cookies used by this Beacon instance (YAML fallback when DB inventory is empty)
+    # First-party cookies used by this Beacon instance (YAML fallback when DB inventory is empty).
+    # Names must match CookieConsentBundle CookieNameEnum + Symfony session / remember_me / CSRF.
     cookie_inventory:
         - name: PHPSESSID
           duration: Session
@@ -80,7 +92,19 @@ nowo_cookie_consent:
               es:
                   provider: Beacon (primera parte)
                   purpose: Permite la autenticación persistente cuando el usuario selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada).
-        - name: CookieConsent
+        - name: csrf-token_*
+          duration: Session
+          category: required
+          type: first_party
+          sort_order: 15
+          translations:
+              en:
+                  provider: Beacon (first-party)
+                  purpose: Short-lived double-submit CSRF cookie set by Symfony when submitting protected forms (name pattern csrf-token_<token>; __Host- prefix on HTTPS).
+              es:
+                  provider: Beacon (primera parte)
+                  purpose: Cookie CSRF de doble envío de corta duración que Symfony establece al enviar formularios protegidos (patrón csrf-token_<token>; prefijo __Host- en HTTPS).
+        - name: Cookie_Consent
           duration: 1 year
           category: required
           type: first_party
@@ -88,11 +112,11 @@ nowo_cookie_consent:
           translations:
               en:
                   provider: Beacon (first-party)
-                  purpose: Stores the user’s cookie-category decisions so that the consent banner is not shown again until preferences change or expire.
+                  purpose: Records that a cookie-consent decision was made so the banner is not shown again until preferences change or expire.
               es:
                   provider: Beacon (primera parte)
-                  purpose: Almacena las decisiones del usuario sobre categorías de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias.
-        - name: CookieConsentKey
+                  purpose: Registra que se tomó una decisión de consentimiento de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias.
+        - name: Cookie_Consent_Key
           duration: 1 year
           category: required
           type: first_party
@@ -100,7 +124,31 @@ nowo_cookie_consent:
           translations:
               en:
                   provider: Beacon (first-party)
-                  purpose: Associates anonymized consent-log records with the user’s selection for accountability and audit purposes.
+                  purpose: Anonymous technical key linking the browser consent record to the server-side consent audit log (accountability).
               es:
                   provider: Beacon (primera parte)
-                  purpose: Asocia registros anonimizados del consentimiento con la selección del usuario, con fines de responsabilidad y auditoría.
+                  purpose: Clave técnica anónima que vincula el registro de consentimiento del navegador con el registro de auditoría en el servidor (responsabilidad).
+        - name: Cookie_Category_analytics
+          duration: 1 year
+          category: required
+          type: first_party
+          sort_order: 40
+          translations:
+              en:
+                  provider: Beacon (first-party)
+                  purpose: Stores whether the analytics category was accepted or refused (consent machinery; not an analytics tracker itself).
+              es:
+                  provider: Beacon (primera parte)
+                  purpose: Almacena si la categoría de analítica fue aceptada o rechazada (mecanismo de consentimiento; no es un rastreador de analítica).
+        - name: Cookie_Category_preferences
+          duration: 1 year
+          category: required
+          type: first_party
+          sort_order: 50
+          translations:
+              en:
+                  provider: Beacon (first-party)
+                  purpose: Stores whether the preferences category was accepted or refused (consent machinery).
+              es:
+                  provider: Beacon (primera parte)
+                  purpose: Almacena si la categoría de preferencias fue aceptada o rechazada (mecanismo de consentimiento).

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `017-export-webhooks`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Export issues (and related rows) as CSV and JSON; emit lifecycle webhooks for issue events such as resolved, assigned, and similar status/assignment changes.
 

@@ -29,6 +29,8 @@ class ProjectRepository extends ServiceEntityRepository
     public function findAllOrdered(?string $query = null): array
     {
         $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.createdBy', 'cb')->addSelect('cb')
+            ->leftJoin('p.updatedBy', 'ub')->addSelect('ub')
             ->orderBy('p.name', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {

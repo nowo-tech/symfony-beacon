@@ -2,7 +2,7 @@
 
 **Feature Branch**: `021-project-health-ui`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Project health surface showing Messenger queue depth/lag, webhook delivery failures, and recent last deliveries.
 

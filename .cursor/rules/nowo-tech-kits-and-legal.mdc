@@ -21,7 +21,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Dashboard menus (DB + Twig/API) | `nowo-tech/dashboard-menu-bundle` | Tree menus, i18n, permissions, admin CRUD |
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
-| Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest |
+| Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest. Also installed **in this server** for dogfooding when `BEACON_DSN` is set. |
 | Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs + Mailer DSN |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
 
@@ -45,7 +45,7 @@ Do **not** silently ship tracking or optional cookies without consent UX.
 
 ## Current project status (honest baseline)
 
-Identity already uses **AuthKit** for login/registration (`registration_mode: first_user_only`), plus UserKit / AuditKit / password kits for account lifecycle. Remaining Phase 6 work (`037`) is kit polish on account chrome — **not** a greenfield AuthKit migration. Do not reintroduce a custom `SecurityController`.
+Identity already uses **AuthKit** for login/registration (`registration_mode: first_user_only`), plus UserKit / AuditKit / password kits for account lifecycle. Phase 6 `037-authkit-identity-migration` is **kit polish** (area nav, social links, security activity) — **not** a greenfield AuthKit migration; see `specs/037-authkit-identity-migration/`. Do not reintroduce a custom `SecurityController`.
 
 ## Agent behaviour
 

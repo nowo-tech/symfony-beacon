@@ -49,6 +49,21 @@ As an admin, I can clear the stored DSN so the instance returns to the env fallb
 
 1. **Given** a database DSN exists, **When** I check “Clear stored DSN” and save, **Then** the DB field is null and the UI shows env-fallback status.
 
+### User Story 5 - Gate AuthKit magic login and password reset UI (Priority: P1)
+
+As a guest on the login page, I only see **magic login** and **forgot password** when a deliverable encrypted instance Mailer DSN is configured. Env `MAILER_DSN=null://null` alone MUST NOT show those links.
+
+**Why this priority**: Offering passwordless/reset flows without outbound mail creates dead ends and support confusion.
+
+**Independent Test**: Without DB DSN, `/login` has no magic/reset links; `/login/magic` and `/reset-password` redirect to login. After saving a deliverable DSN, links appear and routes work.
+
+**Acceptance Scenarios**:
+
+1. **Given** no encrypted deliverable Mailer DSN in `instance_settings`, **When** I open AuthKit login, **Then** magic-login and forgot-password links are absent.
+2. **Given** the same state, **When** I request `/login/magic` or `/reset-password` (bare or locale-prefixed), **Then** I am redirected to login.
+3. **Given** a deliverable encrypted DSN is stored (not `null://…`), **When** I open login, **Then** magic-login and forgot-password links appear (AuthKit profile modes still enabled).
+4. **Given** only env `MAILER_DSN` is set (no DB DSN), **When** I open login, **Then** those links remain hidden.
+
 ### Edge Cases
 
 - Blank DSN field on save keeps the existing encrypted value (does not wipe accidentally).
@@ -64,11 +79,13 @@ As an admin, I can clear the stored DSN so the instance returns to the env fallb
 - **FR-004**: Magic login and email notification delivery use `ConfiguredMailer` (including From).
 - **FR-005**: `.env` / `.env.dist` document `MAILER_DSN` as bootstrap/fallback only.
 - **FR-006**: Docs updated: CHANGELOG, UPGRADING, NOTIFICATIONS, SECURITY, LEGAL-AND-COOKIES as needed.
+- **FR-007**: AuthKit magic-login and password-reset **login affordances and public routes** MUST be gated on `ConfiguredMailer::isMagicLoginAvailable()` (encrypted deliverable DB DSN); Twig uses `beacon_magic_login_enabled()`; a request subscriber redirects gated AuthKit routes to login when unavailable.
 
 ## Success Criteria
 
 - **SC-001**: Functional tests cover admin-only access, encrypt-at-rest, and clear → env fallback (`InstanceMailerSettingsTest`).
 - **SC-002**: `make qa` stays green with Doctrine mapping + route registration for Settings controllers.
+- **SC-003**: Functional tests assert magic/reset links and routes are hidden/redirected without DB Mailer DSN and available after enabling (`MagicLoginTest` / `PasswordResetTest`).
 
 ## Assumptions
 

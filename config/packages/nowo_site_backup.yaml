@@ -1,0 +1,158 @@
+# nowo-tech/site-backup-bundle — backup panel + cold-start setup wizard
+# Docs: https://github.com/nowo-tech/SiteBackupBundle/blob/main/docs/SETUP-WIZARD.md
+nowo_site_backup:
+    enabled: true
+    process_timeout: 900
+    backup:
+        include_paths:
+            - config
+            - public
+            - templates
+            - translations
+            - src
+            - migrations
+            - composer.json
+            - composer.lock
+            - .env
+        exclude_patterns:
+            - 'var/cache/*'
+            - 'var/log/*'
+            - 'var/site-backup/*'
+            - 'vendor/*'
+            - 'node_modules/*'
+            - '.git/*'
+        storage_dir: '%kernel.project_dir%/var/site-backup/archives'
+        # Shell expands MYSQL_* from the container environment (see .env.dist).
+        database_dump_command: 'mysqldump --single-transaction -h database -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"'
+    restore:
+        protected_paths:
+            - '.env.local'
+            - 'var/site-backup'
+            - 'config/secrets'
+    panel:
+        path_prefix: '/_site_backup'
+        # Host chrome only — panel pages stay in the package (SiteBackup 1.5+).
+        layout_template: 'kit/site_backup_panel_layout.html.twig'
+    security:
+        password_protection: true
+        password_hash: '%env(SITE_BACKUP_PASSWORD_HASH)%'
+    exclusions:
+        paths:
+            - /health/live
+            - /health/ready
+        path_prefixes:
+            - /api/
+            - /_wdt
+            - /_profiler
+            - /build/
+            - /assets/
+            - /login
+            - /register
+            - /logout
+            - /reset-password
+            - /legal
+            - /locale/
+            - /cookie_consent
+            - /cookie-consent/
+        patterns:
+            - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal)(/|$|\?)#'
+            - '#^/(manifest\.webmanifest|sw\.js|offline)$#'
+    setup:
+        enabled: true
+        path_prefix: '/setup'
+        # Host chrome only — wizard/done/token stay in the package (SiteBackup 1.4+).
+        layout_template: 'kit/site_backup_setup_layout.html.twig'
+        # Shared secret for /setup (?token= or X-Setup-Token). Empty = open (dev only).
+        # Production MUST set a non-default value (SiteBackupSecurityDefaultsGuard).
+        setup_token: '%env(default::SITE_SETUP_TOKEN)%'
+        # Existing installs without setup.done stay usable; empty schema / setup.required still gate.
+        # Fresh clones that must block the app until wizard finishes: set true.
+        require_done_marker: false
+        # JSON + DBAL; load prefers DB so wiping var/ keeps mid-wizard progress.
+        progress_storage: chain
+        brand_name: 'Symfony Beacon'
+        admin_provisioner: App\Setup\AdminUserProvisioner
+        # One Continuar click per auto step in the UI (CLI still chains automatically).
+        advance_mode: manual
+        detectors:
+            marker: true
+            doctrine_connect: true
+            doctrine_schema_empty: true
+            incomplete_progress: true
+        default_profile: fresh_install
+        profiles:
+            # Guided admin path or full SQL dump (1.3+ bootstrap_mode).
+            fresh_install:
+                steps:
+                    - { type: requirements }
+                    - { type: bootstrap_mode }
+                    - { type: database_url, optional: false }
+                    - { type: database_create }
+                    - { type: cache_clear }
+                    - {
+                        type: sql_file,
+                        id: full_database_import,
+                        paths: ['var/site-backup/full-import.sql', 'var/site-backup/last-restore-dump.sql'],
+                        if_exists: false,
+                        when_answer: { bootstrap_mode: full_database }
+                      }
+                    - { type: migrations }
+                    - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
+                    - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
+                    - {
+                        type: sample_data,
+                        when: opt_in,
+                        commands: ['app:seed-sample --size=dev --ensure-demo'],
+                        when_answer: { bootstrap_mode: guided }
+                      }
+                    - { type: marker, write_done: true }
+            post_restore:
+                steps:
+                    - { type: requirements }
+                    - { type: database_create }
+                    - { type: cache_clear }
+                    - { type: sql_file, paths: ['var/site-backup/last-restore-dump.sql'], if_exists: true }
+                    - { type: migrations }
+                    - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
+                    - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
+                    - { type: marker, write_done: true }
+            # Deep-link: /setup?profile=full_database
+            full_database:
+                steps:
+                    - { type: requirements }
+                    - { type: database_url, optional: false }
+                    - { type: database_create }
+                    - { type: cache_clear }
+                    - {
+                        type: sql_file,
+                        id: full_database_import,
+                        paths: ['var/site-backup/full-import.sql', 'var/site-backup/last-restore-dump.sql'],
+                        if_exists: false
+                      }
+                    - { type: migrations }
+                    - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
+                    - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
+                    - { type: marker, write_done: true }
+            minimal:
+                steps:
+                    - { type: database_create }
+                    - { type: migrations }
+                    - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
+                    - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
+                    - { type: marker, write_done: true }
+
+when@test:
+    nowo_site_backup:
+        security:
+            # Demo hash for password "password" (panel tests only).
+            password_hash: '$2y$13$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+        setup:
+            # Fixed token for PHPUnit (see SiteBackupSetupTest::SETUP_TOKEN).
+            setup_token: 'test-setup-token'
+            # PHPUnit seeds catalogs / schema; avoid redirecting every request to /setup.
+            require_done_marker: false
+            detectors:
+                marker: false
+                doctrine_connect: false
+                doctrine_schema_empty: false
+                incomplete_progress: false

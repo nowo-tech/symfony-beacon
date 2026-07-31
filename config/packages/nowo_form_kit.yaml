@@ -12,7 +12,7 @@ nowo_form_kit:
                 attr:
                     class: 'input'
                 row_attr:
-                    class: 'space-y-1.5'
+                    class: 'flex flex-col gap-2'
             field_types:
                 textarea:
                     attr:

@@ -28,15 +28,20 @@ class UserRepository extends ServiceEntityRepository
      *
      * @return list<User>
      */
-    public function findAllForAdminDirectory(): array
+    public function findAllForAdminDirectory(?string $query = null): array
     {
-        /** @var list<User> $users */
-        $users = $this->createQueryBuilder('u')
+        $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.createdBy', 'cb')->addSelect('cb')
             ->leftJoin('u.updatedBy', 'ub')->addSelect('ub')
-            ->orderBy('u.email', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('u.email', 'ASC');
+
+        if (null !== $query && '' !== trim($query)) {
+            $qb->andWhere('u.email LIKE :q OR u.displayName LIKE :q')
+                ->setParameter('q', '%'.trim($query).'%');
+        }
+
+        /** @var list<User> $users */
+        $users = $qb->getQuery()->getResult();
 
         return $users;
     }

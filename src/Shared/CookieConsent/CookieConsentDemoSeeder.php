@@ -9,6 +9,7 @@ use Nowo\CookieConsentBundle\Entity\CookieConsentConfig;
 use Nowo\CookieConsentBundle\Entity\CookieConsentConfigTranslation;
 use Nowo\CookieConsentBundle\Entity\CookieDefinition;
 use Nowo\CookieConsentBundle\Entity\CookieDefinitionTranslation;
+use Nowo\CookieConsentBundle\Enum\CookieNameEnum;
 use Nowo\CookieConsentBundle\Repository\CookieConsentConfigRepository;
 use Nowo\CookieConsentBundle\Repository\CookieDefinitionRepository;
 
@@ -21,7 +22,7 @@ use Nowo\CookieConsentBundle\Repository\CookieDefinitionRepository;
 final readonly class CookieConsentDemoSeeder
 {
     /** @var list<string> */
-    private const LOCALES = ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt'];
+    private const array LOCALES = ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt'];
 
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -39,7 +40,7 @@ final readonly class CookieConsentDemoSeeder
         $config = $this->configRepository->findDefaultEnabled();
 
         if (!$config instanceof CookieConsentConfig) {
-            $config = (new CookieConsentConfig())
+            $config = new CookieConsentConfig()
                 ->setName('Beacon default')
                 ->setDefault(true)
                 ->setEnabled(true);
@@ -137,7 +138,7 @@ final readonly class CookieConsentDemoSeeder
         foreach ($this->modalCopy() as $locale => $copy) {
             $translation = $config->findTranslation($locale);
             if (!$translation instanceof CookieConsentConfigTranslation) {
-                $translation = (new CookieConsentConfigTranslation())->setLocale($locale);
+                $translation = new CookieConsentConfigTranslation()->setLocale($locale);
                 $config->addTranslation($translation);
                 $this->entityManager->persist($translation);
                 $changed = true;
@@ -190,22 +191,33 @@ final readonly class CookieConsentDemoSeeder
 
     private function seedCookieDefinitions(CookieConsentConfig $config): bool
     {
-        $changed = false;
+        $changed = $this->renameLegacyConsentCookies($config);
+
         $existing = [];
         foreach ($this->definitionRepository->findByConfigOrdered($config) as $definition) {
             $existing[$definition->getName()] = $definition;
         }
 
+        $wantedNames = [];
         foreach ($this->cookieInventory() as $row) {
+            $wantedNames[$row['name']] = true;
             $definition = $existing[$row['name']] ?? null;
             if (!$definition instanceof CookieDefinition) {
-                $definition = (new CookieDefinition())
+                $definition = new CookieDefinition()
                     ->setConfig($config)
                     ->setName($row['name']);
                 $config->addCookieDefinition($definition);
                 $this->entityManager->persist($definition);
                 $changed = true;
             }
+
+            $before = [
+                $definition->getDuration(),
+                $definition->getCategory(),
+                $definition->getType(),
+                $definition->getSortOrder(),
+                $definition->isAllowedByDefault(),
+            ];
 
             $definition
                 ->setDuration($row['duration'])
@@ -214,10 +226,20 @@ final readonly class CookieConsentDemoSeeder
                 ->setSortOrder($row['sortOrder'])
                 ->setAllowedByDefault($row['allowedByDefault']);
 
+            if ($before !== [
+                $definition->getDuration(),
+                $definition->getCategory(),
+                $definition->getType(),
+                $definition->getSortOrder(),
+                $definition->isAllowedByDefault(),
+            ]) {
+                $changed = true;
+            }
+
             foreach ($row['translations'] as $locale => $copy) {
                 $translation = $definition->findTranslation($locale);
                 if (!$translation instanceof CookieDefinitionTranslation) {
-                    $translation = (new CookieDefinitionTranslation())->setLocale($locale);
+                    $translation = new CookieDefinitionTranslation()->setLocale($locale);
                     $definition->addTranslation($translation);
                     $this->entityManager->persist($translation);
                     $changed = true;
@@ -230,6 +252,36 @@ final readonly class CookieConsentDemoSeeder
                     $changed = true;
                 }
             }
+        }
+
+        foreach ($existing as $name => $definition) {
+            if (isset($wantedNames[$name])) {
+                continue;
+            }
+            $this->entityManager->remove($definition);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * CookieConsentBundle ≥1.1 renamed consent cookies to Cookie_Consent / Cookie_Consent_Key.
+     */
+    private function renameLegacyConsentCookies(CookieConsentConfig $config): bool
+    {
+        $map = [
+            'CookieConsent' => 'Cookie_Consent',
+            'CookieConsentKey' => 'Cookie_Consent_Key',
+        ];
+        $changed = false;
+        foreach ($this->definitionRepository->findByConfigOrdered($config) as $definition) {
+            $newName = $map[$definition->getName()] ?? null;
+            if (null === $newName) {
+                continue;
+            }
+            $definition->setName($newName);
+            $changed = true;
         }
 
         return $changed;
@@ -382,37 +434,88 @@ final readonly class CookieConsentDemoSeeder
                 ],
             ],
             [
-                'name' => 'CookieConsent',
+                'name' => 'csrf-token_*',
+                'duration' => 'Session',
+                'category' => 'required',
+                'type' => CookieDefinition::TYPE_FIRST_PARTY,
+                'sortOrder' => 15,
+                'allowedByDefault' => true,
+                'purpose' => [
+                    'en' => 'Short-lived double-submit CSRF cookie set by Symfony when submitting protected forms (name pattern csrf-token_<token>; __Host- prefix on HTTPS).',
+                    'es' => 'Cookie CSRF de doble envío de corta duración que Symfony establece al enviar formularios protegidos (patrón csrf-token_<token>; prefijo __Host- en HTTPS).',
+                    'de' => 'Kurzlebiger Double-Submit-CSRF-Cookie, den Symfony beim Absenden geschützter Formulare setzt (Muster csrf-token_<token>; __Host- Präfix bei HTTPS).',
+                    'nl' => 'Kortdurende double-submit CSRF-cookie die Symfony zet bij het verzenden van beveiligde formulieren (patroon csrf-token_<token>; __Host- prefix op HTTPS).',
+                    'fr' => 'Cookie CSRF double-soumission de courte durée défini par Symfony lors de l’envoi de formulaires protégés (motif csrf-token_<token> ; préfixe __Host- en HTTPS).',
+                    'it' => 'Cookie CSRF double-submit di breve durata impostato da Symfony all’invio di form protetti (pattern csrf-token_<token>; prefisso __Host- su HTTPS).',
+                    'pt' => 'Cookie CSRF de double-submit de curta duração definido pelo Symfony ao submeter formulários protegidos (padrão csrf-token_<token>; prefixo __Host- em HTTPS).',
+                ],
+            ],
+            [
+                'name' => CookieNameEnum::COOKIE_CONSENT_NAME,
                 'duration' => '1 year',
                 'category' => 'required',
                 'type' => CookieDefinition::TYPE_FIRST_PARTY,
                 'sortOrder' => 20,
                 'allowedByDefault' => true,
                 'purpose' => [
-                    'en' => 'Stores the user’s cookie-category decisions so that the consent banner is not shown again until preferences change or expire.',
-                    'es' => 'Almacena las decisiones del usuario sobre categorías de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias.',
-                    'de' => 'Speichert die Cookie-Kategorieentscheidungen des Nutzers, damit der Hinweis nicht erneut angezeigt wird, bis Präferenzen geändert werden oder ablaufen.',
-                    'nl' => 'Slaat de cookiecategoriekeuzes van de gebruiker op, zodat de cookiemelding niet opnieuw wordt getoond tot voorkeuren wijzigen of verlopen.',
-                    'fr' => 'Enregistre les décisions de l’utilisateur concernant les catégories de cookies afin de ne pas réafficher l’avis tant que les préférences n’ont pas changé ou expiré.',
-                    'it' => 'Memorizza le decisioni dell’utente sulle categorie di cookie affinché l’avviso non venga riproposto finché le preferenze non cambiano o scadono.',
-                    'pt' => 'Armazena as decisões do utilizador sobre categorias de cookies para não voltar a apresentar o aviso até que as preferências sejam alteradas ou caduquem.',
+                    'en' => 'Records that a cookie-consent decision was made so the banner is not shown again until preferences change or expire.',
+                    'es' => 'Registra que se tomó una decisión de consentimiento de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias.',
+                    'de' => 'Speichert, dass eine Cookie-Einwilligungsentscheidung getroffen wurde, damit der Hinweis nicht erneut angezeigt wird, bis Präferenzen geändert werden oder ablaufen.',
+                    'nl' => 'Registreert dat een cookietoestemmingskeuze is gemaakt, zodat de melding niet opnieuw wordt getoond tot voorkeuren wijzigen of verlopen.',
+                    'fr' => 'Enregistre qu’une décision de consentement aux cookies a été prise afin de ne pas réafficher l’avis tant que les préférences n’ont pas changé ou expiré.',
+                    'it' => 'Registra che è stata presa una decisione di consenso ai cookie affinché l’avviso non venga riproposto finché le preferenze non cambiano o scadono.',
+                    'pt' => 'Regista que foi tomada uma decisão de consentimento de cookies para não voltar a apresentar o aviso até que as preferências sejam alteradas ou caduquem.',
                 ],
             ],
             [
-                'name' => 'CookieConsentKey',
+                'name' => CookieNameEnum::COOKIE_CONSENT_KEY_NAME,
                 'duration' => '1 year',
                 'category' => 'required',
                 'type' => CookieDefinition::TYPE_FIRST_PARTY,
                 'sortOrder' => 30,
                 'allowedByDefault' => true,
                 'purpose' => [
-                    'en' => 'Associates anonymized consent-log records with the user’s selection for accountability and audit purposes.',
-                    'es' => 'Asocia registros anonimizados del consentimiento con la selección del usuario, con fines de responsabilidad y auditoría.',
-                    'de' => 'Verknüpft anonymisierte Einwilligungsprotokolle mit der Auswahl des Nutzers zu Nachweis- und Prüfzwecken.',
-                    'nl' => 'Koppelt geanonimiseerde toestemmingslogboeken aan de keuze van de gebruiker voor verantwoording en audit.',
-                    'fr' => 'Associe des journaux de consentement anonymisés au choix de l’utilisateur à des fins de responsabilité et d’audit.',
-                    'it' => 'Associa registrazioni anonimizzate del consenso alla scelta dell’utente a fini di responsabilità e di audit.',
-                    'pt' => 'Associa registos anonimizados de consentimento à seleção do utilizador para fins de responsabilização e auditoria.',
+                    'en' => 'Anonymous technical key linking the browser consent record to the server-side consent audit log (accountability).',
+                    'es' => 'Clave técnica anónima que vincula el registro de consentimiento del navegador con el registro de auditoría en el servidor (responsabilidad).',
+                    'de' => 'Anonyme technische Kennung, die den Browser-Einwilligungsdatensatz mit dem serverseitigen Audit-Protokoll verknüpft (Rechenschaftspflicht).',
+                    'nl' => 'Anonieme technische sleutel die het browser-toestemmingsrecord koppelt aan het server-side auditlogboek (verantwoording).',
+                    'fr' => 'Clé technique anonyme reliant l’enregistrement de consentement du navigateur au journal d’audit côté serveur (responsabilité).',
+                    'it' => 'Chiave tecnica anonima che collega il record di consenso del browser al registro di audit lato server (responsabilità).',
+                    'pt' => 'Chave técnica anónima que associa o registo de consentimento do navegador ao registo de auditoria no servidor (responsabilização).',
+                ],
+            ],
+            [
+                'name' => CookieNameEnum::getCookieCategoryName('analytics'),
+                'duration' => '1 year',
+                'category' => 'required',
+                'type' => CookieDefinition::TYPE_FIRST_PARTY,
+                'sortOrder' => 40,
+                'allowedByDefault' => true,
+                'purpose' => [
+                    'en' => 'Stores whether the analytics category was accepted or refused (consent machinery; not an analytics tracker itself).',
+                    'es' => 'Almacena si la categoría de analítica fue aceptada o rechazada (mecanismo de consentimiento; no es un rastreador de analítica).',
+                    'de' => 'Speichert, ob die Analyse-Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik; kein Analyse-Tracker).',
+                    'nl' => 'Slaat op of de analysecategorie is geaccepteerd of geweigerd (toestemmingsmechanisme; geen analysetracker).',
+                    'fr' => 'Enregistre si la catégorie analytique a été acceptée ou refusée (mécanisme de consentement ; pas un outil d’analyse).',
+                    'it' => 'Memorizza se la categoria analytics è stata accettata o rifiutata (meccanismo di consenso; non è un tracker analytics).',
+                    'pt' => 'Armazena se a categoria de análise foi aceite ou recusada (mecanismo de consentimento; não é um rastreador de análise).',
+                ],
+            ],
+            [
+                'name' => CookieNameEnum::getCookieCategoryName('preferences'),
+                'duration' => '1 year',
+                'category' => 'required',
+                'type' => CookieDefinition::TYPE_FIRST_PARTY,
+                'sortOrder' => 50,
+                'allowedByDefault' => true,
+                'purpose' => [
+                    'en' => 'Stores whether the preferences category was accepted or refused (consent machinery).',
+                    'es' => 'Almacena si la categoría de preferencias fue aceptada o rechazada (mecanismo de consentimiento).',
+                    'de' => 'Speichert, ob die Präferenz-Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik).',
+                    'nl' => 'Slaat op of de voorkeurencategorie is geaccepteerd of geweigerd (toestemmingsmechanisme).',
+                    'fr' => 'Enregistre si la catégorie préférences a été acceptée ou refusée (mécanisme de consentement).',
+                    'it' => 'Memorizza se la categoria preferences è stata accettata o rifiutata (meccanismo di consenso).',
+                    'pt' => 'Armazena se a categoria de preferências foi aceite ou recusada (mecanismo de consentimento).',
                 ],
             ],
         ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\EventSubscriber;
 
 use App\Identity\Entity\User;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Applies sticky session locale for anonymous requests without a path {_locale}.
  *
- * When the route already carries {_locale} (AuthKit / legal / setup), the path wins.
+ * When the route already carries {_locale} (AuthKit / legal), the path wins.
  * Authenticated users are handled by {@see UserPreferredLocaleSubscriber}.
  */
 final readonly class GuestSessionLocaleSubscriber implements EventSubscriberInterface
@@ -24,7 +25,9 @@ final readonly class GuestSessionLocaleSubscriber implements EventSubscriberInte
         private TokenStorageInterface $tokenStorage,
         private TranslatorInterface $translator,
         /** @var list<string> */
+        #[Autowire('%kernel.enabled_locales%')]
         private array $enabledLocales,
+        #[Autowire('%kernel.default_locale%')]
         private string $defaultLocale,
     ) {
     }

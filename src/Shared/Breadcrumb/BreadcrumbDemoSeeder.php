@@ -184,6 +184,16 @@ final readonly class BreadcrumbDemoSeeder
 
         $this->ensureItem(
             $collection,
+            'admin_ops_overview',
+            'Ops overview',
+            ['en' => 'Ops overview', 'es' => 'Vista ops', 'de' => 'Ops-Übersicht', 'nl' => 'Ops-overzicht', 'fr' => 'Vue ops', 'it' => 'Panoramica ops', 'pt' => 'Visão ops'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
             'admin_users',
             'Users',
             ['en' => 'Users', 'es' => 'Usuarios', 'de' => 'Benutzer', 'nl' => 'Gebruikers', 'fr' => 'Utilisateurs', 'it' => 'Utenti', 'pt' => 'Utilizadores'],
@@ -349,6 +359,186 @@ final readonly class BreadcrumbDemoSeeder
             ['en' => 'Items', 'es' => 'Ítems', 'de' => 'Einträge', 'nl' => 'Items', 'fr' => 'Éléments', 'it' => 'Elementi', 'pt' => 'Itens'],
             $breadcrumbs,
             ['collectionId'],
+            $changed,
+        );
+
+        $account = $this->ensureItem(
+            $collection,
+            'account_profile',
+            'Account settings',
+            [
+                'en' => 'Account settings',
+                'es' => 'Ajustes de cuenta',
+                'de' => 'Kontoeinstellungen',
+                'nl' => 'Accountinstellingen',
+                'fr' => 'Paramètres du compte',
+                'it' => 'Impostazioni account',
+                'pt' => 'Definições da conta',
+            ],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_projects',
+            'My projects',
+            [
+                'en' => 'My projects',
+                'es' => 'Mis proyectos',
+                'de' => 'Meine Projekte',
+                'nl' => 'Mijn projecten',
+                'fr' => 'Mes projets',
+                'it' => 'I miei progetti',
+                'pt' => 'Os meus projetos',
+            ],
+            $account,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_groups',
+            'My groups',
+            [
+                'en' => 'My groups',
+                'es' => 'Mis grupos',
+                'de' => 'Meine Gruppen',
+                'nl' => 'Mijn groepen',
+                'fr' => 'Mes groupes',
+                'it' => 'I miei gruppi',
+                'pt' => 'Os meus grupos',
+            ],
+            $account,
+            [],
+            $changed,
+        );
+
+        $security = $this->ensureItem(
+            $collection,
+            'account_security',
+            'Security',
+            [
+                'en' => 'Security',
+                'es' => 'Seguridad',
+                'de' => 'Sicherheit',
+                'nl' => 'Beveiliging',
+                'fr' => 'Sécurité',
+                'it' => 'Sicurezza',
+                'pt' => 'Segurança',
+            ],
+            $account,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_security_history',
+            'Change history',
+            [
+                'en' => 'Change history',
+                'es' => 'Historial de cambios',
+                'de' => 'Änderungshistorie',
+                'nl' => 'Wijzigingsgeschiedenis',
+                'fr' => 'Historique des changements',
+                'it' => 'Cronologia modifiche',
+                'pt' => 'Histórico de alterações',
+            ],
+            $security,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_security_activity',
+            'Activity',
+            [
+                'en' => 'Activity',
+                'es' => 'Actividad',
+                'de' => 'Aktivität',
+                'nl' => 'Activiteit',
+                'fr' => 'Activité',
+                'it' => 'Attività',
+                'pt' => 'Atividade',
+            ],
+            $security,
+            [],
+            $changed,
+        );
+
+        $display = $this->ensureItem(
+            $collection,
+            'account_display',
+            'Display',
+            [
+                'en' => 'Display',
+                'es' => 'Visualización',
+                'de' => 'Anzeige',
+                'nl' => 'Weergave',
+                'fr' => 'Affichage',
+                'it' => 'Visualizzazione',
+                'pt' => 'Apresentação',
+            ],
+            $account,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_display_panels',
+            'Issue panels',
+            [
+                'en' => 'Issue panels',
+                'es' => 'Paneles de incidencias',
+                'de' => 'Issue-Panels',
+                'nl' => 'Issuepanelen',
+                'fr' => 'Panneaux d’incidents',
+                'it' => 'Pannelli issue',
+                'pt' => 'Painéis de issues',
+            ],
+            $display,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_display_tours',
+            'Tours',
+            [
+                'en' => 'Tours',
+                'es' => 'Tours',
+                'de' => 'Touren',
+                'nl' => 'Tours',
+                'fr' => 'Visites guidées',
+                'it' => 'Tour',
+                'pt' => 'Tours',
+            ],
+            $display,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_display_notifications',
+            'Notifications',
+            [
+                'en' => 'Notifications',
+                'es' => 'Notificaciones',
+                'de' => 'Benachrichtigungen',
+                'nl' => 'Meldingen',
+                'fr' => 'Notifications',
+                'it' => 'Notifiche',
+                'pt' => 'Notificações',
+            ],
+            $display,
+            [],
             $changed,
         );
 

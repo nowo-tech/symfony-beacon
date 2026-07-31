@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Identity\Service;
 
-use App\Project\Access\ProjectAccess;
 use App\Identity\Entity\User;
 use App\Identity\Tour\ProductTourContext;
 use App\Identity\Tour\ProductTourPage;
+use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\ProjectRole;

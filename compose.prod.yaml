@@ -1,7 +1,7 @@
 # Optional production-oriented stack (no source bind-mount).
 # Default local stack remains compose.yaml (frankenphp_dev + ./:/app).
 #
-#   cp .env.dist .env   # set real APP_SECRET / MySQL passwords first
+#   cp .env.dist .env   # set real APP_SECRET / MySQL / SiteBackup secrets first
 #   docker compose -f compose.prod.yaml --env-file .env up --build -d
 #
 # Docs: docs/PRODUCTION.md
@@ -24,6 +24,9 @@ services:
       MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
+      # SiteBackup: unique values required (local .env.dist defaults are refused at boot).
+      SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
+      SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
@@ -92,6 +95,8 @@ services:
       MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
+      SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
+      SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
@@ -107,7 +112,7 @@ services:
         "async",
         "-vv",
         "--time-limit=3600",
-        "--memory-limit=128M",
+        "--memory-limit=256M",
       ]
 
   mercure:

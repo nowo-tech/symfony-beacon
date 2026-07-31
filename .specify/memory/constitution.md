@@ -60,7 +60,7 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Secrets: never in git. Version **only** `.env.dist`.
 - Ingest auth: Envelope-compatible (`X-Beacon-Auth` header and/or envelope `dsn`) mapped to project API keys. Query-string auth (`beacon_key` / `beacon_secret`) is **deprecated** but still accepted with deprecation headers.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
-- The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository** (out of scope here); configure via `BEACON_DSN`.
+- The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository**; this server may install it for **dogfooding** (self-reporting via `BEACON_DSN`). External apps configure their own DSN against this host.
 - Mobile: PWA only in this repository (`docs/NATIVE-MOBILE.md`).
 
 ## Development workflow (SDD)

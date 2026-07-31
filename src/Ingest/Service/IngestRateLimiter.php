@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Ingest\Service;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
@@ -17,6 +18,7 @@ final readonly class IngestRateLimiter
 {
     public function __construct(
         private CacheItemPoolInterface $cache,
+        #[Autowire('%beacon.ingest_rate_limit%')]
         private int $limitPerMinute,
     ) {
     }

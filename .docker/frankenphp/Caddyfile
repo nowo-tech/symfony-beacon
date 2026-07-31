@@ -51,7 +51,16 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 
 	# Instruct browsers to forget a previously advertised HTTP/3 endpoint
 	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
-	header Alt-Svc "clear"
+	header {
+		Alt-Svc "clear"
+		# Baseline browser hardening (053). CSP is intentionally permissive for Vite/Mercure/PWA;
+		# tighten per-operator via CADDY_SERVER_EXTRA_DIRECTIVES when ready.
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
+	}
 
 	# Symfony document root
 	root * /app/public

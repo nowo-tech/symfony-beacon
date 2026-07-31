@@ -6,7 +6,7 @@
 
 **Input**: Add passwordless magic-link login for users; optional signed share links to open a project or a specific issue; introduce a read-only **viewer** project role.
 
-**Related**: Prefer [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) / Symfony Security login-link capabilities over a bespoke auth stack. SSO/OIDC remains a separate Later item on the roadmap.
+**Related**: Prefer [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) / Symfony Security login-link capabilities over a bespoke auth stack. Social OAuth provider login is specified in `060-authkit-social-login`. Enterprise SSO/SAML remains Later on the roadmap.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -24,6 +24,7 @@ As a user, I request a one-time login link by email and sign in without typing a
 2. **Given** an expired or already-consumed link, **When** I open it, **Then** sign-in fails with a clear message and no session is created.
 3. **Given** a disabled account, **When** a magic link is requested or used, **Then** access is denied consistently with password login.
 4. **Given** login throttling, **When** magic-link requests are abused, **Then** rate limits apply (same order of protection as password login).
+5. **Given** no deliverable encrypted instance Mailer DSN (`034`), **When** I open login, **Then** magic-login (and AuthKit password-reset) links are not shown and those routes redirect to login.
 
 ---
 
@@ -79,6 +80,7 @@ As a project admin/owner, I create a time-limited signed link that opens a speci
 - **FR-006**: System SHOULD support creating revocable, time-limited signed links scoped to a project or a single issue for read-only access (P2).
 - **FR-007**: Share-link and magic-link actions MUST be auditable (`user_action` or equivalent).
 - **FR-008**: Prefer AuthKit / Security login-link integration; do not invent a parallel credential store.
+- **FR-009**: Magic-login and password-reset UI/routes MUST require a deliverable encrypted instance Mailer DSN (see `034-encrypted-mailer-dsn` FR-007); AuthKit profile `mode: enabled` alone is not sufficient.
 
 ### Key Entities
 
@@ -101,7 +103,7 @@ As a project admin/owner, I create a time-limited signed link that opens a speci
 
 ## Out of scope
 
-- **SSO / SAML / OIDC** (roadmap Later; separate spec).
+- **SSO / SAML / OIDC** enterprise federation (roadmap Later; separate from AuthKit **social OAuth** in `060`).
 - Public anonymous issue boards without authentication.
 - Embedding Envelope ingest credentials in share links.
 - Native PagerDuty login.

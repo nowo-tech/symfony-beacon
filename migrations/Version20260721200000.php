@@ -37,7 +37,8 @@ final class Version20260721200000 extends AbstractMigration
         // Fresh empty databases keep setup_completed_at NULL so /setup can run.
         $this->addSql(
             'UPDATE instance_settings SET setup_completed_at = CURRENT_TIMESTAMP WHERE id = 1 AND setup_completed_at IS NULL AND EXISTS (SELECT 1 FROM app_user LIMIT 1)'
-        );    }
+        );
+    }
 
     public function down(Schema $schema): void
     {

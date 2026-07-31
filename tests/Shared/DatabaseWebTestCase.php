@@ -30,6 +30,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 abstract class DatabaseWebTestCase extends WebTestCase
 {
+    /**
+     * When true (default), menus/breadcrumbs/cookie consent are seeded after schema create so
+     * {@see PlatformCatalogsSetupRedirectSubscriber} does not force HTML traffic to /setup.
+     * Opt out in cold-start tests that need empty catalogs.
+     */
+    protected bool $autoSeedPlatformCatalogs = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,6 +61,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
 
         $this->removeSqliteFiles(\is_string($path) ? $path : null);
         $this->clearRateLimiterCache();
+        $this->clearSiteBackupState();
 
         static::createClient();
         $em = static::getContainer()->get(EntityManagerInterface::class);
@@ -62,7 +70,29 @@ abstract class DatabaseWebTestCase extends WebTestCase
         if ([] !== $meta) {
             $schemaTool->createSchema($meta);
         }
+        if ($this->autoSeedPlatformCatalogs) {
+            $this->seedPlatformCatalogs();
+        }
         self::ensureKernelShutdown();
+    }
+
+    /**
+     * Drop SiteBackup markers/progress so prior host runs do not skip or bounce `/setup`.
+     */
+    private function clearSiteBackupState(): void
+    {
+        $projectDir = \dirname(__DIR__, 2);
+        $dir = $projectDir.'/var/site-backup';
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        foreach (['setup.done', 'setup.required', 'setup-progress.json'] as $name) {
+            $file = $dir.'/'.$name;
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
     }
 
     /**

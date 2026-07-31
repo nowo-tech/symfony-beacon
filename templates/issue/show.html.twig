@@ -114,6 +114,29 @@
             {% endblock %}
         {% endembed %}
 
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'ai_export', title: 'issues.aside_ai_export'|trans} %}
+            {% block body %}
+                <div class="issue-ai-export" data-testid="issue-ai-export">
+                    <p class="issue-assignee-form__help">{{ 'issues.export_for_ai_help'|trans }}</p>
+                    <div class="issue-status-actions__buttons flex flex-wrap gap-2">
+                        {% set ai_md_path = path('issue_export_ai_md', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
+                        {% set ai_json_path = path('issue_export_ai_json', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
+                        <button
+                            type="button"
+                            class="btn-primary"
+                            data-controller="clipboard-copy"
+                            data-clipboard-copy-url-value="{{ ai_md_path }}"
+                            data-clipboard-copy-label-value="{{ 'issues.export_for_ai'|trans|e('html_attr') }}"
+                            data-clipboard-copy-done-label-value="{{ 'issues.export_for_ai_copied'|trans|e('html_attr') }}"
+                            data-action="click->clipboard-copy#copyFromUrl"
+                        >{{ 'issues.export_for_ai'|trans }}</button>
+                        <a class="btn-ghost" href="{{ ai_md_path }}">{{ 'issues.export_for_ai_md'|trans }}</a>
+                        <a class="btn-ghost" href="{{ ai_json_path }}">{{ 'issues.export_for_ai_json'|trans }}</a>
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+
         {% if can_triage|default(false) %}
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
             {% block body %}

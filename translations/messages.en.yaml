@@ -6,6 +6,7 @@ nav:
     account: Account menu
     admin: Administration
     admin_hub: Admin overview
+    ops: Ops overview
     users: Users
     groups: Groups
     admin_projects: Projects
@@ -26,6 +27,12 @@ api_docs:
     title: API docs
     intro: Explore Envelope ingest and related HTTP endpoints. Use Authorize with an X-Beacon-Auth header (beacon_key and beacon_secret from your project DSN).
     open_json: OpenAPI JSON
+magic_login:
+    confirm:
+        title: Continue sign-in
+        heading: Finish magic login
+        help: Confirm to complete passwordless sign-in. This page posts the one-time link so the token is not sent as a GET navigational request.
+        submit: Continue
 common:
     filter: Filter
     clear_filters: Clear filters
@@ -63,6 +70,11 @@ theme:
     night: Night
     switch_to_day: Switch to day mode
     switch_to_night: Switch to night mode
+layout:
+    width_content: Content
+    width_full: Full width
+    switch_to_content: Switch to centered content width
+    switch_to_full: Switch to full-width content
 auth:
     tagline: Self-hosted error tracking for PHP & Symfony.
     brand_eyebrow: Error tracking
@@ -82,7 +94,7 @@ auth:
         email_body: "Open this link to sign in (expires %expires%):\n\n%link%"
     reset:
         email_subject: Reset your Beacon password
-        email_body: "Use this link to choose a new password:\n\n%link%\n"
+        email_body: "Use this link to choose a new password:\n\n%link%\n\nOr enter this one-time code on the reset form:\n\n%code%\n"
 flash:
     project:
         created: Project created.
@@ -92,6 +104,7 @@ flash:
         governance_saved: Project governance settings saved.
         governance_invalid: Governance values must be empty (inherit) or non-negative integers.
         quota_approaching: This project is approaching its daily event quota.
+        quota_monthly_approaching: This project is approaching its monthly event quota.
         history_cleared: Project history cleared.
         deleted: Project deleted.
         delete_confirmation_mismatch: Project name did not match. Nothing was deleted.
@@ -175,11 +188,14 @@ project:
         intro: API keys, members, governance, and destructive project actions.
     governance:
         title: Governance
-        help: Per-project retention, rate limits, and daily quotas. Leave a field empty to inherit the server default.
+        help: Per-project retention, rate limits, and daily/monthly event quotas. Leave a field empty to inherit the server default.
         retention_days: Retention days
         retention_max_events: Max stored events
         ingest_rate_limit: Ingest rate limit (per minute)
         event_quota_daily: Daily event quota
+        event_quota_monthly: Monthly event quota
+        quota_usage_monthly: '%count% / %quota% events this month (UTC)'
+        month_utc_hint: Month boundary is UTC
         inherit_hint: 'Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.'
         save: Save governance
         quota_usage: 'Events today: %count% / %quota%'
@@ -346,6 +362,12 @@ issues:
     no_source_context: No source context for this frame.
     copy_path: Copy path
     path_copied: Copied
+    aside_ai_export: AI export
+    export_for_ai: Copy for AI
+    export_for_ai_copied: Copied
+    export_for_ai_md: Download Markdown
+    export_for_ai_json: Download JSON
+    export_for_ai_help: Scrubbed stack and request context in beacon-ai-export/v1 format for pasting into an AI assistant.
     breadcrumbs: Breadcrumbs
     raw_payload: Raw payload
     highlights: Highlights
@@ -672,11 +694,14 @@ users:
     title: Users
     intro: Create accounts, assign instance roles, and enable or disable login (UserKit).
     create: Add user
+    search_placeholder: Search by name or email…
     create_intro: Create a Beacon account. The person can sign in with this email and password.
     back: Back to users
     cancel: Cancel
     role_label: Role
     last_admin_hint: Keep at least one administrator.
+    edit_role_title: Change user role
+    edit_role_body: 'Choose a new role for %name% (%email%).'
     col:
         user: User
         email: Email
@@ -704,6 +729,7 @@ users:
         enable: Enable
         disable: Disable
         update_role: Update
+        edit_role: Edit role
         self: This is you
         activity: Activity
     projects_title: Project memberships
@@ -717,6 +743,8 @@ users:
         timeline_title: Activity timeline
         recent_title: Recent activity
         recent_intro: Latest administrative, membership, and product actions across the instance.
+        audit_intro: Identity and membership actions for this account (filters match Admin project audit).
+        audit_empty: No recorded identity actions match the current filters.
         empty: No recorded actions yet.
         by: 'By %name%'
         by_system: By system
@@ -762,6 +790,7 @@ users:
             'analytics.opened': Analytics opened
             'auth.magic_login_requested': Magic login requested
             'auth.magic_login_consumed': Magic login used
+            'auth.password_reset_requested': Password reset requested
             'project.share_link_created': Share link created
             'project.share_link_revoked': Share link revoked
             'project.share_link_opened': Share link opened
@@ -788,11 +817,22 @@ preferences:
     intro: Update your profile, password, language, and theme preferences.
     nav:
         profile: Profile
+        projects: My projects
+        groups: My groups
         security: Security
+        password: Change password
+        password_history: Change history
+        security_activity: Activity
+        area_label: Account sections
         display: Display
+        appearance: Appearance
+        panels: Issue panels
+        tours: Tours
+        notifications: Notifications
     profile:
         title: Profile
         intro: Review your account details and update your display name or sign-in email.
+        tabs_label: Profile sections
         submit: Save profile
         edit_title: Edit profile
         account_id: Account ID
@@ -819,17 +859,33 @@ preferences:
     security:
         title: Security
         intro: Change your account password.
+        tabs_label: Security sections
         submit: Update password
         history_title: Password change history
         history_intro: Recent password updates kept for reuse prevention. Hashes are never shown.
         history_current: 'Current password set on:'
         history_entry: Password changed
         history_empty: No password changes recorded yet.
+        social_title: Linked social accounts
+        social_intro: OAuth providers connected to this Beacon account.
+        social_disabled: Social login is not enabled on this instance.
+        social_empty: No social accounts are linked yet. Sign in with a provider from the login page to link one when social login is enabled.
+        social_unlink_note: Unlinking providers from this page is not available yet. Contact an instance admin if you need a link removed.
+        activity_title: Security activity
+        activity_intro: Recent password-reset and magic-login events for your account.
+        activity_empty: No security events recorded yet.
     display:
         title: Display
-        intro: Choose language, theme, layout density, text size, contrast, sidebar, motion, content width, and which issue panels start collapsed.
+        intro: Choose language, theme, layout density, text size, contrast, sidebar, motion, and content width.
+        tabs_label: Display sections
         submit: Save display settings
         section_layout: Language, theme, and layout
+        panels_title: Issue panels
+        panels_intro: Choose which issue panels start collapsed, and clear browser overrides for panel open/closed state.
+        tours_title: Tours
+        tours_intro: Control which product tours may auto-start, and replay the dashboard tour.
+        notifications_title: Notifications
+        notifications_intro: Optional push alerts for new issues, and install Beacon as an app on your device.
         pwa_title: Install app
         pwa_intro: Add this site to your device for a faster, standalone experience. Availability depends on your browser.
         pwa_prompt_title: Install for quicker access
@@ -866,7 +922,7 @@ preferences:
     product_tour_enabled: Active tours
     product_tour_enabled_help: Checked tours can auto-start once per area. Uncheck a tour to hide it; uncheck all to disable every tour.
     product_tour_select_all: Select all tours
-    product_tour_save_hint: Click Save display settings below to apply tour changes.
+    product_tour_save_hint: Click Save display settings to apply tour changes.
     product_tour_page:
         dashboard: Dashboard
         project_issues: Project issues
@@ -961,31 +1017,21 @@ user_preferences:
         strength_invalid: 'The password does not meet the strength requirements (%missing%).'
 
 # PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
-requirement.min_length: 'At least %count% characters'
-requirement.max_length: 'At most %count% characters'
-requirement.lowercase: 'At least one lowercase letter'
-requirement.uppercase: 'At least one uppercase letter'
-requirement.digit: 'At least one number'
-requirement.special: 'At least one special character'
-requirement.no_whitespace: 'No whitespace allowed'
-requirement.not_contain: 'Must not contain forbidden text'
-requirement.min_unique_chars: 'At least %count% unique characters'
-requirement.regex: 'Must match the required pattern'
-generator.button: 'Generate password'
-generator.modal_title: 'Suggested passwords'
-generator.modal_hint: 'These passwords match your current policy. Copy one or apply it to the field.'
-generator.copy: 'Copy'
-generator.copied: 'Copied!'
-generator.use_password: 'Use this password'
-generator.close: 'Close'
-generator.failed: 'Could not generate a valid password. Try again or relax the policy.'
 
 groups:
     title: Groups
     intro: Organize users into groups, then link groups to projects for bulk access.
     create: New group
+    search_placeholder: Search by name, slug, or description…
     empty: No groups yet.
     open: Open
+    col:
+        group: Group
+        slug: Slug
+        members: Members
+        description: Description
+        audit: Audit
+        actions: Actions
     back: Back to groups
     edit: Edit
     edit_title: Edit group
@@ -995,6 +1041,9 @@ groups:
     delete_confirm: Delete this group? It will be unlinked from all projects.
     name_label: Name
     description_label: Description
+    audit_title: Audit timeline
+    audit_intro: Group-related administrative actions (create/update, members, project links). AuditKit timestamps above remain the last-editor snapshot.
+    audit_empty: No recorded group actions match the current filters.
     members_title: Group members
     members_empty: No members in this group yet.
     add_member: Add member
@@ -1014,6 +1063,17 @@ admin_projects:
     create: New project
     empty: No projects yet.
     open: Manage
+    col:
+        project: Project
+        slug: Slug
+        members: Members
+        groups: Groups
+        activity: Activity
+        status: Status
+        audit: Audit
+        actions: Actions
+    status:
+        active: Ingest active
     back: Back to projects
     edit: Edit
     edit_title: Edit project
@@ -1069,11 +1129,30 @@ admin:
         users: List accounts and roles on this instance.
         groups: Create groups and manage their members for project access.
         projects: List all projects, manage members and group links, or delete a project.
+        ops: Cross-project spikes, open issues, and failed deliveries.
         appearance: Brand name and accent colors.
         mailer: Encrypted Mailer DSN and From address for transactional email.
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
+    ops:
+        title: Ops overview
+        intro: Instance-wide health signals across projects. Messenger queue depth is always instance-wide.
+        filter_project: Project filter
+        filter_all: All projects
+        queue_title: Messenger queue
+        queue_instance_wide: Instance-wide async pending (not project-scoped)
+        open_issues_title: Open issues
+        suspended_title: Suspended ingest
+        suspended_list_title: Suspended projects
+        spikes_title: Error spikes
+        spikes_help: 'Projects where today’s errors exceed max(3, 2 × 7-day daily average).'
+        spikes_empty: No error spikes right now.
+        spikes_metric: '%today% today (7d avg %avg%, threshold %threshold%)'
+        failed_title: Failed deliveries
+        failed_empty: No destinations with a failed last delivery.
+        open_by_project_title: Open issues by project
+        open_by_project_empty: No open issues in scope.
 setup:
     eyebrow: First run
     title: Instance setup
@@ -1083,6 +1162,29 @@ setup:
     already_done: Setup is marked complete.
     back_dashboard: Back to dashboard
     login_setup_link: First-run setup
+    progress_of: 'Step %current% of %total%'
+    log:
+        tabs_label: Setup progress
+        tab: Log
+        completed: Completed
+    admin:
+        email: Email
+        password: Password
+    token:
+        title: Setup token required
+        body: 'Open %path% with the configured setup.setup_token.'
+    reason:
+        heading: Setup is required
+        db_connection: The database is not reachable with the current DATABASE_URL (missing, wrong, or the DB service is down).
+        db_connection_hint: Configure a working DATABASE_URL in the database step before continuing. Skip is disabled until the connection works.
+        db_connection_form: Database connection failed. Enter a valid DATABASE_URL (written to .env.local). You cannot skip this step until the database responds.
+        db_schema_empty: The database connects but has no tables yet — migrations / import will create the schema.
+        db_schema_hint: Continue the wizard to run migrations (or import a full dump). You do not need to change DATABASE_URL if the connection already works.
+        marker_required: A setup.required marker is present (cold start or post-restore).
+        marker_done_missing: setup.done is missing while require_done_marker is enabled.
+        incomplete: 'Wizard in progress: %detail%'
+    database:
+        intro: Optional — leave empty and skip if DATABASE_URL in the environment already works.
     bootstrap_login_hint: Prefer to create your own admin?
     bootstrap_login_link: Sign in
     bootstrap_register_link: Register first admin
@@ -1110,7 +1212,8 @@ setup:
         sample_title: Full sample load
         sample_body: Create the demo project if needed and load the larger sample telemetry dataset (load profile).
         sample_cta: Install full sample load
-        sample_note: This can take a minute. Huge datasets remain CLI-only (`app:seed-sample --size=huge --force`). If no user exists yet, a local demo admin may be created to own the demo project.
+        sample_note: This can take a minute. Huge datasets remain CLI-only (`app:seed-sample --size=huge --force`).
+        sample_requires_register: Register the first admin before loading sample telemetry (demo project is owned by your account).
     step_demo:
         title: Demo project
         body: Create the local demo admin (if missing) and demo project with an API key.
@@ -1133,6 +1236,7 @@ setup:
         demo_ok: Demo user / project ready.
         demo_exists: Demo user and project already exist.
         sample_ok: Sample telemetry loaded. Mercure live alerts were enabled with env defaults when needed.
+        sample_requires_user: Sign in or register the first admin before loading sample data.
         sample_demo_user: 'Created local demo admin admin@symfony-beacon.local / admin123 to own the demo project.'
         complete: Setup marked complete.
         bootstrap_ready: Setup complete. Sign in or register the first admin to continue.
@@ -1281,9 +1385,11 @@ legal:
         duration_consent: Approximately 1 year
         purpose_session: Maintains the authenticated HTTP session required to access protected areas of the service.
         purpose_remember: Enables persistent authentication when “Remember me” is selected at sign-in (secure token; limited lifetime).
-        purpose_consent: Stores cookie-category decisions and an anonymized consent key for accountability and audit logging.
+        purpose_csrf: Short-lived double-submit CSRF cookie set by Symfony when submitting protected forms (name pattern csrf-token_<token>; __Host- prefix on HTTPS).
+        purpose_consent: Cookie_Consent and Cookie_Consent_Key record that a consent decision was made and link an anonymous key to the server-side consent audit log.
+        purpose_category: Cookie_Category_analytics and Cookie_Category_preferences store whether each optional category was accepted or refused (consent machinery, not trackers).
         storage_heading: Local storage
-        storage_body: Theme preference (light/dark) may be stored in the browser’s localStorage and is not a HTTP cookie. Under typical ePrivacy guidance this may be treated as strictly necessary for a coherent user interface; operators should confirm the applicable rules in their jurisdiction.
+        storage_body: Theme preference (light/dark) and some UI layout choices may be stored in the browser’s localStorage and are not HTTP cookies. Under typical ePrivacy guidance this may be treated as strictly necessary for a coherent user interface; operators should confirm the applicable rules in their jurisdiction.
 
 notifications:
     title: Notifications

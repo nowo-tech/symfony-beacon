@@ -34,6 +34,34 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::assertSelectorExists('table .badge');
     }
 
+    public function testAdminUsersSearchFiltersByEmailOrName(): void
+    {
+        [$client, $admin] = $this->bootWithDemoProject('admin-users-search@example.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setDisplayName('Alpha Admin');
+        $em = self::getContainer()->get('doctrine')->getManager();
+
+        $other = new User();
+        $other->setEmail('bravo-user@example.com');
+        $other->setDisplayName('Bravo User');
+        $other->setPassword('unused');
+        $em->persist($other);
+        $em->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        $this->login($client, $admin);
+
+        $client->request(Request::METHOD_GET, '/admin/users', ['q' => 'bravo']);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form[action$="/admin/users"] input[name="q"]');
+        self::assertSelectorTextContains('table', 'bravo-user@example.com');
+        self::assertSelectorTextNotContains('table', 'admin-users-search@example.com');
+
+        $client->request(Request::METHOD_GET, '/admin/users', ['q' => 'Alpha']);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('table', 'admin-users-search@example.com');
+        self::assertSelectorTextNotContains('table', 'bravo-user@example.com');
+    }
+
     public function testAdminCanDisableAnotherUser(): void
     {
         [$client, $admin] = $this->bootWithDemoProject('toggle-admin@example.com');
@@ -124,6 +152,14 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h1', 'Activity history');
         self::assertSelectorTextContains('body', 'User created');
         self::assertSelectorTextContains('body', 'User role changed');
+        self::assertSelectorExists('[data-testid="user-audit-entry"]');
+
+        $client->request(Request::METHOD_GET, '/admin/users/'.$reloaded->getUuid().'/activity', [
+            'action' => 'user.role_changed',
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('#user-audit-timeline', 'User role changed');
+        self::assertSelectorTextNotContains('#user-audit-timeline', 'User created');
     }
 
     public function testAdminCanRemoveUserFromProjectAndBlocksLastOwner(): void

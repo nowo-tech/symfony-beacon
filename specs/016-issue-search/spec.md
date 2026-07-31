@@ -2,7 +2,7 @@
 
 **Feature Branch**: `016-issue-search`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Full-text issue search; filters for tag, URL, user (assignee/actor), and release; occurrence sorts for 24h / 7d / 30d must remain database-backed (SQL-only), not application-side.
 

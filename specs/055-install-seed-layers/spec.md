@@ -4,7 +4,7 @@
 **Created**: 2026-07-21  
 **Status**: Implemented  
 
-**Input**: Split first-install / upgrade seeding into clear layers: (1) extract idempotent platform seed (menus/breadcrumbs) from `app:seed-demo`; (2) leave `app:seed-demo` for identity + demo project + DSN client env only; (3) add `app:seed-sample` with volume profiles for QA/load; (4) document upgrade as migrate + platform seed. Visual onboarding wizard is **out of scope** for this feature (follow-up after CLI is stable).
+**Input**: Split first-install / upgrade seeding into clear layers: (1) extract idempotent platform seed (menus/breadcrumbs/cookie consent) from `app:seed-demo`; (2) leave `app:seed-demo` for identity + Symfony Beacon project + DSN client env only; (3) add `app:seed-sample` with volume profiles for QA/load; (4) document upgrade as migrate + platform seed. Visual cold-start UI is **out of scope** here — see `056-setup-wizard` (SiteBackupBundle `/setup`).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -70,7 +70,8 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 
 1. **Given** README quick start, **When** I follow first-install steps, **Then** I see migrate + platform seed (bootstrap), then optional demo seed and optional sample seed.
 2. **Given** UPGRADING for the release that ships this feature, **When** I upgrade, **Then** I am instructed to run migrations and `app:seed-platform` (or `make seed-platform`) after pull/install.
-3. **Given** Makefile help, **When** I list targets, **Then** `bootstrap`, `seed-platform`, `seed` / `seed-demo`, and `seed-sample` are distinguishable.
+3. **Given** Makefile help, **When** I list targets, **Then** `bootstrap`, `seed-platform`, `seed` / `seed-demo`, `dogfood`, and `seed-sample` are distinguishable (`dogfood` = Symfony Beacon dogfood project + API key + server `BEACON_DSN` wire with `--skip-demo-user`, without re-running platform seed).
+4. **Given** `var/secrets/` is missing, **When** I run `make dogfood` / `seed-platform` / `seed-sample` / `bootstrap`, **Then** Make creates `var/secrets/` first so Halite can write `.Halite.default.key` (see `048-prod-encrypt-key`).
 
 ---
 
@@ -91,12 +92,13 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 - **FR-002**: System MUST provide a **demo seed** command (evolved from current `app:seed-demo`) limited to demo identity, demo project, API key, and optional client-env DSN write; it MUST invoke or document prerequisite platform seed so menus are not a side effect of demo-only data.
 - **FR-003**: System MUST provide a **sample seed** command with named profiles (`dev`, `load`, `huge`) that generate tagged sample telemetry for validation/load testing.
 - **FR-004**: Sample data MUST be identifiable (project slug and/or explicit sample marker) so purge can remove it without deleting unrelated operator data.
-- **FR-005**: `make bootstrap` MUST run schema migrate + platform seed; demo and sample MUST be separate optional Make targets (or clearly optional steps after bootstrap).
+- **FR-005**: `make bootstrap` MUST run schema migrate + platform seed; demo and sample MUST be separate optional Make targets (or clearly optional steps after bootstrap). Seed-related Make targets that encrypt fields (`bootstrap`, `seed-platform`, `seed-sample`, `dogfood`) MUST ensure `var/secrets/` exists before console (Halite key file parent directory).
 - **FR-006**: Upgrade documentation MUST prescribe `migrate` + platform seed as the default post-upgrade data step for navigation catalogs (replacing “re-run seed-demo for menus”).
 - **FR-007**: Platform seed MUST be safe to run repeatedly on production-like databases (no demo credentials, no sample flood).
 - **FR-008**: Lightweight N+1 / analytics snippets currently created by demo seed MUST move under sample seed (at least profile `dev`) so demo seed stays identity+project+DSN focused.
 - **FR-009**: English operator docs (README, UPGRADING, CHANGELOG, CONTRIBUTING or INSTALL note) MUST describe the three layers and when to use each.
 - **FR-010**: Automated tests MUST cover: platform seed idempotency; demo seed create-once behavior; sample `dev` create + purge; bootstrap Make/contract smoke as appropriate for the repo’s test style.
+- **FR-011**: `make dogfood` MUST invoke `app:seed-demo --skip-demo-user` (Symfony Beacon project / DSN wiring for existing admins; no new demo user).
 
 ### Key Entities
 
@@ -121,15 +123,15 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 - Schema continues to come from Doctrine migrations only (no frozen SQL dump as source of truth in this feature).
 - Existing `BreadcrumbDemoSeeder` / `DashboardMenuDemoSeeder` upsert behavior is the basis for platform seed (rename/move under platform naming as needed).
 - Default demo credentials remain `admin@symfony-beacon.local` / `admin123` unless overridden by options (local/dev convenience; not for production hardening).
-- Visual **setup wizard UI** is deferred to a later spec after CLI layers are stable.
+- Visual cold-start UI lives in `056-setup-wizard` (SiteBackupBundle); this feature stays CLI/Make layers.
 - `load` / `huge` exact row counts and batching strategy are deferred to plan/tasks; this spec only requires distinct profiles and safe defaults (`dev` default).
 - Production Compose operators may run platform seed from the `php` service the same way they run migrations.
 
 ## Out of Scope
 
-- Visual / HTTP onboarding wizard (empty-instance UI).
+- Visual / HTTP onboarding wizard (see `056-setup-wizard` / SiteBackup).
 - Replacing AuthKit first-user registration.
-- Dumping/restoring full MySQL snapshots as the primary install path.
+- Dumping/restoring full MySQL snapshots as the primary install path (SiteBackup `full_database` profile is optional ops, not this feature).
 - Generating sample data that mimics other tenants’ PII (use synthetic emails/messages only).
 - SSO, monthly quota, or ops-overview features.
 - Changing Envelope ingest protocol or DSN format.

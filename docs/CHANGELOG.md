@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [0.13.0] - 2026-07-31
+
+### Added
+
+- **Security hardening residual:** webhook DNS pin (`OutboundUrlGuard` + HttpClient `resolve`); Web Push endpoint allowlist; `BEACON_INGEST_REJECT_QUERY_AUTH` (prod default reject query auth); POST-only magic-login confirm interstitial; Caddy security headers (`053`); `/api/doc` → `ROLE_ADMIN` (`054`); HTTP Envelope `429` tests for daily/monthly quotas + OpenAPI multi-cause `429`
+- **Ops overview** (`035`): `/admin/ops` for instance admins — Messenger queue depth, open issues, suspended ingest, error spikes, failed deliveries (optional project filter); Administration hub card + menu/breadcrumb seed
+- **Admin identity audit** (`036`): filterable `user_action` timelines on Admin → Group show and Admin → User activity (parity with project audit `031`); shared Twig partial
+- **Identity kit polish** (`037`): shared Account area nav (Profile|Security|Display); linked social accounts + security activity on `/account/security*`; AuthKit audit subscribers set `subjectUser`
+- **Monthly event quota** (`032`): `BEACON_EVENT_QUOTA_MONTHLY` + `project.event_quota_monthly`; UTC month boundary; Settings governance; Envelope/worker `429` / drop; 80% approaching flash
+- SiteBackup hardening: `setup.setup_token` wired to `SITE_SETUP_TOKEN`; prod refuses empty/local token and the documented local panel password hash (`SiteBackupSecurityDefaultsGuard`); `compose.prod.yaml` requires both secrets
+- AuthKit password reset **OTP code** path (`delivery: both`): `/reset-password/complete`, Beacon Twig override, email body includes `%code%` backup; rate limit + audit (`auth.password_reset_requested`)
+- Admin directory search (`q`) on Users and Groups (Projects already had it); table layout aligned across Users / Groups / Projects
+- **SiteBackupBundle** (`nowo-tech/site-backup-bundle` **1.5.0**): panel `/_site_backup`, cold-start wizard `/setup` (migrations, `app:seed-platform`, admin provisioner, optional sample data); `SITE_BACKUP_PASSWORD_HASH` in `.env.dist`
+  - Durable setup progress: `progress_storage: chain` (filesystem + Doctrine DBAL; load prefers DB so wiping `var/` keeps the current step)
+  - `IncompleteSetupProgressDetector` (`detectors.incomplete_progress: true`) — site gate while phase is `running` / `waiting_input` / `failed`
+  - Progress timestamps `started_at` / `completed_at`; route prefixes honour `setup.path_prefix` / `panel.path_prefix`
+  - **1.3.x:** `bootstrap_mode` (guided admin vs full SQL dump), profile `full_database`, `when_answer` filters, `advance_mode`, optional YAML `tabs` + checkers
+  - **1.4–1.5:** `setup.layout_template` + `panel.layout_template` (`kit/site_backup_*_layout.html.twig`); Twig globals; vendor reasons + DB connection UX; restyle via `.nowo-site-backup-*` / `.nowo-ui-*`
+- **Dogfooding** (`058`): require `nowo-tech/beacon-bundle`; `config/packages/nowo_beacon.yaml`; `make ready`; demo seed writes loopback `BEACON_DSN` when empty; stable demo secret; `DropSelfIngestBeforeSend` anti-loop
+- **AI issue export** (`059`): `beacon-ai-export/v1` Markdown/JSON per issue; Copy for AI + downloads; [docs/AI-EXPORT.md](AI-EXPORT.md)
+- Cookie Consent admin Web UI (`web_ui` + `kit/cookie_consent_admin_layout.html.twig`, ROLE_ADMIN)
+- Dev: `nowo-tech/phpstan-frankenphp` (`ruleset-classic` + `ruleset-worker` + `ruleset-hardening` in `phpstan.neon.dist`)
+
+### Changed
+
+- Composer kit bumps: AuthKit **1.11.4** (`auth_panel` / mail-ready / form themes / Twig UI globals), PWA **1.2.0** (mark/button config), SiteBackup **1.6.0**, Beacon client **1.6.9**, Dashboard Menu **1.0.4** / Breadcrumb **2.0.11** (`--nowo-ui-*`), Cookie Consent **1.4.7** (CSRF-optional modal); dropped AuthKit `security/*` and PWA Twig forks; kit admin maps `--nowo-ui-*` under `.kit-admin`
+- Cookie Consent **1.4.5**: vendor Tailwind modal/form use `--nowo-cc-*` tokens; dropped host form-theme fork and manual `twig.paths` (bundle `TwigPathsPass` prepends app overrides)
+- Cookie consent **modal** uses vendor Twig again (skin via `_cookie_consent.scss`); dropped host fork of `cookie_consent.tailwind.html.twig` so `display_config` / two-step / preference sections track CookieConsent upgrades
+- AuthKit layout extends shared `layouts/guest_shell.html.twig` (single guest chrome; bubble via `cookie_consent_extras` block)
+- Removed duplicate password-strength `requirement.*` / `generator.*` keys from `messages.*` (AuthKit domain + PasswordStrength vendor remain)
+- AuthKit logout CSRF enabled (`enable_csrf: true`); user menu passes `_csrf_token` (AuthKit 1.7.6+)
+- Menus / Breadcrumbs kit chrome: Beacon page heading + `.panel` shell; `nowo-ui-*` restyled under `.kit-admin` to admin tokens (still no page Twig forks; kits’ TwigPathsPass has no `@!` namespace)
+- Replaced the custom `/setup` wizard with SiteBackupBundle setup (`/setup`); removed `SetupWizardController` / `LocalizedPublicPath` / setup rate limiter
+- Composer deps: **site-backup-bundle 1.5.0** (Packagist); Symfony 8.1 patch bump (`framework-bundle`/`console`/`form`/… **8.1.2**, `http-client` **8.1.3**); PHPUnit **13.2.6**, PHPStan **2.2.7**, Rector **2.5.8**, PHP-CS-Fixer **3.95.17**
+- SiteBackup setup + panel: `layout_template` kit shells + `.nowo-site-backup-*` / `.nowo-ui-*` CSS (REQ-UI-001; no Twig page forks)
+- Composer kits/Symfony bump: AuthKit 1.8, Dashboard Menu 1.0, Cookie Consent 1.4, Breadcrumb 2.0.9, Login Throttle 3.1, Password Strength 2.1, Password Policy 1.4, plus related nowo-tech / Doctrine Bundle 3.3 / Web Push 11
+- Kit Twig strategy: remove forked dashboard Menu/Breadcrumb pages; host shells only (`templates/kit/*_dashboard_layout.html.twig` + `body_before`/`body_after` wrappers) so kit upgrades land without re-copying CRUD Twig
+- Password Strength form theme extends `@NowoPasswordStrengthBundle` (2.x namespace); Password Policy overrides use domain `NowoPasswordPolicyBundle`
+- Dashboard Menu / Breadcrumb: `css_framework` / `icon_set` / `security.access_roles` configured
+- Ingest worker: one Doctrine flush per envelope (deferred notifications/thresholds); Messenger `--memory-limit=256M`
+- Retention aggregate recompute uses SQL `COUNT`/`MIN`/`MAX` instead of hydrating all events
+- `IssueRepository::findByRelease` capped at 500 (same as environment compare)
+
+### Fixed
+
+- Cookie consent inventory aligned with CookieConsentBundle names (`Cookie_Consent`, `Cookie_Consent_Key`, `Cookie_Category_*`) plus Symfony `csrf-token_*`; legal cookies page and platform seeder updated
+- Envelope ingest clears the EntityManager when auth left a managed `ProjectApiKey` (sync Messenger) so notification flushes cannot double-encrypt Halite secrets
+- PHPUnit bootstrap writes a durable Halite key under `var/secrets/` so KernelBrowser reboots keep decrypting API secrets (multi-request Envelope ingest)
+- AuthKit mailer gate + magic-login rate limit also match `*_unlocalized` dual-URL routes (`locale.unlocalized: serve`)
+- Setup locale switcher: returning to bare `/setup` (default locale) no longer keeps a sticky non-default session language
+
 ## [0.12.8] - 2026-07-21
 
 ### Added
@@ -130,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Magic login and email notification delivery read Mailer DSN/From from instance settings (`ConfiguredMailer`); `.env` `MAILER_DSN` remains bootstrap/fallback only (`null://null` by default)
-- Password-policy flash messages use structured toast title/body overrides (`PasswordPolicyBundle.*.yaml`)
+- Password-policy flash messages use structured toast title/body overrides (`NowoPasswordPolicyBundle.*.yaml`)
 - Filter UIs always expose **Clear filters**; dashboard project list keeps search / filter / clear / new-project on one toolbar
 - Batch-load Doctrine associations on several admin, issue, notification, and dashboard paths (fewer N+1 queries)
 - SECURITY.md: operators configure Mailer via Administration (encrypted), not only env
@@ -504,7 +561,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.5...v0.12.6

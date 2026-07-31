@@ -1,0 +1,28 @@
+{# Display area: Appearance | Issue panels | Tours | Notifications #}
+{% set route = app.request.attributes.get('_route') %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'preferences.display.tabs_label'|trans,
+    nav_class: 'preferences-nav mb-6',
+    items: [
+        {
+            label: 'preferences.nav.appearance'|trans,
+            href: path('account_display'),
+            current: route == 'account_display',
+        },
+        {
+            label: 'preferences.nav.panels'|trans,
+            href: path('account_display_panels'),
+            current: route == 'account_display_panels',
+        },
+        {
+            label: 'preferences.nav.tours'|trans,
+            href: path('account_display_tours'),
+            current: route == 'account_display_tours',
+        },
+        {
+            label: 'preferences.nav.notifications'|trans,
+            href: path('account_display_notifications'),
+            current: route == 'account_display_notifications',
+        },
+    ],
+} only %}

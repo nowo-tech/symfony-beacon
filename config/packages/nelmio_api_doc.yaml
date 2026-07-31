@@ -27,7 +27,7 @@ nelmio_api_doc:
                 Unauthenticated liveness/readiness probes for orchestrators.
 
                 ## Docs UI
-                Swagger UI at `/api/doc` requires a logged-in Beacon session; it documents these
+                Swagger UI at `/api/doc` requires a Beacon session with **ROLE_ADMIN**; it documents these
                 HTTP APIs only (not the Twig dashboard).
             version: '1.0.0'
             contact:

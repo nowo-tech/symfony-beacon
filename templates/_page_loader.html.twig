@@ -1,0 +1,20 @@
+{# Full-page Thinking Orb loader (initial paint + in-app navigations). #}
+<div
+    class="page-loader"
+    data-controller="page-loader"
+    data-page-loader-target="overlay"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+>
+    <div class="page-loader__inner">
+        {% include '_thinking_orb.html.twig' with {
+            state: 'working',
+            size: 64,
+            rotate_states: true,
+            label: 'Loading…',
+            class: 'page-loader__orb'
+        } %}
+        <p class="page-loader__label">Loading…</p>
+    </div>
+</div>

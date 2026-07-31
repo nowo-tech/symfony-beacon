@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared;
 
+use App\Identity\Command\SeedDemoCommand;
 use App\Identity\Repository\UserRepository;
-use App\Shared\Settings\Repository\InstanceSettingsRepository;
-use App\Shared\Mercure\ConfiguredMercure;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
+use App\Shared\Mercure\ConfiguredMercure;
 use App\Shared\ProjectRole;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -47,7 +48,7 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
         $em->flush();
 
         $sampleTester = new CommandTester($application->find('app:seed-sample'));
-        $sampleTester->execute(['--size' => 'dev', '--project' => 'demo']);
+        $sampleTester->execute(['--size' => 'dev', '--project' => SeedDemoCommand::DEMO_PROJECT_SLUG]);
         self::assertSame(0, $sampleTester->getStatusCode(), $sampleTester->getDisplay());
         self::assertStringContainsString('Mercure', $sampleTester->getDisplay());
 
@@ -67,18 +68,18 @@ final class SeedSampleCommandTest extends DatabaseWebTestCase
 
         $demoIssueCount = (int) $em->createQuery(
             'SELECT COUNT(i.id) FROM '.Issue::class.' i WHERE i.project = :p',
-        )->setParameter('p', $em->getRepository(Project::class)->findOneBy(['slug' => 'demo']))
+        )->setParameter('p', $em->getRepository(Project::class)->findOneBy(['slug' => SeedDemoCommand::DEMO_PROJECT_SLUG]))
             ->getSingleScalarResult();
         self::assertGreaterThanOrEqual(30, $demoIssueCount);
 
-        $sampleTester->execute(['--purge' => true, '--project' => 'demo']);
+        $sampleTester->execute(['--purge' => true, '--project' => SeedDemoCommand::DEMO_PROJECT_SLUG]);
         self::assertSame(0, $sampleTester->getStatusCode(), $sampleTester->getDisplay());
 
         $em->clear();
 
         $demoAfter = (int) $em->createQuery(
             'SELECT COUNT(i.id) FROM '.Issue::class.' i JOIN i.project p WHERE p.slug = :slug',
-        )->setParameter('slug', 'demo')->getSingleScalarResult();
+        )->setParameter('slug', SeedDemoCommand::DEMO_PROJECT_SLUG)->getSingleScalarResult();
         self::assertSame(0, $demoAfter);
 
         $kept = $em->find(Issue::class, $otherIssue->getId());

@@ -66,6 +66,9 @@
     "nowo-tech/auth-kit-bundle": {
         "version": "v1.5.1"
     },
+    "nowo-tech/beacon-bundle": {
+        "version": "v1.6.7"
+    },
     "nowo-tech/breadcrumb-kit-bundle": {
         "version": "v2.0.2"
     },
@@ -102,6 +105,9 @@
     "nowo-tech/select-all-choice-bundle": {
         "version": "v1.4.11"
     },
+    "nowo-tech/site-backup-bundle": {
+        "version": "v1.1.0"
+    },
     "nowo-tech/tag-input-bundle": {
         "version": "v1.0.4"
     },
@@ -119,6 +125,18 @@
             "version": "6.5",
             "ref": "3a6673f248f8fc1dd364dadfef4c5b381d1efab6"
         }
+    },
+    "php-http/discovery": {
+        "version": "1.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.18",
+            "ref": "f45b5dd173a27873ab19f5e3180b2f661c21de02"
+        },
+        "files": [
+            "config/packages/http_discovery.yaml"
+        ]
     },
     "phpstan/phpstan": {
         "version": "2.2.5"

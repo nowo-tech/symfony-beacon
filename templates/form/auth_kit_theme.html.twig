@@ -2,7 +2,8 @@
 {% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
 
 {%- block form_row -%}
-    <div class="space-y-1.5">
+    {# flex+gap beats Tailwind space-y (:where = 0 specificity, often overridden by preflight/SCSS). #}
+    <div class="flex flex-col gap-2">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
@@ -43,7 +44,7 @@
 {%- endblock choice_widget_collapsed -%}
 
 {%- block checkbox_row -%}
-    <div class="space-y-1.5">
+    <div class="flex flex-col gap-2">
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
         {{- form_help(form) -}}

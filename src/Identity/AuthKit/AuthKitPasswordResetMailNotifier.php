@@ -12,11 +12,11 @@ use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** Delivers AuthKit password-reset emails via encrypted instance Mailer. */
-final class AuthKitPasswordResetMailNotifier implements PasswordResetNotifierInterface
+final readonly class AuthKitPasswordResetMailNotifier implements PasswordResetNotifierInterface
 {
     public function __construct(
-        private readonly ConfiguredMailer $mailer,
-        private readonly TranslatorInterface $translator,
+        private ConfiguredMailer $mailer,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -31,7 +31,7 @@ final class AuthKitPasswordResetMailNotifier implements PasswordResetNotifierInt
             return;
         }
 
-        $message = (new Email())
+        $message = new Email()
             ->from($this->mailer->getFromAddress())
             ->to($to)
             ->subject($this->translator->trans('auth.reset.email_subject'))

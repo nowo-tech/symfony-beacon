@@ -3,7 +3,7 @@
 {% block title %}{{ 'admin_projects.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
         <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin_projects.title'|trans }}</h1>
         <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin_projects.intro'|trans }}</p>
@@ -24,37 +24,72 @@
     <a class="btn-ghost no-underline" href="{{ path('admin_projects') }}">{{ 'common.clear_filters'|trans }}</a>
 </form>
 
-{% if projects is empty %}
-    <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin_projects.empty'|trans }}</p>
-{% else %}
-    <ul class="space-y-3">
-        {% for project in projects %}
-            <li class="panel flex flex-wrap items-center justify-between gap-3">
-                <div class="min-w-0">
-                    <a class="font-medium no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ project.name }}</a>
-                    <div class="text-xs text-[var(--color-ink)]/55">
-                        {{ project.slug }}
-                        · {{ 'admin_projects.member_count'|trans({'%count%': access_counts[project.id].members|default(0)}) }}
-                        · {{ 'admin_projects.group_count'|trans({'%count%': access_counts[project.id].groups|default(0)}) }}
-                        {% set stats = opsStats[project.id] ?? null %}
-                        {% if stats %}
-                            · {{ 'admin_projects.stats_open_issues'|trans({'%count%': stats.open_issues}) }}
-                            · {{ 'admin_projects.stats_events_7d'|trans({'%count%': stats.events_last_7d}) }}
-                            {% if not project.ingestEnabled %}
-                                · <span class="text-[var(--color-alert)]">{{ 'admin_projects.ingest_suspended_badge'|trans }}</span>
-                            {% endif %}
+<section class="panel overflow-x-auto">
+    <table class="w-full text-left text-sm">
+        <thead>
+            <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.project'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.slug'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.members'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.groups'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.activity'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.status'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.audit'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.actions'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+                {% set stats = opsStats[project.id] ?? null %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                    <td class="px-2 py-3">
+                        <a class="font-medium no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ project.name }}</a>
+                        {% if project.description %}
+                            <p class="mt-0.5 line-clamp-2 text-xs text-[var(--color-ink)]/55">{{ project.description }}</p>
                         {% endif %}
-                    </div>
-                    {% if project.description %}
-                        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ project.description }}</p>
-                    {% endif %}
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <a class="btn-ghost no-underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'admin_projects.open_settings'|trans }}</a>
-                    <a class="btn-ghost no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.open'|trans }}</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+                    </td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ project.slug }}</td>
+                    <td class="px-2 py-3">
+                        <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">
+                            {{ 'admin_projects.member_count'|trans({'%count%': access_counts[project.id].members|default(0)}) }}
+                        </span>
+                    </td>
+                    <td class="px-2 py-3">
+                        <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">
+                            {{ 'admin_projects.group_count'|trans({'%count%': access_counts[project.id].groups|default(0)}) }}
+                        </span>
+                    </td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">
+                        {% if stats %}
+                            <div>{{ 'admin_projects.stats_open_issues'|trans({'%count%': stats.open_issues}) }}</div>
+                            <div class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.stats_events_7d'|trans({'%count%': stats.events_last_7d}) }}</div>
+                        {% else %}
+                            <span class="text-[var(--color-ink)]/40">{{ 'common.na'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        {% if project.ingestEnabled %}
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'admin_projects.status.active'|trans }}</span>
+                        {% else %}
+                            <span class="badge bg-[var(--color-alert)]/15 text-[var(--color-alert)]">{{ 'admin_projects.ingest_suspended_badge'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3 align-top">
+                        {% include 'shared/_audit_meta.html.twig' with {entity: project} only %}
+                    </td>
+                    <td class="px-2 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ 'admin_projects.open'|trans }}</a>
+                            <a class="btn-ghost btn-sm no-underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'admin_projects.open_settings'|trans }}</a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="8">{{ 'admin_projects.empty'|trans }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 {% endblock %}

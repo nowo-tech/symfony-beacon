@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.security.history_title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_security_tabs.html.twig' %}
+
+    <section class="panel" data-testid="password-change-history" aria-labelledby="password-history-heading">
+        <h2 id="password-history-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.security.history_title'|trans }}</h2>
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.history_intro'|trans }}</p>
+
+        {% if password_changed_at %}
+            <p class="mb-4 text-sm">
+                <span class="font-medium">{{ 'preferences.security.history_current'|trans }}</span>
+                <time class="text-[var(--color-ink)]/70" datetime="{{ password_changed_at|date('c') }}">{{ password_changed_at|date('Y-m-d H:i') }}</time>
+            </p>
+        {% endif %}
+
+        {% if password_change_history is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.security.history_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-3 text-sm">
+                {% for changed_at in password_change_history %}
+                    <li class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0" data-testid="password-change-entry">
+                        <span class="font-medium">{{ 'preferences.security.history_entry'|trans }}</span>
+                        <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ changed_at|date('c') }}">{{ changed_at|date('Y-m-d H:i') }}</time>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

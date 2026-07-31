@@ -1,0 +1,88 @@
+{#
+  Shared admin UserAction timeline (031 / 036).
+
+  Required:
+    form_action (string URL), reset_path (string URL)
+    audit_actions (list of UserActionType), audit_filter {action, from, to}
+    audit_entries (list of UserAction)
+  Optional:
+    title_key, intro_key, empty_key (translation keys)
+    timeline_id, entry_testid
+#}
+{% set title_key = title_key|default('admin_projects.audit_title') %}
+{% set intro_key = intro_key|default('admin_projects.audit_intro') %}
+{% set empty_key = empty_key|default('admin_projects.audit_empty') %}
+{% set timeline_id = timeline_id|default('audit-timeline') %}
+{% set entry_testid = entry_testid|default('audit-entry') %}
+
+<div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <div>
+        <h2 class="text-lg font-semibold">{{ title_key|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ intro_key|trans }}</p>
+    </div>
+    <a class="text-sm no-underline" href="{{ reset_path }}">{{ 'admin_projects.audit_reset'|trans }}</a>
+</div>
+
+<form method="get" action="{{ form_action }}" class="mb-4 grid gap-3 sm:grid-cols-4">
+    <div class="sm:col-span-2">
+        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-action">{{ 'admin_projects.audit_filter_action'|trans }}</label>
+        <select id="{{ timeline_id }}-action" class="input w-full" name="action">
+            <option value="">{{ 'admin_projects.audit_filter_all_actions'|trans }}</option>
+            {% for action in audit_actions %}
+                <option value="{{ action.value }}" {% if audit_filter.action == action.value %}selected{% endif %}>
+                    {{ ('users.activity.action.' ~ action.value)|trans }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-from">{{ 'admin_projects.audit_filter_from'|trans }}</label>
+        <input id="{{ timeline_id }}-from" class="input w-full" type="date" name="from" value="{{ audit_filter.from }}">
+    </div>
+    <div>
+        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-to">{{ 'admin_projects.audit_filter_to'|trans }}</label>
+        <input id="{{ timeline_id }}-to" class="input w-full" type="date" name="to" value="{{ audit_filter.to }}">
+    </div>
+    <div class="flex flex-wrap items-end gap-2 sm:col-span-4">
+        <button class="btn-primary" type="submit">{{ 'admin_projects.audit_apply'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ reset_path }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
+</form>
+
+{% if audit_entries is empty %}
+    <p class="text-sm text-[var(--color-ink)]/55">{{ empty_key|trans }}</p>
+{% else %}
+    <ul id="{{ timeline_id }}" class="space-y-3 text-sm">
+        {% for entry in audit_entries %}
+            <li data-testid="{{ entry_testid }}" class="border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0">
+                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
+                    <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                </div>
+                <div class="mt-1 text-xs text-[var(--color-ink)]/65">
+                    {% if entry.actor %}
+                        {{ 'users.activity.by'|trans({'%name%': entry.actor.displayName}) }}
+                    {% else %}
+                        {{ 'users.activity.by_system'|trans }}
+                    {% endif %}
+                    {% if entry.subjectUser and (not entry.actor or entry.subjectUser.id != entry.actor.id) %}
+                        · {{ 'users.activity.subject'|trans({'%name%': entry.subjectUser.displayName}) }}
+                    {% endif %}
+                    {% if entry.ipAddress %}
+                        · {{ entry.ipAddress }}
+                    {% endif %}
+                </div>
+                {% if entry.context is not empty %}
+                    <dl class="mt-2 grid gap-1 text-xs text-[var(--color-ink)]/60 sm:grid-cols-2">
+                        {% for key, value in entry.context %}
+                            <div>
+                                <dt class="inline font-medium">{{ ('users.activity.context.' ~ key)|trans }}:</dt>
+                                <dd class="inline">{{ value }}</dd>
+                            </div>
+                        {% endfor %}
+                    </dl>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

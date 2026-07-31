@@ -1,0 +1,27 @@
+{# Account area chrome: Profile | Security | Display (037). #}
+{% set route = app.request.attributes.get('_route') %}
+{% set in_profile = route in ['account_profile', 'account_projects', 'account_groups'] %}
+{% set in_security = route starts with 'account_security' %}
+{% set in_display = route starts with 'account_display' %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'preferences.nav.area_label'|trans,
+    nav_class: 'preferences-area-nav mb-4',
+    attr: {'data-testid': 'account-area-nav'},
+    items: [
+        {
+            label: 'preferences.nav.profile'|trans,
+            href: path('account_profile'),
+            current: in_profile,
+        },
+        {
+            label: 'preferences.nav.security'|trans,
+            href: path('account_security'),
+            current: in_security,
+        },
+        {
+            label: 'preferences.nav.display'|trans,
+            href: path('account_display'),
+            current: in_display,
+        },
+    ],
+} only %}

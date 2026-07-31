@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Notifications\Service;
 
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Blocks SSRF to private / link-local / metadata addresses for outbound notification HTTP URLs.
+ *
+ * When DNS is used, {@see httpClientOptionsForUrl()} pins the first validated public A record via
+ * HttpClient `resolve` so a later rebinding cannot steer the TCP connection to a private IP.
  */
 final readonly class OutboundUrlGuard
 {
     public function __construct(
+        #[Autowire('%beacon.notifications.allow_private_urls%')]
         private bool $allowPrivateUrls = false,
     ) {
     }
@@ -20,6 +25,33 @@ final readonly class OutboundUrlGuard
      * @throws InvalidArgumentException when the URL is unsafe
      */
     public function assertSafeHttpUrl(string $url): void
+    {
+        $this->assertSafeAndPin($url);
+    }
+
+    /**
+     * Validate the URL and return HttpClient options that pin DNS for hostname targets.
+     *
+     * @return array{resolve?: array<string, string>}
+     *
+     * @throws InvalidArgumentException when the URL is unsafe
+     */
+    public function httpClientOptionsForUrl(string $url): array
+    {
+        $pin = $this->assertSafeAndPin($url);
+        if (null === $pin) {
+            return [];
+        }
+
+        return ['resolve' => [$pin['host'] => $pin['ip']]];
+    }
+
+    /**
+     * @return array{host: string, ip: string}|null Pin map when a hostname was resolved; null when pin is N/A
+     *
+     * @throws InvalidArgumentException when the URL is unsafe
+     */
+    private function assertSafeAndPin(string $url): ?array
     {
         $url = trim($url);
         $parts = parse_url($url);
@@ -33,7 +65,7 @@ final readonly class OutboundUrlGuard
         }
 
         if ($this->allowPrivateUrls) {
-            return;
+            return null;
         }
 
         $host = strtolower($parts['host']);
@@ -46,7 +78,7 @@ final readonly class OutboundUrlGuard
                 throw new InvalidArgumentException('Notification URL must not target a private address.');
             }
 
-            return;
+            return null;
         }
 
         $ips = gethostbynamel($host);
@@ -54,11 +86,16 @@ final readonly class OutboundUrlGuard
             throw new InvalidArgumentException('Notification URL host could not be resolved.');
         }
 
+        $publicIps = [];
         foreach ($ips as $ip) {
             if ($this->isBlockedIp($ip)) {
                 throw new InvalidArgumentException('Notification URL resolves to a private address.');
             }
+            $publicIps[] = $ip;
         }
+
+        // Pin the first validated public A record for the outbound connect (anti DNS rebinding).
+        return ['host' => $host, 'ip' => $publicIps[0]];
     }
 
     private function isBlockedHostName(string $host): bool

@@ -1,116 +1,30 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-# See also https://symfony.com/doc/current/service_container/import.html
+# Domain aliases / non-parameter bindings: config/services/*.yaml (imported first).
+# Scalar parameters use #[Autowire('%…%')] on constructors — no exclude list needed.
+# See https://symfony.com/doc/current/service_container/import.html
 
 imports:
     - { resource: parameters.yaml }
+    - { resource: services/ }
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
-
-    App\Shared\Retention\RetentionPurger:
-        arguments:
-            $retentionDays: '%beacon.retention_days%'
-            $maxEventsPerProject: '%beacon.retention_max_events%'
-
-    App\Shared\Retention\RetentionPurgeCommand:
-        arguments:
-            $retentionDays: '%beacon.retention_days%'
-            $maxEventsPerProject: '%beacon.retention_max_events%'
-
-    App\Ingest\Service\IngestRateLimiter:
-        arguments:
-            $limitPerMinute: '%beacon.ingest_rate_limit%'
-
-    App\Project\Service\ProjectGovernanceResolver:
-        arguments:
-            $defaultRetentionDays: '%beacon.retention_days%'
-            $defaultRetentionMaxEvents: '%beacon.retention_max_events%'
-            $defaultIngestRateLimit: '%beacon.ingest_rate_limit%'
-            $defaultEventQuotaDaily: '%beacon.event_quota_daily%'
-
-    App\Notifications\Service\OutboundUrlGuard:
-        arguments:
-            $allowPrivateUrls: '%beacon.notifications.allow_private_urls%'
-
-    App\Notifications\Service\NotificationDeliveryHistoryRecorder:
-        arguments:
-            $historyLimit: '%beacon.notifications.delivery_history_limit%'
-
-    App\Notifications\Service\WebPushClientFactory:
-        arguments:
-            $vapidPublicKey: '%beacon.vapid.public_key%'
-            $vapidPrivateKey: '%beacon.vapid.private_key%'
-            $vapidSubject: '%beacon.vapid.subject%'
-
-    App\Shared\Mercure\ConfiguredMercure:
-        arguments:
-            $envUrl: '%beacon.mercure.env_url%'
-            $envPublicUrl: '%beacon.mercure.env_public_url%'
-            $envJwtSecret: '%beacon.mercure.env_jwt_secret%'
-
-    App\Shared\Mercure\MercureSampleSeeder:
-        arguments:
-            $envUrl: '%beacon.mercure.env_url%'
-            $envPublicUrl: '%beacon.mercure.env_public_url%'
-            $envJwtSecret: '%beacon.mercure.env_jwt_secret%'
-
-    App\Identity\Controller\GuestLocaleController:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Shared\Locale\BarePublicLocaleRedirectController:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Shared\Settings\Controller\SetupWizardController:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Identity\AuthKit\MailerGatedAuthKitRouteSubscriber:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Shared\Settings\EventSubscriber\PlatformSetupRedirectSubscriber:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Shared\Locale\LocalizedPublicPath:
-        arguments:
-            $defaultLocale: '%kernel.default_locale%'
-
-    App\Identity\EventSubscriber\GuestSessionLocaleSubscriber:
-        arguments:
-            $enabledLocales: '%kernel.enabled_locales%'
-            $defaultLocale: '%kernel.default_locale%'
-
-    Nowo\AuthKitBundle\MagicLogin\MagicLoginNotifierInterface: '@App\Identity\AuthKit\AuthKitMagicLoginMailNotifier'
-    Nowo\AuthKitBundle\PasswordReset\PasswordResetNotifierInterface: '@App\Identity\AuthKit\AuthKitPasswordResetMailNotifier'
-
-    Nowo\AuthKitBundle\MagicLogin\MagicLoginRequestHandler:
-        arguments:
-            $loginLinkHandler: '@security.authenticator.login_link_handler.main'
-
-    # Prefer encrypted instance_settings.mailer_dsn; MAILER_DSN env is bootstrap/fallback only.
-    Symfony\Component\Mailer\MailerInterface: '@App\Shared\Mailer\ConfiguredMailer'
-
-    # AuditKit ships entity:null tags; DoctrineBundle 3 skips attach — bridge as event listener.
-    App\Shared\Audit\AuditableDoctrineBridge:
-        tags:
-            - { name: doctrine.event_listener, event: prePersist, method: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate, method: preUpdate }
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            # Registered in services/auth_kit.yaml with autoconfigure: false (AsDecorator).
+            - '../src/Identity/Routing/MagicLoginCheckRouteLoaderDecorator.php'
 
 when@test:
     parameters:
+        # Keep catalog-empty → /setup redirect on in tests (DatabaseWebTestCase seeds catalogs by default).
+        app.setup.check_platform_catalogs: true
         # Override env default so local webhook hosts (example.test) skip DNS SSRF checks in PHPUnit.
         beacon.notifications.allow_private_urls: true

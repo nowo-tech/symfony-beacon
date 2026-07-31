@@ -25,3 +25,4 @@
 - [x] T010 PHPUnit `InstanceMailerSettingsTest` (403, encrypt-at-rest, clear fallback)
 - [x] T011 Update CHANGELOG / UPGRADING / NOTIFICATIONS / SECURITY / LEGAL / `.env.dist`
 - [x] T012 Speckit artifacts `034-encrypted-mailer-dsn` + ROADMAP pointer
+- [x] T013 Gate AuthKit magic/reset login UI + routes on deliverable encrypted DSN (`beacon_magic_login_enabled`, `MailerGatedAuthKitRouteSubscriber`)

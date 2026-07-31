@@ -19,6 +19,8 @@ use App\Notifications\Service\VolumeThresholdEvaluator;
 use App\Performance\Entity\PerfSpan;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\NPlusOneDetector;
+use App\Project\Entity\Project;
+use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\IssueStatus;
@@ -29,6 +31,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
  * Persists Envelope event/transaction items, groups issues, and updates analytics.
+ *
+ * One Doctrine flush per envelope (not per item). Notification/threshold side effects
+ * run after the flush using deferred callbacks.
  */
 #[AsMessageHandler]
 final readonly class ProcessEnvelopeHandler
@@ -53,6 +58,14 @@ final readonly class ProcessEnvelopeHandler
 
     public function __invoke(ProcessEnvelopeMessage $message): void
     {
+        // Sync Messenger shares the HTTP EntityManager. If Envelope auth left a
+        // ProjectApiKey managed, clear so notification flushes cannot double-encrypt
+        // Halite secrets. Skip clear when invoked without auth entities (unit-style tests).
+        $identityMap = $this->entityManager->getUnitOfWork()->getIdentityMap();
+        if ([] !== ($identityMap[ProjectApiKey::class] ?? [])) {
+            $this->entityManager->clear();
+        }
+
         $project = $this->projectRepository->find($message->projectId);
         if (null === $project) {
             return;
@@ -75,8 +88,19 @@ final readonly class ProcessEnvelopeHandler
             return;
         }
 
+        if ($this->governanceResolver->isMonthlyQuotaExceeded($project)) {
+            $this->logger->info('Dropping queued Envelope: monthly event quota exceeded.', [
+                'project_id' => $message->projectId,
+            ]);
+
+            return;
+        }
+
         $parsed = $this->envelopeParser->parse($message->rawEnvelope);
         $receivedAt = new DateTimeImmutable($message->receivedAtIso);
+
+        /** @var list<callable(): void> $afterFlush */
+        $afterFlush = [];
 
         foreach ($parsed['items'] as $item) {
             $type = (string) ($item['header']['type'] ?? '');
@@ -86,26 +110,26 @@ final readonly class ProcessEnvelopeHandler
             }
 
             if ('event' === $type) {
-                $this->ingestEvent($project->getId() ?? 0, $payload, $receivedAt);
+                $this->ingestEvent($project, $payload, $receivedAt, $afterFlush);
             } elseif ('transaction' === $type) {
-                $this->ingestTransaction($project->getId() ?? 0, $payload, $receivedAt);
+                $this->ingestTransaction($project, $payload, $receivedAt, $afterFlush);
             }
             // Other item types are accepted at the HTTP layer and ignored here.
         }
 
         $this->entityManager->flush();
+
+        foreach ($afterFlush as $callback) {
+            $callback();
+        }
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param array<string, mixed>   $payload
+     * @param list<callable(): void> $afterFlush
      */
-    private function ingestEvent(int $projectId, array $payload, DateTimeImmutable $receivedAt): void
+    private function ingestEvent(Project $project, array $payload, DateTimeImmutable $receivedAt, array &$afterFlush): void
     {
-        $project = $this->projectRepository->find($projectId);
-        if (null === $project) {
-            return;
-        }
-
         $eventId = (string) ($payload['event_id'] ?? bin2hex(random_bytes(16)));
         if ($this->eventRepository->findOneByProjectAndEventId($project, $eventId) instanceof Event) {
             return;
@@ -164,35 +188,29 @@ final readonly class ProcessEnvelopeHandler
         $stat = $this->dailyProjectStatRepository->findOrCreate($project, $receivedAt);
         $stat->incrementErrorCount();
 
-        $this->entityManager->flush();
-
-        if ($isNew) {
-            $this->notificationDispatcher->dispatchNewIssue($project, $issue);
-        } elseif ($isRegression) {
-            $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
-        }
-
+        $environment = isset($payload['environment']) ? (string) $payload['environment'] : null;
+        $release = isset($payload['release']) ? (string) $payload['release'] : null;
         $level = strtolower((string) ($payload['level'] ?? 'error'));
-        if (\in_array($level, ['error', 'fatal'], true)) {
-            $this->volumeThresholdEvaluator->evaluate(
-                $project,
-                isset($payload['environment']) ? (string) $payload['environment'] : null,
-                isset($payload['release']) ? (string) $payload['release'] : null,
-                $receivedAt,
-            );
-        }
+
+        $afterFlush[] = function () use ($project, $issue, $isNew, $isRegression, $level, $environment, $release, $receivedAt): void {
+            if ($isNew) {
+                $this->notificationDispatcher->dispatchNewIssue($project, $issue);
+            } elseif ($isRegression) {
+                $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
+            }
+
+            if (\in_array($level, ['error', 'fatal'], true)) {
+                $this->volumeThresholdEvaluator->evaluate($project, $environment, $release, $receivedAt);
+            }
+        };
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param array<string, mixed>   $payload
+     * @param list<callable(): void> $afterFlush
      */
-    private function ingestTransaction(int $projectId, array $payload, DateTimeImmutable $receivedAt): void
+    private function ingestTransaction(Project $project, array $payload, DateTimeImmutable $receivedAt, array &$afterFlush): void
     {
-        $project = $this->projectRepository->find($projectId);
-        if (null === $project) {
-            return;
-        }
-
         $spansRaw = $payload['spans'] ?? [];
         $spanInputs = [];
         if (\is_array($spansRaw)) {
@@ -250,10 +268,10 @@ final readonly class ProcessEnvelopeHandler
             $stat->incrementNPlusOneCount($detection['count']);
         }
 
-        $this->entityManager->flush();
-
         if ($detection['count'] > 0) {
-            $this->notificationDispatcher->dispatchNPlusOne($project, $tx);
+            $afterFlush[] = function () use ($project, $tx): void {
+                $this->notificationDispatcher->dispatchNPlusOne($project, $tx);
+            };
         }
     }
 

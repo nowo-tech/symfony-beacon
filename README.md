@@ -13,7 +13,7 @@ Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **E
 
 Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
 
-> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). Configure `BEACON_DSN` against this server (any host/port). Install from Packagist or VCS as documented in that repo.
+> The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). This server **also** requires that bundle so the instance can dogfood its own errors when `BEACON_DSN` is set (see [DSN.md](docs/DSN.md)). External apps still point their DSN at this server.
 
 
 ## Features
@@ -22,18 +22,18 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Password or **magic login** / **password reset** via AuthKit (`/login/magic`, `/reset-password`) — only when Administration → Mailer has a deliverable encrypted DSN; project **share links** for time-limited viewer access (project-wide or issue-scoped)
 - **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
 - Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
-- **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`; AuthKit/setup dual URLs (bare for `DEFAULT_LOCALE`, prefixed for others — see [ADDING-LOCALES.md](docs/ADDING-LOCALES.md)); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
+- **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`; AuthKit dual URLs (bare for `DEFAULT_LOCALE`, prefixed for others — see [ADDING-LOCALES.md](docs/ADDING-LOCALES.md)); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
 - Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, push subscriptions, **instance Mailer DSN/From**, **Mercure URL/JWT**)
 - **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login
 - **Administration → Mercure** (`/settings/mercure`): optional live new-issue toasts (hub + JWT); see [docs/MERCURE.md](docs/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
 - Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install
-- Install seed layers + **Setup** wizard (`/setup` for `DEFAULT_LOCALE`; auto-redirect when catalogs are empty; public bootstrap when no users yet); contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
+- Install seed layers + **SiteBackup** setup wizard (`/setup`; auto-redirect when catalogs/schema need bootstrap); ops panel `/_site_backup`; contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
 - Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
 - Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history, **transfer ownership**, delete)
 - Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
-- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
+- Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **Copy for AI** (`beacon-ai-export/v1` Markdown/JSON — [docs/AI-EXPORT.md](docs/AI-EXPORT.md)), **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (`X-Beacon-Auth` / envelope `dsn`; query auth **deprecated**); per-project suspend + daily quota; secret always required
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
@@ -54,7 +54,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Account preferences at `/account/profile`, `/account/security`, `/account/display`
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, Mailer, Mercure, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)
 
-Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). Auth is password (+ remember-me) or **magic login** (`/login/magic`); SSO is Later.
+Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). Instance Security roles: **`ROLE_USER`** (any signed-in account) and **`ROLE_ADMIN`** (Administration) — see [docs/ROLES.md](docs/ROLES.md). Auth is password (+ remember-me) or **magic login** (`/login/magic`); SSO is Later.
 
 ## Requirements
 
@@ -68,11 +68,11 @@ git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
 cp .env.dist .env
 make up          # starts stack + builds frontend into public/build/
-make bootstrap   # migrate + platform menus/breadcrumbs
-make seed        # optional: demo admin + project + .demo-client.env
+make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
+# or: make bootstrap && make seed
 # Optional QA samples: make seed-sample
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
-# Option B — demo login after make seed (see below)
+# Option B — demo login after make ready / make seed (see below)
 ```
 
 - HTTP: http://localhost:9081  
@@ -85,13 +85,14 @@ make seed        # optional: demo admin + project + .demo-client.env
 - Login: https://localhost:9444/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
 - OpenAPI (after login): https://localhost:9444/api/doc
 
-> After the first user exists, `/register` redirects to login. Auth/setup: bare paths for `DEFAULT_LOCALE`, prefixed for other locales (setup redirects `/es/setup` → `/setup` when default is `es`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs).
+> After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs).
 
 Seed prints DSNs and writes `.demo-client.env` for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
 
 ```text
-UI DSN: https://<public_key>@localhost:9444/<project_id>
-Client DSN (Docker): http://<public_key>@host.docker.internal:9081/<project_id>
+UI DSN: https://<public_key>:<secret>@localhost:9444/<project_id>
+Client DSN (Docker): http://<public_key>:<secret>@host.docker.internal:9081/<project_id>
+Self DSN (dogfood): http://<public_key>:<secret>@127.0.0.1/<project_id>
 ```
 
 In `BeaconBundle/demo/symfony8`, `make up` / `make sync-beacon` copies that Client DSN into `BEACON_DSN` so `/exception` can ingest directly.

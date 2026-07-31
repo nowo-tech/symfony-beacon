@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Account security: change password with PasswordToggle, PasswordStrength (strong),
@@ -21,6 +22,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 final class AccountSecurityType extends FormKitAbstractType
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -38,8 +44,9 @@ final class AccountSecurityType extends FormKitAbstractType
             ->add('plainPassword', PasswordStrengthType::class, [
                 'mapped' => true,
                 'required' => true,
-                'label' => 'user_preferences.plain_password.first.label',
-                'translation_domain' => 'messages',
+                // Label from messages; strength/generator catalogue stays on the kit domain.
+                'label' => $this->translator->trans('user_preferences.plain_password.first.label', [], 'messages'),
+                'translation_domain' => 'NowoPasswordStrengthBundle',
                 'attr' => ['autocomplete' => 'new-password'],
                 'level' => 'strong',
                 'policy_mode' => 'level',

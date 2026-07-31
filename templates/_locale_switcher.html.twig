@@ -4,10 +4,6 @@
 {% set current_locale = app.request.locale|default(default_locale) %}
 {% set compact = compact|default(false) %}
 {% set path_locale_routes = [
-    'setup_wizard',
-    'setup_wizard_run',
-    'setup_wizard_localized',
-    'setup_wizard_run_localized',
     'legal_notice',
     'legal_privacy',
     'legal_terms',
@@ -20,6 +16,8 @@
     'nowo_auth_kit_reset_password_code',
     'nowo_auth_kit_magic_login_request',
     'nowo_auth_kit_magic_login_check',
+    'nowo_auth_kit_social_login_start',
+    'nowo_auth_kit_social_login_check',
 ] %}
 {% set use_path_locale = route in path_locale_routes %}
 
@@ -53,35 +51,31 @@
                         </form>
                     {% elseif use_path_locale or (route in path_locale_routes) %}
                         {% set target_route = route %}
-                        {% if target_route in ['setup_wizard', 'setup_wizard_run', 'setup_wizard_localized', 'setup_wizard_run_localized'] %}
-                            <a href="{{ beacon_setup_path(locale) }}"
-                               class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
-                               hreflang="{{ locale }}"
-                               lang="{{ locale }}">
-                                <span class="locale-switcher__code">{{ locale|upper }}</span>
-                                <span>{{ ('locale.' ~ locale)|trans }}</span>
-                            </a>
-                        {% else %}
-                            {% if target_route ends with '_bare_redirect' or target_route == 'app_home_redirect' %}
-                                {% set target_route = 'nowo_auth_kit_login' %}
-                            {% endif %}
-                            {% set params = route_params|merge({'_locale': locale}) %}
-                            <a href="{{ path(target_route, params) }}"
-                               class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
-                               hreflang="{{ locale }}"
-                               lang="{{ locale }}">
-                                <span class="locale-switcher__code">{{ locale|upper }}</span>
-                                <span>{{ ('locale.' ~ locale)|trans }}</span>
-                            </a>
+                        {% if target_route ends with '_bare_redirect' or target_route == 'app_home_redirect' %}
+                            {% set target_route = 'nowo_auth_kit_login' %}
                         {% endif %}
-                    {% else %}
-                        <a href="{{ path('guest_locale_switch', {locale: locale, redirect: app.request.requestUri}) }}"
+                        {% set params = route_params|merge({'_locale': locale}) %}
+                        <a href="{{ path(target_route, params) }}"
                            class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
                            hreflang="{{ locale }}"
                            lang="{{ locale }}">
                             <span class="locale-switcher__code">{{ locale|upper }}</span>
                             <span>{{ ('locale.' ~ locale)|trans }}</span>
                         </a>
+                    {% else %}
+                        <form method="post" action="{{ path('guest_locale_switch', {locale: locale}) }}" class="m-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('guest_locale') }}">
+                            <input type="hidden" name="redirect" value="{{ app.request.requestUri }}">
+                            <button
+                                type="submit"
+                                class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
+                                hreflang="{{ locale }}"
+                                lang="{{ locale }}"
+                            >
+                                <span class="locale-switcher__code">{{ locale|upper }}</span>
+                                <span>{{ ('locale.' ~ locale)|trans }}</span>
+                            </button>
+                        </form>
                     {% endif %}
                 </li>
             {% endfor %}

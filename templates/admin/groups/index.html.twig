@@ -11,20 +11,65 @@
     <a class="btn-primary no-underline" href="{{ path('admin_groups_new') }}">{{ 'groups.create'|trans }}</a>
 </div>
 
-{% if groups is empty %}
-    <p class="text-sm text-[var(--color-ink)]/55">{{ 'groups.empty'|trans }}</p>
-{% else %}
-    <ul class="space-y-3">
-        {% for group in groups %}
-            <li class="panel flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <a class="font-medium no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ group.name }}</a>
-                    <div class="text-xs text-[var(--color-ink)]/55">{{ 'groups.member_count'|trans({'%count%': member_counts[group.id]|default(0)}) }}</div>
-                    {% include 'shared/_audit_meta.html.twig' with {entity: group, class: 'mt-2 sm:grid-cols-2'} only %}
-                </div>
-                <a class="btn-ghost no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ 'groups.open'|trans }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+<form method="get" action="{{ path('admin_groups') }}" class="mb-4 flex flex-wrap gap-2">
+    <input
+        class="input min-w-56 flex-1"
+        type="search"
+        name="q"
+        value="{{ q }}"
+        placeholder="{{ 'groups.search_placeholder'|trans }}"
+        autocomplete="off"
+    >
+    <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
+    <a class="btn-ghost no-underline" href="{{ path('admin_groups') }}">{{ 'common.clear_filters'|trans }}</a>
+</form>
+
+<section class="panel overflow-x-auto">
+    <table class="w-full text-left text-sm">
+        <thead>
+            <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.group'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.slug'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.members'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.description'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.audit'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'groups.col.actions'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                    <td class="px-2 py-3">
+                        <a class="font-medium no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ group.name }}</a>
+                    </td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ group.slug }}</td>
+                    <td class="px-2 py-3">
+                        <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">
+                            {{ 'groups.member_count'|trans({'%count%': member_counts[group.id]|default(0)}) }}
+                        </span>
+                    </td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/65">
+                        {% if group.description %}
+                            <span class="line-clamp-2">{{ group.description }}</span>
+                        {% else %}
+                            <span class="text-[var(--color-ink)]/40">{{ 'common.na'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3 align-top">
+                        {% include 'shared/_audit_meta.html.twig' with {entity: group} only %}
+                    </td>
+                    <td class="px-2 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_groups_show', {id: group.uuid}) }}">{{ 'groups.open'|trans }}</a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="6">{{ 'groups.empty'|trans }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 {% endblock %}

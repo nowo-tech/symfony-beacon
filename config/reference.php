@@ -31,7 +31,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type ImportsConfig = list<string|array{
  *     resource: string,
  *     type?: string|null,
- *     ignore_errors?: bool,
+ *     ignore_errors?: bool|'not_found',
  * }>
  * @psalm-type ParametersConfig = array<string, scalar|\UnitEnum|array<scalar|\UnitEnum|array<mixed>|Param|null>|Param|null>
  * @psalm-type ArgumentsType = list<mixed>|array<string, mixed>
@@ -142,9 +142,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     set_locale_from_accept_language?: bool|Param, // Whether to use the Accept-Language HTTP header to set the Request locale (only when the "_locale" request attribute is not passed). // Default: false
  *     set_content_language_from_locale?: bool|Param, // Whether to set the Content-Language HTTP header on the Response using the Request locale. // Default: false
  *     enabled_locales?: list<scalar|Param|null>,
- *     trusted_hosts?: string|list<scalar|Param|null>,
+ *     trusted_hosts?: Param|string|list<scalar|Param|null>,
  *     trusted_proxies?: mixed, // Default: ["%env(default::SYMFONY_TRUSTED_PROXIES)%"]
- *     trusted_headers?: string|list<scalar|Param|null>,
+ *     trusted_headers?: Param|string|list<scalar|Param|null>,
  *     error_controller?: scalar|Param|null, // Default: "error_controller"
  *     handle_all_throwables?: bool|Param, // HttpKernel will handle all kinds of \Throwable. // Default: true
  *     csrf_protection?: bool|array{
@@ -208,23 +208,23 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 property?: scalar|Param|null,
  *                 service?: scalar|Param|null,
  *             },
- *             supports?: string|list<scalar|Param|null>,
+ *             supports?: Param|string|list<scalar|Param|null>,
  *             definition_validators?: list<scalar|Param|null>,
  *             support_strategy?: scalar|Param|null,
- *             initial_marking?: \BackedEnum|string|list<scalar|Param|null>,
+ *             initial_marking?: \BackedEnum|Param|string|list<scalar|Param|null>,
  *             events_to_dispatch?: null|list<string|Param>,
- *             places?: string|list<array{ // Default: []
+ *             places?: Param|string|list<array{ // Default: []
  *                 name?: scalar|Param|null,
  *                 metadata?: array<string, mixed>,
  *             }>,
  *             transitions?: list<array{ // Default: []
  *                 name?: string|Param,
  *                 guard?: string|Param, // An expression to block the transition.
- *                 from?: \BackedEnum|string|list<array{ // Default: []
+ *                 from?: \BackedEnum|Param|string|list<array{ // Default: []
  *                     place?: string|Param,
  *                     weight?: int|Param, // Default: 1
  *                 }>,
- *                 to?: \BackedEnum|string|list<array{ // Default: []
+ *                 to?: \BackedEnum|Param|string|list<array{ // Default: []
  *                     place?: string|Param,
  *                     weight?: int|Param, // Default: 1
  *                 }>,
@@ -264,7 +264,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     request?: bool|array{ // Request configuration
  *         enabled?: bool|Param, // Default: false
- *         formats?: array<string, string|list<scalar|Param|null>>,
+ *         formats?: array<string, Param|string|list<scalar|Param|null>>,
  *     },
  *     assets?: bool|array{ // Assets configuration
  *         enabled?: bool|Param, // Default: true
@@ -274,7 +274,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         version_format?: scalar|Param|null, // Default: "%%s?%%s"
  *         json_manifest_path?: scalar|Param|null, // Default: null
  *         base_path?: scalar|Param|null, // Default: ""
- *         base_urls?: string|list<scalar|Param|null>,
+ *         base_urls?: Param|string|list<scalar|Param|null>,
  *         packages?: array<string, array{ // Default: []
  *             strict_mode?: bool|Param, // Throw an exception if an entry is missing from the manifest.json. // Default: false
  *             version_strategy?: scalar|Param|null, // Default: null
@@ -282,12 +282,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             version_format?: scalar|Param|null, // Default: null
  *             json_manifest_path?: scalar|Param|null, // Default: null
  *             base_path?: scalar|Param|null, // Default: ""
- *             base_urls?: string|list<scalar|Param|null>,
+ *             base_urls?: Param|string|list<scalar|Param|null>,
  *         }>,
  *     },
  *     asset_mapper?: bool|array{ // Asset Mapper configuration
  *         enabled?: bool|Param, // Default: false
- *         paths?: string|array<string, scalar|Param|null>,
+ *         paths?: Param|string|array<string, scalar|Param|null>,
  *         excluded_patterns?: list<scalar|Param|null>,
  *         exclude_dotfiles?: bool|Param, // If true, any files starting with "." will be excluded from the asset mapper. // Default: true
  *         server?: bool|Param, // If true, a "dev server" will return the assets from the public directory (true in "debug" mode only by default). // Default: true
@@ -306,7 +306,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     translator?: bool|array{ // Translator configuration
  *         enabled?: bool|Param, // Default: true
- *         fallbacks?: string|list<scalar|Param|null>,
+ *         fallbacks?: Param|string|list<scalar|Param|null>,
  *         logging?: bool|Param, // Default: false
  *         formatter?: scalar|Param|null, // Default: "translator.formatter.default"
  *         cache_dir?: scalar|Param|null, // Default: "%kernel.cache_dir%/translations"
@@ -325,7 +325,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             domains?: list<scalar|Param|null>,
  *             locales?: list<scalar|Param|null>,
  *         }>,
- *         globals?: array<string, string|array{ // Default: []
+ *         globals?: array<string, Param|string|array{ // Default: []
  *             value?: mixed,
  *             message?: string|Param,
  *             parameters?: array<string, scalar|Param|null>,
@@ -335,7 +335,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     validation?: bool|array{ // Validation configuration
  *         enabled?: bool|Param, // Default: true
  *         enable_attributes?: bool|Param, // Default: true
- *         static_method?: string|list<scalar|Param|null>,
+ *         static_method?: Param|string|list<scalar|Param|null>,
  *         translation_domain?: scalar|Param|null, // Default: "validators"
  *         email_validation_mode?: "html5"|"html5-allow-no-tld"|"strict"|Param, // Default: "html5"
  *         mapping?: array{
@@ -396,7 +396,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         default_doctrine_dbal_provider?: scalar|Param|null, // Default: "database_connection"
  *         default_pdo_provider?: scalar|Param|null, // Default: null
  *         pools?: array<string, array{ // Default: []
- *             adapters?: string|list<scalar|Param|null>,
+ *             adapters?: Param|string|list<scalar|Param|null>,
  *             tags?: scalar|Param|null, // Default: null
  *             public?: bool|Param, // Default: false
  *             default_lifetime?: scalar|Param|null, // Default lifetime of the pool.
@@ -418,17 +418,17 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     web_link?: bool|array{ // Web links configuration
  *         enabled?: bool|Param, // Default: true
  *     },
- *     lock?: bool|string|array{ // Lock configuration
+ *     lock?: Param|bool|string|array{ // Lock configuration
  *         enabled?: bool|Param, // Default: false
- *         resources?: string|array<string, string|list<scalar|Param|null>>,
+ *         resources?: Param|string|array<string, Param|string|list<scalar|Param|null>>,
  *     },
- *     semaphore?: bool|string|array{ // Semaphore configuration
+ *     semaphore?: Param|bool|string|array{ // Semaphore configuration
  *         enabled?: bool|Param, // Default: false
- *         resources?: string|array<string, scalar|Param|null>,
+ *         resources?: Param|string|array<string, scalar|Param|null>,
  *     },
  *     messenger?: bool|array{ // Messenger configuration
  *         enabled?: bool|Param, // Default: true
- *         routing?: array<string, string|list<scalar|Param|null>>,
+ *         routing?: array<string, Param|string|list<scalar|Param|null>>,
  *         serializer?: array{
  *             default_serializer?: scalar|Param|null, // Service id to use as the default serializer for the transports. // Default: "messenger.transport.native_php_serializer"
  *             symfony_serializer?: array{
@@ -436,12 +436,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 context?: array<string, mixed>,
  *             },
  *         },
- *         transports?: array<string, string|array{ // Default: []
+ *         transports?: array<string, Param|string|array{ // Default: []
  *             dsn?: scalar|Param|null,
  *             serializer?: scalar|Param|null, // Service id of a custom serializer to use. // Default: null
  *             options?: array<string, mixed>,
  *             failure_transport?: scalar|Param|null, // Transport name to send failed messages to (after all retries have failed). // Default: null
- *             retry_strategy?: string|array{
+ *             retry_strategy?: Param|string|array{
  *                 service?: scalar|Param|null, // Service id to override the retry strategy entirely. // Default: null
  *                 max_retries?: int|Param, // Default: 3
  *                 delay?: int|Param, // Time in ms to delay (or the initial value when multiplier is used). // Default: 1000
@@ -452,15 +452,15 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             rate_limiter?: scalar|Param|null, // Rate limiter name to use when processing messages. // Default: null
  *         }>,
  *         failure_transport?: scalar|Param|null, // Transport name to send failed messages to (after all retries have failed). // Default: null
- *         stop_worker_on_signals?: int|string|list<scalar|Param|null>,
+ *         stop_worker_on_signals?: Param|int|string|list<scalar|Param|null>,
  *         default_bus?: scalar|Param|null, // Default: null
  *         buses?: array<string, array{ // Default: {"messenger.bus.default":{"default_middleware":{"enabled":true,"allow_no_handlers":false,"allow_no_senders":true},"middleware":[]}}
- *             default_middleware?: bool|string|array{
+ *             default_middleware?: Param|bool|string|array{
  *                 enabled?: bool|Param, // Default: true
  *                 allow_no_handlers?: bool|Param, // Default: false
  *                 allow_no_senders?: bool|Param, // Default: true
  *             },
- *             middleware?: string|list<string|array{ // Default: []
+ *             middleware?: Param|string|list<Param|string|array{ // Default: []
  *                 id?: scalar|Param|null,
  *                 arguments?: list<mixed>,
  *             }>,
@@ -509,9 +509,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             retry_failed?: bool|array{
  *                 enabled?: bool|Param, // Default: false
  *                 retry_strategy?: scalar|Param|null, // service id to override the retry strategy. // Default: null
- *                 http_codes?: int|string|array<string, array{ // Default: []
+ *                 http_codes?: Param|int|string|array<string, array{ // Default: []
  *                     code?: int|Param,
- *                     methods?: string|list<string|Param>,
+ *                     methods?: Param|string|list<string|Param>,
  *                 }>,
  *                 max_retries?: int|Param, // Default: 3
  *                 delay?: int|Param, // Time in ms to delay (or the initial value when multiplier is used). // Default: 1000
@@ -521,7 +521,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             },
  *         },
  *         mock_response_factory?: scalar|Param|null, // `true` to always return empty 200 responses, or the id of the service to use to generate mock responses - which should be either an invokable or an iterable.
- *         scoped_clients?: array<string, string|array{ // Default: []
+ *         scoped_clients?: array<string, Param|string|array{ // Default: []
  *             scope?: scalar|Param|null, // The regular expression that the request URL must match before adding the other options. When none is provided, the base URI is used instead.
  *             base_uri?: scalar|Param|null, // The URI to resolve relative URLs, following rules in RFC 3985, section 2.
  *             auth_basic?: scalar|Param|null, // An HTTP Basic authentication "username:password".
@@ -563,9 +563,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             retry_failed?: bool|array{
  *                 enabled?: bool|Param, // Default: false
  *                 retry_strategy?: scalar|Param|null, // service id to override the retry strategy. // Default: null
- *                 http_codes?: int|string|array<string, array{ // Default: []
+ *                 http_codes?: Param|int|string|array<string, array{ // Default: []
  *                     code?: int|Param,
- *                     methods?: string|list<string|Param>,
+ *                     methods?: Param|string|list<string|Param>,
  *                 }>,
  *                 max_retries?: int|Param, // Default: 3
  *                 delay?: int|Param, // Time in ms to delay (or the initial value when multiplier is used). // Default: 1000
@@ -582,10 +582,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         transports?: array<string, scalar|Param|null>,
  *         envelope?: array{ // Mailer Envelope configuration
  *             sender?: scalar|Param|null,
- *             recipients?: string|list<scalar|Param|null>,
- *             allowed_recipients?: string|list<scalar|Param|null>,
+ *             recipients?: Param|string|list<scalar|Param|null>,
+ *             allowed_recipients?: Param|string|list<scalar|Param|null>,
  *         },
- *         headers?: array<string, string|array{ // Default: []
+ *         headers?: array<string, Param|string|array{ // Default: []
  *             value?: mixed,
  *         }>,
  *         dkim_signer?: bool|array{ // DKIM signer configuration
@@ -622,7 +622,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         chatter_transports?: array<string, scalar|Param|null>,
  *         texter_transports?: array<string, scalar|Param|null>,
  *         notification_on_failed_messages?: bool|Param, // Default: false
- *         channel_policy?: array<string, string|list<scalar|Param|null>>,
+ *         channel_policy?: array<string, Param|string|list<scalar|Param|null>>,
  *         admin_recipients?: list<array{ // Default: []
  *             email?: scalar|Param|null,
  *             phone?: scalar|Param|null, // Default: ""
@@ -635,7 +635,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             cache_pool?: scalar|Param|null, // The cache pool to use for storing the current limiter state. // Default: "cache.rate_limiter"
  *             storage_service?: scalar|Param|null, // The service ID of a custom storage implementation, this precedes any configured "cache_pool". // Default: null
  *             policy?: "fixed_window"|"token_bucket"|"sliding_window"|"compound"|"no_limit"|Param, // The algorithm to be used by this limiter.
- *             limiters?: string|list<scalar|Param|null>,
+ *             limiters?: Param|string|list<scalar|Param|null>,
  *             limit?: int|Param, // The maximum allowed hits in a fixed interval or burst.
  *             interval?: scalar|Param|null, // Configures the fixed interval if "policy" is set to "fixed_window" or "sliding_window". The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).
  *             rate?: array{ // Configures the fill rate if "policy" is set to "token_bucket".
@@ -661,20 +661,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             allow_safe_elements?: bool|Param, // Allows "safe" elements and attributes. // Default: false
  *             allow_static_elements?: bool|Param, // Allows all static elements and attributes from the W3C Sanitizer API standard. // Default: false
  *             allow_elements?: array<string, mixed>,
- *             block_elements?: string|list<string|Param>,
- *             drop_elements?: string|list<string|Param>,
+ *             block_elements?: Param|string|list<string|Param>,
+ *             drop_elements?: Param|string|list<string|Param>,
  *             allow_attributes?: array<string, mixed>,
  *             drop_attributes?: array<string, mixed>,
  *             force_attributes?: array<string, array<string, string|Param>>,
  *             force_https_urls?: bool|Param, // Transforms URLs using the HTTP scheme to use the HTTPS scheme instead. // Default: false
- *             allowed_link_schemes?: string|list<string|Param>,
- *             allowed_link_hosts?: null|string|list<string|Param>,
+ *             allowed_link_schemes?: Param|string|list<string|Param>,
+ *             allowed_link_hosts?: Param|null|string|list<string|Param>,
  *             allow_relative_links?: bool|Param, // Allows relative URLs to be used in links href attributes. // Default: false
- *             allowed_media_schemes?: string|list<string|Param>,
- *             allowed_media_hosts?: null|string|list<string|Param>,
+ *             allowed_media_schemes?: Param|string|list<string|Param>,
+ *             allowed_media_hosts?: Param|null|string|list<string|Param>,
  *             allow_relative_medias?: bool|Param, // Allows relative URLs to be used in media source attributes (img, audio, video, ...). // Default: false
- *             with_attribute_sanitizers?: string|list<string|Param>,
- *             without_attribute_sanitizers?: string|list<string|Param>,
+ *             with_attribute_sanitizers?: Param|string|list<string|Param>,
+ *             without_attribute_sanitizers?: Param|string|list<string|Param>,
  *             max_input_length?: int|Param, // The maximum length allowed for the sanitized input. // Default: 0
  *         }>,
  *     },
@@ -704,7 +704,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type DoctrineConfig = array{
  *     dbal?: array{
  *         default_connection?: scalar|Param|null,
- *         types?: array<string, string|array{ // Default: []
+ *         types?: array<string, Param|string|array{ // Default: []
  *             class?: scalar|Param|null,
  *         }>,
  *         driver_schemes?: array<string, scalar|Param|null>,
@@ -795,17 +795,17 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             evict_cache?: bool|Param, // Set to true to fetch the entity from the database instead of using the cache, if any // Default: false
  *         },
  *         entity_managers?: array<string, array{ // Default: []
- *             query_cache_driver?: string|array{
+ *             query_cache_driver?: Param|string|array{
  *                 type?: scalar|Param|null, // Default: null
  *                 id?: scalar|Param|null,
  *                 pool?: scalar|Param|null,
  *             },
- *             metadata_cache_driver?: string|array{
+ *             metadata_cache_driver?: Param|string|array{
  *                 type?: scalar|Param|null, // Default: null
  *                 id?: scalar|Param|null,
  *                 pool?: scalar|Param|null,
  *             },
- *             result_cache_driver?: string|array{
+ *             result_cache_driver?: Param|string|array{
  *                 type?: scalar|Param|null, // Default: null
  *                 id?: scalar|Param|null,
  *                 pool?: scalar|Param|null,
@@ -833,7 +833,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             schema_ignore_classes?: list<scalar|Param|null>,
  *             validate_xml_mapping?: bool|Param, // Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.14 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/6728. // Default: false
  *             second_level_cache?: array{
- *                 region_cache_driver?: string|array{
+ *                 region_cache_driver?: Param|string|array{
  *                     type?: scalar|Param|null, // Default: null
  *                     id?: scalar|Param|null,
  *                     pool?: scalar|Param|null,
@@ -844,7 +844,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 enabled?: bool|Param, // Default: true
  *                 factory?: scalar|Param|null,
  *                 regions?: array<string, array{ // Default: []
- *                     cache_driver?: string|array{
+ *                     cache_driver?: Param|string|array{
  *                         type?: scalar|Param|null, // Default: null
  *                         id?: scalar|Param|null,
  *                         pool?: scalar|Param|null,
@@ -862,7 +862,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 }>,
  *             },
  *             hydrators?: array<string, scalar|Param|null>,
- *             mappings?: array<string, bool|string|array{ // Default: []
+ *             mappings?: array<string, Param|bool|string|array{ // Default: []
  *                 mapping?: scalar|Param|null, // Default: true
  *                 type?: scalar|Param|null,
  *                 dir?: scalar|Param|null,
@@ -875,7 +875,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 numeric_functions?: array<string, scalar|Param|null>,
  *                 datetime_functions?: array<string, scalar|Param|null>,
  *             },
- *             filters?: array<string, string|array{ // Default: []
+ *             filters?: array<string, Param|string|array{ // Default: []
  *                 class?: scalar|Param|null,
  *                 enabled?: bool|Param, // Default: false
  *                 parameters?: array<string, mixed>,
@@ -925,7 +925,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     auto_reload?: scalar|Param|null,
  *     optimizations?: int|Param,
  *     default_path?: scalar|Param|null, // The default path used to load templates. // Default: "%kernel.project_dir%/templates"
- *     file_name_pattern?: string|list<scalar|Param|null>,
+ *     file_name_pattern?: Param|string|list<scalar|Param|null>,
  *     paths?: array<string, mixed>,
  *     date?: array{ // The default format options used by the date filter.
  *         format?: scalar|Param|null, // Default: "F j, Y H:i"
@@ -1028,9 +1028,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         allow_if_all_abstain?: bool|Param, // Default: false
  *         allow_if_equal_granted_denied?: bool|Param, // Default: true
  *     },
- *     password_hashers?: array<string, string|array{ // Default: []
+ *     password_hashers?: array<string, Param|string|array{ // Default: []
  *         algorithm?: scalar|Param|null,
- *         migrate_from?: string|list<scalar|Param|null>,
+ *         migrate_from?: Param|string|list<scalar|Param|null>,
  *         hash_algorithm?: scalar|Param|null, // Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms. // Default: "sha512"
  *         key_length?: scalar|Param|null, // Default: 40
  *         ignore_case?: bool|Param, // Default: false
@@ -1044,7 +1044,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     providers?: array<string, array{ // Default: []
  *         id?: scalar|Param|null,
  *         chain?: array{
- *             providers?: string|list<scalar|Param|null>,
+ *             providers?: Param|string|list<scalar|Param|null>,
  *         },
  *         entity?: array{
  *             class?: scalar|Param|null, // The full entity class name of your user class.
@@ -1054,7 +1054,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         memory?: array{
  *             users?: array<string, array{ // Default: []
  *                 password?: scalar|Param|null, // Default: null
- *                 roles?: string|list<scalar|Param|null>,
+ *                 roles?: Param|string|list<scalar|Param|null>,
  *             }>,
  *         },
  *         ldap?: array{
@@ -1063,7 +1063,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             search_dn?: scalar|Param|null, // Default: null
  *             search_password?: scalar|Param|null, // Default: null
  *             extra_fields?: list<scalar|Param|null>,
- *             default_roles?: string|list<scalar|Param|null>,
+ *             default_roles?: Param|string|list<scalar|Param|null>,
  *             role_fetcher?: scalar|Param|null, // Default: null
  *             uid_key?: scalar|Param|null, // Default: "sAMAccountName"
  *             filter?: scalar|Param|null, // Default: "({uid_key}={user_identifier})"
@@ -1073,7 +1073,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     firewalls?: array<string, array{ // Default: []
  *         pattern?: scalar|Param|null,
  *         host?: scalar|Param|null,
- *         methods?: string|list<scalar|Param|null>,
+ *         methods?: Param|string|list<scalar|Param|null>,
  *         security?: bool|Param, // Default: true
  *         user_checker?: scalar|Param|null, // The UserChecker to use when authenticating users in this firewall. // Default: "security.user_checker"
  *         request_matcher?: scalar|Param|null,
@@ -1092,8 +1092,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             path?: scalar|Param|null, // Default: "/logout"
  *             target?: scalar|Param|null, // Default: "/"
  *             invalidate_session?: bool|Param, // Default: true
- *             clear_site_data?: string|list<"*"|"cache"|"cookies"|"storage"|"clientHints"|"executionContexts"|"prefetchCache"|"prerenderCache"|Param>,
- *             delete_cookies?: string|array<string, array{ // Default: []
+ *             clear_site_data?: Param|string|list<"*"|"cache"|"cookies"|"storage"|"clientHints"|"executionContexts"|"prefetchCache"|"prerenderCache"|Param>,
+ *             delete_cookies?: Param|string|array<string, array{ // Default: []
  *                 path?: scalar|Param|null, // Default: null
  *                 domain?: scalar|Param|null, // Default: null
  *                 secure?: scalar|Param|null, // Default: false
@@ -1231,10 +1231,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             success_handler?: scalar|Param|null,
  *             failure_handler?: scalar|Param|null,
  *             realm?: scalar|Param|null, // Default: null
- *             token_extractors?: string|list<scalar|Param|null>,
- *             token_handler?: string|array{
+ *             token_extractors?: Param|string|list<scalar|Param|null>,
+ *             token_handler?: Param|string|array{
  *                 id?: scalar|Param|null,
- *                 oidc_user_info?: string|array{
+ *                 oidc_user_info?: Param|string|array{
  *                     base_uri?: scalar|Param|null, // Base URI of the userinfo endpoint on the OIDC server, or the OIDC server URI to use the discovery (require "discovery" to be configured).
  *                     discovery?: array{ // Enable the OIDC discovery.
  *                         cache?: array{
@@ -1246,7 +1246,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *                 },
  *                 oidc?: array{
  *                     discovery?: array{ // Enable the OIDC discovery.
- *                         base_uri?: string|list<scalar|Param|null>,
+ *                         base_uri?: Param|string|list<scalar|Param|null>,
  *                         cache?: array{
  *                             id?: scalar|Param|null, // Cache service id to use to cache the OIDC discovery configuration.
  *                         },
@@ -1288,10 +1288,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         remember_me?: array{
  *             secret?: scalar|Param|null, // Default: "%kernel.secret%"
  *             service?: scalar|Param|null,
- *             user_providers?: string|list<scalar|Param|null>,
+ *             user_providers?: Param|string|list<scalar|Param|null>,
  *             catch_exceptions?: bool|Param, // Default: true
  *             signature_properties?: list<scalar|Param|null>,
- *             token_provider?: string|array{
+ *             token_provider?: Param|string|array{
  *                 service?: scalar|Param|null, // The service ID of a custom remember-me token provider.
  *                 doctrine?: bool|array{
  *                     enabled?: bool|Param, // Default: false
@@ -1316,14 +1316,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         path?: scalar|Param|null, // Use the urldecoded format. // Default: null
  *         host?: scalar|Param|null, // Default: null
  *         port?: int|Param, // Default: null
- *         ips?: string|list<scalar|Param|null>,
+ *         ips?: Param|string|list<scalar|Param|null>,
  *         attributes?: array<string, scalar|Param|null>,
  *         route?: scalar|Param|null, // Default: null
- *         methods?: string|list<scalar|Param|null>,
+ *         methods?: Param|string|list<scalar|Param|null>,
  *         allow_if?: scalar|Param|null, // Default: null
- *         roles?: string|list<scalar|Param|null>,
+ *         roles?: Param|string|list<scalar|Param|null>,
  *     }>,
- *     role_hierarchy?: array<string, string|list<scalar|Param|null>>,
+ *     role_hierarchy?: array<string, Param|string|list<scalar|Param|null>>,
  * }
  * @psalm-type WebProfilerConfig = array{
  *     toolbar?: bool|array{ // Profiler toolbar configuration
@@ -1351,11 +1351,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type NowoAuthKitConfig = array{
  *     default_profile?: scalar|Param|null, // Profile name used when no profile is specified explicitly. // Default: "default"
+ *     outbound_mail_ready_checker?: scalar|Param|null, // Optional service id implementing OutboundMailReadyCheckerInterface for password-reset and magic-login UI hints. // Default: null
  *     profiles?: array<string, array{ // Default: []
  *         user_class?: scalar|Param|null, // FQCN of the application user entity (must implement UserInterface). // Default: null
  *         user_identifier_field?: scalar|Param|null, // Entity property used as the security user identifier (form_login username). // Default: "email"
  *         registration_role?: scalar|Param|null, // Role assigned to users created via registration (in addition to ROLE_USER from the entity). // Default: "ROLE_USER"
  *         registration_mode?: "disabled"|"first_user_only"|"always"|Param, // disabled: no registration. first_user_only: register only when no users exist. always: open registration. // Default: "first_user_only"
+ *         registration_rate_limit?: int|Param, // Max registration POSTs per client IP per window (0 = disabled). // Default: 5
+ *         registration_rate_window?: int|Param, // Seconds for registration_rate_limit window. // Default: 900
  *         login_fields?: list<mixed>,
  *         remember_me?: array{ // Persistent login cookie (Symfony firewall remember_me). Set enabled: true or add remember_me to login_fields.
  *             enabled?: bool|Param, // When true, configures firewall remember_me and ensures the login checkbox is shown. // Default: false
@@ -1376,6 +1379,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             reset_password?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password.html.twig"
  *             reset_password_code?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password_code.html.twig"
  *             magic_login_request?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/magic_login_request.html.twig"
+ *             form_theme?: list<scalar|Param|null>,
+ *         },
+ *         css?: array{
+ *             button_class?: scalar|Param|null, // Default: "nowo-auth-kit__button"
+ *             secondary_button_class?: scalar|Param|null, // Default: "nowo-auth-kit__social-button"
  *         },
  *         embed?: array{
  *             mode?: "disabled"|"dropdown"|Param, // disabled: full-page routes only. dropdown: embed login/register via auth_kit_dropdown(). // Default: "disabled"
@@ -1393,6 +1401,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             token_bytes?: int|Param, // Entropy for link tokens (bytes before hex encoding). // Default: 32
  *             code_length?: int|Param, // Default: 6
  *             code_charset?: "numeric"|"alphanumeric"|Param, // Default: "numeric"
+ *             max_code_attempts?: int|Param, // Failed OTP verifications before the reset credential is cleared (0 = disabled). // Default: 5
+ *             request_rate_limit?: int|Param, // Max password-reset requests per client IP per window (0 = disabled). // Default: 5
+ *             request_rate_window?: int|Param, // Seconds for request_rate_limit window. // Default: 900
  *             token_field?: scalar|Param|null, // User entity property storing the hashed reset credential. // Default: "passwordResetToken"
  *             token_expires_field?: scalar|Param|null, // User entity property storing credential expiry. // Default: "passwordResetExpiresAt"
  *         },
@@ -1400,6 +1411,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             mode?: "disabled"|"enabled"|Param, // disabled: hide magic login. enabled: request form + Symfony login_link check route. // Default: "disabled"
  *             lifetime?: int|Param, // Seconds until the magic login link expires (Symfony login_link lifetime). // Default: 600
  *             max_uses?: int|Param, // How many times the signed login link can be used (Symfony login_link max_uses). // Default: 1
+ *             request_rate_limit?: int|Param, // Max magic-login requests per client IP per window (0 = disabled). // Default: 5
+ *             request_rate_window?: int|Param, // Seconds for request_rate_limit window. // Default: 900
+ *         },
+ *         social_login?: array{
+ *             mode?: "disabled"|"enabled"|Param, // disabled: hide social login. enabled: OAuth buttons when provider credentials exist in the database. // Default: "disabled"
+ *             create_user_if_missing?: bool|Param, // When true, creates a local user from the social profile email if none exists. // Default: true
+ *             require_verified_email?: bool|Param, // When true, linking or creating a local user requires the IdP to assert email_verified (or GitHub verified). // Default: true
  *         },
  *         routes?: array{
  *             login?: array{
@@ -1433,6 +1451,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             magic_login_check?: array{
  *                 path?: scalar|Param|null, // Default: "/magic-login/check"
  *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_magic_login_check"
+ *             },
+ *             social_login_start?: array{
+ *                 path?: scalar|Param|null, // Default: "/login/social/{provider}"
+ *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_social_login_start"
+ *             },
+ *             social_login_check?: array{
+ *                 path?: scalar|Param|null, // Default: "/login/social/{provider}/check"
+ *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_social_login_check"
  *             },
  *         },
  *         firewall?: scalar|Param|null, // Symfony firewall name where form_login should point (documented for security.yaml). // Default: "main"
@@ -1514,8 +1540,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         enabled?: bool|Param, // Registers CRUD controllers and forms; import bundle routing with path_prefix (see docs). // Default: false
  *         path_prefix?: scalar|Param|null, // URL prefix for dashboard routes (leading slash, no trailing slash). Use the same value when importing routing in your app. // Default: "/breadcrumb-kit-admin"
  *         layout_template?: scalar|Param|null, // Twig layout extended by dashboard pages (override in app like DashboardMenuBundle). // Default: "@NowoBreadcrumbKitBundle/dashboard/layout.html.twig"
+ *         css_framework?: scalar|Param|null, // CSS stack for dashboard markup (REQ-UI-001): see Nowo\BreadcrumbKitBundle\Enum\CssFramework. // Default: "bootstrap5"
+ *         icon_set?: scalar|Param|null, // Icon set for dashboard row actions (REQ-UI-001): see Nowo\BreadcrumbKitBundle\Enum\IconSet. // Default: "bootstrap-icons"
  *         import_max_bytes?: int|Param, // Max JSON upload size for dashboard import (default 2 MiB). // Default: 2097152
- *         pagination?: array{ // Pagination for the collections list in the dashboard.
+ *         pagination?: array{ // Pagination for collections and items lists in the dashboard.
  *             enabled?: bool|Param, // Default: true
  *             per_page?: int|Param, // Default: 20
  *         },
@@ -1526,13 +1554,18 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             delete?: scalar|Param|null, // Default: "normal"
  *         },
  *     },
+ *     security?: array{ // Private dashboard access (REQ-UI-002). Defaults to ROLE_ADMIN; demos may set allow_unauthenticated.
+ *         access_checker?: scalar|Param|null, // Service id implementing BreadcrumbKitAccessCheckerInterface. null = built-in role checker. // Default: null
+ *         access_roles?: list<scalar|Param|null>,
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO only: allow dashboard without SecurityBundle / without login. Never true in production. // Default: false
+ *     },
  *     inline_edit?: array{
  *         query_param?: scalar|Param|null, // Query parameter name; when present and truthy (1, true, yes, on), the default breadcrumb template may show an edit control if the collection enables a checker and the checker allows access. // Default: null
  *         access_services?: array<string, scalar|Param|null>,
  *     },
  * }
  * @psalm-type TwigComponentConfig = array{
- *     defaults?: array<string, string|array{ // Default: []
+ *     defaults?: array<string, Param|string|array{ // Default: []
  *         template_directory?: scalar|Param|null, // Default: "components"
  *         name_prefix?: scalar|Param|null, // Default: ""
  *     }>,
@@ -1572,6 +1605,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     dashboard?: array{ // Admin dashboard to manage menus and items. Import routes with prefix (e.g. /admin/menus).
  *         enabled?: bool|Param, // Default: false
  *         layout_template?: scalar|Param|null, // Twig template that dashboard views extend (e.g. @App/base.html.twig). Must define block "nowo_dashboard_menu_content". If not set or template does not exist, the bundle layout is used. // Default: "@NowoDashboardMenuBundle/dashboard/layout.html.twig"
+ *         css_framework?: scalar|Param|null, // CSS stack for dashboard markup (REQ-UI-001): see Nowo\DashboardMenuBundle\Enum\CssFramework. // Default: "bootstrap5"
+ *         icon_set?: scalar|Param|null, // Icon set for dashboard row actions (REQ-UI-001): see Nowo\DashboardMenuBundle\Enum\IconSet. // Default: "bootstrap-icons"
  *         path_prefix?: scalar|Param|null, // Deprecated: The option "nowo_dashboard_menu.dashboard.path_prefix" is deprecated. Configure the dashboard URL prefix in your app routing (e.g. config/routes.yaml or config/routes_nowo_dashboard_menu.yaml) when importing @NowoDashboardMenuBundle/Resources/config/routes_dashboard.yaml. // Deprecated: set the dashboard URL prefix in config/routes.yaml when importing routes_dashboard.yaml (e.g. prefix: /admin/menus). // Default: "/admin/menus"
  *         route_name_exclude_patterns?: list<scalar|Param|null>,
  *         pagination?: array{ // Pagination for the menus list in the dashboard.
@@ -1588,7 +1623,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         stimulus_script_url?: scalar|Param|null, // Optional URL of a script that loads Stimulus and the Live controller and sets window.Stimulus. When set, the dashboard layout includes this script so the item form Live Component works in the modal. Use the bundle default (null = use bundled script), or your app entry (e.g. Vite) that exposes window.Stimulus. // Default: null
  *         import_max_bytes?: int|Param, // Maximum size in bytes for JSON import file uploads. Default 2 MiB. Prevents DoS from very large uploads. // Default: 2097152
  *         position_step?: int|Param, // Gap used when re-indexing item positions from the menu detail dashboard (e.g. 100 → positions 100, 200, 300 per sibling group). Minimum 1. // Default: 100
- *         required_role?: scalar|Param|null, // When set (e.g. ROLE_ADMIN), all dashboard routes require this role. Requires SecurityBundle. Leave null to rely on app access_control. // Default: null
+ *         required_role?: scalar|Param|null, // Deprecated: Use "nowo_dashboard_menu.security.access_roles" instead of "dashboard.required_role". // DEPRECATED: use security.access_roles. When set (e.g. ROLE_ADMIN), maps to security.access_roles for BC. // Default: null
  *         import_export_rate_limit?: bool|array{ // Optional rate limit for import and export actions: limit requests per interval per user/IP. E.g. { limit: 10, interval: 60 } = 10 per minute.
  *             enabled?: bool|Param, // Default: true
  *             limit?: int|Param, // Default: 10
@@ -1616,6 +1651,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             expanded?: list<scalar|Param|null>,
  *             collapsed?: list<scalar|Param|null>,
  *         },
+ *     },
+ *     security?: array{ // Dashboard admin access control (REQ-UI-002). Host should also lock dashboard.path_prefix via security.access_control.
+ *         access_checker?: scalar|Param|null, // Optional service id implementing DashboardMenuAccessCheckerInterface. Null uses the built-in role checker. // Default: null
+ *         access_roles?: list<scalar|Param|null>,
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO ONLY. When true, dashboard may load without SecurityBundle / without login. Production MUST keep false. // Default: false
  *     },
  * }
  * @psalm-type NowoFormKitConfig = array{
@@ -1849,6 +1889,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         show_never_option?: bool|Param, // Default: true
  *         position?: "bottom"|"top"|Param, // Default: "bottom"
  *         css_class?: scalar|Param|null, // Default: "nowo-pwa-install"
+ *         mark_asset?: scalar|Param|null, // Default: null
+ *         title?: scalar|Param|null, // Default: null
+ *         eyebrow?: scalar|Param|null, // Default: null
+ *         button_class?: scalar|Param|null, // Default: ""
+ *         dismiss_button_class?: scalar|Param|null, // Default: null
+ *         never_button_class?: scalar|Param|null, // Default: null
  *         delay_ms?: int|Param, // Default: 0
  *         visibility?: "all"|"mobile"|"desktop"|Param, // Default: "all"
  *         route_targeting?: array{
@@ -1909,7 +1955,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_cookie_log, dashboard_cookie_config, …). Empty = no prefix. // Default: ""
  *     },
  *     table_prefix?: scalar|Param|null, // Deprecated: Use doctrine.table_prefix instead. // Deprecated. Use doctrine.table_prefix (e.g. "app_" yields app_dashboard_cookie_log). // Default: ""
- *     categories?: mixed, // Cookie categories shown in the consent modal (excluding "required"). // Default: ["analytics","marketing","preferences"]
+ *     categories?: list<scalar|Param|null>,
  *     use_logger?: bool|Param, // Persist consent choices to the database when true. // Default: true
  *     use_database_config?: bool|Param, // Load modal copy and display settings from CookieConsentConfig entities when true. // Default: false
  *     use_cookie_inventory?: bool|Param, // Expose cookie definitions (name, category/block, duration, provider, purpose) in the preferences modal and legal pages. // Default: false
@@ -1930,11 +1976,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     http_only?: bool|Param, // Set HttpOnly flag on consent cookies. // Default: true
  *     form_action?: scalar|Param|null, // Optional route name used as the form action URL. // Default: null
  *     csrf_protection?: bool|Param, // Enable CSRF protection on the consent form. // Default: true
- *     disabled_routes?: mixed, // Route names where the modal must not open automatically. // Default: ["privacy","imprint"]
+ *     disabled_routes?: list<scalar|Param|null>,
  *     route_targeting_mode?: "all"|"only"|"except"|Param, // Controls where the modal auto-opens: all pages, only listed routes, or all except listed routes. // Default: "all"
- *     target_routes?: mixed, // Route names used with route_targeting_mode (Symfony route names, one per line in the admin UI). // Default: []
+ *     target_routes?: list<scalar|Param|null>,
  *     default_locale?: scalar|Param|null, // Fallback locale when no supported language can be detected. // Default: "en"
- *     enabled_locales?: mixed, // Locales supported by the cookie consent UI and locale detection. // Default: ["en","es","it","fr","de","pt","nl","pl","ca"]
+ *     enabled_locales?: list<scalar|Param|null>,
  *     detect_locale_from_accept_language?: bool|Param, // Use the Accept-Language request header when no explicit locale is available. // Default: true
  *     ui_theme?: "bootstrap"|"tailwind"|Param, // UI framework used by the bundled cookie consent modal templates. // Default: "bootstrap"
  *     color_theme?: "light"|"dark"|"dark-turquoise"|"light-funky"|"elegant-black"|Param, // Default: "light"
@@ -1949,7 +1995,24 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     preferences_bubble_position?: "bottom-right"|"bottom-left"|"top-right"|"top-left"|Param, // Screen corner for the floating preferences bubble. // Default: "bottom-right"
  *     preferences_bubble_border_color?: scalar|Param|null, // Hex color for the preferences bubble border and cookie icon (e.g. #30363c). // Default: null
  *     preferences_bubble_icon?: scalar|Param|null, // Custom HTML or SVG markup for the preferences bubble icon. Leave empty for the default cookie SVG. // Default: null
- *     preference_sections?: mixed, // Default: []
+ *     preference_sections?: list<array{ // Default: []
+ *         title?: scalar|Param|null, // Default: ""
+ *         description?: scalar|Param|null, // Default: ""
+ *         categories?: list<scalar|Param|null>,
+ *     }>,
+ *     web_ui?: array{
+ *         enabled?: bool|Param, // When false, admin access subscriber is not registered (routes still load; prefer security firewall). // Default: true
+ *         path_prefix?: scalar|Param|null, // Documented URL path prefix for admin CRUD (host should lock with security.access_control). // Default: "/cookie-consent-config"
+ *         layout_template?: scalar|Param|null, // Twig layout extended by admin pages (global nowo_cookie_consent_layout_template). Set to your app layout or a one-file bridge. // Default: "@NowoCookieConsentBundle/admin/layout.html.twig"
+ *         css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host CSS stack hint: bootstrap5 | bootstrap4 | bootstrap | tailwind | foundation | tabler | custom | none. // Default: "bootstrap5"
+ *         icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Default: "bootstrap-icons"
+ *         list_page_size?: int|Param, // Default page size for admin cookie definition lists. // Default: 20
+ *     },
+ *     security?: array{
+ *         access_checker?: scalar|Param|null, // Optional service id implementing CookieConsentAccessCheckerInterface. // Default: null
+ *         access_roles?: list<scalar|Param|null>,
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO ONLY. When true, admin UI may load without SecurityBundle / without login. Production MUST keep false. // Default: false
+ *     },
  * }
  * @psalm-type NowoLoginThrottleConfig = array{
  *     enabled?: bool|Param, // Enable or disable login throttling (for simple single-firewall configuration) // Default: true
@@ -2117,7 +2180,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     hubs?: array<string, array{ // Default: []
  *         url?: scalar|Param|null, // URL of the hub's publish endpoint
  *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
- *         jwt?: string|array{ // JSON Web Token configuration.
+ *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
  *             factory?: scalar|Param|null, // The ID of a service to call to create the JSON Web Token.
@@ -2144,6 +2207,184 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     translation_domain?: scalar|Param|null, // Default translation domain for the "Select all" label (bundle uses NowoSelectAllChoiceBundle). // Default: "NowoSelectAllChoiceBundle"
  *     form_theme?: scalar|Param|null, // Base form layout template used for choice widgets. Must match one of Symfony's form themes (e.g. form_div_layout.html.twig, bootstrap_5_layout.html.twig). See docs/CONFIGURATION.md. // Default: "form_div_layout.html.twig"
  *     debug?: bool|Param, // When true, the frontend logs all debug/info/warn messages to the console. When false, only the initial "script loaded" message is shown. // Default: false
+ * }
+ * @psalm-type NowoBeaconConfig = array{
+ *     enabled?: bool|Param, // Master switch. When false, no events are sent even if DSN is set. // Default: true
+ *     dsn?: scalar|Param|null, // Beacon DSN: https://PUBLIC_KEY:SECRET_KEY@host:port/PROJECT_ID (empty disables sending). Prefer %env(default::BEACON_DSN)%. // Default: ""
+ *     environment?: scalar|Param|null, // Environment tag sent with events (e.g. prod, staging). // Default: "%kernel.environment%"
+ *     release?: scalar|Param|null, // Optional release / version string attached to events. // Default: null
+ *     server_name?: scalar|Param|null, // Hostname tag for events. Defaults to gethostname() when null. // Default: null
+ *     verify_peer?: bool|Param, // TLS certificate verification. Set false for local self-signed Beacon HTTPS (dev only). // Default: true
+ *     timeout?: float|Param, // HTTP timeout in seconds for ingest requests. // Default: 5.0
+ *     transport?: array{ // Outbound Envelope delivery mode.
+ *         mode?: "sync"|"async"|"messenger"|Param, // sync = block on HTTP; async = start HTTP and finalize on kernel/console terminate; messenger = queue via Symfony Messenger (requires symfony/messenger). // Default: "sync"
+ *     },
+ *     register_error_listener?: bool|Param, // When true, register a kernel.exception listener that reports uncaught exceptions. // Default: true
+ *     ignore_exceptions?: list<scalar|Param|null>,
+ *     ignore_paths?: list<scalar|Param|null>,
+ *     register_console_listener?: bool|Param, // When true, report uncaught console command errors (ConsoleEvents::ERROR). // Default: true
+ *     register_messenger_listener?: bool|Param, // When true and symfony/messenger is installed, report WorkerMessageFailedEvent failures that will not retry. // Default: true
+ *     auto_http_transaction?: bool|Param, // When true, send a performance transaction for each main HTTP request (skips ignore_paths). // Default: false
+ *     before_send?: scalar|Param|null, // Optional service id of an invokable that receives the event/transaction payload array and returns the mutated array, or null to drop the send. // Default: null
+ *     instrumentation?: array{ // Opt-in automatic spans / breadcrumbs for Doctrine SQL and HttpClient requests.
+ *         doctrine?: bool|Param, // When true and doctrine/dbal is installed, record SQL query spans and breadcrumbs. // Default: false
+ *         http_client?: bool|Param, // When true, decorate http_client to record outbound HTTP spans and breadcrumbs (Beacon Envelope calls are skipped). // Default: false
+ *     },
+ *     monolog_handler?: array{ // Optional Monolog handler (requires monolog/monolog). Disabled by default.
+ *         enabled?: bool|Param, // Default: false
+ *         level?: scalar|Param|null, // Minimum Monolog level to forward (e.g. error, warning). // Default: "error"
+ *     },
+ *     send?: array{ // Opt-in/out switches for categories of context attached to outbound events.
+ *         environment?: bool|Param, // Send environment tag. // Default: true
+ *         release?: bool|Param, // Send release / code version when configured. // Default: true
+ *         server_name?: bool|Param, // Send server hostname tag. // Default: true
+ *         stacktrace?: bool|Param, // Send stack frames and culprit for exceptions, and current stack for captureMessage(). // Default: true
+ *         request?: bool|Param, // Attach current HTTP request (url/method/query) to events and transactions when a request is available. // Default: true
+ *         user?: bool|Param, // Send authenticated user summary (may include PII). Disabled by default. // Default: false
+ *         runtime?: bool|Param, // Send PHP runtime version in contexts.runtime. // Default: true
+ *         framework?: bool|Param, // Send Symfony version in contexts.framework when available. // Default: true
+ *         os?: bool|Param, // Send OS family/version in contexts.os. // Default: true
+ *     },
+ * }
+ * @psalm-type NowoSiteBackupConfig = array{ // Nowo Site Backup Bundle configuration.
+ *     enabled?: bool|Param, // Master switch: when false the restore loading page is never shown. // Default: true
+ *     default_message?: scalar|Param|null, // Translation id (domain NowoSiteBackupBundle) or literal for the public restore loading page. Default: restore.page.message. // Default: "restore.page.message"
+ *     status_code?: int|Param, // HTTP status code while restore mode is active. // Default: 503
+ *     subscriber_priority?: int|Param, // kernel.request listener priority (default 31: after router). // Default: 31
+ *     process_timeout?: int|Param, // Timeout in seconds for tar / dump subprocesses (REQ-RUNTIME-001). // Default: 600
+ *     css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host CSS stack hint for setup/panel Web UI (REQ-UI-001). Twig global nowo_site_backup_css_framework. Demo default: custom (semantic nowo-ui-*). // Default: "custom"
+ *     backup?: array{ // What is included in an integral backup.
+ *         include_paths?: list<scalar|Param|null>,
+ *         exclude_patterns?: list<scalar|Param|null>,
+ *         storage_dir?: scalar|Param|null, // Directory where .tar.gz + .meta.json artifacts are stored. // Default: "%kernel.project_dir%/var/site-backup/archives"
+ *         database_dump_command?: scalar|Param|null, // Shell command that writes SQL to stdout (e.g. mysqldump …). Empty = no DB dump. // Default: null
+ *     },
+ *     restore?: array{ // Safe restore options.
+ *         progress_file?: scalar|Param|null, // JSON progress file used by the loading UI (keep outside overwritten paths if possible). // Default: "%kernel.project_dir%/var/site-backup/restore-progress.json"
+ *         protected_paths?: list<scalar|Param|null>,
+ *     },
+ *     panel?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/_site_backup"
+ *         layout_template?: scalar|Param|null, // Host Twig layout for panel pages (global nowo_site_backup_panel_layout_template). Must define block nowo_ui_content / nowo_site_backup_panel_content. Default: bundle standalone panel layout. // Default: null
+ *     },
+ *     exclusions?: array{
+ *         paths?: list<scalar|Param|null>,
+ *         path_prefixes?: list<scalar|Param|null>,
+ *         routes?: list<scalar|Param|null>,
+ *         patterns?: list<scalar|Param|null>,
+ *         ips?: list<scalar|Param|null>,
+ *     },
+ *     security?: array{
+ *         password_protection?: bool|Param, // Default: true
+ *         password_hash?: scalar|Param|null, // Default: null
+ *         access_gate?: scalar|Param|null, // Default: null
+ *     },
+ *     storage?: array{
+ *         history_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/history.jsonl"
+ *     },
+ *     templates?: array{
+ *         restore_page?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/restore/page.html.twig"
+ *         panel_layout?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/panel/layout.html.twig"
+ *         panel_index?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/panel/index.html.twig"
+ *         panel_login?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/panel/login.html.twig"
+ *         panel_history?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/panel/history.html.twig"
+ *         setup_wizard?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/wizard.html.twig"
+ *         setup_layout?: scalar|Param|null, // Twig layout extended by setup wizard/done/token. Prefer setup.layout_template. // Default: "@NowoSiteBackupBundle/setup/layout.html.twig"
+ *         setup_admin?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/admin.html.twig"
+ *         setup_sample?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/sample_data.html.twig"
+ *         setup_database?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/database.html.twig"
+ *         setup_done?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/done.html.twig"
+ *         setup_token?: scalar|Param|null, // Default: "@NowoSiteBackupBundle/setup/token.html.twig"
+ *     },
+ *     setup?: array{ // Cold-start / post-restore setup wizard.
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/_setup"
+ *         layout_template?: scalar|Param|null, // Host Twig layout for setup pages (extends pattern like CookieConsent layout_template). Must define block nowo_site_backup_content. Default uses the bundle standalone layout. // Default: null
+ *         require_done_marker?: bool|Param, // When true, missing setup.done forces the wizard (fresh clones). Default false so adding the bundle does not lock existing apps. // Default: false
+ *         brand_name?: scalar|Param|null, // Default: "Site Setup"
+ *         setup_token?: scalar|Param|null, // Optional shared secret for /_setup (?token= or X-Setup-Token). // Default: null
+ *         progress_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup-progress.json"
+ *         progress_storage?: "filesystem"|"doctrine"|"chain"|Param, // filesystem = JSON in var/; doctrine = DBAL table; chain = write both, prefer DB on load (survives var/ wipe). // Default: "filesystem"
+ *         progress_table?: scalar|Param|null, // DBAL table name when progress_storage is doctrine or chain. // Default: "nowo_site_backup_setup_progress"
+ *         required_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.required"
+ *         done_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.done"
+ *         php_binary?: scalar|Param|null, // Default: "php"
+ *         admin_provisioner?: scalar|Param|null, // Service id implementing AdminUserProvisionerInterface. // Default: null
+ *         trigger_after_restore?: bool|Param, // Default: true
+ *         post_restore_profile?: scalar|Param|null, // Default: "post_restore"
+ *         detectors?: array{
+ *             marker?: bool|Param, // Default: true
+ *             doctrine_connect?: bool|Param, // Default: false
+ *             doctrine_schema_empty?: bool|Param, // Default: false
+ *             incomplete_progress?: bool|Param, // When true, unfinished setup progress (running/waiting/failed) forces the site gate to /_setup. // Default: true
+ *         },
+ *         default_profile?: scalar|Param|null, // Default: "fresh_install"
+ *         advance_mode?: "automatic"|"manual"|Param, // automatic = chain auto tabs until interaction; manual = one auto tab per Continuar. // Default: "automatic"
+ *         profiles?: array<string, array{ // Default: {"fresh_install":{"steps":[{"type":"requirements"},{"type":"bootstrap_mode"},{"type":"database_url","optional":true},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","id":"full_database_import","paths":["var/site-backup/full-import.sql","var/site-backup/last-restore-dump.sql"],"if_exists":false,"when_answer":{"bootstrap_mode":"full_database"}},{"type":"migrations"},{"type":"admin_user","roles":["ROLE_SUPER_ADMIN"],"skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"post_restore":{"steps":[{"type":"requirements"},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","paths":["var/site-backup/last-restore-dump.sql"],"if_exists":true},{"type":"migrations"},{"type":"admin_user","skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"full_database":{"steps":[{"type":"requirements"},{"type":"database_url","optional":true},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","id":"full_database_import","paths":["var/site-backup/full-import.sql","var/site-backup/last-restore-dump.sql"],"if_exists":false},{"type":"migrations"},{"type":"admin_user","skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"minimal":{"steps":[{"type":"database_create"},{"type":"migrations"},{"type":"admin_user"},{"type":"marker","write_done":true}]}}
+ *             advance_mode?: scalar|Param|null, // Override setup.advance_mode for this profile (automatic|manual). // Default: null
+ *             steps?: list<array{ // Default: []
+ *                 type?: scalar|Param|null,
+ *                 id?: scalar|Param|null, // Default: null
+ *                 label?: scalar|Param|null, // Default: null
+ *                 command?: mixed, // Default: null
+ *                 commands?: mixed, // Default: null
+ *                 paths?: mixed, // Default: null
+ *                 roles?: mixed, // Default: null
+ *                 extensions?: mixed, // Default: null
+ *                 writable?: mixed, // Default: null
+ *                 optional?: bool|Param|null, // Default: null
+ *                 if_exists?: bool|Param|null, // Default: null
+ *                 require_tar?: bool|Param|null, // Default: null
+ *                 write_done?: bool|Param|null, // Default: null
+ *                 skip_if_admin_exists?: bool|Param|null, // Default: null
+ *                 when?: scalar|Param|null, // Default: null
+ *                 when_answer?: mixed, // Map of answer key => required value; step is skipped unless all match. // Default: null
+ *                 ...<string, mixed>
+ *             }>,
+ *             tabs?: list<array{ // Default: []
+ *                 type?: scalar|Param|null,
+ *                 id?: scalar|Param|null, // Default: null
+ *                 label?: scalar|Param|null, // Default: null
+ *                 command?: mixed, // Default: null
+ *                 commands?: mixed, // Default: null
+ *                 paths?: mixed, // Default: null
+ *                 roles?: mixed, // Default: null
+ *                 extensions?: mixed, // Default: null
+ *                 writable?: mixed, // Default: null
+ *                 optional?: bool|Param|null, // Default: null
+ *                 if_exists?: bool|Param|null, // Default: null
+ *                 require_tar?: bool|Param|null, // Default: null
+ *                 write_done?: bool|Param|null, // Default: null
+ *                 skip_if_admin_exists?: bool|Param|null, // Default: null
+ *                 when?: scalar|Param|null, // Default: null
+ *                 when_answer?: mixed, // Map of answer key => required value; step is skipped unless all match. // Default: null
+ *                 checker?: scalar|Param|null, // Service id / FQCN implementing SetupTabCheckerInterface. // Default: null
+ *                 template?: scalar|Param|null, // Twig template for custom waiting_input UI. // Default: null
+ *                 label_domain?: scalar|Param|null, // Translation domain for label/description (default NowoSiteBackupBundle). // Default: null
+ *                 description?: scalar|Param|null, // Optional translation id for tab subtitle. // Default: null
+ *                 runner?: array{ // Optional nested step config when type is custom (e.g. console / sql_file).
+ *                     type?: scalar|Param|null, // Default: null
+ *                     id?: scalar|Param|null, // Default: null
+ *                     label?: scalar|Param|null, // Default: null
+ *                     command?: mixed, // Default: null
+ *                     commands?: mixed, // Default: null
+ *                     paths?: mixed, // Default: null
+ *                     roles?: mixed, // Default: null
+ *                     extensions?: mixed, // Default: null
+ *                     writable?: mixed, // Default: null
+ *                     optional?: bool|Param|null, // Default: null
+ *                     if_exists?: bool|Param|null, // Default: null
+ *                     require_tar?: bool|Param|null, // Default: null
+ *                     write_done?: bool|Param|null, // Default: null
+ *                     skip_if_admin_exists?: bool|Param|null, // Default: null
+ *                     when?: scalar|Param|null, // Default: null
+ *                     when_answer?: mixed, // Map of answer key => required value; step is skipped unless all match. // Default: null
+ *                 },
+ *                 ...<string, mixed>
+ *             }>,
+ *         }>,
+ *     },
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
@@ -2178,6 +2419,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nelmio_api_doc?: NelmioApiDocConfig,
  *     mercure?: MercureConfig,
  *     nowo_select_all_choice?: NowoSelectAllChoiceConfig,
+ *     nowo_beacon?: NowoBeaconConfig,
+ *     nowo_site_backup?: NowoSiteBackupConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2213,6 +2456,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nelmio_api_doc?: NelmioApiDocConfig,
  *         mercure?: MercureConfig,
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
+ *         nowo_beacon?: NowoBeaconConfig,
+ *         nowo_site_backup?: NowoSiteBackupConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2247,6 +2492,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nelmio_api_doc?: NelmioApiDocConfig,
  *         mercure?: MercureConfig,
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
+ *         nowo_beacon?: NowoBeaconConfig,
+ *         nowo_site_backup?: NowoSiteBackupConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2283,6 +2530,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nelmio_api_doc?: NelmioApiDocConfig,
  *         mercure?: MercureConfig,
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
+ *         nowo_beacon?: NowoBeaconConfig,
+ *         nowo_site_backup?: NowoSiteBackupConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

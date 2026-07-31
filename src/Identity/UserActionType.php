@@ -114,6 +114,9 @@ enum UserActionType: string
     /** Magic login link consumed successfully. */
     case MagicLoginConsumed = 'auth.magic_login_consumed';
 
+    /** Password reset link/code requested (email may have been sent). */
+    case PasswordResetRequested = 'auth.password_reset_requested';
+
     /** Project share link created. */
     case ProjectShareLinkCreated = 'project.share_link_created';
 

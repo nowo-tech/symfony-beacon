@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Identity\AdminAuditFilter;
+use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
@@ -46,10 +48,13 @@ final class AdminUserController extends AbstractController
 
     /** User directory with enable/role controls and a recent-activity strip. */
     #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $query = $request->query->getString('q');
+
         return $this->render('admin/users/index.html.twig', [
-            'users' => $this->userRepository->findAllForAdminDirectory(),
+            'users' => $this->userRepository->findAllForAdminDirectory('' !== $query ? $query : null),
+            'q' => $query,
             'adminCount' => $this->countAdmins(),
             'recentActions' => $this->userActionRepository->findLatest(25),
         ]);
@@ -138,10 +143,23 @@ final class AdminUserController extends AbstractController
     public function activity(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         User $user,
+        Request $request,
     ): Response {
+        $auditActions = AdminIdentityAudit::userTimelineActions();
+        $audit = AdminAuditFilter::fromRequest($request, $auditActions);
+
         return $this->render('admin/users/activity.html.twig', [
             'user' => $user,
-            'actions' => $this->userActionRepository->findForUser($user),
+            'userAuditActions' => $auditActions,
+            'userAuditFilter' => $audit['filter'],
+            'actions' => $this->userActionRepository->findForUser(
+                $user,
+                $auditActions,
+                $audit['action'],
+                $audit['from'],
+                $audit['to'],
+                AdminIdentityAudit::TIMELINE_LIMIT,
+            ),
             'memberships' => $this->projectMembershipRepository->findByUser($user),
         ]);
     }

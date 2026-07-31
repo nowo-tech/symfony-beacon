@@ -60,12 +60,12 @@ final class PerformanceAccessTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/performance?per_page=10&page=1');
         self::assertResponseIsSuccessful();
-        self::assertCount(10, $crawler->filter('table tbody tr'));
+        self::assertCount(10, $crawler->filter('.performance-table table tbody tr'));
         self::assertSelectorExists('.table-pagination');
         self::assertSelectorExists('a.table-pagination__link[href*="page=2"]');
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/performance?per_page=10&page=2');
-        self::assertCount(2, $crawler->filter('table tbody tr'));
+        self::assertCount(2, $crawler->filter('.performance-table table tbody tr'));
     }
 
     private function makeTransaction(Project $project, string $name, DateTimeImmutable $receivedAt): PerfTransaction

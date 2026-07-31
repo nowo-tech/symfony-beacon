@@ -21,19 +21,24 @@ class UserGroupRepository extends ServiceEntityRepository
     }
 
     /**
-     * All groups ordered by display name.
+     * All groups ordered by display name (optional name/slug/description search).
      *
      * @return list<UserGroup>
      */
-    public function findAllOrdered(): array
+    public function findAllOrdered(?string $query = null): array
     {
-        /** @var list<UserGroup> $groups */
-        $groups = $this->createQueryBuilder('g')
+        $qb = $this->createQueryBuilder('g')
             ->leftJoin('g.createdBy', 'cb')->addSelect('cb')
             ->leftJoin('g.updatedBy', 'ub')->addSelect('ub')
-            ->orderBy('g.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('g.name', 'ASC');
+
+        if (null !== $query && '' !== trim($query)) {
+            $qb->andWhere('g.name LIKE :q OR g.slug LIKE :q OR g.description LIKE :q')
+                ->setParameter('q', '%'.trim($query).'%');
+        }
+
+        /** @var list<UserGroup> $groups */
+        $groups = $qb->getQuery()->getResult();
 
         return $groups;
     }

@@ -12,37 +12,40 @@ final class SafeInternalRedirectTest extends TestCase
 {
     public function testAllowsRelativePath(): void
     {
-        $request = Request::create('https://beacon.example/admin');
-        self::assertSame(
-            '/admin/projects',
-            SafeInternalRedirect::resolve($request, '/admin/projects', '/fallback'),
-        );
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/account', SafeInternalRedirect::resolve($request, '/account', '/fallback'));
     }
 
-    public function testRejectsProtocolRelativeOpenRedirect(): void
+    public function testRejectsProtocolRelative(): void
     {
-        $request = Request::create('https://beacon.example/admin');
-        self::assertSame(
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, '//evil.example/phish', '/fallback'));
+    }
+
+    public function testRejectsBackslashHost(): void
+    {
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, '/\\evil.example', '/fallback'));
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, '/%5cevil.example', '/fallback'));
+    }
+
+    public function testReducesSameHostAbsoluteToPath(): void
+    {
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/legal/privacy', SafeInternalRedirect::resolve(
+            $request,
+            'https://beacon.example/legal/privacy',
             '/fallback',
-            SafeInternalRedirect::resolve($request, '//evil.example/phish', '/fallback'),
-        );
+        ));
     }
 
-    public function testAllowsSameHostAbsoluteUrl(): void
+    public function testRejectsExternalAbsolute(): void
     {
-        $request = Request::create('https://beacon.example/admin');
-        self::assertSame(
-            'https://beacon.example/admin/projects',
-            SafeInternalRedirect::resolve($request, 'https://beacon.example/admin/projects', '/fallback'),
-        );
-    }
-
-    public function testRejectsExternalAbsoluteUrl(): void
-    {
-        $request = Request::create('https://beacon.example/admin');
-        self::assertSame(
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/fallback', SafeInternalRedirect::resolve(
+            $request,
+            'https://evil.example/phish',
             '/fallback',
-            SafeInternalRedirect::resolve($request, 'https://evil.example/', '/fallback'),
-        );
+        ));
     }
 }

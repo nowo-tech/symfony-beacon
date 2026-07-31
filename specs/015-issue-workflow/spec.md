@@ -2,7 +2,7 @@
 
 **Feature Branch**: `015-issue-workflow`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Issue comments; priority (`low` | `medium` | `high` | `critical`); mark-as-duplicate (link + ignored); merge later; saved views for issue lists.
 

@@ -76,6 +76,13 @@ $beacon-btn-sm-font-size: 0.8125rem;
   }
 }
 
+/* Shared section tabs (project + account preferences). Links use .btn-ghost.is-active. */
+.beacon-tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .btn-secondary {
   @include beacon-btn-base;
   font-weight: 500;
@@ -204,18 +211,24 @@ html[data-ui-density='compact'] .app-header {
   --app-header-height: 3rem;
 }
 
-html[data-ui-density='compact'] .app-sidebar {
-  width: 14.25rem;
-}
-
 html[data-ui-density='compact'] .app-shell {
   --app-sidebar-width: 14.25rem;
+}
+
+html[data-ui-density='compact'] .app-sidebar,
+html[data-ui-density='compact'] .app-sidebar__inner {
+  width: var(--app-sidebar-width, 14.25rem);
+}
+
+html[data-ui-density='compact'] .app-shell:not(.is-sidebar-collapsed) > .app-main {
+  padding-inline-start: var(--app-sidebar-width, 14.25rem);
 }
 
 html[data-ui-density='compact'] .btn-primary,
 html[data-ui-density='compact'] .btn-ghost,
 html[data-ui-density='compact'] .btn-danger,
 html[data-ui-density='compact'] .theme-toggle,
+html[data-ui-density='compact'] .content-width-toggle,
 html[data-ui-density='compact'] .locale-switcher__summary,
 html[data-ui-density='compact'] .input {
   min-height: 2rem;
@@ -2019,6 +2032,37 @@ textarea.input {
   text-transform: uppercase;
 }
 
+.badge--editable {
+  gap: 0.35rem;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  line-height: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-moss) 18%, var(--color-sand));
+    color: var(--color-moss-deep);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+.badge__edit-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.badge--editable:hover .badge__edit-icon {
+  opacity: 1;
+}
+
 .badge-error {
   background: var(--beacon-badge-error-bg);
   color: var(--beacon-badge-error-text);
@@ -2301,7 +2345,8 @@ body::-webkit-scrollbar-corner,
 }
 
 .locale-switcher__summary,
-.theme-toggle {
+.theme-toggle,
+.content-width-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -2442,6 +2487,16 @@ body::-webkit-scrollbar-corner,
   white-space: nowrap;
 }
 
+.content-width-toggle__icon--to-full,
+.content-width-toggle__icon--to-content {
+  display: none;
+}
+
+.app-shell.is-content-width .content-width-toggle__icon--to-full,
+.app-shell.is-full-width .content-width-toggle__icon--to-content {
+  display: block;
+}
+
 .brand-mark {
   display: inline-flex;
   flex-direction: row;
@@ -2550,20 +2605,24 @@ body::-webkit-scrollbar-corner,
   height: var(--app-header-height);
 }
 
+/*
+ * Sidebar motion: fixed panel slides via transform; main content reserves space
+ * with padding-inline-start (length→length interpolates without @property).
+ * Avoid animating grid-template-columns — rem↔0px snaps in browsers without
+ * registered custom properties and feels abrupt beside the slide.
+ */
 .app-shell {
   --app-sidebar-width: 15.5rem;
+  /* Smooth ease-out: soft start and landing (less “snap” than iOS decelerate). */
+  --app-sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-sidebar-duration: 0.42s;
   display: grid;
   flex: 1 1 auto;
-  grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   /* header | body | legal footer */
   grid-template-rows: auto 1fr auto;
   min-height: 0;
   width: 100%;
-  transition: grid-template-columns 0.22s ease;
-}
-
-.app-shell.is-sidebar-collapsed {
-  --app-sidebar-width: 0px;
 }
 
 .app-header {
@@ -2623,25 +2682,31 @@ body::-webkit-scrollbar-corner,
   left: 0;
   bottom: 0;
   z-index: 30;
-  width: 15.5rem;
+  width: var(--app-sidebar-width, 15.5rem);
   border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
   background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   backdrop-filter: blur(8px);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  transition: opacity 0.2s ease, width 0.22s ease;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  will-change: transform;
 }
 
 .app-shell.is-sidebar-collapsed .app-sidebar {
-  width: 0;
-  opacity: 0;
+  /* Extra 0.5rem so the border clears the viewport during the slide. */
+  transform: translate3d(calc(-100% - 0.5rem), 0, 0);
   pointer-events: none;
-  border-right-width: 0;
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .app-sidebar__inner {
-  width: 15.5rem;
+  width: var(--app-sidebar-width, 15.5rem);
   padding: 1rem 0.85rem 1.5rem;
 }
 
@@ -2657,8 +2722,16 @@ body::-webkit-scrollbar-corner,
 
 .app-main {
   grid-row: 2;
-  grid-column: 2;
+  grid-column: 1;
   min-width: 0;
+  /* Desktop gutter: animates with the sidebar slide (same duration/ease). */
+  padding-inline-start: var(--app-sidebar-width, 15.5rem);
+  transition: padding-inline-start var(--app-sidebar-duration, 0.42s)
+    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.app-shell.is-sidebar-collapsed > .app-main {
+  padding-inline-start: 0;
 }
 
 .app-main__inner {
@@ -2685,12 +2758,13 @@ body::-webkit-scrollbar-corner,
 
 @media (max-width: 900px) {
   .app-shell {
-    --app-sidebar-width: 0px;
-    grid-template-columns: minmax(0, 1fr);
+    --app-sidebar-width: min(18rem, 86vw);
   }
 
-  .app-main {
-    grid-column: 1;
+  .app-main,
+  .app-shell.is-sidebar-collapsed > .app-main,
+  html[data-ui-density='compact'] .app-shell:not(.is-sidebar-collapsed) > .app-main {
+    padding-inline-start: 0;
   }
 
   .app-shell > .site-legal-footer {
@@ -2716,25 +2790,26 @@ body::-webkit-scrollbar-corner,
     left: 0;
     bottom: 0;
     z-index: 35;
-    width: min(18rem, 86vw);
+    width: var(--app-sidebar-width);
     border-right: 1px solid var(--color-sand);
     background: var(--color-surface);
-    opacity: 0;
+    box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
     pointer-events: none;
-    transform: translateX(-100%);
-    transition: transform 0.22s ease, opacity 0.22s ease;
+    transform: translate3d(calc(-100% - 0.75rem), 0, 0);
+    transition:
+      transform var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+      box-shadow var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
   .app-shell.is-sidebar-open .app-sidebar {
-    opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
-  .app-shell.is-sidebar-collapsed .app-sidebar {
-    opacity: 0;
+  .app-shell:not(.is-sidebar-open) .app-sidebar {
     pointer-events: none;
-    transform: translateX(-100%);
+    transform: translate3d(calc(-100% - 0.75rem), 0, 0);
+    box-shadow: none;
   }
 
   .app-sidebar-backdrop {
@@ -2744,10 +2819,29 @@ body::-webkit-scrollbar-corner,
     z-index: 30;
     background: rgb(15 28 24 / 35%);
     backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+      visibility 0s linear var(--app-sidebar-duration, 0.42s);
+  }
+
+  .app-shell.is-sidebar-open .app-sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+      visibility 0s linear 0s;
   }
 
   .app-sidebar-backdrop[hidden] {
-    display: none;
+    /* Override UA [hidden]{display:none} so opacity can animate out. */
+    display: block !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 }
 
@@ -3540,6 +3634,12 @@ html[data-ui-density='compact'] .issue-saved-views__save {
 /* —— PWA install (Beacon theme; overrides default slate/blue pwa.css) —— */
 .beacon-pwa-install,
 .nowo-pwa-install.beacon-pwa-install {
+  --nowo-pwa-primary: var(--beacon-moss, #1f6f54);
+  --nowo-pwa-surface: var(--beacon-surface, #ffffff);
+  --nowo-pwa-text: var(--beacon-ink, #0f1c18);
+  --nowo-pwa-muted: color-mix(in srgb, var(--beacon-ink, #0f1c18) 65%, transparent);
+  --nowo-pwa-border: var(--beacon-sand, #d8e2dc);
+  --nowo-pwa-radius: 0.75rem;
   z-index: 1050;
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-surface) 94%, transparent);

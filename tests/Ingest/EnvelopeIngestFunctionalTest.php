@@ -234,4 +234,86 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertSame('true', $client->getResponse()->headers->get('Deprecation'));
         self::assertStringContainsString('deprecated', (string) $client->getResponse()->headers->get('Warning'));
     }
+
+    public function testDailyQuotaReturnsHttp429(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject('http-quota-daily@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $project->setEventQuotaDaily(1);
+        $em->flush();
+
+        $headers = $this->beaconAuthHeaders($apiKey);
+        $headers['CONTENT_TYPE'] = 'application/x-beacon-envelope';
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/',
+            [],
+            [],
+            $headers,
+            $this->minimalEventEnvelope('http-quota-d1', 'Under daily quota'),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/',
+            [],
+            [],
+            $headers,
+            $this->minimalEventEnvelope('http-quota-d2', 'Over daily quota'),
+        );
+        self::assertResponseStatusCodeSame(429);
+        self::assertSame('daily event quota exceeded', $client->getResponse()->getContent());
+        self::assertSame('60', $client->getResponse()->headers->get('Retry-After'));
+    }
+
+    public function testMonthlyQuotaReturnsHttp429(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject('http-quota-monthly@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $project->setEventQuotaMonthly(1);
+        $em->flush();
+
+        $headers = $this->beaconAuthHeaders($apiKey);
+        $headers['CONTENT_TYPE'] = 'application/x-beacon-envelope';
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/',
+            [],
+            [],
+            $headers,
+            $this->minimalEventEnvelope('http-quota-m1', 'Under monthly quota'),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getId().'/envelope/',
+            [],
+            [],
+            $headers,
+            $this->minimalEventEnvelope('http-quota-m2', 'Over monthly quota'),
+        );
+        self::assertResponseStatusCodeSame(429);
+        self::assertSame('monthly event quota exceeded', $client->getResponse()->getContent());
+        self::assertSame('3600', $client->getResponse()->headers->get('Retry-After'));
+    }
+
+    private function minimalEventEnvelope(string $eventIdSeed, string $message): string
+    {
+        $eventId = hash('md5', $eventIdSeed);
+
+        return implode("\n", [
+            json_encode(['event_id' => $eventId], \JSON_THROW_ON_ERROR),
+            json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR),
+            json_encode([
+                'event_id' => $eventId,
+                'message' => $message,
+                'level' => 'error',
+                'platform' => 'php',
+            ], \JSON_THROW_ON_ERROR),
+        ]);
+    }
 }

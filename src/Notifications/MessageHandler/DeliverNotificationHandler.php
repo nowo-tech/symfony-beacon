@@ -67,11 +67,7 @@ final readonly class DeliverNotificationHandler
                     $message->payload,
                 );
 
-                if (NotificationDestinationType::Telegram !== $destination->getType()) {
-                    $this->outboundUrlGuard->assertSafeHttpUrl($request['url']);
-                }
-
-                $response = $this->httpClient->request('POST', $request['url'], [
+                $httpOptions = [
                     'json' => $request['json'],
                     'timeout' => 10,
                     // Prevent SSRF via 30x to private/metadata hosts after the initial URL guard.
@@ -80,7 +76,14 @@ final readonly class DeliverNotificationHandler
                         'User-Agent' => 'symfony-beacon-notifications/1.0',
                         'Content-Type' => 'application/json',
                     ],
-                ]);
+                ];
+
+                if (NotificationDestinationType::Telegram !== $destination->getType()) {
+                    // Validate + pin resolved public A record (anti DNS rebinding / TOCTOU).
+                    $httpOptions = array_merge($httpOptions, $this->outboundUrlGuard->httpClientOptionsForUrl($request['url']));
+                }
+
+                $response = $this->httpClient->request('POST', $request['url'], $httpOptions);
 
                 $status = $response->getStatusCode();
                 if ($status < 200 || $status >= 300) {

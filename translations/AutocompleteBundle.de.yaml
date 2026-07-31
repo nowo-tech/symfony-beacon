@@ -1,3 +1,5 @@
+# Project overrides only — keys that differ from the vendor catalogue.
+# Do not duplicate unchanged bundle strings; missing keys fall back to the package translations.
+
 No results found: Keine Treffer.
 Loading more results...: Weitere Ergebnisse werden geladen…
-No more results: Keine weiteren Ergebnisse

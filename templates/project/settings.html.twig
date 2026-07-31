@@ -18,8 +18,14 @@
     <h2 class="mb-2 text-lg font-semibold">{{ 'project.governance.title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'project.governance.help'|trans }}</p>
     {% if effectiveQuota > 0 %}
-        <p class="mb-4 text-xs text-[var(--color-ink)]/55">
+        <p class="mb-2 text-xs text-[var(--color-ink)]/55">
             {{ 'project.governance.quota_usage'|trans({'%count%': eventsToday, '%quota%': effectiveQuota}) }}
+        </p>
+    {% endif %}
+    {% if effectiveMonthlyQuota > 0 %}
+        <p class="mb-4 text-xs text-[var(--color-ink)]/55">
+            {{ 'project.governance.quota_usage_monthly'|trans({'%count%': eventsThisMonth, '%quota%': effectiveMonthlyQuota}) }}
+            <span class="text-[var(--color-ink)]/40">({{ 'project.governance.month_utc_hint'|trans }})</span>
         </p>
     {% endif %}
     <form method="post" action="{{ path('project_governance_save', {id: project.uuid}) }}" class="grid gap-4 sm:grid-cols-2">
@@ -43,6 +49,11 @@
             <label class="mb-1 block text-sm font-medium" for="event_quota_daily">{{ 'project.governance.event_quota_daily'|trans }}</label>
             <input class="input w-full" type="number" min="0" name="event_quota_daily" id="event_quota_daily" value="{{ project.eventQuotaDaily ?? '' }}" placeholder="{{ governanceDefaults.event_quota_daily }}">
             <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.event_quota_daily}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="event_quota_monthly">{{ 'project.governance.event_quota_monthly'|trans }}</label>
+            <input class="input w-full" type="number" min="0" name="event_quota_monthly" id="event_quota_monthly" value="{{ project.eventQuotaMonthly ?? '' }}" placeholder="{{ governanceDefaults.event_quota_monthly }}">
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.event_quota_monthly}) }}</p>
         </div>
         <div class="sm:col-span-2">
             <button class="btn-primary" type="submit">{{ 'project.governance.save'|trans }}</button>

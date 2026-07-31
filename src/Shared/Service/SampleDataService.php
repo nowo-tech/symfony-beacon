@@ -6,6 +6,7 @@ namespace App\Shared\Service;
 
 use App\Analytics\Entity\DailyProjectStat;
 use App\Analytics\Service\AnalyticsDemoSeeder;
+use App\Identity\Command\SeedDemoCommand;
 use App\Issues\Entity\Issue;
 use App\Issues\Service\IssueSampleSeeder;
 use App\Performance\Entity\PerfTransaction;
@@ -17,7 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
 /**
- * Sample telemetry profiles + purge for a target project (default slug=demo).
+ * Sample telemetry profiles + purge for a target project (default slug=symfony-beacon).
  *
  * Also applies default Mercure instance settings so live toasts work locally.
  */
@@ -43,6 +44,15 @@ final readonly class SampleDataService
     public function resolveProject(string $slug): Project
     {
         $project = $this->projectRepository->findOneBy(['slug' => $slug]);
+        if (!$project instanceof Project && \in_array($slug, [
+            SeedDemoCommand::DEMO_PROJECT_SLUG,
+            SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG,
+        ], true)) {
+            $fallbackSlug = SeedDemoCommand::DEMO_PROJECT_SLUG === $slug
+                ? SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG
+                : SeedDemoCommand::DEMO_PROJECT_SLUG;
+            $project = $this->projectRepository->findOneBy(['slug' => $fallbackSlug]);
+        }
         if (!$project instanceof Project) {
             throw new InvalidArgumentException(\sprintf('Project slug "%s" not found. Run app:seed-demo first or pass --project=.', $slug));
         }

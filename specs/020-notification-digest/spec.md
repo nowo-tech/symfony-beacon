@@ -2,7 +2,7 @@
 
 **Feature Branch**: `020-notification-digest`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Quiet hours and digest delivery for project notifications; explicitly no native PagerDuty integration.
 

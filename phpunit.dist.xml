@@ -23,6 +23,11 @@
         <env name="MAILER_DSN" value="null://null"/>
         <!-- ###- symfony/mailer ### -->
 
+        <!-- ###+ nowo-tech/site-backup-bundle ### -->
+        <env name="SITE_SETUP_TOKEN" value="test-setup-token"/>
+        <env name="SITE_BACKUP_PASSWORD_HASH" value="$2y$13$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi"/>
+        <!-- ###- nowo-tech/site-backup-bundle ### -->
+
         <!-- ###+ symfony/mercure-bundle ### -->
         <!-- See https://symfony.com/doc/current/mercure.html#configuration -->
         <!-- The URL of the Mercure hub, used by the app to publish updates (can be a local URL) -->

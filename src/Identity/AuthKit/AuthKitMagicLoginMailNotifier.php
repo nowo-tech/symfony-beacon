@@ -11,11 +11,11 @@ use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** Delivers AuthKit magic-login links via encrypted instance Mailer. */
-final class AuthKitMagicLoginMailNotifier implements MagicLoginNotifierInterface
+final readonly class AuthKitMagicLoginMailNotifier implements MagicLoginNotifierInterface
 {
     public function __construct(
-        private readonly ConfiguredMailer $mailer,
-        private readonly TranslatorInterface $translator,
+        private ConfiguredMailer $mailer,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -30,7 +30,7 @@ final class AuthKitMagicLoginMailNotifier implements MagicLoginNotifierInterface
             return;
         }
 
-        $message = (new Email())
+        $message = new Email()
             ->from($this->mailer->getFromAddress())
             ->to($to)
             ->subject($this->translator->trans('auth.magic.email_subject'))

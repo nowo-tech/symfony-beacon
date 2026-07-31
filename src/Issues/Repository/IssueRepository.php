@@ -255,7 +255,7 @@ class IssueRepository extends ServiceEntityRepository
      *
      * @return list<Issue>
      */
-    public function findByRelease(Project $project, string $release): array
+    public function findByRelease(Project $project, string $release, int $limit = 500): array
     {
         $normalized = Issue::normalizeRelease($release);
         if (null === $normalized) {
@@ -270,6 +270,7 @@ class IssueRepository extends ServiceEntityRepository
             ->setParameter('release', $normalized)
             ->orderBy('i.lastSeen', 'DESC')
             ->addOrderBy('i.id', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
 

@@ -210,6 +210,8 @@ final class ProjectController extends AbstractController
             'governanceDefaults' => $this->governanceResolver->envDefaults(),
             'eventsToday' => $this->governanceResolver->eventsReceivedToday($project),
             'effectiveQuota' => $this->governanceResolver->effectiveEventQuotaDaily($project),
+            'eventsThisMonth' => $this->governanceResolver->eventsReceivedThisMonth($project),
+            'effectiveMonthlyQuota' => $this->governanceResolver->effectiveEventQuotaMonthly($project),
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
             'shareLinks' => $this->shareLinkRepository->findActiveByProject($project),
             'lastShareUrl' => $request->getSession()->remove('_beacon_last_share_url'),
@@ -234,9 +236,10 @@ final class ProjectController extends AbstractController
         $retentionMaxEvents = $this->parseOptionalNonNegativeInt($request->request->getString('retention_max_events'));
         $ingestRateLimit = $this->parseOptionalNonNegativeInt($request->request->getString('ingest_rate_limit_per_minute'));
         $eventQuotaDaily = $this->parseOptionalNonNegativeInt($request->request->getString('event_quota_daily'));
+        $eventQuotaMonthly = $this->parseOptionalNonNegativeInt($request->request->getString('event_quota_monthly'));
 
         if (
-            \in_array(false, [$retentionDays, $retentionMaxEvents, $ingestRateLimit, $eventQuotaDaily], true)
+            \in_array(false, [$retentionDays, $retentionMaxEvents, $ingestRateLimit, $eventQuotaDaily, $eventQuotaMonthly], true)
         ) {
             $this->addFlash('error', 'flash.project.governance_invalid');
 
@@ -247,6 +250,7 @@ final class ProjectController extends AbstractController
         $project->setRetentionMaxEvents($retentionMaxEvents);
         $project->setIngestRateLimitPerMinute($ingestRateLimit);
         $project->setEventQuotaDaily($eventQuotaDaily);
+        $project->setEventQuotaMonthly($eventQuotaMonthly);
         // ingestEnabled is toggled by platform admins (019); owners keep current value here.
         $this->entityManager->flush();
 
@@ -451,17 +455,23 @@ final class ProjectController extends AbstractController
         if (!\in_array($access->role, [ProjectRole::Owner, ProjectRole::Admin], true)) {
             return;
         }
-        if (!$this->governanceResolver->isApproachingDailyQuota($project)) {
-            return;
-        }
 
         $session = $request->getSession();
-        $flagKey = '_beacon_quota_warn_'.$project->getUuid();
-        if ($session->get($flagKey)) {
-            return;
+        if ($this->governanceResolver->isApproachingDailyQuota($project)) {
+            $flagKey = '_beacon_quota_warn_'.$project->getUuid();
+            if (!$session->get($flagKey)) {
+                $session->set($flagKey, true);
+                $this->addFlash('warning', 'flash.project.quota_approaching');
+            }
         }
-        $session->set($flagKey, true);
-        $this->addFlash('warning', 'flash.project.quota_approaching');
+
+        if ($this->governanceResolver->isApproachingMonthlyQuota($project)) {
+            $flagKey = '_beacon_quota_monthly_warn_'.$project->getUuid();
+            if (!$session->get($flagKey)) {
+                $session->set($flagKey, true);
+                $this->addFlash('warning', 'flash.project.quota_monthly_approaching');
+            }
+        }
     }
 
     #[Route('/projects/{id}/clear-history', name: 'project_clear_history', requirements: ['id' => Requirement::UUID], methods: ['POST'])]

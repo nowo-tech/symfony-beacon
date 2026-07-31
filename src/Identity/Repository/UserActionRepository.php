@@ -6,6 +6,7 @@ namespace App\Identity\Repository;
 
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
+use App\Identity\Entity\UserGroup;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
@@ -32,21 +33,50 @@ class UserActionRepository extends ServiceEntityRepository
     /**
      * Actions where the user is subject or actor, newest first.
      *
+     * @param list<UserActionType> $allowedActions empty = no action-type restriction (legacy callers)
+     *
      * @return list<UserAction>
      */
-    public function findForUser(User $user, int $limit = 100): array
-    {
-        /** @var list<UserAction> $rows */
-        $rows = $this->createQueryBuilder('a')
+    public function findForUser(
+        User $user,
+        array $allowedActions = [],
+        ?UserActionType $action = null,
+        ?DateTimeImmutable $from = null,
+        ?DateTimeImmutable $to = null,
+        int $limit = 100,
+    ): array {
+        if ($action instanceof UserActionType && [] !== $allowedActions && !\in_array($action, $allowedActions, true)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('a')
             ->leftJoin('a.actor', 'actor')->addSelect('actor')
             ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
             ->andWhere('a.subjectUser = :user OR a.actor = :user')
             ->setParameter('user', $user)
             ->orderBy('a.createdAt', 'DESC')
             ->addOrderBy('a.id', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ([] !== $allowedActions) {
+            $qb->andWhere('a.action IN (:allowed)')
+                ->setParameter('allowed', $allowedActions);
+        }
+
+        if ($action instanceof UserActionType) {
+            $qb->andWhere('a.action = :action')->setParameter('action', $action);
+        }
+
+        if ($from instanceof DateTimeImmutable) {
+            $qb->andWhere('a.createdAt >= :from')->setParameter('from', $from);
+        }
+
+        if ($to instanceof DateTimeImmutable) {
+            $qb->andWhere('a.createdAt <= :to')->setParameter('to', $to);
+        }
+
+        /** @var list<UserAction> $rows */
+        $rows = $qb->getQuery()->getResult();
 
         return $rows;
     }
@@ -86,15 +116,66 @@ class UserActionRepository extends ServiceEntityRepository
         ?DateTimeImmutable $to = null,
         int $limit = 100,
     ): array {
+        return $this->findForContextUuid(
+            'project_uuid',
+            $project->getUuid(),
+            $allowedActions,
+            $action,
+            $from,
+            $to,
+            $limit,
+        );
+    }
+
+    /**
+     * Newest group-scoped audit entries using `context.group_uuid`.
+     *
+     * @param list<UserActionType> $allowedActions
+     *
+     * @return list<UserAction>
+     */
+    public function findForGroup(
+        UserGroup $group,
+        array $allowedActions,
+        ?UserActionType $action = null,
+        ?DateTimeImmutable $from = null,
+        ?DateTimeImmutable $to = null,
+        int $limit = 100,
+    ): array {
+        return $this->findForContextUuid(
+            'group_uuid',
+            $group->getUuid(),
+            $allowedActions,
+            $action,
+            $from,
+            $to,
+            $limit,
+        );
+    }
+
+    /**
+     * @param list<UserActionType> $allowedActions
+     *
+     * @return list<UserAction>
+     */
+    private function findForContextUuid(
+        string $contextKey,
+        string $uuid,
+        array $allowedActions,
+        ?UserActionType $action,
+        ?DateTimeImmutable $from,
+        ?DateTimeImmutable $to,
+        int $limit,
+    ): array {
         if ([] === $allowedActions) {
             return [];
         }
 
         $connection = $this->getEntityManager()->getConnection();
         $platform = $connection->getDatabasePlatform();
-        $where = [$this->projectUuidPredicate($platform), 'action IN (:actions)'];
+        $where = [$this->contextUuidPredicate($platform, $contextKey), 'action IN (:actions)'];
         $params = [
-            'projectUuid' => $project->getUuid(),
+            'contextUuid' => $uuid,
             'actions' => array_map(
                 static fn (UserActionType $allowed): string => $allowed->value,
                 $allowedActions,
@@ -102,7 +183,7 @@ class UserActionRepository extends ServiceEntityRepository
             'limit' => $limit,
         ];
         $types = [
-            'projectUuid' => ParameterType::STRING,
+            'contextUuid' => ParameterType::STRING,
             'actions' => ArrayParameterType::STRING,
             'limit' => ParameterType::INTEGER,
         ];
@@ -160,16 +241,17 @@ class UserActionRepository extends ServiceEntityRepository
         return $rows;
     }
 
-    private function projectUuidPredicate(object $platform): string
+    private function contextUuidPredicate(object $platform, string $contextKey): string
     {
+        $path = '$.'.$contextKey;
         if ($platform instanceof MySQLPlatform) {
-            return "JSON_UNQUOTE(JSON_EXTRACT(context, '$.project_uuid')) = :projectUuid";
+            return "JSON_UNQUOTE(JSON_EXTRACT(context, '".$path."')) = :contextUuid";
         }
 
         if ($platform instanceof SQLitePlatform) {
-            return "json_extract(context, '$.project_uuid') = :projectUuid";
+            return "json_extract(context, '".$path."') = :contextUuid";
         }
 
-        throw new RuntimeException(\sprintf('Project audit query is unsupported on %s.', $platform::class));
+        throw new RuntimeException(\sprintf('Identity audit query is unsupported on %s.', $platform::class));
     }
 }

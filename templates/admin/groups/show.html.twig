@@ -26,6 +26,21 @@
 </section>
 
 <section class="panel mb-6">
+    {% include 'admin/_audit_timeline.html.twig' with {
+        form_action: path('admin_groups_show', {id: group.uuid}),
+        reset_path: path('admin_groups_show', {id: group.uuid}),
+        title_key: 'groups.audit_title',
+        intro_key: 'groups.audit_intro',
+        empty_key: 'groups.audit_empty',
+        audit_actions: groupAuditActions,
+        audit_filter: groupAuditFilter,
+        audit_entries: groupAuditEntries,
+        timeline_id: 'group-audit-timeline',
+        entry_testid: 'group-audit-entry'
+    } only %}
+</section>
+
+<section class="panel mb-6">
     <h2 class="mb-3 text-lg font-semibold">{{ 'groups.members_title'|trans }}</h2>
     <ul class="space-y-2 text-sm">
         {% for membership in group.memberships %}

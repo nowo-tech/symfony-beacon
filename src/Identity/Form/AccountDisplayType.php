@@ -7,6 +7,7 @@ namespace App\Identity\Form;
 use App\Identity\Entity\User;
 use App\Identity\Tour\ProductTourPage;
 use App\Issues\IssuePanelIds;
+use InvalidArgumentException;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\TagInputBundle\Form\TagType;
 use Nowo\TagInputBundle\Form\ValueFormat;
@@ -16,26 +17,44 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Account display preferences: locale, theme, layout, a11y, issue panels, tours, push.
+ * Account display preferences by section: appearance, panels, tours, or notifications.
  */
 final class AccountDisplayType extends FormKitAbstractType
 {
+    public const string SECTION_APPEARANCE = 'appearance';
+
+    public const string SECTION_PANELS = 'panels';
+
+    public const string SECTION_TOURS = 'tours';
+
+    public const string SECTION_NOTIFICATIONS = 'notifications';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var list<string> $enabledLocales */
         $enabledLocales = $options['enabled_locales'];
+        $section = (string) $options['section'];
+
+        match ($section) {
+            self::SECTION_APPEARANCE => $this->buildAppearanceFields($builder, $enabledLocales),
+            self::SECTION_PANELS => $this->buildPanelFields($builder),
+            self::SECTION_TOURS => $this->buildTourFields($builder),
+            self::SECTION_NOTIFICATIONS => $this->buildNotificationFields($builder, (bool) $options['push_available']),
+            default => throw new InvalidArgumentException(\sprintf('Unknown display section "%s".', $section)),
+        };
+    }
+
+    /**
+     * @param list<string> $enabledLocales
+     */
+    private function buildAppearanceFields(FormBuilderInterface $builder, array $enabledLocales): void
+    {
         $localeChoices = [];
         foreach ($enabledLocales as $locale) {
             $localeChoices[strtoupper($locale)] = $locale;
         }
 
-        $panelIds = IssuePanelIds::all();
-        $tourChoices = [];
-        foreach (ProductTourPage::all() as $page) {
-            $tourChoices['preferences.product_tour_page.'.$page->value] = $page->value;
-        }
-
-        $this->withBuilder($builder, function () use ($localeChoices, $tourChoices): void {
+        $this->withBuilder($builder, function () use ($localeChoices): void {
             $this->addChoiceField('preferredLocale', [
                 'choices' => $localeChoices,
                 'placeholder' => 'preferences.locale_auto',
@@ -100,7 +119,37 @@ final class AccountDisplayType extends FormKitAbstractType
                 'placeholder' => 'preferences.motion_system',
                 'required' => false,
             ]);
+        });
+    }
 
+    private function buildPanelFields(FormBuilderInterface $builder): void
+    {
+        $panelIds = IssuePanelIds::all();
+
+        $builder->add('preferredCollapsedIssuePanels', TagType::class, [
+            'value_format' => ValueFormat::ARRAY,
+            'whitelist' => $panelIds,
+            'max_tags' => \count($panelIds),
+            'duplicates' => false,
+            'dropdown_enabled' => true,
+            'required' => false,
+            'label' => 'preferences.issue_panels_collapsed',
+            'help' => 'preferences.issue_panels_help',
+            'placeholder' => 'preferences.issue_panels_placeholder',
+            'translation_domain' => 'messages',
+            'container_class' => 'nowo-tag-input issue-panel-prefs',
+            'input_class' => 'input nowo-tag-input__field',
+        ]);
+    }
+
+    private function buildTourFields(FormBuilderInterface $builder): void
+    {
+        $tourChoices = [];
+        foreach (ProductTourPage::all() as $page) {
+            $tourChoices['preferences.product_tour_page.'.$page->value] = $page->value;
+        }
+
+        $this->withBuilder($builder, function () use ($tourChoices): void {
             $this->addChoiceField('productTourEnabledPages', [
                 'mapped' => false,
                 'required' => false,
@@ -119,30 +168,20 @@ final class AccountDisplayType extends FormKitAbstractType
                 'select_all_container_css_class' => 'space-y-2',
             ]);
         });
+    }
 
-        $builder->add('preferredCollapsedIssuePanels', TagType::class, [
-            'value_format' => ValueFormat::ARRAY,
-            'whitelist' => $panelIds,
-            'max_tags' => \count($panelIds),
-            'duplicates' => false,
-            'dropdown_enabled' => true,
-            'required' => false,
-            'label' => 'preferences.issue_panels_collapsed',
-            'help' => 'preferences.issue_panels_help',
-            'placeholder' => 'preferences.issue_panels_placeholder',
-            'translation_domain' => 'messages',
-            'container_class' => 'nowo-tag-input issue-panel-prefs',
-            'input_class' => 'input nowo-tag-input__field',
-        ]);
-
-        if ($options['push_available']) {
-            $builder->add('pushNotificationsEnabled', CheckboxType::class, [
-                'required' => false,
-                'label' => 'preferences.push_notifications',
-                'help' => 'preferences.push_notifications_help',
-                'translation_domain' => 'messages',
-            ]);
+    private function buildNotificationFields(FormBuilderInterface $builder, bool $pushAvailable): void
+    {
+        if (!$pushAvailable) {
+            return;
         }
+
+        $builder->add('pushNotificationsEnabled', CheckboxType::class, [
+            'required' => false,
+            'label' => 'preferences.push_notifications',
+            'help' => 'preferences.push_notifications_help',
+            'translation_domain' => 'messages',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -151,9 +190,17 @@ final class AccountDisplayType extends FormKitAbstractType
             'data_class' => User::class,
             'enabled_locales' => ['en', 'es', 'de', 'nl', 'fr', 'it', 'pt'],
             'push_available' => false,
+            'section' => self::SECTION_APPEARANCE,
         ]);
         $resolver->setAllowedTypes('enabled_locales', 'string[]');
         $resolver->setAllowedTypes('push_available', 'bool');
+        $resolver->setAllowedTypes('section', 'string');
+        $resolver->setAllowedValues('section', [
+            self::SECTION_APPEARANCE,
+            self::SECTION_PANELS,
+            self::SECTION_TOURS,
+            self::SECTION_NOTIFICATIONS,
+        ]);
     }
 
     #[Override]

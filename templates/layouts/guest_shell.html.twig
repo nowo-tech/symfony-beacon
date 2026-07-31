@@ -16,6 +16,7 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="page-shell">
+    {% include '_page_loader.html.twig' %}
     {% include '_toasts.html.twig' %}
     <div class="top-controls">
         {% include '_theme_toggle.html.twig' %}
@@ -30,5 +31,6 @@
     {{ nowo_pwa_install_prompt() }}
     {% include '_legal_footer.html.twig' %}
     {{ render(path('nowo_cookie_consent.show')) }}
+    {% block cookie_consent_extras %}{% endblock %}
 </body>
 </html>

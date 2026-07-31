@@ -3,11 +3,14 @@
 {% block title %}{{ 'preferences.profile.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-2xl space-y-6">
+<div class="mx-auto space-y-6">
     <div>
-        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.profile.title'|trans }}</h1>
-        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.intro'|trans }}</p>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.intro'|trans }}</p>
     </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_profile_tabs.html.twig' %}
 
     <section class="panel" data-testid="profile-overview" aria-labelledby="profile-overview-heading">
         <div class="mb-4 flex flex-wrap items-center gap-4">
@@ -100,44 +103,5 @@
             <button class="btn-primary" type="submit">{{ 'preferences.profile.submit'|trans }}</button>
         </div>
     {{ form_end(form) }}
-
-    <section class="panel" data-testid="profile-projects" aria-labelledby="profile-projects-heading">
-        <h2 id="profile-projects-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.profile.projects_title'|trans }}</h2>
-        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.projects_intro'|trans }}</p>
-        {% if project_memberships is empty %}
-            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.profile.projects_empty'|trans }}</p>
-        {% else %}
-            <ul class="space-y-2 text-sm">
-                {% for membership in project_memberships %}
-                    <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
-                        <div class="min-w-0">
-                            <a class="font-medium no-underline" href="{{ path('project_show', {id: membership.project.uuid}) }}">{{ membership.project.name }}</a>
-                            <div class="text-xs text-[var(--color-ink)]/55">{{ membership.project.slug }}</div>
-                        </div>
-                        <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ membership.role.value)|trans }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
-
-    <section class="panel" data-testid="profile-groups" aria-labelledby="profile-groups-heading">
-        <h2 id="profile-groups-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.profile.groups_title'|trans }}</h2>
-        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.profile.groups_intro'|trans }}</p>
-        {% if group_memberships is empty %}
-            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.profile.groups_empty'|trans }}</p>
-        {% else %}
-            <ul class="space-y-2 text-sm">
-                {% for membership in group_memberships %}
-                    <li class="border-b border-[var(--color-sand)] py-2 last:border-0">
-                        <div class="font-medium">{{ membership.userGroup.name }}</div>
-                        {% if membership.userGroup.description %}
-                            <div class="text-xs text-[var(--color-ink)]/55">{{ membership.userGroup.description }}</div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
 </div>
 {% endblock %}

@@ -6,9 +6,14 @@ namespace App\Project\Service;
 
 use App\Issues\Repository\EventRepository;
 use App\Project\Entity\Project;
+use DateTimeImmutable;
+use DateTimeZone;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Resolves effective governance limits (project override → env default) and quota usage.
+ *
+ * Monthly quotas use the UTC calendar month (FR-004).
  */
 final readonly class ProjectGovernanceResolver
 {
@@ -16,10 +21,16 @@ final readonly class ProjectGovernanceResolver
 
     public function __construct(
         private EventRepository $eventRepository,
+        #[Autowire('%beacon.retention_days%')]
         private int $defaultRetentionDays,
+        #[Autowire('%beacon.retention_max_events%')]
         private int $defaultRetentionMaxEvents,
+        #[Autowire('%beacon.ingest_rate_limit%')]
         private int $defaultIngestRateLimit,
+        #[Autowire('%beacon.event_quota_daily%')]
         private int $defaultEventQuotaDaily,
+        #[Autowire('%beacon.event_quota_monthly%')]
+        private int $defaultEventQuotaMonthly,
     ) {
     }
 
@@ -43,9 +54,30 @@ final readonly class ProjectGovernanceResolver
         return $project->getEventQuotaDaily() ?? $this->defaultEventQuotaDaily;
     }
 
+    public function effectiveEventQuotaMonthly(Project $project): int
+    {
+        return $project->getEventQuotaMonthly() ?? $this->defaultEventQuotaMonthly;
+    }
+
     public function eventsReceivedToday(Project $project): int
     {
         return $this->eventRepository->countReceivedTodayForProject($project);
+    }
+
+    public function eventsReceivedThisMonth(Project $project): int
+    {
+        return $this->eventRepository->countReceivedSinceForProject($project, self::utcMonthStart());
+    }
+
+    /**
+     * Start of the current UTC calendar month (inclusive lower bound for monthly quota).
+     */
+    public static function utcMonthStart(?DateTimeImmutable $now = null): DateTimeImmutable
+    {
+        $utc = new DateTimeZone('UTC');
+        $now ??= new DateTimeImmutable('now', $utc);
+
+        return $now->setTimezone($utc)->modify('first day of this month')->setTime(0, 0, 0);
     }
 
     /**
@@ -53,14 +85,21 @@ final readonly class ProjectGovernanceResolver
      */
     public function isApproachingDailyQuota(Project $project): bool
     {
-        $quota = $this->effectiveEventQuotaDaily($project);
-        if ($quota < 1) {
-            return false;
-        }
+        return $this->isApproachingQuota(
+            $this->effectiveEventQuotaDaily($project),
+            $this->eventsReceivedToday($project),
+        );
+    }
 
-        $count = $this->eventsReceivedToday($project);
-
-        return $count >= (int) ceil($quota * self::APPROACHING_QUOTA_RATIO);
+    /**
+     * True when a monthly quota is configured and this UTC month's count is at or above 80%.
+     */
+    public function isApproachingMonthlyQuota(Project $project): bool
+    {
+        return $this->isApproachingQuota(
+            $this->effectiveEventQuotaMonthly($project),
+            $this->eventsReceivedThisMonth($project),
+        );
     }
 
     /**
@@ -68,18 +107,33 @@ final readonly class ProjectGovernanceResolver
      */
     public function isDailyQuotaExceeded(Project $project): bool
     {
-        $quota = $this->effectiveEventQuotaDaily($project);
-        if ($quota < 1) {
-            return false;
-        }
+        return $this->isQuotaExceeded(
+            $this->effectiveEventQuotaDaily($project),
+            $this->eventsReceivedToday($project),
+        );
+    }
 
-        return $this->eventsReceivedToday($project) >= $quota;
+    /**
+     * True when a monthly quota is configured and this UTC month's count has reached it.
+     */
+    public function isMonthlyQuotaExceeded(Project $project): bool
+    {
+        return $this->isQuotaExceeded(
+            $this->effectiveEventQuotaMonthly($project),
+            $this->eventsReceivedThisMonth($project),
+        );
     }
 
     /**
      * Env defaults exposed to Settings UI (empty field = inherit).
      *
-     * @return array{retention_days: int, retention_max_events: int, ingest_rate_limit: int, event_quota_daily: int}
+     * @return array{
+     *     retention_days: int,
+     *     retention_max_events: int,
+     *     ingest_rate_limit: int,
+     *     event_quota_daily: int,
+     *     event_quota_monthly: int
+     * }
      */
     public function envDefaults(): array
     {
@@ -88,6 +142,25 @@ final readonly class ProjectGovernanceResolver
             'retention_max_events' => $this->defaultRetentionMaxEvents,
             'ingest_rate_limit' => $this->defaultIngestRateLimit,
             'event_quota_daily' => $this->defaultEventQuotaDaily,
+            'event_quota_monthly' => $this->defaultEventQuotaMonthly,
         ];
+    }
+
+    private function isApproachingQuota(int $quota, int $count): bool
+    {
+        if ($quota < 1) {
+            return false;
+        }
+
+        return $count >= (int) ceil($quota * self::APPROACHING_QUOTA_RATIO);
+    }
+
+    private function isQuotaExceeded(int $quota, int $count): bool
+    {
+        if ($quota < 1) {
+            return false;
+        }
+
+        return $count >= $quota;
     }
 }

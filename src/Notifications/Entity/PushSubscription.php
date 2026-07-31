@@ -53,8 +53,8 @@ class PushSubscription
     private DateTimeImmutable $updatedAt;
 
     public function __construct(#[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private User $user)
+        #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+        private User $user)
     {
         $now = new DateTimeImmutable();
         $this->createdAt = $now;

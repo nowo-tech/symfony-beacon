@@ -13,13 +13,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 /** IP rate limit for AuthKit magic-login request POSTs (skipped in the test environment). */
-final class MagicLoginRateLimitSubscriber implements EventSubscriberInterface
+final readonly class MagicLoginRateLimitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         #[Autowire(service: 'limiter.magic_login')]
-        private readonly RateLimiterFactory $magicLoginLimiter,
+        private RateLimiterFactory $magicLoginLimiter,
         #[Autowire('%kernel.environment%')]
-        private readonly string $environment = 'prod',
+        private string $environment = 'prod',
     ) {
     }
 
@@ -39,7 +39,11 @@ final class MagicLoginRateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ('nowo_auth_kit_magic_login_request' !== (string) $request->attributes->get('_route')) {
+        $route = (string) $request->attributes->get('_route');
+        $base = str_ends_with($route, '_unlocalized')
+            ? substr($route, 0, -\strlen('_unlocalized'))
+            : $route;
+        if ('nowo_auth_kit_magic_login_request' !== $base) {
             return;
         }
 

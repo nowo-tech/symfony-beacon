@@ -22,7 +22,7 @@ Split the overloaded `app:seed-demo` into three CLI layers: **platform** (idempo
 | **Project Type** | Modular Symfony CLI + docs |
 | **Performance Goals** | Profile `dev` &lt; 5 minutes on a developer machine; `load`/`huge` batch inserts with `EntityManager::clear()` / flush chunks |
 | **Constraints** | Platform seed must never create users/projects/samples; English docs; worker-safe (commands are CLI, not HTTP) |
-| **Scale/Scope** | Three commands + Makefile + docs; wizard UI out of scope |
+| **Scale/Scope** | Three commands + Makefile + docs; cold-start UI in `056` (SiteBackupBundle) |
 
 ## Constitution Check
 

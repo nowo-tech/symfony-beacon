@@ -18,3 +18,11 @@ includes:
     - vendor/phpstan/phpstan-symfony/rules.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon
+    # nowo-tech/phpstan-frankenphp — classic → worker → hardening
+    # https://github.com/nowo-tech/PhpStanFrankenPhp/blob/main/docs/CONFIGURATION.md
+    - vendor/nowo-tech/phpstan-frankenphp/extension.neon
+    - vendor/nowo-tech/phpstan-frankenphp/ruleset-classic.neon
+    - vendor/nowo-tech/phpstan-frankenphp/ruleset-worker.neon
+    - vendor/nowo-tech/phpstan-frankenphp/ruleset-hardening.neon
+    # Optional: also flag $_GET/$_POST/… (framework often touches these legitimately)
+    # - vendor/nowo-tech/phpstan-frankenphp/ruleset-worker-strict.neon

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Shared\Command;
 
+use App\Identity\Command\SeedDemoCommand;
+use App\Identity\Service\DemoIdentitySeeder;
 use App\Shared\Service\SampleDataService;
 use InvalidArgumentException;
+use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Optional QA/load sample telemetry for a project (default slug=demo).
+ * Optional QA/load sample telemetry for a project (default slug=symfony-beacon).
  */
 #[AsCommand(
     name: 'app:seed-sample',
@@ -24,6 +27,7 @@ final class SeedSampleCommand extends Command
 {
     public function __construct(
         private readonly SampleDataService $sampleDataService,
+        private readonly DemoIdentitySeeder $demoIdentitySeeder,
     ) {
         parent::__construct();
     }
@@ -32,9 +36,10 @@ final class SeedSampleCommand extends Command
     {
         $this
             ->addOption('size', null, InputOption::VALUE_REQUIRED, 'dev|load|huge', 'dev')
-            ->addOption('project', null, InputOption::VALUE_REQUIRED, 'Target project slug', 'demo')
+            ->addOption('project', null, InputOption::VALUE_REQUIRED, 'Target project slug', SeedDemoCommand::DEMO_PROJECT_SLUG)
             ->addOption('purge', null, InputOption::VALUE_NONE, 'Delete issues/events/perf/stats for the project (keep project + keys)')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Required for size=huge');
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Required for size=huge')
+            ->addOption('ensure-demo', null, InputOption::VALUE_NONE, 'Create the Symfony Beacon dogfood project for an existing user when missing (setup wizard)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -44,6 +49,22 @@ final class SeedSampleCommand extends Command
         $slug = (string) $input->getOption('project');
         $purge = (bool) $input->getOption('purge');
         $force = (bool) $input->getOption('force');
+        $ensureDemo = (bool) $input->getOption('ensure-demo');
+
+        $isDogfoodSlug = \in_array($slug, [
+            SeedDemoCommand::DEMO_PROJECT_SLUG,
+            SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG,
+        ], true);
+
+        if ($ensureDemo && $isDogfoodSlug && !$purge) {
+            try {
+                $this->demoIdentitySeeder->ensureDemoProject();
+            } catch (LogicException $e) {
+                $io->error($e->getMessage());
+
+                return Command::FAILURE;
+            }
+        }
 
         try {
             $project = $this->sampleDataService->resolveProject($slug);

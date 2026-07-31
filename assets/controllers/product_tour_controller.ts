@@ -1,3 +1,5 @@
+import.meta.stimulusFetch = "lazy";
+
 import { Controller } from "@hotwired/stimulus";
 import { driver, type Config, type DriveStep, type Driver } from "driver.js";
 import "driver.js/dist/driver.css";

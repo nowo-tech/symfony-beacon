@@ -8,7 +8,7 @@ use App\Shared\Menu\DashboardMenuDemoSeeder;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * NelmioApiDocBundle Swagger UI is linked from the Dashboard (Panel) sidebar.
+ * NelmioApiDocBundle Swagger UI is linked from Administration (ROLE_ADMIN).
  */
 final class ApiDocAccessTest extends DatabaseWebTestCase
 {
@@ -22,13 +22,27 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/en/login');
     }
 
-    public function testAuthenticatedUserCanOpenSwaggerUiAndJson(): void
+    public function testMemberUserCannotOpenApiDoc(): void
     {
-        [$client, $user] = $this->bootWithDemoProject('apidoc@example.com');
+        [$client, $user] = $this->bootWithDemoProject('apidoc-member@example.com');
+        $this->login($client, $user);
+
+        $client->request(Request::METHOD_GET, '/api/doc');
+        self::assertResponseStatusCodeSame(403);
+
+        $client->request(Request::METHOD_GET, '/api/doc.json');
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testAdminCanOpenSwaggerUiAndJson(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('apidoc-admin@example.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        self::getContainer()->get('doctrine')->getManager()->flush();
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/dashboard');
+        $client->request(Request::METHOD_GET, '/admin');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('a[href="/api/doc"]');
 
@@ -59,6 +73,7 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         self::assertArrayHasKey('403', $ingest['responses'] ?? []);
         self::assertArrayHasKey('429', $ingest['responses'] ?? []);
         self::assertArrayHasKey('Retry-After', $ingest['responses']['429']['headers'] ?? []);
+        self::assertStringContainsString('quota', strtolower((string) ($ingest['responses']['429']['description'] ?? '')));
 
         $schemes = $json['components']['securitySchemes'] ?? [];
         self::assertArrayHasKey('BeaconAuth', $schemes);

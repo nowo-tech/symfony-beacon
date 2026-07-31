@@ -18,3 +18,4 @@
 ## Requirements
 
 - Document preferred auth in DSN.md / API.md; keep query acceptance until a future removal spec.
+- Preferred auth remains `X-Beacon-Auth` or envelope-header `dsn` for the HTTP auth step only; after ACK the queued Messenger payload MUST NOT retain `dsn` (`003-ingest` FR-005 / FR-010).

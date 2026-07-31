@@ -129,7 +129,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject('tour-prefs@example.com');
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/account/display');
+        $crawler = $client->request(Request::METHOD_GET, '/account/display/tours');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save display settings')->form();
@@ -137,7 +137,7 @@ final class ProductTourTest extends DatabaseWebTestCase
             $checkbox->untick();
         }
         $client->submit($form);
-        self::assertResponseRedirects('/account/display');
+        self::assertResponseRedirects('/account/display/tours');
 
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
@@ -157,7 +157,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         self::getContainer()->get(EntityManagerInterface::class)->flush();
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/account/display');
+        $crawler = $client->request(Request::METHOD_GET, '/account/display/tours');
         $form = $crawler->selectButton('Save display settings')->form();
         foreach ($form['user_preferences']['productTourEnabledPages'] as $checkbox) {
             $checkbox->untick();
@@ -165,7 +165,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         $form['user_preferences']['productTourEnabledPages'][0]->tick(); // dashboard
         $form['user_preferences']['productTourEnabledPages'][1]->tick(); // project_issues
         $client->submit($form);
-        self::assertResponseRedirects('/account/display');
+        self::assertResponseRedirects('/account/display/tours');
 
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
@@ -185,7 +185,7 @@ final class ProductTourTest extends DatabaseWebTestCase
         self::getContainer()->get(EntityManagerInterface::class)->flush();
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/account/display');
+        $crawler = $client->request(Request::METHOD_GET, '/account/display/tours');
         self::assertResponseIsSuccessful();
         $form = $crawler->filter('form[action$="/account/product-tour/replay"]')->form();
         $client->submit($form);

@@ -179,7 +179,7 @@ services:
         "async",
         "-vv",
         "--time-limit=3600",
-        "--memory-limit=128M",
+        "--memory-limit=256M",
       ]
     # Image HEALTHCHECK expects FrankenPHP :2019; this process only runs Messenger.
     healthcheck:

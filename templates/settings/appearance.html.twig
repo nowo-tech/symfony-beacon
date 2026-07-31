@@ -3,7 +3,7 @@
 {% block title %}{{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-xl">
+<div class="mx-auto">
     <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
     <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
 
@@ -14,7 +14,7 @@
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.light'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.accentColor) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.accentColor) }}
@@ -23,7 +23,7 @@
                     {{ form_errors(form.accentColor) }}
                     {{ form_help(form.accentColor) }}
                 </div>
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.accentDeepColor) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.accentDeepColor) }}
@@ -38,7 +38,7 @@
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.dark'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.accentColorDark) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.accentColorDark) }}
@@ -47,7 +47,7 @@
                     {{ form_errors(form.accentColorDark) }}
                     {{ form_help(form.accentColorDark) }}
                 </div>
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.accentDeepColorDark) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.accentDeepColorDark) }}
@@ -62,7 +62,7 @@
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.danger'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.dangerColor) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.dangerColor) }}
@@ -71,7 +71,7 @@
                     {{ form_errors(form.dangerColor) }}
                     {{ form_help(form.dangerColor) }}
                 </div>
-                <div class="space-y-1.5">
+                <div class="flex flex-col gap-2">
                     {{ form_label(form.dangerColorDark) }}
                     <div class="flex items-center gap-3">
                         {{ form_widget(form.dangerColorDark) }}

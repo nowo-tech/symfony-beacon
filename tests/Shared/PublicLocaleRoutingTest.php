@@ -10,7 +10,7 @@ final class PublicLocaleRoutingTest extends DatabaseWebTestCase
 {
     public function testBareLoginRedirectsToDefaultLocale(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/login');
         if ($client->getResponse()->isRedirection()) {
             self::assertResponseRedirects('/en/login');
@@ -21,7 +21,7 @@ final class PublicLocaleRoutingTest extends DatabaseWebTestCase
 
     public function testLocalizedLoginRenders(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/es/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('html[lang="es"]', '');
@@ -30,38 +30,30 @@ final class PublicLocaleRoutingTest extends DatabaseWebTestCase
 
     public function testBareLegalRedirectsToDefaultLocale(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/legal/privacy');
         self::assertResponseRedirects('/en/legal/privacy');
     }
 
     public function testLocalizedLegalRendersSpanish(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/es/legal/privacy');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Política de privacidad');
         self::assertSelectorExists('a[href="/en/legal/privacy"]');
     }
 
-    public function testBareSetupServesDefaultLocale(): void
+    public function testSiteBackupSetupRouteIsRegistered(): void
     {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/setup');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Instance setup');
-    }
-
-    public function testDefaultLocalePrefixedSetupRedirectsToBare(): void
-    {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/en/setup');
-        self::assertResponseRedirects('/setup');
+        self::createClient();
+        $router = self::getContainer()->get('router');
+        self::assertMatchesRegularExpression('#^/setup/?$#', $router->generate('nowo_site_backup_setup'));
     }
 
     public function testBareResetPasswordRedirectsToDefaultLocale(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/reset-password');
         if ($client->getResponse()->isRedirection()) {
             $location = (string) $client->getResponse()->headers->get('Location');
@@ -77,7 +69,7 @@ final class PublicLocaleRoutingTest extends DatabaseWebTestCase
 
     public function testLocalizedRegisterRenders(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/en/register');
         self::assertResponseIsSuccessful();
     }

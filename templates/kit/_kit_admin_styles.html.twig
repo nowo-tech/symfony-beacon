@@ -1,5 +1,27 @@
 {# Loaded after Bootstrap CDN so Beacon tokens win over default btn colors / sizes. #}
 <style>
+/*
+ * Page chrome (outside .kit-admin): beat Bootstrap reboot so title/intro match
+ * admin users/groups (text-3xl + muted intro). Element+class > bare h1/p.
+ */
+h1.kit-admin-page-header__title {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 2.25rem;
+  letter-spacing: normal;
+  color: var(--color-ink, var(--beacon-ink));
+  margin: 0;
+}
+
+p.kit-admin-page-header__intro {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 65%, transparent);
+}
+
 /* —— Kit admin (Menus / Breadcrumbs) — type + control scale —— */
 .kit-admin {
   --kit-font-body: 0.875rem;
@@ -12,6 +34,25 @@
   --kit-btn-sm: 2rem;
   --kit-btn-sm-font: 0.8125rem;
   --kit-btn-radius: 0.375rem;
+
+  /* Menu/Breadcrumb nowo-ui.css tokens (1.0.4 / 2.0.11+) */
+  --nowo-ui-primary: var(--beacon-moss);
+  --nowo-ui-primary-contrast: #ffffff;
+  --nowo-ui-danger: var(--beacon-alert);
+  --nowo-ui-danger-text: var(--beacon-alert);
+  --nowo-ui-danger-bg: var(--beacon-flash-error-bg);
+  --nowo-ui-danger-border: var(--beacon-flash-error-border);
+  --nowo-ui-danger-text-strong: var(--beacon-alert);
+  --nowo-ui-success-bg: var(--beacon-flash-ok-bg);
+  --nowo-ui-success-border: var(--beacon-flash-ok-border);
+  --nowo-ui-success-text: var(--beacon-flash-ok-text);
+  --nowo-ui-surface: var(--beacon-surface);
+  --nowo-ui-surface-muted: var(--beacon-mist);
+  --nowo-ui-border: var(--beacon-sand);
+  --nowo-ui-border-strong: var(--beacon-sand);
+  --nowo-ui-text: var(--beacon-ink);
+  --nowo-ui-muted: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  --nowo-ui-radius: var(--kit-btn-radius);
 
   --bs-body-color: var(--beacon-ink);
   --bs-body-bg: var(--beacon-surface);
@@ -29,6 +70,7 @@
 
 [data-theme="dark"] .kit-admin {
   --bs-primary-rgb: 74, 173, 127;
+  --nowo-ui-primary-contrast: #0c1210;
 }
 
 .kit-admin .h1,
@@ -606,5 +648,212 @@
 .modal-backdrop.show {
   opacity: 0.55;
   background-color: #0c1210;
+}
+
+/*
+ * Semantic nowo-ui-* hooks (REQ-UI-001) — map vendor dual-classes to Beacon admin lists.
+ * Loaded after public/bundles/*/css/nowo-ui.css so slate/blue defaults lose to tokens.
+ */
+.kit-admin .nowo-ui-page-header,
+.kit-admin .nowo-ui-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--beacon-sand);
+}
+
+/* Same layout as admin users/groups filter row (outside .panel). */
+.kit-admin > .nowo-ui-search,
+.kit-admin .nowo-ui-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.kit-admin > .nowo-ui-search {
+  margin-bottom: 1rem;
+}
+
+.kit-admin > .panel {
+  margin-top: 0;
+}
+
+.kit-admin > .panel > .nowo-ui-toolbar.nowo-ui-page-header,
+.kit-admin > .panel > .nowo-ui-toolbar {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.kit-admin .nowo-ui-search .nowo-ui-input,
+.kit-admin .nowo-ui-search .form-control,
+.kit-admin .nowo-ui-search input[type="search"],
+.kit-admin .nowo-ui-search__input {
+  flex: 1 1 14rem;
+  min-width: 14rem;
+  max-width: none;
+  min-height: 2.25rem;
+}
+
+.kit-admin .nowo-ui-toolbar .nowo-ui-input,
+.kit-admin .nowo-ui-toolbar .form-control,
+.kit-admin .nowo-ui-toolbar input[type="search"] {
+  flex: 1 1 14rem;
+  max-width: 22rem;
+  min-height: 2.25rem;
+}
+
+.kit-admin .nowo-ui-list,
+.kit-admin .list-group {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.kit-admin .nowo-ui-list-item,
+.kit-admin .list-group-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin: 0;
+  padding: 0.85rem 0.15rem;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--beacon-sand) 85%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: var(--beacon-ink);
+  transition: background-color 0.12s ease;
+}
+
+.kit-admin .nowo-ui-list-item:hover,
+.kit-admin .list-group-item:hover {
+  background: color-mix(in srgb, var(--beacon-mist) 70%, transparent);
+}
+
+.kit-admin .nowo-ui-list-item:last-child,
+.kit-admin .list-group-item:last-child {
+  border-bottom: 0;
+}
+
+.kit-admin .nowo-ui-list-item strong,
+.kit-admin .list-group-item strong {
+  font-weight: 600;
+  color: var(--beacon-ink);
+}
+
+.kit-admin .nowo-ui-row-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kit-admin .nowo-ui-badge,
+.kit-admin .badge:not(.bg-secondary):not(.bg-light) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.35rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--beacon-sand);
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--beacon-sand) 55%, var(--beacon-mist));
+  color: color-mix(in srgb, var(--beacon-ink) 80%, transparent);
+  font-size: var(--kit-font-meta);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.kit-admin .nowo-ui-table-wrap,
+.kit-admin .table-responsive {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.kit-admin .nowo-ui-table,
+.kit-admin .table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.kit-admin .nowo-ui-table th,
+.kit-admin .nowo-ui-table td {
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--beacon-sand) 85%, transparent);
+  text-align: left;
+  vertical-align: middle;
+  font-size: var(--kit-font-body);
+  color: var(--beacon-ink);
+}
+
+.kit-admin .nowo-ui-table thead th {
+  color: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  font-size: var(--kit-font-meta);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom-color: var(--beacon-sand);
+}
+
+.kit-admin .nowo-ui-table tbody tr:hover,
+.kit-admin .nowo-ui-table--striped tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--beacon-mist) 55%, transparent);
+}
+
+.kit-admin .nowo-ui-table--striped tbody tr:nth-child(even):hover {
+  background: color-mix(in srgb, var(--beacon-mist) 70%, transparent);
+}
+
+.kit-admin .nowo-ui-empty {
+  margin: 0;
+  padding: 1rem 0.15rem;
+  font-size: var(--kit-font-body);
+}
+
+/* Colours from --nowo-ui-* on .kit-admin; keep Beacon control metrics only. */
+.kit-admin .nowo-ui-input {
+  font-size: var(--kit-font-body);
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.kit-admin .nowo-ui-input:focus {
+  border-color: var(--nowo-ui-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--nowo-ui-primary) 20%, transparent);
+}
+
+.kit-admin .nowo-ui-btn {
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: var(--kit-btn-pad-y) var(--kit-btn-pad-x);
+  font-size: var(--kit-btn-font);
+  font-weight: 500;
+}
+
+.kit-admin .nowo-ui-btn--primary {
+  font-weight: 600;
+}
+
+.kit-admin .nowo-ui-btn--sm {
+  width: var(--kit-btn-sm);
+  min-width: var(--kit-btn-sm);
+  height: var(--kit-btn-sm);
+  min-height: var(--kit-btn-sm);
+  padding: 0.35rem;
+  font-size: var(--kit-btn-sm-font);
+}
+
+.kit-admin .nowo-ui-body {
+  padding: 0;
 }
 </style>

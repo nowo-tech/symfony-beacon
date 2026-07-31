@@ -13,6 +13,40 @@
 11. Dependency bumps: run `make composer-outdated` ([`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper)) and apply suggested exact pins carefully (Symfony Flex `extra.symfony.require` stays `8.1.*`).
 12. New Doctrine migrations MUST use [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) MDK definitions (`CreateTablesService` + `AppliesMdkDefinition` / `migrations/FieldDictionary/`). Prefer idempotent declarative tables/columns over raw `CREATE TABLE` SQL.
 13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
+14. **Kit Twig overrides** — prefer host `layout_template` shells under `templates/kit/` over copying full dashboard/admin pages into `templates/bundles/Nowo*Bundle/`. When a page must diverge, extend the bundle original with `{% extends '@Nowo…/…' %}` and override blocks only (Password Strength is the reference). Full forks of `dashboard/*.html.twig` / `admin/*.html.twig` break on kit upgrades. Kit shells must wrap with `body_before` / `body_after` (not `body`) because kit pages also define `{% block body %}`. Avoid `@!Nowo…` bang namespaces — kit TwigPathsPass does not register them.
+
+## Kit Twig strategy (nowo-tech)
+
+| Bundle | What Beacon customizes | What must stay out of git forks |
+|--------|------------------------|----------------------------------|
+| Dashboard Menu | `kit/menu_dashboard_layout.html.twig` + `dashboard.layout_template`; restyle via `kit/_kit_admin_styles.html.twig` (`.kit-admin` / `.nowo-ui-*`) | Do **not** fork `dashboard/index|show|*.html.twig` page bodies |
+| Breadcrumb Kit | `kit/breadcrumb_dashboard_layout.html.twig` + same kit admin CSS | Do **not** fork `dashboard/**` page bodies |
+| Cookie Consent | `kit/cookie_consent_admin_layout.html.twig` + `web_ui.layout_template`; modal = **vendor** + `assets/styles/_cookie_consent.scss` (tokens) | Do **not** fork modal/form Twig (1.4.5+ BEM + `--nowo-cc-*`) |
+| AuthKit | `layout.html.twig` only (`auth_brand` + guest_shell); `css` / `form_theme` / `outbound_mail_ready_checker` in YAML | Do **not** fork `security/*` (1.11+ `auth_panel` blocks) |
+| PWA | YAML `install_prompt.mark_asset` + button classes + `_components.scss` tokens | Do **not** fork `pwa/*.html.twig` (1.2+) |
+
+After upgrading kits: `composer update`, `bin/console assets:install`, `bin/console cache:clear`, then smoke menu/breadcrumb/cookie **modal + admin**, AuthKit login, SiteBackup setup, PWA install prompt.
+
+### Local kit development (path repositories)
+
+When iterating on a sibling kit under `../bundles/<Name>Bundle` (or `repositories/bundles/`), prefer a **Composer path repository** over editing `vendor/` or copying Twig into Beacon:
+
+```json
+{
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../../bundles/CookieConsentBundle",
+      "options": { "symlink": true }
+    }
+  ],
+  "require": {
+    "nowo-tech/cookie-consent-bundle": "@dev"
+  }
+}
+```
+
+Use path only while developing; remove before release so Packagist pins stay authoritative. Host apps should keep customizing via `layout_template` / CSS / block extends — push reusable hooks (Twig blocks, CSS tokens, `layout_template`) **upstream into the kit** instead of growing Beacon forks.
 
 ## Documentation map
 
@@ -21,6 +55,7 @@
 | [INSTALL.md](INSTALL.md) | First install + seed layers (platform / demo / sample) |
 | [README.md](../README.md) | Product overview + quick start |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Why modular Symfony / flows |
+| [ROLES.md](ROLES.md) | Instance `ROLE_*` vs project membership roles |
 | [API.md](API.md) | Ingest, health, OpenAPI pointer |
 | [DSN.md](DSN.md) | Client DSN + auth |
 | [NOTIFICATIONS.md](NOTIFICATIONS.md) | Outbound channels |
@@ -61,13 +96,13 @@ The client Symfony bundle is **out of scope** for this repository.
 
 ## Internationalization
 
-Public AuthKit and setup URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.in_path: both` + `unlocalized: serve` for AuthKit; `LocalizedPublicPath` for setup):
+Public AuthKit URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.in_path: both` + `unlocalized: serve`). Cold-start setup uses SiteBackup at **`/setup`** (single path, not locale-prefixed):
 
 | Context | Paths / behaviour |
 | --- | --- |
-| Default locale (bare) | `/login`, `/register`, `/logout`, `/setup` serve that locale |
-| Other locales | `/{locale}/login`, `/{locale}/setup`, … |
-| Setup default-locale prefix | `/es/setup` → `/setup` when `DEFAULT_LOCALE=es` |
+| Default locale (bare) | `/login`, `/register`, `/logout` serve that locale |
+| Other locales | `/{locale}/login`, `/{locale}/register`, … |
+| Setup / backup | `/setup`, `/_site_backup` (SiteBackupBundle) |
 | Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
 | App shell | `/dashboard`, `/account/…`, `/projects/…` (locale from account preference; no `_locale` in path) |
 

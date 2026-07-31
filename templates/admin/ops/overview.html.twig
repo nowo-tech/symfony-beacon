@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.ops.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin.ops.title'|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin.ops.intro'|trans }}</p>
+    </div>
+    <form method="get" action="{{ path('admin_ops_overview') }}" class="flex flex-wrap items-end gap-2">
+        <label class="block text-sm">
+            <span class="mb-1 block text-[var(--color-ink)]/65">{{ 'admin.ops.filter_project'|trans }}</span>
+            <select name="project" class="min-w-[12rem] rounded border border-[var(--color-ink)]/20 bg-transparent px-2 py-1.5">
+                <option value="">{{ 'admin.ops.filter_all'|trans }}</option>
+                {% for project in overview.projects %}
+                    <option value="{{ project.uuid }}" {% if overview.filter_project and overview.filter_project.id == project.id %}selected{% endif %}>
+                        {{ project.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+        <button type="submit" class="rounded bg-[var(--color-moss)] px-3 py-1.5 text-sm font-medium text-white">{{ 'common.filter'|trans }}</button>
+        {% if overview.filter_project %}
+            <a class="px-2 py-1.5 text-sm underline" href="{{ path('admin_ops_overview') }}">{{ 'common.clear_filters'|trans }}</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="mb-6 grid gap-4 sm:grid-cols-3">
+    <div class="panel">
+        <h2 class="text-sm font-semibold text-[var(--color-ink)]/70">{{ 'admin.ops.queue_title'|trans }}</h2>
+        <p class="mt-2 text-2xl font-bold">
+            {% if overview.messenger.available %}
+                {{ overview.messenger.pending }}
+            {% else %}
+                {{ 'common.na'|trans }}
+            {% endif %}
+        </p>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'admin.ops.queue_instance_wide'|trans }}</p>
+    </div>
+    <div class="panel">
+        <h2 class="text-sm font-semibold text-[var(--color-ink)]/70">{{ 'admin.ops.open_issues_title'|trans }}</h2>
+        <p class="mt-2 text-2xl font-bold">{{ overview.open_issues_total }}</p>
+    </div>
+    <div class="panel">
+        <h2 class="text-sm font-semibold text-[var(--color-ink)]/70">{{ 'admin.ops.suspended_title'|trans }}</h2>
+        <p class="mt-2 text-2xl font-bold">{{ overview.suspended_count }}</p>
+    </div>
+</div>
+
+<section class="panel mb-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'admin.ops.spikes_title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'admin.ops.spikes_help'|trans }}</p>
+    {% if overview.spikes is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin.ops.spikes_empty'|trans }}</p>
+    {% else %}
+        <ul class="divide-y divide-[var(--color-ink)]/10">
+            {% for row in overview.spikes %}
+                <li class="flex flex-wrap items-baseline justify-between gap-2 py-2 text-sm">
+                    <a class="font-medium underline" href="{{ path('admin_projects_show', {id: row.project.uuid}) }}">{{ row.project.name }}</a>
+                    <span class="text-[var(--color-ink)]/70">
+                        {{ 'admin.ops.spikes_metric'|trans({
+                            '%today%': row.errors_last_1d,
+                            '%avg%': row.avg_errors_last_7d,
+                            '%threshold%': row.threshold|number_format(1)
+                        }) }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+<section class="panel mb-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'admin.ops.failed_title'|trans }}</h2>
+    {% if overview.failed_deliveries is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin.ops.failed_empty'|trans }}</p>
+    {% else %}
+        <ul class="divide-y divide-[var(--color-ink)]/10">
+            {% for row in overview.failed_deliveries %}
+                <li class="py-2 text-sm">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <a class="font-medium underline" href="{{ path('admin_projects_show', {id: row.project.uuid}) }}">{{ row.project.name }}</a>
+                        <span class="text-[var(--color-ink)]/55">
+                            {% if row.last_delivery_at %}{{ row.last_delivery_at|date('Y-m-d H:i') }}{% else %}{{ 'common.na'|trans }}{% endif %}
+                        </span>
+                    </div>
+                    <p class="mt-0.5 text-[var(--color-ink)]/70">
+                        {{ row.label }} · {{ row.type }}
+                        {% if row.error_snippet %}
+                            · <span class="text-[var(--color-alert)]">{{ row.error_snippet|length > 120 ? row.error_snippet|slice(0, 120) ~ '…' : row.error_snippet }}</span>
+                        {% endif %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+<section class="panel mb-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'admin.ops.open_by_project_title'|trans }}</h2>
+    {% if overview.open_issues_by_project is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'admin.ops.open_by_project_empty'|trans }}</p>
+    {% else %}
+        <ul class="divide-y divide-[var(--color-ink)]/10">
+            {% for row in overview.open_issues_by_project %}
+                <li class="flex flex-wrap items-baseline justify-between gap-2 py-2 text-sm">
+                    <a class="font-medium underline" href="{{ path('issue_index', {id: row.project.uuid}) }}">{{ row.project.name }}</a>
+                    <span>{{ row.open_issues }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+{% if overview.suspended_count > 0 %}
+<section class="panel">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'admin.ops.suspended_list_title'|trans }}</h2>
+    <ul class="divide-y divide-[var(--color-ink)]/10">
+        {% for project in overview.suspended_projects %}
+            <li class="py-2 text-sm">
+                <a class="font-medium underline" href="{{ path('admin_projects_show', {id: project.uuid}) }}">{{ project.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}

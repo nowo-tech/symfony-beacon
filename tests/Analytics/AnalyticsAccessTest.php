@@ -77,7 +77,8 @@ final class AnalyticsAccessTest extends DatabaseWebTestCase
             '/projects/'.$project->getUuid().'/analytics?'.http_build_query($baseQuery + ['page' => '1']),
         );
         self::assertResponseIsSuccessful();
-        self::assertCount(10, $crawler->filter('table tbody tr'));
+        // Scope to the daily stats table — cookie consent inventory also renders a <table>.
+        self::assertCount(10, $crawler->filter('.analytics-table table tbody tr'));
         self::assertSelectorExists('.table-pagination');
         self::assertSelectorExists('a.table-pagination__link[href*="page=2"]');
 
@@ -85,7 +86,7 @@ final class AnalyticsAccessTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/analytics?'.http_build_query($baseQuery + ['page' => '2']),
         );
-        self::assertCount(2, $crawler->filter('table tbody tr'));
+        self::assertCount(2, $crawler->filter('.analytics-table table tbody tr'));
     }
 
     public function testPeriodPresetChangesRowCount(): void
@@ -95,7 +96,7 @@ final class AnalyticsAccessTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/analytics?period=7&per_page=100');
         self::assertResponseIsSuccessful();
-        self::assertCount(7, $crawler->filter('table tbody tr'));
+        self::assertCount(7, $crawler->filter('.analytics-table table tbody tr'));
     }
 
     public function testInvalidCustomRangeFallsBackWithFlash(): void

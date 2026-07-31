@@ -57,6 +57,32 @@ final class ProcessEnvelopeGovernanceTest extends DatabaseWebTestCase
         self::assertCount(1, $em->getRepository(Issue::class)->findBy(['project' => $project]));
     }
 
+    public function testWorkerDropsEnvelopeWhenMonthlyQuotaExceeded(): void
+    {
+        [, , $project] = $this->bootWithDemoProject('worker-quota-monthly@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $project->setEventQuotaMonthly(1);
+        $em->flush();
+
+        $handler = self::getContainer()->get(ProcessEnvelopeHandler::class);
+        $handler(new ProcessEnvelopeMessage(
+            $project->getId() ?? 0,
+            $this->eventEnvelope('gov-mquota-1', 'First event under monthly quota'),
+            new DateTimeImmutable()->format(\DATE_ATOM),
+        ));
+        self::assertCount(1, $em->getRepository(Issue::class)->findBy(['project' => $project]));
+
+        $handler(new ProcessEnvelopeMessage(
+            $project->getId() ?? 0,
+            $this->eventEnvelope('gov-mquota-2', 'Second event over monthly quota'),
+            new DateTimeImmutable()->format(\DATE_ATOM),
+        ));
+
+        $em->clear();
+        self::assertCount(1, $em->getRepository(Issue::class)->findBy(['project' => $project]));
+    }
+
     private function eventEnvelope(string $eventId, string $message): string
     {
         $header = json_encode(['dsn' => 'https://x@localhost/1'], \JSON_THROW_ON_ERROR);

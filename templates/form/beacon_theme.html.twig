@@ -2,7 +2,7 @@
 {% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
 
 {%- block form_row -%}
-    <div class="{{ row_attr.class|default('space-y-1.5') }}">
+    <div class="{{ row_attr.class|default('flex flex-col gap-2') }}">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.12.8 to the next release](#upgrading-from-0128-to-the-next-release)
+- [Upgrading from 0.13.0 to the next release](#upgrading-from-0130-to-the-next-release)
+- [Upgrading from 0.12.8 to 0.13.0](#upgrading-from-0128-to-0130)
 - [Upgrading from 0.12.7 to 0.12.8](#upgrading-from-0127-to-0128)
 - [Upgrading from 0.12.6 to 0.12.7](#upgrading-from-0126-to-0127)
 - [Upgrading from 0.12.5 to 0.12.6](#upgrading-from-0125-to-0126)
@@ -38,7 +39,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.12.8 to the next release
+## Upgrading from 0.13.0 to the next release
 
 ```bash
 git pull
@@ -49,6 +50,58 @@ php bin/console app:seed-platform
 pnpm install
 make vite-build
 ```
+
+_(No additional operator steps yet — see Unreleased in CHANGELOG when cutting the next tag.)_
+
+## Upgrading from 0.12.8 to 0.13.0
+
+```bash
+git pull
+composer install
+# If Packagist lacks nowo-tech/beacon-bundle, composer.json already lists the GitHub VCS repository.
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Security / ops
+
+- **`/api/doc` and `/api/doc.json` require `ROLE_ADMIN`** (was any authenticated user). Re-seed menus (`app:seed-platform`) so API docs moves under Administration.
+- **Magic login** consumes via **POST** (`check_post_only: true`): email links open a confirm page that auto-POSTs. Bookmarklets/scripts that only GET the signed URL must POST `user` / `expires` / `hash`.
+- **Query-string ingest auth:** production defaults to **`BEACON_INGEST_REJECT_QUERY_AUTH=1`** (401). Migrate clients to `X-Beacon-Auth` or envelope `dsn`; set `0` only during migration.
+- **Web Push:** subscribe/delivery accept only known HTTPS push hosts (FCM / Mozilla / Apple).
+- **Webhooks:** delivery pins DNS after SSRF checks (`resolve`); keep `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0` in prod.
+- **Caddy:** baseline CSP / frame / referrer / nosniff headers; add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES` in prod (see [PRODUCTION.md](PRODUCTION.md)).
+
+### Dogfooding + AI export
+
+- New dependency: `nowo-tech/beacon-bundle`. Empty `BEACON_DSN` keeps reporting off.
+- Local first-run: prefer `make ready` (bootstrap + seed). Seed writes loopback `BEACON_DSN` into `.env` only when empty; then `make restart`.
+- Demo API keys created by seed use a **stable secret** (`DEMO_SECRET_KEY`) in addition to the existing stable public key — for new keys only.
+- Issue show: **Copy for AI** / Markdown+JSON download (`059`, [AI-EXPORT.md](AI-EXPORT.md)).
+
+### SiteBackupBundle 1.5.0
+
+- Require `nowo-tech/site-backup-bundle:1.5.0`. Wizard URL **`/setup`**, panel **`/_site_backup`**.
+- **`setup.layout_template: kit/site_backup_setup_layout.html.twig`** and **`panel.layout_template: kit/site_backup_panel_layout.html.twig`** — host chrome only (Twig globals `nowo_site_backup_*_layout_template`).
+- Restyle vendor markup with `.nowo-site-backup-setup` / `.nowo-site-backup-panel` / `.nowo-ui-*` in `assets/styles/_setup.scss`.
+- Bundle shows detector reasons + hides database Skip when connection failed.
+- Upstream notes: [SiteBackupBundle UPGRADING](https://github.com/nowo-tech/SiteBackupBundle/blob/main/docs/UPGRADING.md) · [CHANGELOG](https://github.com/nowo-tech/SiteBackupBundle/blob/main/docs/CHANGELOG.md)
+
+### SiteBackupBundle 1.3.x–1.4.x (historical)
+
+- **Bootstrap choice** on `fresh_install`: guided (create admin + optional sample) or **full database** SQL import.
+- Deep-link profile: `/setup?profile=full_database`.
+- Durable progress (`progress_storage: chain`), `advance_mode: manual`, incomplete detector.
+- 1.4 introduced setup `layout_template`; 1.5 adds panel `layout_template` + layout Twig globals.
+
+### Composer / Symfony patches
+
+- Symfony 8.1 components bumped where patches exist (`framework-bundle` 8.1.2, `http-client` 8.1.3, …).
+- Dev tooling: PHPUnit 13.2.6, PHPStan 2.2.7, Rector 2.5.8, PHP-CS-Fixer 3.95.17.
+- `symfony/ux-icons` stays on **2.36.1** (3.x is a major; not taken in this bump).
 
 ## Upgrading from 0.12.7 to 0.12.8
 
@@ -63,27 +116,43 @@ pnpm install
 make vite-build
 ```
 
-### Dual public URLs (AuthKit + setup)
+### Monthly event quota (`032`)
 
-- **Default locale** (`DEFAULT_LOCALE`, e.g. `es` in this project’s `.env`, `en` in `.env.dist`): bare paths serve content — `/login`, `/register`, `/setup`.
-- **Other locales**: prefixed — `/en/login`, `/en/setup`.
-- Setup redirects a prefixed default-locale URL to bare (`/es/setup` → `/setup` when `DEFAULT_LOCALE=es`).
+- Env `BEACON_EVENT_QUOTA_MONTHLY` (default `0` = unlimited) + nullable `project.event_quota_monthly`.
+- Run migrations; Settings → Governance exposes the field (same inherit/`0` semantics as daily).
+- Envelope returns `429 monthly event quota exceeded` (`Retry-After: 3600`) when the UTC month cap is hit; worker drops queued envelopes likewise. Daily and monthly both apply when configured.
+- Approaching warning at 80% of the monthly cap (`flash.project.quota_monthly_approaching`).
+
+### Dual public URLs (AuthKit)
+
+- **Default locale** (`DEFAULT_LOCALE`, e.g. `es` in this project’s `.env`, `en` in `.env.dist`): bare paths serve content — `/login`, `/register`.
+- **Other locales**: prefixed — `/en/login`, `/en/register`.
 - AuthKit uses `locale.in_path: both` + `unlocalized: serve` (see `config/packages/nowo_auth_kit.yaml`).
+- Cold-start / restore setup is SiteBackup at **`/setup`** (panel **`/_site_backup`**). Set **`SITE_SETUP_TOKEN`** (open `/setup?token=…`) and **`SITE_BACKUP_PASSWORD_HASH`** (see `.env.dist`). Production refuses the documented local defaults — rotate before deploy.
 - Legal pages still redirect bare → `/{DEFAULT_LOCALE}/legal/…`.
 - Dashboard / app shell URLs never include `_locale` (account `preferredLocale`).
 - Operator manual: [ADDING-LOCALES.md](ADDING-LOCALES.md).
 
-### Setup wizard (empty catalogs)
+### Ops overview (`035`)
 
-- Missing menus / breadcrumbs / cookie consent force HTML visitors to setup (required platform step, then optional AuthKit register + Full sample load).
-- When no users exist, setup remains public; after users exist, only `ROLE_ADMIN`.
-- Details: [INSTALL.md](INSTALL.md), spec `056`.
+- Instance admins: **Administration → Ops** (`/admin/ops`) — Messenger async depth (instance-wide), open issues, suspended ingest, error spikes, failed last deliveries; optional `?project=` UUID filter.
+- Re-run `app:seed-platform` (or menu/breadcrumb seed) so the Administration sidebar includes **Ops**.
+
+### Setup wizard (SiteBackup)
+
+- Missing schema / `setup.required` / empty platform catalogs force visitors toward **`/setup`**.
+- Wizard profile runs migrations, `app:seed-platform`, admin creation, optional sample data.
+- Existing instances: `mkdir -p var/site-backup && touch var/site-backup/setup.done` after `app:seed-platform` if needed.
+- Details: [INSTALL.md](INSTALL.md).
 
 ### AuthKit password reset + magic login
 
 - Password reset and magic login are AuthKit routes/templates (custom `MagicLoginController` removed).
 - Migration `Version20260721250000` adds `password_reset_token` / `password_reset_expires_at` on `app_user`.
 - Magic login / reset email still require a deliverable encrypted Mailer DSN under Administration → Mailer.
+- Password reset `delivery: both` (email link + OTP code at `/reset-password/complete`).
+- Logout uses CSRF (`enable_csrf: true`); UI must pass `_csrf_token` (AuthKit embed pattern).
+- **Social / OAuth login is not part of AuthKit** (SSO/OIDC remains roadmap Later).
 
 ### PHP memory for cache warm
 
@@ -449,6 +518,7 @@ Add to `.env` if missing (defaults match `.env.dist`):
 
 ```bash
 BEACON_EVENT_QUOTA_DAILY=0
+BEACON_EVENT_QUOTA_MONTHLY=0
 ```
 
 ### Product depth (014–022)
@@ -458,7 +528,7 @@ BEACON_EVENT_QUOTA_DAILY=0
 - **Search**: tag / URL / user filters; SQL occurrence sorts.
 - **Export**: `/projects/{uuid}/export/issues|events.{csv,json}` (owner/admin).
 - **Lifecycle webhooks**: opt-in categories `issue.resolved|reopened|assigned|commented|duplicated`.
-- **Governance**: per-project retention/rate/quota in Settings; API key revoke/rotate; `BEACON_EVENT_QUOTA_DAILY`.
+- **Governance**: per-project retention/rate/daily+monthly quota in Settings; API key revoke/rotate; `BEACON_EVENT_QUOTA_DAILY` / `BEACON_EVENT_QUOTA_MONTHLY` (monthly uses UTC calendar month; empty project field inherits env; `0` = unlimited).
 - **Admin ops**: project stats, suspend ingest, view-as-member.
 - **Digest / quiet hours**: configure on destinations; flush with `bin/console app:notifications:flush-digests` (schedule via cron).
 - **Health UI**: last delivery status on Settings / Admin project show.

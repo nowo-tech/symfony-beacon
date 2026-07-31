@@ -74,7 +74,7 @@ Identity in this repo owns **User** persistence, account preferences, magic-logi
 | Choice | Rationale |
 |--------|-----------|
 | Envelope protocol on the server | Operators can point Envelope-compatible clients (especially `nowo-tech/beacon-bundle`) at this server immediately. |
-| `nowo-tech/beacon-bundle` in another repository | Client instrumentation (Monolog, exceptions, `send.*` flags, stack source context) evolves on the app side without coupling release cycles to the server. DSN = host/port/project against this server. |
+| `nowo-tech/beacon-bundle` in another repository | Client instrumentation evolves independently. This server may still **require** the bundle to dogfood its own errors (`BEACON_DSN` → loopback demo project after `make ready`). External apps keep using a separate install. |
 
 Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([EVENT-CONTEXT.md](EVENT-CONTEXT.md)).
 
@@ -90,8 +90,8 @@ Features are specified under `specs/` before large changes. That matches an open
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, magic login (Mailer-gated), seed | Auth boundary; AuthKit + Security `login_link` (`026`) |
-| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links | Multi-tenant tenancy unit |
+| `Identity` | Users, account prefs, magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](ROLES.md) |
+| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |

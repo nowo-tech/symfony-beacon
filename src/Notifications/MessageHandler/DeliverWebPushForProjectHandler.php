@@ -8,9 +8,11 @@ use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Message\DeliverWebPushForProjectMessage;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
+use App\Notifications\Service\WebPushEndpointGuard;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
@@ -26,6 +28,7 @@ final readonly class DeliverWebPushForProjectHandler
         private ProjectMembershipRepository $membershipRepository,
         private PushSubscriptionRepository $subscriptionRepository,
         private WebPushClientFactory $webPushFactory,
+        private WebPushEndpointGuard $webPushEndpointGuard,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
     ) {
@@ -53,6 +56,18 @@ final readonly class DeliverWebPushForProjectHandler
         $stale = [];
 
         foreach ($subscriptions as $subscription) {
+            try {
+                $this->webPushEndpointGuard->assertSafeEndpoint($subscription->getEndpoint());
+            } catch (InvalidArgumentException $e) {
+                $this->logger->warning('Removing unsafe Web Push endpoint.', [
+                    'subscription' => $subscription->getId(),
+                    'exception' => $e->getMessage(),
+                ]);
+                $stale[] = $subscription;
+
+                continue;
+            }
+
             try {
                 $report = $webPush->sendOneNotification(
                     $this->webPushFactory->createSubscription(

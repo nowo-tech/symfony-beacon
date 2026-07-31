@@ -1,0 +1,37 @@
+{#
+  Beacon section tabs (project nav, account preferences, …).
+
+  Required:
+    - aria_label: string (already translated)
+    - items: list of {
+        label: string,
+        href: string,
+        current?: bool,
+        attr?: { [htmlAttribute]: string }  (e.g. {'data-tour': 'project-settings'})
+      }
+
+  Optional:
+    - nav_class: extra classes on <nav> (e.g. 'project-nav', 'preferences-nav')
+    - attr: extra attributes on <nav> (e.g. {'data-tour': 'project-nav'})
+#}
+{% set nav_class = nav_class|default('') %}
+{% set attr = attr|default({}) %}
+<nav
+    class="beacon-tabs{{ nav_class ? ' ' ~ nav_class : '' }}"
+    aria-label="{{ aria_label }}"
+    {% for name, value in attr %}{{ name }}="{{ value }}" {% endfor %}
+>
+    <div class="beacon-tabs__list">
+        {% for item in items %}
+            {% set is_current = item.current|default(false) %}
+            <a
+                class="btn-ghost no-underline{{ is_current ? ' is-active' : '' }}"
+                href="{{ item.href }}"
+                {% if is_current %}aria-current="page"{% endif %}
+                {% if item.attr is defined %}
+                    {% for name, value in item.attr %}{{ name }}="{{ value }}" {% endfor %}
+                {% endif %}
+            >{{ item.label }}</a>
+        {% endfor %}
+    </div>
+</nav>

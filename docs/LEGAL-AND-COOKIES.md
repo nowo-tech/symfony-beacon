@@ -24,7 +24,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | `ui_theme` | `tailwind` |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
 | `use_database_config` | `true` (modal copy + display from DB; seeded by `app:seed-platform`) |
-| `csrf_protection` | `false` (vendor modal JS posts via XHR without firing `submit`, so Symfony stateless CSRF never hydrates) |
+| `csrf_protection` | `true` (modal JS double-submits SameOrigin CSRF for XHR; keep enabled) |
 | `color_theme` | `light` (Beacon SCSS remaps to moss tokens; follows `data-theme`) |
 | `disable_page_interaction` | `true` (dimmed overlay until choice) |
 | `categories` | `analytics`, `preferences` (plus always-on required) |
@@ -34,7 +34,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | `enabled_locales` | `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` |
 | `disabled_routes` | legal pages (banner does not auto-open there) |
 
-Twig overrides live under `templates/bundles/NowoCookieConsentBundle/` (registered in `config/packages/twig.yaml`) and style tokens in `assets/styles/_cookie_consent.scss`.
+Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/` — CookieConsent **1.4.5+** prepends that path automatically. Skin tokens: `assets/styles/_cookie_consent.scss`. Do **not** fork the modal Twig for skinning; prefer tokens. XHR CSRF double-submit lives in vendor `nowo-consent-modal.js` (**≥1.4.8**).
 
 Routes: `config/routes/nowo_cookie_consent.yaml`  
 Privacy link from the modal: `translations/NowoCookieConsentBundle.*.yaml` → `legal_privacy`.
@@ -59,7 +59,19 @@ make seed-platform
 # or Setup wizard → step 1 (platform)
 ```
 
-`CookieConsentDemoSeeder` creates the default enabled profile (`dashboard_cookie_config`), locale copy (`en`/`es`/`de`/`nl`/`fr`/`it`/`pt`), and first-party cookie definitions (`PHPSESSID`, `REMEMBERME`, `CookieConsent`, `CookieConsentKey`). YAML `cookie_inventory` remains a fallback until the DB inventory exists.
+`CookieConsentDemoSeeder` creates the default enabled profile (`dashboard_cookie_config`), locale copy (`en`/`es`/`de`/`nl`/`fr`/`it`/`pt`), and first-party cookie definitions aligned with CookieConsentBundle `CookieNameEnum` plus Symfony session / remember-me / CSRF:
+
+| Cookie | Category | Notes |
+|--------|----------|--------|
+| `PHPSESSID` | required | Framework session |
+| `REMEMBERME` | required | AuthKit remember-me (7 days) |
+| `csrf-token_*` | required | Symfony double-submit CSRF (`__Host-` on HTTPS) |
+| `Cookie_Consent` | required | Consent decision marker (bundle) |
+| `Cookie_Consent_Key` | required | Anonymous audit key (bundle) |
+| `Cookie_Category_analytics` | required | Category choice flag (bundle; not a tracker) |
+| `Cookie_Category_preferences` | required | Category choice flag (bundle) |
+
+YAML `cookie_inventory` remains a fallback until the DB inventory exists. Re-run `app:seed-platform` (or Setup → platform) after upgrading the cookie-consent bundle so legacy `CookieConsent` / `CookieConsentKey` names are renamed.
 
 ### Assets
 

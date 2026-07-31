@@ -28,7 +28,11 @@ CI already builds this target (`.github/workflows/ci.yml`).
 - `APP_SECRET`
 - `DATABASE_URL` (or Compose-equivalent MySQL vars)
 - `MESSENGER_TRANSPORT_DSN` if you run async workers
+- `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (not the `.env.dist` local default)
+- `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (not the `.env.dist` local default)
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
+
+`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses to boot in `APP_ENV=prod`** if `SITE_SETUP_TOKEN` is empty/local or `SITE_BACKUP_PASSWORD_HASH` is still the documented local hash. `compose.prod.yaml` also requires both variables via `${VAR:?…}`.
 
 The prod image runs `pnpm install --frozen-lockfile` and `pnpm run build` so `public/build/` is baked in (no Vite HMR container in production).
 
@@ -112,6 +116,30 @@ make console ARGS='app:retention:purge'
 ## Ingest rate limit
 
 `BEACON_INGEST_RATE_LIMIT` = max Envelope POSTs per project per minute (`0` = unlimited). Exceeded requests get HTTP `429` with `Retry-After: 60`.
+
+Daily / monthly event quotas also return `429` (`daily event quota exceeded` / `monthly event quota exceeded`).
+
+### Query-string ingest auth
+
+Prefer `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` is deprecated.
+
+| Env | Default | Meaning |
+|-----|---------|---------|
+| `BEACON_INGEST_REJECT_QUERY_AUTH` | `0` in `.env.dist`; **`1` in `APP_ENV=prod`** | When `1`, query auth returns **401** |
+
+Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` in prod only while migrating clients.
+
+## Security headers (Caddy)
+
+The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and a permissive `Content-Security-Policy` compatible with Vite HMR, Mercure SSE, and the PWA service worker.
+
+- **Dev** may omit HSTS (no HSTS in the default file).
+- **Prod:** add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES`, e.g. `header Strict-Transport-Security "max-age=31536000; includeSubDomains"`.
+- Tighten CSP per operator when third-party scripts are known; do not ship analytics cookies without cookie-consent kit UX.
+
+`/api/doc` and `/api/doc.json` require **`ROLE_ADMIN`**.
+
+Outbound webhooks: keep `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0` in production. Delivery pins DNS (`resolve`) after `OutboundUrlGuard` validation (anti rebinding).
 
 ## Login throttling
 

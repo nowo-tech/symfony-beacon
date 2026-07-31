@@ -1,0 +1,6 @@
+# Envelope ingest auth hardening.
+# Dev/test keep deprecated query auth (with Warning / Deprecation headers).
+# Production refuses query beacon_key/beacon_secret unless explicitly set to 0.
+when@prod:
+    parameters:
+        env(BEACON_INGEST_REJECT_QUERY_AUTH): '1'

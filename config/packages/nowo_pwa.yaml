@@ -53,7 +53,12 @@ nowo_pwa:
         position: bottom
         visibility: all
         dismiss_days: 14
-        css_class: nowo-pwa-install
+        css_class: nowo-pwa-install beacon-pwa-install
+        mark_asset: /brand/beacon-mark.svg
+        title: preferences.display.pwa_prompt_title
+        button_class: btn-primary
+        dismiss_button_class: btn-ghost
+        never_button_class: 'btn-ghost beacon-pwa-install__never'
 
     install_links:
         enabled: true

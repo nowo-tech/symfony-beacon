@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Prefer encrypted instance_settings.mailer_dsn; MAILER_DSN env is bootstrap/fallback only.
+    Symfony\Component\Mailer\MailerInterface: '@App\Shared\Mailer\ConfiguredMailer'

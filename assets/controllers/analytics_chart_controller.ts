@@ -1,3 +1,5 @@
+import.meta.stimulusFetch = "lazy";
+
 import { Controller } from "@hotwired/stimulus";
 import {
   Chart,

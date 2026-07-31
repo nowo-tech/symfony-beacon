@@ -25,7 +25,7 @@ Public surfaces:
 | Surface | Behaviour |
 |---------|-----------|
 | AuthKit (login/register/logout/reset/magic) | `locale.in_path: both` + `unlocalized: serve` — bare serves `DEFAULT_LOCALE`; other locales use `/{_locale}/…` |
-| Setup | Same bare-vs-prefixed rule via `LocalizedPublicPath`; prefixed **default** locale redirects to bare |
+| Setup / backup | SiteBackupBundle paths `/setup` and `/_site_backup` (not locale-prefixed) |
 | Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
 
 Guests change language via the path switcher (links to another `/{locale}/…`) or `GET|POST /locale/{locale}?redirect=…` (session `_locale` + localize public paths). After sign-in, the app shell stores the preferred locale on the user account (`POST /account/locale/{locale}`) and does **not** put `_locale` in dashboard URLs.
@@ -206,7 +206,7 @@ make qa
 
 - **English** remains the source of truth for docs, specs, PHPDoc, and the default UI catalogue.
 - Prefer **endonyms** in `locale.{code}` (e.g. `Deutsch`, `Español`, `Polski`).
-- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + setup `LocalizedPublicPath` + guest session locale + account preference (no `_locale` on dashboard paths).
+- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + guest session locale + account preference (no `_locale` on dashboard paths). SiteBackup `/setup` is not locale-prefixed.
 - Prefer shipping complete `messages.{locale}.yaml` catalogues (key parity with English); translator `fallbacks: [en]` covers gaps only as a safety net.
 - Legal / cookie UX: when adding locales, translate consent catalogues and keep [`LEGAL-AND-COOKIES.md`](LEGAL-AND-COOKIES.md) operator placeholders in English for docs.
 
@@ -220,8 +220,9 @@ config/packages/nowo_breadcrumb_kit.yaml
 config/packages/nowo_dashboard_menu.yaml
 config/packages/security.yaml
 config/packages/twig.yaml
-src/Shared/Locale/LocalizedPublicPath.php
+config/packages/nowo_site_backup.yaml
 src/Shared/Locale/BarePublicLocaleRedirectController.php
+src/Setup/AdminUserProvisioner.php
 src/Identity/Controller/AccountLocaleController.php
 src/Identity/Controller/GuestLocaleController.php
 src/Identity/EventSubscriber/UserPreferredLocaleSubscriber.php

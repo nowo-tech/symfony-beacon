@@ -33,43 +33,17 @@
 </section>
 
 <section class="panel">
-    <h2 class="mb-3 text-lg font-semibold">{{ 'users.activity.timeline_title'|trans }}</h2>
-    {% if actions is empty %}
-        <p class="text-sm text-[var(--color-ink)]/55">{{ 'users.activity.empty'|trans }}</p>
-    {% else %}
-        <ul class="space-y-3 text-sm">
-            {% for entry in actions %}
-                <li class="border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0">
-                    <div class="flex flex-wrap items-baseline justify-between gap-2">
-                        <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
-                        <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
-                    </div>
-                    <div class="mt-1 text-xs text-[var(--color-ink)]/65">
-                        {% if entry.actor %}
-                            {{ 'users.activity.by'|trans({'%name%': entry.actor.displayName}) }}
-                        {% else %}
-                            {{ 'users.activity.by_system'|trans }}
-                        {% endif %}
-                        {% if entry.subjectUser and (not entry.actor or entry.subjectUser.id != entry.actor.id) %}
-                            · {{ 'users.activity.subject'|trans({'%name%': entry.subjectUser.displayName}) }}
-                        {% endif %}
-                        {% if entry.ipAddress %}
-                            · {{ entry.ipAddress }}
-                        {% endif %}
-                    </div>
-                    {% if entry.context is not empty %}
-                        <dl class="mt-2 grid gap-1 text-xs text-[var(--color-ink)]/60 sm:grid-cols-2">
-                            {% for key, value in entry.context %}
-                                <div>
-                                    <dt class="inline font-medium">{{ ('users.activity.context.' ~ key)|trans }}:</dt>
-                                    <dd class="inline">{{ value }}</dd>
-                                </div>
-                            {% endfor %}
-                        </dl>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    {% include 'admin/_audit_timeline.html.twig' with {
+        form_action: path('admin_users_activity', {id: user.uuid}),
+        reset_path: path('admin_users_activity', {id: user.uuid}),
+        title_key: 'users.activity.timeline_title',
+        intro_key: 'users.activity.audit_intro',
+        empty_key: 'users.activity.audit_empty',
+        audit_actions: userAuditActions,
+        audit_filter: userAuditFilter,
+        audit_entries: actions,
+        timeline_id: 'user-audit-timeline',
+        entry_testid: 'user-audit-entry'
+    } only %}
 </section>
 {% endblock %}

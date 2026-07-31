@@ -9,6 +9,7 @@ use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Purges old telemetry by age and/or caps event count per project.
@@ -23,7 +24,9 @@ final readonly class RetentionPurger
         private EntityManagerInterface $entityManager,
         private ProjectRepository $projectRepository,
         private IssueMergeService $issueMergeService,
+        #[Autowire('%beacon.retention_days%')]
         private int $retentionDays,
+        #[Autowire('%beacon.retention_max_events%')]
         private int $maxEventsPerProject,
     ) {
     }

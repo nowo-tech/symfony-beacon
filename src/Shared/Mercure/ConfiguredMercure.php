@@ -7,6 +7,7 @@ namespace App\Shared\Mercure;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\Jwt\FactoryTokenProvider;
@@ -25,8 +26,11 @@ final class ConfiguredMercure implements ResetInterface
 
     public function __construct(
         private readonly InstanceSettingsRepository $settingsRepository,
+        #[Autowire('%beacon.mercure.env_url%')]
         private readonly string $envUrl,
+        #[Autowire('%beacon.mercure.env_public_url%')]
         private readonly string $envPublicUrl,
+        #[Autowire('%beacon.mercure.env_jwt_secret%')]
         private readonly string $envJwtSecret,
         private readonly ?HttpClientInterface $httpClient = null,
     ) {

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `032-monthly-quota`  
 **Created**: 2026-07-21  
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Add optional per-project **monthly** event quota alongside the existing daily quota (`018-project-governance`), with inherit-from-env behaviour and approaching-limit warnings.
 

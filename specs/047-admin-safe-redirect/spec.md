@@ -2,7 +2,7 @@
 
 **Feature Branch**: `047-admin-safe-redirect`  
 **Created**: 2026-07-21  
-**Status**: Implemented (v0.12.2) — retrospective SDD artifact
+**Status**: Implemented (v0.12.2; hardened separators / same-host — 2026-07-22) — retrospective SDD artifact
 
 **Input**: Admin view-as-member and account locale redirects must reject open redirects (`//host`, off-site URLs).
 
@@ -14,7 +14,11 @@
 
 1. **Given** `redirect=//evil.example`, **When** view-as or locale POST completes, **Then** the app falls back to a safe default path.
 2. **Given** `redirect=/projects/...` (same-origin relative), **When** the action completes, **Then** the user is sent to that path.
+3. **Given** `redirect` containing `\`, `%5c`, or other encoded path separators / control characters, **When** validated, **Then** the target is rejected and a safe default is used.
+4. **Given** an absolute same-host URL, **When** validated, **Then** it is reduced to a path-only internal redirect (no scheme/host preserved for the Location target).
 
 ## Requirements
 
 - Central helper `SafeInternalRedirect` (or equivalent) for privileged redirect targets.
+- Reject protocol-relative URLs, backslash / encoded-separator tricks, and off-site absolutes.
+- Same-host absolute URLs MUST be normalized to a safe relative path before redirect.

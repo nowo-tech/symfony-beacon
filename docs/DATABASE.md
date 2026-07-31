@@ -153,6 +153,7 @@ erDiagram
         int retention_max_events
         int ingest_rate_limit_per_minute
         int event_quota_daily
+        int event_quota_monthly
         bool ingest_enabled
         datetime created_at
         datetime updated_at

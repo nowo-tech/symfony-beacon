@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Identity\AccountSecurityActivity;
 use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProfileType;
 use App\Identity\Form\AccountSecurityType;
+use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
+use App\Identity\Service\AccountSocialAccounts;
 use App\Issues\IssuePanelIds;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
@@ -43,10 +46,12 @@ final class AccountPreferencesController extends AbstractController
 
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipRepository $projectMembershipRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
         private readonly PushSubscriptionRepository $pushSubscriptionRepository,
         private readonly WebPushClientFactory $webPushFactory,
+        private readonly AccountSocialAccounts $accountSocialAccounts,
         private readonly PasswordExpiryServiceInterface $passwordExpiryService,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
@@ -54,6 +59,7 @@ final class AccountPreferencesController extends AbstractController
     ) {
     }
 
+    #[Route('/account', name: 'account_index', methods: ['GET'])]
     #[Route('/account/preferences', name: 'account_preferences', methods: ['GET'])]
     public function preferencesIndex(): RedirectResponse
     {
@@ -89,6 +95,28 @@ final class AccountPreferencesController extends AbstractController
         return $this->renderProfile($form, $user);
     }
 
+    #[Route('/account/projects', name: 'account_projects', methods: ['GET'])]
+    public function projects(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render('account/projects.html.twig', [
+            'project_memberships' => $this->projectMembershipRepository->findByUser($user),
+        ]);
+    }
+
+    #[Route('/account/groups', name: 'account_groups', methods: ['GET'])]
+    public function groups(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render('account/groups.html.twig', [
+            'group_memberships' => $this->userGroupMembershipRepository->findByUser($user),
+        ]);
+    }
+
     /**
      * @param FormInterface<mixed> $form
      */
@@ -119,8 +147,6 @@ final class AccountPreferencesController extends AbstractController
             'form' => $form,
             'profile_user' => $user,
             'profile_roles' => $roleLabels,
-            'project_memberships' => $this->projectMembershipRepository->findByUser($user),
-            'group_memberships' => $this->userGroupMembershipRepository->findByUser($user),
             'password_changed_at' => $passwordChangedAt,
             'password_expires_at' => $passwordExpiresAt,
             'password_days_remaining' => $passwordDaysRemaining,
@@ -145,19 +171,19 @@ final class AccountPreferencesController extends AbstractController
             if (!\is_string($plainPassword) || '' === $plainPassword) {
                 $form->get('plainPassword')->addError(new FormError($this->translator->trans('preferences.error.password_required')));
 
-                return $this->renderSecurity($form, $user);
+                return $this->renderSecurity($form);
             }
 
             if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
                 $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
 
-                return $this->renderSecurity($form, $user);
+                return $this->renderSecurity($form);
             }
 
             if ($this->passwordHasher->isPasswordValid($user, $plainPassword)) {
                 $form->get('plainPassword')->addError(new FormError($this->translator->trans('preferences.error.password_same_as_current')));
 
-                return $this->renderSecurity($form, $user);
+                return $this->renderSecurity($form);
             }
 
             $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
@@ -168,18 +194,48 @@ final class AccountPreferencesController extends AbstractController
             return $this->redirectToRoute('account_security');
         }
 
-        return $this->renderSecurity($form, $user);
+        return $this->renderSecurity($form);
+    }
+
+    #[Route('/account/security/history', name: 'account_security_history', methods: ['GET'])]
+    public function securityHistory(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render('account/security_history.html.twig', [
+            'password_changed_at' => $user->getPasswordChangedAt(),
+            'password_change_history' => $this->passwordChangeHistoryFor($user),
+        ]);
+    }
+
+    #[Route('/account/security/activity', name: 'account_security_activity', methods: ['GET'])]
+    public function securityActivity(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render('account/security_activity.html.twig', [
+            'security_actions' => $this->userActionRepository->findForUser(
+                $user,
+                AccountSecurityActivity::actionTypes(),
+                limit: AccountSecurityActivity::TIMELINE_LIMIT,
+            ),
+        ]);
     }
 
     /**
      * @param FormInterface<mixed> $form
      */
-    private function renderSecurity(FormInterface $form, User $user): Response
+    private function renderSecurity(FormInterface $form): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('account/security.html.twig', [
             'form' => $form,
-            'password_changed_at' => $user->getPasswordChangedAt(),
-            'password_change_history' => $this->passwordChangeHistoryFor($user),
+            'social_login_enabled' => $this->accountSocialAccounts->isSocialLoginEnabled(),
+            'linked_social_accounts' => $this->accountSocialAccounts->linkedFor($user),
         ]);
     }
 
@@ -212,26 +268,77 @@ final class AccountPreferencesController extends AbstractController
     #[Route('/account/display', name: 'account_display', methods: ['GET', 'POST'])]
     public function display(Request $request): Response
     {
+        return $this->handleDisplaySection(
+            $request,
+            AccountDisplayType::SECTION_APPEARANCE,
+            'account_display',
+            'account/display.html.twig',
+        );
+    }
+
+    #[Route('/account/display/panels', name: 'account_display_panels', methods: ['GET', 'POST'])]
+    public function displayPanels(Request $request): Response
+    {
+        return $this->handleDisplaySection(
+            $request,
+            AccountDisplayType::SECTION_PANELS,
+            'account_display_panels',
+            'account/display_panels.html.twig',
+        );
+    }
+
+    #[Route('/account/display/tours', name: 'account_display_tours', methods: ['GET', 'POST'])]
+    public function displayTours(Request $request): Response
+    {
+        return $this->handleDisplaySection(
+            $request,
+            AccountDisplayType::SECTION_TOURS,
+            'account_display_tours',
+            'account/display_tours.html.twig',
+        );
+    }
+
+    #[Route('/account/display/notifications', name: 'account_display_notifications', methods: ['GET', 'POST'])]
+    public function displayNotifications(Request $request): Response
+    {
+        return $this->handleDisplaySection(
+            $request,
+            AccountDisplayType::SECTION_NOTIFICATIONS,
+            'account_display_notifications',
+            'account/display_notifications.html.twig',
+        );
+    }
+
+    private function handleDisplaySection(
+        Request $request,
+        string $section,
+        string $routeName,
+        string $template,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
         /** @var list<string> $enabledLocales */
         $enabledLocales = $this->getParameter('kernel.enabled_locales');
+        $pushAvailable = $this->webPushFactory->isConfigured();
 
         $form = $this->createForm(AccountDisplayType::class, $user, [
             'enabled_locales' => $enabledLocales,
-            'push_available' => $this->webPushFactory->isConfigured(),
+            'push_available' => $pushAvailable,
+            'section' => $section,
         ]);
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted()) {
+        if (!$form->isSubmitted() && $form->has('productTourEnabledPages')) {
             $form->get('productTourEnabledPages')->setData($user->getEnabledProductTourPages());
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var list<string>|array<int, mixed> $enabledTours */
-            $enabledTours = $form->get('productTourEnabledPages')->getData() ?? [];
-            $user->syncEnabledProductTourPages(\is_array($enabledTours) ? $enabledTours : []);
+            if ($form->has('productTourEnabledPages')) {
+                /** @var list<string>|array<int, mixed> $enabledTours */
+                $enabledTours = $form->get('productTourEnabledPages')->getData() ?? [];
+                $user->syncEnabledProductTourPages(\is_array($enabledTours) ? $enabledTours : []);
+            }
 
             if ($form->has('pushNotificationsEnabled') && !$user->isPushNotificationsEnabled()) {
                 foreach ($this->pushSubscriptionRepository->findByUser($user) as $subscription) {
@@ -241,21 +348,23 @@ final class AccountPreferencesController extends AbstractController
 
             $this->entityManager->flush();
 
-            $locale = $user->getPreferredLocale();
-            if (\is_string($locale) && '' !== $locale) {
-                $request->setLocale($locale);
-                $request->getSession()->set('_locale', $locale);
+            if (AccountDisplayType::SECTION_APPEARANCE === $section) {
+                $locale = $user->getPreferredLocale();
+                if (\is_string($locale) && '' !== $locale) {
+                    $request->setLocale($locale);
+                    $request->getSession()->set('_locale', $locale);
+                }
             }
 
             $this->addFlash('success', 'flash.preferences.display_saved');
 
-            return $this->redirectToRoute('account_display');
+            return $this->redirectToRoute($routeName);
         }
 
-        return $this->render('account/display.html.twig', [
+        return $this->render($template, [
             'form' => $form,
             'issue_panel_ids' => IssuePanelIds::all(),
-            'push_available' => $this->webPushFactory->isConfigured(),
+            'push_available' => $pushAvailable,
         ]);
     }
 
@@ -352,5 +461,36 @@ final class AccountPreferencesController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json(['ok' => true, 'theme' => $theme]);
+    }
+
+    /**
+     * Persist content width from the header toggle (JSON): content | full.
+     */
+    #[Route('/account/content-width', name: 'account_content_width', methods: ['POST'])]
+    public function contentWidth(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('account_content_width', $request->headers->get('X-CSRF-TOKEN', ''))) {
+            return $this->json(['ok' => false, 'error' => 'invalid_csrf'], Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            /** @var array{contentWidth?: mixed} $payload */
+            $payload = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $this->json(['ok' => false, 'error' => 'invalid_json'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $width = $payload['contentWidth'] ?? null;
+        if (!\is_string($width) || !\in_array($width, ['content', 'full'], true)) {
+            return $this->json(['ok' => false, 'error' => 'invalid_content_width'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user->setPreferredContentWidth($width);
+        $this->entityManager->flush();
+
+        return $this->json(['ok' => true, 'contentWidth' => $width]);
     }
 }

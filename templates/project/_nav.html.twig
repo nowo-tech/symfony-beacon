@@ -1,8 +1,8 @@
 {#
-  Shared project section navigation.
+  Shared project section header + tabs.
   Expects: project, current (issues|performance|analytics|releases|settings)
 #}
-<nav class="project-nav mb-6" data-tour="project-nav" aria-label="{{ 'project.nav.label'|trans }}">
+<div class="project-nav mb-6" data-tour="project-nav">
     <div class="mb-3">
         <a href="{{ path('dashboard_home') }}" class="text-sm no-underline text-[var(--color-ink)]/55 hover:text-[var(--color-ink)]">{{ 'projects.title'|trans }}</a>
         <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ project.name }}</h1>
@@ -10,32 +10,35 @@
             <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ project.description }}</p>
         {% endif %}
     </div>
-    <div class="flex flex-wrap gap-2">
-        <a
-            class="btn-ghost no-underline{% if current == 'issues' %} is-active{% endif %}"
-            href="{{ path('issue_index', {id: project.uuid}) }}"
-            {% if current == 'issues' %}aria-current="page"{% endif %}
-        >{{ 'nav.issues'|trans }}</a>
-        <a
-            class="btn-ghost no-underline{% if current == 'performance' %} is-active{% endif %}"
-            href="{{ path('performance_index', {id: project.uuid}) }}"
-            {% if current == 'performance' %}aria-current="page"{% endif %}
-        >{{ 'nav.performance'|trans }}</a>
-        <a
-            class="btn-ghost no-underline{% if current == 'analytics' %} is-active{% endif %}"
-            href="{{ path('analytics_show', {id: project.uuid}) }}"
-            {% if current == 'analytics' %}aria-current="page"{% endif %}
-        >{{ 'nav.analytics'|trans }}</a>
-        <a
-            class="btn-ghost no-underline{% if current == 'releases' %} is-active{% endif %}"
-            href="{{ path('project_releases', {id: project.uuid}) }}"
-            {% if current == 'releases' %}aria-current="page"{% endif %}
-        >{{ 'nav.releases'|trans }}</a>
-        <a
-            class="btn-ghost no-underline{% if current == 'settings' %} is-active{% endif %}"
-            href="{{ path('project_settings', {id: project.uuid}) }}"
-            data-tour="project-settings"
-            {% if current == 'settings' %}aria-current="page"{% endif %}
-        >{{ 'project.settings.nav'|trans }}</a>
-    </div>
-</nav>
+    {% include 'shared/_tabs.html.twig' with {
+        aria_label: 'project.nav.label'|trans,
+        items: [
+            {
+                label: 'nav.issues'|trans,
+                href: path('issue_index', {id: project.uuid}),
+                current: current == 'issues',
+            },
+            {
+                label: 'nav.performance'|trans,
+                href: path('performance_index', {id: project.uuid}),
+                current: current == 'performance',
+            },
+            {
+                label: 'nav.analytics'|trans,
+                href: path('analytics_show', {id: project.uuid}),
+                current: current == 'analytics',
+            },
+            {
+                label: 'nav.releases'|trans,
+                href: path('project_releases', {id: project.uuid}),
+                current: current == 'releases',
+            },
+            {
+                label: 'project.settings.nav'|trans,
+                href: path('project_settings', {id: project.uuid}),
+                current: current == 'settings',
+                attr: {'data-tour': 'project-settings'},
+            },
+        ],
+    } only %}
+</div>

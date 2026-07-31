@@ -46,7 +46,7 @@ function syncThemeControls(theme: Theme): void {
 
 function syncCookieConsentTheme(theme: Theme): void {
   const modal = document.getElementById('cookieconsent');
-  if (!(modal instanceof HTMLElement) || modal.dataset.beaconThemeSync !== 'true') {
+  if (!(modal instanceof HTMLElement)) {
     return;
   }
 
@@ -180,7 +180,20 @@ function applySidebar(collapsed: boolean): void {
   shell.classList.toggle('is-sidebar-open', mobile && !collapsed);
 
   if (backdrop) {
-    backdrop.hidden = !(mobile && !collapsed);
+    // Overlay fade is driven by `.is-sidebar-open`; keep `hidden` for a11y only.
+    if (mobile && !collapsed) {
+      backdrop.hidden = false;
+    } else if (!mobile) {
+      backdrop.hidden = true;
+    } else {
+      const hide = (): void => {
+        if (!shell.classList.contains('is-sidebar-open')) {
+          backdrop.hidden = true;
+        }
+      };
+      backdrop.addEventListener('transitionend', hide, { once: true });
+      window.setTimeout(hide, 480);
+    }
   }
 
   document.querySelectorAll<HTMLElement>('[data-sidebar-toggle]').forEach((button) => {
@@ -247,6 +260,101 @@ function initSidebar(): void {
   });
 }
 
+type ContentWidth = 'content' | 'full';
+
+function isContentWidth(value: string | null | undefined): value is ContentWidth {
+  return value === 'content' || value === 'full';
+}
+
+function resolveContentWidth(): ContentWidth {
+  const shell = document.querySelector<HTMLElement>('[data-app-shell]');
+  if (shell && isContentWidth(shell.dataset.contentWidth)) {
+    return shell.dataset.contentWidth;
+  }
+
+  return shell?.classList.contains('is-full-width') ? 'full' : 'content';
+}
+
+function syncContentWidthControls(width: ContentWidth): void {
+  document.querySelectorAll<HTMLElement>('[data-content-width-toggle]').forEach((button) => {
+    const nextLabel = width === 'full' ? button.dataset.labelContent : button.dataset.labelFull;
+    const nextAria = width === 'full' ? button.dataset.ariaToContent : button.dataset.ariaToFull;
+    const label = button.querySelector<HTMLElement>('[data-content-width-label]');
+
+    button.dataset.contentWidthCurrent = width;
+    button.setAttribute('aria-pressed', width === 'full' ? 'true' : 'false');
+    if (nextAria) {
+      button.setAttribute('aria-label', nextAria);
+    }
+    if (label && nextLabel) {
+      label.textContent = nextLabel;
+    }
+  });
+}
+
+function applyContentWidth(width: ContentWidth, persist: boolean): void {
+  const shell = document.querySelector<HTMLElement>('[data-app-shell]');
+  if (!shell) {
+    return;
+  }
+
+  shell.dataset.contentWidth = width;
+  shell.classList.toggle('is-full-width', width === 'full');
+  shell.classList.toggle('is-content-width', width === 'content');
+  syncContentWidthControls(width);
+
+  if (persist) {
+    syncContentWidthToAccount(width);
+  }
+}
+
+function syncContentWidthToAccount(width: ContentWidth): void {
+  const shell = document.querySelector<HTMLElement>('[data-app-shell][data-content-width-sync-url]');
+  if (!(shell instanceof HTMLElement)) {
+    return;
+  }
+  const url = shell.dataset.contentWidthSyncUrl;
+  const token = shell.dataset.contentWidthSyncToken;
+  if (!url || !token) {
+    return;
+  }
+
+  void fetch(url, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-CSRF-TOKEN': token,
+    },
+    body: JSON.stringify({ contentWidth: width }),
+  }).catch(() => {
+    // Preference remains on the shell classes if the network call fails.
+  });
+}
+
+function initContentWidth(): void {
+  const shell = document.querySelector('[data-app-shell]');
+  if (!shell) {
+    return;
+  }
+
+  applyContentWidth(resolveContentWidth(), false);
+
+  document.querySelectorAll('[data-content-width-toggle]').forEach((button) => {
+    if (button instanceof HTMLElement && button.dataset.contentWidthBound === '1') {
+      return;
+    }
+    if (button instanceof HTMLElement) {
+      button.dataset.contentWidthBound = '1';
+    }
+    button.addEventListener('click', () => {
+      const current = resolveContentWidth();
+      applyContentWidth(current === 'full' ? 'content' : 'full', true);
+    });
+  });
+}
+
 // Close locale / user dropdowns when clicking outside (details/summary).
 document.addEventListener('click', (event) => {
   const target = event.target;
@@ -264,6 +372,7 @@ document.addEventListener('click', (event) => {
 });
 
 initTheme();
+initContentWidth();
 initSidebar();
 initColorHexLabels();
 

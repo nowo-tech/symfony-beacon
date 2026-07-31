@@ -91,6 +91,7 @@
 - [x] T027 Run PHPUnit seed tests + relevant smoke; fix CS if needed
 - [x] T028 Mark `specs/055-install-seed-layers/spec.md` status **Implemented** when done; tick ROADMAP 6.4a when shipped
 - [x] T029 Validate `quickstart.md` commands manually or via CI-equivalent compose exec
+- [x] T030 Align dogfood contract: `--skip-demo-user`, slug `symfony-beacon`, Make `ensure-halite-secrets` on seed/dogfood/bootstrap (`048` / `058`)
 
 ---
 

@@ -33,4 +33,6 @@ return [
     Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
     Symfony\Bundle\MercureBundle\MercureBundle::class => ['all' => true],
     Nowo\SelectAllChoiceBundle\NowoSelectAllChoiceBundle::class => ['all' => true],
+    Nowo\BeaconBundle\NowoBeaconBundle::class => ['all' => true],
+    Nowo\SiteBackupBundle\NowoSiteBackupBundle::class => ['all' => true],
 ];

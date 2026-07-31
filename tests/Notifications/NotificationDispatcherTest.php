@@ -27,6 +27,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class NotificationDispatcherTest extends TestCase
 {
+    private int $destinationIdSeq = 0;
+
     public function testDispatchesOnlyMatchingEnabledDestinationsForNewIssue(): void
     {
         $project = new Project();
@@ -171,19 +173,18 @@ final class NotificationDispatcherTest extends TestCase
      */
     private function destination(Project $project, array $categories, bool $enabled): NotificationDestination
     {
-        static $id = 0;
-        ++$id;
+        ++$this->destinationIdSeq;
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
-        $destination->setLabel('D'.$id);
+        $destination->setLabel('D'.$this->destinationIdSeq);
         $destination->setType(NotificationDestinationType::Http);
         $destination->setEndpointUrl('https://example.test/hook');
         $destination->setEnabled($enabled);
         $destination->setCategories($categories);
 
         $ref = new ReflectionProperty($destination, 'id');
-        $ref->setValue($destination, $id);
+        $ref->setValue($destination, $this->destinationIdSeq);
 
         return $destination;
     }

@@ -58,6 +58,10 @@ class Project implements AuditableInterface
     #[ORM\Column(nullable: true)]
     private ?int $eventQuotaDaily = null;
 
+    /** Monthly event quota (UTC calendar month); null inherits `beacon.event_quota_monthly`. */
+    #[ORM\Column(nullable: true)]
+    private ?int $eventQuotaMonthly = null;
+
     /** When false, Envelope ingest is rejected (admin suspend / governance). */
     #[ORM\Column(options: ['default' => true])]
     private bool $ingestEnabled = true;
@@ -190,6 +194,18 @@ class Project implements AuditableInterface
     public function setEventQuotaDaily(?int $eventQuotaDaily): self
     {
         $this->eventQuotaDaily = $eventQuotaDaily;
+
+        return $this;
+    }
+
+    public function getEventQuotaMonthly(): ?int
+    {
+        return $this->eventQuotaMonthly;
+    }
+
+    public function setEventQuotaMonthly(?int $eventQuotaMonthly): self
+    {
+        $this->eventQuotaMonthly = $eventQuotaMonthly;
 
         return $this;
     }

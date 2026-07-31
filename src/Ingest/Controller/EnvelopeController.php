@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -47,6 +48,10 @@ ENVELOPE;
         private ProjectGovernanceResolver $governanceResolver,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
+        #[Autowire('%beacon.envelope_max_bytes%')]
+        private int $maxEnvelopeBytes = 2_097_152,
+        #[Autowire('%beacon.ingest_reject_query_auth%')]
+        private bool $rejectQueryAuth = false,
     ) {
     }
 
@@ -57,7 +62,7 @@ Accepts an Envelope body (newline-separated JSON header, item header, and payloa
 **Auth (preferred first):**
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
-- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`)
+- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When `BEACON_INGEST_REJECT_QUERY_AUTH=1` (prod default), query auth is refused with **401**.
 
 The public key is an opaque identifier and MUST belong to `{projectId}`. Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [
@@ -145,17 +150,31 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
     )]
     #[OA\Response(
         response: 429,
-        description: 'Per-project ingest rate limit exceeded (`BEACON_INGEST_RATE_LIMIT`).',
+        description: <<<'MD'
+Too many requests — one of:
+
+- **Rate limit** — per-project sliding window (`BEACON_INGEST_RATE_LIMIT` / project override); body `rate limit exceeded`; `Retry-After: 60`
+- **Daily quota** — calendar-day event quota exceeded; body `daily event quota exceeded`; `Retry-After: 60`
+- **Monthly quota** — UTC calendar-month event quota exceeded; body `monthly event quota exceeded`; `Retry-After: 3600`
+MD,
         headers: [
             new OA\Header(
                 header: 'Retry-After',
-                description: 'Seconds to wait before retrying (typically 60).',
+                description: 'Seconds to wait before retrying (60 for rate/daily; 3600 for monthly).',
                 schema: new OA\Schema(type: 'integer', example: 60),
             ),
         ],
         content: new OA\MediaType(
             mediaType: 'text/plain',
-            schema: new OA\Schema(type: 'string', example: 'rate limit exceeded'),
+            schema: new OA\Schema(
+                type: 'string',
+                example: 'rate limit exceeded',
+                enum: [
+                    'rate limit exceeded',
+                    'daily event quota exceeded',
+                    'monthly event quota exceeded',
+                ],
+            ),
         ),
     )]
     public function __invoke(int $projectId, Request $request): Response
@@ -163,6 +182,10 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
         $body = $request->getContent();
         if ('' === $body) {
             return new Response('Empty body', Response::HTTP_BAD_REQUEST);
+        }
+
+        if (\strlen($body) > $this->maxEnvelopeBytes) {
+            return new Response('envelope too large', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
 
         $envelopeDsn = null;
@@ -185,11 +208,18 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
                 'project_id' => $projectId,
                 'client_ip' => $request->getClientIp(),
             ]);
+            if ($this->rejectQueryAuth) {
+                return $this->ingestResponse(
+                    'query string authorization is disabled; use X-Beacon-Auth or envelope dsn',
+                    Response::HTTP_UNAUTHORIZED,
+                    true,
+                );
+            }
         }
 
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
-            $queryString,
+            $this->rejectQueryAuth ? '' : $queryString,
             $envelopeDsn,
         );
 
@@ -216,7 +246,12 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
         try {
             $this->envelopeParser->parse($body);
         } catch (Throwable $e) {
-            return $this->ingestResponse('invalid envelope: '.$e->getMessage(), Response::HTTP_BAD_REQUEST, $usedQueryAuth);
+            $this->logger->notice('Envelope parse rejected.', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->ingestResponse('invalid envelope', Response::HTTP_BAD_REQUEST, $usedQueryAuth);
         }
 
         if (null === $this->projectRepository->find($projectId)) {
@@ -233,6 +268,12 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
             ]);
         }
 
+        if ($this->governanceResolver->isMonthlyQuotaExceeded($project)) {
+            return $this->ingestResponse('monthly event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
+                'Retry-After' => '3600',
+            ]);
+        }
+
         $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
         if (!$this->ingestRateLimiter->accept($projectId, $rateLimit)) {
             return $this->ingestResponse('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
@@ -242,11 +283,40 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
 
         $this->bus->dispatch(new ProcessEnvelopeMessage(
             $projectId,
-            $body,
+            $this->scrubEnvelopeCredentials($body),
             new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ));
 
         return $this->ingestResponse('', Response::HTTP_OK, $usedQueryAuth);
+    }
+
+    /**
+     * Remove DSN (may contain secret) from the envelope header before queue storage.
+     */
+    private function scrubEnvelopeCredentials(string $body): string
+    {
+        $normalized = str_replace("\r\n", "\n", $body);
+        $pos = strpos($normalized, "\n");
+        $headerLine = false === $pos ? $normalized : substr($normalized, 0, $pos);
+        $rest = false === $pos ? '' : substr($normalized, $pos);
+
+        try {
+            $header = json_decode($headerLine, true, 512, \JSON_THROW_ON_ERROR);
+        } catch (Throwable) {
+            return $body;
+        }
+
+        if (!\is_array($header) || !isset($header['dsn'])) {
+            return $body;
+        }
+
+        unset($header['dsn']);
+        $encoded = json_encode($header, \JSON_UNESCAPED_SLASHES);
+        if (false === $encoded) {
+            return $body;
+        }
+
+        return $encoded.$rest;
     }
 
     /**

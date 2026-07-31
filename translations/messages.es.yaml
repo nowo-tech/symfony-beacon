@@ -6,6 +6,7 @@ nav:
     account: Menú de cuenta
     admin: Administración
     admin_hub: Resumen admin
+    ops: Resumen ops
     users: Usuarios
     groups: Grupos
     admin_projects: Proyectos
@@ -26,6 +27,12 @@ api_docs:
     title: Docs API
     intro: Explora el ingest Envelope y los endpoints HTTP relacionados. Usa Authorize con la cabecera X-Beacon-Auth (beacon_key y beacon_secret del DSN del proyecto).
     open_json: OpenAPI JSON
+magic_login:
+    confirm:
+        title: Continuar inicio de sesión
+        heading: Completar acceso mágico
+        help: Confirma para terminar el acceso sin contraseña. Esta página envía el enlace de un solo uso por POST para no filtrar el token en una navegación GET.
+        submit: Continuar
 common:
     filter: Filtrar
     clear_filters: Limpiar filtros
@@ -63,6 +70,11 @@ theme:
     night: Noche
     switch_to_day: Cambiar a modo día
     switch_to_night: Cambiar a modo noche
+layout:
+    width_content: Contenido
+    width_full: Ancho completo
+    switch_to_content: Cambiar a ancho de contenido centrado
+    switch_to_full: Cambiar a contenido a ancho completo
 auth:
     magic:
         title: Acceso con enlace mágico
@@ -78,7 +90,7 @@ auth:
         email_body: "Abre este enlace para entrar (caduca %expires%):\n\n%link%"
     reset:
         email_subject: Restablece tu contraseña de Beacon
-        email_body: "Usa este enlace para elegir una contraseña nueva:\n\n%link%\n"
+        email_body: "Usa este enlace para elegir una contraseña nueva:\n\n%link%\n\nO introduce este código de un solo uso en el formulario de restablecimiento:\n\n%code%\n"
     tagline: Seguimiento de errores self-hosted para PHP y Symfony.
     brand_eyebrow: Seguimiento de errores
     bootstrap_eyebrow: Arranque
@@ -92,6 +104,7 @@ flash:
         governance_saved: Ajustes de gobernanza del proyecto guardados.
         governance_invalid: Los valores de gobernanza deben estar vacíos (heredar) o ser enteros no negativos.
         quota_approaching: Este proyecto se acerca a su cuota diaria de eventos.
+        quota_monthly_approaching: Este proyecto se acerca a su cuota mensual de eventos.
         history_cleared: Historial del proyecto vaciado.
         deleted: Proyecto eliminado.
         delete_confirmation_mismatch: El nombre del proyecto no coincide. No se eliminó nada.
@@ -180,6 +193,9 @@ project:
         retention_max_events: Máximo de eventos almacenados
         ingest_rate_limit: Límite de ingest (por minuto)
         event_quota_daily: Cuota diaria de eventos
+        event_quota_monthly: Cuota mensual de eventos
+        quota_usage_monthly: '%count% / %quota% eventos este mes (UTC)'
+        month_utc_hint: El límite del mes es UTC
         inherit_hint: 'Vacío = heredar valor del servidor (%default%). Usa 0 para desactivar si el valor por defecto no es cero.'
         save: Guardar gobernanza
         quota_usage: 'Eventos hoy: %count% / %quota%'
@@ -346,6 +362,12 @@ issues:
     no_source_context: Sin código fuente para este frame.
     copy_path: Copiar ruta
     path_copied: Copiado
+    aside_ai_export: Exportar para IA
+    export_for_ai: Copiar para IA
+    export_for_ai_copied: Copiado
+    export_for_ai_md: Descargar Markdown
+    export_for_ai_json: Descargar JSON
+    export_for_ai_help: Contexto de stack y petición depurado en formato beacon-ai-export/v1 para pegar en un asistente de IA.
     breadcrumbs: Breadcrumbs
     raw_payload: Payload en bruto
     highlights: Highlights
@@ -672,11 +694,14 @@ users:
     title: Usuarios
     intro: Crea cuentas, asigna roles de instancia y activa o desactiva el acceso (UserKit).
     create: Añadir usuario
+    search_placeholder: Buscar por nombre o email…
     create_intro: Crea una cuenta Beacon. La persona podrá iniciar sesión con este email y contraseña.
     back: Volver a usuarios
     cancel: Cancelar
     role_label: Rol
     last_admin_hint: Debe quedar al menos un administrador.
+    edit_role_title: Cambiar rol de usuario
+    edit_role_body: 'Elige un nuevo rol para %name% (%email%).'
     col:
         user: Usuario
         email: Correo
@@ -704,6 +729,7 @@ users:
         enable: Activar
         disable: Desactivar
         update_role: Actualizar
+        edit_role: Editar rol
         self: Eres tú
         activity: Actividad
     projects_title: Membresías de proyecto
@@ -717,6 +743,8 @@ users:
         timeline_title: Línea de tiempo
         recent_title: Actividad reciente
         recent_intro: Últimas acciones administrativas, de membresía y de producto en la instancia.
+        audit_intro: Acciones de identidad y membresía de esta cuenta (los filtros coinciden con la auditoría de proyectos Admin).
+        audit_empty: Ninguna acción de identidad registrada coincide con los filtros actuales.
         empty: Aún no hay acciones registradas.
         by: 'Por %name%'
         by_system: Por el sistema
@@ -762,6 +790,7 @@ users:
             'analytics.opened': Analítica abierta
             'auth.magic_login_requested': Magic login solicitado
             'auth.magic_login_consumed': Magic login usado
+            'auth.password_reset_requested': Restablecimiento de contraseña solicitado
             'project.share_link_created': Enlace para compartir creado
             'project.share_link_revoked': Enlace para compartir revocado
             'project.share_link_opened': Enlace para compartir abierto
@@ -788,11 +817,22 @@ preferences:
     intro: Actualiza tu perfil, contraseña, idioma y preferencias de tema.
     nav:
         profile: Perfil
+        projects: Mis proyectos
+        groups: Mis grupos
         security: Seguridad
+        password: Cambiar contraseña
+        password_history: Historial de cambios
+        security_activity: Actividad
+        area_label: Secciones de la cuenta
         display: Interfaz
+        appearance: Apariencia
+        panels: Paneles
+        tours: Tours
+        notifications: Notificaciones
     profile:
         title: Perfil
         intro: Revisa los datos de tu cuenta y actualiza el nombre visible o el correo de acceso.
+        tabs_label: Secciones del perfil
         submit: Guardar perfil
         edit_title: Editar perfil
         account_id: ID de cuenta
@@ -819,17 +859,33 @@ preferences:
     security:
         title: Seguridad
         intro: Cambia la contraseña de tu cuenta.
+        tabs_label: Secciones de seguridad
         submit: Actualizar contraseña
         history_title: Historial de cambios de contraseña
         history_intro: Actualizaciones recientes conservadas para evitar reutilizar contraseñas. Los hashes nunca se muestran.
         history_current: 'Contraseña actual establecida el:'
         history_entry: Contraseña cambiada
         history_empty: Aún no hay cambios de contraseña registrados.
+        social_title: Cuentas sociales vinculadas
+        social_intro: Proveedores OAuth conectados a esta cuenta Beacon.
+        social_disabled: El inicio de sesión social no está activado en esta instancia.
+        social_empty: Aún no hay cuentas sociales vinculadas. Inicia sesión con un proveedor desde la página de acceso para vincular una cuando el login social esté activo.
+        social_unlink_note: Desvincular proveedores desde esta página aún no está disponible. Contacta con un administrador de la instancia si necesitas quitar un enlace.
+        activity_title: Actividad de seguridad
+        activity_intro: Eventos recientes de restablecimiento de contraseña y magic login de tu cuenta.
+        activity_empty: Aún no hay eventos de seguridad registrados.
     display:
         title: Interfaz
-        intro: Elige idioma, tema, densidad, tamaño de texto, contraste, barra lateral, movimiento, ancho del contenido y qué paneles de incidencia empiezan colapsados.
+        intro: Elige idioma, tema, densidad, tamaño de texto, contraste, barra lateral, movimiento y ancho del contenido.
+        tabs_label: Secciones de visualización
         submit: Guardar interfaz
         section_layout: Idioma, tema y diseño
+        panels_title: Paneles de incidencias
+        panels_intro: Elige qué paneles de incidencias empiezan plegados y borra los estados guardados en el navegador.
+        tours_title: Tours
+        tours_intro: Controla qué tours del producto pueden iniciarse solos y vuelve a reproducir el tour del panel.
+        notifications_title: Notificaciones
+        notifications_intro: Alertas push opcionales para incidencias nuevas e instalación de Beacon como aplicación.
         pwa_title: Instalar aplicación
         pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y autónoma. La disponibilidad depende del navegador.
         pwa_prompt_title: Instala para acceder antes
@@ -866,7 +922,7 @@ preferences:
     product_tour_enabled: Tours activos
     product_tour_enabled_help: Los tours marcados pueden iniciarse una vez por área. Desmarca uno para ocultarlo; desmarca todos para desactivar todos.
     product_tour_select_all: Seleccionar todos los tours
-    product_tour_save_hint: Pulsa Guardar interfaz abajo para aplicar los cambios de tours.
+    product_tour_save_hint: Haz clic en Guardar ajustes de visualización para aplicar los cambios del tour.
     product_tour_page:
         dashboard: Panel
         project_issues: Incidencias del proyecto
@@ -961,31 +1017,21 @@ user_preferences:
         strength_invalid: 'La contraseña no cumple los requisitos de fortaleza (%missing%).'
 
 # PasswordStrengthType on /account/security uses translation_domain messages (same pattern as AuthKit → NowoAuthKitBundle).
-requirement.min_length: 'Al menos %count% caracteres'
-requirement.max_length: 'Como máximo %count% caracteres'
-requirement.lowercase: 'Al menos una letra minúscula'
-requirement.uppercase: 'Al menos una letra mayúscula'
-requirement.digit: 'Al menos un número'
-requirement.special: 'Al menos un carácter especial'
-requirement.no_whitespace: 'No se permiten espacios en blanco'
-requirement.not_contain: 'No debe contener texto prohibido'
-requirement.min_unique_chars: 'Al menos %count% caracteres únicos'
-requirement.regex: 'Debe coincidir con el patrón requerido'
-generator.button: 'Generar contraseña'
-generator.modal_title: 'Contraseñas sugeridas'
-generator.modal_hint: 'Estas contraseñas cumplen la política actual. Cópiala o aplícala al campo.'
-generator.copy: 'Copiar'
-generator.copied: '¡Copiado!'
-generator.use_password: 'Usar esta contraseña'
-generator.close: 'Cerrar'
-generator.failed: 'No se pudo generar una contraseña válida. Inténtalo de nuevo o relaja la política.'
 
 groups:
     title: Grupos
     intro: Organiza usuarios en grupos y vincúlalos a proyectos para acceso masivo.
     create: Nuevo grupo
+    search_placeholder: Buscar por nombre, slug o descripción…
     empty: Aún no hay grupos.
     open: Abrir
+    col:
+        group: Grupo
+        slug: Slug
+        members: Miembros
+        description: Descripción
+        audit: Auditoría
+        actions: Acciones
     back: Volver a grupos
     edit: Editar
     edit_title: Editar grupo
@@ -995,6 +1041,9 @@ groups:
     delete_confirm: ¿Eliminar este grupo? Se desvinculará de todos los proyectos.
     name_label: Nombre
     description_label: Descripción
+    audit_title: Línea de auditoría
+    audit_intro: Acciones administrativas del grupo (crear/actualizar, miembros, vínculos a proyectos). Las marcas de AuditKit de arriba siguen siendo la instantánea del último editor.
+    audit_empty: Ninguna acción de grupo registrada coincide con los filtros actuales.
     members_title: Miembros del grupo
     members_empty: Aún no hay miembros en este grupo.
     add_member: Añadir miembro
@@ -1014,6 +1063,17 @@ admin_projects:
     create: Nuevo proyecto
     empty: Aún no hay proyectos.
     open: Gestionar
+    col:
+        project: Proyecto
+        slug: Slug
+        members: Miembros
+        groups: Grupos
+        activity: Actividad
+        status: Estado
+        audit: Auditoría
+        actions: Acciones
+    status:
+        active: Ingest activo
     back: Volver a proyectos
     edit: Editar
     edit_title: Editar proyecto
@@ -1069,11 +1129,30 @@ admin:
         users: Listar cuentas y roles de esta instancia.
         groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
         projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
+        ops: Picos entre proyectos, incidencias abiertas y entregas fallidas.
         appearance: Nombre de marca y colores de acento.
         mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
         setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.
+    ops:
+        title: Resumen ops
+        intro: Señales de salud a nivel de instancia entre proyectos. La profundidad de la cola Messenger es siempre a nivel de instancia.
+        filter_project: Filtro de proyecto
+        filter_all: Todos los proyectos
+        queue_title: Cola Messenger
+        queue_instance_wide: Pendientes async a nivel de instancia (no por proyecto)
+        open_issues_title: Incidencias abiertas
+        suspended_title: Ingest suspendido
+        suspended_list_title: Proyectos suspendidos
+        spikes_title: Picos de errores
+        spikes_help: 'Proyectos donde los errores de hoy superan max(3, 2 × media diaria de 7 días).'
+        spikes_empty: No hay picos de errores ahora.
+        spikes_metric: '%today% hoy (media 7d %avg%, umbral %threshold%)'
+        failed_title: Entregas fallidas
+        failed_empty: No hay destinos con una última entrega fallida.
+        open_by_project_title: Incidencias abiertas por proyecto
+        open_by_project_empty: No hay incidencias abiertas en el ámbito.
 setup:
     eyebrow: Primer arranque
     title: Configuración de la instancia
@@ -1083,6 +1162,29 @@ setup:
     already_done: La configuración ya está marcada como completa.
     back_dashboard: Volver al panel
     login_setup_link: Configuración inicial
+    progress_of: 'Paso %current% de %total%'
+    log:
+        tabs_label: Progreso del setup
+        tab: Terminal
+        completed: Completado
+    admin:
+        email: Correo
+        password: Contraseña
+    token:
+        title: Se requiere token de setup
+        body: 'Abre %path% con el setup.setup_token configurado.'
+    reason:
+        heading: Hace falta completar el setup
+        db_connection: La base de datos no es alcanzable con el DATABASE_URL actual (falta, es incorrecto o el servicio DB está caído).
+        db_connection_hint: Configura un DATABASE_URL válido en el paso de base de datos antes de continuar. Omitir está desactivado hasta que la conexión funcione.
+        db_connection_form: Falló la conexión a la base de datos. Introduce un DATABASE_URL válido (se escribe en .env.local). No puedes omitir este paso hasta que la base responda.
+        db_schema_empty: La base conecta pero aún no tiene tablas — las migraciones / importación crearán el esquema.
+        db_schema_hint: Continúa el asistente para ejecutar migraciones (o importar un dump completo). No hace falta cambiar DATABASE_URL si la conexión ya funciona.
+        marker_required: Existe el marcador setup.required (arranque en frío o post-restore).
+        marker_done_missing: Falta setup.done y require_done_marker está activo.
+        incomplete: 'Asistente en curso: %detail%'
+    database:
+        intro: Opcional — déjalo vacío y omite si el DATABASE_URL del entorno ya funciona.
     bootstrap_login_hint: ¿Prefieres crear tu propio admin?
     bootstrap_login_link: Iniciar sesión
     bootstrap_register_link: Registrar primer admin
@@ -1110,7 +1212,8 @@ setup:
         sample_title: Carga completa de muestras
         sample_body: Crea el proyecto demo si hace falta y carga el dataset de telemetría mayor (perfil load).
         sample_cta: Instalar carga completa de muestras
-        sample_note: Puede tardar un minuto. Los datasets huge siguen solo por CLI (`app:seed-sample --size=huge --force`). Si aún no hay usuario, puede crearse un admin demo local como dueño del proyecto demo.
+        sample_note: Puede tardar un minuto. Los datasets huge siguen solo por CLI (`app:seed-sample --size=huge --force`).
+        sample_requires_register: Registra el primer admin antes de cargar telemetría de muestra (el proyecto demo queda ligado a tu cuenta).
     step_demo:
         title: Proyecto demo
         body: Crea el admin demo (si falta) y el proyecto demo con API key.
@@ -1133,6 +1236,7 @@ setup:
         demo_ok: Usuario / proyecto demo listos.
         demo_exists: El usuario y proyecto demo ya existen.
         sample_ok: Telemetría de muestra cargada. Las alertas Mercure en vivo se activaron con los valores de entorno cuando hacía falta.
+        sample_requires_user: Inicia sesión o registra el primer admin antes de cargar datos de muestra.
         sample_demo_user: 'Se creó el admin demo local admin@symfony-beacon.local / admin123 como dueño del proyecto demo.'
         complete: Configuración marcada como completa.
         bootstrap_ready: Configuración lista. Inicia sesión o registra el primer admin para continuar.
@@ -1281,9 +1385,11 @@ legal:
         duration_consent: Aproximadamente 1 año
         purpose_session: Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio.
         purpose_remember: Permite la autenticación persistente cuando se selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada).
-        purpose_consent: Almacena las decisiones sobre categorías de cookies y una clave anonimizada con fines de responsabilidad y auditoría.
+        purpose_csrf: Cookie CSRF de doble envío de corta duración que Symfony establece al enviar formularios protegidos (patrón csrf-token_<token>; prefijo __Host- en HTTPS).
+        purpose_consent: Cookie_Consent y Cookie_Consent_Key registran que se tomó una decisión de consentimiento y vinculan una clave anónima al registro de auditoría en el servidor.
+        purpose_category: Cookie_Category_analytics y Cookie_Category_preferences almacenan si cada categoría opcional fue aceptada o rechazada (mecanismo de consentimiento, no rastreadores).
         storage_heading: Almacenamiento local
-        storage_body: La preferencia de tema (claro/oscuro) puede guardarse en el localStorage del navegador y no constituye una cookie HTTP. Según la orientación habitual sobre ePrivacy, puede tratarse como estrictamente necesaria para una interfaz coherente; el operador debe confirmar las normas aplicables en su jurisdicción.
+        storage_body: La preferencia de tema (claro/oscuro) y algunas opciones de interfaz pueden guardarse en el localStorage del navegador y no constituyen cookies HTTP. Según la orientación habitual sobre ePrivacy, puede tratarse como estrictamente necesaria para una interfaz coherente; el operador debe confirmar las normas aplicables en su jurisdicción.
 
 notifications:
     title: Notificaciones

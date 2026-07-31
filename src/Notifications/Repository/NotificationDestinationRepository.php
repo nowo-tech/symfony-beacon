@@ -51,4 +51,29 @@ class NotificationDestinationRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * Destinations whose last recorded delivery failed (cross-project ops overview).
+     *
+     * @return list<NotificationDestination>
+     */
+    public function findWithFailedLastDelivery(?Project $project = null, int $limit = 25): array
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->innerJoin('d.project', 'p')->addSelect('p')
+            ->andWhere('d.lastDeliverySuccess = false')
+            ->andWhere('d.lastDeliveryAt IS NOT NULL')
+            ->orderBy('d.lastDeliveryAt', 'DESC')
+            ->addOrderBy('d.id', 'DESC')
+            ->setMaxResults(max(1, $limit));
+
+        if ($project instanceof Project) {
+            $qb->andWhere('d.project = :project')->setParameter('project', $project);
+        }
+
+        /** @var list<NotificationDestination> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
 }

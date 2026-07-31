@@ -1,5 +1,6 @@
 # nowo-tech/breadcrumb-kit-bundle
 # https://github.com/nowo-tech/BreadcrumbKitBundle
+# Host shell only: kit/breadcrumb_dashboard_layout.html.twig — do not fork dashboard/*.twig.
 nowo_breadcrumb_kit:
     locales: '%fallback_locales%'
     default_locale: '%default_locale%'
@@ -15,6 +16,8 @@ nowo_breadcrumb_kit:
         enabled: true
         path_prefix: /breadcrumb-kit-admin
         layout_template: 'kit/breadcrumb_dashboard_layout.html.twig'
+        css_framework: bootstrap5
+        icon_set: bootstrap-icons
         modals:
             collection_form: normal
             item_form: normal
@@ -23,3 +26,6 @@ nowo_breadcrumb_kit:
         pagination:
             enabled: true
             per_page: 20
+    security:
+        access_roles: [ROLE_ADMIN]
+        allow_unauthenticated: false

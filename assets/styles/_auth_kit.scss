@@ -1,0 +1,79 @@
+/* Beacon skin for nowo-tech/auth-kit-bundle (vendor BEM + --nowo-auth-kit-* tokens). */
+
+.nowo-auth-kit {
+  --nowo-auth-kit-primary: var(--beacon-moss, #1f6f54);
+  --nowo-auth-kit-primary-hover: var(--beacon-moss-deep, #134736);
+  --nowo-auth-kit-surface: var(--beacon-surface, #ffffff);
+  --nowo-auth-kit-text: var(--beacon-ink, #0f1c18);
+  --nowo-auth-kit-muted: color-mix(in srgb, var(--beacon-ink, #0f1c18) 65%, transparent);
+  --nowo-auth-kit-border: var(--beacon-sand, #d8e2dc);
+  --nowo-auth-kit-danger: var(--beacon-alert, #b42318);
+  --nowo-auth-kit-radius: 0.75rem;
+}
+
+.nowo-auth-kit__main {
+  width: 100%;
+}
+
+.nowo-auth-kit__panel {
+  background: var(--nowo-auth-kit-surface);
+  border: 1px solid var(--nowo-auth-kit-border);
+  border-radius: var(--nowo-auth-kit-radius);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--beacon-ink, #0f1c18) 12%, transparent);
+  color: var(--nowo-auth-kit-text);
+  padding: 1.25rem 1.35rem 1.4rem;
+}
+
+.nowo-auth-kit__panel h1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 1rem;
+}
+
+/* Stack AuthKit fields: space-y utilities are :where() (0 specificity) and lose to preflight. */
+.nowo-auth-kit__panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nowo-auth-kit__panel form > button[type='submit'],
+.nowo-auth-kit__panel form > .btn-primary {
+  width: 100%;
+}
+
+.nowo-auth-kit__alert--error {
+  background: var(--beacon-flash-error-bg, #fef2f2);
+  border: 1px solid var(--beacon-flash-error-border, #fecaca);
+  border-radius: 0.5rem;
+  color: var(--nowo-auth-kit-danger);
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.nowo-auth-kit__footer,
+.nowo-auth-kit__social-heading {
+  color: var(--nowo-auth-kit-muted);
+  font-size: 0.875rem;
+}
+
+.nowo-auth-kit__footer {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.nowo-auth-kit__social {
+  border-top: 1px solid color-mix(in srgb, var(--nowo-auth-kit-text) 10%, transparent);
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+}
+
+.nowo-auth-kit__social-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

@@ -33,6 +33,7 @@
         {% endblock %}
     </head>
     <body class="page-shell{% if app.user %} page-shell--app{% endif %}">
+        {% include '_page_loader.html.twig' %}
         {% if app.user %}
             <div
                 class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}{% if app.user.preferredSidebar == 'collapsed' %} is-sidebar-collapsed{% endif %}"
@@ -44,6 +45,8 @@
                 data-sidebar-default="{{ app.user.preferredSidebar }}"
                 data-theme-sync-url="{{ path('account_theme') }}"
                 data-theme-sync-token="{{ csrf_token('account_theme') }}"
+                data-content-width-sync-url="{{ path('account_content_width') }}"
+                data-content-width-sync-token="{{ csrf_token('account_content_width') }}"
             >
                 <header class="app-header">
                     <div class="app-header__start">
@@ -63,6 +66,7 @@
                     </div>
                     <div class="app-header__end">
                         {% include '_theme_toggle.html.twig' with {compact: true} %}
+                        {% include '_content_width_toggle.html.twig' with {compact: true} %}
                         {% include '_locale_switcher.html.twig' with {compact: true} %}
                         {% include '_user_menu.html.twig' %}
                     </div>
@@ -106,14 +110,18 @@
                         {% block app_flashes %}
                             {% include '_toasts.html.twig' %}
                         {% endblock %}
+                        {# body_before/after let kit host layouts wrap page body without colliding
+                           with Dashboard Menu / Breadcrumb Kit pages that also define `body`. #}
+                        {% block body_before %}{% endblock %}
                         {% block body %}{% endblock %}
+                        {% block body_after %}{% endblock %}
 
         {% if app.user %}
                     </main>
                 </div>
                 {% include '_legal_footer.html.twig' %}
             </div>
-            <div class="app-sidebar-backdrop" data-sidebar-backdrop hidden></div>
+            <div class="app-sidebar-backdrop" data-sidebar-backdrop></div>
             {{ nowo_pwa_install_prompt() }}
             {% include '_issue_realtime.html.twig' %}
         {% else %}

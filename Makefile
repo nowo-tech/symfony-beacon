@@ -1,11 +1,11 @@
-.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample bootstrap classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa composer-outdated \
-	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens
+.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa qa-fix composer-outdated update-deps \
+	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
-	@echo "  make up              Start stack (php + mysql + messenger) + vite-build"
+	@echo "  make up              Start stack (php + mysql + messenger) + vite-build; prints HTTP/HTTPS ports"
 	@echo "  make classic         FrankenPHP HTTP in classic mode"
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
 	@echo "  make down            Stop containers"
@@ -22,9 +22,11 @@ help:
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
 	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
-	@echo "  make seed            Platform seed + demo user/project + .demo-client.env"
+	@echo "  make seed            Platform seed + demo user/project + .demo-client.env + server BEACON_DSN"
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
+	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + BEACON_DSN (no new user)"
 	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"
+	@echo "  make ready           bootstrap + seed (recommended first local run / dogfooding)"
 	@echo "  make restart         Restart php + messenger"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
@@ -38,6 +40,8 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
+	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
+	@echo "  make update-deps     composer update + pnpm update (in php container)"
 	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
 	@echo ""
 	@echo "Git hygiene:"
@@ -63,21 +67,37 @@ strip-cursor-coauthor-from-history:
 	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
 	@./.scripts/strip-cursor-coauthor-from-history.sh main
 
+# Print published app ports (from running compose, else .env / defaults).
+print-urls:
+	@HTTP_PUB=$$(docker compose port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
+	HTTPS_PUB=$$(docker compose port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
+	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
+	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
+	HTTP_PUB=$${HTTP_PUB:-9081}; \
+	HTTPS_PUB=$${HTTPS_PUB:-9444}; \
+	echo ""; \
+	echo "Beacon is up:"; \
+	echo "  HTTP:  http://localhost:$${HTTP_PUB}"; \
+	echo "  HTTPS: https://localhost:$${HTTPS_PUB}"
+
 up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	docker compose up --build -d
 	@echo "Building frontend assets (static public/build/)…"
 	@$(MAKE) vite-build
+	@$(MAKE) print-urls
 
 classic:
 	@test -f .env || cp .env.dist .env
 	FRANKENPHP_MODE=classic docker compose up --build -d
 	@$(MAKE) vite-build
+	@$(MAKE) print-urls
 
 worker:
 	@test -f .env || cp .env.dist .env
 	FRANKENPHP_MODE=worker docker compose up --build -d
 	@$(MAKE) vite-build
+	@$(MAKE) print-urls
 
 down:
 	docker compose --profile hmr down
@@ -117,21 +137,37 @@ shell:
 console:
 	docker compose exec php bin/console $(ARGS)
 
-seed-platform:
+# Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
+ensure-halite-secrets:
+	docker compose exec -T php mkdir -p var/secrets
+
+seed-platform: ensure-halite-secrets
 	docker compose exec -T php bin/console app:seed-platform
 
 seed: seed-platform
 	docker compose exec -T php bin/console app:seed-demo
 	@echo "Client env: .demo-client.env — in BeaconBundle/demo/symfony8 run: make sync-beacon"
+	@echo "Server dogfood: BEACON_DSN set in .env when empty (loopback 127.0.0.1)"
 	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
 
-seed-sample:
+seed-sample: ensure-halite-secrets
 	docker compose exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 
-bootstrap:
+# Ensure demo project + API key exist, grant ROLE_ADMIN membership, write .demo-client.env,
+# and set server BEACON_DSN (loopback) when empty. Does not create a demo admin user.
+dogfood: ensure-halite-secrets
+	docker compose exec -T php bin/console app:seed-demo --skip-demo-user
+	@echo "Dogfood: BEACON_DSN is written only when empty. If it changed, run: make restart"
+
+bootstrap: ensure-halite-secrets
 	docker compose exec -T php bin/console doctrine:migrations:migrate -n
 	@$(MAKE) seed-platform
-	@echo "Next: make seed (demo user) and/or make seed-sample — or register at /en/register"
+	@docker compose exec -T php sh -c 'mkdir -p var/site-backup && touch var/site-backup/setup.done'
+	@echo "Next: make seed (or make ready) for demo user + dogfood DSN — or open /setup / register"
+
+ready: bootstrap seed
+	@echo "Ready: demo project seeded; restart php if BEACON_DSN was just written (make restart)"
+	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
 
 restart:
 	docker compose restart php messenger
@@ -176,6 +212,14 @@ test-coverage:
 	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-text --coverage-html var/coverage-html
 
 qa: cs twig-cs phpstan rector test
+
+qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
+
+# Update PHP (Composer) and frontend (pnpm) lockfiles within constraint ranges.
+update-deps:
+	docker compose exec -T php composer update
+	docker compose exec -T php pnpm update
+	@echo "Dependencies updated. Consider: make vite-build && make qa"
 
 # Suggest pinned composer require commands for outdated direct deps (runs in php container).
 # The helper may exit non-zero when outdated packages are found; still print suggestions.

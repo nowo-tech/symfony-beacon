@@ -1,0 +1,26 @@
+{# Beacon host layout for SiteBackup setup (REQ-UI-001 / SiteBackup 1.4+).
+   Bundle pages extend nowo_site_backup_setup_layout_template and fill
+   nowo_site_backup_content (nested under nowo_ui_content).
+   Do not fork wizard/done/token under templates/bundles/. #}
+{% extends 'layouts/guest_shell.html.twig' %}
+
+{% set brand = site_appearance.brandName|default(brandName|default('Beacon')) %}
+
+{% block title %}{{ brand }} — Setup{% endblock %}
+
+{% block guest_shell_width %}max-w-xl{% endblock %}
+
+{% block body %}
+<div class="fade-up mb-6 text-center">
+    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-moss)]">
+        {{ 'setup.eyebrow'|trans }}
+    </p>
+    {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
+</div>
+
+<div class="fade-up-delay panel shadow-md nowo-site-backup-setup">
+    {% block nowo_ui_content %}
+        {% block nowo_site_backup_content %}{% endblock %}
+    {% endblock %}
+</div>
+{% endblock %}

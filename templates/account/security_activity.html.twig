@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.security.activity_title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_security_tabs.html.twig' %}
+
+    <section class="panel" data-testid="security-activity" aria-labelledby="security-activity-heading">
+        <h2 id="security-activity-heading" class="mb-1 text-lg font-semibold">{{ 'preferences.security.activity_title'|trans }}</h2>
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.activity_intro'|trans }}</p>
+
+        {% if security_actions is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.security.activity_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-3 text-sm">
+                {% for entry in security_actions %}
+                    <li class="border-b border-[var(--color-sand)] pb-3 last:border-0 last:pb-0" data-testid="security-activity-entry">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
+                            <time class="text-xs text-[var(--color-ink)]/50" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                        </div>
+                        {% if entry.context.masked is defined and entry.context.masked %}
+                            <p class="mt-1 text-xs text-[var(--color-ink)]/60">{{ entry.context.masked }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

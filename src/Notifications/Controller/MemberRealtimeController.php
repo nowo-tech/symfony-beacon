@@ -9,9 +9,11 @@ use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Realtime\IssueRealtimeTopics;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
+use App\Notifications\Service\WebPushEndpointGuard;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Mercure\ConfiguredMercure;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +32,7 @@ final class MemberRealtimeController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly ConfiguredMercure $mercure,
         private readonly WebPushClientFactory $webPushFactory,
+        private readonly WebPushEndpointGuard $webPushEndpointGuard,
         private readonly PushSubscriptionRepository $subscriptionRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -107,6 +110,12 @@ final class MemberRealtimeController extends AbstractController
         $auth = $keys['auth'] ?? null;
         if (!\is_string($p256dh) || '' === $p256dh || !\is_string($auth) || '' === $auth) {
             return $this->json(['ok' => false, 'error' => 'invalid_keys'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $this->webPushEndpointGuard->assertSafeEndpoint($endpoint);
+        } catch (InvalidArgumentException) {
+            return $this->json(['ok' => false, 'error' => 'invalid_endpoint'], Response::HTTP_BAD_REQUEST);
         }
 
         $encoding = $payload['contentEncoding'] ?? 'aes128gcm';

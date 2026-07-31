@@ -35,7 +35,6 @@ final readonly class DashboardMenuDemoSeeder
             'dashboard-menu-navigation',
             [
                 [10, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos', 'de' => 'Projekte', 'nl' => 'Projecten', 'fr' => 'Projets', 'it' => 'Progetti', 'pt' => 'Projetos'], 'dashboard_home', null],
-                [30, 'API docs', ['en' => 'API docs', 'es' => 'Docs API', 'de' => 'API-Doku', 'nl' => 'API-docs', 'fr' => 'Docs API', 'it' => 'Documentazione API', 'pt' => 'Docs da API'], 'app.swagger_ui', null],
             ],
         );
 
@@ -56,9 +55,11 @@ final readonly class DashboardMenuDemoSeeder
             'administration-menu-navigation',
             [
                 [10, 'Overview', ['en' => 'Overview', 'es' => 'Resumen', 'de' => 'Übersicht', 'nl' => 'Overzicht', 'fr' => 'Aperçu', 'it' => 'Panoramica', 'pt' => 'Resumo'], 'admin_hub', 'ROLE_ADMIN'],
+                [15, 'Ops', ['en' => 'Ops', 'es' => 'Ops', 'de' => 'Ops', 'nl' => 'Ops', 'fr' => 'Ops', 'it' => 'Ops', 'pt' => 'Ops'], 'admin_ops_overview', 'ROLE_ADMIN'],
                 [20, 'Users', ['en' => 'Users', 'es' => 'Usuarios', 'de' => 'Benutzer', 'nl' => 'Gebruikers', 'fr' => 'Utilisateurs', 'it' => 'Utenti', 'pt' => 'Utilizadores'], 'admin_users', 'ROLE_ADMIN'],
                 [25, 'Groups', ['en' => 'Groups', 'es' => 'Grupos', 'de' => 'Gruppen', 'nl' => 'Groepen', 'fr' => 'Groupes', 'it' => 'Gruppi', 'pt' => 'Grupos'], 'admin_groups', 'ROLE_ADMIN'],
                 [27, 'Projects', ['en' => 'Projects', 'es' => 'Proyectos', 'de' => 'Projekte', 'nl' => 'Projecten', 'fr' => 'Projets', 'it' => 'Progetti', 'pt' => 'Projetos'], 'admin_projects', 'ROLE_ADMIN'],
+                [28, 'API docs', ['en' => 'API docs', 'es' => 'Docs API', 'de' => 'API-Doku', 'nl' => 'API-docs', 'fr' => 'Docs API', 'it' => 'Documentazione API', 'pt' => 'Docs da API'], 'app.swagger_ui', 'ROLE_ADMIN'],
                 [30, 'Appearance', ['en' => 'Appearance', 'es' => 'Apariencia', 'de' => 'Erscheinungsbild', 'nl' => 'Weergave', 'fr' => 'Apparence', 'it' => 'Aspetto', 'pt' => 'Aparência'], 'settings_appearance', 'ROLE_ADMIN'],
                 [35, 'Mailer', ['en' => 'Mailer', 'es' => 'Correo', 'de' => 'Mailer', 'nl' => 'Mailer', 'fr' => 'Mailer', 'it' => 'Mailer', 'pt' => 'Mailer'], 'settings_mailer', 'ROLE_ADMIN'],
                 [37, 'Mercure', ['en' => 'Mercure', 'es' => 'Mercure', 'de' => 'Mercure', 'nl' => 'Mercure', 'fr' => 'Mercure', 'it' => 'Mercure', 'pt' => 'Mercure'], 'settings_mercure', 'ROLE_ADMIN'],

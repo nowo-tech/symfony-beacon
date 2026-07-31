@@ -35,6 +35,15 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h1', 'Projects');
         self::assertSelectorTextContains('body', $project->getName());
 
+        $client->request(Request::METHOD_GET, '/admin/projects', ['q' => $project->getSlug()]);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form[action$="/admin/projects"] input[name="q"]');
+        self::assertSelectorTextContains('body', $project->getName());
+
+        $client->request(Request::METHOD_GET, '/admin/projects', ['q' => 'no-such-project-zzz']);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'No projects yet');
+
         $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', $project->getName());

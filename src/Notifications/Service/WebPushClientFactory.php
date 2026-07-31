@@ -7,6 +7,7 @@ namespace App\Notifications\Service;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Builds a configured {@see WebPush} client when VAPID keys are present.
@@ -14,8 +15,11 @@ use RuntimeException;
 final readonly class WebPushClientFactory
 {
     public function __construct(
+        #[Autowire('%beacon.vapid.public_key%')]
         private string $vapidPublicKey,
+        #[Autowire('%beacon.vapid.private_key%')]
         private string $vapidPrivateKey,
+        #[Autowire('%beacon.vapid.subject%')]
         private string $vapidSubject,
     ) {
     }

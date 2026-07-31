@@ -21,11 +21,12 @@ php bin/console app:seed-demo
   [--base-url=…] [--ingest-base-url=…]
   [--write-client-env[=path]]
   [--with-platform]
+  [--skip-demo-user]
 ```
 
 | Aspect | Contract |
 |--------|----------|
-| Side effects | Demo user + `slug=demo` project + API key; optional `.demo-client.env`; optional platform if `--with-platform` |
+| Side effects | Dogfood project (`slug=symfony-beacon`, legacy `demo` upgraded) + API key; optional demo user unless `--skip-demo-user`; optional `.demo-client.env`; optional platform if `--with-platform`; may write server `BEACON_DSN` when empty |
 | Does not | Seed analytics / performance / issue volumes |
 | Idempotent | Create-once for user/project/key |
 
@@ -34,7 +35,7 @@ php bin/console app:seed-demo
 ```text
 php bin/console app:seed-sample
   [--size=dev|load|huge]      # default dev (not --profile: reserved by Symfony Console)
-  [--project=demo]            # slug
+  [--project=symfony-beacon]  # slug (legacy `demo` accepted / upgraded)
   [--purge]                   # delete telemetry for project
   [--force]                   # required for size=huge
 ```
@@ -51,12 +52,15 @@ Also ensures light perf N+1 + analytics window appropriate to size (see research
 
 | Target | Runs |
 |--------|------|
-| `make bootstrap` | `migrate -n` + `app:seed-platform` |
-| `make seed-platform` | `app:seed-platform` |
+| `make ensure-halite-secrets` | `mkdir -p var/secrets` in `php` (Halite key parent dir) |
+| `make bootstrap` | `ensure-halite-secrets` + `migrate -n` + `app:seed-platform` |
+| `make seed-platform` | `ensure-halite-secrets` + `app:seed-platform` |
 | `make seed` | `seed-platform` + `app:seed-demo` |
-| `make seed-sample` | `app:seed-sample` (`PROFILE` env → `--size`, default `dev`) |
+| `make dogfood` | `ensure-halite-secrets` + `app:seed-demo --skip-demo-user` |
+| `make seed-sample` | `ensure-halite-secrets` + `app:seed-sample` (`PROFILE` env → `--size`, default `dev`) |
 
 ## Compatibility
 
 - Keep command name `app:seed-demo` (docs/scripts already use it).
 - Alias note in help text: prefer `make seed-platform` after upgrades.
+- Dogfood project slug is `symfony-beacon` (stable name **Symfony Beacon**).

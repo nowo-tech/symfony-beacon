@@ -3,6 +3,9 @@
 # Typed aliases for env vars defined in `.env` / `.env.dist`.
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(BEACON_ENVELOPE_MAX_BYTES): '2097152'
+    env(BEACON_EVENT_QUOTA_MONTHLY): '0'
+    env(BEACON_INGEST_REJECT_QUERY_AUTH): '0'
     default_locale: '%env(DEFAULT_LOCALE)%'
     # Catalogue fallbacks when a key is missing in the active locale (always keep English).
     fallback_locales: [en, es, de, nl, fr, it, pt]
@@ -10,6 +13,7 @@ parameters:
     beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
     beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
     beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
+    beacon.event_quota_monthly: '%env(int:BEACON_EVENT_QUOTA_MONTHLY)%'
     beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
     beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
     beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
@@ -18,3 +22,8 @@ parameters:
     beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
     beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
     beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
+    beacon.envelope_max_bytes: '%env(int:BEACON_ENVELOPE_MAX_BYTES)%'
+    # When true, Envelope ingest rejects deprecated query-string auth (401). Prod defaults to 1 via beacon_ingest.yaml.
+    beacon.ingest_reject_query_auth: '%env(bool:BEACON_INGEST_REJECT_QUERY_AUTH)%'
+    # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
+    app.setup.check_platform_catalogs: true

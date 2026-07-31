@@ -17,7 +17,7 @@ use Nowo\DashboardMenuBundle\Repository\MenuRepository;
 final readonly class PlatformBootstrapState
 {
     /** @var list<string> */
-    private const REQUIRED_MENU_CODES = ['dashboard', 'preferences', 'administration'];
+    private const array REQUIRED_MENU_CODES = ['dashboard', 'preferences', 'administration'];
 
     public function __construct(
         private MenuRepository $menuRepository,

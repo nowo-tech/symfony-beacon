@@ -85,6 +85,42 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         self::assertSame('dark', $reloaded->getPreferredTheme());
     }
 
+    public function testUserCanPersistContentWidthToggleChoice(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('width-sync@example.com');
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/dashboard');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-content-width-toggle]');
+        $shell = $crawler->filter('[data-app-shell][data-content-width-sync-token]');
+        self::assertGreaterThan(0, $shell->count());
+        $token = (string) $shell->attr('data-content-width-sync-token');
+        self::assertNotSame('', $token);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/account/content-width',
+            server: [
+                'HTTP_X_CSRF_TOKEN' => $token,
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            content: json_encode(['contentWidth' => 'full'], \JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent() ?: '', true);
+        self::assertIsArray($payload);
+        self::assertTrue($payload['ok'] ?? false);
+        self::assertSame('full', $payload['contentWidth'] ?? null);
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('full', $reloaded->getPreferredContentWidth());
+    }
+
     public function testLoginShowsCustomBrand(): void
     {
         $client = self::createClient();
@@ -112,7 +148,10 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         ]);
         $client->submit($form);
 
-        $client->request(Request::METHOD_GET, '/en/logout');
+        $csrf = $client->getContainer()->get('security.csrf.token_manager')->getToken('logout')->getValue();
+        $client->request(Request::METHOD_GET, '/en/logout', [
+            '_csrf_token' => $csrf,
+        ]);
         $client->request(Request::METHOD_GET, '/en/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1.brand-mark', 'Custom Ops');
