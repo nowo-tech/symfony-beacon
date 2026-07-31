@@ -7,6 +7,7 @@ namespace App\Notifications\MessageHandler;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\NotificationCircuitBreaker;
 use App\Notifications\Service\NotificationDeliveryHistoryRecorder;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
@@ -28,6 +29,7 @@ final readonly class DeliverNotificationHandler
     public function __construct(
         private NotificationDestinationRepository $destinationRepository,
         private NotificationDeliveryHistoryRecorder $deliveryHistoryRecorder,
+        private NotificationCircuitBreaker $circuitBreaker,
         private NotificationOutboundFormatter $outboundFormatter,
         private OutboundUrlGuard $outboundUrlGuard,
         private HttpClientInterface $httpClient,
@@ -43,6 +45,14 @@ final readonly class DeliverNotificationHandler
         $isSample = true === ($message->payload['test'] ?? false);
         // Sample sends may target a disabled destination so operators can verify before enabling.
         if (null === $destination || (!$destination->isEnabled() && !$isSample)) {
+            return;
+        }
+
+        if ($this->circuitBreaker->shouldSkipDelivery($destination, $isSample)) {
+            $this->logger->info('Skipping notification delivery: circuit open.', [
+                'destination_id' => $message->destinationId,
+            ]);
+
             return;
         }
 

@@ -120,6 +120,25 @@ final class ProjectNotificationController extends AbstractController
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
+    #[Route('/projects/{projectId}/notifications/{id}/resume', name: 'project_notification_resume', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    public function resume(
+        string $projectId,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        NotificationDestination $destination,
+        Request $request,
+    ): RedirectResponse {
+        $project = $this->requireManagedDestination($projectId, $destination);
+        if (!$this->isCsrfTokenValid('notif_resume_'.$destination->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $destination->resumeCircuit();
+        $this->entityManager->flush();
+        $this->addFlash('success', 'notifications.flash.circuit_resumed');
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
     #[Route('/projects/{projectId}/notifications/{id}/delete', name: 'project_notification_delete', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
     public function delete(
         string $projectId,

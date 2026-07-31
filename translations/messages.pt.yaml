@@ -1406,6 +1406,9 @@ notifications:
     enable: Ativar
     disable: Desativar
     disabled: Desativado
+    resume: Resume
+    circuit_paused: Auto-paused
+    circuit_paused_help: 'Paused after %count% consecutive delivery failures. Outbound alerts are skipped until you resume (Send test still works).'
     test: 'Enviar teste'
     test_hint: 'Enviar uma notificacao de exemplo no formato %type% (funciona mesmo que o destino esteja desativado)'
     delete: Eliminar
@@ -1464,6 +1467,7 @@ notifications:
         disabled: 'Destino desativado.'
         deleted: 'Destino eliminado.'
         test_queued: 'Notificacao de exemplo nativa do canal colocada em fila para entrega.'
+        circuit_resumed: Destination circuit resumed; deliveries may proceed again.
     help:
         title: 'Guias de configuracao de notificacoes'
         link: 'Guias de configuracao'

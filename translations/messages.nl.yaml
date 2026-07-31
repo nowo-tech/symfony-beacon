@@ -1406,6 +1406,9 @@ notifications:
     enable: Inschakelen
     disable: Uitschakelen
     disabled: Uitgeschakeld
+    resume: Resume
+    circuit_paused: Auto-paused
+    circuit_paused_help: 'Paused after %count% consecutive delivery failures. Outbound alerts are skipped until you resume (Send test still works).'
     test: 'Test verzenden'
     test_hint: 'Verzend een voorbeeldmelding in %type%-indeling (werkt ook als de bestemming is uitgeschakeld)'
     delete: Verwijderen
@@ -1464,6 +1467,7 @@ notifications:
         disabled: 'Bestemming uitgeschakeld.'
         deleted: 'Bestemming verwijderd.'
         test_queued: 'Kanaaleigen voorbeeldmelding in wachtrij geplaatst voor levering.'
+        circuit_resumed: Destination circuit resumed; deliveries may proceed again.
     help:
         title: 'Handleidingen voor notificatie-setup'
         link: 'Setup-handleidingen'

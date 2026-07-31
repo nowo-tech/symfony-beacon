@@ -59,6 +59,14 @@ class NotificationDestination implements AuditableInterface
     #[ORM\Column]
     private bool $enabled = true;
 
+    /** Consecutive outbound delivery failures since last success or resume (`039`). */
+    #[ORM\Column(options: ['default' => 0])]
+    private int $consecutiveFailures = 0;
+
+    /** When set, the circuit is open (auto-paused) until resume or cooldown expiry. */
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $circuitOpenedAt = null;
+
     /** @var list<string> */
     #[ORM\Column(type: 'json')]
     private array $categories = ['error', 'warning', 'n_plus_one'];
@@ -167,6 +175,50 @@ class NotificationDestination implements AuditableInterface
     public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function getConsecutiveFailures(): int
+    {
+        return $this->consecutiveFailures;
+    }
+
+    public function getCircuitOpenedAt(): ?DateTimeImmutable
+    {
+        return $this->circuitOpenedAt;
+    }
+
+    public function incrementConsecutiveFailures(): self
+    {
+        ++$this->consecutiveFailures;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function openCircuit(?DateTimeImmutable $at = null): self
+    {
+        $this->circuitOpenedAt = $at ?? new DateTimeImmutable();
+        $this->touch();
+
+        return $this;
+    }
+
+    public function clearCircuitOpenedAt(): self
+    {
+        $this->circuitOpenedAt = null;
+        $this->touch();
+
+        return $this;
+    }
+
+    /** Clear circuit and failure counter (admin resume or delivery success). */
+    public function resumeCircuit(): self
+    {
+        $this->consecutiveFailures = 0;
+        $this->circuitOpenedAt = null;
         $this->touch();
 
         return $this;
@@ -338,6 +390,8 @@ class NotificationDestination implements AuditableInterface
         $this->lastDeliveryAt = $deliveredAt ?? new DateTimeImmutable();
         $this->lastDeliverySuccess = true;
         $this->lastDeliveryError = null;
+        $this->consecutiveFailures = 0;
+        $this->circuitOpenedAt = null;
         $this->touch();
 
         return $this;

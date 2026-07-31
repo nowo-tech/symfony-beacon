@@ -16,6 +16,7 @@ final readonly class NotificationDeliveryHistoryRecorder
 {
     public function __construct(
         private NotificationDeliveryAttemptRepository $attemptRepository,
+        private NotificationCircuitBreaker $circuitBreaker,
         #[Autowire('%beacon.notifications.delivery_history_limit%')]
         private int $historyLimit,
     ) {
@@ -38,6 +39,7 @@ final readonly class NotificationDeliveryHistoryRecorder
         $timestamp = $deliveredAt ?? new DateTimeImmutable();
 
         $destination->recordDeliveryFailure($error, $timestamp);
+        $this->circuitBreaker->onFailure($destination, $timestamp);
         $this->attemptRepository->record($destination, false, $error, $timestamp);
         $this->attemptRepository->removeAll($destination->trimDeliveryAttempts($this->historyLimit));
     }

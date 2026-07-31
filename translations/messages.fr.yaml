@@ -1466,6 +1466,9 @@ notifications:
     enable: Activer
     disable: Desactiver
     disabled: Desactive
+    resume: Reprendre
+    circuit_paused: Pause auto
+    circuit_paused_help: "En pause apres %count% echecs de livraison consecutifs. Les alertes sont ignorees jusqu''a la reprise (Envoyer un test fonctionne toujours)."
     test: 'Envoyer un test'
     test_hint: "Envoyer une notification d''exemple au format %type% (fonctionne meme si la destination est desactivee)"
 
@@ -1532,6 +1535,7 @@ notifications:
         disabled: 'Destination desactivee.'
         deleted: 'Destination supprimee.'
         test_queued: "Notification d''exemple native au canal mise en file pour livraison."
+        circuit_resumed: "Circuit du destinataire reouvert ; les livraisons peuvent reprendre."
 
     help:
         title: 'Guides de configuration des notifications'

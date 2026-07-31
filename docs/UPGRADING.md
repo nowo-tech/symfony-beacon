@@ -52,7 +52,11 @@ pnpm install
 make vite-build
 ```
 
-_(No additional operator steps yet — see Unreleased in CHANGELOG when cutting the next tag.)_
+### Notification circuit breaker (`039`)
+
+- New columns on `notification_destination`: `consecutive_failures`, `circuit_opened_at`.
+- Env (optional): `BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD` (default `5`), `BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES` (default `0` = pause until admin Resume).
+- Project Settings shows **Auto-paused** + **Resume** when a destination trips.
 
 ## Upgrading from 0.13.0 to 0.14.0
 

@@ -199,7 +199,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Next** |
+| 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Done** (Unreleased) |
 | 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Next** (after `039`) |
 | 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Next** (after `033`) |
 
@@ -283,4 +283,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 2. Only then pull deferred Planned rows (`040` / `041` / `042`).
 3. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (released **v0.14.0**; Next = `039` → `033` → `043`).
+Last updated: 2026-07-31 (released **v0.14.0**; `039` Done Unreleased; Next = `033` → `043`).

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Notification circuit breaker** (`039`): auto-pause destinations after consecutive delivery failures; admin **Resume** (CSRF); optional cooldown via `BEACON_NOTIFICATION_CIRCUIT_BREAKER_*`
+
 ## [0.14.0] - 2026-07-31
 
 ### Added

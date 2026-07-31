@@ -215,6 +215,7 @@ Outbound delivery runs on the **Messenger `async`** transport (`DeliverNotificat
 - Slack / Discord / Teams / Telegram / HTTP use `HttpClient` POSTs.
 - Email uses Symfony Mailer via encrypted instance Mailer settings (env `MAILER_DSN` fallback only).
 - Each attempt updates the destination **last delivery** summary and appends a bounded **delivery history** row (`notification_delivery_attempt`). Retention per destination defaults to **20** attempts (`BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`). Recent attempts appear under **Project → Settings → Health**.
+- **Circuit breaker** (`039`): after `BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD` consecutive failures (default **5**), the destination is **auto-paused** (`circuit_opened_at`). Further alerts are skipped until a project admin clicks **Resume**, or until `BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES` elapses when that value is **> 0** (default **0** = pause until resume). **Send test** still works while paused.
 
 Ensure the Messenger worker is running (`make up` starts it in Docker).
 

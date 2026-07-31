@@ -30,6 +30,7 @@ final readonly class NotificationDispatcher
         private NotificationDigestBufferRepository $bufferRepository,
         private NotificationPayloadBuilder $payloadBuilder,
         private QuietHoursEvaluator $quietHoursEvaluator,
+        private NotificationCircuitBreaker $circuitBreaker,
         private MessageBusInterface $bus,
         private EntityManagerInterface $entityManager,
         private MemberIssueRealtimeNotifierInterface $memberRealtimeNotifier,
@@ -183,6 +184,10 @@ final readonly class NotificationDispatcher
     private function enqueueOrBuffer(int $destinationId, NotificationDestination $destination, array $payload): void
     {
         if ($destinationId < 1) {
+            return;
+        }
+
+        if ($this->circuitBreaker->shouldSkipDelivery($destination)) {
             return;
         }
 

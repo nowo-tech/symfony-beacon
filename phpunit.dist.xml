@@ -41,6 +41,8 @@
         <env name="BEACON_INGEST_REJECT_QUERY_AUTH" value="1" force="true"/>
         <env name="BEACON_METRICS_REQUIRE_TOKEN" value="0" force="true"/>
         <env name="BEACON_METRICS_TOKEN" value="phpunit-metrics-token" force="true"/>
+        <env name="BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD" value="3" force="true"/>
+        <env name="BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES" value="0" force="true"/>
     </php>
 
     <testsuites>

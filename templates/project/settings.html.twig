@@ -472,8 +472,16 @@
         <ul class="space-y-2 text-sm">
             {% for destination in destinations %}
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
-                    <div class="font-medium">{{ destination.label }}</div>
+                    <div class="font-medium">
+                        {{ destination.label }}
+                        {% if beacon_notification_circuit_open(destination) %}
+                            <span class="badge badge-error">{{ 'notifications.circuit_paused'|trans }}</span>
+                        {% endif %}
+                    </div>
                     <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                        {% if beacon_notification_circuit_open(destination) %}
+                            <p class="text-[var(--color-alert)]">{{ 'notifications.circuit_paused_help'|trans({'%count%': destination.consecutiveFailures}) }}</p>
+                        {% endif %}
                         {% if destination.lastDeliveryAt %}
                             {{ 'project.health.last_delivery'|trans }}
                             {{ destination.lastDeliveryAt|date('Y-m-d H:i') }}
@@ -490,6 +498,12 @@
                             {{ 'project.health.never_delivered'|trans }}
                         {% endif %}
                     </div>
+                    {% if beacon_notification_circuit_open(destination) and membership.role.value in ['owner', 'admin'] %}
+                        <form class="mt-2" method="post" action="{{ path('project_notification_resume', {projectId: project.uuid, id: destination.uuid}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('notif_resume_' ~ destination.id) }}">
+                            <button class="btn-ghost" type="submit">{{ 'notifications.resume'|trans }}</button>
+                        </form>
+                    {% endif %}
                     {% set attempts = delivery_attempts_by_destination[destination.id]|default([]) %}
                     <div class="mt-3">
                         {% if attempts is empty %}
@@ -624,6 +638,9 @@
                                 {% if not destination.enabled %}
                                     <span class="badge badge-error">{{ 'notifications.disabled'|trans }}</span>
                                 {% endif %}
+                                {% if beacon_notification_circuit_open(destination) %}
+                                    <span class="badge badge-error">{{ 'notifications.circuit_paused'|trans }}</span>
+                                {% endif %}
                             </div>
                             <div class="mt-1 text-xs text-[var(--color-ink)]/60">
                                 {{ ('notifications.type.' ~ destination.type.value)|trans }}
@@ -638,6 +655,12 @@
                         {% if membership.role.value in ['owner', 'admin'] %}
                             <div class="flex flex-wrap gap-2">
                                 <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.uuid, id: destination.uuid}) }}">{{ 'notifications.edit'|trans }}</a>
+                                {% if beacon_notification_circuit_open(destination) %}
+                                    <form method="post" action="{{ path('project_notification_resume', {projectId: project.uuid, id: destination.uuid}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('notif_resume_' ~ destination.id) }}">
+                                        <button class="btn-ghost" type="submit">{{ 'notifications.resume'|trans }}</button>
+                                    </form>
+                                {% endif %}
                                 <form method="post" action="{{ path('project_notification_toggle', {projectId: project.uuid, id: destination.uuid}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_toggle_' ~ destination.id) }}">
                                     <button class="btn-ghost" type="submit">{{ destination.enabled ? 'notifications.disable'|trans : 'notifications.enable'|trans }}</button>

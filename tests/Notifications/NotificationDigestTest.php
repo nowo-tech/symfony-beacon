@@ -12,6 +12,7 @@ use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
+use App\Notifications\Service\NotificationCircuitBreaker;
 use App\Notifications\Service\NotificationDigestFlusher;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
@@ -68,6 +69,7 @@ final class NotificationDigestTest extends TestCase
             $bufferRepo,
             new NotificationPayloadBuilder($urls),
             new QuietHoursEvaluator(),
+            new NotificationCircuitBreaker(5, 0),
             $bus,
             $em,
             $this->createStub(MemberIssueRealtimeNotifierInterface::class),
