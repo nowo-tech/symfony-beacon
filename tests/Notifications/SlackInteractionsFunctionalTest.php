@@ -11,6 +11,7 @@ use App\Shared\IssueStatus;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 
 final class SlackInteractionsFunctionalTest extends DatabaseWebTestCase
@@ -228,7 +229,7 @@ final class SlackInteractionsFunctionalTest extends DatabaseWebTestCase
     }
 
     private function postSlackAction(
-        \Symfony\Bundle\FrameworkBundle\KernelBrowser $client,
+        KernelBrowser $client,
         NotificationDestination $destination,
         string $projectUuid,
         string $issueUuid,

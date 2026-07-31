@@ -14,6 +14,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\SlackRequestSignatureVerifier;
+use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\IssueStatus;
@@ -141,7 +142,7 @@ final class SlackInteractionsController extends AbstractController
             $actor = null;
             if ($mappedUser instanceof User) {
                 $access = $this->projectAccess->resolveAccess($project, $mappedUser);
-                if (null !== $access && $access->canTriageIssues()) {
+                if ($access instanceof ProjectAccess && $access->canTriageIssues()) {
                     $actor = $mappedUser;
                 }
             }
