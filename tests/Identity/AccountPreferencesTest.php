@@ -150,6 +150,34 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('[data-testid="profile-overview"]', 'Updated Prefs');
     }
 
+    public function testUserCanSavePhoneForQrLogin(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('qr-phone@example.com');
+        $user->setDisplayName('QR User');
+        self::getContainer()->get('doctrine')->getManager()->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/profile');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('input[name="user_preferences[phone]"]');
+
+        $form = $crawler->selectButton('Save profile')->form([
+            'user_preferences[displayName]' => 'QR User',
+            'user_preferences[email]' => 'qr-phone@example.com',
+            'user_preferences[phone]' => '+34600111222',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/account/profile');
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertInstanceOf(User::class, $reloaded);
+        self::assertSame('+34600111222', $reloaded->getPhone());
+        self::assertNotNull($reloaded->getPhoneVerifiedAt());
+    }
+
     public function testUserCanUpdateDisplayPreferences(): void
     {
         [$client, $user] = $this->bootWithDemoProject('display@example.com');

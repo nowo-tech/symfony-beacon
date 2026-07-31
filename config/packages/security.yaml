@@ -61,6 +61,8 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/login/social
       roles: PUBLIC_ACCESS
+    - path: ^/login/qr
+      roles: PUBLIC_ACCESS
     - path: ^/reset-password
       roles: PUBLIC_ACCESS
     - path: ^/share/
@@ -71,6 +73,8 @@ security:
     - path: ^/(en|es|de|nl|fr|it|pt)/login/magic
       roles: PUBLIC_ACCESS
     - path: ^/(en|es|de|nl|fr|it|pt)/login/social
+      roles: PUBLIC_ACCESS
+    - path: ^/(en|es|de|nl|fr|it|pt)/login/qr
       roles: PUBLIC_ACCESS
     - path: ^/(en|es|de|nl|fr|it|pt)/reset-password
       roles: PUBLIC_ACCESS

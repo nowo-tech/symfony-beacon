@@ -828,6 +828,8 @@ preferences:
         role_member: Lid
         slack_user_id: Slack user ID
         slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
+        phone: Telefoonnummer
+        phone_help: 'Optioneel. Vereist voor QR-login. Opslaan markeert als geverifieerd tot SMS-OTP.'
         projects_title: 'Je projecten'
         projects_intro: 'Projecten via direct lidmaatschap.'
         projects_empty: 'Je bent nog geen direct lid van een project.'

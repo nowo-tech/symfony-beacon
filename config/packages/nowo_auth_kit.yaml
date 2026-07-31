@@ -49,6 +49,14 @@ nowo_auth_kit:
             social_login:
                 mode: enabled
                 create_user_if_missing: false
+            # QR phone login (AuthKit 1.12). Requires User.phone + phoneVerifiedAt.
+            qr_login:
+                mode: enabled
+                challenge_ttl: 90
+                approve_requires: session
+                desktop_binding: strict
+                phone_field: phone
+                phone_verified_field: phoneVerifiedAt
             embed:
                 mode: disabled
             css:
@@ -96,3 +104,21 @@ nowo_auth_kit:
                 social_login_check:
                     path: /login/social/{provider}/check
                     name: nowo_auth_kit_social_login_check
+                qr_login_start:
+                    path: /login/qr
+                    name: nowo_auth_kit_qr_login_start
+                qr_login_show:
+                    path: /login/qr/{id}
+                    name: nowo_auth_kit_qr_login_show
+                qr_login_status:
+                    path: /login/qr/{id}/status
+                    name: nowo_auth_kit_qr_login_status
+                qr_login_complete:
+                    path: /login/qr/{id}/complete
+                    name: nowo_auth_kit_qr_login_complete
+                qr_login_approve:
+                    path: /login/qr/{id}/approve
+                    name: nowo_auth_kit_qr_login_approve
+                qr_login_deny:
+                    path: /login/qr/{id}/deny
+                    name: nowo_auth_kit_qr_login_deny

@@ -33,7 +33,7 @@
         "minishlink/web-push": "11.0.0",
         "nelmio/api-doc-bundle": "5.10.3",
         "nowo-tech/audit-kit-bundle": "1.1.11",
-        "nowo-tech/auth-kit-bundle": "1.11.4",
+        "nowo-tech/auth-kit-bundle": "1.12.0",
         "nowo-tech/beacon-bundle": "1.6.10",
         "nowo-tech/breadcrumb-kit-bundle": "2.0.11",
         "nowo-tech/cookie-consent-bundle": "1.4.8",

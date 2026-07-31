@@ -33,6 +33,12 @@ final class AccountProfileType extends FormKitAbstractType
                 'help' => 'preferences.profile.slack_user_id_help',
                 'constraints' => [new Length(max: 64)],
             ]);
+            $this->addTextField('phone', [
+                'required' => false,
+                'label' => 'preferences.profile.phone',
+                'help' => 'preferences.profile.phone_help',
+                'constraints' => [new Length(max: 32)],
+            ]);
         });
     }
 

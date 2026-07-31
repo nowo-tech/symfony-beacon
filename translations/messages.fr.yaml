@@ -833,6 +833,8 @@ preferences:
         role_member: Membre
         slack_user_id: Slack user ID
         slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
+        phone: Numéro de téléphone
+        phone_help: 'Facultatif. Requis pour la connexion QR. L’enregistrement le marque vérifié jusqu’à l’OTP SMS.'
         projects_title: 'Vos projets'
         projects_intro: 'Projets accessibles via une appartenance directe.'
         projects_empty: 'Vous n’êtes membre direct d’aucun projet pour le moment.'

@@ -23,6 +23,21 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'symfony-beacon');
         self::assertSelectorExists('input[name="login_form[_remember_me]"]');
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertMatchesRegularExpression('#href="[^"]*/login/qr"#', $html);
+        self::assertStringContainsString('Sign in with phone', $html);
+    }
+
+    public function testQrLoginStartIsPublic(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/login/qr');
+        self::assertTrue(
+            $client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection(),
+            'QR start should be publicly reachable (200 or redirect to show).',
+        );
+        self::assertNotSame(403, $client->getResponse()->getStatusCode());
+        self::assertNotSame(401, $client->getResponse()->getStatusCode());
     }
 
     public function testPathLocaleSwitchShowsSpanishLogin(): void
