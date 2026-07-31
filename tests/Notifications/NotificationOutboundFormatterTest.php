@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Notifications;
 
+use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use InvalidArgumentException;
@@ -67,6 +68,50 @@ final class NotificationOutboundFormatterTest extends TestCase
         self::assertSame($payload, $slack['json']['beacon']);
         self::assertSame('#C9A227', $slack['json']['attachments'][0]['color']);
         self::assertSame('Beacon · sample send', $slack['json']['attachments'][0]['footer']);
+        self::assertArrayNotHasKey('blocks', $slack['json']);
+    }
+
+    public function testAddsSlackResolveBlockWhenSigningSecretPresent(): void
+    {
+        $formatter = new NotificationOutboundFormatter();
+        $destination = new NotificationDestination();
+        $destination->setType(NotificationDestinationType::Slack);
+        $destination->setSigningSecret('secret');
+        $destination->setEndpointUrl('https://hooks.slack.com/services/T/B/X');
+        $destination->setLabel('Ops');
+        $destination->setCategories(['error']);
+
+        $payload = [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'url' => 'https://beacon.test/i/1',
+            'project' => [
+                'uuid' => '11111111-1111-4111-8111-111111111111',
+                'name' => 'Acme',
+            ],
+            'issue' => [
+                'uuid' => '22222222-2222-4222-8222-222222222222',
+                'title' => 'Boom',
+                'level' => 'error',
+            ],
+        ];
+
+        $slack = $formatter->httpRequest(
+            NotificationDestinationType::Slack,
+            'https://hooks.slack.com/services/T/B/X',
+            $payload,
+            $destination,
+        );
+
+        self::assertArrayHasKey('blocks', $slack['json']);
+        $actions = $slack['json']['blocks'][1];
+        self::assertSame('actions', $actions['type']);
+        self::assertSame('beacon_resolve', $actions['elements'][0]['action_id']);
+        $value = json_decode((string) $actions['elements'][0]['value'], true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('resolve', $value['a']);
+        self::assertSame($destination->getUuid(), $value['d']);
+        self::assertSame('11111111-1111-4111-8111-111111111111', $value['p']);
+        self::assertSame('22222222-2222-4222-8222-222222222222', $value['i']);
     }
 
     public function testEmailBodyIncludesFactsAndUrl(): void

@@ -1594,6 +1594,9 @@ notifications:
         endpoint_invalid: "L''endpoint ne correspond pas au type selectionne."
 
         endpoint_ssrf: "L''endpoint ne doit pas cibler des adresses privees, link-local ou de metadonnees cloud."
+        signing_secret: Slack signing secret
+        signing_secret_help: 'Optional. Slack app Signing Secret enables interactive Resolve buttons. Leave blank to keep the current value.'
+        clear_signing_secret: Clear Slack signing secret
 
         enabled: Active
         categories: "Categories d''alerte"
