@@ -9,6 +9,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Project\Entity\Project;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,9 +27,9 @@ final readonly class IssueUserMailNotifier
         private UrlGeneratorInterface $urlGenerator,
         private LoggerInterface $logger,
         private InboundEmailReplyToken $inboundEmailReplyToken,
-        #[\Symfony\Component\DependencyInjection\Attribute\Autowire('%beacon.inbound_email.enabled%')]
+        #[Autowire('%beacon.inbound_email.enabled%')]
         private bool $inboundEmailEnabled = false,
-        #[\Symfony\Component\DependencyInjection\Attribute\Autowire('%beacon.inbound_email.mail_domain%')]
+        #[Autowire('%beacon.inbound_email.mail_domain%')]
         private string $inboundMailDomain = '',
     ) {
     }

@@ -12,13 +12,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *
  * Token payload is base64url(json) + "." + hex hmac.
  */
-final class InboundEmailReplyToken
+final readonly class InboundEmailReplyToken
 {
     public const int DEFAULT_TTL_SECONDS = 2_592_000; // 30 days
 
     public function __construct(
         #[Autowire('%beacon.inbound_email.signing_secret%')]
-        private readonly string $signingSecret,
+        private string $signingSecret,
     ) {
     }
 

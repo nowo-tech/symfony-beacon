@@ -21,7 +21,7 @@ final class InboundEmailUnitTest extends TestCase
 
     public function testQuoteStripperRemovesQuotedReply(): void
     {
-        $body = (new InboundEmailQuoteStripper())->strip("Hello\n\nOn Mon, someone wrote:\n> prior");
+        $body = new InboundEmailQuoteStripper()->strip("Hello\n\nOn Mon, someone wrote:\n> prior");
         self::assertSame('Hello', $body);
     }
 }
