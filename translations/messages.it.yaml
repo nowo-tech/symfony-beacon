@@ -87,7 +87,7 @@ auth:
         submit: 'Invia magic link'
         sent: "Se quell'account esiste ed è attivo, il link è in arrivo."
         throttled: 'Troppe richieste. Riprova più tardi.'
-        invalid: 'Impossibile elaborare la richiesta.'
+        invalid: Questo link non è valido, è scaduto, revocato o esaurito.
         unavailable: "L'accesso con magic link non è disponibile finché un amministratore non configura il Mailer (DSN crittografato) in Amministrazione → Mailer."
         back_to_password: 'Accedi con password'
         email_subject: 'Il tuo magic link Beacon'
@@ -326,8 +326,13 @@ projects:
     errors_last_7_days: '%count% errori negli ultimi 7 giorni'
     share:
         title: 'Link di condivisione'
-        help: 'Crea un link temporaneo con accesso in sola lettura (viewer) a questo progetto (o a una issue). I destinatari devono accedere.'
+        help: Crea un link a tempo limitato in sola lettura per questo progetto (o una issue). I destinatari devono accedere. I nuovi link hanno 1 uso per impostazione predefinita.
         days: 'Durata (giorni)'
+        max_uses: Usi massimi
+        max_uses_help: Lascia Usi massimi vuoto per aperture illimitate fino alla scadenza. Il valore predefinito è 1.
+        max_uses_unlimited: Illimitato
+        max_uses_invalid: Usi massimi deve essere un intero positivo (o vuoto per illimitato).
+        uses: 'Usi %used% / %max%'
         issue_uuid: 'UUID issue (opzionale)'
         issue_optional: "Lascia vuoto per l'intero progetto"
         create: 'Crea link di condivisione'
@@ -337,7 +342,7 @@ projects:
         scoped_issue: 'Limitato a una issue'
         created: 'Link creato — copialo ora; non verrà mostrato di nuovo.'
         revoked: 'Link di condivisione revocato.'
-        invalid: 'Questo link è non valido, scaduto o revocato.'
+        invalid: Questo link non è valido, è scaduto, revocato o esaurito.
         invalid_csrf: 'Token di sicurezza non valido.'
         issue_not_found: 'Issue non trovata in questo progetto.'
         expires_in_past: 'La scadenza deve essere nel futuro.'

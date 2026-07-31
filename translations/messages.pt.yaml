@@ -87,7 +87,7 @@ auth:
         submit: 'Enviar magic link'
         sent: 'Se essa conta existir e estiver ativa, o link está a caminho.'
         throttled: 'Demasiados pedidos. Tente mais tarde.'
-        invalid: 'Não foi possível processar o pedido.'
+        invalid: Este link é inválido, expirou, foi revogado ou esgotou as utilizações.
         unavailable: 'O início de sessão por magic link fica indisponível até um administrador configurar o Mailer (DSN encriptado) em Administração → Mailer.'
         back_to_password: 'Entrar com palavra-passe'
         email_subject: 'O seu magic link Beacon'
@@ -326,8 +326,13 @@ projects:
     errors_last_7_days: '%count% erros nos últimos 7 dias'
     share:
         title: 'Ligações de partilha'
-        help: 'Crie uma ligação temporária com acesso só de leitura (viewer) a este projeto (ou a uma issue). Os destinatários têm de iniciar sessão.'
+        help: Crie um link temporário somente leitura para este projeto (ou uma issue). Os destinatários devem iniciar sessão. Novos links usam 1 utilização por omissão.
         days: 'Validade (dias)'
+        max_uses: Utilizações máx.
+        max_uses_help: Deixe Utilizações máx. vazio para aberturas ilimitadas até expirar. O valor predefinido é 1.
+        max_uses_unlimited: Ilimitado
+        max_uses_invalid: Utilizações máx. deve ser um inteiro positivo (ou vazio para ilimitado).
+        uses: 'Utilizações %used% / %max%'
         issue_uuid: 'UUID da issue (opcional)'
         issue_optional: 'Deixe vazio para o projeto inteiro'
         create: 'Criar ligação de partilha'
@@ -337,7 +342,7 @@ projects:
         scoped_issue: 'Limitada a uma issue'
         created: 'Ligação criada — copie-a agora; não será mostrada novamente.'
         revoked: 'Ligação de partilha revogada.'
-        invalid: 'Esta ligação é inválida, expirou ou foi revogada.'
+        invalid: Este link é inválido, expirou, foi revogado ou esgotou as utilizações.
         invalid_csrf: 'Token de segurança inválido.'
         issue_not_found: 'Issue não encontrada neste projeto.'
         expires_in_past: 'A expiração tem de ser no futuro.'

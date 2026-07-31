@@ -53,6 +53,13 @@ class ProjectShareLink
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $lastUsedAt = null;
 
+    /** Null = unlimited uses within lifetime (legacy / explicit unlimited). */
+    #[ORM\Column(nullable: true)]
+    private ?int $maxUses = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private int $useCount = 0;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -155,7 +162,29 @@ class ProjectShareLink
 
     public function isUsable(?DateTimeImmutable $now = null): bool
     {
-        return !$this->isRevoked() && !$this->isExpired($now);
+        return !$this->isRevoked() && !$this->isExpired($now) && !$this->isExhausted();
+    }
+
+    public function getMaxUses(): ?int
+    {
+        return $this->maxUses;
+    }
+
+    public function setMaxUses(?int $maxUses): self
+    {
+        $this->maxUses = $maxUses;
+
+        return $this;
+    }
+
+    public function getUseCount(): int
+    {
+        return $this->useCount;
+    }
+
+    public function isExhausted(): bool
+    {
+        return null !== $this->maxUses && $this->useCount >= $this->maxUses;
     }
 
     public function getLastUsedAt(): ?DateTimeImmutable
@@ -165,6 +194,7 @@ class ProjectShareLink
 
     public function markUsed(?DateTimeImmutable $at = null): self
     {
+        ++$this->useCount;
         $this->lastUsedAt = $at ?? new DateTimeImmutable();
 
         return $this;

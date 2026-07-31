@@ -87,7 +87,7 @@ auth:
         submit: 'Magic-Link senden'
         sent: 'Wenn dieses Konto existiert und aktiviert ist, ist der Link unterwegs.'
         throttled: 'Zu viele Anfragen. Versuchen Sie es später erneut.'
-        invalid: 'Die Anfrage konnte nicht verarbeitet werden.'
+        invalid: Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.
         unavailable: 'Die Anmeldung per Magic-Link ist erst verfügbar, wenn ein Administrator unter Administration → Mailer einen verschlüsselten Mailer-DSN konfiguriert.'
         back_to_password: 'Mit Passwort anmelden'
         email_subject: 'Ihr Beacon Magic-Link'
@@ -326,8 +326,13 @@ projects:
     errors_last_7_days: '%count% Fehler in den letzten 7 Tagen'
     share:
         title: Freigabelinks
-        help: 'Erstellen Sie einen zeitlich begrenzten Link mit schreibgeschütztem Viewer-Zugriff auf dieses Projekt (oder ein Issue). Empfänger müssen sich anmelden.'
+        help: Erstellen Sie einen zeitlich begrenzten Link mit schreibgeschütztem Viewer-Zugriff auf dieses Projekt (oder ein Issue). Empfänger müssen sich anmelden. Neue Links sind standardmäßig einmalig nutzbar.
         days: 'Gültigkeit (Tage)'
+        max_uses: Max. Nutzungen
+        max_uses_help: Lassen Sie Max. Nutzungen leer für unbegrenzte Öffnungen bis zum Ablauf. Standard ist 1 (einmalig).
+        max_uses_unlimited: Unbegrenzt
+        max_uses_invalid: Max. Nutzungen muss eine positive Ganzzahl sein (oder leer für unbegrenzt).
+        uses: 'Nutzungen %used% / %max%'
         issue_uuid: 'Issue-UUID (optional)'
         issue_optional: 'Leer lassen für das gesamte Projekt'
         create: 'Freigabelink erstellen'
@@ -337,7 +342,7 @@ projects:
         scoped_issue: 'Auf Issue beschränkt'
         created: 'Freigabelink erstellt — jetzt kopieren; er wird nicht erneut angezeigt.'
         revoked: 'Freigabelink widerrufen.'
-        invalid: 'Dieser Freigabelink ist ungültig, abgelaufen oder widerrufen.'
+        invalid: Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.
         invalid_csrf: 'Ungültiges Sicherheitstoken.'
         issue_not_found: 'Issue in diesem Projekt nicht gefunden.'
         expires_in_past: 'Das Ablaufdatum muss in der Zukunft liegen.'

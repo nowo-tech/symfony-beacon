@@ -83,7 +83,7 @@ auth:
         submit: Enviar enlace
         sent: Si esa cuenta existe y está activa, el enlace está en camino.
         throttled: Demasiadas solicitudes. Inténtalo más tarde.
-        invalid: No se pudo procesar la solicitud.
+        invalid: Este enlace no es válido, ha caducado, fue revocado o agotó sus usos.
         unavailable: El acceso con enlace mágico no está disponible hasta que un administrador configure el Mailer (DSN cifrado) en Administración → Mailer.
         back_to_password: Entrar con contraseña
         email_subject: Tu enlace mágico de Beacon
@@ -315,8 +315,13 @@ projects:
     create_first: Crea tu primer proyecto
     share:
         title: Enlaces para compartir
-        help: Crea un enlace temporal de solo lectura al proyecto (o a un issue). El destinatario debe iniciar sesión.
+        help: Crea un enlace temporal de solo lectura al proyecto (o a un issue). El destinatario debe iniciar sesión. Los enlaces nuevos usan 1 uso por defecto.
         days: Duración (días)
+        max_uses: Usos máximos
+        max_uses_help: Deja Usos máximos vacío para aperturas ilimitadas hasta la caducidad. El valor por defecto es 1 (un solo uso).
+        max_uses_unlimited: Ilimitado
+        max_uses_invalid: Usos máximos debe ser un entero positivo (o vacío para ilimitado).
+        uses: 'Usos %used% / %max%'
         issue_uuid: UUID del issue (opcional)
         issue_optional: Vacío = proyecto completo
         create: Crear enlace
@@ -326,7 +331,7 @@ projects:
         scoped_issue: Acotado a un issue
         created: Enlace creado — cópialo ahora; no se volverá a mostrar.
         revoked: Enlace revocado.
-        invalid: Este enlace no es válido, ha caducado o fue revocado.
+        invalid: Este enlace no es válido, ha caducado, fue revocado o agotó sus usos.
         invalid_csrf: Token de seguridad no válido.
         issue_not_found: Issue no encontrado en este proyecto.
         expires_in_past: La caducidad debe ser futura.

@@ -199,6 +199,8 @@ erDiagram
         datetime expires_at
         datetime revoked_at
         datetime last_used_at
+        int max_uses
+        int use_count
         datetime created_at
     }
 
