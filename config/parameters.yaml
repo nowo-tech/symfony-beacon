@@ -37,3 +37,32 @@ parameters:
     beacon.metrics_require_token: '%env(bool:BEACON_METRICS_REQUIRE_TOKEN)%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true
+    # AuthKit social OAuth apps (empty = skip seed). Env-backed for FrankenPHP-safe DI (no $_ENV reads).
+    env(AUTH_KIT_SOCIAL_GOOGLE_CLIENT_ID): ''
+    env(AUTH_KIT_SOCIAL_GOOGLE_CLIENT_SECRET): ''
+    env(AUTH_KIT_SOCIAL_GOOGLE_LABEL): ''
+    env(AUTH_KIT_SOCIAL_GOOGLE_ENABLED): '1'
+    env(AUTH_KIT_SOCIAL_GITHUB_CLIENT_ID): ''
+    env(AUTH_KIT_SOCIAL_GITHUB_CLIENT_SECRET): ''
+    env(AUTH_KIT_SOCIAL_GITHUB_LABEL): ''
+    env(AUTH_KIT_SOCIAL_GITHUB_ENABLED): '1'
+    env(AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_ID): ''
+    env(AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_SECRET): ''
+    env(AUTH_KIT_SOCIAL_MICROSOFT_LABEL): ''
+    env(AUTH_KIT_SOCIAL_MICROSOFT_ENABLED): '1'
+    beacon.auth_kit_social_providers:
+        google:
+            client_id: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_CLIENT_SECRET)%'
+            label: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_LABEL)%'
+            enabled: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_ENABLED)%'
+        github:
+            client_id: '%env(default::AUTH_KIT_SOCIAL_GITHUB_CLIENT_ID)%'
+            client_secret: '%env(default::AUTH_KIT_SOCIAL_GITHUB_CLIENT_SECRET)%'
+            label: '%env(default::AUTH_KIT_SOCIAL_GITHUB_LABEL)%'
+            enabled: '%env(default::AUTH_KIT_SOCIAL_GITHUB_ENABLED)%'
+        microsoft:
+            client_id: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_ID)%'
+            client_secret: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_SECRET)%'
+            label: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_LABEL)%'
+            enabled: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_ENABLED)%'

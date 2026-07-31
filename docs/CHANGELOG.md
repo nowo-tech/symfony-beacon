@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **PHPStan / FrankenPHP CI** (`063`): FormBuilder generics on `AccountDisplayType`; social login seed via container params (no `$_ENV`); SiteBackup guard instance latch; ingest query-auth test swaps `IngestQueryAuthSettings` instead of `putenv`
 - **SiteBackup secrets guard** (`062`, Fixes #3): fail closed for empty/local-default `SITE_SETUP_TOKEN` / `SITE_BACKUP_PASSWORD_HASH` in **all environments except `dev`/`test`** (covers `staging` and misnamed deploys, not only `prod`)
 
 ## [0.15.0] - 2026-07-31
