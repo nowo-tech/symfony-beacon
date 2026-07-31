@@ -558,11 +558,13 @@ analytics:
         nplus1_groups: N+1-Gruppen
 appearance:
     title: Aussehen
-    intro: 'Passen Sie den Markennamen, die Akzentfarben und die Gefahrenfarben für diese Beacon-Instanz an. Nur Administratoren können diese Einstellungen ändern.'
+    intro: 'Passen Sie Markennamen, Akzente, Statusfarben und Oberflächen für diese Beacon-Instanz an. Nur Administratoren können diese Einstellungen ändern.'
     section:
         light: 'Leichte Themenakzente'
         dark: 'Dunkle Themenakzente'
         danger: Gefahren-/Fehlerfarben
+        warn: Warnfarben
+        surfaces: 'Oberflächen (Papier, Tinte, Panels)'
     submit: 'Aussehen speichern'
     reset: 'Auf Standardeinstellungen zurücksetzen'
 site_appearance:
@@ -598,6 +600,38 @@ site_appearance:
         label: 'Gefahr (dunkel)'
         placeholder: '#f97066'
         help: 'Fehler / destruktiver Akzent im Dunkelmodus.'
+    warn_color:
+        label: Warnung
+        placeholder: '#b54708'
+        help: 'Warnakzent im Lichtmodus.'
+    warn_color_dark:
+        label: 'Warnung (dunkel)'
+        placeholder: '#fdb022'
+        help: 'Warnakzent im Dunkelmodus.'
+    paper_color:
+        label: Papier
+        placeholder: '#f3f6f4'
+        help: 'Seitenhintergrund im Lichtmodus.'
+    paper_color_dark:
+        label: 'Papier (dunkel)'
+        placeholder: '#0c1210'
+        help: 'Seitenhintergrund im Dunkelmodus.'
+    ink_color:
+        label: Tinte
+        placeholder: '#0f1c18'
+        help: 'Primäre Textfarbe im Lichtmodus.'
+    ink_color_dark:
+        label: 'Tinte (dunkel)'
+        placeholder: '#e6eee9'
+        help: 'Primäre Textfarbe im Dunkelmodus.'
+    surface_color:
+        label: Oberfläche
+        placeholder: '#ffffff'
+        help: 'Panels und Karten im Lichtmodus.'
+    surface_color_dark:
+        label: 'Oberfläche (dunkel)'
+        placeholder: '#151c19'
+        help: 'Panels und Karten im Dunkelmodus.'
     color:
         invalid: 'Verwenden Sie eine Hex-Farbe wie #1f6f54.'
 users:
@@ -1034,7 +1068,7 @@ admin:
         groups: 'Erstellen Sie Gruppen und verwalten Sie deren Mitglieder für den Projektzugriff.'
         projects: 'Listen Sie alle Projekte auf, verwalten Sie Mitglieder und Gruppenlinks oder löschen Sie ein Projekt.'
         ops: Projektübergreifende Spitzen, offene Issues und fehlgeschlagene Zustellungen.
-        appearance: 'Markenname und Akzentfarben.'
+        appearance: 'Markenname, Akzente, Statusfarben und Oberflächen.'
         menus: 'Navigationsmenüs bearbeiten.'
         breadcrumbs: 'Breadcrumb-Sammlungen verwalten.'
         mailer: 'Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.'

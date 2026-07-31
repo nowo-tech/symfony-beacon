@@ -15,36 +15,10 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('password-strength.js', 'nowo_password_strength') }}" defer></script>
-    {# Mirror generator “Use this password” into the confirm field (kit only fills the strength input). #}
-    <script>
-        document.addEventListener('click', (event) => {
-            const target = event.target;
-            if (!(target instanceof Element)) {
-                return;
-            }
-            const item = target.closest('.password-strength-modal-item');
-            if (!item) {
-                return;
-            }
-            const useBtn = item.querySelector('button:last-of-type');
-            if (!(useBtn instanceof HTMLElement) || target.closest('button') !== useBtn) {
-                return;
-            }
-            window.requestAnimationFrame(() => {
-                const input = document.querySelector('form[name="user_preferences"] input.password-strength-input');
-                const confirm = document.querySelector('form[name="user_preferences"] input[name="user_preferences[plainPassword_confirm]"]');
-                if (input instanceof HTMLInputElement && confirm instanceof HTMLInputElement && input.value !== '') {
-                    confirm.value = input.value;
-                    confirm.dispatchEvent(new Event('input', { bubbles: true }));
-                    confirm.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            });
-        });
-    </script>
 {% endblock %}
 
 {% block body %}
-<div class="mx-auto space-y-6">
+<div class="mx-auto space-y-6" data-controller="password-confirm-mirror">
     <div>
         <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.security.title'|trans }}</h1>
         <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.intro'|trans }}</p>

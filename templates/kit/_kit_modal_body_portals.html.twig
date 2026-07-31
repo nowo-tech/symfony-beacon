@@ -1,7 +1,6 @@
 {#
   Bootstrap appends .modal-backdrop to <body>, but kit modals live under
-  .app-main__inner / .page-shell (stacking contexts). Reparent so the dialog
-  paints above the backdrop.
+  .app-main__inner / .page-shell (stacking contexts). Reparent via kit-admin.ts.
 #}
 <style>
   body > .modal {
@@ -13,12 +12,3 @@
     z-index: 1070;
   }
 </style>
-<script>
-(function () {
-  document.querySelectorAll('.kit-modal.modal').forEach(function (el) {
-    if (el.parentElement !== document.body) {
-      document.body.appendChild(el);
-    }
-  });
-})();
-</script>

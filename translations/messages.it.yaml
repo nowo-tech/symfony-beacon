@@ -558,11 +558,13 @@ analytics:
         nplus1_groups: 'Gruppi N+1'
 appearance:
     title: Aspetto
-    intro: 'Personalizza il nome del marchio, i colori principali e i colori di pericolo per questa istanza Beacon. Solo gli amministratori possono modificare queste impostazioni.'
+    intro: 'Personalizza il nome del marchio, gli accenti, i colori di stato e le superfici di questa istanza Beacon. Solo gli amministratori possono modificare queste impostazioni.'
     section:
         light: 'Accenti di temi chiari'
         dark: 'Accenti di temi scuri'
         danger: 'Colori di pericolo/errore'
+        warn: 'Colori di avviso'
+        surfaces: 'Superfici (carta, inchiostro, pannelli)'
     submit: "Salva l'aspetto"
     reset: 'Ripristina le impostazioni predefinite'
 site_appearance:
@@ -598,6 +600,38 @@ site_appearance:
         label: 'Pericolo (scuro)'
         placeholder: '#f97066'
         help: 'Errore/accento distruttivo in modalità oscura.'
+    warn_color:
+        label: Avviso
+        placeholder: '#b54708'
+        help: 'Accento di avviso in modalità chiara.'
+    warn_color_dark:
+        label: 'Avviso (scuro)'
+        placeholder: '#fdb022'
+        help: 'Accento di avviso in modalità scura.'
+    paper_color:
+        label: Carta
+        placeholder: '#f3f6f4'
+        help: 'Sfondo della pagina in modalità chiara.'
+    paper_color_dark:
+        label: 'Carta (scuro)'
+        placeholder: '#0c1210'
+        help: 'Sfondo della pagina in modalità scura.'
+    ink_color:
+        label: Inchiostro
+        placeholder: '#0f1c18'
+        help: 'Colore del testo principale in modalità chiara.'
+    ink_color_dark:
+        label: 'Inchiostro (scuro)'
+        placeholder: '#e6eee9'
+        help: 'Colore del testo principale in modalità scura.'
+    surface_color:
+        label: Superficie
+        placeholder: '#ffffff'
+        help: 'Pannelli e schede in modalità chiara.'
+    surface_color_dark:
+        label: 'Superficie (scuro)'
+        placeholder: '#151c19'
+        help: 'Pannelli e schede in modalità scura.'
     color:
         invalid: 'Utilizza un colore esadecimale come #1f6f54.'
 users:
@@ -1034,7 +1068,7 @@ admin:
         groups: "Crea gruppi e gestisci i loro membri per l'accesso al progetto."
         projects: 'Elenca tutti i progetti, gestisci i membri e i collegamenti ai gruppi o elimina un progetto.'
         ops: Picchi tra progetti, issue aperte e consegne non riuscite.
-        appearance: 'Marchio e colori accesi.'
+        appearance: 'Marchio, accenti, colori di stato e superfici.'
         menus: 'Modifica i menu di navigazione.'
         breadcrumbs: 'Gestisci le raccolte breadcrumb.'
         mailer: 'DSN Mailer cifrato e indirizzo From per e-mail transazionali.'

@@ -577,11 +577,13 @@ releases:
         help: This reuses the existing `014` issue-list compare. When a release is selected, the link keeps that release filter.
 appearance:
     title: Appearance
-    intro: Customize brand name, accent colors, and danger colors for this Beacon instance. Only administrators can change these settings.
+    intro: Customize brand name, accents, status colors, and page surfaces for this Beacon instance. Only administrators can change these settings.
     section:
         light: Light theme accents
         dark: Dark theme accents
         danger: Danger / error colors
+        warn: Warning colors
+        surfaces: Page surfaces (paper, ink, panels)
     submit: Save appearance
     reset: Reset to defaults
 mailer_settings:
@@ -692,6 +694,38 @@ site_appearance:
         label: Danger (dark)
         placeholder: '#f97066'
         help: Error / destructive accent in dark mode.
+    warn_color:
+        label: Warning
+        placeholder: '#b54708'
+        help: Warning / caution accent in light mode.
+    warn_color_dark:
+        label: Warning (dark)
+        placeholder: '#fdb022'
+        help: Warning / caution accent in dark mode.
+    paper_color:
+        label: Paper
+        placeholder: '#f3f6f4'
+        help: Page background in light mode.
+    paper_color_dark:
+        label: Paper (dark)
+        placeholder: '#0c1210'
+        help: Page background in dark mode.
+    ink_color:
+        label: Ink
+        placeholder: '#0f1c18'
+        help: Primary text color in light mode.
+    ink_color_dark:
+        label: Ink (dark)
+        placeholder: '#e6eee9'
+        help: Primary text color in dark mode.
+    surface_color:
+        label: Surface
+        placeholder: '#ffffff'
+        help: Panels and cards in light mode.
+    surface_color_dark:
+        label: Surface (dark)
+        placeholder: '#151c19'
+        help: Panels and cards in dark mode.
     color:
         invalid: 'Use a hex color like #1f6f54.'
 users:
@@ -1134,7 +1168,7 @@ admin:
         groups: Create groups and manage their members for project access.
         projects: List all projects, manage members and group links, or delete a project.
         ops: Cross-project spikes, open issues, and failed deliveries.
-        appearance: Brand name and accent colors.
+        appearance: Brand name, accents, status colors, and page surfaces.
         mailer: Encrypted Mailer DSN and From address for transactional email.
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.

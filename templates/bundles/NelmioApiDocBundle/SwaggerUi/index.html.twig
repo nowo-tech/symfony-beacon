@@ -67,11 +67,6 @@
 {{ nelmioAsset(assets_mode, 'swagger-ui/swagger-ui-standalone-preset.js') }}
 {{ nelmioAsset(assets_mode, 'init-swagger-ui.js') }}
 
-<script type="text/javascript">
-    window.addEventListener('load', () => {
-        if (typeof loadSwaggerUI === 'function') {
-            loadSwaggerUI({{ swagger_ui_config|json_encode(65)|raw }});
-        }
-    });
-</script>
+<script type="application/json" id="swagger-ui-boot">{{ swagger_ui_config|json_encode(65)|raw }}</script>
+{{ vite_entry_script_tags('swagger-ui-boot') }}
 {% endblock %}

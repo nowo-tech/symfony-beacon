@@ -2,7 +2,7 @@
 
 **Feature Branch**: `039-notification-circuit-breaker`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented (v0.15.0)
 
 **Input**: Pause / back off a notification destination after N consecutive delivery failures; instance or project admin can resume. Complements `030` delivery history.
 

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.14.0 to the next release](#upgrading-from-0140-to-the-next-release)
+- [Upgrading from 0.15.0 to the next release](#upgrading-from-0150-to-the-next-release)
+- [Upgrading from 0.14.0 to 0.15.0](#upgrading-from-0140-to-0150)
 - [Upgrading from 0.13.0 to 0.14.0](#upgrading-from-0130-to-0140)
 - [Upgrading from 0.12.8 to 0.13.0](#upgrading-from-0128-to-0130)
 - [Upgrading from 0.12.7 to 0.12.8](#upgrading-from-0127-to-0128)
@@ -40,7 +41,21 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.14.0 to the next release
+## Upgrading from 0.15.0 to the next release
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+_(No additional operator steps yet — see Unreleased in CHANGELOG when cutting the next tag.)_
+
+## Upgrading from 0.14.0 to 0.15.0
 
 ```bash
 git pull
@@ -57,6 +72,18 @@ make vite-build
 - New columns on `notification_destination`: `consecutive_failures`, `circuit_opened_at`.
 - Env (optional): `BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD` (default `5`), `BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES` (default `0` = pause until admin Resume).
 - Project Settings shows **Auto-paused** + **Resume** when a destination trips.
+- See [NOTIFICATIONS.md](NOTIFICATIONS.md).
+
+### CSP / HSTS
+
+- Rebuild front-end assets (`pnpm install` + `make vite-build`) — new Vite entries `kit-admin` and `swagger-ui-boot`; Bootstrap is a JS dependency (no CDN).
+- Default CSP no longer allows inline scripts; confirm forms and saved-view select use Stimulus.
+- HSTS is on by default for non-localhost hosts (`max-age=31536000; includeSubDomains`). Local `https://localhost:…` is excluded. If TLS terminates in front of Caddy, set HSTS there or via `CADDY_SERVER_EXTRA_DIRECTIVES`.
+- See [PRODUCTION.md](PRODUCTION.md#security-headers-caddy).
+
+### Appearance palette
+
+- Migration adds `site_appearance` warn / paper / ink / surface colors (light + dark). Existing rows get defaults; review Administration → Appearance after upgrade.
 
 ## Upgrading from 0.13.0 to 0.14.0
 

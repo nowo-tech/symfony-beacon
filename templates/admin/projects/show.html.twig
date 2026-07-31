@@ -146,7 +146,10 @@
                     <form
                         method="post"
                         action="{{ path('admin_projects_members_remove', {projectId: project.uuid, userId: memberUser.uuid}) }}"
-                        onsubmit="return {% if isLastOwner %}false{% else %}confirm('{{ 'admin_projects.remove_member_confirm'|trans({'%email%': memberUser.email})|e('js') }}'){% endif %}"
+                        data-controller="confirm-submit"
+                        data-confirm-submit-message-value="{{ 'admin_projects.remove_member_confirm'|trans({'%email%': memberUser.email})|e('html_attr') }}"
+                        data-confirm-submit-blocked-value="{{ isLastOwner ? 'true' : 'false' }}"
+                        data-action="submit->confirm-submit#confirm"
                     >
                         <input type="hidden" name="_token" value="{{ csrf_token('admin_project_member_remove_' ~ member.id) }}">
                         <button class="btn-ghost" type="submit" {% if isLastOwner %}disabled title="{{ 'project.members.last_owner_hint'|trans|e('html_attr') }}"{% endif %}>{{ 'admin_projects.remove_member'|trans }}</button>
@@ -213,7 +216,9 @@
                     <form
                         method="post"
                         action="{{ path('admin_projects_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
-                        onsubmit="return confirm('{{ 'admin_projects.unlink_group_confirm'|trans({'%name%': linkedGroup.name})|e('js') }}')"
+                        data-controller="confirm-submit"
+                        data-confirm-submit-message-value="{{ 'admin_projects.unlink_group_confirm'|trans({'%name%': linkedGroup.name})|e('html_attr') }}"
+                        data-action="submit->confirm-submit#confirm"
                     >
                         <input type="hidden" name="_token" value="{{ csrf_token('admin_project_group_remove_' ~ groupAccess.id) }}">
                         <button class="btn-ghost" type="submit">{{ 'project.groups.remove'|trans }}</button>

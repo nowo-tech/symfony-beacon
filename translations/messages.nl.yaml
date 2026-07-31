@@ -558,11 +558,13 @@ analytics:
         nplus1_groups: N+1-groepen
 appearance:
     title: Verschijning
-    intro: 'Pas de merknaam, accentkleuren en gevaarkleuren aan voor dit Beacon-exemplaar. Alleen beheerders kunnen deze instellingen wijzigen.'
+    intro: 'Pas de merknaam, accenten, statuskleuren en oppervlakken aan voor dit Beacon-exemplaar. Alleen beheerders kunnen deze instellingen wijzigen.'
     section:
         light: 'Lichte thema-accenten'
         dark: 'Donkere thema-accenten'
         danger: Gevaar-/foutkleuren
+        warn: Waarschuwingskleuren
+        surfaces: 'Oppervlakken (papier, inkt, panelen)'
     submit: 'Bewaar uiterlijk'
     reset: 'Resetten naar standaardwaarden'
 site_appearance:
@@ -598,6 +600,38 @@ site_appearance:
         label: 'Gevaar (donker)'
         placeholder: '#f97066'
         help: 'Fout / destructief accent in donkere modus.'
+    warn_color:
+        label: Waarschuwing
+        placeholder: '#b54708'
+        help: 'Waarschuwingsaccent in lichtmodus.'
+    warn_color_dark:
+        label: 'Waarschuwing (donker)'
+        placeholder: '#fdb022'
+        help: 'Waarschuwingsaccent in donkere modus.'
+    paper_color:
+        label: Papier
+        placeholder: '#f3f6f4'
+        help: 'Pagina-achtergrond in lichtmodus.'
+    paper_color_dark:
+        label: 'Papier (donker)'
+        placeholder: '#0c1210'
+        help: 'Pagina-achtergrond in donkere modus.'
+    ink_color:
+        label: Inkt
+        placeholder: '#0f1c18'
+        help: 'Primaire tekstkleur in lichtmodus.'
+    ink_color_dark:
+        label: 'Inkt (donker)'
+        placeholder: '#e6eee9'
+        help: 'Primaire tekstkleur in donkere modus.'
+    surface_color:
+        label: Oppervlak
+        placeholder: '#ffffff'
+        help: 'Panelen en kaarten in lichtmodus.'
+    surface_color_dark:
+        label: 'Oppervlak (donker)'
+        placeholder: '#151c19'
+        help: 'Panelen en kaarten in donkere modus.'
     color:
         invalid: 'Gebruik een hexadecimale kleur zoals #1f6f54.'
 users:
@@ -1034,7 +1068,7 @@ admin:
         groups: 'Creëer groepen en beheer hun leden voor projecttoegang.'
         projects: 'Maak een lijst van alle projecten, beheer leden en groepslinks, of verwijder een project.'
         ops: Projectoverschrijdende pieken, open issues en mislukte leveringen.
-        appearance: 'Merknaam en accentkleuren.'
+        appearance: 'Merknaam, accenten, statuskleuren en oppervlakken.'
         menus: "Navigatiemenu's bewerken."
         breadcrumbs: 'Beheer broodkruimelverzamelingen.'
         mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'

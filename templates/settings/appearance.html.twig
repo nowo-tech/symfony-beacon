@@ -2,7 +2,20 @@
 
 {% block title %}{{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
+{% macro color_field(field) %}
+    <div class="flex flex-col gap-2">
+        {{ form_label(field) }}
+        <div class="flex items-center gap-3">
+            {{ form_widget(field) }}
+            <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ field.vars.id }}">{{ field.vars.value }}</span>
+        </div>
+        {{ form_errors(field) }}
+        {{ form_help(field) }}
+    </div>
+{% endmacro %}
+
 {% block body %}
+{% import _self as ui %}
 <div class="mx-auto">
     <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
     <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
@@ -14,72 +27,44 @@
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.light'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.accentColor) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.accentColor) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentColor.vars.id }}">{{ form.accentColor.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.accentColor) }}
-                    {{ form_help(form.accentColor) }}
-                </div>
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.accentDeepColor) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.accentDeepColor) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentDeepColor.vars.id }}">{{ form.accentDeepColor.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.accentDeepColor) }}
-                    {{ form_help(form.accentDeepColor) }}
-                </div>
+                {{ ui.color_field(form.accentColor) }}
+                {{ ui.color_field(form.accentDeepColor) }}
             </div>
         </fieldset>
 
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.dark'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.accentColorDark) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.accentColorDark) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentColorDark.vars.id }}">{{ form.accentColorDark.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.accentColorDark) }}
-                    {{ form_help(form.accentColorDark) }}
-                </div>
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.accentDeepColorDark) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.accentDeepColorDark) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.accentDeepColorDark.vars.id }}">{{ form.accentDeepColorDark.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.accentDeepColorDark) }}
-                    {{ form_help(form.accentDeepColorDark) }}
-                </div>
+                {{ ui.color_field(form.accentColorDark) }}
+                {{ ui.color_field(form.accentDeepColorDark) }}
             </div>
         </fieldset>
 
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.danger'|trans }}</legend>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.dangerColor) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.dangerColor) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.dangerColor.vars.id }}">{{ form.dangerColor.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.dangerColor) }}
-                    {{ form_help(form.dangerColor) }}
-                </div>
-                <div class="flex flex-col gap-2">
-                    {{ form_label(form.dangerColorDark) }}
-                    <div class="flex items-center gap-3">
-                        {{ form_widget(form.dangerColorDark) }}
-                        <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ form.dangerColorDark.vars.id }}">{{ form.dangerColorDark.vars.value }}</span>
-                    </div>
-                    {{ form_errors(form.dangerColorDark) }}
-                    {{ form_help(form.dangerColorDark) }}
-                </div>
+                {{ ui.color_field(form.dangerColor) }}
+                {{ ui.color_field(form.dangerColorDark) }}
+            </div>
+        </fieldset>
+
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.warn'|trans }}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+                {{ ui.color_field(form.warnColor) }}
+                {{ ui.color_field(form.warnColorDark) }}
+            </div>
+        </fieldset>
+
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.surfaces'|trans }}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+                {{ ui.color_field(form.paperColor) }}
+                {{ ui.color_field(form.paperColorDark) }}
+                {{ ui.color_field(form.inkColor) }}
+                {{ ui.color_field(form.inkColorDark) }}
+                {{ ui.color_field(form.surfaceColor) }}
+                {{ ui.color_field(form.surfaceColorDark) }}
             </div>
         </fieldset>
 

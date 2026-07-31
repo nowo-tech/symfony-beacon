@@ -13,7 +13,13 @@
     </div>
     <div class="flex flex-wrap gap-2">
         <a class="btn-ghost no-underline" href="{{ path('admin_groups_edit', {id: group.uuid}) }}">{{ 'groups.edit'|trans }}</a>
-        <form method="post" action="{{ path('admin_groups_delete', {id: group.uuid}) }}" onsubmit="return confirm('{{ 'groups.delete_confirm'|trans|e('js') }}')">
+        <form
+            method="post"
+            action="{{ path('admin_groups_delete', {id: group.uuid}) }}"
+            data-controller="confirm-submit"
+            data-confirm-submit-message-value="{{ 'groups.delete_confirm'|trans|e('html_attr') }}"
+            data-action="submit->confirm-submit#confirm"
+        >
             <input type="hidden" name="_token" value="{{ csrf_token('admin_group_delete_' ~ group.id) }}">
             <button class="btn-danger" type="submit">{{ 'groups.delete'|trans }}</button>
         </form>
@@ -77,7 +83,13 @@
                     <a class="font-medium no-underline" href="{{ path('project_settings', {id: access.project.uuid}) }}">{{ access.project.name }}</a>
                     <div class="text-xs text-[var(--color-ink)]/55">{{ ('project.members.role.' ~ access.role.value)|trans }}</div>
                 </div>
-                <form method="post" action="{{ path('admin_groups_projects_remove', {groupId: group.uuid, accessId: access.uuid}) }}" onsubmit="return confirm('{{ 'groups.unlink_project_confirm'|trans({'%project%': access.project.name})|e('js') }}')">
+                <form
+                    method="post"
+                    action="{{ path('admin_groups_projects_remove', {groupId: group.uuid, accessId: access.uuid}) }}"
+                    data-controller="confirm-submit"
+                    data-confirm-submit-message-value="{{ 'groups.unlink_project_confirm'|trans({'%project%': access.project.name})|e('html_attr') }}"
+                    data-action="submit->confirm-submit#confirm"
+                >
                     <input type="hidden" name="_token" value="{{ csrf_token('admin_group_project_remove_' ~ access.id) }}">
                     <button class="btn-ghost" type="submit">{{ 'groups.unlink_project'|trans }}</button>
                 </form>

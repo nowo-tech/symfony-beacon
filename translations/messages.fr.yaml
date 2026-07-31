@@ -558,11 +558,13 @@ analytics:
         nplus1_groups: 'Groupes N+1'
 appearance:
     title: Apparence
-    intro: "Personnalisez le nom de la marque, les couleurs d'accent et les couleurs de danger pour cette instance Beacon. Seuls les administrateurs peuvent modifier ces paramètres."
+    intro: "Personnalisez le nom de la marque, les accents, les couleurs d'état et les surfaces pour cette instance Beacon. Seuls les administrateurs peuvent modifier ces paramètres."
     section:
         light: 'Accents de thème clair'
         dark: 'Accents de thème sombre'
         danger: 'Couleurs de danger/erreur'
+        warn: "Couleurs d'avertissement"
+        surfaces: 'Surfaces (papier, encre, panneaux)'
     submit: "Enregistrer l'apparence"
     reset: 'Réinitialiser aux valeurs par défaut'
 site_appearance:
@@ -598,6 +600,38 @@ site_appearance:
         label: 'Danger (sombre)'
         placeholder: '#f97066'
         help: 'Erreur/accent destructeur en mode sombre.'
+    warn_color:
+        label: Avertissement
+        placeholder: '#b54708'
+        help: "Accent d'avertissement en mode clair."
+    warn_color_dark:
+        label: 'Avertissement (sombre)'
+        placeholder: '#fdb022'
+        help: "Accent d'avertissement en mode sombre."
+    paper_color:
+        label: Papier
+        placeholder: '#f3f6f4'
+        help: 'Fond de page en mode clair.'
+    paper_color_dark:
+        label: 'Papier (sombre)'
+        placeholder: '#0c1210'
+        help: 'Fond de page en mode sombre.'
+    ink_color:
+        label: Encre
+        placeholder: '#0f1c18'
+        help: 'Couleur du texte principal en mode clair.'
+    ink_color_dark:
+        label: 'Encre (sombre)'
+        placeholder: '#e6eee9'
+        help: 'Couleur du texte principal en mode sombre.'
+    surface_color:
+        label: Surface
+        placeholder: '#ffffff'
+        help: 'Panneaux et cartes en mode clair.'
+    surface_color_dark:
+        label: 'Surface (sombre)'
+        placeholder: '#151c19'
+        help: 'Panneaux et cartes en mode sombre.'
     color:
         invalid: 'Utilisez une couleur hexadécimale comme #1f6f54.'
 users:
@@ -1042,7 +1076,7 @@ admin:
         groups: 'Créez des groupes et gérez leurs membres pour accéder au projet.'
         projects: 'Répertoriez tous les projets, gérez les membres et les liens de groupe ou supprimez un projet.'
         ops: Pics inter-projets, incidents ouverts et livraisons échouées.
-        appearance: 'Nom de la marque et couleurs d’accent.'
+        appearance: 'Nom de la marque, accents, couleurs d’état et surfaces.'
         menus: 'Modifier les menus de navigation.'
         breadcrumbs: "Gérer les collections de fils d'Ariane."
         mailer: 'DSN Mailer chiffré et adresse From pour les e-mails transactionnels.'

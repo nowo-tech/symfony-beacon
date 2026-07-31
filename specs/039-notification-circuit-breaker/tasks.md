@@ -28,7 +28,7 @@
 
 - [x] T011 PHPUnit: trip after N failures, skip while open, resume clears, success resets counter
 - [x] T012 CHANGELOG Unreleased + UPGRADING placeholder notes for v0.15
-- [x] T013 Mark ROADMAP 6.6 Done (Unreleased) when code lands
+- [x] T013 Mark ROADMAP 6.6 Done (v0.15.0) when code lands
 
 ## Dependencies
 

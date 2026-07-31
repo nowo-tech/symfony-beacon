@@ -147,12 +147,11 @@ Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` only while migrating clients (any enviro
 
 ## Security headers (Caddy)
 
-The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and a `Content-Security-Policy` with `object-src 'none'`. Theme boot uses the Vite entry `theme-boot` (`assets/theme-boot.ts`) + `data-*` prefs (no inline boot scripts). `style-src` / residual kit `script-src` still allow `'unsafe-inline'` for operator CSS overrides and kit admin leftovers.
+The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, **HSTS** (skipped for `localhost` / `127.0.0.1` so local self-signed HTTPS is not sticky-pinned), and a `Content-Security-Policy` with `object-src 'none'` and **`script-src 'self'`** (no `'unsafe-inline'`). Theme boot uses Vite `theme-boot`; kit admin uses Vite `kit-admin` (self-hosted Bootstrap); confirm dialogs / selects use Stimulus. `style-src` still allows `'unsafe-inline'` for operator appearance CSS overrides and small kit layout `<style>` blocks.
 
-- **Dev** may omit HSTS (no HSTS in the default file).
-- **Prod:** add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES`, e.g. `header Strict-Transport-Security "max-age=31536000; includeSubDomains"`.
-- To drop `script-src 'unsafe-inline'` after removing remaining kit/admin inline scripts, override CSP via `CADDY_SERVER_EXTRA_DIRECTIVES` (replace the header for your site). Do not ship analytics cookies without cookie-consent kit UX.
-- **Swagger UI** (`/api/doc`) needs `script-src 'unsafe-eval'` (JSON Schema compile). The Caddyfile overrides CSP on that path only; Swagger assets are served same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`).
+- **HSTS:** default `max-age=31536000; includeSubDomains` on non-loopback hosts. Override or extend via `CADDY_SERVER_EXTRA_DIRECTIVES` if you terminate TLS elsewhere (or need `preload`).
+- Do not ship analytics cookies without cookie-consent kit UX.
+- **Swagger UI** (`/api/doc`) still needs `script-src 'unsafe-eval'` (JSON Schema compile). The Caddyfile overrides CSP on that path only (no `'unsafe-inline'`); Swagger assets are same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`) and boot via Vite `swagger-ui-boot`.
 
 `/api/doc` and `/api/doc.json` require **`ROLE_ADMIN`**.
 

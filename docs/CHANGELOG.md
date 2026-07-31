@@ -7,9 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-07-31
+
 ### Added
 
 - **Notification circuit breaker** (`039`): auto-pause destinations after consecutive delivery failures; admin **Resume** (CSRF); optional cooldown via `BEACON_NOTIFICATION_CIRCUIT_BREAKER_*`
+- **Appearance palette**: Administration → Appearance can set warn / paper / ink / surface colors (light + dark); migration `Version20260731130000`
+
+### Changed
+
+- **CSP / HSTS hardening:** default CSP drops `script-src 'unsafe-inline'` (Vite `kit-admin` + `swagger-ui-boot`, Stimulus for confirms/selects); HSTS enabled by default except `localhost` / `127.0.0.1`; kit admin Bootstrap self-hosted (no jsDelivr)
+
+### Fixed
+
+- Expanded choice checkboxes (e.g. Account → Display → Tours) keep input and label on one row
+- Preferences sidebar marks **Display** / **Security** / **Profile** current for all related `account_*` sub-routes (not only exact paths)
 
 ## [0.14.0] - 2026-07-31
 
@@ -577,7 +589,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...v0.12.8

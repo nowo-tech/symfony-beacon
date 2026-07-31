@@ -558,11 +558,13 @@ analytics:
         nplus1_groups: 'Grupos N+1'
 appearance:
     title: Aparência
-    intro: 'Personalize o nome da marca, cores de destaque e cores de perigo para esta instância do Beacon. Somente administradores podem alterar essas configurações.'
+    intro: 'Personalize o nome da marca, destaques, cores de estado e superfícies desta instância Beacon. Somente administradores podem alterar essas configurações.'
     section:
         light: 'Acentos de tema claro'
         dark: 'Acentos de tema escuro'
         danger: 'Cores de perigo/erro'
+        warn: 'Cores de aviso'
+        surfaces: 'Superfícies (papel, tinta, painéis)'
     submit: 'Salvar aparência'
     reset: 'Redefinir para os padrões'
 site_appearance:
@@ -598,6 +600,38 @@ site_appearance:
         label: 'Perigo (escuro)'
         placeholder: '#f97066'
         help: 'Erro/acento destrutivo no modo escuro.'
+    warn_color:
+        label: Aviso
+        placeholder: '#b54708'
+        help: 'Acento de aviso no modo claro.'
+    warn_color_dark:
+        label: 'Aviso (escuro)'
+        placeholder: '#fdb022'
+        help: 'Acento de aviso no modo escuro.'
+    paper_color:
+        label: Papel
+        placeholder: '#f3f6f4'
+        help: 'Fundo da página no modo claro.'
+    paper_color_dark:
+        label: 'Papel (escuro)'
+        placeholder: '#0c1210'
+        help: 'Fundo da página no modo escuro.'
+    ink_color:
+        label: Tinta
+        placeholder: '#0f1c18'
+        help: 'Cor do texto principal no modo claro.'
+    ink_color_dark:
+        label: 'Tinta (escuro)'
+        placeholder: '#e6eee9'
+        help: 'Cor do texto principal no modo escuro.'
+    surface_color:
+        label: Superfície
+        placeholder: '#ffffff'
+        help: 'Painéis e cartões no modo claro.'
+    surface_color_dark:
+        label: 'Superfície (escuro)'
+        placeholder: '#151c19'
+        help: 'Painéis e cartões no modo escuro.'
     color:
         invalid: 'Use uma cor hexadecimal como #1f6f54.'
 users:
@@ -1034,7 +1068,7 @@ admin:
         groups: 'Crie grupos e gerencie seus membros para acesso ao projeto.'
         projects: 'Liste todos os projetos, gerencie membros e links de grupos ou exclua um projeto.'
         ops: Picos entre projetos, issues abertas e entregas falhadas.
-        appearance: 'Nome da marca e cores de destaque.'
+        appearance: 'Nome da marca, destaques, cores de estado e superfícies.'
         menus: 'Edite menus de navegação.'
         breadcrumbs: 'Gerenciar coleções de navegação estrutural.'
         mailer: 'DSN Mailer encriptado e endereço From para e-mails transacionais.'

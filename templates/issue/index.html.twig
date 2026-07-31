@@ -26,7 +26,12 @@
 <div class="issue-saved-views panel mb-4 flex flex-wrap items-end gap-3" data-tour="issue-saved-views">
     <div class="grow min-w-[12rem]">
         <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-select">{{ 'issues.views.label'|trans }}</label>
-        <select id="saved-view-select" class="input w-full" onchange="if (this.value) { window.location = this.value; }">
+        <select
+            id="saved-view-select"
+            class="input w-full"
+            data-controller="navigate-select"
+            data-action="change->navigate-select#change"
+        >
             <option value="">{{ 'issues.views.choose'|trans }}</option>
             {% for view in savedViews|default([]) %}
                 <option value="{{ path('issue_view_apply', {id: project.uuid, viewUuid: view.uuid}) }}">{{ view.name }}</option>

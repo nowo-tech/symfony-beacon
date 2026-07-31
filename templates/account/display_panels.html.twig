@@ -45,20 +45,10 @@
         <button
             type="button"
             class="btn-ghost"
-            data-reset-issue-panels
+            data-controller="issue-panels-reset"
+            data-issue-panels-reset-done-label-value="{{ 'preferences.issue_panels_reset_done'|trans|e('html_attr') }}"
+            data-action="issue-panels-reset#reset"
         >{{ 'preferences.issue_panels_reset'|trans }}</button>
     </section>
 </div>
-<script>
-(() => {
-  const btn = document.querySelector('[data-reset-issue-panels]');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    try {
-      localStorage.removeItem('beacon.issuePanelState');
-    } catch (_) {}
-    btn.textContent = {{ 'preferences.issue_panels_reset_done'|trans|json_encode|raw }};
-  });
-})();
-</script>
 {% endblock %}

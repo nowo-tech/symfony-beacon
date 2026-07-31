@@ -41,6 +41,10 @@ export default defineConfig({
                 app: './assets/app.ts',
                 // Early <head> boot (FOUC): load via vite_entry_script_tags('theme-boot') before app.
                 'theme-boot': './assets/theme-boot.ts',
+                // Kit admin shells (menus / breadcrumbs / cookie consent) — Bootstrap + layout helpers.
+                'kit-admin': './assets/kit-admin.ts',
+                // Nelmio Swagger UI init (CSP: no inline script on /api/doc).
+                'swagger-ui-boot': './assets/swagger-ui-boot.ts',
             },
         },
     },

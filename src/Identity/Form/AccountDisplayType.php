@@ -162,10 +162,10 @@ final class AccountDisplayType extends FormKitAbstractType
                 'select_all' => true,
                 'select_all_label' => 'preferences.product_tour_select_all',
                 'select_all_translation_domain' => 'messages',
-                'select_all_css_class' => 'size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30',
-                'select_all_wrapper_css_class' => 'flex items-center gap-2',
+                'select_all_css_class' => 'size-4 shrink-0 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30',
+                'select_all_wrapper_css_class' => 'flex items-center gap-2.5 pb-2 mb-1 border-b border-[var(--color-sand)]/60',
                 'select_all_label_css_class' => 'text-sm font-medium text-[var(--color-ink)]',
-                'select_all_container_css_class' => 'space-y-2',
+                'select_all_container_css_class' => 'space-y-3',
             ]);
         });
     }

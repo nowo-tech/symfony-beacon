@@ -40,6 +40,14 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
             'site_appearance[accentDeepColorDark]' => '#5eead4',
             'site_appearance[dangerColor]' => '#c2410c',
             'site_appearance[dangerColorDark]' => '#fb923c',
+            'site_appearance[warnColor]' => '#a16207',
+            'site_appearance[warnColorDark]' => '#facc15',
+            'site_appearance[paperColor]' => '#f0fdfa',
+            'site_appearance[paperColorDark]' => '#042f2e',
+            'site_appearance[inkColor]' => '#134e4a',
+            'site_appearance[inkColorDark]' => '#ccfbf1',
+            'site_appearance[surfaceColor]' => '#ffffff',
+            'site_appearance[surfaceColorDark]' => '#115e59',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/settings/appearance');
@@ -49,6 +57,10 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         $html = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('--beacon-moss: #0d9488', $html);
         self::assertStringContainsString('--beacon-alert: #c2410c', $html);
+        self::assertStringContainsString('--beacon-warn: #a16207', $html);
+        self::assertStringContainsString('--beacon-paper: #f0fdfa', $html);
+        self::assertStringContainsString('--beacon-ink: #134e4a', $html);
+        self::assertStringContainsString('--beacon-surface: #ffffff', $html);
     }
 
     public function testUserCanPersistThemeToggleChoice(): void

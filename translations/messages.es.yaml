@@ -577,11 +577,13 @@ releases:
         help: Reutiliza el compare existente del listado de incidencias de `014`. Cuando eliges una release, el enlace mantiene ese filtro.
 appearance:
     title: Apariencia
-    intro: Personaliza el nombre de marca, los colores de acento y los de peligro de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
+    intro: Personaliza el nombre de marca, acentos, colores de estado y superficies de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.
     section:
         light: Acentos modo día
         dark: Acentos modo noche
         danger: Colores de peligro / error
+        warn: Colores de aviso
+        surfaces: Superficies (papel, tinta, paneles)
     submit: Guardar apariencia
     reset: Restaurar valores
 mailer_settings:
@@ -692,6 +694,38 @@ site_appearance:
         label: Peligro (noche)
         placeholder: '#f97066'
         help: Acento de error / destructivo en modo noche.
+    warn_color:
+        label: Aviso
+        placeholder: '#b54708'
+        help: Acento de aviso / precaución en modo día.
+    warn_color_dark:
+        label: Aviso (noche)
+        placeholder: '#fdb022'
+        help: Acento de aviso / precaución en modo noche.
+    paper_color:
+        label: Papel
+        placeholder: '#f3f6f4'
+        help: Fondo de página en modo día.
+    paper_color_dark:
+        label: Papel (noche)
+        placeholder: '#0c1210'
+        help: Fondo de página en modo noche.
+    ink_color:
+        label: Tinta
+        placeholder: '#0f1c18'
+        help: Color de texto principal en modo día.
+    ink_color_dark:
+        label: Tinta (noche)
+        placeholder: '#e6eee9'
+        help: Color de texto principal en modo noche.
+    surface_color:
+        label: Superficie
+        placeholder: '#ffffff'
+        help: Paneles y tarjetas en modo día.
+    surface_color_dark:
+        label: Superficie (noche)
+        placeholder: '#151c19'
+        help: Paneles y tarjetas en modo noche.
     color:
         invalid: 'Usa un color hexadecimal como #1f6f54.'
 users:
@@ -1134,7 +1168,7 @@ admin:
         groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
         projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
         ops: Picos entre proyectos, incidencias abiertas y entregas fallidas.
-        appearance: Nombre de marca y colores de acento.
+        appearance: Nombre de marca, acentos, colores de estado y superficies.
         mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
         setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.

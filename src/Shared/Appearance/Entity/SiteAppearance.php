@@ -27,6 +27,14 @@ class SiteAppearance implements AuditableInterface
     public const DEFAULT_ACCENT_DEEP_DARK = '#6bc49a';
     public const DEFAULT_DANGER = '#b42318';
     public const DEFAULT_DANGER_DARK = '#f97066';
+    public const DEFAULT_WARN = '#b54708';
+    public const DEFAULT_WARN_DARK = '#fdb022';
+    public const DEFAULT_PAPER = '#f3f6f4';
+    public const DEFAULT_PAPER_DARK = '#0c1210';
+    public const DEFAULT_INK = '#0f1c18';
+    public const DEFAULT_INK_DARK = '#e6eee9';
+    public const DEFAULT_SURFACE = '#ffffff';
+    public const DEFAULT_SURFACE_DARK = '#151c19';
 
     #[ORM\Id]
     #[ORM\Column]
@@ -55,6 +63,30 @@ class SiteAppearance implements AuditableInterface
 
     #[ORM\Column(length: 7)]
     private string $dangerColorDark = self::DEFAULT_DANGER_DARK;
+
+    #[ORM\Column(length: 7)]
+    private string $warnColor = self::DEFAULT_WARN;
+
+    #[ORM\Column(length: 7)]
+    private string $warnColorDark = self::DEFAULT_WARN_DARK;
+
+    #[ORM\Column(length: 7)]
+    private string $paperColor = self::DEFAULT_PAPER;
+
+    #[ORM\Column(length: 7)]
+    private string $paperColorDark = self::DEFAULT_PAPER_DARK;
+
+    #[ORM\Column(length: 7)]
+    private string $inkColor = self::DEFAULT_INK;
+
+    #[ORM\Column(length: 7)]
+    private string $inkColorDark = self::DEFAULT_INK_DARK;
+
+    #[ORM\Column(length: 7)]
+    private string $surfaceColor = self::DEFAULT_SURFACE;
+
+    #[ORM\Column(length: 7)]
+    private string $surfaceColorDark = self::DEFAULT_SURFACE_DARK;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -170,6 +202,102 @@ class SiteAppearance implements AuditableInterface
         return $this;
     }
 
+    public function getWarnColor(): string
+    {
+        return $this->warnColor;
+    }
+
+    public function setWarnColor(string $warnColor): self
+    {
+        $this->warnColor = strtolower(trim($warnColor));
+
+        return $this;
+    }
+
+    public function getWarnColorDark(): string
+    {
+        return $this->warnColorDark;
+    }
+
+    public function setWarnColorDark(string $warnColorDark): self
+    {
+        $this->warnColorDark = strtolower(trim($warnColorDark));
+
+        return $this;
+    }
+
+    public function getPaperColor(): string
+    {
+        return $this->paperColor;
+    }
+
+    public function setPaperColor(string $paperColor): self
+    {
+        $this->paperColor = strtolower(trim($paperColor));
+
+        return $this;
+    }
+
+    public function getPaperColorDark(): string
+    {
+        return $this->paperColorDark;
+    }
+
+    public function setPaperColorDark(string $paperColorDark): self
+    {
+        $this->paperColorDark = strtolower(trim($paperColorDark));
+
+        return $this;
+    }
+
+    public function getInkColor(): string
+    {
+        return $this->inkColor;
+    }
+
+    public function setInkColor(string $inkColor): self
+    {
+        $this->inkColor = strtolower(trim($inkColor));
+
+        return $this;
+    }
+
+    public function getInkColorDark(): string
+    {
+        return $this->inkColorDark;
+    }
+
+    public function setInkColorDark(string $inkColorDark): self
+    {
+        $this->inkColorDark = strtolower(trim($inkColorDark));
+
+        return $this;
+    }
+
+    public function getSurfaceColor(): string
+    {
+        return $this->surfaceColor;
+    }
+
+    public function setSurfaceColor(string $surfaceColor): self
+    {
+        $this->surfaceColor = strtolower(trim($surfaceColor));
+
+        return $this;
+    }
+
+    public function getSurfaceColorDark(): string
+    {
+        return $this->surfaceColorDark;
+    }
+
+    public function setSurfaceColorDark(string $surfaceColorDark): self
+    {
+        $this->surfaceColorDark = strtolower(trim($surfaceColorDark));
+
+        return $this;
+    }
+
     public function resetToDefaults(): self
     {
         $this->brandName = self::DEFAULT_BRAND_NAME;
@@ -180,6 +308,14 @@ class SiteAppearance implements AuditableInterface
         $this->accentDeepColorDark = self::DEFAULT_ACCENT_DEEP_DARK;
         $this->dangerColor = self::DEFAULT_DANGER;
         $this->dangerColorDark = self::DEFAULT_DANGER_DARK;
+        $this->warnColor = self::DEFAULT_WARN;
+        $this->warnColorDark = self::DEFAULT_WARN_DARK;
+        $this->paperColor = self::DEFAULT_PAPER;
+        $this->paperColorDark = self::DEFAULT_PAPER_DARK;
+        $this->inkColor = self::DEFAULT_INK;
+        $this->inkColorDark = self::DEFAULT_INK_DARK;
+        $this->surfaceColor = self::DEFAULT_SURFACE;
+        $this->surfaceColorDark = self::DEFAULT_SURFACE_DARK;
 
         return $this;
     }

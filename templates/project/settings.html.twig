@@ -78,7 +78,13 @@
                                 <input type="hidden" name="_token" value="{{ csrf_token('project_key_rotate_' ~ key.id) }}">
                                 <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.rotate'|trans }}</button>
                             </form>
-                            <form method="post" action="{{ path('project_keys_revoke', {projectId: project.uuid, keyId: key.id}) }}" onsubmit="return confirm('{{ 'project.api_keys.revoke_confirm'|trans|e('js') }}')">
+                            <form
+                                method="post"
+                                action="{{ path('project_keys_revoke', {projectId: project.uuid, keyId: key.id}) }}"
+                                data-controller="confirm-submit"
+                                data-confirm-submit-message-value="{{ 'project.api_keys.revoke_confirm'|trans|e('html_attr') }}"
+                                data-action="submit->confirm-submit#confirm"
+                            >
                                 <input type="hidden" name="_token" value="{{ csrf_token('project_key_revoke_' ~ key.id) }}">
                                 <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.revoke'|trans }}</button>
                             </form>
@@ -600,7 +606,13 @@
                                 <input type="hidden" name="_token" value="{{ csrf_token('threshold_toggle_' ~ rule.id) }}">
                                 <button class="btn-ghost" type="submit">{{ rule.enabled ? 'thresholds.disable'|trans : 'thresholds.enable'|trans }}</button>
                             </form>
-                            <form method="post" action="{{ path('project_threshold_rule_delete', {projectId: project.uuid, id: rule.uuid}) }}" onsubmit="return confirm('{{ 'thresholds.delete_confirm'|trans|e('js') }}')">
+                            <form
+                                method="post"
+                                action="{{ path('project_threshold_rule_delete', {projectId: project.uuid, id: rule.uuid}) }}"
+                                data-controller="confirm-submit"
+                                data-confirm-submit-message-value="{{ 'thresholds.delete_confirm'|trans|e('html_attr') }}"
+                                data-action="submit->confirm-submit#confirm"
+                            >
                                 <input type="hidden" name="_token" value="{{ csrf_token('threshold_delete_' ~ rule.id) }}">
                                 <button class="btn-danger" type="submit">{{ 'thresholds.delete'|trans }}</button>
                             </form>
@@ -669,7 +681,13 @@
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_test_' ~ destination.id) }}">
                                     <button class="btn-ghost" type="submit" title="{{ 'notifications.test_hint'|trans({'%type%': ('notifications.type.' ~ destination.type.value)|trans}) }}">{{ 'notifications.test'|trans }}</button>
                                 </form>
-                                <form method="post" action="{{ path('project_notification_delete', {projectId: project.uuid, id: destination.uuid}) }}" onsubmit="return confirm('{{ 'notifications.delete_confirm'|trans|e('js') }}')">
+                                <form
+                                    method="post"
+                                    action="{{ path('project_notification_delete', {projectId: project.uuid, id: destination.uuid}) }}"
+                                    data-controller="confirm-submit"
+                                    data-confirm-submit-message-value="{{ 'notifications.delete_confirm'|trans|e('html_attr') }}"
+                                    data-action="submit->confirm-submit#confirm"
+                                >
                                     <input type="hidden" name="_token" value="{{ csrf_token('notif_delete_' ~ destination.id) }}">
                                     <button class="btn-danger" type="submit">{{ 'notifications.delete'|trans }}</button>
                                 </form>

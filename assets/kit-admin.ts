@@ -1,0 +1,112 @@
+/**
+ * Kit admin shells (menus / breadcrumbs / cookie-consent): Bootstrap + layout helpers.
+ * Config from <script type="application/json" id="…"> islands (CSP-safe).
+ */
+// @ts-expect-error — CSS side-effect import (no type decls required).
+import 'bootstrap/dist/css/bootstrap.min.css';
+// @ts-expect-error — JS bundle side-effect (Modal, etc. on window.bootstrap).
+import 'bootstrap';
+
+function readJson<T extends Record<string, unknown>>(id: string): T | null {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLScriptElement)) {
+    return null;
+  }
+  try {
+    const parsed: unknown = JSON.parse(el.textContent ?? '{}');
+    return parsed !== null && typeof parsed === 'object' ? (parsed as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+declare global {
+  interface Window {
+    dashboardMenuIconSelectorScriptUrl?: string;
+    __nowoDashboardMenuConfig?: Record<string, unknown>;
+    dashboardMenuI18n?: Record<string, string>;
+    breadcrumbKitI18n?: Record<string, string>;
+    __breadcrumbKitDashboard?: Record<string, unknown>;
+  }
+}
+
+function bootDashboardMenu(): void {
+  const boot = readJson<{
+    iconSelectorScriptUrl?: string | null;
+    cssFramework?: string;
+    i18n?: Record<string, string>;
+  }>('beacon-dashboard-menu-boot');
+  if (!boot) {
+    return;
+  }
+  if (boot.iconSelectorScriptUrl) {
+    window.dashboardMenuIconSelectorScriptUrl = boot.iconSelectorScriptUrl;
+  }
+  window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
+    cssFramework: boot.cssFramework ?? 'bootstrap5',
+  });
+  if (boot.i18n) {
+    window.dashboardMenuI18n = boot.i18n;
+  }
+}
+
+function bootBreadcrumbKit(): void {
+  const boot = readJson<{
+    cssFramework?: string;
+    importPartialUrl?: string;
+    dashboardBase?: string;
+    i18n?: Record<string, string>;
+  }>('beacon-breadcrumb-kit-boot');
+  if (!boot) {
+    return;
+  }
+  if (boot.i18n) {
+    window.breadcrumbKitI18n = boot.i18n;
+  }
+  window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};
+  window.__breadcrumbKitDashboard.cssFramework = boot.cssFramework ?? 'bootstrap5';
+  if (boot.importPartialUrl) {
+    window.__breadcrumbKitDashboard.importPartialUrl = boot.importPartialUrl;
+  }
+  if (boot.dashboardBase) {
+    window.__breadcrumbKitDashboard.dashboardBase = boot.dashboardBase;
+  }
+}
+
+function splitKitFilters(): void {
+  document.querySelectorAll<HTMLElement>('.kit-admin[data-kit-split-filters]').forEach((root) => {
+    if (root.dataset.kitSplitDone === '1') {
+      return;
+    }
+    root.dataset.kitSplitDone = '1';
+
+    const search = root.querySelector(':scope > .nowo-ui-search');
+    if (!search) {
+      root.classList.add('panel');
+      return;
+    }
+
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    let node = search.nextSibling;
+    while (node) {
+      const next = node.nextSibling;
+      panel.appendChild(node);
+      node = next;
+    }
+    root.appendChild(panel);
+  });
+}
+
+function portalKitModals(): void {
+  document.querySelectorAll('.kit-modal.modal').forEach((el) => {
+    if (el.parentElement !== document.body) {
+      document.body.appendChild(el);
+    }
+  });
+}
+
+bootDashboardMenu();
+bootBreadcrumbKit();
+splitKitFilters();
+portalKitModals();

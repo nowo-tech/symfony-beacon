@@ -21,7 +21,13 @@
                     <a class="font-medium no-underline" href="{{ path('project_settings', {id: membership.project.uuid}) }}">{{ membership.project.name }}</a>
                     <div class="text-xs text-[var(--color-ink)]/55">{{ ('project.members.role.' ~ membership.role.value)|trans }}</div>
                 </div>
-                <form method="post" action="{{ path('admin_users_projects_remove', {userId: user.uuid, projectId: membership.project.uuid}) }}" onsubmit="return confirm('{{ 'users.remove_from_project_confirm'|trans({'%project%': membership.project.name})|e('js') }}')">
+                <form
+                    method="post"
+                    action="{{ path('admin_users_projects_remove', {userId: user.uuid, projectId: membership.project.uuid}) }}"
+                    data-controller="confirm-submit"
+                    data-confirm-submit-message-value="{{ 'users.remove_from_project_confirm'|trans({'%project%': membership.project.name})|e('html_attr') }}"
+                    data-action="submit->confirm-submit#confirm"
+                >
                     <input type="hidden" name="_token" value="{{ csrf_token('admin_user_project_remove_' ~ membership.id) }}">
                     <button class="btn-ghost" type="submit">{{ 'users.remove_from_project'|trans }}</button>
                 </form>

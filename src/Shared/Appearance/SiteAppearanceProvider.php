@@ -77,8 +77,48 @@ final class SiteAppearanceProvider implements ResetInterface
         return $this->get()->getDangerColorDark();
     }
 
+    public function getWarnColor(): string
+    {
+        return $this->get()->getWarnColor();
+    }
+
+    public function getWarnColorDark(): string
+    {
+        return $this->get()->getWarnColorDark();
+    }
+
+    public function getPaperColor(): string
+    {
+        return $this->get()->getPaperColor();
+    }
+
+    public function getPaperColorDark(): string
+    {
+        return $this->get()->getPaperColorDark();
+    }
+
+    public function getInkColor(): string
+    {
+        return $this->get()->getInkColor();
+    }
+
+    public function getInkColorDark(): string
+    {
+        return $this->get()->getInkColorDark();
+    }
+
+    public function getSurfaceColor(): string
+    {
+        return $this->get()->getSurfaceColor();
+    }
+
+    public function getSurfaceColorDark(): string
+    {
+        return $this->get()->getSurfaceColorDark();
+    }
+
     /**
-     * Inline CSS that overrides Beacon accent tokens for light and dark themes.
+     * Inline CSS that overrides Beacon palette tokens for light and dark themes.
      */
     public function getCssOverrides(): string
     {
@@ -89,11 +129,19 @@ final class SiteAppearanceProvider implements ResetInterface
             \sprintf('  --beacon-moss: %s;', $a->getAccentColor()),
             \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColor()),
             \sprintf('  --beacon-alert: %s;', $a->getDangerColor()),
+            \sprintf('  --beacon-warn: %s;', $a->getWarnColor()),
+            \sprintf('  --beacon-paper: %s;', $a->getPaperColor()),
+            \sprintf('  --beacon-ink: %s;', $a->getInkColor()),
+            \sprintf('  --beacon-surface: %s;', $a->getSurfaceColor()),
             '}',
             '[data-theme="dark"] {',
             \sprintf('  --beacon-moss: %s;', $a->getAccentColorDark()),
             \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColorDark()),
             \sprintf('  --beacon-alert: %s;', $a->getDangerColorDark()),
+            \sprintf('  --beacon-warn: %s;', $a->getWarnColorDark()),
+            \sprintf('  --beacon-paper: %s;', $a->getPaperColorDark()),
+            \sprintf('  --beacon-ink: %s;', $a->getInkColorDark()),
+            \sprintf('  --beacon-surface: %s;', $a->getSurfaceColorDark()),
             '}',
         ]);
     }

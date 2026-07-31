@@ -53,22 +53,25 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
 	header {
 		Alt-Svc "clear"
-		# Baseline browser hardening (053). Prefer external scripts (theme-boot.js); style-src
-		# keeps 'unsafe-inline' for operator CSS overrides. Kit admin pages may still need
-		# inline scripts — tighten further via CADDY_SERVER_EXTRA_DIRECTIVES when ready.
+		# Baseline browser hardening (053). Theme boot + kit-admin + Stimulus avoid inline scripts.
+		# style-src keeps 'unsafe-inline' for operator CSS overrides (site appearance) and kit layout CSS.
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 	}
 
+	# HSTS by default on real hosts. Skip localhost / loopback so local self-signed
+	# HTTPS (e.g. :9444) does not sticky-pin browsers. Override via CADDY_SERVER_EXTRA_DIRECTIVES.
+	@enableHsts not host localhost 127.0.0.1
+	header @enableHsts Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
 	# Mutually exclusive CSP: Swagger UI needs 'unsafe-eval' (JSON Schema compile); keep it off elsewhere.
-	# object-src 'none' blocks plugin vectors. script-src still allows 'unsafe-inline' for kit/admin
-	# leftovers; theme prefs use Vite entry theme-boot + data-* (no inline boot).
+	# Default CSP: no script-src 'unsafe-inline' (Vite entries + Stimulus + JSON data islands).
 	@swaggerUi path /api/doc /api/doc/
 	@defaultCsp not path /api/doc /api/doc/
-	header @defaultCsp Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
-	header @swaggerUi Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
+	header @defaultCsp Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
+	header @swaggerUi Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
 
 	# Optional: restrict Prometheus scrapes to private networks (uncomment in prod):
 	# @metricsPublic {
