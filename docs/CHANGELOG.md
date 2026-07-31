@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Teams Assign to me** (`073-teams-assign-openuri`, Fixes #36): MessageCard **OpenUri Assign to me** when a destination signing secret is set; `GET /hooks/teams/assign-me` validates HMAC, requires Beacon login + triage, assigns via `IssueAssigneeChanger` (`via: teams`).
 - **AuthKit 1.12.0** (`072-authkit-1.12`, Fixes #34): bump from 1.11.4; QR login foundation (`qr_login` enabled, `/login/qr*` public, `app_user.phone` / `phone_verified_at`, challenge table); admin **Enterprise SSO** flag on social credentials; Account profile phone field.
 - **Slack Assign-to-me** (`071-slack-assign-mapping`, Fixes #32): optional Account **Slack user ID**; Block Kit **Assign to me** on Slack alerts; Resolve attributes actor when mapped + triage; shared `IssueAssigneeChanger`.
 - **OTLP traces ingest** (`070-otlp-traces`, Fixes #28): `POST /api/{projectId}/otlp/v1/traces` accepts OTLP ExportTraceServiceRequest JSON; ERROR spans (status +/or exception attributes) map to Beacon events via the Envelope worker; same auth/governance as OTLP logs; cap 200.

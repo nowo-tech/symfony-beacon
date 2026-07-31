@@ -428,6 +428,7 @@ issues:
     assignee_saved: Assignee updated.
     assignee_not_member: That user is not a member of this project.
     assignee_invalid: Could not update the assignee.
+    assignee_forbidden: You need triage access on this project to assign issues.
     status:
         unresolved: Unresolved
         resolved: Resolved
