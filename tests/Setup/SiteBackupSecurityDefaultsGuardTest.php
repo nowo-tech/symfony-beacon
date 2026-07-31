@@ -11,12 +11,6 @@ use RuntimeException;
 
 final class SiteBackupSecurityDefaultsGuardTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        SiteBackupSecurityDefaultsGuard::resetCheckedFlag();
-    }
-
     public function testDevEnvironmentAllowsLocalDefaults(): void
     {
         $guard = new SiteBackupSecurityDefaultsGuard(

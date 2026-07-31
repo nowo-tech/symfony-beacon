@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * Applies to `prod`, `staging`, and any other non-local environment name so misnamed
  * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked.
+ *
+ * Instance latch (not static) so FrankenPHP workers do not share mutable static state.
  */
 final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 {
@@ -27,7 +29,7 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
     /** Documented local setup token from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_SETUP_TOKEN = 'beacon-local-setup';
 
-    private static bool $checked = false;
+    private bool $checked = false;
 
     public function __construct(
         #[Autowire('%kernel.environment%')]
@@ -65,10 +67,10 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
      */
     public function assertProductionSecretsSafe(): void
     {
-        if ($this->isLocalDevelopmentEnvironment() || self::$checked) {
+        if ($this->isLocalDevelopmentEnvironment() || $this->checked) {
             return;
         }
-        self::$checked = true;
+        $this->checked = true;
 
         $token = trim((string) $this->setupToken);
         if ('' === $token) {
@@ -90,13 +92,5 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
     private function isLocalDevelopmentEnvironment(): bool
     {
         return \in_array($this->environment, ['dev', 'test'], true);
-    }
-
-    /**
-     * @internal tests only — reset the once-per-process latch
-     */
-    public static function resetCheckedFlag(): void
-    {
-        self::$checked = false;
     }
 }

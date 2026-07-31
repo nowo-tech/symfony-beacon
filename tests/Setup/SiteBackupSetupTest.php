@@ -114,7 +114,9 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertTrue(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
 
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
-        $user = new User('member-setup@example.com');
+        $user = new User();
+        $user->setEmail('member-setup@example.com');
+        $user->setDisplayName('Member');
         $user->setRoles(['ROLE_USER']);
         $user->setPassword($hasher->hashPassword($user, 'secret'));
         $em = self::getContainer()->get(EntityManagerInterface::class);

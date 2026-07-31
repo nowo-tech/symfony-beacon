@@ -7,6 +7,7 @@ namespace App\Ingest\Controller;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\IngestQueryAuthSettings;
 use App\Ingest\Service\IngestRateLimiter;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
@@ -50,10 +51,9 @@ ENVELOPE;
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
         private MetricsCollector $metricsCollector,
+        private IngestQueryAuthSettings $queryAuthSettings,
         #[Autowire('%beacon.envelope_max_bytes%')]
         private int $maxEnvelopeBytes = 2_097_152,
-        #[Autowire('%beacon.ingest_reject_query_auth%')]
-        private bool $rejectQueryAuth = false,
     ) {
     }
 
@@ -210,7 +210,7 @@ MD,
                 'project_id' => $projectId,
                 'client_ip' => $request->getClientIp(),
             ]);
-            if ($this->rejectQueryAuth) {
+            if ($this->queryAuthSettings->shouldRejectQueryAuth()) {
                 return $this->ingestResponse(
                     'query string authorization is disabled; use X-Beacon-Auth or envelope dsn',
                     Response::HTTP_UNAUTHORIZED,
@@ -221,7 +221,7 @@ MD,
 
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
-            $this->rejectQueryAuth ? '' : $queryString,
+            $this->queryAuthSettings->shouldRejectQueryAuth() ? '' : $queryString,
             $envelopeDsn,
         );
 

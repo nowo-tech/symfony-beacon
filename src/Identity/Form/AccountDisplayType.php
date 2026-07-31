@@ -45,7 +45,8 @@ final class AccountDisplayType extends FormKitAbstractType
     }
 
     /**
-     * @param list<string> $enabledLocales
+     * @param FormBuilderInterface<User> $builder
+     * @param list<string>               $enabledLocales
      */
     private function buildAppearanceFields(FormBuilderInterface $builder, array $enabledLocales): void
     {
@@ -122,6 +123,9 @@ final class AccountDisplayType extends FormKitAbstractType
         });
     }
 
+    /**
+     * @param FormBuilderInterface<User> $builder
+     */
     private function buildPanelFields(FormBuilderInterface $builder): void
     {
         $panelIds = IssuePanelIds::all();
@@ -142,6 +146,9 @@ final class AccountDisplayType extends FormKitAbstractType
         ]);
     }
 
+    /**
+     * @param FormBuilderInterface<User> $builder
+     */
     private function buildTourFields(FormBuilderInterface $builder): void
     {
         $tourChoices = [];
@@ -170,6 +177,9 @@ final class AccountDisplayType extends FormKitAbstractType
         });
     }
 
+    /**
+     * @param FormBuilderInterface<User> $builder
+     */
     private function buildNotificationFields(FormBuilderInterface $builder, bool $pushAvailable): void
     {
         if (!$pushAvailable) {

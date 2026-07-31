@@ -7,9 +7,10 @@ namespace App\Identity\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Upserts AuthKit social OAuth app credentials from environment variables.
+ * Upserts AuthKit social OAuth app credentials from container parameters (env-backed).
  *
  * Env pattern (empty values are skipped):
  * - AUTH_KIT_SOCIAL_{PROVIDER}_CLIENT_ID
@@ -22,9 +23,14 @@ final readonly class SocialLoginCredentialSeeder
     /** @var list<string> */
     private const array PROVIDERS = ['google', 'github', 'microsoft'];
 
+    /**
+     * @param array<string, array{client_id: string, client_secret: string, label: string, enabled: string}> $providers
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SocialLoginCredentialRepository $credentials,
+        #[Autowire('%beacon.auth_kit_social_providers%')]
+        private array $providers,
     ) {
     }
 
@@ -36,20 +42,24 @@ final readonly class SocialLoginCredentialSeeder
         $updated = [];
 
         foreach (self::PROVIDERS as $provider) {
-            $prefix = 'AUTH_KIT_SOCIAL_'.strtoupper($provider).'_';
-            $clientId = trim((string) ($_ENV[$prefix.'CLIENT_ID'] ?? $_SERVER[$prefix.'CLIENT_ID'] ?? getenv($prefix.'CLIENT_ID') ?: ''));
-            $clientSecret = trim((string) ($_ENV[$prefix.'CLIENT_SECRET'] ?? $_SERVER[$prefix.'CLIENT_SECRET'] ?? getenv($prefix.'CLIENT_SECRET') ?: ''));
+            $row = $this->providers[$provider] ?? null;
+            if (!\is_array($row)) {
+                continue;
+            }
+
+            $clientId = trim((string) ($row['client_id'] ?? ''));
+            $clientSecret = trim((string) ($row['client_secret'] ?? ''));
 
             if ('' === $clientId || '' === $clientSecret) {
                 continue;
             }
 
-            $label = trim((string) ($_ENV[$prefix.'LABEL'] ?? $_SERVER[$prefix.'LABEL'] ?? getenv($prefix.'LABEL') ?: ''));
+            $label = trim((string) ($row['label'] ?? ''));
             if ('' === $label) {
                 $label = ucfirst($provider);
             }
 
-            $enabledRaw = strtolower(trim((string) ($_ENV[$prefix.'ENABLED'] ?? $_SERVER[$prefix.'ENABLED'] ?? getenv($prefix.'ENABLED') ?: '1')));
+            $enabledRaw = strtolower(trim((string) ($row['enabled'] ?? '1')));
             $enabled = !\in_array($enabledRaw, ['0', 'false', 'no', 'off'], true);
 
             $credential = $this->credentials->findOneByProvider($provider);
