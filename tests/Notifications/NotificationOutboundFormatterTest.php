@@ -18,9 +18,16 @@ final class NotificationOutboundFormatterTest extends TestCase
     {
         $urls = $this->createMock(UrlGeneratorInterface::class);
         $urls->method('generate')->willReturnCallback(
-            static fn (string $name): string => 'hooks_teams_actions' === $name
-                ? 'https://beacon.test/hooks/teams/actions'
-                : 'https://beacon.test/',
+            static function (string $name, array $parameters = []): string {
+                if ('hooks_teams_actions' === $name) {
+                    return 'https://beacon.test/hooks/teams/actions';
+                }
+                if ('hooks_teams_assign_me' === $name) {
+                    return 'https://beacon.test/hooks/teams/assign-me?'.http_build_query($parameters);
+                }
+
+                return 'https://beacon.test/';
+            },
         );
 
         return new NotificationOutboundFormatter($urls, new InteractionActionToken());
@@ -165,8 +172,9 @@ final class NotificationOutboundFormatterTest extends TestCase
         );
 
         $actions = $teams['json']['potentialAction'];
-        self::assertCount(2, $actions);
+        self::assertCount(3, $actions);
         self::assertSame('OpenUri', $actions[0]['@type']);
+        self::assertSame('Open in Beacon', $actions[0]['name']);
         self::assertSame('HttpPOST', $actions[1]['@type']);
         self::assertSame('Resolve', $actions[1]['name']);
         self::assertSame('https://beacon.test/hooks/teams/actions', $actions[1]['target']);
@@ -175,6 +183,50 @@ final class NotificationOutboundFormatterTest extends TestCase
         self::assertSame($destination->getUuid(), $body['d']);
         self::assertArrayHasKey('sig', $body);
         self::assertTrue(new InteractionActionToken()->isValidResolveToken('teams-secret', $body));
+
+        self::assertSame('OpenUri', $actions[2]['@type']);
+        self::assertSame('Assign to me', $actions[2]['name']);
+        $assignUri = (string) ($actions[2]['targets'][0]['uri'] ?? '');
+        self::assertStringContainsString('/hooks/teams/assign-me', $assignUri);
+        self::assertStringContainsString('a=assign', $assignUri);
+        parse_str((string) parse_url($assignUri, \PHP_URL_QUERY), $assignQuery);
+        self::assertTrue(new InteractionActionToken()->isValidAssignToken('teams-secret', $assignQuery));
+    }
+
+    public function testTeamsAssignOpenUriOmittedWithoutSigningSecret(): void
+    {
+        $formatter = $this->formatter();
+        $destination = new NotificationDestination();
+        $destination->setType(NotificationDestinationType::Teams);
+        $destination->setEndpointUrl('https://outlook.office.com/webhook/x');
+        $destination->setLabel('Ops');
+        $destination->setCategories(['error']);
+
+        $payload = [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'url' => 'https://beacon.test/i/1',
+            'project' => [
+                'uuid' => '11111111-1111-4111-8111-111111111111',
+                'name' => 'Acme',
+            ],
+            'issue' => [
+                'uuid' => '22222222-2222-4222-8222-222222222222',
+                'title' => 'Boom',
+                'level' => 'error',
+            ],
+        ];
+
+        $teams = $formatter->httpRequest(
+            NotificationDestinationType::Teams,
+            'https://outlook.office.com/webhook/x',
+            $payload,
+            $destination,
+        );
+
+        $actions = $teams['json']['potentialAction'];
+        self::assertCount(1, $actions);
+        self::assertSame('Open in Beacon', $actions[0]['name']);
     }
 
     public function testEmailBodyIncludesFactsAndUrl(): void

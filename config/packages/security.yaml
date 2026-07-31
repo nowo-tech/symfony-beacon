@@ -100,6 +100,9 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/hooks/slack
       roles: PUBLIC_ACCESS
+    # Assign OpenUri needs a Beacon session (login redirect); other Teams hooks stay public.
+    - path: ^/hooks/teams/assign-me
+      roles: ROLE_USER
     - path: ^/hooks/teams
       roles: PUBLIC_ACCESS
     - path: ^/api/doc

@@ -289,6 +289,11 @@ final readonly class NotificationOutboundFormatter
             $actions[] = $resolve;
         }
 
+        $assign = $this->teamsAssignOpenUri($payload, $destination);
+        if (null !== $assign) {
+            $actions[] = $assign;
+        }
+
         $card['potentialAction'] = $actions;
 
         return $card;
@@ -297,9 +302,9 @@ final readonly class NotificationOutboundFormatter
     /**
      * @param array<string, mixed> $payload
      *
-     * @return array<string, mixed>|null
+     * @return array{projectUuid: string, issueUuid: string, destinationUuid: string}|null
      */
-    private function teamsResolveHttpPost(array $payload, ?NotificationDestination $destination): ?array
+    private function teamsInteractiveContext(array $payload, ?NotificationDestination $destination): ?array
     {
         if (!$destination instanceof NotificationDestination || !$destination->hasSigningSecret()) {
             return null;
@@ -327,11 +332,30 @@ final readonly class NotificationOutboundFormatter
             return null;
         }
 
+        return [
+            'projectUuid' => $projectUuid,
+            'issueUuid' => $issueUuid,
+            'destinationUuid' => $destinationUuid,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>|null
+     */
+    private function teamsResolveHttpPost(array $payload, ?NotificationDestination $destination): ?array
+    {
+        $ctx = $this->teamsInteractiveContext($payload, $destination);
+        if (null === $ctx || !$destination instanceof NotificationDestination) {
+            return null;
+        }
+
         $token = $this->actionToken->issueResolveToken(
             (string) $destination->getSigningSecret(),
-            $destinationUuid,
-            $projectUuid,
-            $issueUuid,
+            $ctx['destinationUuid'],
+            $ctx['projectUuid'],
+            $ctx['issueUuid'],
         );
 
         $target = $this->urlGenerator->generate('hooks_teams_actions', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -348,6 +372,43 @@ final readonly class NotificationOutboundFormatter
                     'value' => 'application/json',
                 ],
             ],
+        ];
+    }
+
+    /**
+     * OpenUri Assign: MessageCard HttpPOST cannot identify the clicker.
+     *
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>|null
+     */
+    private function teamsAssignOpenUri(array $payload, ?NotificationDestination $destination): ?array
+    {
+        $ctx = $this->teamsInteractiveContext($payload, $destination);
+        if (null === $ctx || !$destination instanceof NotificationDestination) {
+            return null;
+        }
+
+        $token = $this->actionToken->issueAssignToken(
+            (string) $destination->getSigningSecret(),
+            $ctx['destinationUuid'],
+            $ctx['projectUuid'],
+            $ctx['issueUuid'],
+        );
+
+        $uri = $this->urlGenerator->generate(
+            'hooks_teams_assign_me',
+            $token,
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        );
+
+        return [
+            '@type' => 'OpenUri',
+            'name' => 'Assign to me',
+            'targets' => [[
+                'os' => 'default',
+                'uri' => $uri,
+            ]],
         ];
     }
 

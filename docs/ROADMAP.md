@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.23** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / OTLP metrics / inbound email / Teams Assign / QR SMS OTP) when prioritized.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / OTLP metrics / inbound email / QR polish) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -263,11 +263,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.23 | **Slack Assign-to-me** + Account Slack user ID mapping; Resolve actor when mapped; shared `IssueAssigneeChanger` | Beacon | `071-slack-assign-mapping` | **Done** |
 
+### Done (Teams Assign OpenUri)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.25 | **Teams Assign to me** via OpenUri (HMAC + Beacon session + triage; no `teamsUserId`) | Beacon | `073-teams-assign-openuri` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / OTLP metrics / inbound email / Teams Assign) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / OTLP metrics / inbound email / QR polish) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)
 
@@ -281,7 +287,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | — | **QR phone login** polish (SMS OTP verify, QR PNG generator) | Beacon | extends `072` | **Later** |
 | — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
 | — | **OTLP metrics** (+ gRPC / Bundle exporter / full Performance waterfall from traces) | Beacon (+ optional Bundle) | extends `067`/`070` | **Later** |
-| — | Teams **Assign** / Teams→member mapping | Beacon | extends `069`/`071` | **Later** |
+| — | Teams→member mapping / Adaptive Cards (OpenUri Assign shipped in `073` / 6.25) | Beacon | extends `073` | **Later** |
 | — | **Inbound email → issue comment** | Beacon | — | **Later** |
 
 ---
@@ -343,4 +349,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.23 Slack Assign-to-me Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (6.25 Teams Assign OpenUri Done; Next = Later Phase 6+).
