@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81356644312dec53a40ebb4ad9db3d96",
+    "content-hash": "da5f3382d9c60d5bf6ea5b90977d7341",
     "packages": [
         {
             "name": "brick/math",
@@ -1940,16 +1940,16 @@
         },
         {
             "name": "nowo-tech/beacon-bundle",
-            "version": "v1.6.9",
+            "version": "v1.6.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BeaconBundle.git",
-                "reference": "a9296bd8446b9a43145538ee081bee13393a7d29"
+                "reference": "90490f14e64cefafa3729ca20fdefba1d8202801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/a9296bd8446b9a43145538ee081bee13393a7d29",
-                "reference": "a9296bd8446b9a43145538ee081bee13393a7d29",
+                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/90490f14e64cefafa3729ca20fdefba1d8202801",
+                "reference": "90490f14e64cefafa3729ca20fdefba1d8202801",
                 "shasum": ""
             },
             "require": {
@@ -1976,6 +1976,7 @@
                 "symfony/clock": "^7.0 || ^8.0",
                 "symfony/console": "^7.0 || ^8.0",
                 "symfony/messenger": "^7.0 || ^8.0",
+                "symfony/scheduler": "^7.0 || ^8.0",
                 "symfony/security-core": "^7.0 || ^8.0",
                 "symfony/yaml": "^7.0 || ^8.0"
             },
@@ -1984,6 +1985,7 @@
                 "monolog/monolog": "Enable nowo_beacon.monolog_handler to forward log records to Beacon",
                 "symfony/flex": "For automatic Flex recipe installation of config/packages/nowo_beacon.yaml",
                 "symfony/messenger": "Required for register_messenger_listener and transport.mode=messenger.",
+                "symfony/scheduler": "Optional: attach extra.scheduler on Messenger failures when envelopes carry ScheduledStamp (include_scheduler_context).",
                 "symfony/security-bundle": "Enable send.user authenticated context via the security token storage"
             },
             "type": "symfony-bundle",
@@ -2030,7 +2032,7 @@
                 "issues": "https://github.com/nowo-tech/BeaconBundle/issues",
                 "source": "https://github.com/nowo-tech/BeaconBundle"
             },
-            "time": "2026-07-30T11:58:55+00:00"
+            "time": "2026-07-31T12:22:38+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",
