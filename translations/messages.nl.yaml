@@ -759,6 +759,9 @@ users:
             project.share_link_created: 'Deellink aangemaakt'
             project.share_link_revoked: 'Deellink ingetrokken'
             project.share_link_opened: 'Deellink geopend'
+            instance.config_exported: 'Instantieconfiguratie geëxporteerd'
+            instance.config_imported: 'Instantieconfiguratie geïmporteerd'
+            instance.mailer_updated: 'Instantie-mailerinstellingen bijgewerkt'
         context:
             email: E-mail
             role: Rol
@@ -776,6 +779,11 @@ users:
             issue_title: Probleem
             event_id: Gebeurtenis-ID
             label: Label
+            cleared: 'DSN gewist'
+            dsn_changed: 'DSN gewijzigd'
+            from_changed: 'From gewijzigd'
+            scheme: Schema
+            host: Host
     empty: 'Nog geen gebruikers.'
 preferences:
     title: Accountinstellingen
@@ -1377,6 +1385,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Voer een geldige Symfony Mailer-DSN in (bijvoorbeeld smtp://user:pass@host:587).'
         null_transport: 'null:// kan geen e-mail afleveren. Plak een echte SMTP-DSN (of andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.'
+        scheme_not_allowed: 'Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps, sendmail, native of een ondersteund providerschema (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Opgeslagen DSN wissen'
         help: 'Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving totdat je een nieuwe opslaat.'

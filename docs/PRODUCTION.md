@@ -77,6 +77,8 @@ Generate a key once (then back it up with other secrets):
 docker compose -f compose.prod.yaml exec php bin/console doctrine:encrypt:generate-secret-key
 ```
 
+Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `instance.mailer_updated` with **redacted** `scheme` and `host` only (never the DSN secret). Plaintext DSN input must use an allowlisted Mailer scheme (`smtp` / `smtps` / `sendmail` / `native` and common provider schemes).
+
 ## Messenger in production
 
 Keep the **HTTP** container separate from the **`messenger:consume`** process (same as local Compose). Scale consumers independently; do not confuse them with `FRANKENPHP_MODE=worker`.

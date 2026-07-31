@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared;
 
+use App\Identity\Entity\UserAction;
+use App\Identity\UserActionType;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -72,6 +74,21 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertSame('smtp://user:s3cret@mail.example:587', $mailer->getEffectiveDsn());
         self::assertSame('alerts@example.com', $mailer->getFromAddress());
         self::assertInstanceOf(MailerInterface::class, self::getContainer()->get(MailerInterface::class));
+
+        $actions = $em->getRepository(UserAction::class)->findBy(
+            ['action' => UserActionType::InstanceMailerUpdated],
+            ['id' => 'DESC'],
+            1,
+        );
+        self::assertCount(1, $actions);
+        $context = $actions[0]->getContext();
+        self::assertTrue($context['dsn_changed'] ?? false);
+        self::assertTrue($context['from_changed'] ?? false);
+        self::assertFalse($context['cleared'] ?? true);
+        self::assertSame('smtp', $context['scheme'] ?? null);
+        self::assertSame('mail.example', $context['host'] ?? null);
+        self::assertStringNotContainsString('s3cret', json_encode($context, \JSON_THROW_ON_ERROR));
+        self::assertStringNotContainsString('smtp://', json_encode($context, \JSON_THROW_ON_ERROR));
     }
 
     public function testClearStoredDsnFallsBackToEnvironment(): void
@@ -102,6 +119,18 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertNotNull($reloaded);
         self::assertNull($reloaded->getMailerDsn());
         self::assertFalse(self::getContainer()->get(ConfiguredMailer::class)->isConfiguredFromDatabase());
+
+        $actions = $em->getRepository(UserAction::class)->findBy(
+            ['action' => UserActionType::InstanceMailerUpdated],
+            ['id' => 'DESC'],
+            1,
+        );
+        self::assertCount(1, $actions);
+        $context = $actions[0]->getContext();
+        self::assertTrue($context['cleared'] ?? false);
+        self::assertTrue($context['dsn_changed'] ?? false);
+        self::assertSame('', $context['scheme'] ?? null);
+        self::assertSame('', $context['host'] ?? null);
     }
 
     public function testRejectsInvalidAndNullMailerDsnOnSave(): void
@@ -118,7 +147,15 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         ]);
         $client->submit($form);
         self::assertResponseStatusCodeSame(422);
-        self::assertSelectorTextContains('body', 'valid Symfony Mailer DSN');
+        self::assertSelectorTextContains('body', 'scheme is not allowed');
+
+        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $form = $crawler->selectButton('Save mailer settings')->form([
+            'instance_mailer_settings[plainMailerDsn]' => 'file:///tmp/mail.sock',
+        ]);
+        $client->submit($form);
+        self::assertResponseStatusCodeSame(422);
+        self::assertSelectorTextContains('body', 'scheme is not allowed');
 
         $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
@@ -159,7 +196,11 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         ]);
         self::assertResponseRedirects('/settings/mailer');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Sample email sent');
+        $body = $client->getResponse()->getContent() ?: '';
+        self::assertTrue(
+            str_contains($body, 'Sample email sent') || str_contains($body, 'Correo de muestra enviado'),
+            'Expected sample-sent flash (EN or ES catalogue).',
+        );
     }
 
     public function testSampleSendBlockedWithoutDeliverableDsn(): void

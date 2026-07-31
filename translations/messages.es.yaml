@@ -668,6 +668,7 @@ instance_mailer:
         placeholder: smtp://user:pass@mail.example:587
         invalid: Introduce un DSN de Symfony Mailer válido (por ejemplo smtp://user:pass@host:587).
         null_transport: null:// no puede entregar correo. Pega un DSN SMTP (u otro) real, o usa Borrar DSN guardado para volver al entorno.
+        scheme_not_allowed: Ese esquema de DSN de Mailer no está permitido. Usa smtp, smtps, sendmail, native o un proveedor soportado (Mailgun, Postmark, SES, …).
     clear_dsn:
         label: Borrar DSN guardado
         help: Elimina el DSN de la base de datos y vuelve a MAILER_DSN del entorno hasta que guardes uno nuevo.
@@ -853,6 +854,9 @@ users:
             'project.share_link_created': Enlace para compartir creado
             'project.share_link_revoked': Enlace para compartir revocado
             'project.share_link_opened': Enlace para compartir abierto
+            'instance.config_exported': Configuración de instancia exportada
+            'instance.config_imported': Configuración de instancia importada
+            'instance.mailer_updated': Ajustes de mailer de instancia actualizados
         context:
             email: Email
             role: Rol
@@ -870,6 +874,11 @@ users:
             issue_title: Incidencia
             event_id: ID del evento
             label: Etiqueta
+            cleared: DSN borrado
+            dsn_changed: DSN cambiado
+            from_changed: From cambiado
+            scheme: Esquema
+            host: Host
     empty: Aún no hay usuarios.
 preferences:
     title: Ajustes de cuenta

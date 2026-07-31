@@ -764,6 +764,9 @@ users:
             project.share_link_created: 'Lien de partage créé'
             project.share_link_revoked: 'Lien de partage révoqué'
             project.share_link_opened: 'Lien de partage ouvert'
+            instance.config_exported: "Configuration d'instance exportée"
+            instance.config_imported: "Configuration d'instance importée"
+            instance.mailer_updated: "Paramètres mailer d'instance mis à jour"
         context:
             email: E-mail
             role: Rôle
@@ -781,6 +784,11 @@ users:
             issue_title: Problème
             event_id: "ID d'événement"
             label: Étiquette
+            cleared: 'DSN effacé'
+            dsn_changed: 'DSN modifié'
+            from_changed: 'From modifié'
+            scheme: Schéma
+            host: Hôte
     empty: "Aucun utilisateur pour l'instant."
 preferences:
     title: 'Paramètres du compte'
@@ -1409,6 +1417,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Saisissez un DSN Symfony Mailer valide (par exemple smtp://user:pass@host:587).'
         null_transport: "null:// ne peut pas livrer d''e-mail. Collez un vrai DSN SMTP (ou autre), ou utilisez Effacer le DSN stocke pour retomber sur l''environnement."
+        scheme_not_allowed: "Ce schema de DSN Mailer n''est pas autorise. Utilisez smtp, smtps, sendmail, native ou un fournisseur pris en charge (Mailgun, Postmark, SES, …)."
 
     clear_dsn:
         label: 'Effacer le DSN stocke'

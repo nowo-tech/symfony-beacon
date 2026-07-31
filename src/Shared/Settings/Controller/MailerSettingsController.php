@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Shared\Settings\Controller;
 
 use App\Identity\Entity\User;
+use App\Identity\Service\UserActionRecorder;
+use App\Identity\UserActionType;
 use App\Shared\Mailer\ConfiguredMailer;
+use App\Shared\Mailer\MailerDsnAudit;
 use App\Shared\Settings\Form\InstanceMailerSettingsType;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Psr\Log\LoggerInterface;
@@ -29,6 +32,7 @@ final class MailerSettingsController extends AbstractController
         private readonly ConfiguredMailer $configuredMailer,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
+        private readonly UserActionRecorder $userActionRecorder,
     ) {
     }
 
@@ -36,6 +40,9 @@ final class MailerSettingsController extends AbstractController
     public function edit(Request $request): Response
     {
         $settings = $this->repository->getOrCreate();
+        $beforeDsn = $settings->getMailerDsn();
+        $beforeFrom = $settings->getMailerFrom();
+
         $form = $this->createForm(InstanceMailerSettingsType::class, $settings);
         $form->handleRequest($request);
 
@@ -51,6 +58,7 @@ final class MailerSettingsController extends AbstractController
 
             $this->repository->save($settings);
             $this->configuredMailer->reset();
+            $this->recordMailerAudit($beforeDsn, $beforeFrom, $settings->getMailerDsn(), $settings->getMailerFrom());
             $this->addFlash('success', 'flash.mailer.saved');
 
             return $this->redirectToRoute('settings_mailer');
@@ -106,5 +114,33 @@ final class MailerSettingsController extends AbstractController
         }
 
         return $this->redirectToRoute('settings_mailer');
+    }
+
+    private function recordMailerAudit(?string $beforeDsn, ?string $beforeFrom, ?string $afterDsn, ?string $afterFrom): void
+    {
+        $dsnChanged = $beforeDsn !== $afterDsn;
+        $fromChanged = $beforeFrom !== $afterFrom;
+        if (!$dsnChanged && !$fromChanged) {
+            return;
+        }
+
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $redacted = MailerDsnAudit::redact($afterDsn);
+        $this->userActionRecorder->recordAndFlush(
+            UserActionType::InstanceMailerUpdated,
+            $user,
+            $user,
+            [
+                'cleared' => null !== $beforeDsn && null === $afterDsn,
+                'dsn_changed' => $dsnChanged,
+                'from_changed' => $fromChanged,
+                'scheme' => $redacted['scheme'] ?? '',
+                'host' => $redacted['host'] ?? '',
+            ],
+        );
     }
 }

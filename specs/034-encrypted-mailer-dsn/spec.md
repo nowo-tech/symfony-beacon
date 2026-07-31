@@ -92,6 +92,7 @@ As a guest on the login page, I only see **magic login** and **forgot password**
 - Same Halite default profile as `ProjectApiKey.secretKey` and `NotificationDestination.endpointUrl`.
 - No per-project Mailer DSN in this feature (instance-wide only).
 - English UI catalogues are source of truth; Spanish (and other locales) follow project i18n conventions.
+- **6.15 residual:** Admin Mailer saves emit `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets). `MailerDsnValidator` enforces an allowlist of Mailer schemes.
 
 ## Out of Scope
 
