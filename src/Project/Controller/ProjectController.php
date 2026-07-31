@@ -17,6 +17,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Form\ProjectType;
+use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
@@ -59,6 +60,7 @@ final class ProjectController extends AbstractController
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly ProjectShareLinkRepository $shareLinkRepository,
+        private readonly ProjectReadTokenRepository $readTokenRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -215,6 +217,8 @@ final class ProjectController extends AbstractController
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
             'shareLinks' => $this->shareLinkRepository->findActiveByProject($project),
             'lastShareUrl' => $request->getSession()->remove('_beacon_last_share_url'),
+            'readTokens' => $this->readTokenRepository->findByProject($project),
+            'lastReadToken' => $request->getSession()->remove('_beacon_last_read_token'),
         ]);
     }
 

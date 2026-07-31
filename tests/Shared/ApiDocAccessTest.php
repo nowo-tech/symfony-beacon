@@ -82,8 +82,13 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
 
         $schemes = $json['components']['securitySchemes'] ?? [];
         self::assertArrayHasKey('BeaconAuth', $schemes);
+        self::assertArrayHasKey('BeaconReadToken', $schemes);
         self::assertArrayHasKey('BeaconKeyQuery', $schemes);
         self::assertArrayHasKey('BeaconSecretQuery', $schemes);
+
+        self::assertArrayHasKey('/api/projects/{projectUuid}/issues', $json['paths']);
+        self::assertSame('readProjectIssues', $json['paths']['/api/projects/{projectUuid}/issues']['get']['operationId'] ?? null);
+        self::assertArrayHasKey('/api/projects/{projectUuid}/issues/{issueUuid}', $json['paths']);
 
         self::assertArrayHasKey('/health/live', $json['paths']);
         self::assertArrayHasKey('/health/ready', $json['paths']);

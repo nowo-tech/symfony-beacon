@@ -36,6 +36,10 @@ nelmio_api_doc:
         tags:
             - name: Ingest
               description: Envelope wire-protocol ingest (async processing via Messenger).
+            - name: Read API
+              description: |
+                Project-scoped JSON read of issues. Authenticate with `Authorization: Bearer <brt_…>`
+                (create tokens in Project Settings). Distinct from ingest keys. Put rate limits at the reverse proxy.
             - name: Health
               description: Liveness and readiness probes (no authentication).
         components:
@@ -48,6 +52,13 @@ nelmio_api_doc:
                         Beacon auth header. Example:
                         `Beacon beacon_key=PUBLIC, beacon_secret=SECRET`
                         The secret is always required. Prefer this over query auth.
+                BeaconReadToken:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: brt_
+                    description: |
+                        Project read API token (`brt_` + hex). Create/revoke in Project Settings.
+                        Does not accept ingest public/secret keys.
                 BeaconKeyQuery:
                     type: apiKey
                     in: query
