@@ -12,6 +12,7 @@ nav:
     admin_projects: Projects
     appearance: Appearance
     mailer: Mailer
+    instance_config: Instance config
     social_login: Social login
     setup: Setup
     menus: Menus
@@ -657,6 +658,21 @@ mailer_settings:
 
             If you received this, the encrypted Mailer DSN can deliver magic-login emails.
             From address: %from%
+settings:
+    instance_config:
+        title: Instance config
+        intro: Export or import allowlisted non-secret settings (appearance and instance flags). Mailer DSN, Mercure secrets, and OAuth secrets are never included.
+        export_title: Export
+        export_help: Download a versioned JSON file safe for backup drills. Secrets stay on this instance.
+        export: Download JSON
+        import_title: Import
+        import_help: Restore appearance and allowlisted flags from a previous export. Secret values are rejected and left unchanged.
+        import: Import JSON
+        file: Config file
+        imported: Instance config imported.
+        import_failed: Import failed. Check schema version and that the file has no secret keys.
+        missing_file: Choose a JSON file to import.
+        invalid_csrf: Invalid security token.
 social_login_settings:
     title: Social login
     intro: Store OAuth app credentials in the database (AuthKit table auth_kit_social_credential). Login buttons appear when social_login.mode is enabled and at least one credential row is enabled.
@@ -945,6 +961,8 @@ users:
             'project.share_link_created': Share link created
             'project.share_link_revoked': Share link revoked
             'project.share_link_opened': Share link opened
+            'instance.config_exported': Instance config exported
+            'instance.config_imported': Instance config imported
         context:
             email: Email
             role: Role
@@ -1303,6 +1321,7 @@ admin:
         ops: Cross-project spikes, open issues, and failed deliveries.
         appearance: Brand name, accents, status colors, and page surfaces.
         mailer: Encrypted Mailer DSN and From address for transactional email.
+        instance_config: Export or import non-secret appearance and instance flags (JSON).
         social_login: OAuth provider credentials (Google / GitHub / Microsoft) stored in the database.
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.

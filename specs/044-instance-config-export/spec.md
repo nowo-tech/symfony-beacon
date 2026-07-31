@@ -2,7 +2,7 @@
 
 **Feature Branch**: `044-instance-config-export`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Export/import instance settings (appearance, mailer metadata flags, non-secret config JSON) for backup drills. Secrets (Mailer DSN, OAuth, encrypt key) MUST NOT be included in cleartext exports.
 
@@ -32,7 +32,7 @@ As an instance admin, I restore allowlisted settings from a file.
 
 ## Success Criteria
 
-- **SC-001**: Round-trip test without leaking DSN/OAuth secrets.
+- **SC-001**: Round-trip test without leaking DSN/OAuth secrets (`InstanceConfigPortabilityTest`).
 - **SC-002**: CSRF on import.
 
 ## Out of scope
