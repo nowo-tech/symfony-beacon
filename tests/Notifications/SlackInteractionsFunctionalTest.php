@@ -224,7 +224,7 @@ final class SlackInteractionsFunctionalTest extends DatabaseWebTestCase
         /** @var Issue $reloaded */
         $reloaded = $em->getRepository(Issue::class)->find($issue->getId());
         self::assertNotNull($reloaded->getAssignee());
-        self::assertSame($owner->getId(), $reloaded->getAssignee()?->getId());
+        self::assertSame($owner->getId(), $reloaded->getAssignee()->getId());
     }
 
     private function postSlackAction(
