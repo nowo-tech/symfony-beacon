@@ -1699,18 +1699,43 @@ error:
         title: Onverwachte omweg
         lead: Dat verzoek is niet aangekomen. Jij hebt niets in brand gestoken — probeer het zo opnieuw.
         hint: Onze mascotte zoekt al onder de bankkussens naar aanwijzingen.
-    404:
-        title: Naast de kaart
-        lead: Dit pad staat niet op deze Beacon. Controleer de URL of volg het licht naar home — geen speurtocht nodig.
-        hint: Zelfs de beste ontdekkers dwalen als de kaart ondersteboven ligt.
-        image_alt: Beacon-mascotte met kaart en loep naast een grote 404
+    400:
+        title: Puzzelstukjes door elkaar
+        lead: Dat verzoek paste niet helemaal bij de vorm die we verwachtten. Pas het aan en stuur het opnieuw — geen gebroken glas, alleen hoeken die niet kloppen.
+        hint: Onze mascotte leest de instructies nog steeds ondersteboven. Overkomt de besten.
+        image_alt: Beacon-mascotte met puzzelstukjes en een waarschuwingsdriehoek naast een grote 400
+    401:
+        title: Badge graag
+        lead: Deze deur vraagt om een geldige pas. Log in en probeer opnieuw — de portier is vriendelijk, alleen grondig.
+        hint: Zelfs robots vergeten soms hun toegangspas. We houden een reserve bij de balie.
+        image_alt: Beacon-mascotte bij een checkpoint met toegangspas naast een grote 401
     403:
         title: Poort dicht
         lead: Je hebt niet de juiste sleutels voor deze pagina. Log in met een toegestaan account of ga terug — het is niet persoonlijk.
         hint: De mascotte omkopen met koekjes opent het slot ook niet. Hebben we geprobeerd.
         image_alt: Beacon-mascotte naast een beveiligde poort met 403
+    404:
+        title: Naast de kaart
+        lead: Dit pad staat niet op deze Beacon. Controleer de URL of volg het licht naar home — geen speurtocht nodig.
+        hint: Zelfs de beste ontdekkers dwalen als de kaart ondersteboven ligt.
+        image_alt: Beacon-mascotte met kaart en loep naast een grote 404
+    408:
+        title: Zandloper leeg
+        lead: We wachtten geduldig, maar het verzoek duurde te lang. Probeer opnieuw als alles sneller voelt — geen haast aan jouw kant.
+        hint: Onze mascotte staart nog naar de klok. Timeouts gebeuren; koffie helpt.
+        image_alt: Beacon-mascotte met zandloper en wekker naast een grote 408
+    429:
+        title: Zachte pauze
+        lead: Je stuurde verzoeken iets sneller dan we kunnen jongleren. Adem even en ga verder — de wachtrij loopt leeg.
+        hint: Onze mascotte drukte pauze op de band. Geen standje — meer een stretchtje.
+        image_alt: Beacon-mascotte die een berichtenwachtrij pauzeert naast een grote 429
     500:
         title: Beacon-hik
         lead: Er ging iets mis aan onze kant, niet aan de jouwe. Wacht even en probeer opnieuw — jij deed niets verkeerd.
         hint: We tikken de servers heel zachtjes met een moersleutel. Heel zachtjes.
         image_alt: Beacon-mascotte die een serverrack met 500 repareert
+    502:
+        title: Kabel los
+        lead: Een link tussen diensten werd zacht. We steken weer in — probeer zo opnieuw; jij deed niets verkeerd.
+        hint: Onze mascotte verbindt de gloedkabel opnieuw. Vonken zijn opzettelijk. Waarschijnlijk.
+        image_alt: Beacon-mascotte die een gloeiende kabel tussen servers herverbindt naast een grote 502

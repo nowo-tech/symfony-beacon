@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Project\Entity\Project;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
@@ -88,7 +89,7 @@ final class SlackInteractionsController extends AbstractController
         $destinationUuid = isset($value['d']) && \is_string($value['d']) ? $value['d'] : '';
         $projectUuid = isset($value['p']) && \is_string($value['p']) ? $value['p'] : '';
         $issueUuid = isset($value['i']) && \is_string($value['i']) ? $value['i'] : '';
-        if ('' === $destinationUuid || '' === $projectUuid || '' === $issueUuid) {
+        if (in_array('', [$destinationUuid, $projectUuid, $issueUuid], true)) {
             return new Response('Incomplete action value', Response::HTTP_BAD_REQUEST);
         }
 
@@ -112,7 +113,7 @@ final class SlackInteractionsController extends AbstractController
         }
 
         $project = $destination->getProject();
-        if (null === $project || $project->getUuid() !== $projectUuid) {
+        if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
             return new Response('Project mismatch', Response::HTTP_FORBIDDEN);
         }
 

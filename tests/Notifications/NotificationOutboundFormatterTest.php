@@ -171,7 +171,7 @@ final class NotificationOutboundFormatterTest extends TestCase
         self::assertSame('resolve', $body['a']);
         self::assertSame($destination->getUuid(), $body['d']);
         self::assertArrayHasKey('sig', $body);
-        self::assertTrue((new InteractionActionToken())->isValidResolveToken('teams-secret', $body));
+        self::assertTrue(new InteractionActionToken()->isValidResolveToken('teams-secret', $body));
     }
 
     public function testEmailBodyIncludesFactsAndUrl(): void

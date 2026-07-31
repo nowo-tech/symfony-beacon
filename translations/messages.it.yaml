@@ -1699,18 +1699,43 @@ error:
         title: Deviazione inaspettata
         lead: Quella richiesta non è arrivata a destinazione. Non hai rotto niente — riprova tra un momento.
         hint: La nostra mascotte sta già cercando indizi sotto i cuscini del divano.
-    404:
-        title: Fuori mappa
-        lead: Questo percorso non esiste su questo Beacon. Controlla l'URL o segui la luce verso la home — nessuna caccia al tesoro.
-        hint: Anche i migliori esploratori sbagliano strada quando la mappa è a testa in giù.
-        image_alt: Mascotte Beacon che esplora con mappa e lente accanto a un grande 404
+    400:
+        title: Pezzi del puzzle mischiati
+        lead: Quella richiesta non combacia del tutto con la forma prevista. Sistemala e inviala di nuovo — niente vetri rotti, solo angoli che non combaciano.
+        hint: La nostra mascotte sta ancora leggendo le istruzioni al contrario. Succede ai migliori.
+        image_alt: Mascotte Beacon con pezzi di puzzle e triangolo di avviso accanto a un grande 400
+    401:
+        title: Badge, per favore
+        lead: Questa porta richiede un passaggio valido. Accedi e riprova — il guardiano è gentile, solo scrupoloso.
+        hint: Anche i robot a volte dimenticano la tessera. Ne teniamo una di scorta al bancone.
+        image_alt: Mascotte Beacon a un checkpoint con tessera di accesso accanto a un grande 401
     403:
         title: Cancello chiuso
         lead: Non hai le chiavi di questa pagina. Accedi con un account autorizzato o torna alla home — non è niente di personale.
         hint: Corrompere la mascotte con i biscotti non apre comunque la serratura. Ci abbiamo provato.
         image_alt: Mascotte Beacon accanto a un cancello protetto con 403
+    404:
+        title: Fuori mappa
+        lead: Questo percorso non esiste su questo Beacon. Controlla l'URL o segui la luce verso la home — nessuna caccia al tesoro.
+        hint: Anche i migliori esploratori sbagliano strada quando la mappa è a testa in giù.
+        image_alt: Mascotte Beacon che esplora con mappa e lente accanto a un grande 404
+    408:
+        title: Clessidra vuota
+        lead: Abbiamo aspettato con pazienza, ma la richiesta ha impiegato troppo. Riprova quando tutto sarà più snello — senza fretta da parte tua.
+        hint: La nostra mascotte fissa ancora l'orologio. I timeout succedono; il caffè aiuta.
+        image_alt: Mascotte Beacon con clessidra e sveglia accanto a un grande 408
+    429:
+        title: Pausa soft
+        lead: Hai inviato richieste un po' più in fretta di quanto possiamo fare i giocolieri. Fai un respiro e continua — la coda si svuoterà.
+        hint: La mascotte ha premuto pausa sul nastro. Non è un rimprovero — più una pausa stretching.
+        image_alt: Mascotte Beacon che mette in pausa una coda di messaggi accanto a un grande 429
     500:
         title: Singhiozzo del Beacon
         lead: Qualcosa ha inciampato dalla nostra parte, non dalla tua. Aspetta un po' e riprova — non hai fatto nulla di sbagliato.
         hint: Stiamo dando un colpetto gentile ai server con una chiave inglese. Molto gentile.
         image_alt: Mascotte Beacon che ripara un rack server con 500
+    502:
+        title: Cavo staccato
+        lead: Un collegamento tra servizi si è allentato. Stiamo ripristinando — riprova tra un momento; non hai fatto nulla di sbagliato.
+        hint: La mascotte sta riconnettendo il cavo luminoso. Le scintille sono volute. Probabilmente.
+        image_alt: Mascotte Beacon che riconnette un cavo luminoso tra server accanto a un grande 502

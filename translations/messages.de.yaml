@@ -1699,18 +1699,43 @@ error:
         title: Unerwarteter Umweg
         lead: Die Anfrage ist nicht angekommen. Du hast nichts kaputtgemacht — versuche es gleich noch einmal.
         hint: Unser Maskottchen sucht schon unter den Sofakissen nach Hinweisen.
-    404:
-        title: Abseits der Karte
-        lead: Dieser Pfad existiert auf diesem Beacon nicht. Prüfe die URL oder folge dem Licht nach Hause — keine Schatzsuche nötig.
-        hint: Selbst die besten Entdecker gehen fehl, wenn die Karte auf dem Kopf steht.
-        image_alt: Beacon-Maskottchen mit Karte und Lupe neben einer großen 404
+    400:
+        title: Puzzle-Teile durcheinander
+        lead: Die Anfrage passt nicht ganz zur erwarteten Form. Passe sie an und sende sie erneut — kein Scherbenhaufen, nur falsche Ecken.
+        hint: Unser Maskottchen liest die Anleitung noch immer auf dem Kopf. Passiert den Besten.
+        image_alt: Beacon-Maskottchen mit Puzzle-Teilen und Warn-Dreieck neben einer großen 400
+    401:
+        title: Ausweis bitte
+        lead: Diese Tür braucht einen gültigen Pass. Melde dich an und versuche es erneut — der Türsteher ist freundlich, nur gründlich.
+        hint: Selbst Roboter vergessen manchmal ihre Zugangskarte. Am Schalter liegt ein Ersatz.
+        image_alt: Beacon-Maskottchen am Checkpoint mit Zugangskarte neben einer großen 401
     403:
         title: Tor geschlossen
         lead: Du hast nicht die richtigen Schlüssel für diese Seite. Melde dich mit einem erlaubten Konto an oder gehe zurück — das ist nicht persönlich.
         hint: Das Maskottchen mit Keksen zu bestechen öffnet das Schloss trotzdem nicht. Haben wir versucht.
         image_alt: Beacon-Maskottchen neben einem gesicherten Tor mit 403
+    404:
+        title: Abseits der Karte
+        lead: Dieser Pfad existiert auf diesem Beacon nicht. Prüfe die URL oder folge dem Licht nach Hause — keine Schatzsuche nötig.
+        hint: Selbst die besten Entdecker gehen fehl, wenn die Karte auf dem Kopf steht.
+        image_alt: Beacon-Maskottchen mit Karte und Lupe neben einer großen 404
+    408:
+        title: Sanduhr abgelaufen
+        lead: Wir haben geduldig gewartet, aber die Anfrage dauerte zu lange. Versuche es erneut, wenn alles flotter läuft — keine Eile auf deiner Seite.
+        hint: Unser Maskottchen starrt noch auf die Uhr. Timeouts passieren; Kaffee hilft.
+        image_alt: Beacon-Maskottchen mit Sanduhr und Wecker neben einer großen 408
+    429:
+        title: Sanfte Pause
+        lead: Du hast Anfragen etwas schneller geschickt, als wir jonglieren können. Atme kurz durch und mach weiter — die Warteschlange leert sich.
+        hint: Unser Maskottchen hat Pause am Förderband gedrückt. Kein Tadel — eher eine Dehnungspause.
+        image_alt: Beacon-Maskottchen pausiert eine Nachrichtenwarteschlange neben einer großen 429
     500:
         title: Beacon-Schluckauf
         lead: Bei uns ist etwas gestolpert, nicht bei dir. Warte kurz und versuche es erneut — du hast nichts falsch gemacht.
         hint: Wir tippen den Servern ganz sanft mit dem Schraubenschlüssel auf die Schulter.
         image_alt: Beacon-Maskottchen repariert ein Server-Rack mit 500
+    502:
+        title: Kabel raus
+        lead: Eine Verbindung zwischen Diensten ist weich geworden. Wir stecken wieder ein — versuche es gleich noch einmal; du hast nichts falsch gemacht.
+        hint: Unser Maskottchen verbindet das Leuchtkabel neu. Funken sind Absicht. Wahrscheinlich.
+        image_alt: Beacon-Maskottchen verbindet ein leuchtendes Kabel zwischen Servern neben einer großen 502

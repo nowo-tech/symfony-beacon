@@ -93,7 +93,7 @@ final class OtlpTracesMapper
     public function toEnvelopeBody(array $payloads): string
     {
         $lines = [
-            json_encode(['sdk' => ['name' => 'beacon-otlp'], 'sent_at' => (new DateTimeImmutable())->format(\DATE_ATOM)], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES),
+            json_encode(['sdk' => ['name' => 'beacon-otlp'], 'sent_at' => new DateTimeImmutable()->format(\DATE_ATOM)], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES),
         ];
 
         foreach ($payloads as $payload) {
@@ -148,7 +148,7 @@ final class OtlpTracesMapper
             'tags' => array_filter([
                 'otel.service' => $service,
                 'otel.span' => $name,
-            ], static fn ($v) => null !== $v && '' !== $v),
+            ], static fn (?string $v): bool => null !== $v && '' !== $v),
             'extra' => [
                 'otlp' => true,
                 'otlp.signal' => 'traces',
@@ -286,7 +286,7 @@ final class OtlpTracesMapper
             return ((float) $nano) / 1_000_000_000.0;
         }
 
-        return (float) (new DateTimeImmutable())->format('U.u');
+        return (float) new DateTimeImmutable()->format('U.u');
     }
 
     /**

@@ -124,7 +124,6 @@ MD,
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
             '',
-            null,
         );
 
         if (null === $auth['public_key']) {

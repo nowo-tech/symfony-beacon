@@ -8,15 +8,21 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class PublicLocaleRoutingTest extends DatabaseWebTestCase
 {
-    public function testBareLoginRedirectsToDefaultLocale(): void
+    public function testHomeRedirectsToBareLogin(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/');
+        self::assertResponseRedirects('/login');
+    }
+
+    public function testBareLoginServesDefaultLocaleWithoutPrefix(): void
     {
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/login');
-        if ($client->getResponse()->isRedirection()) {
-            self::assertResponseRedirects('/en/login');
-            $client->followRedirect();
-        }
+        // AuthKit unlocalized: serve — bare /login must not bounce to /{DEFAULT_LOCALE}/login.
+        self::assertFalse($client->getResponse()->isRedirection());
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('html[lang="en"]');
     }
 
     public function testLocalizedLoginRenders(): void

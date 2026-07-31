@@ -15,11 +15,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Each third-party channel gets a native wire format (Slack attachments, Discord embeds,
  * Teams MessageCard, Telegram text, raw JSON for HTTP).
  */
-final class NotificationOutboundFormatter
+final readonly class NotificationOutboundFormatter
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly InteractionActionToken $actionToken,
+        private UrlGeneratorInterface $urlGenerator,
+        private InteractionActionToken $actionToken,
     ) {
     }
 
@@ -123,7 +123,7 @@ final class NotificationOutboundFormatter
         $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
         $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
         $destinationUuid = $destination->getUuid();
-        if ('' === $projectUuid || '' === $issueUuid || '' === $destinationUuid) {
+        if (in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
             return null;
         }
 
@@ -307,7 +307,7 @@ final class NotificationOutboundFormatter
         $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
         $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
         $destinationUuid = $destination->getUuid();
-        if ('' === $projectUuid || '' === $issueUuid || '' === $destinationUuid) {
+        if (in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
             return null;
         }
 

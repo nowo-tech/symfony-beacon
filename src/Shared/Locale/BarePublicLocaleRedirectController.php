@@ -11,7 +11,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Bare redirects for non-AuthKit public URLs (legal + home).
- * AuthKit bare auth routes are registered by the bundle when locale.in_path=both.
+ * Legal pages only exist as /{_locale}/legal/…; home targets AuthKit's bare login twin
+ * (nowo_auth_kit_login_unlocalized → /login) when locale.in_path=both + unlocalized=serve.
  */
 final class BarePublicLocaleRedirectController extends AbstractController
 {
@@ -48,6 +49,7 @@ final class BarePublicLocaleRedirectController extends AbstractController
     #[Route('/', name: 'app_home_redirect', methods: ['GET'])]
     public function home(): RedirectResponse
     {
-        return $this->redirectToRoute('nowo_auth_kit_login', ['_locale' => $this->defaultLocale]);
+        // AuthKit locale.unlocalized=serve: bare /login is the default-locale twin (not /{DEFAULT_LOCALE}/login).
+        return $this->redirectToRoute('nowo_auth_kit_login_unlocalized');
     }
 }

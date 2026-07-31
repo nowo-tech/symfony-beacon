@@ -68,6 +68,6 @@ final class OtlpTracesMapperTest extends TestCase
     public function testRejectsInvalidJson(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        (new OtlpTracesMapper())->mapToEventPayloads('{');
+        new OtlpTracesMapper()->mapToEventPayloads('{');
     }
 }

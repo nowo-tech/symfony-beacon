@@ -16,7 +16,7 @@ final class SlackRequestSignatureVerifier
     public function isValid(string $signingSecret, string $timestampHeader, string $signatureHeader, string $rawBody, ?int $now = null): bool
     {
         $signingSecret = trim($signingSecret);
-        if ('' === $signingSecret || '' === $timestampHeader || '' === $signatureHeader) {
+        if (in_array('', [$signingSecret, $timestampHeader, $signatureHeader], true)) {
             return false;
         }
 

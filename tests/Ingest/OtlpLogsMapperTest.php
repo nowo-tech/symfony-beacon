@@ -67,6 +67,6 @@ final class OtlpLogsMapperTest extends TestCase
     public function testRejectsInvalidJson(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        (new OtlpLogsMapper())->mapToEventPayloads('{');
+        new OtlpLogsMapper()->mapToEventPayloads('{');
     }
 }
