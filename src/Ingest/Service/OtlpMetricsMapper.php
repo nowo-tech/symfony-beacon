@@ -176,7 +176,7 @@ final class OtlpMetricsMapper
             'extra' => [
                 'otlp' => true,
                 'otlp.signal' => 'metrics',
-                ...($value !== null ? ['otlp.metric_value' => (string) $value] : []),
+                ...(null !== $value ? ['otlp.metric_value' => (string) $value] : []),
             ],
         ];
 
