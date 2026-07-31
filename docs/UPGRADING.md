@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 1.0.0 to the next release](#upgrading-from-100-to-the-next-release)
+- [Upgrading from 1.0.1 to the next release](#upgrading-from-101-to-the-next-release)
+- [Upgrading from 1.0.0 to 1.0.1](#upgrading-from-100-to-101)
 - [Upgrading from 0.17.0 to 1.0.0](#upgrading-from-0170-to-100)
 - [Upgrading from 0.16.0 to 0.17.0](#upgrading-from-0160-to-0170)
 - [Upgrading from 0.15.0 to 0.16.0](#upgrading-from-0150-to-0160)
@@ -44,7 +45,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 1.0.0 to the next release
+## Upgrading from 1.0.1 to the next release
 
 ```bash
 git pull
@@ -57,6 +58,21 @@ make vite-build
 ```
 
 No further steps until the next tagged release.
+
+## Upgrading from 1.0.0 to 1.0.1
+
+```bash
+git fetch --tags
+git checkout v1.0.1   # or pull main at the release commit
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+**1.0.1** is a patch: documentation layout (`docs/product|ops|dev`) plus Doctrine query reductions on list/export, retention, ingest thresholds, and related paths. **No new migrations.** Bookmark updates only if you linked secondary manuals by old paths (see [docs/README.md](README.md)).
 
 ## Upgrading from 0.17.0 to 1.0.0
 

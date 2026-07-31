@@ -43,7 +43,7 @@ Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/
    # or a full stack: make up
    ```
 
-4. Confirm Caddy proxies the hub (already in [`.docker/frankenphp/Caddyfile`](../.docker/frankenphp/Caddyfile)):
+4. Confirm Caddy proxies the hub (already in [`.docker/frankenphp/Caddyfile`](../../.docker/frankenphp/Caddyfile)):
 
    ```caddy
    handle /.well-known/mercure* {
@@ -193,6 +193,6 @@ docker compose up -d --force-recreate mercure
 ## Related
 
 - Member alerts overview: [NOTIFICATIONS.md](../product/NOTIFICATIONS.md#member-push-mercure--web-push)
-- Production Compose: [`compose.prod.yaml`](../compose.prod.yaml)
-- Local Caddy proxy: [`.docker/frankenphp/Caddyfile`](../.docker/frankenphp/Caddyfile)
-- Env templates: [`.env.dist`](../.env.dist)
+- Production Compose: [`compose.prod.yaml`](../../compose.prod.yaml)
+- Local Caddy proxy: [`.docker/frankenphp/Caddyfile`](../../.docker/frankenphp/Caddyfile)
+- Env templates: [`.env.dist`](../../.env.dist)
