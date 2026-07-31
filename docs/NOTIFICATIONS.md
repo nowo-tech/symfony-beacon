@@ -65,9 +65,25 @@ Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against 
 6. In Beacon: type **Slack Incoming Webhook**, paste the URL as the endpoint, choose categories, save.
 7. Use **Send test** and confirm a message appears in the Slack channel.
 
-**What Beacon sends:** JSON `{ "text": "<summary>", "beacon": { …canonical payload… } }`.
+**What Beacon sends:** JSON `{ "text": "<summary>", "attachments": […], "beacon": { …canonical payload… } }`. When a **Slack signing secret** is configured on the destination, issue alerts (`issue.new` / `issue.regression` / `issue.reopened`) also include Block Kit **blocks** with a **Resolve** button.
 
 **Tips:** Prefer a dedicated `#errors` / `#ops` channel. Rotate the webhook by regenerating it in Slack and updating the destination in Beacon. Do not commit webhook URLs to git.
+
+#### Interactive Resolve (optional)
+
+Incoming Webhooks alone cannot receive button clicks. To enable **Resolve** from Slack:
+
+1. In the same Slack app: **Basic Information** → copy **Signing Secret**.
+2. Under **Interactivity & Shortcuts**, turn Interactivity **On** and set Request URL to:
+
+   ```text
+   https://<your-beacon-host>/hooks/slack/interactions
+   ```
+
+3. In Beacon, edit the Slack destination, paste the Signing Secret, save.
+4. New issue alerts will show a **Resolve** button. Beacon verifies `X-Slack-Signature` (5-minute window) before changing status.
+
+v1 records the status change with a null actor (`via: slack` in the audit payload). Mapping Slack users to Beacon members is not shipped yet. Teams interactive actions and Assign are out of scope.
 
 ---
 

@@ -75,6 +75,7 @@ final readonly class DeliverNotificationHandler
                     $destination->getType(),
                     $endpoint,
                     $message->payload,
+                    $destination,
                 );
 
                 $httpOptions = [

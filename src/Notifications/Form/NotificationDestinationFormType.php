@@ -17,6 +17,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -68,6 +69,21 @@ final class NotificationDestinationFormType extends AbstractType
                     new Assert\NotBlank(),
                     new Assert\Length(max: 2048),
                 ],
+            ])
+            ->add('signingSecret', PasswordType::class, [
+                'label' => 'notifications.form.signing_secret',
+                'help' => 'notifications.form.signing_secret_help',
+                'required' => false,
+                'mapped' => false,
+                'always_empty' => true,
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                ],
+            ])
+            ->add('clearSigningSecret', CheckboxType::class, [
+                'label' => 'notifications.form.clear_signing_secret',
+                'required' => false,
+                'mapped' => false,
             ])
             ->add('enabled', CheckboxType::class, [
                 'label' => 'notifications.form.enabled',
@@ -131,6 +147,15 @@ final class NotificationDestinationFormType extends AbstractType
             /** @var NotificationDestination $data */
             $data = $event->getData();
             $form = $event->getForm();
+
+            if (true === $form->get('clearSigningSecret')->getData()) {
+                $data->setSigningSecret(null);
+            } else {
+                $plainSecret = trim((string) $form->get('signingSecret')->getData());
+                if ('' !== $plainSecret) {
+                    $data->setSigningSecret($plainSecret);
+                }
+            }
 
             try {
                 new DateTimeZone($data->getQuietHoursTimezone());

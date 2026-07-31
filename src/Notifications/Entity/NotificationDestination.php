@@ -56,6 +56,13 @@ class NotificationDestination implements AuditableInterface
     #[Encrypted]
     private string $endpointUrl = '';
 
+    /**
+     * Slack app signing secret for interactive callbacks (encrypted; Slack destinations only).
+     */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $signingSecret = null;
+
     #[ORM\Column]
     private bool $enabled = true;
 
@@ -165,6 +172,32 @@ class NotificationDestination implements AuditableInterface
         $this->touch();
 
         return $this;
+    }
+
+    public function getSigningSecret(): ?string
+    {
+        return $this->signingSecret;
+    }
+
+    public function setSigningSecret(?string $signingSecret): self
+    {
+        if (null === $signingSecret) {
+            $this->signingSecret = null;
+            $this->touch();
+
+            return $this;
+        }
+
+        $trimmed = trim($signingSecret);
+        $this->signingSecret = '' !== $trimmed ? $trimmed : null;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function hasSigningSecret(): bool
+    {
+        return null !== $this->signingSecret && '' !== $this->signingSecret;
     }
 
     public function isEnabled(): bool

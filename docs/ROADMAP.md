@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19** OTLP logs HTTP JSON ingest Done (`067`). **Next**: Later Phase 6+ (SSO / OTLP traces / Slack interactive / inbound email) when prioritized. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19** OTLP logs HTTP JSON ingest Done (`067`). **6.20** Slack interactive Resolve Done (`068`). **Next**: Later Phase 6+ (SSO / OTLP traces / Teams interactive / inbound email) when prioritized. No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -167,7 +167,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` / `065` | **Done** (v0.17.0; see 6.15) |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**; Bundle console/Scheduler + Monolog Done in Bundle **v1.6.10**; Mailer DSN audit + Mailpit + Ops defaults + Social login admin Done in **v0.17.0**; OTLP logs HTTP JSON Done (`067` / 6.19). **Next**: pull from Later when prioritized.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**; Bundle console/Scheduler + Monolog Done in Bundle **v1.6.10**; Mailer DSN audit + Mailpit + Ops defaults + Social login admin Done in **v0.17.0**; OTLP logs HTTP JSON Done (`067` / 6.19); Slack interactive Resolve Done (`068` / 6.20). **Next**: pull from Later when prioritized.
 
 ### Done (v0.13.0 product — was Next)
 
@@ -239,11 +239,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.19 | **OTLP logs ingest** (HTTP JSON ExportLogsServiceRequest → Beacon events; same DSN auth; WARN+ only; cap 200) | Beacon | `067-otlp-ingest` | **Done** |
 
+### Done (Slack interactive Resolve)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.20 | **Slack interactive Resolve**: Block Kit button + `POST /hooks/slack/interactions` (signed); optional encrypted signing secret per destination | Beacon | `068-slack-interactive-actions` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / OTLP traces / interactive Slack / inbound email) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / OTLP traces / Teams interactive / inbound email) when prioritized | Beacon | — | **Next** |
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -251,7 +257,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | — | **QR phone login** (AuthKit design; runtime not shipped) | AuthKit / Beacon | — | **Later** |
 | — | **WebAuthn / passkeys** if AuthKit supports | Beacon | — | **Later** |
 | — | **OTLP traces/metrics** (+ gRPC / Bundle exporter) | Beacon (+ optional Bundle) | extends `067` | **Later** |
-| — | Slack/Teams **interactive** resolve / assign actions | Beacon | — | **Later** |
+| — | Teams **interactive** resolve / assign (+ Slack Assign / Slack→member mapping) | Beacon | extends `068` | **Later** |
 | — | **Inbound email → issue comment** | Beacon | — | **Later** |
 
 ---
@@ -302,7 +308,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.16.0** | Coverage (`033`) + GDPR (`043`); collaboration/API (`040`–`042`, `044`, `061`); SiteBackup dual setup locale (`056`) + secrets guard (`062`); RoutingKit (`064-routing-kit`); branded HTTP errors (`063-branded-http-errors`); CSP PHP delivery + display-pref defaults |
 | **v0.17.0** | Mailer DSN audit (`6.15` / `065`); local Mailpit (`066`); Ops defaults in DB (`6.17`); Social login admin UI (`6.18`); Constitution v1.3.0 (no `env(VAR):` defaults in parameters) |
 | **Bundle v1.6.10** | Phase 6.13–6.14: nested console extras + Scheduler context; Monolog bridge already shipped (docs closed) |
-| **Next** | Later Phase 6+ (SSO / OTLP traces / …) when specified |
+| **Next** | Later Phase 6+ (SSO / OTLP traces / Teams interactive / …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -313,4 +319,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.19 OTLP logs ingest Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (6.20 Slack interactive Resolve Done; Next = Later Phase 6+).

@@ -1531,6 +1531,9 @@ notifications:
         endpoint_help: 'Slack / Discord / Teams / HTTP: URL HTTPS del webhook. Email: indirizzo del destinatario. Telegram: bot_token@chat_id'
         endpoint_invalid: 'L''endpoint non corrisponde al tipo selezionato.'
         endpoint_ssrf: 'L''endpoint non deve puntare a indirizzi privati, link-local o metadati cloud.'
+        signing_secret: Slack signing secret
+        signing_secret_help: 'Optional. Slack app Signing Secret enables interactive Resolve buttons. Leave blank to keep the current value.'
+        clear_signing_secret: Clear Slack signing secret
         enabled: Abilitata
         categories: 'Categorie di avviso'
         quiet_hours_legend: 'Ore di silenzio e digest'

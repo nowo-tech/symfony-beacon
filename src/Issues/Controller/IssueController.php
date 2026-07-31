@@ -23,6 +23,7 @@ use App\Issues\Repository\IssueSavedViewRepository;
 use App\Issues\Service\IssueAssigneeGuard;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
+use App\Issues\Service\IssueStatusChanger;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
@@ -63,6 +64,7 @@ final class IssueController extends AbstractController
         private readonly IssueCommentRepository $commentRepository,
         private readonly IssueSavedViewRepository $savedViewRepository,
         private readonly IssueHistoryRecorder $historyRecorder,
+        private readonly IssueStatusChanger $issueStatusChanger,
         private readonly IssueMergeService $issueMergeService,
         private readonly IssueAssigneeGuard $assigneeGuard,
         private readonly UserActionRecorder $userActionRecorder,
@@ -493,32 +495,7 @@ final class IssueController extends AbstractController
             ]);
         }
 
-        $previous = $issue->getStatus();
-        if ($previous !== $next) {
-            $issue->setStatus($next);
-            $this->historyRecorder->recordStatusChange($issue, $previous, $next, $user);
-            $this->userActionRecorder->record(
-                UserActionType::IssueStatusChanged,
-                $user,
-                $user,
-                [
-                    'project_uuid' => $project->getUuid(),
-                    'project_name' => $project->getName(),
-                    'issue_uuid' => $issue->getUuid(),
-                    'issue_title' => $issue->getTitle(),
-                    'from' => $previous->value,
-                    'to' => $next->value,
-                ],
-            );
-            if (IssueStatus::Resolved === $next) {
-                $this->notificationDispatcher->dispatchIssueResolved($project, $issue);
-            } elseif (
-                IssueStatus::Unresolved === $next
-                && \in_array($previous, [IssueStatus::Resolved, IssueStatus::Ignored], true)
-            ) {
-                $this->notificationDispatcher->dispatchIssueReopened($project, $issue);
-            }
-            $this->entityManager->flush();
+        if ($this->issueStatusChanger->change($issue, $next, $user)) {
             $this->addFlash('success', 'issues.status_saved');
         }
 
