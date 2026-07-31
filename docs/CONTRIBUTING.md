@@ -14,6 +14,7 @@
 12. New Doctrine migrations MUST use [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) MDK definitions (`CreateTablesService` + `AppliesMdkDefinition` / `migrations/FieldDictionary/`). Prefer idempotent declarative tables/columns over raw `CREATE TABLE` SQL.
 13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
 14. **Kit Twig overrides** — prefer host `layout_template` shells under `templates/kit/` over copying full dashboard/admin pages into `templates/bundles/Nowo*Bundle/`. When a page must diverge, extend the bundle original with `{% extends '@Nowo…/…' %}` and override blocks only (Password Strength is the reference). Full forks of `dashboard/*.html.twig` / `admin/*.html.twig` break on kit upgrades. Kit shells must wrap with `body_before` / `body_after` (not `body`) because kit pages also define `{% block body %}`. Avoid `@!Nowo…` bang namespaces — kit TwigPathsPass does not register them.
+15. **Env defaults** — do **not** add `env(VAR_NAME): '…'` entries in `config/parameters.yaml` (constitution Principle IX). Put defaults in `.env.dist`; use `when@…` package YAML for env-specific overrides; typed `%env(…)%` aliases remain fine.
 
 ## Kit Twig strategy (nowo-tech)
 

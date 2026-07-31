@@ -7,14 +7,14 @@ namespace App\Shared\Retention;
 use App\Issues\Service\IssueMergeService;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Purges old telemetry by age and/or caps event count per project.
  *
- * Prefers per-project overrides, then env defaults (`beacon.retention_*`).
+ * Prefers per-project overrides, then instance operational defaults.
  * Uses portable SQL (MySQL + SQLite tests). Does not remove projects, keys, or memberships.
  * After deleting events, recomputes issue denormalized aggregates so counters stay truthful.
  */
@@ -24,10 +24,7 @@ final readonly class RetentionPurger
         private EntityManagerInterface $entityManager,
         private ProjectRepository $projectRepository,
         private IssueMergeService $issueMergeService,
-        #[Autowire('%beacon.retention_days%')]
-        private int $retentionDays,
-        #[Autowire('%beacon.retention_max_events%')]
-        private int $maxEventsPerProject,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
@@ -167,11 +164,11 @@ final readonly class RetentionPurger
 
     private function effectiveRetentionDays(Project $project): int
     {
-        return $project->getRetentionDays() ?? $this->retentionDays;
+        return $project->getRetentionDays() ?? $this->opsDefaults->retentionDays();
     }
 
     private function effectiveMaxEvents(Project $project): int
     {
-        return $project->getRetentionMaxEvents() ?? $this->maxEventsPerProject;
+        return $project->getRetentionMaxEvents() ?? $this->opsDefaults->retentionMaxEvents();
     }
 }

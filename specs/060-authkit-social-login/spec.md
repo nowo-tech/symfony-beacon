@@ -2,7 +2,7 @@
 
 **Feature Branch**: `060-authkit-social-login`  
 **Created**: 2026-07-30  
-**Status**: Implemented  
+**Status**: Implemented (OAuth + seed in v0.13.0; **admin CRUD** replaces env seeder in v0.17.0)  
 
 **Input**: Enable AuthKit OAuth social login on Beacon using [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) **≥ 1.9** so operators can “Continue with …” Google / GitHub / Microsoft (or custom). Provider **client id/secret** and linked-user tokens are stored in Doctrine tables owned by AuthKit. Prefer kit integration over a bespoke OAuth stack.
 
@@ -34,16 +34,17 @@ As a user with an existing Beacon account whose email matches the provider profi
 2. **Given** `create_user_if_missing: false` (Beacon default), **When** the IdP email matches no local user, **Then** login fails closed (redirect to login with error; no ROLE_ADMIN auto-create).
 3. **Given** public `access_control`, **When** I hit start/check routes (bare and locale-prefixed), **Then** they are `PUBLIC_ACCESS`.
 
-### User Story 3 - Operator seeds credentials from env (Priority: P2)
+### User Story 3 - Admin manages credentials in UI (Priority: P1)
 
-As a local operator, I set `AUTH_KIT_SOCIAL_{PROVIDER}_CLIENT_ID/SECRET` in `.env` and run `app:seed-social-login` to upsert credentials into the database.
+As an instance admin, I create, edit, enable/disable, and delete OAuth provider credentials under **Administration → Social login** without env bootstrap or a CLI seeder.
 
-**Independent Test**: Run command with Google env vars; assert one enabled credential; run again → idempotent update.
+**Independent Test**: As `ROLE_ADMIN`, open `/admin/social-login`, add an enabled Google credential, assert login shows the Continue-with button; disable or delete → button gone.
 
 **Acceptance Scenarios**:
 
-1. **Given** both client id and secret for a known provider, **When** I run `app:seed-social-login`, **Then** the credential is upserted and enabled (unless `…_ENABLED=0`).
-2. **Given** no env pairs, **When** I run the command, **Then** it succeeds with a warning and changes nothing.
+1. **Given** I am an instance admin, **When** I save a provider with client id/secret enabled, **Then** the credential is stored in `auth_kit_social_credential` and buttons appear when AuthKit mode is enabled.
+2. **Given** an existing credential, **When** I disable or delete it, **Then** that provider no longer appears on login.
+3. **Given** a non-admin, **When** I open the social login admin routes, **Then** access is denied (403).
 
 ## Requirements *(mandatory)*
 
@@ -52,7 +53,7 @@ As a local operator, I set `AUTH_KIT_SOCIAL_{PROVIDER}_CLIENT_ID/SECRET` in `.en
 - **FR-003**: Security `access_control` MUST allow `/login/social` (bare + locale prefixes).
 - **FR-004**: Login Twig override MUST render social buttons using AuthKit variables (`social_login_enabled`, `social_login_providers`, `social_login_route`).
 - **FR-005**: Beacon MUST default `create_user_if_missing: false` while `registration_role` is `ROLE_ADMIN` / `first_user_only`, to avoid open admin signup via OAuth.
-- **FR-006**: Provide `app:seed-social-login` + `.env.dist` documented `AUTH_KIT_SOCIAL_*` placeholders.
+- **FR-006**: Provide Administration → Social login CRUD for `auth_kit_social_credential` (`ROLE_ADMIN`); do not rely on `app:seed-social-login` / `AUTH_KIT_SOCIAL_*` env bootstrap (removed in v0.17.0).
 - **FR-007**: Password-policy excluded routes and locale switcher MUST include social login route names.
 - **FR-008**: Privacy/legal: document third-party IdP use; cookie consent when non-essential third-party scripts are added later (OAuth redirect itself is not a Beacon tracking cookie).
 
@@ -66,7 +67,7 @@ As a local operator, I set `AUTH_KIT_SOCIAL_{PROVIDER}_CLIENT_ID/SECRET` in `.en
 - **SC-001**: Login shows social affordances only when mode + enabled DB credentials exist.
 - **SC-002**: OAuth start/check routes are public and locale-aware.
 - **SC-003**: With `create_user_if_missing: false`, unknown emails do not create users.
-- **SC-004**: `app:seed-social-login` upserts from env without requiring SQL by hand.
+- **SC-004**: Admins can manage provider credentials via the Social login admin UI without SQL or env seeders.
 
 ## Assumptions
 
@@ -77,7 +78,6 @@ As a local operator, I set `AUTH_KIT_SOCIAL_{PROVIDER}_CLIENT_ID/SECRET` in `.en
 ## Out of Scope
 
 - Enterprise SSO/SAML/OIDC federation.
-- Admin CRUD UI for social credentials (env seeder + DB is enough for v1).
 - Encrypting OAuth client secrets with Halite (AuthKit stores them; optional follow-up).
 - Creating local users as `ROLE_ADMIN` via social signup.
 - QR phone login / WebAuthn.

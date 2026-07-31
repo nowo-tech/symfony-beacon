@@ -372,6 +372,76 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'settings_ops_defaults',
+            'Ops defaults',
+            ['en' => 'Ops defaults', 'es' => 'Valores ops', 'de' => 'Ops-Standards', 'nl' => 'Ops-standaarden', 'fr' => 'Valeurs ops', 'it' => 'Predefiniti ops', 'pt' => 'Predefinições ops'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'settings_instance_config',
+            'Instance config',
+            ['en' => 'Instance config', 'es' => 'Configuración de instancia', 'de' => 'Instanzkonfiguration', 'nl' => 'Instantieconfiguratie', 'fr' => 'Configuration d’instance', 'it' => 'Configurazione istanza', 'pt' => 'Configuração da instância'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $socialLogin = $this->ensureItem(
+            $collection,
+            'admin_social_login',
+            'Social login',
+            ['en' => 'Social login', 'es' => 'Inicio social', 'de' => 'Social Login', 'nl' => 'Sociale login', 'fr' => 'Connexion sociale', 'it' => 'Login social', 'pt' => 'Login social'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_social_login_new',
+            'Add provider',
+            ['en' => 'Add provider', 'es' => 'Añadir proveedor', 'de' => 'Anbieter hinzufügen', 'nl' => 'Provider toevoegen', 'fr' => 'Ajouter un fournisseur', 'it' => 'Aggiungi provider', 'pt' => 'Adicionar fornecedor'],
+            $socialLogin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_social_login_edit',
+            'Edit provider',
+            ['en' => 'Edit provider', 'es' => 'Editar proveedor', 'de' => 'Anbieter bearbeiten', 'nl' => 'Provider bewerken', 'fr' => 'Modifier le fournisseur', 'it' => 'Modifica provider', 'pt' => 'Editar fornecedor'],
+            $socialLogin,
+            ['provider'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_site_backup_setup',
+            'Setup',
+            ['en' => 'Setup', 'es' => 'Configuración', 'de' => 'Einrichtung', 'nl' => 'Configuratie', 'fr' => 'Configuration', 'it' => 'Configurazione', 'pt' => 'Configuração'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_routing_kit_panel',
+            'Locale routes',
+            ['en' => 'Locale routes', 'es' => 'Rutas por idioma', 'de' => 'Locale-Routen', 'nl' => 'Locale-routes', 'fr' => 'Routes par locale', 'it' => 'Route per locale', 'pt' => 'Rotas por locale'],
+            $admin,
+            [],
+            $changed,
+        );
+
         $menus = $this->ensureItem(
             $collection,
             'nowo_dashboard_menu_dashboard_index',
@@ -630,6 +700,24 @@ final readonly class BreadcrumbDemoSeeder
                 'fr' => 'Mes groupes',
                 'it' => 'I miei gruppi',
                 'pt' => 'Os meus grupos',
+            ],
+            $account,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'account_privacy',
+            'Privacy',
+            [
+                'en' => 'Privacy',
+                'es' => 'Privacidad',
+                'de' => 'Datenschutz',
+                'nl' => 'Privacy',
+                'fr' => 'Confidentialité',
+                'it' => 'Privacy',
+                'pt' => 'Privacidade',
             ],
             $account,
             [],

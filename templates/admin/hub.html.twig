@@ -34,6 +34,14 @@
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.mailer'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.mailer'|trans }}</p>
     </a>
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_social_login') }}" data-testid="admin-social-login">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.social_login'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.social_login'|trans }}</p>
+    </a>
+    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_ops_defaults') }}" data-testid="admin-ops-defaults">
+        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.ops_defaults'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.ops_defaults'|trans }}</p>
+    </a>
     <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_instance_config') }}" data-testid="admin-instance-config">
         <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.instance_config'|trans }}</h2>
         <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.instance_config'|trans }}</p>

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Notifications\Service;
 
 use App\Notifications\Entity\NotificationDestination;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Consecutive-failure circuit breaker for outbound notification destinations.
@@ -14,21 +14,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class NotificationCircuitBreaker
 {
     public function __construct(
-        #[Autowire('%beacon.notifications.circuit_breaker_threshold%')]
-        private int $threshold,
-        #[Autowire('%beacon.notifications.circuit_breaker_cooldown_minutes%')]
-        private int $cooldownMinutes,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
     public function getThreshold(): int
     {
-        return max(1, $this->threshold);
+        return $this->opsDefaults->circuitBreakerThreshold();
     }
 
     public function getCooldownMinutes(): int
     {
-        return max(0, $this->cooldownMinutes);
+        return $this->opsDefaults->circuitBreakerCooldownMinutes();
     }
 
     /**

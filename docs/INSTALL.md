@@ -26,9 +26,13 @@ make ready              # migrate + platform + demo + dogfood BEACON_DSN when em
 # make bootstrap        # migrate + platform seed + setup.done marker
 # make seed             # optional: demo user + project + DSN
 make seed-sample        # optional: PROFILE=dev samples
+# Optional local SMTP catcher (not production):
+# make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/MAILPIT.md
 ```
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
+
+To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](MAILPIT.md). Do not run Mailpit in production.
 
 Alternatively open the app with an empty (or catalog-less) database: the SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`** (local default `beacon-local-setup`). Choose **guided** (migrations, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
 

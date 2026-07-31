@@ -19,6 +19,9 @@ use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
+use App\Shared\Settings\Entity\InstanceSettings;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
@@ -69,7 +72,7 @@ final class NotificationDigestTest extends TestCase
             $bufferRepo,
             new NotificationPayloadBuilder($urls),
             new QuietHoursEvaluator(),
-            new NotificationCircuitBreaker(5, 0),
+            $this->circuitBreaker(),
             $bus,
             $em,
             $this->createStub(MemberIssueRealtimeNotifierInterface::class),
@@ -86,6 +89,14 @@ final class NotificationDigestTest extends TestCase
 
         self::assertCount(1, $buffered);
         self::assertSame('issue.new', $buffered[0]['event']);
+    }
+
+    private function circuitBreaker(): NotificationCircuitBreaker
+    {
+        $repository = $this->createStub(InstanceSettingsRepository::class);
+        $repository->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+
+        return new NotificationCircuitBreaker(new InstanceOpsDefaults($repository));
     }
 
     public function testFlushDigestSendsOneSummary(): void

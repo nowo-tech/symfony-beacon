@@ -79,6 +79,8 @@ docker compose -f compose.prod.yaml exec php bin/console doctrine:encrypt:genera
 
 Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `instance.mailer_updated` with **redacted** `scheme` and `host` only (never the DSN secret). Plaintext DSN input must use an allowlisted Mailer scheme (`smtp` / `smtps` / `sendmail` / `native` and common provider schemes).
 
+**Mailer in production:** configure a real SMTP or provider DSN under **Administration → Mailer**. The local **Mailpit** catcher (`make mailpit`, Compose profile `mail` in `compose.override.yaml`) is for development only and is **absent** from [`compose.prod.yaml`](../compose.prod.yaml) — see [MAILPIT.md](MAILPIT.md).
+
 ## Messenger in production
 
 Keep the **HTTP** container separate from the **`messenger:consume`** process (same as local Compose). Scale consumers independently; do not confuse them with `FRANKENPHP_MODE=worker`.
@@ -118,12 +120,7 @@ Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/
 
 ## Retention purge
 
-Configure in `.env`:
-
-| Variable | Meaning |
-|----------|---------|
-| `BEACON_RETENTION_DAYS` | Delete events/transactions/stats older than N days (`0` = off) |
-| `BEACON_RETENTION_MAX_EVENTS_PER_PROJECT` | Cap stored events per project (`0` = off) |
+Configure retention days and the maximum stored events per project under **Administration → Ops defaults**. Both values use `0` to disable that retention rule; projects may override them in Project Settings.
 
 Run daily (cron / systemd timer):
 
@@ -135,9 +132,9 @@ make console ARGS='app:retention:purge'
 
 ## Ingest rate limit
 
-`BEACON_INGEST_RATE_LIMIT` = max Envelope POSTs per project per minute (`0` = unlimited). Exceeded requests get HTTP `429` with `Retry-After: 60`.
+Set the maximum Envelope POSTs per project per minute under **Administration → Ops defaults** (`0` = unlimited). Projects may override it. Exceeded requests get HTTP `429` with `Retry-After: 60`.
 
-Daily / monthly event quotas also return `429` (`daily event quota exceeded` / `monthly event quota exceeded`).
+Daily and monthly event quotas are configured on the same page (`0` = unlimited) and also return `429` (`daily event quota exceeded` / `monthly event quota exceeded`).
 
 ### Query-string ingest auth
 

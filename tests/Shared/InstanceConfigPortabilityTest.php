@@ -30,6 +30,9 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         $settings->setMailerFrom('ops@example.com');
         $settings->setMercureJwtSecret('jwt-super-secret');
         $settings->setMercureEnabled(true);
+        $settings->setRetentionDays(30);
+        $settings->setIngestRateLimit(240);
+        $settings->setNotificationCircuitBreakerThreshold(7);
         $em->flush();
 
         $portability = self::getContainer()->get(InstanceConfigPortability::class);
@@ -40,6 +43,9 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         self::assertSame('Export Brand', $payload['appearance']['brand_name']);
         self::assertTrue($payload['instance']['mercure_enabled']);
         self::assertTrue($payload['instance']['mailer_configured']);
+        self::assertSame(30, $payload['instance']['retention_days']);
+        self::assertSame(240, $payload['instance']['ingest_rate_limit']);
+        self::assertSame(7, $payload['instance']['notification_circuit_breaker_threshold']);
         self::assertStringNotContainsString('super-secret', $json);
         self::assertStringNotContainsString('smtp://', $json);
         self::assertStringNotContainsString('ops@example.com', $json);
@@ -48,6 +54,9 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         $appearance->setBrandName('Changed');
         $appearance->setAccentColor('#000000');
         $settings->setMercureEnabled(false);
+        $settings->setRetentionDays(0);
+        $settings->setIngestRateLimit(1);
+        $settings->setNotificationCircuitBreakerThreshold(1);
         $em->flush();
 
         $portability->import($payload);
@@ -58,6 +67,9 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         self::assertSame('Export Brand', $reloaded->getBrandName());
         self::assertSame('#abcdef', $reloaded->getAccentColor());
         self::assertTrue($reloadedSettings->isMercureEnabled());
+        self::assertSame(30, $reloadedSettings->getRetentionDays());
+        self::assertSame(240, $reloadedSettings->getIngestRateLimit());
+        self::assertSame(7, $reloadedSettings->getNotificationCircuitBreakerThreshold());
         self::assertSame('smtp://user:super-secret@mail.example:587', $reloadedSettings->getMailerDsn());
         self::assertSame('jwt-super-secret', $reloadedSettings->getMercureJwtSecret());
 
@@ -79,6 +91,18 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
             'version' => InstanceConfigPortability::VERSION,
             'instance' => ['mailer_dsn' => 'smtp://leak'],
         ]);
+    }
+
+    public function testImportAcceptsVersionOnePayload(): void
+    {
+        $this->bootAdmin('config-v1@example.com');
+        $portability = self::getContainer()->get(InstanceConfigPortability::class);
+
+        self::assertSame(['instance'], $portability->import([
+            'schema' => InstanceConfigPortability::SCHEMA,
+            'version' => 1,
+            'instance' => ['mercure_enabled' => true],
+        ]));
     }
 
     public function testNonAdminDeniedAndImportViaUi(): void

@@ -434,6 +434,14 @@ erDiagram
         text mercure_url "encrypted"
         text mercure_public_url "encrypted"
         text mercure_jwt_secret "encrypted"
+        int retention_days
+        int retention_max_events
+        int ingest_rate_limit
+        int event_quota_daily
+        int event_quota_monthly
+        int notification_delivery_history_limit
+        int notification_circuit_breaker_threshold
+        int notification_circuit_breaker_cooldown_minutes
         datetime created_at
         datetime updated_at
         int created_by_id FK
@@ -457,7 +465,7 @@ erDiagram
     }
 ```
 
-Admin UI: **Administration → Mailer** / **Mercure** / **Appearance**. See [MERCURE.md](MERCURE.md) and [PRODUCTION.md](PRODUCTION.md#field-encryption-key-halite).
+Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **Appearance**. See [MERCURE.md](MERCURE.md) and [PRODUCTION.md](PRODUCTION.md#field-encryption-key-halite).
 
 ---
 

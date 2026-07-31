@@ -6,12 +6,12 @@ namespace App\Project\Service;
 
 use App\Issues\Repository\EventRepository;
 use App\Project\Entity\Project;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use DateTimeZone;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Resolves effective governance limits (project override → env default) and quota usage.
+ * Resolves effective governance limits (project override → instance default) and quota usage.
  *
  * Monthly quotas use the UTC calendar month (FR-004).
  */
@@ -21,42 +21,33 @@ final readonly class ProjectGovernanceResolver
 
     public function __construct(
         private EventRepository $eventRepository,
-        #[Autowire('%beacon.retention_days%')]
-        private int $defaultRetentionDays,
-        #[Autowire('%beacon.retention_max_events%')]
-        private int $defaultRetentionMaxEvents,
-        #[Autowire('%beacon.ingest_rate_limit%')]
-        private int $defaultIngestRateLimit,
-        #[Autowire('%beacon.event_quota_daily%')]
-        private int $defaultEventQuotaDaily,
-        #[Autowire('%beacon.event_quota_monthly%')]
-        private int $defaultEventQuotaMonthly,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
     public function effectiveRetentionDays(Project $project): int
     {
-        return $project->getRetentionDays() ?? $this->defaultRetentionDays;
+        return $project->getRetentionDays() ?? $this->opsDefaults->retentionDays();
     }
 
     public function effectiveRetentionMaxEvents(Project $project): int
     {
-        return $project->getRetentionMaxEvents() ?? $this->defaultRetentionMaxEvents;
+        return $project->getRetentionMaxEvents() ?? $this->opsDefaults->retentionMaxEvents();
     }
 
     public function effectiveIngestRateLimit(Project $project): int
     {
-        return $project->getIngestRateLimitPerMinute() ?? $this->defaultIngestRateLimit;
+        return $project->getIngestRateLimitPerMinute() ?? $this->opsDefaults->ingestRateLimit();
     }
 
     public function effectiveEventQuotaDaily(Project $project): int
     {
-        return $project->getEventQuotaDaily() ?? $this->defaultEventQuotaDaily;
+        return $project->getEventQuotaDaily() ?? $this->opsDefaults->eventQuotaDaily();
     }
 
     public function effectiveEventQuotaMonthly(Project $project): int
     {
-        return $project->getEventQuotaMonthly() ?? $this->defaultEventQuotaMonthly;
+        return $project->getEventQuotaMonthly() ?? $this->opsDefaults->eventQuotaMonthly();
     }
 
     public function eventsReceivedToday(Project $project): int
@@ -125,7 +116,7 @@ final readonly class ProjectGovernanceResolver
     }
 
     /**
-     * Env defaults exposed to Settings UI (empty field = inherit).
+     * Instance defaults exposed to Settings UI (empty field = inherit).
      *
      * @return array{
      *     retention_days: int,
@@ -138,11 +129,11 @@ final readonly class ProjectGovernanceResolver
     public function envDefaults(): array
     {
         return [
-            'retention_days' => $this->defaultRetentionDays,
-            'retention_max_events' => $this->defaultRetentionMaxEvents,
-            'ingest_rate_limit' => $this->defaultIngestRateLimit,
-            'event_quota_daily' => $this->defaultEventQuotaDaily,
-            'event_quota_monthly' => $this->defaultEventQuotaMonthly,
+            'retention_days' => $this->opsDefaults->retentionDays(),
+            'retention_max_events' => $this->opsDefaults->retentionMaxEvents(),
+            'ingest_rate_limit' => $this->opsDefaults->ingestRateLimit(),
+            'event_quota_daily' => $this->opsDefaults->eventQuotaDaily(),
+            'event_quota_monthly' => $this->opsDefaults->eventQuotaMonthly(),
         ];
     }
 

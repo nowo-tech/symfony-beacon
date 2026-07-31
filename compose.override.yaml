@@ -1,14 +1,24 @@
 
 services:
 ###> symfony/mailer ###
+  # Local SMTP catcher (Mailpit). Dev/test only — not in compose.prod.yaml.
+  # Opt-in profile (same idea as Vite HMR): `make mailpit` or
+  #   docker compose --profile mail up -d mailer
   mailer:
+    profiles: ["mail"]
     image: axllent/mailpit
+    restart: unless-stopped
     ports:
-      - "1025"
-      - "8025"
+      - target: 1025
+        published: ${MAILPIT_SMTP_PORT:-1026}
+        protocol: tcp
+      - target: 8025
+        published: ${MAILPIT_UI_PORT:-18025}
+        protocol: tcp
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    # Image has no HEALTHCHECK; UI is ready almost immediately after start.
 ###< symfony/mailer ###
 
 ###> symfony/mercure-bundle ###

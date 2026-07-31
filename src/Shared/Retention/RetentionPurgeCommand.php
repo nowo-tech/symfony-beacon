@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Shared\Retention;
 
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Console entry point for telemetry retention purge (cron / scheduler).
@@ -20,10 +20,7 @@ final class RetentionPurgeCommand extends Command
 {
     public function __construct(
         private readonly RetentionPurger $retentionPurger,
-        #[Autowire('%beacon.retention_days%')]
-        private readonly int $retentionDays,
-        #[Autowire('%beacon.retention_max_events%')]
-        private readonly int $maxEventsPerProject,
+        private readonly InstanceOpsDefaults $opsDefaults,
     ) {
         parent::__construct();
     }
@@ -36,10 +33,12 @@ final class RetentionPurgeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $retentionDays = $this->opsDefaults->retentionDays();
+        $maxEventsPerProject = $this->opsDefaults->retentionMaxEvents();
         $io->writeln(\sprintf(
             'Retention policy: days=%d, max_events_per_project=%d (0 = disabled)',
-            $this->retentionDays,
-            $this->maxEventsPerProject,
+            $retentionDays,
+            $maxEventsPerProject,
         ));
 
         if ($input->getOption('dry-run')) {
@@ -48,8 +47,8 @@ final class RetentionPurgeCommand extends Command
             return Command::SUCCESS;
         }
 
-        if ($this->retentionDays < 1 && $this->maxEventsPerProject < 1) {
-            $io->warning('Both BEACON_RETENTION_DAYS and BEACON_RETENTION_MAX_EVENTS_PER_PROJECT are disabled; nothing to do.');
+        if ($retentionDays < 1 && $maxEventsPerProject < 1) {
+            $io->warning('Both instance retention defaults are disabled; nothing to do.');
 
             return Command::SUCCESS;
         }

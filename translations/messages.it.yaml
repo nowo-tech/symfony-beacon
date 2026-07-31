@@ -12,6 +12,7 @@ nav:
     admin_projects: Progetti
     appearance: Aspetto
     mailer: Mailer
+    instance_config: Configurazione istanza
     menus: Menù
     breadcrumbs: Pangrattato
     routing: Route per locale
@@ -1122,6 +1123,7 @@ admin:
         breadcrumbs: 'Gestisci le raccolte breadcrumb.'
         routing: 'Gestisci percorsi pubblici duali per locale (JSON) per controller Routable.'
         mailer: 'DSN Mailer cifrato e indirizzo From per e-mail transazionali.'
+        instance_config: 'Esporta o importa aspetto e flag istanza non segreti (JSON).'
         setup: 'Passi iniziali piattaforma / demo / seed di esempio.'
     ops:
         title: Panoramica Ops
@@ -1340,6 +1342,21 @@ mailer_settings:
 
             Se lo hai ricevuto, il DSN Mailer cifrato puo consegnare le email di magic login.
             Indirizzo From: %from%
+settings:
+    instance_config:
+        title: Configurazione istanza
+        intro: Esporta o importa impostazioni non segrete consentite (aspetto e flag dell'istanza). Il DSN Mailer, i segreti Mercure e i segreti OAuth non sono mai inclusi.
+        export_title: Esporta
+        export_help: Scarica un file JSON versionato adatto alle prove di backup. I segreti restano su questa istanza.
+        export: Scarica JSON
+        import_title: Importa
+        import_help: Ripristina aspetto e flag consentiti da un'esportazione precedente. I valori segreti vengono rifiutati e restano invariati.
+        import: Importa JSON
+        file: File di configurazione
+        imported: Configurazione istanza importata.
+        import_failed: Importazione non riuscita. Controlla la versione dello schema e che il file non contenga chiavi segrete.
+        missing_file: Scegli un file JSON da importare.
+        invalid_csrf: Token di sicurezza non valido.
 mercure_settings:
     title: Mercure
     intro: 'Avvisi live facoltativi per i membri autenticati quando viene creata una nuova issue. Disabilitati per impostazione predefinita - abilitali solo quando e disponibile un hub Mercure. Il Web Push resta un''opzione separata in Account -> Display.'

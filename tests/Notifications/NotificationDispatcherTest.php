@@ -19,6 +19,9 @@ use App\Notifications\Service\QuietHoursEvaluator;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
+use App\Shared\Settings\Entity\InstanceSettings;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -163,11 +166,19 @@ final class NotificationDispatcherTest extends TestCase
             $this->createStub(NotificationDigestBufferRepository::class),
             new NotificationPayloadBuilder($urls),
             new QuietHoursEvaluator(),
-            new NotificationCircuitBreaker(5, 0),
+            $this->circuitBreaker(),
             $bus,
             $em,
             $realtime ?? $this->createStub(MemberIssueRealtimeNotifierInterface::class),
         );
+    }
+
+    private function circuitBreaker(): NotificationCircuitBreaker
+    {
+        $repository = $this->createStub(InstanceSettingsRepository::class);
+        $repository->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+
+        return new NotificationCircuitBreaker(new InstanceOpsDefaults($repository));
     }
 
     /**

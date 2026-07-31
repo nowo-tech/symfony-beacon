@@ -16,12 +16,12 @@ final class IngestRateLimitTest extends DatabaseWebTestCase
         $cache = self::getContainer()->get('cache.app');
         self::assertInstanceOf(CacheItemPoolInterface::class, $cache);
 
-        $limiter = new IngestRateLimiter($cache, 2);
-        self::assertTrue($limiter->accept(42));
-        self::assertTrue($limiter->accept(42));
-        self::assertFalse($limiter->accept(42));
+        $limiter = new IngestRateLimiter($cache);
+        self::assertTrue($limiter->accept(42, 2));
+        self::assertTrue($limiter->accept(42, 2));
+        self::assertFalse($limiter->accept(42, 2));
         // Other projects are independent
-        self::assertTrue($limiter->accept(43));
+        self::assertTrue($limiter->accept(43, 2));
     }
 
     public function testDisabledLimitAlwaysAccepts(): void
@@ -29,8 +29,8 @@ final class IngestRateLimitTest extends DatabaseWebTestCase
         self::createClient();
         $cache = self::getContainer()->get('cache.app');
         self::assertInstanceOf(CacheItemPoolInterface::class, $cache);
-        $limiter = new IngestRateLimiter($cache, 0);
-        self::assertTrue($limiter->accept(1));
-        self::assertTrue($limiter->accept(1));
+        $limiter = new IngestRateLimiter($cache);
+        self::assertTrue($limiter->accept(1, 0));
+        self::assertTrue($limiter->accept(1, 0));
     }
 }

@@ -127,6 +127,8 @@ Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against 
 3. In Beacon: type **Email**, set endpoint to the **recipient address** (e.g. `ops@example.com`).
 4. Choose categories, save, **Send test**, and check the inbox (and spam).
 
+**Local development:** start Mailpit with `make mailpit`, then save DSN `smtp://mailer:1025` under Administration → Mailer and inspect messages at http://localhost:18025 (default host UI port). Full guide: [MAILPIT.md](MAILPIT.md). Mailpit is **not** started by `make up` and is **not** part of the production Compose stack.
+
 **What Beacon sends:** email subject = summary; body = summary plus the issue/performance URL when present. From address comes from Mailer settings.
 
 **Tips:** Use a shared ops alias. For richer HTML digests, prefer Slack/Discord/Teams or a generic HTTP bridge into your mail tool.
@@ -214,8 +216,8 @@ Outbound delivery runs on the **Messenger `async`** transport (`DeliverNotificat
 
 - Slack / Discord / Teams / Telegram / HTTP use `HttpClient` POSTs.
 - Email uses Symfony Mailer via encrypted instance Mailer settings (env `MAILER_DSN` fallback only).
-- Each attempt updates the destination **last delivery** summary and appends a bounded **delivery history** row (`notification_delivery_attempt`). Retention per destination defaults to **20** attempts (`BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`). Recent attempts appear under **Project → Settings → Health**.
-- **Circuit breaker** (`039`): after `BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD` consecutive failures (default **5**), the destination is **auto-paused** (`circuit_opened_at`). Further alerts are skipped until a project admin clicks **Resume**, or until `BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES` elapses when that value is **> 0** (default **0** = pause until resume). **Send test** still works while paused.
+- Each attempt updates the destination **last delivery** summary and appends a bounded **delivery history** row (`notification_delivery_attempt`). Retention per destination defaults to **20** attempts and is configured under **Administration → Ops defaults**. Recent attempts appear under **Project → Settings → Health**.
+- **Circuit breaker** (`039`): after the configured consecutive-failure threshold (default **5** under **Administration → Ops defaults**), the destination is **auto-paused** (`circuit_opened_at`). Further alerts are skipped until a project admin clicks **Resume**, or until the configured cooldown elapses when it is **> 0** (default **0** = pause until resume). **Send test** still works while paused.
 
 Ensure the Messenger worker is running (`make up` starts it in Docker).
 

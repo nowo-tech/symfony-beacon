@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if is_new %}
+        {{ 'social_login_settings.create'|trans }}
+    {% else %}
+        {{ 'social_login_settings.edit_title'|trans({'%provider%': provider|capitalize}) }}
+    {% endif %}
+    — {{ site_appearance.brandName }}
+{% endblock %}
+
+{% block body %}
+<div class="mx-auto">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">
+        {% if is_new %}
+            {{ 'social_login_settings.create'|trans }}
+        {% else %}
+            {{ 'social_login_settings.edit_title'|trans({'%provider%': provider|capitalize}) }}
+        {% endif %}
+    </h1>
+    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.edit_intro'|trans }}</p>
+
+    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+        {{ form_row(form.provider) }}
+        {{ form_row(form.label) }}
+        {{ form_row(form.client_id) }}
+        {{ form_row(form.client_secret) }}
+        {{ form_row(form.enabled) }}
+
+        <div class="border-t border-[var(--color-sand)] pt-4 space-y-4">
+            <h2 class="text-base font-semibold">{{ 'social_login_settings.endpoints_title'|trans }}</h2>
+            <p class="text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.endpoints_intro'|trans }}</p>
+            {{ form_row(form.authorize_url) }}
+            {{ form_row(form.token_url) }}
+            {{ form_row(form.userinfo_url) }}
+            {{ form_row(form.scopes) }}
+        </div>
+
+        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+            <button class="btn-primary" type="submit">{{ 'social_login_settings.submit'|trans }}</button>
+            <a class="btn-ghost no-underline" href="{{ path('admin_social_login') }}">{{ 'common.cancel'|trans }}</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -19,7 +19,7 @@ use InvalidArgumentException;
 final readonly class InstanceConfigPortability
 {
     public const string SCHEMA = 'beacon-instance-config';
-    public const int VERSION = 1;
+    public const int VERSION = 2;
 
     /** @var list<string> */
     private const array FORBIDDEN_KEYS = [
@@ -48,7 +48,7 @@ final readonly class InstanceConfigPortability
      *     version: int,
      *     exported_at: string,
      *     appearance: array<string, string>,
-     *     instance: array<string, bool|string|null>
+     *     instance: array<string, bool|int|string|null>
      * }
      */
     public function export(): array
@@ -86,6 +86,14 @@ final readonly class InstanceConfigPortability
                 'mercure_url_configured' => null !== $settings->getMercureUrl() && '' !== $settings->getMercureUrl(),
                 'mercure_public_url_configured' => null !== $settings->getMercurePublicUrl() && '' !== $settings->getMercurePublicUrl(),
                 'mercure_jwt_configured' => $settings->hasMercureJwtSecret(),
+                'retention_days' => $settings->getRetentionDays(),
+                'retention_max_events' => $settings->getRetentionMaxEvents(),
+                'ingest_rate_limit' => $settings->getIngestRateLimit(),
+                'event_quota_daily' => $settings->getEventQuotaDaily(),
+                'event_quota_monthly' => $settings->getEventQuotaMonthly(),
+                'notification_delivery_history_limit' => $settings->getNotificationDeliveryHistoryLimit(),
+                'notification_circuit_breaker_threshold' => $settings->getNotificationCircuitBreakerThreshold(),
+                'notification_circuit_breaker_cooldown_minutes' => $settings->getNotificationCircuitBreakerCooldownMinutes(),
             ],
         ];
     }
@@ -102,7 +110,8 @@ final readonly class InstanceConfigPortability
         if (($payload['schema'] ?? null) !== self::SCHEMA) {
             throw new InvalidArgumentException('invalid_schema');
         }
-        if (self::VERSION !== (int) ($payload['version'] ?? 0)) {
+        $version = (int) ($payload['version'] ?? 0);
+        if ($version < 1 || $version > self::VERSION) {
             throw new InvalidArgumentException('unsupported_version');
         }
 
@@ -189,6 +198,23 @@ final readonly class InstanceConfigPortability
             } else {
                 $settings->clearSetupCompleted();
             }
+        }
+
+        $integerSetters = [
+            'retention_days' => 'setRetentionDays',
+            'retention_max_events' => 'setRetentionMaxEvents',
+            'ingest_rate_limit' => 'setIngestRateLimit',
+            'event_quota_daily' => 'setEventQuotaDaily',
+            'event_quota_monthly' => 'setEventQuotaMonthly',
+            'notification_delivery_history_limit' => 'setNotificationDeliveryHistoryLimit',
+            'notification_circuit_breaker_threshold' => 'setNotificationCircuitBreakerThreshold',
+            'notification_circuit_breaker_cooldown_minutes' => 'setNotificationCircuitBreakerCooldownMinutes',
+        ];
+        foreach ($integerSetters as $key => $setter) {
+            if (!\array_key_exists($key, $data) || !\is_int($data[$key])) {
+                continue;
+            }
+            $settings->{$setter}($data[$key]);
         }
 
         $this->instanceSettingsRepository->save($settings);

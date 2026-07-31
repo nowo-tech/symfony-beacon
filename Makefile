@@ -1,4 +1,4 @@
-.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
+.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
@@ -17,6 +17,8 @@ help:
 	@echo "  make vite-build      pnpm run build (one-shot → public/build/)"
 	@echo "  make vite-watch      pnpm run watch (vite build --watch, no HMR)"
 	@echo "  make pnpm            pnpm in php container (ARGS='install' / 'add -D …')"
+	@echo "  make mailpit         Start Mailpit (compose profile mail) for local SMTP; prints UI URL"
+	@echo "  make mailpit-logs    Follow Mailpit logs"
 	@echo "  make messenger-logs  Follow Messenger worker logs"
 	@echo "  make mysql           mysql CLI shell"
 	@echo "  make shell           Shell in the php container"
@@ -80,7 +82,11 @@ print-urls:
 	echo ""; \
 	echo "Beacon is up:"; \
 	echo "  HTTP:  http://localhost:$${HTTP_PUB}"; \
-	echo "  HTTPS: https://localhost:$${HTTPS_PUB}"
+	echo "  HTTPS: https://localhost:$${HTTPS_PUB}"; \
+	MAILPIT_UI=$$(docker compose --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+	if [ -n "$$MAILPIT_UI" ]; then \
+		echo "  Mailpit UI: http://localhost:$${MAILPIT_UI}  (SMTP from PHP: smtp://mailer:1025)"; \
+	fi
 
 up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
@@ -88,6 +94,7 @@ up:
 	@echo "Building frontend assets (static public/build/)…"
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
+	@echo "Optional local SMTP: make mailpit  (see docs/MAILPIT.md)"
 
 classic:
 	@test -f .env || cp .env.dist .env
@@ -102,7 +109,7 @@ worker:
 	@$(MAKE) print-urls
 
 down:
-	docker compose --profile hmr down
+	docker compose --profile hmr --profile mail down
 
 build:
 	docker compose build --no-cache
@@ -129,6 +136,23 @@ vite-watch:
 
 pnpm:
 	docker compose exec -T php pnpm $(ARGS)
+
+# Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
+# Docs: docs/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
+mailpit:
+	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	docker compose --profile mail up -d mailer
+	@UI_PUB=$$(docker compose --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+	UI_PUB=$${UI_PUB:-18025}; \
+	echo ""; \
+	echo "Mailpit is up (dev/test only — not used in production):"; \
+	echo "  UI:   http://localhost:$${UI_PUB}"; \
+	echo "  SMTP (from PHP container): smtp://mailer:1025"; \
+	echo "  Save that DSN under Administration → Mailer, then use Send sample email."; \
+	echo "  Docs: docs/MAILPIT.md"
+
+mailpit-logs:
+	docker compose --profile mail logs -f mailer
 
 messenger-logs:
 	docker compose logs -f messenger

@@ -38,7 +38,7 @@ This application is **FrankenPHP worker mode friendly**.
 - **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`; AuthKit dual URLs (bare for `DEFAULT_LOCALE`, prefixed for others — see [ADDING-LOCALES.md](docs/ADDING-LOCALES.md)); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
 - Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, push subscriptions, **instance Mailer DSN/From**, **Mercure URL/JWT**)
-- **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login
+- **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login — local catcher: `make mailpit` ([docs/MAILPIT.md](docs/MAILPIT.md))
 - **Administration → Mercure** (`/settings/mercure`): optional live new-issue toasts (hub + JWT); see [docs/MERCURE.md](docs/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
 - Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install
@@ -84,6 +84,7 @@ make up          # starts stack + builds frontend into public/build/
 make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # or: make bootstrap && make seed
 # Optional QA samples: make seed-sample
+# Optional local SMTP: make mailpit  (UI http://localhost:18025 — docs/MAILPIT.md)
 # Option A — register the first admin in the UI: https://localhost:9444/en/register
 # Option B — demo login after make ready / make seed (see below)
 ```
@@ -91,6 +92,7 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 - HTTP: http://localhost:9081  
 - HTTPS: https://localhost:9444  
 - MySQL: `localhost:3308`
+- Mailpit (after `make mailpit`): http://localhost:18025 — save `smtp://mailer:1025` in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
 - After seed, open Performance with N+1 filter: `/projects/1/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/1/analytics` (14 days of error / transaction / N+1 counters)
@@ -167,6 +169,7 @@ CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that upl
 - [Product roadmap](docs/ROADMAP.md)
 - [Project notifications](docs/NOTIFICATIONS.md)
 - [Mercure (live alerts, JWT)](docs/MERCURE.md)
+- [Mailpit (local SMTP catcher)](docs/MAILPIT.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release checklist](docs/RELEASE.md)

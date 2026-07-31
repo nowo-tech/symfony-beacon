@@ -2,7 +2,7 @@
 
 **Feature Branch**: `034-encrypted-mailer-dsn`  
 **Created**: 2026-07-21  
-**Status**: Implemented  
+**Status**: Implemented (Mailer DSN + gate through v0.12.x; **6.15** audit + scheme allowlist in v0.17.0)  
 
 **Input**: Store the Symfony Mailer DSN encrypted in the database (instance settings), not as the primary operator secret in `.env`. Prefer Halite / `nowo-tech/doctrine-encrypt-bundle` like API secrets and webhook URLs. Admin UI under Administration; runtime mailer for magic login and email notification destinations.
 
@@ -94,9 +94,14 @@ As a guest on the login page, I only see **magic login** and **forgot password**
 - English UI catalogues are source of truth; Spanish (and other locales) follow project i18n conventions.
 - **6.15 residual:** Admin Mailer saves emit `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets). `MailerDsnValidator` enforces an allowlist of Mailer schemes.
 
+## Related
+
+- Local SMTP catcher for development: [`066-local-mailpit`](../066-local-mailpit/spec.md) (`make mailpit`, docs/MAILPIT.md).
+
 ## Out of Scope
 
 - Multi-tenant / per-project SMTP credentials.
 - OAuth “sign in with Google” style mailer setup wizards.
+- Shipping a local Mailpit container (see `066`; production must use a real DSN).
 - Removing Symfony’s `framework.mailer.dsn` env binding entirely (kept for container boot + fallback).
 - Marketing email / newsletter tooling.

@@ -10,6 +10,9 @@ use App\Issues\Service\IssueMergeService;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\IssueStatus;
 use App\Shared\Retention\RetentionPurger;
+use App\Shared\Settings\Entity\InstanceSettings;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Shared\DatabaseWebTestCase as BaseDatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -62,8 +65,7 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
             $em,
             self::getContainer()->get(ProjectRepository::class),
             self::getContainer()->get(IssueMergeService::class),
-            30,
-            0,
+            $this->opsDefaults(),
         );
         $result = $purger->purgeProject($project);
 
@@ -110,8 +112,7 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
             $em,
             self::getContainer()->get(ProjectRepository::class),
             self::getContainer()->get(IssueMergeService::class),
-            30,
-            0,
+            $this->opsDefaults(),
         );
         $purger->purgeProject($project);
 
@@ -120,5 +121,14 @@ final class RetentionPurgerTest extends BaseDatabaseWebTestCase
         self::assertSame(1, $reloaded->getEventCount());
         self::assertNull($em->getRepository(Event::class)->findOneBy(['eventId' => 'old-recount']));
         self::assertNotNull($em->getRepository(Event::class)->findOneBy(['eventId' => 'fresh-recount']));
+    }
+
+    private function opsDefaults(): InstanceOpsDefaults
+    {
+        $settings = InstanceSettings::defaults()->setRetentionDays(30);
+        $repository = $this->createStub(InstanceSettingsRepository::class);
+        $repository->method('getOrCreate')->willReturn($settings);
+
+        return new InstanceOpsDefaults($repository);
     }
 }

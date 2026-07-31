@@ -1,0 +1,16 @@
+---
+description: Forbid env(NAME): default map entries in config/parameters.yaml (constitution Principle IX)
+globs: config/parameters.yaml
+alwaysApply: false
+---
+
+# No `env(…):` defaults in `parameters.yaml`
+
+Constitution **Principle IX** (NON-NEGOTIABLE):
+
+- Do **not** add lines like `env(FOO): 'default'` under `parameters:` in `config/parameters.yaml`.
+- Put operator defaults in `.env.dist` (versioned).
+- Use `when@prod` / `when@dev` / `when@test` in `config/packages/*.yaml` for environment-specific overrides.
+- Typed aliases remain OK: `beacon.foo: '%env(int:FOO)%'` when `FOO` is defined via `.env.dist` or runtime.
+
+If a feature needs a tunable default and a ROLE_ADMIN UI exists, prefer instance/DB settings over env defaults.

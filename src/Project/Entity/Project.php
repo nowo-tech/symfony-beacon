@@ -42,23 +42,23 @@ class Project implements AuditableInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    /** Per-project retention days; null inherits `beacon.retention_days`. */
+    /** Per-project retention days; null inherits the instance ops default. */
     #[ORM\Column(nullable: true)]
     private ?int $retentionDays = null;
 
-    /** Per-project max stored events; null inherits `beacon.retention_max_events`. */
+    /** Per-project max stored events; null inherits the instance ops default. */
     #[ORM\Column(nullable: true)]
     private ?int $retentionMaxEvents = null;
 
-    /** Per-project ingest rate limit (per minute); null inherits `beacon.ingest_rate_limit`. */
+    /** Per-project ingest rate limit (per minute); null inherits the instance ops default. */
     #[ORM\Column(nullable: true)]
     private ?int $ingestRateLimitPerMinute = null;
 
-    /** Daily event quota; null inherits `beacon.event_quota_daily`. */
+    /** Daily event quota; null inherits the instance ops default. */
     #[ORM\Column(nullable: true)]
     private ?int $eventQuotaDaily = null;
 
-    /** Monthly event quota (UTC calendar month); null inherits `beacon.event_quota_monthly`. */
+    /** Monthly event quota (UTC calendar month); null inherits the instance ops default. */
     #[ORM\Column(nullable: true)]
     private ?int $eventQuotaMonthly = null;
 

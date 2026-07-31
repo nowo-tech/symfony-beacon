@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'ops_defaults.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <p class="text-sm"><a class="text-[var(--color-moss)] no-underline hover:underline" href="{{ path('admin_hub') }}">{{ 'admin.hub.title'|trans }}</a></p>
+    <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'ops_defaults.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'ops_defaults.intro'|trans }}</p>
+</div>
+
+{{ form_start(form, {attr: {class: 'panel space-y-4', 'data-testid': 'ops-defaults-form'}}) }}
+    <fieldset class="space-y-4">
+        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.governance'|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.governance_help'|trans }}</p>
+        {{ form_row(form.retentionDays) }}
+        {{ form_row(form.retentionMaxEvents) }}
+        {{ form_row(form.ingestRateLimit) }}
+        {{ form_row(form.eventQuotaDaily) }}
+        {{ form_row(form.eventQuotaMonthly) }}
+    </fieldset>
+
+    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
+        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.notifications'|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.notifications_help'|trans }}</p>
+        {{ form_row(form.notificationDeliveryHistoryLimit) }}
+        {{ form_row(form.notificationCircuitBreakerThreshold) }}
+        {{ form_row(form.notificationCircuitBreakerCooldownMinutes) }}
+    </fieldset>
+
+    <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+        <button class="btn-primary" type="submit" data-testid="ops-defaults-submit">{{ 'ops_defaults.submit'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}
+{% endblock %}
