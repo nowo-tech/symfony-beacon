@@ -32,7 +32,9 @@ CI already builds this target (`.github/workflows/ci.yml`).
 - `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (not the `.env.dist` local default)
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
 
-`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses to boot outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty/local or `SITE_BACKUP_PASSWORD_HASH` is still the documented local hash. `compose.prod.yaml` also requires both variables via `${VAR:?…}`.
+`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty/local or `SITE_BACKUP_PASSWORD_HASH` is still the documented local hash. `compose.prod.yaml` also requires both variables via `${VAR:?…}`.
+
+Image builds (`frankenphp_prod` `composer post-install-cmd` → `cache:clear`) skip the guard for `cache:clear` / `cache:warmup` / `assets:install` only, so the Docker bake can warm caches without embedding runtime SiteBackup secrets. The first real HTTP request still fails closed until operators inject unique secrets.
 
 The prod image runs `pnpm install --frozen-lockfile` and `pnpm run build` so `public/build/` is baked in (no Vite HMR container in production).
 

@@ -8,6 +8,10 @@ use App\Setup\SiteBackupSecurityDefaultsGuard;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class SiteBackupSecurityDefaultsGuardTest extends TestCase
 {
@@ -80,6 +84,44 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    #[DataProvider('cacheBuildConsoleCommandsProvider')]
+    public function testBuildAutoScriptConsoleCommandsSkipGuard(string $commandName): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            'prod',
+            SiteBackupSecurityDefaultsGuard::LOCAL_DEV_SETUP_TOKEN,
+            SiteBackupSecurityDefaultsGuard::LOCAL_DEV_PANEL_PASSWORD_HASH,
+        );
+        $command = $this->createStub(Command::class);
+        $command->method('getName')->willReturn($commandName);
+        $event = new ConsoleCommandEvent(
+            $command,
+            $this->createStub(InputInterface::class),
+            $this->createStub(OutputInterface::class),
+        );
+        $guard->onConsole($event);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testOtherConsoleCommandsStillEnforceGuard(): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            'prod',
+            SiteBackupSecurityDefaultsGuard::LOCAL_DEV_SETUP_TOKEN,
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        );
+        $command = $this->createStub(Command::class);
+        $command->method('getName')->willReturn('doctrine:migrations:migrate');
+        $event = new ConsoleCommandEvent(
+            $command,
+            $this->createStub(InputInterface::class),
+            $this->createStub(OutputInterface::class),
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('documented local default');
+        $guard->onConsole($event);
+    }
+
     /**
      * @return iterable<string, array{string}>
      */
@@ -87,5 +129,15 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
     {
         yield 'prod' => ['prod'];
         yield 'staging' => ['staging'];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function cacheBuildConsoleCommandsProvider(): iterable
+    {
+        yield 'cache:clear' => ['cache:clear'];
+        yield 'cache:warmup' => ['cache:warmup'];
+        yield 'assets:install' => ['assets:install'];
     }
 }
