@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Ingest;
 
 use App\Ingest\Service\OtlpLogsMapper;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class OtlpLogsMapperTest extends TestCase
@@ -65,7 +66,7 @@ final class OtlpLogsMapperTest extends TestCase
 
     public function testRejectsInvalidJson(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         (new OtlpLogsMapper())->mapToEventPayloads('{');
     }
 }

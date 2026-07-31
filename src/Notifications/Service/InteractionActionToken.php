@@ -56,7 +56,7 @@ final class InteractionActionToken
             || !\is_string($destinationUuid) || '' === $destinationUuid
             || !\is_string($projectUuid) || '' === $projectUuid
             || !\is_string($issueUuid) || '' === $issueUuid
-            || !\is_numeric($exp)
+            || !is_numeric($exp)
             || !\is_string($sig) || '' === $sig
         ) {
             return false;

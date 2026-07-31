@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Ingest\Service;
 
+use DateTimeImmutable;
+use InvalidArgumentException;
+use JsonException;
+
 /**
  * Maps OTLP HTTP JSON ExportLogsServiceRequest bodies to Beacon event payloads.
  *
@@ -23,12 +27,12 @@ final class OtlpLogsMapper
     {
         try {
             $decoded = json_decode($jsonBody, true, 512, \JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            throw new \InvalidArgumentException('invalid otlp json');
+        } catch (JsonException) {
+            throw new InvalidArgumentException('invalid otlp json');
         }
 
         if (!\is_array($decoded)) {
-            throw new \InvalidArgumentException('invalid otlp json');
+            throw new InvalidArgumentException('invalid otlp json');
         }
 
         /** @var list<array<string, mixed>> $events */
@@ -88,7 +92,7 @@ final class OtlpLogsMapper
     public function toEnvelopeBody(array $payloads): string
     {
         $lines = [
-            json_encode(['sdk' => ['name' => 'beacon-otlp'], 'sent_at' => (new \DateTimeImmutable())->format(\DATE_ATOM)], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES),
+            json_encode(['sdk' => ['name' => 'beacon-otlp'], 'sent_at' => (new DateTimeImmutable())->format(\DATE_ATOM)], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES),
         ];
 
         foreach ($payloads as $payload) {
@@ -101,7 +105,7 @@ final class OtlpLogsMapper
     }
 
     /**
-     * @param array<string, mixed> $record
+     * @param array<string, mixed>  $record
      * @param array<string, string> $resourceAttrs
      *
      * @return array<string, mixed>|null
@@ -150,7 +154,7 @@ final class OtlpLogsMapper
             'timestamp' => $timestamp,
             'tags' => array_filter([
                 'otel.service' => $service,
-                'otel.severity' => $severityText !== '' ? $severityText : null,
+                'otel.severity' => '' !== $severityText ? $severityText : null,
             ], static fn ($v) => null !== $v && '' !== $v),
             'extra' => [
                 'otlp' => true,
@@ -279,7 +283,7 @@ final class OtlpLogsMapper
             return ((float) $nano) / 1_000_000_000.0;
         }
 
-        return (float) (new \DateTimeImmutable())->format('U.u');
+        return (float) (new DateTimeImmutable())->format('U.u');
     }
 
     /**
