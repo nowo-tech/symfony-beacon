@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.21** OTLP logs + Slack/Teams Resolve Done. **6.22** OTLP traces Done (`070`). **Next**: Later Phase 6+ (SSO / OTLP metrics / inbound email / Assign mapping) when prioritized. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.22** OTLP + Slack/Teams Resolve Done. **6.23** Slack Assign-to-me + user mapping Done (`071`). **Next**: Later Phase 6+ (SSO / OTLP metrics / inbound email / Teams Assign) when prioritized. No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -167,7 +167,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` / `065` | **Done** (v0.17.0; see 6.15) |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**; Bundle console/Scheduler + Monolog Done in Bundle **v1.6.10**; Mailer DSN audit + Mailpit + Ops defaults + Social login admin Done in **v0.17.0**; OTLP logs (`067` / 6.19); Slack/Teams Resolve (`068`/`069`); OTLP traces (`070` / 6.22). **Next**: pull from Later when prioritized.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**; Bundle console/Scheduler + Monolog Done in Bundle **v1.6.10**; Mailer DSN audit + Mailpit + Ops defaults + Social login admin Done in **v0.17.0**; OTLP logs (`067` / 6.19); Slack/Teams Resolve (`068`/`069`); OTLP traces (`070` / 6.22); Slack Assign-to-me (`071` / 6.23). **Next**: pull from Later when prioritized.
 
 ### Done (v0.13.0 product — was Next)
 
@@ -257,11 +257,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.22 | **OTLP traces ingest** (HTTP JSON ExportTraceServiceRequest → ERROR spans → Beacon events; same DSN auth; cap 200) | Beacon | `070-otlp-traces` | **Done** |
 
+### Done (Slack Assign-to-me)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.23 | **Slack Assign-to-me** + Account Slack user ID mapping; Resolve actor when mapped; shared `IssueAssigneeChanger` | Beacon | `071-slack-assign-mapping` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / OTLP metrics / inbound email / Assign mapping) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / OTLP metrics / inbound email / Teams Assign) when prioritized | Beacon | — | **Next** |
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -269,7 +275,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | — | **QR phone login** (AuthKit design; runtime not shipped) | AuthKit / Beacon | — | **Later** |
 | — | **WebAuthn / passkeys** if AuthKit supports | Beacon | — | **Later** |
 | — | **OTLP metrics** (+ gRPC / Bundle exporter / full Performance waterfall from traces) | Beacon (+ optional Bundle) | extends `067`/`070` | **Later** |
-| — | Slack/Teams **Assign** + Slack→member mapping | Beacon | extends `068`/`069` | **Later** |
+| — | Teams **Assign** / Teams→member mapping | Beacon | extends `069`/`071` | **Later** |
 | — | **Inbound email → issue comment** | Beacon | — | **Later** |
 
 ---
@@ -331,4 +337,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.22 OTLP traces ingest Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (6.23 Slack Assign-to-me Done; Next = Later Phase 6+).

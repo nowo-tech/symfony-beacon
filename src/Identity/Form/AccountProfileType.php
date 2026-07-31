@@ -27,6 +27,12 @@ final class AccountProfileType extends FormKitAbstractType
             $this->addEmailField('email', [
                 'constraints' => [new NotBlank(), new Email(), new Length(max: 180)],
             ]);
+            $this->addTextField('slackUserId', [
+                'required' => false,
+                'label' => 'preferences.profile.slack_user_id',
+                'help' => 'preferences.profile.slack_user_id_help',
+                'constraints' => [new Length(max: 64)],
+            ]);
         });
     }
 

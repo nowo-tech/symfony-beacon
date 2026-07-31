@@ -81,9 +81,10 @@ Incoming Webhooks alone cannot receive button clicks. To enable **Resolve** from
    ```
 
 3. In Beacon, edit the Slack destination, paste the Signing Secret, save.
-4. New issue alerts will show a **Resolve** button. Beacon verifies `X-Slack-Signature` (5-minute window) before changing status.
+4. New issue alerts will show **Resolve** and **Assign to me**.
+5. For **Assign to me**, each person must link their Slack member ID under **Account → Profile → Slack user ID** (Slack profile → ⋯ → Copy member ID). They also need triage access on the project.
 
-v1 records the status change with a null actor (`via: slack` in the audit payload). Mapping Slack users to Beacon members is not shipped yet. Assign is out of scope.
+Beacon verifies `X-Slack-Signature` (5-minute window) before changing status or assignee. Resolve still works without a linked Slack ID (actor stays null). Assign requires a linked ID + triage. Mapping Teams clickers is out of scope (MessageCard HttpPOST has no user id).
 
 ---
 

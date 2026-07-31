@@ -20,7 +20,7 @@ use App\Issues\Repository\IssueCommentRepository;
 use App\Issues\Repository\IssueHistoryEntryRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
-use App\Issues\Service\IssueAssigneeGuard;
+use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
 use App\Issues\Service\IssueStatusChanger;
@@ -65,8 +65,8 @@ final class IssueController extends AbstractController
         private readonly IssueSavedViewRepository $savedViewRepository,
         private readonly IssueHistoryRecorder $historyRecorder,
         private readonly IssueStatusChanger $issueStatusChanger,
+        private readonly IssueAssigneeChanger $issueAssigneeChanger,
         private readonly IssueMergeService $issueMergeService,
-        private readonly IssueAssigneeGuard $assigneeGuard,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
@@ -403,49 +403,20 @@ final class IssueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $assignee = $issue->getAssignee();
+            // Form already mutated the entity; restore previous so the changer can detect a real change.
+            $issue->setAssignee($previousAssignee);
             try {
-                $this->assigneeGuard->assertAssignable($project, $assignee);
+                if ($this->issueAssigneeChanger->assign($issue, $assignee, $user)) {
+                    $this->addFlash('success', 'issues.assignee_saved');
+                }
             } catch (InvalidArgumentException) {
                 $this->addFlash('error', 'issues.assignee_not_member');
-                $issue->setAssignee($previousAssignee);
 
                 return $this->redirectToRoute('issue_show', [
                     'projectId' => $project->getUuid(),
                     'id' => $issue->getUuid(),
                 ]);
             }
-
-            $this->historyRecorder->recordAssigneeChange($issue, $previousAssignee, $assignee, $user);
-            if ($previousAssignee?->getId() !== $assignee?->getId()) {
-                $this->userActionRecorder->record(
-                    UserActionType::IssueAssigned,
-                    $user,
-                    $assignee ?? $user,
-                    [
-                        'project_uuid' => $project->getUuid(),
-                        'project_name' => $project->getName(),
-                        'issue_uuid' => $issue->getUuid(),
-                        'issue_title' => $issue->getTitle(),
-                        'from' => $previousAssignee?->getDisplayName(),
-                        'to' => $assignee?->getDisplayName(),
-                    ],
-                );
-                $this->notificationDispatcher->dispatchIssueAssigned(
-                    $project,
-                    $issue,
-                    $previousAssignee,
-                    $assignee,
-                );
-                $this->issueUserMailNotifier->notifyAssigneeChanged(
-                    $project,
-                    $issue,
-                    $previousAssignee,
-                    $assignee,
-                    $user,
-                );
-            }
-            $this->entityManager->flush();
-            $this->addFlash('success', 'issues.assignee_saved');
 
             return $this->redirectToRoute('issue_show', [
                 'projectId' => $project->getUuid(),

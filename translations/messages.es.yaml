@@ -936,6 +936,8 @@ preferences:
         status_anonymized: Anonymized
         role_admin: Administrador
         role_member: Miembro
+        slack_user_id: Slack user ID
+        slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
         projects_title: Tus proyectos
         projects_intro: Proyectos a los que accedes por membresía directa.
         projects_empty: Aún no eres miembro directo de ningún proyecto.

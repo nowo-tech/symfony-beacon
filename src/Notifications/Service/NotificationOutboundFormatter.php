@@ -123,12 +123,18 @@ final readonly class NotificationOutboundFormatter
         $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
         $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
         $destinationUuid = $destination->getUuid();
-        if (in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
+        if (\in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
             return null;
         }
 
-        $value = json_encode([
+        $valueResolve = json_encode([
             'a' => 'resolve',
+            'd' => $destinationUuid,
+            'p' => $projectUuid,
+            'i' => $issueUuid,
+        ], \JSON_THROW_ON_ERROR);
+        $valueAssign = json_encode([
+            'a' => 'assign',
             'd' => $destinationUuid,
             'p' => $projectUuid,
             'i' => $issueUuid,
@@ -146,7 +152,17 @@ final readonly class NotificationOutboundFormatter
                         'emoji' => false,
                     ],
                     'style' => 'primary',
-                    'value' => $value,
+                    'value' => $valueResolve,
+                ],
+                [
+                    'type' => 'button',
+                    'action_id' => 'beacon_assign',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => 'Assign to me',
+                        'emoji' => false,
+                    ],
+                    'value' => $valueAssign,
                 ],
             ],
         ];
@@ -307,7 +323,7 @@ final readonly class NotificationOutboundFormatter
         $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
         $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
         $destinationUuid = $destination->getUuid();
-        if (in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
+        if (\in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
             return null;
         }
 

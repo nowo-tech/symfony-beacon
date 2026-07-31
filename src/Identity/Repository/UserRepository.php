@@ -23,6 +23,16 @@ class UserRepository extends ServiceEntityRepository
         return $this->findOneBy(['email' => strtolower(trim($email))]);
     }
 
+    public function findOneBySlackUserId(string $slackUserId): ?User
+    {
+        $slackUserId = trim($slackUserId);
+        if ('' === $slackUserId) {
+            return null;
+        }
+
+        return $this->findOneBy(['slackUserId' => $slackUserId]);
+    }
+
     /**
      * Admin directory with AuditKit blame users eager-loaded (avoids N+1).
      *
