@@ -12,6 +12,7 @@ nav:
     admin_projects: Projets
     appearance: Apparence
     mailer: Mailer
+    instance_config: Configuration d'instance
     menus: Menus
     breadcrumbs: "Fil d'Ariane"
     routing: Routes par locale
@@ -1130,6 +1131,7 @@ admin:
         breadcrumbs: "Gérer les collections de fils d'Ariane."
         routing: 'Gérer les chemins publics duals par locale (JSON) pour les contrôleurs Routable.'
         mailer: 'DSN Mailer chiffré et adresse From pour les e-mails transactionnels.'
+        instance_config: "Exporter ou importer l'apparence et les indicateurs d'instance non secrets (JSON)."
         setup: 'Étapes initiales plateforme / démo / échantillons.'
     ops:
         title: Vue Ops
@@ -1362,6 +1364,21 @@ mailer_settings:
 
             Si vous l'avez recu, le DSN Mailer chiffre peut distribuer les e-mails de magic login.
             Adresse From : %from%
+settings:
+    instance_config:
+        title: Configuration d'instance
+        intro: Exportez ou importez des paramètres non secrets autorisés (apparence et indicateurs d'instance). Le DSN Mailer, les secrets Mercure et les secrets OAuth ne sont jamais inclus.
+        export_title: Exporter
+        export_help: Téléchargez un fichier JSON versionné adapté aux exercices de sauvegarde. Les secrets restent sur cette instance.
+        export: Télécharger le JSON
+        import_title: Importer
+        import_help: Restaurez l'apparence et les indicateurs autorisés depuis une exportation précédente. Les valeurs secrètes sont rejetées et restent inchangées.
+        import: Importer le JSON
+        file: Fichier de configuration
+        imported: Configuration d'instance importée.
+        import_failed: Échec de l'importation. Vérifiez la version du schéma et l'absence de clés secrètes dans le fichier.
+        missing_file: Choisissez un fichier JSON à importer.
+        invalid_csrf: Jeton de sécurité invalide.
 mercure_settings:
     title: Mercure
     intro: "Alertes en direct facultatives pour les membres connectes lorsqu''une nouvelle issue est creee. Desactive par defaut - activez seulement lorsqu''un hub Mercure est disponible. Le Web Push reste une option distincte sous Compte -> Affichage."

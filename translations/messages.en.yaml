@@ -12,6 +12,7 @@ nav:
     admin_projects: Projects
     appearance: Appearance
     mailer: Mailer
+    ops_defaults: Ops defaults
     instance_config: Instance config
     social_login: Social login
     setup: Setup
@@ -139,6 +140,8 @@ flash:
         sample_unavailable: Save a deliverable encrypted Mailer DSN before sending a sample.
         sample_invalid_recipient: Enter a valid recipient email address.
         sample_failed: Sample email could not be sent. Check the Mailer DSN and server logs.
+    ops_defaults:
+        saved: Operational defaults saved.
     mercure:
         saved: Mercure settings saved.
     social_login:
@@ -659,6 +662,39 @@ mailer_settings:
 
             If you received this, the encrypted Mailer DSN can deliver magic-login emails.
             From address: %from%
+ops_defaults:
+    title: Ops defaults
+    intro: Configure instance-wide defaults inherited by projects and notification delivery services.
+    section:
+        governance: Project governance
+        governance_help: Projects inherit these retention, ingest rate, and quota values unless they define an override.
+        notifications: Notification delivery
+        notifications_help: These limits apply to notification history and automatic circuit breaking across the instance.
+    retention_days:
+        label: Retention days
+        help: Delete telemetry older than this many days. Use 0 to disable age-based retention.
+    retention_max_events:
+        label: Maximum stored events per project
+        help: Keep at most this many events per project. Use 0 for no event-count cap.
+    ingest_rate_limit:
+        label: Ingest rate limit per minute
+        help: Maximum Envelope requests per project each minute. Use 0 for unlimited.
+    event_quota_daily:
+        label: Daily event quota
+        help: Maximum accepted events per project each day. Use 0 for unlimited.
+    event_quota_monthly:
+        label: Monthly event quota
+        help: Maximum accepted events per project per UTC calendar month. Use 0 for unlimited.
+    delivery_history_limit:
+        label: Delivery history limit
+        help: Number of recent delivery attempts retained for each notification destination.
+    circuit_breaker_threshold:
+        label: Circuit breaker failure threshold
+        help: Consecutive delivery failures before a notification destination is automatically paused.
+    circuit_breaker_cooldown:
+        label: Circuit breaker cooldown in minutes
+        help: Minutes before an automatically paused destination may retry. Use 0 to require manual resume.
+    submit: Save ops defaults
 settings:
     instance_config:
         title: Instance config
@@ -1329,6 +1365,7 @@ admin:
         ops: Cross-project spikes, open issues, and failed deliveries.
         appearance: Brand name, accents, status colors, and page surfaces.
         mailer: Encrypted Mailer DSN and From address for transactional email.
+        ops_defaults: Instance retention, ingest rate, quotas, and notification delivery limits.
         instance_config: Export or import non-secret appearance and instance flags (JSON).
         social_login: OAuth provider credentials (Google / GitHub / Microsoft) stored in the database.
         setup: First-run platform / demo / sample seed steps.

@@ -5,48 +5,39 @@ declare(strict_types=1);
 namespace App\Ingest\Service;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
 /**
  * Sliding-window ingest rate limit keyed by project id (API key storms).
  *
- * Prefer a per-project override when provided; otherwise use the env default.
+ * The caller provides the effective project or instance limit.
  */
 final readonly class IngestRateLimiter
 {
     public function __construct(
         private CacheItemPoolInterface $cache,
-        #[Autowire('%beacon.ingest_rate_limit%')]
-        private int $limitPerMinute,
     ) {
     }
 
-    public function isEnabled(?int $limitOverride = null): bool
+    public function isEnabled(int $limitPerMinute): bool
     {
-        return $this->resolveLimit($limitOverride) > 0;
+        return $limitPerMinute > 0;
     }
 
-    public function accept(int $projectId, ?int $limitOverride = null): bool
+    public function accept(int $projectId, int $limitPerMinute): bool
     {
-        $limit = $this->resolveLimit($limitOverride);
-        if ($limit <= 0) {
+        if ($limitPerMinute <= 0) {
             return true;
         }
 
         $factory = new RateLimiterFactory([
             'id' => 'beacon_ingest',
             'policy' => 'sliding_window',
-            'limit' => $limit,
+            'limit' => $limitPerMinute,
             'interval' => '1 minute',
         ], new CacheStorage($this->cache));
 
         return $factory->create('project_'.$projectId)->consume(1)->isAccepted();
-    }
-
-    private function resolveLimit(?int $limitOverride): int
-    {
-        return $limitOverride ?? $this->limitPerMinute;
     }
 }

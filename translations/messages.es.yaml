@@ -12,6 +12,7 @@ nav:
     admin_projects: Proyectos
     appearance: Apariencia
     mailer: Correo
+    instance_config: Configuración de instancia
     setup: Configuración
     menus: Menús
     breadcrumbs: Migas
@@ -623,6 +624,21 @@ mailer_settings:
 
             Si lo has recibido, el DSN cifrado de Mailer puede entregar emails de magic login.
             Remitente: %from%
+settings:
+    instance_config:
+        title: Configuración de instancia
+        intro: Exporta o importa ajustes no secretos de la lista permitida (apariencia y flags de instancia). El DSN de Mailer, los secretos de Mercure y los secretos OAuth nunca se incluyen.
+        export_title: Exportar
+        export_help: Descarga un archivo JSON versionado seguro para ensayos de copia de seguridad. Los secretos permanecen en esta instancia.
+        export: Descargar JSON
+        import_title: Importar
+        import_help: Restaura la apariencia y los flags permitidos desde una exportación anterior. Los valores secretos se rechazan y no se modifican.
+        import: Importar JSON
+        file: Archivo de configuración
+        imported: Configuración de instancia importada.
+        import_failed: Falló la importación. Comprueba la versión del esquema y que el archivo no tenga claves secretas.
+        missing_file: Elige un archivo JSON para importar.
+        invalid_csrf: Token de seguridad no válido.
 mercure_settings:
     title: Mercure
     intro: Alertas en vivo opcionales para miembros conectados cuando se crea una incidencia nueva. Desactivado por defecto — actívalo solo si hay un hub Mercure disponible. El Web Push sigue siendo una opción aparte en Cuenta → Interfaz.
@@ -1220,6 +1236,7 @@ admin:
         ops: Picos entre proyectos, incidencias abiertas y entregas fallidas.
         appearance: Nombre de marca, acentos, colores de estado y superficies.
         mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
+        instance_config: Exporta o importa apariencia y flags de instancia no secretos (JSON).
         setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.

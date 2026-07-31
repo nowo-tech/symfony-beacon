@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.16.0 to the next release](#upgrading-from-0160-to-the-next-release)
+- [Upgrading from 0.17.0 to the next release](#upgrading-from-0170-to-the-next-release)
+- [Upgrading from 0.16.0 to 0.17.0](#upgrading-from-0160-to-0170)
 - [Upgrading from 0.15.0 to 0.16.0](#upgrading-from-0150-to-0160)
 - [Upgrading from 0.14.0 to 0.15.0](#upgrading-from-0140-to-0150)
 - [Upgrading from 0.13.0 to 0.14.0](#upgrading-from-0130-to-0140)
@@ -42,7 +43,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.16.0 to the next release
+## Upgrading from 0.17.0 to the next release
 
 ```bash
 git pull
@@ -54,7 +55,39 @@ pnpm install
 make vite-build
 ```
 
-_(Placeholder — fill when cutting the next release.)_
+## Upgrading from 0.16.0 to 0.17.0
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+Migration `Version20260731170000` adds operational defaults to `instance_settings`. After migrating, configure retention, ingest rate, daily/monthly quotas, delivery history, and circuit-breaker behavior under **Administration → Ops defaults**.
+
+The former `BEACON_RETENTION_*`, `BEACON_INGEST_RATE_LIMIT`, `BEACON_EVENT_QUOTA_*`, `BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`, and `BEACON_NOTIFICATION_CIRCUIT_BREAKER_*` variables are no longer read and may be removed. Instance config export is now v2; imports continue to accept v1 files.
+
+### Mailer DSN audit (`6.15`)
+
+- Saving or clearing Administration → Mailer records `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets).
+- `MailerDsnValidator` rejects schemes outside the allowlist (`smtp`/`smtps`/sendmail/native + common provider schemes).
+
+### Local Mailpit (`066`)
+
+- The Flex `mailer` service in `compose.override.yaml` is now behind Compose profile **`mail`** (not started by `make up`).
+- Start with `make mailpit` (or `docker compose --profile mail up -d mailer`). UI default: http://localhost:18025; PHP DSN: `smtp://mailer:1025` under **Administration → Mailer**.
+- Host ports: `MAILPIT_UI_PORT` / `MAILPIT_SMTP_PORT` in `.env` (defaults 18025 / 1026 in `.env.dist`). Guide: [MAILPIT.md](MAILPIT.md).
+- Production (`compose.prod.yaml`) never includes Mailpit.
+
+### Social login admin (extends `060`)
+
+- Manage OAuth provider credentials under **Administration → Social login** (create / edit / delete / enable).
+- `app:seed-social-login` and `AUTH_KIT_SOCIAL_*` env bootstrap are removed; migrate any env-seeded providers via the admin UI if needed.
+- AuthKit profile `social_login.mode` must still be enabled for buttons to appear on login.
 
 ## Upgrading from 0.15.0 to 0.16.0
 

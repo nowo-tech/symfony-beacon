@@ -7,13 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-07-31
+
 ### Added
 
+- **Local Mailpit** (`066-local-mailpit`): optional Compose profile `mail` + `make mailpit` / `make mailpit-logs` for catching SMTP in development; docs [MAILPIT.md](MAILPIT.md). Not started by `make up`; not in `compose.prod.yaml`.
 - **Mailer DSN change audit** (`6.15`, Fixes #18): Admin Mailer save/clear records `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets); `MailerDsnValidator` scheme allowlist (`smtp`/`smtps`/sendmail/native + common provider schemes).
+- **Ops defaults in database**: retention, ingest rate, daily/monthly quotas, delivery-history size, and notification circuit-breaker settings under **Administration → Ops defaults**; migration `Version20260731170000`; included in instance config export v2.
+- **Social login admin** (extends `060`): OAuth provider credentials managed in Administration → Social login (`auth_kit_social_credential`); replaces env/`app:seed-social-login` bootstrap.
 
 ### Changed
 
-- **Roadmap**: Bundle **v1.6.10** closes Phase **6.13** / **6.14**; **6.15** Mailer DSN audit Done; **Next** = Later Phase 6+ when prioritized.
+- **Constitution v1.3.0**: Principle IX — forbid `env(VAR):` default map entries in `config/parameters.yaml` (defaults belong in `.env.dist` / `when@…` package config).
+- Former `BEACON_RETENTION_*`, `BEACON_INGEST_RATE_LIMIT`, `BEACON_EVENT_QUOTA_*`, `BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT`, and `BEACON_NOTIFICATION_CIRCUIT_BREAKER_*` env vars are no longer read (configure via Ops defaults).
+- **Roadmap**: Phase **6.15** / **6.16** Done in **v0.17.0**; Bundle **v1.6.10** closed **6.13** / **6.14**; **Next** = Later Phase 6+ when prioritized.
 
 ## [0.16.0] - 2026-07-31
 
@@ -36,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **PHPStan / FrankenPHP CI** (`063-phpstan-frankenphp-ci`): FormBuilder generics on `AccountDisplayType`; SiteBackup guard instance latch; ingest query-auth test swaps `IngestQueryAuthSettings` instead of `putenv`
-- **Social login admin**: OAuth provider credentials managed in Administration → Social login (`auth_kit_social_credential`); optional `app:seed-social-login` from env remains for CLI bootstrap
 - **SiteBackup secrets guard** (`062`, Fixes #3): fail closed for empty/local-default `SITE_SETUP_TOKEN` / `SITE_BACKUP_PASSWORD_HASH` in **all environments except `dev`/`test`** (covers `staging` and misnamed deploys, not only `prod`)
 - **SiteBackup guard + Docker build** (`064-sitebackup-guard-skip-cache-clear`): skip guard for `cache:clear` / `cache:warmup` / `assets:install` so `frankenphp_prod` image builds can run Composer auto-scripts; HTTP and other console commands still fail closed
 - **CSP delivery:** `Content-Security-Policy` moved from Caddy to PHP (`ContentSecurityPolicySubscriber`) so the Web Debug Toolbar can merge script/style nonces; kit page `window.*Config` scripts rewritten to JSON islands (`KitInlineConfigScriptSubscriber`)
@@ -632,7 +638,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...v0.14.0

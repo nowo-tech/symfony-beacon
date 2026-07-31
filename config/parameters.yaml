@@ -1,26 +1,16 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
 # Typed aliases for env vars defined in `.env` / `.env.dist`.
+# Do NOT add `env(NAME): 'default'` here (constitution Principle IX) — defaults belong in `.env.dist`.
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     env(BEACON_ENVELOPE_MAX_BYTES): '2097152'
-    env(BEACON_EVENT_QUOTA_MONTHLY): '0'
     # Default reject deprecated query-string ingest auth (all envs). Set 0 only while migrating clients.
     env(BEACON_INGEST_REJECT_QUERY_AUTH): '1'
     default_locale: '%env(DEFAULT_LOCALE)%'
     # Catalogue fallbacks when a key is missing in the active locale (always keep English).
     fallback_locales: [en, es, de, nl, fr, it, pt]
-    beacon.retention_days: '%env(int:BEACON_RETENTION_DAYS)%'
-    beacon.retention_max_events: '%env(int:BEACON_RETENTION_MAX_EVENTS_PER_PROJECT)%'
-    beacon.ingest_rate_limit: '%env(int:BEACON_INGEST_RATE_LIMIT)%'
-    beacon.event_quota_daily: '%env(int:BEACON_EVENT_QUOTA_DAILY)%'
-    beacon.event_quota_monthly: '%env(int:BEACON_EVENT_QUOTA_MONTHLY)%'
     beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
-    beacon.notifications.delivery_history_limit: '%env(int:BEACON_NOTIFICATION_DELIVERY_HISTORY_LIMIT)%'
-    env(BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD): '5'
-    env(BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES): '0'
-    beacon.notifications.circuit_breaker_threshold: '%env(int:BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD)%'
-    beacon.notifications.circuit_breaker_cooldown_minutes: '%env(int:BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES)%'
     beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
     beacon.vapid.private_key: '%env(string:VAPID_PRIVATE_KEY)%'
     beacon.vapid.subject: '%env(string:VAPID_SUBJECT)%'
@@ -37,32 +27,3 @@ parameters:
     beacon.metrics_require_token: '%env(bool:BEACON_METRICS_REQUIRE_TOKEN)%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true
-    # AuthKit social OAuth apps (empty = skip seed). Env-backed for FrankenPHP-safe DI (no $_ENV reads).
-    env(AUTH_KIT_SOCIAL_GOOGLE_CLIENT_ID): ''
-    env(AUTH_KIT_SOCIAL_GOOGLE_CLIENT_SECRET): ''
-    env(AUTH_KIT_SOCIAL_GOOGLE_LABEL): ''
-    env(AUTH_KIT_SOCIAL_GOOGLE_ENABLED): '1'
-    env(AUTH_KIT_SOCIAL_GITHUB_CLIENT_ID): ''
-    env(AUTH_KIT_SOCIAL_GITHUB_CLIENT_SECRET): ''
-    env(AUTH_KIT_SOCIAL_GITHUB_LABEL): ''
-    env(AUTH_KIT_SOCIAL_GITHUB_ENABLED): '1'
-    env(AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_ID): ''
-    env(AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_SECRET): ''
-    env(AUTH_KIT_SOCIAL_MICROSOFT_LABEL): ''
-    env(AUTH_KIT_SOCIAL_MICROSOFT_ENABLED): '1'
-    beacon.auth_kit_social_providers:
-        google:
-            client_id: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_CLIENT_ID)%'
-            client_secret: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_CLIENT_SECRET)%'
-            label: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_LABEL)%'
-            enabled: '%env(default::AUTH_KIT_SOCIAL_GOOGLE_ENABLED)%'
-        github:
-            client_id: '%env(default::AUTH_KIT_SOCIAL_GITHUB_CLIENT_ID)%'
-            client_secret: '%env(default::AUTH_KIT_SOCIAL_GITHUB_CLIENT_SECRET)%'
-            label: '%env(default::AUTH_KIT_SOCIAL_GITHUB_LABEL)%'
-            enabled: '%env(default::AUTH_KIT_SOCIAL_GITHUB_ENABLED)%'
-        microsoft:
-            client_id: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_ID)%'
-            client_secret: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_CLIENT_SECRET)%'
-            label: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_LABEL)%'
-            enabled: '%env(default::AUTH_KIT_SOCIAL_MICROSOFT_ENABLED)%'

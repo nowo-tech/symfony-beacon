@@ -17,7 +17,7 @@ final class MailerDsnValidator
      *
      * @var list<string>
      */
-    public const ALLOWED_SCHEMES = [
+    public const array ALLOWED_SCHEMES = [
         'smtp',
         'smtps',
         'sendmail',
@@ -81,11 +81,7 @@ final class MailerDsnValidator
             return false;
         }
 
-        if (null !== $this->validatePlainDsn($dsn)) {
-            return false;
-        }
-
-        return true;
+        return null === $this->validatePlainDsn($dsn);
     }
 
     private function isNullTransport(string $dsn): bool

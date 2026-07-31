@@ -1,3 +1,13 @@
+<!--
+Sync Impact Report
+- Version change: 1.2.0 → 1.3.0 (MINOR: new env/parameters configuration constraint)
+- Modified principles: none renamed
+- Added sections: Technical constraints — env parameter defaults; Constitution Check gates in plan-template
+- Removed sections: none
+- Templates: .specify/templates/plan-template.md ✅; docs/CONTRIBUTING.md ✅; .cursor/rules/no-env-defaults-in-parameters.mdc ✅
+- Follow-up: existing `env(NAME):` keys in config/parameters.yaml are legacy; new code MUST NOT add more (prefer .env.dist defaults / when@ env package overrides)
+-->
+
 # symfony-beacon Constitution
 
 ## Core Principles
@@ -53,6 +63,17 @@ All project prose MUST be written in **English** (docs, specs, PHPDoc, Twig UI c
 
 Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functional) matching its acceptance scenarios. CI must stay green.
 
+### IX. Env defaults live in `.env.dist` (NON-NEGOTIABLE)
+
+`config/parameters.yaml` MUST NOT define Symfony env default entries of the form `env(VAR_NAME): '…'`.
+
+- Document and version operator-facing defaults **only** in `.env.dist` (and keep secrets out of git).
+- Typed aliases such as `beacon.foo: '%env(int:FOO)%'` remain allowed when the variable is required or always present via `.env.dist` / runtime env.
+- Environment-specific overrides (e.g. prod fail-closed flags) belong in `config/packages/*.yaml` under `when@…`, not as `env(…):` defaults in `parameters.yaml`.
+- Prefer instance/database settings for tunable ops defaults when a UI already exists; do not paper over missing `.env.dist` keys with `env(NAME):` in parameters.
+
+Rationale: `env(NAME):` defaults in `parameters.yaml` hide required configuration, duplicate `.env.dist`, and make FrankenPHP / Compose / upgrade diffs harder to audit.
+
 ## Technical constraints
 
 - Entrypoint: `.docker/frankenphp/docker-entrypoint.sh` maps `FRANKENPHP_MODE` → `FRANKENPHP_CONFIG`.
@@ -62,6 +83,7 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository**; this server may install it for **dogfooding** (self-reporting via `BEACON_DSN`). External apps configure their own DSN against this host.
 - Mobile: PWA only in this repository (`docs/NATIVE-MOBILE.md`).
+- Configuration: see **Principle IX** — no `env(…):` default map entries in `config/parameters.yaml`.
 
 ## Development workflow (SDD)
 
@@ -81,4 +103,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Every significant PR/change must map to a spec under `specs/`.
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.2.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-21
+**Version**: 1.3.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-31

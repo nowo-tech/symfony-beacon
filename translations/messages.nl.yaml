@@ -12,6 +12,7 @@ nav:
     admin_projects: Projecten
     appearance: Weergave
     mailer: Mailer
+    instance_config: Instantieconfiguratie
     menus: "Menu's"
     breadcrumbs: Paneermeel
     routing: Locale-routes
@@ -1122,6 +1123,7 @@ admin:
         breadcrumbs: 'Beheer broodkruimelverzamelingen.'
         routing: 'Beheer duale publieke locale-paden (JSON) voor Routable-controllers.'
         mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'
+        instance_config: 'Exporteer of importeer niet-geheime weergave en instantieflags (JSON).'
         setup: 'Eerste platform-/demo-/sample-seedstappen.'
     ops:
         title: Ops-overzicht
@@ -1340,6 +1342,21 @@ mailer_settings:
 
             Als je dit hebt ontvangen, kan de versleutelde Mailer-DSN magic-loginmails afleveren.
             From-adres: %from%
+settings:
+    instance_config:
+        title: Instantieconfiguratie
+        intro: Exporteer of importeer toegestane niet-geheime instellingen (weergave en instantieflags). Mailer-DSN, Mercure-geheimen en OAuth-geheimen worden nooit opgenomen.
+        export_title: Exporteren
+        export_help: Download een geversioniseerd JSON-bestand dat veilig is voor back-upoefeningen. Geheimen blijven op deze instantie.
+        export: JSON downloaden
+        import_title: Importeren
+        import_help: Herstel weergave en toegestane flags vanuit een eerdere export. Geheime waarden worden geweigerd en blijven ongewijzigd.
+        import: JSON importeren
+        file: Configuratiebestand
+        imported: Instantieconfiguratie geïmporteerd.
+        import_failed: Import mislukt. Controleer de schemaversie en of het bestand geen geheime sleutels bevat.
+        missing_file: Kies een JSON-bestand om te importeren.
+        invalid_csrf: Ongeldig beveiligingstoken.
 mercure_settings:
     title: Mercure
     intro: 'Optionele livemeldingen voor aangemelde leden wanneer een nieuwe issue wordt aangemaakt. Standaard uitgeschakeld - alleen inschakelen wanneer een Mercure-hub beschikbaar is. Web Push blijft een aparte opt-in onder Account -> Weergave.'

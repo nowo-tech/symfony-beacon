@@ -12,6 +12,7 @@ nav:
     admin_projects: Projetos
     appearance: Aparência
     mailer: Mailer
+    instance_config: Configuração da instância
     menus: Cardápios
     breadcrumbs: 'Pão ralado'
     routing: Rotas por locale
@@ -1122,6 +1123,7 @@ admin:
         breadcrumbs: 'Gerenciar coleções de navegação estrutural.'
         routing: 'Gerir caminhos públicos duals por locale (JSON) para controladores Routable.'
         mailer: 'DSN Mailer encriptado e endereço From para e-mails transacionais.'
+        instance_config: 'Exportar ou importar aparência e flags de instância não secretos (JSON).'
         setup: 'Passos iniciais de plataforma / demo / seed de amostras.'
     ops:
         title: Visão Ops
@@ -1340,6 +1342,21 @@ mailer_settings:
 
             Se a recebeu, o DSN Mailer cifrado consegue entregar emails de magic login.
             Endereco From: %from%
+settings:
+    instance_config:
+        title: Configuração da instância
+        intro: Exporte ou importe definições não secretas permitidas (aparência e flags da instância). O DSN do Mailer, segredos Mercure e segredos OAuth nunca são incluídos.
+        export_title: Exportar
+        export_help: Descarregue um ficheiro JSON versionado seguro para ensaios de backup. Os segredos permanecem nesta instância.
+        export: Descarregar JSON
+        import_title: Importar
+        import_help: Restaure a aparência e as flags permitidas a partir de uma exportação anterior. Os valores secretos são rejeitados e não são alterados.
+        import: Importar JSON
+        file: Ficheiro de configuração
+        imported: Configuração da instância importada.
+        import_failed: A importação falhou. Verifique a versão do esquema e se o ficheiro não tem chaves secretas.
+        missing_file: Escolha um ficheiro JSON para importar.
+        invalid_csrf: Token de segurança inválido.
 mercure_settings:
     title: Mercure
     intro: 'Alertas live opcionais para membros autenticados quando e criada uma nova issue. Desativado por predefinicao - ative apenas quando existir um hub Mercure disponivel. O Web Push continua a ser uma opcao separada em Conta -> Visualizacao.'

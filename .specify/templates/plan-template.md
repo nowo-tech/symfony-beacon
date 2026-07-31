@@ -40,7 +40,13 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Spec-first: feature has/will have `specs/NNN-*/` artifacts before implementation
+- [ ] Canonical stack / Docker-first / worker-safe (no alternate runtime without amendment)
+- [ ] English docs/PHPDoc/UI; tests planned for behavior changes
+- [ ] Env/config: **MUST NOT** add `env(VAR_NAME): '…'` defaults in `config/parameters.yaml` (Principle IX). Put defaults in `.env.dist`; use `when@…` package config for env-specific overrides; prefer DB/instance settings for tunable ops when UI exists
+- [ ] Prefer `nowo-tech/*` kits over hand-rolled auth/legal/cookie UX where applicable
+
+[Gates determined based on constitution file — keep the checklist above; add feature-specific gates as needed]
 
 ## Project Structure
 

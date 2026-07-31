@@ -22,6 +22,14 @@ class InstanceSettings implements AuditableInterface
     use TimestampableTrait;
 
     public const DEFAULT_MAILER_FROM = 'beacon@localhost';
+    public const DEFAULT_RETENTION_DAYS = 0;
+    public const DEFAULT_RETENTION_MAX_EVENTS = 0;
+    public const DEFAULT_INGEST_RATE_LIMIT = 120;
+    public const DEFAULT_EVENT_QUOTA_DAILY = 0;
+    public const DEFAULT_EVENT_QUOTA_MONTHLY = 0;
+    public const DEFAULT_DELIVERY_HISTORY_LIMIT = 20;
+    public const DEFAULT_CIRCUIT_BREAKER_THRESHOLD = 5;
+    public const DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES = 0;
 
     #[ORM\Id]
     #[ORM\Column]
@@ -59,6 +67,30 @@ class InstanceSettings implements AuditableInterface
     #[ORM\Column(type: 'text', nullable: true)]
     #[Encrypted]
     private ?string $mercureJwtSecret = null;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_RETENTION_DAYS])]
+    private int $retentionDays = self::DEFAULT_RETENTION_DAYS;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_RETENTION_MAX_EVENTS])]
+    private int $retentionMaxEvents = self::DEFAULT_RETENTION_MAX_EVENTS;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_INGEST_RATE_LIMIT])]
+    private int $ingestRateLimit = self::DEFAULT_INGEST_RATE_LIMIT;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_EVENT_QUOTA_DAILY])]
+    private int $eventQuotaDaily = self::DEFAULT_EVENT_QUOTA_DAILY;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_EVENT_QUOTA_MONTHLY])]
+    private int $eventQuotaMonthly = self::DEFAULT_EVENT_QUOTA_MONTHLY;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_DELIVERY_HISTORY_LIMIT])]
+    private int $notificationDeliveryHistoryLimit = self::DEFAULT_DELIVERY_HISTORY_LIMIT;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_CIRCUIT_BREAKER_THRESHOLD])]
+    private int $notificationCircuitBreakerThreshold = self::DEFAULT_CIRCUIT_BREAKER_THRESHOLD;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES])]
+    private int $notificationCircuitBreakerCooldownMinutes = self::DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -249,6 +281,102 @@ class InstanceSettings implements AuditableInterface
     public function hasMercureJwtSecret(): bool
     {
         return null !== $this->mercureJwtSecret && '' !== $this->mercureJwtSecret;
+    }
+
+    public function getRetentionDays(): int
+    {
+        return $this->retentionDays;
+    }
+
+    public function setRetentionDays(int $retentionDays): self
+    {
+        $this->retentionDays = max(0, $retentionDays);
+
+        return $this;
+    }
+
+    public function getRetentionMaxEvents(): int
+    {
+        return $this->retentionMaxEvents;
+    }
+
+    public function setRetentionMaxEvents(int $retentionMaxEvents): self
+    {
+        $this->retentionMaxEvents = max(0, $retentionMaxEvents);
+
+        return $this;
+    }
+
+    public function getIngestRateLimit(): int
+    {
+        return $this->ingestRateLimit;
+    }
+
+    public function setIngestRateLimit(int $ingestRateLimit): self
+    {
+        $this->ingestRateLimit = max(0, $ingestRateLimit);
+
+        return $this;
+    }
+
+    public function getEventQuotaDaily(): int
+    {
+        return $this->eventQuotaDaily;
+    }
+
+    public function setEventQuotaDaily(int $eventQuotaDaily): self
+    {
+        $this->eventQuotaDaily = max(0, $eventQuotaDaily);
+
+        return $this;
+    }
+
+    public function getEventQuotaMonthly(): int
+    {
+        return $this->eventQuotaMonthly;
+    }
+
+    public function setEventQuotaMonthly(int $eventQuotaMonthly): self
+    {
+        $this->eventQuotaMonthly = max(0, $eventQuotaMonthly);
+
+        return $this;
+    }
+
+    public function getNotificationDeliveryHistoryLimit(): int
+    {
+        return $this->notificationDeliveryHistoryLimit;
+    }
+
+    public function setNotificationDeliveryHistoryLimit(int $notificationDeliveryHistoryLimit): self
+    {
+        $this->notificationDeliveryHistoryLimit = max(1, $notificationDeliveryHistoryLimit);
+
+        return $this;
+    }
+
+    public function getNotificationCircuitBreakerThreshold(): int
+    {
+        return $this->notificationCircuitBreakerThreshold;
+    }
+
+    public function setNotificationCircuitBreakerThreshold(int $notificationCircuitBreakerThreshold): self
+    {
+        $this->notificationCircuitBreakerThreshold = max(1, $notificationCircuitBreakerThreshold);
+
+        return $this;
+    }
+
+    public function getNotificationCircuitBreakerCooldownMinutes(): int
+    {
+        return $this->notificationCircuitBreakerCooldownMinutes;
+    }
+
+    public function setNotificationCircuitBreakerCooldownMinutes(int $notificationCircuitBreakerCooldownMinutes): self
+    {
+        $this->notificationCircuitBreakerCooldownMinutes = max(0, $notificationCircuitBreakerCooldownMinutes);
+
+        return $this;
     }
 
     public function getCreatedBy(): ?object

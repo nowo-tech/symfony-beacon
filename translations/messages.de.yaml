@@ -12,6 +12,7 @@ nav:
     admin_projects: Projekte
     appearance: Erscheinungsbild
     mailer: Mailer
+    instance_config: Instanzkonfiguration
     menus: Menüs
     breadcrumbs: Paniermehl
     routing: Locale-Routen
@@ -1122,6 +1123,7 @@ admin:
         breadcrumbs: 'Breadcrumb-Sammlungen verwalten.'
         routing: 'Duale Locale-Pfade (JSON) für Routable-Controller verwalten.'
         mailer: 'Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.'
+        instance_config: 'Nicht-geheimes Erscheinungsbild und Instanz-Flags exportieren oder importieren (JSON).'
         setup: 'Erste Plattform- / Demo- / Sample-Seed-Schritte.'
     ops:
         title: Ops-Übersicht
@@ -1340,6 +1342,21 @@ mailer_settings:
 
             Wenn Sie diese Nachricht erhalten haben, kann das verschlusselte Mailer DSN Magic-Login-E-Mails zustellen.
             Absenderadresse: %from%
+settings:
+    instance_config:
+        title: Instanzkonfiguration
+        intro: Exportieren oder importieren Sie freigegebene nicht-geheime Einstellungen (Erscheinungsbild und Instanz-Flags). Mailer-DSN, Mercure-Geheimnisse und OAuth-Geheimnisse sind nie enthalten.
+        export_title: Export
+        export_help: Laden Sie eine versionierte JSON-Datei herunter, die für Backup-Übungen geeignet ist. Geheimnisse bleiben auf dieser Instanz.
+        export: JSON herunterladen
+        import_title: Import
+        import_help: Stellen Sie Erscheinungsbild und freigegebene Flags aus einem früheren Export wieder her. Geheime Werte werden abgelehnt und bleiben unverändert.
+        import: JSON importieren
+        file: Konfigurationsdatei
+        imported: Instanzkonfiguration importiert.
+        import_failed: Import fehlgeschlagen. Prüfen Sie die Schemaversion und ob die Datei keine geheimen Schlüssel enthält.
+        missing_file: Wählen Sie eine JSON-Datei zum Importieren.
+        invalid_csrf: Ungültiges Sicherheitstoken.
 mercure_settings:
     title: Mercure
     intro: 'Optionale Live-Benachrichtigungen fur angemeldete Mitglieder, wenn ein neues Issue erstellt wird. Standardmassig deaktiviert - nur aktivieren, wenn ein Mercure-Hub verfugbar ist. Web Push bleibt eine separate Aktivierung unter Konto -> Anzeige.'

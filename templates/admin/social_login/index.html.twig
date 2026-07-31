@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'social_login_settings.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'social_login_settings.title'|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.intro'|trans }}</p>
+    </div>
+    <a class="btn-primary no-underline" href="{{ path('admin_social_login_new') }}" data-tour="admin-social-login-new">{{ 'social_login_settings.create'|trans }}</a>
+</div>
+
+<div class="panel mb-4 space-y-2 text-sm text-[var(--color-ink)]/75">
+    {% if social_login_active %}
+        <p class="font-medium text-[var(--color-moss)]">{{ 'social_login_settings.status.active'|trans }}</p>
+    {% else %}
+        <p>{{ 'social_login_settings.status.inactive'|trans }}</p>
+    {% endif %}
+    <p>{{ 'social_login_settings.redirect_hint'|trans({'%uri%': app.request.schemeAndHttpHost}) }}</p>
+</div>
+
+{% if credentials is empty %}
+    <section class="panel mb-4 text-sm text-[var(--color-ink)]/65">
+        {{ 'social_login_settings.empty'|trans }}
+    </section>
+{% else %}
+    <section class="panel mb-4 overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                    <th class="px-2 py-2 font-medium">{{ 'social_login_settings.table.provider'|trans }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'social_login_settings.table.label'|trans }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'social_login_settings.table.client_id'|trans }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'social_login_settings.table.enabled'|trans }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'social_login_settings.table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for credential in credentials %}
+                    <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                        <td class="px-2 py-3 font-mono text-xs">{{ credential.provider }}</td>
+                        <td class="px-2 py-3 font-medium">{{ credential.label }}</td>
+                        <td class="px-2 py-3 font-mono text-xs max-w-[12rem] truncate" title="{{ credential.clientId }}">{{ credential.clientId }}</td>
+                        <td class="px-2 py-3">
+                            {% if credential.enabled %}
+                                <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'social_login_settings.enabled'|trans }}</span>
+                            {% else %}
+                                <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/65">{{ 'social_login_settings.disabled'|trans }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a class="btn-ghost no-underline" href="{{ path('admin_social_login_edit', {provider: credential.provider}) }}">{{ 'social_login_settings.edit'|trans }}</a>
+                                <form method="post" action="{{ path('admin_social_login_delete', {provider: credential.provider}) }}" onsubmit="return confirm({{ 'social_login_settings.delete_confirm'|trans|json_encode|raw }});">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_social_login_delete_' ~ credential.provider) }}">
+                                    <button class="btn-ghost" type="submit">{{ 'social_login_settings.delete'|trans }}</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endif %}
+
+{% if missing_builtins is not empty %}
+    <section class="panel mb-4 space-y-3">
+        <h2 class="text-lg font-semibold">{{ 'social_login_settings.add_title'|trans }}</h2>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.add_intro'|trans }}</p>
+        <div class="flex flex-wrap gap-2">
+            {% for provider in missing_builtins %}
+                <a class="btn-secondary no-underline" href="{{ path('admin_social_login_new', {provider: provider}) }}">{{ 'social_login_settings.add_provider'|trans({'%provider%': provider|capitalize}) }}</a>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

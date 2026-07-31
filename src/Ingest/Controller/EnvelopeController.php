@@ -155,7 +155,7 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
         description: <<<'MD'
 Too many requests — one of:
 
-- **Rate limit** — per-project sliding window (`BEACON_INGEST_RATE_LIMIT` / project override); body `rate limit exceeded`; `Retry-After: 60`
+- **Rate limit** — per-project sliding window (instance ops default / project override); body `rate limit exceeded`; `Retry-After: 60`
 - **Daily quota** — calendar-day event quota exceeded; body `daily event quota exceeded`; `Retry-After: 60`
 - **Monthly quota** — UTC calendar-month event quota exceeded; body `monthly event quota exceeded`; `Retry-After: 3600`
 MD,
