@@ -37,3 +37,7 @@ when@test:
             public: true
             arguments:
                 $rejectQueryAuth: '%beacon.ingest_reject_query_auth%'
+        App\Issues\Service\IssueUserMailNotifier:
+            public: true
+            autowire: true
+            autoconfigure: true

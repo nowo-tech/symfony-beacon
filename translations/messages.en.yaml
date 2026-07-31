@@ -12,6 +12,7 @@ nav:
     admin_projects: Projects
     appearance: Appearance
     mailer: Mailer
+    social_login: Social login
     setup: Setup
     menus: Menus
     breadcrumbs: Breadcrumbs
@@ -138,6 +139,10 @@ flash:
         sample_failed: Sample email could not be sent. Check the Mailer DSN and server logs.
     mercure:
         saved: Mercure settings saved.
+    social_login:
+        saved: Social login provider saved.
+        deleted: Social login provider removed.
+        provider_exists: That provider already exists — edit the existing credential.
     preferences:
         saved: Preferences saved.
         profile_saved: Profile saved.
@@ -425,12 +430,23 @@ issues:
     comments_title: Comments
     comments_empty: No comments yet.
     comment_body: Comment
-    comment_placeholder: Add a comment…
+    comment_placeholder: 'Add a comment… Use @name to mention a project member.'
     comment_submit: Post comment
     comment_saved: Comment added.
     comment_empty: Comment cannot be empty.
     comment_too_long: Comment is too long.
     comment_invalid: Could not add the comment.
+    mail:
+        mention_subject: 'You were mentioned on [%project%] %issue%'
+        mention_body: |
+            %author% mentioned you on issue "%issue%" in project %project%.
+
+            %link%
+        assign_subject: 'You were assigned to [%project%] %issue%'
+        assign_body: |
+            %actor% assigned you to issue "%issue%" in project %project%.
+
+            %link%
     duplicate_of: 'Duplicate of'
     duplicate_help: Mark this issue as a duplicate of another in the same project (sets status to ignored).
     duplicate_aside_help: Link this issue to a canonical issue in the same project.
@@ -622,6 +638,48 @@ mailer_settings:
 
             If you received this, the encrypted Mailer DSN can deliver magic-login emails.
             From address: %from%
+social_login_settings:
+    title: Social login
+    intro: Store OAuth app credentials in the database (AuthKit table auth_kit_social_credential). Login buttons appear when social_login.mode is enabled and at least one credential row is enabled.
+    status:
+        active: Social login buttons are active on the login page.
+        inactive: Social login is not showing buttons yet (enable the AuthKit profile mode and add at least one enabled provider below).
+    redirect_hint: 'Register redirect URIs at each IdP as %uri%/login/social/{provider}/check (and /{locale}/… for non-default locales).'
+    empty: No OAuth providers configured yet.
+    disabled: Off
+    edit: Edit
+    delete: Remove
+    delete_confirm: Remove this OAuth provider credential?
+    add_title: Add a provider
+    add_intro: Built-in endpoint catalogs exist for Google, GitHub, and Microsoft.
+    add_provider: 'Add %provider%'
+    new_title: 'Add %provider%'
+    edit_title: 'Edit %provider%'
+    edit_intro: Client secrets are stored in the database. Leave the secret blank when editing to keep the current value.
+    submit: Save provider
+    table:
+        provider: Provider
+        label: Label
+        client_id: Client ID
+        enabled: Enabled
+        actions: Actions
+social_login_credential:
+    provider:
+        label: Provider key
+        help: Lowercase slug (google, github, microsoft, or custom).
+        invalid: Use a lowercase slug starting with a letter (a-z, digits, _ or -).
+    label:
+        label: Button label
+        help: Shown on the login page Continue-with button.
+    client_id:
+        label: Client ID
+    client_secret:
+        label: Client secret
+        help_new: OAuth client secret from the IdP app registration.
+        help_edit: Leave blank to keep the current secret.
+    enabled:
+        label: Enabled
+        help: Disabled providers stay in the database but do not show on login.
 mercure_settings:
     title: Mercure
     intro: Optional live alerts for signed-in members when a new issue is created. Disabled by default — enable only when a Mercure hub is available. Web Push remains a separate Account → Display opt-in.
@@ -1210,6 +1268,7 @@ admin:
         ops: Cross-project spikes, open issues, and failed deliveries.
         appearance: Brand name, accents, status colors, and page surfaces.
         mailer: Encrypted Mailer DSN and From address for transactional email.
+        social_login: OAuth provider credentials (Google / GitHub / Microsoft) stored in the database.
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.

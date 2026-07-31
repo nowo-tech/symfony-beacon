@@ -23,6 +23,7 @@ use App\Issues\Repository\IssueSavedViewRepository;
 use App\Issues\Service\IssueAssigneeGuard;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
+use App\Issues\Service\IssueUserMailNotifier;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
@@ -68,6 +69,7 @@ final class IssueController extends AbstractController
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
         private readonly NotificationDispatcher $notificationDispatcher,
+        private readonly IssueUserMailNotifier $issueUserMailNotifier,
         private readonly EntityManagerInterface $entityManager,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
         private readonly AiIssueExportFormatter $aiIssueExportFormatter,
@@ -430,6 +432,13 @@ final class IssueController extends AbstractController
                     $previousAssignee,
                     $assignee,
                 );
+                $this->issueUserMailNotifier->notifyAssigneeChanged(
+                    $project,
+                    $issue,
+                    $previousAssignee,
+                    $assignee,
+                    $user,
+                );
             }
             $this->entityManager->flush();
             $this->addFlash('success', 'issues.assignee_saved');
@@ -625,6 +634,7 @@ final class IssueController extends AbstractController
             ],
         );
         $this->notificationDispatcher->dispatchIssueCommented($project, $issue, $comment);
+        $this->issueUserMailNotifier->notifyMentionsFromComment($project, $issue, $comment, $user);
         $this->entityManager->flush();
         $this->addFlash('success', 'issues.comment_saved');
 
