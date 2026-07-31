@@ -7,7 +7,7 @@ namespace App\Ingest\Controller;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\IngestRateLimiter;
-use App\Ingest\Service\OtlpLogsMapper;
+use App\Ingest\Service\OtlpTracesMapper;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
@@ -27,14 +27,14 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * OTLP HTTP JSON logs ingest: maps LogRecords to Beacon events via the Envelope worker.
+ * OTLP HTTP JSON traces ingest: maps ERROR spans to Beacon events via the Envelope worker.
  */
 #[AsController]
-final readonly class OtlpLogsController
+final readonly class OtlpTracesController
 {
     public function __construct(
         private EnvelopeAuthParser $authParser,
-        private OtlpLogsMapper $otlpLogsMapper,
+        private OtlpTracesMapper $otlpTracesMapper,
         private ProjectRepository $projectRepository,
         private ProjectApiKeyRepository $apiKeyRepository,
         private IngestRateLimiter $ingestRateLimiter,
@@ -47,20 +47,20 @@ final readonly class OtlpLogsController
     ) {
     }
 
-    #[Route('/api/{projectId}/otlp/v1/logs', name: 'ingest_otlp_logs', requirements: ['projectId' => '\d+'], methods: ['POST'])]
+    #[Route('/api/{projectId}/otlp/v1/traces', name: 'ingest_otlp_traces', requirements: ['projectId' => '\d+'], methods: ['POST'])]
     #[OA\Post(
-        path: '/api/{projectId}/otlp/v1/logs',
-        operationId: 'ingestOtlpLogs',
+        path: '/api/{projectId}/otlp/v1/traces',
+        operationId: 'ingestOtlpTraces',
         description: <<<'MD'
-Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` / `scopeLogs` / `logRecords`).
+Accepts an OTLP **ExportTraceServiceRequest** JSON body (`resourceSpans` / `scopeSpans` / `spans`).
 
-Maps WARN+ LogRecords (severityNumber ≥ 13) into Beacon events and queues the same async Envelope worker.
-At most **200** records are accepted per request. Metrics and gRPC are out of scope for v1 (see `/otlp/v1/traces` for ERROR span ingest).
+Maps **ERROR** spans (status code ERROR and/or exception attributes) into Beacon events and queues the same async Envelope worker.
+At most **200** spans are accepted per request. Metrics, gRPC, protobuf, and full Performance waterfall ingest are out of scope for v1.
 
 **Auth (required):** `X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…` bound to `{projectId}`.
 Query-string auth is **not** accepted on this endpoint.
 MD,
-        summary: 'Ingest OTLP logs (HTTP JSON)',
+        summary: 'Ingest OTLP traces (HTTP JSON)',
         security: [['BeaconAuth' => []]],
         tags: ['Ingest'],
     )]
@@ -77,19 +77,24 @@ MD,
             mediaType: 'application/json',
             schema: new OA\Schema(type: 'object'),
             example: [
-                'resourceLogs' => [[
+                'resourceSpans' => [[
                     'resource' => [
                         'attributes' => [
                             ['key' => 'service.name', 'value' => ['stringValue' => 'demo']],
                             ['key' => 'deployment.environment', 'value' => ['stringValue' => 'prod']],
                         ],
                     ],
-                    'scopeLogs' => [[
-                        'logRecords' => [[
-                            'timeUnixNano' => '1721491200000000000',
-                            'severityNumber' => 17,
-                            'severityText' => 'ERROR',
-                            'body' => ['stringValue' => 'Something broke'],
+                    'scopeSpans' => [[
+                        'spans' => [[
+                            'traceId' => 'aabbccdd',
+                            'spanId' => '11223344',
+                            'name' => 'POST /checkout',
+                            'endTimeUnixNano' => '1721491200000000000',
+                            'status' => ['code' => 2, 'message' => 'payment failed'],
+                            'attributes' => [
+                                ['key' => 'exception.type', 'value' => ['stringValue' => 'RuntimeException']],
+                                ['key' => 'exception.message', 'value' => ['stringValue' => 'payment failed']],
+                            ],
                         ]],
                     ]],
                 ]],
@@ -97,7 +102,7 @@ MD,
         ),
     )]
     #[OA\Response(response: 200, description: 'Accepted; async processing queued. Empty body.')]
-    #[OA\Response(response: 400, description: 'Invalid JSON or empty mapped set after filters.')]
+    #[OA\Response(response: 400, description: 'Invalid JSON.')]
     #[OA\Response(response: 401, description: 'Missing authorization.')]
     #[OA\Response(response: 403, description: 'Forbidden / ingest disabled.')]
     #[OA\Response(response: 404, description: 'Project not found.')]
@@ -173,9 +178,9 @@ MD,
         }
 
         try {
-            $payloads = $this->otlpLogsMapper->mapToEventPayloads($body);
+            $payloads = $this->otlpTracesMapper->mapToEventPayloads($body);
         } catch (InvalidArgumentException $e) {
-            $this->logger->notice('OTLP logs parse rejected.', [
+            $this->logger->notice('OTLP traces parse rejected.', [
                 'project_id' => $projectId,
                 'error' => $e->getMessage(),
             ]);
@@ -184,11 +189,10 @@ MD,
         }
 
         if ([] === $payloads) {
-            // Valid OTLP with only dropped severities — ACK without queue work.
             return $this->respond('', Response::HTTP_OK);
         }
 
-        $envelope = $this->otlpLogsMapper->toEnvelopeBody($payloads);
+        $envelope = $this->otlpTracesMapper->toEnvelopeBody($payloads);
         $this->bus->dispatch(new ProcessEnvelopeMessage(
             $projectId,
             $envelope,

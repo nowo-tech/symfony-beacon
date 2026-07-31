@@ -31,11 +31,19 @@ Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
 ```
 
-Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches `BEACON_ENVELOPE_MAX_BYTES`.
+Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches `BEACON_ENVELOPE_MAX_BYTES`. Spec: `067-otlp-ingest`.
 
-Out of scope for v1: gRPC, `/v1/traces`, `/v1/metrics`, protobuf Content-Type. Spec: `067-otlp-ingest`.
+## OTLP traces ingest (v1)
 
-## Health
+```http
+POST /api/{project_id}/otlp/v1/traces
+Content-Type: application/json
+X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
+```
+
+Accepts an OTLP **ExportTraceServiceRequest** JSON body (`resourceSpans` → `scopeSpans` → `spans`). **ERROR** spans (status code ERROR and/or exception attributes) map to Beacon events via the same worker (cap **200** spans per request). OK/UNSET spans without exceptions are dropped. Query-string auth is **not** accepted. Spec: `070-otlp-traces`.
+
+Out of scope for OTLP v1 adapters: gRPC, `/v1/metrics`, protobuf Content-Type, full Performance waterfall from all spans.
 
 | Endpoint | Purpose |
 |----------|---------|
