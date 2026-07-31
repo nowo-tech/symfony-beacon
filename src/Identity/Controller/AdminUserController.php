@@ -7,8 +7,11 @@ namespace App\Identity\Controller;
 use App\Identity\AdminAuditFilter;
 use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
+use App\Identity\Exception\AccountAnonymizeException;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
+use App\Identity\Service\AccountAnonymizer;
+use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
@@ -18,6 +21,7 @@ use App\Project\Service\ProjectMembershipManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use JsonException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,6 +47,8 @@ final class AdminUserController extends AbstractController
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly AccountDataExporter $accountDataExporter,
+        private readonly AccountAnonymizer $accountAnonymizer,
     ) {
     }
 
@@ -289,6 +295,69 @@ final class AdminUserController extends AbstractController
             'success',
             $user->isEnabled() ? 'flash.users.enabled' : 'flash.users.disabled'
         );
+
+        return $this->redirectToRoute('admin_users');
+    }
+
+    #[Route('/admin/users/{id}/export', name: 'admin_users_export', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    public function export(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        User $user,
+    ): Response {
+        /** @var User $current */
+        $current = $this->getUser();
+        $payload = $this->accountDataExporter->export($user);
+        $this->actionRecorder->recordAndFlush(
+            UserActionType::AccountExported,
+            $current,
+            $user,
+            ['scope' => 'admin'],
+        );
+
+        try {
+            $json = json_encode($payload, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
+        } catch (JsonException $e) {
+            throw new RuntimeException('Unable to encode account export.', 0, $e);
+        }
+
+        return new Response($json, Response::HTTP_OK, [
+            'Content-Type' => 'application/json; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="beacon-account-'.$user->getUuid().'.json"',
+        ]);
+    }
+
+    #[Route('/admin/users/{id}/anonymize', name: 'admin_users_anonymize', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    public function anonymize(
+        Request $request,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        User $user,
+    ): RedirectResponse {
+        if (!$this->isCsrfTokenValid('admin_user_anonymize_'.$user->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        /** @var User $current */
+        $current = $this->getUser();
+        if ($current->getId() === $user->getId()) {
+            $this->addFlash('error', 'flash.users.cannot_anonymize_self');
+
+            return $this->redirectToRoute('admin_users');
+        }
+
+        try {
+            $this->accountAnonymizer->anonymize($user, $current);
+        } catch (AccountAnonymizeException $e) {
+            $this->addFlash('error', match ($e->reasonCode) {
+                AccountAnonymizeException::ALREADY_ANONYMIZED => 'flash.privacy.already_anonymized',
+                AccountAnonymizeException::SOLE_OWNER => 'flash.privacy.sole_owner',
+                AccountAnonymizeException::LAST_ADMIN => 'flash.privacy.last_admin',
+                default => 'flash.privacy.anonymize_failed',
+            });
+
+            return $this->redirectToRoute('admin_users');
+        }
+
+        $this->addFlash('success', 'flash.users.anonymized');
 
         return $this->redirectToRoute('admin_users');
     }

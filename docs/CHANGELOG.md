@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **GDPR account export / anonymize** (`043`): Account → Privacy JSON download (`beacon-account-export/v1`); self-service and admin anonymize (scrub + disable + `anonymized_at`); blocks sole project owner / last admin; app-owned (not anonymize-bundle runtime)
+- **CI coverage soft gate** (`033`): GitHub Actions **Coverage** job (PCOV) uploads Clover + HTML artifacts; local `make test-coverage`; optional `COVERAGE_MIN` statement-% soft threshold (unset = informational; never 100% by default)
+
 ## [0.15.0] - 2026-07-31
 
 ### Added

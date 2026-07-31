@@ -96,6 +96,93 @@ jobs:
       - name: PHPUnit
         run: vendor/bin/phpunit
 
+  # Informational coverage (PCOV). Soft gate only when COVERAGE_MIN is set (never 100% by default).
+  coverage:
+    name: Coverage (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.5"]
+    env:
+      # Leave empty until a baseline is agreed (specs/033-coverage-ci). Example: "40"
+      COVERAGE_MIN: ""
+
+    services:
+      mysql:
+        image: mysql:9.7
+        env:
+          MYSQL_DATABASE: app
+          MYSQL_USER: app
+          MYSQL_PASSWORD: "!ChangeMe!"
+          MYSQL_ROOT_PASSWORD: "!ChangeMeRoot!"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p!ChangeMeRoot!"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ctype, iconv, intl, pdo_mysql, zip
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Prepare environment
+        run: |
+          cp .env.dist .env
+          php -r '
+            $pdo = new PDO("mysql:host=127.0.0.1;port=3306", "root", "!ChangeMeRoot!");
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS app_test");
+            $pdo->exec("GRANT ALL ON app_test.* TO '\''app'\''@'\''%'\''");
+            echo "app_test ready\n";
+          '
+
+      - name: PHPUnit with coverage
+        run: |
+          mkdir -p var/coverage var/coverage-html
+          vendor/bin/phpunit \
+            --coverage-text \
+            --coverage-clover var/coverage/clover.xml \
+            --coverage-html var/coverage-html
+
+      - name: Soft coverage threshold
+        run: sh .scripts/check-coverage-threshold.sh var/coverage/clover.xml
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-coverage-${{ matrix.php }}
+          path: |
+            var/coverage/clover.xml
+            var/coverage-html
+          if-no-files-found: warn
+          retention-days: 14
+
   docker:
     name: Docker build
     runs-on: ubuntu-latest

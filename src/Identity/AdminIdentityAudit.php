@@ -25,6 +25,8 @@ final class AdminIdentityAudit
             UserActionType::UserRoleChanged,
             UserActionType::UserEnabled,
             UserActionType::UserDisabled,
+            UserActionType::AccountExported,
+            UserActionType::UserAnonymized,
             UserActionType::GroupMemberAdded,
             UserActionType::GroupMemberRemoved,
             UserActionType::ProjectMemberAdded,

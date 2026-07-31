@@ -51,7 +51,9 @@
                     </td>
                     <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ user.email }}</td>
                     <td class="px-2 py-3">
-                        {% if user.enabled %}
+                        {% if user.anonymized %}
+                            <span class="badge bg-[var(--color-ink)]/10 text-[var(--color-ink)]/70">{{ 'users.status.anonymized'|trans }}</span>
+                        {% elseif user.enabled %}
                             <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'users.status.enabled'|trans }}</span>
                         {% else %}
                             <span class="badge bg-[var(--color-alert)]/15 text-[var(--color-alert)]">{{ 'users.status.disabled'|trans }}</span>
@@ -124,8 +126,11 @@
                     <td class="px-2 py-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_users_activity', {id: user.uuid}) }}">{{ 'users.actions.activity'|trans }}</a>
+                            <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_users_export', {id: user.uuid}) }}">{{ 'users.actions.export'|trans }}</a>
                             {% if isSelf %}
                                 <span class="text-xs text-[var(--color-ink)]/45">{{ 'users.actions.self'|trans }}</span>
+                            {% elseif user.anonymized %}
+                                <span class="badge bg-[var(--color-ink)]/10 text-[var(--color-ink)]/70">{{ 'users.status.anonymized'|trans }}</span>
                             {% else %}
                                 <form method="post" action="{{ path('admin_users_toggle_enabled', {id: user.uuid}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('toggle_user_' ~ user.id) }}">
@@ -137,6 +142,33 @@
                                         {% endif %}
                                     </button>
                                 </form>
+                                <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="ANONYMIZE">
+                                    <button type="button" class="btn-danger btn-sm" data-action="confirm-dialog#open">{{ 'users.actions.anonymize'|trans }}</button>
+                                    <dialog class="confirm-dialog" data-confirm-dialog-target="dialog" aria-labelledby="admin-user-anonymize-{{ user.id }}">
+                                        <form method="post" action="{{ path('admin_users_anonymize', {id: user.uuid}) }}" class="confirm-dialog__panel">
+                                            <div class="confirm-dialog__header">
+                                                <h2 id="admin-user-anonymize-{{ user.id }}" class="confirm-dialog__title">{{ 'users.anonymize_confirm_title'|trans }}</h2>
+                                                <p class="confirm-dialog__body">{{ 'users.anonymize_confirm_body'|trans({'%email%': user.email}) }}</p>
+                                            </div>
+                                            <label class="confirm-dialog__label" for="admin-user-anonymize-input-{{ user.id }}">
+                                                {{ 'preferences.privacy.anonymize_type_label'|trans }}
+                                            </label>
+                                            <input
+                                                id="admin-user-anonymize-input-{{ user.id }}"
+                                                class="input w-full"
+                                                type="text"
+                                                autocomplete="off"
+                                                data-confirm-dialog-target="confirmInput"
+                                                required
+                                            >
+                                            <input type="hidden" name="_token" value="{{ csrf_token('admin_user_anonymize_' ~ user.id) }}">
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
+                                                <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'users.actions.anonymize'|trans }}</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </div>
                             {% endif %}
                         </div>
                     </td>

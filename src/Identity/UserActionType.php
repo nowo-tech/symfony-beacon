@@ -24,6 +24,12 @@ enum UserActionType: string
     /** Account disabled (UserKit); login is blocked. */
     case UserDisabled = 'user.disabled';
 
+    /** GDPR account data export downloaded. */
+    case AccountExported = 'user.account_exported';
+
+    /** GDPR anonymize / soft-delete completed. */
+    case UserAnonymized = 'user.anonymized';
+
     case GroupCreated = 'group.created';
     case GroupUpdated = 'group.updated';
     case GroupDeleted = 'group.deleted';

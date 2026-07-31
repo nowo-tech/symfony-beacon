@@ -148,6 +148,8 @@ flash:
         enabled: Cuenta de usuario activada.
         disabled: Cuenta de usuario desactivada.
         cannot_disable_self: No puedes desactivar tu propia cuenta.
+        cannot_anonymize_self: Use Account → Privacy to anonymize your own account.
+        anonymized: User account anonymized.
         created: Cuenta de usuario creada.
         role_updated: Rol de usuario actualizado.
         invalid_email: Introduce un email válido.
@@ -159,6 +161,12 @@ flash:
         last_admin: La instancia debe conservar al menos un administrador.
         project_unlink_forbidden: No tienes permiso para quitar esa membresía de proyecto.
         project_unlink_error: No se pudo quitar al usuario del proyecto.
+    privacy:
+        anonymized: Your account was anonymized. You have been signed out.
+        already_anonymized: That account is already anonymized.
+        sole_owner: Transfer sole project ownership (or add another owner) before anonymizing.
+        last_admin: Keep at least one instance administrator before anonymizing.
+        anonymize_failed: Account could not be anonymized.
     groups:
         created: Grupo creado.
         updated: Grupo actualizado.
@@ -751,6 +759,7 @@ users:
     status:
         enabled: Activo
         disabled: Desactivado
+        anonymized: Anonymized
     presence:
         online: En línea
         offline: Desconectado
@@ -770,6 +779,10 @@ users:
         edit_role: Editar rol
         self: Eres tú
         activity: Actividad
+        export: Export data
+        anonymize: Anonymize
+    anonymize_confirm_title: Anonymize user
+    anonymize_confirm_body: 'Scrub personal data for %email% and disable sign-in. Type ANONYMIZE to confirm.'
     projects_title: Membresías de proyecto
     projects_intro: Roles directos en proyectos de esta cuenta (no vía grupos). Los administradores de instancia pueden quitarlos aquí.
     projects_empty: Sin membresías directas en proyectos.
@@ -792,6 +805,8 @@ users:
             'user.role_changed': Rol de usuario cambiado
             'user.enabled': Usuario activado
             'user.disabled': Usuario desactivado
+            'user.account_exported': Account data exported
+            'user.anonymized': Account anonymized
             'group.created': Grupo creado
             'group.updated': Grupo actualizado
             'group.deleted': Grupo eliminado
@@ -857,6 +872,7 @@ preferences:
         profile: Perfil
         projects: Mis proyectos
         groups: Mis grupos
+        privacy: Privacidad
         security: Seguridad
         password: Cambiar contraseña
         password_history: Historial de cambios
@@ -886,6 +902,7 @@ preferences:
         update_password: Actualizar contraseña
         status_enabled: Activa
         status_disabled: Desactivada
+        status_anonymized: Anonymized
         role_admin: Administrador
         role_member: Miembro
         projects_title: Tus proyectos
@@ -894,6 +911,24 @@ preferences:
         groups_title: Tus grupos
         groups_intro: Grupos que pueden dar acceso a más proyectos.
         groups_empty: No perteneces a ningún grupo.
+    privacy:
+        title: Privacidad y datos
+        intro: Descarga una copia de los datos de tu cuenta o anonimiza esta cuenta.
+        export_title: Descargar mis datos
+        export_intro: Exporta tu perfil, membresías y actividad de seguridad en JSON. Nunca se incluyen hashes de contraseña ni datos de otros usuarios.
+        export_button: Descargar JSON
+        events_note: Los eventos e issues del proyecto permanecen en cada proyecto hasta la purga de retención — no forman parte de esta exportación de cuenta.
+        legal_link: Ver política de privacidad
+        anonymize_title: Anonimizar cuenta
+        anonymize_intro: Se borrarán tu email y nombre visible, se deshabilitará el acceso y se limpiarán las credenciales. No se puede deshacer desde la interfaz.
+        anonymize_open: Anonimizar mi cuenta
+        anonymize_confirm_title: Confirmar anonimización
+        anonymize_confirm_body: Tu acceso dejará de funcionar. Escribe ANONYMIZE para confirmar.
+        anonymize_type_label: 'Escribe ANONYMIZE para confirmar'
+        anonymize_confirm: Anonimizar permanentemente
+        already_anonymized: Esta cuenta ya está anonimizada.
+        blocked_last_admin: Eres el último administrador de la instancia. Añade otro admin antes de anonimizar.
+        blocked_sole_owner: 'Transfiere la propiedad del proyecto “%name%” (o añade otro propietario) antes de anonimizar.'
     security:
         title: Seguridad
         intro: Cambia la contraseña de tu cuenta.

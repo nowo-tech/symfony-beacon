@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.privacy.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.title'|trans }}</h1>
+        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_profile_tabs.html.twig' %}
+
+    <section class="panel space-y-4" data-testid="account-privacy-export" aria-labelledby="privacy-export-heading">
+        <div>
+            <h2 id="privacy-export-heading" class="text-lg font-semibold">{{ 'preferences.privacy.export_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.privacy.export_intro'|trans }}</p>
+        </div>
+        <p class="text-sm text-[var(--color-ink)]/70">{{ 'preferences.privacy.events_note'|trans }}</p>
+        <p class="text-sm">
+            <a class="no-underline" href="{{ path('legal_privacy') }}">{{ 'preferences.privacy.legal_link'|trans }}</a>
+        </p>
+        <a class="btn-primary no-underline" href="{{ path('account_privacy_export') }}" data-testid="account-privacy-export-btn">
+            {{ 'preferences.privacy.export_button'|trans }}
+        </a>
+    </section>
+
+    <section class="panel space-y-4" data-testid="account-privacy-anonymize" aria-labelledby="privacy-anonymize-heading">
+        <div>
+            <h2 id="privacy-anonymize-heading" class="text-lg font-semibold text-[var(--color-alert)]">{{ 'preferences.privacy.anonymize_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.privacy.anonymize_intro'|trans }}</p>
+        </div>
+
+        {% if profile_user.anonymized %}
+            <p class="text-sm text-[var(--color-ink)]/70" data-testid="privacy-already-anonymized">{{ 'preferences.privacy.already_anonymized'|trans }}</p>
+        {% elseif not can_anonymize %}
+            <ul class="list-disc space-y-1 pl-5 text-sm text-[var(--color-ink)]/75">
+                {% if is_last_admin %}
+                    <li>{{ 'preferences.privacy.blocked_last_admin'|trans }}</li>
+                {% endif %}
+                {% for project in sole_owner_projects %}
+                    <li>{{ 'preferences.privacy.blocked_sole_owner'|trans({'%name%': project.name}) }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="ANONYMIZE">
+                <button type="button" class="btn-danger" data-action="confirm-dialog#open" data-testid="account-privacy-anonymize-open">
+                    {{ 'preferences.privacy.anonymize_open'|trans }}
+                </button>
+                <dialog
+                    class="confirm-dialog"
+                    data-confirm-dialog-target="dialog"
+                    aria-labelledby="privacy-anonymize-confirm-title"
+                >
+                    <form method="post" action="{{ path('account_privacy_anonymize') }}" class="confirm-dialog__panel">
+                        <div class="confirm-dialog__header">
+                            <h2 id="privacy-anonymize-confirm-title" class="confirm-dialog__title">{{ 'preferences.privacy.anonymize_confirm_title'|trans }}</h2>
+                            <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
+                        </div>
+                        <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
+                            {{ 'preferences.privacy.anonymize_type_label'|trans }}
+                        </label>
+                        <input
+                            id="privacy-anonymize-confirm-input"
+                            class="input w-full"
+                            type="text"
+                            autocomplete="off"
+                            data-confirm-dialog-target="confirmInput"
+                            required
+                        >
+                        <input type="hidden" name="_token" value="{{ csrf_token('account_privacy_anonymize') }}">
+                        <div class="confirm-dialog__actions">
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
+                            <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled data-testid="account-privacy-anonymize-submit">
+                                {{ 'preferences.privacy.anonymize_confirm'|trans }}
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
