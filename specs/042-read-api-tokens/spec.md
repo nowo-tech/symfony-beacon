@@ -2,7 +2,7 @@
 
 **Feature Branch**: `042-read-api-tokens`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented  
 
 **Input**: Authenticated JSON read API for issues list/detail/export for automation (not public boards). Ship after hardening `045`–`048`. Prefer project tokens distinct from ingest secrets.
 
@@ -21,13 +21,13 @@ As an integrator, I list/get issues with a project read token.
 
 - **FR-001**: Project-scoped read tokens (create/revoke in Settings; hashed at rest).
 - **FR-002**: Endpoints for issues list/detail; export may reuse `017` auth model.
-- **FR-003**: No public unauthenticated boards; rate-limit documented.
+- **FR-003**: No public unauthenticated boards; rate-limit documented (reverse proxy; OpenAPI tag).
 - **FR-004**: Tokens must not equal ingest public/secret key material.
 
 ## Success Criteria
 
-- **SC-001**: OpenAPI/Nelmio documents read routes.
-- **SC-002**: Tests cover authz denials.
+- **SC-001**: OpenAPI/Nelmio documents read routes (`BeaconReadToken`).
+- **SC-002**: Tests cover authz denials (`ProjectReadApiFunctionalTest`).
 
 ## Out of scope
 

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Read API + project tokens** (`042`, Fixes #12): Bearer `brt_` tokens (hashed at rest) for `GET /api/projects/{uuid}/issues` and issue detail; create/revoke in Project Settings; OpenAPI `BeaconReadToken`; ingest keys rejected
 - **Issue mentions + assignee email** (`040`, Fixes #8): `@name` in comments notifies project members via encrypted instance Mailer; assign notifies the new assignee (skipped when Mailer is not deliverable)
 - **Similar issues** (`041`, Fixes #10): issue show suggests title-similar issues in the same project (cap 5) with mark-duplicate shortcut
 - **Share link max uses** (`061`, Fixes #2): optional `max_uses` / `use_count` on `project_share_link`; Settings UI defaults new links to **1** use (clear the field for unlimited until expiry)

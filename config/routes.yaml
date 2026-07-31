@@ -18,6 +18,12 @@ controllers_ingest:
         namespace: App\Ingest\Controller
     type: attribute
 
+controllers_read_api:
+    resource:
+        path: ../src/Api/Read/Controller/
+        namespace: App\Api\Read\Controller
+    type: attribute
+
 controllers_issues:
     resource:
         path: ../src/Issues/Controller/

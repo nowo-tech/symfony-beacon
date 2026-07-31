@@ -13,6 +13,9 @@ security:
     ingest:
       pattern: ^/api/\d+/envelope
       security: false
+    read_api:
+      pattern: ^/api/projects/
+      security: false
     main:
       lazy: true
       provider: app_user_provider
@@ -76,6 +79,8 @@ security:
     - path: ^/locale/
       roles: PUBLIC_ACCESS
     - path: ^/api/\d+/envelope
+      roles: PUBLIC_ACCESS
+    - path: ^/api/projects/
       roles: PUBLIC_ACCESS
     - path: ^/(manifest\.webmanifest|sw\.js|offline)$
       roles: PUBLIC_ACCESS

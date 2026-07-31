@@ -143,6 +143,7 @@ flash:
         saved: Social login provider saved.
         deleted: Social login provider removed.
         provider_exists: That provider already exists — edit the existing credential.
+        custom_urls_required: Custom providers require authorize, token, and userinfo URLs.
     preferences:
         saved: Preferences saved.
         profile_saved: Profile saved.
@@ -343,6 +344,21 @@ projects:
         expires_in_past: Expiry must be in the future.
         expires_too_far: Share links cannot last more than 30 days.
         issue_wrong_project: That issue does not belong to this project.
+    read_token:
+        title: Read API tokens
+        help: 'Create Bearer tokens (prefix brt_) for automation. Tokens are hashed at rest and distinct from ingest keys. Use Authorization: Bearer on /api/projects/{uuid}/issues.'
+        label: Label
+        label_placeholder: CI bot, export script…
+        create: Create token
+        revoke: Revoke
+        empty: No read API tokens yet.
+        active: Active
+        last_used: Last used
+        revoked_at: Revoked
+        created: Read token created — copy it now; it will not be shown again.
+        revoked: Read token revoked.
+        copy_once: Copy this token now. It will not be shown again.
+        invalid_csrf: Invalid security token.
 issues:
     viewer_readonly: You have read-only (viewer) access on this project.
     title: Issues
@@ -648,7 +664,9 @@ social_login_settings:
         active: Social login buttons are active on the login page.
         inactive: Social login is not showing buttons yet (enable the AuthKit profile mode and add at least one enabled provider below).
     redirect_hint: 'Register redirect URIs at each IdP as %uri%/login/social/{provider}/check (and /{locale}/… for non-default locales).'
+    create: Add provider
     empty: No OAuth providers configured yet.
+    enabled: On
     disabled: Off
     edit: Edit
     delete: Remove
@@ -659,6 +677,8 @@ social_login_settings:
     new_title: 'Add %provider%'
     edit_title: 'Edit %provider%'
     edit_intro: Client secrets are stored in the database. Leave the secret blank when editing to keep the current value.
+    endpoints_title: OAuth endpoints
+    endpoints_intro: Built-in Google / GitHub / Microsoft providers can leave these blank. Custom providers must set authorize, token, and userinfo URLs.
     submit: Save provider
     table:
         provider: Provider
@@ -683,6 +703,18 @@ social_login_credential:
     enabled:
         label: Enabled
         help: Disabled providers stay in the database but do not show on login.
+    authorize_url:
+        label: Authorize URL
+        help: Optional for built-in providers; required for custom IdPs.
+    token_url:
+        label: Token URL
+        help: Optional for built-in providers; required for custom IdPs.
+    userinfo_url:
+        label: Userinfo URL
+        help: Optional for built-in providers; required for custom IdPs.
+    scopes:
+        label: Scopes
+        help: Optional space- or comma-separated OAuth scopes.
 mercure_settings:
     title: Mercure
     intro: Optional live alerts for signed-in members when a new issue is created. Disabled by default — enable only when a Mercure hub is available. Web Push remains a separate Account → Display opt-in.
@@ -1479,7 +1511,7 @@ legal:
         controller_heading: Data controller
         controller_body: The operator of this Beacon instance is the data controller for accounts and telemetry stored on their deployment. Fill in legal name and contact details in the Legal notice page.
         data_heading: Data we process
-        data_body: Depending on how the operator configures and uses the instance, processing may include:
+        data_body: 'Depending on how the operator configures and uses the instance, processing may include:'
         data_account: Account data (email, display name, password hash, roles, preferences)
         data_telemetry: Application error and performance telemetry sent via project DSN / Envelope ingest
         data_logs: Operational logs and optional cookie consent logs
