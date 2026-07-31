@@ -80,6 +80,8 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         self::assertArrayHasKey('Retry-After', $ingest['responses']['429']['headers'] ?? []);
         self::assertStringContainsString('quota', strtolower((string) ($ingest['responses']['429']['description'] ?? '')));
 
+        self::assertArrayHasKey('/api/{projectId}/otlp/v1/logs', $json['paths']);
+        self::assertSame('ingestOtlpLogs', $json['paths']['/api/{projectId}/otlp/v1/logs']['post']['operationId'] ?? null);
         $schemes = $json['components']['securitySchemes'] ?? [];
         self::assertArrayHasKey('BeaconAuth', $schemes);
         self::assertArrayHasKey('BeaconReadToken', $schemes);

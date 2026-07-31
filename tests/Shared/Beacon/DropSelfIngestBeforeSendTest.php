@@ -33,6 +33,14 @@ final class DropSelfIngestBeforeSendTest extends TestCase
         self::assertNull($result);
     }
 
+    public function testDropsOtlpLogsPath(): void
+    {
+        $filter = new DropSelfIngestBeforeSend();
+        self::assertNull($filter([
+            'request' => ['url' => 'http://127.0.0.1/api/1/otlp/v1/logs'],
+        ]));
+    }
+
     public function testKeepsDashboardException(): void
     {
         $filter = new DropSelfIngestBeforeSend();

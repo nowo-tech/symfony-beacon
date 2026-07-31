@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **OTLP logs ingest** (`067-otlp-ingest`, Fixes #20): `POST /api/{projectId}/otlp/v1/logs` accepts OTLP ExportLogsServiceRequest JSON; WARN+ LogRecords map to Beacon events via the Envelope worker; same `X-Beacon-Auth` / rate / quota / size limits; query auth rejected; dogfood `before_send` also drops `/otlp/` paths.
+
 ## [0.17.0] - 2026-07-31
 
 ### Added
