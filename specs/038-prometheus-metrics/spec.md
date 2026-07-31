@@ -2,7 +2,7 @@
 
 **Feature Branch**: `038-prometheus-metrics`
 **Created**: 2026-07-31
-**Status**: Implemented (Unreleased)
+**Status**: Implemented (v0.14.0)
 
 **Input**: Expose a Prometheus scrape endpoint (`/metrics` or `/health/metrics`) for ingest ACK rate, Messenger depth, and notification failures. Endpoint MUST be auth-gated or network-restricted for self-host.
 

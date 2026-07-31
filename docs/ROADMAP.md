@@ -203,7 +203,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.6a | **CSP / HSTS**: drop `script-src 'unsafe-inline'`; HSTS by default (except localhost); kit-admin / swagger-ui-boot Vite entries | Beacon | extends `053` | **Done** (v0.15.0) |
 | 6.6b | Appearance palette (warn / paper / ink / surface light+dark) + Tours form / preferences sidebar current fixes | Beacon | — | **Done** (v0.15.0) |
 
-### Done (v0.16.0 Unreleased — coverage + GDPR + collaboration)
+### Done (v0.16.0 — coverage + GDPR + collaboration)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|

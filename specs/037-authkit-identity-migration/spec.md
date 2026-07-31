@@ -14,7 +14,7 @@
 - Magic login + social OAuth (`026`, `060`) with mailer gating where required (`034`).
 - Account tabs: Profile | Projects | Groups; Security | History; Display | Panels | Tours | Notifications.
 - Password change + password history; content-width preference; profile overview (roles, UUID, memberships).
-- Password reset OTP path (`delivery: both`) Unreleased.
+- Password reset OTP path (`delivery: both`) shipped with AuthKit polish.
 
 ## User Scenarios & Testing *(mandatory)*
 
