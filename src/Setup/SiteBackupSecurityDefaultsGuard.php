@@ -13,15 +13,18 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Fail closed in production when SiteBackup still uses documented local defaults
+ * Fail closed outside local `dev`/`test` when SiteBackup still uses documented local defaults
  * (panel password hash / setup token from `.env.dist`).
+ *
+ * Applies to `prod`, `staging`, and any other non-local environment name so misnamed
+ * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked.
  */
 final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 {
     /** bcrypt hash for local password "beacon-local-panel" shipped in `.env.dist`. */
     public const string LOCAL_DEV_PANEL_PASSWORD_HASH = '$2y$12$h4X4XEsjEForb/3ZYVEXkuKT6B5GHlsAVx6EwJBBpJ15WnkrptgtW';
 
-    /** Documented local setup token from `.env.dist` — must be rotated in production. */
+    /** Documented local setup token from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_SETUP_TOKEN = 'beacon-local-setup';
 
     private static bool $checked = false;
@@ -58,18 +61,18 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
     }
 
     /**
-     * @throws RuntimeException when production still uses empty or documented local SiteBackup secrets
+     * @throws RuntimeException when a non-local environment still uses empty or documented local SiteBackup secrets
      */
     public function assertProductionSecretsSafe(): void
     {
-        if ('prod' !== $this->environment || self::$checked) {
+        if ($this->isLocalDevelopmentEnvironment() || self::$checked) {
             return;
         }
         self::$checked = true;
 
         $token = trim((string) $this->setupToken);
         if ('' === $token) {
-            throw new RuntimeException('SITE_SETUP_TOKEN must be set in production so /setup is not anonymously writable. Generate a random secret and open /setup?token=… (see docs/PRODUCTION.md).');
+            throw new RuntimeException('SITE_SETUP_TOKEN must be set outside local development (dev/test) so /setup is not anonymously writable. Generate a random secret and open /setup?token=… (see docs/PRODUCTION.md).');
         }
         if (hash_equals(self::LOCAL_DEV_SETUP_TOKEN, $token)) {
             throw new RuntimeException('SITE_SETUP_TOKEN is still the documented local default (beacon-local-setup). Set a unique secret before exposing this instance (docs/PRODUCTION.md).');
@@ -77,11 +80,16 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 
         $hash = trim((string) $this->panelPasswordHash);
         if ('' === $hash) {
-            throw new RuntimeException('SITE_BACKUP_PASSWORD_HASH must be set in production for /_site_backup. Generate with: bin/console nowo:site-backup:hash-password');
+            throw new RuntimeException('SITE_BACKUP_PASSWORD_HASH must be set outside local development (dev/test) for /_site_backup. Generate with: bin/console nowo:site-backup:hash-password');
         }
         if (hash_equals(self::LOCAL_DEV_PANEL_PASSWORD_HASH, $hash)) {
             throw new RuntimeException('SITE_BACKUP_PASSWORD_HASH is still the documented local default (password "beacon-local-panel"). Generate a new hash with: bin/console nowo:site-backup:hash-password');
         }
+    }
+
+    private function isLocalDevelopmentEnvironment(): bool
+    {
+        return \in_array($this->environment, ['dev', 'test'], true);
     }
 
     /**

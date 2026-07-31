@@ -33,6 +33,7 @@ You should receive an acknowledgement within a few business days. We will work w
 
 - This repository is the **self-hosted Beacon server**. The separate Symfony client is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle).
 - Misconfiguration of operator secrets (`.env`, Halite keys under `var/secrets/`, API keys) is an operational risk; see [PRODUCTION.md](docs/PRODUCTION.md) and [LEGAL-AND-COOKIES.md](docs/LEGAL-AND-COOKIES.md).
+- **SiteBackup** `/setup` and `/_site_backup` are Symfony-public surfaces gated by `SITE_SETUP_TOKEN` / panel password. Outside `dev`/`test`, empty or documented-local secrets fail closed (`SiteBackupSecurityDefaultsGuard`, `062`).
 - CI runs **Gitleaks** on every push/PR (`.github/workflows/ci.yml` job **Secret scan**; local: `make secrets-scan`). Config: [`.gitleaks.toml`](.gitleaks.toml). Finding a secret fails the workflow — rotate the credential and purge it from git history before merging.
 - Feature requests and non-security bugs belong in [GitHub Issues](https://github.com/nowo-tech/symfony-beacon/issues) using the templates.
 
