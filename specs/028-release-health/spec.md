@@ -2,7 +2,7 @@
 
 **Feature Branch**: `028-release-health`  
 **Created**: 2026-07-21  
-**Status**: Implemented  
+**Status**: Implemented (breadcrumb seed — 2026-07-31)  
 
 **Input**: A project panel that shows release health using existing denormalized release fields (`014-releases`): new issues per release, comparison across releases/environments, without requiring operators to reconstruct it from the issue list alone.
 
@@ -37,11 +37,13 @@ As a project member, I compare issue sets between two releases or reuse environm
 - **FR-002**: Show “new in release” counts derived from `firstRelease` (and link to `?release=` filtered issues).
 - **FR-003**: List distinct releases available for the project (from issues and/or events).
 - **FR-004**: Members can view; mutate not required.
+- **FR-005**: Platform breadcrumb seed MUST include route `project_releases` under the project crumb (same `{id}` param pattern as Analytics / Issues), so `/projects/{uuid}/releases` shows Projects → Project → Releases after `app:seed-platform`.
 
 ## Success Criteria
 
 - **SC-001**: Seeded releases show correct new-issue counts in functional tests.
 - **SC-002**: Deep link from Release health to filtered issues preserves query semantics from `014`.
+- **SC-003**: Functional tests assert the Release health page renders the breadcrumb wrap with Projects and Releases labels.
 
 ## Assumptions
 

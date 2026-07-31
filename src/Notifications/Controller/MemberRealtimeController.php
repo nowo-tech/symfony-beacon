@@ -164,7 +164,7 @@ final class MemberRealtimeController extends AbstractController
 
         $endpoint = $payload['endpoint'] ?? null;
         if (\is_string($endpoint) && '' !== $endpoint) {
-            $this->subscriptionRepository->deleteByEndpointHash(hash('sha256', $endpoint));
+            $this->subscriptionRepository->deleteByEndpointHashForUser(hash('sha256', $endpoint), $user);
         } else {
             foreach ($this->subscriptionRepository->findByUser($user) as $row) {
                 $this->entityManager->remove($row);

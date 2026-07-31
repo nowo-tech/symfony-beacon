@@ -29,6 +29,15 @@ final class MetricsEndpointTest extends DatabaseWebTestCase
         self::assertStringContainsString('text/plain', (string) $client->getResponse()->headers->get('Content-Type'));
     }
 
+    public function testQueryTokenIsRejected(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/metrics', [
+            'token' => 'phpunit-metrics-token',
+        ]);
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testAdminSessionAllowsScrape(): void
     {
         [$client, $user] = $this->bootWithDemoProject('metrics-admin@example.com');
@@ -39,5 +48,20 @@ final class MetricsEndpointTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/metrics');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('beacon_ingest_reject_total', (string) $client->getResponse()->getContent());
+    }
+
+    public function testRequireTokenWithEmptyTokenReturnsServiceUnavailable(): void
+    {
+        self::createClient();
+        $container = self::getContainer();
+        $controller = new \App\Shared\Metrics\MetricsController(
+            $container->get(\App\Shared\Metrics\MetricsCollector::class),
+            $container->get(\App\Shared\Metrics\PrometheusTextFormatter::class),
+            '',
+            true,
+        );
+        $response = $controller(Request::create('/metrics'));
+        self::assertSame(503, $response->getStatusCode());
+        self::assertStringContainsString('not configured', (string) $response->getContent());
     }
 }

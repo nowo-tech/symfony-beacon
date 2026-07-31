@@ -54,7 +54,12 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         self::assertSelectorExists('#swagger-ui');
         self::assertSelectorNotExists('a#logo');
         self::assertSelectorTextContains('.api-docs__title', 'API docs');
-        self::assertStringContainsString('swagger', strtolower($client->getResponse()->getContent() ?: ''));
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('swagger', strtolower($html));
+        // CSP allows only 'self'; assets must not load from jsDelivr CDN.
+        self::assertStringNotContainsString('cdn.jsdelivr.net', $html);
+        self::assertStringContainsString('/bundles/nelmioapidoc/swagger-ui/swagger-ui.css', $html);
+        self::assertStringContainsString('/bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js', $html);
 
         $client->request(Request::METHOD_GET, '/api/doc.json');
         self::assertResponseIsSuccessful();

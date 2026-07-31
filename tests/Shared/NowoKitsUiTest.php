@@ -8,6 +8,7 @@ use App\Issues\Entity\Issue;
 use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use DateTimeImmutable;
+use Nowo\CookieConsentBundle\Entity\CookieConsentConfig;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -34,7 +35,6 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.app-sidebar__label', 'Dashboard');
         self::assertSelectorTextContains('.beacon-nav', 'Projects');
         self::assertSelectorNotExists('.beacon-nav a[href="/projects/new"]');
-        self::assertSelectorTextContains('.beacon-nav', 'API docs');
         self::assertSelectorExists('button[data-action="confirm-dialog#open"]');
         self::assertSelectorExists('dialog.confirm-dialog');
         self::assertSelectorExists('.user-avatar');
@@ -147,6 +147,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorExists('#administration-menu-navigation');
         self::assertSelectorTextContains('.app-sidebar__label', 'Administration');
         self::assertSelectorTextContains('.beacon-nav', 'Users');
+        self::assertSelectorTextContains('.beacon-nav', 'API docs');
         self::assertSelectorTextContains('.beacon-nav', 'Appearance');
         self::assertSelectorTextContains('.beacon-nav', 'Menus');
         self::assertSelectorTextContains('.beacon-nav', 'Breadcrumbs');
@@ -220,5 +221,79 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Menus');
         self::assertSelectorExists('.kit-admin');
         self::assertSelectorNotExists('.btn-outline-info');
+    }
+
+    public function testProductAndKitCrudBreadcrumbGapsAreSeeded(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('bc-gaps@example.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        self::getContainer()->get('doctrine')->getManager()->flush();
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+        $this->login($client, $user);
+
+        $client->request(Request::METHOD_GET, '/admin/users/new');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Administration');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Users');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New user');
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Settings');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New threshold rule');
+
+        // Menu create/edit forms are kit modal partials (no app shell); seed still registers the routes.
+        $seededRoutes = self::getContainer()->get('doctrine')->getConnection()->fetchFirstColumn(
+            'SELECT route_name FROM dashboard_breadcrumb_item ORDER BY route_name ASC',
+        );
+        foreach ([
+            'admin_users_activity',
+            'project_notification_edit',
+            'project_threshold_rule_edit',
+            'nowo_dashboard_menu_dashboard_menu_new',
+            'nowo_dashboard_menu_dashboard_menu_edit',
+            'nowo_dashboard_menu_dashboard_item_new',
+            'nowo_dashboard_menu_dashboard_item_edit',
+            'nowo_dashboard_menu_dashboard_menu_copy',
+            'nowo_dashboard_menu_dashboard_import',
+            'nowo_breadcrumb_kit_dashboard_index',
+            'nowo_breadcrumb_kit_dashboard_collections_new',
+            'nowo_breadcrumb_kit_dashboard_collections_edit',
+            'nowo_breadcrumb_kit_dashboard_items_new',
+            'nowo_breadcrumb_kit_dashboard_items_edit',
+            'nowo_breadcrumb_kit_dashboard_import',
+            'nowo_cookie_consent_config_settings_edit',
+            'nowo_cookie_consent_cookie_definitions_index',
+            'nowo_cookie_consent_cookie_definitions_new',
+            'nowo_cookie_consent_cookie_definitions_edit',
+        ] as $routeName) {
+            self::assertContains($routeName, $seededRoutes);
+        }
+
+        $client->request(Request::METHOD_GET, '/admin/menus/import');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Menus');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Import');
+
+        $client->request(Request::METHOD_GET, '/breadcrumb-kit-admin/collections/new');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Breadcrumbs');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New collection');
+
+        $config = self::getContainer()->get('doctrine')->getRepository(CookieConsentConfig::class)->findOneBy([]);
+        self::assertNotNull($config);
+        $configId = $config->getId();
+        self::assertNotNull($configId);
+
+        $client->request(Request::METHOD_GET, '/cookie-consent-config/'.$configId.'/settings');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Administration');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Cookie consent');
+        self::assertSelectorExists('#administration-menu-navigation');
     }
 }

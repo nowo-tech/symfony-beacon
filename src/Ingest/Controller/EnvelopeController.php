@@ -64,7 +64,7 @@ Accepts an Envelope body (newline-separated JSON header, item header, and payloa
 **Auth (preferred first):**
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
-- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When `BEACON_INGEST_REJECT_QUERY_AUTH=1` (prod default), query auth is refused with **401**.
+- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When `BEACON_INGEST_REJECT_QUERY_AUTH=1` (default), query auth is refused with **401**.
 
 The public key is an opaque identifier and MUST belong to `{projectId}`. Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [

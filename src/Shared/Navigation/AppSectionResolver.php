@@ -17,6 +17,7 @@ final readonly class AppSectionResolver
         'settings_',
         'nowo_dashboard_menu_',
         'nowo_breadcrumb_kit_',
+        'nowo_cookie_consent_',
     ];
 
     /** @var list<string> */

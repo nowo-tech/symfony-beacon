@@ -112,6 +112,36 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'project_notification_edit',
+            'Edit notification',
+            ['en' => 'Edit notification', 'es' => 'Editar notificación', 'de' => 'Benachrichtigung bearbeiten', 'nl' => 'Melding bewerken', 'fr' => 'Modifier la notification', 'it' => 'Modifica notifica', 'pt' => 'Editar notificação'],
+            $settings,
+            ['projectId', 'id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_threshold_rule_new',
+            'New threshold rule',
+            ['en' => 'New threshold rule', 'es' => 'Nueva regla de umbral', 'de' => 'Neue Schwellwertregel', 'nl' => 'Nieuwe drempelregel', 'fr' => 'Nouvelle règle de seuil', 'it' => 'Nuova regola di soglia', 'pt' => 'Nova regra de limiar'],
+            $settings,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_threshold_rule_edit',
+            'Edit threshold rule',
+            ['en' => 'Edit threshold rule', 'es' => 'Editar regla de umbral', 'de' => 'Schwellwertregel bearbeiten', 'nl' => 'Drempelregel bewerken', 'fr' => 'Modifier la règle de seuil', 'it' => 'Modifica regola di soglia', 'pt' => 'Editar regra de limiar'],
+            $settings,
+            ['projectId', 'id'],
+            $changed,
+        );
+
         $issues = $this->ensureItem(
             $collection,
             'issue_index',
@@ -147,6 +177,16 @@ final readonly class BreadcrumbDemoSeeder
             'analytics_show',
             'Analytics',
             ['en' => 'Analytics', 'es' => 'Analítica', 'de' => 'Analysen', 'nl' => 'Analytics', 'fr' => 'Analytique', 'it' => 'Analisi', 'pt' => 'Análises'],
+            $project,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_releases',
+            'Releases',
+            ['en' => 'Releases', 'es' => 'Releases', 'de' => 'Releases', 'nl' => 'Releases', 'fr' => 'Releases', 'it' => 'Release', 'pt' => 'Releases'],
             $project,
             ['id'],
             $changed,
@@ -192,13 +232,33 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
-        $this->ensureItem(
+        $users = $this->ensureItem(
             $collection,
             'admin_users',
             'Users',
             ['en' => 'Users', 'es' => 'Usuarios', 'de' => 'Benutzer', 'nl' => 'Gebruikers', 'fr' => 'Utilisateurs', 'it' => 'Utenti', 'pt' => 'Utilizadores'],
             $admin,
             [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_users_new',
+            'New user',
+            ['en' => 'New user', 'es' => 'Nuevo usuario', 'de' => 'Neuer Benutzer', 'nl' => 'Nieuwe gebruiker', 'fr' => 'Nouvel utilisateur', 'it' => 'Nuovo utente', 'pt' => 'Novo utilizador'],
+            $users,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_users_activity',
+            'Activity',
+            ['en' => 'Activity', 'es' => 'Actividad', 'de' => 'Aktivität', 'nl' => 'Activiteit', 'fr' => 'Activité', 'it' => 'Attività', 'pt' => 'Atividade'],
+            $users,
+            ['id'],
             $changed,
         );
 
@@ -342,6 +402,66 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_menu_new',
+            'New menu',
+            ['en' => 'New menu', 'es' => 'Nuevo menú', 'de' => 'Neues Menü', 'nl' => 'Nieuw menu', 'fr' => 'Nouveau menu', 'it' => 'Nuovo menu', 'pt' => 'Novo menu'],
+            $menus,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_menu_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar', 'de' => 'Bearbeiten', 'nl' => 'Bewerken', 'fr' => 'Modifier', 'it' => 'Modifica', 'pt' => 'Editar'],
+            $menuShow,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_menu_copy',
+            'Copy',
+            ['en' => 'Copy', 'es' => 'Copiar', 'de' => 'Kopieren', 'nl' => 'Kopiëren', 'fr' => 'Copier', 'it' => 'Copia', 'pt' => 'Copiar'],
+            $menuShow,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_item_new',
+            'New item',
+            ['en' => 'New item', 'es' => 'Nuevo ítem', 'de' => 'Neuer Eintrag', 'nl' => 'Nieuw item', 'fr' => 'Nouvel élément', 'it' => 'Nuovo elemento', 'pt' => 'Novo item'],
+            $menuShow,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_item_edit',
+            'Edit item',
+            ['en' => 'Edit item', 'es' => 'Editar ítem', 'de' => 'Eintrag bearbeiten', 'nl' => 'Item bewerken', 'fr' => 'Modifier l’élément', 'it' => 'Modifica elemento', 'pt' => 'Editar item'],
+            $menuShow,
+            ['id', 'itemId'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_dashboard_menu_dashboard_import',
+            'Import',
+            ['en' => 'Import', 'es' => 'Importar', 'de' => 'Importieren', 'nl' => 'Importeren', 'fr' => 'Importer', 'it' => 'Importa', 'pt' => 'Importar'],
+            $menus,
+            [],
+            $changed,
+        );
+
         $breadcrumbs = $this->ensureItem(
             $collection,
             'nowo_breadcrumb_kit_dashboard_collections_index',
@@ -354,11 +474,111 @@ final readonly class BreadcrumbDemoSeeder
 
         $this->ensureItem(
             $collection,
+            'nowo_breadcrumb_kit_dashboard_index',
+            'Breadcrumbs',
+            ['en' => 'Breadcrumbs', 'es' => 'Migas', 'de' => 'Brotkrumen', 'nl' => 'Broodkruimels', 'fr' => 'Fil d’Ariane', 'it' => 'Breadcrumb', 'pt' => 'Navegação'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_breadcrumb_kit_dashboard_collections_new',
+            'New collection',
+            ['en' => 'New collection', 'es' => 'Nueva colección', 'de' => 'Neue Sammlung', 'nl' => 'Nieuwe collectie', 'fr' => 'Nouvelle collection', 'it' => 'Nuova collezione', 'pt' => 'Nova coleção'],
+            $breadcrumbs,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_breadcrumb_kit_dashboard_collections_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar', 'de' => 'Bearbeiten', 'nl' => 'Bewerken', 'fr' => 'Modifier', 'it' => 'Modifica', 'pt' => 'Editar'],
+            $breadcrumbs,
+            ['id'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_breadcrumb_kit_dashboard_import',
+            'Import',
+            ['en' => 'Import', 'es' => 'Importar', 'de' => 'Importieren', 'nl' => 'Importeren', 'fr' => 'Importer', 'it' => 'Importa', 'pt' => 'Importar'],
+            $breadcrumbs,
+            [],
+            $changed,
+        );
+
+        $breadcrumbItems = $this->ensureItem(
+            $collection,
             'nowo_breadcrumb_kit_dashboard_items_index',
             'Items',
             ['en' => 'Items', 'es' => 'Ítems', 'de' => 'Einträge', 'nl' => 'Items', 'fr' => 'Éléments', 'it' => 'Elementi', 'pt' => 'Itens'],
             $breadcrumbs,
             ['collectionId'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_breadcrumb_kit_dashboard_items_new',
+            'New item',
+            ['en' => 'New item', 'es' => 'Nuevo ítem', 'de' => 'Neuer Eintrag', 'nl' => 'Nieuw item', 'fr' => 'Nouvel élément', 'it' => 'Nuovo elemento', 'pt' => 'Novo item'],
+            $breadcrumbItems,
+            ['collectionId'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_breadcrumb_kit_dashboard_items_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar', 'de' => 'Bearbeiten', 'nl' => 'Bewerken', 'fr' => 'Modifier', 'it' => 'Modifica', 'pt' => 'Editar'],
+            $breadcrumbItems,
+            ['collectionId', 'id'],
+            $changed,
+        );
+
+        $cookieConsent = $this->ensureItem(
+            $collection,
+            'nowo_cookie_consent_config_settings_edit',
+            'Cookie consent',
+            ['en' => 'Cookie consent', 'es' => 'Consentimiento de cookies', 'de' => 'Cookie-Einwilligung', 'nl' => 'Cookie-toestemming', 'fr' => 'Consentement cookies', 'it' => 'Consenso cookie', 'pt' => 'Consentimento de cookies'],
+            $admin,
+            ['configId'],
+            $changed,
+        );
+
+        $cookieDefinitions = $this->ensureItem(
+            $collection,
+            'nowo_cookie_consent_cookie_definitions_index',
+            'Cookie definitions',
+            ['en' => 'Cookie definitions', 'es' => 'Definiciones de cookies', 'de' => 'Cookie-Definitionen', 'nl' => 'Cookie-definities', 'fr' => 'Définitions de cookies', 'it' => 'Definizioni cookie', 'pt' => 'Definições de cookies'],
+            $cookieConsent,
+            ['configId'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_cookie_consent_cookie_definitions_new',
+            'New definition',
+            ['en' => 'New definition', 'es' => 'Nueva definición', 'de' => 'Neue Definition', 'nl' => 'Nieuwe definitie', 'fr' => 'Nouvelle définition', 'it' => 'Nuova definizione', 'pt' => 'Nova definição'],
+            $cookieDefinitions,
+            ['configId'],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_cookie_consent_cookie_definitions_edit',
+            'Edit',
+            ['en' => 'Edit', 'es' => 'Editar', 'de' => 'Bearbeiten', 'nl' => 'Bewerken', 'fr' => 'Modifier', 'it' => 'Modifica', 'pt' => 'Editar'],
+            $cookieDefinitions,
+            ['configId', 'id'],
             $changed,
         );
 

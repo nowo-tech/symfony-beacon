@@ -188,18 +188,13 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-app-shell][data-contrast="more"]');
         self::assertSelectorExists('[data-app-shell][data-sidebar-default="collapsed"]');
         $html = $client->getResponse()->getContent() ?: '';
-        self::assertStringContainsString('__BEACON_USER_THEME__', $html);
-        self::assertStringContainsString('dark', $html);
-        self::assertStringContainsString('__BEACON_USER_DENSITY__', $html);
-        self::assertStringContainsString('compact', $html);
-        self::assertStringContainsString('__BEACON_USER_MOTION__', $html);
-        self::assertStringContainsString('reduce', $html);
-        self::assertStringContainsString('__BEACON_USER_FONT_SCALE__', $html);
-        self::assertStringContainsString('"lg"', $html);
-        self::assertStringContainsString('__BEACON_USER_CONTRAST__', $html);
-        self::assertStringContainsString('"more"', $html);
-        self::assertStringContainsString('__BEACON_USER_SIDEBAR__', $html);
-        self::assertStringContainsString('"collapsed"', $html);
+        self::assertStringContainsString('data-user-theme="dark"', $html);
+        self::assertStringContainsString('data-user-density="compact"', $html);
+        self::assertStringContainsString('data-user-motion="reduce"', $html);
+        self::assertStringContainsString('data-user-font-scale="lg"', $html);
+        self::assertStringContainsString('data-user-contrast="more"', $html);
+        self::assertStringContainsString('data-user-sidebar="collapsed"', $html);
+        self::assertStringContainsString('theme-boot', $html);
 
         $crawler = $client->request(Request::METHOD_GET, '/account/display/panels');
         self::assertResponseIsSuccessful();
@@ -210,9 +205,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/account/display/panels');
         $client->followRedirect();
         $html = $client->getResponse()->getContent() ?: '';
-        self::assertStringContainsString('__BEACON_ISSUE_PANEL_DEFAULTS__', $html);
-        self::assertStringContainsString('"raw"', $html);
-        self::assertStringContainsString('"tags"', $html);
+        self::assertStringContainsString('data-issue-panel-defaults=', $html);
+        self::assertMatchesRegularExpression('/data-issue-panel-defaults="[^"]*raw[^"]*tags[^"]*"/', $html);
         self::assertStringContainsString('nowo-tag-input', $html);
         self::assertStringContainsString('bundles/nowotaginput/tag-input.js', $html);
 

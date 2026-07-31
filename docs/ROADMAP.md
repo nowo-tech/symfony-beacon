@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: make multi-project self-hosting easier to run, close remaining Identity/kit debt, and deepen issue collaboration — without SaaS multi-tenant or SSO until specified.
+Focus: ship Unreleased ops/security as **v0.14.0**, then harden notification delivery (`039`) and CI coverage (`033`) before collaboration/read-API features. Defer mentions / similar issues / read API until ops metrics + circuit breaker + coverage are stable. GDPR account export/anonymize (`043`) follows coverage. No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -158,15 +158,18 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Medium | Expand **PRODUCTION.md**: trusted proxies, encrypt key, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0`, health binding, HSTS/CSP | `048` / docs | **Done** (encrypt key; headers baseline v0.13.0) |
 | Low | Security **headers** in Caddy (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`) | `053-security-headers` | **Done** (v0.13.0; HSTS via extra directives) |
 | Low | Restrict **Nelmio `/api/doc`** to `ROLE_ADMIN` | `054-api-doc-admin-only` | **Done** (v0.13.0) |
-| Low | Generic client errors on Envelope parse (detail → logs only) | `051` / ingest | **Planned** |
-| Low | Prefer POST-only magic-login consume + `Referrer-Policy` (reduce GET token leakage) | extends AuthKit / `026` | **Done** (v0.13.0) |
+| Low | Generic client errors on Envelope parse (detail → logs only) | `051` / ingest | **Done** (HTTP already returns `invalid envelope`) |
+| Low | Prefer POST-only magic-login consume + `Referrer-Policy` (reduce GET token leakage) | extends AuthKit / `026` | **Done** (v0.13.0; confirm click hardened in v0.14.0) |
 | Low | Cookie-consent POST CSRF (double-submit header; kit ≥ 1.4.8) | kit config | **Done** |
 | Med | SiteBackup local defaults on public `/setup` + `/_site_backup` | `SITE_SETUP_TOKEN` + guard | **Done** |
+| Med | Guest locale open redirect (`/\\…`) vs `SafeInternalRedirect` | guest locale | **Done** (v0.14.0) |
+| Med | `/metrics` query `?token=` leakage | extends `038` | **Done** (v0.14.0; Bearer only) |
+| Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** High/Medium security Done through DNS pin + query-auth reject + headers/`api/doc`. Remaining product: Planned 6.5+ (`038`–`044`, `033`).
+**Suggested patch order:** Security High/Medium Done through **v0.14.0**. **Next**: `039` → `033` → `043`. Defer `040` / `041` / `042` until those land. `044` + Bundle console/Monolog remain Planned.
 
-### Next (immediate queue — product)
+### Done (v0.13.0 product — was Next)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -185,20 +188,31 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.4i | **Mailer-gated AuthKit magic/reset UI** (encrypted deliverable DSN required) | Beacon | extends `034` / `026` | **Done** |
 | 6.4j | **AI issue export** (`beacon-ai-export/v1` Markdown/JSON; scrubbed headers) | Beacon | `059-ai-issue-export` | **Done** |
 
-### Planned
+### Done (v0.14.0)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.5 | **Prometheus metrics** scrape (`/metrics` or `/health/metrics`): ingest ACK rate, Messenger depth, notification failures — **auth or network-restrict** this endpoint | Beacon | `038-prometheus-metrics` | **Done** (Unreleased) |
-| 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Planned** |
-| 6.7 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Planned** |
-| 6.8 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Planned** |
-| 6.9 | **Read API + project tokens**: authenticated JSON for issues list/detail/export (automation; not public boards) — ship **after** `045`–`048` | Beacon | `042-read-api-tokens` | **Planned** |
-| 6.10 | **GDPR helpers**: account data export + soft-delete / anonymize path (prefer `nowo-tech` anonymize kit if available) | Beacon | `043-gdpr-user-export` | **Planned** |
-| 6.11 | **CI coverage soft gate** (promote `033`) | Beacon | `033-coverage-ci` | **Planned** |
-| 6.12 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Planned** |
-| 6.13 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
-| 6.14 | **Instance settings export/import** (appearance, mailer metadata flags, non-secret config JSON) for backup drills | Beacon | `044-instance-config-export` | **Planned** |
+| 6.5 | **Prometheus metrics** scrape (`GET /metrics`): ingest ACK/reject, Messenger depth, failed destinations — `ROLE_ADMIN` or Bearer `BEACON_METRICS_TOKEN` (prod requires token) | Beacon | `038-prometheus-metrics` | **Done** (v0.14.0) |
+| 6.5a | Security residual: reject query ingest auth by default; guest locale `SafeInternalRedirect`; metrics Bearer-only; Web Push unsubscribe scoped to owner; magic-login Continue click; Telegram DNS pin; CSP/`theme-boot` | Beacon | extends `038` / hardening | **Done** (v0.14.0) |
+
+### Next (immediate queue after v0.14.0)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Next** |
+| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Next** (after `039`) |
+| 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Next** (after `033`) |
+
+### Planned (deferred until Next ops/coverage/GDPR land)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Planned** (deferred) |
+| 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Planned** (deferred) |
+| 6.11 | **Read API + project tokens**: authenticated JSON for issues list/detail/export (automation; not public boards) — after hardening + coverage baseline | Beacon | `042-read-api-tokens` | **Planned** (deferred) |
+| 6.12 | **Instance settings export/import** (appearance, mailer metadata flags, non-secret config JSON) for backup drills | Beacon | `044-instance-config-export` | **Planned** |
+| 6.13 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Planned** |
+| 6.14 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
 
 ### Later (Phase 6+)
 
@@ -253,8 +267,11 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.12.6** | Mercure live alerts + PWA Web Push; encrypted Mailer From / Mercure URLs; sample seed Mercure defaults; tour Select all |
 | **v0.12.7** | Public setup bootstrap (min / bulk); cookie consent platform seed + professional copy; DATABASE.md ER docs; Compose MySQL bind mount; fresh-install migration hardening |
 | **v0.12.8** | Dual AuthKit/setup public URLs (bare `DEFAULT_LOCALE`); empty-catalog setup redirect; AuthKit password reset/magic; catalogue parity for all enabled locales; PHP 512M cache:clear |
-| **v0.13.0** | Phase 6 Next product: ops overview (`035`), identity audit (`036`), AuthKit identity polish (`037`), monthly quota (`032`); SiteBackup setup, dogfood (`058`), AI export (`059`), social login (`060`); security residual (DNS pin, query-auth reject, Web Push allowlist, POST magic login, Caddy headers, `/api/doc` admin-only) |
-| **v0.14.0+** | Phase 6 Planned: Prometheus (`038`, network-restricted), notification circuit breaker (`039`), mentions (`040`), similar issues (`041`), read API (`042`), GDPR helpers (`043`), coverage soft gate (`033`), Bundle console/Monolog; SSO/OIDC when specified |
+| **v0.13.0** | Phase 6 product: ops overview (`035`), identity audit (`036`), AuthKit identity polish (`037`), monthly quota (`032`); SiteBackup setup, dogfood (`058`), AI export (`059`), social login (`060`); security residual (DNS pin, query-auth reject, Web Push allowlist, POST magic login, Caddy headers, `/api/doc` admin-only) |
+| **v0.14.0** | Prometheus (`038`) + security residual (Bearer-only metrics, guest locale redirect, Web Push unsubscribe scope, magic-login Continue, query-auth default reject, Telegram DNS pin, CSP/`theme-boot`) |
+| **v0.15.0** | Notification circuit breaker (`039`) |
+| **v0.15.x / v0.16** | CI coverage soft gate (`033`), then GDPR export/anonymize (`043`) |
+| **Later** | Mentions (`040`), similar issues (`041`), read API (`042`), instance config export (`044`), Bundle console/Monolog; SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -262,9 +279,8 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pick the highest **In progress** / **Next** row that is unblocked — Phase 6 product Next is **Done (v0.13.0)**; prefer Planned (`038`+).
-2. Ensure a feature spec exists (`/speckit-specify` or update existing).
-3. Plan → tasks → implement → tests → changelog/upgrading.
-4. Mark the row **Done** and bump the indicative release when shipping.
+1. Implement **Next** in order: `039` → `033` → `043` (plan → tasks → tests → changelog).
+2. Only then pull deferred Planned rows (`040` / `041` / `042`).
+3. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (released **v0.13.0**; Next = Planned `038`+).
+Last updated: 2026-07-31 (released **v0.14.0**; Next = `039` → `033` → `043`).

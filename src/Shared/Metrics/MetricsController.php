@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Prometheus scrape endpoint (admin session or metrics token).
+ *
+ * When {@see $requireMetricsToken} is true (prod default), a non-empty
+ * {@see $metricsToken} must be configured or the endpoint returns 503.
  */
 final class MetricsController extends AbstractController
 {
@@ -20,12 +23,21 @@ final class MetricsController extends AbstractController
         private readonly PrometheusTextFormatter $formatter,
         #[Autowire('%beacon.metrics_token%')]
         private readonly string $metricsToken = '',
+        #[Autowire('%beacon.metrics_require_token%')]
+        private readonly bool $requireMetricsToken = false,
     ) {
     }
 
     #[Route('/metrics', name: 'beacon_metrics', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
+        if ($this->requireMetricsToken && '' === $this->metricsToken) {
+            return new Response("metrics token not configured\n", Response::HTTP_SERVICE_UNAVAILABLE, [
+                'Content-Type' => 'text/plain; charset=utf-8',
+                'Cache-Control' => 'no-store',
+            ]);
+        }
+
         if (!$this->isAuthorized($request)) {
             return new Response("unauthorized\n", Response::HTTP_UNAUTHORIZED, [
                 'Content-Type' => 'text/plain; charset=utf-8',
@@ -66,8 +78,8 @@ final class MetricsController extends AbstractController
             return trim(substr($header, 7));
         }
 
-        $query = $request->query->get('token');
+        // Query ?token= is rejected (proxy/access logs / Referer leakage); use Bearer only.
 
-        return \is_string($query) ? $query : null;
+        return null;
     }
 }

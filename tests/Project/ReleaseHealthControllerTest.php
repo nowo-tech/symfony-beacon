@@ -35,6 +35,9 @@ final class ReleaseHealthControllerTest extends DatabaseWebTestCase
         );
 
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.beacon-breadcrumb-wrap');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Projects');
+        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Releases');
         $body = $crawler->text();
         self::assertStringContainsString('2 issues were first seen in this release.', $body);
         self::assertSelectorExists('a[href*="/issues?release=1.0.0"][href*="status="]');

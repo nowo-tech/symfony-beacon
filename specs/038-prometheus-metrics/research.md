@@ -14,7 +14,7 @@
 
 **Choice**:
 1. Authenticated `ROLE_ADMIN` session (browser), **or**
-2. `Authorization: Bearer <BEACON_METRICS_TOKEN>` / `?token=` when `BEACON_METRICS_TOKEN` is non-empty.
+2. `Authorization: Bearer <BEACON_METRICS_TOKEN>` when `BEACON_METRICS_TOKEN` is non-empty (query `?token=` is not accepted).
 
 Empty token + anonymous → 401. Document firewall/bind in PRODUCTION.md.
 

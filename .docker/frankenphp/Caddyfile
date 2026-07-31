@@ -53,14 +53,29 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
 	header {
 		Alt-Svc "clear"
-		# Baseline browser hardening (053). CSP is intentionally permissive for Vite/Mercure/PWA;
-		# tighten per-operator via CADDY_SERVER_EXTRA_DIRECTIVES when ready.
+		# Baseline browser hardening (053). Prefer external scripts (theme-boot.js); style-src
+		# keeps 'unsafe-inline' for operator CSS overrides. Kit admin pages may still need
+		# inline scripts — tighten further via CADDY_SERVER_EXTRA_DIRECTIVES when ready.
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
-		Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
 	}
+
+	# Mutually exclusive CSP: Swagger UI needs 'unsafe-eval' (JSON Schema compile); keep it off elsewhere.
+	# object-src 'none' blocks plugin vectors. script-src still allows 'unsafe-inline' for kit/admin
+	# leftovers; theme prefs use Vite entry theme-boot + data-* (no inline boot).
+	@swaggerUi path /api/doc /api/doc/
+	@defaultCsp not path /api/doc /api/doc/
+	header @defaultCsp Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
+	header @swaggerUi Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
+
+	# Optional: restrict Prometheus scrapes to private networks (uncomment in prod):
+	# @metricsPublic {
+	# 	path /metrics
+	# 	not remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1 ::1
+	# }
+	# respond @metricsPublic "Forbidden" 403
 
 	# Symfony document root
 	root * /app/public

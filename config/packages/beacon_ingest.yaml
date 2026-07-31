@@ -1,6 +1,4 @@
 # Envelope ingest auth hardening.
-# Dev/test keep deprecated query auth (with Warning / Deprecation headers).
-# Production refuses query beacon_key/beacon_secret unless explicitly set to 0.
-when@prod:
-    parameters:
-        env(BEACON_INGEST_REJECT_QUERY_AUTH): '1'
+# Default (all envs): reject deprecated query beacon_key/beacon_secret (see parameters.yaml).
+# Set BEACON_INGEST_REJECT_QUERY_AUTH=0 only while migrating clients to X-Beacon-Auth or envelope dsn.
+# Tests that exercise the legacy path set the env to 0 for that case only.

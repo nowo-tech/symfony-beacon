@@ -102,10 +102,15 @@ Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/
 
 | Access | How |
 |--------|-----|
-| Admin UI | Logged-in `ROLE_ADMIN` session |
-| Scraper | Set `BEACON_METRICS_TOKEN` and send `Authorization: Bearer …` (or `?token=`) |
+| Admin UI | Logged-in `ROLE_ADMIN` session (only when a token is configured in prod — see below) |
+| Scraper | Set `BEACON_METRICS_TOKEN` and send `Authorization: Bearer …` only (query `?token=` is rejected) |
 
-**Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). Counters live in `cache.app` (shared only if your cache backend is shared across workers).
+| Env | Default | Meaning |
+|-----|---------|---------|
+| `BEACON_METRICS_TOKEN` | empty | Bearer scrape secret |
+| `BEACON_METRICS_REQUIRE_TOKEN` | `0` in dist; **`1` in `APP_ENV=prod`** | When `1`, empty token → **503** until configured |
+
+**Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). The FrankenPHP `Caddyfile` includes a commented `remote_ip` snippet for private-only scrapes. Counters live in `cache.app` (shared only if your cache backend is shared across workers).
 
 ## Retention purge
 
@@ -136,17 +141,18 @@ Prefer `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` i
 
 | Env | Default | Meaning |
 |-----|---------|---------|
-| `BEACON_INGEST_REJECT_QUERY_AUTH` | `0` in `.env.dist`; **`1` in `APP_ENV=prod`** | When `1`, query auth returns **401** |
+| `BEACON_INGEST_REJECT_QUERY_AUTH` | **`1`** (all envs, including `.env.dist`) | When `1`, query auth returns **401** |
 
-Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` in prod only while migrating clients.
+Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` only while migrating clients (any environment).
 
 ## Security headers (Caddy)
 
-The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and a permissive `Content-Security-Policy` compatible with Vite HMR, Mercure SSE, and the PWA service worker.
+The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and a `Content-Security-Policy` with `object-src 'none'`. Theme boot uses the Vite entry `theme-boot` (`assets/theme-boot.ts`) + `data-*` prefs (no inline boot scripts). `style-src` / residual kit `script-src` still allow `'unsafe-inline'` for operator CSS overrides and kit admin leftovers.
 
 - **Dev** may omit HSTS (no HSTS in the default file).
 - **Prod:** add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES`, e.g. `header Strict-Transport-Security "max-age=31536000; includeSubDomains"`.
-- Tighten CSP per operator when third-party scripts are known; do not ship analytics cookies without cookie-consent kit UX.
+- To drop `script-src 'unsafe-inline'` after removing remaining kit/admin inline scripts, override CSP via `CADDY_SERVER_EXTRA_DIRECTIVES` (replace the header for your site). Do not ship analytics cookies without cookie-consent kit UX.
+- **Swagger UI** (`/api/doc`) needs `script-src 'unsafe-eval'` (JSON Schema compile). The Caddyfile overrides CSP on that path only; Swagger assets are served same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`).
 
 `/api/doc` and `/api/doc.json` require **`ROLE_ADMIN`**.
 

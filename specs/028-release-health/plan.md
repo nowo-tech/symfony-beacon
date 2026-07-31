@@ -21,14 +21,16 @@ Add a project-scoped **Release health** panel at `/projects/{uuid}/releases` so 
 | Release compare | Compare issue sets where `firstRelease = :release OR lastRelease = :release`; classify only-A / both / only-B |
 | Environment compare | Deep-link to existing `IssueController` environment compare (`environment` + `compare`) |
 | UI | Add `Releases` tab to `templates/project/_nav.html.twig`; new Twig page with release picker, compare summary, empty states, and issue-list links |
+| Breadcrumbs | Idempotent `BreadcrumbDemoSeeder` item for `project_releases` under `project_show`, params `['id']` (platform seed via `app:seed-platform`) |
 | I18n | English UI copy with `messages.en.yaml` and `messages.es.yaml` keys |
-| Testing | PHPUnit functional tests for member access, empty state, release counts, issue-list deep links, and release compare |
+| Testing | PHPUnit functional tests for member access, empty state, release counts, issue-list deep links, release compare, and breadcrumb labels |
 
 ## Files
 
 - `src/Project/Controller/ProjectReleaseHealthController.php`
 - `src/Issues/Repository/IssueRepository.php`
 - `src/Issues/Repository/EventRepository.php`
+- `src/Shared/Breadcrumb/BreadcrumbDemoSeeder.php`
 - `templates/project/_nav.html.twig`
 - `templates/project/releases.html.twig`
 - `translations/messages.en.yaml`
@@ -42,3 +44,4 @@ Add a project-scoped **Release health** panel at `/projects/{uuid}/releases` so 
 
 - Reuse existing `014-releases` query semantics for the issue-list deep link (`release=...`).
 - Do not add write/mutation actions; this is read-only project telemetry UI.
+- Existing installs pick up the Releases crumb by re-running `app:seed-platform` (upsert; no wipe).

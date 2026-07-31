@@ -66,12 +66,17 @@ class PushSubscriptionRepository extends ServiceEntityRepository
         return $rows;
     }
 
-    public function deleteByEndpointHash(string $endpointHash): void
+    /**
+     * Deletes a push subscription only when it belongs to the given user (anti-IDOR).
+     */
+    public function deleteByEndpointHashForUser(string $endpointHash, User $user): void
     {
         $this->createQueryBuilder('s')
             ->delete()
             ->andWhere('s.endpointHash = :hash')
+            ->andWhere('s.user = :user')
             ->setParameter('hash', $endpointHash)
+            ->setParameter('user', $user)
             ->getQuery()
             ->execute();
     }

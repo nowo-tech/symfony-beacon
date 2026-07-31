@@ -74,7 +74,7 @@ Preferred Envelope mechanisms (mapped to project API keys):
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret` (recommended)
 - Envelope header `"dsn": "https://public:secret@…"`
 
-**Deprecated:** query string `?beacon_key=…&beacon_secret=…` — secrets appear in proxy/access logs and Referer. Still accepted for compatibility; responses include `Deprecation: true` and a `Warning` header. Prefer header or envelope DSN.
+**Deprecated:** query string `?beacon_key=…&beacon_secret=…` — secrets appear in proxy/access logs and Referer. **Rejected by default** (`BEACON_INGEST_REJECT_QUERY_AUTH=1` → HTTP 401). Set `0` only while migrating; responses then include `Deprecation: true` and a `Warning` header. Prefer header or envelope DSN.
 
 The public key must belong to the `{project_id}` in the URL.
 

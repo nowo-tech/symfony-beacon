@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Shared\Http\SafeInternalRedirect;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -57,22 +58,17 @@ final class GuestLocaleController extends AbstractController
 
     private function safeRedirectTarget(Request $request, string $locale): string
     {
+        $fallback = $this->generateUrl('nowo_auth_kit_login', ['_locale' => $locale]);
         $redirect = (string) $request->request->get('redirect', $request->query->get('redirect', ''));
-        if ('' === $redirect) {
-            return $this->generateUrl('nowo_auth_kit_login', ['_locale' => $locale]);
-        }
-
-        if (!str_starts_with($redirect, '/') || str_starts_with($redirect, '//')) {
-            return $this->generateUrl('nowo_auth_kit_login', ['_locale' => $locale]);
+        $safe = SafeInternalRedirect::resolve($request, $redirect, $fallback);
+        if ($safe === $fallback) {
+            return $fallback;
         }
 
         // Prefer keeping guests on a locale-prefixed public URL when switching language.
-        $localized = $this->localizePublicPath($redirect, $locale);
-        if (null !== $localized) {
-            return $localized;
-        }
+        $localized = $this->localizePublicPath($safe, $locale);
 
-        return $redirect;
+        return $localized ?? $safe;
     }
 
     private function localizePublicPath(string $path, string $locale): ?string

@@ -20,9 +20,11 @@
 - [x] T007 Add `Releases` tab to `templates/project/_nav.html.twig`
 - [x] T008 Build `templates/project/releases.html.twig` with picker, empty states, issue-list links, and environment-compare deep link
 - [x] T009 Add English and Spanish translation keys for the new panel
+- [x] T013 Seed breadcrumb item `project_releases` under project in `BreadcrumbDemoSeeder` (locale labels; params `['id']`)
 
 ## Tests and docs
 
 - [x] T010 Add PHPUnit functional coverage for release health access, counts, empty states, and compare
 - [x] T011 Update `docs/ROADMAP.md` (5.4 Done) and `docs/CHANGELOG.md` Unreleased
 - [x] T012 Mark spec artifacts complete (`spec.md` status, checklist)
+- [x] T014 Extend `ReleaseHealthControllerTest` to assert Projects / Releases breadcrumb wrap on the panel

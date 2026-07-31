@@ -78,10 +78,8 @@ final readonly class DeliverNotificationHandler
                     ],
                 ];
 
-                if (NotificationDestinationType::Telegram !== $destination->getType()) {
-                    // Validate + pin resolved public A record (anti DNS rebinding / TOCTOU).
-                    $httpOptions = array_merge($httpOptions, $this->outboundUrlGuard->httpClientOptionsForUrl($request['url']));
-                }
+                // Validate + pin resolved public A record (anti DNS rebinding / TOCTOU), including Telegram → api.telegram.org.
+                $httpOptions = array_merge($httpOptions, $this->outboundUrlGuard->httpClientOptionsForUrl($request['url']));
 
                 $response = $this->httpClient->request('POST', $request['url'], $httpOptions);
 

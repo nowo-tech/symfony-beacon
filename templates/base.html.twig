@@ -1,24 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}">
+<html
+    lang="{{ app.request.locale|default('en') }}"
+    {% if app.user and app.user.preferredTheme %}data-user-theme="{{ app.user.preferredTheme|e('html_attr') }}"{% endif %}
+    {% if app.user %}
+        data-user-density="{{ app.user.preferredUiDensity|e('html_attr') }}"
+        data-user-motion="{{ app.user.preferredMotion|e('html_attr') }}"
+        data-user-font-scale="{{ app.user.preferredFontScale|e('html_attr') }}"
+        data-user-contrast="{{ app.user.preferredContrast|e('html_attr') }}"
+        data-user-sidebar="{{ app.user.preferredSidebar|e('html_attr') }}"
+    {% endif %}
+    data-issue-panel-defaults="{{ (app.user ? app.user.preferredCollapsedIssuePanels : ['raw', 'extra'])|json_encode|e('html_attr') }}"
+>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        {% if app.user and app.user.preferredTheme %}
-            <script>window.__BEACON_USER_THEME__ = {{ app.user.preferredTheme|json_encode|raw }};</script>
-        {% endif %}
-        {% if app.user %}
-            <script>
-                window.__BEACON_USER_DENSITY__ = {{ app.user.preferredUiDensity|json_encode|raw }};
-                window.__BEACON_USER_MOTION__ = {{ app.user.preferredMotion|json_encode|raw }};
-                window.__BEACON_USER_FONT_SCALE__ = {{ app.user.preferredFontScale|json_encode|raw }};
-                window.__BEACON_USER_CONTRAST__ = {{ app.user.preferredContrast|json_encode|raw }};
-                window.__BEACON_USER_SIDEBAR__ = {{ app.user.preferredSidebar|json_encode|raw }};
-            </script>
-        {% endif %}
-        <script>
-            window.__BEACON_ISSUE_PANEL_DEFAULTS__ = {{ (app.user ? app.user.preferredCollapsedIssuePanels : ['raw', 'extra'])|json_encode|raw }};
-        </script>
-        {% include '_theme_boot.html.twig' %}
+        {# Vite entry (CSP script-src 'self'); prefs via data-* above. Runs before paint. #}
+        {{ vite_entry_script_tags('theme-boot') }}
         <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
         <style>{{ site_appearance.cssOverrides|raw }}</style>
         {{ nowo_pwa_head() }}

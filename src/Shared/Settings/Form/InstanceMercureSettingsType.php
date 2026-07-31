@@ -35,7 +35,7 @@ final class InstanceMercureSettingsType extends AbstractType
                 'label' => 'instance_mercure.url.label',
                 'help' => 'instance_mercure.url.help',
                 'attr' => [
-                    'placeholder' => 'http://mercure/.well-known/mercure',
+                    'placeholder' => 'instance_mercure.url.placeholder',
                 ],
                 'constraints' => [
                     new Length(max: 2048),
@@ -46,7 +46,7 @@ final class InstanceMercureSettingsType extends AbstractType
                 'label' => 'instance_mercure.public_url.label',
                 'help' => 'instance_mercure.public_url.help',
                 'attr' => [
-                    'placeholder' => 'https://localhost:9444/.well-known/mercure',
+                    'placeholder' => 'instance_mercure.public_url.placeholder',
                 ],
                 'constraints' => [
                     new Length(max: 2048),
@@ -59,7 +59,7 @@ final class InstanceMercureSettingsType extends AbstractType
                 'help' => 'instance_mercure.jwt_secret.help',
                 'attr' => [
                     'autocomplete' => 'new-password',
-                    'placeholder' => '••••••••••••••••••••••••••••••••',
+                    'placeholder' => 'instance_mercure.jwt_secret.placeholder',
                 ],
                 'constraints' => [
                     new Length(max: 512),
@@ -78,6 +78,7 @@ final class InstanceMercureSettingsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
+            'translation_domain' => 'messages',
         ]);
     }
 

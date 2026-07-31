@@ -39,6 +39,8 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 app: './assets/app.ts',
+                // Early <head> boot (FOUC): load via vite_entry_script_tags('theme-boot') before app.
+                'theme-boot': './assets/theme-boot.ts',
             },
         },
     },

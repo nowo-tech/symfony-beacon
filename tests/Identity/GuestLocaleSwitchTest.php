@@ -57,6 +57,25 @@ final class GuestLocaleSwitchTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h1', 'Política de privacidad');
     }
 
+    public function testGuestLocaleRejectsOpenRedirectTargets(): void
+    {
+        $client = self::createClient();
+        $token = $this->guestLocaleCsrfToken($client);
+
+        $client->request(Request::METHOD_POST, '/locale/es', [
+            '_token' => $token,
+            'redirect' => '/\\evil.example',
+        ]);
+        self::assertResponseRedirects('/es/login');
+
+        $token = $this->guestLocaleCsrfToken($client);
+        $client->request(Request::METHOD_POST, '/locale/es', [
+            '_token' => $token,
+            'redirect' => '//evil.example',
+        ]);
+        self::assertResponseRedirects('/es/login');
+    }
+
     /**
      * Login/legal pages use path-locale anchors, so CSRF must be minted against an
      * explicit session shared with the BrowserKit cookie jar.

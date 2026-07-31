@@ -15,7 +15,7 @@ Content-Type: application/x-beacon-envelope
 |-----------|--------|
 | `X-Beacon-Auth: beacon_key=…; beacon_secret=…` | **Preferred** |
 | Envelope header `"dsn": "https://public:secret@host/project"` | Supported |
-| Query `?beacon_key=&beacon_secret=` | **Deprecated** (still accepted; `Deprecation` + `Warning` headers) |
+| Query `?beacon_key=&beacon_secret=` | **Deprecated** — rejected by default (`BEACON_INGEST_REJECT_QUERY_AUTH=1`); set `0` only while migrating |
 
 Ingest **always requires** a non-empty secret. The public key must belong to `{project_id}`. Successful requests return a fast **200 ACK**; processing continues on Messenger.
 

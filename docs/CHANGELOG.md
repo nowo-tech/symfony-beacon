@@ -7,13 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-07-31
+
 ### Added
 
-- **Prometheus metrics** (`038`): `GET /metrics` (text exposition) — Messenger depth, failed notification destinations, ingest ACK/reject counters; `ROLE_ADMIN` or `BEACON_METRICS_TOKEN`
+- **Prometheus metrics** (`038`): `GET /metrics` (text exposition) — Messenger depth, failed notification destinations, ingest ACK/reject counters; `ROLE_ADMIN` or `BEACON_METRICS_TOKEN` (prod requires token configured)
 
 ### Changed
 
+- **Security residual hardening:** `BEACON_INGEST_REJECT_QUERY_AUTH` defaults to **1** in all environments; prod `/metrics` requires a non-empty `BEACON_METRICS_TOKEN` (`BEACON_METRICS_REQUIRE_TOKEN`); CSP adds `object-src 'none'` and theme prefs boot via Vite entry `assets/theme-boot.ts` + `data-*` (no inline theme scripts)
+
 ### Fixed
+
+- Guest locale switch redirects use `SafeInternalRedirect` (reject `/\\…` / backslash open redirects)
+- `/metrics` accepts only `Authorization: Bearer` (query `?token=` rejected)
+- Web Push unsubscribe deletes only the current user's subscription (endpoint hash scoped to owner)
+- Magic login confirm requires an explicit Continue click (no auto-POST), preserving `check_post_only`
+- Telegram notification delivery pins DNS via `OutboundUrlGuard` like other HTTP channels
 
 ## [0.13.0] - 2026-07-31
 
@@ -563,7 +573,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.6...v0.12.7

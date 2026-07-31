@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.13.0 to the next release](#upgrading-from-0130-to-the-next-release)
+- [Upgrading from 0.14.0 to the next release](#upgrading-from-0140-to-the-next-release)
+- [Upgrading from 0.13.0 to 0.14.0](#upgrading-from-0130-to-0140)
 - [Upgrading from 0.12.8 to 0.13.0](#upgrading-from-0128-to-0130)
 - [Upgrading from 0.12.7 to 0.12.8](#upgrading-from-0127-to-0128)
 - [Upgrading from 0.12.6 to 0.12.7](#upgrading-from-0126-to-0127)
@@ -39,7 +40,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.13.0 to the next release
+## Upgrading from 0.14.0 to the next release
 
 ```bash
 git pull
@@ -52,6 +53,33 @@ make vite-build
 ```
 
 _(No additional operator steps yet — see Unreleased in CHANGELOG when cutting the next tag.)_
+
+## Upgrading from 0.13.0 to 0.14.0
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+### Prometheus `/metrics` (`038`)
+
+- Scrapers: `GET /metrics` with session as `ROLE_ADMIN`, or `Authorization: Bearer <BEACON_METRICS_TOKEN>`.
+- **Query `?token=` is rejected** (use Bearer only).
+- Production: set a non-empty `BEACON_METRICS_TOKEN` (`.env.dist` / Compose). Empty token in prod fails closed when `BEACON_METRICS_REQUIRE_TOKEN=1`.
+- See [PRODUCTION.md](PRODUCTION.md) and [API.md](API.md).
+
+### Security residual
+
+- **`BEACON_INGEST_REJECT_QUERY_AUTH` defaults to `1`** in all environments (not only prod). Migrate Envelope clients to `X-Beacon-Auth` or envelope `dsn`; set `0` only during a short migration window.
+- Guest locale switch rejects backslash / protocol-relative open redirects (`SafeInternalRedirect`).
+- Web Push unsubscribe is scoped to the signed-in user (endpoint hash alone is not enough).
+- Magic login confirm page no longer auto-POSTs; user must click **Continue**.
+- Theme preferences boot via Vite `assets/theme-boot.ts` (CSP-friendly; no inline theme scripts). Rebuild front-end assets after upgrade.
 
 ## Upgrading from 0.12.8 to 0.13.0
 
@@ -69,11 +97,12 @@ make vite-build
 ### Security / ops
 
 - **`/api/doc` and `/api/doc.json` require `ROLE_ADMIN`** (was any authenticated user). Re-seed menus (`app:seed-platform`) so API docs moves under Administration.
-- **Magic login** consumes via **POST** (`check_post_only: true`): email links open a confirm page that auto-POSTs. Bookmarklets/scripts that only GET the signed URL must POST `user` / `expires` / `hash`.
-- **Query-string ingest auth:** production defaults to **`BEACON_INGEST_REJECT_QUERY_AUTH=1`** (401). Migrate clients to `X-Beacon-Auth` or envelope `dsn`; set `0` only during migration.
+- **Magic login** consumes via **POST** (`check_post_only: true`): email links open a confirm page; the user must click **Continue** to POST. Bookmarklets/scripts that only GET the signed URL must POST `user` / `expires` / `hash`.
+- **Query-string ingest auth:** defaults to **`BEACON_INGEST_REJECT_QUERY_AUTH=1`** in all environments (401). Migrate clients to `X-Beacon-Auth` or envelope `dsn`; set `0` only during migration.
+- **`/metrics`:** production requires a non-empty `BEACON_METRICS_TOKEN` (`BEACON_METRICS_REQUIRE_TOKEN=1`); scrapers use `Authorization: Bearer` only.
 - **Web Push:** subscribe/delivery accept only known HTTPS push hosts (FCM / Mozilla / Apple).
 - **Webhooks:** delivery pins DNS after SSRF checks (`resolve`); keep `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0` in prod.
-- **Caddy:** baseline CSP / frame / referrer / nosniff headers; add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES` in prod (see [PRODUCTION.md](PRODUCTION.md)).
+- **Caddy:** baseline CSP (`object-src 'none'`) / frame / referrer / nosniff headers; theme boot is same-origin JS; add HSTS via `CADDY_SERVER_EXTRA_DIRECTIVES` in prod (see [PRODUCTION.md](PRODUCTION.md)).
 
 ### Dogfooding + AI export
 

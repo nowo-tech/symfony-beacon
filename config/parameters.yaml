@@ -5,7 +5,8 @@
 parameters:
     env(BEACON_ENVELOPE_MAX_BYTES): '2097152'
     env(BEACON_EVENT_QUOTA_MONTHLY): '0'
-    env(BEACON_INGEST_REJECT_QUERY_AUTH): '0'
+    # Default reject deprecated query-string ingest auth (all envs). Set 0 only while migrating clients.
+    env(BEACON_INGEST_REJECT_QUERY_AUTH): '1'
     default_locale: '%env(DEFAULT_LOCALE)%'
     # Catalogue fallbacks when a key is missing in the active locale (always keep English).
     fallback_locales: [en, es, de, nl, fr, it, pt]
@@ -23,9 +24,12 @@ parameters:
     beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
     beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
     beacon.envelope_max_bytes: '%env(int:BEACON_ENVELOPE_MAX_BYTES)%'
-    # When true, Envelope ingest rejects deprecated query-string auth (401). Prod defaults to 1 via beacon_ingest.yaml.
+    # When true, Envelope ingest rejects deprecated query-string auth (401). Default 1 in all envs.
     beacon.ingest_reject_query_auth: '%env(bool:BEACON_INGEST_REJECT_QUERY_AUTH)%'
     env(BEACON_METRICS_TOKEN): ''
     beacon.metrics_token: '%env(string:BEACON_METRICS_TOKEN)%'
+    env(BEACON_METRICS_REQUIRE_TOKEN): '0'
+    # When true, /metrics returns 503 until BEACON_METRICS_TOKEN is non-empty (prod default via beacon_metrics.yaml).
+    beacon.metrics_require_token: '%env(bool:BEACON_METRICS_REQUIRE_TOKEN)%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true

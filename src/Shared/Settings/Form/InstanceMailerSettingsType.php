@@ -39,7 +39,7 @@ final class InstanceMailerSettingsType extends AbstractType
                 'help' => 'instance_mailer.mailer_dsn.help',
                 'attr' => [
                     'autocomplete' => 'new-password',
-                    'placeholder' => 'smtp://user:pass@mail.example:587',
+                    'placeholder' => 'instance_mailer.mailer_dsn.placeholder',
                 ],
                 'constraints' => [
                     new Length(max: 2048),
@@ -57,7 +57,7 @@ final class InstanceMailerSettingsType extends AbstractType
                 'label' => 'instance_mailer.mailer_from.label',
                 'help' => 'instance_mailer.mailer_from.help',
                 'attr' => [
-                    'placeholder' => 'beacon@example.com',
+                    'placeholder' => 'instance_mailer.mailer_from.placeholder',
                 ],
                 'constraints' => [
                     new Email(),
@@ -70,6 +70,7 @@ final class InstanceMailerSettingsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
+            'translation_domain' => 'messages',
         ]);
     }
 

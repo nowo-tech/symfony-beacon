@@ -1280,12 +1280,15 @@ instance_mercure:
     url:
         label: 'Publish-URL (server)'
         help: 'Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure binnen Compose).'
+        placeholder: 'http://mercure/.well-known/mercure'
     public_url:
         label: 'Publieke URL (browser)'
         help: 'Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure via Caddy).'
+        placeholder: 'https://localhost:9444/.well-known/mercure'
     jwt_secret:
         label: 'JWT-secret'
         help: 'Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET. Minimaal 32 tekens indien ingesteld.'
+        placeholder: '••••••••••••••••••••••••••••••••'
         too_short: 'JWT-secret moet minimaal 32 tekens bevatten.'
         invalid: 'Voer een geldige JWT-secretstring in.'
     clear_secret:
@@ -1304,6 +1307,7 @@ instance_mailer:
     mailer_from:
         label: 'From-adres'
         help: 'Envelope From voor magic login en notificatiemails. Standaard beacon@localhost wanneer leeg.'
+        placeholder: beacon@example.com
 setup:
     eyebrow: 'Eerste keer'
     title: 'Instantie-setup'
