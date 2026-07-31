@@ -44,7 +44,7 @@ final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
         $em->persist($issue);
         $em->flush();
 
-        $token = (new InteractionActionToken())->issueResolveToken(
+        $token = new InteractionActionToken()->issueResolveToken(
             'teams-signing-secret',
             $destination->getUuid(),
             $project->getUuid(),
@@ -97,7 +97,7 @@ final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
         $em->persist($issue);
         $em->flush();
 
-        $token = (new InteractionActionToken())->issueResolveToken(
+        $token = new InteractionActionToken()->issueResolveToken(
             'teams-signing-secret',
             $destination->getUuid(),
             $project->getUuid(),

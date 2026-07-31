@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Project\Entity\Project;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
@@ -78,7 +79,7 @@ final class TeamsActionsController extends AbstractController
         $issueUuid = (string) $payload['i'];
 
         $project = $destination->getProject();
-        if (null === $project || $project->getUuid() !== $projectUuid) {
+        if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
             return new Response('Project mismatch', Response::HTTP_FORBIDDEN);
         }
 
