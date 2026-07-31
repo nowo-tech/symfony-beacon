@@ -16,8 +16,8 @@ use App\Project\Service\ProjectAccessService;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -42,7 +42,7 @@ final class TeamsAssignMeController extends AbstractController
     }
 
     #[Route('/hooks/teams/assign-me', name: 'hooks_teams_assign_me', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -78,8 +78,8 @@ final class TeamsAssignMeController extends AbstractController
             throw $this->createAccessDeniedException('Invalid token');
         }
 
-        $projectUuid = (string) $payload['p'];
-        $issueUuid = (string) $payload['i'];
+        $projectUuid = $payload['p'];
+        $issueUuid = $payload['i'];
 
         $project = $destination->getProject();
         if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
