@@ -2,7 +2,7 @@
 
 **Feature Branch**: `041-similar-issues`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented
 
 **Input**: On issue show, suggest similar issues (fingerprint / title proximity) with shortcut to link or mark duplicate.
 

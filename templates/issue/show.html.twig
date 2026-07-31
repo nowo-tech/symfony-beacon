@@ -195,6 +195,34 @@
             {% endblock %}
         {% endembed %}
 
+        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'similar', title: 'issues.similar_title'|trans} %}
+            {% block body %}
+                <div class="issue-similar" data-testid="similar-issues">
+                    {% if similarIssues|default([]) is empty %}
+                        <p class="text-xs text-[var(--color-ink)]/55">{{ 'issues.similar_empty'|trans }}</p>
+                    {% else %}
+                        <ul class="space-y-2 text-sm">
+                            {% for similar in similarIssues %}
+                                <li class="flex flex-wrap items-start justify-between gap-2">
+                                    <a class="link min-w-0 grow" href="{{ path('issue_show', {projectId: project.uuid, id: similar.uuid}) }}">
+                                        <span class="font-medium">{{ similar.title }}</span>
+                                        <span class="block text-xs text-[var(--color-ink)]/55">{{ ('issues.status.' ~ similar.status.value)|trans }} · {{ similar.lastSeen|date('Y-m-d') }}</span>
+                                    </a>
+                                    {% if can_triage|default(false) %}
+                                        <form method="post" action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}" class="shrink-0">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
+                                            <input type="hidden" name="canonical_uuid" value="{{ similar.uuid }}">
+                                            <button type="submit" class="btn-ghost btn-sm" title="{{ 'issues.similar_mark_duplicate'|trans }}">{{ 'issues.similar_mark_duplicate'|trans }}</button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endblock %}
+        {% endembed %}
+
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'duplicate', title: 'issues.aside_duplicate'|trans} %}
             {% block body %}
                 <div class="issue-duplicate-actions" data-testid="mark-duplicate" data-controller="confirm-dialog">

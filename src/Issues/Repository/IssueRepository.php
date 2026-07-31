@@ -374,6 +374,91 @@ class IssueRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /**
+     * Similar issues in the same project (title proximity; excludes self; prefers non-ignored).
+     *
+     * @return list<Issue>
+     */
+    public function findSimilarIssues(Issue $issue, int $limit = 5): array
+    {
+        $project = $issue->getProject();
+        if (!$project instanceof Project || $limit < 1) {
+            return [];
+        }
+
+        $title = trim($issue->getTitle());
+        if ('' === $title) {
+            return [];
+        }
+
+        $tokens = preg_split('/\s+/u', $title) ?: [];
+        $tokens = array_values(array_filter(
+            $tokens,
+            static fn (string $t): bool => mb_strlen($t) >= 3,
+        ));
+        if ([] === $tokens) {
+            $tokens = [$title];
+        }
+        $tokens = \array_slice($tokens, 0, 4);
+
+        $qb = $this->createQueryBuilder('i')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.id != :excludeId')
+            ->andWhere('i.status IN (:statuses)')
+            ->setParameter('project', $project)
+            ->setParameter('excludeId', $issue->getId() ?? 0)
+            ->setParameter('statuses', [IssueStatus::Unresolved, IssueStatus::Resolved])
+            ->orderBy('i.lastSeen', 'DESC')
+            ->setMaxResults($limit * 3);
+
+        $ors = [];
+        foreach ($tokens as $i => $token) {
+            $param = 'sim'.$i;
+            $ors[] = 'LOWER(i.title) LIKE :'.$param;
+            $qb->setParameter($param, '%'.$this->escapeLike(mb_strtolower($token)).'%');
+        }
+        $qb->andWhere('('.implode(' OR ', $ors).')');
+
+        /** @var list<Issue> $candidates */
+        $candidates = $qb->getQuery()->getResult();
+
+        $scored = [];
+        $needle = mb_strtolower($title);
+        foreach ($candidates as $candidate) {
+            $other = mb_strtolower($candidate->getTitle());
+            $score = 0;
+            if ($other === $needle) {
+                $score += 100;
+            }
+            foreach ($tokens as $token) {
+                if (str_contains($other, mb_strtolower($token))) {
+                    $score += 10;
+                }
+            }
+            if ($score > 0) {
+                $scored[] = ['issue' => $candidate, 'score' => $score, 'last' => $candidate->getLastSeen()->getTimestamp()];
+            }
+        }
+
+        usort(
+            $scored,
+            static function (array $a, array $b): int {
+                if ($a['score'] !== $b['score']) {
+                    return $b['score'] <=> $a['score'];
+                }
+
+                return $b['last'] <=> $a['last'];
+            },
+        );
+
+        $out = [];
+        foreach (\array_slice($scored, 0, $limit) as $row) {
+            $out[] = $row['issue'];
+        }
+
+        return $out;
+    }
+
     private function createFilteredQueryBuilder(
         Project $project,
         ?string $query,

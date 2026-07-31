@@ -436,6 +436,9 @@ issues:
     comment_empty: Comment cannot be empty.
     comment_too_long: Comment is too long.
     comment_invalid: Could not add the comment.
+    similar_title: Similar issues
+    similar_empty: No similar issues in this project.
+    similar_mark_duplicate: Mark duplicate
     mail:
         mention_subject: 'You were mentioned on [%project%] %issue%'
         mention_body: |
