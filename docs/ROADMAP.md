@@ -129,7 +129,7 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Done** (v0.13.0; see Phase 6.4) |
-| 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Later** |
+| 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Done** (see Phase 6.7) |
 | — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
 
 Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control plane — use HTTP webhooks + digests instead.
@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: Phase 6 Next product through **v0.15.0** (circuit breaker + CSP/HSTS). Prefer CI coverage (`033`) then GDPR helpers (`043`). Defer mentions / similar issues / read API until coverage lands. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.15.0** shipped; **CI coverage (`033`)** and **GDPR helpers (`043`)** Done Unreleased. **Next**: deferred Planned collaboration/API (`040`+). No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -167,7 +167,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**. **Next**: `033` → `043`. Defer `040` / `041` / `042` until those land. `044` + Bundle console/Monolog remain Planned.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` Done Unreleased. **Next**: pull Planned `040` / `041` / `042` when prioritized. `044` + Bundle console/Monolog remain Planned.
 
 ### Done (v0.13.0 product — was Next)
 
@@ -203,14 +203,20 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.6a | **CSP / HSTS**: drop `script-src 'unsafe-inline'`; HSTS by default (except localhost); kit-admin / swagger-ui-boot Vite entries | Beacon | extends `053` | **Done** (v0.15.0) |
 | 6.6b | Appearance palette (warn / paper / ink / surface light+dark) + Tours form / preferences sidebar current fixes | Beacon | — | **Done** (v0.15.0) |
 
-### Next (immediate queue after v0.15.0)
+### Done (v0.16.0 Unreleased — coverage + GDPR)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Next** |
-| 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Next** (after `033`) |
+| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Done** (Unreleased) |
+| 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Done** (Unreleased) |
 
-### Planned (deferred until Next ops/coverage/GDPR land)
+### Next (immediate queue)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| — | _(empty — pull Planned rows when ready)_ | — | — | — |
+
+### Planned (deferred until prioritized)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
@@ -277,7 +283,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.13.0** | Phase 6 product: ops overview (`035`), identity audit (`036`), AuthKit identity polish (`037`), monthly quota (`032`); SiteBackup setup, dogfood (`058`), AI export (`059`), social login (`060`); security residual (DNS pin, query-auth reject, Web Push allowlist, POST magic login, Caddy headers, `/api/doc` admin-only) |
 | **v0.14.0** | Prometheus (`038`) + security residual (Bearer-only metrics, guest locale redirect, Web Push unsubscribe scope, magic-login Continue, query-auth default reject, Telegram DNS pin, CSP/`theme-boot`) |
 | **v0.15.0** | Notification circuit breaker (`039`); CSP without script `unsafe-inline` + default HSTS; appearance palette; Tours/sidebar UX fixes |
-| **v0.16.0** | CI coverage soft gate (`033`), then GDPR export/anonymize (`043`) |
+| **v0.16.0** | CI coverage soft gate (`033`) + GDPR export/anonymize (`043`) |
 | **Later** | Mentions (`040`), similar issues (`041`), read API (`042`), instance config export (`044`), Bundle console/Monolog; SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -286,8 +292,7 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Implement **Next** in order: `033` → `043` (plan → tasks → tests → changelog).
-2. Only then pull deferred Planned rows (`040` / `041` / `042`).
-3. Mark rows **Done** and bump the indicative release when shipping.
+1. Pull **Planned** rows (`040` → `041` → `042`, then `044` / Bundle) when prioritized.
+2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (released **v0.15.0**; Next = `033` → `043`).
+Last updated: 2026-07-31 (`033` + `043` Done Unreleased; Next = Planned backlog).

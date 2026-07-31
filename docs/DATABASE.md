@@ -87,6 +87,7 @@ erDiagram
         json product_tour_seen_pages
         bool push_notifications_enabled
         bool enabled
+        datetime anonymized_at
         datetime last_activity_at
         datetime created_at
         datetime updated_at

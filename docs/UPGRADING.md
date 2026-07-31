@@ -53,7 +53,15 @@ pnpm install
 make vite-build
 ```
 
-_(No additional operator steps yet — see Unreleased in CHANGELOG when cutting the next tag.)_
+_(Coverage tooling: `make test-coverage`; CI Coverage job informational until `COVERAGE_MIN` is set — [CONTRIBUTING.md](CONTRIBUTING.md).)_
+
+### GDPR account export / anonymize (`043`)
+
+- Migrate: adds `app_user.anonymized_at`.
+- Account → **Privacy** (`/account/privacy`): download JSON export; optional self-service anonymize (blocked if sole project owner or last instance admin).
+- Admin → Users: **Export data** / **Anonymize** for other accounts.
+- Anonymize does **not** purge project events/issues — see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md).
+- Runtime anonymize is app-owned (do not use `anonymize-bundle` as the production executor).
 
 ## Upgrading from 0.14.0 to 0.15.0
 
@@ -532,7 +540,7 @@ composer install
 make vite-build
 ```
 
-Phase 5 product features (`025`–`033`) remain **specified only** — not shipped. See [ROADMAP](ROADMAP.md) Phase 5.
+Phase 5 product features (`025`–`033`) were **specified only** at this tag — most shipped in later 0.11–0.16 releases; see [ROADMAP](ROADMAP.md).
 
 ## Upgrading from 0.10.0 to 0.10.1
 

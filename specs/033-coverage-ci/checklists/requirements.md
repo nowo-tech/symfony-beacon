@@ -5,4 +5,5 @@
 
 - [x] Draft spec written in English
 - [x] Scope bounded; out-of-scope listed
-- [ ] Plan / clarify before implement
+- [x] Plan / research / tasks complete
+- [x] Implemented (CI job + make target + soft gate + docs)

@@ -13,7 +13,7 @@ final class PreferencesMenuCurrentMarker
 {
     /** @var array<string, list<string>> route name => prefixes that should light that sidebar item */
     private const array ROUTE_PREFIXES = [
-        'account_profile' => ['account_profile', 'account_projects', 'account_groups'],
+        'account_profile' => ['account_profile', 'account_projects', 'account_groups', 'account_privacy'],
         'account_security' => ['account_security'],
         'account_display' => ['account_display'],
     ];

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `043-gdpr-user-export`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented (Unreleased)  
 
 **Input**: Account data export + soft-delete / anonymize path. Prefer `nowo-tech` anonymize kit if available; English legal/privacy copy remains operator-customizable.
 

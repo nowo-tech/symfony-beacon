@@ -148,6 +148,8 @@ flash:
         enabled: User account enabled.
         disabled: User account disabled.
         cannot_disable_self: You cannot disable your own account.
+        cannot_anonymize_self: Use Account → Privacy to anonymize your own account.
+        anonymized: User account anonymized.
         created: User account created.
         role_updated: User role updated.
         invalid_email: Enter a valid email address.
@@ -159,6 +161,12 @@ flash:
         last_admin: The instance must keep at least one administrator.
         project_unlink_forbidden: You are not allowed to remove that project membership.
         project_unlink_error: Could not remove the user from the project.
+    privacy:
+        anonymized: Your account was anonymized. You have been signed out.
+        already_anonymized: That account is already anonymized.
+        sole_owner: Transfer sole project ownership (or add another owner) before anonymizing.
+        last_admin: Keep at least one instance administrator before anonymizing.
+        anonymize_failed: Account could not be anonymized.
     groups:
         created: Group created.
         updated: Group updated.
@@ -751,6 +759,7 @@ users:
     status:
         enabled: Enabled
         disabled: Disabled
+        anonymized: Anonymized
     presence:
         online: Online
         offline: Offline
@@ -770,6 +779,10 @@ users:
         edit_role: Edit role
         self: This is you
         activity: Activity
+        export: Export data
+        anonymize: Anonymize
+    anonymize_confirm_title: Anonymize user
+    anonymize_confirm_body: 'Scrub personal data for %email% and disable sign-in. Type ANONYMIZE to confirm.'
     projects_title: Project memberships
     projects_intro: Direct project roles for this account (not via groups). Instance admins can remove them here.
     projects_empty: No direct project memberships.
@@ -792,6 +805,8 @@ users:
             'user.role_changed': User role changed
             'user.enabled': User enabled
             'user.disabled': User disabled
+            'user.account_exported': Account data exported
+            'user.anonymized': Account anonymized
             'group.created': Group created
             'group.updated': Group updated
             'group.deleted': Group deleted
@@ -857,6 +872,7 @@ preferences:
         profile: Profile
         projects: My projects
         groups: My groups
+        privacy: Privacy
         security: Security
         password: Change password
         password_history: Change history
@@ -886,6 +902,7 @@ preferences:
         update_password: Update password
         status_enabled: Active
         status_disabled: Disabled
+        status_anonymized: Anonymized
         role_admin: Administrator
         role_member: Member
         projects_title: Your projects
@@ -894,6 +911,24 @@ preferences:
         groups_title: Your groups
         groups_intro: Groups that may grant access to additional projects.
         groups_empty: You are not in any group.
+    privacy:
+        title: Privacy & data
+        intro: Download a copy of your account data or anonymize this account.
+        export_title: Download my data
+        export_intro: Export your profile, memberships, and security activity as JSON. Password hashes and other users' data are never included.
+        export_button: Download JSON
+        events_note: Project ingest events and issues stay with each project until retention purge — they are not part of this account export.
+        legal_link: View privacy policy
+        anonymize_title: Anonymize account
+        anonymize_intro: Scrub your email and display name, disable sign-in, and clear credentials. This cannot be undone from the UI.
+        anonymize_open: Anonymize my account
+        anonymize_confirm_title: Confirm anonymization
+        anonymize_confirm_body: Your login will stop working. Type ANONYMIZE to confirm.
+        anonymize_type_label: 'Type ANONYMIZE to confirm'
+        anonymize_confirm: Anonymize permanently
+        already_anonymized: This account has already been anonymized.
+        blocked_last_admin: You are the last instance administrator. Add another admin before anonymizing.
+        blocked_sole_owner: 'Transfer ownership of project “%name%” (or add another owner) before anonymizing.'
     security:
         title: Security
         intro: Change your account password.

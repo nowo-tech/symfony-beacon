@@ -121,6 +121,14 @@ Each row may include the actor, subject user, structured context (emails, roles,
 
 Treat this as personal data: document it in your privacy policy, define retention, and restrict `/admin/users` (and per-user activity) to operators who need it. Per-issue assignee/status history (`issue_history`) remains on the issue page and is separate from this instance-wide timeline. AuditKit timestamps/blame on entities are also separate and do not replace this timeline.
 
+### Account export and anonymize (`043`)
+
+Signed-in users can download a JSON export of **their** account fields, project/group memberships metadata, and allowlisted security activity from **Account → Privacy** (`/account/privacy`). Instance admins can export or anonymize other accounts from **Admin → Users**.
+
+Anonymize scrubs email/display name, disables login (UserKit), clears password history / social links / push subscriptions, and sets `anonymized_at`. It does **not** delete project ingest events or issues (those remain project telemetry until retention purge). Blocked when the account is the sole direct project owner or the last instance administrator.
+
+Operators should mention these controls and event retention in `/legal/privacy` placeholder copy before production.
+
 ## References
 
 - Bundle docs: [CONFIGURATION](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/CONFIGURATION.md), [USAGE](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/USAGE.md)

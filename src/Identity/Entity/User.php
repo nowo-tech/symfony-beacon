@@ -141,6 +141,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\Column(options: ['default' => false])]
     private bool $pushNotificationsEnabled = false;
 
+    /** When set, personal identifiers were scrubbed (GDPR anonymize); login remains disabled. */
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $anonymizedAt = null;
+
     /** @var Collection<int, ProjectMembership> */
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
@@ -619,6 +623,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function setPushNotificationsEnabled(bool $pushNotificationsEnabled): self
     {
         $this->pushNotificationsEnabled = $pushNotificationsEnabled;
+
+        return $this;
+    }
+
+    public function getAnonymizedAt(): ?DateTimeImmutable
+    {
+        return $this->anonymizedAt;
+    }
+
+    public function isAnonymized(): bool
+    {
+        return $this->anonymizedAt instanceof DateTimeImmutable;
+    }
+
+    public function setAnonymizedAt(?DateTimeImmutable $anonymizedAt): self
+    {
+        $this->anonymizedAt = $anonymizedAt;
 
         return $this;
     }

@@ -39,6 +39,7 @@ help:
 	@echo "  make rector          Rector dry-run"
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
+	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
 	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
 	@echo "  make update-deps     composer update + pnpm update (in php container)"
@@ -208,8 +209,14 @@ rector-fix:
 test:
 	docker compose exec -T php vendor/bin/phpunit
 
+# Optional soft gate: COVERAGE_MIN=40 make test-coverage (statement % from Clover; unset = informational).
 test-coverage:
-	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-text --coverage-html var/coverage-html
+	docker compose exec -T php mkdir -p var/coverage var/coverage-html
+	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
+		--coverage-text \
+		--coverage-clover var/coverage/clover.xml \
+		--coverage-html var/coverage-html
+	docker compose exec -T -e COVERAGE_MIN="$(COVERAGE_MIN)" php sh .scripts/check-coverage-threshold.sh var/coverage/clover.xml
 
 qa: cs twig-cs phpstan rector test
 
