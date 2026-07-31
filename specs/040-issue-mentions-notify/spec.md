@@ -2,7 +2,7 @@
 
 **Feature Branch**: `040-issue-mentions-notify`
 **Created**: 2026-07-31
-**Status**: Draft  
+**Status**: Implemented
 
 **Input**: Support `@user` mentions in issue comments and email (instance Mailer from `034`) on assign and mention.
 
