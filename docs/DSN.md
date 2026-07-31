@@ -89,6 +89,16 @@ X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET
 
 ERROR spans become Beacon Issues/Events (see [API.md](API.md#otlp-traces-ingest-v1), spec `070-otlp-traces`).
 
+### OTLP metrics (HTTP JSON adapter)
+
+```http
+POST /api/{project_id}/otlp/v1/metrics
+Content-Type: application/json
+X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET
+```
+
+Failure-like metric data points become Beacon Issues/Events (see [API.md](API.md#otlp-metrics-ingest-v1), spec `074-otlp-metrics`).
+
 ## Auth
 
 Preferred Envelope mechanisms (mapped to project API keys):
