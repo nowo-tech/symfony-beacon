@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Roadmap**: Bundle **v1.6.10** closes Phase **6.13** (nested console extras + Scheduler context) and **6.14** (Monolog bridge already shipped); **Next** = Mailer DSN change audit (`6.15`, extends `034`).
+
 ## [0.16.0] - 2026-07-31
 
 ### Added

@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.16.0** shipped (coverage/GDPR, collaboration/API `040`–`044`/`061`, SiteBackup locale + RoutingKit + branded errors, CSP PHP delivery, display-pref defaults). **Next**: Bundle console/Monolog. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.16.0** shipped (coverage/GDPR, collaboration/API `040`–`044`/`061`, SiteBackup locale + RoutingKit + branded errors, CSP PHP delivery, display-pref defaults). Bundle **v1.6.10** closed Phase 6.13–6.14 (console enrich + Scheduler context; Monolog already shipped). **Next**: Mailer DSN change audit (security residual). No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -165,9 +165,9 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Med | Guest locale open redirect (`/\\…`) vs `SafeInternalRedirect` | guest locale | **Done** (v0.14.0) |
 | Med | `/metrics` query `?token=` leakage | extends `038` | **Done** (v0.14.0; Bearer only) |
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
-| Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
+| Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Next** (see 6.15) |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**. **Next**: Bundle console/Monolog remain Planned.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**; Bundle console/Scheduler + Monolog Done in Bundle **v1.6.10**. **Next**: Mailer DSN `UserAction` audit (Info residual).
 
 ### Done (v0.13.0 product — was Next)
 
@@ -217,17 +217,18 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.12b | **RoutingKit** install (`/_routing/`; `#[Routable]` discovery) | Beacon | `064-routing-kit` | **Done** (v0.16.0) |
 | 6.12c | **Branded HTTP errors** 404/403/500 + mascot; `/_error/{code}` preview **dev-only** | Beacon | `063-branded-http-errors` | **Done** (v0.16.0) |
 
+### Done (Bundle companion — v1.6.10)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.13 | **BeaconBundle**: enrich **console / cron** failure extras (`extra.console` nested) + optional **Scheduler** `ScheduledStamp` context on final Messenger failures (`include_scheduler_context`). Base console capture existed since Bundle ≥1.1.0 | Bundle | — | **Done** (Bundle **v1.6.10**) |
+| 6.14 | **BeaconBundle**: opt-in **Monolog** bridge (`monolog_handler` → Envelope events/messages) | Bundle | — | **Done** (Bundle ≥1.1.0; documented closed with **v1.6.10**) |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.13 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Next** |
-
-### Planned (deferred until prioritized)
-
-| # | Item | Repo | Spec | Status |
-|---|------|------|------|--------|
-| 6.14 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
+| 6.15 | **Mailer DSN change audit**: record Admin Mailer DSN updates in `UserAction` (redacted); optional scheme allowlist for encrypted DSN | Beacon | extends `034` | **Next** |
 
 ### Later (Phase 6+)
 
@@ -286,7 +287,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.14.0** | Prometheus (`038`) + security residual (Bearer-only metrics, guest locale redirect, Web Push unsubscribe scope, magic-login Continue, query-auth default reject, Telegram DNS pin, CSP/`theme-boot`) |
 | **v0.15.0** | Notification circuit breaker (`039`); CSP without script `unsafe-inline` + default HSTS; appearance palette; Tours/sidebar UX fixes |
 | **v0.16.0** | Coverage (`033`) + GDPR (`043`); collaboration/API (`040`–`042`, `044`, `061`); SiteBackup dual setup locale (`056`) + secrets guard (`062`); RoutingKit (`064-routing-kit`); branded HTTP errors (`063-branded-http-errors`); CSP PHP delivery + display-pref defaults |
-| **Later** | Bundle console/Monolog; SSO/OIDC when specified |
+| **Bundle v1.6.10** | Phase 6.13–6.14: nested console extras + Scheduler context; Monolog bridge already shipped (docs closed) |
+| **Next** | Mailer DSN audit (`6.15`); then SSO/OIDC / OTLP when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -294,7 +296,7 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pull **Next** Bundle console/Monolog when prioritized.
+1. Pull **Next** Mailer DSN audit (`6.15`) when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (v0.16.0 shipped; Next = Bundle console/Monolog Planned).
+Last updated: 2026-07-31 (Bundle v1.6.10 closed 6.13–6.14; Next = Mailer DSN audit `6.15`).
