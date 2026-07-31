@@ -214,8 +214,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.10 | **Similar issues** suggestions on issue show | Beacon | `041-similar-issues` | **Next** |
-| 6.11 | **Read API + project tokens** | Beacon | `042-read-api-tokens` | **Planned** |
+| 6.11 | **Read API + project tokens** | Beacon | `042-read-api-tokens` | **Next** |
 | 6.12 | **Instance settings export/import** | Beacon | `044-instance-config-export` | **Planned** |
 
 ### Planned (deferred until prioritized)
@@ -223,6 +222,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Done** (Unreleased) |
+| 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Done** (Unreleased) |
 | 6.13 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Planned** |
 | 6.14 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
 

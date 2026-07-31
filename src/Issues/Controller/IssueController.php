@@ -286,6 +286,7 @@ final class IssueController extends AbstractController
         $history = $this->historyEntryRepository->findLatestForIssue($issue);
         $comments = $this->commentRepository->findLatestForIssue($issue);
         $duplicateCandidates = $this->issueRepository->findDuplicateCandidates($project, $issue);
+        $similarIssues = $this->issueRepository->findSimilarIssues($issue);
 
         return $this->render('issue/show.html.twig', [
             'project' => $project,
@@ -297,6 +298,7 @@ final class IssueController extends AbstractController
             'issueHistory' => $history,
             'comments' => $comments,
             'duplicateCandidates' => $duplicateCandidates,
+            'similarIssues' => $similarIssues,
             'priorities' => IssuePriority::cases(),
             'can_triage' => $access->canTriageIssues(),
         ]);
