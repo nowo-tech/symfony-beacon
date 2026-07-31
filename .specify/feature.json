@@ -1,1 +1,3 @@
-{"feature_directory": "specs/038-prometheus-metrics"}
+{
+  "feature_directory": "specs/039-notification-circuit-breaker"
+}
