@@ -77,3 +77,9 @@ controllers_health:
         path: ../src/Shared/Health/
         namespace: App\Shared\Health
     type: attribute
+
+controllers_metrics:
+    resource:
+        path: ../src/Shared/Metrics/
+        namespace: App\Shared\Metrics
+    type: attribute

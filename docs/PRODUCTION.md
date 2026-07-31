@@ -96,6 +96,17 @@ Monitor queue depth via `GET /health/ready` → `checks.messenger_async_pending`
 
 Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/Compose healthchecks.
 
+## Prometheus metrics (`/metrics`)
+
+`GET /metrics` exposes Prometheus text exposition (`beacon_messenger_async_pending`, `beacon_notification_destinations_failed`, `beacon_ingest_ack_total`, `beacon_ingest_reject_total`).
+
+| Access | How |
+|--------|-----|
+| Admin UI | Logged-in `ROLE_ADMIN` session |
+| Scraper | Set `BEACON_METRICS_TOKEN` and send `Authorization: Bearer …` (or `?token=`) |
+
+**Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). Counters live in `cache.app` (shared only if your cache backend is shared across workers).
+
 ## Retention purge
 
 Configure in `.env`:

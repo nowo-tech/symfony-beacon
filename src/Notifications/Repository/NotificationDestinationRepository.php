@@ -76,4 +76,17 @@ class NotificationDestinationRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * Count destinations whose last recorded delivery failed (instance-wide metrics).
+     */
+    public function countWithFailedLastDelivery(): int
+    {
+        return (int) $this->createQueryBuilder('d')
+            ->select('COUNT(d.id)')
+            ->andWhere('d.lastDeliverySuccess = false')
+            ->andWhere('d.lastDeliveryAt IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

@@ -13,6 +13,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
+use App\Shared\Metrics\MetricsCollector;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
@@ -48,6 +49,7 @@ ENVELOPE;
         private ProjectGovernanceResolver $governanceResolver,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
+        private MetricsCollector $metricsCollector,
         #[Autowire('%beacon.envelope_max_bytes%')]
         private int $maxEnvelopeBytes = 2_097_152,
         #[Autowire('%beacon.ingest_reject_query_auth%')]
@@ -324,6 +326,8 @@ MD,
      */
     private function ingestResponse(string $content, int $status, bool $usedQueryAuth, array $extraHeaders = []): Response
     {
+        $this->recordIngestMetric($status, $content);
+
         $headers = $extraHeaders;
         if ($usedQueryAuth) {
             $headers['Deprecation'] = 'true';
@@ -331,5 +335,24 @@ MD,
         }
 
         return new Response($content, $status, $headers);
+    }
+
+    private function recordIngestMetric(int $status, string $content): void
+    {
+        if (Response::HTTP_OK === $status) {
+            $this->metricsCollector->recordIngestAck();
+
+            return;
+        }
+
+        $reason = match (true) {
+            Response::HTTP_UNAUTHORIZED === $status => 'unauthorized',
+            Response::HTTP_FORBIDDEN === $status => 'forbidden',
+            Response::HTTP_TOO_MANY_REQUESTS === $status && str_contains($content, 'rate limit') => 'rate_limit',
+            Response::HTTP_TOO_MANY_REQUESTS === $status => 'quota',
+            Response::HTTP_BAD_REQUEST === $status => 'invalid',
+            default => 'other',
+        };
+        $this->metricsCollector->recordIngestReject($reason);
     }
 }

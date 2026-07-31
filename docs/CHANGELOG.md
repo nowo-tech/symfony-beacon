@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Prometheus metrics** (`038`): `GET /metrics` (text exposition) — Messenger depth, failed notification destinations, ingest ACK/reject counters; `ROLE_ADMIN` or `BEACON_METRICS_TOKEN`
+
 ### Changed
 
 ### Fixed

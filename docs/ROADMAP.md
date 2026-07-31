@@ -189,7 +189,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.5 | **Prometheus metrics** scrape (`/metrics` or `/health/metrics`): ingest ACK rate, Messenger depth, notification failures — **auth or network-restrict** this endpoint | Beacon | `038-prometheus-metrics` | **Planned** |
+| 6.5 | **Prometheus metrics** scrape (`/metrics` or `/health/metrics`): ingest ACK rate, Messenger depth, notification failures — **auth or network-restrict** this endpoint | Beacon | `038-prometheus-metrics` | **Done** (Unreleased) |
 | 6.6 | **Notification circuit breaker**: pause / back off a destination after N consecutive failures; admin resume | Beacon | `039-notification-circuit-breaker` | **Planned** |
 | 6.7 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Planned** |
 | 6.8 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Planned** |

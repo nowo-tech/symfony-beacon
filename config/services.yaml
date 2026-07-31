@@ -28,3 +28,5 @@ when@test:
         app.setup.check_platform_catalogs: true
         # Override env default so local webhook hosts (example.test) skip DNS SSRF checks in PHPUnit.
         beacon.notifications.allow_private_urls: true
+        # Stable scrape token for MetricsEndpointTest (Bearer / ?token=).
+        beacon.metrics_token: 'phpunit-metrics-token'
