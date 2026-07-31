@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Notifications;
 
-use App\Issues\Entity\Issue;
 use App\Identity\Entity\User;
+use App\Issues\Entity\Issue;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\InteractionActionToken;
