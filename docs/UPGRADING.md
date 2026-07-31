@@ -196,7 +196,7 @@ make vite-build
 - **Default locale** (`DEFAULT_LOCALE`, e.g. `es` in this project’s `.env`, `en` in `.env.dist`): bare paths serve content — `/login`, `/register`.
 - **Other locales**: prefixed — `/en/login`, `/en/register`.
 - AuthKit uses `locale.in_path: both` + `unlocalized: serve` (see `config/packages/nowo_auth_kit.yaml`).
-- Cold-start / restore setup is SiteBackup at **`/setup`** (panel **`/_site_backup`**). Set **`SITE_SETUP_TOKEN`** (open `/setup?token=…`) and **`SITE_BACKUP_PASSWORD_HASH`** (see `.env.dist`). Production refuses the documented local defaults — rotate before deploy.
+- Cold-start / restore setup is SiteBackup at **`/setup`** (panel **`/_site_backup`**). Set **`SITE_SETUP_TOKEN`** (open `/setup?token=…`) and **`SITE_BACKUP_PASSWORD_HASH`** (see `.env.dist`). Outside **`dev`/`test`** (including `prod` and `staging`), Beacon refuses the documented local defaults — rotate before deploy (`062`).
 - Legal pages still redirect bare → `/{DEFAULT_LOCALE}/legal/…`.
 - Dashboard / app shell URLs never include `_locale` (account `preferredLocale`).
 - Operator manual: [ADDING-LOCALES.md](ADDING-LOCALES.md).
