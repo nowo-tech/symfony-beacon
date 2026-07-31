@@ -71,6 +71,8 @@ RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scri
 
 COPY --link . ./
 
+# post-install runs cache:clear; SiteBackupSecurityDefaultsGuard skips cache/assets console
+# commands so this bake does not need runtime SITE_* secrets (compose.prod injects them).
 RUN mkdir -p var/cache var/log \
 	&& pnpm install --frozen-lockfile \
 	&& pnpm run build \

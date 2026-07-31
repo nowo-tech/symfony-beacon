@@ -20,6 +20,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked.
  *
  * Instance latch (not static) so FrankenPHP workers do not share mutable static state.
+ *
+ * Console `cache:clear` / `cache:warmup` / `assets:install` are skipped so Docker
+ * `frankenphp_prod` image builds (`composer dump-env` + post-install auto-scripts) can
+ * warm the cache without baking runtime SiteBackup secrets into the image. HTTP requests
+ * and all other console commands still enforce the check.
  */
 final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 {
@@ -28,6 +33,13 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 
     /** Documented local setup token from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_SETUP_TOKEN = 'beacon-local-setup';
+
+    /** @var list<string> */
+    private const array SKIP_CONSOLE_COMMANDS = [
+        'cache:clear',
+        'cache:warmup',
+        'assets:install',
+    ];
 
     private bool $checked = false;
 
@@ -59,6 +71,10 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 
     public function onConsole(ConsoleCommandEvent $event): void
     {
+        $name = $event->getCommand()?->getName();
+        if (null !== $name && \in_array($name, self::SKIP_CONSOLE_COMMANDS, true)) {
+            return;
+        }
         $this->assertProductionSecretsSafe();
     }
 
