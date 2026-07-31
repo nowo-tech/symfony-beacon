@@ -11,7 +11,7 @@ security:
       pattern: ^/(_profiler|_wdt|assets|build)/
       security: false
     ingest:
-      pattern: ^/api/\d+/envelope
+      pattern: ^/api/\d+/(envelope|otlp)
       security: false
     read_api:
       pattern: ^/api/projects/
@@ -78,7 +78,7 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/locale/
       roles: PUBLIC_ACCESS
-    - path: ^/api/\d+/envelope
+    - path: ^/api/\d+/(envelope|otlp)
       roles: PUBLIC_ACCESS
     - path: ^/api/projects/
       roles: PUBLIC_ACCESS

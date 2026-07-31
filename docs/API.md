@@ -19,9 +19,21 @@ Content-Type: application/x-beacon-envelope
 
 Ingest **always requires** a non-empty secret. The public key must belong to `{project_id}`. Successful requests return a fast **200 ACK**; processing continues on Messenger.
 
-Governance: per-project **suspend ingest** and **daily quota** are enforced on ACK and re-checked in the worker (`051`).
+Governance: per-project **suspend ingest** and **daily/monthly quota** are enforced on ACK and re-checked in the worker (`051`).
 
 See [DSN.md](DSN.md) for full DSN examples and Docker client notes.
+
+## OTLP logs ingest (v1)
+
+```http
+POST /api/{project_id}/otlp/v1/logs
+Content-Type: application/json
+X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
+```
+
+Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches `BEACON_ENVELOPE_MAX_BYTES`.
+
+Out of scope for v1: gRPC, `/v1/traces`, `/v1/metrics`, protobuf Content-Type. Spec: `067-otlp-ingest`.
 
 ## Health
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Beacon;
 
 /**
- * Drops Beacon client payloads that originate from Envelope ingest HTTP requests.
+ * Drops Beacon client payloads that originate from ingest HTTP requests.
  *
  * Prevents a feedback loop when this server dogfoods itself via BEACON_DSN:
  * an ingest failure must not be re-reported through the same ingest path.
@@ -21,7 +21,7 @@ final class DropSelfIngestBeforeSend
      */
     public function __invoke(array $event): ?array
     {
-        if ($this->isEnvelopeIngestRequest($event)) {
+        if ($this->isIngestHttpRequest($event)) {
             return null;
         }
 
@@ -31,7 +31,7 @@ final class DropSelfIngestBeforeSend
     /**
      * @param BeaconEvent $event
      */
-    private function isEnvelopeIngestRequest(array $event): bool
+    private function isIngestHttpRequest(array $event): bool
     {
         $candidates = [];
 
@@ -61,16 +61,16 @@ final class DropSelfIngestBeforeSend
             $candidates[] = $transaction;
         }
 
-        return array_any($candidates, fn (string $value): bool => $this->pathLooksLikeEnvelopeIngest($value));
+        return array_any($candidates, fn (string $value): bool => $this->pathLooksLikeIngest($value));
     }
 
-    private function pathLooksLikeEnvelopeIngest(string $value): bool
+    private function pathLooksLikeIngest(string $value): bool
     {
         $path = parse_url($value, \PHP_URL_PATH);
         if (!\is_string($path) || '' === $path) {
             $path = $value;
         }
 
-        return str_contains($path, '/envelope');
+        return str_contains($path, '/envelope') || str_contains($path, '/otlp/');
     }
 }

@@ -19,6 +19,9 @@ final class DropSelfIngestBeforeSendTest extends TestCase
         self::assertNull($hook([
             'request' => ['path' => '/api/1/envelope'],
         ]));
+        self::assertNull($hook([
+            'request' => ['url' => 'https://beacon.example/api/1/otlp/v1/logs'],
+        ]));
     }
 
     public function testKeepsDashboardExceptions(): void

@@ -20,8 +20,12 @@ nelmio_api_doc:
 
                 Auth may be supplied via:
                 - Header `X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…`
-                - Query `?beacon_key=…&beacon_secret=…`
+                - Query `?beacon_key=…&beacon_secret=…` (Envelope only; deprecated / rejected by default)
                 - Envelope header JSON line `"dsn": "https://public:secret@host/id"`
+
+                ## OTLP logs
+                `POST /api/{projectId}/otlp/v1/logs` accepts OTLP HTTP JSON log exports (WARN+),
+                authenticated with `X-Beacon-Auth` only (no query auth).
 
                 ## Health
                 Unauthenticated liveness/readiness probes for orchestrators.
