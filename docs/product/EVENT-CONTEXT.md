@@ -30,7 +30,7 @@ Primary implementation: [BeaconBundle USAGE — Tags / before_send](https://gith
 | `setTag` / `setTags` | `payload.tags` | Event detail → Tags → **Client tags** |
 | `before_send` service | Mutates or drops payload pre-transport | Absent fields simply do not appear |
 
-Also see [DSN.md](DSN.md#client-capabilities-beaconbundle) and specs `023-client-tags-scrubbing` / `024-client-spans` (Bundle-primary).
+Also see [DSN.md](../DSN.md#client-capabilities-beaconbundle) and specs `023-client-tags-scrubbing` / `024-client-spans` (Bundle-primary).
 
 ## Spans and breadcrumbs (BeaconBundle)
 

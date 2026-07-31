@@ -33,7 +33,7 @@ Artifacts under `specs/` are the source of truth; code must align with them.
 Do not introduce alternate stacks (Nginx+FPM, Apache) without amending this constitution.
 Do not introduce full DDD/hexagonal layers; keep Symfony modular conventions.
 Do not replace the Twig app with a separate mobile-only UI stack without a new spec amending this principle.
-Do not reintroduce Hotwire Native / `symfony/ux-native` without amending this constitution (removed; see `docs/NATIVE-MOBILE.md`).
+Do not reintroduce Hotwire Native / `symfony/ux-native` without amending this constitution (removed; see `docs/dev/NATIVE-MOBILE.md`).
 
 ### III. Product mission
 
@@ -49,7 +49,7 @@ Do not document or depend on host-installed PHP/Composer.
 ### V. Classic ↔ worker compatibility
 
 Application code must be safe in **worker mode** (resettable cross-request state; per-request stateful services implement `ResetInterface` when needed).
-See `docs/FRANKENPHP-CODING.md`. Default coding target: `FRANKENPHP_MODE=worker` and `FRANKENPHP_RESET_KERNEL=false`.
+See `docs/ops/FRANKENPHP-CODING.md`. Default coding target: `FRANKENPHP_MODE=worker` and `FRANKENPHP_RESET_KERNEL=false`.
 
 ### VI. Efficient ingest
 
@@ -96,7 +96,7 @@ Rationale: contribution history and review attribution belong to the people who 
 - Ingest auth: Envelope-compatible (`X-Beacon-Auth` header and/or envelope `dsn`) mapped to project API keys. Query-string auth (`beacon_key` / `beacon_secret`) is **deprecated** but still accepted with deprecation headers.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository**; this server may install it for **dogfooding** (self-reporting via `BEACON_DSN`). External apps configure their own DSN against this host.
-- Mobile: PWA only in this repository (`docs/NATIVE-MOBILE.md`).
+- Mobile: PWA only in this repository (`docs/dev/NATIVE-MOBILE.md`).
 - Configuration: see **Principle IX** — no `env(…):` default map entries in `config/parameters.yaml`.
 
 ## Development workflow (SDD)

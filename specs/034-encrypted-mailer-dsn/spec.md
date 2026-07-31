@@ -96,7 +96,7 @@ As a guest on the login page, I only see **magic login** and **forgot password**
 
 ## Related
 
-- Local SMTP catcher for development: [`066-local-mailpit`](../066-local-mailpit/spec.md) (`make mailpit`, docs/MAILPIT.md).
+- Local SMTP catcher for development: [`066-local-mailpit`](../066-local-mailpit/spec.md) (`make mailpit`, docs/ops/MAILPIT.md).
 
 ## Out of Scope
 

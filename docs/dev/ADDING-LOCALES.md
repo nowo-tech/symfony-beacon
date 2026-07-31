@@ -210,7 +210,7 @@ make qa
 - Prefer **endonyms** in `locale.{code}` (e.g. `Deutsch`, `Español`, `Polski`).
 - Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + SiteBackup `setup.locale` (same model) + guest session locale + account preference (no `_locale` on dashboard paths). Optional RoutingKit for other `#[Routable]` app routes (`064`).
 - Prefer shipping complete `messages.{locale}.yaml` catalogues (key parity with English); translator `fallbacks: [en]` covers gaps only as a safety net.
-- Legal / cookie UX: when adding locales, translate consent catalogues and keep [`LEGAL-AND-COOKIES.md`](LEGAL-AND-COOKIES.md) operator placeholders in English for docs.
+- Legal / cookie UX: when adding locales, translate consent catalogues and keep [`LEGAL-AND-COOKIES.md`](../product/LEGAL-AND-COOKIES.md) operator placeholders in English for docs.
 
 ## Related files (quick index)
 

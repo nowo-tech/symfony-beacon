@@ -101,6 +101,8 @@ final readonly class ProcessEnvelopeHandler
 
         /** @var list<callable(): void> $afterFlush */
         $afterFlush = [];
+        /** @var array<string, array{0: ?string, 1: ?string}> $volumeThresholdKeys */
+        $volumeThresholdKeys = [];
 
         foreach ($parsed['items'] as $item) {
             $type = (string) ($item['header']['type'] ?? '');
@@ -110,7 +112,7 @@ final readonly class ProcessEnvelopeHandler
             }
 
             if ('event' === $type) {
-                $this->ingestEvent($project, $payload, $receivedAt, $afterFlush);
+                $this->ingestEvent($project, $payload, $receivedAt, $afterFlush, $volumeThresholdKeys);
             } elseif ('transaction' === $type) {
                 $this->ingestTransaction($project, $payload, $receivedAt, $afterFlush);
             }
@@ -122,14 +124,28 @@ final readonly class ProcessEnvelopeHandler
         foreach ($afterFlush as $callback) {
             $callback();
         }
+
+        if ([] !== $volumeThresholdKeys) {
+            $this->volumeThresholdEvaluator->evaluateContexts(
+                $project,
+                array_values($volumeThresholdKeys),
+                $receivedAt,
+            );
+        }
     }
 
     /**
-     * @param array<string, mixed>   $payload
-     * @param list<callable(): void> $afterFlush
+     * @param array<string, mixed>                         $payload
+     * @param list<callable(): void>                       $afterFlush
+     * @param array<string, array{0: ?string, 1: ?string}> $volumeThresholdKeys
      */
-    private function ingestEvent(Project $project, array $payload, DateTimeImmutable $receivedAt, array &$afterFlush): void
-    {
+    private function ingestEvent(
+        Project $project,
+        array $payload,
+        DateTimeImmutable $receivedAt,
+        array &$afterFlush,
+        array &$volumeThresholdKeys,
+    ): void {
         $eventId = (string) ($payload['event_id'] ?? bin2hex(random_bytes(16)));
         if ($this->eventRepository->findOneByProjectAndEventId($project, $eventId) instanceof Event) {
             return;
@@ -192,17 +208,18 @@ final readonly class ProcessEnvelopeHandler
         $release = isset($payload['release']) ? (string) $payload['release'] : null;
         $level = strtolower((string) ($payload['level'] ?? 'error'));
 
-        $afterFlush[] = function () use ($project, $issue, $isNew, $isRegression, $level, $environment, $release, $receivedAt): void {
+        $afterFlush[] = function () use ($project, $issue, $isNew, $isRegression): void {
             if ($isNew) {
                 $this->notificationDispatcher->dispatchNewIssue($project, $issue);
             } elseif ($isRegression) {
                 $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
             }
-
-            if (\in_array($level, ['error', 'fatal'], true)) {
-                $this->volumeThresholdEvaluator->evaluate($project, $environment, $release, $receivedAt);
-            }
         };
+
+        if (\in_array($level, ['error', 'fatal'], true)) {
+            $key = ($environment ?? '')."\0".($release ?? '');
+            $volumeThresholdKeys[$key] = [$environment, $release];
+        }
     }
 
     /**

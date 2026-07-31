@@ -9,7 +9,7 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 | Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs + cookie consent profile/inventory (idempotent; safe after upgrades) |
 | Demo | `app:seed-demo` / `make seed` | Local admin + **Symfony Beacon** project (`slug=symfony-beacon`) + `.demo-client.env` + optional server `BEACON_DSN` |
 | Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user`) | Same project/DSN wiring **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to existing `ROLE_ADMIN` users |
-| Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](MERCURE.md)) |
+| Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](ops/MERCURE.md)) |
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
 | Setup UI | `/setup` | SiteBackup wizard (bootstrap choice, migrations, platform seed, admin / optional sample, or full SQL dump) |
 
@@ -27,12 +27,12 @@ make ready              # migrate + platform + demo + dogfood BEACON_DSN when em
 # make seed             # optional: demo user + project + DSN
 make seed-sample        # optional: PROFILE=dev samples
 # Optional local SMTP catcher (not production):
-# make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/MAILPIT.md
+# make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/ops/MAILPIT.md
 ```
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
 
-To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](MAILPIT.md). Do not run Mailpit in production.
+To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 
 Alternatively open the app with an empty (or catalog-less) database: the SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`** (local default `beacon-local-setup`). Choose **guided** (migrations, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
 

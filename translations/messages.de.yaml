@@ -1364,7 +1364,7 @@ settings:
 mercure_settings:
     title: Mercure
     intro: 'Optionale Live-Benachrichtigungen fur angemeldete Mitglieder, wenn ein neues Issue erstellt wird. Standardmassig deaktiviert - nur aktivieren, wenn ein Mercure-Hub verfugbar ist. Web Push bleibt eine separate Aktivierung unter Konto -> Anzeige.'
-    manual_hint: 'Betriebshandbuch (Hub, JWT-Geheimnis, Compose, Fehlerbehebung): docs/MERCURE.md im Repository.'
+    manual_hint: 'Betriebshandbuch (Hub, JWT-Geheimnis, Compose, Fehlerbehebung): docs/ops/MERCURE.md im Repository.'
     status:
         active: 'Live-Mercure-Benachrichtigungen sind fur Mitglieder aktiviert.'
         inactive: 'Mercure ist deaktiviert'
@@ -1588,7 +1588,7 @@ notifications:
         toc: 'Zum Kanal springen'
         intro: 'Schritt-fur-Schritt-Anleitungen, um Slack, Discord, Microsoft Teams, Telegram, E-Mail oder einen generischen HTTP-Webhook mit diesem Projekt zu verbinden.'
         payload_label: 'Beacon sendet:'
-        docs_hint: 'Vollstandige Referenz (Payloads, Zustellung, Berechtigungen): docs/NOTIFICATIONS.md im Repository.'
+        docs_hint: 'Vollstandige Referenz (Payloads, Zustellung, Berechtigungen): docs/product/NOTIFICATIONS.md im Repository.'
         slack:
             title: 'Slack (Incoming Webhook)'
             lead: 'Erstellen Sie einen Slack-App-Incoming-Webhook und fugen Sie die HTTPS-URL in Beacon ein.'

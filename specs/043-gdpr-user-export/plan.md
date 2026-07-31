@@ -24,7 +24,7 @@ Self-service (and admin) **JSON account export** plus **app-owned anonymize** th
 
 - English docs / PHPDoc / UI default locale — pass  
 - Prefer kits: UserKit disable; AuthKit social cleanup; **not** anonymize-bundle runtime — pass (roadmap)  
-- Legal pages remain (`LEGAL-AND-COOKIES.md`) — pass  
+- Legal pages remain (`docs/product/LEGAL-AND-COOKIES.md`) — pass  
 - No drive-by refactors — pass  
 
 ## Project Structure
@@ -53,7 +53,7 @@ src/Identity/UserActionType.php                   # UserAnonymized, AccountExpor
 migrations/Version20260731140000.php
 templates/account/privacy.html.twig
 templates/account/_profile_tabs.html.twig
-docs/LEGAL-AND-COOKIES.md, CHANGELOG, ROADMAP, UPGRADING, DATABASE.md
+docs/product/LEGAL-AND-COOKIES.md, CHANGELOG, ROADMAP, UPGRADING, docs/dev/DATABASE.md
 tests/Identity/GdprAccountExportTest.php
 ```
 

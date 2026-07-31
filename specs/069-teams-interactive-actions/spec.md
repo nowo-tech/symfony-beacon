@@ -34,7 +34,7 @@ As a project owner, I store a signing secret on the Teams destination (same encr
 | FR-002 | MessageCard includes HttpPOST Resolve when secret set + issue/project UUIDs on new/regression/reopened (not samples) |
 | FR-003 | `POST /hooks/teams/actions` public; verify HMAC token + expiry (default 7 days) |
 | FR-004 | Shared `IssueStatusChanger` with `via: teams` |
-| FR-005 | Absolute action URL from router (`DEFAULT_URI`); document in NOTIFICATIONS.md |
+| FR-005 | Absolute action URL from router (`DEFAULT_URI`); document in docs/product/NOTIFICATIONS.md |
 
 ## Out of Scope (this spec)
 

@@ -10,6 +10,6 @@
 
 ## Phase 2: Docs + spec
 
-- [x] T004 Add `docs/MAILPIT.md`; link from INSTALL, NOTIFICATIONS, PRODUCTION, README, CHANGELOG
+- [x] T004 Add `docs/ops/MAILPIT.md`; link from INSTALL, NOTIFICATIONS, PRODUCTION, README, CHANGELOG
 - [x] T005 Speckit artifacts `066-local-mailpit` + ROADMAP pointer
 - [x] T006 Confirm `compose.prod.yaml` has no Mailpit service

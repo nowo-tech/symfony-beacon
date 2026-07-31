@@ -115,7 +115,7 @@ final class SeedSampleCommand extends Command
             $result['performance'] ? 'seeded' : 'already present',
             $result['mercure'] ? 'enabled/configured' : 'already configured',
         ));
-        $io->note('Mercure live alerts use Administration → Mercure (enabled by sample seed). See docs/MERCURE.md.');
+        $io->note('Mercure live alerts use Administration → Mercure (enabled by sample seed). See docs/ops/MERCURE.md.');
 
         return Command::SUCCESS;
     }

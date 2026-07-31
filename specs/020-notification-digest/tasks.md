@@ -15,5 +15,5 @@
 
 ## Phase 3: Polish
 
-- [x] T006 `NotificationDigestTest` + docs (`NOTIFICATIONS.md`, CHANGELOG)
+- [x] T006 `NotificationDigestTest` + docs (`docs/product/NOTIFICATIONS.md`, CHANGELOG)
 - [x] T007 plan/tasks; ROADMAP 4.7 Done

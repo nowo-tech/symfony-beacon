@@ -30,38 +30,72 @@ final readonly class VolumeThresholdEvaluator
         ?string $eventReleaseVersion = null,
         ?DateTimeImmutable $now = null,
     ): void {
-        if (!$project->isIngestEnabled()) {
+        $this->evaluateContexts(
+            $project,
+            [[$eventEnvironment, $eventReleaseVersion]],
+            $now,
+        );
+    }
+
+    /**
+     * Evaluate once per unique environment/release pair (loads rules a single time).
+     *
+     * @param list<array{0: ?string, 1: ?string}> $contexts
+     */
+    public function evaluateContexts(
+        Project $project,
+        array $contexts,
+        ?DateTimeImmutable $now = null,
+    ): void {
+        if (!$project->isIngestEnabled() || [] === $contexts) {
             return;
         }
 
         $now ??= new DateTimeImmutable();
-        $eventEnvironment = ProjectThresholdRule::normalizeEnvironment($eventEnvironment);
-        $eventReleaseVersion = ProjectThresholdRule::normalizeRelease($eventReleaseVersion);
+        $rules = $this->thresholdRuleRepository->findEnabledByProject($project);
+        if ([] === $rules) {
+            return;
+        }
 
         $updated = false;
-        foreach ($this->thresholdRuleRepository->findEnabledByProject($project) as $rule) {
-            if ($rule->isCooldownActive($now)) {
-                continue;
-            }
-            if (!$this->matchesCurrentEvent($rule, $eventEnvironment, $eventReleaseVersion)) {
-                continue;
-            }
+        $checkedRuleIds = [];
 
-            $since = $now->modify(\sprintf('-%d minutes', $rule->getWindowMinutes()));
-            $actualCount = $this->eventRepository->countReceivedSince(
-                $project,
-                $since,
-                $rule->getEnvironment(),
-                $rule->getReleaseVersion(),
-            );
+        foreach ($contexts as [$eventEnvironment, $eventReleaseVersion]) {
+            $eventEnvironment = ProjectThresholdRule::normalizeEnvironment($eventEnvironment);
+            $eventReleaseVersion = ProjectThresholdRule::normalizeRelease($eventReleaseVersion);
 
-            if ($actualCount < $rule->getErrorCount()) {
-                continue;
+            foreach ($rules as $rule) {
+                $ruleId = $rule->getId();
+                if (null !== $ruleId && isset($checkedRuleIds[$ruleId])) {
+                    continue;
+                }
+                if ($rule->isCooldownActive($now)) {
+                    continue;
+                }
+                if (!$this->matchesCurrentEvent($rule, $eventEnvironment, $eventReleaseVersion)) {
+                    continue;
+                }
+
+                if (null !== $ruleId) {
+                    $checkedRuleIds[$ruleId] = true;
+                }
+
+                $since = $now->modify(\sprintf('-%d minutes', $rule->getWindowMinutes()));
+                $actualCount = $this->eventRepository->countReceivedSince(
+                    $project,
+                    $since,
+                    $rule->getEnvironment(),
+                    $rule->getReleaseVersion(),
+                );
+
+                if ($actualCount < $rule->getErrorCount()) {
+                    continue;
+                }
+
+                $this->notificationDispatcher->dispatchVolumeThreshold($project, $rule, $actualCount);
+                $rule->markFired($now);
+                $updated = true;
             }
-
-            $this->notificationDispatcher->dispatchVolumeThreshold($project, $rule, $actualCount);
-            $rule->markFired($now);
-            $updated = true;
         }
 
         if ($updated) {

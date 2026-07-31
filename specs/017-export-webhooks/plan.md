@@ -55,7 +55,7 @@ src/Notifications/Service/NotificationDispatcher.php
 src/Issues/Controller/IssueController.php
 src/Project/Controller/ProjectExportController.php
 src/Issues/Repository/EventRepository.php          # filtered event export query
-docs/NOTIFICATIONS.md
+docs/product/NOTIFICATIONS.md
 docs/CHANGELOG.md
 translations/messages.en.yaml
 translations/messages.es.yaml

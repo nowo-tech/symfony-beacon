@@ -45,5 +45,5 @@ src/Issues/Repository/EventRepository.php
 templates/project/settings.html.twig
 tests/Notifications/ThresholdAlertTest.php
 migrations/Version20260721190000.php
-docs/NOTIFICATIONS.md
+docs/product/NOTIFICATIONS.md
 ```

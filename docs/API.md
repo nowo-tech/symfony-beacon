@@ -2,7 +2,7 @@
 
 Beacon exposes a small public/operator API surface. Interactive OpenAPI lives in the app at **`/api/doc`** (Nelmio ApiDoc).
 
-Related: [DSN.md](DSN.md) (client auth), [ARCHITECTURE.md](ARCHITECTURE.md) (ingest flow), [NOTIFICATIONS.md](NOTIFICATIONS.md) (outbound webhooks).
+Related: [DSN.md](DSN.md) (client auth), [ARCHITECTURE.md](ARCHITECTURE.md) (ingest flow), [NOTIFICATIONS.md](product/NOTIFICATIONS.md) (outbound webhooks).
 
 ## Envelope ingest
 

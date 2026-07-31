@@ -2,7 +2,7 @@
 
 This document explains **why** Symfony Beacon uses its current shape: modular Symfony packages, FrankenPHP, Envelope-compatible ingest, Messenger, Twig + Vite, and Nowo.tech kits — instead of a full DDD/hexagonal rewrite, a separate SPA, or a classic Nginx+FPM stack.
 
-Normative constraints live in [`.specify/memory/constitution.md`](../.specify/memory/constitution.md). Coding rules for the HTTP runtime are in [FRANKENPHP-CODING.md](FRANKENPHP-CODING.md).
+Normative constraints live in [`.specify/memory/constitution.md`](../.specify/memory/constitution.md). Coding rules for the HTTP runtime are in [FRANKENPHP-CODING.md](ops/FRANKENPHP-CODING.md).
 
 ## Product constraints that drive the design
 
@@ -54,7 +54,7 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Server-rendered Twig | Auth, CSRF, flash messages, and permission checks stay in one stack; good fit for an operator console. |
 | Stimulus | Progressive enhancement for interactive widgets (DataTables, clipboard, collapse panels). |
 | Vite + TypeScript + Tailwind 4 | Modern asset pipeline without splitting the product into “API repo + frontend repo”. |
-| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](NATIVE-MOBILE.md) — Hotwire Native removed). |
+| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md) — Hotwire Native removed). |
 | Montserrat | Brand wordmarks and app chrome share one geometric sans (self-hosted). |
 
 A dedicated SPA would force a second auth model, duplicated validation, and larger ops surface for little benefit on CRUD-heavy admin screens.
@@ -65,7 +65,7 @@ Login, registration, cookies, menus, and forms are solved problems. Preferring [
 
 - Keeps Beacon focused on **telemetry** (ingest, grouping, performance, analytics).
 - Reuses tested AuthKit / UserKit / AuditKit / cookie-consent / dashboard-menu / form-kit behaviour.
-- Leaves room for operator legal pages without inventing a consent stack ([LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
+- Leaves room for operator legal pages without inventing a consent stack ([LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md)).
 
 Identity in this repo owns **User** persistence, account preferences, magic-login gating, and project membership; AuthKit owns the login/register chrome.
 
@@ -76,7 +76,7 @@ Identity in this repo owns **User** persistence, account preferences, magic-logi
 | Envelope protocol on the server | Operators can point Envelope-compatible clients (especially `nowo-tech/beacon-bundle`) at this server immediately. |
 | `nowo-tech/beacon-bundle` in another repository | Client instrumentation evolves independently. This server may still **require** the bundle to dogfood its own errors (`BEACON_DSN` → loopback demo project after `make ready`). External apps keep using a separate install. |
 
-Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([EVENT-CONTEXT.md](EVENT-CONTEXT.md)).
+Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([EVENT-CONTEXT.md](product/EVENT-CONTEXT.md)).
 
 ## Why Spec-Driven Development
 
@@ -90,7 +90,7 @@ Features are specified under `specs/` before large changes. That matches an open
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](ROLES.md) |
+| `Identity` | Users, account prefs, magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](product/ROLES.md) |
 | `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
 | `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT | Primary debugging UX |
@@ -99,7 +99,7 @@ Features are specified under `specs/` before large changes. That matches an open
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history | Outbound alerts after ingest |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer / Mercure settings | Cross-cutting presentation / instance config |
 
-Entity tables, columns, and FK relationships (Mermaid ER): [DATABASE.md](DATABASE.md).
+Entity tables, columns, and FK relationships (Mermaid ER): [DATABASE.md](dev/DATABASE.md).
 
 ## Flows (Mermaid)
 

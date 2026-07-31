@@ -71,8 +71,9 @@ class IssueRepository extends ServiceEntityRepository
             user: $user,
         );
 
-        // Always hydrate assignee for list/export Twig (avoids N+1 per row).
+        // Always hydrate assignee + duplicateOf for list/export/API (avoids N+1 per row).
         $qb->leftJoin('i.assignee', 'assignee_user')->addSelect('assignee_user');
+        $qb->leftJoin('i.duplicateOf', 'duplicate_of')->addSelect('duplicate_of');
 
         $this->applySqlSort($qb, $sort);
 
@@ -306,7 +307,18 @@ class IssueRepository extends ServiceEntityRepository
 
     public function findOneByProjectAndUuid(Project $project, string $uuid): ?Issue
     {
-        return $this->findOneBy(['project' => $project, 'uuid' => $uuid]);
+        /** @var Issue|null $issue */
+        $issue = $this->createQueryBuilder('i')
+            ->leftJoin('i.assignee', 'assignee_user')->addSelect('assignee_user')
+            ->leftJoin('i.duplicateOf', 'duplicate_of')->addSelect('duplicate_of')
+            ->andWhere('i.project = :project')
+            ->andWhere('i.uuid = :uuid')
+            ->setParameter('project', $project)
+            ->setParameter('uuid', $uuid)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $issue;
     }
 
     public function countByProjectAndStatus(Project $project, IssueStatus $status): int

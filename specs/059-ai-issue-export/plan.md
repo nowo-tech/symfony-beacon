@@ -4,7 +4,7 @@
 
 ## Summary
 
-`AiIssueExportFormatter` builds canonical array + Markdown/JSON. Issue routes `export/ai.md` and `export/ai.json`. Issue show UI: Copy for AI + downloads. Scrub sensitive headers. Docs `docs/AI-EXPORT.md`.
+`AiIssueExportFormatter` builds canonical array + Markdown/JSON. Issue routes `export/ai.md` and `export/ai.json`. Issue show UI: Copy for AI + downloads. Scrub sensitive headers. Docs `docs/product/AI-EXPORT.md`.
 
 ## Implementation
 

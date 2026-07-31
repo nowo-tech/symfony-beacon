@@ -6,7 +6,7 @@
 ## Phase 1: Setup
 
 - [x] T001 Add env defaults + parameters for circuit threshold/cooldown in `.env.dist` and `config/parameters.yaml`
-- [x] T002 [P] Document behaviour in `docs/NOTIFICATIONS.md` (short section)
+- [x] T002 [P] Document behaviour in `docs/product/NOTIFICATIONS.md` (short section)
 
 ## Phase 2: Foundational
 

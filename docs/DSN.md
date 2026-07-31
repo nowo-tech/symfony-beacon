@@ -145,6 +145,6 @@ The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMes
 | Doctrine / HttpClient spans (`instrumentation.*`) | transaction `spans` + breadcrumbs | Performance + event breadcrumbs |
 | Contexts (PHP / Symfony / OS) | payload `contexts` | Event detail |
 
-Details: [EVENT-CONTEXT.md](EVENT-CONTEXT.md#tags-and-before_send-beaconbundle), Bundle [USAGE.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/USAGE.md) / [CONFIGURATION.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md).
+Details: [EVENT-CONTEXT.md](product/EVENT-CONTEXT.md#tags-and-before_send-beaconbundle), Bundle [USAGE.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/USAGE.md) / [CONFIGURATION.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md).
 
 From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC:SECRET@host.docker.internal:9081/1`.

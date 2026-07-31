@@ -15,7 +15,7 @@ There is no separate `src/Hardening` module—behaviour lives in Shared/Identity
 - Production image target `frankenphp_prod` and guidance in `docs/PRODUCTION.md`.
 - Secrets: version `.env.dist` only; never commit `.env`. Halite keys / encrypted Doctrine fields for API secrets and webhook URLs (`nowo-tech/doctrine-encrypt-bundle`). Durable key in prod Compose (`048`) and durable test key via PHPUnit bootstrap (`var/secrets/`).
 - CSRF on forms and on non-form mutating POSTs (e.g. **create API key**, **guest locale switch**).
-- Cookie consent + legal/privacy/terms pages at `/{_locale}/legal/…` (bare `/legal/…` redirects to `DEFAULT_LOCALE`; `docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`).
+- Cookie consent + legal/privacy/terms pages at `/{_locale}/legal/…` (bare `/legal/…` redirects to `DEFAULT_LOCALE`; `docs/product/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`).
 - Login throttling with **database** storage shared across FrankenPHP workers / multi-pod (`login_attempts`, see `012-safe-self-hosting`).
 - UserKit `invalidate_sessions_on_disable: true`.
 - Outbound notification URL SSRF guard (private / link-local / metadata blocked in production).

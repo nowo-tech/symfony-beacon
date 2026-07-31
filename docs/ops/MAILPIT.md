@@ -43,7 +43,7 @@ Image: [`axllent/mailpit`](https://hub.docker.com/r/axllent/mailpit). Defined in
 
 4. On the same page, use **Send sample email** (or trigger magic login / a project email notification test). Messages appear in the Mailpit UI.
 
-Env `MAILER_DSN` remains a bootstrap fallback only (`null://null` in `.env.dist`). Magic login and forgot-password stay gated on a **deliverable encrypted** database DSN — see [`034-encrypted-mailer-dsn`](../specs/034-encrypted-mailer-dsn/spec.md) and [NOTIFICATIONS.md](NOTIFICATIONS.md#email).
+Env `MAILER_DSN` remains a bootstrap fallback only (`null://null` in `.env.dist`). Magic login and forgot-password stay gated on a **deliverable encrypted** database DSN — see [`034-encrypted-mailer-dsn`](../../specs/034-encrypted-mailer-dsn/spec.md) and [NOTIFICATIONS.md](../product/NOTIFICATIONS.md#email).
 
 ---
 

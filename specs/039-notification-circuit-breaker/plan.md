@@ -65,7 +65,7 @@ migrations/Version20260731120000.php
 config/parameters.yaml
 .env.dist
 tests/Notifications/NotificationCircuitBreakerTest.php
-docs/NOTIFICATIONS.md
+docs/product/NOTIFICATIONS.md
 docs/CHANGELOG.md
 docs/UPGRADING.md
 ```

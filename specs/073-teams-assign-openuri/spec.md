@@ -32,7 +32,7 @@ As an operator, Teams MessageCards for `issue.new` / `regression` / `reopened` i
 | FR-001 | `InteractionActionToken` supports `a: assign` (and keeps resolve wrappers) |
 | FR-002 | MessageCard **Assign to me** OpenUri → `hooks_teams_assign_me` with signed query |
 | FR-003 | `GET /hooks/teams/assign-me` requires `ROLE_USER`, validates HMAC, triage, `IssueAssigneeChanger::assign(..., 'teams')` |
-| FR-004 | Document in NOTIFICATIONS.md |
+| FR-004 | Document in docs/product/NOTIFICATIONS.md |
 
 ## Out of Scope
 

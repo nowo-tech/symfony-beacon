@@ -32,7 +32,7 @@ As a user, I store my Slack member ID on Account → Profile so interactive acti
 | FR-002 | Slack Block Kit **Assign to me** beside Resolve when signing secret set |
 | FR-003 | Shared `IssueAssigneeChanger` for UI and Slack |
 | FR-004 | Resolve attributes actor when mapped user has triage; otherwise null actor |
-| FR-005 | Document in NOTIFICATIONS.md |
+| FR-005 | Document in docs/product/NOTIFICATIONS.md |
 
 ## Out of Scope
 

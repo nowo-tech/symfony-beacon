@@ -8,19 +8,19 @@ In addition, **optional** member alerts for **new issues** on projects they belo
 
 | Channel | When | How to enable |
 |---|---|---|
-| Mercure (SSE) | App open (browser or installed PWA) | **Administration → Mercure** (off by default; **enabled automatically** when you run `app:seed-sample` / Setup sample data). Hub URL / JWT from that screen or `MERCURE_*` env — see [MERCURE.md](MERCURE.md) |
+| Mercure (SSE) | App open (browser or installed PWA) | **Administration → Mercure** (off by default; **enabled automatically** when you run `app:seed-sample` / Setup sample data). Hub URL / JWT from that screen or `MERCURE_*` env — see [MERCURE.md](../ops/MERCURE.md) |
 | Web Push | Background / locked screen | **Account → Display → Push notifications** (off by default; requires `VAPID_*` env keys) |
 
 Neither channel is required for Envelope ingest or webhook destinations.
 
-See feature specs `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](ROADMAP.md).
+See feature specs `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](../ROADMAP.md).
 In the app, open **Project → Settings → Notifications → Setup guides** for the same manuals.
 
 ## Member push (Mercure + Web Push)
 
 ### Mercure hub
 
-Full operator manual (Compose hub, JWT secret, admin overrides, external hubs, troubleshooting): **[MERCURE.md](MERCURE.md)**.
+Full operator manual (Compose hub, JWT secret, admin overrides, external hubs, troubleshooting): **[MERCURE.md](../ops/MERCURE.md)**.
 
 Summary:
 
@@ -162,7 +162,7 @@ Classic Incoming Webhooks can carry MessageCard actions. To enable **Resolve** a
 3. In Beacon: type **Email**, set endpoint to the **recipient address** (e.g. `ops@example.com`).
 4. Choose categories, save, **Send test**, and check the inbox (and spam).
 
-**Local development:** start Mailpit with `make mailpit`, then save DSN `smtp://mailer:1025` under Administration → Mailer and inspect messages at http://localhost:18025 (default host UI port). Full guide: [MAILPIT.md](MAILPIT.md). Mailpit is **not** started by `make up` and is **not** part of the production Compose stack.
+**Local development:** start Mailpit with `make mailpit`, then save DSN `smtp://mailer:1025` under Administration → Mailer and inspect messages at http://localhost:18025 (default host UI port). Full guide: [MAILPIT.md](../ops/MAILPIT.md). Mailpit is **not** started by `make up` and is **not** part of the production Compose stack.
 
 **What Beacon sends:** email subject = summary; body = summary plus the issue/performance URL when present. From address comes from Mailer settings.
 

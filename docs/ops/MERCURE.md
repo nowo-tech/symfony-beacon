@@ -2,7 +2,7 @@
 
 Beacon can show **live toasts** to signed-in members when a **new issue** is created on a project they belong to. That path uses [Mercure](https://mercure.rocks/) (Server-Sent Events). It is **optional** and **off by default**.
 
-Background / locked-screen alerts use **Web Push** (VAPID) instead — see [NOTIFICATIONS.md](NOTIFICATIONS.md#web-push-pwa). Mercure and Web Push are independent.
+Background / locked-screen alerts use **Web Push** (VAPID) instead — see [NOTIFICATIONS.md](../product/NOTIFICATIONS.md#web-push-pwa). Mercure and Web Push are independent.
 
 | Piece | Role |
 |-------|------|
@@ -179,7 +179,7 @@ In the browser (signed in, Mercure enabled):
 | EventSource 401 | Subscriber JWT secret ≠ hub `MERCURE_SUBSCRIBER_JWT_KEY` |
 | EventSource never connects | Mercure disabled; wrong `MERCURE_PUBLIC_URL`; Caddy proxy missing |
 | CORS errors | Browser URL is cross-origin and hub `cors_origins` excludes Beacon |
-| Toasts only when tab open | Expected — use [Web Push](NOTIFICATIONS.md#web-push-pwa) for background |
+| Toasts only when tab open | Expected — use [Web Push](../product/NOTIFICATIONS.md#web-push-pwa) for background |
 | Push checkbox missing | Separate: set `VAPID_*` (Mercure not required) |
 
 After changing hub env vars:
@@ -192,7 +192,7 @@ docker compose up -d --force-recreate mercure
 
 ## Related
 
-- Member alerts overview: [NOTIFICATIONS.md](NOTIFICATIONS.md#member-push-mercure--web-push)
+- Member alerts overview: [NOTIFICATIONS.md](../product/NOTIFICATIONS.md#member-push-mercure--web-push)
 - Production Compose: [`compose.prod.yaml`](../compose.prod.yaml)
 - Local Caddy proxy: [`.docker/frankenphp/Caddyfile`](../.docker/frankenphp/Caddyfile)
 - Env templates: [`.env.dist`](../.env.dist)

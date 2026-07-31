@@ -32,6 +32,7 @@ class ProjectShareLinkRepository extends ServiceEntityRepository
     {
         /** @var list<ProjectShareLink> $rows */
         $rows = $this->createQueryBuilder('l')
+            ->leftJoin('l.issue', 'i')->addSelect('i')
             ->andWhere('l.project = :project')
             ->andWhere('l.revokedAt IS NULL')
             ->andWhere('l.expiresAt > :now')

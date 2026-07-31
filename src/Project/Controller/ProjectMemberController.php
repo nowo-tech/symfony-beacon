@@ -7,6 +7,7 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupRepository;
+use App\Identity\Repository\UserRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
@@ -35,6 +36,7 @@ final class ProjectMemberController extends AbstractController
         private readonly ProjectAccessService $projectAccess,
         private readonly ProjectMembershipManager $membershipManager,
         private readonly UserGroupRepository $userGroupRepository,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -186,13 +188,7 @@ final class ProjectMemberController extends AbstractController
         }
 
         $memberUuid = $request->request->getString('user');
-        $memberUser = null;
-        foreach ($project->getMemberships() as $membership) {
-            if ($membership->getUser()->getUuid() === $memberUuid) {
-                $memberUser = $membership->getUser();
-                break;
-            }
-        }
+        $memberUser = $this->userRepository->findOneBy(['uuid' => $memberUuid]);
         if (!$memberUser instanceof User) {
             $this->addFlash('error', 'flash.project.member_user_not_found');
 

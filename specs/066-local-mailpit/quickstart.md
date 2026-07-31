@@ -11,6 +11,6 @@ make mailpit
 3. **Send sample email** (or magic login / project email **Send test**).
 4. Confirm the message in Mailpit.
 
-Full manual: [docs/MAILPIT.md](../../docs/MAILPIT.md).
+Full manual: [docs/ops/MAILPIT.md](../../docs/ops/MAILPIT.md).
 
 Production: do not start Mailpit; use a real Mailer DSN ([docs/PRODUCTION.md](../../docs/PRODUCTION.md)).
