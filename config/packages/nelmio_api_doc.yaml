@@ -27,6 +27,10 @@ nelmio_api_doc:
                 `POST /api/{projectId}/otlp/v1/logs` accepts OTLP HTTP JSON log exports (WARN+),
                 authenticated with `X-Beacon-Auth` only (no query auth).
 
+                ## OTLP traces
+                `POST /api/{projectId}/otlp/v1/traces` accepts OTLP HTTP JSON trace exports (ERROR spans),
+                authenticated with `X-Beacon-Auth` only (no query auth).
+
                 ## Health
                 Unauthenticated liveness/readiness probes for orchestrators.
 

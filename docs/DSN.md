@@ -79,6 +79,16 @@ X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET
 
 WARN+ LogRecords become Beacon Issues/Events (see [API.md](API.md#otlp-logs-ingest-v1), spec `067-otlp-ingest`). Prefer Envelope via BeaconBundle for first-party Symfony apps.
 
+### OTLP traces (HTTP JSON adapter)
+
+```http
+POST /api/{project_id}/otlp/v1/traces
+Content-Type: application/json
+X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET
+```
+
+ERROR spans become Beacon Issues/Events (see [API.md](API.md#otlp-traces-ingest-v1), spec `070-otlp-traces`).
+
 ## Auth
 
 Preferred Envelope mechanisms (mapped to project API keys):
