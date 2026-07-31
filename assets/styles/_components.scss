@@ -2608,6 +2608,7 @@ body::-webkit-scrollbar-corner,
 /*
  * Sidebar motion: fixed panel slides via transform; main content reserves space
  * with padding-inline-start (length→length interpolates without @property).
+ * Content width toggle uses the same duration/ease on max-width (72rem↔100%).
  * Avoid animating grid-template-columns — rem↔0px snaps in browsers without
  * registered custom properties and feels abrupt beside the slide.
  */
@@ -2738,14 +2739,17 @@ body::-webkit-scrollbar-corner,
   position: relative;
   z-index: 10;
   width: 100%;
+  /* Length→length (72rem↔100%) so the toggle eases like the sidebar slide;
+   * `max-width: none` does not interpolate and snaps. */
   max-width: 72rem;
   margin: 0 auto;
   padding: 1.75rem 1.25rem 2.5rem;
-  transition: max-width 0.2s ease;
+  transition: max-width var(--app-sidebar-duration, 0.42s)
+    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .app-shell.is-full-width .app-main__inner {
-  max-width: none;
+  max-width: 100%;
 }
 
 .app-shell.is-content-width .app-main__inner {
@@ -3545,10 +3549,12 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   max-width: 72rem;
   margin-inline: auto;
   font-size: 0.8125rem;
+  transition: max-width var(--app-sidebar-duration, 0.42s)
+    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .app-shell.is-full-width > .site-legal-footer .site-legal-footer__nav {
-  max-width: none;
+  max-width: 100%;
 }
 
 .site-legal-footer__nav a {
