@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **QR login image** (`075-qr-png`, Fixes #40): AuthKit **1.12.1** + `endroid/qr-code`; QR show pages render PNG (with GD) or SVG data-URI. SMS OTP remains Later.
 - **OTLP metrics ingest** (`074-otlp-metrics`, Fixes #38): `POST /api/{projectId}/otlp/v1/metrics` accepts OTLP ExportMetricsServiceRequest JSON; failure-like data points map to Beacon events via the Envelope worker; same auth/governance as OTLP logs/traces; cap 200.
 - **Teams Assign to me** (`073-teams-assign-openuri`, Fixes #36): MessageCard **OpenUri Assign to me** when a destination signing secret is set; `GET /hooks/teams/assign-me` validates HMAC, requires Beacon login + triage, assigns via `IssueAssigneeChanger` (`via: teams`).
 - **AuthKit 1.12.0** (`072-authkit-1.12`, Fixes #34): bump from 1.11.4; QR login foundation (`qr_login` enabled, `/login/qr*` public, `app_user.phone` / `phone_verified_at`, challenge table); admin **Enterprise SSO** flag on social credentials; Account profile phone field.
