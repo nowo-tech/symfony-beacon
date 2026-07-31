@@ -5,7 +5,10 @@ contact_links:
     about: Report a security issue privately (do not file a public bug).
   - name: Contributing guide
     url: https://github.com/nowo-tech/symfony-beacon/blob/main/docs/CONTRIBUTING.md
-    about: Spec-driven workflow, kits preference, and QA expectations.
+    about: Spec-driven workflow, kits preference, issue/PR templates, and QA expectations.
+  - name: Funding / Sponsors
+    url: https://github.com/sponsors/nowo-tech
+    about: Support Nowo.tech maintenance of Beacon and the kit ecosystem.
   - name: BeaconBundle (client)
     url: https://github.com/nowo-tech/BeaconBundle/issues
     about: Issues for the Symfony instrumentation client belong in BeaconBundle.

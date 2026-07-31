@@ -125,7 +125,9 @@ final class ProductUserActivityTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/admin/users/'.$ownerUuid.'/activity');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('body', 'Issue assignee changed');
-        self::assertSelectorTextContains('body', 'Issue status changed');
+        // Admin identity timeline intentionally omits issue navigation noise (see AdminIdentityAudit).
+        self::assertSelectorTextNotContains('body', 'Issue assignee changed');
+        self::assertSelectorTextNotContains('body', 'Issue status changed');
+        self::assertSelectorTextContains('body', 'No recorded identity actions');
     }
 }

@@ -11,6 +11,7 @@ use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Repository\ProjectMembershipRepository;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
 
@@ -88,7 +89,7 @@ final readonly class AccountDataExporter
 
         return [
             'schema' => 'beacon-account-export/v1',
-            'exported_at' => (new \DateTimeImmutable())->format(DateTimeInterface::ATOM),
+            'exported_at' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
             'account' => [
                 'uuid' => $user->getUuid(),
                 'email' => $user->getEmail(),

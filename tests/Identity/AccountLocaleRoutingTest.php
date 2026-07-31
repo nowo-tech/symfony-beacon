@@ -27,7 +27,8 @@ final class AccountLocaleRoutingTest extends DatabaseWebTestCase
         self::assertStringNotContainsString('_locale=', $client->getRequest()->getUri());
         self::assertSelectorTextContains('.locale-switcher__code', 'ES');
         self::assertSelectorTextContains('.app-sidebar__label', 'Preferencias');
-        self::assertSelectorTextContains('h1', 'Perfil');
+        self::assertSelectorTextContains('h1', 'Ajustes de cuenta');
+        self::assertSelectorTextContains('.preferences-nav', 'Perfil');
     }
 
     public function testLocaleSwitcherPostsPreferenceWithoutQueryLocale(): void

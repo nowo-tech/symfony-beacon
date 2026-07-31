@@ -45,10 +45,7 @@ final readonly class AccountAnonymizer
 
         $soleOwnerProjects = $this->soleOwnerProjects($subject);
         if ([] !== $soleOwnerProjects) {
-            throw new AccountAnonymizeException(
-                AccountAnonymizeException::SOLE_OWNER,
-                $soleOwnerProjects,
-            );
+            throw new AccountAnonymizeException(AccountAnonymizeException::SOLE_OWNER, $soleOwnerProjects);
         }
 
         if ($this->isLastAdmin($subject)) {

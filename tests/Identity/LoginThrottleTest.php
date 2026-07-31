@@ -30,7 +30,7 @@ final class LoginThrottleTest extends DatabaseWebTestCase
         for ($i = 0; $i < 4; ++$i) {
             $this->submitFailedLogin($client, $email);
             self::assertResponseIsSuccessful();
-            self::assertSelectorExists('.flash-error');
+            self::assertSelectorExists('.nowo-auth-kit__alert--error');
             self::assertStringNotContainsString(
                 'Too many failed login attempts',
                 (string) $client->getResponse()->getContent(),
@@ -40,7 +40,7 @@ final class LoginThrottleTest extends DatabaseWebTestCase
 
         $this->submitFailedLogin($client, $email);
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.flash-error', 'Too many failed login attempts');
+        self::assertSelectorTextContains('.nowo-auth-kit__alert--error', 'Too many failed login attempts');
     }
 
     private function submitFailedLogin(KernelBrowser $client, string $email): void

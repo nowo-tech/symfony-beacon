@@ -1,0 +1,55 @@
+name: CI / Docker / ops
+description: GitHub Actions, FrankenPHP image, Compose, or self-host ops tooling
+title: "[Ops]: "
+labels: ["ops"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For application bugs use **Bug report**. Redact tokens, DSNs, and registry credentials.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What failed?
+      description: Job name, Compose service, or image target (e.g. frankenphp_prod, Coverage, Secret scan).
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - GitHub Actions (Quality / Coverage / Docker / Gitleaks / Git hygiene)
+        - Dockerfile / frankenphp_prod
+        - docker compose (dev)
+        - compose.prod / production deploy
+        - Makefile / local DX
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit / workflow run
+      description: Commit SHA, tag, or link to a failing Actions run.
+      placeholder: https://github.com/nowo-tech/symfony-beacon/actions/runs/…
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt
+      description: Last ~30–50 lines of the failing step (redact secrets).
+      render: shell
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I confirmed this is not an application functional bug (those use Bug report)
+          required: true
+        - label: Logs do not contain real secrets or production DSNs
+          required: true

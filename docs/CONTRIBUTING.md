@@ -7,7 +7,7 @@
 5. Read [docs/ARCHITECTURE.md](ARCHITECTURE.md) before proposing structural changes (modular Symfony vs DDD, ingest vs UI boundaries).
 6. Add PHPUnit coverage for behavior changes. Analytics (`tests/Analytics/`) and Performance (`tests/Performance/`) access tests are part of the default suite (`make test` / CI `vendor/bin/phpunit`) — do not exclude those directories. For a local HTML/Clover report: `make test-coverage` (writes `var/coverage/clover.xml` and `var/coverage-html/`). CI runs a separate **Coverage** job (PCOV) that uploads those artifacts; it does **not** require 100% coverage. Optional soft gate: set `COVERAGE_MIN` (statement percent, e.g. `40`) for `make test-coverage` or in `.github/workflows/ci.yml` — unset means informational only (see `specs/033-coverage-ci/`).
 7. Frontend: TypeScript + SCSS + Tailwind 4 under `assets/` (do not put Tailwind `@apply` inside SCSS).
-8. Run `make test` (and ideally `make qa`) before opening a PR.
+8. Run `make test` (and ideally `make qa`) before opening a PR. CI also runs **Gitleaks** (`make secrets-scan`) and fails if committed secrets are detected — never commit `.env`, Halite keys, or real API tokens (see [SECURITY.md](../SECURITY.md)).
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
 10. Public-facing UI must include legal pages and cookie consent (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
 11. Dependency bumps: run `make composer-outdated` ([`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper)) and apply suggested exact pins carefully (Symfony Flex `extra.symfony.require` stays `8.1.*`).
@@ -64,9 +64,20 @@ Use path only while developing; remove before release so Packagist pins stay aut
 | [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md) / [ADDING-LOCALES.md](ADDING-LOCALES.md) | Compliance / i18n |
 | `specs/NNN-*` | Feature SDD artifacts |
 
-## Pull requests
+## Issues and pull requests
 
-PRs use [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md). Requested reviewers come from [`.github/CODEOWNERS`](../.github/CODEOWNERS).
+**Issues** (chooser on “New issue”):
+
+| Template | When |
+| --- | --- |
+| Bug report | Something broken in the self-hosted server |
+| Feature request | Product / DX improvement |
+| Documentation | Docs / specs / README gaps |
+| Question / support | How-to / ops configuration |
+| CI / Docker / ops | Actions, images, Compose, Makefile |
+| Security | Use the private advisory link (not a public issue) |
+
+**PRs:** default [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md), plus typed templates under [`.github/PULL_REQUEST_TEMPLATE/`](../.github/PULL_REQUEST_TEMPLATE/) (`bugfix`, `feature`, `docs`, `chore`). Pick one via the compare URL, e.g. `?template=feature.md`. Reviewers come from [`.github/CODEOWNERS`](../.github/CODEOWNERS).
 
 ## Git hygiene
 
@@ -77,6 +88,8 @@ make setup-hooks
 ```
 
 This points `core.hooksPath` at `.githooks/`, which strips Cursor `Co-authored-by` / `Made-with` trailers from commit messages.
+
+CI enforces the same rule on every push/PR via the **Git hygiene** job (`.scripts/check-no-cursor-coauthor.sh` on full `HEAD` history). A PR that introduces (or sits on history that already has) those trailers will fail.
 
 Before push / release:
 

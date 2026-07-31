@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Shared;
 
 /**
- * Severity level for a grouped issue (Envelope / Sentry-compatible vocabulary).
+ * Severity level for a grouped issue (Envelope level vocabulary).
  */
 enum IssueLevel: string
 {

@@ -1,0 +1,46 @@
+name: Question / support
+description: How do I run, configure, or operate self-hosted Beacon?
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prefer [docs/INSTALL.md](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/INSTALL.md) and [docs/PRODUCTION.md](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/PRODUCTION.md) first.
+        **Bugs** → Bug report. **Security** → [private advisory](https://github.com/nowo-tech/symfony-beacon/security/advisories/new).
+  - type: textarea
+    id: question
+    attributes:
+      label: What are you trying to do?
+      description: Goal and where you got stuck (command, URL, or config key).
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What did you already try?
+      description: Docs sections read, commands run, relevant `.env` keys (redact secrets).
+    validations:
+      required: true
+  - type: dropdown
+    id: context
+    attributes:
+      label: Context
+      options:
+        - Local Docker Compose
+        - Production / self-hosted deploy
+        - CI / tests
+        - Kit / AuthKit / identity
+        - Ingest / DSN / client
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched issues and docs (INSTALL, PRODUCTION, UPGRADING, FAQ-style sections)
+          required: true
+        - label: This is not a security vulnerability
+          required: true

@@ -30,7 +30,8 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/es/login');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Iniciar sesión');
+        // PWA install prompt also uses h2; AuthKit heading is h1 inside the panel.
+        self::assertSelectorTextContains('.nowo-auth-kit__panel h1', 'Iniciar sesión');
         self::assertSelectorExists('a[href="/en/login"]');
     }
 
@@ -39,7 +40,7 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/de/login');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Anmelden');
+        self::assertSelectorTextContains('.nowo-auth-kit__panel h1', 'Anmelden');
     }
 
     public function testRegisterPageAvailableWhenNoUsers(): void

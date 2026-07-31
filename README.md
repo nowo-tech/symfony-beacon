@@ -7,11 +7,24 @@
   </picture>
 </p>
 
+[![CI](https://github.com/nowo-tech/symfony-beacon/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/symfony-beacon/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/nowo-tech/symfony-beacon.svg?style=flat)](https://github.com/nowo-tech/symfony-beacon/releases)
+[![GitHub downloads](https://img.shields.io/github/downloads/nowo-tech/symfony-beacon/total.svg)](https://github.com/nowo-tech/symfony-beacon/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-8.5%2B-777BB4?logo=php)](https://php.net)
+[![Symfony](https://img.shields.io/badge/Symfony-8.1-000000?logo=symfony)](https://symfony.com)
+[![GitHub stars](https://img.shields.io/github/stars/nowo-tech/symfony-beacon.svg?style=social&label=Star)](https://github.com/nowo-tech/symfony-beacon)
+[![Coverage](https://img.shields.io/badge/Coverage-CI%20report-informational)](#tests-and-coverage)
+
+> ⭐ **Found this useful?** Give the repo a **star** on [GitHub](https://github.com/nowo-tech/symfony-beacon) so more operators can find it. Client SDK: [`nowo-tech/beacon-bundle`](https://packagist.org/packages/nowo-tech/beacon-bundle).
 
 Self-hosted error tracking focused on **PHP / Symfony**. Compatible with the **Envelope wire protocol**, so clients send events to this server via a project DSN — no SaaS account required.
 
-Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
+Built on **Symfony 8.1**, **PHP 8.5**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Messenger**, **AuthKit**, **Vite + TypeScript + SCSS + Tailwind 4**, and **Spec-Driven Development** (GitHub Spec Kit).
+
+![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
+
+This application is **FrankenPHP worker mode friendly**.
 
 > The Symfony instrumentation **bundle** is [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) (separate repository). This server **also** requires that bundle so the instance can dogfood its own errors when `BEACON_DSN` is set (see [DSN.md](docs/DSN.md)). External apps still point their DSN at this server.
 
@@ -39,7 +52,7 @@ Built on **Symfony 8.1**, **FrankenPHP** (classic/worker), **MySQL 9.7**, **Mess
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
 - **Release health** at `/projects/{uuid}/releases` (new-in-release counts + compare)
 - Operator **OpenAPI** panel at `/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
-- Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit** timeline, **encrypted Mailer**, **security hardening** (`045`–`052`) — see [ROADMAP](docs/ROADMAP.md) (Phase 6 Next: ops overview, identity audit, Identity kit polish, monthly quota; SSO Later)
+- Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit**, **encrypted Mailer**, **Prometheus** `/metrics`, **notification circuit breaker**, **GDPR account export/anonymize**, **CI coverage** report — see [ROADMAP](docs/ROADMAP.md) (SSO Later)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories and channel-native **Send test** — [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
@@ -125,13 +138,25 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 
 Specs live under `specs/`. Constitution: `.specify/memory/constitution.md`.
 
-## Tests
+## Tests and coverage
 
 ```bash
 make test
 # or
-docker compose exec php php bin/phpunit
+docker compose exec php vendor/bin/phpunit
+
+# HTML + Clover report (Xdebug in Compose); optional soft gate:
+make test-coverage
+# COVERAGE_MIN=40 make test-coverage
 ```
+
+CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. Soft threshold is off by default (`COVERAGE_MIN` empty) — never a 100% gate. See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and `specs/033-coverage-ci/`.
+
+| Suite | Notes |
+|-------|--------|
+| PHP | PHPUnit (`make test` / CI) |
+| Coverage | `make test-coverage` / CI Coverage job |
+| TS/JS | Vite build in CI Docker job (no Istanbul gate) |
 
 ## Documentation
 

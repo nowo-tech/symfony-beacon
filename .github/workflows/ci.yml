@@ -18,6 +18,40 @@ env:
   COMPOSER_ALLOW_SUPERUSER: "1"
 
 jobs:
+  secrets:
+    name: Secret scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history so rotated/removed secrets still fail the gate.
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        env:
+          GITLEAKS_VERSION: "8.28.0"
+        run: |
+          curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Scan repository for secrets
+        run: gitleaks detect --source . --verbose --redact --exit-code 1
+
+  git-hygiene:
+    name: Git hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history — trailers must not appear on any ancestor of HEAD.
+          fetch-depth: 0
+
+      - name: Block Cursor co-author / Made-with trailers
+        run: sh .scripts/check-no-cursor-coauthor.sh HEAD
+
   qa:
     name: Quality (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -68,6 +102,19 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.4 --activate
+
+      - name: Install and build front-end assets
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Prepare environment
         run: |
@@ -151,6 +198,19 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.4 --activate
+
+      - name: Install and build front-end assets
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
       - name: Prepare environment
         run: |
           cp .env.dist .env
@@ -191,10 +251,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build frankenphp_dev
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_dev
@@ -204,7 +264,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=frankenphp-dev
 
       - name: Build frankenphp_prod
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod

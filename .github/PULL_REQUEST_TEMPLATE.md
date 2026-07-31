@@ -1,6 +1,12 @@
 ## Summary
 
 <!-- What does this PR change and why? Link related issues: Fixes #NN -->
+<!-- Prefer a typed template when useful:
+     bugfix → .github/PULL_REQUEST_TEMPLATE/bugfix.md
+     feature → .github/PULL_REQUEST_TEMPLATE/feature.md
+     docs → .github/PULL_REQUEST_TEMPLATE/docs.md
+     chore/CI → .github/PULL_REQUEST_TEMPLATE/chore.md
+     Example compare URL: ?template=feature.md -->
 
 -
 

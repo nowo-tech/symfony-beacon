@@ -1,5 +1,5 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa qa-fix composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
@@ -40,6 +40,7 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
+	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
 	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
 	@echo "  make update-deps     composer update + pnpm update (in php container)"
@@ -217,6 +218,12 @@ test-coverage:
 		--coverage-clover var/coverage/clover.xml \
 		--coverage-html var/coverage-html
 	docker compose exec -T -e COVERAGE_MIN="$(COVERAGE_MIN)" php sh .scripts/check-coverage-threshold.sh var/coverage/clover.xml
+
+# Same gate as CI job "Secret scan (Gitleaks)". Requires Docker; pins the CLI version used in .github/workflows/ci.yml.
+GITLEAKS_VERSION ?= 8.28.0
+secrets-scan:
+	docker run --rm -v "$(CURDIR):/repo:ro" -w /repo "zricethezav/gitleaks:v$(GITLEAKS_VERSION)" \
+		detect --source . --verbose --redact --exit-code 1
 
 qa: cs twig-cs phpstan rector test
 

@@ -1,0 +1,18 @@
+# Gitleaks — block committed secrets in CI (`make secrets-scan`).
+# https://github.com/gitleaks/gitleaks
+title = "symfony-beacon"
+
+[extend]
+# Inherit default rule set (API keys, private keys, tokens, …).
+useDefault = true
+
+[allowlist]
+description = "Paths that are never scanned as application secrets"
+paths = [
+  '''(^|/)vendor/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)public/build/''',
+  '''(^|/)\.php-cs-fixer\.cache$''',
+  '''(^|/)\.twig-cs-fixer\.cache$''',
+  '''(^|/)\.phpunit\.cache/''',
+]

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Setup;
 
-use Override;
 use App\Identity\Entity\User;
 use App\Setup\AdminUserProvisioner;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -14,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Nowo\SiteBackupBundle\Event\SetupCompletedEvent;
 use Nowo\SiteBackupBundle\Setup\AdminUserProvisionerInterface;
 use Nowo\SiteBackupBundle\Setup\Storage\SetupMarkerManager;
+use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 

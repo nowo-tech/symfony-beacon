@@ -11,6 +11,7 @@ use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use JsonException;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -97,7 +98,7 @@ final class AccountPrivacyController extends AbstractController
         try {
             $json = json_encode($payload, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
         } catch (JsonException $e) {
-            throw new \RuntimeException('Unable to encode account export.', 0, $e);
+            throw new RuntimeException('Unable to encode account export.', 0, $e);
         }
 
         return new Response($json, Response::HTTP_OK, [

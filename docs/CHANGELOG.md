@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **CI secret scan (Gitleaks):** job **Secret scan** fails the workflow when committed secrets are detected (full git history); local `make secrets-scan`; config [`.gitleaks.toml`](../.gitleaks.toml)
+- **CI git hygiene:** job **Git hygiene** fails when any commit on `HEAD` includes Cursor `Co-authored-by` / `Made-with` trailers (`make check-no-cursor-coauthor`; same as `.githooks`)
+- **Issue / PR templates:** Question + CI/ops issue forms; typed PR templates (`bugfix`, `feature`, `docs`, `chore`) under `.github/PULL_REQUEST_TEMPLATE/`
 - **GDPR account export / anonymize** (`043`): Account → Privacy JSON download (`beacon-account-export/v1`); self-service and admin anonymize (scrub + disable + `anonymized_at`); blocks sole project owner / last admin; app-owned (not anonymize-bundle runtime)
 - **CI coverage soft gate** (`033`): GitHub Actions **Coverage** job (PCOV) uploads Clover + HTML artifacts; local `make test-coverage`; optional `COVERAGE_MIN` statement-% soft threshold (unset = informational; never 100% by default)
 

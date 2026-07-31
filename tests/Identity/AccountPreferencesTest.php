@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Identity;
 
-use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
-use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
+use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\UserActionType;
-use App\Identity\Entity\User;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Tests\Shared\DatabaseWebTestCase;
+use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
+use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AccountPreferencesTest extends DatabaseWebTestCase
