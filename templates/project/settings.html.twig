@@ -303,12 +303,17 @@
             <span class="mb-1 block">{{ 'projects.share.days'|trans }}</span>
             <input class="input" type="number" name="days" min="1" max="30" value="7">
         </label>
+        <label class="text-sm">
+            <span class="mb-1 block">{{ 'projects.share.max_uses'|trans }}</span>
+            <input class="input" type="number" name="max_uses" min="1" max="10000" value="1" placeholder="{{ 'projects.share.max_uses_unlimited'|trans }}">
+        </label>
         <label class="text-sm grow">
             <span class="mb-1 block">{{ 'projects.share.issue_uuid'|trans }}</span>
             <input class="input w-full" type="text" name="issue_uuid" placeholder="{{ 'projects.share.issue_optional'|trans }}" autocomplete="off">
         </label>
         <button type="submit" class="btn-primary">{{ 'projects.share.create'|trans }}</button>
     </form>
+    <p class="mb-4 text-xs text-[var(--color-ink)]/50">{{ 'projects.share.max_uses_help'|trans }}</p>
     <ul class="space-y-2 text-sm">
         {% for link in shareLinks|default([]) %}
             <li class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--color-sand)] p-3">
@@ -316,6 +321,7 @@
                     <div class="font-mono text-xs">{{ link.uuid|slice(0, 8) }}…</div>
                     <div class="text-xs text-[var(--color-ink)]/55">
                         {{ 'projects.share.expires'|trans }} {{ link.expiresAt|date('Y-m-d H:i') }}
+                        · {{ 'projects.share.uses'|trans({'%used%': link.useCount, '%max%': link.maxUses ?? ('projects.share.max_uses_unlimited'|trans)}) }}
                         {% if link.issue %} · {{ 'projects.share.scoped_issue'|trans }}{% endif %}
                     </div>
                 </div>

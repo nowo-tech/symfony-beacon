@@ -481,9 +481,10 @@ Configure outbound mail under **Administration → Mailer** (encrypted DSN). Env
 
 ### Share links
 
-- Owners/admins create links under Project Settings → Share links (optional issue UUID; max 30 days).
-- Opening `/share/{token}` requires sign-in; grants session-scoped viewer access until the link expires.
+- Owners/admins create links under Project Settings → Share links (optional issue UUID; max 30 days; **max uses** defaults to **1**, leave empty for unlimited until expiry).
+- Opening `/share/{token}` requires sign-in; grants session-scoped viewer access until the link expires (and while uses remain).
 - Revoking a link invalidates future opens; raw token is shown once at creation.
+- Migration `Version20260731150000` adds `max_uses` / `use_count`. Existing links stay unlimited (`max_uses` NULL) until recreated.
 
 ### View-as-member vs viewer
 

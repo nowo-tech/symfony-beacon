@@ -87,7 +87,7 @@ auth:
         submit: 'Magic link versturen'
         sent: 'Als dat account bestaat en actief is, is de link onderweg.'
         throttled: 'Te veel verzoeken. Probeer het later opnieuw.'
-        invalid: 'Dat verzoek kon niet worden verwerkt.'
+        invalid: Deze deellink is ongeldig, verlopen, ingetrokken of opgebruikt.
         unavailable: 'Magic-link aanmelden is niet beschikbaar totdat een beheerder Mailer (versleutelde DSN) configureert onder Beheer → Mailer.'
         back_to_password: 'Aanmelden met wachtwoord'
         email_subject: 'Je Beacon magic-aanmeldlink'
@@ -326,8 +326,13 @@ projects:
     errors_last_7_days: '%count% fouten in de afgelopen 7 dagen'
     share:
         title: Deellinks
-        help: 'Maak een tijdelijke link met alleen-lezen viewer-toegang tot dit project (of één issue). Ontvangers moeten zich aanmelden.'
+        help: Maak een tijdelijke link met alleen-lezen toegang tot dit project (of één issue). Ontvangers moeten inloggen. Nieuwe links zijn standaard eenmalig.
         days: 'Geldigheid (dagen)'
+        max_uses: Max. gebruik
+        max_uses_help: Laat Max. gebruik leeg voor onbeperkte openingen tot verval. Standaard is 1 (eenmalig).
+        max_uses_unlimited: Onbeperkt
+        max_uses_invalid: Max. gebruik moet een positief geheel getal zijn (of leeg voor onbeperkt).
+        uses: 'Gebruik %used% / %max%'
         issue_uuid: 'Issue-UUID (optioneel)'
         issue_optional: 'Leeg laten voor het hele project'
         create: 'Deellink maken'
@@ -337,7 +342,7 @@ projects:
         scoped_issue: 'Beperkt tot issue'
         created: 'Deellink aangemaakt — kopieer hem nu; hij wordt niet opnieuw getoond.'
         revoked: 'Deellink ingetrokken.'
-        invalid: 'Deze deellink is ongeldig, verlopen of ingetrokken.'
+        invalid: Deze deellink is ongeldig, verlopen, ingetrokken of opgebruikt.
         invalid_csrf: 'Ongeldig beveiligingstoken.'
         issue_not_found: 'Issue niet gevonden in dit project.'
         expires_in_past: 'De vervaldatum moet in de toekomst liggen.'

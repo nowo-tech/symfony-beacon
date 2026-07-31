@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Share link max uses** (`061`, Fixes #2): optional `max_uses` / `use_count` on `project_share_link`; Settings UI defaults new links to **1** use (clear the field for unlimited until expiry)
 - **CI secret scan (Gitleaks):** job **Secret scan** fails the workflow when committed secrets are detected (full git history); local `make secrets-scan`; config [`.gitleaks.toml`](../.gitleaks.toml)
 - **CI git hygiene:** job **Git hygiene** fails when any commit on `HEAD` includes Cursor `Co-authored-by` / `Made-with` trailers (`make check-no-cursor-coauthor`; same as `.githooks`)
 - **Issue / PR templates:** Question + CI/ops issue forms; typed PR templates (`bugfix`, `feature`, `docs`, `chore`) under `.github/PULL_REQUEST_TEMPLATE/`

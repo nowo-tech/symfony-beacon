@@ -89,6 +89,16 @@ final class ProjectShareLinkController extends AbstractController
 
         $days = max(1, min(30, $request->request->getInt('days', 7)));
         $expiresAt = new DateTimeImmutable(\sprintf('+%d days', $days));
+        $maxUsesRaw = trim($request->request->getString('max_uses'));
+        $maxUses = null;
+        if ('' !== $maxUsesRaw) {
+            if (!ctype_digit($maxUsesRaw) || (int) $maxUsesRaw < 1) {
+                $this->addFlash('error', 'projects.share.max_uses_invalid');
+
+                return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            }
+            $maxUses = min(10_000, (int) $maxUsesRaw);
+        }
         $issueUuid = trim($request->request->getString('issue_uuid'));
         $issue = null;
         if ('' !== $issueUuid) {
@@ -101,7 +111,7 @@ final class ProjectShareLinkController extends AbstractController
         }
 
         try {
-            $created = $this->shareLinkManager->create($project, $user, $issue, $expiresAt);
+            $created = $this->shareLinkManager->create($project, $user, $issue, $expiresAt, $maxUses);
         } catch (InvalidArgumentException $e) {
             $this->addFlash('error', 'projects.share.'.$e->getMessage());
 

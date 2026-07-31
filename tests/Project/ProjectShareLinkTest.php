@@ -7,6 +7,7 @@ namespace App\Tests\Project;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Entity\ProjectShareLink;
 use App\Project\Service\ProjectShareLinkManager;
 use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
@@ -124,5 +125,73 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
         $this->login($client, $recipient);
         $client->request(Request::METHOD_GET, '/share/'.$created['rawToken']);
         self::assertResponseRedirects('/en/login');
+    }
+
+    public function testShareLinkMaxUsesExhaustedAfterSingleOpen(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('share-max-uses@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $recipient = new User();
+        $recipient->setEmail('share-max-uses-user@example.com');
+        $recipient->setDisplayName('Recipient');
+        $recipient->setPassword($hasher->hashPassword($recipient, 'secret'));
+        $em->persist($recipient);
+        $em->flush();
+
+        /** @var ProjectShareLinkManager $manager */
+        $manager = self::getContainer()->get(ProjectShareLinkManager::class);
+        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'), 1);
+        $token = $created['rawToken'];
+
+        $this->login($client, $recipient);
+        $client->request(Request::METHOD_GET, '/share/'.$token);
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+
+        $em->clear();
+        $link = $em->find(ProjectShareLink::class, $created['link']->getId());
+        self::assertInstanceOf(ProjectShareLink::class, $link);
+        self::assertSame(1, $link->getUseCount());
+        self::assertFalse($link->isUsable());
+
+        $client->request(Request::METHOD_GET, '/share/'.$token);
+        self::assertResponseRedirects('/en/login');
+    }
+
+    public function testUnlimitedShareLinkAllowsMultipleOpens(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('share-unlimited@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $recipient = new User();
+        $recipient->setEmail('share-unlimited-user@example.com');
+        $recipient->setDisplayName('Recipient');
+        $recipient->setPassword($hasher->hashPassword($recipient, 'secret'));
+        $em->persist($recipient);
+        $em->flush();
+
+        /** @var ProjectShareLinkManager $manager */
+        $manager = self::getContainer()->get(ProjectShareLinkManager::class);
+        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'), null);
+        $token = $created['rawToken'];
+        $linkId = $created['link']->getId();
+
+        $this->login($client, $recipient);
+        $client->request(Request::METHOD_GET, '/share/'.$token);
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+
+        $client->request(Request::METHOD_GET, '/share/'.$token);
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
+        $em->clear();
+        $link = $em->find(ProjectShareLink::class, $linkId);
+        self::assertInstanceOf(ProjectShareLink::class, $link);
+        self::assertSame(2, $link->getUseCount());
+        self::assertTrue($link->isUsable());
     }
 }

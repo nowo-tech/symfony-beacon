@@ -87,7 +87,7 @@ auth:
         submit: 'Envoyer le lien magique'
         sent: 'Si ce compte existe et est activé, le lien est en route.'
         throttled: 'Trop de demandes. Réessayez plus tard.'
-        invalid: 'Impossible de traiter cette demande.'
+        invalid: Ce lien est invalide, expiré, révoqué ou épuisé.
         unavailable: "La connexion par lien magique est indisponible tant qu'un administrateur n'a pas configuré le Mailer (DSN chiffré) sous Administration → Mailer."
         back_to_password: 'Se connecter avec un mot de passe'
         email_subject: 'Votre lien magique Beacon'
@@ -326,8 +326,13 @@ projects:
     errors_last_7_days: '%count% erreurs au cours des 7 derniers jours'
     share:
         title: 'Liens de partage'
-        help: 'Créez un lien temporaire en lecture seule (viewer) vers ce projet (ou une issue). Les destinataires doivent se connecter.'
+        help: Créez un lien temporaire en lecture seule vers ce projet (ou une issue). Le destinataire doit se connecter. Les nouveaux liens sont à usage unique par défaut.
         days: 'Durée de vie (jours)'
+        max_uses: Utilisations max
+        max_uses_help: Laissez Utilisations max vide pour un nombre illimité d’ouvertures jusqu’à expiration. La valeur par défaut est 1.
+        max_uses_unlimited: Illimité
+        max_uses_invalid: Utilisations max doit être un entier positif (ou vide pour illimité).
+        uses: 'Utilisations %used% / %max%'
         issue_uuid: 'UUID de l’issue (optionnel)'
         issue_optional: 'Laisser vide pour tout le projet'
         create: 'Créer un lien de partage'
@@ -337,7 +342,7 @@ projects:
         scoped_issue: 'Limité à une issue'
         created: 'Lien créé — copiez-le maintenant ; il ne sera plus affiché.'
         revoked: 'Lien de partage révoqué.'
-        invalid: 'Ce lien est invalide, expiré ou révoqué.'
+        invalid: Ce lien est invalide, expiré, révoqué ou épuisé.
         invalid_csrf: 'Jeton de sécurité invalide.'
         issue_not_found: 'Issue introuvable dans ce projet.'
         expires_in_past: 'L’expiration doit être dans le futur.'

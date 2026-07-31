@@ -34,7 +34,7 @@ final readonly class ProjectShareLinkManager
     /**
      * @return array{link: ProjectShareLink, rawToken: string}
      */
-    public function create(Project $project, User $actor, ?Issue $issue, DateTimeImmutable $expiresAt): array
+    public function create(Project $project, User $actor, ?Issue $issue, DateTimeImmutable $expiresAt, ?int $maxUses = null): array
     {
         $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
 
@@ -51,6 +51,10 @@ final readonly class ProjectShareLinkManager
             throw new InvalidArgumentException('expires_too_far');
         }
 
+        if (null !== $maxUses && $maxUses < 1) {
+            throw new InvalidArgumentException('max_uses_invalid');
+        }
+
         $raw = bin2hex(random_bytes(32));
         $link = new ProjectShareLink();
         $link->setProject($project);
@@ -58,6 +62,7 @@ final readonly class ProjectShareLinkManager
         $link->setCreatedBy($actor);
         $link->setTokenHash(hash('sha256', $raw));
         $link->setExpiresAt($expiresAt);
+        $link->setMaxUses($maxUses);
         $this->entityManager->persist($link);
         $this->userActionRecorder->record(
             UserActionType::ProjectShareLinkCreated,
@@ -69,6 +74,7 @@ final readonly class ProjectShareLinkManager
                 'share_uuid' => $link->getUuid(),
                 'issue_uuid' => $issue?->getUuid(),
                 'expires_at' => $expiresAt->format(DateTimeInterface::ATOM),
+                'max_uses' => $maxUses,
             ],
         );
         $this->entityManager->flush();

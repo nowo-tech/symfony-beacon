@@ -316,8 +316,13 @@ projects:
     errors_last_7_days: '%count% errors in last 7 days'
     share:
         title: Share links
-        help: Create a time-limited link that grants read-only viewer access to this project (or one issue). Recipients must sign in.
+        help: Create a time-limited link that grants read-only viewer access to this project (or one issue). Recipients must sign in. New links default to one use.
         days: Lifetime (days)
+        max_uses: Max uses
+        max_uses_help: Leave Max uses empty for unlimited opens until expiry. Default is 1 (single use).
+        max_uses_unlimited: Unlimited
+        max_uses_invalid: Max uses must be a positive integer (or empty for unlimited).
+        uses: 'Uses %used% / %max%'
         issue_uuid: Issue UUID (optional)
         issue_optional: Leave empty for whole project
         create: Create share link
@@ -327,7 +332,7 @@ projects:
         scoped_issue: Issue-scoped
         created: Share link created — copy it now; it will not be shown again.
         revoked: Share link revoked.
-        invalid: This share link is invalid, expired, or revoked.
+        invalid: This share link is invalid, expired, revoked, or out of uses.
         invalid_csrf: Invalid security token.
         issue_not_found: Issue not found in this project.
         expires_in_past: Expiry must be in the future.
