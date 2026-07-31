@@ -1797,18 +1797,43 @@ error:
         title: Détour inattendu
         lead: Cette requête n'est pas arrivée à bon port. Vous n'avez rien cassé — réessayez dans un instant.
         hint: Notre mascotte fouille déjà sous les coussins du canapé pour trouver des indices.
-    404:
-        title: Hors carte
-        lead: Ce chemin n'existe pas sur ce Beacon. Vérifiez l'URL ou suivez la lumière vers l'accueil — pas de chasse au trésor.
-        hint: Même les meilleurs explorateurs se trompent quand la carte est à l'envers.
-        image_alt: Mascotte Beacon explorant avec carte et loupe à côté d'un grand 404
+    400:
+        title: Pièces de puzzle mélangées
+        lead: Cette requête ne correspond pas tout à fait à la forme attendue. Ajustez-la et renvoyez-la — pas de casse, juste des coins qui ne s'emboîtent pas.
+        hint: Notre mascotte lit encore les instructions à l'envers. Ça arrive aux meilleurs.
+        image_alt: Mascotte Beacon avec des pièces de puzzle et un triangle d'alerte à côté d'un grand 400
+    401:
+        title: Badge, s'il vous plaît
+        lead: Cette porte demande un laissez-passer valide. Connectez-vous, puis réessayez — le portier est sympa, juste minutieux.
+        hint: Même les robots oublient parfois leur carte d'accès. On en garde une de rechange au bureau.
+        image_alt: Mascotte Beacon à un contrôle d'accès avec une carte à côté d'un grand 401
     403:
         title: Portail fermé
         lead: Vous n'avez pas les clés de cette page. Connectez-vous avec un compte autorisé ou revenez à l'accueil — ce n'est pas personnel.
         hint: Corrompre la mascotte avec des biscuits n'ouvre pas non plus la serrure. On a essayé.
         image_alt: Mascotte Beacon près d'une porte sécurisée marquée 403
+    404:
+        title: Hors carte
+        lead: Ce chemin n'existe pas sur ce Beacon. Vérifiez l'URL ou suivez la lumière vers l'accueil — pas de chasse au trésor.
+        hint: Même les meilleurs explorateurs se trompent quand la carte est à l'envers.
+        image_alt: Mascotte Beacon explorant avec carte et loupe à côté d'un grand 404
+    408:
+        title: Sablier vide
+        lead: Nous avons attendu patiemment, mais la requête a pris trop de temps. Réessayez quand tout sera plus réactif — pas de précipitation de votre côté.
+        hint: Notre mascotte fixe encore l'horloge. Les timeouts arrivent ; le café aide.
+        image_alt: Mascotte Beacon avec un sablier et un réveil à côté d'un grand 408
+    429:
+        title: Pause douce
+        lead: Vous avez envoyé des requêtes un peu plus vite que nous ne pouvons jongler. Respirez un instant, puis continuez — la file va se vider.
+        hint: Notre mascotte a appuyé sur pause sur le tapis. Ce n'est pas une réprimande — plutôt un étirement.
+        image_alt: Mascotte Beacon mettant en pause une file de messages à côté d'un grand 429
     500:
         title: Hoquet du Beacon
         lead: Quelque chose a trébuché de notre côté, pas du vôtre. Attendez un peu et réessayez — vous n'avez rien fait de mal.
         hint: On tapote les serveurs tout doucement avec une clé à molette. Très doucement.
         image_alt: Mascotte Beacon réparant une baie serveur marquée 500
+    502:
+        title: Câble débranché
+        lead: Un lien entre services s'est assoupli. On rebranche — réessayez dans un instant ; vous n'avez rien fait de mal.
+        hint: Notre mascotte reconnecte le câble lumineux. Les étincelles sont volontaires. Probablement.
+        image_alt: Mascotte Beacon reconnectant un câble lumineux entre serveurs à côté d'un grand 502

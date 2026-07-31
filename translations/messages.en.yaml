@@ -1829,18 +1829,43 @@ error:
         title: Unexpected detour
         lead: That request did not land. Nothing you typed set anything on fire — try again in a moment.
         hint: Our mascot is already looking under the sofa cushions for clues.
-    404:
-        title: Off the map
-        lead: This path is not on this Beacon. Check the URL spelling, or follow the light home — no scavenger hunt required.
-        hint: Even the best explorers take a wrong turn when the map is upside down.
-        image_alt: Beacon mascot exploring with a map and magnifying glass next to a large 404
+    400:
+        title: Puzzle pieces mixed up
+        lead: That request did not quite fit the shape we expected. Tweak it and send it again — no broken glass, just mismatched corners.
+        hint: Our mascot is still reading the instructions upside down. Happens to the best of us.
+        image_alt: Beacon mascot with puzzle pieces and a warning triangle next to a large 400
+    401:
+        title: Badge check, please
+        lead: This door needs a valid pass. Sign in, then try again — the gatekeeper is friendly, just thorough.
+        hint: Even robots forget their access cards sometimes. We keep a spare at the desk.
+        image_alt: Beacon mascot at a checkpoint holding an access card next to a large 401
     403:
         title: Gate's closed
         lead: You do not have the keys for this page. Sign in with an allowed account, or head home — the lock is not personal.
         hint: Bribing the mascot with cookies still will not open it. We tried.
         image_alt: Beacon mascot beside a secured gate marked 403
+    404:
+        title: Off the map
+        lead: This path is not on this Beacon. Check the URL spelling, or follow the light home — no scavenger hunt required.
+        hint: Even the best explorers take a wrong turn when the map is upside down.
+        image_alt: Beacon mascot exploring with a map and magnifying glass next to a large 404
+    408:
+        title: Hourglass ran out
+        lead: We waited patiently, but the request took too long. Try again when things feel a bit snappier — no rush on your side.
+        hint: Our mascot is still staring at the clock. Timeouts happen; coffee helps.
+        image_alt: Beacon mascot with an hourglass and alarm clock next to a large 408
+    429:
+        title: Soft pause button
+        lead: You sent requests a little faster than we can juggle. Take a short breather, then continue — the queue will clear.
+        hint: Our mascot hit pause on the conveyor. Not a scolding — more of a stretch break.
+        image_alt: Beacon mascot pausing a message queue next to a large 429
     500:
         title: Beacon hiccup
         lead: Something tripped on our side, not yours. Wait a bit and try again — you did nothing wrong.
         hint: We are gently poking the servers with a wrench. Very gently.
         image_alt: Beacon mascot repairing a server rack marked 500
+    502:
+        title: Cable unplugged
+        lead: A link between services went soft. We are plugging things back in — try again in a moment; you did nothing wrong.
+        hint: Our mascot is reconnecting the glow cable. Sparks are intentional. Probably.
+        image_alt: Beacon mascot reconnecting a glowing cable between servers next to a large 502

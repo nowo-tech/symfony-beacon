@@ -1,0 +1,20 @@
+{% extends 'error/layout.html.twig' %}
+
+{% block title %}408 — {{ 'error.408.title'|trans }}{% endblock %}
+
+{% block error_illustration %}
+<figure class="error-page__figure">
+    <img
+        class="error-page__img"
+        src="{{ asset('illustrations/error-408.png') }}"
+        width="1024"
+        height="682"
+        alt="{{ 'error.408.image_alt'|trans }}"
+        decoding="async"
+    >
+</figure>
+{% endblock %}
+
+{% block error_title %}{{ 'error.408.title'|trans }}{% endblock %}
+{% block error_lead %}{{ 'error.408.lead'|trans }}{% endblock %}
+{% block error_hint %}{{ 'error.408.hint'|trans }}{% endblock %}

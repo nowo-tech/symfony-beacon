@@ -1699,18 +1699,43 @@ error:
         title: Desvio inesperado
         lead: Esse pedido não chegou a bom porto. Não partiste nada — tenta novamente dentro de momentos.
         hint: A nossa mascote já anda à procura de pistas debaixo das almofadas do sofá.
-    404:
-        title: Fora do mapa
-        lead: Este caminho não existe neste Beacon. Verifica o URL ou segue a luz até ao início — sem caça ao tesouro.
-        hint: Até os melhores exploradores se perdem quando o mapa está de cabeça para baixo.
-        image_alt: Mascote Beacon a explorar com mapa e lupa junto a um 404 grande
+    400:
+        title: Peças do puzzle misturadas
+        lead: Esse pedido não encaixa bem na forma que esperávamos. Ajusta-o e envia de novo — sem vidros partidos, só cantos que não casam.
+        hint: A nossa mascote ainda lê as instruções ao contrário. Acontece aos melhores.
+        image_alt: Mascote Beacon com peças de puzzle e triângulo de aviso junto a um 400 grande
+    401:
+        title: Passe, por favor
+        lead: Esta porta pede um passe válido. Inicia sessão e tenta de novo — o porteiro é amável, só rigoroso.
+        hint: Até os robots esquecem o cartão às vezes. Guardamos um de reserva no balcão.
+        image_alt: Mascote Beacon num controlo de acesso com cartão junto a um 401 grande
     403:
         title: Portão fechado
         lead: Não tens as chaves desta página. Inicia sessão com uma conta autorizada ou volta ao início — não é nada pessoal.
         hint: Subornar a mascote com bolachas também não abre a fechadura. Já tentámos.
         image_alt: Mascote Beacon junto a um portão seguro marcado 403
+    404:
+        title: Fora do mapa
+        lead: Este caminho não existe neste Beacon. Verifica o URL ou segue a luz até ao início — sem caça ao tesouro.
+        hint: Até os melhores exploradores se perdem quando o mapa está de cabeça para baixo.
+        image_alt: Mascote Beacon a explorar com mapa e lupa junto a um 404 grande
+    408:
+        title: Ampulheta vazia
+        lead: Esperámos com paciência, mas o pedido demorou demasiado. Tenta de novo quando tudo estiver mais ágil — sem pressa da tua parte.
+        hint: A nossa mascote ainda olha para o relógio. Os timeouts acontecem; o café ajuda.
+        image_alt: Mascote Beacon com ampulheta e despertador junto a um 408 grande
+    429:
+        title: Pausa suave
+        lead: Enviaste pedidos um pouco mais depressa do que conseguimos fazer malabarismos. Respira um momento e continua — a fila vai esvaziar.
+        hint: A mascote carregou em pausa na passadeira. Não é uma bronca — mais um alongamento.
+        image_alt: Mascote Beacon a pausar uma fila de mensagens junto a um 429 grande
     500:
         title: Soluço do Beacon
         lead: Algo tropeçou do nosso lado, não do teu. Espera um pouco e tenta de novo — não fizeste nada de errado.
         hint: Estamos a dar toques suaves no servidor com uma chave inglesa. Muito suaves.
         image_alt: Mascote Beacon a reparar um rack de servidores marcado 500
+    502:
+        title: Cabo desligado
+        lead: Uma ligação entre serviços afrouxou. Estamos a voltar a ligar — tenta dentro de momentos; não fizeste nada de errado.
+        hint: A mascote está a reconectar o cabo luminoso. As faíscas são de propósito. Provavelmente.
+        image_alt: Mascote Beacon a reconectar um cabo luminoso entre servidores junto a um 502 grande

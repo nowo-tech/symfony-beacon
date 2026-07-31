@@ -1698,18 +1698,43 @@ error:
         title: Desvío inesperado
         lead: Esa petición no llegó a buen puerto. No has roto nada — inténtalo de nuevo en un momento.
         hint: La mascota ya está buscando pistas debajo del sofá.
-    404:
-        title: Fuera del mapa
-        lead: Esta ruta no existe en este Beacon. Revisa la URL o vuelve al inicio — no hace falta una búsqueda del tesoro.
-        hint: Hasta los mejores exploradores se pierden cuando el mapa va al revés.
-        image_alt: Mascota Beacon explorando con mapa y lupa junto a un 404
+    400:
+        title: Piezas del puzzle mezcladas
+        lead: Esa petición no encaja del todo con la forma que esperábamos. Ajústala y envíala otra vez — no hay cristales rotos, solo esquinas que no casan.
+        hint: La mascota sigue leyendo las instrucciones al revés. Nos pasa a los mejores.
+        image_alt: Mascota Beacon con piezas de puzzle y un triángulo de aviso junto a un 400
+    401:
+        title: Pase, por favor
+        lead: Esta puerta pide un pase válido. Inicia sesión e inténtalo de nuevo — el portero es amable, solo un poco estricto.
+        hint: Hasta los robots olvidan la tarjeta a veces. Guardamos una de repuesto en el mostrador.
+        image_alt: Mascota Beacon en un control de acceso con tarjeta junto a un 401
     403:
         title: La puerta está cerrada
         lead: No tienes las llaves de esta página. Inicia sesión con una cuenta autorizada o vuelve al inicio — no es nada personal.
         hint: Sobornar a la mascota con galletas tampoco abre el candado. Lo intentamos.
         image_alt: Mascota Beacon junto a una puerta segura marcada 403
+    404:
+        title: Fuera del mapa
+        lead: Esta ruta no existe en este Beacon. Revisa la URL o vuelve al inicio — no hace falta una búsqueda del tesoro.
+        hint: Hasta los mejores exploradores se pierden cuando el mapa va al revés.
+        image_alt: Mascota Beacon explorando con mapa y lupa junto a un 404
+    408:
+        title: Se acabó la arena
+        lead: Esperamos con paciencia, pero la petición tardó demasiado. Prueba otra vez cuando todo vaya más vivo — sin prisas por tu parte.
+        hint: La mascota sigue mirando el reloj. Los timeouts pasan; el café ayuda.
+        image_alt: Mascota Beacon con un reloj de arena y un despertador junto a un 408
+    429:
+        title: Pausa suave
+        lead: Has enviado peticiones un poco más rápido de lo que podemos hacer malabares. Respira un momento y sigue — la cola se vaciará.
+        hint: La mascota ha pulsado pausa en la cinta. No es un regañazo — más bien un estiramiento.
+        image_alt: Mascota Beacon pausando una cola de mensajes junto a un 429
     500:
         title: Un hipo del Beacon
         lead: Algo tropezó de nuestro lado, no del tuyo. Espera un poco e inténtalo otra vez — no has hecho nada mal.
         hint: Estamos dando toquecitos al servidor con una llave inglesa. Con mucho mimo.
         image_alt: Mascota Beacon reparando un rack de servidores marcado 500
+    502:
+        title: Cable desenchufado
+        lead: Un enlace entre servicios se aflojó. Estamos reconectando — prueba en un momento; no has hecho nada mal.
+        hint: La mascota está uniendo el cable luminoso. Las chispas son a propósito. Probablemente.
+        image_alt: Mascota Beacon reconectando un cable luminoso entre servidores junto a un 502
