@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
-use App\Project\Entity\Project;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\InteractionActionToken;
+use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
