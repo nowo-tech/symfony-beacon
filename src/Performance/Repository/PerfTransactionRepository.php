@@ -58,4 +58,17 @@ class PerfTransactionRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * Hydrate spans for a transaction detail view (avoids a second lazy collection query).
+     */
+    public function hydrateSpans(PerfTransaction $transaction): void
+    {
+        $this->createQueryBuilder('t')
+            ->leftJoin('t.spans', 's')->addSelect('s')
+            ->andWhere('t = :transaction')
+            ->setParameter('transaction', $transaction)
+            ->getQuery()
+            ->getResult();
+    }
 }

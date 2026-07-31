@@ -79,6 +79,7 @@ final class PerformanceController extends AbstractController
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($project, $user);
+        $this->transactionRepository->hydrateSpans($transaction);
 
         return $this->render('performance/show.html.twig', [
             'project' => $project,
