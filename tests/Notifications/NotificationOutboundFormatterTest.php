@@ -122,8 +122,11 @@ final class NotificationOutboundFormatterTest extends TestCase
         $actions = $slack['json']['blocks'][1];
         self::assertSame('actions', $actions['type']);
         self::assertSame('beacon_resolve', $actions['elements'][0]['action_id']);
+        self::assertSame('beacon_assign', $actions['elements'][1]['action_id']);
         $value = json_decode((string) $actions['elements'][0]['value'], true, 512, \JSON_THROW_ON_ERROR);
         self::assertSame('resolve', $value['a']);
+        $assignValue = json_decode((string) $actions['elements'][1]['value'], true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('assign', $assignValue['a']);
         self::assertSame($destination->getUuid(), $value['d']);
         self::assertSame('11111111-1111-4111-8111-111111111111', $value['p']);
         self::assertSame('22222222-2222-4222-8222-222222222222', $value['i']);

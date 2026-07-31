@@ -4,27 +4,34 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
-use App\Project\Entity\Project;
+use App\Identity\Entity\User;
+use App\Identity\Repository\UserRepository;
+use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
+use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\SlackRequestSignatureVerifier;
+use App\Project\Entity\Project;
+use App\Project\Service\ProjectAccessService;
 use App\Shared\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Slack interactive component callbacks (Block Kit buttons).
+ * Slack interactive component callbacks (Block Kit Resolve / Assign to me).
  *
  * Public route; authorization is HMAC signature verification against the
- * destination signing secret. Actor is null in v1 (Slack→member mapping Later).
+ * destination signing secret. Assign requires a mapped Slack user id with triage.
  */
 final class SlackInteractionsController extends AbstractController
 {
@@ -32,7 +39,10 @@ final class SlackInteractionsController extends AbstractController
         private readonly SlackRequestSignatureVerifier $signatureVerifier,
         private readonly NotificationDestinationRepository $destinationRepository,
         private readonly IssueRepository $issueRepository,
+        private readonly UserRepository $userRepository,
         private readonly IssueStatusChanger $issueStatusChanger,
+        private readonly IssueAssigneeChanger $issueAssigneeChanger,
+        private readonly ProjectAccessService $projectAccess,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {
@@ -58,7 +68,6 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Invalid payload', Response::HTTP_BAD_REQUEST);
         }
 
-        // Slack URL verification challenge (rare for interactivity; keep harmless).
         if (isset($payload['type']) && 'url_verification' === $payload['type'] && isset($payload['challenge'])) {
             return new Response((string) $payload['challenge'], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
         }
@@ -82,14 +91,15 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Invalid action value', Response::HTTP_BAD_REQUEST);
         }
 
-        if (($value['a'] ?? null) !== 'resolve') {
+        $actionName = $value['a'] ?? null;
+        if (!\in_array($actionName, ['resolve', 'assign'], true)) {
             return new Response('Unsupported action', Response::HTTP_BAD_REQUEST);
         }
 
         $destinationUuid = isset($value['d']) && \is_string($value['d']) ? $value['d'] : '';
         $projectUuid = isset($value['p']) && \is_string($value['p']) ? $value['p'] : '';
         $issueUuid = isset($value['i']) && \is_string($value['i']) ? $value['i'] : '';
-        if (in_array('', [$destinationUuid, $projectUuid, $issueUuid], true)) {
+        if (\in_array('', [$destinationUuid, $projectUuid, $issueUuid], true)) {
             return new Response('Incomplete action value', Response::HTTP_BAD_REQUEST);
         }
 
@@ -118,17 +128,71 @@ final class SlackInteractionsController extends AbstractController
         }
 
         $issue = $this->issueRepository->findOneBy(['uuid' => $issueUuid]);
-        if (null === $issue || $issue->getProject()?->getUuid() !== $projectUuid) {
+        if (!$issue instanceof Issue || $issue->getProject()?->getUuid() !== $projectUuid) {
             return new Response('Issue not found', Response::HTTP_NOT_FOUND);
         }
 
-        $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, null, 'slack');
-        // Ensure any no-op still clears EM state cleanly (changer flushes on change).
+        $slackUserId = $this->extractSlackUserId($payload);
+        $mappedUser = null !== $slackUserId && '' !== $slackUserId
+            ? $this->userRepository->findOneBySlackUserId($slackUserId)
+            : null;
+
+        if ('resolve' === $actionName) {
+            $actor = null;
+            if ($mappedUser instanceof User) {
+                $access = $this->projectAccess->resolveAccess($project, $mappedUser);
+                if (null !== $access && $access->canTriageIssues()) {
+                    $actor = $mappedUser;
+                }
+            }
+            $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, $actor, 'slack');
+            if (!$changed) {
+                $this->entityManager->clear();
+            }
+
+            return new Response('', Response::HTTP_OK);
+        }
+
+        // assign
+        if (!$mappedUser instanceof User) {
+            $this->logger->info('Slack Assign rejected: Slack user id not linked in Beacon.', [
+                'slack_user_id' => $slackUserId,
+                'issue_uuid' => $issueUuid,
+            ]);
+
+            return new Response('Link your Slack user id under Account → Profile', Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            $this->projectAccess->requireTriage($project, $mappedUser);
+        } catch (AccessDeniedHttpException) {
+            return new Response('Triage permission required', Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            $changed = $this->issueAssigneeChanger->assign($issue, $mappedUser, $mappedUser, 'slack');
+        } catch (InvalidArgumentException) {
+            return new Response('Assignee must be a project member', Response::HTTP_FORBIDDEN);
+        }
+
         if (!$changed) {
             $this->entityManager->clear();
         }
 
-        // Ephemeral-style ack for Slack (empty 200 is fine for button clicks).
         return new Response('', Response::HTTP_OK);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function extractSlackUserId(array $payload): ?string
+    {
+        $user = $payload['user'] ?? null;
+        if (!\is_array($user)) {
+            return null;
+        }
+        $id = $user['id'] ?? null;
+
+        return \is_string($id) && '' !== $id ? $id : null;
     }
 }

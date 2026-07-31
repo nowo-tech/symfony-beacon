@@ -35,6 +35,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'app_user')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', columns: ['email'])]
 #[ORM\UniqueConstraint(name: 'uniq_app_user_uuid', columns: ['uuid'])]
+#[ORM\UniqueConstraint(name: 'uniq_app_user_slack_user_id', columns: ['slack_user_id'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPasswordPolicyInterface, AccountStatusInterface, LastActivityInterface, AuditableInterface
 {
     use EnabledUserTrait;
@@ -52,6 +53,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     #[ORM\Column(length: 120)]
     private string $displayName = '';
+
+    /**
+     * Slack member user id (e.g. U012ABCDEF) for interactive Assign / Resolve attribution.
+     */
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $slackUserId = null;
 
     /** @var list<string> */
     #[ORM\Column]
@@ -190,6 +197,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function setDisplayName(string $displayName): self
     {
         $this->displayName = trim($displayName);
+
+        return $this;
+    }
+
+    public function getSlackUserId(): ?string
+    {
+        return $this->slackUserId;
+    }
+
+    public function setSlackUserId(?string $slackUserId): self
+    {
+        if (null === $slackUserId) {
+            $this->slackUserId = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($slackUserId);
+        $this->slackUserId = '' !== $trimmed ? $trimmed : null;
 
         return $this;
     }

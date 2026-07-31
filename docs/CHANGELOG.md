@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Slack Assign-to-me** (`071-slack-assign-mapping`, Fixes #32): optional Account **Slack user ID**; Block Kit **Assign to me** on Slack alerts; Resolve attributes actor when mapped + triage; shared `IssueAssigneeChanger`.
 - **OTLP traces ingest** (`070-otlp-traces`, Fixes #28): `POST /api/{projectId}/otlp/v1/traces` accepts OTLP ExportTraceServiceRequest JSON; ERROR spans (status +/or exception attributes) map to Beacon events via the Envelope worker; same auth/governance as OTLP logs; cap 200.
 - **Teams interactive Resolve** (`069-teams-interactive-actions`, Fixes #26): MessageCard HttpPOST **Resolve** when a destination signing secret is set; `POST /hooks/teams/actions` verifies HMAC token (7-day expiry) and resolves via `IssueStatusChanger` (`via: teams`).
 - **Slack interactive Resolve** (`068-slack-interactive-actions`, Fixes #24): optional encrypted Slack signing secret on notification destinations; Block Kit **Resolve** on issue alerts; `POST /hooks/slack/interactions` verifies `X-Slack-Signature` and resolves via shared `IssueStatusChanger`.

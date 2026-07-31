@@ -57,6 +57,7 @@ final readonly class AccountAnonymizer
 
         $subject->setEmail('anonymized-'.$uuid.'@invalid.local');
         $subject->setDisplayName('Anonymized user');
+        $subject->setSlackUserId(null);
         $subject->setEnabled(false);
         $subject->setAnonymizedAt(new DateTimeImmutable());
         $subject->setPasswordResetToken(null);
