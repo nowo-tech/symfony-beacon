@@ -208,7 +208,7 @@ make vite-build
 - Guest locale switch rejects backslash / protocol-relative open redirects (`SafeInternalRedirect`).
 - Web Push unsubscribe is scoped to the signed-in user (endpoint hash alone is not enough).
 - Magic login confirm page no longer auto-POSTs; user must click **Continue**.
-- Theme preferences boot via Vite `assets/theme-boot.ts` (CSP-friendly; no inline theme scripts). Rebuild front-end assets after upgrade.
+- Theme preferences boot via blocking IIFE compiled from `assets/theme-boot.ts` → `public/build/theme-boot.js` (FOUC-safe; CSP `script-src 'self'`). Rebuild front-end assets after upgrade.
 
 ## Upgrading from 0.12.8 to 0.13.0
 

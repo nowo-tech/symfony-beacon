@@ -189,12 +189,13 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-app-shell][data-sidebar-default="collapsed"]');
         $html = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('data-user-theme="dark"', $html);
+        self::assertStringContainsString('data-theme="dark"', $html);
         self::assertStringContainsString('data-user-density="compact"', $html);
         self::assertStringContainsString('data-user-motion="reduce"', $html);
         self::assertStringContainsString('data-user-font-scale="lg"', $html);
         self::assertStringContainsString('data-user-contrast="more"', $html);
         self::assertStringContainsString('data-user-sidebar="collapsed"', $html);
-        self::assertStringContainsString('theme-boot', $html);
+        self::assertStringContainsString('build/theme-boot.js', $html);
 
         $crawler = $client->request(Request::METHOD_GET, '/account/display/panels');
         self::assertResponseIsSuccessful();

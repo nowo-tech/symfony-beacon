@@ -13,6 +13,7 @@
     "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
     "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "@tailwindcss/vite": "4.3.3",
+    "esbuild": "^0.28.1",
     "sass": "1.102.0",
     "tailwindcss": "4.3.3",
     "tom-select": "2.6.2",

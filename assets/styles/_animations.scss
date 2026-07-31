@@ -34,30 +34,76 @@
   }
 }
 
-/* Thinking Orbs page loader — https://orbs.jakubantalik.com/ */
+@keyframes beacon-loader-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes beacon-loader-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Thinking Orbs page loader — translucent veil only (no solid screen). */
 .page-loader {
   position: fixed;
   inset: 0;
   z-index: 9999;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--color-paper, #f7f4ef) 88%, transparent);
-  backdrop-filter: blur(6px);
-  transition: opacity 0.32s ease, visibility 0.32s ease;
+  /* Light veil — content stays visible underneath */
+  background: color-mix(in srgb, var(--color-paper, #f3f6f4) 42%, transparent);
+  color: var(--color-ink, #0f1c18);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-[data-theme="dark"] .page-loader {
-  background: color-mix(in srgb, var(--color-paper, #0f1613) 86%, transparent);
+html[data-theme="dark"] .page-loader {
+  background: color-mix(in srgb, var(--beacon-paper, #0c1210) 48%, transparent);
+  color: var(--beacon-ink, #e6eee9);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .page-loader {
+    background: color-mix(in srgb, #0c1210 48%, transparent);
+    color: #e6eee9;
+  }
 }
 
 .page-loader[hidden] {
   display: none;
 }
 
+/* Keyframes so first paint (is-active in HTML) still eases in. */
+.page-loader.is-active:not(.is-leaving) {
+  visibility: visible;
+  pointer-events: auto;
+  animation: beacon-loader-fade-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 .page-loader.is-leaving {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  animation: none;
 }
 
 .page-loader__inner {
@@ -65,7 +111,11 @@
   flex-direction: column;
   align-items: center;
   gap: 0.85rem;
-  animation: beacon-fade-up 0.45s ease both;
+  opacity: 0;
+}
+
+.page-loader.is-active:not(.is-leaving) .page-loader__inner {
+  animation: beacon-loader-content-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
 
 .page-loader__label {
@@ -74,7 +124,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-ink, #0f1c18) 62%, transparent);
+  color: color-mix(in srgb, currentColor 62%, transparent);
 }
 
 .thinking-orb {
@@ -87,8 +137,12 @@
     transition: none;
   }
 
-  .page-loader__inner {
+  .page-loader.is-active:not(.is-leaving),
+  .page-loader.is-active:not(.is-leaving) .page-loader__inner {
     animation: none;
+    opacity: 1;
+    transform: none;
+    visibility: visible;
   }
 }
 
@@ -98,7 +152,11 @@
     transition: none;
   }
 
-  .page-loader__inner {
+  .page-loader.is-active:not(.is-leaving),
+  .page-loader.is-active:not(.is-leaving) .page-loader__inner {
     animation: none;
+    opacity: 1;
+    transform: none;
+    visibility: visible;
   }
 }

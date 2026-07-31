@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Full-page Thinking Orb overlay.
+ * Full-page Thinking Orb overlay (translucent veil).
  *
  * Shows on connect (initial paint), hides after `minVisible` ms once the
  * window has loaded. Also shows briefly when following same-origin links.
@@ -10,7 +10,7 @@ export default class extends Controller {
   static targets = ['overlay'];
 
   static values = {
-    minVisible: { type: Number, default: 450 },
+    minVisible: { type: Number, default: 650 },
     linkDelay: { type: Number, default: 120 },
   };
 
@@ -26,7 +26,8 @@ export default class extends Controller {
 
   connect(): void {
     this.shownAt = performance.now();
-    this.show();
+    // Initial markup already has is-active (CSS keyframes handle the soft enter).
+    this.show(false);
 
     if (document.readyState === 'complete') {
       this.scheduleHide();
@@ -108,7 +109,7 @@ export default class extends Controller {
     }, Math.max(0, this.linkDelayValue));
   };
 
-  private show(): void {
+  private show(restartEnter = true): void {
     const overlay = this.resolveOverlay();
     if (!overlay) {
       return;
@@ -118,6 +119,15 @@ export default class extends Controller {
     overlay.classList.remove('is-leaving');
     overlay.setAttribute('aria-busy', 'true');
     document.documentElement.classList.add('is-page-loading');
+
+    if (!restartEnter && overlay.classList.contains('is-active')) {
+      return;
+    }
+
+    // Retrigger enter keyframes (also used on in-app navigations).
+    overlay.classList.remove('is-active');
+    void overlay.offsetWidth;
+    overlay.classList.add('is-active');
   }
 
   private scheduleHide(): void {
@@ -154,17 +164,17 @@ export default class extends Controller {
 
     if (immediate) {
       overlay.hidden = true;
-      overlay.classList.remove('is-leaving');
+      overlay.classList.remove('is-leaving', 'is-active');
       return;
     }
 
     overlay.classList.add('is-leaving');
     const done = (): void => {
       overlay.hidden = true;
-      overlay.classList.remove('is-leaving');
+      overlay.classList.remove('is-leaving', 'is-active');
     };
     overlay.addEventListener('transitionend', done, { once: true });
-    window.setTimeout(done, 400);
+    window.setTimeout(done, 500);
   }
 
   private clearTimers(): void {
