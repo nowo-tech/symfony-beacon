@@ -473,4 +473,4 @@ Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **App
 
 - Architecture flows: [ARCHITECTURE.md](../ARCHITECTURE.md)
 - Migrations: `migrations/`
-- Local MySQL bind mount: `./.data/mysql` in [`compose.yaml`](../compose.yaml)
+- Local MySQL bind mount: `./.data/mysql` in [`compose.yaml`](../../compose.yaml)

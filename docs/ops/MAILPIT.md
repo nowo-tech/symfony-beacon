@@ -2,7 +2,7 @@
 
 Beacon sends transactional mail (magic login, password reset, notification email, Admin **Send sample**) through Symfony Mailer. For local development you can catch that mail with **[Mailpit](https://github.com/axllent/mailpit)** instead of a real SMTP provider.
 
-Mailpit is **dev/test only**. It is **not** part of [`compose.prod.yaml`](../compose.prod.yaml) and must **not** be used in production.
+Mailpit is **dev/test only**. It is **not** part of [`compose.prod.yaml`](../../compose.prod.yaml) and must **not** be used in production.
 
 | Piece | Role |
 |-------|------|
@@ -11,7 +11,7 @@ Mailpit is **dev/test only**. It is **not** part of [`compose.prod.yaml`](../com
 | `make mailpit` | Starts the service and prints the UI URL |
 | Administration → Mailer | Save encrypted DSN `smtp://mailer:1025` so the app delivers into Mailpit |
 
-Image: [`axllent/mailpit`](https://hub.docker.com/r/axllent/mailpit). Defined in [`compose.override.yaml`](../compose.override.yaml) (merged automatically for the default local stack).
+Image: [`axllent/mailpit`](https://hub.docker.com/r/axllent/mailpit). Defined in [`compose.override.yaml`](../../compose.override.yaml) (merged automatically for the default local stack).
 
 ---
 

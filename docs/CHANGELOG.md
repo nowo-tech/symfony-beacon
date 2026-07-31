@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-31
+
 ### Changed
 
-- Documentation layout: secondary manuals moved under `docs/product/`, `docs/ops/`, and `docs/dev/`; canonical guides stay at `docs/` root. Index: [README.md](README.md).
+- Documentation layout: secondary manuals moved under `docs/product/`, `docs/ops/`, and `docs/dev/`; canonical guides stay at `docs/` root. Index: [README.md](README.md) (Fixes #44 / #46). Relative links from nested manuals to Compose / Caddy / `.env.dist` corrected.
+
+### Fixed
+
+- Doctrine N+1 / query amplification on hot paths: hydrate `Issue.assignee` + `duplicateOf` for list/export/API; batch retention aggregate recompute; dedupe volume-threshold evaluation per envelope; share-link `issue` fetch-join; sole-owner and membership lookups without lazy collection walks; performance detail span hydrate.
 
 ## [1.0.0] - 2026-07-31
 
@@ -670,7 +676,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...v1.0.0
 [0.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...v0.16.0
