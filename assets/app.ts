@@ -176,8 +176,15 @@ function applySidebar(collapsed: boolean): void {
   }
 
   const mobile = isMobileSidebar();
-  shell.classList.toggle('is-sidebar-collapsed', !mobile && collapsed);
-  shell.classList.toggle('is-sidebar-open', mobile && !collapsed);
+  const nextCollapsed = !mobile && collapsed;
+  const nextOpen = mobile && !collapsed;
+
+  // Ensure the browser registers the pre-change transform before toggling,
+  // so the slide transition runs instead of a visibility pop.
+  void shell.querySelector('.app-sidebar')?.getBoundingClientRect();
+
+  shell.classList.toggle('is-sidebar-collapsed', nextCollapsed);
+  shell.classList.toggle('is-sidebar-open', nextOpen);
 
   if (backdrop) {
     // Overlay fade is driven by `.is-sidebar-open`; keep `hidden` for a11y only.
@@ -297,6 +304,9 @@ function applyContentWidth(width: ContentWidth, persist: boolean): void {
   if (!shell) {
     return;
   }
+
+  // Register current max-width before toggling so the rem↔% transition runs.
+  void shell.querySelector('.app-main__inner')?.getBoundingClientRect();
 
   shell.dataset.contentWidth = width;
   shell.classList.toggle('is-full-width', width === 'full');

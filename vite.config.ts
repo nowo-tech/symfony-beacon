@@ -1,6 +1,51 @@
-import { defineConfig } from 'vite';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, type Plugin } from 'vite';
 import symfonyPlugin from 'vite-plugin-symfony';
 import tailwindcss from '@tailwindcss/vite';
+import * as esbuild from 'esbuild';
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Compile assets/theme-boot.ts → public/build/theme-boot.js as a classic IIFE.
+ * Modules are deferred (FOUC); a blocking <script> must be classic for pre-paint theme.
+ */
+function themeBootIife(): Plugin {
+  const entry = path.join(rootDir, 'assets/theme-boot.ts');
+  const outfile = path.join(rootDir, 'public/build/theme-boot.js');
+
+  const buildIife = async (): Promise<void> => {
+    await esbuild.build({
+      entryPoints: [entry],
+      outfile,
+      bundle: true,
+      format: 'iife',
+      platform: 'browser',
+      target: ['es2018'],
+      minify: true,
+      logLevel: 'silent',
+    });
+  };
+
+  return {
+    name: 'theme-boot-iife',
+    async buildStart() {
+      await buildIife();
+    },
+    async closeBundle() {
+      await buildIife();
+    },
+    configureServer(server) {
+      server.watcher.add(entry);
+      server.watcher.on('change', (file) => {
+        if (path.resolve(file) === entry) {
+          void buildIife();
+        }
+      });
+    },
+  };
+}
 
 /**
  * Inside Docker, Vite always listens on 5173 (compose maps host VITE_PORT → 5173).
@@ -13,6 +58,7 @@ const hmrClientPort = Number(process.env.HTTPS_PORT || 443);
 
 export default defineConfig({
     plugins: [
+        themeBootIife(),
         tailwindcss(),
         symfonyPlugin({
             viteDevServerHostname: process.env.VITE_DEV_SERVER_HOST || 'localhost',
@@ -39,8 +85,6 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 app: './assets/app.ts',
-                // Early <head> boot (FOUC): load via vite_entry_script_tags('theme-boot') before app.
-                'theme-boot': './assets/theme-boot.ts',
                 // Kit admin shells (menus / breadcrumbs / cookie consent) — Bootstrap + layout helpers.
                 'kit-admin': './assets/kit-admin.ts',
                 // Nelmio Swagger UI init (CSP: no inline script on /api/doc).

@@ -2605,6 +2605,13 @@ body::-webkit-scrollbar-corner,
   height: var(--app-header-height);
 }
 
+/* Registered so content↔full max-width interpolates (rem↔% otherwise snaps). */
+@property --beacon-content-max {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 72rem;
+}
+
 /*
  * Sidebar motion: fixed panel slides via transform; main content reserves space
  * with padding-inline-start (length→length interpolates without @property).
@@ -2684,31 +2691,41 @@ body::-webkit-scrollbar-corner,
   bottom: 0;
   z-index: 30;
   width: var(--app-sidebar-width, 15.5rem);
-  border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  backdrop-filter: blur(8px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  transform: translate3d(0, 0, 0);
-  transition:
-    transform var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-    box-shadow var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-    border-color var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  /* Keep this shell free of backdrop-filter: animating transform on a
+     filtered element makes Chromium/WebKit pop the panel instead of sliding. */
+  background: transparent;
+  border: 0;
+  overflow: visible;
+  transform: translateX(0);
+  transition: transform var(--app-sidebar-duration, 0.42s)
+    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
   will-change: transform;
 }
 
 .app-shell.is-sidebar-collapsed .app-sidebar {
-  /* Extra 0.5rem so the border clears the viewport during the slide. */
-  transform: translate3d(calc(-100% - 0.5rem), 0, 0);
+  /* Extra 0.5rem so the panel clears the viewport during the slide. */
+  transform: translateX(calc(-100% - 0.5rem));
   pointer-events: none;
-  box-shadow: none;
-  border-color: transparent;
 }
 
 .app-sidebar__inner {
+  box-sizing: border-box;
   width: var(--app-sidebar-width, 15.5rem);
+  height: 100%;
+  min-height: 100%;
   padding: 1rem 0.85rem 1.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
+  background: var(--color-surface);
+  box-shadow: none;
+  transition: box-shadow var(--app-sidebar-duration, 0.42s)
+    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.app-shell:not(.is-sidebar-collapsed) .app-sidebar__inner {
+  box-shadow: 4px 0 24px rgb(var(--beacon-shadow) / 6%);
 }
 
 .app-sidebar__label {
@@ -2739,21 +2756,23 @@ body::-webkit-scrollbar-corner,
   position: relative;
   z-index: 10;
   width: 100%;
-  /* Length→length (72rem↔100%) so the toggle eases like the sidebar slide;
-   * `max-width: none` does not interpolate and snaps. */
-  max-width: 72rem;
+  /* --beacon-content-max is a registered <length-percentage> so rem↔% eases. */
+  max-width: var(--beacon-content-max, 72rem);
   margin: 0 auto;
   padding: 1.75rem 1.25rem 2.5rem;
-  transition: max-width var(--app-sidebar-duration, 0.42s)
-    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
-}
-
-.app-shell.is-full-width .app-main__inner {
-  max-width: 100%;
+  transition:
+    max-width var(--app-sidebar-duration, 0.42s)
+      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    --beacon-content-max var(--app-sidebar-duration, 0.42s)
+      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .app-shell.is-content-width .app-main__inner {
-  max-width: 72rem;
+  --beacon-content-max: 72rem;
+}
+
+.app-shell.is-full-width .app-main__inner {
+  --beacon-content-max: 100%;
 }
 
 .app-sidebar-backdrop {
@@ -2795,25 +2814,47 @@ body::-webkit-scrollbar-corner,
     bottom: 0;
     z-index: 35;
     width: var(--app-sidebar-width);
+    background: transparent;
+    border: 0;
+    overflow: visible;
+    pointer-events: none;
+    transform: translateX(calc(-100% - 0.75rem));
+    transition: transform var(--app-sidebar-duration, 0.42s)
+      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .app-sidebar__inner {
     border-right: 1px solid var(--color-sand);
     background: var(--color-surface);
-    box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
-    pointer-events: none;
-    transform: translate3d(calc(-100% - 0.75rem), 0, 0);
-    transition:
-      transform var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-      box-shadow var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    box-shadow: none;
   }
 
   .app-shell.is-sidebar-open .app-sidebar {
     pointer-events: auto;
-    transform: translate3d(0, 0, 0);
+    transform: translateX(0);
+  }
+
+  .app-shell.is-sidebar-open .app-sidebar__inner {
+    box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
   }
 
   .app-shell:not(.is-sidebar-open) .app-sidebar {
     pointer-events: none;
-    transform: translate3d(calc(-100% - 0.75rem), 0, 0);
+    transform: translateX(calc(-100% - 0.75rem));
+  }
+
+  .app-shell:not(.is-sidebar-open) .app-sidebar__inner {
     box-shadow: none;
+  }
+
+  /* Desktop collapsed shadow rule does not apply on the drawer. */
+  .app-shell:not(.is-sidebar-collapsed) .app-sidebar__inner {
+    box-shadow: none;
+  }
+
+  .app-shell.is-sidebar-open:not(.is-sidebar-collapsed) .app-sidebar__inner,
+  .app-shell.is-sidebar-open .app-sidebar__inner {
+    box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 18%);
   }
 
   .app-sidebar-backdrop {
@@ -3546,15 +3587,22 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   gap: 0.75rem 1.25rem;
   justify-content: center;
   align-items: center;
-  max-width: 72rem;
+  max-width: var(--beacon-content-max, 72rem);
   margin-inline: auto;
   font-size: 0.8125rem;
-  transition: max-width var(--app-sidebar-duration, 0.42s)
-    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  transition:
+    max-width var(--app-sidebar-duration, 0.42s)
+      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    --beacon-content-max var(--app-sidebar-duration, 0.42s)
+      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.app-shell.is-content-width > .site-legal-footer .site-legal-footer__nav {
+  --beacon-content-max: 72rem;
 }
 
 .app-shell.is-full-width > .site-legal-footer .site-legal-footer__nav {
-  max-width: 100%;
+  --beacon-content-max: 100%;
 }
 
 .site-legal-footer__nav a {
