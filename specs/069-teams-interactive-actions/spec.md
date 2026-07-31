@@ -36,11 +36,16 @@ As a project owner, I store a signing secret on the Teams destination (same encr
 | FR-004 | Shared `IssueStatusChanger` with `via: teams` |
 | FR-005 | Absolute action URL from router (`DEFAULT_URI`); document in NOTIFICATIONS.md |
 
-## Out of Scope
+## Out of Scope (this spec)
 
-- Assign / Ignore buttons
-- Slack→member mapping
+- Assign / Ignore buttons (Assign OpenUri shipped in `073-teams-assign-openuri`)
+- Slack→member mapping (`071`)
 - Adaptive Cards / Workflows-only tenants without MessageCard HttpPOST
+- Teams→member mapping (ROADMAP **Later**)
+
+## As-built follow-ups
+
+- Teams Assign to me via OpenUri: **`073-teams-assign-openuri`** (Phase 6.25 Done).
 
 ## Assumptions
 

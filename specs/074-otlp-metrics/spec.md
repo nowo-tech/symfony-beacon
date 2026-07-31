@@ -42,6 +42,10 @@ As an operator, metrics ingest honors ingest suspend, rate limit, daily/monthly 
 - Time-series storage / dashboards / full Performance waterfall
 - BeaconBundle OTLP metrics exporter
 
+## Later (roadmap)
+
+- OTLP gRPC / protobuf / Bundle exporter / Performance TSDB (extends this slice)
+
 ## Assumptions
 
 - Clients speak OTLP/HTTP JSON (`resourceMetrics` camelCase; snake_case accepted as alias).

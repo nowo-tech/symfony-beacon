@@ -14,7 +14,11 @@
 2. Anonymous `GET /login/qr` → show page HTML includes `data:image/png` or `data:image/svg+xml` img src.
 3. ROADMAP: QR image Done; **SMS OTP** remains Later.
 
-## Out of Scope
+## Out of Scope (this spec)
 
-- SMS OTP / phone_otp notifiers
+- SMS OTP / phone_otp notifiers (ROADMAP **Later**)
 - Enabling `ext-gd` in Docker (SVG fallback is acceptable without GD)
+
+## Later (roadmap)
+
+- QR SMS OTP verify (`phone_otp` / notifiers)

@@ -48,12 +48,15 @@ This application is **FrankenPHP worker mode friendly**.
 - Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **Copy for AI** (`beacon-ai-export/v1` Markdown/JSON — [docs/AI-EXPORT.md](docs/AI-EXPORT.md)), **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (`X-Beacon-Auth` / envelope `dsn`; query auth **deprecated**); per-project suspend + daily quota; secret always required
+- **OTLP HTTP JSON** adapters: `POST /api/{project_id}/otlp/v1/logs|traces|metrics` (WARN+ logs, ERROR spans, failure-like metric data points → Issues; same DSN auth)
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
 - **Release health** at `/projects/{uuid}/releases` (new-in-release counts + compare)
 - Operator **OpenAPI** panel at `/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
 - Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit**, **encrypted Mailer**, **Prometheus** `/metrics`, **notification circuit breaker**, **GDPR account export/anonymize**, **CI coverage** report — see [ROADMAP](docs/ROADMAP.md) (SSO Later)
-- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories and channel-native **Send test** — [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
+- Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories, Slack/Teams **Resolve** / **Assign**, and channel-native **Send test** — [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)
+- Optional **inbound email** replies → issue comments — [docs/INBOUND-EMAIL.md](docs/INBOUND-EMAIL.md)
+- **QR phone login** (AuthKit + image via `endroid/qr-code`); SMS OTP Later
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
@@ -168,6 +171,7 @@ CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that upl
 - [HTTP API overview](docs/API.md)
 - [Product roadmap](docs/ROADMAP.md)
 - [Project notifications](docs/NOTIFICATIONS.md)
+- [Inbound email comments](docs/INBOUND-EMAIL.md)
 - [Mercure (live alerts, JWT)](docs/MERCURE.md)
 - [Mailpit (local SMTP catcher)](docs/MAILPIT.md)
 - [Changelog](docs/CHANGELOG.md)

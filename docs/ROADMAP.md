@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.0.0** is the first stable major (Phases 0–6 through **6.28** Done). **v0.17.0** shipped Mailer DSN audit (`6.15`), Mailpit (`6.16`), Ops defaults, and Social login admin. **6.19**–**6.28** OTLP logs/traces/metrics, Slack/Teams Resolve/Assign, AuthKit QR image, and inbound email comments Done. **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -356,7 +356,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.16.0** | Coverage (`033`) + GDPR (`043`); collaboration/API (`040`–`042`, `044`, `061`); SiteBackup dual setup locale (`056`) + secrets guard (`062`); RoutingKit (`064-routing-kit`); branded HTTP errors (`063-branded-http-errors`); CSP PHP delivery + display-pref defaults |
 | **v0.17.0** | Mailer DSN audit (`6.15` / `065`); local Mailpit (`066`); Ops defaults in DB (`6.17`); Social login admin UI (`6.18`); Constitution v1.3.0 (no `env(VAR):` defaults in parameters) |
 | **Bundle v1.6.10** | Phase 6.13–6.14: nested console extras + Scheduler context; Monolog bridge already shipped (docs closed) |
-| **Next** | Later Phase 6+ (SSO / OTLP metrics / inbound email / …) when specified |
+| **v1.0.0** | First stable major: OTLP logs/traces/metrics (`067`/`070`/`074`); Slack/Teams Resolve + Assign (`068`/`069`/`071`/`073`); AuthKit 1.12 + QR image (`072`/`075`); inbound email comments (`076`); branded 4xx/5xx expansion; Constitution Principle X |
+| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -367,4 +368,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.28 Inbound email comments Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (**v1.0.0** stable; 6.28 Done; Next = Later Phase 6+).

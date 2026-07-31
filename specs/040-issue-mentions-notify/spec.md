@@ -40,3 +40,8 @@ As a member, when assigned to an issue, I get email.
 
 - In-app real-time mention UX beyond email.
 - Slack/Discord mention bridging.
+
+## As-built follow-ups
+
+- Reply-to-email → issue comment: **`076-inbound-email-comment`** (Phase 6.28 Done).
+- IMAP / attachments / provider-native adapters: ROADMAP **Later**.

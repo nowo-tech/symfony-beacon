@@ -2,7 +2,7 @@
 
 **Feature Branch**: `023-client-tags-scrubbing`  
 **Created**: 2026-07-21  
-**Status**: In progress (Bundle-primary; companion UI/docs in Beacon)
+**Status**: Implemented (Phase 3.4 Done — Bundle tags API + `before_send`; Beacon companion UI/docs)
 
 **Input**: Primary work in the Beacon client Bundle: public tags API and `before_send` scrubbing hooks; Beacon server provides companion UI. Repositories: Bundle + Beacon.
 

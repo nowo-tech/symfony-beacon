@@ -2,7 +2,7 @@
 
 **Feature Branch**: `024-client-spans`  
 **Created**: 2026-07-21  
-**Status**: In progress (Bundle-primary; Beacon Performance UI already renders spans)
+**Status**: Implemented (Phase 3.3 Done — Bundle Doctrine/HttpClient spans; Beacon Performance UI renders spans)
 
 **Input**: Bundle emits Doctrine and HttpClient spans; Beacon Performance UI shows those spans for transactions.
 

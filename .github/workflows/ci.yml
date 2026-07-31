@@ -62,7 +62,8 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9.7
+        # AWS Public ECR mirror of Docker Hub library/mysql — avoids Hub pull timeouts on GHA
+        image: public.ecr.aws/docker/library/mysql:9.7
         env:
           MYSQL_DATABASE: app
           MYSQL_USER: app
@@ -157,7 +158,8 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9.7
+        # AWS Public ECR mirror of Docker Hub library/mysql — avoids Hub pull timeouts on GHA
+        image: public.ecr.aws/docker/library/mysql:9.7
         env:
           MYSQL_DATABASE: app
           MYSQL_USER: app

@@ -36,11 +36,16 @@ As an operator, traces ingest honors ingest suspend, rate limit, daily/monthly q
 | FR-004 | Reuse `ProcessEnvelopeMessage` worker |
 | FR-005 | Document in API.md / DSN.md / OpenAPI |
 
-## Out of Scope
+## Out of Scope (this spec)
 
-- OTLP gRPC, `/v1/metrics`, protobuf binary
+- OTLP gRPC / protobuf binary
 - Full Performance waterfall / transaction ingest from all spans
 - BeaconBundle OTLP exporter
+
+## As-built follow-ups
+
+- OTLP metrics HTTP JSON: **`074-otlp-metrics`** (Phase 6.26 Done).
+- gRPC / protobuf / Bundle exporter / Performance TSDB: ROADMAP **Later**.
 
 ## Assumptions
 

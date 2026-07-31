@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-31
+
+First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade from **0.17.0** is additive (migrations + Composer). Enterprise SSO/SAML, WebAuthn, and QR SMS OTP remain ROADMAP **Later**.
+
 ### Added
 
 - **Inbound email → issue comment** (`076-inbound-email-comment`, Fixes #42): opt-in webhook `POST /hooks/email/inbound`; Reply-To tokens on mention/assign mail; shared `IssueCommentCreator`; Message-ID idempotency. See [INBOUND-EMAIL.md](INBOUND-EMAIL.md).
@@ -19,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Teams interactive Resolve** (`069-teams-interactive-actions`, Fixes #26): MessageCard HttpPOST **Resolve** when a destination signing secret is set; `POST /hooks/teams/actions` verifies HMAC token (7-day expiry) and resolves via `IssueStatusChanger` (`via: teams`).
 - **Slack interactive Resolve** (`068-slack-interactive-actions`, Fixes #24): optional encrypted Slack signing secret on notification destinations; Block Kit **Resolve** on issue alerts; `POST /hooks/slack/interactions` verifies `X-Slack-Signature` and resolves via shared `IssueStatusChanger`.
 - **OTLP logs ingest** (`067-otlp-ingest`, Fixes #20): `POST /api/{projectId}/otlp/v1/logs` accepts OTLP ExportLogsServiceRequest JSON; WARN+ LogRecords map to Beacon events via the Envelope worker; same `X-Beacon-Auth` / rate / quota / size limits; query auth rejected; dogfood `before_send` also drops `/otlp/` paths.
+- **Branded HTTP errors** expanded: Twig pages for **400**, **401**, **408**, **429**, and **502** (in addition to 403/404/500).
+
+### Changed
+
+- **Constitution Principle X**: forbid Cursor / `@cursor.com` / `Made-with: Cursor` attribution on commits, issues, and PRs (human git identity only).
+- CI MySQL service images use the AWS Public ECR mirror of `mysql:9.7` to avoid Docker Hub pull timeouts on GitHub Actions.
+
+### Fixed
+
+- Dark mode page-loader flash and sidebar slide motion.
+- Mercure / Slack interaction test and CS Fixer / Rector CI blockers.
 
 ## [0.17.0] - 2026-07-31
 
@@ -651,7 +666,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...v1.0.0
 [0.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...v0.15.0

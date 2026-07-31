@@ -36,8 +36,12 @@ As an operator, Teams MessageCards for `issue.new` / `regression` / `reopened` i
 
 ## Out of Scope
 
-- Adaptive Cards / `teamsUserId` mapping
+- Adaptive Cards / `teamsUserId` mapping (ROADMAP **Later**)
 - Changing Slack Assign or Teams Resolve HttpPOST
+
+## Later (roadmap)
+
+- Teams→member mapping / Adaptive Cards
 
 ## Assumptions
 

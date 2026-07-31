@@ -39,17 +39,20 @@ As a project owner, I store the Slack app Signing Secret on the destination (enc
 | FR-002 | Slack outbound includes Block Kit Resolve when secret set + issue/project UUIDs on `issue.new` / `issue.regression` / `issue.reopened` (not sample sends) |
 | FR-003 | `POST /hooks/slack/interactions` public; verify `X-Slack-Signature` + ±5 min timestamp |
 | FR-004 | Shared `IssueStatusChanger` for UI and Slack paths (history, UserAction, resolve/reopen notify) |
-| FR-005 | v1 actor is `null` after valid signature (Slack user → Beacon member mapping is Later) |
+| FR-005 | Resolve actor is `null` unless Slack user → Beacon member mapping exists (`071-slack-assign-mapping`) |
 | FR-006 | Document Slack App Interactivity URL + signing secret in NOTIFICATIONS.md |
 
-## Out of Scope
+## Out of Scope (this spec)
 
-- Teams interactive actions
-- Assign / Ignore / other buttons
-- Slack user email → membership mapping
+- Teams interactive actions (`069`)
+- Assign / Ignore / other buttons (Assign shipped in `071`)
 - Replacing Incoming Webhooks with full Slack Events API
+
+## As-built follow-ups
+
+- Slack user ID → member mapping + Assign-to-me: **`071-slack-assign-mapping`** (Phase 6.23 Done).
 
 ## Assumptions
 
 - Incoming Webhooks can carry Block Kit; button clicks require a Slack **App** with Interactivity Request URL pointing at Beacon.
-- Authorization for v1 is possession of the destination signing secret (HMAC), not a mapped Beacon user.
+- Authorization for Resolve without mapping is possession of the destination signing secret (HMAC).

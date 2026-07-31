@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.17.0 to the next release](#upgrading-from-0170-to-the-next-release)
+- [Upgrading from 1.0.0 to the next release](#upgrading-from-100-to-the-next-release)
+- [Upgrading from 0.17.0 to 1.0.0](#upgrading-from-0170-to-100)
 - [Upgrading from 0.16.0 to 0.17.0](#upgrading-from-0160-to-0170)
 - [Upgrading from 0.15.0 to 0.16.0](#upgrading-from-0150-to-0160)
 - [Upgrading from 0.14.0 to 0.15.0](#upgrading-from-0140-to-0150)
@@ -43,7 +44,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.17.0 to the next release
+## Upgrading from 1.0.0 to the next release
 
 ```bash
 git pull
@@ -55,28 +56,59 @@ pnpm install
 make vite-build
 ```
 
-Requires **AuthKit 1.12.1** (QR image) / **1.12.0** minimum for QR foundation. Migration `Version20260731200000` adds `auth_kit_qr_login_challenge`, `auth_kit_social_credential.enterprise_sso`, and `app_user.phone` / `phone_verified_at`. QR login is enabled in `nowo_auth_kit.yaml`; users set a phone on Account → Profile. Mark OIDC IdPs as **Enterprise SSO** in Administration → Social login when they should appear under the organization heading.
+No further steps until the next tagged release.
+
+## Upgrading from 0.17.0 to 1.0.0
+
+```bash
+git fetch --tags
+git checkout v1.0.0   # or pull main at the release commit
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+**1.0.0** is the first stable major. Changes since **0.17.0** are additive. Migrations to apply: `Version20260731180000` (destination `signing_secret`), `Version20260731190000` (`app_user.slack_user_id`), `Version20260731200000` (AuthKit QR + enterprise SSO + phone), `Version20260731210000` (`inbound_email_message`).
+
+Requires **AuthKit 1.12.1** and `endroid/qr-code` ^6 (Composer lock).
+
+### OTLP logs / traces / metrics (`067` / `070` / `074`)
+
+- New routes: `POST /api/{projectId}/otlp/v1/logs`, `/traces`, `/metrics` (same `X-Beacon-Auth` as Envelope; no query auth).
+- No schema migration for OTLP. Caps **200** mapped records/spans/data points per request. See [API.md](API.md) / [DSN.md](DSN.md).
+
+### Slack interactive Resolve + Assign (`068` / `071`)
+
+- Optional encrypted **signing secret** on Slack notification destinations (migration `…180000`).
+- Configure Slack App Interactivity Request URL → `POST /hooks/slack/interactions`.
+- Optional Account **Slack user ID** (`…190000`) enables **Assign to me** and Resolve actor attribution. Guide: [NOTIFICATIONS.md](NOTIFICATIONS.md).
+
+### Teams interactive Resolve + Assign OpenUri (`069` / `073`)
+
+- Teams destinations with a signing secret get MessageCard **Resolve** (HttpPOST) and **Assign to me** (OpenUri).
+- Ensure `DEFAULT_URI` is the public Beacon origin so OpenUri targets `/hooks/teams/assign-me`.
+- Assign requires Beacon login + project triage (no Teams user-id mapping).
+
+### AuthKit 1.12 + QR login (`072` / `075`)
+
+- Migration `Version20260731200000` adds `auth_kit_qr_login_challenge`, `auth_kit_social_credential.enterprise_sso`, and `app_user.phone` / `phone_verified_at`.
+- QR login is enabled in `nowo_auth_kit.yaml`; users set a phone on Account → Profile.
+- QR show pages render PNG (with `ext-gd`) or SVG data URIs. SMS OTP remains Later.
+- Mark OIDC IdPs as **Enterprise SSO** in Administration → Social login when they should appear under the organization heading.
 
 ### Inbound email comments (`076` / 6.28)
 
 - Migration `Version20260731210000` adds `inbound_email_message`.
 - Opt-in: `BEACON_INBOUND_EMAIL_ENABLED`, `BEACON_INBOUND_MAIL_DOMAIN`, `BEACON_INBOUND_WEBHOOK_SECRET`. Guide: [INBOUND-EMAIL.md](INBOUND-EMAIL.md).
+- Stores reply bodies as issue comments (personal data) — update privacy/terms as needed.
 
-### QR login image (`075` / 6.27)
+### Other
 
-- Requires AuthKit **1.12.1** and `endroid/qr-code` ^6.
-- No schema migration. Without `ext-gd`, QR codes render as SVG data URIs.
-
-### OTLP metrics (`074` / 6.26)
-
-- New ingest route `POST /api/{projectId}/otlp/v1/metrics` (same `X-Beacon-Auth` as logs/traces).
-- No schema migration. Failure-like data points only; healthy metrics ACK without Issues.
-
-### Teams Assign OpenUri (`073` / 6.25)
-
-- Teams destinations with a signing secret now include **Assign to me** (OpenUri) alongside **Resolve**.
-- Ensure `DEFAULT_URI` is the public Beacon origin so OpenUri targets `/hooks/teams/assign-me`.
-- No schema migration. Users must be logged in to Beacon with project triage; there is no Teams user-id mapping.
+- Branded error pages now cover 400/401/408/429/502 in addition to 403/404/500.
+- Constitution Principle X: do not add Cursor co-author trailers on commits/PRs.
 
 ## Upgrading from 0.16.0 to 0.17.0
 

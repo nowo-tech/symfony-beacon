@@ -15,7 +15,7 @@ Per-project daily counters (`DailyProjectStat`) track errors, transactions, and 
 - No filters by environment, release, level, or issue status.
 - Functional access tests ship under `022-analytics-perf-ci`.
 
-Charting, selectable time ranges, and dimension filters are specified in **`025-analytics-charts`** (Next).
+Charting, selectable time ranges, and dimension filters shipped in **`025-analytics-charts`** (Implemented).
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -48,13 +48,18 @@ As a security reviewer, OTLP never accepts query-string credentials and never pu
 | FR-002 | Auth via `X-Beacon-Auth` only (same key+secret binding as Envelope) |
 | FR-003 | Map OTLP JSON LogRecords (severity ≥ WARN) to Beacon event payloads; cap 200 records/request |
 | FR-004 | Reuse `ProcessEnvelopeMessage` worker for persistence/grouping/notifications |
-| FR-005 | Document in API.md / DSN.md / OpenAPI; no gRPC / traces / metrics in v1 |
+| FR-005 | Document in API.md / DSN.md / OpenAPI; no gRPC in this slice |
 
-## Out of Scope
+## Out of Scope (this spec)
 
-- OTLP gRPC, `/v1/traces`, `/v1/metrics`
+- OTLP gRPC / protobuf binary
 - BeaconBundle OTLP exporter
-- Protobuf binary Content-Type (JSON only in v1)
+
+## As-built follow-ups
+
+- OTLP traces HTTP JSON: **`070-otlp-traces`** (Phase 6.22 Done).
+- OTLP metrics HTTP JSON: **`074-otlp-metrics`** (Phase 6.26 Done).
+- gRPC / protobuf / Bundle exporter / Performance TSDB: ROADMAP **Later**.
 
 ## Assumptions
 

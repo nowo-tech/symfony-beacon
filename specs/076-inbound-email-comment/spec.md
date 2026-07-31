@@ -20,7 +20,11 @@
 
 ## Out of Scope
 
-IMAP, attachments, HTML MIME, Postmark/SES native adapters
+IMAP, attachments, HTML MIME, Postmark/SES native adapters (ROADMAP **Later**)
+
+## Later (roadmap)
+
+- IMAP / POP polling, attachments → blobs, provider-native Postmark/SES adapters
 
 ## Privacy
 
