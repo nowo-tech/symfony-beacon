@@ -101,7 +101,7 @@ final readonly class ProcessEnvelopeHandler
 
         /** @var list<callable(): void> $afterFlush */
         $afterFlush = [];
-        /** @var array<string, array{0: ?string, 1: ?string, 2: DateTimeImmutable}> $volumeThresholdKeys */
+        /** @var array<string, array{0: ?string, 1: ?string}> $volumeThresholdKeys */
         $volumeThresholdKeys = [];
 
         foreach ($parsed['items'] as $item) {
@@ -126,22 +126,18 @@ final readonly class ProcessEnvelopeHandler
         }
 
         if ([] !== $volumeThresholdKeys) {
-            $contexts = [];
-            foreach ($volumeThresholdKeys as [$environment, $release]) {
-                $contexts[] = [$environment, $release];
-            }
             $this->volumeThresholdEvaluator->evaluateContexts(
                 $project,
-                $contexts,
+                array_values($volumeThresholdKeys),
                 $receivedAt,
             );
         }
     }
 
     /**
-     * @param array<string, mixed>                                                     $payload
-     * @param list<callable(): void>                                                   $afterFlush
-     * @param array<string, array{0: ?string, 1: ?string, 2: DateTimeImmutable}> $volumeThresholdKeys
+     * @param array<string, mixed>                         $payload
+     * @param list<callable(): void>                       $afterFlush
+     * @param array<string, array{0: ?string, 1: ?string}> $volumeThresholdKeys
      */
     private function ingestEvent(
         Project $project,
@@ -149,8 +145,7 @@ final readonly class ProcessEnvelopeHandler
         DateTimeImmutable $receivedAt,
         array &$afterFlush,
         array &$volumeThresholdKeys,
-    ): void
-    {
+    ): void {
         $eventId = (string) ($payload['event_id'] ?? bin2hex(random_bytes(16)));
         if ($this->eventRepository->findOneByProjectAndEventId($project, $eventId) instanceof Event) {
             return;
@@ -223,7 +218,7 @@ final readonly class ProcessEnvelopeHandler
 
         if (\in_array($level, ['error', 'fatal'], true)) {
             $key = ($environment ?? '')."\0".($release ?? '');
-            $volumeThresholdKeys[$key] = [$environment, $release, $receivedAt];
+            $volumeThresholdKeys[$key] = [$environment, $release];
         }
     }
 
