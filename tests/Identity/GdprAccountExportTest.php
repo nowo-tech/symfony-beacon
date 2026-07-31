@@ -9,6 +9,7 @@ use App\Identity\Exception\AccountAnonymizeException;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
@@ -76,7 +77,7 @@ final class GdprAccountExportTest extends DatabaseWebTestCase
 
         $user = $em->find(User::class, $user->getId());
         self::assertInstanceOf(User::class, $user);
-        $memberships = self::getContainer()->get(\App\Project\Repository\ProjectMembershipRepository::class)->findByUser($user);
+        $memberships = self::getContainer()->get(ProjectMembershipRepository::class)->findByUser($user);
         self::assertNotEmpty($memberships);
         $project = $memberships[0]->getProject();
         self::assertNotNull($project);

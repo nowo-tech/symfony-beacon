@@ -1,0 +1,25 @@
+{% extends 'error/layout.html.twig' %}
+
+{% block title %}403 — {{ 'error.403.title'|trans }}{% endblock %}
+
+{% block error_illustration %}
+<figure class="error-page__figure">
+    <img
+        class="error-page__img"
+        src="{{ asset('illustrations/error-403.png') }}"
+        width="1024"
+        height="682"
+        alt="{{ 'error.403.image_alt'|trans }}"
+        decoding="async"
+    >
+</figure>
+{% endblock %}
+
+{% block error_title %}{{ 'error.403.title'|trans }}{% endblock %}
+{% block error_lead %}{{ 'error.403.lead'|trans }}{% endblock %}
+
+{% block error_hint %}{{ 'error.403.hint'|trans }}{% endblock %}
+
+{% block error_extra_actions %}
+    <a class="btn btn-ghost" href="{{ path('nowo_auth_kit_login_unlocalized') }}">{{ 'error.sign_in'|trans }}</a>
+{% endblock %}

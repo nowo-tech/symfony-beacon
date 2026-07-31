@@ -89,3 +89,8 @@ controllers_metrics:
         path: ../src/Shared/Metrics/
         namespace: App\Shared\Metrics
     type: attribute
+
+# RoutingKit DB/JSON locale routes — MUST be last so {name}.{locale} overlays app routes.
+nowo_routing_kit_db:
+    resource: .
+    type: nowo_routing_kit

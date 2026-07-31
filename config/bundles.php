@@ -24,7 +24,6 @@ return [
     Nowo\PwaBundle\PwaBundle::class => ['all' => true],
     Nowo\CookieConsentBundle\NowoCookieConsentBundle::class => ['all' => true],
     Nowo\LoginThrottleBundle\NowoLoginThrottleBundle::class => ['all' => true],
-    // Real class (not class_alias) — required for composer --classmap-authoritative in prod images.
     Nowo\PasswordPolicyBundle\NowoPasswordPolicyBundle::class => ['all' => true],
     Nowo\AuditKitBundle\NowoAuditKitBundle::class => ['all' => true],
     Nowo\UserKitBundle\NowoUserKitBundle::class => ['all' => true],
@@ -36,4 +35,5 @@ return [
     Nowo\SelectAllChoiceBundle\NowoSelectAllChoiceBundle::class => ['all' => true],
     Nowo\BeaconBundle\NowoBeaconBundle::class => ['all' => true],
     Nowo\SiteBackupBundle\NowoSiteBackupBundle::class => ['all' => true],
+    Nowo\RoutingKitBundle\NowoRoutingKitBundle::class => ['all' => true],
 ];

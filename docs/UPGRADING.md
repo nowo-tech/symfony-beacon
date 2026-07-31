@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 0.15.0 to the next release](#upgrading-from-0150-to-the-next-release)
+- [Upgrading from 0.16.0 to the next release](#upgrading-from-0160-to-the-next-release)
+- [Upgrading from 0.15.0 to 0.16.0](#upgrading-from-0150-to-0160)
 - [Upgrading from 0.14.0 to 0.15.0](#upgrading-from-0140-to-0150)
 - [Upgrading from 0.13.0 to 0.14.0](#upgrading-from-0130-to-0140)
 - [Upgrading from 0.12.8 to 0.13.0](#upgrading-from-0128-to-0130)
@@ -41,7 +42,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 0.15.0 to the next release
+## Upgrading from 0.16.0 to the next release
 
 ```bash
 git pull
@@ -53,15 +54,71 @@ pnpm install
 make vite-build
 ```
 
-_(Coverage tooling: `make test-coverage`; CI Coverage job informational until `COVERAGE_MIN` is set — [CONTRIBUTING.md](CONTRIBUTING.md).)_
+_(Placeholder — fill when cutting the next release.)_
+
+## Upgrading from 0.15.0 to 0.16.0
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console app:seed-platform
+pnpm install
+make vite-build
+```
+
+Migrations since **0.15.0**: `Version20260731140000` (`anonymized_at`), `Version20260731150000` (share-link max uses), `Version20260731160000` (`project_read_token`).
+
+Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent padding, kit-admin JSON islands, theme-boot on guest shell).
 
 ### GDPR account export / anonymize (`043`)
 
-- Migrate: adds `app_user.anonymized_at`.
 - Account → **Privacy** (`/account/privacy`): download JSON export; optional self-service anonymize (blocked if sole project owner or last instance admin).
 - Admin → Users: **Export data** / **Anonymize** for other accounts.
 - Anonymize does **not** purge project events/issues — see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md).
 - Runtime anonymize is app-owned (do not use `anonymize-bundle` as the production executor).
+
+### Collaboration / API (`040`–`042`, `044`, `061`)
+
+- Issue `@mentions` and assignee email require a deliverable encrypted instance Mailer.
+- Similar-issues suggestions appear on issue show (cap 5).
+- Project Settings → read API tokens (`brt_…`); Envelope ingest keys are rejected on the read API.
+- Administration → Instance config: JSON export/import of allowlisted appearance + flags (secrets rejected).
+- Share links support optional `max_uses` (UI default **1**; clear for unlimited until expiry).
+
+### SiteBackup / locales (`056`, `062`, kits)
+
+- Requires **SiteBackupBundle ≥ 1.7.0**: bare `/setup` serves `DEFAULT_LOCALE`; other locales use `/{_locale}/setup`. Align `setup.locale.enabled` with `%fallback_locales%` — see [ADDING-LOCALES.md](ADDING-LOCALES.md).
+- Non-`dev`/`test` environments fail closed when `SITE_SETUP_TOKEN` / `SITE_BACKUP_PASSWORD_HASH` are empty or still the local defaults (`062`).
+- Docker image builds that run `cache:clear` / `cache:warmup` / `assets:install` skip that secrets guard (`064-sitebackup-guard-skip-cache-clear`).
+
+### RoutingKit (`064-routing-kit`)
+
+- New dependency `nowo-tech/routing-kit-bundle`; config `config/packages/nowo_routing_kit.yaml`; admin UI `/_routing/`.
+- Use `#[Routable]` for app controllers that need dual locale paths. AuthKit and SiteBackup keep their own locale loaders.
+
+### Branded HTTP errors (`063-branded-http-errors`)
+
+- Twig overrides under `templates/bundles/TwigBundle/Exception/`; illustrations in `public/illustrations/`.
+- Preview `/_error/{404|403|500}` is registered **only** when `APP_ENV=dev`.
+
+### CSP delivery (post-0.15.0 hardening)
+
+- CSP is emitted by PHP (`ContentSecurityPolicySubscriber`), not Caddy, so the Web Debug Toolbar can merge nonces.
+- Debug CSP allows `'unsafe-eval'` for the toolbar; `/_wdt` and `/_profiler` skip app CSP.
+- Kit admin pages no longer rely on inline `window.*Config` scripts (JSON islands + Vite `kit-admin`).
+- Password toggle / confirms / selects need the rebuilt Stimulus entrypoints — see [PRODUCTION.md](PRODUCTION.md#security-headers-caddy).
+
+### Account display preference defaults
+
+- New users always persist locale (`%default_locale%`), theme `light`, contrast/motion `system` (and related appearance columns).
+- Opening `/account/display` heals legacy null columns; anonymized accounts stay scrubbed.
+- No migration required (data heal on persist/update and account display).
+
+### CI / coverage (`033`)
+
+- Optional local `make test-coverage`; CI Coverage job is informational until `COVERAGE_MIN` is set — [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Upgrading from 0.14.0 to 0.15.0
 

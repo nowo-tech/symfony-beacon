@@ -6,6 +6,7 @@ namespace App\Identity\Entity;
 
 use App\Identity\Repository\UserRepository;
 use App\Identity\Tour\ProductTourPage;
+use App\Identity\UserDisplayPreferenceDefaults;
 use App\Issues\IssuePanelIds;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\Doctrine\PublicUuidTrait;
@@ -83,39 +84,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $passwordHistory;
 
-    /** Preferred UI locale (`en` / `es` / `de` / `nl` / `fr` / `it` / `pt`); null = follow request / browser. */
+    /** Preferred UI locale (`en` / `es` / …); null only for legacy / anonymized rows. */
     #[ORM\Column(length: 8, nullable: true)]
     private ?string $preferredLocale = null;
 
-    /** Preferred color theme (`light` / `dark`); null = follow device / localStorage. */
+    /** Preferred color theme (`light` / `dark`). Default `light` for new users; locale is filled on PrePersist from `%default_locale%`. */
     #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredTheme = null;
+    private ?string $preferredTheme = UserDisplayPreferenceDefaults::THEME;
 
     /** Main content width: `content` (centered max-width) or `full`. Null = content. */
     #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredContentWidth = null;
+    private ?string $preferredContentWidth = UserDisplayPreferenceDefaults::CONTENT_WIDTH;
 
     /** UI density: `comfortable` (default) or `compact`. Null = comfortable. */
     #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredUiDensity = null;
+    private ?string $preferredUiDensity = UserDisplayPreferenceDefaults::UI_DENSITY;
 
     /**
-     * Motion preference: null = follow OS, `reduce` = minimize motion, `full` = allow motion.
+     * Motion preference: `system` (follow OS), `reduce`, or `full`.
      */
     #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredMotion = null;
+    private ?string $preferredMotion = UserDisplayPreferenceDefaults::MOTION;
 
     /** Root font scale: `sm` | `md` (default) | `lg`. Null = md. */
     #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredFontScale = null;
+    private ?string $preferredFontScale = UserDisplayPreferenceDefaults::FONT_SCALE;
 
-    /** Contrast: null = system, `more` = stronger ink/borders. */
+    /** Contrast: `system` (follow device) or `more`. */
     #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredContrast = null;
+    private ?string $preferredContrast = UserDisplayPreferenceDefaults::CONTRAST;
 
     /** Desktop sidebar default: `expanded` (default) or `collapsed`. Null = expanded. */
     #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredSidebar = null;
+    private ?string $preferredSidebar = UserDisplayPreferenceDefaults::SIDEBAR;
 
     /**
      * Issue/event panel ids that should start collapsed (browser can override via localStorage).
@@ -332,7 +333,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
-    public function getPreferredLocale(): ?string
+    public function getPreferredLocale(): string
+    {
+        return $this->preferredLocale ?? UserDisplayPreferenceDefaults::LOCALE;
+    }
+
+    /** Stored column before defaults (PrePersist / legacy null rows). */
+    public function getPreferredLocaleRaw(): ?string
     {
         return $this->preferredLocale;
     }
@@ -345,7 +352,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
-    public function getPreferredTheme(): ?string
+    public function getPreferredTheme(): string
+    {
+        return $this->preferredTheme ?? UserDisplayPreferenceDefaults::THEME;
+    }
+
+    public function getPreferredThemeRaw(): ?string
     {
         return $this->preferredTheme;
     }
@@ -363,7 +375,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function getPreferredContentWidth(): string
     {
-        return 'full' === $this->preferredContentWidth ? 'full' : 'content';
+        return 'full' === $this->preferredContentWidth ? 'full' : UserDisplayPreferenceDefaults::CONTENT_WIDTH;
+    }
+
+    public function getPreferredContentWidthRaw(): ?string
+    {
+        return $this->preferredContentWidth;
     }
 
     public function setPreferredContentWidth(?string $preferredContentWidth): self
@@ -379,7 +396,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function getPreferredUiDensity(): string
     {
-        return 'compact' === $this->preferredUiDensity ? 'compact' : 'comfortable';
+        return 'compact' === $this->preferredUiDensity ? 'compact' : UserDisplayPreferenceDefaults::UI_DENSITY;
+    }
+
+    public function getPreferredUiDensityRaw(): ?string
+    {
+        return $this->preferredUiDensity;
     }
 
     public function setPreferredUiDensity(?string $preferredUiDensity): self
@@ -393,7 +415,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
-    public function getPreferredMotion(): ?string
+    public function getPreferredMotion(): string
+    {
+        return $this->preferredMotion ?? UserDisplayPreferenceDefaults::MOTION;
+    }
+
+    public function getPreferredMotionRaw(): ?string
     {
         return $this->preferredMotion;
     }
@@ -401,7 +428,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function setPreferredMotion(?string $preferredMotion): self
     {
         $normalized = null !== $preferredMotion ? strtolower(trim($preferredMotion)) : null;
-        if (null !== $normalized && !\in_array($normalized, ['reduce', 'full'], true)) {
+        if (null !== $normalized && !\in_array($normalized, ['system', 'reduce', 'full'], true)) {
             $normalized = null;
         }
         $this->preferredMotion = $normalized;
@@ -411,7 +438,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function getPreferredFontScale(): string
     {
-        return \in_array($this->preferredFontScale, ['sm', 'lg'], true) ? $this->preferredFontScale : 'md';
+        return \in_array($this->preferredFontScale, ['sm', 'lg'], true)
+            ? $this->preferredFontScale
+            : UserDisplayPreferenceDefaults::FONT_SCALE;
+    }
+
+    public function getPreferredFontScaleRaw(): ?string
+    {
+        return $this->preferredFontScale;
     }
 
     public function setPreferredFontScale(?string $preferredFontScale): self
@@ -425,7 +459,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
-    public function getPreferredContrast(): ?string
+    public function getPreferredContrast(): string
+    {
+        return $this->preferredContrast ?? UserDisplayPreferenceDefaults::CONTRAST;
+    }
+
+    public function getPreferredContrastRaw(): ?string
     {
         return $this->preferredContrast;
     }
@@ -433,7 +472,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function setPreferredContrast(?string $preferredContrast): self
     {
         $normalized = null !== $preferredContrast ? strtolower(trim($preferredContrast)) : null;
-        if (null !== $normalized && 'more' !== $normalized) {
+        if (null !== $normalized && !\in_array($normalized, ['system', 'more'], true)) {
             $normalized = null;
         }
         $this->preferredContrast = $normalized;
@@ -443,7 +482,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function getPreferredSidebar(): string
     {
-        return 'collapsed' === $this->preferredSidebar ? 'collapsed' : 'expanded';
+        return 'collapsed' === $this->preferredSidebar ? 'collapsed' : UserDisplayPreferenceDefaults::SIDEBAR;
+    }
+
+    public function getPreferredSidebarRaw(): ?string
+    {
+        return $this->preferredSidebar;
     }
 
     public function setPreferredSidebar(?string $preferredSidebar): self

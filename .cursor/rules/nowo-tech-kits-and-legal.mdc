@@ -21,6 +21,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Dashboard menus (DB + Twig/API) | `nowo-tech/dashboard-menu-bundle` | Tree menus, i18n, permissions, admin CRUD |
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
+| Dual locale public paths (`/foo` + `/{locale}/foo`) | `nowo-tech/routing-kit-bundle` | `#[Routable]` + panel `/_routing/`; AuthKit/SiteBackup keep their own locale config |
 | Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest. Also installed **in this server** for dogfooding when `BEACON_DSN` is set. |
 | Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs + Mailer DSN |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |

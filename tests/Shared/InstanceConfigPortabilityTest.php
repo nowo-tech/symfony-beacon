@@ -10,6 +10,8 @@ use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceConfigPortability;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -97,7 +99,9 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/settings/instance-config');
         self::assertResponseIsSuccessful();
         $form = $crawler->selectButton('Import JSON')->form();
-        $form['config']->upload($tmp);
+        $configField = $form->get('config');
+        self::assertInstanceOf(FileFormField::class, $configField);
+        $configField->upload($tmp);
         $client->submit($form);
         self::assertResponseRedirects('/settings/instance-config');
         $client->followRedirect();
@@ -109,11 +113,11 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
     }
 
     /**
-     * @return array{0: \Symfony\Bundle\FrameworkBundle\KernelBrowser, 1: User}
+     * @return array{0: KernelBrowser, 1: User}
      */
     private function bootAdmin(string $email): array
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $this->seedPlatformCatalogs();
         $admin = $this->makeUser($email, ['ROLE_ADMIN']);
 

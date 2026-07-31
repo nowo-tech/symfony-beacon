@@ -1,0 +1,47 @@
+# nowo-tech/routing-kit-bundle — DB/JSON locale paths + admin panel
+# https://github.com/nowo-tech/RoutingKitBundle
+# Dual public URLs for #[Routable] app routes; AuthKit/SiteBackup keep their own locale config.
+nowo_routing_kit:
+    enabled: true
+    default_locale: '%default_locale%'
+    locales: '%fallback_locales%'
+    storage:
+        paths_file: '%kernel.project_dir%/var/routing_kit/paths.json'
+    discovery:
+        # Beacon controllers live under domain folders (no src/Controller).
+        scan_dirs:
+            - '%kernel.project_dir%/src/Shared/Legal/Controller'
+            - '%kernel.project_dir%/src/Shared/Locale'
+            - '%kernel.project_dir%/src/Shared/Controller'
+            - '%kernel.project_dir%/src/Identity/Controller'
+            - '%kernel.project_dir%/src/Project/Controller'
+            - '%kernel.project_dir%/src/Issues/Controller'
+            - '%kernel.project_dir%/src/Analytics/Controller'
+            - '%kernel.project_dir%/src/Notifications/Controller'
+            - '%kernel.project_dir%/src/Performance/Controller'
+            - '%kernel.project_dir%/src/Shared/Settings/Controller'
+            - '%kernel.project_dir%/src/Shared/Appearance/Controller'
+    panel:
+        enabled: true
+        path_prefix: '/_routing'
+        allow_controller_override: false
+        max_definitions: 500
+        list_page_size: 50
+        reject_conflicts: true
+    web_ui:
+        enabled: true
+        layout_template: 'kit/routing_kit_panel_layout.html.twig'
+        css_framework: custom
+        icon_set: none
+    security:
+        access_roles: [ROLE_ADMIN]
+        allow_unauthenticated: false
+    redirects:
+        canonical_enabled: true
+        canonical_status: 301
+        root_enabled: false
+    auto_invalidate_cache: true
+    # Bare path for DEFAULT_LOCALE (same idea as AuthKit unlocalized: serve).
+    register_unprefixed_default: true
+    # SeoKit not installed — bridge no-ops when SeoPathBuilderInterface is absent.
+    seo_kit_bridge: true

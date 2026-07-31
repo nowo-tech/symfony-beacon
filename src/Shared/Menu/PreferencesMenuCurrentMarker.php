@@ -47,7 +47,7 @@ final class PreferencesMenuCurrentMarker
             $children = [];
         }
         /** @var list<array<string, mixed>> $childList */
-        $childList = array_values(array_filter($children, static fn (mixed $c): bool => \is_array($c)));
+        $childList = array_values(array_filter($children, \is_array(...)));
         $children = array_map(
             fn (array $child): array => $this->markNode($child, $route),
             $childList,

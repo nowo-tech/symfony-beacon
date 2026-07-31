@@ -25,7 +25,7 @@ Public surfaces:
 | Surface | Behaviour |
 |---------|-----------|
 | AuthKit (login/register/logout/reset/magic) | `locale.in_path: both` + `unlocalized: serve` — bare serves `DEFAULT_LOCALE`; other locales use `/{_locale}/…` |
-| Setup / backup | SiteBackupBundle paths `/setup` and `/_site_backup` (not locale-prefixed) |
+| Setup / backup | SiteBackupBundle ≥ 1.7.0: bare `/setup` for `DEFAULT_LOCALE`, `/{_locale}/setup` for others (`setup.locale.in_path: both` + `unlocalized: serve`); panel `/_site_backup` |
 | Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
 
 Guests change language via the path switcher (links to another `/{locale}/…`) or `GET|POST /locale/{locale}?redirect=…` (session `_locale` + localize public paths). After sign-in, the app shell stores the preferred locale on the user account (`POST /account/locale/{locale}`) and does **not** put `_locale` in dashboard URLs.
@@ -45,12 +45,12 @@ This feeds `framework.default_locale` (`config/packages/translation.yaml`) and i
 ## Checklist (summary)
 
 1. Pick a standard IETF language tag (e.g. `pl`, `ca`, `pt_BR` — use the same code everywhere).
-2. Enable the locale in **all** config lists below (keep them in sync).
+2. Enable the locale in **all** config lists below (keep them in sync), including AuthKit `locale.enabled`, SiteBackup `setup.locale.enabled` (`%fallback_locales%`), and RoutingKit `locales` when used.
 3. Add translation catalogues under `translations/`.
 4. Add `locale.{code}` labels in every `messages.*.yaml`.
 5. Extend security firewall path regexes and `account_locale_switch` / `guest_locale_switch` / bare-redirect + prefixed public route requirements.
 6. Extend menu / breadcrumb seeder translation maps (and re-seed).
-7. Smoke-test AuthKit + app shell + cookie consent; extend PHPUnit if needed.
+7. Smoke-test AuthKit + `/setup` + `/{locale}/setup` + app shell + cookie consent; extend PHPUnit if needed.
 8. Update this doc’s “Current locales” table and `docs/CHANGELOG.md` when shipping.
 
 ---
@@ -64,6 +64,8 @@ Update **every** list so Twig, AuthKit, consent, menus, and breadcrumbs agree:
 | `.env` / `.env.dist` | `DEFAULT_LOCALE` → `framework.default_locale` |
 | `config/packages/translation.yaml` | `framework.enabled_locales` (+ `default_locale: '%env(DEFAULT_LOCALE)%'`) |
 | `config/packages/nowo_auth_kit.yaml` | `nowo_auth_kit.locale.enabled` (+ `locale.default` / `in_path: both`) |
+| `config/packages/nowo_site_backup.yaml` | `setup.locale.enabled` (usually `%fallback_locales%`) + `in_path: both` / `unlocalized: serve` |
+| `config/packages/nowo_routing_kit.yaml` | `nowo_routing_kit.locales` (when RoutingKit dual paths are used) |
 | `config/packages/nowo_cookie_consent.yaml` | `nowo_cookie_consent.enabled_locales` |
 | `config/packages/nowo_breadcrumb_kit.yaml` | `nowo_breadcrumb_kit.locales` |
 | `config/packages/nowo_dashboard_menu.yaml` | `nowo_dashboard_menu.locales` |
@@ -185,7 +187,7 @@ make qa
 ## 6. Manual smoke checklist
 
 1. Clear cache: `docker compose exec -T php php bin/console cache:clear`
-2. Anonymous: open `/{locale}/login` and `/{locale}/register` (if first-user registration still open).
+2. Anonymous: open `/{locale}/login` and `/{locale}/register` (if first-user registration still open); open `/setup` (default locale) and `/{locale}/setup`.
 3. Locale switcher on AuthKit layout changes the path locale.
 4. Sign in; switch locale from the header; confirm preference persists after reload (no `_locale=` in the URL).
 5. Account → Display language list includes the new locale.
@@ -206,7 +208,7 @@ make qa
 
 - **English** remains the source of truth for docs, specs, PHPDoc, and the default UI catalogue.
 - Prefer **endonyms** in `locale.{code}` (e.g. `Deutsch`, `Español`, `Polski`).
-- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + guest session locale + account preference (no `_locale` on dashboard paths). SiteBackup `/setup` is not locale-prefixed.
+- Do not hand-roll a second i18n stack; use Symfony Translator + AuthKit dual URLs (`in_path: both` / `unlocalized: serve`) + SiteBackup `setup.locale` (same model) + guest session locale + account preference (no `_locale` on dashboard paths). Optional RoutingKit for other `#[Routable]` app routes (`064`).
 - Prefer shipping complete `messages.{locale}.yaml` catalogues (key parity with English); translator `fallbacks: [en]` covers gaps only as a safety net.
 - Legal / cookie UX: when adding locales, translate consent catalogues and keep [`LEGAL-AND-COOKIES.md`](LEGAL-AND-COOKIES.md) operator placeholders in English for docs.
 
@@ -221,6 +223,7 @@ config/packages/nowo_dashboard_menu.yaml
 config/packages/security.yaml
 config/packages/twig.yaml
 config/packages/nowo_site_backup.yaml
+config/packages/nowo_routing_kit.yaml
 src/Shared/Locale/BarePublicLocaleRedirectController.php
 src/Setup/AdminUserProvisioner.php
 src/Identity/Controller/AccountLocaleController.php

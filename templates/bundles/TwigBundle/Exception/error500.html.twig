@@ -1,0 +1,20 @@
+{% extends 'error/layout.html.twig' %}
+
+{% block title %}500 — {{ 'error.500.title'|trans }}{% endblock %}
+
+{% block error_illustration %}
+<figure class="error-page__figure">
+    <img
+        class="error-page__img"
+        src="{{ asset('illustrations/error-500.png') }}"
+        width="1024"
+        height="682"
+        alt="{{ 'error.500.image_alt'|trans }}"
+        decoding="async"
+    >
+</figure>
+{% endblock %}
+
+{% block error_title %}{{ 'error.500.title'|trans }}{% endblock %}
+{% block error_lead %}{{ 'error.500.lead'|trans }}{% endblock %}
+{% block error_hint %}{{ 'error.500.hint'|trans }}{% endblock %}

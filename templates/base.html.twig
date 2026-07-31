@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html
     lang="{{ app.request.locale|default('en') }}"
-    {% if app.user and app.user.preferredTheme %}data-user-theme="{{ app.user.preferredTheme|e('html_attr') }}"{% endif %}
+    {% if app.user %}data-user-theme="{{ app.user.preferredTheme|e('html_attr') }}"{% endif %}
     {% if app.user %}
         data-user-density="{{ app.user.preferredUiDensity|e('html_attr') }}"
         data-user-motion="{{ app.user.preferredMotion|e('html_attr') }}"

@@ -149,11 +149,11 @@ Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` only while migrating clients (any enviro
 
 ## Security headers (Caddy)
 
-The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, **HSTS** (skipped for `localhost` / `127.0.0.1` so local self-signed HTTPS is not sticky-pinned), and a `Content-Security-Policy` with `object-src 'none'` and **`script-src 'self'`** (no `'unsafe-inline'`). Theme boot uses Vite `theme-boot`; kit admin uses Vite `kit-admin` (self-hosted Bootstrap); confirm dialogs / selects use Stimulus. `style-src` still allows `'unsafe-inline'` for operator appearance CSS overrides and small kit layout `<style>` blocks.
+The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and **HSTS** (skipped for `localhost` / `127.0.0.1` so local self-signed HTTPS is not sticky-pinned). **`Content-Security-Policy`** is set in PHP (`ContentSecurityPolicySubscriber`) with `object-src 'none'` and **`script-src 'self'`** (no `'unsafe-inline'`), so the Web Debug Toolbar can merge its script/style **nonces** into the same header. In **`kernel.debug`**, CSP also allows `'unsafe-eval'` because the toolbar `eval()`s scripts from the `/_wdt` AJAX fragment (prod stays without `'unsafe-eval'` except Swagger UI). Theme boot uses Vite `theme-boot`; kit admin uses Vite `kit-admin` (self-hosted Bootstrap); confirm dialogs / password toggle / selects use Stimulus. Vendor kit page `window.*Config` scripts are rewritten to JSON islands (`KitInlineConfigScriptSubscriber`). `style-src` still allows `'unsafe-inline'` for operator appearance CSS overrides and small kit layout `<style>` blocks.
 
 - **HSTS:** default `max-age=31536000; includeSubDomains` on non-loopback hosts. Override or extend via `CADDY_SERVER_EXTRA_DIRECTIVES` if you terminate TLS elsewhere (or need `preload`).
 - Do not ship analytics cookies without cookie-consent kit UX.
-- **Swagger UI** (`/api/doc`) still needs `script-src 'unsafe-eval'` (JSON Schema compile). The Caddyfile overrides CSP on that path only (no `'unsafe-inline'`); Swagger assets are same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`) and boot via Vite `swagger-ui-boot`.
+- **Swagger UI** (`/api/doc`) still needs `script-src 'unsafe-eval'` (JSON Schema compile). The PHP CSP subscriber uses a path-specific policy (no `'unsafe-inline'`); Swagger assets are same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`) and boot via Vite `swagger-ui-boot`.
 
 `/api/doc` and `/api/doc.json` require **`ROLE_ADMIN`**.
 

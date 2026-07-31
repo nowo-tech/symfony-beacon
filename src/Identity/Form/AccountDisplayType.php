@@ -56,10 +56,11 @@ final class AccountDisplayType extends FormKitAbstractType
         }
 
         $this->withBuilder($builder, function () use ($localeChoices): void {
+            // No empty ChoiceType placeholder — every account has concrete defaults.
             $this->addChoiceField('preferredLocale', [
                 'choices' => $localeChoices,
-                'placeholder' => 'preferences.locale_auto',
-                'required' => false,
+                'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredTheme', [
                 'choices' => [
@@ -67,8 +68,8 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.theme_dark' => 'dark',
                 ],
                 'choice_translation_domain' => 'messages',
-                'placeholder' => 'preferences.theme_auto',
-                'required' => false,
+                'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredContentWidth', [
                 'choices' => [
@@ -77,6 +78,7 @@ final class AccountDisplayType extends FormKitAbstractType
                 ],
                 'choice_translation_domain' => 'messages',
                 'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredUiDensity', [
                 'choices' => [
@@ -85,6 +87,7 @@ final class AccountDisplayType extends FormKitAbstractType
                 ],
                 'choice_translation_domain' => 'messages',
                 'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredFontScale', [
                 'choices' => [
@@ -94,14 +97,16 @@ final class AccountDisplayType extends FormKitAbstractType
                 ],
                 'choice_translation_domain' => 'messages',
                 'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredContrast', [
                 'choices' => [
+                    'preferences.contrast_system' => 'system',
                     'preferences.contrast_more' => 'more',
                 ],
                 'choice_translation_domain' => 'messages',
-                'placeholder' => 'preferences.contrast_system',
-                'required' => false,
+                'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredSidebar', [
                 'choices' => [
@@ -110,15 +115,17 @@ final class AccountDisplayType extends FormKitAbstractType
                 ],
                 'choice_translation_domain' => 'messages',
                 'required' => true,
+                'placeholder' => false,
             ]);
             $this->addChoiceField('preferredMotion', [
                 'choices' => [
+                    'preferences.motion_system' => 'system',
                     'preferences.motion_reduce' => 'reduce',
                     'preferences.motion_full' => 'full',
                 ],
                 'choice_translation_domain' => 'messages',
-                'placeholder' => 'preferences.motion_system',
-                'required' => false,
+                'required' => true,
+                'placeholder' => false,
             ]);
         });
     }

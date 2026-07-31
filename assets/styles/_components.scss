@@ -3637,27 +3637,35 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   font-weight: 600;
 }
 
-/* —— PWA install (Beacon theme; overrides default slate/blue pwa.css) —— */
-.beacon-pwa-install,
-.nowo-pwa-install.beacon-pwa-install {
-  --nowo-pwa-primary: var(--beacon-moss, #1f6f54);
-  --nowo-pwa-surface: var(--beacon-surface, #ffffff);
-  --nowo-pwa-text: var(--beacon-ink, #0f1c18);
-  --nowo-pwa-muted: color-mix(in srgb, var(--beacon-ink, #0f1c18) 65%, transparent);
-  --nowo-pwa-border: var(--beacon-sand, #d8e2dc);
-  --nowo-pwa-radius: 0.75rem;
-  z-index: 1050;
-  color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-sand) 85%, transparent);
-  border-radius: 0.75rem;
-  box-shadow:
+/* —— PWA install (Beacon theme; overrides default slate/blue pwa.css) ——
+ * css_class MUST be a single BEM root (nowo-pwa-install). Extra tokens break
+ * {{ css_class }}__mark / --banner concatenation in PwaBundle's template. */
+.nowo-pwa-install {
+  --nowo-pwa-install-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  --nowo-pwa-install-color: var(--color-ink);
+  --nowo-pwa-install-shadow:
     0 1px 2px rgb(var(--beacon-shadow) / 8%),
     0 12px 32px rgb(var(--beacon-shadow) / 14%);
+  --nowo-pwa-install-radius: 0.75rem;
+  --nowo-pwa-install-mark-size: 2.5rem;
+  --nowo-pwa-install-mark-radius: 0.5rem;
+  --nowo-pwa-install-eyebrow-color: var(--color-moss);
+  --nowo-pwa-install-title-color: var(--color-ink);
+  --nowo-pwa-install-message-color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+  --nowo-pwa-install-primary-bg: var(--color-moss);
+  --nowo-pwa-install-primary-color: #fff;
+  --nowo-pwa-install-secondary-color: color-mix(in srgb, var(--color-ink) 72%, transparent);
+  --nowo-pwa-install-backdrop-bg: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  z-index: 1050;
+  color: var(--nowo-pwa-install-color);
+  background: var(--nowo-pwa-install-bg);
+  border: 1px solid color-mix(in srgb, var(--color-sand) 85%, transparent);
+  border-radius: var(--nowo-pwa-install-radius);
+  box-shadow: var(--nowo-pwa-install-shadow);
   backdrop-filter: blur(12px);
 }
 
-.nowo-pwa-install--banner.beacon-pwa-install {
+.nowo-pwa-install--banner {
   position: fixed;
   left: 1rem;
   right: 1rem;
@@ -3666,20 +3674,36 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   padding: 0;
 }
 
-.nowo-pwa-install--banner.nowo-pwa-install--bottom.beacon-pwa-install {
+.nowo-pwa-install--banner.nowo-pwa-install--bottom {
   bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
-.nowo-pwa-install--banner.nowo-pwa-install--top.beacon-pwa-install {
+.nowo-pwa-install--banner.nowo-pwa-install--top {
   top: max(1rem, env(safe-area-inset-top));
 }
 
-.beacon-pwa-install__panel,
-.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__panel {
+.nowo-pwa-install__panel {
   padding: 1.1rem 1.2rem 1.15rem;
 }
 
-.beacon-pwa-install__eyebrow {
+.nowo-pwa-install__brand {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.5rem;
+}
+
+.nowo-pwa-install__mark {
+  display: block;
+  width: var(--nowo-pwa-install-mark-size);
+  height: var(--nowo-pwa-install-mark-size);
+  max-width: var(--nowo-pwa-install-mark-size);
+  max-height: var(--nowo-pwa-install-mark-size);
+  margin: 0;
+  object-fit: contain;
+  border-radius: var(--nowo-pwa-install-mark-radius);
+}
+
+.nowo-pwa-install__eyebrow {
   margin: 0 0 0.35rem;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -3688,12 +3712,7 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   color: var(--color-moss);
 }
 
-.beacon-pwa-install__mark {
-  display: block;
-  margin: 0 0 0.5rem;
-}
-
-.beacon-pwa-install__title {
+.nowo-pwa-install__title {
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.125rem;
@@ -3701,22 +3720,21 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   color: var(--color-ink);
 }
 
-.beacon-pwa-install__message {
+.nowo-pwa-install__message {
   margin: 0.4rem 0 0;
   font-size: 0.875rem;
   line-height: 1.45;
   color: color-mix(in srgb, var(--color-ink) 68%, transparent);
 }
 
-.beacon-pwa-install__actions,
-.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__actions {
+.nowo-pwa-install__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.95rem;
 }
 
-.nowo-pwa-install.beacon-pwa-install .nowo-pwa-install__actions button {
+.nowo-pwa-install__actions button {
   padding: unset;
   font-weight: unset;
   border: unset;
@@ -3730,7 +3748,7 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   opacity: 0.85;
 }
 
-.nowo-pwa-install--modal.beacon-pwa-install {
+.nowo-pwa-install--modal {
   position: fixed;
   inset: 0;
   display: flex;
@@ -3743,16 +3761,14 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   backdrop-filter: none;
 }
 
-.beacon-pwa-install__backdrop,
-.nowo-pwa-install--modal.beacon-pwa-install .nowo-pwa-install__backdrop {
+.nowo-pwa-install--modal .nowo-pwa-install__backdrop {
   position: absolute;
   inset: 0;
   background: color-mix(in srgb, var(--color-ink) 45%, transparent);
   backdrop-filter: blur(2px);
 }
 
-.nowo-pwa-install--modal.beacon-pwa-install .beacon-pwa-install__panel,
-.nowo-pwa-install--modal.beacon-pwa-install .nowo-pwa-install__panel {
+.nowo-pwa-install--modal .nowo-pwa-install__panel {
   position: relative;
   z-index: 1;
   width: min(100%, 32rem);

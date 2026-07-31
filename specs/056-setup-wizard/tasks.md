@@ -25,3 +25,10 @@
 - [x] T015 `SiteBackupSetupTest` + INSTALL/CHANGELOG/ROADMAP sync
 - [x] T016 Harden setup tests (no 404; home→`/setup`; login/health exempt; `SetupCompletedEvent`; catalog check on in test) + mark SiteBackup required when catalogs empty (avoid `/setup`→`/` loop)
 - [x] T017 Wire `SITE_SETUP_TOKEN` → `setup.setup_token`; prod guard against local panel hash / local token; compose.prod requires both; tests use `test-setup-token`
+
+## Phase 3: SiteBackup locale-in-path (kit ≥ 1.7.0)
+
+- [x] T018 Require `nowo-tech/site-backup-bundle:1.7.0`; configure `setup.locale` (`both` + `serve`) matching AuthKit
+- [x] T019 Remove Beacon dual-route patch (`setup_locale.yaml`, pathPrefix factory/compiler pass, locale gate subscribers)
+- [x] T020 Locale switcher uses setup `*_unlocalized` twins; `PlatformCatalogsSetupRedirectSubscriber` uses kit `SetupPathPrefixResolver`
+- [x] T021 Friendlier token gate (`templates.setup_token` + `setup.token.*` catalogues); update `056` spec / ADDING-LOCALES / CONTRIBUTING

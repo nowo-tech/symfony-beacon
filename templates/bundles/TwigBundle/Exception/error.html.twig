@@ -1,0 +1,7 @@
+{% extends 'error/layout.html.twig' %}
+
+{% block title %}{{ status_code|default('Error') }} — {{ 'error.generic.title'|trans }}{% endblock %}
+
+{% block error_title %}{{ 'error.generic.title'|trans }}{% endblock %}
+{% block error_lead %}{{ 'error.generic.lead'|trans }}{% endblock %}
+{% block error_hint %}{{ 'error.generic.hint'|trans }}{% endblock %}

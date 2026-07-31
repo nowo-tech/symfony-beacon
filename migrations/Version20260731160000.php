@@ -42,6 +42,7 @@ final class Version20260731160000 extends AbstractMigration
                         ['name' => 'uniq_project_read_token_hash', 'columns' => ['token_hash'], 'unique' => true],
                         ['name' => 'idx_project_read_token_project', 'columns' => ['project_id']],
                     ],
+                    MDK::PRIMARY_KEY => IdField::primaryKey(),
                     MDK::FOREIGN_KEYS => [
                         ['name' => 'fk_project_read_token_project', 'columns' => ['project_id'], 'foreign_table' => 'project', 'foreign_columns' => ['id'], 'on_delete' => 'CASCADE'],
                         ['name' => 'fk_project_read_token_user', 'columns' => ['created_by_id'], 'foreign_table' => 'app_user', 'foreign_columns' => ['id'], 'on_delete' => 'CASCADE'],

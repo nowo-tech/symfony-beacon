@@ -131,7 +131,7 @@ class ProjectReadToken
 
     public function isActive(): bool
     {
-        return $this->active && null === $this->revokedAt;
+        return $this->active && !$this->revokedAt instanceof DateTimeImmutable;
     }
 
     public function revoke(?DateTimeImmutable $at = null): self

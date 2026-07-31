@@ -1,0 +1,35 @@
+{# Shared chrome for branded HTTP errors (403 / 404 / 500). Keep DI light. #}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    {% include '_theme_boot.html.twig' %}
+    <title>{% block title %}{{ status_code|default('Error') }} — Beacon{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
+    {{ vite_entry_link_tags('app') }}
+    {{ vite_entry_script_tags('app') }}
+</head>
+<body class="page-shell error-page" data-error-status="{{ status_code|default('') }}">
+    <div class="top-controls">
+        {% include '_theme_toggle.html.twig' %}
+    </div>
+    <main class="error-page__main">
+        <div class="error-page__card">
+            {% block error_illustration %}{% endblock %}
+            <p class="error-page__code" aria-hidden="true">{{ status_code|default('') }}</p>
+            <h1 class="error-page__title">{% block error_title %}{{ 'error.generic.title'|trans }}{% endblock %}</h1>
+            <p class="error-page__lead">{% block error_lead %}{{ 'error.generic.lead'|trans }}{% endblock %}</p>
+            {% set error_hint %}{% block error_hint %}{% endblock %}{% endset %}
+            {% if error_hint|trim != '' %}
+                <p class="error-page__hint">{{ error_hint|trim }}</p>
+            {% endif %}
+            <div class="error-page__actions">
+                <a class="btn btn-primary" href="/">{{ 'error.home'|trans }}</a>
+                {% block error_extra_actions %}{% endblock %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>

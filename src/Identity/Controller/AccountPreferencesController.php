@@ -14,6 +14,7 @@ use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountSocialAccounts;
+use App\Identity\UserDisplayPreferenceDefaults;
 use App\Issues\IssuePanelIds;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
@@ -317,6 +318,7 @@ final class AccountPreferencesController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
+        $this->healDisplayPreferencesIfNeeded($user);
 
         /** @var list<string> $enabledLocales */
         $enabledLocales = $this->getParameter('kernel.enabled_locales');
@@ -366,6 +368,27 @@ final class AccountPreferencesController extends AbstractController
             'issue_panel_ids' => IssuePanelIds::all(),
             'push_available' => $pushAvailable,
         ]);
+    }
+
+    /**
+     * Persist canonical defaults for legacy null preference columns (skips anonymized users).
+     */
+    private function healDisplayPreferencesIfNeeded(User $user): void
+    {
+        if ($user->isAnonymized()) {
+            return;
+        }
+
+        if (!\in_array(null, [$user->getPreferredLocaleRaw(), $user->getPreferredThemeRaw(), $user->getPreferredMotionRaw(), $user->getPreferredContrastRaw(), $user->getPreferredContentWidthRaw(), $user->getPreferredUiDensityRaw(), $user->getPreferredFontScaleRaw(), $user->getPreferredSidebarRaw()], true)
+        ) {
+            return;
+        }
+
+        UserDisplayPreferenceDefaults::applyMissing(
+            $user,
+            (string) $this->getParameter('default_locale'),
+        );
+        $this->entityManager->flush();
     }
 
     /**

@@ -14,6 +14,7 @@ nav:
     mailer: Mailer
     menus: Cardápios
     breadcrumbs: 'Pão ralado'
+    routing: Rotas por locale
     toggle_sidebar: 'Alternar navegação'
     preferences: Preferências
     account_settings: 'Configurações de Conta'
@@ -1111,6 +1112,7 @@ admin:
         appearance: 'Nome da marca, destaques, cores de estado e superfícies.'
         menus: 'Edite menus de navegação.'
         breadcrumbs: 'Gerenciar coleções de navegação estrutural.'
+        routing: 'Gerir caminhos públicos duals por locale (JSON) para controladores Routable.'
         mailer: 'DSN Mailer encriptado e endereço From para e-mails transacionais.'
         setup: 'Passos iniciais de plataforma / demo / seed de amostras.'
     ops:
@@ -1400,8 +1402,12 @@ setup:
         email: Email
         password: Palavra-passe
     token:
-        title: 'Token de setup necessario'
-        body: 'Abra %path% com o setup.setup_token configurado.'
+        title: 'Ei — sem a chave de setup não passas'
+        lead: Está tudo bem. O setup está fechado para ninguém configurar a instância ao acaso.
+        body: 'Abre %path% com o SITE_SETUP_TOKEN do teu ambiente.'
+        step_env: 'Procura SITE_SETUP_TOKEN no teu .env (em .env.dist está o valor local documentado).'
+        step_url: 'Abre %path% no browser — substitui … por esse token.'
+        step_header: 'Ou envia o cabeçalho X-Setup-Token com o mesmo valor.'
     reason:
         heading: 'O setup e obrigatorio'
         db_connection: 'A base de dados nao esta acessivel com o DATABASE_URL atual (em falta, incorreto ou o servico DB esta em baixo).'
@@ -1656,3 +1662,26 @@ thresholds:
         cooldown_range: 'O cooldown tem de estar entre 1 e 10080 minutos.'
         environment_length: 'O ambiente tem de ter no maximo 80 caracteres.'
         release_length: 'A release tem de ter no maximo 120 caracteres.'
+
+error:
+    home: Voltar ao início
+    sign_in: Iniciar sessão
+    generic:
+        title: Desvio inesperado
+        lead: Esse pedido não chegou a bom porto. Não partiste nada — tenta novamente dentro de momentos.
+        hint: A nossa mascote já anda à procura de pistas debaixo das almofadas do sofá.
+    404:
+        title: Fora do mapa
+        lead: Este caminho não existe neste Beacon. Verifica o URL ou segue a luz até ao início — sem caça ao tesouro.
+        hint: Até os melhores exploradores se perdem quando o mapa está de cabeça para baixo.
+        image_alt: Mascote Beacon a explorar com mapa e lupa junto a um 404 grande
+    403:
+        title: Portão fechado
+        lead: Não tens as chaves desta página. Inicia sessão com uma conta autorizada ou volta ao início — não é nada pessoal.
+        hint: Subornar a mascote com bolachas também não abre a fechadura. Já tentámos.
+        image_alt: Mascote Beacon junto a um portão seguro marcado 403
+    500:
+        title: Soluço do Beacon
+        lead: Algo tropeçou do nosso lado, não do teu. Espera um pouco e tenta de novo — não fizeste nada de errado.
+        hint: Estamos a dar toques suaves no servidor com uma chave inglesa. Muito suaves.
+        image_alt: Mascote Beacon a reparar um rack de servidores marcado 500

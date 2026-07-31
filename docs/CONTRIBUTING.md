@@ -109,19 +109,35 @@ The client Symfony bundle is **out of scope** for this repository.
 
 ## Internationalization
 
-Public AuthKit URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.in_path: both` + `unlocalized: serve`). Cold-start setup uses SiteBackup at **`/setup`** (single path, not locale-prefixed):
+Public AuthKit URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.in_path: both` + `unlocalized: serve`). Cold-start setup uses SiteBackup **≥ 1.7.0** with the same dual model (`setup.locale`):
 
 | Context | Paths / behaviour |
 | --- | --- |
-| Default locale (bare) | `/login`, `/register`, `/logout` serve that locale |
-| Other locales | `/{locale}/login`, `/{locale}/register`, … |
-| Setup / backup | `/setup`, `/_site_backup` (SiteBackupBundle) |
+| Default locale (bare) | `/login`, `/register`, `/logout`, `/setup` serve that locale |
+| Other locales | `/{locale}/login`, `/{locale}/register`, `/{locale}/setup`, … |
+| Setup / backup | `/setup` + `/{locale}/setup`; panel `/_site_backup` (SiteBackupBundle) |
 | Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
 | App shell | `/dashboard`, `/account/…`, `/projects/…` (locale from account preference; no `_locale` in path) |
+| RoutingKit (optional app routes) | `/_routing/` admin; `#[Routable]` dual paths (`064`) |
+| HTTP error preview | `/_error/{404\|403\|500}` **dev only** (`063`) |
 
 Guest language: path switcher or `GET|POST /locale/{locale}` (session). Signed-in users: `preferredLocale` via `POST /account/locale/{locale}`. Enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`. `.env.dist` defaults to `en`; this project’s local `.env` may use `es`.
 
 **Full operator/developer manual:** [ADDING-LOCALES.md](ADDING-LOCALES.md) (enable config lists, catalogues, security regexes, seeders, tests, smoke checklist).
+
+## HTTP error pages
+
+Branded Twig overrides live under `templates/bundles/TwigBundle/Exception/` (`error404`, `error403`, `error500`) with art in `public/illustrations/` and the mascot in `public/brand/mascot.png`.
+
+Preview routes are registered **only when `APP_ENV=dev`** (not `test` / `prod`):
+
+| Code | URL |
+| --- | --- |
+| 404 | `https://localhost:9444/_error/404` |
+| 403 | `https://localhost:9444/_error/403` |
+| 500 | `https://localhost:9444/_error/500` |
+
+With `APP_DEBUG=0` (any env), real missing routes / access denials / exceptions still use the same templates; `/_error/*` itself is unavailable outside `dev`.
 
 ### Catalogue layout
 

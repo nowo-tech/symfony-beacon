@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -57,7 +58,7 @@ final class InstanceConfigController extends AbstractController
     }
 
     #[Route('/settings/instance-config/import', name: 'settings_instance_config_import', methods: ['POST'])]
-    public function import(Request $request): Response
+    public function import(Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -82,7 +83,7 @@ final class InstanceConfigController extends AbstractController
                 throw new InvalidArgumentException('invalid_json');
             }
             $applied = $this->portability->import($payload);
-        } catch (JsonException|InvalidArgumentException $e) {
+        } catch (JsonException|InvalidArgumentException) {
             $this->addFlash('error', 'settings.instance_config.import_failed');
 
             return $this->redirectToRoute('settings_instance_config');

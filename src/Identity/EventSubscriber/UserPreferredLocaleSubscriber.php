@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\EventSubscriber;
 
 use App\Identity\Entity\User;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -25,6 +26,8 @@ final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInt
     public function __construct(
         private TokenStorageInterface $tokenStorage,
         private TranslatorInterface $translator,
+        #[Autowire('%default_locale%')]
+        private string $defaultLocale,
     ) {
     }
 
@@ -67,8 +70,8 @@ final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInt
             return;
         }
 
-        $preferred = $user->getPreferredLocale();
-        if (null === $preferred || '' === $preferred) {
+        $preferred = $user->getPreferredLocaleRaw() ?? strtolower(trim($this->defaultLocale));
+        if ('' === $preferred) {
             return;
         }
 

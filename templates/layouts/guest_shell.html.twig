@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    {% include '_theme_boot.html.twig' %}
+    {# Vite entry (CSP script-src 'self'); same as base.html.twig. #}
+    {{ vite_entry_script_tags('theme-boot') }}
     <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
     <style>{{ site_appearance.cssOverrides|raw }}</style>
     {{ nowo_pwa_head() }}

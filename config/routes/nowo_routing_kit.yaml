@@ -1,0 +1,3 @@
+# Panel CRUD only. DB/JSON locale loader is imported last in config/routes.yaml.
+nowo_routing_kit_panel:
+    resource: '@NowoRoutingKitBundle/Resources/config/routes.yaml'

@@ -89,7 +89,7 @@ final readonly class AccountDataExporter
 
         return [
             'schema' => 'beacon-account-export/v1',
-            'exported_at' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
+            'exported_at' => new DateTimeImmutable()->format(DateTimeInterface::ATOM),
             'account' => [
                 'uuid' => $user->getUuid(),
                 'email' => $user->getEmail(),

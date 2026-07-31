@@ -40,7 +40,7 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
     {
         $client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/setup/');
+        $client->request(Request::METHOD_GET, '/setup');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -49,7 +49,7 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         $client = self::createClient();
         self::assertTrue(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
 
-        $client->request(Request::METHOD_GET, '/setup/?token='.self::SETUP_TOKEN);
+        $client->request(Request::METHOD_GET, '/setup?token='.self::SETUP_TOKEN);
         if ($client->getResponse()->isRedirection()) {
             $client->followRedirect();
         }
@@ -58,6 +58,30 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertNotSame(404, $client->getResponse()->getStatusCode());
         self::assertTrue(self::getContainer()->get(SetupMarkerManager::class)->isRequiredMarked());
         self::assertSelectorExists('body');
+    }
+
+    public function testSetupTokenGateShowsFriendlyGateIllustration(): void
+    {
+        $client = self::createClient();
+
+        $client->request(Request::METHOD_GET, '/setup');
+        self::assertResponseStatusCodeSame(403);
+        self::assertSelectorExists('[data-testid="setup-token-gate"]');
+        self::assertSelectorExists('img.setup-token-gate__img[src*="error-403"]');
+    }
+
+    public function testLocalizedSetupRouteRespondsSuccessfullyWithToken(): void
+    {
+        $client = self::createClient();
+        self::assertTrue(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
+
+        $client->request(Request::METHOD_GET, '/es/setup?token='.self::SETUP_TOKEN);
+        if ($client->getResponse()->isRedirection()) {
+            $client->followRedirect();
+        }
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('html[lang="es"]');
     }
 
     public function testHomeRedirectsToSetupWhenPlatformCatalogsEmpty(): void

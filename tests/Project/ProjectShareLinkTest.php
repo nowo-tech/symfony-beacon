@@ -176,7 +176,7 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
 
         /** @var ProjectShareLinkManager $manager */
         $manager = self::getContainer()->get(ProjectShareLinkManager::class);
-        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'), null);
+        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'));
         $token = $created['rawToken'];
         $linkId = $created['link']->getId();
 

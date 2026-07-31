@@ -1,7 +1,8 @@
 {# Beacon host layout for SiteBackup setup (REQ-UI-001 / SiteBackup 1.4+).
    Bundle pages extend nowo_site_backup_setup_layout_template and fill
    nowo_site_backup_content (nested under nowo_ui_content).
-   Do not fork wizard/done/token under templates/bundles/. #}
+   Token gate: templates.setup_token → kit/site_backup_setup_token.html.twig.
+   Dual locale URLs: setup.locale (SiteBackup 1.7+). Wizard/done stay in the package. #}
 {% extends 'layouts/guest_shell.html.twig' %}
 
 {% set brand = site_appearance.brandName|default(brandName|default('Beacon')) %}

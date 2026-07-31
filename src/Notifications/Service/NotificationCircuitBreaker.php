@@ -37,7 +37,7 @@ final readonly class NotificationCircuitBreaker
     public function maybeExpireCircuit(NotificationDestination $destination, ?DateTimeImmutable $now = null): void
     {
         $openedAt = $destination->getCircuitOpenedAt();
-        if (null === $openedAt || $this->getCooldownMinutes() < 1) {
+        if (!$openedAt instanceof DateTimeImmutable || $this->getCooldownMinutes() < 1) {
             return;
         }
 
@@ -52,7 +52,7 @@ final readonly class NotificationCircuitBreaker
     {
         $this->maybeExpireCircuit($destination, $now);
 
-        return null !== $destination->getCircuitOpenedAt();
+        return $destination->getCircuitOpenedAt() instanceof DateTimeImmutable;
     }
 
     public function shouldSkipDelivery(NotificationDestination $destination, bool $isSample = false): bool

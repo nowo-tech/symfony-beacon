@@ -16,7 +16,7 @@ use InvalidArgumentException;
  * Secrets (Mailer DSN/From, Mercure URLs/JWT) are never written to export JSON
  * and are rejected on import.
  */
-final class InstanceConfigPortability
+final readonly class InstanceConfigPortability
 {
     public const string SCHEMA = 'beacon-instance-config';
     public const int VERSION = 1;
@@ -36,9 +36,9 @@ final class InstanceConfigPortability
     ];
 
     public function __construct(
-        private readonly SiteAppearanceRepository $appearanceRepository,
-        private readonly InstanceSettingsRepository $instanceSettingsRepository,
-        private readonly SiteAppearanceProvider $appearanceProvider,
+        private SiteAppearanceRepository $appearanceRepository,
+        private InstanceSettingsRepository $instanceSettingsRepository,
+        private SiteAppearanceProvider $appearanceProvider,
     ) {
     }
 
@@ -59,7 +59,7 @@ final class InstanceConfigPortability
         return [
             'schema' => self::SCHEMA,
             'version' => self::VERSION,
-            'exported_at' => (new DateTimeImmutable())->format(\DATE_ATOM),
+            'exported_at' => new DateTimeImmutable()->format(\DATE_ATOM),
             'appearance' => [
                 'brand_name' => $appearance->getBrandName(),
                 'brand_eyebrow' => $appearance->getBrandEyebrow(),
@@ -102,7 +102,7 @@ final class InstanceConfigPortability
         if (($payload['schema'] ?? null) !== self::SCHEMA) {
             throw new InvalidArgumentException('invalid_schema');
         }
-        if ((int) ($payload['version'] ?? 0) !== self::VERSION) {
+        if (self::VERSION !== (int) ($payload['version'] ?? 0)) {
             throw new InvalidArgumentException('unsupported_version');
         }
 

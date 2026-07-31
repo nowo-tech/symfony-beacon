@@ -6,6 +6,7 @@ namespace App\Tests\Issues;
 
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
+use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -55,7 +56,7 @@ final class IssueSimilarSuggestionsTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('[data-testid="similar-issues"]', 'No similar issues');
     }
 
-    private function makeIssue($project, string $fpSeed, string $title): Issue
+    private function makeIssue(Project $project, string $fpSeed, string $title): Issue
     {
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $issue = new Issue();

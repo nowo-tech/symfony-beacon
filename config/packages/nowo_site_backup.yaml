@@ -3,6 +3,9 @@
 nowo_site_backup:
     enabled: true
     process_timeout: 900
+    templates:
+        # Friendlier token gate (SVG + calm copy); wizard/done stay in the package.
+        setup_token: 'kit/site_backup_setup_token.html.twig'
     backup:
         include_paths:
             - config
@@ -54,12 +57,20 @@ nowo_site_backup:
             - /locale/
             - /cookie_consent
             - /cookie-consent/
+            - /_routing
+            - /_error
         patterns:
-            - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal)(/|$|\?)#'
+            - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$|\?)#'
             - '#^/(manifest\.webmanifest|sw\.js|offline)$#'
     setup:
         enabled: true
         path_prefix: '/setup'
+        # Dual URLs like AuthKit: bare /setup = DEFAULT_LOCALE; /{_locale}/setup for others.
+        locale:
+            in_path: both
+            default: '%default_locale%'
+            enabled: '%fallback_locales%'
+            unlocalized: serve
         # Host chrome only — wizard/done/token stay in the package (SiteBackup 1.4+).
         layout_template: 'kit/site_backup_setup_layout.html.twig'
         # Shared secret for /setup (?token= or X-Setup-Token). Empty = open (dev only).

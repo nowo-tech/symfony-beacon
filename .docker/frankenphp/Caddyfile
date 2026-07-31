@@ -53,8 +53,9 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
 	header {
 		Alt-Svc "clear"
-		# Baseline browser hardening (053). Theme boot + kit-admin + Stimulus avoid inline scripts.
-		# style-src keeps 'unsafe-inline' for operator CSS overrides (site appearance) and kit layout CSS.
+		# Baseline browser hardening (053). CSP is set in PHP (ContentSecurityPolicySubscriber)
+		# so the Web Debug Toolbar can merge script/style nonces. Theme boot + kit-admin +
+		# Stimulus avoid inline scripts; style-src still allows 'unsafe-inline' for appearance CSS.
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
@@ -65,13 +66,6 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	# HTTPS (e.g. :9444) does not sticky-pin browsers. Override via CADDY_SERVER_EXTRA_DIRECTIVES.
 	@enableHsts not host localhost 127.0.0.1
 	header @enableHsts Strict-Transport-Security "max-age=31536000; includeSubDomains"
-
-	# Mutually exclusive CSP: Swagger UI needs 'unsafe-eval' (JSON Schema compile); keep it off elsewhere.
-	# Default CSP: no script-src 'unsafe-inline' (Vite entries + Stimulus + JSON data islands).
-	@swaggerUi path /api/doc /api/doc/
-	@defaultCsp not path /api/doc /api/doc/
-	header @defaultCsp Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
-	header @swaggerUi Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; connect-src 'self' ws: wss:; worker-src 'self'; manifest-src 'self'"
 
 	# Optional: restrict Prometheus scrapes to private networks (uncomment in prod):
 	# @metricsPublic {

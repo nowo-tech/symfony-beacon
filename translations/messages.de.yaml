@@ -14,6 +14,7 @@ nav:
     mailer: Mailer
     menus: Menüs
     breadcrumbs: Paniermehl
+    routing: Locale-Routen
     toggle_sidebar: 'Navigation umschalten'
     preferences: Präferenzen
     account_settings: Kontoeinstellungen
@@ -1111,6 +1112,7 @@ admin:
         appearance: 'Markenname, Akzente, Statusfarben und Oberflächen.'
         menus: 'Navigationsmenüs bearbeiten.'
         breadcrumbs: 'Breadcrumb-Sammlungen verwalten.'
+        routing: 'Duale Locale-Pfade (JSON) für Routable-Controller verwalten.'
         mailer: 'Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.'
         setup: 'Erste Plattform- / Demo- / Sample-Seed-Schritte.'
     ops:
@@ -1400,8 +1402,12 @@ setup:
         email: E-Mail
         password: Passwort
     token:
-        title: 'Setup-Token erforderlich'
-        body: 'Offnen Sie %path% mit dem konfigurierten setup.setup_token.'
+        title: 'Hey — ohne Setup-Schlüssel geht es nicht weiter'
+        lead: Alles in Ordnung. Setup ist gesperrt, damit Fremde die Instanz nicht konfigurieren können.
+        body: 'Öffnen Sie %path% mit dem SITE_SETUP_TOKEN aus Ihrer Umgebung.'
+        step_env: 'Finden Sie SITE_SETUP_TOKEN in Ihrer .env (den lokalen Standard dokumentiert .env.dist).'
+        step_url: 'Öffnen Sie %path% im Browser — ersetzen Sie … durch diesen Token.'
+        step_header: 'Oder senden Sie den Header X-Setup-Token mit demselben Wert.'
     reason:
         heading: 'Setup ist erforderlich'
         db_connection: 'Die Datenbank ist mit der aktuellen DATABASE_URL nicht erreichbar (fehlt, falsch oder der DB-Dienst ist ausgefallen).'
@@ -1656,3 +1662,26 @@ thresholds:
         cooldown_range: 'Der Cooldown muss zwischen 1 und 10080 Minuten liegen.'
         environment_length: 'Die Umgebung darf hochstens 80 Zeichen lang sein.'
         release_length: 'Die Release darf hochstens 120 Zeichen lang sein.'
+
+error:
+    home: Zur Startseite
+    sign_in: Anmelden
+    generic:
+        title: Unerwarteter Umweg
+        lead: Die Anfrage ist nicht angekommen. Du hast nichts kaputtgemacht — versuche es gleich noch einmal.
+        hint: Unser Maskottchen sucht schon unter den Sofakissen nach Hinweisen.
+    404:
+        title: Abseits der Karte
+        lead: Dieser Pfad existiert auf diesem Beacon nicht. Prüfe die URL oder folge dem Licht nach Hause — keine Schatzsuche nötig.
+        hint: Selbst die besten Entdecker gehen fehl, wenn die Karte auf dem Kopf steht.
+        image_alt: Beacon-Maskottchen mit Karte und Lupe neben einer großen 404
+    403:
+        title: Tor geschlossen
+        lead: Du hast nicht die richtigen Schlüssel für diese Seite. Melde dich mit einem erlaubten Konto an oder gehe zurück — das ist nicht persönlich.
+        hint: Das Maskottchen mit Keksen zu bestechen öffnet das Schloss trotzdem nicht. Haben wir versucht.
+        image_alt: Beacon-Maskottchen neben einem gesicherten Tor mit 403
+    500:
+        title: Beacon-Schluckauf
+        lead: Bei uns ist etwas gestolpert, nicht bei dir. Warte kurz und versuche es erneut — du hast nichts falsch gemacht.
+        hint: Wir tippen den Servern ganz sanft mit dem Schraubenschlüssel auf die Schulter.
+        image_alt: Beacon-Maskottchen repariert ein Server-Rack mit 500

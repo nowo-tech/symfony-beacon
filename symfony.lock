@@ -102,6 +102,9 @@
     "nowo-tech/pwa-bundle": {
         "version": "v1.1.2"
     },
+    "nowo-tech/routing-kit-bundle": {
+        "version": "v1.1.6"
+    },
     "nowo-tech/select-all-choice-bundle": {
         "version": "v1.4.11"
     },

@@ -13,6 +13,7 @@ use App\Identity\UserActionType;
 use JsonException;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -66,7 +67,7 @@ final class AccountPrivacyController extends AbstractController
     }
 
     #[Route('/account/privacy/anonymize', name: 'account_privacy_anonymize', methods: ['POST'])]
-    public function anonymize(Request $request): Response
+    public function anonymize(Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();

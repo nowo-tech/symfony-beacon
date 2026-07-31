@@ -129,7 +129,7 @@ Ordered Speckit program. Prefer AuthKit / Symfony login-link for magic login; do
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | 5.8 | **Monthly event quota** (alongside daily; extends `018`) | Beacon | `032-monthly-quota` | **Done** (v0.13.0; see Phase 6.4) |
-| 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Done** (see Phase 6.7) |
+| 5.9 | **CI coverage report** (informational / soft threshold; not 100% gate) | Beacon | `033-coverage-ci` | **Done** (v0.16.0; see Phase 6.7) |
 | — | **SSO/SAML/OIDC** via AuthKit / dedicated enterprise spec | Beacon | — | **Later** |
 
 Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control plane — use HTTP webhooks + digests instead.
@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.15.0** shipped; **CI coverage (`033`)**, **GDPR (`043`)**, collaboration/API (`040`–`042`), and **instance config export (`044`)** Done Unreleased. **Next**: Bundle console/Monolog. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.16.0** shipped (coverage/GDPR, collaboration/API `040`–`044`/`061`, SiteBackup locale + RoutingKit + branded errors, CSP PHP delivery, display-pref defaults). **Next**: Bundle console/Monolog. No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -167,7 +167,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` Done Unreleased. **Next**: Bundle console/Monolog remain Planned.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` / `061`–`064` + RoutingKit / branded errors Done in **v0.16.0**. **Next**: Bundle console/Monolog remain Planned.
 
 ### Done (v0.13.0 product — was Next)
 
@@ -207,12 +207,15 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Done** (Unreleased) |
-| 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Done** (Unreleased) |
-| 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Done** (Unreleased) |
-| 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Done** (Unreleased) |
-| 6.11 | **Read API + project tokens** | Beacon | `042-read-api-tokens` | **Done** (Unreleased) |
-| 6.12 | **Instance settings export/import** | Beacon | `044-instance-config-export` | **Done** (Unreleased) |
+| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Done** (v0.16.0) |
+| 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Done** (v0.16.0) |
+| 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Done** (v0.16.0) |
+| 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Done** (v0.16.0) |
+| 6.11 | **Read API + project tokens** | Beacon | `042-read-api-tokens` | **Done** (v0.16.0) |
+| 6.12 | **Instance settings export/import** | Beacon | `044-instance-config-export` | **Done** (v0.16.0) |
+| 6.12a | **SiteBackup setup locale-in-path** (`both` + `serve`; kit ≥ 1.7.0) + friendly token gate | Beacon | `056-setup-wizard` | **Done** (v0.16.0) |
+| 6.12b | **RoutingKit** install (`/_routing/`; `#[Routable]` discovery) | Beacon | `064-routing-kit` | **Done** (v0.16.0) |
+| 6.12c | **Branded HTTP errors** 404/403/500 + mascot; `/_error/{code}` preview **dev-only** | Beacon | `063-branded-http-errors` | **Done** (v0.16.0) |
 
 ### Next (immediate queue)
 
@@ -282,7 +285,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.13.0** | Phase 6 product: ops overview (`035`), identity audit (`036`), AuthKit identity polish (`037`), monthly quota (`032`); SiteBackup setup, dogfood (`058`), AI export (`059`), social login (`060`); security residual (DNS pin, query-auth reject, Web Push allowlist, POST magic login, Caddy headers, `/api/doc` admin-only) |
 | **v0.14.0** | Prometheus (`038`) + security residual (Bearer-only metrics, guest locale redirect, Web Push unsubscribe scope, magic-login Continue, query-auth default reject, Telegram DNS pin, CSP/`theme-boot`) |
 | **v0.15.0** | Notification circuit breaker (`039`); CSP without script `unsafe-inline` + default HSTS; appearance palette; Tours/sidebar UX fixes |
-| **v0.16.0** | CI coverage soft gate (`033`) + GDPR export/anonymize (`043`) |
+| **v0.16.0** | Coverage (`033`) + GDPR (`043`); collaboration/API (`040`–`042`, `044`, `061`); SiteBackup dual setup locale (`056`) + secrets guard (`062`); RoutingKit (`064-routing-kit`); branded HTTP errors (`063-branded-http-errors`); CSP PHP delivery + display-pref defaults |
 | **Later** | Bundle console/Monolog; SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -294,4 +297,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull **Next** Bundle console/Monolog when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (`033` + `043` Done Unreleased; Next = Planned backlog).
+Last updated: 2026-07-31 (v0.16.0 shipped; Next = Bundle console/Monolog Planned).

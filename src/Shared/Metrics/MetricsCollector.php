@@ -17,7 +17,7 @@ final readonly class MetricsCollector
     private const string ACK_KEY = 'beacon.metrics.ingest_ack';
 
     /** @var list<string> */
-    public const REJECT_REASONS = [
+    public const array REJECT_REASONS = [
         'unauthorized',
         'forbidden',
         'quota',

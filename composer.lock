@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f6e33193741d9d4cb3971375b5ba54a",
+    "content-hash": "81356644312dec53a40ebb4ad9db3d96",
     "packages": [
         {
             "name": "brick/math",
@@ -3017,6 +3017,94 @@
             "time": "2026-07-30T16:27:25+00:00"
         },
         {
+            "name": "nowo-tech/routing-kit-bundle",
+            "version": "v1.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/RoutingKitBundle.git",
+                "reference": "bb3322bfc243119f31a21075503eea60f12b327d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/RoutingKitBundle/zipball/bb3322bfc243119f31a21075503eea60f12b327d",
+                "reference": "bb3322bfc243119f31a21075503eea60f12b327d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/event-dispatcher": "^7.0 || ^8.0",
+                "symfony/finder": "^7.0 || ^8.0",
+                "symfony/http-foundation": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/routing": "^7.0 || ^8.0",
+                "symfony/security-core": "^7.4 || ^8.0",
+                "symfony/security-csrf": "^7.0 || ^8.0",
+                "symfony/yaml": "^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.0 <2.2.6",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/framework-bundle": "^7.0 || ^8.0",
+                "symfony/twig-bundle": "^7.0 || ^8.0",
+                "twig/twig": "^3.12"
+            },
+            "suggest": {
+                "doctrine/orm": "Implement RoutePathStorageInterface against Doctrine entities",
+                "nowo-tech/seo-kit-bundle": "Bridge: RoutingKit paths feed SeoKit canonical/hreflang (requires SeoPathBuilderInterface)",
+                "symfony/security-bundle": "Recommended: firewall + ROLE_ADMIN for /_routing",
+                "symfony/translation": "Required for |trans in panel templates",
+                "symfony/twig-bundle": "Required to render the routing CRUD panel"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\RoutingKitBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle for DB-driven locale routes, canonical URL styles, CRUD panel, and SeoKit compatibility.",
+            "homepage": "https://github.com/nowo-tech/RoutingKitBundle",
+            "keywords": [
+                "canonical",
+                "i18n",
+                "locale",
+                "routing",
+                "seo",
+                "symfony",
+                "symfony-bundle"
+            ],
+            "support": {
+                "changelog": "https://github.com/nowo-tech/RoutingKitBundle/blob/main/docs/CHANGELOG.md",
+                "docs": "https://github.com/nowo-tech/RoutingKitBundle/tree/main/docs",
+                "issues": "https://github.com/nowo-tech/RoutingKitBundle/issues",
+                "source": "https://github.com/nowo-tech/RoutingKitBundle"
+            },
+            "time": "2026-07-30T11:56:16+00:00"
+        },
+        {
             "name": "nowo-tech/select-all-choice-bundle",
             "version": "v1.4.12",
             "source": {
@@ -3093,16 +3181,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "8f3412e1a83dc9151089be6285340e5f69f58e3b"
+                "reference": "44ef01519bb04959271dc9c6943c0d636d89ada6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/8f3412e1a83dc9151089be6285340e5f69f58e3b",
-                "reference": "8f3412e1a83dc9151089be6285340e5f69f58e3b",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/44ef01519bb04959271dc9c6943c0d636d89ada6",
+                "reference": "44ef01519bb04959271dc9c6943c0d636d89ada6",
                 "shasum": ""
             },
             "require": {
@@ -3179,7 +3267,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-07-30T11:59:03+00:00"
+            "time": "2026-07-31T10:32:28+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",

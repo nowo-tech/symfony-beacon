@@ -1,0 +1,22 @@
+{# Beacon host layout for RoutingKit admin panel (REQ-UI-001).
+   Panel pages fill {% block body %}; wrap via body_before/after (same as cookie-consent/menus). #}
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ vite_entry_link_tags('kit-admin') }}
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ vite_entry_script_tags('kit-admin') }}
+{% endblock %}
+
+{% block body_before %}
+    <div class="kit-admin panel nowo-ui-routing-kit-panel" data-css-framework="{{ nowo_routing_kit_css_framework|default('custom') }}">
+{% endblock %}
+
+{% block body_after %}
+    </div>
+{% endblock %}

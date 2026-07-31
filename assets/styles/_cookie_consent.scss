@@ -150,6 +150,13 @@ html[data-theme="dark"] .nowo-cookie-consent,
   white-space: normal;
 }
 
+/* Vendor `.show { padding: 1rem 0 }` drops horizontal inset; left/right box layouts
+   then sit flush against the viewport edge. Restore a small side gap. */
+.nowo-cookie-consent.nowo-cookie-consent--layout-box.show {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .nowo-cookie-consent.nowo-cookie-consent--layout-box .nowo-cookie-consent__dialog {
   max-width: min(32rem, calc(100vw - 2rem));
   width: 100%;

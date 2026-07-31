@@ -1,4 +1,7 @@
-{# Locale switcher: path locale on public dual routes; account preference when signed-in; else guest session. #}
+{# Locale switcher: path locale on public dual routes; account preference when signed-in; else guest session.
+   AuthKit (locale.unlocalized: serve): DEFAULT_LOCALE uses bare /login; other locales use /{_locale}/login.
+   SiteBackup 1.7+ setup.locale mirrors AuthKit: bare /setup for DEFAULT_LOCALE; /{_locale}/setup otherwise.
+   Legal pages keep /{_locale}/legal/… for every locale including the default. #}
 {% set route = app.request.attributes.get('_route') %}
 {% set route_params = app.request.attributes.get('_route_params')|default({}) %}
 {% set current_locale = app.request.locale|default(default_locale) %}
@@ -18,6 +21,24 @@
     'nowo_auth_kit_magic_login_check',
     'nowo_auth_kit_social_login_start',
     'nowo_auth_kit_social_login_check',
+    'nowo_site_backup_setup',
+    'nowo_site_backup_setup_done',
+    'nowo_site_backup_setup_unlocalized',
+    'nowo_site_backup_setup_done_unlocalized',
+] %}
+{% set dual_path_routes = [
+    'nowo_auth_kit_login',
+    'nowo_auth_kit_register',
+    'nowo_auth_kit_logout',
+    'nowo_auth_kit_reset_password_request',
+    'nowo_auth_kit_reset_password',
+    'nowo_auth_kit_reset_password_code',
+    'nowo_auth_kit_magic_login_request',
+    'nowo_auth_kit_magic_login_check',
+    'nowo_auth_kit_social_login_start',
+    'nowo_auth_kit_social_login_check',
+    'nowo_site_backup_setup',
+    'nowo_site_backup_setup_done',
 ] %}
 {% set use_path_locale = route in path_locale_routes %}
 
@@ -54,8 +75,17 @@
                         {% if target_route ends with '_bare_redirect' or target_route == 'app_home_redirect' %}
                             {% set target_route = 'nowo_auth_kit_login' %}
                         {% endif %}
-                        {% set params = route_params|merge({'_locale': locale}) %}
-                        <a href="{{ path(target_route, params) }}"
+                        {% if target_route ends with '_unlocalized' %}
+                            {% set target_route = target_route|slice(0, -('_unlocalized'|length)) %}
+                        {% endif %}
+                        {% set bare_params = route_params|filter((v, k) => k != '_locale') %}
+                        {% set query_suffix = app.request.queryString ? ('?' ~ app.request.queryString) : '' %}
+                        {% if locale == default_locale and target_route in dual_path_routes %}
+                            {% set href = path(target_route ~ '_unlocalized', bare_params) ~ query_suffix %}
+                        {% else %}
+                            {% set href = path(target_route, bare_params|merge({'_locale': locale})) ~ query_suffix %}
+                        {% endif %}
+                        <a href="{{ href }}"
                            class="locale-switcher__option{{ locale == current_locale ? ' is-active' : '' }}"
                            hreflang="{{ locale }}"
                            lang="{{ locale }}">

@@ -15,6 +15,7 @@ nav:
     setup: Configuración
     menus: Menús
     breadcrumbs: Migas
+    routing: Rutas por idioma
     toggle_sidebar: Alternar navegación
     preferences: Preferencias
     account_settings: Ajustes de cuenta
@@ -1213,6 +1214,7 @@ admin:
         setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.
         breadcrumbs: Gestionar colecciones de migas.
+        routing: Gestionar rutas públicas duales por locale (JSON) para controladores Routable.
     ops:
         title: Resumen ops
         intro: Señales de salud a nivel de instancia entre proyectos. La profundidad de la cola Messenger es siempre a nivel de instancia.
@@ -1249,8 +1251,12 @@ setup:
         email: Correo
         password: Contraseña
     token:
-        title: Se requiere token de setup
-        body: 'Abre %path% con el setup.setup_token configurado.'
+        title: 'Ey — sin la llave de setup no pasas'
+        lead: Tranquilo, no está roto. El setup está cerrado para que nadie configure la instancia al azar.
+        body: 'Abre %path% con el SITE_SETUP_TOKEN de tu entorno.'
+        step_env: 'Busca SITE_SETUP_TOKEN en tu .env (en .env.dist está el valor local documentado).'
+        step_url: 'Abre %path% en el navegador — sustituye … por ese token.'
+        step_header: 'O envía la cabecera X-Setup-Token con el mismo valor.'
     reason:
         heading: Hace falta completar el setup
         db_connection: La base de datos no es alcanzable con el DATABASE_URL actual (falta, es incorrecto o el servicio DB está caído).
@@ -1655,3 +1661,26 @@ thresholds:
         cooldown_range: El cooldown debe estar entre 1 y 10080 minutos.
         environment_length: El entorno debe tener como máximo 80 caracteres.
         release_length: La release debe tener como máximo 120 caracteres.
+
+error:
+    home: Volver al inicio
+    sign_in: Iniciar sesión
+    generic:
+        title: Desvío inesperado
+        lead: Esa petición no llegó a buen puerto. No has roto nada — inténtalo de nuevo en un momento.
+        hint: La mascota ya está buscando pistas debajo del sofá.
+    404:
+        title: Fuera del mapa
+        lead: Esta ruta no existe en este Beacon. Revisa la URL o vuelve al inicio — no hace falta una búsqueda del tesoro.
+        hint: Hasta los mejores exploradores se pierden cuando el mapa va al revés.
+        image_alt: Mascota Beacon explorando con mapa y lupa junto a un 404
+    403:
+        title: La puerta está cerrada
+        lead: No tienes las llaves de esta página. Inicia sesión con una cuenta autorizada o vuelve al inicio — no es nada personal.
+        hint: Sobornar a la mascota con galletas tampoco abre el candado. Lo intentamos.
+        image_alt: Mascota Beacon junto a una puerta segura marcada 403
+    500:
+        title: Un hipo del Beacon
+        lead: Algo tropezó de nuestro lado, no del tuyo. Espera un poco e inténtalo otra vez — no has hecho nada mal.
+        hint: Estamos dando toquecitos al servidor con una llave inglesa. Con mucho mimo.
+        image_alt: Mascota Beacon reparando un rack de servidores marcado 500

@@ -6,6 +6,7 @@ namespace App\Setup;
 
 use App\Shared\Settings\Service\PlatformBootstrapState;
 use Nowo\SiteBackupBundle\Model\SetupProgress;
+use Nowo\SiteBackupBundle\Routing\SetupPathPrefixResolver;
 use Nowo\SiteBackupBundle\Setup\SetupOrchestrator;
 use Nowo\SiteBackupBundle\Setup\Storage\SetupMarkerManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -17,13 +18,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Throwable;
 
 /**
- * When platform catalogs are missing, send HTML visitors to SiteBackup `/setup`.
+ * When platform catalogs are missing, send HTML visitors to SiteBackup setup
+ * (`/setup` or `/{_locale}/setup` depending on request locale / setup.locale).
  *
  * Complements SiteBackupBundle detectors (empty schema / markers). AuthKit, legal,
  * health, and ingest stay reachable so operators can still register or sign in.
  *
  * Also marks SiteBackup setup as required and clears a stale "completed" progress
- * so `/setup` does not bounce back to `/` while catalogs are still empty.
+ * so setup does not bounce back to `/` while catalogs are still empty.
  */
 final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSubscriberInterface
 {
@@ -32,10 +34,11 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
         private AuthorizationCheckerInterface $authorizationChecker,
         private SetupMarkerManager $setupMarkers,
         private SetupOrchestrator $setupOrchestrator,
-        #[Autowire('%app.setup.check_platform_catalogs%')]
-        private bool $enabled = true,
+        private SetupPathPrefixResolver $setupPathPrefixResolver,
         #[Autowire('%nowo.site_backup.setup.path_prefix%')]
         private string $setupPathPrefix = '/setup',
+        #[Autowire('%app.setup.check_platform_catalogs%')]
+        private bool $enabled = true,
     ) {
     }
 
@@ -74,7 +77,7 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             return;
         }
 
-        // Keep SiteBackup gate aligned with empty catalogs (avoids /setup → / loops).
+        // Keep SiteBackup gate aligned with empty catalogs (avoids setup → / loops).
         if (!$this->setupMarkers->isRequiredMarked()) {
             $this->setupMarkers->markRequired('fresh_install');
         }
@@ -98,13 +101,14 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             return;
         }
 
-        $event->setResponse(new RedirectResponse($this->setupPathPrefix));
+        $event->setResponse(new RedirectResponse($this->setupPathPrefixResolver->resolve()));
     }
 
     private function isExcludedPath(string $path): bool
     {
+        $base = rtrim($this->setupPathPrefix, '/') ?: '/setup';
         $prefixes = [
-            $this->setupPathPrefix,
+            $base,
             '/_site_backup',
             '/_wdt',
             '/_profiler',
@@ -119,6 +123,8 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             '/locale/',
             '/cookie_consent',
             '/cookie-consent/',
+            '/_routing',
+            '/_error',
             '/health/',
         ];
         foreach ($prefixes as $prefix) {
@@ -127,7 +133,10 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             }
         }
 
-        return (bool) preg_match('#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal)(/|$)#', $path);
+        return (bool) preg_match(
+            '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$)#',
+            $path,
+        );
     }
 
     private function isExcludedRoute(string $route): bool

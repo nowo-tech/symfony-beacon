@@ -2321,6 +2321,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *         default_profile?: scalar|Param|null, // Default: "fresh_install"
  *         advance_mode?: "automatic"|"manual"|Param, // automatic = chain auto tabs until interaction; manual = one auto tab per Continuar. // Default: "automatic"
+ *         locale?: array{ // Locale-in-path for setup wizard routes (mirrors AuthKit locale config).
+ *             in_path?: "never"|"always"|"both"|Param, // never = bare prefix only (BC); always = /{_locale}{prefix}; both = dual URLs. // Default: "never"
+ *             default?: scalar|Param|null, // Default locale for localized routes. // Default: "en"
+ *             enabled?: list<scalar|Param|null>,
+ *             unlocalized?: "serve"|"redirect"|Param, // When in_path=both: serve renders with default locale; redirect bounces to /{locale}/…. // Default: "redirect"
+ *         },
  *         profiles?: array<string, array{ // Default: {"fresh_install":{"steps":[{"type":"requirements"},{"type":"bootstrap_mode"},{"type":"database_url","optional":true},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","id":"full_database_import","paths":["var/site-backup/full-import.sql","var/site-backup/last-restore-dump.sql"],"if_exists":false,"when_answer":{"bootstrap_mode":"full_database"}},{"type":"migrations"},{"type":"admin_user","roles":["ROLE_SUPER_ADMIN"],"skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"post_restore":{"steps":[{"type":"requirements"},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","paths":["var/site-backup/last-restore-dump.sql"],"if_exists":true},{"type":"migrations"},{"type":"admin_user","skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"full_database":{"steps":[{"type":"requirements"},{"type":"database_url","optional":true},{"type":"database_create"},{"type":"cache_clear"},{"type":"sql_file","id":"full_database_import","paths":["var/site-backup/full-import.sql","var/site-backup/last-restore-dump.sql"],"if_exists":false},{"type":"migrations"},{"type":"admin_user","skip_if_admin_exists":true},{"type":"marker","write_done":true}]},"minimal":{"steps":[{"type":"database_create"},{"type":"migrations"},{"type":"admin_user"},{"type":"marker","write_done":true}]}}
  *             advance_mode?: scalar|Param|null, // Override setup.advance_mode for this profile (automatic|manual). // Default: null
  *             steps?: list<array{ // Default: []
@@ -2386,6 +2392,51 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  * }
+ * @psalm-type NowoRoutingKitConfig = array{ // Nowo Routing Kit Bundle configuration.
+ *     enabled?: bool|Param, // Default: true
+ *     default_locale?: scalar|Param|null, // Default: "en"
+ *     locales?: list<scalar|Param|null>,
+ *     locale_provider?: scalar|Param|null, // Service id implementing LocaleProviderInterface. null = ConfigurableLocaleProvider from YAML. // Default: null
+ *     storage?: array{
+ *         paths_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/routing_kit/paths.json"
+ *         path_storage?: scalar|Param|null, // Service id implementing RoutePathStorageInterface. // Default: null
+ *     },
+ *     discovery?: array{
+ *         scan_dirs?: list<scalar|Param|null>,
+ *     },
+ *     panel?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/_routing"
+ *         role?: mixed, // Deprecated BC alias for security.access_roles (scalar or null). Prefer security.access_roles. // Default: "ROLE_ADMIN"
+ *         allow_controller_override?: bool|Param, // When false (default), panel cannot set a free-form _controller; discovery controller is used. // Default: false
+ *         max_definitions?: int|Param, // Hard cap on stored path rows (REQ-PERF-001). // Default: 500
+ *         list_page_size?: int|Param, // Page size for the panel index list (REQ-PERF-001). // Default: 50
+ *         reject_conflicts?: bool|Param, // Default: true
+ *         export_signing_key?: scalar|Param|null, // HMAC key for signed export/import. null = kernel.secret. When set, must be at least 32 characters. // Default: null
+ *     },
+ *     web_ui?: array{ // REQ-UI-001 look-and-feel for the admin panel (layout, CSS stack, icons).
+ *         enabled?: bool|Param, // Default: true
+ *         layout_template?: scalar|Param|null, // Twig layout that panel pages extend (host apps SHOULD set their project layout). // Default: "@NowoRoutingKitBundle/panel/layout.html.twig"
+ *         css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Default: "custom"
+ *         icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Default: "none"
+ *     },
+ *     security?: array{ // REQ-UI-002 private panel access (firewall the path_prefix in the host app as well).
+ *         access_roles?: list<scalar|Param|null>,
+ *         access_checker?: scalar|Param|null, // Optional custom service id; reserved for future checkers. null = built-in role gate. // Default: null
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO only: skip in-bundle role check (same effect as empty access_roles). Production MUST keep false. // Default: false
+ *     },
+ *     redirects?: array{
+ *         canonical_enabled?: bool|Param, // Default: true
+ *         canonical_status?: int|Param, // Default: 301
+ *         root_enabled?: bool|Param, // Default: false
+ *         root_canonical_style?: "without_prefix"|"with_prefix"|Param, // Default: "without_prefix"
+ *         root_home_path?: scalar|Param|null, // Default: "/"
+ *         root_status?: int|Param, // Default: 302
+ *     },
+ *     auto_invalidate_cache?: bool|Param, // Default: true
+ *     register_unprefixed_default?: bool|Param, // Default: true
+ *     seo_kit_bridge?: bool|Param, // When true and SeoKitBundle is installed, decorate SeoPathBuilderInterface with RoutingKit paths. // Default: true
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2421,6 +2472,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *     nowo_beacon?: NowoBeaconConfig,
  *     nowo_site_backup?: NowoSiteBackupConfig,
+ *     nowo_routing_kit?: NowoRoutingKitConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2458,6 +2510,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
+ *         nowo_routing_kit?: NowoRoutingKitConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2494,6 +2547,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
+ *         nowo_routing_kit?: NowoRoutingKitConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2532,6 +2586,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_select_all_choice?: NowoSelectAllChoiceConfig,
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
+ *         nowo_routing_kit?: NowoRoutingKitConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

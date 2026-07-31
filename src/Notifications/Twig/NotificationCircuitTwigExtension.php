@@ -6,6 +6,7 @@ namespace App\Notifications\Twig;
 
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Service\NotificationCircuitBreaker;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -19,6 +20,7 @@ final class NotificationCircuitTwigExtension extends AbstractExtension
     ) {
     }
 
+    #[Override]
     public function getFunctions(): array
     {
         return [

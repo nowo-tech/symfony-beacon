@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Ingest;
 
+use App\Ingest\Service\IngestQueryAuthSettings;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
-use App\Ingest\Service\IngestQueryAuthSettings;
 use App\Performance\Entity\PerfTransaction;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;

@@ -32,7 +32,8 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         // PWA install prompt also uses h2; AuthKit heading is h1 inside the panel.
         self::assertSelectorTextContains('.nowo-auth-kit__panel h1', 'Iniciar sesión');
-        self::assertSelectorExists('a[href="/en/login"]');
+        // DEFAULT_LOCALE (en in PHPUnit) is canonical as bare /login, not /en/login.
+        self::assertSelectorExists('a[href="/login"]');
     }
 
     public function testGermanLoginRendersInPathLocale(): void

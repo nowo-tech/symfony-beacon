@@ -53,7 +53,8 @@ nowo_pwa:
         position: bottom
         visibility: all
         dismiss_days: 14
-        css_class: nowo-pwa-install beacon-pwa-install
+        # Single BEM root — extra classes break {{ css_class }}__mark / --banner concatenation in the bundle template.
+        css_class: nowo-pwa-install
         mark_asset: /brand/beacon-mark.svg
         title: preferences.display.pwa_prompt_title
         button_class: btn-primary

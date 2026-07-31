@@ -7,25 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-07-31
+
 ### Added
 
 - **Instance config export/import** (`044`, Fixes #14): ROLE_ADMIN JSON export/import of allowlisted appearance + instance flags (`beacon-instance-config` v1); secrets rejected; audit `instance.config_*`
-- **Read API + project tokens** (`042`, Fixes #12): Bearer `brt_` tokens (hashed at rest) for `GET /api/projects/{uuid}/issues` and issue detail; create/revoke in Project Settings; OpenAPI `BeaconReadToken`; ingest keys rejected
+- **Read API + project tokens** (`042`, Fixes #12): Bearer `brt_` tokens (hashed at rest) for `GET /api/projects/{uuid}/issues` and issue detail; create/revoke in Project Settings; OpenAPI `BeaconReadToken`; ingest keys rejected; migration `Version20260731160000`
 - **Issue mentions + assignee email** (`040`, Fixes #8): `@name` in comments notifies project members via encrypted instance Mailer; assign notifies the new assignee (skipped when Mailer is not deliverable)
 - **Similar issues** (`041`, Fixes #10): issue show suggests title-similar issues in the same project (cap 5) with mark-duplicate shortcut
-- **Share link max uses** (`061`, Fixes #2): optional `max_uses` / `use_count` on `project_share_link`; Settings UI defaults new links to **1** use (clear the field for unlimited until expiry)
+- **Share link max uses** (`061`, Fixes #2): optional `max_uses` / `use_count` on `project_share_link`; Settings UI defaults new links to **1** use (clear the field for unlimited until expiry); migration `Version20260731150000`
+- **GDPR account export / anonymize** (`043`): Account → Privacy JSON download (`beacon-account-export/v1`); self-service and admin anonymize (scrub + disable + `anonymized_at`); blocks sole project owner / last admin; app-owned (not anonymize-bundle runtime); migration `Version20260731140000`
+- **CI coverage soft gate** (`033`): GitHub Actions **Coverage** job (PCOV) uploads Clover + HTML artifacts; local `make test-coverage`; optional `COVERAGE_MIN` statement-% soft threshold (unset = informational; never 100% by default)
 - **CI secret scan (Gitleaks):** job **Secret scan** fails the workflow when committed secrets are detected (full git history); local `make secrets-scan`; config [`.gitleaks.toml`](../.gitleaks.toml)
 - **CI git hygiene:** job **Git hygiene** fails when any commit on `HEAD` includes Cursor `Co-authored-by` / `Made-with` trailers (`make check-no-cursor-coauthor`; same as `.githooks`)
 - **Issue / PR templates:** Question + CI/ops issue forms; typed PR templates (`bugfix`, `feature`, `docs`, `chore`) under `.github/PULL_REQUEST_TEMPLATE/`
-- **GDPR account export / anonymize** (`043`): Account → Privacy JSON download (`beacon-account-export/v1`); self-service and admin anonymize (scrub + disable + `anonymized_at`); blocks sole project owner / last admin; app-owned (not anonymize-bundle runtime)
-- **CI coverage soft gate** (`033`): GitHub Actions **Coverage** job (PCOV) uploads Clover + HTML artifacts; local `make test-coverage`; optional `COVERAGE_MIN` statement-% soft threshold (unset = informational; never 100% by default)
+- **RoutingKit** (`064-routing-kit`): `nowo-tech/routing-kit-bundle` dual `/path` + `/{locale}/path` for `#[Routable]` app controllers; admin panel `/_routing/` in kit chrome
+- **Branded HTTP errors** (`063-branded-http-errors`): Twig 404/403/500 with Beacon illustrations + mascot; `/_error/{code}` preview **dev-only**
+- **SiteBackup setup dual locale** (`056`): SiteBackupBundle ≥ 1.7.0 `setup.locale` (`both` + `serve`) — bare `/setup` for `DEFAULT_LOCALE`, `/{_locale}/setup` for others; friendlier setup token gate template
 
 ### Changed
 
-- **PHPStan / FrankenPHP CI** (`063`): FormBuilder generics on `AccountDisplayType`; SiteBackup guard instance latch; ingest query-auth test swaps `IngestQueryAuthSettings` instead of `putenv`
+- **PHPStan / FrankenPHP CI** (`063-phpstan-frankenphp-ci`): FormBuilder generics on `AccountDisplayType`; SiteBackup guard instance latch; ingest query-auth test swaps `IngestQueryAuthSettings` instead of `putenv`
 - **Social login admin**: OAuth provider credentials managed in Administration → Social login (`auth_kit_social_credential`); optional `app:seed-social-login` from env remains for CLI bootstrap
 - **SiteBackup secrets guard** (`062`, Fixes #3): fail closed for empty/local-default `SITE_SETUP_TOKEN` / `SITE_BACKUP_PASSWORD_HASH` in **all environments except `dev`/`test`** (covers `staging` and misnamed deploys, not only `prod`)
-- **SiteBackup guard + Docker build** (`064`): skip guard for `cache:clear` / `cache:warmup` / `assets:install` so `frankenphp_prod` image builds can run Composer auto-scripts; HTTP and other console commands still fail closed
+- **SiteBackup guard + Docker build** (`064-sitebackup-guard-skip-cache-clear`): skip guard for `cache:clear` / `cache:warmup` / `assets:install` so `frankenphp_prod` image builds can run Composer auto-scripts; HTTP and other console commands still fail closed
+- **CSP delivery:** `Content-Security-Policy` moved from Caddy to PHP (`ContentSecurityPolicySubscriber`) so the Web Debug Toolbar can merge script/style nonces; kit page `window.*Config` scripts rewritten to JSON islands (`KitInlineConfigScriptSubscriber`)
+
+### Fixed
+
+- Account display preferences always persist concrete defaults on user create/update (locale = `%default_locale%`, theme `light`, contrast/motion `system`); legacy null rows heal on `/account/display` and effective getters no longer leave selects empty
+- CSP `script-src 'self'` no longer blocks login password toggle (`password-toggle` Stimulus), kit dashboard config scripts, or the Symfony profiler toolbar nonce
+- Web Debug Toolbar no longer stuck on “loading”: debug CSP allows `'unsafe-eval'` (toolbar `eval()`s `/_wdt` scripts); `/_wdt`/`/_profiler` fragments skip app CSP
+- Register Stimulus controllers added for CSP hardening (`confirm-submit`, `navigate-select`, `issue-panels-reset`, `password-confirm-mirror`) and load SameOrigin CSRF helper
+- Guest shell loads Vite `theme-boot` (was an empty include after the inline-theme migration)
+- Cookie consent banner keeps horizontal inset when `.show` overrides vendor padding
 
 ## [0.15.0] - 2026-07-31
 
@@ -609,7 +624,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.12.8...v0.13.0

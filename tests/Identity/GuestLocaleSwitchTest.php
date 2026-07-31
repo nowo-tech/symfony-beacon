@@ -19,12 +19,15 @@ final class GuestLocaleSwitchTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/en/login');
         self::assertResponseIsSuccessful();
+        // Non-default locale keeps a prefix; DEFAULT_LOCALE (en in PHPUnit) uses bare /login.
         self::assertSelectorExists('a[href="/es/login"]');
+        self::assertSelectorExists('a[href="/login"]');
 
         $client->request(Request::METHOD_GET, '/es/login');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.locale-switcher__code', 'ES');
         self::assertSelectorExists('html[lang="es"]');
+        self::assertSelectorExists('a[href="/login"]');
     }
 
     public function testAnonymousLegalPagesShowLocaleAndThemeSwitchers(): void

@@ -14,6 +14,7 @@ nav:
     mailer: Mailer
     menus: "Menu's"
     breadcrumbs: Paneermeel
+    routing: Locale-routes
     toggle_sidebar: 'Schakel navigatie in'
     preferences: Voorkeuren
     account_settings: Accountinstellingen
@@ -1111,6 +1112,7 @@ admin:
         appearance: 'Merknaam, accenten, statuskleuren en oppervlakken.'
         menus: "Navigatiemenu's bewerken."
         breadcrumbs: 'Beheer broodkruimelverzamelingen.'
+        routing: 'Beheer duale publieke locale-paden (JSON) voor Routable-controllers.'
         mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'
         setup: 'Eerste platform-/demo-/sample-seedstappen.'
     ops:
@@ -1400,8 +1402,12 @@ setup:
         email: E-mail
         password: Wachtwoord
     token:
-        title: 'Setup-token vereist'
-        body: 'Open %path% met de geconfigureerde setup.setup_token.'
+        title: 'Hé — zonder de setup-sleutel kom je er niet in'
+        lead: Er is niets kapot. Setup is vergrendeld zodat vreemden de instantie niet kunnen configureren.
+        body: 'Open %path% met de SITE_SETUP_TOKEN uit je omgeving.'
+        step_env: 'Zoek SITE_SETUP_TOKEN in je .env (de lokale standaard staat in .env.dist).'
+        step_url: 'Open %path% in de browser — vervang … door die token.'
+        step_header: 'Of stuur de header X-Setup-Token met dezelfde waarde.'
     reason:
         heading: 'Setup is vereist'
         db_connection: 'De database is niet bereikbaar met de huidige DATABASE_URL (ontbreekt, onjuist of de DB-service is niet beschikbaar).'
@@ -1656,3 +1662,26 @@ thresholds:
         cooldown_range: 'Cooldown moet tussen 1 en 10080 minuten liggen.'
         environment_length: 'Omgeving mag maximaal 80 tekens bevatten.'
         release_length: 'Release mag maximaal 120 tekens bevatten.'
+
+error:
+    home: Terug naar home
+    sign_in: Inloggen
+    generic:
+        title: Onverwachte omweg
+        lead: Dat verzoek is niet aangekomen. Jij hebt niets in brand gestoken — probeer het zo opnieuw.
+        hint: Onze mascotte zoekt al onder de bankkussens naar aanwijzingen.
+    404:
+        title: Naast de kaart
+        lead: Dit pad staat niet op deze Beacon. Controleer de URL of volg het licht naar home — geen speurtocht nodig.
+        hint: Zelfs de beste ontdekkers dwalen als de kaart ondersteboven ligt.
+        image_alt: Beacon-mascotte met kaart en loep naast een grote 404
+    403:
+        title: Poort dicht
+        lead: Je hebt niet de juiste sleutels voor deze pagina. Log in met een toegestaan account of ga terug — het is niet persoonlijk.
+        hint: De mascotte omkopen met koekjes opent het slot ook niet. Hebben we geprobeerd.
+        image_alt: Beacon-mascotte naast een beveiligde poort met 403
+    500:
+        title: Beacon-hik
+        lead: Er ging iets mis aan onze kant, niet aan de jouwe. Wacht even en probeer opnieuw — jij deed niets verkeerd.
+        hint: We tikken de servers heel zachtjes met een moersleutel. Heel zachtjes.
+        image_alt: Beacon-mascotte die een serverrack met 500 repareert

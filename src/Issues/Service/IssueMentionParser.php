@@ -78,11 +78,7 @@ final readonly class IssueMentionParser
             $display = strtolower(str_replace(' ', '', $user->getDisplayName()));
             $displaySpaced = strtolower($user->getDisplayName());
 
-            if ($token === $email
-                || $token === $local
-                || $token === $display
-                || $token === str_replace(' ', '.', $displaySpaced)
-                || $token === str_replace(' ', '_', $displaySpaced)
+            if (\in_array($token, [$email, $local, $display, str_replace(' ', '.', $displaySpaced), str_replace(' ', '_', $displaySpaced)], true)
             ) {
                 return $user;
             }

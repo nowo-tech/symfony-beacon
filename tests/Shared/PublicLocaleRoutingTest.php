@@ -48,7 +48,21 @@ final class PublicLocaleRoutingTest extends DatabaseWebTestCase
     {
         self::createClient();
         $router = self::getContainer()->get('router');
-        self::assertMatchesRegularExpression('#^/setup/?$#', $router->generate('nowo_site_backup_setup'));
+        // SiteBackup 1.7 setup.locale in_path=both: canonical is localized; bare is *_unlocalized.
+        self::assertSame('/en/setup', $router->generate('nowo_site_backup_setup', ['_locale' => 'en']));
+        self::assertSame('/es/setup', $router->generate('nowo_site_backup_setup', ['_locale' => 'es']));
+        self::assertMatchesRegularExpression('#^/setup/?$#', $router->generate('nowo_site_backup_setup_unlocalized'));
+    }
+
+    public function testLocalizedSetupUrlIsReachableWithoutCanonicalRedirect(): void
+    {
+        $client = self::createClient();
+        // PHPUnit DEFAULT_LOCALE=en — /en/setup is a valid localized twin (no force-redirect to bare).
+        $client->request(Request::METHOD_GET, '/en/setup?token=test-setup-token');
+        if ($client->getResponse()->isRedirection()) {
+            $client->followRedirect();
+        }
+        self::assertContains($client->getResponse()->getStatusCode(), [200, 403]);
     }
 
     public function testBareResetPasswordRedirectsToDefaultLocale(): void

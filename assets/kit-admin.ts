@@ -73,6 +73,28 @@ function bootBreadcrumbKit(): void {
   }
 }
 
+function mergePageConfigs(): void {
+  document.querySelectorAll<HTMLScriptElement>('script.beacon-kit-page-config').forEach((el) => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(el.textContent ?? '{}');
+    } catch {
+      return;
+    }
+    if (parsed === null || typeof parsed !== 'object') {
+      return;
+    }
+    const data = parsed as Record<string, unknown>;
+    if (el.dataset.kit === 'dashboard-menu') {
+      window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, data);
+      return;
+    }
+    if (el.dataset.kit === 'breadcrumb-kit') {
+      window.__breadcrumbKitDashboard = Object.assign(window.__breadcrumbKitDashboard || {}, data);
+    }
+  });
+}
+
 function splitKitFilters(): void {
   document.querySelectorAll<HTMLElement>('.kit-admin[data-kit-split-filters]').forEach((root) => {
     if (root.dataset.kitSplitDone === '1') {
@@ -108,5 +130,6 @@ function portalKitModals(): void {
 
 bootDashboardMenu();
 bootBreadcrumbKit();
+mergePageConfigs();
 splitKitFilters();
 portalKitModals();

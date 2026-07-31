@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Twig;
 
 use App\Shared\Menu\PreferencesMenuCurrentMarker;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -18,6 +19,7 @@ final class MenuTwigExtension extends AbstractExtension
     ) {
     }
 
+    #[Override]
     public function getFunctions(): array
     {
         return [

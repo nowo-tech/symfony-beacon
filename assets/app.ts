@@ -375,6 +375,7 @@ initTheme();
 initContentWidth();
 initSidebar();
 initColorHexLabels();
+initBreadcrumbInlineEdit();
 
 function initColorHexLabels(): void {
   document.querySelectorAll<HTMLInputElement>('input[type="color"]').forEach((input) => {
@@ -387,6 +388,26 @@ function initColorHexLabels(): void {
     };
     sync();
     input.addEventListener('input', sync);
+  });
+}
+
+/** Breadcrumb Kit inline editor dialog (CSP-safe; vendor used an inline IIFE). */
+function initBreadcrumbInlineEdit(): void {
+  document.querySelectorAll<HTMLElement>('[data-breadcrumb-kit-inline-wrap="1"]').forEach((wrap) => {
+    const openBtn = wrap.querySelector<HTMLElement>('[data-bk-inline-open]');
+    const dlg = wrap.querySelector<HTMLDialogElement>('[data-bk-inline-dialog]');
+    const closeBtn = wrap.querySelector<HTMLElement>('[data-bk-inline-close]');
+    if (!openBtn || !dlg) {
+      return;
+    }
+    openBtn.addEventListener('click', () => {
+      if (typeof dlg.showModal === 'function') {
+        dlg.showModal();
+      }
+    });
+    closeBtn?.addEventListener('click', () => {
+      dlg.close();
+    });
   });
 }
 

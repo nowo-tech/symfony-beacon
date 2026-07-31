@@ -17,6 +17,7 @@ nav:
     setup: Setup
     menus: Menus
     breadcrumbs: Breadcrumbs
+    routing: Locale routes
     toggle_sidebar: Toggle navigation
     preferences: Preferences
     account_settings: Account settings
@@ -1326,6 +1327,7 @@ admin:
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
+        routing: Manage dual locale public paths (JSON) for Routable controllers.
     ops:
         title: Ops overview
         intro: Instance-wide health signals across projects. Messenger queue depth is always instance-wide.
@@ -1362,8 +1364,12 @@ setup:
         email: Email
         password: Password
     token:
-        title: Setup token required
-        body: 'Open %path% with the configured setup.setup_token.'
+        title: 'Hey — you need the setup key to pass'
+        lead: Nothing is broken. Setup is locked so strangers cannot configure this instance.
+        body: 'Open %path% with the SITE_SETUP_TOKEN from your environment.'
+        step_env: 'Find SITE_SETUP_TOKEN in your .env (see .env.dist for the documented local default).'
+        step_url: 'Open %path% in the browser — replace … with that token.'
+        step_header: 'Or send the header X-Setup-Token with the same value.'
     reason:
         heading: Setup is required
         db_connection: The database is not reachable with the current DATABASE_URL (missing, wrong, or the DB service is down).
@@ -1768,3 +1774,26 @@ thresholds:
         cooldown_range: Cooldown must be between 1 and 10080 minutes.
         environment_length: Environment must be at most 80 characters.
         release_length: Release must be at most 120 characters.
+
+error:
+    home: Back to home
+    sign_in: Sign in
+    generic:
+        title: Unexpected detour
+        lead: That request did not land. Nothing you typed set anything on fire — try again in a moment.
+        hint: Our mascot is already looking under the sofa cushions for clues.
+    404:
+        title: Off the map
+        lead: This path is not on this Beacon. Check the URL spelling, or follow the light home — no scavenger hunt required.
+        hint: Even the best explorers take a wrong turn when the map is upside down.
+        image_alt: Beacon mascot exploring with a map and magnifying glass next to a large 404
+    403:
+        title: Gate's closed
+        lead: You do not have the keys for this page. Sign in with an allowed account, or head home — the lock is not personal.
+        hint: Bribing the mascot with cookies still will not open it. We tried.
+        image_alt: Beacon mascot beside a secured gate marked 403
+    500:
+        title: Beacon hiccup
+        lead: Something tripped on our side, not yours. Wait a bit and try again — you did nothing wrong.
+        hint: We are gently poking the servers with a wrench. Very gently.
+        image_alt: Beacon mascot repairing a server rack marked 500

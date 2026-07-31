@@ -10,6 +10,7 @@ use App\Issues\Entity\IssueComment;
 use App\Issues\Service\IssueMentionParser;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Issues\Service\IssueUserMailTransport;
+use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\ProjectRole;
 use App\Tests\Shared\DatabaseWebTestCase;
@@ -241,7 +242,7 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
         self::assertSame(1, $transport->sent);
     }
 
-    private function persistIssue($project, string $fingerprintSeed): Issue
+    private function persistIssue(Project $project, string $fingerprintSeed): Issue
     {
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $issue = new Issue();

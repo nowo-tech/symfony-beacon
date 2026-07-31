@@ -16,11 +16,11 @@ use Symfony\Component\Routing\RouteCollection;
  * Allows POST on AuthKit magic-login check routes and swaps in the confirm interstitial controller.
  */
 #[AsDecorator(decorates: AuthKitRouteLoader::class)]
-final class MagicLoginCheckRouteLoaderDecorator implements LoaderInterface
+final readonly class MagicLoginCheckRouteLoaderDecorator implements LoaderInterface
 {
     public function __construct(
         #[AutowireDecorated]
-        private readonly LoaderInterface $inner,
+        private LoaderInterface $inner,
     ) {
     }
 

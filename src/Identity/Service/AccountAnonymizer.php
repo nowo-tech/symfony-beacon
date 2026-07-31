@@ -64,6 +64,8 @@ final readonly class AccountAnonymizer
         $subject->setPushNotificationsEnabled(false);
         $subject->setPreferredLocale(null);
         $subject->setPreferredTheme(null);
+        $subject->setPreferredMotion(null);
+        $subject->setPreferredContrast(null);
         $subject->setRoles([]);
 
         $random = bin2hex(random_bytes(32));

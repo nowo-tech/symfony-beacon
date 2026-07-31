@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared;
 
+use App\Shared\Metrics\MetricsCollector;
+use App\Shared\Metrics\MetricsController;
+use App\Shared\Metrics\PrometheusTextFormatter;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MetricsEndpointTest extends DatabaseWebTestCase
@@ -54,9 +57,9 @@ final class MetricsEndpointTest extends DatabaseWebTestCase
     {
         self::createClient();
         $container = self::getContainer();
-        $controller = new \App\Shared\Metrics\MetricsController(
-            $container->get(\App\Shared\Metrics\MetricsCollector::class),
-            $container->get(\App\Shared\Metrics\PrometheusTextFormatter::class),
+        $controller = new MetricsController(
+            $container->get(MetricsCollector::class),
+            $container->get(PrometheusTextFormatter::class),
             '',
             true,
         );

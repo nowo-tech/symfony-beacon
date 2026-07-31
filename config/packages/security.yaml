@@ -99,8 +99,16 @@ security:
     # SiteBackupBundle: cold-start setup + panel (panel uses its own password gate)
     - path: ^/setup
       roles: PUBLIC_ACCESS
+    - path: ^/(en|es|de|nl|fr|it|pt)/setup
+      roles: PUBLIC_ACCESS
     - path: ^/_site_backup
       roles: PUBLIC_ACCESS
+    # Framework error page previews (/_error/{code}) in dev/test
+    - path: ^/_error
+      roles: PUBLIC_ACCESS
+    # RoutingKitBundle admin panel (in-bundle ROLE_ADMIN + firewall)
+    - path: ^/_routing
+      roles: ROLE_ADMIN
     - path: ^/
       roles: ROLE_USER
 when@test:

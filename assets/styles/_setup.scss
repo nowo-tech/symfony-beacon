@@ -2,6 +2,76 @@
  * Prefer setup.layout_template + this CSS over Twig forks under templates/bundles/.
  */
 
+.setup-token-gate {
+  text-align: center;
+}
+
+.setup-token-gate__art {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 1rem;
+}
+
+.setup-token-gate__img {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+  border-radius: 1rem;
+}
+
+.setup-token-gate__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.setup-token-gate__lead {
+  margin: 0 0 1.1rem;
+  font-size: 0.925rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+  text-wrap: pretty;
+}
+
+.setup-token-gate__steps {
+  margin: 0 0 1.1rem;
+  padding: 0.85rem 1rem 0.85rem 1.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  border: 1px solid var(--color-sand);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-mist) 45%, var(--color-surface));
+}
+
+.setup-token-gate__steps li + li {
+  margin-top: 0.45rem;
+}
+
+.setup-token-gate__tip {
+  margin: 0;
+}
+
+.setup-token-gate__code {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  word-break: break-all;
+  color: var(--color-moss-deep);
+  background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-moss) 28%, var(--color-sand));
+  border-radius: 0.5rem;
+}
+
+[data-theme='dark'] .setup-token-gate__code {
+  color: var(--color-moss);
+}
+
 .nowo-site-backup-setup {
   --nowo-site-backup-primary: var(--beacon-moss, #1f6f54);
   --nowo-site-backup-surface: var(--beacon-surface, #ffffff);

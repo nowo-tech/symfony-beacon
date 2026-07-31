@@ -1,5 +1,5 @@
 {% use "form_div_layout.html.twig" %}
-{% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
+{% use "form/_toggle_password_csp.html.twig" %}
 
 {%- block form_row -%}
     {# flex+gap beats Tailwind space-y (:where = 0 specificity, often overridden by preflight/SCSS). #}

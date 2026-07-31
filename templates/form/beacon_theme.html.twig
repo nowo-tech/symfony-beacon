@@ -1,5 +1,5 @@
 {% use "form_div_layout.html.twig" %}
-{% use "@NowoPasswordToggleBundle/Form/toggle_password_widget.html.twig" %}
+{% use "form/_toggle_password_csp.html.twig" %}
 
 {%- block form_row -%}
     <div class="{{ row_attr.class|default('flex flex-col gap-2') }}">

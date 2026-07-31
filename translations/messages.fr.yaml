@@ -14,6 +14,7 @@ nav:
     mailer: Mailer
     menus: Menus
     breadcrumbs: "Fil d'Ariane"
+    routing: Routes par locale
     toggle_sidebar: 'Basculer la navigation'
     preferences: Préférences
     account_settings: 'Paramètres du compte'
@@ -1119,6 +1120,7 @@ admin:
         appearance: 'Nom de la marque, accents, couleurs d’état et surfaces.'
         menus: 'Modifier les menus de navigation.'
         breadcrumbs: "Gérer les collections de fils d'Ariane."
+        routing: 'Gérer les chemins publics duals par locale (JSON) pour les contrôleurs Routable.'
         mailer: 'DSN Mailer chiffré et adresse From pour les e-mails transactionnels.'
         setup: 'Étapes initiales plateforme / démo / échantillons.'
     ops:
@@ -1436,8 +1438,12 @@ setup:
         email: E-mail
         password: Mot de passe
     token:
-        title: 'Jeton de configuration requis'
-        body: 'Ouvrez %path% avec le setup.setup_token configure.'
+        title: 'Hé — sans la clé de setup, pas de passage'
+        lead: Rien n'est cassé. Le setup est verrouillé pour empêcher une configuration au hasard.
+        body: 'Ouvrez %path% avec le SITE_SETUP_TOKEN de votre environnement.'
+        step_env: 'Trouvez SITE_SETUP_TOKEN dans votre .env (la valeur locale documentée est dans .env.dist).'
+        step_url: 'Ouvrez %path% dans le navigateur — remplacez … par ce jeton.'
+        step_header: 'Ou envoyez l''en-tête X-Setup-Token avec la même valeur.'
     reason:
         heading: 'La configuration est requise'
         db_connection: "La base de donnees n''est pas joignable avec la DATABASE_URL actuelle (absente, incorrecte ou service DB indisponible)."
@@ -1754,3 +1760,26 @@ thresholds:
         environment_length: "L''environnement doit contenir au maximum 80 caracteres."
 
         release_length: 'La release doit contenir au maximum 120 caracteres.'
+
+error:
+    home: Retour à l'accueil
+    sign_in: Se connecter
+    generic:
+        title: Détour inattendu
+        lead: Cette requête n'est pas arrivée à bon port. Vous n'avez rien cassé — réessayez dans un instant.
+        hint: Notre mascotte fouille déjà sous les coussins du canapé pour trouver des indices.
+    404:
+        title: Hors carte
+        lead: Ce chemin n'existe pas sur ce Beacon. Vérifiez l'URL ou suivez la lumière vers l'accueil — pas de chasse au trésor.
+        hint: Même les meilleurs explorateurs se trompent quand la carte est à l'envers.
+        image_alt: Mascotte Beacon explorant avec carte et loupe à côté d'un grand 404
+    403:
+        title: Portail fermé
+        lead: Vous n'avez pas les clés de cette page. Connectez-vous avec un compte autorisé ou revenez à l'accueil — ce n'est pas personnel.
+        hint: Corrompre la mascotte avec des biscuits n'ouvre pas non plus la serrure. On a essayé.
+        image_alt: Mascotte Beacon près d'une porte sécurisée marquée 403
+    500:
+        title: Hoquet du Beacon
+        lead: Quelque chose a trébuché de notre côté, pas du vôtre. Attendez un peu et réessayez — vous n'avez rien fait de mal.
+        hint: On tapote les serveurs tout doucement avec une clé à molette. Très doucement.
+        image_alt: Mascotte Beacon réparant une baie serveur marquée 500

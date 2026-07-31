@@ -1,0 +1,76 @@
+/* Branded HTTP error pages (403 / 404 / 500). */
+
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.error-page__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem 3rem;
+}
+
+.error-page__card {
+  width: min(40rem, 100%);
+  text-align: center;
+}
+
+.error-page__figure {
+  margin: 0 0 1.25rem;
+}
+
+.error-page__img {
+  display: block;
+  width: min(100%, 28rem);
+  height: auto;
+  margin-inline: auto;
+  border-radius: 1rem;
+}
+
+.error-page__code {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-moss);
+}
+
+.error-page__title {
+  margin: 0.35rem 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.error-page__lead {
+  margin: 0 auto 0.65rem;
+  max-width: 32rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+  text-wrap: pretty;
+}
+
+.error-page__hint {
+  margin: 0 auto 1.35rem;
+  max-width: 30rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  text-wrap: pretty;
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+}

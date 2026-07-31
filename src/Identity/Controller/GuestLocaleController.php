@@ -58,7 +58,9 @@ final class GuestLocaleController extends AbstractController
 
     private function safeRedirectTarget(Request $request, string $locale): string
     {
-        $fallback = $this->generateUrl('nowo_auth_kit_login', ['_locale' => $locale]);
+        $fallback = $locale === $this->defaultLocale
+            ? $this->generateUrl('nowo_auth_kit_login_unlocalized')
+            : $this->generateUrl('nowo_auth_kit_login', ['_locale' => $locale]);
         $redirect = (string) $request->request->get('redirect', $request->query->get('redirect', ''));
         $safe = SafeInternalRedirect::resolve($request, $redirect, $fallback);
         if ($safe === $fallback) {
@@ -118,12 +120,7 @@ final class GuestLocaleController extends AbstractController
             return null;
         }
 
-        // SiteBackup setup has a single path (no locale prefix).
-        if ('/setup' === $rest || str_starts_with($rest, '/setup/')) {
-            return $rest.$suffix;
-        }
-
-        // Default locale stays unprefixed for AuthKit dual URLs; others use /{locale}/….
+        // Default locale stays unprefixed for AuthKit + setup dual URLs; others use /{locale}/….
         if ($locale === $this->defaultLocale) {
             return $rest.$suffix;
         }
