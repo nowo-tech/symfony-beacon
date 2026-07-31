@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / inbound email / QR SMS OTP) when prioritized.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -281,11 +281,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.27 | **QR login image** (AuthKit 1.12.1 + `endroid/qr-code`; PNG with GD else SVG) | Beacon | `075-qr-png` | **Done** |
 
+### Done (Inbound email comments)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.28 | **Inbound email → issue comment** (webhook + Reply-To token + Message-ID idempotency) | Beacon | `076-inbound-email-comment` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / inbound email / QR SMS OTP) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / QR SMS OTP / WebAuthn) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)
 
@@ -300,7 +306,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
 | — | OTLP gRPC / protobuf / Bundle exporter / Performance TSDB (HTTP JSON metrics shipped in `074` / 6.26) | Beacon (+ optional Bundle) | extends `074` | **Later** |
 | — | Teams→member mapping / Adaptive Cards (OpenUri Assign shipped in `073` / 6.25) | Beacon | extends `073` | **Later** |
-| — | **Inbound email → issue comment** | Beacon | — | **Later** |
+| — | IMAP / attachments / provider-native adapters (webhook inbound shipped in `076` / 6.28) | Beacon | extends `076` | **Later** |
 
 ---
 
@@ -361,4 +367,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.27 QR login image Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (6.28 Inbound email comments Done; Next = Later Phase 6+).
