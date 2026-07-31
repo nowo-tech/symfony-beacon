@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.0 → 1.3.0 (MINOR: new env/parameters configuration constraint)
+- Version change: 1.3.0 → 1.4.0 (MINOR: new Principle X — no Cursor / agent attribution)
 - Modified principles: none renamed
-- Added sections: Technical constraints — env parameter defaults; Constitution Check gates in plan-template
+- Added sections: Principle X (commits, issues, PRs/MRs)
 - Removed sections: none
-- Templates: .specify/templates/plan-template.md ✅; docs/CONTRIBUTING.md ✅; .cursor/rules/no-env-defaults-in-parameters.mdc ✅
-- Follow-up: existing `env(NAME):` keys in config/parameters.yaml are legacy; new code MUST NOT add more (prefer .env.dist defaults / when@ env package overrides)
+- Templates: .specify/templates/plan-template.md ✅; docs/CONTRIBUTING.md ✅; .cursor/rules/no-cursor-attribution.mdc ✅; .cursor/rules/no-cursor-coauthor.mdc ✅
+- Follow-up: CI Git hygiene already enforces commit trailers; agents MUST also keep issue/PR bodies clean
 -->
 
 # symfony-beacon Constitution
@@ -74,6 +74,20 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 
 Rationale: `env(NAME):` defaults in `parameters.yaml` hide required configuration, duplicate `.env.dist`, and make FrankenPHP / Compose / upgrade diffs harder to audit.
 
+### X. No Cursor / agent attribution (NON-NEGOTIABLE)
+
+Commits, GitHub **issues**, and **pull requests / merge requests** MUST use only the human author's identity. Do **not** add Cursor Agent (or similar IDE-agent) credit.
+
+Forbidden (non-exhaustive):
+
+- `Co-authored-by: Cursor`, `Co-authored-by: Cursor Agent`, or any `*@cursor.com` / `*@cursor.so` trailer
+- `Made-with: Cursor` / `Made with Cursor` (or similar) in commit messages, issue bodies, or PR/MR bodies
+- Invented co-authors for the agent in git metadata or GitHub UI
+
+Use `make setup-hooks` locally; CI **Git hygiene** rejects forbidden trailers in git history (`make check-no-cursor-coauthor`). Strip before push if a trailer appears.
+
+Rationale: contribution history and review attribution belong to the people who own the change, not the tooling that assisted.
+
 ## Technical constraints
 
 - Entrypoint: `.docker/frankenphp/docker-entrypoint.sh` maps `FRANKENPHP_MODE` → `FRANKENPHP_CONFIG`.
@@ -101,6 +115,7 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 
 - This constitution overrides ad-hoc habits and agent prompts.
 - Every significant PR/change must map to a spec under `specs/`.
+- Commits, issues, and PRs/MRs MUST comply with **Principle X** (no Cursor / agent attribution).
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.3.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-31
+**Version**: 1.4.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-31

@@ -82,6 +82,10 @@ Use path only while developing; remove before release so Packagist pins stay aut
 
 ## Git hygiene
 
+**Constitution Principle X:** do not attribute work to Cursor Agent (or similar IDE agents) in **commits**, **GitHub issues**, or **pull / merge requests**.
+
+Forbidden examples: `Co-authored-by: Cursor`, `Co-authored-by: Cursor Agent`, `*@cursor.com` / `*@cursor.so` trailers, `Made-with: Cursor` / `Made with Cursor` in commit messages, issue text, or PR/MR bodies. Use only the human author’s git / GitHub identity.
+
 Run once per clone:
 
 ```bash

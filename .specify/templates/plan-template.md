@@ -45,6 +45,7 @@
 - [ ] English docs/PHPDoc/UI; tests planned for behavior changes
 - [ ] Env/config: **MUST NOT** add `env(VAR_NAME): '…'` defaults in `config/parameters.yaml` (Principle IX). Put defaults in `.env.dist`; use `when@…` package config for env-specific overrides; prefer DB/instance settings for tunable ops when UI exists
 - [ ] Prefer `nowo-tech/*` kits over hand-rolled auth/legal/cookie UX where applicable
+- [ ] No Cursor / agent attribution (Principle X): no `Co-authored-by: Cursor*`, `Made-with: Cursor`, or similar in commits, issues, or PR/MR bodies
 
 [Gates determined based on constitution file — keep the checklist above; add feature-specific gates as needed]
 
