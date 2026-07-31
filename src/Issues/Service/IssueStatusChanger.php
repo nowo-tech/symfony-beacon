@@ -29,7 +29,7 @@ final readonly class IssueStatusChanger
     /**
      * @return bool True when the status actually changed
      */
-    public function change(Issue $issue, IssueStatus $next, ?User $actor): bool
+    public function change(Issue $issue, IssueStatus $next, ?User $actor, string $via = 'ui'): bool
     {
         $project = $issue->getProject();
         if (!$project instanceof Project) {
@@ -54,7 +54,7 @@ final readonly class IssueStatusChanger
                 'issue_title' => $issue->getTitle(),
                 'from' => $previous->value,
                 'to' => $next->value,
-                'via' => null === $actor ? 'slack' : 'ui',
+                'via' => $via,
             ],
         );
 

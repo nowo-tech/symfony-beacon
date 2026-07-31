@@ -57,7 +57,7 @@ class NotificationDestination implements AuditableInterface
     private string $endpointUrl = '';
 
     /**
-     * Slack app signing secret for interactive callbacks (encrypted; Slack destinations only).
+     * Slack/Teams interaction signing secret for Resolve callbacks (encrypted).
      */
     #[ORM\Column(type: 'text', nullable: true)]
     #[Encrypted]
