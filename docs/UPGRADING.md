@@ -57,6 +57,11 @@ make vite-build
 
 Requires **AuthKit 1.12.1** (QR image) / **1.12.0** minimum for QR foundation. Migration `Version20260731200000` adds `auth_kit_qr_login_challenge`, `auth_kit_social_credential.enterprise_sso`, and `app_user.phone` / `phone_verified_at`. QR login is enabled in `nowo_auth_kit.yaml`; users set a phone on Account → Profile. Mark OIDC IdPs as **Enterprise SSO** in Administration → Social login when they should appear under the organization heading.
 
+### Inbound email comments (`076` / 6.28)
+
+- Migration `Version20260731210000` adds `inbound_email_message`.
+- Opt-in: `BEACON_INBOUND_EMAIL_ENABLED`, `BEACON_INBOUND_MAIL_DOMAIN`, `BEACON_INBOUND_WEBHOOK_SECRET`. Guide: [INBOUND-EMAIL.md](INBOUND-EMAIL.md).
+
 ### QR login image (`075` / 6.27)
 
 - Requires AuthKit **1.12.1** and `endroid/qr-code` ^6.

@@ -31,6 +31,10 @@ when@test:
         # Stable scrape token for MetricsEndpointTest (Authorization: Bearer only).
         beacon.metrics_token: 'phpunit-metrics-token'
         beacon.metrics_require_token: false
+        beacon.inbound_email.enabled: true
+        beacon.inbound_email.mail_domain: 'inbound.beacon.test'
+        beacon.inbound_email.webhook_secret: 'phpunit-inbound-secret'
+        beacon.inbound_email.signing_secret: 'phpunit-inbound-secret'
     services:
         # Allow EnvelopeIngestFunctionalTest to swap query-auth policy without putenv/$_ENV.
         App\Ingest\Service\IngestQueryAuthSettings:

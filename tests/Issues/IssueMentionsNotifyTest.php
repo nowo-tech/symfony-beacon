@@ -7,6 +7,7 @@ namespace App\Tests\Issues;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
+use App\Issues\Service\InboundEmailReplyToken;
 use App\Issues\Service\IssueMentionParser;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Issues\Service\IssueUserMailTransport;
@@ -91,6 +92,7 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
+            new InboundEmailReplyToken('test-inbound-secret'),
         );
         $notifier->notifyMentionsFromComment($project, $issue, $comment, $owner);
         $notifier->notifyAssigneeChanged($project, $issue, null, $owner, $owner);
@@ -146,6 +148,7 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
+            new InboundEmailReplyToken('test-inbound-secret'),
         );
         $notifier->notifyMentionsFromComment($project, $issue, $comment, $owner);
         $notifier->notifyAssigneeChanged($project, $issue, null, $alice, $owner);
@@ -227,6 +230,7 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
+            new InboundEmailReplyToken('test-inbound-secret'),
         );
         $client->disableReboot();
         $client->getContainer()->set(IssueUserMailNotifier::class, $notifier);

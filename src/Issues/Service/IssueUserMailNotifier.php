@@ -9,6 +9,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Project\Entity\Project;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,6 +26,11 @@ final readonly class IssueUserMailNotifier
         private TranslatorInterface $translator,
         private UrlGeneratorInterface $urlGenerator,
         private LoggerInterface $logger,
+        private InboundEmailReplyToken $inboundEmailReplyToken,
+        #[Autowire('%beacon.inbound_email.enabled%')]
+        private bool $inboundEmailEnabled = false,
+        #[Autowire('%beacon.inbound_email.mail_domain%')]
+        private string $inboundMailDomain = '',
     ) {
     }
 
@@ -89,6 +95,10 @@ final readonly class IssueUserMailNotifier
                 ->to($email)
                 ->subject($this->translator->trans($subjectKey, $params))
                 ->text($this->translator->trans($bodyKey, $params));
+            if ($this->inboundEmailEnabled && '' !== $this->inboundMailDomain) {
+                $token = $this->inboundEmailReplyToken->issue($issue->getUuid());
+                $message->replyTo('reply+'.$token.'@'.$this->inboundMailDomain);
+            }
             $this->mailTransport->send($message);
         } catch (Throwable $e) {
             $this->logger->warning('Issue user mail notify failed.', [

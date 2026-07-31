@@ -10,7 +10,6 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\Entity\IssueComment;
 use App\Issues\Entity\IssueSavedView;
 use App\Issues\Export\AiIssueExportFormatter;
 use App\Issues\Form\IssueAssigneeType;
@@ -21,10 +20,10 @@ use App\Issues\Repository\IssueHistoryEntryRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
 use App\Issues\Service\IssueAssigneeChanger;
+use App\Issues\Service\IssueCommentCreator;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMergeService;
 use App\Issues\Service\IssueStatusChanger;
-use App\Issues\Service\IssueUserMailNotifier;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
@@ -66,12 +65,12 @@ final class IssueController extends AbstractController
         private readonly IssueHistoryRecorder $historyRecorder,
         private readonly IssueStatusChanger $issueStatusChanger,
         private readonly IssueAssigneeChanger $issueAssigneeChanger,
+        private readonly IssueCommentCreator $issueCommentCreator,
         private readonly IssueMergeService $issueMergeService,
         private readonly UserActionRecorder $userActionRecorder,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
         private readonly NotificationDispatcher $notificationDispatcher,
-        private readonly IssueUserMailNotifier $issueUserMailNotifier,
         private readonly EntityManagerInterface $entityManager,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
         private readonly AiIssueExportFormatter $aiIssueExportFormatter,
@@ -553,40 +552,16 @@ final class IssueController extends AbstractController
         }
 
         $body = trim($request->request->getString('body'));
-        if ('' === $body) {
-            $this->addFlash('error', 'issues.comment_empty');
-
-            return $this->redirectToRoute('issue_show', $showParams);
+        try {
+            $this->issueCommentCreator->create($issue, $user, $body);
+            $this->addFlash('success', 'issues.comment_saved');
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('error', match ($e->getMessage()) {
+                'empty' => 'issues.comment_empty',
+                'too_long' => 'issues.comment_too_long',
+                default => 'issues.comment_invalid',
+            });
         }
-        if (mb_strlen($body) > IssueComment::BODY_MAX_LENGTH) {
-            $this->addFlash('error', 'issues.comment_too_long');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $comment = new IssueComment();
-        $comment->setIssue($issue);
-        $comment->setAuthor($user);
-        $comment->setBody($body);
-        $this->entityManager->persist($comment);
-        $issue->addComment($comment);
-
-        $this->userActionRecorder->record(
-            UserActionType::IssueCommented,
-            $user,
-            $user,
-            [
-                'project_uuid' => $project->getUuid(),
-                'project_name' => $project->getName(),
-                'issue_uuid' => $issue->getUuid(),
-                'issue_title' => $issue->getTitle(),
-                'comment_uuid' => $comment->getUuid(),
-            ],
-        );
-        $this->notificationDispatcher->dispatchIssueCommented($project, $issue, $comment);
-        $this->issueUserMailNotifier->notifyMentionsFromComment($project, $issue, $comment, $user);
-        $this->entityManager->flush();
-        $this->addFlash('success', 'issues.comment_saved');
 
         return $this->redirectToRoute('issue_show', $showParams);
     }
