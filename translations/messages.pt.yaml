@@ -759,6 +759,9 @@ users:
             project.share_link_created: 'Ligação de partilha criada'
             project.share_link_revoked: 'Ligação de partilha revogada'
             project.share_link_opened: 'Ligação de partilha aberta'
+            instance.config_exported: 'Configuração da instância exportada'
+            instance.config_imported: 'Configuração da instância importada'
+            instance.mailer_updated: 'Definições de mailer da instância atualizadas'
         context:
             email: E-mail
             role: Papel
@@ -776,6 +779,11 @@ users:
             issue_title: Emitir
             event_id: 'ID do evento'
             label: Rótulo
+            cleared: 'DSN limpo'
+            dsn_changed: 'DSN alterado'
+            from_changed: 'From alterado'
+            scheme: Esquema
+            host: Host
     empty: 'Nenhum usuário ainda.'
 preferences:
     title: 'Configurações de Conta'
@@ -1377,6 +1385,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Introduza um DSN Symfony Mailer valido (por exemplo smtp://user:pass@host:587).'
         null_transport: 'null:// nao consegue entregar email. Cole um DSN SMTP real (ou outro), ou use Limpar DSN guardado para recorrer ao ambiente.'
+        scheme_not_allowed: 'Esse esquema de DSN Mailer nao e permitido. Use smtp, smtps, sendmail, native ou um esquema de fornecedor suportado (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Limpar DSN guardado'
         help: 'Remove o DSN da base de dados e recorre a MAILER_DSN do ambiente ate guardar um novo.'

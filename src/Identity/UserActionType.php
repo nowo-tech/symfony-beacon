@@ -137,4 +137,7 @@ enum UserActionType: string
 
     /** Instance non-secret config JSON imported. */
     case InstanceConfigImported = 'instance.config_imported';
+
+    /** Instance Mailer DSN and/or From updated (context is redacted — no secrets). */
+    case InstanceMailerUpdated = 'instance.mailer_updated';
 }

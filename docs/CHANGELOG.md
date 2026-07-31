@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Mailer DSN change audit** (`6.15`, Fixes #18): Admin Mailer save/clear records `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets); `MailerDsnValidator` scheme allowlist (`smtp`/`smtps`/sendmail/native + common provider schemes).
+
 ### Changed
 
-- **Roadmap**: Bundle **v1.6.10** closes Phase **6.13** (nested console extras + Scheduler context) and **6.14** (Monolog bridge already shipped); **Next** = Mailer DSN change audit (`6.15`, extends `034`).
+- **Roadmap**: Bundle **v1.6.10** closes Phase **6.13** / **6.14**; **6.15** Mailer DSN audit Done; **Next** = Later Phase 6+ when prioritized.
 
 ## [0.16.0] - 2026-07-31
 
