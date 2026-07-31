@@ -31,5 +31,5 @@
 
 - [x] T040 Add functional test for first fire + cooldown suppression
 - [x] T041 Add settings access/CRUD test for threshold rules
-- [x] T042 Create/update `docs/NOTIFICATIONS.md`
+- [x] T042 Create/update `docs/product/NOTIFICATIONS.md`
 - [x] T043 Update `docs/ROADMAP.md` and `docs/CHANGELOG.md`

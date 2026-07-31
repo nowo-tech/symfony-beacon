@@ -84,7 +84,7 @@ Requires **AuthKit 1.12.1** and `endroid/qr-code` ^6 (Composer lock).
 
 - Optional encrypted **signing secret** on Slack notification destinations (migration `…180000`).
 - Configure Slack App Interactivity Request URL → `POST /hooks/slack/interactions`.
-- Optional Account **Slack user ID** (`…190000`) enables **Assign to me** and Resolve actor attribution. Guide: [NOTIFICATIONS.md](NOTIFICATIONS.md).
+- Optional Account **Slack user ID** (`…190000`) enables **Assign to me** and Resolve actor attribution. Guide: [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
 
 ### Teams interactive Resolve + Assign OpenUri (`069` / `073`)
 
@@ -102,7 +102,7 @@ Requires **AuthKit 1.12.1** and `endroid/qr-code` ^6 (Composer lock).
 ### Inbound email comments (`076` / 6.28)
 
 - Migration `Version20260731210000` adds `inbound_email_message`.
-- Opt-in: `BEACON_INBOUND_EMAIL_ENABLED`, `BEACON_INBOUND_MAIL_DOMAIN`, `BEACON_INBOUND_WEBHOOK_SECRET`. Guide: [INBOUND-EMAIL.md](INBOUND-EMAIL.md).
+- Opt-in: `BEACON_INBOUND_EMAIL_ENABLED`, `BEACON_INBOUND_MAIL_DOMAIN`, `BEACON_INBOUND_WEBHOOK_SECRET`. Guide: [INBOUND-EMAIL.md](product/INBOUND-EMAIL.md).
 - Stores reply bodies as issue comments (personal data) — update privacy/terms as needed.
 
 ### Other
@@ -135,7 +135,7 @@ The former `BEACON_RETENTION_*`, `BEACON_INGEST_RATE_LIMIT`, `BEACON_EVENT_QUOTA
 
 - The Flex `mailer` service in `compose.override.yaml` is now behind Compose profile **`mail`** (not started by `make up`).
 - Start with `make mailpit` (or `docker compose --profile mail up -d mailer`). UI default: http://localhost:18025; PHP DSN: `smtp://mailer:1025` under **Administration → Mailer**.
-- Host ports: `MAILPIT_UI_PORT` / `MAILPIT_SMTP_PORT` in `.env` (defaults 18025 / 1026 in `.env.dist`). Guide: [MAILPIT.md](MAILPIT.md).
+- Host ports: `MAILPIT_UI_PORT` / `MAILPIT_SMTP_PORT` in `.env` (defaults 18025 / 1026 in `.env.dist`). Guide: [MAILPIT.md](ops/MAILPIT.md).
 - Production (`compose.prod.yaml`) never includes Mailpit.
 
 ### Social login admin (extends `060`)
@@ -164,7 +164,7 @@ Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent
 
 - Account → **Privacy** (`/account/privacy`): download JSON export; optional self-service anonymize (blocked if sole project owner or last instance admin).
 - Admin → Users: **Export data** / **Anonymize** for other accounts.
-- Anonymize does **not** purge project events/issues — see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md).
+- Anonymize does **not** purge project events/issues — see [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
 - Runtime anonymize is app-owned (do not use `anonymize-bundle` as the production executor).
 
 ### Collaboration / API (`040`–`042`, `044`, `061`)
@@ -177,7 +177,7 @@ Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent
 
 ### SiteBackup / locales (`056`, `062`, kits)
 
-- Requires **SiteBackupBundle ≥ 1.7.0**: bare `/setup` serves `DEFAULT_LOCALE`; other locales use `/{_locale}/setup`. Align `setup.locale.enabled` with `%fallback_locales%` — see [ADDING-LOCALES.md](ADDING-LOCALES.md).
+- Requires **SiteBackupBundle ≥ 1.7.0**: bare `/setup` serves `DEFAULT_LOCALE`; other locales use `/{_locale}/setup`. Align `setup.locale.enabled` with `%fallback_locales%` — see [ADDING-LOCALES.md](dev/ADDING-LOCALES.md).
 - Non-`dev`/`test` environments fail closed when `SITE_SETUP_TOKEN` / `SITE_BACKUP_PASSWORD_HASH` are empty or still the local defaults (`062`).
 - Docker image builds that run `cache:clear` / `cache:warmup` / `assets:install` skip that secrets guard (`064-sitebackup-guard-skip-cache-clear`).
 
@@ -225,7 +225,7 @@ make vite-build
 - New columns on `notification_destination`: `consecutive_failures`, `circuit_opened_at`.
 - Env (optional): `BEACON_NOTIFICATION_CIRCUIT_BREAKER_THRESHOLD` (default `5`), `BEACON_NOTIFICATION_CIRCUIT_BREAKER_COOLDOWN_MINUTES` (default `0` = pause until admin Resume).
 - Project Settings shows **Auto-paused** + **Resume** when a destination trips.
-- See [NOTIFICATIONS.md](NOTIFICATIONS.md).
+- See [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
 
 ### CSP / HSTS
 
@@ -293,7 +293,7 @@ make vite-build
 - New dependency: `nowo-tech/beacon-bundle`. Empty `BEACON_DSN` keeps reporting off.
 - Local first-run: prefer `make ready` (bootstrap + seed). Seed writes loopback `BEACON_DSN` into `.env` only when empty; then `make restart`.
 - Demo API keys created by seed use a **stable secret** (`DEMO_SECRET_KEY`) in addition to the existing stable public key — for new keys only.
-- Issue show: **Copy for AI** / Markdown+JSON download (`059`, [AI-EXPORT.md](AI-EXPORT.md)).
+- Issue show: **Copy for AI** / Markdown+JSON download (`059`, [AI-EXPORT.md](product/AI-EXPORT.md)).
 
 ### SiteBackupBundle 1.5.0
 
@@ -344,7 +344,7 @@ make vite-build
 - Cold-start / restore setup is SiteBackup at **`/setup`** (panel **`/_site_backup`**). Set **`SITE_SETUP_TOKEN`** (open `/setup?token=…`) and **`SITE_BACKUP_PASSWORD_HASH`** (see `.env.dist`). Outside **`dev`/`test`** (including `prod` and `staging`), Beacon refuses the documented local defaults — rotate before deploy (`062`).
 - Legal pages still redirect bare → `/{DEFAULT_LOCALE}/legal/…`.
 - Dashboard / app shell URLs never include `_locale` (account `preferredLocale`).
-- Operator manual: [ADDING-LOCALES.md](ADDING-LOCALES.md).
+- Operator manual: [ADDING-LOCALES.md](dev/ADDING-LOCALES.md).
 
 ### Ops overview (`035`)
 
@@ -394,11 +394,11 @@ make vite-build
 
 - `app:seed-platform` / Setup platform step seeds the default cookie consent profile + inventory (`CookieConsentDemoSeeder`).
 - `use_database_config: true` — re-run `make seed-platform` after upgrade to refresh professional modal copy.
-- Details: [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md).
+- Details: [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
 
 ### Database docs + Compose MySQL path
 
-- Schema overview: [DATABASE.md](DATABASE.md).
+- Schema overview: [DATABASE.md](dev/DATABASE.md).
 - Local Compose MySQL data directory is `./.data/mysql` (gitignored). If you previously used a named Docker volume, migrate data or accept a fresh local DB.
 
 ### Fresh-install migration hardening
@@ -411,7 +411,7 @@ make vite-build
 git pull
 composer install
 # Ensure Mercure + VAPID env vars are set (see `.env.dist`: MERCURE_*, VAPID_*).
-# Mercure JWT / hub setup: docs/MERCURE.md
+# Mercure JWT / hub setup: docs/ops/MERCURE.md
 # Generate VAPID keys if enabling Web Push:
 #   docker compose exec php php -r 'require "vendor/autoload.php"; print_r(Minishlink\WebPush\VAPID::createVapidKeys());'
 docker compose up -d
@@ -425,7 +425,7 @@ make vite-build
 
 ### Member live alerts (Mercure) + Web Push
 
-- Compose `mercure` service + Caddy `/.well-known/mercure` (see [MERCURE.md](MERCURE.md)).
+- Compose `mercure` service + Caddy `/.well-known/mercure` (see [MERCURE.md](ops/MERCURE.md)).
 - **Administration → Mercure** (`/settings/mercure`): master switch; optional URL / public URL / JWT overrides (env fallbacks).
 - Off by default until an admin enables it (or sample seed copies env defaults — see below).
 - Migrations: `Version20260721241000` (instance Mercure fields), `Version20260721240000` (`push_subscription` + user opt-in).
@@ -746,7 +746,7 @@ BEACON_EVENT_QUOTA_MONTHLY=0
 - **Admin ops**: project stats, suspend ingest, view-as-member.
 - **Digest / quiet hours**: configure on destinations; flush with `bin/console app:notifications:flush-digests` (schedule via cron).
 - **Health UI**: last delivery status on Settings / Admin project show.
-- **Client**: upgrade BeaconBundle for public tags, `before_send`, and opt-in Doctrine/HttpClient spans (see [EVENT-CONTEXT](EVENT-CONTEXT.md) / [DSN](DSN.md)).
+- **Client**: upgrade BeaconBundle for public tags, `before_send`, and opt-in Doctrine/HttpClient spans (see [EVENT-CONTEXT](product/EVENT-CONTEXT.md) / [DSN](DSN.md)).
 
 Re-run `make seed` if admin menu items are missing.
 
@@ -861,11 +861,11 @@ Dashboard URLs now use opaque UUID path segments (e.g. `/projects/{uuid}/issues/
 
 - **Administration → Groups**: create groups and add existing users by email.
 - **Project Settings**: add users one-to-one **or** link a group (role admin/member). Owners remain direct user memberships only.
-- **Administration → Users → Activity**: timeline of admin/membership/product actions (optional client IP — see [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md)).
+- **Administration → Users → Activity**: timeline of admin/membership/product actions (optional client IP — see [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md)).
 
 ### Notification channels
 
-Project Settings → Notifications now supports **Discord**, **Microsoft Teams**, **Telegram** (`bot_token@chat_id`), and **email** in addition to Slack / generic HTTP. Email requires a real `MAILER_DSN`. See [NOTIFICATIONS.md](NOTIFICATIONS.md).
+Project Settings → Notifications now supports **Discord**, **Microsoft Teams**, **Telegram** (`bot_token@chat_id`), and **email** in addition to Slack / generic HTTP. Email requires a real `MAILER_DSN`. See [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
 
 ### API docs
 
@@ -981,7 +981,7 @@ No migrations required.
 Documentation and release-notes clarity only. **No schema, env, or Composer changes.**
 
 1. Pull `v0.7.1` (or merge `main`).
-2. Optional: re-read [NATIVE-MOBILE.md](NATIVE-MOBILE.md) if you still expected Hotwire Native — that stack was removed in **0.7.0**.
+2. Optional: re-read [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md) if you still expected Hotwire Native — that stack was removed in **0.7.0**.
 3. Local BeaconBundle pairing remains: `make bootstrap` → demo `make sync-beacon` ([DSN.md](DSN.md)).
 
 ```bash
@@ -1030,14 +1030,14 @@ Sort and paging are **server-side** again (column header links + `per_page` in t
 
 ### 5. Ops / product features
 
-- Project → Settings → **Notifications** (Slack / HTTP): [NOTIFICATIONS.md](NOTIFICATIONS.md)
+- Project → Settings → **Notifications** (Slack / HTTP): [NOTIFICATIONS.md](product/NOTIFICATIONS.md)
 - Optional cron: `app:retention:purge`
 - Probes: `/health/live`, `/health/ready` — [PRODUCTION.md](PRODUCTION.md)
 - Login throttling defaults: see `config/packages/nowo_login_throttle.yaml`
 
 ### 6. Turbo / Hotwire Native removed
 
-`symfony/ux-turbo` and `symfony/ux-native` are gone. Use the PWA for installable mobile access ([NATIVE-MOBILE.md](NATIVE-MOBILE.md)). Full page loads replace Turbo Drive navigation.
+`symfony/ux-turbo` and `symfony/ux-native` are gone. Use the PWA for installable mobile access ([NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md)). Full page loads replace Turbo Drive navigation.
 
 ### 7. Local BeaconBundle demo (optional)
 

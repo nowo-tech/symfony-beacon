@@ -465,12 +465,12 @@ erDiagram
     }
 ```
 
-Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **Appearance**. See [MERCURE.md](MERCURE.md) and [PRODUCTION.md](PRODUCTION.md#field-encryption-key-halite).
+Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **Appearance**. See [MERCURE.md](../ops/MERCURE.md) and [PRODUCTION.md](../PRODUCTION.md#field-encryption-key-halite).
 
 ---
 
 ## Related
 
-- Architecture flows: [ARCHITECTURE.md](ARCHITECTURE.md)
+- Architecture flows: [ARCHITECTURE.md](../ARCHITECTURE.md)
 - Migrations: `migrations/`
 - Local MySQL bind mount: `./.data/mysql` in [`compose.yaml`](../compose.yaml)

@@ -10,7 +10,7 @@
 
 Issues are keyed by a **similarity fingerprint** within a project. The project issues index uses DataTables with URL-synced sort/paging/filters. Issue detail presents structured panels (stack with source context, breadcrumbs, request, tags, contexts, extra, raw JSON) plus occurrence stats, **assignee**, **manual status** (unresolved / resolved / ignored), and an **assignment & status history** timeline in the assignee sidebar. Collapsible panel preferences are stored per browser (`localStorage`) with account-level defaults (Display prefs use Tagify via `nowo-tech/tag-input-bundle`).
 
-Cross-links: [`docs/EVENT-CONTEXT.md`](../../docs/EVENT-CONTEXT.md), ingest reopen behaviour in `003-ingest`, regression notifications in `009-project-notifications`.
+Cross-links: [`docs/product/EVENT-CONTEXT.md`](../../docs/product/EVENT-CONTEXT.md), ingest reopen behaviour in `003-ingest`, regression notifications in `009-project-notifications`.
 
 ## Clarifications (as-built)
 

@@ -76,4 +76,4 @@ Admin UI labels “Admin” / “User” on `/admin/users` map to **`ROLE_ADMIN`
 | “May triage / open Settings on this project” | `ProjectAccessService` + `ProjectRole` helpers |
 | New admin menu item | Seed `required_role: ROLE_ADMIN` (see `DashboardMenuDemoSeeder`) |
 
-Related: [ARCHITECTURE.md](ARCHITECTURE.md) (module map), [INSTALL.md](INSTALL.md) (seed / first admin), `config/packages/security.yaml`, `src/Project/Service/ProjectAccessService.php`.
+Related: [ARCHITECTURE.md](../ARCHITECTURE.md) (module map), [INSTALL.md](../INSTALL.md) (seed / first admin), `config/packages/security.yaml`, `src/Project/Service/ProjectAccessService.php`.

@@ -13,7 +13,7 @@ The Dockerfile also defines a **`frankenphp_prod`** target for baked, no-dev dep
 | PHP / Caddy | Xdebug available, `--watch` | Production `php.ini`, no watch |
 | Secrets | Local `.env` (gitignored) | Inject at **runtime** (env / orchestrator) |
 
-FrankenPHP HTTP modes (`FRANKENPHP_MODE=classic|worker`, `LOOP_MAX`, `RESET_KERNEL`) work the same in prod — see [`FRANKENPHP-CODING.md`](FRANKENPHP-CODING.md).
+FrankenPHP HTTP modes (`FRANKENPHP_MODE=classic|worker`, `LOOP_MAX`, `RESET_KERNEL`) work the same in prod — see [`FRANKENPHP-CODING.md`](ops/FRANKENPHP-CODING.md).
 
 ## Build
 
@@ -79,7 +79,7 @@ docker compose -f compose.prod.yaml exec php bin/console doctrine:encrypt:genera
 
 Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `instance.mailer_updated` with **redacted** `scheme` and `host` only (never the DSN secret). Plaintext DSN input must use an allowlisted Mailer scheme (`smtp` / `smtps` / `sendmail` / `native` and common provider schemes).
 
-**Mailer in production:** configure a real SMTP or provider DSN under **Administration → Mailer**. The local **Mailpit** catcher (`make mailpit`, Compose profile `mail` in `compose.override.yaml`) is for development only and is **absent** from [`compose.prod.yaml`](../compose.prod.yaml) — see [MAILPIT.md](MAILPIT.md).
+**Mailer in production:** configure a real SMTP or provider DSN under **Administration → Mailer**. The local **Mailpit** catcher (`make mailpit`, Compose profile `mail` in `compose.override.yaml`) is for development only and is **absent** from [`compose.prod.yaml`](../compose.prod.yaml) — see [MAILPIT.md](ops/MAILPIT.md).
 
 ## Messenger in production
 

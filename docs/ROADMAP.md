@@ -33,7 +33,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | Daily analytics | Beacon | `005-analytics` |
 | AuthKit, projects, Settings, danger zone | Beacon | `002`, `011` |
 | Rich event context + stack source context | Beacon + Bundle | `010`, Bundle ≥ 1.3.0 |
-| PWA (browser installability) | Beacon | `nowo-tech/pwa-bundle` (Hotwire Native `008` removed — see `docs/NATIVE-MOBILE.md`) |
+| PWA (browser installability) | Beacon | `nowo-tech/pwa-bundle` (Hotwire Native `008` removed — see `docs/dev/NATIVE-MOBILE.md`) |
 | Architecture rationale + Mermaid flows | Beacon | `docs/ARCHITECTURE.md` |
 
 ---

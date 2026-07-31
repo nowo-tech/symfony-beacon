@@ -40,7 +40,7 @@ As a project owner, I store the Slack app Signing Secret on the destination (enc
 | FR-003 | `POST /hooks/slack/interactions` public; verify `X-Slack-Signature` + ±5 min timestamp |
 | FR-004 | Shared `IssueStatusChanger` for UI and Slack paths (history, UserAction, resolve/reopen notify) |
 | FR-005 | Resolve actor is `null` unless Slack user → Beacon member mapping exists (`071-slack-assign-mapping`) |
-| FR-006 | Document Slack App Interactivity URL + signing secret in NOTIFICATIONS.md |
+| FR-006 | Document Slack App Interactivity URL + signing secret in docs/product/NOTIFICATIONS.md |
 
 ## Out of Scope (this spec)
 

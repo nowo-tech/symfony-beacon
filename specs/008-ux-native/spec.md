@@ -4,7 +4,7 @@
 **Created**: 2026-07-20  
 **Status**: **Superseded / Removed** (Hotwire Native dropped; PWA remains)
 
-> **Historical spec.** The server contract (`/config/ios_v1.json`, `/config/android_v1.json`, `ux-native` / `ux-turbo`) was removed. Operators should use the **PWA** (`nowo-tech/pwa-bundle`). See [docs/NATIVE-MOBILE.md](../../docs/NATIVE-MOBILE.md) and constitution v1.2.0+.
+> **Historical spec.** The server contract (`/config/ios_v1.json`, `/config/android_v1.json`, `ux-native` / `ux-turbo`) was removed. Operators should use the **PWA** (`nowo-tech/pwa-bundle`). See [docs/dev/NATIVE-MOBILE.md](../../docs/dev/NATIVE-MOBILE.md) and constitution v1.2.0+.
 
 **Input**: User description: "Pass the project to Symfony UX Native so we can have a mobile application."
 
@@ -63,7 +63,7 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 
 **Why this priority**: Server support alone does not produce App Store / Play binaries; operators need a clear guide.
 
-**Independent Test**: Open `docs/NATIVE-MOBILE.md` and verify it describes config URLs, UA behaviour, and client scaffolding pointers.
+**Independent Test**: Open `docs/dev/NATIVE-MOBILE.md` and verify it describes config URLs, UA behaviour, and client scaffolding pointers.
 
 **Acceptance Scenarios**:
 

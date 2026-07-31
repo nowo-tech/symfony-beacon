@@ -116,22 +116,37 @@ final readonly class AccountAnonymizer
      */
     public function soleOwnerProjects(User $user): array
     {
-        $blocked = [];
+        $ownerMemberships = [];
         foreach ($this->projectMembershipRepository->findByUser($user) as $membership) {
-            if (ProjectRole::Owner !== $membership->getRole()) {
+            if (ProjectRole::Owner === $membership->getRole()) {
+                $ownerMemberships[] = $membership;
+            }
+        }
+        if ([] === $ownerMemberships) {
+            return [];
+        }
+
+        $projectIds = [];
+        foreach ($ownerMemberships as $membership) {
+            $projectId = $membership->getProject()->getId();
+            if (null !== $projectId) {
+                $projectIds[] = $projectId;
+            }
+        }
+
+        $ownerCounts = $this->projectMembershipRepository->countOwnersByProjectIds($projectIds);
+
+        $blocked = [];
+        foreach ($ownerMemberships as $membership) {
+            $project = $membership->getProject();
+            $projectId = $project->getId();
+            if (null === $projectId || ($ownerCounts[$projectId] ?? 0) > 1) {
                 continue;
             }
-            $project = $membership->getProject();
-            $owners = 0;
-            foreach ($this->projectMembershipRepository->findBy(['project' => $project, 'role' => ProjectRole::Owner]) as $ownerMembership) {
-                ++$owners;
-            }
-            if ($owners <= 1) {
-                $blocked[] = [
-                    'uuid' => $project->getUuid(),
-                    'name' => $project->getName(),
-                ];
-            }
+            $blocked[] = [
+                'uuid' => $project->getUuid(),
+                'name' => $project->getName(),
+            ];
         }
 
         return $blocked;

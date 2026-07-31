@@ -18,7 +18,7 @@
 
 ### Session 2026-07-21
 
-- **Q3 (operator manuals)**: In-app setup guides at `/projects/{uuid}/notifications/help` (and `docs/NOTIFICATIONS.md`) document how to connect Slack, Discord, Teams, Telegram, email, and generic HTTP.
+- **Q3 (operator manuals)**: In-app setup guides at `/projects/{uuid}/notifications/help` (and `docs/product/NOTIFICATIONS.md`) document how to connect Slack, Discord, Teams, Telegram, email, and generic HTTP.
 - **Q4 (SSRF)**: Production blocks private/link-local/metadata URLs for Slack/Discord/Teams/HTTP destinations; Telegram uses Bot API host constructed by Beacon; email is Mailer-only (encrypted instance DSN via `034`).
 
 ### Session 2026-07-21 (Mailer settings)
@@ -125,7 +125,7 @@ As a project admin, I can send a test notification to a configured destination s
 - **FR-012**: Destination secrets MUST NOT be exposed in full in list views or ordinary page HTML where avoidable (masked display); MUST be encryptable at rest.
 - **FR-013**: Automated tests MUST cover permission rules, filter matching (issue levels and N+1), first-occurrence vs duplicate silence, regression notify, and that ingest ACK does not depend on destination success.
 - **FR-014**: For issue signals, the system MUST notify on **new issue creation** and on **regression** (status was `resolved` or `ignored` and the issue becomes active again). The system MUST NOT notify on every subsequent event for an already-unresolved issue.
-- **FR-015**: System MUST provide English (and Spanish UI) setup guides for connecting each destination type (`docs/NOTIFICATIONS.md` + in-app help).
+- **FR-015**: System MUST provide English (and Spanish UI) setup guides for connecting each destination type (`docs/product/NOTIFICATIONS.md` + in-app help).
 - **FR-016**: Outbound HTTP destinations MUST be validated against SSRF rules before save and before delivery (except Telegram Bot API URLs constructed by the server).
 
 ### Key Entities

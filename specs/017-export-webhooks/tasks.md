@@ -22,7 +22,7 @@
 
 ## Phase 4: Docs, tests, polish
 
-- [x] T008 Document lifecycle events briefly in `docs/NOTIFICATIONS.md`
+- [x] T008 Document lifecycle events briefly in `docs/product/NOTIFICATIONS.md`
 - [x] T009 Changelog Unreleased bullets (English)
 - [x] T010 `tests/Export/ExportWebhooksTest.php` (export + lifecycle webhook delivery)
 - [x] T011 Extend `NotificationDispatcherTest` for a lifecycle category

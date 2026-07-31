@@ -163,22 +163,167 @@ final readonly class IssueMergeService
 
     /**
      * Recompute denormalized counters for every remaining issue in a project (after retention purge).
+     *
+     * Uses grouped SQL so retention does not run ~4 queries per issue.
      */
     public function recomputeAggregatesForProject(Project $project): int
     {
+        $projectId = $project->getId();
+        if (null === $projectId) {
+            return 0;
+        }
+
+        $connection = $this->entityManager->getConnection();
+
+        /** @var list<array{issue_id: int|string, cnt: int|string, first_seen: ?string, last_seen: ?string}> $aggregates */
+        $aggregates = $connection->fetchAllAssociative(
+            'SELECT i.id AS issue_id, COUNT(e.id) AS cnt, MIN(e.received_at) AS first_seen, MAX(e.received_at) AS last_seen
+             FROM issue i
+             LEFT JOIN event e ON e.issue_id = i.id
+             WHERE i.project_id = ?
+             GROUP BY i.id',
+            [$projectId],
+        );
+
+        if ([] === $aggregates) {
+            return 0;
+        }
+
+        $issueIds = [];
+        foreach ($aggregates as $row) {
+            $issueIds[] = (int) $row['issue_id'];
+        }
+
+        $firstReleases = $this->fetchFirstReleasesByIssueIds($issueIds);
+        $lastMeta = $this->fetchLastMetaByIssueIds($issueIds);
+
+        $issues = $this->issueRepository->findBy(['id' => $issueIds]);
+        $byId = [];
+        foreach ($issues as $issue) {
+            $id = $issue->getId();
+            if (null !== $id) {
+                $byId[$id] = $issue;
+            }
+        }
+
         $updated = 0;
-        foreach ($this->issueRepository->findBy(['project' => $project]) as $issue) {
+        foreach ($aggregates as $row) {
+            $issueId = (int) $row['issue_id'];
+            $issue = $byId[$issueId] ?? null;
             if (!$issue instanceof Issue) {
                 continue;
             }
-            $this->recomputeAggregates($issue);
+
+            $count = (int) $row['cnt'];
+            $issue->setEventCount($count);
+
+            if ($count > 0) {
+                $firstSeen = $row['first_seen'] ?? null;
+                $lastSeen = $row['last_seen'] ?? null;
+                if (\is_string($firstSeen) && '' !== $firstSeen) {
+                    $issue->setFirstSeen(new DateTimeImmutable($firstSeen));
+                }
+                if (\is_string($lastSeen) && '' !== $lastSeen) {
+                    $issue->setLastSeen(new DateTimeImmutable($lastSeen));
+                }
+
+                $firstRelease = $firstReleases[$issueId] ?? null;
+                if (\is_string($firstRelease) && '' !== trim($firstRelease)) {
+                    $issue->setFirstRelease(Issue::normalizeRelease($firstRelease));
+                }
+
+                $meta = $lastMeta[$issueId] ?? null;
+                if (\is_array($meta)) {
+                    $lastRelease = $meta['release_version'] ?? null;
+                    if (\is_string($lastRelease) && '' !== trim($lastRelease)) {
+                        $issue->setLastRelease(Issue::normalizeRelease($lastRelease));
+                    }
+                    $lastEnv = $meta['environment'] ?? null;
+                    if (\is_string($lastEnv) && '' !== trim($lastEnv)) {
+                        $issue->setLastEnvironment(Issue::normalizeEnvironment($lastEnv));
+                    }
+                }
+            }
+
             ++$updated;
         }
+
         if ($updated > 0) {
             $this->entityManager->flush();
         }
 
         return $updated;
+    }
+
+    /**
+     * @param list<int> $issueIds
+     *
+     * @return array<int, string>
+     */
+    private function fetchFirstReleasesByIssueIds(array $issueIds): array
+    {
+        if ([] === $issueIds) {
+            return [];
+        }
+
+        $connection = $this->entityManager->getConnection();
+        $placeholders = implode(',', array_fill(0, \count($issueIds), '?'));
+
+        /** @var list<array{issue_id: int|string, release_version: string}> $rows */
+        $rows = $connection->fetchAllAssociative(
+            "SELECT issue_id, release_version FROM (
+                SELECT issue_id, release_version,
+                       ROW_NUMBER() OVER (PARTITION BY issue_id ORDER BY received_at ASC, id ASC) AS rn
+                FROM event
+                WHERE issue_id IN ($placeholders)
+                  AND release_version IS NOT NULL
+                  AND TRIM(release_version) <> ''
+             ) ranked WHERE rn = 1",
+            $issueIds,
+        );
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['issue_id']] = $row['release_version'];
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param list<int> $issueIds
+     *
+     * @return array<int, array{release_version: ?string, environment: ?string}>
+     */
+    private function fetchLastMetaByIssueIds(array $issueIds): array
+    {
+        if ([] === $issueIds) {
+            return [];
+        }
+
+        $connection = $this->entityManager->getConnection();
+        $placeholders = implode(',', array_fill(0, \count($issueIds), '?'));
+
+        /** @var list<array{issue_id: int|string, release_version: ?string, environment: ?string}> $rows */
+        $rows = $connection->fetchAllAssociative(
+            "SELECT issue_id, release_version, environment FROM (
+                SELECT issue_id, release_version, environment,
+                       ROW_NUMBER() OVER (PARTITION BY issue_id ORDER BY received_at DESC, id DESC) AS rn
+                FROM event
+                WHERE issue_id IN ($placeholders)
+             ) ranked WHERE rn = 1",
+            $issueIds,
+        );
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['issue_id']] = [
+                'release_version' => $row['release_version'],
+                'environment' => $row['environment'],
+            ];
+        }
+
+        return $map;
     }
 
     /**

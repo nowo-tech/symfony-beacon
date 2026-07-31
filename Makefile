@@ -94,7 +94,7 @@ up:
 	@echo "Building frontend assets (static public/build/)…"
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
-	@echo "Optional local SMTP: make mailpit  (see docs/MAILPIT.md)"
+	@echo "Optional local SMTP: make mailpit  (see docs/ops/MAILPIT.md)"
 
 classic:
 	@test -f .env || cp .env.dist .env
@@ -138,7 +138,7 @@ pnpm:
 	docker compose exec -T php pnpm $(ARGS)
 
 # Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
-# Docs: docs/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
+# Docs: docs/ops/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
 mailpit:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	docker compose --profile mail up -d mailer
@@ -149,7 +149,7 @@ mailpit:
 	echo "  UI:   http://localhost:$${UI_PUB}"; \
 	echo "  SMTP (from PHP container): smtp://mailer:1025"; \
 	echo "  Save that DSN under Administration → Mailer, then use Send sample email."; \
-	echo "  Docs: docs/MAILPIT.md"
+	echo "  Docs: docs/ops/MAILPIT.md"
 
 mailpit-logs:
 	docker compose --profile mail logs -f mailer

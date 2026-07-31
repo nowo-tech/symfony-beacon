@@ -3,13 +3,13 @@
 1. Follow Spec-Driven Development (see `.specify/memory/constitution.md`).
 2. Open or update a feature under `specs/NNN-name/` before large changes.
 3. Prefer official [`nowo-tech/*`](https://packagist.org/packages/nowo-tech/) kits (AuthKit, UserKit, AuditKit, cookie consent, …) over reinventing auth/user/legal UX — see `.cursor/rules/nowo-tech-kits-and-legal.mdc`.
-4. Keep application code FrankenPHP **worker-safe** (`docs/FRANKENPHP-CODING.md`).
+4. Keep application code FrankenPHP **worker-safe** (`docs/ops/FRANKENPHP-CODING.md`).
 5. Read [docs/ARCHITECTURE.md](ARCHITECTURE.md) before proposing structural changes (modular Symfony vs DDD, ingest vs UI boundaries).
 6. Add PHPUnit coverage for behavior changes. Analytics (`tests/Analytics/`) and Performance (`tests/Performance/`) access tests are part of the default suite (`make test` / CI `vendor/bin/phpunit`) — do not exclude those directories. For a local HTML/Clover report: `make test-coverage` (writes `var/coverage/clover.xml` and `var/coverage-html/`). CI runs a separate **Coverage** job (PCOV) that uploads those artifacts; it does **not** require 100% coverage. Optional soft gate: set `COVERAGE_MIN` (statement percent, e.g. `40`) for `make test-coverage` or in `.github/workflows/ci.yml` — unset means informational only (see `specs/033-coverage-ci/`).
 7. Frontend: TypeScript + SCSS + Tailwind 4 under `assets/` (do not put Tailwind `@apply` inside SCSS).
 8. Run `make test` (and ideally `make qa`) before opening a PR. CI also runs **Gitleaks** (`make secrets-scan`) and fails if committed secrets are detected — never commit `.env`, Halite keys, or real API tokens (see [SECURITY.md](../SECURITY.md)).
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
-10. Public-facing UI must include legal pages and cookie consent (`docs/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
+10. Public-facing UI must include legal pages and cookie consent (`docs/product/LEGAL-AND-COOKIES.md`, `nowo-tech/cookie-consent-bundle`) when adding cookies, analytics, or marketing surfaces.
 11. Dependency bumps: run `make composer-outdated` ([`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper)) and apply suggested exact pins carefully (Symfony Flex `extra.symfony.require` stays `8.1.*`).
 12. New Doctrine migrations MUST use [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) MDK definitions (`CreateTablesService` + `AppliesMdkDefinition` / `migrations/FieldDictionary/`). Prefer idempotent declarative tables/columns over raw `CREATE TABLE` SQL.
 13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
@@ -51,18 +51,20 @@ Use path only while developing; remove before release so Packagist pins stay aut
 
 ## Documentation map
 
+See the categorized index: [README.md](README.md).
+
 | Doc | Audience |
 |-----|----------|
 | [INSTALL.md](INSTALL.md) | First install + seed layers (platform / demo / sample) |
 | [README.md](../README.md) | Product overview + quick start |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Why modular Symfony / flows |
-| [ROLES.md](ROLES.md) | Instance `ROLE_*` vs project membership roles |
+| [ROLES.md](product/ROLES.md) | Instance `ROLE_*` vs project membership roles |
 | [API.md](API.md) | Ingest, health, OpenAPI pointer |
 | [DSN.md](DSN.md) | Client DSN + auth |
-| [NOTIFICATIONS.md](NOTIFICATIONS.md) | Outbound channels |
+| [NOTIFICATIONS.md](product/NOTIFICATIONS.md) | Outbound channels |
 | [PRODUCTION.md](PRODUCTION.md) | Self-host ops |
 | [ROADMAP.md](ROADMAP.md) / [CHANGELOG.md](CHANGELOG.md) / [UPGRADING.md](UPGRADING.md) | Plan / history / upgrades |
-| [LEGAL-AND-COOKIES.md](LEGAL-AND-COOKIES.md) / [ADDING-LOCALES.md](ADDING-LOCALES.md) | Compliance / i18n |
+| [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md) / [ADDING-LOCALES.md](dev/ADDING-LOCALES.md) | Compliance / i18n |
 | `specs/NNN-*` | Feature SDD artifacts |
 
 ## Issues and pull requests
@@ -128,7 +130,7 @@ Public AuthKit URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.i
 
 Guest language: path switcher or `GET|POST /locale/{locale}` (session). Signed-in users: `preferredLocale` via `POST /account/locale/{locale}`. Enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`. `.env.dist` defaults to `en`; this project’s local `.env` may use `es`.
 
-**Full operator/developer manual:** [ADDING-LOCALES.md](ADDING-LOCALES.md) (enable config lists, catalogues, security regexes, seeders, tests, smoke checklist).
+**Full operator/developer manual:** [ADDING-LOCALES.md](dev/ADDING-LOCALES.md) (enable config lists, catalogues, security regexes, seeders, tests, smoke checklist).
 
 ## HTTP error pages
 

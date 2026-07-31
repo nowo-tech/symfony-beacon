@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation layout: secondary manuals moved under `docs/product/`, `docs/ops/`, and `docs/dev/`; canonical guides stay at `docs/` root. Index: [README.md](README.md).
+
 ## [1.0.0] - 2026-07-31
 
 First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade from **0.17.0** is additive (migrations + Composer). Enterprise SSO/SAML, WebAuthn, and QR SMS OTP remain ROADMAP **Later**.
 
 ### Added
 
-- **Inbound email → issue comment** (`076-inbound-email-comment`, Fixes #42): opt-in webhook `POST /hooks/email/inbound`; Reply-To tokens on mention/assign mail; shared `IssueCommentCreator`; Message-ID idempotency. See [INBOUND-EMAIL.md](INBOUND-EMAIL.md).
+- **Inbound email → issue comment** (`076-inbound-email-comment`, Fixes #42): opt-in webhook `POST /hooks/email/inbound`; Reply-To tokens on mention/assign mail; shared `IssueCommentCreator`; Message-ID idempotency. See [INBOUND-EMAIL.md](product/INBOUND-EMAIL.md).
 - **QR login image** (`075-qr-png`, Fixes #40): AuthKit **1.12.1** + `endroid/qr-code`; QR show pages render PNG (with GD) or SVG data-URI. SMS OTP remains Later.
 - **OTLP metrics ingest** (`074-otlp-metrics`, Fixes #38): `POST /api/{projectId}/otlp/v1/metrics` accepts OTLP ExportMetricsServiceRequest JSON; failure-like data points map to Beacon events via the Envelope worker; same auth/governance as OTLP logs/traces; cap 200.
 - **Teams Assign to me** (`073-teams-assign-openuri`, Fixes #36): MessageCard **OpenUri Assign to me** when a destination signing secret is set; `GET /hooks/teams/assign-me` validates HMAC, requires Beacon login + triage, assigns via `IssueAssigneeChanger` (`via: teams`).
@@ -39,7 +43,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Added
 
-- **Local Mailpit** (`066-local-mailpit`): optional Compose profile `mail` + `make mailpit` / `make mailpit-logs` for catching SMTP in development; docs [MAILPIT.md](MAILPIT.md). Not started by `make up`; not in `compose.prod.yaml`.
+- **Local Mailpit** (`066-local-mailpit`): optional Compose profile `mail` + `make mailpit` / `make mailpit-logs` for catching SMTP in development; docs [MAILPIT.md](ops/MAILPIT.md). Not started by `make up`; not in `compose.prod.yaml`.
 - **Mailer DSN change audit** (`6.15`, Fixes #18): Admin Mailer save/clear records `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets); `MailerDsnValidator` scheme allowlist (`smtp`/`smtps`/sendmail/native + common provider schemes).
 - **Ops defaults in database**: retention, ingest rate, daily/monthly quotas, delivery-history size, and notification circuit-breaker settings under **Administration → Ops defaults**; migration `Version20260731170000`; included in instance config export v2.
 - **Social login admin** (extends `060`): OAuth provider credentials managed in Administration → Social login (`auth_kit_social_credential`); replaces env/`app:seed-social-login` bootstrap.
@@ -137,7 +141,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
   - **1.3.x:** `bootstrap_mode` (guided admin vs full SQL dump), profile `full_database`, `when_answer` filters, `advance_mode`, optional YAML `tabs` + checkers
   - **1.4–1.5:** `setup.layout_template` + `panel.layout_template` (`kit/site_backup_*_layout.html.twig`); Twig globals; vendor reasons + DB connection UX; restyle via `.nowo-site-backup-*` / `.nowo-ui-*`
 - **Dogfooding** (`058`): require `nowo-tech/beacon-bundle`; `config/packages/nowo_beacon.yaml`; `make ready`; demo seed writes loopback `BEACON_DSN` when empty; stable demo secret; `DropSelfIngestBeforeSend` anti-loop
-- **AI issue export** (`059`): `beacon-ai-export/v1` Markdown/JSON per issue; Copy for AI + downloads; [docs/AI-EXPORT.md](AI-EXPORT.md)
+- **AI issue export** (`059`): `beacon-ai-export/v1` Markdown/JSON per issue; Copy for AI + downloads; [docs/product/AI-EXPORT.md](product/AI-EXPORT.md)
 - Cookie Consent admin Web UI (`web_ui` + `kit/cookie_consent_admin_layout.html.twig`, ROLE_ADMIN)
 - Dev: `nowo-tech/phpstan-frankenphp` (`ruleset-classic` + `ruleset-worker` + `ruleset-hardening` in `phpstan.neon.dist`)
 
@@ -193,7 +197,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Added
 
-- Database schema documentation with Mermaid ER diagrams: [DATABASE.md](DATABASE.md)
+- Database schema documentation with Mermaid ER diagrams: [DATABASE.md](dev/DATABASE.md)
 - Platform seed (`app:seed-platform` / Setup platform step) also seeds cookie consent profile + inventory (`CookieConsentDemoSeeder`); `use_database_config: true`
 
 ### Changed
@@ -210,7 +214,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Added
 
-- Mercure hub (Compose + Caddy `/.well-known/mercure`) for **optional** live member alerts when a **new issue** is created on an associated project — enable under **Administration → Mercure** (off by default; URL/JWT from UI or `MERCURE_*` env); operator manual [MERCURE.md](MERCURE.md)
+- Mercure hub (Compose + Caddy `/.well-known/mercure`) for **optional** live member alerts when a **new issue** is created on an associated project — enable under **Administration → Mercure** (off by default; URL/JWT from UI or `MERCURE_*` env); operator manual [MERCURE.md](ops/MERCURE.md)
 - Optional PWA / browser **Web Push** (VAPID) opt-in under **Account → Display**; encrypted `push_subscription` storage and Messenger fan-out (`DeliverWebPushForProjectMessage`); service worker push handlers appended to `nowo-tech/pwa-bundle` SW
 - Account → Display **product tours** card: per-tour enable/disable with Select all (`nowo-tech/select-all-choice-bundle`)
 - Sample seed (`app:seed-sample` / Setup sample actions) enables Mercure with `MERCURE_*` env defaults when instance fields are empty
@@ -282,7 +286,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 ### Added
 
 - Administration → **Mailer**: store Symfony `MAILER_DSN` encrypted in `instance_settings` (Halite / doctrine-encrypt-bundle) with optional From address; runtime mailer prefers DB over env fallback (`034-encrypted-mailer-dsn`)
-- Developer manual **[Adding a UI language](ADDING-LOCALES.md)** (enable locales, catalogues, security, seeders, tests)
+- Developer manual **[Adding a UI language](dev/ADDING-LOCALES.md)** (enable locales, catalogues, security, seeders, tests)
 - Account → Display: **font scale**, **contrast**, and **sidebar** default preferences (theme boot + CSS)
 - Admin → Users / Groups: AuditKit **created / updated** timestamps and **created by / updated by** meta
 - Account → Security: password **generator** (PasswordStrength modal) and **password-change history** dates from `password_history`
@@ -533,7 +537,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - **Ingest rate limit** per project (`BEACON_INGEST_RATE_LIMIT`, HTTP 429)
 - Public **health probes** `GET /health/live` and `GET /health/ready` (DB + Messenger queue depth)
 - Login throttling via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle)
-- Docs: [product roadmap](ROADMAP.md), [notifications](NOTIFICATIONS.md), [architecture](ARCHITECTURE.md); expanded [production](PRODUCTION.md)
+- Docs: [product roadmap](ROADMAP.md), [notifications](product/NOTIFICATIONS.md), [architecture](ARCHITECTURE.md); expanded [production](PRODUCTION.md)
 - Demo bootstrap: `make bootstrap` (migrate + seed); `app:seed-demo` writes `.demo-client.env` for BeaconBundle `make sync-beacon`
 - Demo seed samples: performance N+1 (`demo.nplus1.products`) and a 14-day analytics window
 
@@ -545,7 +549,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Removed
 
-- `symfony/ux-turbo` and `symfony/ux-native` (Hotwire Native shell). Prefer the PWA (`nowo-tech/pwa-bundle`); see [NATIVE-MOBILE.md](NATIVE-MOBILE.md)
+- `symfony/ux-turbo` and `symfony/ux-native` (Hotwire Native shell). Prefer the PWA (`nowo-tech/pwa-bundle`); see [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md)
 
 ### Fixed
 
@@ -588,14 +592,14 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Added
 
-- Rich event context: microsecond `event_timestamp` / `received_at`, promoted `php_version` / `symfony_version` / `user_identifier`, structured event detail UI (`docs/EVENT-CONTEXT.md`, spec `010-rich-event-context`)
+- Rich event context: microsecond `event_timestamp` / `received_at`, promoted `php_version` / `symfony_version` / `user_identifier`, structured event detail UI (`docs/product/EVENT-CONTEXT.md`, spec `010-rich-event-context`)
 - Event detail UI renders `breadcrumbs.values` from Envelope payloads (BeaconBundle `addBreadcrumb`)
 - Project **Settings** (`/projects/{id}/settings`): API keys / DSN, members, danger zone
 - Project danger zone: clear history (owner/admin) and delete project with typed name confirmation (owner) — spec `011-project-danger-zone`
 - Human-friendly API key labels and public keys (`calm-otter-a3f2…`) with Suggest name control
 - Project section nav (Issues / Performance / Analytics / Settings); opening a project lands on Issues
-- Symfony UX Native + Turbo for Hotwire Native shells (`docs/NATIVE-MOBILE.md`)
-- Public legal pages + cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) (`docs/LEGAL-AND-COOKIES.md`)
+- Symfony UX Native + Turbo for Hotwire Native shells (`docs/dev/NATIVE-MOBILE.md`)
+- Public legal pages + cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) (`docs/product/LEGAL-AND-COOKIES.md`)
 - Main nav / breadcrumbs / forms / PWA via Nowo kits (`dashboard-menu`, `breadcrumb-kit`, `form-kit`, `pwa-bundle`)
 - Account preferences split: `/account/profile`, `/account/security`, `/account/display`
 - Appearance settings for admins; admin hub at `/admin`

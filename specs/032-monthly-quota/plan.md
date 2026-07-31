@@ -31,5 +31,5 @@ Mirror daily quota (`018`) with a nullable `event_quota_monthly` override and en
 2. `ProjectGovernanceResolver` monthly helpers
 3. EnvelopeController / ProcessEnvelopeHandler
 4. Settings Twig + saveGovernance + approaching flash
-5. i18n, UPGRADING, CHANGELOG, ROADMAP, DATABASE.md
+5. i18n, UPGRADING, CHANGELOG, ROADMAP, docs/dev/DATABASE.md
 6. PHPUnit

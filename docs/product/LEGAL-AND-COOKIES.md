@@ -132,4 +132,4 @@ Operators should mention these controls and event retention in `/legal/privacy` 
 ## References
 
 - Bundle docs: [CONFIGURATION](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/CONFIGURATION.md), [USAGE](https://github.com/nowo-tech/CookieConsentBundle/blob/main/docs/USAGE.md)
-- Mobile / PWA note: [docs/NATIVE-MOBILE.md](NATIVE-MOBILE.md)
+- Mobile / PWA note: [NATIVE-MOBILE.md](../dev/NATIVE-MOBILE.md)

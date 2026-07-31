@@ -30,4 +30,4 @@ As a developer, the codebase uses modular Symfony packages and Security is regis
 - Constitution updated for the product mission and Envelope compatibility
 - Tailwind via Vite (TypeScript/SCSS asset pipeline)
 - Security + AuthKit login surface enabled (locale-prefixed canonical URLs; bare `/login` redirects via `DEFAULT_LOCALE`)
-- Docs, specs, and PHPDoc in English; UI may be translated (`DEFAULT_LOCALE` / `en` default, see `docs/CONTRIBUTING.md` and `docs/ADDING-LOCALES.md`)
+- Docs, specs, and PHPDoc in English; UI may be translated (`DEFAULT_LOCALE` / `en` default, see `docs/CONTRIBUTING.md` and `docs/dev/ADDING-LOCALES.md`)

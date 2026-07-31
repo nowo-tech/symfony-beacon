@@ -17,6 +17,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
@@ -49,6 +50,7 @@ final class AdminProjectController extends AbstractController
 
     public function __construct(
         private readonly ProjectRepository $projectRepository,
+        private readonly ProjectMembershipRepository $membershipRepository,
         private readonly UserGroupRepository $userGroupRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
         private readonly NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
@@ -610,25 +612,20 @@ final class AdminProjectController extends AbstractController
 
     private function countOwners(Project $project): int
     {
-        $count = 0;
-        foreach ($project->getMemberships() as $membership) {
-            if (ProjectRole::Owner === $membership->getRole()) {
-                ++$count;
-            }
-        }
-
-        return $count;
+        return $this->membershipRepository->count([
+            'project' => $project,
+            'role' => ProjectRole::Owner,
+        ]);
     }
 
     private function requireDirectMembership(Project $project, User $user): ProjectMembership
     {
-        foreach ($project->getMemberships() as $membership) {
-            if ($membership->getUser()->getId() === $user->getId()) {
-                return $membership;
-            }
+        $membership = $this->membershipRepository->findOneByProjectAndUser($project, $user);
+        if (!$membership instanceof ProjectMembership) {
+            throw $this->createNotFoundException();
         }
 
-        throw $this->createNotFoundException();
+        return $membership;
     }
 
     private function flashKeyForCode(string $code): string

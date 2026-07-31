@@ -9,6 +9,7 @@ use App\Identity\Entity\UserGroupMembership;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Shared\ProjectRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,6 +26,41 @@ class ProjectMembershipRepository extends ServiceEntityRepository
     public function findOneByProjectAndUser(Project $project, User $user): ?ProjectMembership
     {
         return $this->findOneBy(['project' => $project, 'user' => $user]);
+    }
+
+    /**
+     * Owner membership counts keyed by project id (one query; avoids N+1 in sole-owner checks).
+     *
+     * @param list<int> $projectIds
+     *
+     * @return array<int, int> project id => owner count
+     */
+    public function countOwnersByProjectIds(array $projectIds): array
+    {
+        if ([] === $projectIds) {
+            return [];
+        }
+
+        /** @var list<array{projectId: int|string, cnt: int|string}> $rows */
+        $rows = $this->createQueryBuilder('m')
+            ->select('IDENTITY(m.project) AS projectId, COUNT(m.id) AS cnt')
+            ->andWhere('m.project IN (:projectIds)')
+            ->andWhere('m.role = :role')
+            ->setParameter('projectIds', $projectIds)
+            ->setParameter('role', ProjectRole::Owner)
+            ->groupBy('m.project')
+            ->getQuery()
+            ->getResult();
+
+        $map = [];
+        foreach ($projectIds as $id) {
+            $map[$id] = 0;
+        }
+        foreach ($rows as $row) {
+            $map[(int) $row['projectId']] = (int) $row['cnt'];
+        }
+
+        return $map;
     }
 
     /**

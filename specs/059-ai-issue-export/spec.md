@@ -36,7 +36,7 @@ As a member inspecting a specific event on the issue, I can export that event in
 - **FR-002**: Include title/level/status/fingerprint, exception, stack frames, scrubbed request, tags, environment, release, breadcrumbs summary, counts, absolute issue URL.
 - **FR-003**: Scrub `Authorization`, `Cookie`, `Set-Cookie`, and similar sensitive headers; do not emit API secrets.
 - **FR-004**: Routes under issue show; same read ACL as viewing the issue; UI copy + download.
-- **FR-005**: Document format in `docs/AI-EXPORT.md`.
+- **FR-005**: Document format in `docs/product/AI-EXPORT.md`.
 
 ## Success Criteria
 
