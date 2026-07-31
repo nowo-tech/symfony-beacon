@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'settings.instance_config.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <p class="text-sm"><a class="text-[var(--color-moss)] no-underline hover:underline" href="{{ path('admin_hub') }}">{{ 'admin.hub.title'|trans }}</a></p>
+    <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'settings.instance_config.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'settings.instance_config.intro'|trans }}</p>
+</div>
+
+<section class="panel mb-6" data-testid="instance-config-export">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'settings.instance_config.export_title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'settings.instance_config.export_help'|trans }}</p>
+    <a class="btn-primary inline-block no-underline" href="{{ path('settings_instance_config_export') }}" data-testid="instance-config-download">{{ 'settings.instance_config.export'|trans }}</a>
+</section>
+
+<section class="panel" data-testid="instance-config-import">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'settings.instance_config.import_title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'settings.instance_config.import_help'|trans }}</p>
+    <form method="post" action="{{ path('settings_instance_config_import') }}" enctype="multipart/form-data" class="flex flex-wrap items-end gap-3">
+        <input type="hidden" name="_token" value="{{ csrf_token('instance_config_import') }}">
+        <label class="text-sm">
+            <span class="mb-1 block">{{ 'settings.instance_config.file'|trans }}</span>
+            <input class="input" type="file" name="config" accept="application/json,.json" required data-testid="instance-config-file">
+        </label>
+        <button type="submit" class="btn-primary" data-testid="instance-config-import-submit">{{ 'settings.instance_config.import'|trans }}</button>
+    </form>
+</section>
+{% endblock %}

@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.15.0** shipped; **CI coverage (`033`)** and **GDPR helpers (`043`)** Done Unreleased. **Next**: Planned `044` instance config export, then Bundle. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.15.0** shipped; **CI coverage (`033`)**, **GDPR (`043`)**, collaboration/API (`040`–`042`), and **instance config export (`044`)** Done Unreleased. **Next**: Bundle console/Monolog. No SaaS multi-tenant or SSO until specified.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -167,7 +167,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | Low | Web Push unsubscribe IDOR (endpoint hash without user scope) | member push | **Done** (v0.14.0) |
 | Info | Audit **Mailer DSN** changes in `UserAction`; optional Mailer scheme allowlist | extends `034` | **Later** |
 
-**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`042` Done Unreleased. **Next**: `044` + Bundle console/Monolog remain Planned.
+**Suggested patch order:** Security + `039` Done through **v0.15.0**; `033` + `043` + `040`–`044` Done Unreleased. **Next**: Bundle console/Monolog remain Planned.
 
 ### Done (v0.13.0 product — was Next)
 
@@ -212,18 +212,18 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Done** (Unreleased) |
 | 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Done** (Unreleased) |
 | 6.11 | **Read API + project tokens** | Beacon | `042-read-api-tokens` | **Done** (Unreleased) |
+| 6.12 | **Instance settings export/import** | Beacon | `044-instance-config-export` | **Done** (Unreleased) |
 
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.12 | **Instance settings export/import** | Beacon | `044-instance-config-export` | **Next** |
+| 6.13 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Next** |
 
 ### Planned (deferred until prioritized)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.13 | **BeaconBundle**: capture **console / cron** command failures + optional scheduled-task context | Bundle | — | **Planned** |
 | 6.14 | **BeaconBundle**: opt-in **Monolog** bridge (selected channels → Envelope events/breadcrumbs) | Bundle | — | **Planned** |
 
 ### Later (Phase 6+)
@@ -283,7 +283,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v0.14.0** | Prometheus (`038`) + security residual (Bearer-only metrics, guest locale redirect, Web Push unsubscribe scope, magic-login Continue, query-auth default reject, Telegram DNS pin, CSP/`theme-boot`) |
 | **v0.15.0** | Notification circuit breaker (`039`); CSP without script `unsafe-inline` + default HSTS; appearance palette; Tours/sidebar UX fixes |
 | **v0.16.0** | CI coverage soft gate (`033`) + GDPR export/anonymize (`043`) |
-| **Later** | Instance config export (`044`), Bundle console/Monolog; SSO/OIDC when specified |
+| **Later** | Bundle console/Monolog; SSO/OIDC when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -291,7 +291,7 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 
 ## How to work this roadmap
 
-1. Pull **Next** `044`, then Bundle console/Monolog when prioritized.
+1. Pull **Next** Bundle console/Monolog when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
 Last updated: 2026-07-31 (`033` + `043` Done Unreleased; Next = Planned backlog).

@@ -131,4 +131,10 @@ enum UserActionType: string
 
     /** Project share link opened (viewer grant applied). */
     case ProjectShareLinkOpened = 'project.share_link_opened';
+
+    /** Instance non-secret config JSON exported. */
+    case InstanceConfigExported = 'instance.config_exported';
+
+    /** Instance non-secret config JSON imported. */
+    case InstanceConfigImported = 'instance.config_imported';
 }
