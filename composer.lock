@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da5f3382d9c60d5bf6ea5b90977d7341",
+    "content-hash": "0c968c018cf200e8cf3b872a773f0cc4",
     "packages": [
         {
             "name": "brick/math",
@@ -1842,16 +1842,16 @@
         },
         {
             "name": "nowo-tech/auth-kit-bundle",
-            "version": "v1.11.4",
+            "version": "v1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/AuthKitBundle.git",
-                "reference": "7490822f82f1ca8807cbe78271763ff7a3cb634e"
+                "reference": "1d2e6f96e33b7ff684b7596c53fb2009f2d1e45b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/7490822f82f1ca8807cbe78271763ff7a3cb634e",
-                "reference": "7490822f82f1ca8807cbe78271763ff7a3cb634e",
+                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/1d2e6f96e33b7ff684b7596c53fb2009f2d1e45b",
+                "reference": "1d2e6f96e33b7ff684b7596c53fb2009f2d1e45b",
                 "shasum": ""
             },
             "require": {
@@ -1936,7 +1936,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-30T16:35:20+00:00"
+            "time": "2026-07-31T14:50:31+00:00"
         },
         {
             "name": "nowo-tech/beacon-bundle",

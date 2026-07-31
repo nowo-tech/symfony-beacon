@@ -73,6 +73,7 @@ final class AdminSocialLoginController extends AbstractController
             'client_id' => '',
             'client_secret' => '',
             'enabled' => true,
+            'enterprise_sso' => false,
             'authorize_url' => '',
             'token_url' => '',
             'userinfo_url' => '',
@@ -90,6 +91,7 @@ final class AdminSocialLoginController extends AbstractController
              *     client_id: string,
              *     client_secret: string,
              *     enabled: bool,
+             *     enterprise_sso: bool,
              *     authorize_url: string,
              *     token_url: string,
              *     userinfo_url: string,
@@ -144,6 +146,7 @@ final class AdminSocialLoginController extends AbstractController
             'client_id' => $credential->getClientId(),
             'client_secret' => '',
             'enabled' => $credential->isEnabled(),
+            'enterprise_sso' => $credential->isEnterpriseSso(),
             'authorize_url' => $credential->getAuthorizeUrl() ?? '',
             'token_url' => $credential->getTokenUrl() ?? '',
             'userinfo_url' => $credential->getUserinfoUrl() ?? '',
@@ -161,6 +164,7 @@ final class AdminSocialLoginController extends AbstractController
              *     client_id: string,
              *     client_secret: string,
              *     enabled: bool,
+             *     enterprise_sso: bool,
              *     authorize_url: string,
              *     token_url: string,
              *     userinfo_url: string,
@@ -218,6 +222,7 @@ final class AdminSocialLoginController extends AbstractController
      *     client_id: string,
      *     client_secret: string,
      *     enabled: bool,
+     *     enterprise_sso: bool,
      *     authorize_url: string,
      *     token_url: string,
      *     userinfo_url: string,
@@ -242,6 +247,7 @@ final class AdminSocialLoginController extends AbstractController
             $this->nullableUrl($data['userinfo_url']),
             $this->parseScopes($data['scopes']),
             flush: true,
+            enterpriseSso: (bool) $data['enterprise_sso'],
         );
     }
 

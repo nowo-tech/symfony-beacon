@@ -36,6 +36,7 @@ final readonly class SocialLoginCredentialSeeder
         ?string $userinfoUrl = null,
         array $scopes = [],
         bool $flush = true,
+        bool $enterpriseSso = false,
     ): SocialLoginCredential {
         $credential = $this->credentials->findOneByProvider($provider);
         if (!$credential instanceof SocialLoginCredential) {
@@ -48,6 +49,7 @@ final readonly class SocialLoginCredentialSeeder
             ->setClientId($clientId)
             ->setClientSecret($clientSecret)
             ->setEnabled($enabled)
+            ->setEnterpriseSso($enterpriseSso)
             ->setAuthorizeUrl($authorizeUrl)
             ->setTokenUrl($tokenUrl)
             ->setUserinfoUrl($userinfoUrl)

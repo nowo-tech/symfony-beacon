@@ -60,6 +60,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $slackUserId = null;
 
+    /**
+     * E.164-ish phone for AuthKit QR login approval ({@see phoneVerifiedAt}).
+     */
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $phone = null;
+
+    /** When set, AuthKit QR login treats {@see $phone} as verified. */
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $phoneVerifiedAt = null;
+
     /** @var list<string> */
     #[ORM\Column]
     private array $roles = [];
@@ -216,6 +226,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
         $trimmed = trim($slackUserId);
         $this->slackUserId = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        if (null === $phone) {
+            $this->phone = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($phone);
+        $this->phone = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getPhoneVerifiedAt(): ?DateTimeImmutable
+    {
+        return $this->phoneVerifiedAt;
+    }
+
+    public function setPhoneVerifiedAt(?DateTimeImmutable $phoneVerifiedAt): self
+    {
+        $this->phoneVerifiedAt = $phoneVerifiedAt;
 
         return $this;
     }

@@ -87,6 +87,14 @@ final class AccountPreferencesController extends AbstractController
                 }
             }
 
+            $phone = $user->getPhone();
+            if (null === $phone || '' === $phone) {
+                $user->setPhoneVerifiedAt(null);
+            } else {
+                // Interim: treat self-saved phone as verified until SMS OTP ships.
+                $user->setPhoneVerifiedAt(new DateTimeImmutable());
+            }
+
             $this->entityManager->flush();
             $this->addFlash('success', 'flash.preferences.profile_saved');
 

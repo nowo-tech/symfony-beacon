@@ -95,6 +95,8 @@ final readonly class AccountDataExporter
                 'email' => $user->getEmail(),
                 'display_name' => $user->getDisplayName(),
                 'slack_user_id' => $user->getSlackUserId(),
+                'phone' => $user->getPhone(),
+                'phone_verified_at' => $this->formatDate($user->getPhoneVerifiedAt()),
                 'roles' => array_values(array_filter(
                     $user->getRoles(),
                     static fn (string $role): bool => 'ROLE_USER' !== $role,

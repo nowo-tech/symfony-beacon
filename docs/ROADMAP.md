@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.22** OTLP + Slack/Teams Resolve Done. **6.23** Slack Assign-to-me + user mapping Done (`071`). **Next**: Later Phase 6+ (SSO / OTLP metrics / inbound email / Teams Assign) when prioritized. No SaaS multi-tenant or SSO until specified.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.23** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / OTLP metrics / inbound email / Teams Assign / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -269,11 +269,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | — | Pull from Later (SSO / OTLP metrics / inbound email / Teams Assign) when prioritized | Beacon | — | **Next** |
 
+### Done (AuthKit 1.12 foundation)
+
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | **SSO/SAML/OIDC** via AuthKit | Beacon | — | **Later** |
-| — | **QR phone login** (AuthKit design; runtime not shipped) | AuthKit / Beacon | — | **Later** |
-| — | **WebAuthn / passkeys** if AuthKit supports | Beacon | — | **Later** |
+| 6.24 | **AuthKit 1.12.0** bump + QR login foundation (phone fields, routes, enterprise SSO admin flag) | Beacon | `072-authkit-1.12` | **Done** |
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| — | **SSO/SAML/OIDC** via AuthKit (SAML still Later; OIDC enterprise flag shipped in 1.12 / `072`) | Beacon | — | **Later** (OIDC ready) |
+| — | **QR phone login** polish (SMS OTP verify, QR PNG generator) | Beacon | extends `072` | **Later** |
+| — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
 | — | **OTLP metrics** (+ gRPC / Bundle exporter / full Performance waterfall from traces) | Beacon (+ optional Bundle) | extends `067`/`070` | **Later** |
 | — | Teams **Assign** / Teams→member mapping | Beacon | extends `069`/`071` | **Later** |
 | — | **Inbound email → issue comment** | Beacon | — | **Later** |

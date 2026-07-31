@@ -756,6 +756,9 @@ social_login_credential:
     enabled:
         label: Enabled
         help: Disabled providers stay in the database but do not show on login.
+    enterprise_sso:
+        label: Enterprise SSO
+        help: Show under “Sign in with your organization” instead of consumer social buttons (OIDC IdPs).
     authorize_url:
         label: Authorize URL
         help: Optional for built-in providers; required for custom IdPs.
@@ -1067,6 +1070,8 @@ preferences:
         role_member: Member
         slack_user_id: Slack user ID
         slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
+        phone: Phone number
+        phone_help: 'Optional. Required for Sign in with phone (QR). Saving a number marks it verified for QR approval until SMS OTP is available.'
         projects_title: Your projects
         projects_intro: Projects you can open through a direct membership.
         projects_empty: You are not a direct member of any project yet.

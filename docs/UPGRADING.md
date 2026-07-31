@@ -55,6 +55,8 @@ pnpm install
 make vite-build
 ```
 
+Requires **AuthKit 1.12.0**. Migration `Version20260731200000` adds `auth_kit_qr_login_challenge`, `auth_kit_social_credential.enterprise_sso`, and `app_user.phone` / `phone_verified_at`. QR login is enabled in `nowo_auth_kit.yaml`; users set a phone on Account → Profile. Mark OIDC IdPs as **Enterprise SSO** in Administration → Social login when they should appear under the organization heading.
+
 ## Upgrading from 0.16.0 to 0.17.0
 
 ```bash

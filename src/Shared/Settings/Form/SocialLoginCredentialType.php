@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints\Regex;
  *     client_id: string,
  *     client_secret: string,
  *     enabled: bool,
+ *     enterprise_sso: bool,
  *     authorize_url: string,
  *     token_url: string,
  *     userinfo_url: string,
@@ -80,6 +81,11 @@ final class SocialLoginCredentialType extends AbstractType
             ->add('enabled', CheckboxType::class, [
                 'label' => 'social_login_credential.enabled.label',
                 'help' => 'social_login_credential.enabled.help',
+                'required' => false,
+            ])
+            ->add('enterprise_sso', CheckboxType::class, [
+                'label' => 'social_login_credential.enterprise_sso.label',
+                'help' => 'social_login_credential.enterprise_sso.help',
                 'required' => false,
             ])
             ->add('authorize_url', UrlType::class, [
