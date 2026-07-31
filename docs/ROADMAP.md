@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / inbound email / QR polish) when prioritized.
+Focus: **v0.17.0** shipped Mailer DSN audit (`6.15`), local Mailpit (`6.16`), Ops defaults in DB, and Social login admin UI. **6.19**–**6.25** OTLP + Slack/Teams Resolve/Assign Done. **6.24** AuthKit **1.12.0** + QR foundation Done (`072`). **Next**: Later Phase 6+ (SAML / WebAuthn / inbound email / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -275,11 +275,17 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.26 | **OTLP metrics ingest** (HTTP JSON ExportMetricsServiceRequest → failure-like data points → Beacon events; same DSN auth; cap 200) | Beacon | `074-otlp-metrics` | **Done** |
 
+### Done (QR login image)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.27 | **QR login image** (AuthKit 1.12.1 + `endroid/qr-code`; PNG with GD else SVG) | Beacon | `075-qr-png` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / inbound email / QR polish) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / inbound email / QR SMS OTP) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)
 
@@ -290,7 +296,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | — | **SSO/SAML/OIDC** via AuthKit (SAML still Later; OIDC enterprise flag shipped in 1.12 / `072`) | Beacon | — | **Later** (OIDC ready) |
-| — | **QR phone login** polish (SMS OTP verify, QR PNG generator) | Beacon | extends `072` | **Later** |
+| — | **QR SMS OTP** verify (`phone_otp` / notifiers; image shipped in `075` / 6.27) | Beacon | extends `072`/`075` | **Later** |
 | — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
 | — | OTLP gRPC / protobuf / Bundle exporter / Performance TSDB (HTTP JSON metrics shipped in `074` / 6.26) | Beacon (+ optional Bundle) | extends `074` | **Later** |
 | — | Teams→member mapping / Adaptive Cards (OpenUri Assign shipped in `073` / 6.25) | Beacon | extends `073` | **Later** |
@@ -355,4 +361,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (6.26 OTLP metrics Done; Next = Later Phase 6+).
+Last updated: 2026-07-31 (6.27 QR login image Done; Next = Later Phase 6+).
