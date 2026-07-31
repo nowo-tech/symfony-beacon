@@ -96,6 +96,8 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/hooks/slack
       roles: PUBLIC_ACCESS
+    - path: ^/hooks/teams
+      roles: PUBLIC_ACCESS
     - path: ^/api/doc
       roles: ROLE_ADMIN
     # SiteBackupBundle: cold-start setup + panel (panel uses its own password gate)

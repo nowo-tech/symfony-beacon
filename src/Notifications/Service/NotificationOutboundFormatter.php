@@ -7,6 +7,7 @@ namespace App\Notifications\Service;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use InvalidArgumentException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Builds type-specific outbound request bodies / addresses for notification delivery.
@@ -16,6 +17,12 @@ use InvalidArgumentException;
  */
 final class NotificationOutboundFormatter
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly InteractionActionToken $actionToken,
+    ) {
+    }
+
     /**
      * @param array<string, mixed> $payload
      *
@@ -43,7 +50,7 @@ final class NotificationOutboundFormatter
             ],
             NotificationDestinationType::Teams => [
                 'url' => $endpoint,
-                'json' => $this->teamsMessageCard($payload, $summary),
+                'json' => $this->teamsMessageCard($payload, $summary, $destination),
             ],
             NotificationDestinationType::Telegram => $this->telegramRequest($endpoint, $this->plainTextBody($payload, $summary)),
             NotificationDestinationType::Http => [
@@ -228,7 +235,7 @@ final class NotificationOutboundFormatter
      *
      * @return array<string, mixed>
      */
-    private function teamsMessageCard(array $payload, string $summary): array
+    private function teamsMessageCard(array $payload, string $summary, ?NotificationDestination $destination): array
     {
         $facts = [];
         foreach ($this->factFields($payload) as $field) {
@@ -249,18 +256,83 @@ final class NotificationOutboundFormatter
             'potentialAction' => [],
         ];
 
+        $actions = [];
         if (isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']) {
-            $card['potentialAction'] = [[
+            $actions[] = [
                 '@type' => 'OpenUri',
                 'name' => 'Open in Beacon',
                 'targets' => [[
                     'os' => 'default',
                     'uri' => $payload['url'],
                 ]],
-            ]];
+            ];
         }
 
+        $resolve = $this->teamsResolveHttpPost($payload, $destination);
+        if (null !== $resolve) {
+            $actions[] = $resolve;
+        }
+
+        $card['potentialAction'] = $actions;
+
         return $card;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>|null
+     */
+    private function teamsResolveHttpPost(array $payload, ?NotificationDestination $destination): ?array
+    {
+        if (!$destination instanceof NotificationDestination || !$destination->hasSigningSecret()) {
+            return null;
+        }
+
+        if (true === ($payload['test'] ?? false)) {
+            return null;
+        }
+
+        $event = (string) ($payload['event'] ?? '');
+        if (!\in_array($event, ['issue.new', 'issue.regression', 'issue.reopened'], true)) {
+            return null;
+        }
+
+        $project = $payload['project'] ?? null;
+        $issue = $payload['issue'] ?? null;
+        if (!\is_array($project) || !\is_array($issue)) {
+            return null;
+        }
+
+        $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
+        $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
+        $destinationUuid = $destination->getUuid();
+        if ('' === $projectUuid || '' === $issueUuid || '' === $destinationUuid) {
+            return null;
+        }
+
+        $token = $this->actionToken->issueResolveToken(
+            (string) $destination->getSigningSecret(),
+            $destinationUuid,
+            $projectUuid,
+            $issueUuid,
+        );
+
+        $target = $this->urlGenerator->generate('hooks_teams_actions', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return [
+            '@type' => 'HttpPOST',
+            'name' => 'Resolve',
+            'target' => $target,
+            'body' => json_encode($token, \JSON_THROW_ON_ERROR),
+            'bodyContentType' => 'application/json',
+            'headers' => [
+                [
+                    'name' => 'Content-Type',
+                    'value' => 'application/json',
+                ],
+            ],
+        ];
     }
 
     /**

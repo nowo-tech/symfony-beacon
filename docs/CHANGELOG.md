@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Teams interactive Resolve** (`069-teams-interactive-actions`, Fixes #26): MessageCard HttpPOST **Resolve** when a destination signing secret is set; `POST /hooks/teams/actions` verifies HMAC token (7-day expiry) and resolves via `IssueStatusChanger` (`via: teams`).
 - **Slack interactive Resolve** (`068-slack-interactive-actions`, Fixes #24): optional encrypted Slack signing secret on notification destinations; Block Kit **Resolve** on issue alerts; `POST /hooks/slack/interactions` verifies `X-Slack-Signature` and resolves via shared `IssueStatusChanger`.
 - **OTLP logs ingest** (`067-otlp-ingest`, Fixes #20): `POST /api/{projectId}/otlp/v1/logs` accepts OTLP ExportLogsServiceRequest JSON; WARN+ LogRecords map to Beacon events via the Envelope worker; same `X-Beacon-Auth` / rate / quota / size limits; query auth rejected; dogfood `before_send` also drops `/otlp/` paths.
 

@@ -121,7 +121,7 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Issue not found', Response::HTTP_NOT_FOUND);
         }
 
-        $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, null);
+        $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, null, 'slack');
         // Ensure any no-op still clears EM state cleanly (changer flushes on change).
         if (!$changed) {
             $this->entityManager->clear();

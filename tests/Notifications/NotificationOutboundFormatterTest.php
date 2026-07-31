@@ -6,15 +6,29 @@ namespace App\Tests\Notifications;
 
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
+use App\Notifications\Service\InteractionActionToken;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class NotificationOutboundFormatterTest extends TestCase
 {
+    private function formatter(): NotificationOutboundFormatter
+    {
+        $urls = $this->createMock(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturnCallback(
+            static fn (string $name): string => 'hooks_teams_actions' === $name
+                ? 'https://beacon.test/hooks/teams/actions'
+                : 'https://beacon.test/',
+        );
+
+        return new NotificationOutboundFormatter($urls, new InteractionActionToken());
+    }
+
     public function testFormatsDiscordTeamsTelegramAndHttp(): void
     {
-        $formatter = new NotificationOutboundFormatter();
+        $formatter = $this->formatter();
         $payload = [
             'event' => 'issue.new',
             'summary' => 'Boom',
@@ -36,6 +50,7 @@ final class NotificationOutboundFormatterTest extends TestCase
         self::assertSame('MessageCard', $teams['json']['@type']);
         self::assertSame('Boom', $teams['json']['text']);
         self::assertNotEmpty($teams['json']['sections'][0]['facts']);
+        self::assertSame('OpenUri', $teams['json']['potentialAction'][0]['@type']);
 
         $telegram = $formatter->httpRequest(NotificationDestinationType::Telegram, '123:ABC@-10042', $payload);
         self::assertSame('https://api.telegram.org/bot123:ABC/sendMessage', $telegram['url']);
@@ -49,7 +64,7 @@ final class NotificationOutboundFormatterTest extends TestCase
 
     public function testFormatsSlackSampleWithAttachment(): void
     {
-        $formatter = new NotificationOutboundFormatter();
+        $formatter = $this->formatter();
         $payload = [
             'event' => 'test',
             'summary' => '[TEST] Slack sample',
@@ -73,7 +88,7 @@ final class NotificationOutboundFormatterTest extends TestCase
 
     public function testAddsSlackResolveBlockWhenSigningSecretPresent(): void
     {
-        $formatter = new NotificationOutboundFormatter();
+        $formatter = $this->formatter();
         $destination = new NotificationDestination();
         $destination->setType(NotificationDestinationType::Slack);
         $destination->setSigningSecret('secret');
@@ -114,9 +129,54 @@ final class NotificationOutboundFormatterTest extends TestCase
         self::assertSame('22222222-2222-4222-8222-222222222222', $value['i']);
     }
 
+    public function testAddsTeamsResolveHttpPostWhenSigningSecretPresent(): void
+    {
+        $formatter = $this->formatter();
+        $destination = new NotificationDestination();
+        $destination->setType(NotificationDestinationType::Teams);
+        $destination->setSigningSecret('teams-secret');
+        $destination->setEndpointUrl('https://outlook.office.com/webhook/x');
+        $destination->setLabel('Ops');
+        $destination->setCategories(['error']);
+
+        $payload = [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'url' => 'https://beacon.test/i/1',
+            'project' => [
+                'uuid' => '11111111-1111-4111-8111-111111111111',
+                'name' => 'Acme',
+            ],
+            'issue' => [
+                'uuid' => '22222222-2222-4222-8222-222222222222',
+                'title' => 'Boom',
+                'level' => 'error',
+            ],
+        ];
+
+        $teams = $formatter->httpRequest(
+            NotificationDestinationType::Teams,
+            'https://outlook.office.com/webhook/x',
+            $payload,
+            $destination,
+        );
+
+        $actions = $teams['json']['potentialAction'];
+        self::assertCount(2, $actions);
+        self::assertSame('OpenUri', $actions[0]['@type']);
+        self::assertSame('HttpPOST', $actions[1]['@type']);
+        self::assertSame('Resolve', $actions[1]['name']);
+        self::assertSame('https://beacon.test/hooks/teams/actions', $actions[1]['target']);
+        $body = json_decode((string) $actions[1]['body'], true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('resolve', $body['a']);
+        self::assertSame($destination->getUuid(), $body['d']);
+        self::assertArrayHasKey('sig', $body);
+        self::assertTrue((new InteractionActionToken())->isValidResolveToken('teams-secret', $body));
+    }
+
     public function testEmailBodyIncludesFactsAndUrl(): void
     {
-        $formatter = new NotificationOutboundFormatter();
+        $formatter = $this->formatter();
         $body = $formatter->emailBody([
             'summary' => '[TEST] Email sample',
             'url' => 'https://beacon.test/settings',
@@ -132,7 +192,7 @@ final class NotificationOutboundFormatterTest extends TestCase
 
     public function testRejectsInvalidTelegramEndpoint(): void
     {
-        $formatter = new NotificationOutboundFormatter();
+        $formatter = $this->formatter();
         $this->expectException(InvalidArgumentException::class);
         $formatter->parseTelegramEndpoint('not-valid');
     }

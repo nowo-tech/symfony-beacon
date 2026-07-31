@@ -83,7 +83,7 @@ Incoming Webhooks alone cannot receive button clicks. To enable **Resolve** from
 3. In Beacon, edit the Slack destination, paste the Signing Secret, save.
 4. New issue alerts will show a **Resolve** button. Beacon verifies `X-Slack-Signature` (5-minute window) before changing status.
 
-v1 records the status change with a null actor (`via: slack` in the audit payload). Mapping Slack users to Beacon members is not shipped yet. Teams interactive actions and Assign are out of scope.
+v1 records the status change with a null actor (`via: slack` in the audit payload). Mapping Slack users to Beacon members is not shipped yet. Assign is out of scope.
 
 ---
 
@@ -107,9 +107,24 @@ v1 records the status change with a null actor (`via: slack` in the audit payloa
 3. Copy the webhook URL Teams provides.
 4. In Beacon: type **Microsoft Teams webhook**, paste the URL, choose categories, save, then **Send test**.
 
-**What Beacon sends:** Office 365 **MessageCard** JSON (`@type`, `summary`, `title`, `text`, optional **Open in Beacon** action when an issue URL is present).
+**What Beacon sends:** Office 365 **MessageCard** JSON (`@type`, `summary`, `title`, `text`, optional **Open in Beacon** action when an issue URL is present). When an **interaction signing secret** is set on the destination, issue alerts (`issue.new` / `issue.regression` / `issue.reopened`) also include an **HttpPOST Resolve** action targeting Beacon.
 
-**Tips:** If your tenant only allows Workflows / Power Automate instead of classic Incoming Webhooks, use a workflow that accepts an HTTP POST and point a **Generic HTTP** destination at that URL (payload shape differs — prefer adapting the workflow to the [canonical JSON](#generic-http-json-body), or keep Teams type when classic Incoming Webhooks are available).
+**Tips:** If your tenant only allows Workflows / Power Automate instead of classic Incoming Webhooks, use a workflow that accepts an HTTP POST and point a **Generic HTTP** destination at that URL (payload shape differs — prefer adapting the workflow to the [canonical JSON](#generic-http-json-body), or keep Teams type when classic Incoming Webhooks are available). Some tenants restrict MessageCard `HttpPOST` to allow-listed hosts — ensure Beacon’s public URL is reachable from Microsoft 365.
+
+#### Interactive Resolve (optional)
+
+Classic Incoming Webhooks can carry MessageCard actions. To enable **Resolve** from Teams:
+
+1. Generate a long random secret (or reuse a shared ops secret) and store it on the Teams destination as the **signing secret** in Beacon.
+2. Ensure `DEFAULT_URI` (router default URI) matches the public Beacon base URL so cards target:
+
+   ```text
+   https://<your-beacon-host>/hooks/teams/actions
+   ```
+
+3. New issue alerts will show **Resolve**. Beacon verifies an HMAC token in the POST body (7-day expiry) before changing status.
+
+v1 records the status change with a null actor (`via: teams`). Assign and Slack→member mapping remain out of scope.
 
 ---
 
