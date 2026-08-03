@@ -78,6 +78,54 @@ class NotificationDestinationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Failed last deliveries limited to the given projects (dashboard Alerts panel).
+     *
+     * @param list<Project> $projects
+     *
+     * @return list<NotificationDestination>
+     */
+    public function findWithFailedLastDeliveryInProjects(array $projects, int $limit = 50): array
+    {
+        if ([] === $projects) {
+            return [];
+        }
+
+        /** @var list<NotificationDestination> $result */
+        $result = $this->createQueryBuilder('d')
+            ->innerJoin('d.project', 'p')->addSelect('p')
+            ->andWhere('d.project IN (:projects)')
+            ->andWhere('d.lastDeliverySuccess = false')
+            ->andWhere('d.lastDeliveryAt IS NOT NULL')
+            ->setParameter('projects', $projects)
+            ->orderBy('d.lastDeliveryAt', 'DESC')
+            ->addOrderBy('d.id', 'DESC')
+            ->setMaxResults(max(1, $limit))
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
+     * @param list<Project> $projects
+     */
+    public function countWithFailedLastDeliveryInProjects(array $projects): int
+    {
+        if ([] === $projects) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('d')
+            ->select('COUNT(d.id)')
+            ->andWhere('d.project IN (:projects)')
+            ->andWhere('d.lastDeliverySuccess = false')
+            ->andWhere('d.lastDeliveryAt IS NOT NULL')
+            ->setParameter('projects', $projects)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * Count destinations whose last recorded delivery failed (instance-wide metrics).
      */
     public function countWithFailedLastDelivery(): int

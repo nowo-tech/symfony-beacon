@@ -7,12 +7,14 @@ namespace App\Issues\Repository;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\AssignmentScope;
 use App\Issues\IssueListSort;
 use App\Project\Entity\Project;
 use App\Shared\IssuePriority;
 use App\Shared\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
@@ -90,6 +92,156 @@ class IssueRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /**
+     * Cross-project assignment inbox for the dashboard Assignments panel.
+     *
+     * @param list<Project> $projects
+     *
+     * @return list<Issue>
+     */
+    public function searchAssignments(
+        array $projects,
+        AssignmentScope $scope,
+        User $viewer,
+        ?string $query = null,
+        ?string $level = null,
+        ?IssueStatus $status = null,
+        ?IssuePriority $priority = null,
+        ?User $assigneeFilter = null,
+        ?IssueListSort $sort = null,
+        ?int $limit = null,
+        ?int $offset = null,
+    ): array {
+        if ([] === $projects) {
+            return [];
+        }
+
+        $sort ??= new IssueListSort(IssueListSort::DEFAULT_FIELD, IssueListSort::DEFAULT_DIRECTION);
+        $qb = $this->createAssignmentQueryBuilder(
+            $projects,
+            $scope,
+            $viewer,
+            $query,
+            $level,
+            $status,
+            $priority,
+            $assigneeFilter,
+        );
+        $qb->leftJoin('i.assignee', 'assignee_user')->addSelect('assignee_user');
+        $qb->leftJoin('i.project', 'assignment_project')->addSelect('assignment_project');
+        $this->applySqlSort($qb, $sort);
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+        }
+        if (null !== $offset && $offset > 0) {
+            $qb->setFirstResult($offset);
+        }
+
+        /** @var list<Issue> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
+
+    /**
+     * @param list<Project> $projects
+     */
+    public function countAssignments(
+        array $projects,
+        AssignmentScope $scope,
+        User $viewer,
+        ?string $query = null,
+        ?string $level = null,
+        ?IssueStatus $status = null,
+        ?IssuePriority $priority = null,
+        ?User $assigneeFilter = null,
+    ): int {
+        if ([] === $projects) {
+            return 0;
+        }
+
+        $qb = $this->createAssignmentQueryBuilder(
+            $projects,
+            $scope,
+            $viewer,
+            $query,
+            $level,
+            $status,
+            $priority,
+            $assigneeFilter,
+        );
+        $qb->select('COUNT(i.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param list<Project> $projects
+     */
+    private function createAssignmentQueryBuilder(
+        array $projects,
+        AssignmentScope $scope,
+        User $viewer,
+        ?string $query,
+        ?string $level,
+        ?IssueStatus $status,
+        ?IssuePriority $priority,
+        ?User $assigneeFilter,
+    ): QueryBuilder {
+        $qb = $this->createQueryBuilder('i')
+            ->andWhere('i.project IN (:projects)')
+            ->setParameter('projects', $projects);
+
+        if (null !== $query && '' !== trim($query)) {
+            $this->applyFullTextOrLikeQuery($qb, trim($query));
+        }
+        if (null !== $level && '' !== $level) {
+            $qb->andWhere('i.level = :level')->setParameter('level', $level);
+        }
+        if ($status instanceof IssueStatus) {
+            $qb->andWhere('i.status = :status')->setParameter('status', $status);
+        }
+        if ($priority instanceof IssuePriority) {
+            $qb->andWhere('i.priority = :priority')->setParameter('priority', $priority);
+        }
+
+        match ($scope) {
+            AssignmentScope::Mine => $qb
+                ->andWhere('i.assignee = :viewer')
+                ->setParameter('viewer', $viewer),
+            AssignmentScope::Unassigned => $qb->andWhere('i.assignee IS NULL'),
+            AssignmentScope::Teammates => $this->applyTeammatesAssigneeFilter($qb, $viewer, $assigneeFilter),
+            AssignmentScope::All => $this->applyOptionalAssigneeFilter($qb, $assigneeFilter),
+        };
+
+        return $qb;
+    }
+
+    private function applyTeammatesAssigneeFilter(QueryBuilder $qb, User $viewer, ?User $assigneeFilter): void
+    {
+        if ($assigneeFilter instanceof User) {
+            $qb->andWhere('i.assignee = :assigneeFilter')
+                ->andWhere('i.assignee != :viewer')
+                ->setParameter('assigneeFilter', $assigneeFilter)
+                ->setParameter('viewer', $viewer);
+
+            return;
+        }
+
+        $qb->andWhere('i.assignee IS NOT NULL')
+            ->andWhere('i.assignee != :viewer')
+            ->setParameter('viewer', $viewer);
+    }
+
+    private function applyOptionalAssigneeFilter(QueryBuilder $qb, ?User $assigneeFilter): void
+    {
+        if ($assigneeFilter instanceof User) {
+            $qb->andWhere('i.assignee = :assigneeFilter')
+                ->setParameter('assigneeFilter', $assigneeFilter);
+        }
+    }
+
     public function countSearch(
         Project $project,
         ?string $query = null,
@@ -154,6 +306,127 @@ class IssueRepository extends ServiceEntityRepository
             ->getResult();
 
         return $result;
+    }
+
+    /**
+     * Cross-project issues first seen in a release (dashboard New in release panel).
+     *
+     * @param list<Project> $projects
+     *
+     * @return list<Issue>
+     */
+    public function searchNewInRelease(
+        array $projects,
+        ?string $release = null,
+        ?int $limit = null,
+        ?int $offset = null,
+    ): array {
+        if ([] === $projects) {
+            return [];
+        }
+
+        $qb = $this->createNewInReleaseQueryBuilder($projects, $release);
+        $qb->leftJoin('i.project', 'nir_project')->addSelect('nir_project');
+        $qb->orderBy('i.lastSeen', 'DESC')->addOrderBy('i.id', 'DESC');
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+        }
+        if (null !== $offset && $offset > 0) {
+            $qb->setFirstResult($offset);
+        }
+
+        /** @var list<Issue> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
+
+    /**
+     * @param list<Project> $projects
+     */
+    public function countNewInRelease(array $projects, ?string $release = null): int
+    {
+        if ([] === $projects) {
+            return 0;
+        }
+
+        $qb = $this->createNewInReleaseQueryBuilder($projects, $release);
+        $qb->select('COUNT(i.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Distinct {@see Issue::$firstRelease} values across projects, newest last-seen first.
+     *
+     * @param list<Project> $projects
+     *
+     * @return list<string>
+     */
+    public function findDistinctFirstReleasesAcrossProjects(array $projects, int $limit = 40): array
+    {
+        if ([] === $projects) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null !== $id) {
+                $ids[] = $id;
+            }
+        }
+        if ([] === $ids) {
+            return [];
+        }
+
+        $sql = <<<'SQL'
+            SELECT first_release AS release_value
+            FROM issue
+            WHERE project_id IN (:projectIds) AND first_release IS NOT NULL AND first_release <> ''
+            GROUP BY first_release
+            ORDER BY MAX(last_seen) DESC, first_release DESC
+            LIMIT :limit
+            SQL;
+
+        /** @var list<int|string> $rows */
+        $rows = $this->getEntityManager()->getConnection()->fetchFirstColumn($sql, [
+            'projectIds' => $ids,
+            'limit' => $limit,
+        ], [
+            'projectIds' => ArrayParameterType::INTEGER,
+            'limit' => ParameterType::INTEGER,
+        ]);
+
+        $releases = [];
+        foreach ($rows as $row) {
+            $normalized = Issue::normalizeRelease((string) $row);
+            if (null === $normalized) {
+                continue;
+            }
+            $releases[] = $normalized;
+        }
+
+        return array_values(array_unique($releases));
+    }
+
+    /**
+     * @param list<Project> $projects
+     */
+    private function createNewInReleaseQueryBuilder(array $projects, ?string $release): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->andWhere('i.project IN (:projects)')
+            ->andWhere('i.firstRelease IS NOT NULL')
+            ->setParameter('projects', $projects);
+
+        $normalized = null !== $release && '' !== $release ? Issue::normalizeRelease($release) : null;
+        if (null !== $normalized) {
+            $qb->andWhere('i.firstRelease = :release')->setParameter('release', $normalized);
+        }
+
+        return $qb;
     }
 
     /**

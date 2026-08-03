@@ -9,6 +9,7 @@ use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\InteractionActionToken;
 use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
@@ -24,7 +25,8 @@ use Symfony\Component\Routing\Attribute\Route;
  * Microsoft Teams MessageCard HttpPOST callbacks (Resolve).
  *
  * Public route; authorization is an HMAC token in the JSON body signed with the
- * destination signing secret. Actor is null in v1.
+ * destination signing secret. Anonymous Resolve is off by default
+ * ({@see HookMutationPolicy}); prefer OpenUri Assign / a future authenticated Resolve.
  */
 final class TeamsActionsController extends AbstractController
 {
@@ -35,6 +37,7 @@ final class TeamsActionsController extends AbstractController
         private readonly IssueStatusChanger $issueStatusChanger,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
+        private readonly HookMutationPolicy $hookMutationPolicy,
     ) {
     }
 
@@ -86,6 +89,18 @@ final class TeamsActionsController extends AbstractController
         $issue = $this->issueRepository->findOneBy(['uuid' => $issueUuid]);
         if (null === $issue || $issue->getProject()?->getUuid() !== $projectUuid) {
             return new Response('Issue not found', Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$this->hookMutationPolicy->allowAnonymousResolve()) {
+            $this->logger->info('Teams Resolve rejected: anonymous resolve disabled.', [
+                'issue_uuid' => $issueUuid,
+                'destination_uuid' => $destinationUuid,
+            ]);
+
+            return new Response(
+                'Anonymous Teams Resolve is disabled; enable Allow anonymous Resolve under Administration → Ops defaults for legacy',
+                Response::HTTP_FORBIDDEN,
+            );
         }
 
         $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, null, 'teams');

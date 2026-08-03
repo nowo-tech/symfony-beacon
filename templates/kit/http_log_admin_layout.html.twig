@@ -1,0 +1,236 @@
+{# Beacon host layout for Http Log admin UI.
+   Admin pages fill {% block nowo_ui_content %}.
+   Prefer this shell + kit/_kit_admin_styles; list/filter structure lives in
+   templates/bundles/NowoHttpLogBundle/admin/ (Beacon panel cards). #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav.http_log'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ vite_entry_link_tags('kit-admin') }}
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+    <style>
+        /* Http log list: separate filter + results panels (issues-style). */
+        .kit-admin.nowo-http-log .http-log-filters {
+            display: grid;
+            gap: 0.75rem;
+            align-items: end;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 640px) {
+            .kit-admin.nowo-http-log .http-log-filters {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1024px) {
+            .kit-admin.nowo-http-log .http-log-filters {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1280px) {
+            .kit-admin.nowo-http-log .http-log-filters {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+        .kit-admin.nowo-http-log .http-log-filters .form-group,
+        .kit-admin.nowo-http-log .http-log-filters > div {
+            min-width: 0;
+            margin: 0;
+        }
+        .kit-admin.nowo-http-log .http-log-filters label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 60%, transparent);
+        }
+        .kit-admin.nowo-http-log .http-log-filters input,
+        .kit-admin.nowo-http-log .http-log-filters select {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            border-radius: 0.375rem;
+            border: 1px solid var(--color-sand, var(--beacon-sand));
+            background: var(--color-surface, var(--beacon-surface));
+            color: var(--color-ink, var(--beacon-ink));
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.25;
+        }
+        .kit-admin.nowo-http-log .http-log-filters__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            grid-column: 1 / -1;
+        }
+        .kit-admin.nowo-http-log .http-log-results__toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .kit-admin.nowo-http-log .http-log-results__summary {
+            margin: 0;
+            font-size: 0.875rem;
+            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 70%, transparent);
+        }
+        .kit-admin.nowo-http-log .http-log-results__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .kit-admin.nowo-http-log .http-log-results__action {
+            display: inline-flex;
+            margin: 0;
+        }
+        .kit-admin.nowo-http-log .http-log-results__action .btn-sm.btn-label {
+            width: auto;
+            min-width: 0;
+            height: auto;
+            white-space: nowrap;
+        }
+        .kit-admin.nowo-http-log .http-log-table-wrap {
+            overflow-x: auto;
+        }
+        .kit-admin.nowo-http-log .http-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+        .kit-admin.nowo-http-log .http-log-table th {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 55%, transparent);
+            border-bottom: 1px solid var(--color-sand, var(--beacon-sand));
+        }
+        .kit-admin.nowo-http-log .http-log-table td {
+            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid color-mix(in srgb, var(--color-sand, var(--beacon-sand)) 70%, transparent);
+            vertical-align: middle;
+        }
+        .kit-admin.nowo-http-log .http-log-table .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 20rem;
+        }
+        .kit-admin.nowo-http-log .badge {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            background: color-mix(in srgb, var(--color-sand, var(--beacon-sand)) 80%, transparent);
+        }
+        .kit-admin.nowo-http-log .btn-sm {
+            font-size: 0.8125rem;
+            padding: 0.25rem 0.6rem;
+        }
+        .kit-admin.nowo-http-log .btn-outline-secondary,
+        .kit-admin.nowo-http-log .btn-outline-danger,
+        .kit-admin.nowo-http-log .btn-ghost {
+            border: 1px solid var(--color-sand, var(--beacon-sand));
+            background: transparent;
+            color: var(--color-ink, var(--beacon-ink));
+            border-radius: 0.375rem;
+            padding: 0.35rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            text-decoration: none;
+        }
+        .kit-admin.nowo-http-log .btn-outline-danger {
+            color: var(--color-alert, var(--beacon-alert));
+            border-color: color-mix(in srgb, var(--color-alert, var(--beacon-alert)) 40%, var(--color-sand, var(--beacon-sand)));
+        }
+        .kit-admin.nowo-http-log .btn-danger {
+            background: var(--color-alert, var(--beacon-alert));
+            color: #fff;
+            border: 0;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        .kit-admin.nowo-http-log .http-log-pagination {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            list-style: none;
+            margin: 1rem 0 0;
+            padding: 0;
+        }
+        .kit-admin.nowo-http-log .http-log-pagination a,
+        .kit-admin.nowo-http-log .http-log-pagination span {
+            display: inline-flex;
+            padding: 0.35rem 0.65rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--color-sand, var(--beacon-sand));
+            text-decoration: none;
+            color: var(--color-ink, var(--beacon-ink));
+            font-size: 0.8125rem;
+        }
+        .kit-admin.nowo-http-log .http-log-details {
+            display: grid;
+            grid-template-columns: minmax(8rem, 12rem) 1fr;
+            gap: 0.5rem 1rem;
+            margin: 0;
+        }
+        .kit-admin.nowo-http-log .http-log-details dt {
+            margin: 0;
+            font-size: 0.75rem;
+            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 55%, transparent);
+        }
+        .kit-admin.nowo-http-log .http-log-details dd {
+            margin: 0;
+            min-width: 0;
+            word-break: break-word;
+        }
+        .kit-admin.nowo-http-log .nowo-ui-code,
+        .kit-admin.nowo-http-log .bg-light {
+            background: color-mix(in srgb, var(--color-sand, var(--beacon-sand)) 35%, transparent);
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            font-size: 0.75rem;
+            padding: 0.75rem;
+        }
+        .kit-admin.nowo-http-log .h5,
+        .kit-admin.nowo-http-log .nowo-ui-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.5rem;
+        }
+        .kit-admin.nowo-http-log .nowo-ui-back a {
+            color: var(--color-moss, var(--beacon-moss));
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        .kit-admin.nowo-http-log .nowo-ui-back a:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ vite_entry_script_tags('kit-admin') }}
+{% endblock %}
+
+{% block body %}
+    <header class="kit-admin-page-header mb-6">
+        <h1 class="kit-admin-page-header__title">{% block page_title %}{{ 'nav.http_log'|trans }}{% endblock %}</h1>
+        <p class="kit-admin-page-header__intro">{{ 'admin.hub.http_log'|trans }}</p>
+    </header>
+    <div
+        class="kit-admin nowo-http-log"
+        data-css-framework="{{ nowo_http_log_css_framework|default('custom') }}"
+        data-testid="admin-http-log"
+    >
+        {% block nowo_ui_content %}{% endblock %}
+    </div>
+{% endblock %}

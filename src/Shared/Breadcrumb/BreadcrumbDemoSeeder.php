@@ -52,11 +52,13 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        // Panel aside routes nest under dashboard home so trails are visible
+        // (presentation.hide_when_single_root hides lone root crumbs).
         $this->ensureItem(
             $collection,
-            'project_new',
-            'New project',
-            ['en' => 'New project', 'es' => 'Nuevo proyecto', 'de' => 'Neues Projekt', 'nl' => 'Nieuw project', 'fr' => 'Nouveau projet', 'it' => 'Nuovo progetto', 'pt' => 'Novo projeto'],
+            'dashboard_assignments',
+            'Assignments',
+            ['en' => 'Assignments', 'es' => 'Asignaciones', 'de' => 'Zuweisungen', 'nl' => 'Toewijzingen', 'fr' => 'Affectations', 'it' => 'Assegnazioni', 'pt' => 'Atribuições'],
             $projects,
             [],
             $changed,
@@ -64,9 +66,59 @@ final readonly class BreadcrumbDemoSeeder
 
         $this->ensureItem(
             $collection,
-            'app.swagger_ui',
-            'API docs',
-            ['en' => 'API docs', 'es' => 'Docs API', 'de' => 'API-Doku', 'nl' => 'API-docs', 'fr' => 'Docs API', 'it' => 'Documentazione API', 'pt' => 'Docs da API'],
+            'dashboard_summary',
+            'Summary',
+            ['en' => 'Summary', 'es' => 'Resumen', 'de' => 'Übersicht', 'nl' => 'Samenvatting', 'fr' => 'Résumé', 'it' => 'Riepilogo', 'pt' => 'Resumo'],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'dashboard_activity',
+            'Activity',
+            ['en' => 'Activity', 'es' => 'Actividad', 'de' => 'Aktivität', 'nl' => 'Activiteit', 'fr' => 'Activité', 'it' => 'Attività', 'pt' => 'Atividade'],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'dashboard_mentions',
+            'Mentions',
+            ['en' => 'Mentions', 'es' => 'Menciones', 'de' => 'Erwähnungen', 'nl' => 'Vermeldingen', 'fr' => 'Mentions', 'it' => 'Menzioni', 'pt' => 'Menções'],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'dashboard_alerts',
+            'Alerts',
+            ['en' => 'Alerts', 'es' => 'Alertas', 'de' => 'Warnungen', 'nl' => 'Meldingen', 'fr' => 'Alertes', 'it' => 'Avvisi', 'pt' => 'Alertas'],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'dashboard_new_in_release',
+            'New in release',
+            ['en' => 'New in release', 'es' => 'Nuevo en release', 'de' => 'Neu in Release', 'nl' => 'Nieuw in release', 'fr' => 'Nouveau en release', 'it' => 'Nuovo in release', 'pt' => 'Novo na release'],
+            $projects,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'project_new',
+            'New project',
+            ['en' => 'New project', 'es' => 'Nuevo proyecto', 'de' => 'Neues Projekt', 'nl' => 'Nieuw project', 'fr' => 'Nouveau projet', 'it' => 'Nuovo progetto', 'pt' => 'Novo projeto'],
             $projects,
             [],
             $changed,
@@ -227,6 +279,16 @@ final readonly class BreadcrumbDemoSeeder
             'admin_ops_overview',
             'Ops overview',
             ['en' => 'Ops overview', 'es' => 'Vista ops', 'de' => 'Ops-Übersicht', 'nl' => 'Ops-overzicht', 'fr' => 'Vue ops', 'it' => 'Panoramica ops', 'pt' => 'Visão ops'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'admin_api_doc',
+            'API docs',
+            ['en' => 'API docs', 'es' => 'Docs API', 'de' => 'API-Doku', 'nl' => 'API-docs', 'fr' => 'Docs API', 'it' => 'Documentazione API', 'pt' => 'Docs da API'],
             $admin,
             [],
             $changed,
@@ -442,6 +504,26 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        $httpLog = $this->ensureItem(
+            $collection,
+            'nowo_http_log_admin_index',
+            'HTTP log',
+            ['en' => 'HTTP log', 'es' => 'Log HTTP', 'de' => 'HTTP-Protokoll', 'nl' => 'HTTP-log', 'fr' => 'Journal HTTP', 'it' => 'Log HTTP', 'pt' => 'Log HTTP'],
+            $admin,
+            [],
+            $changed,
+        );
+
+        $this->ensureItem(
+            $collection,
+            'nowo_http_log_admin_show',
+            'Request',
+            ['en' => 'Request', 'es' => 'Petición', 'de' => 'Anfrage', 'nl' => 'Request', 'fr' => 'Requête', 'it' => 'Richiesta', 'pt' => 'Pedido'],
+            $httpLog,
+            ['id'],
+            $changed,
+        );
+
         $menus = $this->ensureItem(
             $collection,
             'nowo_dashboard_menu_dashboard_index',
@@ -619,6 +701,17 @@ final readonly class BreadcrumbDemoSeeder
             ['en' => 'Cookie consent', 'es' => 'Consentimiento de cookies', 'de' => 'Cookie-Einwilligung', 'nl' => 'Cookie-toestemming', 'fr' => 'Consentement cookies', 'it' => 'Consenso cookie', 'pt' => 'Consentimento de cookies'],
             $admin,
             ['configId'],
+            $changed,
+        );
+
+        // Section forms (1.5+); same trail label as the settings redirect entry.
+        $this->ensureItem(
+            $collection,
+            'nowo_cookie_consent_config_settings_section',
+            'Cookie consent',
+            ['en' => 'Cookie consent', 'es' => 'Consentimiento de cookies', 'de' => 'Cookie-Einwilligung', 'nl' => 'Cookie-toestemming', 'fr' => 'Consentement cookies', 'it' => 'Consenso cookie', 'pt' => 'Consentimento de cookies'],
+            $admin,
+            ['configId', 'section'],
             $changed,
         );
 

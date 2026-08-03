@@ -1,5 +1,5 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
@@ -42,6 +42,7 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
+	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
 	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
@@ -234,7 +235,15 @@ rector-fix:
 test:
 	docker compose exec -T php vendor/bin/phpunit
 
-# Optional soft gate: COVERAGE_MIN=40 make test-coverage (statement % from Clover; unset = informational).
+# Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
+kit-smoke:
+	docker compose exec -T php vendor/bin/phpunit \
+		tests/Identity/AuthKitBootstrapTest.php \
+		tests/Identity/MagicLoginTest.php \
+		tests/Identity/PasswordResetTest.php \
+		tests/Identity/LoginThrottleTest.php
+
+# Soft gate: COVERAGE_MIN defaults in CI; override locally e.g. COVERAGE_MIN=35 make test-coverage
 test-coverage:
 	docker compose exec -T php mkdir -p var/coverage var/coverage-html
 	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \

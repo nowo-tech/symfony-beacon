@@ -28,6 +28,15 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
             'instance_ops_defaults[ingestRateLimit]' => '200',
             'instance_ops_defaults[eventQuotaDaily]' => '5000',
             'instance_ops_defaults[eventQuotaMonthly]' => '100000',
+            'instance_ops_defaults[envelopeMaxBytes]' => '1048576',
+            'instance_ops_defaults[ingestRejectQueryAuth]' => '1',
+            'instance_ops_defaults[metricsRequireToken]' => '1',
+            'instance_ops_defaults[plainMetricsToken]' => 'ops-metrics-token',
+            'instance_ops_defaults[inboundEmailEnabled]' => '1',
+            'instance_ops_defaults[inboundMailDomain]' => 'mail.example.test',
+            'instance_ops_defaults[plainInboundWebhookSecret]' => 'ops-inbound-secret',
+            'instance_ops_defaults[allowPrivateUrls]' => '1',
+            'instance_ops_defaults[allowAnonymousResolve]' => '1',
             'instance_ops_defaults[notificationDeliveryHistoryLimit]' => '25',
             'instance_ops_defaults[notificationCircuitBreakerThreshold]' => '4',
             'instance_ops_defaults[notificationCircuitBreakerCooldownMinutes]' => '15',
@@ -43,6 +52,15 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         self::assertSame(200, $settings->getIngestRateLimit());
         self::assertSame(5000, $settings->getEventQuotaDaily());
         self::assertSame(100000, $settings->getEventQuotaMonthly());
+        self::assertSame(1048576, $settings->getEnvelopeMaxBytes());
+        self::assertTrue($settings->isIngestRejectQueryAuth());
+        self::assertTrue($settings->isMetricsRequireToken());
+        self::assertSame('ops-metrics-token', $settings->getMetricsToken());
+        self::assertTrue($settings->isInboundEmailEnabled());
+        self::assertSame('mail.example.test', $settings->getInboundMailDomain());
+        self::assertSame('ops-inbound-secret', $settings->getInboundWebhookSecret());
+        self::assertTrue($settings->isAllowPrivateUrls());
+        self::assertTrue($settings->isAllowAnonymousResolve());
         self::assertSame(25, $settings->getNotificationDeliveryHistoryLimit());
         self::assertSame(4, $settings->getNotificationCircuitBreakerThreshold());
         self::assertSame(15, $settings->getNotificationCircuitBreakerCooldownMinutes());

@@ -32,7 +32,7 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
 
     public function testSwaggerPathAllowsUnsafeEval(): void
     {
-        $response = $this->dispatch('/api/doc', '<html><body>doc</body></html>', kernelDebug: false);
+        $response = $this->dispatch('/admin/api/doc', '<html><body>doc</body></html>', kernelDebug: false);
         $csp = (string) $response->headers->get('Content-Security-Policy');
         self::assertStringContainsString("'unsafe-eval'", $csp);
     }

@@ -25,18 +25,17 @@
     {{ form_start(form) }}
         <section class="panel space-y-4" aria-labelledby="display-panels-heading">
             <h2 id="display-panels-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.panels_title'|trans }}</h2>
-            {{ form_row(form.preferredCollapsedIssuePanels) }}
+            {% include 'form/_fields.html.twig' with {form: form} only %}
             <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.issue_panels_ids_hint'|trans }}</p>
             <ul class="issue-panel-prefs__legend" aria-label="{{ 'preferences.issue_panels_ids_legend'|trans }}">
                 {% for panelId in issue_panel_ids %}
                     <li><code>{{ panelId }}</code> — {{ ('preferences.issue_panel.' ~ panelId)|trans }}</li>
                 {% endfor %}
             </ul>
+            <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+                <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
+            </div>
         </section>
-
-        <div class="mt-4 flex flex-wrap gap-2">
-            <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
-        </div>
     {{ form_end(form) }}
 
     <section class="panel space-y-2">

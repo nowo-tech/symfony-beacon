@@ -1,6 +1,4 @@
-# Prometheus scrape hardening.
-# Production requires a non-empty BEACON_METRICS_TOKEN (503 until configured).
-# Scrapers use Authorization: Bearer only; ROLE_ADMIN session still works when a token is set.
-when@prod:
-    parameters:
-        env(BEACON_METRICS_REQUIRE_TOKEN): '1'
+# Prometheus scrape hardening notes.
+# Metrics token + require-token live under Administration → Ops defaults (instance_settings).
+# Scrapers use Authorization: Bearer only; ROLE_ADMIN session still works when authorized.
+# Production: enable "Require metrics token" and set a non-empty token in Ops defaults.

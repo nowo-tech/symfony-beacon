@@ -83,8 +83,7 @@
                 <p class="confirm-dialog__body">{{ 'project.name.help'|trans }}</p>
             </div>
             <div class="confirm-dialog__content">
-                {{ form_row(newProjectForm.name) }}
-                {{ form_row(newProjectForm.description) }}
+                {% include 'form/_fields.html.twig' with {form: newProjectForm} only %}
             </div>
             <div class="confirm-dialog__actions">
                 <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>

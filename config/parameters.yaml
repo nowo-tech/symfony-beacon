@@ -4,33 +4,14 @@
 # Do NOT add `env(NAME): 'default'` here (constitution Principle IX) — defaults belong in `.env.dist`.
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    env(BEACON_ENVELOPE_MAX_BYTES): '2097152'
-    # Default reject deprecated query-string ingest auth (all envs). Set 0 only while migrating clients.
-    env(BEACON_INGEST_REJECT_QUERY_AUTH): '1'
     default_locale: '%env(DEFAULT_LOCALE)%'
     # Catalogue fallbacks when a key is missing in the active locale (always keep English).
     fallback_locales: [en, es, de, nl, fr, it, pt]
-    beacon.notifications.allow_private_urls: '%env(bool:BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS)%'
     beacon.vapid.public_key: '%env(string:VAPID_PUBLIC_KEY)%'
     beacon.vapid.private_key: '%env(string:VAPID_PRIVATE_KEY)%'
     beacon.vapid.subject: '%env(string:VAPID_SUBJECT)%'
     beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
     beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
     beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
-    beacon.envelope_max_bytes: '%env(int:BEACON_ENVELOPE_MAX_BYTES)%'
-    # When true, Envelope ingest rejects deprecated query-string auth (401). Default 1 in all envs.
-    beacon.ingest_reject_query_auth: '%env(bool:BEACON_INGEST_REJECT_QUERY_AUTH)%'
-    env(BEACON_METRICS_TOKEN): ''
-    beacon.metrics_token: '%env(string:BEACON_METRICS_TOKEN)%'
-    env(BEACON_METRICS_REQUIRE_TOKEN): '0'
-    # When true, /metrics returns 503 until BEACON_METRICS_TOKEN is non-empty (prod default via beacon_metrics.yaml).
-    beacon.metrics_require_token: '%env(bool:BEACON_METRICS_REQUIRE_TOKEN)%'
-    env(BEACON_INBOUND_EMAIL_ENABLED): '0'
-    env(BEACON_INBOUND_MAIL_DOMAIN): ''
-    env(BEACON_INBOUND_WEBHOOK_SECRET): ''
-    beacon.inbound_email.enabled: '%env(bool:BEACON_INBOUND_EMAIL_ENABLED)%'
-    beacon.inbound_email.mail_domain: '%env(string:BEACON_INBOUND_MAIL_DOMAIN)%'
-    beacon.inbound_email.webhook_secret: '%env(string:BEACON_INBOUND_WEBHOOK_SECRET)%'
-    beacon.inbound_email.signing_secret: '%beacon.inbound_email.webhook_secret%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true

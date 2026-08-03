@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Issues\Service;
 
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use JsonException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * HMAC reply tokens embedded in Reply-To local-parts (reply+{token}).
  *
  * Token payload is base64url(json) + "." + hex hmac.
+ * Signing secret comes from Ops defaults (inbound webhook secret).
  */
 final readonly class InboundEmailReplyToken
 {
     public const int DEFAULT_TTL_SECONDS = 2_592_000; // 30 days
 
     public function __construct(
-        #[Autowire('%beacon.inbound_email.signing_secret%')]
-        private string $signingSecret,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
@@ -30,7 +30,7 @@ final readonly class InboundEmailReplyToken
             'exp' => $now + $ttlSeconds,
         ];
         $payload = rtrim(strtr(base64_encode(json_encode($claims, \JSON_THROW_ON_ERROR)), '+/', '-_'), '=');
-        $sig = hash_hmac('sha256', $payload, $this->signingSecret);
+        $sig = hash_hmac('sha256', $payload, $this->opsDefaults->inboundWebhookSecret());
 
         return $payload.'.'.$sig;
     }
@@ -43,7 +43,7 @@ final readonly class InboundEmailReplyToken
             return null;
         }
         [$payload, $sig] = $parts;
-        $expected = hash_hmac('sha256', $payload, $this->signingSecret);
+        $expected = hash_hmac('sha256', $payload, $this->opsDefaults->inboundWebhookSecret());
         if (!hash_equals($expected, $sig)) {
             return null;
         }

@@ -22,6 +22,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | Setting | Beacon value |
 |---------|----------------|
 | `ui_theme` | `tailwind` |
+| `web_ui` | enabled; Administration → **Cookie consent** (`/admin/cookie-consent` → `/cookie-consent-config/{id}/settings/profile`, CookieConsent **1.5+**) |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
 | `use_database_config` | `true` (modal copy + display from DB; seeded by `app:seed-platform`) |
 | `csrf_protection` | `true` (modal JS double-submits SameOrigin CSRF for XHR; keep enabled) |
@@ -128,6 +129,12 @@ Signed-in users can download a JSON export of **their** account fields, project/
 Anonymize scrubs email/display name, disables login (UserKit), clears password history / social links / push subscriptions, and sets `anonymized_at`. It does **not** delete project ingest events or issues (those remain project telemetry until retention purge). Blocked when the account is the sole direct project owner or the last instance administrator.
 
 Operators should mention these controls and event retention in `/legal/privacy` placeholder copy before production.
+
+## HTTP request audit log
+
+[`nowo-tech/http-log-bundle`](https://packagist.org/packages/nowo-tech/http-log-bundle) may store request metadata (path, route, status, duration), optional headers/bodies (redacted), **client IP**, and **user identifier** for operators at `/admin/http-log`.
+
+Treat this as personal data when IPs or account identifiers are captured: document processing in your privacy policy, keep retention configured (`nowo_http_log.retention.days`, default 30), schedule `nowo:http-log:purge`, and restrict the admin UI to `ROLE_ADMIN`. Ingest (`/api`), health, and metrics paths are ignored by default in this host.
 
 ## References
 

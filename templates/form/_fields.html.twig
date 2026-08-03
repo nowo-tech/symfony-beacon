@@ -1,0 +1,11 @@
+{#
+  Render every form child that has not already been painted, in Form Type order.
+  Use after any intentional manual form_row/form_widget calls so new Type fields appear automatically.
+  Field attr / row_attr / label_attr belong on the Form Type (FormKit), not in the template.
+  Primary submit/cancel actions belong inside the same panel/card as the fields (border-t action row).
+#}
+{% for field in form %}
+    {% if not field.rendered %}
+        {{ form_row(field) }}
+    {% endif %}
+{% endfor %}

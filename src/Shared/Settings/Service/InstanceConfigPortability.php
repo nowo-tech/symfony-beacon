@@ -19,7 +19,7 @@ use InvalidArgumentException;
 final readonly class InstanceConfigPortability
 {
     public const string SCHEMA = 'beacon-instance-config';
-    public const int VERSION = 2;
+    public const int VERSION = 3;
 
     /** @var list<string> */
     private const array FORBIDDEN_KEYS = [
@@ -28,6 +28,10 @@ final readonly class InstanceConfigPortability
         'mercure_url',
         'mercure_public_url',
         'mercure_jwt_secret',
+        'metrics_token',
+        'inbound_webhook_secret',
+        'inbound_email_webhook_secret',
+        'webhook_secret',
         'client_secret',
         'client_id',
         'password',
@@ -94,6 +98,15 @@ final readonly class InstanceConfigPortability
                 'notification_delivery_history_limit' => $settings->getNotificationDeliveryHistoryLimit(),
                 'notification_circuit_breaker_threshold' => $settings->getNotificationCircuitBreakerThreshold(),
                 'notification_circuit_breaker_cooldown_minutes' => $settings->getNotificationCircuitBreakerCooldownMinutes(),
+                'envelope_max_bytes' => $settings->getEnvelopeMaxBytes(),
+                'ingest_reject_query_auth' => $settings->isIngestRejectQueryAuth(),
+                'metrics_require_token' => $settings->isMetricsRequireToken(),
+                'metrics_token_configured' => $settings->hasMetricsToken(),
+                'inbound_email_enabled' => $settings->isInboundEmailEnabled(),
+                'inbound_email_mail_domain' => $settings->getInboundMailDomain(),
+                'inbound_email_webhook_secret_configured' => $settings->hasInboundWebhookSecret(),
+                'notifications_allow_private_urls' => $settings->isAllowPrivateUrls(),
+                'hooks_allow_anonymous_resolve' => $settings->isAllowAnonymousResolve(),
             ],
         ];
     }
@@ -186,7 +199,7 @@ final readonly class InstanceConfigPortability
     {
         $settings = $this->instanceSettingsRepository->getOrCreate();
 
-        // Metadata-only keys are ignored on import (mailer_configured, mercure_*_configured).
+        // Metadata-only keys are ignored on import (mailer_configured, mercure_*_configured, *_token_configured).
         if (\array_key_exists('mercure_enabled', $data)) {
             $settings->setMercureEnabled((bool) $data['mercure_enabled']);
         }
@@ -200,6 +213,24 @@ final readonly class InstanceConfigPortability
             }
         }
 
+        $booleanSetters = [
+            'ingest_reject_query_auth' => 'setIngestRejectQueryAuth',
+            'metrics_require_token' => 'setMetricsRequireToken',
+            'inbound_email_enabled' => 'setInboundEmailEnabled',
+            'notifications_allow_private_urls' => 'setAllowPrivateUrls',
+            'hooks_allow_anonymous_resolve' => 'setAllowAnonymousResolve',
+        ];
+        foreach ($booleanSetters as $key => $setter) {
+            if (!\array_key_exists($key, $data)) {
+                continue;
+            }
+            $settings->{$setter}((bool) $data[$key]);
+        }
+
+        if (\array_key_exists('inbound_email_mail_domain', $data) && (\is_string($data['inbound_email_mail_domain']) || null === $data['inbound_email_mail_domain'])) {
+            $settings->setInboundMailDomain($data['inbound_email_mail_domain']);
+        }
+
         $integerSetters = [
             'retention_days' => 'setRetentionDays',
             'retention_max_events' => 'setRetentionMaxEvents',
@@ -209,6 +240,7 @@ final readonly class InstanceConfigPortability
             'notification_delivery_history_limit' => 'setNotificationDeliveryHistoryLimit',
             'notification_circuit_breaker_threshold' => 'setNotificationCircuitBreakerThreshold',
             'notification_circuit_breaker_cooldown_minutes' => 'setNotificationCircuitBreakerCooldownMinutes',
+            'envelope_max_bytes' => 'setEnvelopeMaxBytes',
         ];
         foreach ($integerSetters as $key => $setter) {
             if (!\array_key_exists($key, $data) || !\is_int($data[$key])) {

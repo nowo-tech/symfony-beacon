@@ -27,10 +27,11 @@ nowo_pwa:
     service_worker:
         enabled: true
         strategy: network-first
-        cache_version: v3
+        # Bump when deny/precache rules change so browsers drop stale SW caches.
+        cache_version: v4
         cache_name_prefix: beacon-pwa
+        # Never precache auth HTML: pathname.endsWith('/login') also matches /es/login.
         precache_urls:
-            - /login
             - /offline
         runtime_cache_patterns:
             - '/build/'
@@ -39,6 +40,14 @@ nowo_pwa:
             - '/api/'
             - '/admin'
             - '/account'
+            - '/cookie-consent-config'
+            - '/cookie_consent'
+            - '/login'
+            - '/register'
+            - '/logout'
+            - '/reset-password'
+            - '/setup'
+            - '/_site_backup'
             - '/.well-known/mercure'
             - '/_profiler'
             - '/_wdt'

@@ -23,7 +23,7 @@ nowo_routing_kit:
             - '%kernel.project_dir%/src/Shared/Appearance/Controller'
     panel:
         enabled: true
-        path_prefix: '/_routing'
+        path_prefix: '/admin/_routing'
         allow_controller_override: false
         max_definitions: 500
         list_page_size: 50

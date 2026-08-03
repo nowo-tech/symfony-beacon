@@ -82,6 +82,57 @@ class UserActionRepository extends ServiceEntityRepository
     }
 
     /**
+     * Actor-scoped product actions for the dashboard Recent activity panel.
+     *
+     * When {@code $projectUuids} is non-empty, only rows whose {@code context.project_uuid}
+     * is in that set are returned (in-memory filter after a bounded fetch).
+     *
+     * @param list<UserActionType> $allowedActions
+     * @param list<string>         $projectUuids
+     *
+     * @return list<UserAction>
+     */
+    public function findActorProductActivity(
+        User $actor,
+        array $allowedActions,
+        array $projectUuids = [],
+        int $limit = 50,
+    ): array {
+        if ([] === $allowedActions) {
+            return [];
+        }
+
+        $fetchLimit = [] === $projectUuids ? $limit : max($limit * 4, 100);
+        $rows = $this->createQueryBuilder('a')
+            ->leftJoin('a.actor', 'actor')->addSelect('actor')
+            ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
+            ->andWhere('a.actor = :actor')
+            ->andWhere('a.action IN (:allowed)')
+            ->setParameter('actor', $actor)
+            ->setParameter('allowed', $allowedActions)
+            ->orderBy('a.createdAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setMaxResults($fetchLimit)
+            ->getQuery()
+            ->getResult();
+
+        /** @var list<UserAction> $rows */
+        if ([] !== $projectUuids) {
+            $allowed = array_fill_keys($projectUuids, true);
+            $rows = array_values(array_filter(
+                $rows,
+                static function (UserAction $row) use ($allowed): bool {
+                    $uuid = $row->getContext()['project_uuid'] ?? null;
+
+                    return \is_string($uuid) && isset($allowed[$uuid]);
+                },
+            ));
+        }
+
+        return \array_slice($rows, 0, $limit);
+    }
+
+    /**
      * Newest actions across the instance (admin users index “recent activity”).
      *
      * @return list<UserAction>

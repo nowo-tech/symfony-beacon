@@ -55,7 +55,12 @@ php bin/console doctrine:migrations:migrate --no-interaction
 php bin/console app:seed-platform
 pnpm install
 make vite-build
+php bin/console assets:install
 ```
+
+When this release includes kit admin `css_framework: custom` (no Bootstrap in Vite `kit-admin`) and kit pins **1.0.5** / **2.0.12** / RoutingKit **1.1.8** / CookieConsent **1.5.0** / SiteBackup **1.8.1** / AuthKit **1.12.2** / Beacon **1.6.11** / UX Icons **3.4.0**: smoke menus / breadcrumbs / cookie admin (`/cookie-consent-config/{id}/settings` → `/settings/profile`) / `/admin/_routing/` / `/setup` + `/_site_backup` for shell chrome (aside, brand, crumbs) and modals. Re-run `make seed` (or platform seed) so breadcrumb trails include `nowo_cookie_consent_config_settings_section`. Clear UX Icons cache if you rely on Iconify on-demand icons (`bin/console cache:clear`).
+
+**HttpLogBundle (`nowo-tech/http-log-bundle` 1.0.1):** run migrations for `nowo_http_log_entry`, ensure Messenger workers consume `PersistHttpLogMessage` / `ExportHttpLogMessage` / `PurgeHttpLogMessage` (routed to `async`), open **Administration → HTTP log** (`/admin/http-log`, `ROLE_ADMIN`), and schedule `nowo:http-log:purge`. Re-run platform/demo seed so the administration menu and breadcrumbs include the new routes. Document HTTP audit logging (IPs / user identifiers) in operator privacy copy — see [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
 
 No further steps until the next tagged release.
 
@@ -125,6 +130,23 @@ Requires **AuthKit 1.12.1** and `endroid/qr-code` ^6 (Composer lock).
 
 - Branded error pages now cover 400/401/408/429/502 in addition to 403/404/500.
 - Constitution Principle X: do not add Cursor co-author trailers on commits/PRs.
+
+## Upgrading from 1.0.1 (ops env → database)
+
+```bash
+git pull
+composer install
+docker compose up -d
+php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+Migration `Version20260803140000` adds remaining ops knobs to `instance_settings` (envelope max bytes, reject query auth, metrics token/require, inbound email, allow private URLs, anonymous Resolve).
+
+Re-apply any former env values under **Administration → Ops defaults**. Secrets (metrics token, inbound webhook secret) are encrypted at rest — blank fields on save keep the current secret.
+
+In production, enable **Require metrics scrape token** and set a token (this replaces the former `when@prod` `BEACON_METRICS_REQUIRE_TOKEN=1` default). For local private webhooks, enable **Allow private notification URLs**.
+
+The former `BEACON_INGEST_REJECT_QUERY_AUTH`, `BEACON_METRICS_*`, `BEACON_ENVELOPE_MAX_BYTES`, `BEACON_INBOUND_*`, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS`, and `BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE` variables are no longer read and may be removed from `.env`. Instance config export is now **v3**; imports continue to accept v1–v2 files.
 
 ## Upgrading from 0.16.0 to 0.17.0
 
@@ -199,7 +221,7 @@ Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent
 
 ### RoutingKit (`064-routing-kit`)
 
-- New dependency `nowo-tech/routing-kit-bundle`; config `config/packages/nowo_routing_kit.yaml`; admin UI `/_routing/`.
+- New dependency `nowo-tech/routing-kit-bundle`; config `config/packages/nowo_routing_kit.yaml`; admin UI `/admin/_routing/`.
 - Use `#[Routable]` for app controllers that need dual locale paths. AuthKit and SiteBackup keep their own locale loaders.
 
 ### Branded HTTP errors (`063-branded-http-errors`)
@@ -296,7 +318,7 @@ make vite-build
 
 ### Security / ops
 
-- **`/api/doc` and `/api/doc.json` require `ROLE_ADMIN`** (was any authenticated user). Re-seed menus (`app:seed-platform`) so API docs moves under Administration.
+- **OpenAPI UI moved** to **`/admin/api/doc`** and **`/admin/api/doc.json`** (was `/api/doc` / `/api/doc.json`). Still requires **`ROLE_ADMIN`**. Re-seed menus/breadcrumbs (`app:seed-platform`) so links and crumbs use route `admin_api_doc`.
 - **Magic login** consumes via **POST** (`check_post_only: true`): email links open a confirm page; the user must click **Continue** to POST. Bookmarklets/scripts that only GET the signed URL must POST `user` / `expires` / `hash`.
 - **Query-string ingest auth:** defaults to **`BEACON_INGEST_REJECT_QUERY_AUTH=1`** in all environments (401). Migrate clients to `X-Beacon-Auth` or envelope `dsn`; set `0` only during migration.
 - **`/metrics`:** production requires a non-empty `BEACON_METRICS_TOKEN` (`BEACON_METRICS_REQUIRE_TOKEN=1`); scrapers use `Authorization: Bearer` only.
@@ -885,7 +907,7 @@ Project Settings → Notifications now supports **Discord**, **Microsoft Teams**
 
 ### API docs
 
-Authenticated operators can open **Panel → API docs** (`/api/doc`). Authorize Try-it-out with `X-Beacon-Auth`.
+Authenticated admins can open **Administration → API docs** (`/admin/api/doc`). Authorize Try-it-out with `X-Beacon-Auth`.
 
 ### Migrations Kit rewrite (no new schema from the rewrite itself)
 
@@ -911,7 +933,7 @@ make test
 docker compose exec php vendor/bin/phpunit tests/Identity/ tests/Ingest/EnvelopeAuthParserTest.php tests/Shared/ApiDocAccessTest.php
 ```
 
-Log in, open `/api/doc`, and confirm OpenAPI title **Symfony Beacon API**. Send a test Envelope with BeaconBundle **1.5+**.
+Log in as admin, open `/admin/api/doc`, and confirm OpenAPI title **Symfony Beacon API**. Send a test Envelope with BeaconBundle **1.5+**.
 
 ---
 

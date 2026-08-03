@@ -10,7 +10,7 @@
 
 ### US1 — Admin path panel (P1)
 
-As `ROLE_ADMIN`, **When** I open `/_routing/`, **Then** I manage stored locale paths (JSON under `var/routing_kit/`) inside Beacon kit-admin chrome (`kit/routing_kit_panel_layout.html.twig`).
+As `ROLE_ADMIN`, **When** I open `/admin/_routing/`, **Then** I manage stored locale paths (JSON under `var/routing_kit/`) inside Beacon kit-admin chrome (`kit/routing_kit_panel_layout.html.twig`).
 
 ### US2 — Default-locale bare paths (P1)
 
@@ -25,7 +25,7 @@ As a developer, **When** I add `#[Routable]` on controllers under Beacon domain 
 - **FR-001**: Require `nowo-tech/routing-kit-bundle` (pinned) and register the bundle.
 - **FR-002**: Config `nowo_routing_kit` MUST use `%default_locale%` / `%fallback_locales%`, host layout, `security.access_roles: [ROLE_ADMIN]`, and `register_unprefixed_default: true`.
 - **FR-003**: Panel routes import via `config/routes/nowo_routing_kit.yaml`; DB/JSON loader `type: nowo_routing_kit` MUST be imported **last** in `config/routes.yaml`.
-- **FR-004**: `access_control` MUST require `ROLE_ADMIN` for `^/_routing`. Setup/catalog gates MUST exclude `/_routing`.
+- **FR-004**: `access_control` MUST require `ROLE_ADMIN` for `^/admin/_routing`. Setup/catalog gates MUST exclude `/admin/_routing`.
 - **FR-005**: Administration hub SHOULD link to `nowo_routing_kit_panel` with i18n keys `nav.routing` / `admin.hub.routing`.
 - **FR-006**: AuthKit and SiteBackup locale routing remain owned by those bundles (`002`, `056`); RoutingKit MUST NOT be required to dual-serve `/login` or `/setup`.
 

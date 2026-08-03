@@ -1,0 +1,180 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Issues\Controller;
+
+use App\Identity\Entity\User;
+use App\Issues\AssignmentScope;
+use App\Issues\IssueListSort;
+use App\Issues\Repository\IssueRepository;
+use App\Project\Entity\Project;
+use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Repository\ProjectRepository;
+use App\Shared\IssuePriority;
+use App\Shared\IssueStatus;
+use App\Shared\Pagination\PagePagination;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+/**
+ * Cross-project assignment inbox in the Dashboard section.
+ */
+#[IsGranted('ROLE_USER')]
+final class DashboardAssignmentsController extends AbstractController
+{
+    public function __construct(
+        private readonly ProjectRepository $projectRepository,
+        private readonly ProjectMembershipRepository $membershipRepository,
+        private readonly IssueRepository $issueRepository,
+    ) {
+    }
+
+    #[Route('/dashboard/assignments', name: 'dashboard_assignments', methods: ['GET'])]
+    public function index(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $accessible = $this->projectRepository->findAccessibleByUser($user);
+
+        $scope = AssignmentScope::tryFromQuery($request->query->getString('scope') ?: null);
+        $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
+        $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
+
+        $statusParam = $request->query->getString('status');
+        $status = '' === $statusParam
+            ? IssueStatus::Unresolved
+            : (IssueStatus::tryFrom($statusParam) ?? IssueStatus::Unresolved);
+
+        $priorityParam = $request->query->getString('priority');
+        $priority = '' !== $priorityParam ? IssuePriority::tryFrom($priorityParam) : null;
+
+        $assigneeFilter = $this->resolveAssigneeFilter(
+            $accessible,
+            $user,
+            $request->query->getString('assignee'),
+        );
+
+        $q = $request->query->getString('q') ?: null;
+        $level = $request->query->getString('level') ?: null;
+        $sort = IssueListSort::fromQuery(
+            $request->query->getString('sort') ?: null,
+            $request->query->getString('dir') ?: null,
+        );
+
+        $total = $this->issueRepository->countAssignments(
+            $projects,
+            $scope,
+            $user,
+            $q,
+            $level,
+            $status,
+            $priority,
+            $assigneeFilter,
+        );
+        $pagination = PagePagination::fromRequest($request, $total);
+        $issues = $this->issueRepository->searchAssignments(
+            $projects,
+            $scope,
+            $user,
+            $q,
+            $level,
+            $status,
+            $priority,
+            $assigneeFilter,
+            $sort,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
+
+        $filters = [
+            'scope' => $scope->value,
+            'project' => $projectFilter?->getUuid() ?? '',
+            'q' => $q ?? '',
+            'level' => $level ?? '',
+            'status' => $status->value,
+            'priority' => $priority instanceof IssuePriority ? $priority->value : '',
+            'assignee' => null !== $assigneeFilter?->getId() ? (string) $assigneeFilter->getId() : '',
+            'sort' => $sort->field,
+            'dir' => $sort->direction,
+            'per_page' => $pagination['per_page'],
+        ];
+
+        return $this->render('dashboard/assignments.html.twig', [
+            'issues' => $issues,
+            'projects' => $accessible,
+            'teammates' => $this->collectTeammates($accessible, $user),
+            'filters' => $filters,
+            'pagination' => $pagination,
+            'scopes' => AssignmentScope::cases(),
+        ]);
+    }
+
+    /**
+     * @param list<Project> $accessible
+     */
+    private function resolveProjectFilter(array $accessible, string $uuid): ?Project
+    {
+        if ('' === $uuid) {
+            return null;
+        }
+        foreach ($accessible as $project) {
+            if ($project->getUuid() === $uuid) {
+                return $project;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param list<Project> $accessible
+     */
+    private function resolveAssigneeFilter(array $accessible, User $viewer, string $raw): ?User
+    {
+        if ('' === $raw || !ctype_digit($raw)) {
+            return null;
+        }
+        $id = (int) $raw;
+        foreach ($this->collectTeammates($accessible, $viewer) as $teammate) {
+            if ($teammate->getId() === $id) {
+                return $teammate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param list<Project> $projects
+     *
+     * @return list<User>
+     */
+    private function collectTeammates(array $projects, User $viewer): array
+    {
+        /** @var array<int, User> $byId */
+        $byId = [];
+        foreach ($projects as $project) {
+            foreach ($this->membershipRepository->findUsersByProject($project) as $member) {
+                $id = $member->getId();
+                if (null === $id || $id === $viewer->getId()) {
+                    continue;
+                }
+                $byId[$id] = $member;
+            }
+        }
+        $list = array_values($byId);
+        usort(
+            $list,
+            static fn (User $a, User $b): int => strcasecmp(
+                $a->getDisplayName() ?: $a->getEmail(),
+                $b->getDisplayName() ?: $b->getEmail(),
+            ),
+        );
+
+        return $list;
+    }
+}

@@ -9,6 +9,7 @@ use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
+use App\Identity\Form\AdminGroupType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
@@ -75,22 +76,14 @@ final class AdminGroupController extends AbstractController
     #[Route('/admin/groups/new', name: 'admin_groups_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_group_new', $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
+        $group = new UserGroup();
+        $form = $this->createForm(AdminGroupType::class, $group, [
+            'csrf_token_id' => 'admin_group_new',
+        ]);
+        $form->handleRequest($request);
 
-            $name = trim($request->request->getString('name'));
-            if ('' === $name) {
-                $this->addFlash('error', 'flash.groups.name_required');
-
-                return $this->redirectToRoute('admin_groups_new');
-            }
-
-            $group = new UserGroup();
-            $group->setName($name);
-            $group->setSlug($this->uniqueSlug($name));
-            $group->setDescription($request->request->getString('description') ?: null);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $group->setSlug($this->uniqueSlug($group->getName()));
             $this->entityManager->persist($group);
             /** @var User $actor */
             $actor = $this->getUser();
@@ -107,6 +100,7 @@ final class AdminGroupController extends AbstractController
         }
 
         return $this->render('admin/groups/form.html.twig', [
+            'form' => $form,
             'group' => null,
             'is_edit' => false,
         ]);
@@ -146,23 +140,15 @@ final class AdminGroupController extends AbstractController
         UserGroup $group,
         Request $request,
     ): Response {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_group_edit_'.$group->getId(), $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
+        $form = $this->createForm(AdminGroupType::class, $group, [
+            'csrf_token_id' => 'admin_group_edit_'.$group->getId(),
+        ]);
+        $form->handleRequest($request);
 
-            $name = trim($request->request->getString('name'));
-            if ('' === $name) {
-                $this->addFlash('error', 'flash.groups.name_required');
-
-                return $this->redirectToRoute('admin_groups_edit', ['id' => $group->getUuid()]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($group->getSlug() !== $this->slugify($group->getName())) {
+                $group->setSlug($this->uniqueSlug($group->getName(), $group));
             }
-
-            $group->setName($name);
-            if ($group->getSlug() !== $this->slugify($name)) {
-                $group->setSlug($this->uniqueSlug($name, $group));
-            }
-            $group->setDescription($request->request->getString('description') ?: null);
             /** @var User $actor */
             $actor = $this->getUser();
             $this->actionRecorder->record(
@@ -180,6 +166,7 @@ final class AdminGroupController extends AbstractController
         $this->groupRepository->hydrateAudit($group);
 
         return $this->render('admin/groups/form.html.twig', [
+            'form' => $form,
             'group' => $group,
             'is_edit' => true,
         ]);

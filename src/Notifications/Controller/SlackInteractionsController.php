@@ -13,6 +13,7 @@ use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\SlackRequestSignatureVerifier;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
@@ -32,7 +33,8 @@ use Symfony\Component\Routing\Attribute\Route;
  * Slack interactive component callbacks (Block Kit Resolve / Assign to me).
  *
  * Public route; authorization is HMAC signature verification against the
- * destination signing secret. Assign requires a mapped Slack user id with triage.
+ * destination signing secret. Resolve and Assign require a mapped Slack user id
+ * with triage unless {@see HookMutationPolicy::allowAnonymousResolve()} is enabled.
  */
 final class SlackInteractionsController extends AbstractController
 {
@@ -46,6 +48,7 @@ final class SlackInteractionsController extends AbstractController
         private readonly ProjectAccessService $projectAccess,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
+        private readonly HookMutationPolicy $hookMutationPolicy,
     ) {
     }
 
@@ -145,6 +148,17 @@ final class SlackInteractionsController extends AbstractController
                 if ($access instanceof ProjectAccess && $access->canTriageIssues()) {
                     $actor = $mappedUser;
                 }
+            }
+            if (!$actor instanceof User && !$this->hookMutationPolicy->allowAnonymousResolve()) {
+                $this->logger->info('Slack Resolve rejected: mapped triage user required.', [
+                    'slack_user_id' => $slackUserId,
+                    'issue_uuid' => $issueUuid,
+                ]);
+
+                return new Response(
+                    'Link your Slack user id under Account → Profile (triage required)',
+                    Response::HTTP_FORBIDDEN,
+                );
             }
             $changed = $this->issueStatusChanger->change($issue, IssueStatus::Resolved, $actor, 'slack');
             if (!$changed) {

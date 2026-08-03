@@ -18,6 +18,8 @@ final readonly class AppSectionResolver
         'nowo_dashboard_menu_',
         'nowo_breadcrumb_kit_',
         'nowo_cookie_consent_',
+        'nowo_routing_kit_',
+        'nowo_http_log_',
     ];
 
     /** @var list<string> */

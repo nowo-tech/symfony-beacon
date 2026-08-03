@@ -10,7 +10,8 @@ use App\Shared\Settings\Repository\InstanceSettingsRepository;
 /**
  * Reads instance-wide operational defaults from {@see InstanceSettings} (singleton row).
  *
- * Replaces former env parameters for retention, ingest rate, quotas, and notification limits.
+ * Replaces former env parameters for retention, ingest, quotas, metrics, inbound email,
+ * notification SSRF, and hook mutation policy.
  */
 final readonly class InstanceOpsDefaults
 {
@@ -62,5 +63,50 @@ final readonly class InstanceOpsDefaults
     public function circuitBreakerCooldownMinutes(): int
     {
         return max(0, $this->settings()->getNotificationCircuitBreakerCooldownMinutes());
+    }
+
+    public function envelopeMaxBytes(): int
+    {
+        return max(1, $this->settings()->getEnvelopeMaxBytes());
+    }
+
+    public function ingestRejectQueryAuth(): bool
+    {
+        return $this->settings()->isIngestRejectQueryAuth();
+    }
+
+    public function metricsToken(): string
+    {
+        return $this->settings()->getMetricsToken() ?? '';
+    }
+
+    public function metricsRequireToken(): bool
+    {
+        return $this->settings()->isMetricsRequireToken();
+    }
+
+    public function inboundEmailEnabled(): bool
+    {
+        return $this->settings()->isInboundEmailEnabled();
+    }
+
+    public function inboundMailDomain(): string
+    {
+        return $this->settings()->getInboundMailDomain() ?? '';
+    }
+
+    public function inboundWebhookSecret(): string
+    {
+        return $this->settings()->getInboundWebhookSecret() ?? '';
+    }
+
+    public function allowPrivateUrls(): bool
+    {
+        return $this->settings()->isAllowPrivateUrls();
+    }
+
+    public function allowAnonymousResolve(): bool
+    {
+        return $this->settings()->isAllowAnonymousResolve();
     }
 }

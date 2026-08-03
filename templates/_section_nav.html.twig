@@ -3,12 +3,20 @@
 {% set menuTree = dashboard_menu_tree(menuCode) %}
 {% if menuCode == 'preferences' %}
     {% set menuTree = beacon_preferences_menu_current(menuTree, app.request.attributes.get('_route')) %}
+{% elseif menuCode == 'administration' %}
+    {% set menuTree = beacon_administration_menu_current(menuTree, app.request.attributes.get('_route')) %}
 {% endif %}
 {% set menuConfig = dashboard_menu_config(menuCode) %}
 {% if menuTree is not empty %}
-    {{ include('@NowoDashboardMenuBundle/menu.html.twig', {
-        menuTree: menuTree,
-        menuCode: menuCode,
-        menuConfig: menuConfig,
-    }) }}
+    <div
+        data-controller="menu-nested-collapse"
+        data-menu-nested-collapse-menu-code-value="{{ menuCode }}"
+        data-action="click->menu-nested-collapse#toggle"
+    >
+        {{ include('@NowoDashboardMenuBundle/menu.html.twig', {
+            menuTree: menuTree,
+            menuCode: menuCode,
+            menuConfig: menuConfig,
+        }) }}
+    </div>
 {% endif %}

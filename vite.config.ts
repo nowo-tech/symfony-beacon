@@ -87,7 +87,7 @@ export default defineConfig({
                 app: './assets/app.ts',
                 // Kit admin shells (menus / breadcrumbs / cookie consent) — Bootstrap + layout helpers.
                 'kit-admin': './assets/kit-admin.ts',
-                // Nelmio Swagger UI init (CSP: no inline script on /api/doc).
+                // Nelmio Swagger UI init (CSP: no inline script on /admin/api/doc).
                 'swagger-ui-boot': './assets/swagger-ui-boot.ts',
             },
         },

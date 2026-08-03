@@ -1,6 +1,6 @@
 {#
   Override NelmioApiDoc Swagger UI so it renders inside the Beacon app shell
-  (sidebar Panel + header) instead of the standalone Nelmio page.
+  (Administration sidebar + header) instead of the standalone Nelmio page.
 #}
 {% extends 'base.html.twig' %}
 
@@ -19,7 +19,7 @@
             <p class="api-docs__lead">{{ 'api_docs.intro'|trans }}</p>
         </div>
         <div class="api-docs__actions">
-            <a class="btn-ghost no-underline" href="{{ path('app.swagger') }}" target="_blank" rel="noopener">
+            <a class="btn-ghost no-underline" href="{{ path('admin_api_doc_json') }}" target="_blank" rel="noopener">
                 {{ 'api_docs.open_json'|trans }}
             </a>
         </div>

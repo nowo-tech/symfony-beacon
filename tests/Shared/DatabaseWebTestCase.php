@@ -12,6 +12,7 @@ use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
 use App\Shared\CookieConsent\CookieConsentDemoSeeder;
 use App\Shared\Menu\DashboardMenuDemoSeeder;
 use App\Shared\ProjectRole;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use FilesystemIterator;
@@ -70,6 +71,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
         if ([] !== $meta) {
             $schemaTool->createSchema($meta);
         }
+        $this->seedTestOpsDefaults();
         if ($this->autoSeedPlatformCatalogs) {
             $this->seedPlatformCatalogs();
         }
@@ -189,6 +191,24 @@ abstract class DatabaseWebTestCase extends WebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
         self::getContainer()->get(CookieConsentDemoSeeder::class)->seedIfEmpty();
+    }
+
+    /**
+     * Stable Ops defaults formerly supplied via when@test parameters (metrics, inbound, SSRF).
+     */
+    protected function seedTestOpsDefaults(): void
+    {
+        $repository = self::getContainer()->get(InstanceSettingsRepository::class);
+        $settings = $repository->getOrCreate();
+        $settings->setMetricsToken('phpunit-metrics-token');
+        $settings->setMetricsRequireToken(false);
+        $settings->setInboundEmailEnabled(true);
+        $settings->setInboundMailDomain('inbound.beacon.test');
+        $settings->setInboundWebhookSecret('phpunit-inbound-secret');
+        $settings->setAllowPrivateUrls(true);
+        $settings->setAllowAnonymousResolve(false);
+        $settings->setIngestRejectQueryAuth(true);
+        $repository->save($settings);
     }
 
     protected function login(KernelBrowser $client, User $user): void

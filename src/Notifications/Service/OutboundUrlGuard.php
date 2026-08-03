@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Service;
 
 use InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 
 /**
  * Blocks SSRF to private / link-local / metadata addresses for outbound notification HTTP URLs.
@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class OutboundUrlGuard
 {
     public function __construct(
-        #[Autowire('%beacon.notifications.allow_private_urls%')]
-        private bool $allowPrivateUrls = false,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
@@ -64,7 +63,7 @@ final readonly class OutboundUrlGuard
             throw new InvalidArgumentException('Notification URL must use http or https.');
         }
 
-        if ($this->allowPrivateUrls) {
+        if ($this->opsDefaults->allowPrivateUrls()) {
             return null;
         }
 
@@ -73,8 +72,13 @@ final readonly class OutboundUrlGuard
             throw new InvalidArgumentException('Notification URL host is not allowed.');
         }
 
-        if (false !== filter_var($host, \FILTER_VALIDATE_IP)) {
-            if ($this->isBlockedIp($host)) {
+        $ipLiteral = $host;
+        if (str_starts_with($ipLiteral, '[') && str_ends_with($ipLiteral, ']')) {
+            $ipLiteral = substr($ipLiteral, 1, -1);
+        }
+
+        if (false !== filter_var($ipLiteral, \FILTER_VALIDATE_IP)) {
+            if ($this->isBlockedIp($ipLiteral)) {
                 throw new InvalidArgumentException('Notification URL must not target a private address.');
             }
 

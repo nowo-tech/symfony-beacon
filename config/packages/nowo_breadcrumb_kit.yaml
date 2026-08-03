@@ -16,8 +16,9 @@ nowo_breadcrumb_kit:
         enabled: true
         path_prefix: /breadcrumb-kit-admin
         layout_template: 'kit/breadcrumb_dashboard_layout.html.twig'
-        css_framework: bootstrap5
-        icon_set: bootstrap-icons
+        # Tailwind host: semantic nowo-ui + kit JS modals (no Bootstrap in Vite kit-admin).
+        css_framework: custom
+        icon_set: none
         modals:
             collection_form: normal
             item_form: normal

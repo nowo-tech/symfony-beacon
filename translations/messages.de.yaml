@@ -1,5 +1,11 @@
 nav:
     projects: Projekte
+    assignments: Zuweisungen
+    summary: Übersicht
+    activity: Aktivität
+    mentions: Erwähnungen
+    alerts: Warnungen
+    new_in_release: Neu in Release
     new_project: 'Neues Projekt'
     log_out: Abmelden
     main: Hauptnavigation
@@ -12,10 +18,16 @@ nav:
     admin_projects: Projekte
     appearance: Erscheinungsbild
     mailer: Mailer
-    instance_config: Instanzkonfiguration
+    mercure: Mercure
+    instance_config: Instanzexport
     menus: Menüs
-    breadcrumbs: Paniermehl
+    breadcrumbs: Brotkrumen
+    cookie_consent: Cookie-Einwilligung
     routing: Locale-Routen
+    http_log: HTTP-Protokoll
+    api_docs: API-Dokumente
+    social_login: Social Login
+    ops_defaults: Ops-Standards
     toggle_sidebar: 'Navigation umschalten'
     preferences: Präferenzen
     account_settings: Kontoeinstellungen
@@ -25,6 +37,74 @@ nav:
     analytics: Analysen
     setup: Einrichtung
     releases: Releases
+assignments:
+    title: Zuweisungen
+    intro: Issues, die dir, Teammitgliedern oder niemandem zugewiesen sind, in Projekten mit Zugriff.
+    empty: Keine Issues entsprechen diesen Zuweisungsfiltern.
+    filter:
+        scope: Bereich
+        project: Projekt
+        any_project: Beliebiges Projekt
+        level: Stufe
+        status: Status
+        priority: Priorität
+        assignee: Teammitglied
+    scope:
+        mine: Mir zugewiesen
+        teammates: Teammitglieder
+        unassigned: Nicht zugewiesen
+        all: Alle in meinen Projekten
+    col:
+        project: Projekt
+        status: Status
+summary:
+    title: Tagesübersicht
+    intro: Schnelle Zähler über Projekte, auf die du Zugriff hast — offene Arbeit, Erwähnungen und Zustellungsstatus.
+    card:
+        mine_open: Mir zugewiesen (offen)
+        unassigned_open: Nicht zugewiesen (offen)
+        unread_mentions: Ungelesene Erwähnungen
+        failed_deliveries: Fehlgeschlagene Zustellungen
+        errors_today: Fehler heute
+        projects: Projekte
+activity:
+    title: Letzte Aktivität
+    intro: Deine letzten Produktaktionen in Projekten, auf die du Zugriff hast.
+    empty: Noch keine aktuelle Aktivität.
+    filter:
+        project: Projekt
+        any_project: Beliebiges Projekt
+mentions:
+    title: Erwähnungen
+    intro: Kommentare, in denen dich jemand @erwähnt hat.
+    empty: Keine Erwähnungen passen zu diesen Filtern.
+    unread: Ungelesen
+    by: 'Von %name%'
+    mark_read: Als gelesen markieren
+    mark_all_read: Alle als gelesen markieren
+    filter:
+        project: Projekt
+        any_project: Beliebiges Projekt
+        unread_only: Nur ungelesen
+alerts:
+    title: Warnungen
+    intro: Benachrichtigungsziele in deinen Projekten mit fehlgeschlagener letzter Zustellung.
+    empty: Keine fehlgeschlagenen Zustellungen in deinen Projekten.
+    filter:
+        project: Projekt
+        any_project: Beliebiges Projekt
+new_in_release:
+    title: Neu in Release
+    intro: Issues, die zuerst in einem Release gesehen wurden.
+    empty: Keine New-in-Release-Issues passen zu diesen Filtern.
+    filter:
+        project: Projekt
+        any_project: Beliebiges Projekt
+        release: Release
+        any_release: Beliebiges Release
+    col:
+        project: Projekt
+        release: Erstes Release
 api_docs:
     title: API-Dokumente
     intro: 'Entdecken Sie die Umschlagaufnahme und zugehörige HTTP-Endpunkte. Verwenden Sie Authorize mit einem X-Beacon-Auth-Header (beacon_key und beacon_secret aus Ihrem Projekt-DSN).'
@@ -969,6 +1049,10 @@ user_preferences:
         label: E-Mail
         placeholder: you@example.com
         help: 'Wird zur Anmeldung verwendet.'
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Sprache
         placeholder: Auto
@@ -1118,6 +1202,12 @@ admin:
     hub:
         title: Verwaltung
         intro: 'Instanzkonfiguration für Operatoren mit erhöhten Rollen.'
+        section:
+            overview: Übersicht
+            access: Zugriff
+            instance: Instanz
+            navigation: Navigation & Rechtliches
+            observability: Observability
         users: 'Listen Sie Konten und Rollen für diese Instanz auf.'
         groups: 'Erstellen Sie Gruppen und verwalten Sie deren Mitglieder für den Projektzugriff.'
         projects: 'Listen Sie alle Projekte auf, verwalten Sie Mitglieder und Gruppenlinks oder löschen Sie ein Projekt.'
@@ -1125,10 +1215,21 @@ admin:
         appearance: 'Markenname, Akzente, Statusfarben und Oberflächen.'
         menus: 'Navigationsmenüs bearbeiten.'
         breadcrumbs: 'Breadcrumb-Sammlungen verwalten.'
+        cookie_consent: 'Modaltext, Kategorien und First-Party-Cookie-Inventar bearbeiten.'
         routing: 'Duale Locale-Pfade (JSON) für Routable-Controller verwalten.'
+        http_log: Erfasste HTTP-Anfragen (Header, Status, Dauer) mit Aufbewahrung und Export einsehen.
         mailer: 'Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.'
+        api_docs: Envelope-Ingest und zugehörige HTTP-OpenAPI-Dokumentation erkunden.
+        social_login: OAuth-Anmeldeinformationen (Google / GitHub / Microsoft) in der Datenbank.
+        ops_defaults: Instanzweite Aufbewahrung, Ingest-Rate, Quotas und Zustelllimits.
+        mercure: Live-Issue-Alerts über Mercure-Hub (optional).
         instance_config: 'Nicht-geheimes Erscheinungsbild und Instanz-Flags exportieren oder importieren (JSON).'
         setup: 'Erste Plattform- / Demo- / Sample-Seed-Schritte.'
+    cookie_consent:
+        tabs_label: Cookie-Einwilligungsbereiche
+        tab_settings: Einstellungen
+        tab_cookies: Cookie-Inventar
+        section_tabs_label: Einstellungsabschnitte
     ops:
         title: Ops-Übersicht
         intro: Instanzweite Gesundheitssignale über Projekte. Die Messenger-Warteschlangentiefe ist immer instanzweit.

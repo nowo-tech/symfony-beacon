@@ -244,23 +244,40 @@ html[data-ui-density='compact'] body {
   font-size: calc(1rem * var(--beacon-font-scale, 1) * var(--beacon-density-font));
 }
 
-html[data-motion='reduce'] *,
-html[data-motion='reduce'] *::before,
-html[data-motion='reduce'] *::after {
+html[data-motion='reduce'] *:not(.app-sidebar):not(.app-main):not(.app-main__inner):not(.site-legal-footer__nav):not(.app-sidebar-backdrop),
+html[data-motion='reduce'] *:not(.app-sidebar):not(.app-main):not(.app-main__inner):not(.site-legal-footer__nav):not(.app-sidebar-backdrop)::before,
+html[data-motion='reduce'] *:not(.app-sidebar):not(.app-main):not(.app-main__inner):not(.site-legal-footer__nav):not(.app-sidebar-backdrop)::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
 
+/* Explicit reduce still kills shell layout motion (a11y). */
+html[data-motion='reduce'] .app-sidebar,
+html[data-motion='reduce'] .app-main,
+html[data-motion='reduce'] .app-main__inner,
+html[data-motion='reduce'] .site-legal-footer__nav,
+html[data-motion='reduce'] .app-sidebar-backdrop {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html[data-motion='system'] *,
-  html[data-motion='system'] *::before,
-  html[data-motion='system'] *::after {
+  /*
+   * System + OS reduce: mute decorative motion only.
+   * Keep aside / content-width / drawer transitions (functional layout).
+   */
+  html[data-motion='system'] .page-loader,
+  html[data-motion='system'] .page-loader *,
+  html[data-motion='system'] .fade-up,
+  html[data-motion='system'] .fade-up-delay,
+  html[data-motion='system'] .flash.flash-toast,
+  html[data-motion='system'] .beacon-nav .collapse,
+  html[data-motion='system'] .thinking-orb {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
@@ -2132,7 +2149,7 @@ textarea.input {
     0 1px 2px color-mix(in srgb, var(--color-ink) 6%, transparent),
     0 10px 28px color-mix(in srgb, var(--color-ink) 10%, transparent);
   backdrop-filter: blur(8px);
-  animation: beacon-toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: beacon-toast-in 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .flash.flash-toast.is-leaving {
@@ -2615,15 +2632,21 @@ body::-webkit-scrollbar-corner,
 /*
  * Sidebar motion: fixed panel slides via transform; main content reserves space
  * with padding-inline-start (length→length interpolates without @property).
- * Content width toggle uses the same duration/ease on max-width (72rem↔100%).
+ * Content width toggle uses the same ease on max-width (72rem↔100%).
  * Avoid animating grid-template-columns — rem↔0px snaps in browsers without
  * registered custom properties and feels abrupt beside the slide.
  */
 .app-shell {
   --app-sidebar-width: 15.5rem;
-  /* Smooth ease-out: soft start and landing (less “snap” than iOS decelerate). */
-  --app-sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --app-sidebar-duration: 0.42s;
+  /*
+   * Visible mid-travel ease (Material standard decelerate). Avoid expo-out
+   * curves like (0.16, 1, 0.3, 1) — they finish ~90% of the slide in the
+   * first ~80ms and read as a pop, not a slide.
+   */
+  --app-sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --app-sidebar-duration: 0.4s;
+  --app-content-width-duration: 0.45s;
+  --app-nav-collapse-duration: 0.3s;
   display: grid;
   flex: 1 1 auto;
   grid-template-columns: minmax(0, 1fr);
@@ -2697,9 +2720,18 @@ body::-webkit-scrollbar-corner,
   border: 0;
   overflow: visible;
   transform: translateX(0);
-  transition: transform var(--app-sidebar-duration, 0.42s)
-    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
-  will-change: transform;
+  transition: transform var(--app-sidebar-duration, 0.4s)
+    var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.app-shell.is-shell-motion .app-sidebar,
+.app-shell.is-shell-motion .app-main {
+  will-change: transform, padding-inline-start;
+}
+
+.app-shell.is-shell-motion .app-main__inner,
+.app-shell.is-shell-motion > .site-legal-footer .site-legal-footer__nav {
+  will-change: max-width;
 }
 
 .app-shell.is-sidebar-collapsed .app-sidebar {
@@ -2720,8 +2752,8 @@ body::-webkit-scrollbar-corner,
   border-right: 1px solid color-mix(in srgb, var(--color-sand) 80%, transparent);
   background: var(--color-surface);
   box-shadow: none;
-  transition: box-shadow var(--app-sidebar-duration, 0.42s)
-    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  transition: box-shadow var(--app-sidebar-duration, 0.4s)
+    var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .app-shell:not(.is-sidebar-collapsed) .app-sidebar__inner {
@@ -2744,8 +2776,8 @@ body::-webkit-scrollbar-corner,
   min-width: 0;
   /* Desktop gutter: animates with the sidebar slide (same duration/ease). */
   padding-inline-start: var(--app-sidebar-width, 15.5rem);
-  transition: padding-inline-start var(--app-sidebar-duration, 0.42s)
-    var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  transition: padding-inline-start var(--app-sidebar-duration, 0.4s)
+    var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .app-shell.is-sidebar-collapsed > .app-main {
@@ -2761,10 +2793,10 @@ body::-webkit-scrollbar-corner,
   margin: 0 auto;
   padding: 1.75rem 1.25rem 2.5rem;
   transition:
-    max-width var(--app-sidebar-duration, 0.42s)
-      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-    --beacon-content-max var(--app-sidebar-duration, 0.42s)
-      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    max-width var(--app-content-width-duration, 0.45s)
+      var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    --beacon-content-max var(--app-content-width-duration, 0.45s)
+      var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .app-shell.is-content-width .app-main__inner {
@@ -2819,8 +2851,8 @@ body::-webkit-scrollbar-corner,
     overflow: visible;
     pointer-events: none;
     transform: translateX(calc(-100% - 0.75rem));
-    transition: transform var(--app-sidebar-duration, 0.42s)
-      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: transform var(--app-sidebar-duration, 0.4s)
+      var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .app-sidebar__inner {
@@ -2868,8 +2900,8 @@ body::-webkit-scrollbar-corner,
     visibility: hidden;
     pointer-events: none;
     transition:
-      opacity var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-      visibility 0s linear var(--app-sidebar-duration, 0.42s);
+      opacity var(--app-sidebar-duration, 0.4s) var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+      visibility 0s linear var(--app-sidebar-duration, 0.4s);
   }
 
   .app-shell.is-sidebar-open .app-sidebar-backdrop {
@@ -2877,7 +2909,7 @@ body::-webkit-scrollbar-corner,
     visibility: visible;
     pointer-events: auto;
     transition:
-      opacity var(--app-sidebar-duration, 0.42s) var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+      opacity var(--app-sidebar-duration, 0.4s) var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1)),
       visibility 0s linear 0s;
   }
 
@@ -2898,6 +2930,44 @@ body::-webkit-scrollbar-corner,
   margin: 0;
   padding: 0;
   list-style: none;
+
+  /*
+   * Nested section collapse: animate height with grid 0fr→1fr (no display:none snap).
+   * Bundle uses Bootstrap's .collapse class; Tailwind maps .collapse to
+   * visibility:collapse — force visible so children can animate.
+   */
+  .collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: visible;
+    opacity: 1;
+    transition:
+      grid-template-rows var(--app-nav-collapse-duration, 0.3s)
+        var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity calc(var(--app-nav-collapse-duration, 0.3s) * 0.75)
+        var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
+
+    > * {
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    &:not(.show) {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.show {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+/* Skip collapse animation on first paint (controller opens/closes branches). */
+[data-controller~='menu-nested-collapse']:not(.is-nav-collapse-ready) .collapse {
+  transition: none !important;
 }
 
 .beacon-nav__link {
@@ -2917,17 +2987,74 @@ body::-webkit-scrollbar-corner,
   }
 }
 
-.beacon-nav__item:nth-child(2) .beacon-nav__link {
-  border: 1px solid var(--color-sand);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+.beacon-nav__section {
+  margin-top: 0.65rem;
+  padding-top: 0.35rem;
 
-  &:hover,
-  &.is-current {
-    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
-    background: var(--color-surface);
-    color: var(--color-ink);
-    text-decoration: none;
+  &:first-child {
+    margin-top: 0;
+    padding-top: 0;
   }
+}
+
+.beacon-nav__section-label,
+a.beacon-nav__section-label {
+  display: block;
+  padding: 0.35rem 0.7rem 0.2rem;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.beacon-nav__section {
+  position: relative;
+
+  > .menu-nested-toggle {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0.3rem;
+    background: transparent;
+    color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      color: var(--color-ink);
+      background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface));
+    }
+
+    .menu-nested-toggle-icon {
+      display: inline-flex;
+      transition: transform var(--app-nav-collapse-duration, 0.3s)
+        var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+  }
+
+  &.is-collapsed > .menu-nested-toggle .menu-nested-toggle-icon {
+    transform: rotate(-90deg);
+  }
+}
+
+.beacon-nav__children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0 0 0 0.25rem;
+  list-style: none;
 }
 
 /* —— User avatar menu —— */
@@ -3068,11 +3195,11 @@ body::-webkit-scrollbar-corner,
 }
 
 .fade-up {
-  animation: beacon-fade-up 0.55s ease-out both;
+  animation: beacon-fade-up 0.65s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .fade-up-delay {
-  animation: beacon-fade-up 0.65s ease-out 0.08s both;
+  animation: beacon-fade-up 0.75s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
 }
 
 .row-hover:hover {
@@ -3591,10 +3718,10 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   margin-inline: auto;
   font-size: 0.8125rem;
   transition:
-    max-width var(--app-sidebar-duration, 0.42s)
-      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-    --beacon-content-max var(--app-sidebar-duration, 0.42s)
-      var(--app-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    max-width var(--app-content-width-duration, 0.45s)
+      var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    --beacon-content-max var(--app-content-width-duration, 0.45s)
+      var(--app-sidebar-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .app-shell.is-content-width > .site-legal-footer .site-legal-footer__nav {
@@ -3826,20 +3953,77 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 22%);
 }
 
-.beacon-pwa-install-links {
+/* Preferences install links — moss/btn chrome instead of default pwa.css blue. */
+.nowo-pwa-install-links {
+  --nowo-pwa-install-links-gap: 0.65rem;
+  --nowo-pwa-install-links-radius: #{$beacon-btn-radius};
+  --nowo-pwa-install-links-padding: #{$beacon-btn-padding-y} #{$beacon-btn-padding-x};
+  --nowo-pwa-install-links-install-bg: var(--color-moss);
+  --nowo-pwa-install-links-install-color: #fff;
+  --nowo-pwa-install-links-uninstall-bg: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  --nowo-pwa-install-links-uninstall-color: var(--color-ink);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--nowo-pwa-install-links-gap);
   margin: 0;
 }
 
-.beacon-pwa-install-links .btn-primary,
-.beacon-pwa-install-links .btn-ghost {
+[data-theme='dark'] .nowo-pwa-install-links {
+  --nowo-pwa-install-links-install-color: #0c1210;
+}
+
+/* Let Beacon .btn-* own chrome (beat pwa.css link rules). */
+.nowo-pwa-install-links a.btn-primary,
+.nowo-pwa-install-links a.btn-ghost {
+  padding: $beacon-btn-padding-y $beacon-btn-padding-x;
+  font-size: $beacon-btn-font-size;
+  line-height: 1.25;
+  border-radius: $beacon-btn-radius;
   text-decoration: none;
 }
 
-.beacon-pwa-install-links__hint {
+.nowo-pwa-install-links a.btn-primary {
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-moss);
+  border: 1px solid var(--color-moss);
+  box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 8%);
+
+  &:hover {
+    background: var(--color-moss-deep);
+    border-color: var(--color-moss-deep);
+    box-shadow: 0 2px 8px rgb(var(--beacon-shadow) / 12%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+[data-theme='dark'] .nowo-pwa-install-links a.btn-primary {
+  color: #0c1210;
+}
+
+.nowo-pwa-install-links a.btn-ghost {
+  font-weight: 500;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border: 1px solid var(--color-sand);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: var(--color-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+.nowo-pwa-install-links__hint {
   display: none;
   margin: 0;
   flex: 1 1 100%;
@@ -3849,7 +4033,7 @@ html[data-ui-density='compact'] .issue-saved-views__save {
 }
 
 /* Show help only when neither install nor uninstall control is visible */
-.beacon-pwa-install-links:not(:has(.nowo-pwa-install-links__install:not([hidden]))):not(:has(.nowo-pwa-install-links__uninstall:not([hidden]))) .beacon-pwa-install-links__hint {
+.nowo-pwa-install-links:not(:has(.nowo-pwa-install-links__install:not([hidden]))):not(:has(.nowo-pwa-install-links__uninstall:not([hidden]))) .nowo-pwa-install-links__hint {
   display: block;
 }
 

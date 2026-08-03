@@ -15,11 +15,11 @@ use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\Metrics\MetricsCollector;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -52,8 +52,7 @@ ENVELOPE;
         private LoggerInterface $logger,
         private MetricsCollector $metricsCollector,
         private IngestQueryAuthSettings $queryAuthSettings,
-        #[Autowire('%beacon.envelope_max_bytes%')]
-        private int $maxEnvelopeBytes = 2_097_152,
+        private InstanceOpsDefaults $opsDefaults,
     ) {
     }
 
@@ -64,7 +63,7 @@ Accepts an Envelope body (newline-separated JSON header, item header, and payloa
 **Auth (preferred first):**
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
-- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When `BEACON_INGEST_REJECT_QUERY_AUTH=1` (default), query auth is refused with **401**.
+- **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When ingest reject-query-auth is enabled (Ops defaults; default on), query auth is refused with **401**.
 
 The public key is an opaque identifier and MUST belong to `{projectId}`. Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [
@@ -186,7 +185,7 @@ MD,
             return new Response('Empty body', Response::HTTP_BAD_REQUEST);
         }
 
-        if (\strlen($body) > $this->maxEnvelopeBytes) {
+        if (\strlen($body) > $this->opsDefaults->envelopeMaxBytes()) {
             return new Response('envelope too large', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
 

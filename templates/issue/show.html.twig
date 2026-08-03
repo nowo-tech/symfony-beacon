@@ -190,6 +190,7 @@
                 {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
                     {{ form_widget(assigneeForm.assignee) }}
                     {{ form_errors(assigneeForm.assignee) }}
+                    {% include 'form/_fields.html.twig' with {form: assigneeForm} only %}
                     <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
                 {{ form_end(assigneeForm) }}
             {% endblock %}

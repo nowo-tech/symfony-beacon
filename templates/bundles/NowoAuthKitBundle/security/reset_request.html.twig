@@ -15,7 +15,7 @@
     <p>{{ 'reset.request.help'|trans({}, 'NowoAuthKitBundle') }}</p>
 
     {{ form_start(reset_request_form) }}
-        {{ form_row(reset_request_form.identifier) }}
+        {% include 'form/_fields.html.twig' with {form: reset_request_form} only %}
         <button type="submit" class="{{ nowo_auth_kit_button_class|default('nowo-auth-kit__button') }}">{{ 'reset.request.submit'|trans({}, 'NowoAuthKitBundle') }}</button>
     {{ form_end(reset_request_form) }}
 

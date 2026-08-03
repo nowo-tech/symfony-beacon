@@ -1,5 +1,11 @@
 nav:
     projects: Projetos
+    assignments: Atribuições
+    summary: Resumo
+    activity: Atividade
+    mentions: Menções
+    alerts: Alertas
+    new_in_release: Novo na release
     new_project: 'Novo projeto'
     log_out: Sair
     main: 'Navegação principal'
@@ -12,10 +18,16 @@ nav:
     admin_projects: Projetos
     appearance: Aparência
     mailer: Mailer
-    instance_config: Configuração da instância
+    mercure: Mercure
+    instance_config: Exportar / importar
     menus: Cardápios
     breadcrumbs: 'Pão ralado'
+    cookie_consent: Consentimento de cookies
     routing: Rotas por locale
+    http_log: Log HTTP
+    api_docs: Docs da API
+    social_login: Login social
+    ops_defaults: Limites ops
     toggle_sidebar: 'Alternar navegação'
     preferences: Preferências
     account_settings: 'Configurações de Conta'
@@ -23,8 +35,76 @@ nav:
     issues: Incidentes
     performance: Desempenho
     analytics: Análise
-    setup: Configuração
+    setup: Setup inicial
     releases: Releases
+assignments:
+    title: Atribuições
+    intro: Issues atribuídas a si, aos colegas, ou ainda sem atribuição nos projetos a que tem acesso.
+    empty: Nenhuma issue corresponde a estes filtros de atribuição.
+    filter:
+        scope: Âmbito
+        project: Projeto
+        any_project: Qualquer projeto
+        level: Nível
+        status: Estado
+        priority: Prioridade
+        assignee: Colega
+    scope:
+        mine: Atribuídas a mim
+        teammates: Colegas
+        unassigned: Sem atribuição
+        all: Todas nos meus projetos
+    col:
+        project: Projeto
+        status: Estado
+summary:
+    title: Resumo do dia
+    intro: Contagens rápidas nos projetos a que tens acesso.
+    card:
+        mine_open: Atribuídas a mim (abertas)
+        unassigned_open: Sem atribuição (abertas)
+        unread_mentions: Menções por ler
+        failed_deliveries: Entregas falhadas
+        errors_today: Erros hoje
+        projects: Projetos
+activity:
+    title: Atividade recente
+    intro: As tuas ações recentes de produto nos projetos a que tens acesso.
+    empty: Ainda sem atividade recente.
+    filter:
+        project: Projeto
+        any_project: Qualquer projeto
+mentions:
+    title: Menções
+    intro: Comentários onde alguém te @mencionou.
+    empty: Nenhuma menção corresponde a estes filtros.
+    unread: Por ler
+    by: 'Por %name%'
+    mark_read: Marcar como lida
+    mark_all_read: Marcar todas como lidas
+    filter:
+        project: Projeto
+        any_project: Qualquer projeto
+        unread_only: Só por ler
+alerts:
+    title: Alertas
+    intro: Destinos de notificação cuja última entrega falhou.
+    empty: Sem entregas falhadas nos teus projetos.
+    filter:
+        project: Projeto
+        any_project: Qualquer projeto
+new_in_release:
+    title: Novo na release
+    intro: Issues vistas pela primeira vez numa release.
+    empty: Nenhuma issue new-in-release corresponde a estes filtros.
+    filter:
+        project: Projeto
+        any_project: Qualquer projeto
+        release: Release
+        any_release: Qualquer release
+    col:
+        project: Projeto
+        release: Primeira release
 api_docs:
     title: 'Documentos da API'
     intro: 'Explore a ingestão de envelopes e endpoints HTTP relacionados. Use Authorize com um cabeçalho X-Beacon-Auth (beacon_key e beacon_secret do DSN do seu projeto).'
@@ -969,6 +1049,10 @@ user_preferences:
         label: E-mail
         placeholder: você@exemplo.com
         help: 'Usado para fazer login.'
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Linguagem
         placeholder: Auto
@@ -1118,6 +1202,12 @@ admin:
     hub:
         title: Administração
         intro: 'Configuração de instância para operadores com funções elevadas.'
+        section:
+            overview: Visão geral
+            access: Acesso
+            instance: Instância
+            navigation: Navegação e legal
+            observability: Observabilidade
         users: 'Liste contas e funções nesta instância.'
         groups: 'Crie grupos e gerencie seus membros para acesso ao projeto.'
         projects: 'Liste todos os projetos, gerencie membros e links de grupos ou exclua um projeto.'
@@ -1125,10 +1215,21 @@ admin:
         appearance: 'Nome da marca, destaques, cores de estado e superfícies.'
         menus: 'Edite menus de navegação.'
         breadcrumbs: 'Gerenciar coleções de navegação estrutural.'
+        cookie_consent: 'Editar texto do modal, categorias e inventário de cookies first-party.'
         routing: 'Gerir caminhos públicos duals por locale (JSON) para controladores Routable.'
+        http_log: Consultar pedidos HTTP capturados (cabeçalhos, estado, duração) com retenção e exportação.
         mailer: 'DSN Mailer encriptado e endereço From para e-mails transacionais.'
+        api_docs: Explorar o ingest Envelope e a documentação OpenAPI HTTP relacionada.
+        social_login: Credenciais OAuth (Google / GitHub / Microsoft) na base de dados.
+        ops_defaults: Retenção, ritmo de ingest, quotas e limites de entrega.
+        mercure: Alertas de issues em tempo real via hub Mercure (opcional).
         instance_config: 'Exportar ou importar aparência e flags de instância não secretos (JSON).'
         setup: 'Passos iniciais de plataforma / demo / seed de amostras.'
+    cookie_consent:
+        tabs_label: Áreas de consentimento de cookies
+        tab_settings: Definições
+        tab_cookies: Inventário de cookies
+        section_tabs_label: Secções de definições
     ops:
         title: Visão Ops
         intro: Sinais de saúde da instância entre projetos. A profundidade da fila Messenger é sempre da instância.

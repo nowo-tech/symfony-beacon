@@ -26,21 +26,12 @@ when@test:
     parameters:
         # Keep catalog-empty → /setup redirect on in tests (DatabaseWebTestCase seeds catalogs by default).
         app.setup.check_platform_catalogs: true
-        # Override env default so local webhook hosts (example.test) skip DNS SSRF checks in PHPUnit.
-        beacon.notifications.allow_private_urls: true
-        # Stable scrape token for MetricsEndpointTest (Authorization: Bearer only).
-        beacon.metrics_token: 'phpunit-metrics-token'
-        beacon.metrics_require_token: false
-        beacon.inbound_email.enabled: true
-        beacon.inbound_email.mail_domain: 'inbound.beacon.test'
-        beacon.inbound_email.webhook_secret: 'phpunit-inbound-secret'
-        beacon.inbound_email.signing_secret: 'phpunit-inbound-secret'
     services:
         # Allow EnvelopeIngestFunctionalTest to swap query-auth policy without putenv/$_ENV.
         App\Ingest\Service\IngestQueryAuthSettings:
             public: true
-            arguments:
-                $rejectQueryAuth: '%beacon.ingest_reject_query_auth%'
+            autowire: true
+            autoconfigure: true
         App\Issues\Service\IssueUserMailNotifier:
             public: true
             autowire: true

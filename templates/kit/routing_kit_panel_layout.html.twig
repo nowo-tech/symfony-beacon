@@ -1,16 +1,11 @@
 {# Beacon host layout for RoutingKit admin panel (REQ-UI-001).
-   Panel pages fill {% block body %}; wrap via body_before/after (same as cookie-consent/menus). #}
+   Panel pages fill {% block body %}; wrap via body_before/after.
+   Do NOT load Vite kit-admin: RoutingKit uses css_framework=custom (nowo-ui.css via panel/base). #}
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
-    {{ vite_entry_link_tags('kit-admin') }}
     {% include 'kit/_kit_admin_styles.html.twig' %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {{ vite_entry_script_tags('kit-admin') }}
 {% endblock %}
 
 {% block body_before %}

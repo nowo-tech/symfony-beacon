@@ -1,0 +1,77 @@
+{% extends nowo_http_log_layout_template|default('@NowoHttpLogBundle/layout.html.twig') %}
+
+{% block title %}{{ 'admin.show.title'|trans({'%id%': entry.id}, 'NowoHttpLogBundle') }} — {{ parent() }}{% endblock %}
+
+{% block nowo_ui_content %}
+    <p class="nowo-ui-back mb-3">
+        <a href="{{ path('nowo_http_log_admin_index') }}">&larr; {{ 'admin.action.back'|trans({}, 'NowoHttpLogBundle') }}</a>
+    </p>
+
+    <div class="panel http-log-show" data-testid="http-log-show">
+        <dl class="http-log-details nowo-ui-details">
+            <dt>{{ 'admin.column.id'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.id }}</dd>
+
+            <dt>{{ 'admin.field.request_id'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd><code>{{ entry.requestId }}</code></dd>
+
+            <dt>{{ 'admin.column.created_at'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.createdAt|date('Y-m-d H:i:s') }}</dd>
+
+            <dt>{{ 'admin.column.method'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.method }}</dd>
+
+            <dt>{{ 'admin.field.url'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd><code>{{ entry.scheme }}://{{ entry.host }}{{ entry.path }}</code></dd>
+
+            <dt>{{ 'admin.field.route'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.routeName }}</dd>
+
+            <dt>{{ 'admin.column.status'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.statusCode }}</dd>
+
+            <dt>{{ 'admin.column.duration'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.durationMs|number_format(2) }} ms</dd>
+
+            <dt>{{ 'admin.column.client_ip'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.clientIp }}</dd>
+
+            <dt>{{ 'admin.field.user'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.userIdentifier }}</dd>
+
+            <dt>{{ 'admin.field.content_type'|trans({}, 'NowoHttpLogBundle') }}</dt>
+            <dd>{{ entry.contentType }} ({{ entry.bodyContentType }})</dd>
+        </dl>
+
+        {% if entry.queryParams %}
+            <h2 class="h5 nowo-ui-section-title">{{ 'admin.field.query_params'|trans({}, 'NowoHttpLogBundle') }}</h2>
+            <pre class="nowo-ui-code">{{ entry.queryParams|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+
+        {% if entry.requestHeaders %}
+            <h2 class="h5 nowo-ui-section-title">{{ 'admin.field.request_headers'|trans({}, 'NowoHttpLogBundle') }}</h2>
+            <pre class="nowo-ui-code">{{ entry.requestHeaders|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+
+        {% if entry.responseHeaders %}
+            <h2 class="h5 nowo-ui-section-title">{{ 'admin.field.response_headers'|trans({}, 'NowoHttpLogBundle') }}</h2>
+            <pre class="nowo-ui-code">{{ entry.responseHeaders|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+
+        {% if entry.requestBody %}
+            <h2 class="h5 nowo-ui-section-title">{{ 'admin.field.request_body'|trans({}, 'NowoHttpLogBundle') }}{% if entry.requestBodyTruncated %} ({{ 'admin.field.truncated'|trans({}, 'NowoHttpLogBundle') }}){% endif %}</h2>
+            <pre class="nowo-ui-code">{{ entry.requestBody }}</pre>
+        {% endif %}
+
+        {% if entry.responseBody %}
+            <h2 class="h5 nowo-ui-section-title">{{ 'admin.field.response_body'|trans({}, 'NowoHttpLogBundle') }}{% if entry.responseBodyTruncated %} ({{ 'admin.field.truncated'|trans({}, 'NowoHttpLogBundle') }}){% endif %}</h2>
+            <pre class="nowo-ui-code">{{ entry.responseBody }}</pre>
+        {% endif %}
+
+        <form method="post" action="{{ path('nowo_http_log_admin_delete', {id: entry.id}) }}" class="mt-4"
+              onsubmit="return confirm('{{ 'admin.delete.confirm'|trans({}, 'NowoHttpLogBundle')|e('js') }}');">
+            <input type="hidden" name="_token" value="{{ csrf_token('http_log_delete') }}">
+            <button type="submit" class="btn btn-danger nowo-ui-btn-delete">{{ 'admin.action.delete'|trans({}, 'NowoHttpLogBundle') }}</button>
+        </form>
+    </div>
+{% endblock %}

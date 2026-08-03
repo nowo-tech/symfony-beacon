@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'summary.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'summary.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'summary.intro'|trans }}</p>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-testid="summary-cards">
+    <a class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md" href="{{ path('dashboard_assignments', {scope: 'mine', status: 'unresolved'}) }}">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.mine_open'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.mine_open }}</p>
+    </a>
+    <a class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md" href="{{ path('dashboard_assignments', {scope: 'unassigned', status: 'unresolved'}) }}">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.unassigned_open'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.unassigned_open }}</p>
+    </a>
+    <a class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md" href="{{ path('dashboard_mentions', {unread: 1}) }}">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.unread_mentions'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.unread_mentions }}</p>
+    </a>
+    <a class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md" href="{{ path('dashboard_alerts') }}">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.failed_deliveries'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.failed_deliveries }}</p>
+    </a>
+    <div class="panel">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.errors_today'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.errors_today }}</p>
+    </div>
+    <a class="panel block no-underline transition hover:-translate-y-0.5 hover:shadow-md" href="{{ path('dashboard_home') }}">
+        <p class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">{{ 'summary.card.projects'|trans }}</p>
+        <p class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ summary.project_count }}</p>
+    </a>
+</div>
+{% endblock %}

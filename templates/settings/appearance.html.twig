@@ -68,6 +68,8 @@
             </div>
         </fieldset>
 
+        {% include 'form/_fields.html.twig' with {form: form} only %}
+
         <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
             <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>

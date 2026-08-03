@@ -28,7 +28,12 @@ final class EnvelopeAuthParser
     /**
      * @return array{public_key: ?string, secret_key: ?string}
      */
-    public function parseFromRequest(?string $authHeader, string $queryString, ?string $envelopeDsn = null): array
+    public function parseFromRequest(
+        #[\SensitiveParameter]
+        ?string $authHeader,
+        string $queryString,
+        ?string $envelopeDsn = null,
+    ): array
     {
         $key = null;
         $secret = null;

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'activity.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'activity.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'activity.intro'|trans }}</p>
+</div>
+
+<form method="get" action="{{ path('dashboard_activity') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="activity-filters">
+    <select class="input" name="project" aria-label="{{ 'activity.filter.project'|trans }}">
+        <option value="">{{ 'activity.filter.any_project'|trans }}</option>
+        {% for project in projects %}
+            <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+    </select>
+    <div class="issue-filters__actions">
+        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('dashboard_activity') }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
+</form>
+
+{% if actions is empty %}
+    <div class="panel text-[var(--color-ink)]/70" data-testid="activity-empty">{{ 'activity.empty'|trans }}</div>
+{% else %}
+    <div class="panel" data-testid="activity-results">
+        <ul class="divide-y divide-[var(--color-sand)]/70">
+            {% for entry in actions %}
+                {% set ctx = entry.context %}
+                <li class="flex flex-wrap items-baseline justify-between gap-2 py-3 text-sm">
+                    <div class="min-w-0">
+                        <span class="font-medium">{{ ('users.activity.action.' ~ entry.action.value)|trans }}</span>
+                        {% if ctx.issue_title is defined and ctx.issue_title %}
+                            {% if ctx.project_uuid is defined and ctx.issue_uuid is defined %}
+                                <a class="ml-1 no-underline text-[var(--color-moss)] hover:underline" href="{{ path('issue_show', {projectId: ctx.project_uuid, id: ctx.issue_uuid}) }}">{{ ctx.issue_title }}</a>
+                            {% else %}
+                                <span class="ml-1 text-[var(--color-ink)]/70">{{ ctx.issue_title }}</span>
+                            {% endif %}
+                        {% elseif ctx.project_name is defined and ctx.project_name %}
+                            {% if ctx.project_uuid is defined %}
+                                <a class="ml-1 no-underline text-[var(--color-moss)] hover:underline" href="{{ path('project_show', {id: ctx.project_uuid}) }}">{{ ctx.project_name }}</a>
+                            {% else %}
+                                <span class="ml-1 text-[var(--color-ink)]/70">{{ ctx.project_name }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <time class="shrink-0 text-xs text-[var(--color-ink)]/55" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+{% endblock %}

@@ -21,12 +21,46 @@
     </fieldset>
 
     <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
+        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.ingest'|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.ingest_help'|trans }}</p>
+        {{ form_row(form.envelopeMaxBytes) }}
+        {{ form_row(form.ingestRejectQueryAuth) }}
+    </fieldset>
+
+    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
+        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.metrics'|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.metrics_help'|trans }}</p>
+        {{ form_row(form.metricsRequireToken) }}
+        {{ form_row(form.plainMetricsToken) }}
+        {{ form_row(form.clearMetricsToken) }}
+        {% if settings.hasMetricsToken %}
+            <p class="text-sm text-[var(--color-ink)]/60" data-testid="ops-metrics-token-configured">{{ 'ops_defaults.metrics_token.configured'|trans }}</p>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
+        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.inbound'|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.inbound_help'|trans }}</p>
+        {{ form_row(form.inboundEmailEnabled) }}
+        {{ form_row(form.inboundMailDomain) }}
+        {{ form_row(form.plainInboundWebhookSecret) }}
+        {{ form_row(form.clearInboundWebhookSecret) }}
+        {% if settings.hasInboundWebhookSecret %}
+            <p class="text-sm text-[var(--color-ink)]/60" data-testid="ops-inbound-secret-configured">{{ 'ops_defaults.inbound_webhook_secret.configured'|trans }}</p>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
         <legend class="text-lg font-semibold">{{ 'ops_defaults.section.notifications'|trans }}</legend>
         <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.notifications_help'|trans }}</p>
+        {{ form_row(form.allowPrivateUrls) }}
+        {{ form_row(form.allowAnonymousResolve) }}
         {{ form_row(form.notificationDeliveryHistoryLimit) }}
         {{ form_row(form.notificationCircuitBreakerThreshold) }}
         {{ form_row(form.notificationCircuitBreakerCooldownMinutes) }}
     </fieldset>
+
+    {% include 'form/_fields.html.twig' with {form: form} only %}
 
     <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
         <button class="btn-primary" type="submit" data-testid="ops-defaults-submit">{{ 'ops_defaults.submit'|trans }}</button>

@@ -73,8 +73,8 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('New project')->form([
-            'name' => 'Billing API',
-            'description' => 'From admin',
+            'project[name]' => 'Billing API',
+            'project[description]' => 'From admin',
         ]);
         $client->submit($form);
         self::assertResponseRedirects();

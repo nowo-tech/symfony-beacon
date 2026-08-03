@@ -27,9 +27,7 @@
     </div>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
-        {{ form_row(form.plainMailerDsn) }}
-        {{ form_row(form.clearMailerDsn) }}
-        {{ form_row(form.mailerFrom) }}
+        {% include 'form/_fields.html.twig' with {form: form} only %}
 
         <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'mailer_settings.submit'|trans }}</button>

@@ -1,5 +1,11 @@
 nav:
     projects: Proyectos
+    assignments: Asignaciones
+    summary: Resumen
+    activity: Actividad
+    mentions: Menciones
+    alerts: Alertas
+    new_in_release: Nuevo en release
     new_project: Nuevo proyecto
     log_out: Cerrar sesión
     main: Navegación principal
@@ -12,11 +18,17 @@ nav:
     admin_projects: Proyectos
     appearance: Apariencia
     mailer: Correo
-    instance_config: Configuración de instancia
-    setup: Configuración
+    mercure: Mercure
+    ops_defaults: Límites ops
+    instance_config: Exportar / importar
+    social_login: Login social
+    setup: Setup inicial
     menus: Menús
-    breadcrumbs: Migas
+    breadcrumbs: Migas de pan
+    cookie_consent: Consentimiento de cookies
     routing: Rutas por idioma
+    http_log: Log HTTP
+    api_docs: Docs API
     toggle_sidebar: Alternar navegación
     preferences: Preferencias
     account_settings: Ajustes de cuenta
@@ -25,6 +37,74 @@ nav:
     performance: Rendimiento
     analytics: Analítica
     releases: Releases
+assignments:
+    title: Asignaciones
+    intro: Incidencias asignadas a ti, a tus compañeros o sin asignar en los proyectos a los que tienes acceso.
+    empty: Ninguna incidencia coincide con estos filtros de asignación.
+    filter:
+        scope: Ámbito
+        project: Proyecto
+        any_project: Cualquier proyecto
+        level: Nivel
+        status: Estado
+        priority: Prioridad
+        assignee: Compañero
+    scope:
+        mine: Asignadas a mí
+        teammates: Compañeros
+        unassigned: Sin asignar
+        all: Todas en mis proyectos
+    col:
+        project: Proyecto
+        status: Estado
+summary:
+    title: Resumen del día
+    intro: Conteos rápidos en los proyectos a los que tienes acceso — trabajo abierto, menciones y salud de entregas.
+    card:
+        mine_open: Asignadas a mí (abiertas)
+        unassigned_open: Sin asignar (abiertas)
+        unread_mentions: Menciones sin leer
+        failed_deliveries: Entregas fallidas
+        errors_today: Errores hoy
+        projects: Proyectos
+activity:
+    title: Actividad reciente
+    intro: Tus acciones recientes de producto en los proyectos a los que tienes acceso.
+    empty: Todavía no hay actividad reciente.
+    filter:
+        project: Proyecto
+        any_project: Cualquier proyecto
+mentions:
+    title: Menciones
+    intro: Comentarios donde alguien te @mencionó en proyectos a los que tienes acceso.
+    empty: Ninguna mención coincide con estos filtros.
+    unread: Sin leer
+    by: 'Por %name%'
+    mark_read: Marcar leída
+    mark_all_read: Marcar todas leídas
+    filter:
+        project: Proyecto
+        any_project: Cualquier proyecto
+        unread_only: Solo sin leer
+alerts:
+    title: Alertas
+    intro: Destinos de notificación en tus proyectos cuya última entrega falló.
+    empty: No hay entregas fallidas en tus proyectos.
+    filter:
+        project: Proyecto
+        any_project: Cualquier proyecto
+new_in_release:
+    title: Nuevo en release
+    intro: Incidencias vistas por primera vez en un release en los proyectos a los que tienes acceso.
+    empty: Ninguna incidencia nuevo-en-release coincide con estos filtros.
+    filter:
+        project: Proyecto
+        any_project: Cualquier proyecto
+        release: Release
+        any_release: Cualquier release
+    col:
+        project: Proyecto
+        release: Primer release
 api_docs:
     title: Docs API
     intro: Explora el ingest Envelope y los endpoints HTTP relacionados. Usa Authorize con la cabecera X-Beacon-Auth (beacon_key y beacon_secret del DSN del proyecto).
@@ -1080,6 +1160,10 @@ user_preferences:
         label: Correo
         placeholder: tu@ejemplo.com
         help: Se usa para iniciar sesión.
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Idioma
         placeholder: Automático
@@ -1234,17 +1318,34 @@ admin:
     hub:
         title: Administración
         intro: Configuración de la instancia para operadores con roles elevados.
+        section:
+            overview: Visión general
+            access: Acceso
+            instance: Instancia
+            navigation: Navegación y legal
+            observability: Observabilidad
         users: Listar cuentas y roles de esta instancia.
         groups: Crea grupos y gestiona sus miembros para el acceso a proyectos.
         projects: Lista todos los proyectos, gestiona miembros y grupos, o elimina un proyecto.
         ops: Picos entre proyectos, incidencias abiertas y entregas fallidas.
         appearance: Nombre de marca, acentos, colores de estado y superficies.
         mailer: DSN de Mailer cifrado y dirección From para correo transaccional.
+        mercure: Alertas de incidencias en vivo vía hub Mercure (opcional).
+        ops_defaults: Retención, ritmo de ingest, cuotas y límites de entrega de notificaciones.
         instance_config: Exporta o importa apariencia y flags de instancia no secretos (JSON).
+        social_login: Credenciales OAuth (Google / GitHub / Microsoft) guardadas en la base de datos.
         setup: Pasos iniciales de plataforma / demo / muestras.
         menus: Editar menús de navegación.
-        breadcrumbs: Gestionar colecciones de migas.
+        breadcrumbs: Gestionar colecciones de migas de pan.
+        cookie_consent: Editar el texto del modal, categorías e inventario de cookies de primera parte.
         routing: Gestionar rutas públicas duales por locale (JSON) para controladores Routable.
+        http_log: Consultar peticiones HTTP capturadas (cabeceras, estado, duración) con retención y exportación.
+        api_docs: Explorar el ingest Envelope y la documentación OpenAPI HTTP relacionada.
+    cookie_consent:
+        tabs_label: Áreas de consentimiento de cookies
+        tab_settings: Ajustes
+        tab_cookies: Inventario de cookies
+        section_tabs_label: Secciones de ajustes
     ops:
         title: Resumen ops
         intro: Señales de salud a nivel de instancia entre proyectos. La profundidad de la cola Messenger es siempre a nivel de instancia.

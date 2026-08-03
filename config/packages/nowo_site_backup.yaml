@@ -2,6 +2,8 @@
 # Docs: https://github.com/nowo-tech/SiteBackupBundle/blob/main/docs/SETUP-WIZARD.md
 nowo_site_backup:
     enabled: true
+    # Host CSS stack hint (Twig global nowo_site_backup_css_framework) — REQ-UI-001 / v1.6+
+    css_framework: custom
     process_timeout: 900
     templates:
         # Friendlier token gate (SVG + calm copy); wizard/done stay in the package.
@@ -57,7 +59,7 @@ nowo_site_backup:
             - /locale/
             - /cookie_consent
             - /cookie-consent/
-            - /_routing
+            - /admin/_routing
             - /_error
         patterns:
             - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$|\?)#'
@@ -85,6 +87,7 @@ nowo_site_backup:
         admin_provisioner: App\Setup\AdminUserProvisioner
         # One Continuar click per auto step in the UI (CLI still chains automatically).
         advance_mode: manual
+        # Built-in detectors + App\Setup\PlatformCatalogsSetupNeedDetector (SiteBackup 1.8+).
         detectors:
             marker: true
             doctrine_connect: true

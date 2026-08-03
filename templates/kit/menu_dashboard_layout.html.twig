@@ -28,7 +28,7 @@
     {% endif %}
     <script type="application/json" id="beacon-dashboard-menu-boot">{{ {
         iconSelectorScriptUrl: _icon_url,
-        cssFramework: nowo_dashboard_menu_css_framework|default('bootstrap5'),
+        cssFramework: nowo_dashboard_menu_css_framework|default('custom'),
         i18n: {
             loading: 'dashboard.loading'|trans({}, 'NowoDashboardMenuBundle'),
             errorLoadingForm: 'dashboard.error_loading_form'|trans({}, 'NowoDashboardMenuBundle'),
@@ -58,7 +58,7 @@
         <p class="kit-admin-page-header__intro">{{ 'admin.hub.menus'|trans }}</p>
     </header>
     {# panel class applied by kit-admin.ts (search stays outside the card). #}
-    <div class="kit-admin" data-kit-split-filters>
+    <div class="kit-admin" data-kit-split-filters data-css-framework="{{ nowo_dashboard_menu_css_framework|default('custom') }}">
 {% endblock %}
 
 {% block body_after %}

@@ -1,5 +1,11 @@
 nav:
     projects: Projects
+    assignments: Assignments
+    summary: Summary
+    activity: Activity
+    mentions: Mentions
+    alerts: Alerts
+    new_in_release: New in release
     new_project: New project
     log_out: Log out
     main: Main navigation
@@ -12,13 +18,17 @@ nav:
     admin_projects: Projects
     appearance: Appearance
     mailer: Mailer
+    mercure: Mercure
     ops_defaults: Ops defaults
     instance_config: Instance config
     social_login: Social login
     setup: Setup
     menus: Menus
     breadcrumbs: Breadcrumbs
+    cookie_consent: Cookie consent
     routing: Locale routes
+    http_log: HTTP log
+    api_docs: API docs
     toggle_sidebar: Toggle navigation
     preferences: Preferences
     account_settings: Account settings
@@ -27,6 +37,74 @@ nav:
     performance: Performance
     analytics: Analytics
     releases: Releases
+assignments:
+    title: Assignments
+    intro: Issues assigned to you, your teammates, or still unassigned across projects you can access.
+    empty: No issues match these assignment filters.
+    filter:
+        scope: Assignment scope
+        project: Project
+        any_project: Any project
+        level: Level
+        status: Status
+        priority: Priority
+        assignee: Teammate
+    scope:
+        mine: Assigned to me
+        teammates: Teammates
+        unassigned: Unassigned
+        all: All in my projects
+    col:
+        project: Project
+        status: Status
+summary:
+    title: Day summary
+    intro: Quick counts across projects you can access — open work, mentions, and delivery health.
+    card:
+        mine_open: Assigned to me (open)
+        unassigned_open: Unassigned (open)
+        unread_mentions: Unread mentions
+        failed_deliveries: Failed deliveries
+        errors_today: Errors today
+        projects: Projects
+activity:
+    title: Recent activity
+    intro: Your recent product actions across projects you can access.
+    empty: No recent activity yet.
+    filter:
+        project: Project
+        any_project: Any project
+mentions:
+    title: Mentions
+    intro: Comments where someone @mentioned you in projects you can access.
+    empty: No mentions match these filters.
+    unread: Unread
+    by: 'By %name%'
+    mark_read: Mark read
+    mark_all_read: Mark all read
+    filter:
+        project: Project
+        any_project: Any project
+        unread_only: Unread only
+alerts:
+    title: Alerts
+    intro: Notification destinations in your projects whose last delivery failed.
+    empty: No failed deliveries in your projects.
+    filter:
+        project: Project
+        any_project: Any project
+new_in_release:
+    title: New in release
+    intro: Issues first seen in a release across projects you can access.
+    empty: No new-in-release issues match these filters.
+    filter:
+        project: Project
+        any_project: Any project
+        release: Release
+        any_release: Any release
+    col:
+        project: Project
+        release: First release
 api_docs:
     title: API docs
     intro: Explore Envelope ingest and related HTTP endpoints. Use Authorize with an X-Beacon-Auth header (beacon_key and beacon_secret from your project DSN).
@@ -665,12 +743,18 @@ mailer_settings:
             From address: %from%
 ops_defaults:
     title: Ops defaults
-    intro: Configure instance-wide defaults inherited by projects and notification delivery services.
+    intro: Configure instance-wide defaults for ingest, metrics, inbound email, hooks, project governance, and notification delivery.
     section:
         governance: Project governance
         governance_help: Projects inherit these retention, ingest rate, and quota values unless they define an override.
+        ingest: Ingest & auth
+        ingest_help: Envelope/OTLP body size and deprecated query-string ingest auth policy.
+        metrics: Prometheus metrics
+        metrics_help: Scrape token for GET /metrics (Authorization Bearer only). Leave the token blank when saving to keep the current secret.
+        inbound: Inbound email
+        inbound_help: Reply-To tokens and provider webhooks for issue comments. Leave the webhook secret blank when saving to keep the current value.
         notifications: Notification delivery
-        notifications_help: These limits apply to notification history and automatic circuit breaking across the instance.
+        notifications_help: SSRF policy, interactive Resolve policy, delivery history, and circuit breaking across the instance.
     retention_days:
         label: Retention days
         help: Delete telemetry older than this many days. Use 0 to disable age-based retention.
@@ -686,6 +770,41 @@ ops_defaults:
     event_quota_monthly:
         label: Monthly event quota
         help: Maximum accepted events per project per UTC calendar month. Use 0 for unlimited.
+    envelope_max_bytes:
+        label: Max Envelope / OTLP body size (bytes)
+        help: HTTP 413 when a raw ingest body exceeds this size. Default 2097152 (2 MiB).
+    ingest_reject_query_auth:
+        label: Reject deprecated query-string ingest auth
+        help: When enabled, beacon_key/beacon_secret query parameters are refused (401). Disable only while migrating clients to X-Beacon-Auth or envelope DSN.
+    metrics_require_token:
+        label: Require metrics scrape token
+        help: When enabled, /metrics returns 503 until a metrics token is stored. Recommended in production.
+    metrics_token:
+        label: Metrics scrape token
+        help: Bearer token for scrapers. Blank on save keeps the current token.
+        configured: A metrics scrape token is currently stored.
+    clear_metrics_token:
+        label: Clear metrics scrape token
+        help: Remove the stored scrape token.
+    inbound_email_enabled:
+        label: Enable inbound email comments
+        help: When enabled, mention/assign mail can include Reply-To tokens and POST /hooks/email/inbound accepts provider webhooks.
+    inbound_mail_domain:
+        label: Inbound mail domain
+        help: Domain used in Reply-To addresses (reply+{token}@domain).
+    inbound_webhook_secret:
+        label: Inbound webhook secret
+        help: Shared secret for X-Beacon-Inbound-Secret and Reply-To HMAC signing. Blank on save keeps the current secret.
+        configured: An inbound webhook secret is currently stored.
+    clear_inbound_webhook_secret:
+        label: Clear inbound webhook secret
+        help: Remove the stored inbound webhook secret.
+    allow_private_urls:
+        label: Allow private notification URLs
+        help: When enabled, outbound webhooks may target private/link-local hosts. Keep disabled in production.
+    allow_anonymous_resolve:
+        label: Allow anonymous Slack/Teams Resolve
+        help: Legacy. When enabled, Resolve may mutate issues without a mapped Beacon actor. Prefer mapped users + triage.
     delivery_history_limit:
         label: Delivery history limit
         help: Number of recent delivery attempts retained for each notification destination.
@@ -1213,6 +1332,10 @@ user_preferences:
         label: Email
         placeholder: you@example.com
         help: Used to sign in.
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Language
         placeholder: Auto
@@ -1367,19 +1490,34 @@ admin:
     hub:
         title: Administration
         intro: Instance configuration for operators with elevated roles.
+        section:
+            overview: Overview
+            access: Access
+            instance: Instance
+            navigation: Navigation & legal
+            observability: Observability
         users: List accounts and roles on this instance.
         groups: Create groups and manage their members for project access.
         projects: List all projects, manage members and group links, or delete a project.
         ops: Cross-project spikes, open issues, and failed deliveries.
         appearance: Brand name, accents, status colors, and page surfaces.
         mailer: Encrypted Mailer DSN and From address for transactional email.
-        ops_defaults: Instance retention, ingest rate, quotas, and notification delivery limits.
+        mercure: Live issue alerts via Mercure hub (optional).
+        ops_defaults: Instance retention, ingest, metrics, inbound email, quotas, and notification delivery limits.
         instance_config: Export or import non-secret appearance and instance flags (JSON).
         social_login: OAuth provider credentials (Google / GitHub / Microsoft) stored in the database.
         setup: First-run platform / demo / sample seed steps.
         menus: Edit navigation menus.
         breadcrumbs: Manage breadcrumb collections.
+        cookie_consent: Edit consent modal copy, categories, and first-party cookie inventory.
         routing: Manage dual locale public paths (JSON) for Routable controllers.
+        http_log: Browse captured HTTP requests (headers, status, duration) with retention and export.
+        api_docs: Explore Envelope ingest and related HTTP OpenAPI documentation.
+    cookie_consent:
+        tabs_label: Cookie consent areas
+        tab_settings: Settings
+        tab_cookies: Cookie inventory
+        section_tabs_label: Settings sections
     ops:
         title: Ops overview
         intro: Instance-wide health signals across projects. Messenger queue depth is always instance-wide.

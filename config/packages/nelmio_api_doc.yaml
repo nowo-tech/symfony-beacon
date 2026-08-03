@@ -35,7 +35,7 @@ nelmio_api_doc:
                 Unauthenticated liveness/readiness probes for orchestrators.
 
                 ## Docs UI
-                Swagger UI at `/api/doc` requires a Beacon session with **ROLE_ADMIN**; it documents these
+                Swagger UI at `/admin/api/doc` requires a Beacon session with **ROLE_ADMIN**; it documents these
                 HTTP APIs only (not the Twig dashboard).
             version: '1.0.0'
             contact:
@@ -79,7 +79,7 @@ nelmio_api_doc:
                     description: 'Deprecated: secret in the query string leaks into logs; prefer X-Beacon-Auth. Always required.'
     areas:
         path_patterns:
-            - ^/api(?!/doc)
+            - ^/api
             - ^/health/(live|ready)$
     html_config:
         # Serve Swagger UI from /bundles/nelmioapidoc (same-origin) so Caddy CSP

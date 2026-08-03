@@ -5,7 +5,7 @@
 3. Prefer official [`nowo-tech/*`](https://packagist.org/packages/nowo-tech/) kits (AuthKit, UserKit, AuditKit, cookie consent, …) over reinventing auth/user/legal UX — see `.cursor/rules/nowo-tech-kits-and-legal.mdc`.
 4. Keep application code FrankenPHP **worker-safe** (`docs/ops/FRANKENPHP-CODING.md`).
 5. Read [docs/ARCHITECTURE.md](ARCHITECTURE.md) before proposing structural changes (modular Symfony vs DDD, ingest vs UI boundaries).
-6. Add PHPUnit coverage for behavior changes. Analytics (`tests/Analytics/`) and Performance (`tests/Performance/`) access tests are part of the default suite (`make test` / CI `vendor/bin/phpunit`) — do not exclude those directories. For a local HTML/Clover report: `make test-coverage` (writes `var/coverage/clover.xml` and `var/coverage-html/`). CI runs a separate **Coverage** job (PCOV) that uploads those artifacts; it does **not** require 100% coverage. Optional soft gate: set `COVERAGE_MIN` (statement percent, e.g. `40`) for `make test-coverage` or in `.github/workflows/ci.yml` — unset means informational only (see `specs/033-coverage-ci/`).
+6. Add PHPUnit coverage for behavior changes. Analytics (`tests/Analytics/`) and Performance (`tests/Performance/`) access tests are part of the default suite (`make test` / CI `vendor/bin/phpunit`) — do not exclude those directories. For a local HTML/Clover report: `make test-coverage` (writes `var/coverage/clover.xml` and `var/coverage-html/`). CI runs a separate **Coverage** job (PCOV) that uploads those artifacts; it does **not** require 100% coverage. Soft gate: `COVERAGE_MIN` statement percent in CI (see `specs/033-coverage-ci/`) — raise carefully; never use 100%.
 7. Frontend: TypeScript + SCSS + Tailwind 4 under `assets/` (do not put Tailwind `@apply` inside SCSS).
 8. Run `make test` (and ideally `make qa`) before opening a PR. CI also runs **Gitleaks** (`make secrets-scan`) and fails if committed secrets are detected — never commit `.env`, Halite keys, or real API tokens (see [SECURITY.md](../SECURITY.md)).
 9. English only for **docs**, **specs**, and **PHPDoc**. User-facing UI may be translated (see [Internationalization](#internationalization)); keep the default locale `en`.
@@ -15,22 +15,28 @@
 13. Use GitHub issue / PR templates under `.github/`. Report vulnerabilities via [SECURITY.md](../SECURITY.md) (private advisory), never as a public issue.
 14. **Kit Twig overrides** — prefer host `layout_template` shells under `templates/kit/` over copying full dashboard/admin pages into `templates/bundles/Nowo*Bundle/`. When a page must diverge, extend the bundle original with `{% extends '@Nowo…/…' %}` and override blocks only (Password Strength is the reference). Full forks of `dashboard/*.html.twig` / `admin/*.html.twig` break on kit upgrades. Kit shells must wrap with `body_before` / `body_after` (not `body`) because kit pages also define `{% block body %}`. Avoid `@!Nowo…` bang namespaces — kit TwigPathsPass does not register them.
 15. **Env defaults** — do **not** add `env(VAR_NAME): '…'` entries in `config/parameters.yaml` (constitution Principle IX). Put defaults in `.env.dist`; use `when@…` package YAML for env-specific overrides; typed `%env(…)%` aliases remain fine.
+16. **Symfony forms (host Twig)** — paint fields with `{% include 'form/_fields.html.twig' %}` (Type order; skip already rendered). Put `attr` / `row_attr` / labels on the Form Type (FormKit). After custom layout `form_row`/`form_widget` calls, still include the loop before submit actions (`specs/077-form-type-field-loop/`).
 
 ## Kit Twig strategy (nowo-tech)
 
 | Bundle | What Beacon customizes | What must stay out of git forks |
 |--------|------------------------|----------------------------------|
-| Dashboard Menu | `kit/menu_dashboard_layout.html.twig` + `dashboard.layout_template`; restyle via `kit/_kit_admin_styles.html.twig` (`.kit-admin` / `.nowo-ui-*`) | Do **not** fork `dashboard/index|show|*.html.twig` page bodies |
-| Breadcrumb Kit | `kit/breadcrumb_dashboard_layout.html.twig` + same kit admin CSS | Do **not** fork `dashboard/**` page bodies |
-| Cookie Consent | `kit/cookie_consent_admin_layout.html.twig` + `web_ui.layout_template`; modal = **vendor** + `assets/styles/_cookie_consent.scss` (tokens) | Do **not** fork modal/form Twig (1.4.5+ BEM + `--nowo-cc-*`) |
+| Dashboard Menu | `kit/menu_dashboard_layout.html.twig` + `dashboard.css_framework: custom`; restyle via `kit/_kit_admin_styles.html.twig` (`.kit-admin` / `--nowo-ui-*`) | Do **not** fork `dashboard/index|show|*.html.twig` page bodies |
+| Breadcrumb Kit | `kit/breadcrumb_dashboard_layout.html.twig` + same (`custom`) | Do **not** fork `dashboard/**` page bodies |
+| RoutingKit | `kit/routing_kit_panel_layout.html.twig` + `web_ui.css_framework: custom` (vendor `nowo-ui.css` via `panel/base`) | Do **not** fork `panel/*.html.twig` |
+| Cookie Consent | `kit/cookie_consent_admin_layout.html.twig` + admin `web_ui.css_framework: custom`; settings tabs are **vendor** route-based (`.nowo-ui-tabs`); modal = **vendor** + `_cookie_consent.scss` (`ui_theme: tailwind`) | Do **not** fork modal/form/settings Twig (1.5+ tabs by route; restyle `.nowo-ui-tabs` in `_kit_admin_styles`) |
+| SiteBackup | `kit/site_backup_*_layout.html.twig` + root `css_framework: custom`; restyle via `.nowo-site-backup-*` / `--nowo-ui-*` | Do **not** fork setup/panel page bodies |
+| Http Log | `kit/http_log_admin_layout.html.twig` + `web_ui.css_framework: custom`; pages fill `{% block nowo_ui_content %}` (not `body_before`/`body_after`). Host overrides `admin/index|_filter|show` under `templates/bundles/NowoHttpLogBundle/` for Beacon `.panel` filter/results cards | Prefer layout + targeted bundle overrides over copying the whole admin tree |
 | AuthKit | `layout.html.twig` only (`auth_brand` + guest_shell); `css` / `form_theme` / `outbound_mail_ready_checker` in YAML | Do **not** fork `security/*` (1.11+ `auth_panel` blocks) |
 | PWA | YAML `install_prompt.mark_asset` + button classes + `_components.scss` tokens | Do **not** fork `pwa/*.html.twig` (1.2+) |
 
-After upgrading kits: `composer update`, `bin/console assets:install`, `bin/console cache:clear`, then smoke menu/breadcrumb/cookie **modal + admin**, AuthKit login, SiteBackup setup, PWA install prompt.
+**Tailwind host rule:** kit admin UIs use `css_framework: custom` + vendor `nowo-ui.css`. Vite `kit-admin` is CSP boot / split-filters / modal portals only — **do not** import Bootstrap (reboot breaks aside/brand/crumbs). See OTHER_FULL_SPECS `REQ-MENU-001` / `REQ-TWIG-APP-001`.
+
+After upgrading kits: `composer update`, `bin/console assets:install`, `bin/console cache:clear`, then smoke menu/breadcrumb/cookie **modal + admin**, AuthKit login, SiteBackup setup, PWA install prompt, `/admin/_routing/`, `/admin/http-log`. Fast AuthKit regression suite: `make kit-smoke` (login bootstrap, magic login, password reset, login throttle).
 
 ### Local kit development (path repositories)
 
-When iterating on a sibling kit under `../bundles/<Name>Bundle` (or `repositories/bundles/`), prefer a **Composer path repository** over editing `vendor/` or copying Twig into Beacon:
+When iterating on a sibling kit under `repositories/bundles/`, prefer a **Composer path repository** over editing `vendor/`:
 
 ```json
 {
@@ -40,14 +46,11 @@ When iterating on a sibling kit under `../bundles/<Name>Bundle` (or `repositorie
       "url": "../../bundles/CookieConsentBundle",
       "options": { "symlink": true }
     }
-  ],
-  "require": {
-    "nowo-tech/cookie-consent-bundle": "@dev"
-  }
+  ]
 }
 ```
 
-Use path only while developing; remove before release so Packagist pins stay authoritative. Host apps should keep customizing via `layout_template` / CSS / block extends — push reusable hooks (Twig blocks, CSS tokens, `layout_template`) **upstream into the kit** instead of growing Beacon forks.
+In Docker, also mount that path into the PHP service (Composer resolves relative to `/app`). Use path only while developing; remove before release so Packagist pins stay authoritative. Host apps should keep customizing via `layout_template` / CSS / block extends — push reusable hooks **upstream into the kit** instead of growing Beacon forks.
 
 ## Documentation map
 
@@ -125,7 +128,7 @@ Public AuthKit URLs use **dual paths** controlled by `DEFAULT_LOCALE` (`locale.i
 | Setup / backup | `/setup` + `/{locale}/setup`; panel `/_site_backup` (SiteBackupBundle) |
 | Legal | Bare `/legal/…` redirects to `/{DEFAULT_LOCALE}/legal/…` |
 | App shell | `/dashboard`, `/account/…`, `/projects/…` (locale from account preference; no `_locale` in path) |
-| RoutingKit (optional app routes) | `/_routing/` admin; `#[Routable]` dual paths (`064`) |
+| RoutingKit (optional app routes) | `/admin/_routing/` admin; `#[Routable]` dual paths (`064`) |
 | HTTP error preview | `/_error/{404\|403\|500}` **dev only** (`063`) |
 
 Guest language: path switcher or `GET|POST /locale/{locale}` (session). Signed-in users: `preferredLocale` via `POST /account/locale/{locale}`. Enabled locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`. `.env.dist` defaults to `en`; this project’s local `.env` may use `es`.

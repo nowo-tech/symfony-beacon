@@ -107,7 +107,7 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/hooks/email
       roles: PUBLIC_ACCESS
-    - path: ^/api/doc
+    - path: ^/admin/api/doc
       roles: ROLE_ADMIN
     # SiteBackupBundle: cold-start setup + panel (panel uses its own password gate)
     - path: ^/setup
@@ -120,7 +120,10 @@ security:
     - path: ^/_error
       roles: PUBLIC_ACCESS
     # RoutingKitBundle admin panel (in-bundle ROLE_ADMIN + firewall)
-    - path: ^/_routing
+    - path: ^/admin/_routing
+      roles: ROLE_ADMIN
+    # HttpLogBundle admin UI (in-bundle ROLE_ADMIN gate)
+    - path: ^/admin/http-log
       roles: ROLE_ADMIN
     - path: ^/
       roles: ROLE_USER

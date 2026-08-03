@@ -7,6 +7,9 @@ namespace App\Shared\Menu;
 /**
  * Marks preferences sidebar links current for whole account areas (exact path match is too narrow).
  *
+ * Preserves {@see \Nowo\DashboardMenuBundle\Service\CurrentRouteTreeDecorator} matches and
+ * ORs account route-prefix rules so related pages keep the same nav item highlighted.
+ *
  * @phpstan-type MenuNode array{item: object, children: list<array<string, mixed>>, isCurrent?: bool, hasCurrentInBranch?: bool, href?: string}
  */
 final class PreferencesMenuCurrentMarker
@@ -57,17 +60,17 @@ final class PreferencesMenuCurrentMarker
         $routeName = \is_object($item) && method_exists($item, 'getRouteName')
             ? $item->getRouteName()
             : null;
-        $isCurrent = false;
+        $isCurrent = !empty($node['isCurrent']);
         if (\is_string($routeName) && isset(self::ROUTE_PREFIXES[$routeName])) {
             foreach (self::ROUTE_PREFIXES[$routeName] as $prefix) {
-                if (str_starts_with($route, $prefix)) {
+                if ($route === $prefix || str_starts_with($route, $prefix)) {
                     $isCurrent = true;
                     break;
                 }
             }
         }
 
-        $hasCurrentInBranch = $isCurrent;
+        $hasCurrentInBranch = $isCurrent || !empty($node['hasCurrentInBranch']);
         foreach ($children as $child) {
             if (!empty($child['hasCurrentInBranch']) || !empty($child['isCurrent'])) {
                 $hasCurrentInBranch = true;

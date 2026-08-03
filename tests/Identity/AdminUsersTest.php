@@ -103,11 +103,11 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Add user')->form([
-            'email' => 'newbie@example.com',
-            'display_name' => 'Newbie',
-            'password' => 'secret123',
-            'role' => 'user',
-            'enabled' => '1',
+            'admin_user[email]' => 'newbie@example.com',
+            'admin_user[displayName]' => 'Newbie',
+            'admin_user[password]' => 'secret123',
+            'admin_user[role]' => 'user',
+            'admin_user[enabled]' => '1',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/users');

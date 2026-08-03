@@ -151,8 +151,33 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.beacon-nav', 'Appearance');
         self::assertSelectorTextContains('.beacon-nav', 'Menus');
         self::assertSelectorTextContains('.beacon-nav', 'Breadcrumbs');
+        self::assertSelectorTextContains('.beacon-nav', 'Cookie consent');
+        self::assertSelectorTextContains('.beacon-nav', 'Locale routes');
+        self::assertSelectorTextContains('.beacon-nav', 'HTTP log');
         self::assertSelectorTextContains('.user-menu', 'Administration');
         self::assertSelectorTextContains('.user-avatar', 'DA');
+    }
+
+    public function testHttpLogAdminUsesAdministrationSidebarAndPanels(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('http-log-shell@example.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        self::getContainer()->get('doctrine')->getManager()->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+        $this->login($client, $user);
+
+        $client->request(Request::METHOD_GET, '/admin/http-log');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-app-shell]');
+        self::assertSelectorExists('#administration-menu-navigation');
+        self::assertSelectorTextContains('.app-sidebar__label', 'Administration');
+        self::assertSelectorExists('[data-testid="admin-http-log"]');
+        self::assertSelectorExists('[data-testid="http-log-filters"].panel');
+        self::assertSelectorExists('[data-testid="http-log-results"].panel');
+        self::assertSelectorExists('.http-log-results__actions .btn-label.nowo-ui-btn-export');
+        self::assertSelectorExists('.http-log-results__actions .btn-label.nowo-ui-btn-purge');
+        self::assertSelectorTextContains('[data-testid="http-log-filters"]', 'Clear filters');
     }
 
     public function testKitAdminDashboardsRequireAuth(): void
@@ -265,6 +290,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
             'nowo_breadcrumb_kit_dashboard_items_edit',
             'nowo_breadcrumb_kit_dashboard_import',
             'nowo_cookie_consent_config_settings_edit',
+            'nowo_cookie_consent_config_settings_section',
             'nowo_cookie_consent_cookie_definitions_index',
             'nowo_cookie_consent_cookie_definitions_new',
             'nowo_cookie_consent_cookie_definitions_edit',
@@ -289,11 +315,27 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         $configId = $config->getId();
         self::assertNotNull($configId);
 
+        $client->request(Request::METHOD_GET, '/admin/cookie-consent');
+        self::assertResponseRedirects('/cookie-consent-config/'.$configId.'/settings');
+
         $client->request(Request::METHOD_GET, '/cookie-consent-config/'.$configId.'/settings');
+        self::assertResponseRedirects('/cookie-consent-config/'.$configId.'/settings/profile');
+
+        $client->request(Request::METHOD_GET, '/cookie-consent-config/'.$configId.'/settings/profile');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.beacon-breadcrumb-wrap');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Administration');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Cookie consent');
         self::assertSelectorExists('#administration-menu-navigation');
+        self::assertSelectorTextContains('#administration-menu-navigation', 'Cookie consent');
+        self::assertSelectorExists('.nowo-ui-tabs--area');
+        self::assertSelectorExists('.nowo-ui-tabs--sections');
+        self::assertSelectorExists('.nowo-ui-form-wrap .nowo-ui-action-save');
+        self::assertSelectorExists('h1.kit-admin-page-header__title');
+
+        $client->request(Request::METHOD_GET, '/cookie-consent-config/'.$configId.'/cookies');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('.nowo-ui-tabs--area');
+        self::assertSelectorExists('.nowo-ui-tabs--area a.nowo-ui-tabs__item[aria-current="page"]');
     }
 }

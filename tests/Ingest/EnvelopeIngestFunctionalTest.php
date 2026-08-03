@@ -9,6 +9,7 @@ use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Performance\Entity\PerfTransaction;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Shared\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -239,7 +240,10 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
     public function testQueryAuthStillWorksWithDeprecationHeadersWhenAllowed(): void
     {
         [$client, , $project, $apiKey] = $this->bootWithDemoProject('query-auth@example.com');
-        self::getContainer()->set(IngestQueryAuthSettings::class, new IngestQueryAuthSettings(false));
+        self::getContainer()->set(
+            IngestQueryAuthSettings::class,
+            new IngestQueryAuthSettings(self::getContainer()->get(InstanceOpsDefaults::class), false),
+        );
 
         $eventId = bin2hex(random_bytes(16));
         $body = implode("\n", [

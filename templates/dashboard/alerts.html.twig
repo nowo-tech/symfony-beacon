@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'alerts.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'alerts.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'alerts.intro'|trans }}</p>
+</div>
+
+<form method="get" action="{{ path('dashboard_alerts') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="alerts-filters">
+    <select class="input" name="project" aria-label="{{ 'alerts.filter.project'|trans }}">
+        <option value="">{{ 'alerts.filter.any_project'|trans }}</option>
+        {% for project in projects %}
+            <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+    </select>
+    <div class="issue-filters__actions">
+        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('dashboard_alerts') }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
+</form>
+
+{% if destinations is empty %}
+    <div class="panel text-[var(--color-ink)]/70" data-testid="alerts-empty">{{ 'alerts.empty'|trans }}</div>
+{% else %}
+    <div class="panel" data-testid="alerts-results">
+        <ul class="divide-y divide-[var(--color-sand)]/70">
+            {% for destination in destinations %}
+                {% set project = destination.project %}
+                <li class="py-3 text-sm">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <div class="min-w-0">
+                            <a class="font-medium no-underline hover:underline" href="{{ path('project_notification_edit', {projectId: project.uuid, id: destination.uuid}) }}">{{ destination.label }}</a>
+                            <span class="text-[var(--color-ink)]/55"> · {{ destination.type.value }}</span>
+                        </div>
+                        <time class="shrink-0 text-xs text-[var(--color-ink)]/55" datetime="{{ destination.lastDeliveryAt|date('c') }}">{{ destination.lastDeliveryAt|date('Y-m-d H:i') }}</time>
+                    </div>
+                    <p class="mt-1">
+                        <a class="no-underline text-[var(--color-moss)] hover:underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ project.name }}</a>
+                        {% if destination.lastDeliveryError %}
+                            <span class="text-[var(--color-alert)]"> · {{ destination.lastDeliveryError|length > 140 ? destination.lastDeliveryError|slice(0, 140) ~ '…' : destination.lastDeliveryError }}</span>
+                        {% endif %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+{% endblock %}

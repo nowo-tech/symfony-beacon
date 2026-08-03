@@ -83,7 +83,7 @@ final readonly class ContentSecurityPolicySubscriber
 
     private function isSwaggerUiPath(string $path): bool
     {
-        return '/api/doc' === $path || str_starts_with($path, '/api/doc/');
+        return '/admin/api/doc' === $path || str_starts_with($path, '/admin/api/doc/');
     }
 
     private function isProfilerFragmentPath(string $path): bool

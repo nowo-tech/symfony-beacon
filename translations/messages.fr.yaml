@@ -1,5 +1,11 @@
 nav:
     projects: Projets
+    assignments: Affectations
+    summary: Résumé
+    activity: Activité
+    mentions: Mentions
+    alerts: Alertes
+    new_in_release: Nouveau en release
     new_project: 'Nouveau projet'
     log_out: 'Se déconnecter'
     main: 'Navigation principale'
@@ -12,10 +18,16 @@ nav:
     admin_projects: Projets
     appearance: Apparence
     mailer: Mailer
-    instance_config: Configuration d'instance
+    mercure: Mercure
+    instance_config: Export / import
     menus: Menus
     breadcrumbs: "Fil d'Ariane"
+    cookie_consent: Consentement cookies
     routing: Routes par locale
+    http_log: Journal HTTP
+    api_docs: Docs API
+    social_login: Connexion sociale
+    ops_defaults: Limites ops
     toggle_sidebar: 'Basculer la navigation'
     preferences: Préférences
     account_settings: 'Paramètres du compte'
@@ -23,8 +35,76 @@ nav:
     issues: Incidents
     performance: Performance
     analytics: Analytique
-    setup: Configuration
+    setup: Setup initial
     releases: Releases
+assignments:
+    title: Affectations
+    intro: Issues qui vous sont assignées, à vos coéquipiers, ou non assignées dans vos projets.
+    empty: Aucune issue ne correspond à ces filtres d’affectation.
+    filter:
+        scope: Portée
+        project: Projet
+        any_project: Tout projet
+        level: Niveau
+        status: Statut
+        priority: Priorité
+        assignee: Coéquipier
+    scope:
+        mine: Assignées à moi
+        teammates: Coéquipiers
+        unassigned: Non assignées
+        all: Toutes dans mes projets
+    col:
+        project: Projet
+        status: Statut
+summary:
+    title: Résumé du jour
+    intro: Compteurs rapides sur les projets auxquels vous avez accès — travail ouvert, mentions et livraisons.
+    card:
+        mine_open: Assignées à moi (ouvertes)
+        unassigned_open: Non assignées (ouvertes)
+        unread_mentions: Mentions non lues
+        failed_deliveries: Livraisons échouées
+        errors_today: "Erreurs aujourd'hui"
+        projects: Projets
+activity:
+    title: Activité récente
+    intro: Vos actions produit récentes sur les projets auxquels vous avez accès.
+    empty: "Pas encore d'activité récente."
+    filter:
+        project: Projet
+        any_project: "N'importe quel projet"
+mentions:
+    title: Mentions
+    intro: Commentaires où quelqu'un vous a @mentionné.
+    empty: Aucune mention ne correspond à ces filtres.
+    unread: Non lu
+    by: 'Par %name%'
+    mark_read: Marquer comme lu
+    mark_all_read: Tout marquer comme lu
+    filter:
+        project: Projet
+        any_project: "N'importe quel projet"
+        unread_only: Non lus uniquement
+alerts:
+    title: Alertes
+    intro: Destinations de notification dont la dernière livraison a échoué.
+    empty: Aucune livraison échouée dans vos projets.
+    filter:
+        project: Projet
+        any_project: "N'importe quel projet"
+new_in_release:
+    title: Nouveau en release
+    intro: Issues vues pour la première fois dans une release.
+    empty: Aucune issue nouveau-en-release ne correspond à ces filtres.
+    filter:
+        project: Projet
+        any_project: "N'importe quel projet"
+        release: Release
+        any_release: "N'importe quelle release"
+    col:
+        project: Projet
+        release: Première release
 api_docs:
     title: "Documents sur l'API"
     intro: "Explorez l'ingestion d'enveloppe et les points de terminaison HTTP associés. Utilisez Authorize avec un en-tête X-Beacon-Auth (beacon_key et beacon_secret du DSN de votre projet)."
@@ -977,6 +1057,10 @@ user_preferences:
         label: E-mail
         placeholder: vous@exemple.com
         help: 'Utilisé pour se connecter.'
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Langue
         placeholder: Auto
@@ -1126,6 +1210,12 @@ admin:
     hub:
         title: Administration
         intro: "Configuration d'instance pour les opérateurs avec des rôles élevés."
+        section:
+            overview: Aperçu
+            access: Accès
+            instance: Instance
+            navigation: Navigation et légal
+            observability: Observabilité
         users: 'Répertoriez les comptes et les rôles sur cette instance.'
         groups: 'Créez des groupes et gérez leurs membres pour accéder au projet.'
         projects: 'Répertoriez tous les projets, gérez les membres et les liens de groupe ou supprimez un projet.'
@@ -1133,10 +1223,21 @@ admin:
         appearance: 'Nom de la marque, accents, couleurs d’état et surfaces.'
         menus: 'Modifier les menus de navigation.'
         breadcrumbs: "Gérer les collections de fils d'Ariane."
+        cookie_consent: 'Modifier le texte du modal, les catégories et l’inventaire des cookies first-party.'
         routing: 'Gérer les chemins publics duals par locale (JSON) pour les contrôleurs Routable.'
+        http_log: Consulter les requêtes HTTP capturées (en-têtes, statut, durée) avec rétention et export.
         mailer: 'DSN Mailer chiffré et adresse From pour les e-mails transactionnels.'
+        api_docs: Explorer l’ingest Envelope et la documentation OpenAPI HTTP associée.
+        social_login: Identifiants OAuth (Google / GitHub / Microsoft) stockés en base.
+        ops_defaults: Rétention, débit d’ingest, quotas et limites de livraison.
+        mercure: Alertes d’incidents en direct via hub Mercure (optionnel).
         instance_config: "Exporter ou importer l'apparence et les indicateurs d'instance non secrets (JSON)."
         setup: 'Étapes initiales plateforme / démo / échantillons.'
+    cookie_consent:
+        tabs_label: Zones de consentement cookies
+        tab_settings: Paramètres
+        tab_cookies: Inventaire des cookies
+        section_tabs_label: Sections des paramètres
     ops:
         title: Vue Ops
         intro: Signaux de santé transverses aux projets. La profondeur de file Messenger est toujours à l’échelle de l’instance.

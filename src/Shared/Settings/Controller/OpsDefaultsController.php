@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Admin UI for instance operational defaults (governance inherit + notification limits).
+ * Admin UI for instance operational defaults (governance, ingest/security, metrics, inbound, notifications).
  */
 #[IsGranted('ROLE_ADMIN')]
 final class OpsDefaultsController extends AbstractController
@@ -31,6 +31,24 @@ final class OpsDefaultsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (true === $form->get('clearMetricsToken')->getData()) {
+                $settings->setMetricsToken(null);
+            } else {
+                $plainMetrics = trim((string) $form->get('plainMetricsToken')->getData());
+                if ('' !== $plainMetrics) {
+                    $settings->setMetricsToken($plainMetrics);
+                }
+            }
+
+            if (true === $form->get('clearInboundWebhookSecret')->getData()) {
+                $settings->setInboundWebhookSecret(null);
+            } else {
+                $plainInbound = trim((string) $form->get('plainInboundWebhookSecret')->getData());
+                if ('' !== $plainInbound) {
+                    $settings->setInboundWebhookSecret($plainInbound);
+                }
+            }
+
             $this->repository->save($settings);
             $this->addFlash('success', 'flash.ops_defaults.saved');
 

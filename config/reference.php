@@ -1550,6 +1550,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     iconify?: bool|array{ // Configuration for the remote icon service.
  *         enabled?: bool|Param, // Default: true
  *         on_demand?: bool|Param, // Whether to download icons "on demand". // Default: true
+ *         auto_lock?: bool|Param, // Persist "on demand" icons to the local icon directory (see "icon_dir"). Recommended in dev only. Requires "on_demand" to be enabled. // Default: false
  *         endpoint?: scalar|Param|null, // The endpoint for the Iconify icons API. // Default: "https://api.iconify.design"
  *     },
  *     ignore_not_found?: bool|Param, // Ignore error when an icon is not found. Set to 'true' to fail silently. // Default: false
@@ -2474,6 +2475,56 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     register_unprefixed_default?: bool|Param, // Default: true
  *     seo_kit_bridge?: bool|Param, // When true and SeoKitBundle is installed, decorate SeoPathBuilderInterface with RoutingKit paths. // Default: true
  * }
+ * @psalm-type NowoHttpLogConfig = array{
+ *     enabled?: bool|Param, // Default: true
+ *     environments?: list<scalar|Param|null>,
+ *     async?: bool|Param, // Default: true
+ *     sampling_rate?: float|Param, // Default: 1.0
+ *     track_sub_requests?: bool|Param, // Default: false
+ *     ignore_routes?: list<scalar|Param|null>,
+ *     ignore_path_prefixes?: list<scalar|Param|null>,
+ *     capture?: array{
+ *         request_headers?: bool|Param, // Default: true
+ *         request_body?: bool|Param, // Default: false
+ *         response_headers?: bool|Param, // Default: true
+ *         client_ip?: bool|Param, // Default: true
+ *         user?: bool|Param, // Default: true
+ *         max_body_bytes?: int|Param, // Default: 65536
+ *         response_body_by_type?: array{
+ *             html?: bool|Param, // Default: false
+ *             json?: bool|Param, // Default: true
+ *             soap?: bool|Param, // Default: true
+ *             xml?: bool|Param, // Default: true
+ *             text?: bool|Param, // Default: false
+ *             binary?: bool|Param, // Default: false
+ *             other?: bool|Param, // Default: false
+ *         },
+ *     },
+ *     redaction?: array{
+ *         headers?: list<scalar|Param|null>,
+ *         query_params?: list<scalar|Param|null>,
+ *         json_paths?: list<scalar|Param|null>,
+ *     },
+ *     retention?: array{
+ *         days?: mixed, // Null keeps entries forever // Default: 30
+ *     },
+ *     export?: array{
+ *         formats?: list<scalar|Param|null>,
+ *         max_sync_rows?: int|Param, // Default: 1000
+ *     },
+ *     web_ui?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/admin/http-log"
+ *         layout_template?: scalar|Param|null, // Default: "@NowoHttpLogBundle/layout.html.twig"
+ *         css_framework?: "bootstrap5"|"tailwind"|"foundation"|"custom"|Param, // Default: "bootstrap5"
+ *         page_size?: int|Param, // Default: 50
+ *     },
+ *     security?: array{
+ *         access_roles?: list<scalar|Param|null>,
+ *         access_checker?: scalar|Param|null, // Default: null
+ *         allow_unauthenticated?: bool|Param, // Default: false
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2510,6 +2561,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_beacon?: NowoBeaconConfig,
  *     nowo_site_backup?: NowoSiteBackupConfig,
  *     nowo_routing_kit?: NowoRoutingKitConfig,
+ *     nowo_http_log?: NowoHttpLogConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2548,6 +2600,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2585,6 +2638,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2624,6 +2678,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

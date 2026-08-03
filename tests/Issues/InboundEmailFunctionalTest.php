@@ -69,6 +69,19 @@ final class InboundEmailFunctionalTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testBodyBeaconSecretIsRejected(): void
+    {
+        [$client] = $this->bootWithDemoProject('inbound-body-secret@example.com');
+        $client->request(Request::METHOD_POST, '/hooks/email/inbound', [
+            'sender' => 'x@example.com',
+            'recipient' => 'reply+x@inbound.beacon.test',
+            'body-plain' => 'hi',
+            'beacon_secret' => 'phpunit-inbound-secret',
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testDuplicateMessageIdIsIdempotent(): void
     {
         [$client, , $project] = $this->bootWithDemoProject('inbound-dup@example.com');

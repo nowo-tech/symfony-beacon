@@ -108,13 +108,10 @@ Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/
 
 | Access | How |
 |--------|-----|
-| Admin UI | Logged-in `ROLE_ADMIN` session (only when a token is configured in prod — see below) |
-| Scraper | Set `BEACON_METRICS_TOKEN` and send `Authorization: Bearer …` only (query `?token=` is rejected) |
+| Admin UI | Logged-in `ROLE_ADMIN` session |
+| Scraper | Set a metrics scrape token under **Administration → Ops defaults** and send `Authorization: Bearer …` only (query `?token=` is rejected) |
 
-| Env | Default | Meaning |
-|-----|---------|---------|
-| `BEACON_METRICS_TOKEN` | empty | Bearer scrape secret |
-| `BEACON_METRICS_REQUIRE_TOKEN` | `0` in dist; **`1` in `APP_ENV=prod`** | When `1`, empty token → **503** until configured |
+Enable **Require metrics scrape token** in production (Ops defaults). When required and no token is stored, `/metrics` returns **503**.
 
 **Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). The FrankenPHP `Caddyfile` includes a commented `remote_ip` snippet for private-only scrapes. Counters live in `cache.app` (shared only if your cache backend is shared across workers).
 
@@ -130,6 +127,14 @@ php bin/console app:retention:purge
 make console ARGS='app:retention:purge'
 ```
 
+Also schedule HTTP audit-log retention (HttpLogBundle, default 30 days):
+
+```bash
+php bin/console nowo:http-log:purge
+# or
+make console ARGS='nowo:http-log:purge'
+```
+
 ## Ingest rate limit
 
 Set the maximum Envelope POSTs per project per minute under **Administration → Ops defaults** (`0` = unlimited). Projects may override it. Exceeded requests get HTTP `429` with `Retry-After: 60`.
@@ -140,11 +145,7 @@ Daily and monthly event quotas are configured on the same page (`0` = unlimited)
 
 Prefer `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` is deprecated.
 
-| Env | Default | Meaning |
-|-----|---------|---------|
-| `BEACON_INGEST_REJECT_QUERY_AUTH` | **`1`** (all envs, including `.env.dist`) | When `1`, query auth returns **401** |
-
-Set `BEACON_INGEST_REJECT_QUERY_AUTH=0` only while migrating clients (any environment).
+**Reject deprecated query-string ingest auth** is enabled by default under **Administration → Ops defaults**. Disable it only while migrating clients (any environment).
 
 ## Security headers (Caddy)
 
@@ -152,11 +153,11 @@ The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-T
 
 - **HSTS:** default `max-age=31536000; includeSubDomains` on non-loopback hosts. Override or extend via `CADDY_SERVER_EXTRA_DIRECTIVES` if you terminate TLS elsewhere (or need `preload`).
 - Do not ship analytics cookies without cookie-consent kit UX.
-- **Swagger UI** (`/api/doc`) still needs `script-src 'unsafe-eval'` (JSON Schema compile). The PHP CSP subscriber uses a path-specific policy (no `'unsafe-inline'`); Swagger assets are same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`) and boot via Vite `swagger-ui-boot`.
+- **Swagger UI** (`/admin/api/doc`) still needs `script-src 'unsafe-eval'` (JSON Schema compile). The PHP CSP subscriber uses a path-specific policy (no `'unsafe-inline'`); Swagger assets are same-origin (`nelmio_api_doc.html_config.assets_mode: bundle`) and boot via Vite `swagger-ui-boot`.
 
-`/api/doc` and `/api/doc.json` require **`ROLE_ADMIN`**.
+`/admin/api/doc` and `/admin/api/doc.json` require **`ROLE_ADMIN`**.
 
-Outbound webhooks: keep `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS=0` in production. Delivery pins DNS (`resolve`) after `OutboundUrlGuard` validation (anti rebinding).
+Outbound webhooks: keep **Allow private notification URLs** disabled in production (Ops defaults). Delivery pins DNS (`resolve`) after `OutboundUrlGuard` validation (anti rebinding).
 
 ## Login throttling
 
@@ -170,6 +171,27 @@ Minimum operator checklist:
 2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) separately from the DB dump.
 3. **Encrypt key**: include `var/secrets/.Halite.default.key` (or `APP_ENCRYPT_KEY`) with secret backups — see [Field encryption key](#field-encryption-key-halite).
 4. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.
+
+## Operational inventory (deploy checklist)
+
+Use this list before exposing an instance beyond a trusted network. Details live in the sections above.
+
+| Area | Must configure / verify | Notes |
+|------|-------------------------|--------|
+| **SiteBackup / setup** | Unique `SITE_SETUP_TOKEN`, unique `SITE_BACKUP_PASSWORD_HASH` | Fail-closed outside `dev`/`test` if local defaults remain |
+| **App secrets** | `APP_SECRET`, DB credentials, Halite key volume or `APP_ENCRYPT_KEY` | Losing the encrypt key breaks ciphertext |
+| **Messenger** | Separate `messenger:consume`; watch `/health/ready` queue depth | Do not conflate with `FRANKENPHP_MODE=worker` |
+| **Retention / quotas** | Ops defaults + optional per-project overrides; schedule `app:retention:purge` | `0` disables that rule |
+| **HTTP audit log** | Admin → HTTP log (`/admin/http-log`); schedule `nowo:http-log:purge` | Default retention 30 days; may store IPs / user ids |
+| **Ingest** | Prefer `X-Beacon-Auth`; keep reject-query-auth enabled in Ops defaults | Rotate project API key secrets if leaked |
+| **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
+| **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
+| **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production | Prefer private scrape network / Caddy `remote_ip` allowlist |
+| **Health** | `/health/live` + `/health/ready` for probes | Ready exposes queue depth (operational signal) |
+| **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` so client IP (login throttle, audit) is not spoofable | Default Compose terminates TLS in Caddy — only needed for an outer proxy |
+| **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit` | Controlled sources only; do not `|raw` user/event payload HTML |
+| **Mailer / Mercure** | Real DSN/hub in Admin; never ship Mailpit in prod Compose | Encrypted at rest via Halite |
+| **Legal / cookies** | Privacy/terms/cookies pages; consent kit for non-essential cookies | Required for public operator UX |
 
 ## Out of scope (intentionally)
 

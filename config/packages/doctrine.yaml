@@ -76,6 +76,12 @@ doctrine:
                 dir: Entity
                 prefix: 'Nowo\LoginThrottleBundle\Entity'
                 alias: NowoLoginThrottleBundle
+            NowoHttpLogBundle:
+                type: attribute
+                is_bundle: true
+                dir: Entity
+                prefix: 'Nowo\HttpLogBundle\Entity'
+                alias: NowoHttpLogBundle
 
 when@test:
     doctrine:

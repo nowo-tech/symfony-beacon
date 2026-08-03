@@ -30,6 +30,12 @@ class InstanceSettings implements AuditableInterface
     public const DEFAULT_DELIVERY_HISTORY_LIMIT = 20;
     public const DEFAULT_CIRCUIT_BREAKER_THRESHOLD = 5;
     public const DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES = 0;
+    public const DEFAULT_ENVELOPE_MAX_BYTES = 2_097_152;
+    public const DEFAULT_INGEST_REJECT_QUERY_AUTH = true;
+    public const DEFAULT_METRICS_REQUIRE_TOKEN = false;
+    public const DEFAULT_INBOUND_EMAIL_ENABLED = false;
+    public const DEFAULT_ALLOW_PRIVATE_URLS = false;
+    public const DEFAULT_ALLOW_ANONYMOUS_RESOLVE = false;
 
     #[ORM\Id]
     #[ORM\Column]
@@ -91,6 +97,37 @@ class InstanceSettings implements AuditableInterface
 
     #[ORM\Column(options: ['default' => self::DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES])]
     private int $notificationCircuitBreakerCooldownMinutes = self::DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_ENVELOPE_MAX_BYTES])]
+    private int $envelopeMaxBytes = self::DEFAULT_ENVELOPE_MAX_BYTES;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_INGEST_REJECT_QUERY_AUTH])]
+    private bool $ingestRejectQueryAuth = self::DEFAULT_INGEST_REJECT_QUERY_AUTH;
+
+    /** Prometheus scrape Bearer token (encrypted at rest). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $metricsToken = null;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_METRICS_REQUIRE_TOKEN])]
+    private bool $metricsRequireToken = self::DEFAULT_METRICS_REQUIRE_TOKEN;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_INBOUND_EMAIL_ENABLED])]
+    private bool $inboundEmailEnabled = self::DEFAULT_INBOUND_EMAIL_ENABLED;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $inboundMailDomain = null;
+
+    /** Inbound webhook + Reply-To signing secret (encrypted at rest). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Encrypted]
+    private ?string $inboundWebhookSecret = null;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_ALLOW_PRIVATE_URLS])]
+    private bool $allowPrivateUrls = self::DEFAULT_ALLOW_PRIVATE_URLS;
+
+    #[ORM\Column(options: ['default' => self::DEFAULT_ALLOW_ANONYMOUS_RESOLVE])]
+    private bool $allowAnonymousResolve = self::DEFAULT_ALLOW_ANONYMOUS_RESOLVE;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -375,6 +412,145 @@ class InstanceSettings implements AuditableInterface
     public function setNotificationCircuitBreakerCooldownMinutes(int $notificationCircuitBreakerCooldownMinutes): self
     {
         $this->notificationCircuitBreakerCooldownMinutes = max(0, $notificationCircuitBreakerCooldownMinutes);
+
+        return $this;
+    }
+
+    public function getEnvelopeMaxBytes(): int
+    {
+        return $this->envelopeMaxBytes;
+    }
+
+    public function setEnvelopeMaxBytes(int $envelopeMaxBytes): self
+    {
+        $this->envelopeMaxBytes = max(1, $envelopeMaxBytes);
+
+        return $this;
+    }
+
+    public function isIngestRejectQueryAuth(): bool
+    {
+        return $this->ingestRejectQueryAuth;
+    }
+
+    public function setIngestRejectQueryAuth(bool $ingestRejectQueryAuth): self
+    {
+        $this->ingestRejectQueryAuth = $ingestRejectQueryAuth;
+
+        return $this;
+    }
+
+    public function getMetricsToken(): ?string
+    {
+        return $this->metricsToken;
+    }
+
+    public function setMetricsToken(?string $metricsToken): self
+    {
+        if (null === $metricsToken) {
+            $this->metricsToken = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($metricsToken);
+        $this->metricsToken = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function hasMetricsToken(): bool
+    {
+        return null !== $this->metricsToken && '' !== $this->metricsToken;
+    }
+
+    public function isMetricsRequireToken(): bool
+    {
+        return $this->metricsRequireToken;
+    }
+
+    public function setMetricsRequireToken(bool $metricsRequireToken): self
+    {
+        $this->metricsRequireToken = $metricsRequireToken;
+
+        return $this;
+    }
+
+    public function isInboundEmailEnabled(): bool
+    {
+        return $this->inboundEmailEnabled;
+    }
+
+    public function setInboundEmailEnabled(bool $inboundEmailEnabled): self
+    {
+        $this->inboundEmailEnabled = $inboundEmailEnabled;
+
+        return $this;
+    }
+
+    public function getInboundMailDomain(): ?string
+    {
+        return $this->inboundMailDomain;
+    }
+
+    public function setInboundMailDomain(?string $inboundMailDomain): self
+    {
+        if (null === $inboundMailDomain) {
+            $this->inboundMailDomain = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($inboundMailDomain);
+        $this->inboundMailDomain = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getInboundWebhookSecret(): ?string
+    {
+        return $this->inboundWebhookSecret;
+    }
+
+    public function setInboundWebhookSecret(?string $inboundWebhookSecret): self
+    {
+        if (null === $inboundWebhookSecret) {
+            $this->inboundWebhookSecret = null;
+
+            return $this;
+        }
+
+        $trimmed = trim($inboundWebhookSecret);
+        $this->inboundWebhookSecret = '' !== $trimmed ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function hasInboundWebhookSecret(): bool
+    {
+        return null !== $this->inboundWebhookSecret && '' !== $this->inboundWebhookSecret;
+    }
+
+    public function isAllowPrivateUrls(): bool
+    {
+        return $this->allowPrivateUrls;
+    }
+
+    public function setAllowPrivateUrls(bool $allowPrivateUrls): self
+    {
+        $this->allowPrivateUrls = $allowPrivateUrls;
+
+        return $this;
+    }
+
+    public function isAllowAnonymousResolve(): bool
+    {
+        return $this->allowAnonymousResolve;
+    }
+
+    public function setAllowAnonymousResolve(bool $allowAnonymousResolve): self
+    {
+        $this->allowAnonymousResolve = $allowAnonymousResolve;
 
         return $this;
     }

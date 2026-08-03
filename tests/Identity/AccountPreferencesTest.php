@@ -277,6 +277,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $display = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('id="display-pwa-heading"', $display);
         self::assertStringContainsString('id="nowo-pwa-install-links"', $display);
+        self::assertStringContainsString('nowo-pwa-install-links__install btn-primary', $display);
 
         $client->request(Request::METHOD_GET, '/dashboard');
         self::assertResponseIsSuccessful();

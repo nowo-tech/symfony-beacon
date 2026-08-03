@@ -8,6 +8,7 @@ use App\Identity\AdminAuditFilter;
 use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Exception\AccountAnonymizeException;
+use App\Identity\Form\AdminUserType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
@@ -72,39 +73,26 @@ final class AdminUserController extends AbstractController
     #[Route('/admin/users/new', name: 'admin_users_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_user_new', $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
+        $form = $this->createForm(AdminUserType::class, [
+            'email' => '',
+            'displayName' => '',
+            'password' => '',
+            'role' => 'user',
+            'enabled' => true,
+        ]);
+        $form->handleRequest($request);
 
-            $email = strtolower(trim($request->request->getString('email')));
-            $displayName = trim($request->request->getString('display_name'));
-            $password = $request->request->getString('password');
-            $role = $request->request->getString('role');
-            $enabled = $request->request->getBoolean('enabled', true);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array{email: string, displayName: string, password: string, role: string, enabled: bool} $data */
+            $data = $form->getData();
+            $email = strtolower(trim($data['email']));
+            $displayName = trim($data['displayName']);
+            $password = $data['password'];
+            $role = $data['role'];
+            $enabled = (bool) $data['enabled'];
 
-            if ('' === $email || !filter_var($email, \FILTER_VALIDATE_EMAIL)) {
-                $this->addFlash('error', 'flash.users.invalid_email');
-
-                return $this->redirectToRoute('admin_users_new');
-            }
-            if ('' === $displayName) {
-                $this->addFlash('error', 'flash.users.name_required');
-
-                return $this->redirectToRoute('admin_users_new');
-            }
-            if (\strlen($password) < 8) {
-                $this->addFlash('error', 'flash.users.password_too_short');
-
-                return $this->redirectToRoute('admin_users_new');
-            }
             if ($this->userRepository->findOneByEmail($email) instanceof User) {
                 $this->addFlash('error', 'flash.users.email_taken');
-
-                return $this->redirectToRoute('admin_users_new');
-            }
-            if (!\in_array($role, ['user', 'admin'], true)) {
-                $this->addFlash('error', 'flash.users.invalid_role');
 
                 return $this->redirectToRoute('admin_users_new');
             }
@@ -137,7 +125,9 @@ final class AdminUserController extends AbstractController
             return $this->redirectToRoute('admin_users');
         }
 
-        return $this->render('admin/users/form.html.twig');
+        return $this->render('admin/users/form.html.twig', [
+            'form' => $form,
+        ]);
     }
 
     /**

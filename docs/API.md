@@ -1,6 +1,6 @@
 # HTTP API overview
 
-Beacon exposes a small public/operator API surface. Interactive OpenAPI lives in the app at **`/api/doc`** (Nelmio ApiDoc).
+Beacon exposes a small public/operator API surface. Interactive OpenAPI lives in the app at **`/admin/api/doc`** (Nelmio ApiDoc, Administration shell).
 
 Related: [DSN.md](DSN.md) (client auth), [ARCHITECTURE.md](ARCHITECTURE.md) (ingest flow), [NOTIFICATIONS.md](product/NOTIFICATIONS.md) (outbound webhooks).
 
@@ -15,7 +15,7 @@ Content-Type: application/x-beacon-envelope
 |-----------|--------|
 | `X-Beacon-Auth: beacon_key=…; beacon_secret=…` | **Preferred** |
 | Envelope header `"dsn": "https://public:secret@host/project"` | Supported |
-| Query `?beacon_key=&beacon_secret=` | **Deprecated** — rejected by default (`BEACON_INGEST_REJECT_QUERY_AUTH=1`); set `0` only while migrating |
+| Query `?beacon_key=&beacon_secret=` | **Deprecated** — rejected by default (Ops defaults → reject query auth); disable only while migrating |
 
 Ingest **always requires** a non-empty secret. The public key must belong to `{project_id}`. Successful requests return a fast **200 ACK**; processing continues on Messenger.
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
 ```
 
-Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches `BEACON_ENVELOPE_MAX_BYTES`. Spec: `067-otlp-ingest`.
+Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches Ops defaults envelope max bytes (default 2 MiB). Spec: `067-otlp-ingest`.
 
 ## OTLP traces ingest (v1)
 
@@ -64,8 +64,8 @@ Bind these carefully in production ([PRODUCTION.md](PRODUCTION.md)).
 
 ## Operator OpenAPI
 
-- UI: `/api/doc` (Swagger / OpenAPI panel in the app shell; spec `013-api-docs-panel`)
-- Restricting `/api/doc` to `ROLE_ADMIN` is Planned (`054-api-doc-admin-only`)
+- UI: `/admin/api/doc` (Swagger / OpenAPI in the Administration shell; specs `013-api-docs-panel`, `054-api-doc-admin-only`)
+- Requires **`ROLE_ADMIN`**
 
 There is **no** public read API for issues yet (Planned: `042-read-api-tokens`). Automation today: CSV/JSON export from the Issues UI, notification webhooks, and Envelope ingest.
 

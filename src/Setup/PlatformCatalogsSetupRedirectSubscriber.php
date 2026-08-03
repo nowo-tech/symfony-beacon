@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace App\Setup;
 
 use App\Shared\Settings\Service\PlatformBootstrapState;
-use Nowo\SiteBackupBundle\Model\SetupProgress;
 use Nowo\SiteBackupBundle\Routing\SetupPathPrefixResolver;
-use Nowo\SiteBackupBundle\Setup\SetupOrchestrator;
-use Nowo\SiteBackupBundle\Setup\Storage\SetupMarkerManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,22 +15,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Throwable;
 
 /**
- * When platform catalogs are missing, send HTML visitors to SiteBackup setup
- * (`/setup` or `/{_locale}/setup` depending on request locale / setup.locale).
+ * Extra gate for empty platform catalogs when SiteBackup's own redirect has not run yet.
  *
- * Complements SiteBackupBundle detectors (empty schema / markers). AuthKit, legal,
- * health, and ingest stay reachable so operators can still register or sign in.
- *
- * Also marks SiteBackup setup as required and clears a stale "completed" progress
- * so setup does not bounce back to `/` while catalogs are still empty.
+ * Primary signal is {@see PlatformCatalogsSetupNeedDetector} (SiteBackup 1.8+).
+ * This subscriber keeps Beacon-specific behaviour: authenticated non-admins are not
+ * forced to setup (FR-006), and a completed wizard progress is cleared if catalogs
+ * are wiped again.
  */
 final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PlatformBootstrapState $platformBootstrapState,
         private AuthorizationCheckerInterface $authorizationChecker,
-        private SetupMarkerManager $setupMarkers,
-        private SetupOrchestrator $setupOrchestrator,
         private SetupPathPrefixResolver $setupPathPrefixResolver,
         #[Autowire('%nowo.site_backup.setup.path_prefix%')]
         private string $setupPathPrefix = '/setup',
@@ -77,14 +70,6 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             return;
         }
 
-        // Keep SiteBackup gate aligned with empty catalogs (avoids setup → / loops).
-        if (!$this->setupMarkers->isRequiredMarked()) {
-            $this->setupMarkers->markRequired('fresh_install');
-        }
-        if (SetupProgress::PHASE_COMPLETED === $this->setupOrchestrator->getProgress()->getPhase()) {
-            $this->setupOrchestrator->resetProgress();
-        }
-
         $path = $request->getPathInfo();
         if ($this->isExcludedPath($path)) {
             return;
@@ -123,7 +108,8 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             '/locale/',
             '/cookie_consent',
             '/cookie-consent/',
-            '/_routing',
+            '/cookie-consent-config',
+            '/admin/_routing',
             '/_error',
             '/health/',
         ];

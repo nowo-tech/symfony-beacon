@@ -7,6 +7,9 @@ namespace App\Tests\Shared;
 use App\Shared\Metrics\MetricsCollector;
 use App\Shared\Metrics\MetricsController;
 use App\Shared\Metrics\PrometheusTextFormatter;
+use App\Shared\Settings\Entity\InstanceSettings;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MetricsEndpointTest extends DatabaseWebTestCase
@@ -57,11 +60,15 @@ final class MetricsEndpointTest extends DatabaseWebTestCase
     {
         self::createClient();
         $container = self::getContainer();
+        $settings = InstanceSettings::defaults();
+        $settings->setMetricsRequireToken(true);
+        $settings->setMetricsToken(null);
+        $repository = $this->createStub(InstanceSettingsRepository::class);
+        $repository->method('getOrCreate')->willReturn($settings);
         $controller = new MetricsController(
             $container->get(MetricsCollector::class),
             $container->get(PrometheusTextFormatter::class),
-            '',
-            true,
+            new InstanceOpsDefaults($repository),
         );
         $response = $controller(Request::create('/metrics'));
         self::assertSame(503, $response->getStatusCode());

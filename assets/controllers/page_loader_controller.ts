@@ -1,27 +1,32 @@
 import { Controller } from '@hotwired/stimulus';
 
 /**
- * Full-page Thinking Orb overlay (translucent veil).
+ * Full-page Thinking Orb overlay (soft translucent veil).
  *
  * Shows on connect (initial paint), hides after `minVisible` ms once the
- * window has loaded. Also shows briefly when following same-origin links.
+ * window has loaded. Also eases in when following same-origin links.
  */
 export default class extends Controller {
   static targets = ['overlay'];
 
   static values = {
-    minVisible: { type: Number, default: 650 },
-    linkDelay: { type: Number, default: 120 },
+    minVisible: { type: Number, default: 720 },
+    linkDelay: { type: Number, default: 90 },
+    enterMs: { type: Number, default: 700 },
+    leaveMs: { type: Number, default: 450 },
   };
 
   declare readonly overlayTarget: HTMLElement;
   declare readonly hasOverlayTarget: boolean;
   declare readonly minVisibleValue: number;
   declare readonly linkDelayValue: number;
+  declare readonly enterMsValue: number;
+  declare readonly leaveMsValue: number;
 
   private shownAt = 0;
   private hideTimer: number | null = null;
   private safetyTimer: number | null = null;
+  private showGeneration = 0;
   private navigating = false;
 
   connect(): void {
@@ -115,6 +120,9 @@ export default class extends Controller {
       return;
     }
     this.shownAt = performance.now();
+    this.showGeneration += 1;
+    const generation = this.showGeneration;
+
     overlay.hidden = false;
     overlay.classList.remove('is-leaving');
     overlay.setAttribute('aria-busy', 'true');
@@ -124,10 +132,19 @@ export default class extends Controller {
       return;
     }
 
-    // Retrigger enter keyframes (also used on in-app navigations).
+    // Start from the idle (opacity 0) frame, then activate on the next paints
+    // so the fade-in keyframes always run instead of popping opaque.
     overlay.classList.remove('is-active');
     void overlay.offsetWidth;
-    overlay.classList.add('is-active');
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (generation !== this.showGeneration) {
+          return;
+        }
+        overlay.classList.add('is-active');
+      });
+    });
   }
 
   private scheduleHide(): void {
@@ -159,6 +176,7 @@ export default class extends Controller {
       document.documentElement.classList.remove('is-page-loading');
       return;
     }
+    this.showGeneration += 1;
     overlay.setAttribute('aria-busy', 'false');
     document.documentElement.classList.remove('is-page-loading');
 
@@ -174,10 +192,11 @@ export default class extends Controller {
       overlay.classList.remove('is-leaving', 'is-active');
     };
     overlay.addEventListener('transitionend', done, { once: true });
-    window.setTimeout(done, 500);
+    window.setTimeout(done, this.leaveMsValue + 80);
   }
 
   private clearTimers(): void {
+    this.showGeneration += 1;
     if (this.hideTimer !== null) {
       window.clearTimeout(this.hideTimer);
       this.hideTimer = null;

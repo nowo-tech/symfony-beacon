@@ -2,7 +2,7 @@
 
 **Feature Branch**: `033-coverage-ci`  
 **Created**: 2026-07-21  
-**Status**: Implemented (v0.16.0 — informational CI coverage + optional `COVERAGE_MIN`)  
+**Status**: Implemented (v0.16.0 informational; F0.3 enables soft gate `COVERAGE_MIN=35` in CI — raise carefully, never 100%)  
 
 **Input**: Add a non-blocking (initially) code coverage report job to CI for PHPUnit, without enforcing an aggressive 100% gate. Optional soft threshold only after a baseline exists (`022` already runs functional tests).
 

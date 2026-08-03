@@ -20,7 +20,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
 {
-    public function testResolveHttpPostMarksIssueResolvedWithValidToken(): void
+    public function testResolveHttpPostRejectedWhenAnonymousDisabled(): void
     {
         [$client, , $project] = $this->bootWithDemoProject('teams-resolve@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -65,12 +65,12 @@ final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
             $body,
         );
 
-        self::assertResponseIsSuccessful();
+        self::assertResponseStatusCodeSame(403);
 
         $em->clear();
         /** @var Issue $reloaded */
         $reloaded = $em->getRepository(Issue::class)->find($issue->getId());
-        self::assertSame(IssueStatus::Resolved, $reloaded->getStatus());
+        self::assertSame(IssueStatus::Unresolved, $reloaded->getStatus());
     }
 
     public function testRejectsInvalidTokenWithoutMutatingIssue(): void

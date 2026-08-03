@@ -15,19 +15,11 @@
     {{ form_start(form) }}
         <section class="panel space-y-4" aria-labelledby="display-prefs-heading">
             <h2 id="display-prefs-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.section_layout'|trans }}</h2>
-            {{ form_row(form.preferredLocale) }}
-            {{ form_row(form.preferredTheme) }}
-            {{ form_row(form.preferredContentWidth) }}
-            {{ form_row(form.preferredUiDensity) }}
-            {{ form_row(form.preferredFontScale) }}
-            {{ form_row(form.preferredContrast) }}
-            {{ form_row(form.preferredSidebar) }}
-            {{ form_row(form.preferredMotion) }}
+            {% include 'form/_fields.html.twig' with {form: form} only %}
+            <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+                <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
+            </div>
         </section>
-
-        <div class="mt-4 flex flex-wrap gap-2">
-            <button class="btn-primary" type="submit">{{ 'preferences.display.submit'|trans }}</button>
-        </div>
     {{ form_end(form) }}
 </div>
 {% endblock %}

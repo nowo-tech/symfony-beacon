@@ -23,6 +23,9 @@ framework:
             App\Ingest\Message\ProcessEnvelopeMessage: async
             App\Notifications\Message\DeliverNotificationMessage: async
             App\Notifications\Message\DeliverWebPushForProjectMessage: async
+            Nowo\HttpLogBundle\Message\PersistHttpLogMessage: async
+            Nowo\HttpLogBundle\Message\ExportHttpLogMessage: async
+            Nowo\HttpLogBundle\Message\PurgeHttpLogMessage: async
 
 when@test:
     framework:

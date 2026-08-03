@@ -20,7 +20,8 @@
         {{ form_row(form.environment) }}
         {{ form_row(form.releaseVersion) }}
     </div>
-    <div class="flex flex-wrap gap-2 pt-2">
+    {% include 'form/_fields.html.twig' with {form: form} only %}
+    <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
         <button class="btn-primary" type="submit">{{ 'thresholds.save'|trans }}</button>
         <a class="btn-ghost" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'thresholds.cancel'|trans }}</a>
     </div>

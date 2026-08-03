@@ -132,6 +132,15 @@ function isMobileSidebar(): boolean {
   return window.matchMedia('(max-width: 900px)').matches;
 }
 
+/** True only when the account explicitly chose reduce (not OS system prefs). */
+function shellMotionBlocked(): boolean {
+  return document.documentElement.dataset.motion === 'reduce';
+}
+
+const SHELL_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const SIDEBAR_MS = 420;
+const CONTENT_WIDTH_MS = 480;
+
 function readSidebarCollapsed(): boolean {
   if (isMobileSidebar()) {
     // Drawer should start closed on phones; ignore desktop expanded preference.
@@ -168,7 +177,42 @@ function writeSidebarCollapsed(collapsed: boolean): void {
   }
 }
 
-function applySidebar(collapsed: boolean): void {
+/**
+ * Animate a CSS property with the Web Animations API so motion still runs when
+ * a global `transition-duration: 0.01ms !important` rule would kill CSS transitions.
+ */
+function animateStyle(
+  el: HTMLElement,
+  keyframes: Keyframe[],
+  duration: number,
+  onDone?: () => void,
+): void {
+  if (duration <= 0 || typeof el.animate !== 'function') {
+    onDone?.();
+    return;
+  }
+
+  const animation = el.animate(keyframes, {
+    duration,
+    easing: SHELL_EASE,
+    fill: 'forwards',
+  });
+
+  let settled = false;
+  const finish = (): void => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    animation.cancel();
+    onDone?.();
+  };
+
+  animation.addEventListener('finish', finish, { once: true });
+  window.setTimeout(finish, duration + 80);
+}
+
+function applySidebar(collapsed: boolean, animate = true): void {
   const shell = document.querySelector<HTMLElement>('[data-app-shell]');
   const backdrop = document.querySelector<HTMLElement>('[data-sidebar-backdrop]');
   if (!shell) {
@@ -178,34 +222,110 @@ function applySidebar(collapsed: boolean): void {
   const mobile = isMobileSidebar();
   const nextCollapsed = !mobile && collapsed;
   const nextOpen = mobile && !collapsed;
+  const sidebar = shell.querySelector<HTMLElement>('.app-sidebar');
+  const main = shell.querySelector<HTMLElement>('.app-main');
 
-  // Ensure the browser registers the pre-change transform before toggling,
-  // so the slide transition runs instead of a visibility pop.
-  void shell.querySelector('.app-sidebar')?.getBoundingClientRect();
+  const currentlyOpen = mobile
+    ? shell.classList.contains('is-sidebar-open')
+    : !shell.classList.contains('is-sidebar-collapsed');
+  const willOpen = mobile ? nextOpen : !nextCollapsed;
 
-  shell.classList.toggle('is-sidebar-collapsed', nextCollapsed);
-  shell.classList.toggle('is-sidebar-open', nextOpen);
+  const commitClasses = (): void => {
+    shell.classList.toggle('is-sidebar-collapsed', nextCollapsed);
+    shell.classList.toggle('is-sidebar-open', nextOpen);
 
-  if (backdrop) {
-    // Overlay fade is driven by `.is-sidebar-open`; keep `hidden` for a11y only.
-    if (mobile && !collapsed) {
-      backdrop.hidden = false;
-    } else if (!mobile) {
-      backdrop.hidden = true;
-    } else {
-      const hide = (): void => {
-        if (!shell.classList.contains('is-sidebar-open')) {
-          backdrop.hidden = true;
-        }
-      };
-      backdrop.addEventListener('transitionend', hide, { once: true });
-      window.setTimeout(hide, 480);
+    if (backdrop) {
+      if (mobile && !collapsed) {
+        backdrop.hidden = false;
+      } else if (!mobile) {
+        backdrop.hidden = true;
+      } else {
+        const hide = (): void => {
+          if (!shell.classList.contains('is-sidebar-open')) {
+            backdrop.hidden = true;
+          }
+        };
+        backdrop.addEventListener('transitionend', hide, { once: true });
+        window.setTimeout(hide, 500);
+      }
     }
+
+    document.querySelectorAll<HTMLElement>('[data-sidebar-toggle]').forEach((button) => {
+      button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  };
+
+  const shouldAnimate =
+    animate && !shellMotionBlocked() && sidebar instanceof HTMLElement && currentlyOpen !== willOpen;
+
+  if (!shouldAnimate) {
+    commitClasses();
+    return;
   }
 
-  document.querySelectorAll<HTMLElement>('[data-sidebar-toggle]').forEach((button) => {
-    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-  });
+  const width = sidebar.getBoundingClientRect().width || sidebar.offsetWidth || 248;
+  const gutter = mobile ? 12 : 8;
+  const fromX = currentlyOpen ? 0 : -(width + gutter);
+  const toX = willOpen ? 0 : -(width + gutter);
+  const fromPad = !mobile && currentlyOpen ? width : 0;
+  const toPad = !mobile && willOpen ? width : 0;
+
+  // Freeze at the current visual position, flip classes, then WAAPI to the end.
+  sidebar.style.transition = 'none';
+  sidebar.style.transform = `translateX(${fromX}px)`;
+  if (main && !mobile) {
+    main.style.transition = 'none';
+    main.style.paddingInlineStart = `${fromPad}px`;
+  }
+
+  commitClasses();
+  void sidebar.getBoundingClientRect();
+
+  let pending = mobile || !main ? 1 : 2;
+  const clearInline = (): void => {
+    pending -= 1;
+    if (pending > 0) {
+      return;
+    }
+    sidebar.style.removeProperty('transform');
+    sidebar.style.removeProperty('transition');
+    if (main) {
+      main.style.removeProperty('padding-inline-start');
+      main.style.removeProperty('transition');
+    }
+  };
+
+  animateStyle(
+    sidebar,
+    [{ transform: `translateX(${fromX}px)` }, { transform: `translateX(${toX}px)` }],
+    SIDEBAR_MS,
+    clearInline,
+  );
+
+  if (main && !mobile) {
+    animateStyle(
+      main,
+      [
+        { paddingInlineStart: `${fromPad}px` },
+        { paddingInlineStart: `${toPad}px` },
+      ],
+      SIDEBAR_MS,
+      clearInline,
+    );
+  }
+
+  if (backdrop && mobile) {
+    backdrop.style.opacity = willOpen ? '0' : '1';
+    void backdrop.offsetWidth;
+    animateStyle(
+      backdrop,
+      [{ opacity: willOpen ? 0 : 1 }, { opacity: willOpen ? 1 : 0 }],
+      SIDEBAR_MS,
+      () => {
+        backdrop.style.removeProperty('opacity');
+      },
+    );
+  }
 }
 
 function initSidebar(): void {
@@ -215,7 +335,7 @@ function initSidebar(): void {
   }
 
   let collapsed = readSidebarCollapsed();
-  applySidebar(collapsed);
+  applySidebar(collapsed, false);
 
   document.querySelectorAll('[data-sidebar-toggle]').forEach((button) => {
     if (button instanceof HTMLElement && button.dataset.sidebarBound === '1') {
@@ -263,7 +383,7 @@ function initSidebar(): void {
 
   window.matchMedia('(max-width: 900px)').addEventListener('change', () => {
     collapsed = readSidebarCollapsed();
-    applySidebar(collapsed);
+    applySidebar(collapsed, false);
   });
 }
 
@@ -299,22 +419,77 @@ function syncContentWidthControls(width: ContentWidth): void {
   });
 }
 
-function applyContentWidth(width: ContentWidth, persist: boolean): void {
+function applyContentWidth(width: ContentWidth, persist: boolean, animate = true): void {
   const shell = document.querySelector<HTMLElement>('[data-app-shell]');
   if (!shell) {
     return;
   }
 
-  // Register current max-width before toggling so the rem↔% transition runs.
-  void shell.querySelector('.app-main__inner')?.getBoundingClientRect();
+  const inner = shell.querySelector<HTMLElement>('.app-main__inner');
+  const footerNav = shell.querySelector<HTMLElement>('.site-legal-footer__nav');
 
-  shell.dataset.contentWidth = width;
-  shell.classList.toggle('is-full-width', width === 'full');
-  shell.classList.toggle('is-content-width', width === 'content');
-  syncContentWidthControls(width);
+  const commit = (): void => {
+    shell.dataset.contentWidth = width;
+    shell.classList.toggle('is-full-width', width === 'full');
+    shell.classList.toggle('is-content-width', width === 'content');
+    syncContentWidthControls(width);
 
-  if (persist) {
-    syncContentWidthToAccount(width);
+    if (persist) {
+      syncContentWidthToAccount(width);
+    }
+  };
+
+  const shouldAnimate = animate && !shellMotionBlocked() && inner instanceof HTMLElement;
+  if (!shouldAnimate) {
+    commit();
+    return;
+  }
+
+  const fromWidth = inner.getBoundingClientRect().width;
+  commit();
+  const toWidth = inner.getBoundingClientRect().width;
+
+  if (Math.abs(fromWidth - toWidth) < 0.5) {
+    return;
+  }
+
+  // FLIP in px — rem↔% max-width often snaps even with @property.
+  inner.style.transition = 'none';
+  inner.style.maxWidth = `${fromWidth}px`;
+  if (footerNav) {
+    footerNav.style.transition = 'none';
+    footerNav.style.maxWidth = `${fromWidth}px`;
+  }
+  void inner.getBoundingClientRect();
+
+  let pending = footerNav ? 2 : 1;
+  const clearInline = (): void => {
+    pending -= 1;
+    if (pending > 0) {
+      return;
+    }
+    inner.style.removeProperty('max-width');
+    inner.style.removeProperty('transition');
+    if (footerNav) {
+      footerNav.style.removeProperty('max-width');
+      footerNav.style.removeProperty('transition');
+    }
+  };
+
+  animateStyle(
+    inner,
+    [{ maxWidth: `${fromWidth}px` }, { maxWidth: `${toWidth}px` }],
+    CONTENT_WIDTH_MS,
+    clearInline,
+  );
+
+  if (footerNav) {
+    animateStyle(
+      footerNav,
+      [{ maxWidth: `${fromWidth}px` }, { maxWidth: `${toWidth}px` }],
+      CONTENT_WIDTH_MS,
+      clearInline,
+    );
   }
 }
 
@@ -349,7 +524,7 @@ function initContentWidth(): void {
     return;
   }
 
-  applyContentWidth(resolveContentWidth(), false);
+  applyContentWidth(resolveContentWidth(), false, false);
 
   document.querySelectorAll('[data-content-width-toggle]').forEach((button) => {
     if (button instanceof HTMLElement && button.dataset.contentWidthBound === '1') {

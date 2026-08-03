@@ -52,7 +52,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
 - **Release health** at `/projects/{uuid}/releases` (new-in-release counts + compare)
-- Operator **OpenAPI** panel at `/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
+- Operator **OpenAPI** panel at `/admin/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
 - Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit**, **encrypted Mailer**, **Prometheus** `/metrics`, **notification circuit breaker**, **GDPR account export/anonymize**, **CI coverage** report — see [ROADMAP](docs/ROADMAP.md) (SSO Later)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories, Slack/Teams **Resolve** / **Assign**, and channel-native **Send test** — [docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md)
 - Optional **inbound email** replies → issue comments — [docs/product/INBOUND-EMAIL.md](docs/product/INBOUND-EMAIL.md)
@@ -101,7 +101,7 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 - After seed, open Analytics: `/projects/1/analytics` (14 days of error / transaction / N+1 counters)
 - First-user registration (empty DB only): https://localhost:9444/register
 - Login: https://localhost:9444/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
-- OpenAPI (after login): https://localhost:9444/api/doc
+- OpenAPI (after login, admin): https://localhost:9444/admin/api/doc
 
 > After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs).
 

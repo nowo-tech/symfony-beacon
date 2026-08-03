@@ -1,7 +1,7 @@
 @keyframes beacon-fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
 
   to {
@@ -13,7 +13,7 @@
 @keyframes beacon-toast-in {
   from {
     opacity: 0;
-    transform: translateY(-10px) scale(0.98);
+    transform: translateY(-8px) scale(0.985);
   }
 
   to {
@@ -30,7 +30,7 @@
 
   to {
     opacity: 0;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-6px) scale(0.985);
   }
 }
 
@@ -47,7 +47,7 @@
 @keyframes beacon-loader-content-in {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(6px) scale(0.99);
   }
 
   to {
@@ -56,47 +56,61 @@
   }
 }
 
-/* Thinking Orbs page loader — translucent veil only (no solid screen). */
+/*
+ * Thinking Orbs page loader — soft translucent veil (content stays readable).
+ * Prefer opacity transitions over display toggles so click navigations ease in.
+ */
 .page-loader {
+  --page-loader-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --page-loader-in: 0.7s;
+  --page-loader-out: 0.45s;
+
   position: fixed;
   inset: 0;
   z-index: 9999;
   display: grid;
   place-items: center;
-  /* Light veil — content stays visible underneath */
-  background: color-mix(in srgb, var(--color-paper, #f3f6f4) 42%, transparent);
+  /* Soft veil — avoid a heavy fog that reads as a hard cut. */
+  background: color-mix(in srgb, var(--color-paper, #f3f6f4) 18%, transparent);
   color: var(--color-ink, #0f1c18);
-  -webkit-backdrop-filter: blur(12px) saturate(1.08);
-  backdrop-filter: blur(12px) saturate(1.08);
+  -webkit-backdrop-filter: blur(5px) saturate(1.03);
+  backdrop-filter: blur(5px) saturate(1.03);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity var(--page-loader-out) var(--page-loader-ease),
+    visibility var(--page-loader-out) var(--page-loader-ease);
 }
 
 html[data-theme="dark"] .page-loader {
-  background: color-mix(in srgb, var(--beacon-paper, #0c1210) 48%, transparent);
+  background: color-mix(in srgb, var(--beacon-paper, #0c1210) 22%, transparent);
   color: var(--beacon-ink, #e6eee9);
 }
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) .page-loader {
-    background: color-mix(in srgb, #0c1210 48%, transparent);
+    background: color-mix(in srgb, #0c1210 22%, transparent);
     color: #e6eee9;
   }
 }
 
+/*
+ * Keep the grid box while [hidden] so show/hide can fade.
+ * UA [hidden]{display:none} would otherwise pop the veil on every click.
+ */
 .page-loader[hidden] {
-  display: none;
+  display: grid !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
-/* Keyframes so first paint (is-active in HTML) still eases in. */
+/* Soft enter: gentle ease + enough duration to read as a fade, not a cut. */
 .page-loader.is-active:not(.is-leaving) {
   visibility: visible;
   pointer-events: auto;
-  animation: beacon-loader-fade-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: beacon-loader-fade-in var(--page-loader-in) var(--page-loader-ease) forwards;
 }
 
 .page-loader.is-leaving {
@@ -104,6 +118,9 @@ html[data-theme="dark"] .page-loader {
   visibility: hidden;
   pointer-events: none;
   animation: none;
+  transition:
+    opacity var(--page-loader-out) var(--page-loader-ease),
+    visibility var(--page-loader-out) var(--page-loader-ease);
 }
 
 .page-loader__inner {
@@ -115,7 +132,12 @@ html[data-theme="dark"] .page-loader {
 }
 
 .page-loader.is-active:not(.is-leaving) .page-loader__inner {
-  animation: beacon-loader-content-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  animation: beacon-loader-content-in 0.65s var(--page-loader-ease) 0.14s both;
+}
+
+.page-loader.is-leaving .page-loader__inner {
+  opacity: 0;
+  transition: opacity 0.28s var(--page-loader-ease);
 }
 
 .page-loader__label {
@@ -124,11 +146,16 @@ html[data-theme="dark"] .page-loader {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, currentColor 62%, transparent);
+  color: color-mix(in srgb, currentColor 55%, transparent);
 }
 
 .thinking-orb {
   flex-shrink: 0;
+}
+
+html.is-page-loading,
+html.is-page-loading body {
+  cursor: progress;
 }
 
 @media (prefers-reduced-motion: reduce) {

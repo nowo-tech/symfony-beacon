@@ -38,8 +38,8 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('New group')->form([
-            'name' => 'Platform',
-            'description' => 'Platform team',
+            'admin_group[name]' => 'Platform',
+            'admin_group[description]' => 'Platform team',
         ]);
         $client->submit($form);
         self::assertResponseRedirects();

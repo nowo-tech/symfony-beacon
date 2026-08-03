@@ -9,6 +9,7 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
+use App\Issues\Entity\IssueMention;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,6 +25,7 @@ final readonly class IssueCommentCreator
         private UserActionRecorder $userActionRecorder,
         private NotificationDispatcher $notificationDispatcher,
         private IssueUserMailNotifier $issueUserMailNotifier,
+        private IssueMentionParser $mentionParser,
     ) {
     }
 
@@ -51,6 +53,13 @@ final readonly class IssueCommentCreator
         $comment->setBody($body);
         $this->entityManager->persist($comment);
         $issue->addComment($comment);
+
+        foreach ($this->mentionParser->resolveMentions($project, $body, $author) as $mentioned) {
+            $mention = new IssueMention();
+            $mention->setComment($comment);
+            $mention->setMentionedUser($mentioned);
+            $this->entityManager->persist($mention);
+        }
 
         $this->userActionRecorder->record(
             UserActionType::IssueCommented,

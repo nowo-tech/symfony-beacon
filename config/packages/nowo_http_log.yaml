@@ -1,0 +1,109 @@
+# nowo-tech/http-log-bundle — HTTP request/response audit log + admin UI
+# https://github.com/nowo-tech/HttpLogBundle
+#
+# Host shell only: kit/http_log_admin_layout.html.twig — do not fork admin/*.twig.
+nowo_http_log:
+    enabled: true
+    environments: []
+    async: true
+    sampling_rate: 1.0
+    track_sub_requests: false
+    ignore_routes:
+        - '_wdt'
+        - '_profiler'
+        - 'web_profiler*'
+        - 'nowo_http_log_*'
+        - 'ingest_*'
+        - 'health_*'
+        - 'metrics_*'
+    ignore_path_prefixes:
+        - '/admin/http-log'
+        - '/api'
+        - '/health'
+        - '/metrics'
+        - '/build'
+        - '/assets'
+        - '/_wdt'
+        - '/_profiler'
+    capture:
+        request_headers: true
+        request_body: false
+        response_headers: true
+        client_ip: true
+        user: true
+        max_body_bytes: 65536
+        response_body_by_type:
+            html: false
+            json: true
+            soap: true
+            xml: true
+            text: false
+            binary: false
+            other: false
+    redaction:
+        headers:
+            - Authorization
+            - Cookie
+            - Set-Cookie
+            - X-Api-Key
+            - X-Beacon-Auth
+            - X-Beacon-Inbound-Secret
+            - X-Slack-Signature
+        query_params:
+            - password
+            - token
+            - api_key
+            - beacon_key
+            - beacon_secret
+        json_paths:
+            - '*.password'
+            - '*.token'
+            - '*.secret'
+            - '*.beacon_secret'
+    retention:
+        days: 30
+    export:
+        formats:
+            - csv
+            - json
+        max_sync_rows: 1000
+    web_ui:
+        enabled: true
+        path_prefix: /admin/http-log
+        layout_template: 'kit/http_log_admin_layout.html.twig'
+        css_framework: custom
+        page_size: 50
+    security:
+        access_roles:
+            - ROLE_ADMIN
+        access_checker: null
+        allow_unauthenticated: false
+
+when@dev:
+    nowo_http_log:
+        sampling_rate: 1.0
+        capture:
+            response_body_by_type:
+                html: false
+                json: true
+                text: true
+
+when@test:
+    nowo_http_log:
+        # Avoid persisting every PHPUnit request; admin UI remains available.
+        enabled: false
+        async: false
+
+when@prod:
+    nowo_http_log:
+        sampling_rate: 0.25
+        capture:
+            request_body: false
+            response_body_by_type:
+                html: false
+                json: true
+                soap: false
+                xml: false
+                text: false
+                binary: false
+                other: false

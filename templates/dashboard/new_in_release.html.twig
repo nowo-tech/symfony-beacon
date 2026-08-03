@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'new_in_release.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+{% set filterQuery = {
+    project: filters.project,
+    release: filters.release,
+    per_page: filters.per_page,
+} %}
+
+<div class="mb-6">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'new_in_release.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'new_in_release.intro'|trans }}</p>
+</div>
+
+<form method="get" action="{{ path('dashboard_new_in_release') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="new-in-release-filters">
+    <input type="hidden" name="page" value="1">
+    <select class="input" name="project" aria-label="{{ 'new_in_release.filter.project'|trans }}">
+        <option value="">{{ 'new_in_release.filter.any_project'|trans }}</option>
+        {% for project in projects %}
+            <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+    </select>
+    <select class="input" name="release" aria-label="{{ 'new_in_release.filter.release'|trans }}">
+        <option value="">{{ 'new_in_release.filter.any_release'|trans }}</option>
+        {% for release in releases %}
+            <option value="{{ release }}" {% if filters.release == release %}selected{% endif %}>{{ release }}</option>
+        {% endfor %}
+    </select>
+    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
+        {% for size in [10, 25, 50, 100] %}
+            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
+        {% endfor %}
+    </select>
+    <div class="issue-filters__actions">
+        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('dashboard_new_in_release') }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
+</form>
+
+{% if pagination.total == 0 %}
+    <div class="panel text-[var(--color-ink)]/70" data-testid="new-in-release-empty">{{ 'new_in_release.empty'|trans }}</div>
+{% else %}
+    <div class="panel" data-testid="new-in-release-results">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="text-xs uppercase tracking-wide text-[var(--color-ink)]/55">
+                        <th class="px-3 py-2">{{ 'new_in_release.col.project'|trans }}</th>
+                        <th class="px-3 py-2">{{ 'issues.col.issue'|trans }}</th>
+                        <th class="px-3 py-2">{{ 'new_in_release.col.release'|trans }}</th>
+                        <th class="px-3 py-2">{{ 'issues.col.level'|trans }}</th>
+                        <th class="px-3 py-2">{{ 'issues.col.last_seen'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in issues %}
+                        <tr class="border-t border-[var(--color-sand)]/70">
+                            <td class="px-3 py-2 align-top">
+                                <a class="no-underline text-[var(--color-moss)] hover:underline" href="{{ path('project_show', {id: issue.project.uuid}) }}">{{ issue.project.name }}</a>
+                            </td>
+                            <td class="px-3 py-2 align-top">
+                                <a class="font-medium no-underline hover:underline" href="{{ path('issue_show', {projectId: issue.project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a>
+                                <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
+                            </td>
+                            <td class="px-3 py-2 align-top whitespace-nowrap">{{ issue.firstRelease }}</td>
+                            <td class="px-3 py-2 align-top">
+                                <span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span>
+                            </td>
+                            <td class="px-3 py-2 align-top whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'shared/_table_pagination.html.twig' with {
+            pagination: pagination,
+            item_count: issues|length,
+            route: 'dashboard_new_in_release',
+            route_params: {},
+            query: filterQuery,
+            nav_label: 'issues.pagination.nav'
+        } %}
+    </div>
+{% endif %}
+{% endblock %}

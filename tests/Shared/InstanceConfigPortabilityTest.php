@@ -40,12 +40,17 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         $json = json_encode($payload, \JSON_THROW_ON_ERROR);
 
         self::assertSame(InstanceConfigPortability::SCHEMA, $payload['schema']);
+        self::assertSame(InstanceConfigPortability::VERSION, $payload['version']);
         self::assertSame('Export Brand', $payload['appearance']['brand_name']);
         self::assertTrue($payload['instance']['mercure_enabled']);
         self::assertTrue($payload['instance']['mailer_configured']);
         self::assertSame(30, $payload['instance']['retention_days']);
         self::assertSame(240, $payload['instance']['ingest_rate_limit']);
         self::assertSame(7, $payload['instance']['notification_circuit_breaker_threshold']);
+        self::assertArrayHasKey('envelope_max_bytes', $payload['instance']);
+        self::assertArrayHasKey('ingest_reject_query_auth', $payload['instance']);
+        self::assertArrayHasKey('metrics_token_configured', $payload['instance']);
+        self::assertArrayNotHasKey('metrics_token', $payload['instance']);
         self::assertStringNotContainsString('super-secret', $json);
         self::assertStringNotContainsString('smtp://', $json);
         self::assertStringNotContainsString('ops@example.com', $json);

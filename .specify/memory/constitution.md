@@ -70,7 +70,7 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 - Document and version operator-facing defaults **only** in `.env.dist` (and keep secrets out of git).
 - Typed aliases such as `beacon.foo: '%env(int:FOO)%'` remain allowed when the variable is required or always present via `.env.dist` / runtime env.
 - Environment-specific overrides (e.g. prod fail-closed flags) belong in `config/packages/*.yaml` under `when@…`, not as `env(…):` defaults in `parameters.yaml`.
-- Prefer instance/database settings for tunable ops defaults when a UI already exists; do not paper over missing `.env.dist` keys with `env(NAME):` in parameters.
+- Prefer instance/database settings for tunable ops defaults; migrate operator knobs out of `.env.dist` into Admin UI when they are not boot/infra secrets. Do not paper over missing `.env.dist` keys with `env(NAME):` in parameters.
 
 Rationale: `env(NAME):` defaults in `parameters.yaml` hide required configuration, duplicate `.env.dist`, and make FrankenPHP / Compose / upgrade diffs harder to audit.
 

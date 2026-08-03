@@ -14,6 +14,7 @@ use App\Issues\Service\IssueUserMailTransport;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\ProjectRole;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Shared\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -92,7 +93,8 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
-            new InboundEmailReplyToken('test-inbound-secret'),
+            self::getContainer()->get(InboundEmailReplyToken::class),
+            self::getContainer()->get(InstanceOpsDefaults::class),
         );
         $notifier->notifyMentionsFromComment($project, $issue, $comment, $owner);
         $notifier->notifyAssigneeChanged($project, $issue, null, $owner, $owner);
@@ -148,7 +150,8 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
-            new InboundEmailReplyToken('test-inbound-secret'),
+            self::getContainer()->get(InboundEmailReplyToken::class),
+            self::getContainer()->get(InstanceOpsDefaults::class),
         );
         $notifier->notifyMentionsFromComment($project, $issue, $comment, $owner);
         $notifier->notifyAssigneeChanged($project, $issue, null, $alice, $owner);
@@ -230,7 +233,8 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
             self::getContainer()->get(TranslatorInterface::class),
             self::getContainer()->get(UrlGeneratorInterface::class),
             new NullLogger(),
-            new InboundEmailReplyToken('test-inbound-secret'),
+            self::getContainer()->get(InboundEmailReplyToken::class),
+            self::getContainer()->get(InstanceOpsDefaults::class),
         );
         $client->disableReboot();
         $client->getContainer()->set(IssueUserMailNotifier::class, $notifier);

@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Form field loop convention (`077`): shared `templates/form/_fields.html.twig`; host Symfony forms paint unrendered Type children before actions (FormKit owns field attrs).
+- `nowo-tech/http-log-bundle` **1.0.1**: HTTP request/response audit log with admin UI at `/admin/http-log` (ROLE_ADMIN), kit host layout, Messenger async persist/export/purge, MDK table `nowo_http_log_entry`.
+- Dashboard **Assignments** panel (`079`): `/dashboard/assignments` — mine / teammates / unassigned across accessible projects with filters (project, level, status, priority, assignee, search).
+- Dashboard aside panels: **Summary** (`/dashboard/summary`), **Activity** (`/dashboard/activity`), **Mentions** (`/dashboard/mentions` + read state), **Alerts** (`/dashboard/alerts`), **New in release** (`/dashboard/new-in-release`); `issue_mention` table for @mention inbox.
+- `OtlpIngestGateway`: shared OTLP auth / body limits / quotas / rate limit / metrics for logs, traces, and metrics controllers.
+- `make kit-smoke`: AuthKit bootstrap + magic login + password reset + login throttle suite after kit bumps.
+- Production **operational inventory** checklist (hooks signing secrets, metrics, trusted proxies, SiteBackup, retention).
+- `HookMutationPolicy` / Ops defaults **Allow anonymous Resolve** (default off): Slack/Teams Resolve requires a mapped Beacon actor unless legacy flag is enabled.
+- `OutboundUrlGuard` validates **A + AAAA** DNS answers and prefers an IPv4 pin when both exist.
+- Admin **User / Group / Project** create-edit forms use FormKit Types + `form/_fields.html.twig` (077).
+- **Ops env → database** (`079`): envelope max bytes, reject query auth, metrics token/require, inbound email, allow private URLs, anonymous Resolve moved to **Administration → Ops defaults** (encrypted secrets); instance config export **v3**.
+
+### Changed
+
+- CI Coverage soft gate: `COVERAGE_MIN=35` (statement %; never 100%).
+- Inbound email webhook accepts secret **only** via `X-Beacon-Inbound-Secret` (body `beacon_secret` rejected).
+- Cookie Consent admin **1.5.0**: route-based settings sections (`/settings/{section}`); host drops `data-kit-form-tabs` / tabify JS and restyles vendor `.nowo-ui-tabs` to Beacon tab chrome.
+- Kit admin UIs use `css_framework: custom` + vendor `nowo-ui.css` (Menu / Breadcrumb / Cookie admin / RoutingKit / SiteBackup); Vite `kit-admin` no longer loads Bootstrap (avoids reboot fighting app shell chrome).
+- Composer pins: DashboardMenu **1.0.5**, BreadcrumbKit **2.0.12**, RoutingKit **1.1.7**, CookieConsent **1.5.0**, AuthKit **1.12.2**, Beacon client **1.6.11**, SiteBackup **1.8.1**, UX Icons **3.4.0** (Packagist).
+- SiteBackup: explicit root `css_framework: custom` + `data-css-framework` on setup/panel host shells (1.6+ / 1.8.x).
+- Former `BEACON_INGEST_REJECT_QUERY_AUTH`, `BEACON_METRICS_*`, `BEACON_ENVELOPE_MAX_BYTES`, `BEACON_INBOUND_*`, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS`, and `BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE` env vars are no longer read (configure via Ops defaults).
+
 ## [1.0.1] - 2026-07-31
 
 ### Changed

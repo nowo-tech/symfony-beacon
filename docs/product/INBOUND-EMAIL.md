@@ -4,13 +4,7 @@ Opt-in feature: members reply to **mention** / **assign** emails and Beacon turn
 
 ## Enable
 
-1. Set in `.env`:
-
-   ```bash
-   BEACON_INBOUND_EMAIL_ENABLED=1
-   BEACON_INBOUND_MAIL_DOMAIN=inbound.example.com
-   BEACON_INBOUND_WEBHOOK_SECRET=<long-random-secret>
-   ```
+1. Under **Administration → Ops defaults**, enable inbound email, set the mail domain, and store the webhook secret (encrypted at rest).
 
 2. Point your inbound provider (Mailgun Routes, etc.) to:
 
@@ -18,13 +12,13 @@ Opt-in feature: members reply to **mention** / **assign** emails and Beacon turn
    POST https://<beacon-host>/hooks/email/inbound
    ```
 
-   Send header `X-Beacon-Inbound-Secret: <same secret>` (or form field `beacon_secret`).
+   Send header `X-Beacon-Inbound-Secret: <same secret>` only (body `beacon_secret` is rejected).
 
-3. Migrate: `php bin/console doctrine:migrations:migrate` (`inbound_email_message` table).
+3. Migrate: `php bin/console doctrine:migrations:migrate` (`inbound_email_message` table + ops columns).
 
 ## Behaviour
 
-- Outbound personal mail includes `Reply-To: reply+{hmac-token}@BEACON_INBOUND_MAIL_DOMAIN`.
+- Outbound personal mail includes `Reply-To: reply+{hmac-token}@{inbound mail domain}`.
 - Webhook expects Mailgun-style fields: `sender` / `from`, `recipient` / `To`, `body-plain` / `stripped-text`, `Message-Id`.
 - Author must match a Beacon user email with project **triage**.
 - Quoted replies are stripped; empty bodies are ignored.

@@ -153,8 +153,8 @@ jobs:
       matrix:
         php: ["8.5"]
     env:
-      # Leave empty until a baseline is agreed (specs/033-coverage-ci). Example: "40"
-      COVERAGE_MIN: ""
+      # Soft statement-% floor (specs/033 + remediation F0.3). Raise only after reviewing Clover; never 100%.
+      COVERAGE_MIN: "35"
 
     services:
       mysql:

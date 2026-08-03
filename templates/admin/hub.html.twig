@@ -9,58 +9,103 @@
     <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin.hub.intro'|trans }}</p>
 </div>
 
-<div class="grid gap-4 sm:grid-cols-2">
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_ops_overview') }}" data-tour="admin-ops">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.ops'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.ops'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_users') }}" data-tour="admin-users">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.users'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.users'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_groups') }}">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.groups'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.groups'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_projects') }}" data-tour="admin-projects">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.admin_projects'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.projects'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_appearance') }}">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.appearance'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.appearance'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_mailer') }}" data-tour="admin-mailer">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.mailer'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.mailer'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_social_login') }}" data-testid="admin-social-login">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.social_login'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.social_login'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_ops_defaults') }}" data-testid="admin-ops-defaults">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.ops_defaults'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.ops_defaults'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_instance_config') }}" data-testid="admin-instance-config">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.instance_config'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.instance_config'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_site_backup_setup') }}" data-tour="admin-setup">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.setup'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.setup'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_dashboard_menu_dashboard_index') }}">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.menus'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.menus'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_breadcrumb_kit_dashboard_collections_index') }}">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.breadcrumbs'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.breadcrumbs'|trans }}</p>
-    </a>
-    <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_routing_kit_panel') }}" data-testid="admin-routing">
-        <h2 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.routing'|trans }}</h2>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.routing'|trans }}</p>
-    </a>
+<div class="flex flex-col gap-8">
+    <section>
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'admin.hub.section.overview'|trans }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_ops_overview') }}" data-tour="admin-ops">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.ops'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.ops'|trans }}</p>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'admin.hub.section.access'|trans }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_users') }}" data-tour="admin-users">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.users'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.users'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_groups') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.groups'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.groups'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_projects') }}" data-tour="admin-projects">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.admin_projects'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.projects'|trans }}</p>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'admin.hub.section.instance'|trans }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_appearance') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.appearance'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.appearance'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_mailer') }}" data-tour="admin-mailer">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.mailer'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.mailer'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_mercure') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.mercure'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.mercure'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_social_login') }}" data-testid="admin-social-login">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.social_login'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.social_login'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_ops_defaults') }}" data-testid="admin-ops-defaults">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.ops_defaults'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.ops_defaults'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('settings_instance_config') }}" data-testid="admin-instance-config">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.instance_config'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.instance_config'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_site_backup_setup') }}" data-tour="admin-setup">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.setup'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.setup'|trans }}</p>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'admin.hub.section.navigation'|trans }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_dashboard_menu_dashboard_index') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.menus'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.menus'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_breadcrumb_kit_dashboard_collections_index') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.breadcrumbs'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.breadcrumbs'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_cookie_consent') }}" data-testid="admin-cookie-consent">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.cookie_consent'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.cookie_consent'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_routing_kit_panel') }}" data-testid="admin-routing">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.routing'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.routing'|trans }}</p>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'admin.hub.section.observability'|trans }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('nowo_http_log_admin_index') }}" data-testid="admin-http-log">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.http_log'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.http_log'|trans }}</p>
+            </a>
+            <a class="panel no-underline transition hover:border-[var(--color-moss)]" href="{{ path('admin_api_doc') }}">
+                <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ 'nav.api_docs'|trans }}</h3>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'admin.hub.api_docs'|trans }}</p>
+            </a>
+        </div>
+    </section>
 </div>
 {% endblock %}

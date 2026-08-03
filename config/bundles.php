@@ -36,4 +36,5 @@ return [
     Nowo\BeaconBundle\NowoBeaconBundle::class => ['all' => true],
     Nowo\SiteBackupBundle\NowoSiteBackupBundle::class => ['all' => true],
     Nowo\RoutingKitBundle\NowoRoutingKitBundle::class => ['all' => true],
+    Nowo\HttpLogBundle\NowoHttpLogBundle::class => ['all' => true],
 ];

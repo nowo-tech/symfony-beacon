@@ -15,10 +15,10 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
     public function testApiDocRequiresAuthentication(): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/api/doc');
+        $client->request(Request::METHOD_GET, '/admin/api/doc');
         self::assertResponseRedirects('/en/login');
 
-        $client->request(Request::METHOD_GET, '/api/doc.json');
+        $client->request(Request::METHOD_GET, '/admin/api/doc.json');
         self::assertResponseRedirects('/en/login');
     }
 
@@ -27,10 +27,10 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject('apidoc-member@example.com');
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/api/doc');
+        $client->request(Request::METHOD_GET, '/admin/api/doc');
         self::assertResponseStatusCodeSame(403);
 
-        $client->request(Request::METHOD_GET, '/api/doc.json');
+        $client->request(Request::METHOD_GET, '/admin/api/doc.json');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -44,12 +44,12 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/admin');
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('a[href="/api/doc"]');
+        self::assertSelectorExists('a[href="/admin/api/doc"]');
 
-        $client->request(Request::METHOD_GET, '/api/doc');
+        $client->request(Request::METHOD_GET, '/admin/api/doc');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-app-shell]');
-        self::assertSelectorExists('#dashboard-menu-navigation');
+        self::assertSelectorExists('#administration-menu-navigation');
         self::assertSelectorExists('.api-docs');
         self::assertSelectorExists('#swagger-ui');
         self::assertSelectorNotExists('a#logo');
@@ -61,7 +61,7 @@ final class ApiDocAccessTest extends DatabaseWebTestCase
         self::assertStringContainsString('/bundles/nelmioapidoc/swagger-ui/swagger-ui.css', $html);
         self::assertStringContainsString('/bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js', $html);
 
-        $client->request(Request::METHOD_GET, '/api/doc.json');
+        $client->request(Request::METHOD_GET, '/admin/api/doc.json');
         self::assertResponseIsSuccessful();
         $json = json_decode($client->getResponse()->getContent() ?: '', true);
         self::assertIsArray($json);

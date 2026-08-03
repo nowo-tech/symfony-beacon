@@ -48,9 +48,7 @@
     </section>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
-        {{ form_row(form.currentPassword) }}
-        {{ form_row(form.plainPassword) }}
-        {{ form_row(form.plainPassword_confirm) }}
+        {% include 'form/_fields.html.twig' with {form: form} only %}
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.security.submit'|trans }}</button>
         </div>

@@ -1,11 +1,9 @@
 /**
- * Kit admin shells (menus / breadcrumbs / cookie-consent): Bootstrap + layout helpers.
+ * Kit admin shells (menus / breadcrumbs / cookie-consent): layout helpers only.
+ * CSS framework is `custom` + vendor `nowo-ui.css` — do not load Bootstrap here
+ * (Tailwind app chrome must not be reboot-overridden).
  * Config from <script type="application/json" id="…"> islands (CSP-safe).
  */
-// @ts-expect-error — CSS side-effect import (no type decls required).
-import 'bootstrap/dist/css/bootstrap.min.css';
-// @ts-expect-error — JS bundle side-effect (Modal, etc. on window.bootstrap).
-import 'bootstrap';
 
 function readJson<T extends Record<string, unknown>>(id: string): T | null {
   const el = document.getElementById(id);
@@ -43,7 +41,7 @@ function bootDashboardMenu(): void {
     window.dashboardMenuIconSelectorScriptUrl = boot.iconSelectorScriptUrl;
   }
   window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
-    cssFramework: boot.cssFramework ?? 'bootstrap5',
+    cssFramework: boot.cssFramework ?? 'custom',
   });
   if (boot.i18n) {
     window.dashboardMenuI18n = boot.i18n;
@@ -64,7 +62,7 @@ function bootBreadcrumbKit(): void {
     window.breadcrumbKitI18n = boot.i18n;
   }
   window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};
-  window.__breadcrumbKitDashboard.cssFramework = boot.cssFramework ?? 'bootstrap5';
+  window.__breadcrumbKitDashboard.cssFramework = boot.cssFramework ?? 'custom';
   if (boot.importPartialUrl) {
     window.__breadcrumbKitDashboard.importPartialUrl = boot.importPartialUrl;
   }
@@ -121,7 +119,7 @@ function splitKitFilters(): void {
 }
 
 function portalKitModals(): void {
-  document.querySelectorAll('.kit-modal.modal').forEach((el) => {
+  document.querySelectorAll('.kit-modal.modal, .nowo-ui-modal.modal').forEach((el) => {
     if (el.parentElement !== document.body) {
       document.body.appendChild(el);
     }

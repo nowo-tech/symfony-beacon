@@ -24,6 +24,7 @@ use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectOpsStatsService;
+use App\Project\Form\ProjectType;
 use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\Http\SafeInternalRedirect;
 use App\Shared\ProjectRole;
@@ -91,27 +92,31 @@ final class AdminProjectController extends AbstractController
     #[Route('/admin/projects/new', name: 'admin_projects_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_project_new', $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
+        $form = $this->createForm(ProjectType::class, [
+            'name' => '',
+            'description' => '',
+        ], [
+            'csrf_token_id' => 'admin_project_new',
+        ]);
+        $form->handleRequest($request);
 
-            $name = trim($request->request->getString('name'));
-            if ('' === $name) {
-                $this->addFlash('error', 'flash.admin_projects.name_required');
-
-                return $this->redirectToRoute('admin_projects_new');
-            }
-
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array{name: string, description?: string|null} $data */
+            $data = $form->getData();
             /** @var User $actor */
             $actor = $this->getUser();
-            $project = $this->createProject($name, $request->request->getString('description'), $actor);
+            $project = $this->createProject(
+                trim($data['name']),
+                (string) ($data['description'] ?? ''),
+                $actor,
+            );
             $this->addFlash('success', 'flash.project.created');
 
             return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
         }
 
         return $this->render('admin/projects/form.html.twig', [
+            'form' => $form,
             'project' => null,
             'is_edit' => false,
         ]);
@@ -257,20 +262,19 @@ final class AdminProjectController extends AbstractController
         Project $project,
         Request $request,
     ): Response {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_project_edit_'.$project->getId(), $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
+        $form = $this->createForm(ProjectType::class, [
+            'name' => $project->getName(),
+            'description' => $project->getDescription() ?? '',
+        ], [
+            'csrf_token_id' => 'admin_project_edit_'.$project->getId(),
+        ]);
+        $form->handleRequest($request);
 
-            $name = trim($request->request->getString('name'));
-            if ('' === $name) {
-                $this->addFlash('error', 'flash.admin_projects.name_required');
-
-                return $this->redirectToRoute('admin_projects_edit', ['id' => $project->getUuid()]);
-            }
-
-            $project->setName($name);
-            $description = trim($request->request->getString('description'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array{name: string, description?: string|null} $data */
+            $data = $form->getData();
+            $project->setName(trim($data['name']));
+            $description = trim((string) ($data['description'] ?? ''));
             $project->setDescription('' !== $description ? $description : null);
             $this->entityManager->flush();
             $this->addFlash('success', 'flash.admin_projects.updated');
@@ -279,6 +283,7 @@ final class AdminProjectController extends AbstractController
         }
 
         return $this->render('admin/projects/form.html.twig', [
+            'form' => $form,
             'project' => $project,
             'is_edit' => true,
         ]);

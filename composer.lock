@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c8e87f3999e87c99d350537cbabf8b3",
+    "content-hash": "b3768776b3d35563fa655171bf9766fe",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2019,16 +2019,16 @@
         },
         {
             "name": "nowo-tech/auth-kit-bundle",
-            "version": "v1.12.1",
+            "version": "v1.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/AuthKitBundle.git",
-                "reference": "449d40f578a4902e5c4a1937773b684d709182cc"
+                "reference": "f4f91779f8e129406ac15b10e0faa97276673543"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/449d40f578a4902e5c4a1937773b684d709182cc",
-                "reference": "449d40f578a4902e5c4a1937773b684d709182cc",
+                "url": "https://api.github.com/repos/nowo-tech/AuthKitBundle/zipball/f4f91779f8e129406ac15b10e0faa97276673543",
+                "reference": "f4f91779f8e129406ac15b10e0faa97276673543",
                 "shasum": ""
             },
             "require": {
@@ -2115,20 +2115,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-31T15:43:51+00:00"
+            "time": "2026-08-01T08:38:34+00:00"
         },
         {
             "name": "nowo-tech/beacon-bundle",
-            "version": "v1.6.10",
+            "version": "v1.6.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BeaconBundle.git",
-                "reference": "90490f14e64cefafa3729ca20fdefba1d8202801"
+                "reference": "777406a55d34145443a1c3d5cca4fe26a80cadba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/90490f14e64cefafa3729ca20fdefba1d8202801",
-                "reference": "90490f14e64cefafa3729ca20fdefba1d8202801",
+                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/777406a55d34145443a1c3d5cca4fe26a80cadba",
+                "reference": "777406a55d34145443a1c3d5cca4fe26a80cadba",
                 "shasum": ""
             },
             "require": {
@@ -2211,20 +2211,20 @@
                 "issues": "https://github.com/nowo-tech/BeaconBundle/issues",
                 "source": "https://github.com/nowo-tech/BeaconBundle"
             },
-            "time": "2026-07-31T12:22:38+00:00"
+            "time": "2026-07-31T14:35:19+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",
-            "version": "v2.0.11",
+            "version": "v2.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BreadcrumbKitBundle.git",
-                "reference": "2cce2318cd5f5bd528384517c67b2f3b293a39af"
+                "reference": "7c6155f66965e0961afdb19b9761bb378d35403e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BreadcrumbKitBundle/zipball/2cce2318cd5f5bd528384517c67b2f3b293a39af",
-                "reference": "2cce2318cd5f5bd528384517c67b2f3b293a39af",
+                "url": "https://api.github.com/repos/nowo-tech/BreadcrumbKitBundle/zipball/7c6155f66965e0961afdb19b9761bb378d35403e",
+                "reference": "7c6155f66965e0961afdb19b9761bb378d35403e",
                 "shasum": ""
             },
             "require": {
@@ -2300,20 +2300,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-30T16:03:23+00:00"
+            "time": "2026-08-01T12:11:08+00:00"
         },
         {
             "name": "nowo-tech/cookie-consent-bundle",
-            "version": "v1.4.8",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/CookieConsentBundle.git",
-                "reference": "bad1cd10b635f32d40211ea3543b0521cf70b138"
+                "reference": "b7d189e53c56bbae96a9681dbe4caf4edcf63187"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/bad1cd10b635f32d40211ea3543b0521cf70b138",
-                "reference": "bad1cd10b635f32d40211ea3543b0521cf70b138",
+                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/b7d189e53c56bbae96a9681dbe4caf4edcf63187",
+                "reference": "b7d189e53c56bbae96a9681dbe4caf4edcf63187",
                 "shasum": ""
             },
             "require": {
@@ -2379,20 +2379,20 @@
                 "issues": "https://github.com/nowo-tech/CookieConsentBundle/issues",
                 "source": "https://github.com/nowo-tech/CookieConsentBundle"
             },
-            "time": "2026-07-30T18:30:54+00:00"
+            "time": "2026-08-01T18:09:06+00:00"
         },
         {
             "name": "nowo-tech/dashboard-menu-bundle",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/DashboardMenuBundle.git",
-                "reference": "1e11ec027259dc95c9703d7d422a9012c81ab869"
+                "reference": "4f658f10a48a1b88a0af672cdcf319a8c26a2587"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/DashboardMenuBundle/zipball/1e11ec027259dc95c9703d7d422a9012c81ab869",
-                "reference": "1e11ec027259dc95c9703d7d422a9012c81ab869",
+                "url": "https://api.github.com/repos/nowo-tech/DashboardMenuBundle/zipball/4f658f10a48a1b88a0af672cdcf319a8c26a2587",
+                "reference": "4f658f10a48a1b88a0af672cdcf319a8c26a2587",
                 "shasum": ""
             },
             "require": {
@@ -2484,7 +2484,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-30T16:03:23+00:00"
+            "time": "2026-08-01T12:11:05+00:00"
         },
         {
             "name": "nowo-tech/doctrine-encrypt-bundle",
@@ -2671,6 +2671,102 @@
                 }
             ],
             "time": "2026-07-29T10:49:17+00:00"
+        },
+        {
+            "name": "nowo-tech/http-log-bundle",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/HttpLogBundle.git",
+                "reference": "e42f409e120759ae06c1135cc2ae0e533bc0f7ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/HttpLogBundle/zipball/e42f409e120759ae06c1135cc2ae0e533bc0f7ba",
+                "reference": "e42f409e120759ae06c1135cc2ae0e533bc0f7ba",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.10 || ^3.0",
+                "doctrine/orm": "^2.15 || ^3.0",
+                "php": ">=8.2 <8.6",
+                "psr/clock": "^1.0",
+                "psr/log": "^1 || ^2 || ^3",
+                "symfony/clock": "^7.0 || ^8.0",
+                "symfony/config": "^7.0 || ^8.0",
+                "symfony/dependency-injection": "^7.0 || ^8.0",
+                "symfony/form": "^7.0 || ^8.0",
+                "symfony/framework-bundle": "^7.0 || ^8.0",
+                "symfony/http-foundation": "^7.0 || ^8.0",
+                "symfony/http-kernel": "^7.0 || ^8.0",
+                "symfony/messenger": "^7.0 || ^8.0",
+                "symfony/routing": "^7.0 || ^8.0",
+                "symfony/security-bundle": "^7.0 || ^8.0",
+                "symfony/security-core": "^7.0 || ^8.0",
+                "symfony/security-csrf": "^7.0 || ^8.0",
+                "symfony/translation": "^7.0 || ^8.0",
+                "symfony/twig-bundle": "^7.0 || ^8.0",
+                "twig/twig": "^3.8"
+            },
+            "require-dev": {
+                "dg/bypass-finals": "^1.11",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0",
+                "symfony/yaml": "^7.0 || ^8.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\HttpLogBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle that intercepts HTTP requests and responses, stores them with configurable body policies, and provides a secured admin UI with filter, export, and purge.",
+            "homepage": "https://github.com/nowo-tech/HttpLogBundle",
+            "keywords": [
+                "Audit",
+                "admin",
+                "export",
+                "http",
+                "logging",
+                "purge",
+                "request",
+                "response",
+                "symfony",
+                "symfony-bundle"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/HttpLogBundle/issues",
+                "source": "https://github.com/nowo-tech/HttpLogBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-03T09:12:44+00:00"
         },
         {
             "name": "nowo-tech/login-throttle-bundle",
@@ -3199,16 +3295,16 @@
         },
         {
             "name": "nowo-tech/routing-kit-bundle",
-            "version": "v1.1.6",
+            "version": "v1.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/RoutingKitBundle.git",
-                "reference": "bb3322bfc243119f31a21075503eea60f12b327d"
+                "reference": "b191e14f74bf1113f84d3862ffd80e04c1ff0a18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/RoutingKitBundle/zipball/bb3322bfc243119f31a21075503eea60f12b327d",
-                "reference": "bb3322bfc243119f31a21075503eea60f12b327d",
+                "url": "https://api.github.com/repos/nowo-tech/RoutingKitBundle/zipball/b191e14f74bf1113f84d3862ffd80e04c1ff0a18",
+                "reference": "b191e14f74bf1113f84d3862ffd80e04c1ff0a18",
                 "shasum": ""
             },
             "require": {
@@ -3233,6 +3329,7 @@
                 "phpstan/phpstan-symfony": "^2.0",
                 "phpunit/phpunit": "^10.0",
                 "rector/rector": "^2.0",
+                "symfony/asset": "^7.0 || ^8.0",
                 "symfony/framework-bundle": "^7.0 || ^8.0",
                 "symfony/twig-bundle": "^7.0 || ^8.0",
                 "twig/twig": "^3.12"
@@ -3240,6 +3337,7 @@
             "suggest": {
                 "doctrine/orm": "Implement RoutePathStorageInterface against Doctrine entities",
                 "nowo-tech/seo-kit-bundle": "Bridge: RoutingKit paths feed SeoKit canonical/hreflang (requires SeoPathBuilderInterface)",
+                "symfony/asset": "Required for the nowo_routing_kit named asset package (panel CSS via assets:install)",
                 "symfony/security-bundle": "Recommended: firewall + ROLE_ADMIN for /_routing",
                 "symfony/translation": "Required for |trans in panel templates",
                 "symfony/twig-bundle": "Required to render the routing CRUD panel"
@@ -3283,7 +3381,7 @@
                 "issues": "https://github.com/nowo-tech/RoutingKitBundle/issues",
                 "source": "https://github.com/nowo-tech/RoutingKitBundle"
             },
-            "time": "2026-07-30T11:56:16+00:00"
+            "time": "2026-08-01T18:11:34+00:00"
         },
         {
             "name": "nowo-tech/select-all-choice-bundle",
@@ -3362,16 +3460,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.7.0",
+            "version": "v1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "44ef01519bb04959271dc9c6943c0d636d89ada6"
+                "reference": "5be7fd69c6aa0157b77e12bc6334f88846763857"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/44ef01519bb04959271dc9c6943c0d636d89ada6",
-                "reference": "44ef01519bb04959271dc9c6943c0d636d89ada6",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/5be7fd69c6aa0157b77e12bc6334f88846763857",
+                "reference": "5be7fd69c6aa0157b77e12bc6334f88846763857",
                 "shasum": ""
             },
             "require": {
@@ -3448,7 +3546,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-07-31T10:32:28+00:00"
+            "time": "2026-08-01T11:55:54+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",
@@ -10070,33 +10168,33 @@
         },
         {
             "name": "symfony/ux-icons",
-            "version": "v2.36.1",
+            "version": "v3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-icons.git",
-                "reference": "567f33ddffc25504788abc61977565381e424ada"
+                "reference": "117b5d9bc9652f364495d586235b9e1f1f7c9d52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/567f33ddffc25504788abc61977565381e424ada",
-                "reference": "567f33ddffc25504788abc61977565381e424ada",
+                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/117b5d9bc9652f364495d586235b9e1f1f7c9d52",
+                "reference": "117b5d9bc9652f364495d586235b9e1f1f7c9d52",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
-                "symfony/framework-bundle": "^6.4|^7.0|^8.0",
-                "symfony/twig-bundle": "^6.4|^7.0|^8.0"
+                "php": ">=8.4",
+                "symfony/framework-bundle": "^7.4|^8.0",
+                "symfony/twig-bundle": "^7.4|^8.0"
             },
             "conflict": {
                 "symfony/flex": "<1.13",
                 "symfony/ux-twig-component": "<2.21"
             },
             "require-dev": {
+                "phpunit/phpunit": "^11.1|^12.0",
                 "psr/log": "^2|^3",
-                "symfony/asset-mapper": "^6.4|^7.0|^8.0",
-                "symfony/console": "^6.4|^7.0|^8.0",
-                "symfony/http-client": "^6.4|^7.0|^8.0",
-                "symfony/phpunit-bridge": "^6.3|^7.0|^8.0",
+                "symfony/asset-mapper": "^7.4|^8.0",
+                "symfony/console": "^7.4|^8.0",
+                "symfony/http-client": "^7.4|^8.0",
                 "symfony/ux-twig-component": "^2.14|^3.0",
                 "zenstruck/console-test": "^1.5"
             },
@@ -10139,7 +10237,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-icons/tree/v2.36.1"
+                "source": "https://github.com/symfony/ux-icons/tree/v3.4.0"
             },
             "funding": [
                 {
@@ -10159,7 +10257,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-16T05:43:46+00:00"
+            "time": "2026-07-29T16:44:14+00:00"
         },
         {
             "name": "symfony/ux-live-component",
@@ -11640,16 +11738,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.95.17",
+            "version": "v3.95.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "0ee88422118f3cc59c8c3def222ba7f1493b6d5b"
+                "reference": "a8b4e4216faabf67f4e96110ee99a48c96e4e683"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/0ee88422118f3cc59c8c3def222ba7f1493b6d5b",
-                "reference": "0ee88422118f3cc59c8c3def222ba7f1493b6d5b",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/a8b4e4216faabf67f4e96110ee99a48c96e4e683",
+                "reference": "a8b4e4216faabf67f4e96110ee99a48c96e4e683",
                 "shasum": ""
             },
             "require": {
@@ -11733,7 +11831,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.95.17"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.95.18"
             },
             "funding": [
                 {
@@ -11741,7 +11839,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-24T13:54:39+00:00"
+            "time": "2026-07-30T15:46:02+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -13418,16 +13516,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.5.8",
+            "version": "2.5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "861c77fd2a6d45317a401f4e0b617f947e8b6f96"
+                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/861c77fd2a6d45317a401f4e0b617f947e8b6f96",
-                "reference": "861c77fd2a6d45317a401f4e0b617f947e8b6f96",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/858b1fb95d94f658b54c01080bf7b6ae97274536",
+                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536",
                 "shasum": ""
             },
             "require": {
@@ -13466,7 +13564,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.5.8"
+                "source": "https://github.com/rectorphp/rector/tree/2.5.9"
             },
             "funding": [
                 {
@@ -13474,27 +13572,27 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-27T06:19:16+00:00"
+            "time": "2026-07-30T22:10:00+00:00"
         },
         {
             "name": "sebastian/cli-parser",
-            "version": "5.0.0",
+            "version": "5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/cli-parser.git",
-                "reference": "48a4654fa5e48c1c81214e9930048a572d4b23ca"
+                "reference": "eeb759ad3146b7096fb59c3195d39e071cd409e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/48a4654fa5e48c1c81214e9930048a572d4b23ca",
-                "reference": "48a4654fa5e48c1c81214e9930048a572d4b23ca",
+                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/eeb759ad3146b7096fb59c3195d39e071cd409e3",
+                "reference": "eeb759ad3146b7096fb59c3195d39e071cd409e3",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^13.0"
+                "phpunit/phpunit": "^13.2.6"
             },
             "type": "library",
             "extra": {
@@ -13523,7 +13621,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/cli-parser/issues",
                 "security": "https://github.com/sebastianbergmann/cli-parser/security/policy",
-                "source": "https://github.com/sebastianbergmann/cli-parser/tree/5.0.0"
+                "source": "https://github.com/sebastianbergmann/cli-parser/tree/5.0.1"
             },
             "funding": [
                 {
@@ -13543,7 +13641,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-06T04:39:44+00:00"
+            "time": "2026-08-01T04:27:14+00:00"
         },
         {
             "name": "sebastian/comparator",

@@ -13,4 +13,4 @@ Constitution **Principle IX** (NON-NEGOTIABLE):
 - Use `when@prod` / `when@dev` / `when@test` in `config/packages/*.yaml` for environment-specific overrides.
 - Typed aliases remain OK: `beacon.foo: '%env(int:FOO)%'` when `FOO` is defined via `.env.dist` or runtime.
 
-If a feature needs a tunable default and a ROLE_ADMIN UI exists, prefer instance/DB settings over env defaults.
+If a feature needs a tunable default, prefer instance/DB settings (Admin UI) over env — migrate operator knobs out of `.env.dist` when they are not boot/infra secrets.

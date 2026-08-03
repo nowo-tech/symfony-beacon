@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace App\Ingest\Service;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
 
 /**
  * Whether Envelope ingest rejects deprecated query-string auth.
  *
- * Injectable so tests can replace the service without mutating process env (FrankenPHP-safe).
+ * Optional constructor override lets tests replace the service without mutating process env
+ * (FrankenPHP-safe) or writing to the database mid-request.
  */
 final readonly class IngestQueryAuthSettings
 {
     public function __construct(
-        #[Autowire('%beacon.ingest_reject_query_auth%')]
-        private bool $rejectQueryAuth = true,
+        private InstanceOpsDefaults $opsDefaults,
+        private ?bool $rejectQueryAuth = null,
     ) {
     }
 
     public function shouldRejectQueryAuth(): bool
     {
-        return $this->rejectQueryAuth;
+        return $this->rejectQueryAuth ?? $this->opsDefaults->ingestRejectQueryAuth();
     }
 }

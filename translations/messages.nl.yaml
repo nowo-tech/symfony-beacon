@@ -1,5 +1,11 @@
 nav:
     projects: Projecten
+    assignments: Toewijzingen
+    summary: Samenvatting
+    activity: Activiteit
+    mentions: Vermeldingen
+    alerts: Meldingen
+    new_in_release: Nieuw in release
     new_project: 'Nieuw project'
     log_out: Uitloggen
     main: Hoofdnavigatie
@@ -12,10 +18,16 @@ nav:
     admin_projects: Projecten
     appearance: Weergave
     mailer: Mailer
-    instance_config: Instantieconfiguratie
+    mercure: Mercure
+    instance_config: Instantie-export
     menus: "Menu's"
     breadcrumbs: Paneermeel
+    cookie_consent: Cookie-toestemming
     routing: Locale-routes
+    http_log: HTTP-log
+    api_docs: API-docs
+    social_login: Sociale login
+    ops_defaults: Ops-standaarden
     toggle_sidebar: 'Schakel navigatie in'
     preferences: Voorkeuren
     account_settings: Accountinstellingen
@@ -23,8 +35,76 @@ nav:
     issues: Issues
     performance: Prestaties
     analytics: Analyses
-    setup: Configuratie
+    setup: Setup
     releases: Releases
+assignments:
+    title: Toewijzingen
+    intro: Issues toegewezen aan jou, teamgenoten of nog niet toegewezen in projecten waartoe je toegang hebt.
+    empty: Geen issues komen overeen met deze toewijzingsfilters.
+    filter:
+        scope: Bereik
+        project: Project
+        any_project: Elk project
+        level: Niveau
+        status: Status
+        priority: Prioriteit
+        assignee: Teamgenoot
+    scope:
+        mine: Aan mij toegewezen
+        teammates: Teamgenoten
+        unassigned: Niet toegewezen
+        all: Alles in mijn projecten
+    col:
+        project: Project
+        status: Status
+summary:
+    title: Dagsamenvatting
+    intro: Snelle tellingen over projecten waartoe je toegang hebt.
+    card:
+        mine_open: Aan mij toegewezen (open)
+        unassigned_open: Niet toegewezen (open)
+        unread_mentions: Ongelezen vermeldingen
+        failed_deliveries: Mislukte leveringen
+        errors_today: Fouten vandaag
+        projects: Projecten
+activity:
+    title: Recente activiteit
+    intro: Je recente productacties in projecten waartoe je toegang hebt.
+    empty: Nog geen recente activiteit.
+    filter:
+        project: Project
+        any_project: Elk project
+mentions:
+    title: Vermeldingen
+    intro: Reacties waarin iemand je @vermeldde.
+    empty: Geen vermeldingen matchen deze filters.
+    unread: Ongelezen
+    by: 'Door %name%'
+    mark_read: Markeer als gelezen
+    mark_all_read: Markeer alles als gelezen
+    filter:
+        project: Project
+        any_project: Elk project
+        unread_only: Alleen ongelezen
+alerts:
+    title: Meldingen
+    intro: Notificatiedestinations waarvan de laatste levering mislukte.
+    empty: Geen mislukte leveringen in je projecten.
+    filter:
+        project: Project
+        any_project: Elk project
+new_in_release:
+    title: Nieuw in release
+    intro: Issues voor het eerst gezien in een release.
+    empty: Geen new-in-release issues matchen deze filters.
+    filter:
+        project: Project
+        any_project: Elk project
+        release: Release
+        any_release: Elke release
+    col:
+        project: Project
+        release: Eerste release
 api_docs:
     title: API-documenten
     intro: 'Ontdek Envelope-opname en gerelateerde HTTP-eindpunten. Gebruik Autoriseren met een X-Beacon-Auth-header (beacon_key en beacon_secret van uw project-DSN).'
@@ -969,6 +1049,10 @@ user_preferences:
         label: E-mail
         placeholder: jij@voorbeeld.com
         help: 'Gebruikt om in te loggen.'
+    slack_user_id:
+        placeholder: U012ABCDEF
+    phone:
+        placeholder: '+34600111222'
     preferred_locale:
         label: Taal
         placeholder: Auto
@@ -1118,6 +1202,12 @@ admin:
     hub:
         title: Administratie
         intro: 'Instantieconfiguratie voor operators met verhoogde rollen.'
+        section:
+            overview: Overzicht
+            access: Toegang
+            instance: Instantie
+            navigation: Navigatie & juridisch
+            observability: Observability
         users: 'Geef accounts en rollen weer voor dit exemplaar.'
         groups: 'Creëer groepen en beheer hun leden voor projecttoegang.'
         projects: 'Maak een lijst van alle projecten, beheer leden en groepslinks, of verwijder een project.'
@@ -1125,10 +1215,21 @@ admin:
         appearance: 'Merknaam, accenten, statuskleuren en oppervlakken.'
         menus: "Navigatiemenu's bewerken."
         breadcrumbs: 'Beheer broodkruimelverzamelingen.'
+        cookie_consent: 'Bewerk modaltekst, categorieën en first-party cookie-inventaris.'
         routing: 'Beheer duale publieke locale-paden (JSON) voor Routable-controllers.'
+        http_log: Bekijk vastgelegde HTTP-requests (headers, status, duur) met retentie en export.
         mailer: 'Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.'
+        api_docs: Verken Envelope-ingest en gerelateerde HTTP-OpenAPI-documentatie.
+        social_login: OAuth-gegevens (Google / GitHub / Microsoft) in de database.
+        ops_defaults: Retentie, ingest-snelheid, quota’s en afleverlimieten.
+        mercure: Live issue-alerts via Mercure-hub (optioneel).
         instance_config: 'Exporteer of importeer niet-geheime weergave en instantieflags (JSON).'
         setup: 'Eerste platform-/demo-/sample-seedstappen.'
+    cookie_consent:
+        tabs_label: Cookie-toestemmingsgebieden
+        tab_settings: Instellingen
+        tab_cookies: Cookie-inventaris
+        section_tabs_label: Instellingsecties
     ops:
         title: Ops-overzicht
         intro: Instance-brede gezondheidssignalen over projecten. Messenger-wachtrijdiepte is altijd instance-breed.

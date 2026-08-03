@@ -1,5 +1,5 @@
 /**
- * Swagger UI boot without inline script (CSP: /api/doc still allows unsafe-eval).
+ * Swagger UI boot without inline script (CSP: /admin/api/doc still allows unsafe-eval).
  * Expects #swagger-ui-boot type=application/json with swagger_ui_config.
  */
 function boot(): void {
