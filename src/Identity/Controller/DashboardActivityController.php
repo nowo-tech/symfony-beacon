@@ -9,6 +9,7 @@ use App\Identity\Entity\User;
 use App\Identity\Repository\UserActionRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,11 +45,15 @@ final class DashboardActivityController extends AbstractController
             }
         }
 
+        $types = DashboardProductActivity::types();
+        $total = $this->userActionRepository->countActorProductActivity($user, $types, $uuids);
+        $pagination = PagePagination::fromRequest($request, $total);
         $actions = $this->userActionRepository->findActorProductActivity(
             $user,
-            DashboardProductActivity::types(),
+            $types,
             $uuids,
-            50,
+            $pagination['per_page'],
+            $pagination['offset'],
         );
 
         return $this->render('dashboard/activity.html.twig', [
@@ -56,7 +61,9 @@ final class DashboardActivityController extends AbstractController
             'projects' => $accessible,
             'filters' => [
                 'project' => $projectFilter?->getUuid() ?? '',
+                'per_page' => $pagination['per_page'],
             ],
+            'pagination' => $pagination,
         ]);
     }
 

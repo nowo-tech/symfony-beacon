@@ -3,16 +3,27 @@
 {% block title %}{{ 'activity.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
+{% set filterQuery = {
+    project: filters.project,
+    per_page: filters.per_page,
+} %}
+
 <div class="mb-6">
     <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'activity.title'|trans }}</h1>
     <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'activity.intro'|trans }}</p>
 </div>
 
 <form method="get" action="{{ path('dashboard_activity') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="activity-filters">
+    <input type="hidden" name="page" value="1">
     <select class="input" name="project" aria-label="{{ 'activity.filter.project'|trans }}">
         <option value="">{{ 'activity.filter.any_project'|trans }}</option>
         {% for project in projects %}
             <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+    </select>
+    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
+        {% for size in [10, 25, 50, 100] %}
+            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
         {% endfor %}
     </select>
     <div class="issue-filters__actions">
@@ -21,7 +32,7 @@
     </div>
 </form>
 
-{% if actions is empty %}
+{% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70" data-testid="activity-empty">{{ 'activity.empty'|trans }}</div>
 {% else %}
     <div class="panel" data-testid="activity-results">
@@ -49,6 +60,15 @@
                 </li>
             {% endfor %}
         </ul>
+
+        {% include 'shared/_table_pagination.html.twig' with {
+            pagination: pagination,
+            item_count: actions|length,
+            route: 'dashboard_activity',
+            route_params: {},
+            query: filterQuery,
+            nav_label: 'issues.pagination.nav'
+        } %}
     </div>
 {% endif %}
 {% endblock %}

@@ -84,24 +84,33 @@ class NotificationDestinationRepository extends ServiceEntityRepository
      *
      * @return list<NotificationDestination>
      */
-    public function findWithFailedLastDeliveryInProjects(array $projects, int $limit = 50): array
-    {
+    public function findWithFailedLastDeliveryInProjects(
+        array $projects,
+        ?int $limit = 50,
+        ?int $offset = null,
+    ): array {
         if ([] === $projects) {
             return [];
         }
 
-        /** @var list<NotificationDestination> $result */
-        $result = $this->createQueryBuilder('d')
+        $qb = $this->createQueryBuilder('d')
             ->innerJoin('d.project', 'p')->addSelect('p')
             ->andWhere('d.project IN (:projects)')
             ->andWhere('d.lastDeliverySuccess = false')
             ->andWhere('d.lastDeliveryAt IS NOT NULL')
             ->setParameter('projects', $projects)
             ->orderBy('d.lastDeliveryAt', 'DESC')
-            ->addOrderBy('d.id', 'DESC')
-            ->setMaxResults(max(1, $limit))
-            ->getQuery()
-            ->getResult();
+            ->addOrderBy('d.id', 'DESC');
+
+        if (null !== $limit) {
+            $qb->setMaxResults(max(1, $limit));
+        }
+        if (null !== $offset && $offset > 0) {
+            $qb->setFirstResult($offset);
+        }
+
+        /** @var list<NotificationDestination> $result */
+        $result = $qb->getQuery()->getResult();
 
         return $result;
     }

@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,14 +36,22 @@ final class DashboardAlertsController extends AbstractController
         $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
         $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
 
-        $destinations = $this->destinationRepository->findWithFailedLastDeliveryInProjects($projects, 50);
+        $total = $this->destinationRepository->countWithFailedLastDeliveryInProjects($projects);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $destinations = $this->destinationRepository->findWithFailedLastDeliveryInProjects(
+            $projects,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
 
         return $this->render('dashboard/alerts.html.twig', [
             'destinations' => $destinations,
             'projects' => $accessible,
             'filters' => [
                 'project' => $projectFilter?->getUuid() ?? '',
+                'per_page' => $pagination['per_page'],
             ],
+            'pagination' => $pagination,
         ]);
     }
 

@@ -38,10 +38,10 @@ As a member, when assigned to an issue, I get email.
 
 ## Out of scope
 
-- In-app real-time mention UX beyond email.
 - Slack/Discord mention bridging.
 
 ## As-built follow-ups
 
 - Reply-to-email → issue comment: **`076-inbound-email-comment`** (Phase 6.28 Done).
+- In-app Mentions inbox (persist `@mention`, mark read, Dashboard panel): **`080-dashboard-aside-panels`** (Done).
 - IMAP / attachments / provider-native adapters: ROADMAP **Later**.

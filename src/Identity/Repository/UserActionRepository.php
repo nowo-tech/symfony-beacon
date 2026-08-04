@@ -85,7 +85,7 @@ class UserActionRepository extends ServiceEntityRepository
      * Actor-scoped product actions for the dashboard Recent activity panel.
      *
      * When {@code $projectUuids} is non-empty, only rows whose {@code context.project_uuid}
-     * is in that set are returned (in-memory filter after a bounded fetch).
+     * is in that set are returned (SQL JSON filter).
      *
      * @param list<UserActionType> $allowedActions
      * @param list<string>         $projectUuids
@@ -97,39 +97,86 @@ class UserActionRepository extends ServiceEntityRepository
         array $allowedActions,
         array $projectUuids = [],
         int $limit = 50,
+        int $offset = 0,
     ): array {
-        if ([] === $allowedActions) {
+        $actorId = $actor->getId();
+        if ([] === $allowedActions || null === $actorId || [] === $projectUuids) {
             return [];
         }
 
-        $fetchLimit = [] === $projectUuids ? $limit : max($limit * 4, 100);
-        $rows = $this->createQueryBuilder('a')
-            ->leftJoin('a.actor', 'actor')->addSelect('actor')
-            ->leftJoin('a.subjectUser', 'subjectUser')->addSelect('subjectUser')
-            ->andWhere('a.actor = :actor')
-            ->andWhere('a.action IN (:allowed)')
-            ->setParameter('actor', $actor)
-            ->setParameter('allowed', $allowedActions)
-            ->orderBy('a.createdAt', 'DESC')
-            ->addOrderBy('a.id', 'DESC')
-            ->setMaxResults($fetchLimit)
-            ->getQuery()
-            ->getResult();
+        $connection = $this->getEntityManager()->getConnection();
+        $platform = $connection->getDatabasePlatform();
+        $params = [
+            'actorId' => $actorId,
+            'actions' => array_map(
+                static fn (UserActionType $allowed): string => $allowed->value,
+                $allowedActions,
+            ),
+            'projectUuids' => $projectUuids,
+            'limit' => max(1, $limit),
+            'offset' => max(0, $offset),
+        ];
+        $types = [
+            'actorId' => ParameterType::INTEGER,
+            'actions' => ArrayParameterType::STRING,
+            'projectUuids' => ArrayParameterType::STRING,
+            'limit' => ParameterType::INTEGER,
+            'offset' => ParameterType::INTEGER,
+        ];
 
-        /** @var list<UserAction> $rows */
-        if ([] !== $projectUuids) {
-            $allowed = array_fill_keys($projectUuids, true);
-            $rows = array_values(array_filter(
-                $rows,
-                static function (UserAction $row) use ($allowed): bool {
-                    $uuid = $row->getContext()['project_uuid'] ?? null;
+        /** @var list<int|string> $rawIds */
+        $rawIds = $connection->fetchFirstColumn(
+            'SELECT id
+                FROM user_action
+               WHERE actor_id = :actorId
+                 AND action IN (:actions)
+                 AND '.$this->contextUuidInPredicate($platform, 'project_uuid').'
+            ORDER BY created_at DESC, id DESC
+               LIMIT :limit OFFSET :offset',
+            $params,
+            $types,
+        );
 
-                    return \is_string($uuid) && isset($allowed[$uuid]);
-                },
-            ));
+        return $this->hydrateOrderedByIds($rawIds);
+    }
+
+    /**
+     * @param list<UserActionType> $allowedActions
+     * @param list<string>         $projectUuids
+     */
+    public function countActorProductActivity(
+        User $actor,
+        array $allowedActions,
+        array $projectUuids = [],
+    ): int {
+        $actorId = $actor->getId();
+        if ([] === $allowedActions || null === $actorId || [] === $projectUuids) {
+            return 0;
         }
 
-        return \array_slice($rows, 0, $limit);
+        $connection = $this->getEntityManager()->getConnection();
+        $platform = $connection->getDatabasePlatform();
+
+        return (int) $connection->fetchOne(
+            'SELECT COUNT(id)
+                FROM user_action
+               WHERE actor_id = :actorId
+                 AND action IN (:actions)
+                 AND '.$this->contextUuidInPredicate($platform, 'project_uuid'),
+            [
+                'actorId' => $actorId,
+                'actions' => array_map(
+                    static fn (UserActionType $allowed): string => $allowed->value,
+                    $allowedActions,
+                ),
+                'projectUuids' => $projectUuids,
+            ],
+            [
+                'actorId' => ParameterType::INTEGER,
+                'actions' => ArrayParameterType::STRING,
+                'projectUuids' => ArrayParameterType::STRING,
+            ],
+        );
     }
 
     /**
@@ -268,6 +315,16 @@ class UserActionRepository extends ServiceEntityRepository
             $types,
         );
 
+        return $this->hydrateOrderedByIds($rawIds);
+    }
+
+    /**
+     * @param list<int|string> $rawIds
+     *
+     * @return list<UserAction>
+     */
+    private function hydrateOrderedByIds(array $rawIds): array
+    {
         if ([] === $rawIds) {
             return [];
         }
@@ -301,6 +358,20 @@ class UserActionRepository extends ServiceEntityRepository
 
         if ($platform instanceof SQLitePlatform) {
             return "json_extract(context, '".$path."') = :contextUuid";
+        }
+
+        throw new RuntimeException(\sprintf('Identity audit query is unsupported on %s.', $platform::class));
+    }
+
+    private function contextUuidInPredicate(object $platform, string $contextKey): string
+    {
+        $path = '$.'.$contextKey;
+        if ($platform instanceof MySQLPlatform) {
+            return "JSON_UNQUOTE(JSON_EXTRACT(context, '".$path."')) IN (:projectUuids)";
+        }
+
+        if ($platform instanceof SQLitePlatform) {
+            return "json_extract(context, '".$path."') IN (:projectUuids)";
         }
 
         throw new RuntimeException(\sprintf('Identity audit query is unsupported on %s.', $platform::class));

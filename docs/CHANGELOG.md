@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form field loop convention (`077`): shared `templates/form/_fields.html.twig`; host Symfony forms paint unrendered Type children before actions (FormKit owns field attrs).
 - `nowo-tech/http-log-bundle` **1.0.1**: HTTP request/response audit log with admin UI at `/admin/http-log` (ROLE_ADMIN), kit host layout, Messenger async persist/export/purge, MDK table `nowo_http_log_entry`.
 - Dashboard **Assignments** panel (`079`): `/dashboard/assignments` — mine / teammates / unassigned across accessible projects with filters (project, level, status, priority, assignee, search).
-- Dashboard aside panels: **Summary** (`/dashboard/summary`), **Activity** (`/dashboard/activity`), **Mentions** (`/dashboard/mentions` + read state), **Alerts** (`/dashboard/alerts`), **New in release** (`/dashboard/new-in-release`); `issue_mention` table for @mention inbox.
+- Dashboard aside panels (`080`): **Summary**, **Activity**, **Mentions** (`issue_mention` + read state), **Alerts**, **New in release** — menu/breadcrumb seeds under Projects; list panels use shared `PagePagination`.
 - `OtlpIngestGateway`: shared OTLP auth / body limits / quotas / rate limit / metrics for logs, traces, and metrics controllers.
 - `make kit-smoke`: AuthKit bootstrap + magic login + password reset + login throttle suite after kit bumps.
 - Production **operational inventory** checklist (hooks signing secrets, metrics, trusted proxies, SiteBackup, retention).

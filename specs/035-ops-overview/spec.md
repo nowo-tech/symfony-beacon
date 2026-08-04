@@ -77,3 +77,4 @@ As an instance admin, I jump from a failed-delivery or spike row to the projectâ
 - Multi-org / tenant control plane.
 - Real-time websocket push of overview widgets (Mercure optional later).
 - Replacing Admin â†’ Projects list.
+- Member-scoped failed-delivery inbox (not admin Ops): **`080-dashboard-aside-panels`** Alerts panel.

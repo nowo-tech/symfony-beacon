@@ -54,3 +54,7 @@ As a project member, I compare issue sets between two releases or reuse environm
 
 - Deploy markers from CI/CD webhooks.
 - Source maps / release artifacts upload.
+
+## Related
+
+- Cross-project **New in release** Dashboard panel: **`080-dashboard-aside-panels`**.

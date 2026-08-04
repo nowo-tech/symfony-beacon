@@ -27,11 +27,11 @@ As a member, I filter by level (type), status, priority, text search, and page s
 
 ## Requirements
 
-- **FR-001**: Sidebar Dashboard item **Assignments** (seeded) + breadcrumb.
+- **FR-001**: Sidebar Dashboard item **Assignments** (seeded) + breadcrumb with parent `dashboard_home` (Projects), so the trail renders under `hide_when_single_root`.
 - **FR-002**: Only issues in projects from `findAccessibleByUser`.
 - **FR-003**: Scopes: `mine` | `teammates` | `unassigned` | `all`.
 - **FR-004**: Filters: `project` (uuid), `level`, `status`, `priority`, `assignee` (user id), `q`, `per_page`, `page`.
-- **FR-005**: Paginated table: project, title, level, status, priority, assignee, last seen.
+- **FR-005**: Paginated table via `PagePagination` + `shared/_table_pagination.html.twig`: project, title, level, status, priority, assignee, last seen.
 - **FR-006**: English UI strings + locales in seeder translations.
 
 ## Out of scope (v1)
@@ -39,3 +39,8 @@ As a member, I filter by level (type), status, priority, text search, and page s
 - Cross-project saved views
 - Assign/reassign from this panel
 - Event tag/url/user filters
+
+## Related
+
+- `080-dashboard-aside-panels` — Summary, Activity, Mentions, Alerts, New in release (same Dashboard aside; shared pagination convention FR-011).
+- Breadcrumbs for Assignments nest under `dashboard_home` (Projects) so trails render with `hide_when_single_root`.

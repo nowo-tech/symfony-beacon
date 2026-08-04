@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.0.0** is the first stable major (Phases 0–6 through **6.28** Done). **v0.17.0** shipped Mailer DSN audit (`6.15`), Mailpit (`6.16`), Ops defaults, and Social login admin. **6.19**–**6.28** OTLP logs/traces/metrics, Slack/Teams Resolve/Assign, AuthKit QR image, and inbound email comments Done. **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.0.0** is the first stable major (Phases 0–6 through **6.28** Done). **v0.17.0** shipped Mailer DSN audit (`6.15`), Mailpit (`6.16`), Ops defaults, and Social login admin. **6.19**–**6.28** OTLP logs/traces/metrics, Slack/Teams Resolve/Assign, AuthKit QR image, and inbound email comments Done. **6.29**–**6.30** Dashboard Assignments + aside panels (Summary / Activity / Mentions / Alerts / New in release) Done. **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -287,6 +287,13 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.28 | **Inbound email → issue comment** (webhook + Reply-To token + Message-ID idempotency) | Beacon | `076-inbound-email-comment` | **Done** |
 
+### Done (Dashboard triage panels)
+
+| # | Item | Repo | Spec | Status |
+|---|------|------|------|--------|
+| 6.29 | **Dashboard Assignments** panel (mine / teammates / unassigned across accessible projects) | Beacon | `079-dashboard-assignments` | **Done** |
+| 6.30 | **Dashboard aside panels**: Summary, Activity, Mentions inbox (`issue_mention`), Alerts (member failed deliveries), New in release | Beacon | `080-dashboard-aside-panels` | **Done** |
+
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
@@ -301,6 +308,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
+| — | Watching / favorites (projects or issues) on Dashboard | Beacon | extends `080` | **Later** |
 | — | **SSO/SAML/OIDC** via AuthKit (SAML still Later; OIDC enterprise flag shipped in 1.12 / `072`) | Beacon | — | **Later** (OIDC ready) |
 | — | **QR SMS OTP** verify (`phone_otp` / notifiers; image shipped in `075` / 6.27) | Beacon | extends `072`/`075` | **Later** |
 | — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
@@ -369,4 +377,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-07-31 (**v1.0.1** patch; 6.28 Done; Next = Later Phase 6+).
+Last updated: 2026-08-03 (**6.29** Assignments + **6.30** aside panels Done; Next = Later Phase 6+).
