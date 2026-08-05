@@ -693,12 +693,30 @@ analytics:
 appearance:
     title: Verschijning
     intro: 'Pas de merknaam, accenten, statuskleuren en oppervlakken aan voor dit Beacon-exemplaar. Alleen beheerders kunnen deze instellingen wijzigen.'
+    tabs_label: Weergave-secties
+    subtabs_label: Weergave-subsecties
+    tab:
+        themes: Thema’s
+        themes_help: 'Kies een voorinstelling om achtergrond, accenten en statuskleuren in één keer te vervangen. Handmatige kleuraanpassingen markeren het palet als aangepast.'
+        brand: Merk
+        brand_help: 'Instantie-merknaam en eyebrow in de header en op het inlogscherm.'
+        layout: Layout
+        layout_help: 'Vaste footer, hoekradius en hoe duidelijk randen ogen in lichte en donkere modus.'
+        colors: Kleuren
+        colors_help: 'Stem accenten, statuskleuren en oppervlakken af voor lichte en donkere modus.'
+    subtab:
+        light: Lichte thema’s
+        dark: Donkere thema’s
+        accents: Accenten
+        status: Status
+        surfaces: Oppervlakken
     themes:
         title: Thema’s
         intro: 'Kies een voorinstelling om achtergrond, accenten en statuskleuren in één keer te vervangen. Handmatige kleuraanpassingen hieronder markeren het palet als aangepast.'
         light: Lichte thema’s
         dark: Donkere thema’s
         custom: 'Aangepaste kleuren zijn actief — een thema kiezen overschrijft ze.'
+        pair: 'Actief paar: %light% (licht) + %dark% (donker)'
     theme:
         active: Actief
         beacon: Beacon

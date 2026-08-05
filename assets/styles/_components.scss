@@ -114,6 +114,15 @@ $beacon-btn-sm-font-size: 0.8125rem;
   font-weight: 600;
 }
 
+.beacon-tabs--sections {
+  margin-top: -0.25rem;
+}
+
+.beacon-tabs--sections .nowo-ui-tabs__item {
+  font-size: 0.8125rem;
+  padding: 0.3rem 0.65rem;
+}
+
 .beacon-tabs__list {
   display: flex;
   flex-wrap: wrap;

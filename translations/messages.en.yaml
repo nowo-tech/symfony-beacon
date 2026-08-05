@@ -713,12 +713,30 @@ releases:
 appearance:
     title: Appearance
     intro: Customize brand name, accents, status colors, and page surfaces for this Beacon instance. Only administrators can change these settings.
+    tabs_label: Appearance sections
+    subtabs_label: Appearance subsections
+    tab:
+        themes: Themes
+        themes_help: Pick a preset to replace background, accents, and status colors at once. Manual color edits mark the palette as custom.
+        brand: Brand
+        brand_help: Instance brand name and eyebrow shown in the header and on the login screen.
+        layout: Layout
+        layout_help: Footer pinning, corner radius, and how strongly borders read in light and dark mode.
+        colors: Colors
+        colors_help: Fine-tune accents, status colors, and page surfaces for light and dark modes.
+    subtab:
+        light: Light themes
+        dark: Dark themes
+        accents: Accents
+        status: Status
+        surfaces: Surfaces
     themes:
         title: Themes
         intro: Pick a preset to replace background, accents, and status colors at once. Manual color edits below mark the palette as custom.
         light: Light themes
         dark: Dark themes
-        custom: Custom colors are active — choosing a theme will overwrite them.
+        custom: Custom colors are active for this mode — choosing a theme will overwrite them.
+        pair: 'Active pair: %light% (light) + %dark% (dark)'
     theme:
         active: Active
         beacon: Beacon
@@ -1838,6 +1856,8 @@ notifications:
     new_title: New notification destination
     edit_title: Edit notification destination
     form_help: Choose a channel type and paste the matching endpoint. Secrets are masked in the settings list.
+    teams:
+        token_used: That Teams action link was already used. Open the issue in Beacon if you still need to change it.
     form:
         label: Label
         type: Type

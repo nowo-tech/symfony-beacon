@@ -693,12 +693,30 @@ analytics:
 appearance:
     title: Aussehen
     intro: 'Passen Sie Markennamen, Akzente, Statusfarben und Oberflächen für diese Beacon-Instanz an. Nur Administratoren können diese Einstellungen ändern.'
+    tabs_label: Erscheinungsbild-Abschnitte
+    subtabs_label: Erscheinungsbild-Unterabschnitte
+    tab:
+        themes: Themen
+        themes_help: 'Wählen Sie ein Preset, um Hintergrund, Akzente und Statusfarben auf einmal zu ersetzen. Manuelle Farbänderungen markieren die Palette als benutzerdefiniert.'
+        brand: Marke
+        brand_help: 'Instanz-Markenname und Eyebrow in Header und Anmeldebildschirm.'
+        layout: Layout
+        layout_help: 'Fußzeilen-Pinning, Eckenradius und wie stark Ränder im hellen und dunklen Modus wirken.'
+        colors: Farben
+        colors_help: 'Feinabstimmung von Akzenten, Statusfarben und Oberflächen für hell und dunkel.'
+    subtab:
+        light: Helle Themen
+        dark: Dunkle Themen
+        accents: Akzente
+        status: Status
+        surfaces: Oberflächen
     themes:
         title: Themen
         intro: 'Wählen Sie ein Preset, um Hintergrund, Akzente und Statusfarben auf einmal zu ersetzen. Manuelle Farbänderungen unten markieren die Palette als benutzerdefiniert.'
         light: Helle Themen
         dark: Dunkle Themen
         custom: 'Benutzerdefinierte Farben sind aktiv — die Wahl eines Themas überschreibt sie.'
+        pair: 'Aktives Paar: %light% (hell) + %dark% (dunkel)'
     theme:
         active: Aktiv
         beacon: Beacon

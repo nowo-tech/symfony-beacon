@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+{% block title %}{{ section.tabLabelKey()|trans }} — {{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% macro color_field(field) %}
     <div class="flex flex-col gap-2">
@@ -51,97 +51,97 @@
     <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
     <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
 
-    <section class="panel mb-6 space-y-5" aria-labelledby="appearance-themes-heading">
-        <div>
-            <h2 id="appearance-themes-heading" class="text-lg font-semibold">{{ 'appearance.themes.title'|trans }}</h2>
-            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'appearance.themes.intro'|trans }}</p>
-            {% if activeThemeId == 'custom' %}
-                <p class="mt-2 text-xs font-medium text-[var(--color-warn)]">{{ 'appearance.themes.custom'|trans }}</p>
-            {% endif %}
-        </div>
+    {% set tab_items = [] %}
+    {% for item in sections %}
+        {% set href_params = {section: item.value} %}
+        {% if item.defaultSubtab() %}
+            {% set href_params = href_params|merge({sub: item.defaultSubtab().value}) %}
+        {% endif %}
+        {% set tab_items = tab_items|merge([{
+            label: item.tabLabelKey()|trans,
+            href: path('settings_appearance_section', href_params),
+            current: item == section,
+            attr: {'data-testid': 'appearance-tab-' ~ item.value},
+        }]) %}
+    {% endfor %}
+    {% include 'shared/_tabs.html.twig' with {
+        aria_label: 'appearance.tabs_label'|trans,
+        nav_class: 'mb-4',
+        attr: {'data-testid': 'appearance-tabs'},
+        items: tab_items,
+    } only %}
 
-        <form method="post" class="space-y-5">
-            <input type="hidden" name="_token" value="{{ csrf_token('appearance_theme') }}">
+    {% set section_subtabs = section.subtabs() %}
+    {% if section_subtabs is not empty %}
+        {% set sub_items = [] %}
+        {% for item in section_subtabs %}
+            {% set sub_items = sub_items|merge([{
+                label: item.tabLabelKey()|trans,
+                href: path('settings_appearance_section', {section: section.value, sub: item.value}),
+                current: subtab is not null and item == subtab,
+                attr: {'data-testid': 'appearance-subtab-' ~ item.value},
+            }]) %}
+        {% endfor %}
+        {% include 'shared/_tabs.html.twig' with {
+            aria_label: 'appearance.subtabs_label'|trans,
+            nav_class: 'mb-6 beacon-tabs--sections',
+            attr: {'data-testid': 'appearance-subtabs'},
+            items: sub_items,
+        } only %}
+    {% endif %}
+
+    {% if section.value == 'themes' %}
+        <section class="panel space-y-5" aria-labelledby="appearance-themes-heading">
             <div>
-                <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.light'|trans }}</h3>
+                <h2 id="appearance-themes-heading" class="text-lg font-semibold">{{ section.tabLabelKey()|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ section.helpKey()|trans }}</p>
+                {% if activeThemeId == 'custom' %}
+                    <p class="mt-2 text-xs font-medium text-[var(--color-warn)]">{{ 'appearance.themes.custom'|trans }}</p>
+                {% endif %}
+                {% if activeThemeIdLight != 'custom' and activeThemeIdDark != 'custom' %}
+                    <p class="mt-2 text-xs text-[var(--color-ink)]/55">
+                        {{ 'appearance.themes.pair'|trans({
+                            '%light%': ('appearance.theme.' ~ activeThemeIdLight)|trans,
+                            '%dark%': ('appearance.theme.' ~ activeThemeIdDark)|trans,
+                        }) }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <form method="post" class="space-y-5">
+                <input type="hidden" name="_token" value="{{ csrf_token('appearance_theme') }}">
+                {% set themes = subtab.value == 'dark' ? darkThemes : lightThemes %}
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {% for theme in lightThemes %}
+                    {% for theme in themes %}
                         {{ ui.theme_card(theme, activeThemeId) }}
                     {% endfor %}
                 </div>
+            </form>
+        </section>
+    {% else %}
+        {{ form_start(form, {attr: {class: 'panel space-y-4', 'data-testid': 'appearance-form', 'data-appearance-section': section.value}}) }}
+            <fieldset class="space-y-4">
+                <legend class="text-lg font-semibold">{{ section.tabLabelKey()|trans }}</legend>
+                <p class="text-sm text-[var(--color-ink)]/60">{{ section.helpKey()|trans }}</p>
+
+                {% if section.value == 'colors' %}
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        {% for child in form %}
+                            {% if not child.rendered %}
+                                {{ ui.color_field(child) }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {% include 'form/_fields.html.twig' with {form: form} only %}
+                {% endif %}
+            </fieldset>
+
+            <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+                <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
+                <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>
             </div>
-            <div>
-                <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.dark'|trans }}</h3>
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {% for theme in darkThemes %}
-                        {{ ui.theme_card(theme, activeThemeId) }}
-                    {% endfor %}
-                </div>
-            </div>
-        </form>
-    </section>
-
-    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
-        {{ form_row(form.brandName) }}
-        {{ form_row(form.brandEyebrow) }}
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.layout'|trans }}</legend>
-            {{ form_row(form.footerFixed) }}
-            {{ form_row(form.cornerStyle) }}
-            {{ form_row(form.borderStrength) }}
-        </fieldset>
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.light'|trans }}</legend>
-            <div class="grid gap-4 sm:grid-cols-2">
-                {{ ui.color_field(form.accentColor) }}
-                {{ ui.color_field(form.accentDeepColor) }}
-            </div>
-        </fieldset>
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.dark'|trans }}</legend>
-            <div class="grid gap-4 sm:grid-cols-2">
-                {{ ui.color_field(form.accentColorDark) }}
-                {{ ui.color_field(form.accentDeepColorDark) }}
-            </div>
-        </fieldset>
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.danger'|trans }}</legend>
-            <div class="grid gap-4 sm:grid-cols-2">
-                {{ ui.color_field(form.dangerColor) }}
-                {{ ui.color_field(form.dangerColorDark) }}
-            </div>
-        </fieldset>
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.warn'|trans }}</legend>
-            <div class="grid gap-4 sm:grid-cols-2">
-                {{ ui.color_field(form.warnColor) }}
-                {{ ui.color_field(form.warnColorDark) }}
-            </div>
-        </fieldset>
-
-        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
-            <legend class="text-sm font-semibold">{{ 'appearance.section.surfaces'|trans }}</legend>
-            <div class="grid gap-4 sm:grid-cols-2">
-                {{ ui.color_field(form.paperColor) }}
-                {{ ui.color_field(form.paperColorDark) }}
-                {{ ui.color_field(form.inkColor) }}
-                {{ ui.color_field(form.inkColorDark) }}
-                {{ ui.color_field(form.surfaceColor) }}
-                {{ ui.color_field(form.surfaceColorDark) }}
-            </div>
-        </fieldset>
-
-        {% include 'form/_fields.html.twig' with {form: form} only %}
-
-        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
-            <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
-            <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>
-        </div>
-    {{ form_end(form) }}
+        {{ form_end(form) }}
+    {% endif %}
 </div>
 {% endblock %}

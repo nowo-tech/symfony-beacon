@@ -7,10 +7,10 @@ namespace App\Shared\Appearance;
 use App\Shared\Appearance\Entity\SiteAppearance;
 
 /**
- * Named appearance palettes that replace all site color fields when applied.
+ * Named appearance palettes applied independently for light vs dark mode.
  *
- * Each preset defines a full light + dark companion so the user day/night toggle
- * still works. The mode tag (light|dark) is the primary design intent for UI grouping.
+ * Light presets only overwrite light color fields; dark presets only overwrite
+ * dark color fields, so each mode can stay selected on its own tab.
  */
 final class AppearanceThemePresets
 {
@@ -251,6 +251,9 @@ final class AppearanceThemePresets
         ));
     }
 
+    /**
+     * Apply only the light or dark half of a preset (based on its mode tag).
+     */
     public static function apply(SiteAppearance $appearance, string $id): bool
     {
         $preset = self::get($id);
@@ -258,33 +261,50 @@ final class AppearanceThemePresets
             return false;
         }
 
+        if ('dark' === $preset['mode']) {
+            $appearance
+                ->setAccentColorDark($preset['accentDark'])
+                ->setAccentDeepColorDark($preset['accentDeepDark'])
+                ->setDangerColorDark($preset['dangerDark'])
+                ->setWarnColorDark($preset['warnDark'])
+                ->setPaperColorDark($preset['paperDark'])
+                ->setInkColorDark($preset['inkDark'])
+                ->setSurfaceColorDark($preset['surfaceDark'])
+                ->setThemeIdDark($preset['id']);
+
+            return true;
+        }
+
         $appearance
             ->setAccentColor($preset['accent'])
             ->setAccentDeepColor($preset['accentDeep'])
-            ->setAccentColorDark($preset['accentDark'])
-            ->setAccentDeepColorDark($preset['accentDeepDark'])
             ->setDangerColor($preset['danger'])
-            ->setDangerColorDark($preset['dangerDark'])
             ->setWarnColor($preset['warn'])
-            ->setWarnColorDark($preset['warnDark'])
             ->setPaperColor($preset['paper'])
-            ->setPaperColorDark($preset['paperDark'])
             ->setInkColor($preset['ink'])
-            ->setInkColorDark($preset['inkDark'])
             ->setSurfaceColor($preset['surface'])
-            ->setSurfaceColorDark($preset['surfaceDark'])
             ->setThemeId($preset['id']);
 
         return true;
     }
 
     /**
-     * Resolve which named preset matches the current color fields, if any.
+     * @deprecated Use matchLightId() / matchDarkId() for independent modes.
      */
     public static function matchId(SiteAppearance $appearance): string
     {
-        foreach (self::all() as $preset) {
-            if (self::colorsMatch($appearance, $preset)) {
+        $light = self::matchLightId($appearance);
+        if (self::CUSTOM !== $light) {
+            return $light;
+        }
+
+        return self::matchDarkId($appearance);
+    }
+
+    public static function matchLightId(SiteAppearance $appearance): string
+    {
+        foreach (self::byMode('light') as $preset) {
+            if (self::lightColorsMatch($appearance, $preset)) {
                 return $preset['id'];
             }
         }
@@ -292,39 +312,65 @@ final class AppearanceThemePresets
         return self::CUSTOM;
     }
 
+    public static function matchDarkId(SiteAppearance $appearance): string
+    {
+        foreach (self::byMode('dark') as $preset) {
+            if (self::darkColorsMatch($appearance, $preset)) {
+                return $preset['id'];
+            }
+        }
+
+        return self::CUSTOM;
+    }
+
+    public static function matchForMode(SiteAppearance $appearance, string $mode): string
+    {
+        return 'dark' === $mode
+            ? self::matchDarkId($appearance)
+            : self::matchLightId($appearance);
+    }
+
     /**
      * @param array{
      *     accent: string,
      *     accentDeep: string,
-     *     accentDark: string,
-     *     accentDeepDark: string,
      *     danger: string,
-     *     dangerDark: string,
      *     warn: string,
-     *     warnDark: string,
      *     paper: string,
-     *     paperDark: string,
      *     ink: string,
-     *     inkDark: string,
-     *     surface: string,
-     *     surfaceDark: string
+     *     surface: string
      * } $preset
      */
-    private static function colorsMatch(SiteAppearance $appearance, array $preset): bool
+    private static function lightColorsMatch(SiteAppearance $appearance, array $preset): bool
     {
         return $appearance->getAccentColor() === $preset['accent']
             && $appearance->getAccentDeepColor() === $preset['accentDeep']
-            && $appearance->getAccentColorDark() === $preset['accentDark']
-            && $appearance->getAccentDeepColorDark() === $preset['accentDeepDark']
             && $appearance->getDangerColor() === $preset['danger']
-            && $appearance->getDangerColorDark() === $preset['dangerDark']
             && $appearance->getWarnColor() === $preset['warn']
-            && $appearance->getWarnColorDark() === $preset['warnDark']
             && $appearance->getPaperColor() === $preset['paper']
-            && $appearance->getPaperColorDark() === $preset['paperDark']
             && $appearance->getInkColor() === $preset['ink']
+            && $appearance->getSurfaceColor() === $preset['surface'];
+    }
+
+    /**
+     * @param array{
+     *     accentDark: string,
+     *     accentDeepDark: string,
+     *     dangerDark: string,
+     *     warnDark: string,
+     *     paperDark: string,
+     *     inkDark: string,
+     *     surfaceDark: string
+     * } $preset
+     */
+    private static function darkColorsMatch(SiteAppearance $appearance, array $preset): bool
+    {
+        return $appearance->getAccentColorDark() === $preset['accentDark']
+            && $appearance->getAccentDeepColorDark() === $preset['accentDeepDark']
+            && $appearance->getDangerColorDark() === $preset['dangerDark']
+            && $appearance->getWarnColorDark() === $preset['warnDark']
+            && $appearance->getPaperColorDark() === $preset['paperDark']
             && $appearance->getInkColorDark() === $preset['inkDark']
-            && $appearance->getSurfaceColor() === $preset['surface']
             && $appearance->getSurfaceColorDark() === $preset['surfaceDark'];
     }
 }

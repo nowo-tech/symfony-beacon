@@ -111,10 +111,16 @@ class SiteAppearance implements AuditableInterface
     private string $surfaceColorDark = self::DEFAULT_SURFACE_DARK;
 
     /**
-     * Named palette id from AppearanceThemePresets, or "custom" when colors were edited by hand.
+     * Named light-mode palette id, or "custom" when light colors were edited by hand.
      */
     #[ORM\Column(length: 40)]
     private string $themeId = 'beacon';
+
+    /**
+     * Named dark-mode palette id, or "custom" when dark colors were edited by hand.
+     */
+    #[ORM\Column(length: 40)]
+    private string $themeIdDark = 'custom';
 
     /**
      * When true, the legal footer stays pinned to the viewport bottom while content scrolls.
@@ -357,6 +363,19 @@ class SiteAppearance implements AuditableInterface
         return $this;
     }
 
+    public function getThemeIdDark(): string
+    {
+        return $this->themeIdDark;
+    }
+
+    public function setThemeIdDark(string $themeIdDark): self
+    {
+        $normalized = strtolower(trim($themeIdDark));
+        $this->themeIdDark = '' === $normalized ? 'custom' : $normalized;
+
+        return $this;
+    }
+
     public function isFooterFixed(): bool
     {
         return $this->footerFixed;
@@ -418,6 +437,7 @@ class SiteAppearance implements AuditableInterface
         $this->surfaceColor = self::DEFAULT_SURFACE;
         $this->surfaceColorDark = self::DEFAULT_SURFACE_DARK;
         $this->themeId = 'beacon';
+        $this->themeIdDark = 'custom';
         $this->footerFixed = false;
         $this->cornerStyle = self::CORNER_SOFT;
         $this->borderStrength = self::BORDER_MEDIUM;

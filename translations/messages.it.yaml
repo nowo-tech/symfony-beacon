@@ -693,12 +693,30 @@ analytics:
 appearance:
     title: Aspetto
     intro: 'Personalizza il nome del marchio, gli accenti, i colori di stato e le superfici di questa istanza Beacon. Solo gli amministratori possono modificare queste impostazioni.'
+    tabs_label: 'Sezioni aspetto'
+    subtabs_label: 'Sottosezioni aspetto'
+    tab:
+        themes: Temi
+        themes_help: 'Scegli un preset per sostituire insieme sfondo, accenti e colori di stato. Le modifiche manuali contrassegnano la palette come personalizzata.'
+        brand: Marchio
+        brand_help: 'Nome del marchio e eyebrow dell’istanza nell’header e nella schermata di login.'
+        layout: Layout
+        layout_help: 'Footer fisso, raggio angoli e quanto sono definiti i bordi in modalità chiara e scura.'
+        colors: Colori
+        colors_help: 'Regola accenti, colori di stato e superfici per modalità chiara e scura.'
+    subtab:
+        light: Temi chiari
+        dark: Temi scuri
+        accents: Accenti
+        status: Stato
+        surfaces: Superfici
     themes:
         title: Temi
         intro: 'Scegli un preset per sostituire insieme sfondo, accenti e colori di stato. Le modifiche manuali sotto contrassegnano la palette come personalizzata.'
         light: Temi chiari
         dark: Temi scuri
         custom: 'Sono attivi colori personalizzati — scegliere un tema li sovrascriverà.'
+        pair: 'Coppia attiva: %light% (chiaro) + %dark% (scuro)'
     theme:
         active: Attivo
         beacon: Beacon

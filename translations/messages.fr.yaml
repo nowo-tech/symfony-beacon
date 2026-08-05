@@ -693,12 +693,30 @@ analytics:
 appearance:
     title: Apparence
     intro: "Personnalisez le nom de la marque, les accents, les couleurs d'état et les surfaces pour cette instance Beacon. Seuls les administrateurs peuvent modifier ces paramètres."
+    tabs_label: 'Sections d’apparence'
+    subtabs_label: 'Sous-sections d’apparence'
+    tab:
+        themes: Thèmes
+        themes_help: 'Choisissez un préréglage pour remplacer d’un coup le fond, les accents et les couleurs d’état. Les modifications manuelles marquent la palette comme personnalisée.'
+        brand: Marque
+        brand_help: 'Nom de marque et eyebrow de l’instance dans l’en-tête et l’écran de connexion.'
+        layout: Mise en page
+        layout_help: 'Pied fixe, rayon des coins et force des bordures en mode clair et sombre.'
+        colors: Couleurs
+        colors_help: 'Ajustez accents, couleurs d’état et surfaces pour les modes clair et sombre.'
+    subtab:
+        light: Thèmes clairs
+        dark: Thèmes sombres
+        accents: Accents
+        status: Statut
+        surfaces: Surfaces
     themes:
         title: Thèmes
         intro: 'Choisissez un préréglage pour remplacer d’un coup le fond, les accents et les couleurs d’état. Les modifications manuelles ci-dessous marquent la palette comme personnalisée.'
         light: Thèmes clairs
         dark: Thèmes sombres
         custom: 'Des couleurs personnalisées sont actives — choisir un thème les écrasera.'
+        pair: 'Paire active : %light% (clair) + %dark% (sombre)'
     theme:
         active: Actif
         beacon: Beacon

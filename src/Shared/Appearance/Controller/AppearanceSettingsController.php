@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Controller;
 
+use App\Shared\Appearance\AppearanceSettingsSection;
+use App\Shared\Appearance\AppearanceSettingsSubtab;
 use App\Shared\Appearance\AppearanceThemePresets;
 use App\Shared\Appearance\Form\SiteAppearanceType;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
@@ -15,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Admin UI for site brand name, named themes, and accent colors.
+ * Admin UI for site brand, themes, layout chrome, and palette colors.
  */
 #[IsGranted('ROLE_ADMIN')]
 final class AppearanceSettingsController extends AbstractController
@@ -26,12 +28,55 @@ final class AppearanceSettingsController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/appearance', name: 'settings_appearance', methods: ['GET', 'POST'])]
-    public function edit(Request $request): Response
+    #[Route('/settings/appearance', name: 'settings_appearance', methods: ['GET'])]
+    public function index(): Response
     {
-        $appearance = $this->repository->getOrCreate();
+        return $this->redirectToRoute('settings_appearance_section', [
+            'section' => AppearanceSettingsSection::Themes->value,
+            'sub' => AppearanceSettingsSubtab::Light->value,
+        ]);
+    }
 
-        if ($request->isMethod(Request::METHOD_POST) && $request->request->has('apply_theme')) {
+    #[Route(
+        '/settings/appearance/{section}',
+        name: 'settings_appearance_section',
+        requirements: ['section' => 'themes|brand|layout|colors'],
+        defaults: ['sub' => null],
+        methods: ['GET', 'POST'],
+        priority: 10,
+    )]
+    #[Route(
+        '/settings/appearance/{section}/{sub}',
+        name: 'settings_appearance_section',
+        requirements: [
+            'section' => 'themes|brand|layout|colors',
+            'sub' => 'light|dark|accents|status|surfaces',
+        ],
+        methods: ['GET', 'POST'],
+    )]
+    public function edit(Request $request, string $section, ?string $sub = null): Response
+    {
+        $sectionEnum = AppearanceSettingsSection::tryFrom($section);
+        if (null === $sectionEnum) {
+            throw $this->createNotFoundException();
+        }
+
+        $subEnum = $this->resolveSubtab($sectionEnum, $sub);
+        if (null !== $sectionEnum->defaultSubtab() && null === $subEnum) {
+            return $this->redirectToRoute('settings_appearance_section', [
+                'section' => $sectionEnum->value,
+                'sub' => $sectionEnum->defaultSubtab()->value,
+            ]);
+        }
+
+        $appearance = $this->repository->getOrCreate();
+        $redirectParams = $this->sectionParams($sectionEnum, $subEnum);
+
+        if (
+            AppearanceSettingsSection::Themes === $sectionEnum
+            && $request->isMethod(Request::METHOD_POST)
+            && $request->request->has('apply_theme')
+        ) {
             if (!$this->isCsrfTokenValid('appearance_theme', $request->request->getString('_token'))) {
                 throw $this->createAccessDeniedException('Invalid CSRF token.');
             }
@@ -42,36 +87,82 @@ final class AppearanceSettingsController extends AbstractController
                 $this->appearanceProvider->refresh();
                 $this->addFlash('success', 'flash.appearance.theme_applied');
 
-                return $this->redirectToRoute('settings_appearance');
+                return $this->redirectToRoute('settings_appearance_section', $redirectParams);
             }
 
             $this->addFlash('error', 'flash.appearance.theme_unknown');
 
-            return $this->redirectToRoute('settings_appearance');
+            return $this->redirectToRoute('settings_appearance_section', $redirectParams);
         }
 
-        $form = $this->createForm(SiteAppearanceType::class, $appearance);
-        $form->handleRequest($request);
+        $form = null;
+        if (AppearanceSettingsSection::Themes !== $sectionEnum) {
+            $form = $this->createForm(SiteAppearanceType::class, $appearance, [
+                'section' => $sectionEnum,
+                'subtab' => $subEnum,
+            ]);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($request->request->has('reset')) {
-                $appearance->resetToDefaults();
-            } else {
-                $appearance->setThemeId(AppearanceThemePresets::matchId($appearance));
+            if ($form->isSubmitted() && $form->isValid()) {
+                if ($request->request->has('reset')) {
+                    $appearance->resetToDefaults();
+                } elseif (AppearanceSettingsSection::Colors === $sectionEnum) {
+                    $appearance->setThemeId(AppearanceThemePresets::matchLightId($appearance));
+                    $appearance->setThemeIdDark(AppearanceThemePresets::matchDarkId($appearance));
+                }
+
+                $this->repository->save($appearance);
+                $this->appearanceProvider->refresh();
+                $this->addFlash('success', 'flash.appearance.saved');
+
+                return $this->redirectToRoute('settings_appearance_section', $redirectParams);
             }
-
-            $this->repository->save($appearance);
-            $this->appearanceProvider->refresh();
-            $this->addFlash('success', 'flash.appearance.saved');
-
-            return $this->redirectToRoute('settings_appearance');
         }
+
+        $activeMode = AppearanceSettingsSubtab::Dark === $subEnum ? 'dark' : 'light';
 
         return $this->render('settings/appearance.html.twig', [
             'form' => $form,
-            'activeThemeId' => AppearanceThemePresets::matchId($appearance),
+            'section' => $sectionEnum,
+            'subtab' => $subEnum,
+            'sections' => AppearanceSettingsSection::cases(),
+            'activeThemeId' => AppearanceThemePresets::matchForMode($appearance, $activeMode),
+            'activeThemeIdLight' => AppearanceThemePresets::matchLightId($appearance),
+            'activeThemeIdDark' => AppearanceThemePresets::matchDarkId($appearance),
             'lightThemes' => AppearanceThemePresets::byMode('light'),
             'darkThemes' => AppearanceThemePresets::byMode('dark'),
         ]);
+    }
+
+    /**
+     * @return array{section: string, sub?: string}
+     */
+    private function sectionParams(AppearanceSettingsSection $section, ?AppearanceSettingsSubtab $sub): array
+    {
+        $params = ['section' => $section->value];
+        if (null !== $sub) {
+            $params['sub'] = $sub->value;
+        }
+
+        return $params;
+    }
+
+    private function resolveSubtab(AppearanceSettingsSection $section, ?string $sub): ?AppearanceSettingsSubtab
+    {
+        $allowed = $section->subtabs();
+        if ([] === $allowed) {
+            return null;
+        }
+
+        if (null === $sub || '' === $sub) {
+            return null;
+        }
+
+        $subEnum = AppearanceSettingsSubtab::tryFrom($sub);
+        if (null === $subEnum || !\in_array($subEnum, $allowed, true)) {
+            throw $this->createNotFoundException();
+        }
+
+        return $subEnum;
     }
 }

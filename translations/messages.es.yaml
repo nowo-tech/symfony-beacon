@@ -722,12 +722,30 @@ releases:
 appearance:
     title: Apariencia
     intro: 'Personaliza el nombre de marca, acentos, colores de estado y superficies de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.'
+    tabs_label: 'Secciones de apariencia'
+    subtabs_label: 'Subsecciones de apariencia'
+    tab:
+        themes: Temas
+        themes_help: 'Elige un preset para sustituir de golpe fondo, acentos y colores de estado. Si editas colores a mano, la paleta pasa a ser personalizada.'
+        brand: Marca
+        brand_help: 'Nombre de marca y eyebrow de la instancia en la cabecera y la pantalla de login.'
+        layout: Diseño
+        layout_help: 'Pie fijo, radio de esquinas y qué tan definidos se ven los bordes en modo claro y oscuro.'
+        colors: Colores
+        colors_help: 'Ajusta acentos, colores de estado y superficies para modo claro y oscuro.'
+    subtab:
+        light: Temas claros
+        dark: Temas oscuros
+        accents: Acentos
+        status: Estado
+        surfaces: Superficies
     themes:
         title: Temas
         intro: 'Elige un preset para sustituir de golpe fondo, acentos y colores de estado. Si editas colores a mano abajo, la paleta pasa a ser personalizada.'
         light: Temas claros
         dark: Temas oscuros
         custom: 'Hay colores personalizados activos — elegir un tema los sobrescribirá.'
+        pair: 'Par activo: %light% (claro) + %dark% (oscuro)'
     theme:
         active: Activo
         beacon: Beacon

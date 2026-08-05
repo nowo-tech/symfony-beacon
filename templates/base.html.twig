@@ -19,7 +19,6 @@
         {# Blocking IIFE from assets/theme-boot.ts + critical dark/light substrate (FOUC). #}
         {% include '_theme_boot.html.twig' %}
         <title>{% block title %}{{ site_appearance.brandName }}{% endblock %}</title>
-        <style>{{ site_appearance.cssOverrides|raw }}</style>
         {{ nowo_pwa_head() }}
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
@@ -29,6 +28,8 @@
             <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
+        {# After app CSS so site palette / radius / border tokens win the cascade. #}
+        <style>{{ site_appearance.cssOverrides|raw }}</style>
         {% block javascripts %}
             {{ vite_entry_script_tags('app') }}
             <script src="{{ asset('js/nowo-ui-orb.js', 'nowo_ui_kit') }}" defer></script>

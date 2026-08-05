@@ -5,18 +5,18 @@
     html[data-theme="light"],
     html[data-theme="light"] body {
         color-scheme: light;
-        background-color: #f3f6f4;
+        background-color: {{ site_appearance.paperColor|e('css') }};
     }
     html[data-theme="dark"],
     html[data-theme="dark"] body {
         color-scheme: dark;
-        background-color: #0c1210;
+        background-color: {{ site_appearance.paperColorDark|e('css') }};
     }
     @media (prefers-color-scheme: dark) {
         html:not([data-theme="light"]),
         html:not([data-theme="light"]) body {
             color-scheme: dark;
-            background-color: #0c1210;
+            background-color: {{ site_appearance.paperColorDark|e('css') }};
         }
     }
 </style>

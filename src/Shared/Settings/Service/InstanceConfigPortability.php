@@ -70,7 +70,8 @@ final readonly class InstanceConfigPortability
             'appearance' => [
                 'brand_name' => $appearance->getBrandName(),
                 'brand_eyebrow' => $appearance->getBrandEyebrow(),
-                'theme_id' => AppearanceThemePresets::matchId($appearance),
+                'theme_id' => AppearanceThemePresets::matchLightId($appearance),
+                'theme_id_dark' => AppearanceThemePresets::matchDarkId($appearance),
                 'footer_fixed' => $appearance->isFooterFixed() ? '1' : '0',
                 'corner_style' => $appearance->getCornerStyle(),
                 'border_strength' => $appearance->getBorderStrength(),
@@ -180,9 +181,17 @@ final readonly class InstanceConfigPortability
             $appearance->setBorderStrength($data['border_strength']);
         }
 
-        // Named themes override individual color keys (same semantics as the settings UI).
+        // Named themes override individual color keys for their mode only.
+        $appliedTheme = false;
         if (isset($data['theme_id']) && \is_string($data['theme_id']) && AppearanceThemePresets::has($data['theme_id'])) {
             AppearanceThemePresets::apply($appearance, $data['theme_id']);
+            $appliedTheme = true;
+        }
+        if (isset($data['theme_id_dark']) && \is_string($data['theme_id_dark']) && AppearanceThemePresets::has($data['theme_id_dark'])) {
+            AppearanceThemePresets::apply($appearance, $data['theme_id_dark']);
+            $appliedTheme = true;
+        }
+        if ($appliedTheme) {
             $this->appearanceRepository->save($appearance);
             $this->appearanceProvider->refresh();
 
@@ -216,7 +225,8 @@ final readonly class InstanceConfigPortability
             $appearance->{$setter}($color);
         }
 
-        $appearance->setThemeId(AppearanceThemePresets::matchId($appearance));
+        $appearance->setThemeId(AppearanceThemePresets::matchLightId($appearance));
+        $appearance->setThemeIdDark(AppearanceThemePresets::matchDarkId($appearance));
 
         $this->appearanceRepository->save($appearance);
         $this->appearanceProvider->refresh();

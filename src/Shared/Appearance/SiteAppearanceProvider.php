@@ -49,7 +49,12 @@ final class SiteAppearanceProvider implements ResetInterface
 
     public function getThemeId(): string
     {
-        return AppearanceThemePresets::matchId($this->get());
+        return AppearanceThemePresets::matchLightId($this->get());
+    }
+
+    public function getThemeIdDark(): string
+    {
+        return AppearanceThemePresets::matchDarkId($this->get());
     }
 
     public function isFooterFixed(): bool
@@ -211,6 +216,15 @@ final class SiteAppearanceProvider implements ResetInterface
             \sprintf('  --beacon-shell-b: color-mix(in srgb, %s 6%%, %s);', $ink, $paper),
             \sprintf('  --beacon-mark: %s;', $moss),
             '  --color-sand: var(--beacon-sand);',
+            '  --color-mist: var(--beacon-mist);',
+            '  --color-ink: var(--beacon-ink);',
+            '  --color-paper: var(--beacon-paper);',
+            '  --color-moss: var(--beacon-moss);',
+            '  --color-moss-deep: var(--beacon-moss-deep);',
+            '  --color-alert: var(--beacon-alert);',
+            '  --color-warn: var(--beacon-warn);',
+            '  --color-surface: var(--beacon-surface);',
+            '  --color-surface-muted: var(--beacon-surface-muted);',
         ];
 
         if ($dark) {
