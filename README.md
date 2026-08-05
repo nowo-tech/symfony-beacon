@@ -61,7 +61,8 @@ This application is **FrankenPHP worker mode friendly**.
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
-- Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme)
+- Admin UI chrome via [`nowo-tech/ui-kit-bundle`](https://packagist.org/packages/nowo-tech/ui-kit-bundle) (`css_framework: tailwind`, Beacon `--nowo-ui-*` remap under `.kit-admin`)
+- Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme + kit profiles)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt); **optional** member alerts for new issues — Mercure live toasts via **Administration → Mercure** ([docs/ops/MERCURE.md](docs/ops/MERCURE.md)), Web Push via **Account → Display** ([docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md))
 - Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
 - **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`

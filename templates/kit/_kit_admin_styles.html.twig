@@ -1,4 +1,4 @@
-{# Host restyle for kit admin (`css_framework: custom` + vendor nowo-ui.css). #}
+{# Host restyle for kit admin (UiKit nowo-ui.css + nowo_ui_kit: tailwind; remap --nowo-ui-*). #}
 <style>
 /*
  * Page chrome (outside .kit-admin): title/intro match admin users/groups
@@ -408,27 +408,102 @@ p.kit-admin-page-header__intro {
   color: var(--beacon-ink) !important;
 }
 
-.kit-admin .pagination .page-link {
-  background-color: var(--beacon-surface);
-  border-color: var(--beacon-sand);
-  color: var(--beacon-moss);
-  font-size: var(--kit-font-label);
-  min-height: 2.25rem;
+/* Match product / UiKit table pagination (Beacon pills, not Bootstrap filled active). */
+.kit-admin .nowo-ui-pagination,
+.kit-admin nav.nowo-ui-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--beacon-sand);
+}
+
+.kit-admin .nowo-ui-pagination > ul.pagination,
+.kit-admin .nowo-ui-pagination__nav {
+  order: 2;
+}
+
+.kit-admin .nowo-ui-pagination > p,
+.kit-admin .nowo-ui-pagination__info {
+  order: 1;
+  margin: 0;
+  color: color-mix(in srgb, var(--beacon-ink) 65%, transparent);
+  font-size: var(--kit-font-meta);
+}
+
+.kit-admin .nowo-ui-pagination__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.kit-admin .nowo-ui-pagination__nav > .pagination {
+  margin: 0;
+}
+
+.kit-admin .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.kit-admin .pagination .page-item {
+  margin: 0;
+}
+
+.kit-admin .pagination .page-link,
+.kit-admin .nowo-ui-pagination__link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--beacon-sand);
+  border-radius: 0.375rem;
+  background: var(--beacon-surface);
+  color: var(--beacon-ink);
+  font-size: var(--kit-font-meta);
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
 }
-.kit-admin .pagination .page-item.active .page-link {
-  background-color: var(--beacon-moss);
+
+.kit-admin .pagination .page-link:hover,
+.kit-admin .nowo-ui-pagination__link:hover {
   border-color: var(--beacon-moss);
-  color: #fff;
+  color: var(--beacon-moss);
+  background: var(--beacon-surface);
 }
-[data-theme="dark"] .kit-admin .pagination .page-item.active .page-link {
-  color: #0c1210;
+
+.kit-admin .pagination .page-item.active .page-link,
+.kit-admin .nowo-ui-pagination__link.is-active {
+  border-color: var(--beacon-moss);
+  background: color-mix(in srgb, var(--beacon-moss) 12%, var(--beacon-surface));
+  color: var(--beacon-moss);
+  font-weight: 600;
 }
-.kit-admin .pagination .page-item.disabled .page-link {
-  background-color: transparent;
+
+.kit-admin .pagination .page-item.disabled .page-link,
+.kit-admin .nowo-ui-pagination__link.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  background: var(--beacon-surface);
   border-color: var(--beacon-sand);
-  color: color-mix(in srgb, var(--beacon-ink) 40%, transparent);
+  color: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+}
+
+.kit-admin .nowo-ui-pagination__ellipsis {
+  padding: 0 0.25rem;
+  color: color-mix(in srgb, var(--beacon-ink) 45%, transparent);
 }
 
 .kit-admin .text-muted {
@@ -786,8 +861,10 @@ p.kit-admin-page-header__intro {
 }
 
 .kit-admin .nowo-ui-table th,
-.kit-admin .nowo-ui-table td {
-  padding: 0.65rem 0.5rem;
+.kit-admin .nowo-ui-table td,
+.kit-admin .table th,
+.kit-admin .table td {
+  padding: 0.65rem 0.75rem;
   border-bottom: 1px solid color-mix(in srgb, var(--beacon-sand) 85%, transparent);
   text-align: left;
   vertical-align: middle;
@@ -795,7 +872,8 @@ p.kit-admin-page-header__intro {
   color: var(--beacon-ink);
 }
 
-.kit-admin .nowo-ui-table thead th {
+.kit-admin .nowo-ui-table thead th,
+.kit-admin .table thead th {
   color: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
   font-size: var(--kit-font-meta);
   font-weight: 600;
@@ -805,7 +883,9 @@ p.kit-admin-page-header__intro {
 }
 
 .kit-admin .nowo-ui-table tbody tr:hover,
-.kit-admin .nowo-ui-table--striped tbody tr:nth-child(even) {
+.kit-admin .nowo-ui-table--striped tbody tr:nth-child(even),
+.kit-admin .table tbody tr:hover,
+.kit-admin .table-striped > tbody > tr:nth-of-type(even) > * {
   background: color-mix(in srgb, var(--beacon-mist) 55%, transparent);
 }
 
@@ -844,13 +924,43 @@ p.kit-admin-page-header__intro {
   font-weight: 600;
 }
 
+/* Compact size for labeled toolbar/filter buttons (not forced square). */
 .kit-admin .nowo-ui-btn--sm {
+  min-height: var(--kit-btn-sm);
+  padding: 0.35rem 0.65rem;
+  font-size: var(--kit-btn-sm-font);
+}
+
+/* Icon-only cluster: square controls (row actions + menu/breadcrumb action cells). */
+.kit-admin .nowo-ui-action.nowo-ui-btn--sm,
+.kit-admin .nowo-ui-row-actions .nowo-ui-btn--sm,
+.kit-admin .nowo-dashboard-menu-actions .nowo-ui-btn--sm,
+.kit-admin .nowo-dashboard-menu-move-stack .nowo-ui-btn--sm {
   width: var(--kit-btn-sm);
   min-width: var(--kit-btn-sm);
   height: var(--kit-btn-sm);
   min-height: var(--kit-btn-sm);
   padding: 0.35rem;
-  font-size: var(--kit-btn-sm-font);
+}
+
+.kit-admin .visually-hidden,
+.kit-admin .sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.kit-admin .text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 20rem;
 }
 
 .kit-admin .nowo-ui-body {
@@ -921,8 +1031,70 @@ p.kit-admin-page-header__intro {
 }
 
 .kit-admin .nowo-ui-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--beacon-sand);
+}
+
+/* Raw kit forms (RoutingKit panel, etc.) — stack fields like FormKit. */
+.kit-admin .nowo-ui-form--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.kit-admin .nowo-ui-form--stack .nowo-ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.kit-admin .nowo-ui-input--block,
+.kit-admin .nowo-ui-form--stack .nowo-ui-input,
+.kit-admin .nowo-ui-form--stack textarea,
+.kit-admin .nowo-ui-form--stack select,
+.kit-admin .nowo-ui-form--stack input[type="text"],
+.kit-admin .nowo-ui-form--stack input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]) {
+  width: 100%;
+  max-width: none;
+  min-height: 2.25rem;
+  box-sizing: border-box;
+  border: 1px solid var(--beacon-sand);
+  border-radius: var(--kit-btn-radius);
+  background: var(--beacon-surface);
+  color: var(--beacon-ink);
+  padding: 0.5rem 0.75rem;
+  font-size: var(--kit-font-body);
+}
+
+.kit-admin .nowo-ui-form--stack textarea {
+  min-height: 8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--kit-font-meta);
+  line-height: 1.45;
+}
+
+.kit-admin .nowo-ui-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--kit-font-body);
+  color: var(--beacon-ink);
+}
+
+.kit-admin .nowo-ui-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--beacon-ink);
+}
+
+.kit-admin.nowo-ui-routing-kit-panel .nowo-ui-form-wrap {
+  margin-top: 1.5rem;
 }
 </style>

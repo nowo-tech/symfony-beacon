@@ -1,0 +1,10 @@
+# nowo-tech/ui-kit-bundle
+# https://github.com/nowo-tech/UiKitBundle
+#
+# Host design system: Tailwind class helpers + Beacon token remap under .kit-admin
+# (see templates/kit/_kit_admin_styles.html.twig). Product chrome stays in base.html.twig.
+nowo_ui_kit:
+    css_framework: tailwind
+    icon_set: ux_icon
+    # Table/list row actions: icon only (label is visually hidden + aria-label/title).
+    row_actions_display: icon

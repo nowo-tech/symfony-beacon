@@ -31,7 +31,7 @@ As a member, I filter by level (type), status, priority, text search, and page s
 - **FR-002**: Only issues in projects from `findAccessibleByUser`.
 - **FR-003**: Scopes: `mine` | `teammates` | `unassigned` | `all`.
 - **FR-004**: Filters: `project` (uuid), `level`, `status`, `priority`, `assignee` (user id), `q`, `per_page`, `page`.
-- **FR-005**: Paginated table via `PagePagination` + `shared/_table_pagination.html.twig`: project, title, level, status, priority, assignee, last seen.
+- **FR-005**: Paginated table via `PagePagination` + `shared/_table_pagination.html.twig` (alias of `kit/_pagination` → UiKit `_pagination`, `«` / `»` + page numbers — see `081`): project, title, level, status, priority, assignee, last seen.
 - **FR-006**: English UI strings + locales in seeder translations.
 
 ## Out of scope (v1)
@@ -43,4 +43,5 @@ As a member, I filter by level (type), status, priority, text search, and page s
 ## Related
 
 - `080-dashboard-aside-panels` — Summary, Activity, Mentions, Alerts, New in release (same Dashboard aside; shared pagination convention FR-011).
+- `081-formkit-uikit-kit-sync` — pagination chrome via UiKit 1.7+.
 - Breadcrumbs for Assignments nest under `dashboard_home` (Projects) so trails render with `hide_when_single_root`.

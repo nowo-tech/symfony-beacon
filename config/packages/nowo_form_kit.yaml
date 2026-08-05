@@ -1,10 +1,14 @@
 # nowo-tech/form-kit-bundle
 # https://github.com/nowo-tech/FormKitBundle
+#
+# default_profile beacon = Beacon product forms.
+# Named kit profiles (auth_kit, dashboard_menu, …) stop vendor prepend from seeding
+# Bootstrap field classes when those bundles require FormKit.
 nowo_form_kit:
     default_profile: beacon
     css_framework: tailwind
     profiles:
-        beacon:
+        beacon: &beacon_profile
             alias: beacon
             translation_domain: messages
             required_label_suffix: null
@@ -29,3 +33,51 @@ nowo_form_kit:
             help_modal:
                 framework: tailwind
                 icon_html: '<span aria-hidden="true">?</span>'
+
+        # AuthKit 1.14+ (#[FormKitConfig] auth_kit) — match Beacon inputs.
+        # FormKit 2.2+ inherits form-level translation_domain; keep catalogue + auto_* off.
+        auth_kit:
+            <<: *beacon_profile
+            alias: auth_kit
+            translation_domain: NowoAuthKitBundle
+            auto_placeholder: false
+            auto_help: false
+
+        # DashboardMenu 2.x / BreadcrumbKit 2.0.14+ / HttpLog 1.1+ admin forms.
+        # Host-defined profiles skip vendor domain seed — set kit catalogues explicitly.
+        dashboard_menu:
+            <<: *beacon_profile
+            alias: dashboard_menu
+            translation_domain: NowoDashboardMenuBundle
+            auto_placeholder: false
+            auto_help: false
+
+        breadcrumb_kit:
+            <<: *beacon_profile
+            alias: breadcrumb_kit
+            translation_domain: NowoBreadcrumbKitBundle
+            auto_placeholder: false
+            auto_help: false
+
+        http_log:
+            <<: *beacon_profile
+            alias: http_log
+            translation_domain: NowoHttpLogBundle
+            auto_placeholder: false
+            auto_help: false
+
+        # CookieConsent FormKit forms label keys live in NowoCookieConsentBundle, not messages.
+        cookie_consent:
+            <<: *beacon_profile
+            alias: cookie_consent
+            translation_domain: NowoCookieConsentBundle
+            auto_placeholder: false
+            auto_help: false
+
+        # RoutingKit 1.3+ panel form (#[FormKitConfig] routing_kit).
+        routing_kit:
+            <<: *beacon_profile
+            alias: routing_kit
+            translation_domain: NowoRoutingKitBundle
+            auto_placeholder: false
+            auto_help: false

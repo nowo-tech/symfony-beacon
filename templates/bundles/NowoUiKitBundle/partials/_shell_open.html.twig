@@ -1,0 +1,83 @@
+{#
+  Beacon product chrome open half.
+  Uses app-* layout classes (Beacon CSS). data-nowo-ui-* hooks only — do NOT add
+  nowo-ui-shell/header/aside/main layout classes here: nowo-ui.css grid fights app-shell.
+#}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set framework = framework|default(null) %}
+{% set aside_id = aside_id|default('app-sidebar') %}
+{% set collapsed = collapsed|default(false) %}
+{% set content_width = content_width|default('content') %}
+{% set shell_classes = 'app-shell'
+    ~ (content_width == 'full' ? ' is-full-width' : ' is-content-width')
+    ~ (collapsed ? ' is-sidebar-collapsed' : '')
+%}
+
+<div
+    class="{{ shell_classes }}"
+    data-nowo-ui-shell
+    data-app-shell
+    {% if shell_attr is defined and shell_attr %}
+        {% for name, value in shell_attr %}{{ name }}="{{ value|e('html_attr') }}" {% endfor %}
+    {% endif %}
+>
+    <header class="app-header">
+        <div class="app-header__start">
+            {% include '@NowoUiKitBundle/partials/_burger.html.twig' with {
+                controls: aside_id,
+                expanded: not collapsed,
+                label: 'nav.toggle_sidebar'|trans,
+                framework: framework
+            } %}
+            {% if brand_html is defined and brand_html %}
+                {{ brand_html|raw }}
+            {% elseif brand is defined %}
+                <strong class="app-header__brand">{{ brand }}</strong>
+            {% endif %}
+        </div>
+        <div class="app-header__end">
+            {% if header_end is defined and header_end %}
+                {{ header_end|raw }}
+            {% endif %}
+            {% if show_user_menu|default(false) %}
+                {% include '@NowoUiKitBundle/partials/_user_menu.html.twig' with {
+                    name: name|default(null),
+                    email: email|default(null),
+                    initials: initials|default(null),
+                    avatar_src: avatar_src|default(null),
+                    links: user_links|default([]),
+                    logout_href: logout_href|default(null),
+                    logout_path: logout_path|default(null),
+                    logout_csrf: logout_csrf|default(null),
+                    framework: framework
+                } only %}
+            {% endif %}
+        </div>
+    </header>
+
+    <aside
+        id="{{ aside_id }}"
+        class="app-sidebar"
+        data-nowo-ui-aside
+        data-app-sidebar
+        data-tour="sidebar"
+        aria-label="{{ aside_label|default('nav.aside'|trans({}, 'NowoUiKitBundle')) }}"
+    >
+        {% if aside_html is defined and aside_html %}
+            {{ aside_html|raw }}
+        {% else %}
+            <div class="app-sidebar__inner">
+                {% if aside_label|default(null) %}
+                    <p class="app-sidebar__label">{{ aside_label }}</p>
+                {% endif %}
+                <nav class="app-sidebar__nav">
+                    {% include '@NowoUiKitBundle/partials/_aside_nav_items.html.twig' with {
+                        items: aside_items|default([]),
+                        prefix: aside_id
+                    } only %}
+                </nav>
+            </div>
+        {% endif %}
+    </aside>
+
+    <div class="app-main">

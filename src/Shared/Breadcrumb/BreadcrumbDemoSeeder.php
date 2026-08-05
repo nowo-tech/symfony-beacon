@@ -444,6 +444,17 @@ final readonly class BreadcrumbDemoSeeder
             $changed,
         );
 
+        // Section tabs; same trail label as the ops-defaults redirect entry.
+        $this->ensureItem(
+            $collection,
+            'settings_ops_defaults_section',
+            'Ops defaults',
+            ['en' => 'Ops defaults', 'es' => 'Valores ops', 'de' => 'Ops-Standards', 'nl' => 'Ops-standaarden', 'fr' => 'Valeurs ops', 'it' => 'Predefiniti ops', 'pt' => 'Predefinições ops'],
+            $admin,
+            ['section'],
+            $changed,
+        );
+
         $this->ensureItem(
             $collection,
             'settings_instance_config',

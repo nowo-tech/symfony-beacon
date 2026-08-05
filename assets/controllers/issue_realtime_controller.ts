@@ -176,35 +176,44 @@ export default class extends Controller {
   }
 
   private showToast(message: string, url?: string): void {
-    let stack = document.querySelector<HTMLElement>(".toast-stack[data-controller~='toast-stack']");
+    let stack = document.querySelector<HTMLElement>(
+      ".nowo-ui-toast-stack[data-controller~='toast-stack'], .toast-stack[data-controller~='toast-stack']",
+    );
     if (!stack) {
       stack = document.createElement("div");
-      stack.className = "toast-stack";
+      stack.className = "nowo-ui-toast-stack toast-stack";
+      stack.setAttribute("data-nowo-ui-toast-stack", "");
       stack.setAttribute("data-controller", "toast-stack");
       stack.setAttribute("aria-live", "polite");
       document.body.appendChild(stack);
     }
 
     const toast = document.createElement("div");
-    toast.className = "flash flash-toast flash-info";
+    toast.className = "nowo-ui-toast flash flash-toast flash-info";
+    toast.setAttribute("data-nowo-ui-toast", "");
     toast.setAttribute("data-toast-stack-target", "toast");
     toast.dataset.timeout = "8000";
     toast.setAttribute("role", "status");
 
-    const text = document.createElement(url ? "a" : "span");
+    const content = document.createElement("div");
+    content.className = "nowo-ui-toast__content flash__content";
+
+    const text = document.createElement(url ? "a" : "p");
     text.textContent = message;
+    text.className = url ? "flash-toast__link" : "nowo-ui-toast__message flash__message";
     if (url && text instanceof HTMLAnchorElement) {
       text.href = url;
-      text.className = "flash-toast__link";
     }
-    toast.appendChild(text);
+    content.appendChild(text);
+    toast.appendChild(content);
 
     const dismiss = document.createElement("button");
     dismiss.type = "button";
-    dismiss.className = "flash-toast__dismiss";
+    dismiss.className = "nowo-ui-toast__dismiss flash__dismiss";
+    dismiss.setAttribute("data-nowo-ui-toast-dismiss", "");
     dismiss.setAttribute("data-action", "toast-stack#dismiss");
     dismiss.setAttribute("aria-label", "Dismiss");
-    dismiss.textContent = "×";
+    dismiss.innerHTML = '<span aria-hidden="true">&times;</span>';
     toast.appendChild(dismiss);
 
     stack.appendChild(toast);

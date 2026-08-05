@@ -1,0 +1,29 @@
+{% extends nowo_site_backup_panel_layout_template %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_site_backup_css_framework|default('tailwind') %}
+
+{% block nowo_ui_document_title %}History — Site Backup{% endblock %}
+
+{% block nowo_site_backup_panel_content %}
+<section class="nowo-ui-card card">
+    <h2>History</h2>
+    <div class="{{ ui.table_wrap(_css_fw) }}">
+        <table class="{{ ui.table(_css_fw) }}">
+            <thead><tr><th>When</th><th>Action</th><th>Backup</th><th>Actor</th><th>Message</th></tr></thead>
+            <tbody>
+            {% for h in history %}
+                <tr>
+                    <td>{{ h.occurredAt|date('Y-m-d H:i:s') }}</td>
+                    <td>{{ h.action }}</td>
+                    <td>{{ h.backupId }}</td>
+                    <td>{{ h.actor }}</td>
+                    <td>{{ h.message }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="{{ ui.muted(_css_fw) }}">No history.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

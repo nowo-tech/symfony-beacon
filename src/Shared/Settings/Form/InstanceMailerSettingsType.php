@@ -6,10 +6,11 @@ namespace App\Shared\Settings\Form;
 
 use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
+use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -19,40 +20,47 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Instance Mailer settings (DSN and From stored encrypted; blank DSN keeps current value).
- *
- * @extends AbstractType<InstanceSettings>
  */
-final class InstanceMailerSettingsType extends AbstractType
+final class InstanceMailerSettingsType extends FormKitAbstractType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly MailerDsnValidator $dsnValidator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('plainMailerDsn', PasswordType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'instance_mailer.mailer_dsn.label',
-                'help' => 'instance_mailer.mailer_dsn.help',
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                    'placeholder' => 'instance_mailer.mailer_dsn.placeholder',
-                ],
-                'constraints' => [
-                    new Length(max: 2048),
-                    new Callback($this->validatePlainDsn(...)),
-                ],
-            ])
-            ->add('clearMailerDsn', CheckboxType::class, [
+        $this->withBuilder($builder, function (): void {
+            $this->boundBuilder()->add(
+                'plainMailerDsn',
+                PasswordType::class,
+                $this->mergeFieldOptions('plainMailerDsn', 'password', [
+                    'mapped' => false,
+                    'required' => false,
+                    'label' => 'instance_mailer.mailer_dsn.label',
+                    'help' => 'instance_mailer.mailer_dsn.help',
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                        'placeholder' => 'instance_mailer.mailer_dsn.placeholder',
+                    ],
+                    'constraints' => [
+                        new Length(max: 2048),
+                        new Callback($this->validatePlainDsn(...)),
+                    ],
+                ]),
+            );
+            $this->addCheckboxField('clearMailerDsn', [
+                'placeholder' => false,
                 'mapped' => false,
                 'required' => false,
                 'label' => 'instance_mailer.clear_dsn.label',
                 'help' => 'instance_mailer.clear_dsn.help',
-            ])
-            ->add('mailerFrom', EmailType::class, [
+            ]);
+            $this->addEmailField('mailerFrom', [
                 'required' => false,
                 'label' => 'instance_mailer.mailer_from.label',
                 'help' => 'instance_mailer.mailer_from.help',
@@ -64,8 +72,10 @@ final class InstanceMailerSettingsType extends AbstractType
                     new Length(max: 180),
                 ],
             ]);
+        });
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

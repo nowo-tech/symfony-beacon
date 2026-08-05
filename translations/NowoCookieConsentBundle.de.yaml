@@ -11,6 +11,8 @@ nowo_cookie_consent:
     save: 'Auswahl bestätigen'
     use_only_functional_cookies: 'Nur notwendige Cookies'
     use_all_cookies: 'Alle Cookies akzeptieren'
+    preferences_bubble:
+        label: 'Cookie-Einstellungen öffnen'
     required:
         title: 'Unbedingt erforderlich'
         description: 'Cookies, die für Authentifizierung, Sicherheit und Speicherung Ihrer Einwilligung unerlässlich sind. Sie bleiben stets aktiv und können nicht deaktiviert werden.'

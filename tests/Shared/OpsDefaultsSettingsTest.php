@@ -13,38 +13,47 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
 {
-    public function testAdminCanSaveOpsDefaults(): void
+    public function testIndexRedirectsToGovernanceTab(): void
+    {
+        [$client, $admin] = $this->bootAdmin('ops-defaults-redirect@example.com');
+        $this->login($client, $admin);
+
+        $client->request(Request::METHOD_GET, '/settings/ops-defaults');
+        self::assertResponseRedirects('/settings/ops-defaults/governance');
+    }
+
+    public function testAdminCanSaveOpsDefaultsPerSection(): void
     {
         [$client, $admin] = $this->bootAdmin('ops-defaults@example.com');
         $this->login($client, $admin);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/ops-defaults');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorExists('[data-testid="ops-defaults-form"]');
-
-        $form = $crawler->filter('[data-testid="ops-defaults-form"]')->form([
+        $this->submitSection($client, 'governance', [
             'instance_ops_defaults[retentionDays]' => '30',
             'instance_ops_defaults[retentionMaxEvents]' => '10000',
             'instance_ops_defaults[ingestRateLimit]' => '200',
             'instance_ops_defaults[eventQuotaDaily]' => '5000',
             'instance_ops_defaults[eventQuotaMonthly]' => '100000',
+        ]);
+        $this->submitSection($client, 'ingest', [
             'instance_ops_defaults[envelopeMaxBytes]' => '1048576',
             'instance_ops_defaults[ingestRejectQueryAuth]' => '1',
+        ]);
+        $this->submitSection($client, 'metrics', [
             'instance_ops_defaults[metricsRequireToken]' => '1',
             'instance_ops_defaults[plainMetricsToken]' => 'ops-metrics-token',
+        ]);
+        $this->submitSection($client, 'inbound', [
             'instance_ops_defaults[inboundEmailEnabled]' => '1',
             'instance_ops_defaults[inboundMailDomain]' => 'mail.example.test',
             'instance_ops_defaults[plainInboundWebhookSecret]' => 'ops-inbound-secret',
+        ]);
+        $this->submitSection($client, 'notifications', [
             'instance_ops_defaults[allowPrivateUrls]' => '1',
             'instance_ops_defaults[allowAnonymousResolve]' => '1',
             'instance_ops_defaults[notificationDeliveryHistoryLimit]' => '25',
             'instance_ops_defaults[notificationCircuitBreakerThreshold]' => '4',
             'instance_ops_defaults[notificationCircuitBreakerCooldownMinutes]' => '15',
         ]);
-        $client->submit($form);
-        self::assertResponseRedirects('/settings/ops-defaults');
-        $client->followRedirect();
-        self::assertResponseIsSuccessful();
 
         $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertSame(30, $settings->getRetentionDays());
@@ -71,8 +80,26 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         [$client] = $this->bootAdmin('ops-admin-seed@example.com');
         $user = $this->makeUser('ops-member@example.com');
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/settings/ops-defaults');
+        $client->request(Request::METHOD_GET, '/settings/ops-defaults/governance');
         self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * @param array<string, string> $values
+     */
+    private function submitSection(KernelBrowser $client, string $section, array $values): void
+    {
+        $crawler = $client->request(Request::METHOD_GET, '/settings/ops-defaults/'.$section);
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="ops-defaults-tabs"]');
+        self::assertSelectorExists('[data-testid="ops-defaults-tab-'.$section.'"]');
+        self::assertSelectorExists('[data-testid="ops-defaults-form"][data-ops-section="'.$section.'"]');
+
+        $form = $crawler->filter('[data-testid="ops-defaults-form"]')->form($values);
+        $client->submit($form);
+        self::assertResponseRedirects('/settings/ops-defaults/'.$section);
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
     }
 
     /**

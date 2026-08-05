@@ -10,6 +10,7 @@ nowo_cookie_consent:
     show_preferences: 'Configuración de cookies'
     save: 'Confirmar selección'
     use_only_functional_cookies: 'Solo cookies necesarias'
+    use_all_cookies: 'Aceptar todas las cookies'
     preferences_bubble:
         label: 'Abrir configuración de cookies'
     required:
@@ -18,6 +19,7 @@ nowo_cookie_consent:
         always_on: 'Siempre activas'
     preferences:
         close: 'Volver'
+        usage_title: 'Cómo usamos las cookies'
         usage_description: 'Utilizamos cookies y tecnologías similares. Las cookies estrictamente necesarias permanecen activas porque son esenciales para el funcionamiento del servicio (seguridad, gestión de sesión y registro de su consentimiento). Las cookies de analítica y de preferencias son opcionales y se activan únicamente con su consentimiento previo. Puede aceptar todas las categorías, rechazar las no esenciales o revisar cada categoría. Puede retirar o modificar su consentimiento en cualquier momento mediante Configuración de cookies.'
         description: 'Cookies opcionales que almacenan elecciones de presentación o de funciones no esenciales cuando usted habilita esta categoría.'
     functionality:

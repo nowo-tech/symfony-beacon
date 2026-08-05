@@ -1,7 +1,7 @@
 /**
  * Kit admin shells (menus / breadcrumbs / cookie-consent): layout helpers only.
- * CSS framework is `custom` + vendor `nowo-ui.css` — do not load Bootstrap here
- * (Tailwind app chrome must not be reboot-overridden).
+ * CSS framework is UiKit `tailwind` + `nowo-ui.css` (asset package nowo_ui_kit).
+ * Do not load Bootstrap here (Tailwind app chrome must not be reboot-overridden).
  * Config from <script type="application/json" id="…"> islands (CSP-safe).
  */
 
@@ -41,7 +41,7 @@ function bootDashboardMenu(): void {
     window.dashboardMenuIconSelectorScriptUrl = boot.iconSelectorScriptUrl;
   }
   window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
-    cssFramework: boot.cssFramework ?? 'custom',
+    cssFramework: boot.cssFramework ?? 'tailwind',
   });
   if (boot.i18n) {
     window.dashboardMenuI18n = boot.i18n;
@@ -62,7 +62,7 @@ function bootBreadcrumbKit(): void {
     window.breadcrumbKitI18n = boot.i18n;
   }
   window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};
-  window.__breadcrumbKitDashboard.cssFramework = boot.cssFramework ?? 'custom';
+  window.__breadcrumbKitDashboard.cssFramework = boot.cssFramework ?? 'tailwind';
   if (boot.importPartialUrl) {
     window.__breadcrumbKitDashboard.importPartialUrl = boot.importPartialUrl;
   }

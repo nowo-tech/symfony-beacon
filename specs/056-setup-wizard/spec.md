@@ -2,7 +2,7 @@
 
 **Feature Branch**: `056-setup-wizard`  
 **Created**: 2026-07-21  
-**Status**: Implemented (custom wizard 2026-07-21–22; SiteBackupBundle `/setup` — 2026-07-30; **locale-in-path SiteBackup ≥ 1.7.0** — 2026-07-31)  
+**Status**: Implemented (custom wizard 2026-07-21–22; SiteBackupBundle `/setup` — 2026-07-30; **locale-in-path SiteBackup ≥ 1.7.0** — 2026-07-31; host layouts Tailwind + UiKit tokens / pin **1.10.0** — `081-formkit-uikit-kit-sync` — 2026-08-05)  
 
 **Input**: After CLI seed layers (`055`), provide a cold-start UI so empty instances can migrate, seed platform catalogs, create the first admin, and optionally load sample data. **Current implementation** uses [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **≥ 1.7.0** at `setup.path_prefix: /setup` (ops panel `/_site_backup`). Beacon owns host chrome layouts (including a friendlier token gate Twig), `AdminUserProvisioner`, catalog-empty redirect, and `SetupCompletedEvent` → `instance_settings.setup_completed_at`. Complements AuthKit first-user register; does not replace Docker/Compose install.
 

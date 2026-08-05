@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@hotwired/stimulus": "3.2.2",
+    "@openai/codex-security": "^0.1.5",
     "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
     "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "@tailwindcss/vite": "4.3.3",

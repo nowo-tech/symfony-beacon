@@ -10,8 +10,9 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 /**
  * Blocks SSRF to private / link-local / metadata addresses for outbound notification HTTP URLs.
  *
- * When DNS is used, {@see httpClientOptionsForUrl()} pins the first validated public A record via
- * HttpClient `resolve` so a later rebinding cannot steer the TCP connection to a private IP.
+ * When DNS is used, {@see httpClientOptionsForUrl()} validates public **A and AAAA** answers, then
+ * pins the first public IPv4 (preferred) or IPv6 via HttpClient `resolve` so a later rebinding
+ * cannot steer the TCP connection to a private IP.
  */
 final readonly class OutboundUrlGuard
 {
@@ -85,21 +86,69 @@ final readonly class OutboundUrlGuard
             return null;
         }
 
-        $ips = gethostbynamel($host);
-        if (false === $ips || [] === $ips) {
+        $ips = $this->resolvePublicIps($host);
+        if ([] === $ips) {
             throw new InvalidArgumentException('Notification URL host could not be resolved.');
         }
 
-        $publicIps = [];
+        // Prefer an IPv4 pin when both families are public (HttpClient resolve + dual-stack).
+        $pinIp = $ips[0];
         foreach ($ips as $ip) {
+            if (false !== filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
+                $pinIp = $ip;
+                break;
+            }
+        }
+
+        return ['host' => $host, 'ip' => $pinIp];
+    }
+
+    /**
+     * Resolve hostname to public A + AAAA addresses. Private answers fail closed.
+     *
+     * @return list<string>
+     *
+     * @throws InvalidArgumentException when any answer is private/reserved
+     */
+    private function resolvePublicIps(string $host): array
+    {
+        $candidates = [];
+
+        $aRecords = @dns_get_record($host, \DNS_A);
+        if (\is_array($aRecords)) {
+            foreach ($aRecords as $row) {
+                if (isset($row['ip']) && \is_string($row['ip']) && $row['ip'] !== '') {
+                    $candidates[] = $row['ip'];
+                }
+            }
+        }
+
+        $aaaaRecords = @dns_get_record($host, \DNS_AAAA);
+        if (\is_array($aaaaRecords)) {
+            foreach ($aaaaRecords as $row) {
+                if (isset($row['ipv6']) && \is_string($row['ipv6']) && $row['ipv6'] !== '') {
+                    $candidates[] = $row['ipv6'];
+                }
+            }
+        }
+
+        // Fallback when dns_get_record is unavailable / empty (common in some containers).
+        if ($candidates === []) {
+            $fallback = @gethostbynamel($host);
+            if (\is_array($fallback)) {
+                $candidates = $fallback;
+            }
+        }
+
+        $publicIps = [];
+        foreach (array_values(array_unique($candidates)) as $ip) {
             if ($this->isBlockedIp($ip)) {
                 throw new InvalidArgumentException('Notification URL resolves to a private address.');
             }
             $publicIps[] = $ip;
         }
 
-        // Pin the first validated public A record for the outbound connect (anti DNS rebinding).
-        return ['host' => $host, 'ip' => $publicIps[0]];
+        return $publicIps;
     }
 
     private function isBlockedHostName(string $host): bool

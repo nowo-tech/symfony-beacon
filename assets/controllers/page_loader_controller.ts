@@ -180,19 +180,22 @@ export default class extends Controller {
     overlay.setAttribute('aria-busy', 'false');
     document.documentElement.classList.remove('is-page-loading');
 
-    if (immediate) {
+    const dismiss = (): void => {
       overlay.hidden = true;
       overlay.classList.remove('is-leaving', 'is-active');
+      // Drop any fill from fade-in `animation: … forwards` so the next show starts clean.
+      overlay.style.removeProperty('opacity');
+      overlay.style.removeProperty('visibility');
+    };
+
+    if (immediate) {
+      dismiss();
       return;
     }
 
     overlay.classList.add('is-leaving');
-    const done = (): void => {
-      overlay.hidden = true;
-      overlay.classList.remove('is-leaving', 'is-active');
-    };
-    overlay.addEventListener('transitionend', done, { once: true });
-    window.setTimeout(done, this.leaveMsValue + 80);
+    overlay.addEventListener('transitionend', dismiss, { once: true });
+    window.setTimeout(dismiss, this.leaveMsValue + 80);
   }
 
   private clearTimers(): void {
@@ -210,6 +213,13 @@ export default class extends Controller {
   private resolveOverlay(): HTMLElement | null {
     if (this.hasOverlayTarget) {
       return this.overlayTarget;
+    }
+    if (this.element instanceof HTMLElement && this.element.hasAttribute('data-nowo-ui-page-loader')) {
+      return this.element;
+    }
+    const uikit = document.querySelector<HTMLElement>('[data-nowo-ui-page-loader]');
+    if (uikit) {
+      return uikit;
     }
     return this.element instanceof HTMLElement ? this.element : null;
   }

@@ -24,63 +24,63 @@
         <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
         <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
         {% block stylesheets %}
+            {# UiKit tokens/components first; Beacon app CSS must win for product chrome. #}
+            <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
         {% block javascripts %}
             {{ vite_entry_script_tags('app') }}
+            <script src="{{ asset('js/nowo-ui-orb.js', 'nowo_ui_kit') }}" defer></script>
         {% endblock %}
     </head>
     <body class="page-shell{% if app.user %} page-shell--app{% endif %}">
         {% include '_page_loader.html.twig' %}
+
         {% if app.user %}
-            <div
-                class="app-shell{% if app.user.preferredContentWidth == 'full' %} is-full-width{% else %} is-content-width{% endif %}{% if app.user.preferredSidebar == 'collapsed' %} is-sidebar-collapsed{% endif %}"
-                data-app-shell
-                data-content-width="{{ app.user.preferredContentWidth }}"
-                data-ui-density="{{ app.user.preferredUiDensity }}"
-                data-font-scale="{{ app.user.preferredFontScale }}"
-                data-contrast="{{ app.user.preferredContrast|default('system') }}"
-                data-sidebar-default="{{ app.user.preferredSidebar }}"
-                data-theme-sync-url="{{ path('account_theme') }}"
-                data-theme-sync-token="{{ csrf_token('account_theme') }}"
-                data-content-width-sync-url="{{ path('account_content_width') }}"
-                data-content-width-sync-token="{{ csrf_token('account_content_width') }}"
-            >
-                <header class="app-header">
-                    <div class="app-header__start">
-                        <button
-                            type="button"
-                            class="app-sidebar-toggle"
-                            data-sidebar-toggle
-                            aria-controls="app-sidebar"
-                            aria-expanded="true"
-                            aria-label="{{ 'nav.toggle_sidebar'|trans }}"
-                        >
-                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                        {% include '_brand_mark.html.twig' with {size: 'sm'} %}
+            {% set brand_html %}
+                {% include '_brand_mark.html.twig' with {size: 'sm'} %}
+            {% endset %}
+            {% set header_end %}
+                {% include '_theme_toggle.html.twig' with {compact: true} %}
+                {% include '_content_width_toggle.html.twig' with {compact: true} %}
+                {% include '_locale_switcher.html.twig' with {compact: true} %}
+                {% include '_user_menu.html.twig' %}
+            {% endset %}
+            {% set aside_html %}
+                <div class="app-sidebar__inner">
+                    <p class="app-sidebar__label">{{ app_section.current.labelKey|trans }}</p>
+                    <div class="app-sidebar__nav">
+                        {% include '_section_nav.html.twig' %}
                     </div>
-                    <div class="app-header__end">
-                        {% include '_theme_toggle.html.twig' with {compact: true} %}
-                        {% include '_content_width_toggle.html.twig' with {compact: true} %}
-                        {% include '_locale_switcher.html.twig' with {compact: true} %}
-                        {% include '_user_menu.html.twig' %}
-                    </div>
-                </header>
-
-                <aside id="app-sidebar" class="app-sidebar" data-app-sidebar data-tour="sidebar" aria-label="{{ app_section.current.labelKey|trans }}">
-                    <div class="app-sidebar__inner">
-                        <p class="app-sidebar__label">{{ app_section.current.labelKey|trans }}</p>
-                        <div class="app-sidebar__nav">
-                            {% include '_section_nav.html.twig' %}
-                        </div>
-                    </div>
-                </aside>
-
-                <div class="app-main">
-                    <main class="app-main__inner">
+                </div>
+            {% endset %}
+            {#
+              Open UiKit _shell without capturing {% block body %} (Twig allows one
+              definition). Main slot is closed after the shared body blocks below.
+            #}
+            {% include '@NowoUiKitBundle/partials/_shell_open.html.twig' with {
+                framework: 'tailwind',
+                brand_html: brand_html,
+                header_end: header_end,
+                aside_html: aside_html,
+                aside_label: app_section.current.labelKey|trans,
+                aside_id: 'app-sidebar',
+                show_user_menu: false,
+                collapsed: app.user.preferredSidebar == 'collapsed',
+                content_width: app.user.preferredContentWidth,
+                shell_attr: {
+                    'data-content-width': app.user.preferredContentWidth,
+                    'data-ui-density': app.user.preferredUiDensity,
+                    'data-font-scale': app.user.preferredFontScale,
+                    'data-contrast': app.user.preferredContrast|default('system'),
+                    'data-sidebar-default': app.user.preferredSidebar,
+                    'data-theme-sync-url': path('account_theme'),
+                    'data-theme-sync-token': csrf_token('account_theme'),
+                    'data-content-width-sync-url': path('account_content_width'),
+                    'data-content-width-sync-token': csrf_token('account_content_width'),
+                }
+            } %}
+                <main class="app-main__inner">
         {% else %}
             <div class="top-controls">
                 {% include '_theme_toggle.html.twig' %}
@@ -115,11 +115,13 @@
                         {% block body_after %}{% endblock %}
 
         {% if app.user %}
-                    </main>
-                </div>
+                </main>
+            {% set footer_html %}
                 {% include '_legal_footer.html.twig' %}
-            </div>
-            <div class="app-sidebar-backdrop" data-sidebar-backdrop></div>
+            {% endset %}
+            {% include '@NowoUiKitBundle/partials/_shell_close.html.twig' with {
+                footer_html: footer_html
+            } %}
             {{ nowo_pwa_install_prompt() }}
             {% include '_issue_realtime.html.twig' %}
         {% else %}

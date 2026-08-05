@@ -70,7 +70,9 @@ function applyTheme(theme: Theme, persist: boolean): void {
 }
 
 function syncThemeToAccount(theme: Theme): void {
-  const shell = document.querySelector<HTMLElement>('[data-app-shell][data-theme-sync-url]');
+  const shell = document.querySelector<HTMLElement>(
+    '[data-app-shell][data-theme-sync-url], [data-nowo-ui-shell][data-theme-sync-url]',
+  );
   if (!(shell instanceof HTMLElement)) {
     return;
   }
@@ -213,8 +215,8 @@ function animateStyle(
 }
 
 function applySidebar(collapsed: boolean, animate = true): void {
-  const shell = document.querySelector<HTMLElement>('[data-app-shell]');
-  const backdrop = document.querySelector<HTMLElement>('[data-sidebar-backdrop]');
+  const shell = document.querySelector<HTMLElement>('[data-app-shell], [data-nowo-ui-shell]');
+  const backdrop = document.querySelector<HTMLElement>('[data-sidebar-backdrop], [data-nowo-ui-aside-backdrop]');
   if (!shell) {
     return;
   }
@@ -222,8 +224,8 @@ function applySidebar(collapsed: boolean, animate = true): void {
   const mobile = isMobileSidebar();
   const nextCollapsed = !mobile && collapsed;
   const nextOpen = mobile && !collapsed;
-  const sidebar = shell.querySelector<HTMLElement>('.app-sidebar');
-  const main = shell.querySelector<HTMLElement>('.app-main');
+  const sidebar = shell.querySelector<HTMLElement>('.app-sidebar, [data-nowo-ui-aside]');
+  const main = shell.querySelector<HTMLElement>('.app-main, .nowo-ui-main');
 
   const currentlyOpen = mobile
     ? shell.classList.contains('is-sidebar-open')
@@ -250,9 +252,11 @@ function applySidebar(collapsed: boolean, animate = true): void {
       }
     }
 
-    document.querySelectorAll<HTMLElement>('[data-sidebar-toggle]').forEach((button) => {
-      button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
+    document
+      .querySelectorAll<HTMLElement>('[data-sidebar-toggle], [data-nowo-ui-burger]')
+      .forEach((button) => {
+        button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      });
   };
 
   const shouldAnimate =
@@ -329,7 +333,7 @@ function applySidebar(collapsed: boolean, animate = true): void {
 }
 
 function initSidebar(): void {
-  const shell = document.querySelector('[data-app-shell]');
+  const shell = document.querySelector('[data-app-shell], [data-nowo-ui-shell]');
   if (!shell) {
     return;
   }
@@ -337,7 +341,7 @@ function initSidebar(): void {
   let collapsed = readSidebarCollapsed();
   applySidebar(collapsed, false);
 
-  document.querySelectorAll('[data-sidebar-toggle]').forEach((button) => {
+  document.querySelectorAll('[data-sidebar-toggle], [data-nowo-ui-burger]').forEach((button) => {
     if (button instanceof HTMLElement && button.dataset.sidebarBound === '1') {
       return;
     }
@@ -351,22 +355,24 @@ function initSidebar(): void {
     });
   });
 
-  document.querySelectorAll('[data-sidebar-backdrop]').forEach((backdrop) => {
-    if (backdrop instanceof HTMLElement && backdrop.dataset.sidebarBound === '1') {
-      return;
-    }
-    if (backdrop instanceof HTMLElement) {
-      backdrop.dataset.sidebarBound = '1';
-    }
-    backdrop.addEventListener('click', () => {
-      collapsed = true;
-      writeSidebarCollapsed(collapsed);
-      applySidebar(collapsed);
+  document
+    .querySelectorAll('[data-sidebar-backdrop], [data-nowo-ui-aside-backdrop]')
+    .forEach((backdrop) => {
+      if (backdrop instanceof HTMLElement && backdrop.dataset.sidebarBound === '1') {
+        return;
+      }
+      if (backdrop instanceof HTMLElement) {
+        backdrop.dataset.sidebarBound = '1';
+      }
+      backdrop.addEventListener('click', () => {
+        collapsed = true;
+        writeSidebarCollapsed(collapsed);
+        applySidebar(collapsed);
+      });
     });
-  });
 
   // Close the drawer after choosing a destination on mobile.
-  shell.querySelectorAll('.app-sidebar a[href]').forEach((link) => {
+  shell.querySelectorAll('.app-sidebar a[href], [data-nowo-ui-aside] a[href]').forEach((link) => {
     link.addEventListener('click', () => {
       if (!isMobileSidebar()) {
         return;
@@ -394,7 +400,7 @@ function isContentWidth(value: string | null | undefined): value is ContentWidth
 }
 
 function resolveContentWidth(): ContentWidth {
-  const shell = document.querySelector<HTMLElement>('[data-app-shell]');
+  const shell = document.querySelector<HTMLElement>('[data-app-shell], [data-nowo-ui-shell]');
   if (shell && isContentWidth(shell.dataset.contentWidth)) {
     return shell.dataset.contentWidth;
   }
@@ -420,7 +426,7 @@ function syncContentWidthControls(width: ContentWidth): void {
 }
 
 function applyContentWidth(width: ContentWidth, persist: boolean, animate = true): void {
-  const shell = document.querySelector<HTMLElement>('[data-app-shell]');
+  const shell = document.querySelector<HTMLElement>('[data-app-shell], [data-nowo-ui-shell]');
   if (!shell) {
     return;
   }
@@ -494,7 +500,9 @@ function applyContentWidth(width: ContentWidth, persist: boolean, animate = true
 }
 
 function syncContentWidthToAccount(width: ContentWidth): void {
-  const shell = document.querySelector<HTMLElement>('[data-app-shell][data-content-width-sync-url]');
+  const shell = document.querySelector<HTMLElement>(
+    '[data-app-shell][data-content-width-sync-url], [data-nowo-ui-shell][data-content-width-sync-url]',
+  );
   if (!(shell instanceof HTMLElement)) {
     return;
   }
@@ -519,7 +527,7 @@ function syncContentWidthToAccount(width: ContentWidth): void {
 }
 
 function initContentWidth(): void {
-  const shell = document.querySelector('[data-app-shell]');
+  const shell = document.querySelector('[data-app-shell], [data-nowo-ui-shell]');
   if (!shell) {
     return;
   }

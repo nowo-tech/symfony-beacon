@@ -1,0 +1,104 @@
+{# Host override: UiKit table + icon-only archive row actions (panel POST actions need extra hidden fields). #}
+{% extends nowo_site_backup_panel_layout_template %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_site_backup_css_framework|default('tailwind') %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
+
+{% block nowo_ui_document_title %}Site Backup panel{% endblock %}
+
+{% block nowo_site_backup_panel_content %}
+<section class="nowo-ui-card card">
+    <h2>Create backup</h2>
+    <form method="post" class="nowo-ui-form">
+        <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+        <input type="hidden" name="action" value="create">
+        <label>Label <input type="text" name="label" placeholder="pre-deploy" class="{{ ui.input(_css_fw) }}"></label>
+        <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }}">Create integral backup</button>
+    </form>
+</section>
+
+<section class="nowo-ui-card card">
+    <h2>Restore progress</h2>
+    <p>Phase: <strong>{{ progress.phase }}</strong> — {{ progress.percent|number_format(1) }}%</p>
+    <p>{{ progress.message }}</p>
+    {% if progress.error %}<p class="{{ ui.flash('error', _css_fw) }}">{{ progress.error }}</p>{% endif %}
+    {% if progress.phase in ['completed', 'failed'] %}
+        <form method="post" class="nowo-ui-form">
+            <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+            <input type="hidden" name="action" value="clear_restore">
+            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Clear status</button>
+        </form>
+    {% endif %}
+</section>
+
+<section class="nowo-ui-card card">
+    <h2>Archives</h2>
+    {% if backups is empty %}
+        <p class="{{ ui.empty(_css_fw) }}">No backups yet.</p>
+    {% else %}
+        <div class="{{ ui.table_wrap(_css_fw) }}">
+            <table class="{{ ui.table(_css_fw) }}">
+                <thead>
+                <tr><th>ID</th><th>Created</th><th>Size</th><th>Label</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                {% for b in backups %}
+                    <tr>
+                        <td><code>{{ b.id }}</code></td>
+                        <td>{{ b.createdAt|date('Y-m-d H:i') }}</td>
+                        <td>{{ b.sizeBytes }}</td>
+                        <td>{{ b.label }}</td>
+                        <td>
+                            <div class="{{ ui.row_actions(_css_fw) }} nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}">
+                                <form class="nowo-ui-row-actions__form" method="post">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+                                    <input type="hidden" name="action" value="verify">
+                                    <input type="hidden" name="backup_id" value="{{ b.id }}">
+                                    <button type="submit" class="{{ ui.action('view', _css_fw) }}" title="Verify" aria-label="Verify">
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {
+                                            display: _display,
+                                            icon_name: 'view',
+                                            label: 'Verify'
+                                        } only %}
+                                    </button>
+                                </form>
+                                <form class="nowo-ui-row-actions__form" method="post" onsubmit="return confirm('Restore this backup now? Visitors will see the loading page.');">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+                                    <input type="hidden" name="action" value="restore">
+                                    <input type="hidden" name="backup_id" value="{{ b.id }}">
+                                    <button type="submit" class="{{ ui.action('restore', _css_fw) }}" title="Restore" aria-label="Restore">
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {
+                                            display: _display,
+                                            icon_name: 'restore',
+                                            label: 'Restore'
+                                        } only %}
+                                    </button>
+                                </form>
+                                <form class="nowo-ui-row-actions__form" method="post" onsubmit="return confirm('Delete backup?');">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="backup_id" value="{{ b.id }}">
+                                    <button type="submit" class="{{ ui.action('delete', _css_fw) }}" title="Delete" aria-label="Delete">
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {
+                                            display: _display,
+                                            icon_name: 'delete',
+                                            label: 'Delete'
+                                        } only %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</section>
+
+<form method="post" class="nowo-ui-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrfToken }}">
+    <input type="hidden" name="action" value="logout">
+    <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Logout</button>
+</form>
+{% endblock %}

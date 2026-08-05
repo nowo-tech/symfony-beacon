@@ -1,0 +1,10 @@
+{# Host override: same UiKit table pagination as product / other kits. #}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+{% include 'kit/_pagination.html.twig' with {
+    page: page|default(1),
+    pages: pages|default(1),
+    total: total|default(0),
+    page_size: pageSize|default(per_page|default(25)),
+    item_count: item_count|default(definitions is defined ? definitions|length : 0),
+    framework: _css_fw,
+} %}

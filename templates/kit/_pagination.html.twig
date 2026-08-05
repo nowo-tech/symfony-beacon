@@ -1,0 +1,44 @@
+{#
+  Normalize kit list pagination → UiKit _pagination (same chrome as product tables).
+
+  Accepts either:
+    - pagination: {page|current_page, per_page, total, total_pages}
+    - or loose vars: page, pages, total, page_size|per_page
+
+  Optional: item_count, route, route_params, query, nav_label, trans_domain
+#}
+{% set _raw_pagination = pagination is defined and pagination is not null ? pagination : {} %}
+{% set _page = _raw_pagination.page|default(_raw_pagination.current_page|default(page|default(1))) %}
+{% set _total_pages = _raw_pagination.total_pages|default(pages|default(1)) %}
+{% set _per_page = _raw_pagination.per_page|default(per_page|default(page_size|default(25))) %}
+{% set _total = _raw_pagination.total|default(total|default(0)) %}
+{% set _item_count = item_count|default(0) %}
+{% if _total_pages|default(0) < 1 and _per_page > 0 and _total > 0 %}
+    {% set _total_pages = ((_total / _per_page)|round(0, 'ceil')) %}
+{% endif %}
+{% if query is defined %}
+    {% set _query = query %}
+{% else %}
+    {% set _query = {} %}
+    {% for k, v in app.request.query.all %}
+        {% if k not in ['page', 'per_page'] %}
+            {% set _query = _query|merge({(k): v}) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% include '@NowoUiKitBundle/partials/_pagination.html.twig' with {
+    pagination: {
+        page: _page,
+        per_page: _per_page,
+        total: _total,
+        total_pages: _total_pages,
+    },
+    item_count: _item_count,
+    route: route|default(app.request.attributes.get('_route')),
+    route_params: route_params|default(app.request.attributes.get('_route_params')|default({})),
+    query: _query,
+    nav_label: nav_label|default('pagination.nav'),
+    trans_domain: trans_domain|default('messages'),
+    nav_trans_domain: nav_trans_domain|default(trans_domain|default('messages')),
+    framework: framework|default(nowo_ui_kit_css_framework|default('tailwind')),
+} only %}

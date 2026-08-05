@@ -1,16 +1,14 @@
 {% trans_default_domain 'NowoHttpLogBundle' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_http_log_css_framework|default('tailwind') %}
 {{ form_start(filterForm, {attr: {class: 'http-log-filters panel mb-6', 'data-testid': 'http-log-filters'}}) }}
-    <div>{{ form_row(filterForm.method) }}</div>
-    <div>{{ form_row(filterForm.routeName) }}</div>
-    <div>{{ form_row(filterForm.statusCode) }}</div>
-    <div>{{ form_row(filterForm.clientIp) }}</div>
-    <div>{{ form_row(filterForm.path) }}</div>
-    <div>{{ form_row(filterForm.bodyContentType) }}</div>
-    <div>{{ form_row(filterForm.createdFrom) }}</div>
-    <div>{{ form_row(filterForm.createdTo) }}</div>
-    <div>{{ form_row(filterForm.q) }}</div>
+    {% for field in filterForm %}
+        {% if not field.rendered and field.vars.name != '_token' %}
+            <div>{{ form_row(field) }}</div>
+        {% endif %}
+    {% endfor %}
     <div class="http-log-filters__actions">
-        <button type="submit" class="btn btn-primary nowo-ui-btn-filter">{{ 'admin.action.filter'|trans({}, 'NowoHttpLogBundle') }}</button>
-        <a class="btn-ghost no-underline" href="{{ path('nowo_http_log_admin_index') }}">{{ 'common.clear_filters'|trans({}, 'messages') }}</a>
+        <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }} nowo-ui-btn-filter">{{ 'admin.action.filter'|trans({}, 'NowoHttpLogBundle') }}</button>
+        <a class="{{ ui.btn('secondary', null, _css_fw) }}" href="{{ path('nowo_http_log_admin_index') }}">{{ 'common.clear_filters'|trans({}, 'messages') }}</a>
     </div>
 {{ form_end(filterForm) }}

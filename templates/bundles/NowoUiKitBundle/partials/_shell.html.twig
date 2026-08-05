@@ -1,0 +1,7 @@
+{#
+  Host composition helper — Beacon product chrome (open + main + close).
+  Prefer open/close from base.html.twig when {% block body %} must stay uncaptured.
+#}
+{% include '@NowoUiKitBundle/partials/_shell_open.html.twig' %}
+{% if main is defined %}{{ main|raw }}{% endif %}
+{% include '@NowoUiKitBundle/partials/_shell_close.html.twig' %}

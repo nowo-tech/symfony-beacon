@@ -19,7 +19,8 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Password policy / strength / toggle | `nowo-tech/password-*-bundle` | Prefer kits over custom validators/UI |
 | Breadcrumb trails (DB + Twig) | `nowo-tech/breadcrumb-kit-bundle` | Route matching, i18n, optional admin CRUD |
 | Dashboard menus (DB + Twig/API) | `nowo-tech/dashboard-menu-bundle` | Tree menus, i18n, permissions, admin CRUD |
-| Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels |
+| Admin UI macros / `nowo-ui-*` CSS / modals | `nowo-tech/ui-kit-bundle` | Host: `css_framework: tailwind`, `icon_set: ux_icon`; remap tokens under `.kit-admin` |
+| Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels; kit profiles for AuthKit/admin |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
 | Dual locale public paths (`/foo` + `/{locale}/foo`) | `nowo-tech/routing-kit-bundle` | `#[Routable]` + panel `/_routing/`; AuthKit/SiteBackup keep their own locale config |
 | HTTP request/response audit log + admin | `nowo-tech/http-log-bundle` | Admin `/admin/http-log`; async Messenger persist; host layout `kit/http_log_admin_layout.html.twig` |

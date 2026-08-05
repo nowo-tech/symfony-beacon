@@ -71,7 +71,7 @@ nowo_http_log:
         enabled: true
         path_prefix: /admin/http-log
         layout_template: 'kit/http_log_admin_layout.html.twig'
-        css_framework: custom
+        css_framework: tailwind
         page_size: 50
     security:
         access_roles:

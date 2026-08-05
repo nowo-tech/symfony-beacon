@@ -10,6 +10,7 @@ nowo_cookie_consent:
     show_preferences: 'Impostazioni cookie'
     save: 'Conferma selezione'
     use_only_functional_cookies: 'Solo cookie necessari'
+    use_all_cookies: 'Accetta tutti i cookie'
     preferences_bubble:
         label: 'Apri impostazioni cookie'
     required:

@@ -293,6 +293,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.29 | **Dashboard Assignments** panel (mine / teammates / unassigned across accessible projects) | Beacon | `079-dashboard-assignments` | **Done** |
 | 6.30 | **Dashboard aside panels**: Summary, Activity, Mentions inbox (`issue_mention`), Alerts (member failed deliveries), New in release | Beacon | `080-dashboard-aside-panels` | **Done** |
+| 6.31 | **FormKit / UiKit kit sync** (UiKit host 1.7; FormKit 2.2; AuthKit 1.15; RoutingKit 1.3; Menu 2.0 / Breadcrumb 2.1 / Cookie 1.6 / HttpLog 1.1; profiles, shell, pagination, panel form) | Beacon + kits | `081-formkit-uikit-kit-sync` | **Done** |
 
 ### Next (immediate queue)
 

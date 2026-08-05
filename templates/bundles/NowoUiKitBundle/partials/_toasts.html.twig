@@ -1,0 +1,57 @@
+{#
+  Host override of UiKit _toasts:
+  - Keep UiKit markup / data-nowo-ui-toast* contract
+  - Translate plain string flashes (|trans) like Beacon historically did
+  - Wire Stimulus toast-stack (pause-on-hover) + structured flash test id
+#}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set framework = framework|default(null) %}
+{% set toast_messages = flashes|default(app.flashes) %}
+{% if toast_messages is not empty %}
+    <div
+        class="nowo-ui-toast-stack toast-stack"
+        data-nowo-ui-toast-stack
+        data-controller="toast-stack"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-relevant="additions"
+    >
+        {% for label, messages in toast_messages %}
+            {% for message in messages %}
+                {% set isError = label in ['error', 'danger'] %}
+                {% set isWarning = label == 'warning' %}
+                {% set flashType = isError ? 'error' : (label == 'notice' ? 'info' : label) %}
+                {% set structured = message is iterable and message.title is defined %}
+                {% set toneClass = isError ? 'flash-error' : (isWarning ? 'flash-warning' : (label == 'info' or label == 'notice' ? 'flash-info' : 'flash-success')) %}
+                <div
+                    class="nowo-ui-toast flash flash-toast {{ toneClass }} {{ ui.flash(flashType, framework) }}"
+                    role="{{ isError or isWarning ? 'alert' : 'status' }}"
+                    data-nowo-ui-toast
+                    data-toast-stack-target="toast"
+                    data-timeout="{{ isError or isWarning ? 8000 : 5000 }}"
+                    {% if structured %}data-testid="flash-structured"{% endif %}
+                >
+                    <div class="nowo-ui-toast__content flash__content">
+                        {% if structured %}
+                            <p class="nowo-ui-toast__title flash__title">{{ message.title }}</p>
+                            {% if message.message is defined and message.message is not empty %}
+                                <p class="nowo-ui-toast__message flash__message">{{ message.message }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="nowo-ui-toast__message flash__message">{{ message|trans }}</p>
+                        {% endif %}
+                    </div>
+                    <button
+                        type="button"
+                        class="nowo-ui-toast__dismiss flash__dismiss"
+                        data-nowo-ui-toast-dismiss
+                        data-action="toast-stack#dismiss"
+                        aria-label="{{ 'toast.dismiss'|trans({}, 'NowoUiKitBundle') }}"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

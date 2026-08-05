@@ -25,7 +25,7 @@
     {{ parent() }}
     {% set _bk_dr = dashboard_routes|default({}) %}
     <script type="application/json" id="beacon-breadcrumb-kit-boot">{{ {
-        cssFramework: nowo_breadcrumb_kit_css_framework|default('custom'),
+        cssFramework: nowo_breadcrumb_kit_css_framework|default('tailwind'),
         importPartialUrl: path(_bk_dr.import|default('nowo_breadcrumb_kit_dashboard_import')) ~ '?_partial=1',
         dashboardBase: path(_bk_dr.collections_index|default('nowo_breadcrumb_kit_dashboard_collections_index')),
         i18n: {
@@ -47,7 +47,7 @@
         <p class="kit-admin-page-header__intro">{{ 'admin.hub.breadcrumbs'|trans }}</p>
     </header>
     {# panel class applied by kit-admin.ts (search stays outside the card). #}
-    <div class="kit-admin" data-kit-split-filters data-css-framework="{{ nowo_breadcrumb_kit_css_framework|default('custom') }}">
+    <div class="kit-admin" data-kit-split-filters data-css-framework="{{ nowo_breadcrumb_kit_css_framework|default('tailwind') }}">
 {% endblock %}
 
 {% block body_after %}

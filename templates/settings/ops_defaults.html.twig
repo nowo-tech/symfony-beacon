@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'ops_defaults.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+{% block title %}{{ section.tabLabelKey()|trans }} — {{ 'ops_defaults.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
 <div class="mb-6">
@@ -9,58 +9,36 @@
     <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'ops_defaults.intro'|trans }}</p>
 </div>
 
-{{ form_start(form, {attr: {class: 'panel space-y-4', 'data-testid': 'ops-defaults-form'}}) }}
+{% set tab_items = [] %}
+{% for item in sections %}
+    {% set tab_items = tab_items|merge([{
+        label: item.tabLabelKey()|trans,
+        href: path('settings_ops_defaults_section', {section: item.value}),
+        current: item == section,
+        attr: {'data-testid': 'ops-defaults-tab-' ~ item.value},
+    }]) %}
+{% endfor %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'ops_defaults.tabs_label'|trans,
+    nav_class: 'mb-6',
+    attr: {'data-testid': 'ops-defaults-tabs'},
+    items: tab_items,
+} only %}
+
+{{ form_start(form, {attr: {class: 'panel space-y-4', 'data-testid': 'ops-defaults-form', 'data-ops-section': section.value}}) }}
     <fieldset class="space-y-4">
-        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.governance'|trans }}</legend>
-        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.governance_help'|trans }}</p>
-        {{ form_row(form.retentionDays) }}
-        {{ form_row(form.retentionMaxEvents) }}
-        {{ form_row(form.ingestRateLimit) }}
-        {{ form_row(form.eventQuotaDaily) }}
-        {{ form_row(form.eventQuotaMonthly) }}
-    </fieldset>
+        <legend class="text-lg font-semibold">{{ section.tabLabelKey()|trans }}</legend>
+        <p class="text-sm text-[var(--color-ink)]/60">{{ section.helpKey()|trans }}</p>
 
-    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
-        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.ingest'|trans }}</legend>
-        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.ingest_help'|trans }}</p>
-        {{ form_row(form.envelopeMaxBytes) }}
-        {{ form_row(form.ingestRejectQueryAuth) }}
-    </fieldset>
+        {% include 'form/_fields.html.twig' with {form: form} only %}
 
-    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
-        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.metrics'|trans }}</legend>
-        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.metrics_help'|trans }}</p>
-        {{ form_row(form.metricsRequireToken) }}
-        {{ form_row(form.plainMetricsToken) }}
-        {{ form_row(form.clearMetricsToken) }}
-        {% if settings.hasMetricsToken %}
+        {% if section.value == 'metrics' and settings.hasMetricsToken %}
             <p class="text-sm text-[var(--color-ink)]/60" data-testid="ops-metrics-token-configured">{{ 'ops_defaults.metrics_token.configured'|trans }}</p>
         {% endif %}
-    </fieldset>
-
-    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
-        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.inbound'|trans }}</legend>
-        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.inbound_help'|trans }}</p>
-        {{ form_row(form.inboundEmailEnabled) }}
-        {{ form_row(form.inboundMailDomain) }}
-        {{ form_row(form.plainInboundWebhookSecret) }}
-        {{ form_row(form.clearInboundWebhookSecret) }}
-        {% if settings.hasInboundWebhookSecret %}
+        {% if section.value == 'inbound' and settings.hasInboundWebhookSecret %}
             <p class="text-sm text-[var(--color-ink)]/60" data-testid="ops-inbound-secret-configured">{{ 'ops_defaults.inbound_webhook_secret.configured'|trans }}</p>
         {% endif %}
     </fieldset>
-
-    <fieldset class="space-y-4 border-t border-[var(--color-sand)] pt-4">
-        <legend class="text-lg font-semibold">{{ 'ops_defaults.section.notifications'|trans }}</legend>
-        <p class="text-sm text-[var(--color-ink)]/60">{{ 'ops_defaults.section.notifications_help'|trans }}</p>
-        {{ form_row(form.allowPrivateUrls) }}
-        {{ form_row(form.allowAnonymousResolve) }}
-        {{ form_row(form.notificationDeliveryHistoryLimit) }}
-        {{ form_row(form.notificationCircuitBreakerThreshold) }}
-        {{ form_row(form.notificationCircuitBreakerCooldownMinutes) }}
-    </fieldset>
-
-    {% include 'form/_fields.html.twig' with {form: form} only %}
 
     <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
         <button class="btn-primary" type="submit" data-testid="ops-defaults-submit">{{ 'ops_defaults.submit'|trans }}</button>

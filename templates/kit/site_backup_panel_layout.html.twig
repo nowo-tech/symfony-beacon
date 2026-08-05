@@ -8,6 +8,17 @@
 
 {% block title %}{{ brand }} — Site Backup{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ vite_entry_link_tags('kit-admin') }}
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ vite_entry_script_tags('kit-admin') }}
+{% endblock %}
+
 {% block guest_shell_width %}max-w-4xl{% endblock %}
 
 {% block body %}
@@ -18,7 +29,10 @@
     {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
 </div>
 
-<div class="fade-up-delay panel shadow-md nowo-site-backup-panel" data-css-framework="{{ nowo_site_backup_css_framework|default('custom') }}">
+<div
+    class="fade-up-delay panel shadow-md kit-admin nowo-site-backup-panel"
+    data-css-framework="{{ nowo_site_backup_css_framework|default('tailwind') }}"
+>
     {% block nowo_ui_content %}
         {% block nowo_site_backup_panel_content %}{% endblock %}
     {% endblock %}

@@ -21,16 +21,20 @@
 
 | Bundle | What Beacon customizes | What must stay out of git forks |
 |--------|------------------------|----------------------------------|
-| Dashboard Menu | `kit/menu_dashboard_layout.html.twig` + `dashboard.css_framework: custom`; restyle via `kit/_kit_admin_styles.html.twig` (`.kit-admin` / `--nowo-ui-*`) | Do **not** fork `dashboard/index|show|*.html.twig` page bodies |
-| Breadcrumb Kit | `kit/breadcrumb_dashboard_layout.html.twig` + same (`custom`) | Do **not** fork `dashboard/**` page bodies |
-| RoutingKit | `kit/routing_kit_panel_layout.html.twig` + `web_ui.css_framework: custom` (vendor `nowo-ui.css` via `panel/base`) | Do **not** fork `panel/*.html.twig` |
-| Cookie Consent | `kit/cookie_consent_admin_layout.html.twig` + admin `web_ui.css_framework: custom`; settings tabs are **vendor** route-based (`.nowo-ui-tabs`); modal = **vendor** + `_cookie_consent.scss` (`ui_theme: tailwind`) | Do **not** fork modal/form/settings Twig (1.5+ tabs by route; restyle `.nowo-ui-tabs` in `_kit_admin_styles`) |
-| SiteBackup | `kit/site_backup_*_layout.html.twig` + root `css_framework: custom`; restyle via `.nowo-site-backup-*` / `--nowo-ui-*` | Do **not** fork setup/panel page bodies |
-| Http Log | `kit/http_log_admin_layout.html.twig` + `web_ui.css_framework: custom`; pages fill `{% block nowo_ui_content %}` (not `body_before`/`body_after`). Host overrides `admin/index|_filter|show` under `templates/bundles/NowoHttpLogBundle/` for Beacon `.panel` filter/results cards | Prefer layout + targeted bundle overrides over copying the whole admin tree |
+| Dashboard Menu | `kit/menu_dashboard_layout.html.twig` + `dashboard.css_framework: tailwind`; restyle via `kit/_kit_admin_styles.html.twig` (`.kit-admin` / `--nowo-ui-*`) | Prefer layout-only; **current host forks** `dashboard/index.html.twig` (pagination + icon row actions) until upstream |
+| Breadcrumb Kit | `kit/breadcrumb_dashboard_layout.html.twig` + same (`tailwind`) | Prefer layout-only; **current host forks** `dashboard/collection/index` + `item/index` |
+| RoutingKit | `kit/routing_kit_panel_layout.html.twig` + `web_ui.css_framework: tailwind` | Prefer layout-only; **current host forks** `panel/index` + `panel/form` |
+| Cookie Consent | `kit/cookie_consent_admin_layout.html.twig` + admin `web_ui.css_framework: tailwind`; settings tabs are **vendor** route-based (`.nowo-ui-tabs`); modal = **vendor** + `_cookie_consent.scss` (`ui_theme: tailwind`) | Do **not** fork modal/form/settings Twig; host may override `_pagination` / cookie definition table |
+| SiteBackup | `kit/site_backup_*_layout.html.twig` + root `css_framework: tailwind`; restyle via `.nowo-site-backup-*` / `--nowo-ui-*` | Prefer layout-only; **current host forks** `panel/index` + `history` |
+| Http Log | `kit/http_log_admin_layout.html.twig` + `web_ui.css_framework: tailwind`; pages fill `{% block nowo_ui_content %}` | Host overrides `admin/index|_filter|show` for Beacon `.panel` cards — prefer shrinking these after upstream pagination/row_actions |
 | AuthKit | `layout.html.twig` only (`auth_brand` + guest_shell); `css` / `form_theme` / `outbound_mail_ready_checker` in YAML | Do **not** fork `security/*` (1.11+ `auth_panel` blocks) |
 | PWA | YAML `install_prompt.mark_asset` + button classes + `_components.scss` tokens | Do **not** fork `pwa/*.html.twig` (1.2+) |
 
-**Tailwind host rule:** kit admin UIs use `css_framework: custom` + vendor `nowo-ui.css`. Vite `kit-admin` is CSP boot / split-filters / modal portals only — **do not** import Bootstrap (reboot breaks aside/brand/crumbs). See OTHER_FULL_SPECS `REQ-MENU-001` / `REQ-TWIG-APP-001`.
+**FormKit profiles:** `config/packages/nowo_form_kit.yaml` defines `beacon` plus kit profiles (`auth_kit`, `dashboard_menu`, `breadcrumb_kit`, `http_log`, `cookie_consent`, `routing_kit`). Host-defined profiles **skip vendor domain seeding** — each kit profile must set `translation_domain` to that kit’s catalogue (not `messages`). Kit profiles set `auto_help` / `auto_placeholder` to `false` so missing convention keys are not rendered (FormKit **≥ 2.2**).
+
+**UiKit shared chrome:** product shell uses `@NowoUiKitBundle/partials/_shell_open` / `_shell_close` from `base.html.twig` (Beacon slots for brand / aside / header). Product + kits share `kit/_pagination.html.twig` → `@NowoUiKitBundle/partials/_pagination` (UiKit **1.7+** ships `« »` + page numbers; host override adds Beacon `table-pagination` classes). Product tabs use `shared/_tabs.html.twig` → UiKit `_tabs`. Flashes → UiKit `_toasts`; page loader embeds UiKit `_thinking_orb`. Host `nowo_ui_kit.row_actions_display: icon` for kit table actions.
+
+**Tailwind host rule:** kit admin UIs use `css_framework: tailwind` + vendor `nowo-ui.css` + `.kit-admin` token remap (not Bootstrap). Vite `kit-admin` is CSP boot / split-filters / modal portals only — **do not** import Bootstrap (reboot breaks aside/brand/crumbs). Older docs that said `custom` meant “no Bootstrap kit-admin entry”; runtime YAML is **`tailwind`**. See OTHER_FULL_SPECS `REQ-MENU-001` / `REQ-TWIG-APP-001`.
 
 After upgrading kits: `composer update`, `bin/console assets:install`, `bin/console cache:clear`, then smoke menu/breadcrumb/cookie **modal + admin**, AuthKit login, SiteBackup setup, PWA install prompt, `/admin/_routing/`, `/admin/http-log`. Fast AuthKit regression suite: `make kit-smoke` (login bootstrap, magic login, password reset, login throttle).
 

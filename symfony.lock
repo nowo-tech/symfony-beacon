@@ -120,6 +120,9 @@
     "nowo-tech/twig-inspector-bundle": {
         "version": "v1.0.36"
     },
+    "nowo-tech/ui-kit-bundle": {
+        "version": "v1.5.1"
+    },
     "nowo-tech/user-kit-bundle": {
         "version": "v1.1.3"
     },

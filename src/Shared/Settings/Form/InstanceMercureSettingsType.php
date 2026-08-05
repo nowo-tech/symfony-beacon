@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Shared\Settings\Form;
 
 use App\Shared\Settings\Entity\InstanceSettings;
+use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -17,20 +16,20 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Instance Mercure settings (optional live member alerts; URLs + JWT encrypted at rest).
- *
- * @extends AbstractType<InstanceSettings>
  */
-final class InstanceMercureSettingsType extends AbstractType
+final class InstanceMercureSettingsType extends FormKitAbstractType
 {
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('mercureEnabled', CheckboxType::class, [
+        $this->withBuilder($builder, function (): void {
+            $this->addCheckboxField('mercureEnabled', [
+                'placeholder' => false,
                 'required' => false,
                 'label' => 'instance_mercure.enabled.label',
                 'help' => 'instance_mercure.enabled.help',
-            ])
-            ->add('mercureUrl', TextType::class, [
+            ]);
+            $this->addTextField('mercureUrl', [
                 'required' => false,
                 'label' => 'instance_mercure.url.label',
                 'help' => 'instance_mercure.url.help',
@@ -40,8 +39,8 @@ final class InstanceMercureSettingsType extends AbstractType
                 'constraints' => [
                     new Length(max: 2048),
                 ],
-            ])
-            ->add('mercurePublicUrl', TextType::class, [
+            ]);
+            $this->addTextField('mercurePublicUrl', [
                 'required' => false,
                 'label' => 'instance_mercure.public_url.label',
                 'help' => 'instance_mercure.public_url.help',
@@ -51,29 +50,36 @@ final class InstanceMercureSettingsType extends AbstractType
                 'constraints' => [
                     new Length(max: 2048),
                 ],
-            ])
-            ->add('plainMercureJwtSecret', PasswordType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'instance_mercure.jwt_secret.label',
-                'help' => 'instance_mercure.jwt_secret.help',
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                    'placeholder' => 'instance_mercure.jwt_secret.placeholder',
-                ],
-                'constraints' => [
-                    new Length(max: 512),
-                    new Callback($this->validatePlainSecret(...)),
-                ],
-            ])
-            ->add('clearMercureJwtSecret', CheckboxType::class, [
+            ]);
+            $this->boundBuilder()->add(
+                'plainMercureJwtSecret',
+                PasswordType::class,
+                $this->mergeFieldOptions('plainMercureJwtSecret', 'password', [
+                    'mapped' => false,
+                    'required' => false,
+                    'label' => 'instance_mercure.jwt_secret.label',
+                    'help' => 'instance_mercure.jwt_secret.help',
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                        'placeholder' => 'instance_mercure.jwt_secret.placeholder',
+                    ],
+                    'constraints' => [
+                        new Length(max: 512),
+                        new Callback($this->validatePlainSecret(...)),
+                    ],
+                ]),
+            );
+            $this->addCheckboxField('clearMercureJwtSecret', [
+                'placeholder' => false,
                 'mapped' => false,
                 'required' => false,
                 'label' => 'instance_mercure.clear_secret.label',
                 'help' => 'instance_mercure.clear_secret.help',
             ]);
+        });
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

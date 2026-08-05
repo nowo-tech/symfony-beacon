@@ -1,0 +1,16 @@
+{# Beacon product chrome close half (end main + footer + backdrop). #}
+    </div>
+
+    {% if footer_html is defined and footer_html %}
+        {{ footer_html|raw }}
+    {% else %}
+        {% include '@NowoUiKitBundle/partials/_footer.html.twig' with {
+            brand: footer_brand|default(null),
+            links: footer_links|default([]),
+            copyright: footer_copyright|default(null),
+            framework: framework|default(null)
+        } %}
+    {% endif %}
+
+    <div class="app-sidebar-backdrop" data-nowo-ui-aside-backdrop data-sidebar-backdrop></div>
+</div>

@@ -1,0 +1,118 @@
+{# Host override: Beacon kit chrome + icon row actions (nowo_ui_kit.row_actions_display). #}
+{% extends '@NowoRoutingKitBundle/panel/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_routing_kit_css_framework|default('tailwind') %}
+
+{% block body %}
+    <p class="{{ ui.muted(_css_fw) }} mb-4">{{ 'panel.subtitle'|trans({'%default%': default}, 'NowoRoutingKitBundle') }}</p>
+
+    <div class="{{ ui.toolbar(_css_fw) }}">
+        <a class="{{ ui.btn('primary', null, _css_fw) }}" href="{{ path_prefix }}/new">{{ 'panel.new'|trans({}, 'NowoRoutingKitBundle') }}</a>
+        <form method="post" action="{{ path_prefix }}/export" class="inline">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Export</button>
+        </form>
+        <form method="post" action="{{ path_prefix }}/clear-cache" class="inline">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.clear_cache'|trans({}, 'NowoRoutingKitBundle') }}</button>
+        </form>
+    </div>
+
+    <p class="{{ ui.muted(_css_fw) }} mb-3">{{ total }} row(s) · page {{ page }}/{{ pages }} ({{ page_size }}/page)</p>
+
+    <div class="{{ ui.table_wrap(_css_fw) }}">
+        <table class="{{ ui.table(_css_fw) }}">
+            <thead>
+                <tr>
+                    <th>{{ 'panel.col.route'|trans({}, 'NowoRoutingKitBundle') }}</th>
+                    <th>{{ 'panel.col.locale'|trans({}, 'NowoRoutingKitBundle') }}</th>
+                    <th>{{ 'panel.col.path'|trans({}, 'NowoRoutingKitBundle') }}</th>
+                    <th>{{ 'panel.col.canonical'|trans({}, 'NowoRoutingKitBundle') }}</th>
+                    <th>{{ 'panel.col.enabled'|trans({}, 'NowoRoutingKitBundle') }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in definitions %}
+                <tr>
+                    <td><code>{{ row.routeName }}</code></td>
+                    <td>{{ row.locale }}</td>
+                    <td><code>{{ row.path }}</code></td>
+                    <td>{{ row.canonicalStyle.value }}</td>
+                    <td>
+                        {% if row.enabled %}
+                            <span class="{{ ui.badge('success', _css_fw) }}">yes</span>
+                        {% else %}
+                            <span class="{{ ui.badge(null, _css_fw) }}">no</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% include '@NowoUiKitBundle/partials/_row_actions.html.twig' with {
+                            framework: _css_fw,
+                            actions: [
+                                {
+                                    kind: 'edit',
+                                    href: path_prefix ~ '/edit/' ~ row.id,
+                                    label: 'panel.edit'|trans({}, 'NowoRoutingKitBundle')
+                                },
+                                {
+                                    kind: 'delete',
+                                    method: 'POST',
+                                    href: path_prefix ~ '/delete/' ~ row.id,
+                                    csrf_token: csrf_token,
+                                    csrf_field: '_csrf_token',
+                                    confirm_message: 'Delete this path definition?',
+                                    label: 'panel.delete'|trans({}, 'NowoRoutingKitBundle')
+                                }
+                            ]
+                        } %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="{{ ui.muted(_css_fw) }}">{{ 'panel.empty'|trans({}, 'NowoRoutingKitBundle') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'kit/_pagination.html.twig' with {
+        page: page,
+        pages: pages,
+        total: total,
+        page_size: page_size,
+        item_count: definitions|length,
+        route: 'nowo_routing_kit_panel',
+        route_params: {},
+        query: {},
+        framework: _css_fw,
+    } %}
+
+    <section class="nowo-ui-form-wrap card mt-6">
+        <div class="card-body">
+            <h2 class="h5 nowo-ui-section-title">Import (signed JSON)</h2>
+            <form method="post" action="{{ path_prefix }}/import" class="nowo-ui-form nowo-ui-form--stack">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                <div class="nowo-ui-field">
+                    <label class="form-label" for="payload_json">Payload JSON</label>
+                    <textarea
+                        id="payload_json"
+                        name="payload_json"
+                        class="{{ ui.input(_css_fw) }} nowo-ui-input--block"
+                        rows="6"
+                        required
+                        placeholder='{"version":1,"payload":[],"signature":"..."}'
+                    ></textarea>
+                </div>
+                <label class="nowo-ui-check">
+                    <input type="checkbox" name="replace_all" value="1">
+                    Replace all existing rows
+                </label>
+                <div class="nowo-ui-form-actions">
+                    <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Import</button>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

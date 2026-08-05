@@ -961,7 +961,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         enabled?: bool|Param, // Default: false
  *     },
  *     string?: bool|array{
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *     },
  *     commonmark?: array{
  *         renderer?: array{ // Array of options for rendering HTML.
@@ -1695,6 +1695,121 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         allow_unauthenticated?: bool|Param, // DEV/DEMO ONLY. When true, dashboard may load without SecurityBundle / without login. Production MUST keep false. // Default: false
  *     },
  * }
+ * @psalm-type NowoCookieConsentConfig = array{
+ *     doctrine?: array{ // Doctrine DBAL connection and table prefix for cookie consent entities.
+ *         connection?: scalar|Param|null, // Name of the Doctrine DBAL connection to use (e.g. default, or a custom connection). // Default: "default"
+ *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_cookie_log, dashboard_cookie_config, …). Empty = no prefix. // Default: ""
+ *     },
+ *     table_prefix?: scalar|Param|null, // Deprecated: Use doctrine.table_prefix instead. // Deprecated. Use doctrine.table_prefix (e.g. "app_" yields app_dashboard_cookie_log). // Default: ""
+ *     categories?: list<scalar|Param|null>,
+ *     use_logger?: bool|Param, // Persist consent choices to the database when true. // Default: true
+ *     use_database_config?: bool|Param, // Load modal copy and display settings from CookieConsentConfig entities when true. // Default: false
+ *     use_cookie_inventory?: bool|Param, // Expose cookie definitions (name, category/block, duration, provider, purpose) in the preferences modal and legal pages. // Default: false
+ *     cookie_inventory?: list<array{ // Default: []
+ *         name?: scalar|Param|null,
+ *         duration?: scalar|Param|null, // Default: ""
+ *         category?: scalar|Param|null, // Default: "required"
+ *         type?: scalar|Param|null, // Default: "first_party"
+ *         sort_order?: int|Param, // Default: 0
+ *         provider?: scalar|Param|null, // Default: null
+ *         purpose?: scalar|Param|null, // Default: null
+ *         translations?: list<array{ // Default: []
+ *             provider?: scalar|Param|null, // Default: ""
+ *             purpose?: scalar|Param|null, // Default: ""
+ *         }>,
+ *     }>,
+ *     fetch_config_via_api?: bool|Param, // Expose GET /cookie-consent/config and let the frontend script load settings via fetch(). // Default: false
+ *     http_only?: bool|Param, // Set HttpOnly flag on consent cookies. // Default: true
+ *     form_action?: scalar|Param|null, // Optional route name used as the form action URL. // Default: null
+ *     csrf_protection?: bool|Param, // Enable CSRF protection on the consent form. // Default: true
+ *     disabled_routes?: list<scalar|Param|null>,
+ *     route_targeting_mode?: "all"|"only"|"except"|Param, // Controls where the modal auto-opens: all pages, only listed routes, or all except listed routes. // Default: "all"
+ *     target_routes?: list<scalar|Param|null>,
+ *     default_locale?: scalar|Param|null, // Fallback locale when no supported language can be detected. // Default: "en"
+ *     enabled_locales?: list<scalar|Param|null>,
+ *     detect_locale_from_accept_language?: bool|Param, // Use the Accept-Language request header when no explicit locale is available. // Default: true
+ *     ui_theme?: "bootstrap"|"tailwind"|Param, // UI framework used by the bundled cookie consent modal templates. // Default: "bootstrap"
+ *     color_theme?: "light"|"dark"|"dark-turquoise"|"light-funky"|"elegant-black"|Param, // Default: "light"
+ *     dark_mode_enabled?: bool|Param, // Default: false
+ *     disable_transitions?: bool|Param, // Default: false
+ *     disable_page_interaction?: bool|Param, // When true, adds a full-page overlay and blocks scrolling until the user chooses an option. // Default: false
+ *     two_step_modal?: bool|Param, // Default: false
+ *     open_preferences_modal?: bool|Param, // Default: false
+ *     manage_iframe_placeholders?: bool|Param, // Default: false
+ *     granular_cookie_selection?: bool|Param, // When true, optional cookies can be toggled individually inside each category block. // Default: false
+ *     preferences_bubble_enabled?: bool|Param, // Shows a floating cookie icon button to reopen the preferences modal after consent is saved. // Default: false
+ *     preferences_bubble_position?: "bottom-right"|"bottom-left"|"top-right"|"top-left"|Param, // Screen corner for the floating preferences bubble. // Default: "bottom-right"
+ *     preferences_bubble_border_color?: scalar|Param|null, // Hex color for the preferences bubble border and cookie icon (e.g. #30363c). // Default: null
+ *     preferences_bubble_icon?: scalar|Param|null, // Custom HTML or SVG markup for the preferences bubble icon. Leave empty for the default cookie SVG. // Default: null
+ *     preference_sections?: list<array{ // Default: []
+ *         title?: scalar|Param|null, // Default: ""
+ *         description?: scalar|Param|null, // Default: ""
+ *         categories?: list<scalar|Param|null>,
+ *     }>,
+ *     web_ui?: array{
+ *         enabled?: bool|Param, // When false, admin access subscriber is not registered (routes still load; prefer security firewall). // Default: true
+ *         path_prefix?: scalar|Param|null, // Documented URL path prefix for admin CRUD (host should lock with security.access_control). // Default: "/cookie-consent-config"
+ *         layout_template?: scalar|Param|null, // Twig layout extended by admin pages (global nowo_cookie_consent_layout_template). Set to your app layout or a one-file bridge. // Default: "@NowoCookieConsentBundle/admin/layout.html.twig"
+ *         css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host CSS stack hint: bootstrap5 | bootstrap4 | bootstrap | tailwind | foundation | tabler | custom | none. // Default: "bootstrap5"
+ *         icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Default: "bootstrap-icons"
+ *         list_page_size?: int|Param, // Default page size for admin cookie definition lists. // Default: 20
+ *     },
+ *     security?: array{
+ *         access_checker?: scalar|Param|null, // Optional service id implementing CookieConsentAccessCheckerInterface. // Default: null
+ *         access_roles?: list<scalar|Param|null>,
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO ONLY. When true, admin UI may load without SecurityBundle / without login. Production MUST keep false. // Default: false
+ *     },
+ * }
+ * @psalm-type NowoHttpLogConfig = array{
+ *     enabled?: bool|Param, // Default: true
+ *     environments?: list<scalar|Param|null>,
+ *     async?: bool|Param, // Default: true
+ *     sampling_rate?: float|Param, // Default: 1.0
+ *     track_sub_requests?: bool|Param, // Default: false
+ *     ignore_routes?: list<scalar|Param|null>,
+ *     ignore_path_prefixes?: list<scalar|Param|null>,
+ *     capture?: array{
+ *         request_headers?: bool|Param, // Default: true
+ *         request_body?: bool|Param, // Default: false
+ *         response_headers?: bool|Param, // Default: true
+ *         client_ip?: bool|Param, // Default: true
+ *         user?: bool|Param, // Default: true
+ *         max_body_bytes?: int|Param, // Default: 65536
+ *         response_body_by_type?: array{
+ *             html?: bool|Param, // Default: false
+ *             json?: bool|Param, // Default: true
+ *             soap?: bool|Param, // Default: true
+ *             xml?: bool|Param, // Default: true
+ *             text?: bool|Param, // Default: false
+ *             binary?: bool|Param, // Default: false
+ *             other?: bool|Param, // Default: false
+ *         },
+ *     },
+ *     redaction?: array{
+ *         headers?: list<scalar|Param|null>,
+ *         query_params?: list<scalar|Param|null>,
+ *         json_paths?: list<scalar|Param|null>,
+ *     },
+ *     retention?: array{
+ *         days?: mixed, // Null keeps entries forever // Default: 30
+ *     },
+ *     export?: array{
+ *         formats?: list<scalar|Param|null>,
+ *         max_sync_rows?: int|Param, // Default: 1000
+ *     },
+ *     web_ui?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path_prefix?: scalar|Param|null, // Default: "/admin/http-log"
+ *         layout_template?: scalar|Param|null, // Default: "@NowoHttpLogBundle/layout.html.twig"
+ *         css_framework?: "bootstrap5"|"tailwind"|"foundation"|"custom"|Param, // Default: "bootstrap5"
+ *         page_size?: int|Param, // Default: 50
+ *     },
+ *     security?: array{
+ *         access_roles?: list<scalar|Param|null>,
+ *         access_checker?: scalar|Param|null, // Default: null
+ *         allow_unauthenticated?: bool|Param, // Default: false
+ *     },
+ * }
  * @psalm-type NowoFormKitConfig = array{
  *     type_map?: array<string, scalar|Param|null>,
  *     default_profile?: scalar|Param|null, // Name of the profile to use when no profile is specified (key in profiles) // Default: "default"
@@ -1702,6 +1817,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     profiles?: array<string, array{ // Default: []
  *         alias?: scalar|Param|null, // Alias for this profile (e.g. for reference in form types)
  *         translation_domain?: scalar|Param|null, // Default: "messages"
+ *         auto_placeholder?: bool|Param, // When true (default), unset placeholders become {form}.{field}.placeholder translation keys. Set false for kits that only set explicit labels. // Default: true
+ *         auto_help?: bool|Param, // When true (default), unset help becomes {form}.{field}.help translation keys. Set false to avoid raw missing-help keys in the UI. // Default: true
  *         required_label_suffix?: scalar|Param|null, // Appended to the label when the field is required (e.g. " *"). Empty or null to disable. // Default: null
  *         help_modal?: array{ // Default help modal configuration (used when the field option "help_modal" is enabled).
  *             framework?: scalar|Param|null, // Modal framework to use when opening from frontend. // Default: "bootstrap5"
@@ -1778,6 +1895,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             constraints?: list<mixed>,
  *         }>,
  *     }>,
+ * }
+ * @psalm-type NowoUiKitConfig = array{
+ *     css_framework?: "bootstrap"|"bootstrap5"|"bootstrap4"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host CSS stack: bootstrap5|bootstrap4|tailwind|foundation|custom|none|tabler (bootstrap alias → bootstrap5). // Default: "bootstrap5"
+ *     icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Icon rendering: bootstrap-icons|tabler-icons|ux_icon|svg_inline|none. // Default: "bootstrap-icons"
+ *     row_actions_display?: "icon"|"text"|"icon_text"|Param, // Table/list row actions: icon (glyph only) | text (label only) | icon_text (both). // Default: "icon"
  * }
  * @psalm-type NowoPwaConfig = array{
  *     enabled?: bool|Param, // Master switch for PWA features (manifest, service worker, head tags). // Default: true
@@ -1913,7 +2035,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         strategy?: "network-first"|"cache-first"|"stale-while-revalidate"|Param, // Default: "network-first"
  *         precache_urls?: mixed, // Default: ["/"]
  *         runtime_cache_patterns?: mixed, // Default: []
- *         deny_cache_patterns?: mixed, // Default: []
+ *         deny_cache_patterns?: mixed, // Substring patterns never cached. Defaults exclude auth/admin/API/profiler paths. An explicit empty list disables the defaults. // Default: ["/login","/logout","/register","/reset-password","/admin","/api/","/_profiler","/_wdt","/setup","/_site_backup"]
  *         offline_url?: scalar|Param|null, // Default: null
  *         runtime_cache_max_entries?: int|Param, // Default: 0
  *     },
@@ -1984,71 +2106,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         install_prompt?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/install_prompt.html.twig"
  *         install_links?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/install_links.html.twig"
  *         offline?: scalar|Param|null, // Default: "@NowoPwaBundle/pwa/offline.html.twig"
- *     },
- * }
- * @psalm-type NowoCookieConsentConfig = array{
- *     doctrine?: array{ // Doctrine DBAL connection and table prefix for cookie consent entities.
- *         connection?: scalar|Param|null, // Name of the Doctrine DBAL connection to use (e.g. default, or a custom connection). // Default: "default"
- *         table_prefix?: scalar|Param|null, // Prefix prepended to table names (dashboard_cookie_log, dashboard_cookie_config, …). Empty = no prefix. // Default: ""
- *     },
- *     table_prefix?: scalar|Param|null, // Deprecated: Use doctrine.table_prefix instead. // Deprecated. Use doctrine.table_prefix (e.g. "app_" yields app_dashboard_cookie_log). // Default: ""
- *     categories?: list<scalar|Param|null>,
- *     use_logger?: bool|Param, // Persist consent choices to the database when true. // Default: true
- *     use_database_config?: bool|Param, // Load modal copy and display settings from CookieConsentConfig entities when true. // Default: false
- *     use_cookie_inventory?: bool|Param, // Expose cookie definitions (name, category/block, duration, provider, purpose) in the preferences modal and legal pages. // Default: false
- *     cookie_inventory?: list<array{ // Default: []
- *         name?: scalar|Param|null,
- *         duration?: scalar|Param|null, // Default: ""
- *         category?: scalar|Param|null, // Default: "required"
- *         type?: scalar|Param|null, // Default: "first_party"
- *         sort_order?: int|Param, // Default: 0
- *         provider?: scalar|Param|null, // Default: null
- *         purpose?: scalar|Param|null, // Default: null
- *         translations?: list<array{ // Default: []
- *             provider?: scalar|Param|null, // Default: ""
- *             purpose?: scalar|Param|null, // Default: ""
- *         }>,
- *     }>,
- *     fetch_config_via_api?: bool|Param, // Expose GET /cookie-consent/config and let the frontend script load settings via fetch(). // Default: false
- *     http_only?: bool|Param, // Set HttpOnly flag on consent cookies. // Default: true
- *     form_action?: scalar|Param|null, // Optional route name used as the form action URL. // Default: null
- *     csrf_protection?: bool|Param, // Enable CSRF protection on the consent form. // Default: true
- *     disabled_routes?: list<scalar|Param|null>,
- *     route_targeting_mode?: "all"|"only"|"except"|Param, // Controls where the modal auto-opens: all pages, only listed routes, or all except listed routes. // Default: "all"
- *     target_routes?: list<scalar|Param|null>,
- *     default_locale?: scalar|Param|null, // Fallback locale when no supported language can be detected. // Default: "en"
- *     enabled_locales?: list<scalar|Param|null>,
- *     detect_locale_from_accept_language?: bool|Param, // Use the Accept-Language request header when no explicit locale is available. // Default: true
- *     ui_theme?: "bootstrap"|"tailwind"|Param, // UI framework used by the bundled cookie consent modal templates. // Default: "bootstrap"
- *     color_theme?: "light"|"dark"|"dark-turquoise"|"light-funky"|"elegant-black"|Param, // Default: "light"
- *     dark_mode_enabled?: bool|Param, // Default: false
- *     disable_transitions?: bool|Param, // Default: false
- *     disable_page_interaction?: bool|Param, // When true, adds a full-page overlay and blocks scrolling until the user chooses an option. // Default: false
- *     two_step_modal?: bool|Param, // Default: false
- *     open_preferences_modal?: bool|Param, // Default: false
- *     manage_iframe_placeholders?: bool|Param, // Default: false
- *     granular_cookie_selection?: bool|Param, // When true, optional cookies can be toggled individually inside each category block. // Default: false
- *     preferences_bubble_enabled?: bool|Param, // Shows a floating cookie icon button to reopen the preferences modal after consent is saved. // Default: false
- *     preferences_bubble_position?: "bottom-right"|"bottom-left"|"top-right"|"top-left"|Param, // Screen corner for the floating preferences bubble. // Default: "bottom-right"
- *     preferences_bubble_border_color?: scalar|Param|null, // Hex color for the preferences bubble border and cookie icon (e.g. #30363c). // Default: null
- *     preferences_bubble_icon?: scalar|Param|null, // Custom HTML or SVG markup for the preferences bubble icon. Leave empty for the default cookie SVG. // Default: null
- *     preference_sections?: list<array{ // Default: []
- *         title?: scalar|Param|null, // Default: ""
- *         description?: scalar|Param|null, // Default: ""
- *         categories?: list<scalar|Param|null>,
- *     }>,
- *     web_ui?: array{
- *         enabled?: bool|Param, // When false, admin access subscriber is not registered (routes still load; prefer security firewall). // Default: true
- *         path_prefix?: scalar|Param|null, // Documented URL path prefix for admin CRUD (host should lock with security.access_control). // Default: "/cookie-consent-config"
- *         layout_template?: scalar|Param|null, // Twig layout extended by admin pages (global nowo_cookie_consent_layout_template). Set to your app layout or a one-file bridge. // Default: "@NowoCookieConsentBundle/admin/layout.html.twig"
- *         css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host CSS stack hint: bootstrap5 | bootstrap4 | bootstrap | tailwind | foundation | tabler | custom | none. // Default: "bootstrap5"
- *         icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Default: "bootstrap-icons"
- *         list_page_size?: int|Param, // Default page size for admin cookie definition lists. // Default: 20
- *     },
- *     security?: array{
- *         access_checker?: scalar|Param|null, // Optional service id implementing CookieConsentAccessCheckerInterface. // Default: null
- *         access_roles?: list<scalar|Param|null>,
- *         allow_unauthenticated?: bool|Param, // DEV/DEMO ONLY. When true, admin UI may load without SecurityBundle / without login. Production MUST keep false. // Default: false
  *     },
  * }
  * @psalm-type NowoLoginThrottleConfig = array{
@@ -2313,7 +2370,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         patterns?: list<scalar|Param|null>,
  *         ips?: list<scalar|Param|null>,
  *     },
- *     security?: array{
+ *     security?: array{ // REQ-UI-002 roles + optional ops password gate. Password gate is additional to access_roles.
+ *         access_roles?: list<scalar|Param|null>,
+ *         access_checker?: scalar|Param|null, // Optional service id implementing SiteBackupAccessCheckerInterface. null = role-based default (or AllowAll when allow_unauthenticated). // Default: null
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO only: skip Symfony Security role check (password gate may still apply). Never true in production. // Default: false
  *         password_protection?: bool|Param, // Default: true
  *         password_hash?: scalar|Param|null, // Default: null
  *         access_gate?: scalar|Param|null, // Default: null
@@ -2460,7 +2520,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     security?: array{ // REQ-UI-002 private panel access (firewall the path_prefix in the host app as well).
  *         access_roles?: list<scalar|Param|null>,
- *         access_checker?: scalar|Param|null, // Optional custom service id; reserved for future checkers. null = built-in role gate. // Default: null
+ *         access_checker?: scalar|Param|null, // Optional custom service id implementing RoutingKitAccessCheckerInterface. null = ConfigurableRoutingKitAccessChecker. // Default: null
  *         allow_unauthenticated?: bool|Param, // DEV/DEMO only: skip in-bundle role check (same effect as empty access_roles). Production MUST keep false. // Default: false
  *     },
  *     redirects?: array{
@@ -2474,56 +2534,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     auto_invalidate_cache?: bool|Param, // Default: true
  *     register_unprefixed_default?: bool|Param, // Default: true
  *     seo_kit_bridge?: bool|Param, // When true and SeoKitBundle is installed, decorate SeoPathBuilderInterface with RoutingKit paths. // Default: true
- * }
- * @psalm-type NowoHttpLogConfig = array{
- *     enabled?: bool|Param, // Default: true
- *     environments?: list<scalar|Param|null>,
- *     async?: bool|Param, // Default: true
- *     sampling_rate?: float|Param, // Default: 1.0
- *     track_sub_requests?: bool|Param, // Default: false
- *     ignore_routes?: list<scalar|Param|null>,
- *     ignore_path_prefixes?: list<scalar|Param|null>,
- *     capture?: array{
- *         request_headers?: bool|Param, // Default: true
- *         request_body?: bool|Param, // Default: false
- *         response_headers?: bool|Param, // Default: true
- *         client_ip?: bool|Param, // Default: true
- *         user?: bool|Param, // Default: true
- *         max_body_bytes?: int|Param, // Default: 65536
- *         response_body_by_type?: array{
- *             html?: bool|Param, // Default: false
- *             json?: bool|Param, // Default: true
- *             soap?: bool|Param, // Default: true
- *             xml?: bool|Param, // Default: true
- *             text?: bool|Param, // Default: false
- *             binary?: bool|Param, // Default: false
- *             other?: bool|Param, // Default: false
- *         },
- *     },
- *     redaction?: array{
- *         headers?: list<scalar|Param|null>,
- *         query_params?: list<scalar|Param|null>,
- *         json_paths?: list<scalar|Param|null>,
- *     },
- *     retention?: array{
- *         days?: mixed, // Null keeps entries forever // Default: 30
- *     },
- *     export?: array{
- *         formats?: list<scalar|Param|null>,
- *         max_sync_rows?: int|Param, // Default: 1000
- *     },
- *     web_ui?: array{
- *         enabled?: bool|Param, // Default: true
- *         path_prefix?: scalar|Param|null, // Default: "/admin/http-log"
- *         layout_template?: scalar|Param|null, // Default: "@NowoHttpLogBundle/layout.html.twig"
- *         css_framework?: "bootstrap5"|"tailwind"|"foundation"|"custom"|Param, // Default: "bootstrap5"
- *         page_size?: int|Param, // Default: 50
- *     },
- *     security?: array{
- *         access_roles?: list<scalar|Param|null>,
- *         access_checker?: scalar|Param|null, // Default: null
- *         allow_unauthenticated?: bool|Param, // Default: false
- *     },
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
@@ -2545,9 +2555,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     stimulus?: StimulusConfig,
  *     live_component?: LiveComponentConfig,
  *     nowo_dashboard_menu?: NowoDashboardMenuConfig,
- *     nowo_form_kit?: NowoFormKitConfig,
- *     nowo_pwa?: NowoPwaConfig,
  *     nowo_cookie_consent?: NowoCookieConsentConfig,
+ *     nowo_http_log?: NowoHttpLogConfig,
+ *     nowo_form_kit?: NowoFormKitConfig,
+ *     nowo_ui_kit?: NowoUiKitConfig,
+ *     nowo_pwa?: NowoPwaConfig,
  *     nowo_login_throttle?: NowoLoginThrottleConfig,
  *     nowo_password_policy?: NowoPasswordPolicyConfig,
  *     nowo_audit_kit?: NowoAuditKitConfig,
@@ -2561,7 +2573,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_beacon?: NowoBeaconConfig,
  *     nowo_site_backup?: NowoSiteBackupConfig,
  *     nowo_routing_kit?: NowoRoutingKitConfig,
- *     nowo_http_log?: NowoHttpLogConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2584,9 +2595,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         stimulus?: StimulusConfig,
  *         live_component?: LiveComponentConfig,
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
- *         nowo_form_kit?: NowoFormKitConfig,
- *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_ui_kit?: NowoUiKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *         nowo_password_policy?: NowoPasswordPolicyConfig,
  *         nowo_audit_kit?: NowoAuditKitConfig,
@@ -2600,7 +2613,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
- *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2622,9 +2634,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         stimulus?: StimulusConfig,
  *         live_component?: LiveComponentConfig,
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
- *         nowo_form_kit?: NowoFormKitConfig,
- *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_ui_kit?: NowoUiKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *         nowo_password_policy?: NowoPasswordPolicyConfig,
  *         nowo_audit_kit?: NowoAuditKitConfig,
@@ -2638,7 +2652,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
- *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2662,9 +2675,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         stimulus?: StimulusConfig,
  *         live_component?: LiveComponentConfig,
  *         nowo_dashboard_menu?: NowoDashboardMenuConfig,
- *         nowo_form_kit?: NowoFormKitConfig,
- *         nowo_pwa?: NowoPwaConfig,
  *         nowo_cookie_consent?: NowoCookieConsentConfig,
+ *         nowo_http_log?: NowoHttpLogConfig,
+ *         nowo_form_kit?: NowoFormKitConfig,
+ *         nowo_ui_kit?: NowoUiKitConfig,
+ *         nowo_pwa?: NowoPwaConfig,
  *         nowo_login_throttle?: NowoLoginThrottleConfig,
  *         nowo_password_policy?: NowoPasswordPolicyConfig,
  *         nowo_audit_kit?: NowoAuditKitConfig,
@@ -2678,7 +2693,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
- *         nowo_http_log?: NowoHttpLogConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

@@ -19,7 +19,7 @@
     {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
 </div>
 
-<div class="fade-up-delay panel shadow-md nowo-site-backup-setup" data-css-framework="{{ nowo_site_backup_css_framework|default('custom') }}">
+<div class="fade-up-delay panel shadow-md nowo-site-backup-setup" data-css-framework="{{ nowo_site_backup_css_framework|default('tailwind') }}">
     {% block nowo_ui_content %}
         {% block nowo_site_backup_content %}{% endblock %}
     {% endblock %}

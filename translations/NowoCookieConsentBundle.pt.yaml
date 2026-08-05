@@ -19,6 +19,7 @@ nowo_cookie_consent:
         always_on: 'Sempre ativos'
     preferences:
         close: 'Voltar'
+        usage_title: 'Como usamos os cookies'
         usage_description: 'Utilizamos cookies e tecnologias semelhantes. Os cookies estritamente necessários permanecem ativos porque são essenciais ao funcionamento do serviço (segurança, gestão de sessão e registo do seu consentimento). Os cookies de análise e de preferências são opcionais e só são ativados com o seu consentimento prévio. Pode aceitar todas as categorias, recusar as não essenciais ou analisar cada categoria. Pode retirar ou alterar o consentimento a qualquer momento através das Definições de cookies.'
         description: 'Cookies opcionais que armazenam escolhas de apresentação ou de funcionalidades não essenciais quando ativa esta categoria.'
     functionality:

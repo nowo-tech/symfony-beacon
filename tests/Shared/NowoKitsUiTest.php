@@ -175,8 +175,11 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-testid="admin-http-log"]');
         self::assertSelectorExists('[data-testid="http-log-filters"].panel');
         self::assertSelectorExists('[data-testid="http-log-results"].panel');
-        self::assertSelectorExists('.http-log-results__actions .btn-label.nowo-ui-btn-export');
-        self::assertSelectorExists('.http-log-results__actions .btn-label.nowo-ui-btn-purge');
+        self::assertSelectorExists('.http-log-results__actions .nowo-ui-btn-export');
+        self::assertSelectorExists('.http-log-results__actions .nowo-ui-btn-purge');
+        self::assertSelectorExists('[data-nowo-ui-shell][data-app-shell]');
+        self::assertSelectorExists('.page-loader[data-controller~="page-loader"]');
+        self::assertSelectorExists('[data-nowo-ui-orb]');
         self::assertSelectorTextContains('[data-testid="http-log-filters"]', 'Clear filters');
     }
 

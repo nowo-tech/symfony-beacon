@@ -1,28 +1,9 @@
-{# Thinking Orb canvas — https://orbs.jakubantalik.com/ #}
-{#
-  Usage:
-    {% include '_thinking_orb.html.twig' %}
-    {% include '_thinking_orb.html.twig' with { state: 'searching', size: 20 } %}
-#}
-{% set state = state|default('working') %}
-{% set size = size|default(64) %}
-{% set theme = theme|default('auto') %}
-{% set speed = speed|default(1) %}
-{% set paused = paused|default(false) %}
-{% set rotate_states = rotate_states|default(false) %}
-{% set label = label|default('') %}
-{% set class = class|default('') %}
-
-<canvas
-    class="thinking-orb{{ class ? ' ' ~ class : '' }}"
-    data-controller="thinking-orb"
-    data-thinking-orb-state-value="{{ state }}"
-    data-thinking-orb-size-value="{{ size }}"
-    data-thinking-orb-theme-value="{{ theme }}"
-    data-thinking-orb-speed-value="{{ speed }}"
-    data-thinking-orb-paused-value="{{ paused ? 'true' : 'false' }}"
-    data-thinking-orb-rotate-states-value="{{ rotate_states ? 'true' : 'false' }}"
-    {% if label %}data-thinking-orb-label-value="{{ label }}"{% endif %}
-    width="{{ size }}"
-    height="{{ size }}"
-></canvas>
+{# Thinking Orb — UiKit canvas + nowo-ui-orb.js (MIT thinking-orbs engine). #}
+{% include '@NowoUiKitBundle/partials/_thinking_orb.html.twig' with {
+    state: state|default('working'),
+    size: size|default(64),
+    theme: theme|default('auto'),
+    speed: speed|default(1),
+    paused: paused|default(false),
+    label: label|default(null),
+} %}

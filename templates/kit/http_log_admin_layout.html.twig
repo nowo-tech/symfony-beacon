@@ -87,94 +87,6 @@
             display: inline-flex;
             margin: 0;
         }
-        .kit-admin.nowo-http-log .http-log-results__action .btn-sm.btn-label {
-            width: auto;
-            min-width: 0;
-            height: auto;
-            white-space: nowrap;
-        }
-        .kit-admin.nowo-http-log .http-log-table-wrap {
-            overflow-x: auto;
-        }
-        .kit-admin.nowo-http-log .http-log-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            text-align: left;
-        }
-        .kit-admin.nowo-http-log .http-log-table th {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 55%, transparent);
-            border-bottom: 1px solid var(--color-sand, var(--beacon-sand));
-        }
-        .kit-admin.nowo-http-log .http-log-table td {
-            padding: 0.65rem 0.75rem;
-            border-bottom: 1px solid color-mix(in srgb, var(--color-sand, var(--beacon-sand)) 70%, transparent);
-            vertical-align: middle;
-        }
-        .kit-admin.nowo-http-log .http-log-table .text-truncate {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 20rem;
-        }
-        .kit-admin.nowo-http-log .badge {
-            display: inline-block;
-            padding: 0.15rem 0.45rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            background: color-mix(in srgb, var(--color-sand, var(--beacon-sand)) 80%, transparent);
-        }
-        .kit-admin.nowo-http-log .btn-sm {
-            font-size: 0.8125rem;
-            padding: 0.25rem 0.6rem;
-        }
-        .kit-admin.nowo-http-log .btn-outline-secondary,
-        .kit-admin.nowo-http-log .btn-outline-danger,
-        .kit-admin.nowo-http-log .btn-ghost {
-            border: 1px solid var(--color-sand, var(--beacon-sand));
-            background: transparent;
-            color: var(--color-ink, var(--beacon-ink));
-            border-radius: 0.375rem;
-            padding: 0.35rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.8125rem;
-            text-decoration: none;
-        }
-        .kit-admin.nowo-http-log .btn-outline-danger {
-            color: var(--color-alert, var(--beacon-alert));
-            border-color: color-mix(in srgb, var(--color-alert, var(--beacon-alert)) 40%, var(--color-sand, var(--beacon-sand)));
-        }
-        .kit-admin.nowo-http-log .btn-danger {
-            background: var(--color-alert, var(--beacon-alert));
-            color: #fff;
-            border: 0;
-            border-radius: 0.375rem;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-        }
-        .kit-admin.nowo-http-log .http-log-pagination {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            list-style: none;
-            margin: 1rem 0 0;
-            padding: 0;
-        }
-        .kit-admin.nowo-http-log .http-log-pagination a,
-        .kit-admin.nowo-http-log .http-log-pagination span {
-            display: inline-flex;
-            padding: 0.35rem 0.65rem;
-            border-radius: 0.375rem;
-            border: 1px solid var(--color-sand, var(--beacon-sand));
-            text-decoration: none;
-            color: var(--color-ink, var(--beacon-ink));
-            font-size: 0.8125rem;
-        }
         .kit-admin.nowo-http-log .http-log-details {
             display: grid;
             grid-template-columns: minmax(8rem, 12rem) 1fr;
@@ -228,7 +140,7 @@
     </header>
     <div
         class="kit-admin nowo-http-log"
-        data-css-framework="{{ nowo_http_log_css_framework|default('custom') }}"
+        data-css-framework="{{ nowo_http_log_css_framework|default('tailwind') }}"
         data-testid="admin-http-log"
     >
         {% block nowo_ui_content %}{% endblock %}

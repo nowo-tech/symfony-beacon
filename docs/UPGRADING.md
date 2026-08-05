@@ -58,7 +58,7 @@ make vite-build
 php bin/console assets:install
 ```
 
-When this release includes kit admin `css_framework: custom` (no Bootstrap in Vite `kit-admin`) and kit pins **1.0.5** / **2.0.12** / RoutingKit **1.1.8** / CookieConsent **1.5.0** / SiteBackup **1.8.1** / AuthKit **1.12.2** / Beacon **1.6.11** / UX Icons **3.4.0**: smoke menus / breadcrumbs / cookie admin (`/cookie-consent-config/{id}/settings` → `/settings/profile`) / `/admin/_routing/` / `/setup` + `/_site_backup` for shell chrome (aside, brand, crumbs) and modals. Re-run `make seed` (or platform seed) so breadcrumb trails include `nowo_cookie_consent_config_settings_section`. Clear UX Icons cache if you rely on Iconify on-demand icons (`bin/console cache:clear`).
+When this release includes kit admin `css_framework: tailwind` (no Bootstrap in Vite `kit-admin`; `.kit-admin` remaps UiKit tokens) and kit pins FormKit **2.2.0** / AuthKit **1.15.0** / UiKit **1.7.0** / RoutingKit **1.3.0** (plus Menu/Breadcrumb/CookieConsent/SiteBackup/HttpLog as pinned): smoke menus / breadcrumbs / cookie admin (`/cookie-consent-config/{id}/settings` → `/settings/profile`) / `/admin/_routing/` (Symfony/FormKit create-edit form) / `/setup` + `/_site_backup` for shell chrome (aside, brand, crumbs) and modals. Confirm list pagination shows `«` / `»` + page numbers. After AuthKit **1.15**, run `bin/console doctrine:encrypt:database --force` once so existing social OAuth plaintext rows become Halite ciphertext. Re-run `make seed` (or platform seed) so breadcrumb trails include `nowo_cookie_consent_config_settings_section`. Clear UX Icons cache if you rely on Iconify on-demand icons (`bin/console cache:clear`). See `specs/081-formkit-uikit-kit-sync/`.
 
 **HttpLogBundle (`nowo-tech/http-log-bundle` 1.0.1):** run migrations for `nowo_http_log_entry`, ensure Messenger workers consume `PersistHttpLogMessage` / `ExportHttpLogMessage` / `PurgeHttpLogMessage` (routed to `async`), open **Administration → HTTP log** (`/admin/http-log`, `ROLE_ADMIN`), and schedule `nowo:http-log:purge`. Re-run platform/demo seed so the administration menu and breadcrumbs include the new routes. Document HTTP audit logging (IPs / user identifiers) in operator privacy copy — see [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
 
@@ -221,7 +221,8 @@ Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent
 
 ### RoutingKit (`064-routing-kit`)
 
-- New dependency `nowo-tech/routing-kit-bundle`; config `config/packages/nowo_routing_kit.yaml`; admin UI `/admin/_routing/`.
+- Dependency `nowo-tech/routing-kit-bundle` (**≥ 1.3.0**); config `config/packages/nowo_routing_kit.yaml`; admin UI `/admin/_routing/`.
+- Panel create/edit uses FormKit (`RoutePathDefinitionType`); host Twig overrides must keep `form_*` (see `081-formkit-uikit-kit-sync`).
 - Use `#[Routable]` for app controllers that need dual locale paths. AuthKit and SiteBackup keep their own locale loaders.
 
 ### Branded HTTP errors (`063-branded-http-errors`)

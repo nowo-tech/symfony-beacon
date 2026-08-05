@@ -31,8 +31,8 @@ nowo_routing_kit:
     web_ui:
         enabled: true
         layout_template: 'kit/routing_kit_panel_layout.html.twig'
-        css_framework: custom
-        icon_set: none
+        css_framework: tailwind
+        icon_set: ux_icon
     security:
         access_roles: [ROLE_ADMIN]
         allow_unauthenticated: false

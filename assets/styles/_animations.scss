@@ -96,31 +96,38 @@ html[data-theme="dark"] .page-loader {
 }
 
 /*
- * Keep the grid box while [hidden] so show/hide can fade.
- * UA [hidden]{display:none} would otherwise pop the veil on every click.
+ * Keep the grid box while leaving so opacity can fade.
+ * When fully dismissed ([hidden]), force display:none — a zero-opacity layer with
+ * backdrop-filter can still wash out the page in Chromium.
  */
-.page-loader[hidden] {
-  display: grid !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* Soft enter: gentle ease + enough duration to read as a fade, not a cut. */
-.page-loader.is-active:not(.is-leaving) {
-  visibility: visible;
-  pointer-events: auto;
-  animation: beacon-loader-fade-in var(--page-loader-in) var(--page-loader-ease) forwards;
-}
-
 .page-loader.is-leaving {
+  display: grid;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   animation: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   transition:
     opacity var(--page-loader-out) var(--page-loader-ease),
     visibility var(--page-loader-out) var(--page-loader-ease);
+}
+
+.page-loader[hidden] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Soft enter: gentle ease + enough duration to read as a fade, not a cut. */
+.page-loader.is-active:not(.is-leaving) {
+  display: grid;
+  visibility: visible;
+  pointer-events: auto;
+  animation: beacon-loader-fade-in var(--page-loader-in) var(--page-loader-ease) forwards;
 }
 
 .page-loader__inner {
@@ -149,7 +156,8 @@ html[data-theme="dark"] .page-loader {
   color: color-mix(in srgb, currentColor 55%, transparent);
 }
 
-.thinking-orb {
+.thinking-orb,
+.nowo-ui-orb {
   flex-shrink: 0;
 }
 

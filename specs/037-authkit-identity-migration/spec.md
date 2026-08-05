@@ -10,7 +10,7 @@
 
 ## Already shipped (baseline — do not regress)
 
-- AuthKit login / register / logout / remember-me / dual public locales.
+- AuthKit login / register / logout / remember-me / dual public locales (pin **≥ 1.15** with FormKit **≥ 2.2** host profile `auth_kit`: `auto_help` / `auto_placeholder: false` — see `081-formkit-uikit-kit-sync`).
 - Magic login + social OAuth (`026`, `060`) with mailer gating where required (`034`).
 - Account tabs: Profile | Projects | Groups; Security | History; Display | Panels | Tours | Notifications.
 - Password change + password history; content-width preference; profile overview (roles, UUID, memberships).

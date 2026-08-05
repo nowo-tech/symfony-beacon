@@ -27,9 +27,9 @@ nowo_cookie_consent:
         enabled: true
         path_prefix: /cookie-consent-config
         layout_template: 'kit/cookie_consent_admin_layout.html.twig'
-        # Admin Web UI: custom nowo-ui (public modal stays ui_theme: tailwind).
-        css_framework: custom
-        icon_set: none
+        # Admin Web UI: UiKit Tailwind + ux_icon (public modal stays ui_theme: tailwind).
+        css_framework: tailwind
+        icon_set: ux_icon
         list_page_size: 20
     security:
         access_roles: [ROLE_ADMIN]

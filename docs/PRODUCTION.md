@@ -62,7 +62,15 @@ See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager i
 
 ## Field encryption key (Halite)
 
-Beacon encrypts API key secrets, notification webhook URLs, push subscription endpoints, and **instance Mailer + Mercure settings** (DSN, From, hub URLs, JWT secret) with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
+Beacon encrypts API key secrets, notification webhook URLs, push subscription endpoints, **AuthKit OAuth client secrets + linked-account tokens** (AuthKit **≥ 1.15**), and **instance Mailer + Mercure settings** (DSN, From, hub URLs, JWT secret) with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
+
+After upgrading AuthKit to **1.15+**, encrypt any existing plaintext social rows:
+
+```bash
+docker compose exec php bin/console doctrine:encrypt:database --force
+```
+
+(Plaintext without the `<ENC>` marker still loads; the next flush or the command above writes ciphertext.)
 
 | Approach | Notes |
 |----------|--------|
@@ -92,6 +100,16 @@ docker compose up -d --scale messenger=2
 ```
 
 Monitor queue depth via `GET /health/ready` → `checks.messenger_async_pending` (Doctrine transport).
+
+**Failed transport:** messages that exhaust retries land in the Doctrine `failed` queue (`queue_name=failed`). Envelope payloads may contain application PII even after DSN scrubbing — treat the failed table as sensitive, restrict DB access, and purge periodically:
+
+```bash
+docker compose exec php bin/console messenger:failed:show
+# After review / replay:
+docker compose exec php bin/console messenger:failed:remove --all   # or remove by id
+```
+
+Do not leave failed envelopes indefinitely on shared production databases.
 
 ## Health probes
 
@@ -168,7 +186,7 @@ Outbound webhooks: keep **Allow private notification URLs** disabled in producti
 Minimum operator checklist:
 
 1. **MySQL**: scheduled `mysqldump` (or volume snapshots) of the Compose `database` data directory / managed DB.
-2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) separately from the DB dump.
+2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) **separately** from SiteBackup archives — SiteBackup `include_paths` intentionally **omits `.env`**.
 3. **Encrypt key**: include `var/secrets/.Halite.default.key` (or `APP_ENCRYPT_KEY`) with secret backups — see [Field encryption key](#field-encryption-key-halite).
 4. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.
 
@@ -180,7 +198,7 @@ Use this list before exposing an instance beyond a trusted network. Details live
 |------|-------------------------|--------|
 | **SiteBackup / setup** | Unique `SITE_SETUP_TOKEN`, unique `SITE_BACKUP_PASSWORD_HASH` | Fail-closed outside `dev`/`test` if local defaults remain |
 | **App secrets** | `APP_SECRET`, DB credentials, Halite key volume or `APP_ENCRYPT_KEY` | Losing the encrypt key breaks ciphertext |
-| **Messenger** | Separate `messenger:consume`; watch `/health/ready` queue depth | Do not conflate with `FRANKENPHP_MODE=worker` |
+| **Messenger** | Separate `messenger:consume`; watch `/health/ready` queue depth; purge `messenger:failed` periodically | Failed envelopes may hold PII; do not conflate with `FRANKENPHP_MODE=worker` |
 | **Retention / quotas** | Ops defaults + optional per-project overrides; schedule `app:retention:purge` | `0` disables that rule |
 | **HTTP audit log** | Admin → HTTP log (`/admin/http-log`); schedule `nowo:http-log:purge` | Default retention 30 days; may store IPs / user ids |
 | **Ingest** | Prefer `X-Beacon-Auth`; keep reject-query-auth enabled in Ops defaults | Rotate project API key secrets if leaked |

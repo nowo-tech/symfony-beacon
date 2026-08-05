@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-03
 
-**Status**: Active
+**Status**: Implemented (as-built; section tabs + FormKit Types — 2026-08-05)
 
 **Input**: User description: "Migrate remaining tunable BEACON_* operator knobs from `.env.dist` (ingest reject query auth, metrics token/require, envelope max bytes, inbound email, allow private notification URLs, anonymous hook resolve) into instance database settings under Administration → Ops defaults, matching the prior retention/quotas migration."
 
@@ -74,11 +74,13 @@ As an operator installing from `.env.dist`, I no longer see (or need) the migrat
 - **FR-004**: Instance config export/import includes non-secret flags; secrets never exported; secret keys forbidden on import; bump schema version.
 - **FR-005**: Remove migrated keys from `.env.dist` and stop binding them in `parameters.yaml` / env-based package overrides.
 - **FR-006**: Document upgrade path and production checklist for re-applying former env values in the UI (especially prod metrics require-token).
+- **FR-007**: Ops defaults MUST use route-based sections (`/settings/ops-defaults` → `/settings/ops-defaults/{section}` for governance|ingest|metrics|inbound|notifications) with shared product tabs (`shared/_tabs` → UiKit `_tabs`).
+- **FR-008**: Ops defaults (and sibling settings Mailer / Mercure / Social credential) Form Types MUST extend FormKit (`FormKitAbstractType` / profile `beacon`) and paint fields via `form/_fields.html.twig` (`077`).
 
 ### Key Entities
 
 - **Instance settings**: singleton operator configuration including prior ops defaults plus ingest/security, metrics, inbound email, and hook policy fields.
-- **Ops defaults form**: admin UI for those fields.
+- **Ops defaults form**: admin UI for those fields (sectioned FormKit Types + UiKit tabs).
 
 ## Success Criteria *(mandatory)*
 
@@ -94,3 +96,9 @@ As an operator installing from `.env.dist`, I no longer see (or need) the migrat
 - Secrets use the same encryption approach as Mailer DSN (`doctrine-encrypt-bundle`).
 - Production fail-closed for `/metrics` becomes an Ops checkbox (default off for local DX); upgrade notes tell prod operators to enable it and set a token (replacing former `when@prod` env default).
 - Local private webhook URLs are enabled via Ops defaults (or test seed), not `when@dev` parameter overrides.
+
+## Related
+
+- `077-form-type-field-loop` — Form Type field loop.
+- `078-form-save-restore-actions` — Save + Restore chrome.
+- `081-formkit-uikit-kit-sync` — UiKit tabs/pagination + FormKit pins.

@@ -5,7 +5,7 @@ nav:
     activity: Aktivität
     mentions: Erwähnungen
     alerts: Warnungen
-    new_in_release: Neu in Release
+    new_in_release: 'Neu in Release'
     new_project: 'Neues Projekt'
     log_out: Abmelden
     main: Hauptnavigation
@@ -26,7 +26,7 @@ nav:
     routing: Locale-Routen
     http_log: HTTP-Protokoll
     api_docs: API-Dokumente
-    social_login: Social Login
+    social_login: 'Social Login'
     ops_defaults: Ops-Standards
     toggle_sidebar: 'Navigation umschalten'
     preferences: Präferenzen
@@ -39,81 +39,81 @@ nav:
     releases: Releases
 assignments:
     title: Zuweisungen
-    intro: Issues, die dir, Teammitgliedern oder niemandem zugewiesen sind, in Projekten mit Zugriff.
-    empty: Keine Issues entsprechen diesen Zuweisungsfiltern.
+    intro: 'Issues, die dir, Teammitgliedern oder niemandem zugewiesen sind, in Projekten mit Zugriff.'
+    empty: 'Keine Issues entsprechen diesen Zuweisungsfiltern.'
     filter:
         scope: Bereich
         project: Projekt
-        any_project: Beliebiges Projekt
+        any_project: 'Beliebiges Projekt'
         level: Stufe
         status: Status
         priority: Priorität
         assignee: Teammitglied
     scope:
-        mine: Mir zugewiesen
+        mine: 'Mir zugewiesen'
         teammates: Teammitglieder
-        unassigned: Nicht zugewiesen
-        all: Alle in meinen Projekten
+        unassigned: 'Nicht zugewiesen'
+        all: 'Alle in meinen Projekten'
     col:
         project: Projekt
         status: Status
 summary:
     title: Tagesübersicht
-    intro: Schnelle Zähler über Projekte, auf die du Zugriff hast — offene Arbeit, Erwähnungen und Zustellungsstatus.
+    intro: 'Schnelle Zähler über Projekte, auf die du Zugriff hast — offene Arbeit, Erwähnungen und Zustellungsstatus.'
     card:
-        mine_open: Mir zugewiesen (offen)
-        unassigned_open: Nicht zugewiesen (offen)
-        unread_mentions: Ungelesene Erwähnungen
-        failed_deliveries: Fehlgeschlagene Zustellungen
-        errors_today: Fehler heute
+        mine_open: 'Mir zugewiesen (offen)'
+        unassigned_open: 'Nicht zugewiesen (offen)'
+        unread_mentions: 'Ungelesene Erwähnungen'
+        failed_deliveries: 'Fehlgeschlagene Zustellungen'
+        errors_today: 'Fehler heute'
         projects: Projekte
 activity:
-    title: Letzte Aktivität
-    intro: Deine letzten Produktaktionen in Projekten, auf die du Zugriff hast.
-    empty: Noch keine aktuelle Aktivität.
+    title: 'Letzte Aktivität'
+    intro: 'Deine letzten Produktaktionen in Projekten, auf die du Zugriff hast.'
+    empty: 'Noch keine aktuelle Aktivität.'
     filter:
         project: Projekt
-        any_project: Beliebiges Projekt
+        any_project: 'Beliebiges Projekt'
 mentions:
     title: Erwähnungen
-    intro: Kommentare, in denen dich jemand @erwähnt hat.
-    empty: Keine Erwähnungen passen zu diesen Filtern.
+    intro: 'Kommentare, in denen dich jemand @erwähnt hat.'
+    empty: 'Keine Erwähnungen passen zu diesen Filtern.'
     unread: Ungelesen
     by: 'Von %name%'
-    mark_read: Als gelesen markieren
-    mark_all_read: Alle als gelesen markieren
+    mark_read: 'Als gelesen markieren'
+    mark_all_read: 'Alle als gelesen markieren'
     filter:
         project: Projekt
-        any_project: Beliebiges Projekt
-        unread_only: Nur ungelesen
+        any_project: 'Beliebiges Projekt'
+        unread_only: 'Nur ungelesen'
 alerts:
     title: Warnungen
-    intro: Benachrichtigungsziele in deinen Projekten mit fehlgeschlagener letzter Zustellung.
-    empty: Keine fehlgeschlagenen Zustellungen in deinen Projekten.
+    intro: 'Benachrichtigungsziele in deinen Projekten mit fehlgeschlagener letzter Zustellung.'
+    empty: 'Keine fehlgeschlagenen Zustellungen in deinen Projekten.'
     filter:
         project: Projekt
-        any_project: Beliebiges Projekt
+        any_project: 'Beliebiges Projekt'
 new_in_release:
-    title: Neu in Release
-    intro: Issues, die zuerst in einem Release gesehen wurden.
-    empty: Keine New-in-Release-Issues passen zu diesen Filtern.
+    title: 'Neu in Release'
+    intro: 'Issues, die zuerst in einem Release gesehen wurden.'
+    empty: 'Keine New-in-Release-Issues passen zu diesen Filtern.'
     filter:
         project: Projekt
-        any_project: Beliebiges Projekt
+        any_project: 'Beliebiges Projekt'
         release: Release
-        any_release: Beliebiges Release
+        any_release: 'Beliebiges Release'
     col:
         project: Projekt
-        release: Erstes Release
+        release: 'Erstes Release'
 api_docs:
     title: API-Dokumente
     intro: 'Entdecken Sie die Umschlagaufnahme und zugehörige HTTP-Endpunkte. Verwenden Sie Authorize mit einem X-Beacon-Auth-Header (beacon_key und beacon_secret aus Ihrem Projekt-DSN).'
     open_json: 'OpenAPI JSON'
 magic_login:
     confirm:
-        title: Anmeldung fortsetzen
-        heading: Magic Login abschließen
-        help: Bestätigen Sie, um die passwortlose Anmeldung abzuschließen. Diese Seite sendet den Einmallink per POST, damit das Token nicht als GET-Navigation übertragen wird.
+        title: 'Anmeldung fortsetzen'
+        heading: 'Magic Login abschließen'
+        help: 'Bestätigen Sie, um die passwortlose Anmeldung abzuschließen. Diese Seite sendet den Einmallink per POST, damit das Token nicht als GET-Navigation übertragen wird.'
         submit: Weiter
 common:
     filter: Filter
@@ -154,9 +154,9 @@ theme:
     switch_to_night: 'Zum Nachtmodus wechseln'
 layout:
     width_content: Inhalt
-    width_full: Volle Breite
-    switch_to_content: Zur zentrierten Inhaltsbreite wechseln
-    switch_to_full: Zur vollen Inhaltsbreite wechseln
+    width_full: 'Volle Breite'
+    switch_to_content: 'Zur zentrierten Inhaltsbreite wechseln'
+    switch_to_full: 'Zur vollen Inhaltsbreite wechseln'
 auth:
     tagline: 'Selbstgehostete Fehlerverfolgung für PHP und Symfony.'
     brand_eyebrow: Fehlerverfolgung
@@ -169,7 +169,7 @@ auth:
         submit: 'Magic-Link senden'
         sent: 'Wenn dieses Konto existiert und aktiviert ist, ist der Link unterwegs.'
         throttled: 'Zu viele Anfragen. Versuchen Sie es später erneut.'
-        invalid: Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.
+        invalid: 'Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.'
         unavailable: 'Die Anmeldung per Magic-Link ist erst verfügbar, wenn ein Administrator unter Administration → Mailer einen verschlüsselten Mailer-DSN konfiguriert.'
         back_to_password: 'Mit Passwort anmelden'
         email_subject: 'Ihr Beacon Magic-Link'
@@ -196,7 +196,7 @@ flash:
         governance_saved: 'Projekt-Governance-Einstellungen gespeichert.'
         governance_invalid: 'Governance-Werte müssen leer (erben) oder nicht negative Ganzzahlen sein.'
         quota_approaching: 'Dieses Projekt nähert sich seinem täglichen Veranstaltungskontingent.'
-        quota_monthly_approaching: Dieses Projekt nähert sich seinem monatlichen Ereigniskontingent.
+        quota_monthly_approaching: 'Dieses Projekt nähert sich seinem monatlichen Ereigniskontingent.'
         history_cleared: 'Projektverlauf gelöscht.'
         deleted: 'Projekt gelöscht.'
         delete_confirmation_mismatch: 'Der Projektname stimmte nicht überein. Es wurde nichts gelöscht.'
@@ -232,8 +232,8 @@ flash:
         enabled: 'Benutzerkonto aktiviert.'
         disabled: 'Benutzerkonto deaktiviert.'
         cannot_disable_self: 'Sie können Ihr eigenes Konto nicht deaktivieren.'
-        cannot_anonymize_self: Use Account → Privacy to anonymize your own account.
-        anonymized: User account anonymized.
+        cannot_anonymize_self: 'Use Account → Privacy to anonymize your own account.'
+        anonymized: 'User account anonymized.'
         created: 'Benutzerkonto erstellt.'
         role_updated: 'Benutzerrolle aktualisiert.'
         invalid_email: 'Geben Sie eine gültige E-Mail-Adresse ein.'
@@ -246,11 +246,11 @@ flash:
         project_unlink_forbidden: 'Es ist Ihnen nicht gestattet, diese Projektmitgliedschaft zu entfernen.'
         project_unlink_error: 'Der Benutzer konnte nicht aus dem Projekt entfernt werden.'
     privacy:
-        anonymized: Your account was anonymized. You have been signed out.
-        already_anonymized: That account is already anonymized.
-        sole_owner: Transfer sole project ownership (or add another owner) before anonymizing.
-        last_admin: Keep at least one instance administrator before anonymizing.
-        anonymize_failed: Account could not be anonymized.
+        anonymized: 'Your account was anonymized. You have been signed out.'
+        already_anonymized: 'That account is already anonymized.'
+        sole_owner: 'Transfer sole project ownership (or add another owner) before anonymizing.'
+        last_admin: 'Keep at least one instance administrator before anonymizing.'
+        anonymize_failed: 'Account could not be anonymized.'
     groups:
         created: 'Gruppe erstellt.'
         updated: 'Gruppe aktualisiert.'
@@ -277,6 +277,13 @@ flash:
         sample_failed: 'Beispiel-E-Mail konnte nicht gesendet werden. Prüfen Sie den Mailer-DSN und die Serverprotokolle.'
     mercure:
         saved: 'Mercure-Einstellungen gespeichert.'
+    ops_defaults:
+        saved: 'Betriebliche Standardwerte gespeichert.'
+    social_login:
+        custom_urls_required: 'Benutzerdefinierte Anbieter erfordern Authorize-, Token- und Userinfo-URLs.'
+        deleted: 'Social-Login-Anbieter entfernt.'
+        provider_exists: 'Dieser Anbieter existiert bereits — bearbeiten Sie die vorhandene Anmeldedaten.'
+        saved: 'Social-Login-Anbieter gespeichert.'
 project:
     label: Projekt
     no_description: 'Keine Beschreibung'
@@ -293,9 +300,9 @@ project:
         retention_max_events: 'Max. gespeicherte Ereignisse'
         ingest_rate_limit: 'Begrenzung der Aufnahmerate (pro Minute)'
         event_quota_daily: 'Tägliches Event-Kontingent'
-        event_quota_monthly: Monatliches Ereigniskontingent
+        event_quota_monthly: 'Monatliches Ereigniskontingent'
         quota_usage_monthly: '%count% / %quota% Ereignisse in diesem Monat (UTC)'
-        month_utc_hint: Monatsgrenze ist UTC
+        month_utc_hint: 'Monatsgrenze ist UTC'
         inherit_hint: 'Leer = Serverstandard übernehmen (%default%). Verwenden Sie 0 zum Deaktivieren, wenn der Standardwert ungleich Null ist.'
         save: 'Governance retten'
         quota_usage: 'Veranstaltungen heute: %count% / %quota%'
@@ -408,12 +415,12 @@ projects:
     errors_last_7_days: '%count% Fehler in den letzten 7 Tagen'
     share:
         title: Freigabelinks
-        help: Erstellen Sie einen zeitlich begrenzten Link mit schreibgeschütztem Viewer-Zugriff auf dieses Projekt (oder ein Issue). Empfänger müssen sich anmelden. Neue Links sind standardmäßig einmalig nutzbar.
+        help: 'Erstellen Sie einen zeitlich begrenzten Link mit schreibgeschütztem Viewer-Zugriff auf dieses Projekt (oder ein Issue). Empfänger müssen sich anmelden. Neue Links sind standardmäßig einmalig nutzbar.'
         days: 'Gültigkeit (Tage)'
-        max_uses: Max. Nutzungen
-        max_uses_help: Lassen Sie Max. Nutzungen leer für unbegrenzte Öffnungen bis zum Ablauf. Standard ist 1 (einmalig).
+        max_uses: 'Max. Nutzungen'
+        max_uses_help: 'Lassen Sie Max. Nutzungen leer für unbegrenzte Öffnungen bis zum Ablauf. Standard ist 1 (einmalig).'
         max_uses_unlimited: Unbegrenzt
-        max_uses_invalid: Max. Nutzungen muss eine positive Ganzzahl sein (oder leer für unbegrenzt).
+        max_uses_invalid: 'Max. Nutzungen muss eine positive Ganzzahl sein (oder leer für unbegrenzt).'
         uses: 'Nutzungen %used% / %max%'
         issue_uuid: 'Issue-UUID (optional)'
         issue_optional: 'Leer lassen für das gesamte Projekt'
@@ -424,12 +431,27 @@ projects:
         scoped_issue: 'Auf Issue beschränkt'
         created: 'Freigabelink erstellt — jetzt kopieren; er wird nicht erneut angezeigt.'
         revoked: 'Freigabelink widerrufen.'
-        invalid: Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.
+        invalid: 'Dieser Share-Link ist ungültig, abgelaufen, widerrufen oder aufgebraucht.'
         invalid_csrf: 'Ungültiges Sicherheitstoken.'
         issue_not_found: 'Issue in diesem Projekt nicht gefunden.'
         expires_in_past: 'Das Ablaufdatum muss in der Zukunft liegen.'
         expires_too_far: 'Freigabelinks dürfen maximal 30 Tage gültig sein.'
         issue_wrong_project: 'Dieses Issue gehört nicht zu diesem Projekt.'
+    read_token:
+        active: Aktiv
+        copy_once: 'Kopieren Sie diesen Token jetzt. Er wird nicht erneut angezeigt.'
+        create: 'Token erstellen'
+        created: 'Lese-Token erstellt — jetzt kopieren; er wird nicht erneut angezeigt.'
+        empty: 'Noch keine Lese-API-Tokens.'
+        help: 'Erstellen Sie Bearer-Tokens (Präfix brt_) für Automatisierung. Tokens werden gehasht gespeichert und unterscheiden sich von Ingest-Schlüsseln. Authorization: Bearer auf /api/projects/{uuid}/issues verwenden.'
+        invalid_csrf: 'Ungültiges Sicherheitstoken.'
+        label: Bezeichnung
+        label_placeholder: 'CI-Bot, Exportskript…'
+        last_used: 'Zuletzt verwendet'
+        revoke: Widerrufen
+        revoked: 'Lese-Token widerrufen.'
+        revoked_at: Widerrufen
+        title: Lese-API-Tokens
 issues:
     title: Probleme
     search_placeholder: 'Titel suchen…'
@@ -467,11 +489,11 @@ issues:
     copy_path: 'Pfad kopieren'
     path_copied: Kopiert
     aside_ai_export: KI-Export
-    export_for_ai: Für KI kopieren
+    export_for_ai: 'Für KI kopieren'
     export_for_ai_copied: Kopiert
-    export_for_ai_md: Markdown herunterladen
-    export_for_ai_json: JSON herunterladen
-    export_for_ai_help: Bereinigter Stack und Request im Format beacon-ai-export/v1 zum Einfügen in einen KI-Assistenten.
+    export_for_ai_md: 'Markdown herunterladen'
+    export_for_ai_json: 'JSON herunterladen'
+    export_for_ai_help: 'Bereinigter Stack und Request im Format beacon-ai-export/v1 zum Einfügen in einen KI-Assistenten.'
     breadcrumbs: Paniermehl
     raw_payload: 'Rohe Nutzlast'
     highlights: Höhepunkte
@@ -599,6 +621,21 @@ issues:
         first_seen: 'Zum ersten Mal gesehen'
         last_seen: 'Zuletzt gesehen'
     viewer_readonly: 'Sie haben schreibgeschützten (Viewer-)Zugriff auf dieses Projekt.'
+    assignee_forbidden: 'Sie benötigen Triage-Zugriff auf dieses Projekt, um Issues zuzuweisen.'
+    mail:
+        assign_body: |
+            %actor% hat Ihnen das Issue „%issue%“ im Projekt %project% zugewiesen.
+
+            %link%
+        assign_subject: 'Ihnen wurde [%project%] %issue% zugewiesen'
+        mention_body: |
+            %author% hat Sie im Issue „%issue%“ im Projekt %project% erwähnt.
+
+            %link%
+        mention_subject: 'Sie wurden in [%project%] %issue% erwähnt'
+    similar_empty: 'Keine ähnlichen Issues in diesem Projekt.'
+    similar_mark_duplicate: 'Als Duplikat markieren'
+    similar_title: 'Ähnliche Issues'
 performance:
     title: Leistung
     intro: 'Transaktionen und N+1-Analyse'
@@ -739,7 +776,7 @@ users:
     cancel: Stornieren
     role_label: Rolle
     last_admin_hint: 'Behalten Sie mindestens einen Administrator.'
-    edit_role_title: Benutzerrolle ändern
+    edit_role_title: 'Benutzerrolle ändern'
     edit_role_body: 'Wählen Sie eine neue Rolle für %name% (%email%).'
     col:
         user: Benutzer
@@ -769,13 +806,13 @@ users:
         enable: Aktivieren
         disable: Deaktivieren
         update_role: Aktualisieren
-        edit_role: Rolle bearbeiten
+        edit_role: 'Rolle bearbeiten'
         self: 'Das bist du'
         activity: Aktivität
-        export: Export data
+        export: 'Export data'
         anonymize: Anonymize
-    anonymize_confirm_title: Anonymize user
-    anonymize_confirm_body: \'Scrub personal data for %email% and disable sign-in. Type ANONYMIZE to confirm.\'
+    anonymize_confirm_title: 'Anonymize user'
+    anonymize_confirm_body: '\''Scrub personal data for %email% and disable sign-in. Type ANONYMIZE to confirm.\'''
     projects_title: Projektmitgliedschaften
     projects_intro: 'Direkte Projektrollen für dieses Konto (nicht über Gruppen). Instanzadministratoren können sie hier entfernen.'
     projects_empty: 'Keine direkten Projektmitgliedschaften.'
@@ -787,8 +824,8 @@ users:
         timeline_title: 'Zeitleiste der Aktivität'
         recent_title: 'Aktuelle Aktivität'
         recent_intro: 'Aktuelle Verwaltungs-, Mitgliedschafts- und Produktaktionen in der gesamten Instanz.'
-        audit_intro: Identitäts- und Mitgliedschaftsaktionen für dieses Konto (Filter entsprechen dem Admin-Projekt-Audit).
-        audit_empty: Keine erfassten Identitätsaktionen entsprechen den aktuellen Filtern.
+        audit_intro: 'Identitäts- und Mitgliedschaftsaktionen für dieses Konto (Filter entsprechen dem Admin-Projekt-Audit).'
+        audit_empty: 'Keine erfassten Identitätsaktionen entsprechen den aktuellen Filtern.'
         empty: 'Noch keine aufgezeichneten Aktionen.'
         by: 'Bis %name%'
         by_system: 'Nach System'
@@ -871,11 +908,11 @@ preferences:
     intro: 'Aktualisieren Sie Ihr Profil, Ihr Passwort, Ihre Sprache und Ihre Designeinstellungen.'
     nav:
         profile: Profil
-        projects: Meine Projekte
-        groups: Meine Gruppen
+        projects: 'Meine Projekte'
+        groups: 'Meine Gruppen'
         privacy: Datenschutz
         security: Sicherheit
-        password: Passwort ändern
+        password: 'Passwort ändern'
         password_history: Änderungshistorie
         security_activity: Aktivität
         area_label: Kontenbereiche
@@ -906,7 +943,7 @@ preferences:
         status_anonymized: Anonymized
         role_admin: Administrator
         role_member: Mitglied
-        slack_user_id: Slack user ID
+        slack_user_id: 'Slack user ID'
         slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
         phone: Telefonnummer
         phone_help: 'Optional. Erforderlich für QR-Telefon-Login. Speichern markiert als verifiziert bis SMS-OTP.'
@@ -917,22 +954,22 @@ preferences:
         groups_intro: 'Gruppen, die zusätzlichen Projektzugriff gewähren können.'
         groups_empty: 'Sie gehören keiner Gruppe an.'
     privacy:
-        title: Privacy & data
-        intro: Download a copy of your account data or anonymize this account.
-        export_title: Download my data
-        export_intro: Export your profile, memberships, and security activity as JSON. Password hashes and other users' data are never included.
-        export_button: Download JSON
-        events_note: Project ingest events and issues stay with each project until retention purge — they are not part of this account export.
-        legal_link: View privacy policy
-        anonymize_title: Anonymize account
-        anonymize_intro: Scrub your email and display name, disable sign-in, and clear credentials. This cannot be undone from the UI.
-        anonymize_open: Anonymize my account
-        anonymize_confirm_title: Confirm anonymization
-        anonymize_confirm_body: Your login will stop working. Type ANONYMIZE to confirm.
+        title: 'Privacy & data'
+        intro: 'Download a copy of your account data or anonymize this account.'
+        export_title: 'Download my data'
+        export_intro: "Export your profile, memberships, and security activity as JSON. Password hashes and other users' data are never included."
+        export_button: 'Download JSON'
+        events_note: 'Project ingest events and issues stay with each project until retention purge — they are not part of this account export.'
+        legal_link: 'View privacy policy'
+        anonymize_title: 'Anonymize account'
+        anonymize_intro: 'Scrub your email and display name, disable sign-in, and clear credentials. This cannot be undone from the UI.'
+        anonymize_open: 'Anonymize my account'
+        anonymize_confirm_title: 'Confirm anonymization'
+        anonymize_confirm_body: 'Your login will stop working. Type ANONYMIZE to confirm.'
         anonymize_type_label: 'Type ANONYMIZE to confirm'
-        anonymize_confirm: Anonymize permanently
-        already_anonymized: This account has already been anonymized.
-        blocked_last_admin: You are the last instance administrator. Add another admin before anonymizing.
+        anonymize_confirm: 'Anonymize permanently'
+        already_anonymized: 'This account has already been anonymized.'
+        blocked_last_admin: 'You are the last instance administrator. Add another admin before anonymizing.'
         blocked_sole_owner: 'Transfer ownership of project “%name%” (or add another owner) before anonymizing.'
     security:
         title: Sicherheit
@@ -944,25 +981,25 @@ preferences:
         history_current: 'Aktuelles Passwort gesetzt am:'
         history_entry: 'Passwort geändert'
         history_empty: 'Noch keine Passwortänderungen erfasst.'
-        social_title: Verknüpfte Social-Konten
-        social_intro: OAuth-Anbieter, die mit diesem Beacon-Konto verbunden sind.
-        social_disabled: Social-Login ist auf dieser Instanz nicht aktiviert.
-        social_empty: Noch keine Social-Konten verknüpft. Melden Sie sich mit einem Anbieter auf der Anmeldeseite an, um eines zu verknüpfen, wenn Social-Login aktiviert ist.
-        social_unlink_note: Das Aufheben der Verknüpfung von Anbietern auf dieser Seite ist noch nicht verfügbar. Wenden Sie sich an einen Instanz-Admin, wenn ein Link entfernt werden muss.
+        social_title: 'Verknüpfte Social-Konten'
+        social_intro: 'OAuth-Anbieter, die mit diesem Beacon-Konto verbunden sind.'
+        social_disabled: 'Social-Login ist auf dieser Instanz nicht aktiviert.'
+        social_empty: 'Noch keine Social-Konten verknüpft. Melden Sie sich mit einem Anbieter auf der Anmeldeseite an, um eines zu verknüpfen, wenn Social-Login aktiviert ist.'
+        social_unlink_note: 'Das Aufheben der Verknüpfung von Anbietern auf dieser Seite ist noch nicht verfügbar. Wenden Sie sich an einen Instanz-Admin, wenn ein Link entfernt werden muss.'
         activity_title: Sicherheitsaktivität
-        activity_intro: Aktuelle Passwort-Reset- und Magic-Login-Ereignisse für Ihr Konto.
-        activity_empty: Noch keine Sicherheitsereignisse erfasst.
+        activity_intro: 'Aktuelle Passwort-Reset- und Magic-Login-Ereignisse für Ihr Konto.'
+        activity_empty: 'Noch keine Sicherheitsereignisse erfasst.'
     display:
         title: Anzeige
-        intro: Wählen Sie Sprache, Theme, Dichte, Textgröße, Kontrast, Seitenleiste, Bewegung und Inhaltsbreite.
+        intro: 'Wählen Sie Sprache, Theme, Dichte, Textgröße, Kontrast, Seitenleiste, Bewegung und Inhaltsbreite.'
         tabs_label: Anzeigeabschnitte
         submit: 'Anzeigeeinstellungen speichern'
         panels_title: Issue-Panels
-        panels_intro: Wählen Sie, welche Issue-Panels standardmäßig eingeklappt sind, und löschen Sie Browser-Überschreibungen.
+        panels_intro: 'Wählen Sie, welche Issue-Panels standardmäßig eingeklappt sind, und löschen Sie Browser-Überschreibungen.'
         tours_title: Touren
-        tours_intro: Steuern Sie, welche Produkttouren automatisch starten, und spielen Sie die Dashboard-Tour erneut ab.
+        tours_intro: 'Steuern Sie, welche Produkttouren automatisch starten, und spielen Sie die Dashboard-Tour erneut ab.'
         notifications_title: Benachrichtigungen
-        notifications_intro: Optionale Push-Benachrichtigungen für neue Issues und Beacon als App installieren.
+        notifications_intro: 'Optionale Push-Benachrichtigungen für neue Issues und Beacon als App installieren.'
         pwa_title: 'App installieren'
         pwa_intro: 'Fügen Sie diese Website für ein schnelleres, eigenständiges Erlebnis zu Ihrem Gerät hinzu. Die Verfügbarkeit hängt von Ihrem Browser ab.'
         pwa_prompt_title: 'Installieren Sie es für einen schnelleren Zugriff'
@@ -994,7 +1031,7 @@ preferences:
     motion_system: 'System (Gerät folgen)'
     motion_reduce: 'Bewegung reduzieren'
     motion_full: 'Volle Bewegung'
-    product_tour_title: 'Produkttour'
+    product_tour_title: Produkttour
     product_tour_intro: 'Touren laufen einmal pro Bereich nach dem Setup. Sie bleiben aus, bis Sie sie hier erneut abspielen.'
     product_tour_replay: 'Dashboard-Tour erneut abspielen'
     issue_panels_collapsed: 'Problembereiche sind standardmäßig ausgeblendet'
@@ -1026,7 +1063,7 @@ preferences:
     product_tour_enabled: 'Aktive Touren'
     product_tour_enabled_help: 'Markierte Touren können einmal pro Bereich automatisch starten. Abwählen blendet eine Tour aus; alle abwählen deaktiviert jede Tour.'
     product_tour_select_all: 'Alle Touren auswählen'
-    product_tour_save_hint: Klicken Sie auf Anzeigeeinstellungen speichern, um Tour-Änderungen zu übernehmen.
+    product_tour_save_hint: 'Klicken Sie auf Anzeigeeinstellungen speichern, um Tour-Änderungen zu übernehmen.'
     product_tour_page:
         dashboard: Dashboard
         project_issues: Projekt-Issues
@@ -1120,8 +1157,8 @@ groups:
     name_label: Name
     description_label: Beschreibung
     audit_title: Audit-Zeitlinie
-    audit_intro: Gruppenbezogene Verwaltungsaktionen (Erstellen/Aktualisieren, Mitglieder, Projektlinks). Die AuditKit-Zeitstempel oben bleiben der Snapshot des letzten Bearbeiters.
-    audit_empty: Keine erfassten Gruppenaktionen entsprechen den aktuellen Filtern.
+    audit_intro: 'Gruppenbezogene Verwaltungsaktionen (Erstellen/Aktualisieren, Mitglieder, Projektlinks). Die AuditKit-Zeitstempel oben bleiben der Snapshot des letzten Bearbeiters.'
+    audit_empty: 'Keine erfassten Gruppenaktionen entsprechen den aktuellen Filtern.'
     members_title: Gruppenmitglieder
     members_empty: 'Noch keine Mitglieder in dieser Gruppe.'
     add_member: 'Mitglied hinzufügen'
@@ -1150,7 +1187,7 @@ admin_projects:
         audit: Audit
         actions: Aktionen
     status:
-        active: Ingest aktiv
+        active: 'Ingest aktiv'
     back: 'Zurück zu Projekten'
     edit: Bearbeiten
     edit_title: 'Projekt bearbeiten'
@@ -1206,23 +1243,23 @@ admin:
             overview: Übersicht
             access: Zugriff
             instance: Instanz
-            navigation: Navigation & Rechtliches
+            navigation: 'Navigation & Rechtliches'
             observability: Observability
         users: 'Listen Sie Konten und Rollen für diese Instanz auf.'
         groups: 'Erstellen Sie Gruppen und verwalten Sie deren Mitglieder für den Projektzugriff.'
         projects: 'Listen Sie alle Projekte auf, verwalten Sie Mitglieder und Gruppenlinks oder löschen Sie ein Projekt.'
-        ops: Projektübergreifende Spitzen, offene Issues und fehlgeschlagene Zustellungen.
+        ops: 'Projektübergreifende Spitzen, offene Issues und fehlgeschlagene Zustellungen.'
         appearance: 'Markenname, Akzente, Statusfarben und Oberflächen.'
         menus: 'Navigationsmenüs bearbeiten.'
         breadcrumbs: 'Breadcrumb-Sammlungen verwalten.'
         cookie_consent: 'Modaltext, Kategorien und First-Party-Cookie-Inventar bearbeiten.'
         routing: 'Duale Locale-Pfade (JSON) für Routable-Controller verwalten.'
-        http_log: Erfasste HTTP-Anfragen (Header, Status, Dauer) mit Aufbewahrung und Export einsehen.
+        http_log: 'Erfasste HTTP-Anfragen (Header, Status, Dauer) mit Aufbewahrung und Export einsehen.'
         mailer: 'Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.'
-        api_docs: Envelope-Ingest und zugehörige HTTP-OpenAPI-Dokumentation erkunden.
-        social_login: OAuth-Anmeldeinformationen (Google / GitHub / Microsoft) in der Datenbank.
-        ops_defaults: Instanzweite Aufbewahrung, Ingest-Rate, Quotas und Zustelllimits.
-        mercure: Live-Issue-Alerts über Mercure-Hub (optional).
+        api_docs: 'Envelope-Ingest und zugehörige HTTP-OpenAPI-Dokumentation erkunden.'
+        social_login: 'OAuth-Anmeldeinformationen (Google / GitHub / Microsoft) in der Datenbank.'
+        ops_defaults: 'Instanzweite Aufbewahrung, Ingest-Rate, Quotas und Zustelllimits.'
+        mercure: 'Live-Issue-Alerts über Mercure-Hub (optional).'
         instance_config: 'Nicht-geheimes Erscheinungsbild und Instanz-Flags exportieren oder importieren (JSON).'
         setup: 'Erste Plattform- / Demo- / Sample-Seed-Schritte.'
     cookie_consent:
@@ -1232,29 +1269,29 @@ admin:
         section_tabs_label: Einstellungsabschnitte
     ops:
         title: Ops-Übersicht
-        intro: Instanzweite Gesundheitssignale über Projekte. Die Messenger-Warteschlangentiefe ist immer instanzweit.
+        intro: 'Instanzweite Gesundheitssignale über Projekte. Die Messenger-Warteschlangentiefe ist immer instanzweit.'
         filter_project: Projektfilter
-        filter_all: Alle Projekte
+        filter_all: 'Alle Projekte'
         queue_title: Messenger-Warteschlange
-        queue_instance_wide: Instanzweite async ausstehende Nachrichten (nicht projektspezifisch)
-        open_issues_title: Offene Issues
-        suspended_title: Ausgesetzter Ingest
-        suspended_list_title: Ausgesetzte Projekte
+        queue_instance_wide: 'Instanzweite async ausstehende Nachrichten (nicht projektspezifisch)'
+        open_issues_title: 'Offene Issues'
+        suspended_title: 'Ausgesetzter Ingest'
+        suspended_list_title: 'Ausgesetzte Projekte'
         spikes_title: Fehler-Spikes
         spikes_help: 'Projekte, bei denen die heutigen Fehler max(3, 2 × 7-Tage-Tagesdurchschnitt) überschreiten.'
-        spikes_empty: Derzeit keine Fehler-Spikes.
+        spikes_empty: 'Derzeit keine Fehler-Spikes.'
         spikes_metric: '%today% heute (7-Tage-Ø %avg%, Schwelle %threshold%)'
-        failed_title: Fehlgeschlagene Zustellungen
-        failed_empty: Keine Ziele mit fehlgeschlagener letzter Zustellung.
-        open_by_project_title: Offene Issues nach Projekt
-        open_by_project_empty: Keine offenen Issues im Umfang.
+        failed_title: 'Fehlgeschlagene Zustellungen'
+        failed_empty: 'Keine Ziele mit fehlgeschlagener letzter Zustellung.'
+        open_by_project_title: 'Offene Issues nach Projekt'
+        open_by_project_empty: 'Keine offenen Issues im Umfang.'
 tour:
     controls:
         next: Weiter
         previous: Zuruck
         done: Fertig
         close: Schliessen
-        progress: "{{current}} von {{total}}"
+        progress: '{{current}} von {{total}}'
     role:
         owner: Eigentumer
         admin: Administrator
@@ -1263,61 +1300,61 @@ tour:
     steps:
         dashboard:
             welcome:
-                title: Willkommen bei Beacon
-                description: Kurze Tour durch Ihr Dashboard - Projekte, Navigation und wo Sie Ihr Konto verwalten.
+                title: 'Willkommen bei Beacon'
+                description: 'Kurze Tour durch Ihr Dashboard - Projekte, Navigation und wo Sie Ihr Konto verwalten.'
             sidebar:
                 title: Navigation
-                description: Verwenden Sie die Seitenleiste, um zwischen den Dashboard-Bereichen des aktuellen App-Bereichs zu wechseln.
+                description: 'Verwenden Sie die Seitenleiste, um zwischen den Dashboard-Bereichen des aktuellen App-Bereichs zu wechseln.'
             projects:
-                title: Ihre Projekte
-                description: Jedes Projekt sammelt Fehler, Performance und Analytics aus Apps, die Envelope-Telemetrie senden.
+                title: 'Ihre Projekte'
+                description: 'Jedes Projekt sammelt Fehler, Performance und Analytics aus Apps, die Envelope-Telemetrie senden.'
             new_project:
-                title: Projekt erstellen
-                description: Fugen Sie ein Projekt hinzu, um ein DSN und API-Schlussel fur Ihre Client-SDKs zu erhalten.
+                title: 'Projekt erstellen'
+                description: 'Fugen Sie ein Projekt hinzu, um ein DSN und API-Schlussel fur Ihre Client-SDKs zu erhalten.'
             user_menu:
                 title: Kontomenü
-                description: Offnen Sie Einstellungen, kehren Sie zum Dashboard zuruck oder melden Sie sich uber Ihr Avatar-Menü ab.
+                description: 'Offnen Sie Einstellungen, kehren Sie zum Dashboard zuruck oder melden Sie sich uber Ihr Avatar-Menü ab.'
             admin:
                 title: Administration
-                description: Instanzadministratoren verwalten hier Benutzer, Gruppen, Erscheinungsbild, Mailer und die Ersteinrichtung.
+                description: 'Instanzadministratoren verwalten hier Benutzer, Gruppen, Erscheinungsbild, Mailer und die Ersteinrichtung.'
         project:
             welcome:
                 title: Projekt-Issues
-                description: "Sie sehen dieses Projekt als %role%. Verwenden Sie Issues, um Fehler aus dem Envelope-Ingest zu triagieren."
+                description: 'Sie sehen dieses Projekt als %role%. Verwenden Sie Issues, um Fehler aus dem Envelope-Ingest zu triagieren.'
             nav:
                 title: Projektbereiche
-                description: Wechseln Sie fur dieses Projekt zwischen Issues, Performance, Analytics, Releases und Settings.
+                description: 'Wechseln Sie fur dieses Projekt zwischen Issues, Performance, Analytics, Releases und Settings.'
             filters:
-                title: Filter und Suche
-                description: Grenzen Sie Issues nach Level, Status, Umgebung, Release, Zuständigem und mehr ein.
+                title: 'Filter und Suche'
+                description: 'Grenzen Sie Issues nach Level, Status, Umgebung, Release, Zuständigem und mehr ein.'
             saved_views:
-                title: Gespeicherte Ansichten
-                description: Speichern Sie Filterkombinationen und offnen Sie sie spater fur wiederkehrende Triage-Ablaufe erneut.
+                title: 'Gespeicherte Ansichten'
+                description: 'Speichern Sie Filterkombinationen und offnen Sie sie spater fur wiederkehrende Triage-Ablaufe erneut.'
             list:
                 title: Issue-Liste
-                description: Offnen Sie ein Issue, um Stack Traces, Events und den Triage-Status zu pruufen.
+                description: 'Offnen Sie ein Issue, um Stack Traces, Events und den Triage-Status zu pruufen.'
             settings:
                 title: Projekteinstellungen
-                description: Als Projektadministrator konnen Sie API-Schlussel, Mitglieder, Benachrichtigungen und Governance verwalten.
+                description: 'Als Projektadministrator konnen Sie API-Schlussel, Mitglieder, Benachrichtigungen und Governance verwalten.'
             settings_member:
                 title: Projekteinstellungen
-                description: Prufen Sie die Projektkonfiguration. Anderungen an Mitgliedschaften und API-Schlusseln erfordern einen Projektadministrator.
+                description: 'Prufen Sie die Projektkonfiguration. Anderungen an Mitgliedschaften und API-Schlusseln erfordern einen Projektadministrator.'
         admin:
             welcome:
                 title: Administration
-                description: Instanzweite Steuerung fur Operatoren. Nur ROLE_ADMIN kann dieses Zentrum offnen.
+                description: 'Instanzweite Steuerung fur Operatoren. Nur ROLE_ADMIN kann dieses Zentrum offnen.'
             users:
                 title: Benutzer
-                description: Listen Sie Konten und Rollen auf und aktivieren oder deaktivieren Sie den Zugriff auf dieser Beacon-Instanz.
+                description: 'Listen Sie Konten und Rollen auf und aktivieren oder deaktivieren Sie den Zugriff auf dieser Beacon-Instanz.'
             projects:
-                title: Alle Projekte
-                description: Projektubergreifende Ops - Mitglieder, Gruppen und Danger-Zone-Aktionen fur jedes Projekt.
+                title: 'Alle Projekte'
+                description: 'Projektubergreifende Ops - Mitglieder, Gruppen und Danger-Zone-Aktionen fur jedes Projekt.'
             mailer:
                 title: Mailer
-                description: Konfigurieren Sie das verschlusselte Mailer-DSN fur Magic Links und Benachrichtigungs-E-Mails.
+                description: 'Konfigurieren Sie das verschlusselte Mailer-DSN fur Magic Links und Benachrichtigungs-E-Mails.'
             setup:
                 title: Setup-Assistent
-                description: Fuhren Sie Platform Seed, Demo-Projekt oder Beispieltelemetrie erneut aus, wenn Sie eine neue Umgebung einrichten.
+                description: 'Fuhren Sie Platform Seed, Demo-Projekt oder Beispieltelemetrie erneut aus, wenn Sie eine neue Umgebung einrichten.'
 legal:
     nav:
         label: Legal
@@ -1392,11 +1429,10 @@ legal:
         purpose_csrf: 'Kurzlebiger Double-Submit-CSRF-Cookie, den Symfony beim Absenden geschützter Formulare setzt (Muster csrf-token_<token>; __Host- Präfix bei HTTPS).'
         purpose_consent: 'Cookie_Consent und Cookie_Consent_Key speichern, dass eine Einwilligungsentscheidung getroffen wurde, und verknüpfen einen anonymen Schlüssel mit dem serverseitigen Audit-Protokoll.'
         purpose_category: 'Cookie_Category_analytics und Cookie_Category_preferences speichern, ob jede optionale Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik, keine Tracker).'
-        storage_heading: Lokaler Speicher
+        storage_heading: 'Lokaler Speicher'
         storage_body: 'Die Theme-Präferenz (hell/dunkel) und einige UI-Layout-Einstellungen können im localStorage des Browsers gespeichert werden und sind keine HTTP-Cookies. Nach typischer ePrivacy-Orientierung kann dies als unbedingt erforderlich für eine kohärente Benutzeroberfläche gelten; Betreiber sollten die geltenden Regeln in ihrer Rechtsordnung prüfen.'
-
 releases:
-    title: 'Release-Zustand'
+    title: Release-Zustand
     intro: 'Wahlen Sie eine Release aus, um zu sehen, wie viele Issues dort erstmals aufgetreten sind, zwei Releases zu vergleichen oder direkt zum vorhandenen Issue-List-Vergleich zu springen.'
     empty: 'Fur dieses Projekt sind noch keine Release-Daten verfugbar.'
     focus:
@@ -1419,7 +1455,7 @@ releases:
     catalog:
         title: Releases
     environment_compare:
-        title: 'Umgebungsvergleich'
+        title: Umgebungsvergleich
         environment_a: 'Umgebung A'
         environment_b: 'Umgebung B'
         open_issue_list: 'Vergleich in der Issue-Liste offnen'
@@ -1450,18 +1486,18 @@ mailer_settings:
 settings:
     instance_config:
         title: Instanzkonfiguration
-        intro: Exportieren oder importieren Sie freigegebene nicht-geheime Einstellungen (Erscheinungsbild und Instanz-Flags). Mailer-DSN, Mercure-Geheimnisse und OAuth-Geheimnisse sind nie enthalten.
+        intro: 'Exportieren oder importieren Sie freigegebene nicht-geheime Einstellungen (Erscheinungsbild und Instanz-Flags). Mailer-DSN, Mercure-Geheimnisse und OAuth-Geheimnisse sind nie enthalten.'
         export_title: Export
-        export_help: Laden Sie eine versionierte JSON-Datei herunter, die für Backup-Übungen geeignet ist. Geheimnisse bleiben auf dieser Instanz.
-        export: JSON herunterladen
+        export_help: 'Laden Sie eine versionierte JSON-Datei herunter, die für Backup-Übungen geeignet ist. Geheimnisse bleiben auf dieser Instanz.'
+        export: 'JSON herunterladen'
         import_title: Import
-        import_help: Stellen Sie Erscheinungsbild und freigegebene Flags aus einem früheren Export wieder her. Geheime Werte werden abgelehnt und bleiben unverändert.
-        import: JSON importieren
+        import_help: 'Stellen Sie Erscheinungsbild und freigegebene Flags aus einem früheren Export wieder her. Geheime Werte werden abgelehnt und bleiben unverändert.'
+        import: 'JSON importieren'
         file: Konfigurationsdatei
-        imported: Instanzkonfiguration importiert.
-        import_failed: Import fehlgeschlagen. Prüfen Sie die Schemaversion und ob die Datei keine geheimen Schlüssel enthält.
-        missing_file: Wählen Sie eine JSON-Datei zum Importieren.
-        invalid_csrf: Ungültiges Sicherheitstoken.
+        imported: 'Instanzkonfiguration importiert.'
+        import_failed: 'Import fehlgeschlagen. Prüfen Sie die Schemaversion und ob die Datei keine geheimen Schlüssel enthält.'
+        missing_file: 'Wählen Sie eine JSON-Datei zum Importieren.'
+        invalid_csrf: 'Ungültiges Sicherheitstoken.'
 mercure_settings:
     title: Mercure
     intro: 'Optionale Live-Benachrichtigungen fur angemeldete Mitglieder, wenn ein neues Issue erstellt wird. Standardmassig deaktiviert - nur aktivieren, wenn ein Mercure-Hub verfugbar ist. Web Push bleibt eine separate Aktivierung unter Konto -> Anzeige.'
@@ -1492,9 +1528,9 @@ instance_mercure:
         help: 'Leer lassen, um MERCURE_PUBLIC_URL zu verwenden (normalerweise same-origin /.well-known/mercure uber Caddy).'
         placeholder: 'https://localhost:9444/.well-known/mercure'
     jwt_secret:
-        label: 'JWT-Geheimnis'
+        label: JWT-Geheimnis
         help: 'Leer lassen, um den aktuellen verschlusselten Wert zu behalten oder auf MERCURE_JWT_SECRET zuruckzufallen. Mindestens 32 Zeichen, wenn gesetzt.'
-        placeholder: '••••••••••••••••••••••••••••••••'
+        placeholder: ••••••••••••••••••••••••••••••••
         too_short: 'Das JWT-Geheimnis muss mindestens 32 Zeichen lang sein.'
         invalid: 'Geben Sie eine gultige JWT-Geheimniszeichenfolge ein.'
     clear_secret:
@@ -1512,21 +1548,21 @@ instance_mailer:
         label: 'Gespeichertes DSN loschen'
         help: 'Entfernt das Datenbank-DSN und fallt auf MAILER_DSN aus der Umgebung zuruck, bis Sie ein neues speichern.'
     mailer_from:
-        label: 'Absenderadresse'
+        label: Absenderadresse
         help: 'Envelope-From fur Magic-Login- und Benachrichtigungs-E-Mails. Standard ist beacon@localhost, wenn leer.'
         placeholder: beacon@example.com
 setup:
     eyebrow: 'Erster Start'
-    title: 'Instanz-Setup'
+    title: Instanz-Setup
     intro: 'Installieren Sie Navigationskataloge und optionale Demo-Daten. Dieselben Schritte wie in den CLI-Seed-Schichten.'
     intro_required: 'Navigationskataloge fehlen. Installieren Sie Menus, Breadcrumbs und das Cookie-Consent-Profil, bevor Sie fortfahren.'
     intro_bootstrap: 'Plattformkataloge sind bereit. Registrieren Sie den ersten Administrator, laden Sie optional Beispieltelemetrie und markieren Sie das Setup dann als abgeschlossen.'
     already_done: 'Das Setup ist als abgeschlossen markiert.'
     back_dashboard: 'Zuruck zum Dashboard'
-    login_setup_link: 'Erststart-Setup'
+    login_setup_link: Erststart-Setup
     progress_of: 'Schritt %current% von %total%'
     log:
-        tabs_label: 'Setup-Fortschritt'
+        tabs_label: Setup-Fortschritt
         tab: Protokoll
         completed: Abgeschlossen
     admin:
@@ -1534,7 +1570,7 @@ setup:
         password: Passwort
     token:
         title: 'Hey — ohne Setup-Schlüssel geht es nicht weiter'
-        lead: Alles in Ordnung. Setup ist gesperrt, damit Fremde die Instanz nicht konfigurieren können.
+        lead: 'Alles in Ordnung. Setup ist gesperrt, damit Fremde die Instanz nicht konfigurieren können.'
         body: 'Öffnen Sie %path% mit dem SITE_SETUP_TOKEN aus Ihrer Umgebung.'
         step_env: 'Finden Sie SITE_SETUP_TOKEN in Ihrer .env (den lokalen Standard dokumentiert .env.dist).'
         step_url: 'Öffnen Sie %path% im Browser — ersetzen Sie … durch diesen Token.'
@@ -1552,7 +1588,7 @@ setup:
     database:
         intro: 'Optional - leer lassen und uberspringen, wenn DATABASE_URL aus der Umgebung bereits funktioniert.'
     bootstrap_login_hint: 'Mochten Sie lieber Ihren eigenen Administrator erstellen?'
-    bootstrap_login_link: 'Anmelden'
+    bootstrap_login_link: Anmelden
     bootstrap_register_link: 'Ersten Administrator registrieren'
     banner:
         title: 'Instanz-Setup abschliessen'
@@ -1563,7 +1599,7 @@ setup:
         body: 'Installieren Sie Dashboard-Menus, Breadcrumbs und das Cookie-Consent-Profil/-Inventar. Dieser Schritt ist obligatorisch, bevor der Rest der App funktioniert.'
         item_menus: 'Menus (Dashboard, Einstellungen, Administration)'
         item_breadcrumbs: 'Breadcrumb-Sammlung (Standard)'
-        item_cookies: 'Cookie-Consent-Profil'
+        item_cookies: Cookie-Consent-Profil
         cta: 'Menus, Breadcrumbs und Cookies installieren'
         cta_again: 'Platform Seed erneut ausfuhren'
         done: 'Plattformkataloge sind installiert.'
@@ -1581,12 +1617,12 @@ setup:
         sample_note: 'Dies kann eine Minute dauern. Sehr grosse Datensatze bleiben nur per CLI verfugbar (`app:seed-sample --size=huge --force`).'
         sample_requires_register: 'Registrieren Sie den ersten Administrator, bevor Sie Beispieltelemetrie laden (das Demo-Projekt gehort Ihrem Konto).'
     step_demo:
-        title: 'Demo-Projekt'
+        title: Demo-Projekt
         body: 'Erstellen Sie den lokalen Demo-Administrator (falls fehlend) und das Demo-Projekt mit einem API-Schlussel.'
         cta: 'Demo-Projekt erstellen'
         exists: 'Demo-Projekt ist bereits vorhanden.'
     step_sample:
-        title: 'Beispieltelemetrie'
+        title: Beispieltelemetrie
         body: 'Laden Sie synthetische Issues fur QA. Erfordert das Demo-Projekt. Sehr grosse Grossen bleiben nur per CLI verfugbar.'
         dev: 'Beispiel laden (dev)'
         load: 'Beispiel laden (load)'
@@ -1636,11 +1672,11 @@ notifications:
         endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-Webhook-URL. E-Mail: Empfangeradresse. Telegram: bot_token@chat_id'
         endpoint_invalid: 'Der Endpunkt entspricht nicht dem ausgewahlten Typ.'
         endpoint_ssrf: 'Der Endpunkt darf nicht auf private, link-lokale oder Cloud-Metadaten-Adressen zeigen.'
-        signing_secret: Interaction signing secret
+        signing_secret: 'Interaction signing secret'
         signing_secret_help: 'Optional. Enables interactive Resolve (Slack app Signing Secret, or a shared secret for Teams HttpPOST). Leave blank to keep the current value.'
-        clear_signing_secret: Clear interaction signing secret
+        clear_signing_secret: 'Clear interaction signing secret'
         enabled: Aktiviert
-        categories: 'Benachrichtigungskategorien'
+        categories: Benachrichtigungskategorien
         quiet_hours_legend: 'Ruhezeiten und Digest'
         quiet_hours_enabled: 'Ruhezeiten aktivieren'
         quiet_hours_help: 'Wahrend des Zeitfensters werden Benachrichtigungen gepuffert statt sofort gesendet. Fuhren Sie app:notifications:flush-digests nach Zeitplan aus (oder nach dem Zeitfenster).'
@@ -1656,9 +1692,9 @@ notifications:
         pagerduty_note: 'Native PagerDuty-Unterstutzung wird nicht angeboten; verwenden Sie einen generischen HTTP-Webhook, wenn Sie eine Incident-Bridge benotigen.'
     type:
         slack: 'Slack Incoming Webhook'
-        discord: 'Discord-Webhook'
+        discord: Discord-Webhook
         teams: 'Microsoft Teams-Webhook'
-        telegram: 'Telegram-Bot'
+        telegram: Telegram-Bot
         email: E-Mail
         http: 'Generischer HTTP-Webhook'
     category:
@@ -1667,8 +1703,8 @@ notifications:
         warning: Warnung
         info: Info
         debug: Debug
-        n_plus_one: 'N+1-Erkennungen'
-        'volume.threshold': 'Volumen-Schwellenwerte'
+        n_plus_one: N+1-Erkennungen
+        volume.threshold: Volumen-Schwellenwerte
         issue.resolved: 'Issue gelost'
         issue.reopened: 'Issue erneut geoffnet'
         issue.assigned: 'Issue zugewiesen'
@@ -1681,10 +1717,10 @@ notifications:
         disabled: 'Ziel deaktiviert.'
         deleted: 'Ziel geloscht.'
         test_queued: 'Kanalnative Beispielbenachrichtigung wurde zur Zustellung in die Warteschlange gestellt.'
-        circuit_resumed: Destination circuit resumed; deliveries may proceed again.
+        circuit_resumed: 'Destination circuit resumed; deliveries may proceed again.'
     help:
         title: 'Einrichtungsanleitungen fur Benachrichtigungen'
-        link: 'Einrichtungsanleitungen'
+        link: Einrichtungsanleitungen
         back: 'Zuruck zu den Einstellungen'
         toc: 'Zum Kanal springen'
         intro: 'Schritt-fur-Schritt-Anleitungen, um Slack, Discord, Microsoft Teams, Telegram, E-Mail oder einen generischen HTTP-Webhook mit diesem Projekt zu verbinden.'
@@ -1745,7 +1781,7 @@ notifications:
             payload: 'Kanonische JSON-Payload als Request-Body (User-Agent symfony-beacon-notifications/1.0).'
             tip: 'Bevorzugen Sie HTTPS und authentifizieren Sie Ihren Empfanger. Vermeiden Sie interne oder Cloud-Metadaten-Adressen.'
 thresholds:
-    title: 'Schwellenwert-Benachrichtigungen'
+    title: Schwellenwert-Benachrichtigungen
     intro: 'Erstellen Sie gleitende Volumen-Benachrichtigungen, wenn Error- oder Fatal-Events innerhalb eines Zeitfensters eine konfigurierte Anzahl uberschreiten.'
     ingest_disabled: 'Der Ingest ist fur dieses Projekt ausgesetzt, daher werden Schwellenwertregeln nicht ausgewertet.'
     empty: 'Noch keine Schwellenwertregeln. Fugen Sie eine hinzu, um plotzliche Spitzen abzufangen.'
@@ -1773,15 +1809,15 @@ thresholds:
         label: Bezeichnung
         label_help: 'Optionaler interner Name, der in Settings und Payloads angezeigt wird.'
         enabled: Aktiviert
-        error_count: 'Fehleranzahl'
+        error_count: Fehleranzahl
         error_count_help: 'Benachrichtigen, wenn mindestens so viele Error/Fatal-Events im gleitenden Zeitfenster empfangen werden.'
         window_minutes: 'Fenster (Minuten)'
         window_minutes_help: 'Gleitendes Ruckblicksfenster von 1 bis 1440 Minuten.'
         cooldown_minutes: 'Cooldown (Minuten)'
         cooldown_minutes_help: 'Unterdruckt doppelte Benachrichtigungen fur diese Regel wahrend des Cooldown-Fensters.'
-        environment: 'Umgebungsfilter'
+        environment: Umgebungsfilter
         environment_help: 'Leer lassen, um alle Umgebungen zu zahlen.'
-        release: 'Release-Filter'
+        release: Release-Filter
         release_help: 'Leer lassen, um alle Releases zu zahlen.'
     flash:
         created: 'Schwellenwertregel erstellt.'
@@ -1796,51 +1832,186 @@ thresholds:
         cooldown_range: 'Der Cooldown muss zwischen 1 und 10080 Minuten liegen.'
         environment_length: 'Die Umgebung darf hochstens 80 Zeichen lang sein.'
         release_length: 'Die Release darf hochstens 120 Zeichen lang sein.'
-
 error:
-    home: Zur Startseite
+    home: 'Zur Startseite'
     sign_in: Anmelden
     generic:
-        title: Unerwarteter Umweg
-        lead: Die Anfrage ist nicht angekommen. Du hast nichts kaputtgemacht — versuche es gleich noch einmal.
-        hint: Unser Maskottchen sucht schon unter den Sofakissen nach Hinweisen.
+        title: 'Unerwarteter Umweg'
+        lead: 'Die Anfrage ist nicht angekommen. Du hast nichts kaputtgemacht — versuche es gleich noch einmal.'
+        hint: 'Unser Maskottchen sucht schon unter den Sofakissen nach Hinweisen.'
     400:
-        title: Puzzle-Teile durcheinander
-        lead: Die Anfrage passt nicht ganz zur erwarteten Form. Passe sie an und sende sie erneut — kein Scherbenhaufen, nur falsche Ecken.
-        hint: Unser Maskottchen liest die Anleitung noch immer auf dem Kopf. Passiert den Besten.
-        image_alt: Beacon-Maskottchen mit Puzzle-Teilen und Warn-Dreieck neben einer großen 400
+        title: 'Puzzle-Teile durcheinander'
+        lead: 'Die Anfrage passt nicht ganz zur erwarteten Form. Passe sie an und sende sie erneut — kein Scherbenhaufen, nur falsche Ecken.'
+        hint: 'Unser Maskottchen liest die Anleitung noch immer auf dem Kopf. Passiert den Besten.'
+        image_alt: 'Beacon-Maskottchen mit Puzzle-Teilen und Warn-Dreieck neben einer großen 400'
     401:
-        title: Ausweis bitte
-        lead: Diese Tür braucht einen gültigen Pass. Melde dich an und versuche es erneut — der Türsteher ist freundlich, nur gründlich.
-        hint: Selbst Roboter vergessen manchmal ihre Zugangskarte. Am Schalter liegt ein Ersatz.
-        image_alt: Beacon-Maskottchen am Checkpoint mit Zugangskarte neben einer großen 401
+        title: 'Ausweis bitte'
+        lead: 'Diese Tür braucht einen gültigen Pass. Melde dich an und versuche es erneut — der Türsteher ist freundlich, nur gründlich.'
+        hint: 'Selbst Roboter vergessen manchmal ihre Zugangskarte. Am Schalter liegt ein Ersatz.'
+        image_alt: 'Beacon-Maskottchen am Checkpoint mit Zugangskarte neben einer großen 401'
     403:
-        title: Tor geschlossen
-        lead: Du hast nicht die richtigen Schlüssel für diese Seite. Melde dich mit einem erlaubten Konto an oder gehe zurück — das ist nicht persönlich.
-        hint: Das Maskottchen mit Keksen zu bestechen öffnet das Schloss trotzdem nicht. Haben wir versucht.
-        image_alt: Beacon-Maskottchen neben einem gesicherten Tor mit 403
+        title: 'Tor geschlossen'
+        lead: 'Du hast nicht die richtigen Schlüssel für diese Seite. Melde dich mit einem erlaubten Konto an oder gehe zurück — das ist nicht persönlich.'
+        hint: 'Das Maskottchen mit Keksen zu bestechen öffnet das Schloss trotzdem nicht. Haben wir versucht.'
+        image_alt: 'Beacon-Maskottchen neben einem gesicherten Tor mit 403'
     404:
-        title: Abseits der Karte
-        lead: Dieser Pfad existiert auf diesem Beacon nicht. Prüfe die URL oder folge dem Licht nach Hause — keine Schatzsuche nötig.
-        hint: Selbst die besten Entdecker gehen fehl, wenn die Karte auf dem Kopf steht.
-        image_alt: Beacon-Maskottchen mit Karte und Lupe neben einer großen 404
+        title: 'Abseits der Karte'
+        lead: 'Dieser Pfad existiert auf diesem Beacon nicht. Prüfe die URL oder folge dem Licht nach Hause — keine Schatzsuche nötig.'
+        hint: 'Selbst die besten Entdecker gehen fehl, wenn die Karte auf dem Kopf steht.'
+        image_alt: 'Beacon-Maskottchen mit Karte und Lupe neben einer großen 404'
     408:
-        title: Sanduhr abgelaufen
-        lead: Wir haben geduldig gewartet, aber die Anfrage dauerte zu lange. Versuche es erneut, wenn alles flotter läuft — keine Eile auf deiner Seite.
-        hint: Unser Maskottchen starrt noch auf die Uhr. Timeouts passieren; Kaffee hilft.
-        image_alt: Beacon-Maskottchen mit Sanduhr und Wecker neben einer großen 408
+        title: 'Sanduhr abgelaufen'
+        lead: 'Wir haben geduldig gewartet, aber die Anfrage dauerte zu lange. Versuche es erneut, wenn alles flotter läuft — keine Eile auf deiner Seite.'
+        hint: 'Unser Maskottchen starrt noch auf die Uhr. Timeouts passieren; Kaffee hilft.'
+        image_alt: 'Beacon-Maskottchen mit Sanduhr und Wecker neben einer großen 408'
     429:
-        title: Sanfte Pause
-        lead: Du hast Anfragen etwas schneller geschickt, als wir jonglieren können. Atme kurz durch und mach weiter — die Warteschlange leert sich.
-        hint: Unser Maskottchen hat Pause am Förderband gedrückt. Kein Tadel — eher eine Dehnungspause.
-        image_alt: Beacon-Maskottchen pausiert eine Nachrichtenwarteschlange neben einer großen 429
+        title: 'Sanfte Pause'
+        lead: 'Du hast Anfragen etwas schneller geschickt, als wir jonglieren können. Atme kurz durch und mach weiter — die Warteschlange leert sich.'
+        hint: 'Unser Maskottchen hat Pause am Förderband gedrückt. Kein Tadel — eher eine Dehnungspause.'
+        image_alt: 'Beacon-Maskottchen pausiert eine Nachrichtenwarteschlange neben einer großen 429'
     500:
         title: Beacon-Schluckauf
-        lead: Bei uns ist etwas gestolpert, nicht bei dir. Warte kurz und versuche es erneut — du hast nichts falsch gemacht.
-        hint: Wir tippen den Servern ganz sanft mit dem Schraubenschlüssel auf die Schulter.
-        image_alt: Beacon-Maskottchen repariert ein Server-Rack mit 500
+        lead: 'Bei uns ist etwas gestolpert, nicht bei dir. Warte kurz und versuche es erneut — du hast nichts falsch gemacht.'
+        hint: 'Wir tippen den Servern ganz sanft mit dem Schraubenschlüssel auf die Schulter.'
+        image_alt: 'Beacon-Maskottchen repariert ein Server-Rack mit 500'
     502:
-        title: Kabel raus
-        lead: Eine Verbindung zwischen Diensten ist weich geworden. Wir stecken wieder ein — versuche es gleich noch einmal; du hast nichts falsch gemacht.
-        hint: Unser Maskottchen verbindet das Leuchtkabel neu. Funken sind Absicht. Wahrscheinlich.
-        image_alt: Beacon-Maskottchen verbindet ein leuchtendes Kabel zwischen Servern neben einer großen 502
+        title: 'Kabel raus'
+        lead: 'Eine Verbindung zwischen Diensten ist weich geworden. Wir stecken wieder ein — versuche es gleich noch einmal; du hast nichts falsch gemacht.'
+        hint: 'Unser Maskottchen verbindet das Leuchtkabel neu. Funken sind Absicht. Wahrscheinlich.'
+        image_alt: 'Beacon-Maskottchen verbindet ein leuchtendes Kabel zwischen Servern neben einer großen 502'
+ops_defaults:
+    allow_anonymous_resolve:
+        help: 'Veraltet. Wenn aktiviert, kann Resolve Issues ohne zugeordneten Beacon-Akteur ändern. Bevorzugen Sie zugeordnete Benutzer + Triage.'
+        label: 'Anonymes Slack/Teams-Resolve erlauben'
+    allow_private_urls:
+        help: 'Wenn aktiviert, dürfen ausgehende Webhooks private/link-lokale Hosts erreichen. In Produktion deaktiviert lassen.'
+        label: 'Private Benachrichtigungs-URLs erlauben'
+    circuit_breaker_cooldown:
+        help: 'Minuten, bevor ein automatisch pausiertes Ziel erneut versuchen darf. 0 erzwingt manuelle Fortsetzung.'
+        label: 'Circuit-Breaker-Abkühlzeit in Minuten'
+    circuit_breaker_threshold:
+        help: 'Aufeinanderfolgende Zustellfehler, bevor ein Benachrichtigungsziel automatisch pausiert wird.'
+        label: Circuit-Breaker-Fehlerschwelle
+    clear_inbound_webhook_secret:
+        help: 'Gespeichertes eingehendes Webhook-Geheimnis entfernen.'
+        label: 'Eingehendes Webhook-Geheimnis löschen'
+    clear_metrics_token:
+        help: 'Gespeicherten Scrape-Token entfernen.'
+        label: 'Metriken-Scrape-Token löschen'
+    delivery_history_limit:
+        help: 'Anzahl der jüngsten Zustellversuche, die pro Benachrichtigungsziel behalten werden.'
+        label: 'Limit des Zustellverlaufs'
+    envelope_max_bytes:
+        help: 'HTTP 413, wenn ein roher Ingest-Body diese Größe überschreitet. Standard 2097152 (2 MiB).'
+        label: 'Max. Envelope-/OTLP-Bodygröße (Bytes)'
+    event_quota_daily:
+        help: 'Maximal akzeptierte Events pro Projekt und Tag. 0 = unbegrenzt.'
+        label: 'Tägliche Event-Quote'
+    event_quota_monthly:
+        help: 'Maximal akzeptierte Events pro Projekt und UTC-Kalendermonat. 0 = unbegrenzt.'
+        label: 'Monatliche Event-Quote'
+    inbound_email_enabled:
+        help: 'Wenn aktiviert, können Mention/Assign-Mails Reply-To-Tokens enthalten und POST /hooks/email/inbound akzeptiert Anbieter-Webhooks.'
+        label: 'Eingehende E-Mail-Kommentare aktivieren'
+    inbound_mail_domain:
+        help: 'Domäne für Reply-To-Adressen (reply+{token}@domain).'
+        label: 'Eingehende Mail-Domäne'
+    inbound_webhook_secret:
+        configured: 'Ein eingehendes Webhook-Geheimnis ist derzeit gespeichert.'
+        help: 'Gemeinsames Geheimnis für X-Beacon-Inbound-Secret und Reply-To-HMAC. Leer lassen behält das aktuelle Geheimnis.'
+        label: 'Eingehendes Webhook-Geheimnis'
+    ingest_rate_limit:
+        help: 'Maximale Envelope-Anfragen pro Projekt und Minute. 0 = unbegrenzt.'
+        label: 'Ingest-Ratenlimit pro Minute'
+    ingest_reject_query_auth:
+        help: 'Wenn aktiviert, werden beacon_key/beacon_secret-Query-Parameter abgelehnt (401). Nur während der Migration zu X-Beacon-Auth oder Envelope-DSN deaktivieren.'
+        label: 'Veraltete Query-String-Ingest-Auth ablehnen'
+    intro: 'Konfigurieren Sie instanzweite Standards für Ingest, Metriken, eingehende E-Mail, Hooks, Projektgovernance und Benachrichtigungszustellung.'
+    metrics_require_token:
+        help: 'Wenn aktiviert, liefert /metrics 503, bis ein Metriken-Token gespeichert ist. In Produktion empfohlen.'
+        label: 'Metriken-Scrape-Token erfordern'
+    metrics_token:
+        configured: 'Ein Metriken-Scrape-Token ist derzeit gespeichert.'
+        help: 'Bearer-Token für Scraper. Leer lassen behält den aktuellen Token.'
+        label: Metriken-Scrape-Token
+    retention_days:
+        help: 'Telemetrie älter als diese Anzahl Tage löschen. 0 deaktiviert altersbasierte Aufbewahrung.'
+        label: Aufbewahrungstage
+    retention_max_events:
+        help: 'Höchstens so viele Events pro Projekt behalten. 0 = keine Obergrenze nach Anzahl.'
+        label: 'Maximal gespeicherte Events pro Projekt'
+    section:
+        governance: Projektgovernance
+        governance_help: 'Projekte erben diese Aufbewahrungs-, Ingest-Raten- und Quotewerte, sofern sie keine Überschreibung definieren.'
+        inbound: 'Eingehende E-Mail'
+        inbound_help: 'Reply-To-Tokens und Anbieter-Webhooks für Issue-Kommentare. Webhook-Geheimnis beim Speichern leer lassen, um den aktuellen Wert zu behalten.'
+        ingest: 'Ingest & Auth'
+        ingest_help: 'Envelope/OTLP-Bodygröße und Richtlinie für veraltete Query-String-Ingest-Auth.'
+        metrics: Prometheus-Metriken
+        metrics_help: 'Scrape-Token für GET /metrics (nur Authorization Bearer). Token beim Speichern leer lassen, um das aktuelle Geheimnis zu behalten.'
+        notifications: Benachrichtigungszustellung
+        notifications_help: 'SSRF-Richtlinie, interaktive Resolve-Richtlinie, Zustellverlauf und Circuit Breaking in der gesamten Instanz.'
+    submit: 'Ops-Standards speichern'
+    tabs_label: 'Ops-Standards-Abschnitte'
+    title: Ops-Standards
+social_login_credential:
+    authorize_url:
+        help: 'Optional für integrierte Anbieter; erforderlich für benutzerdefinierte IdPs.'
+        label: Authorize-URL
+    client_id:
+        label: Client-ID
+    client_secret:
+        help_edit: 'Leer lassen, um das aktuelle Geheimnis zu behalten.'
+        help_new: 'OAuth-Clientgeheimnis aus der IdP-App-Registrierung.'
+        label: Clientgeheimnis
+    enabled:
+        help: 'Deaktivierte Anbieter bleiben in der Datenbank, erscheinen aber nicht beim Login.'
+        label: Aktiviert
+    enterprise_sso:
+        help: 'Unter „Mit Ihrer Organisation anmelden“ statt Verbraucher-Social-Buttons anzeigen (OIDC-IdPs).'
+        label: Enterprise-SSO
+    label:
+        help: 'Auf dem Login-Button „Weiter mit“ angezeigt.'
+        label: Button-Beschriftung
+    provider:
+        help: 'Kleingeschriebener Slug (google, github, microsoft oder benutzerdefiniert).'
+        invalid: 'Verwenden Sie einen kleingeschriebenen Slug, der mit einem Buchstaben beginnt (a-z, Ziffern, _ oder -).'
+        label: Anbieterschlüssel
+    scopes:
+        help: 'Optionale OAuth-Scopes, durch Leerzeichen oder Kommas getrennt.'
+        label: Scopes
+    token_url:
+        help: 'Optional für integrierte Anbieter; erforderlich für benutzerdefinierte IdPs.'
+        label: Token-URL
+    userinfo_url:
+        help: 'Optional für integrierte Anbieter; erforderlich für benutzerdefinierte IdPs.'
+        label: Userinfo-URL
+social_login_settings:
+    add_intro: 'Integrierte Endpoint-Kataloge gibt es für Google, GitHub und Microsoft.'
+    add_provider: '%provider% hinzufügen'
+    add_title: 'Anbieter hinzufügen'
+    create: 'Anbieter hinzufügen'
+    delete: Entfernen
+    delete_confirm: 'Diese OAuth-Anbieteranmeldedaten entfernen?'
+    disabled: Aus
+    edit: Bearbeiten
+    edit_intro: 'Clientgeheimnisse werden in der Datenbank gespeichert. Beim Bearbeiten leer lassen, um den aktuellen Wert zu behalten.'
+    edit_title: '%provider% bearbeiten'
+    empty: 'Noch keine OAuth-Anbieter konfiguriert.'
+    enabled: An
+    endpoints_intro: 'Integrierte Google-/GitHub-/Microsoft-Anbieter können diese Felder leer lassen. Benutzerdefinierte Anbieter müssen Authorize-, Token- und Userinfo-URLs setzen.'
+    endpoints_title: OAuth-Endpunkte
+    intro: 'OAuth-App-Anmeldedaten in der Datenbank speichern (AuthKit-Tabelle auth_kit_social_credential). Login-Buttons erscheinen, wenn social_login.mode aktiviert ist und mindestens eine Anmeldeinformation aktiviert ist.'
+    new_title: '%provider% hinzufügen'
+    redirect_hint: 'Registrieren Sie Redirect-URIs bei jedem IdP als %uri%/login/social/{provider}/check (und /{locale}/… für Nicht-Standard-Locales).'
+    status:
+        active: 'Social-Login-Buttons sind auf der Login-Seite aktiv.'
+        inactive: 'Social Login zeigt noch keine Buttons (AuthKit-Profilmodus aktivieren und unten mindestens einen aktivierten Anbieter hinzufügen).'
+    submit: 'Anbieter speichern'
+    table:
+        actions: Aktionen
+        client_id: Client-ID
+        enabled: Aktiviert
+        label: Bezeichnung
+        provider: Anbieter
+    title: 'Social Login'

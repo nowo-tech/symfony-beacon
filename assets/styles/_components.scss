@@ -76,7 +76,44 @@ $beacon-btn-sm-font-size: 0.8125rem;
   }
 }
 
-/* Shared section tabs (project + account preferences). Links use .btn-ghost.is-active. */
+/* Shared section tabs (UiKit nowo-ui-tabs via shared/_tabs; product + ops settings). */
+.beacon-tabs .nowo-ui-tabs,
+.beacon-tabs .nowo-ui-tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.beacon-tabs .nowo-ui-tabs__item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+}
+
+.beacon-tabs .nowo-ui-tabs__item:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-sand) 35%, transparent);
+}
+
+.beacon-tabs .nowo-ui-tabs__item.is-active,
+.beacon-tabs .nowo-ui-tabs__item[aria-current='page'] {
+  border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
+  background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
+  color: var(--color-moss-deep);
+  font-weight: 600;
+}
+
 .beacon-tabs__list {
   display: flex;
   flex-wrap: wrap;
@@ -273,8 +310,10 @@ html[data-motion='reduce'] .app-sidebar-backdrop {
   html[data-motion='system'] .fade-up,
   html[data-motion='system'] .fade-up-delay,
   html[data-motion='system'] .flash.flash-toast,
+  html[data-motion='system'] .nowo-ui-toast,
   html[data-motion='system'] .beacon-nav .collapse,
-  html[data-motion='system'] .thinking-orb {
+  html[data-motion='system'] .thinking-orb,
+  html[data-motion='system'] .nowo-ui-orb {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -2122,7 +2161,8 @@ textarea.input {
   color: var(--color-ink);
 }
 
-.toast-stack {
+.toast-stack,
+.nowo-ui-toast-stack {
   position: fixed;
   top: max(1rem, env(safe-area-inset-top, 0px));
   right: max(1rem, env(safe-area-inset-right, 0px));
@@ -2134,11 +2174,14 @@ textarea.input {
   pointer-events: none;
 }
 
-.page-shell--app .toast-stack {
+.page-shell--app .toast-stack,
+.page-shell--app .nowo-ui-toast-stack {
   top: max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.75rem));
 }
 
-.flash.flash-toast {
+.flash.flash-toast,
+.nowo-ui-toast.flash-toast,
+.nowo-ui-toast {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
@@ -2152,11 +2195,13 @@ textarea.input {
   animation: beacon-toast-in 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.flash.flash-toast.is-leaving {
+.flash.flash-toast.is-leaving,
+.nowo-ui-toast.is-leaving {
   animation: beacon-toast-out 0.28s ease forwards;
 }
 
-.flash__content {
+.flash__content,
+.nowo-ui-toast__content {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -2164,25 +2209,29 @@ textarea.input {
   gap: 0.2rem;
 }
 
-.flash__title {
+.flash__title,
+.nowo-ui-toast__title {
   margin: 0;
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0.01em;
 }
 
-.flash__message {
+.flash__message,
+.nowo-ui-toast__message {
   flex: 1;
   margin: 0;
   line-height: 1.4;
 }
 
-.flash__title + .flash__message {
+.flash__title + .flash__message,
+.nowo-ui-toast__title + .nowo-ui-toast__message {
   opacity: 0.92;
   font-size: 0.8125rem;
 }
 
-.flash__dismiss {
+.flash__dismiss,
+.nowo-ui-toast__dismiss {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -2202,7 +2251,9 @@ textarea.input {
 }
 
 .flash__dismiss:hover,
-.flash__dismiss:focus-visible {
+.flash__dismiss:focus-visible,
+.nowo-ui-toast__dismiss:hover,
+.nowo-ui-toast__dismiss:focus-visible {
   opacity: 1;
   background: color-mix(in srgb, currentColor 12%, transparent);
   outline: none;
@@ -2210,7 +2261,9 @@ textarea.input {
 
 @media (prefers-reduced-motion: reduce) {
   .flash.flash-toast,
-  .flash.flash-toast.is-leaving {
+  .flash.flash-toast.is-leaving,
+  .nowo-ui-toast,
+  .nowo-ui-toast.is-leaving {
     animation: none;
   }
 }
@@ -3480,9 +3533,10 @@ html[data-ui-density='compact'] .issue-saved-views__save {
   white-space: nowrap;
 }
 
-/* Server-side list pagination (Issues / Performance / Analytics). Never DataTables paging. */
+/* Server-side list pagination (UiKit nowo-ui-pagination + Beacon aliases). Never DataTables paging. */
 .table-pagination,
-.issue-pagination {
+.issue-pagination,
+.nowo-ui-pagination {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -3494,26 +3548,51 @@ html[data-ui-density='compact'] .issue-saved-views__save {
 }
 
 .table-pagination__info,
-.issue-pagination__info {
+.issue-pagination__info,
+.nowo-ui-pagination__info {
   margin: 0;
   color: color-mix(in srgb, var(--color-ink) 65%, transparent);
   font-size: 0.8125rem;
 }
 
 .table-pagination__nav,
-.issue-pagination__nav {
+.issue-pagination__nav,
+.nowo-ui-pagination__nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.25rem;
 }
 
+.table-pagination .pagination,
+.issue-pagination .pagination,
+.nowo-ui-pagination .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.table-pagination .page-item,
+.issue-pagination .page-item,
+.nowo-ui-pagination .page-item {
+  margin: 0;
+}
+
 .table-pagination__link,
-.issue-pagination__link {
+.issue-pagination__link,
+.nowo-ui-pagination__link,
+.table-pagination .page-link,
+.issue-pagination .page-link,
+.nowo-ui-pagination .page-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 2rem;
+  min-height: 2rem;
   padding: 0.35rem 0.65rem;
   border: 1px solid var(--color-sand);
   border-radius: 0.375rem;
@@ -3524,13 +3603,21 @@ html[data-ui-density='compact'] .issue-saved-views__save {
 }
 
 .table-pagination__link:hover,
-.issue-pagination__link:hover {
+.issue-pagination__link:hover,
+.nowo-ui-pagination__link:hover,
+.table-pagination .page-link:hover,
+.issue-pagination .page-link:hover,
+.nowo-ui-pagination .page-link:hover {
   border-color: var(--color-moss);
   color: var(--color-moss);
 }
 
 .table-pagination__link.is-active,
-.issue-pagination__link.is-active {
+.issue-pagination__link.is-active,
+.nowo-ui-pagination__link.is-active,
+.table-pagination .page-item.active .page-link,
+.issue-pagination .page-item.active .page-link,
+.nowo-ui-pagination .page-item.active .page-link {
   border-color: var(--color-moss);
   background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
   color: var(--color-moss);
@@ -3538,13 +3625,18 @@ html[data-ui-density='compact'] .issue-saved-views__save {
 }
 
 .table-pagination__link.is-disabled,
-.issue-pagination__link.is-disabled {
+.issue-pagination__link.is-disabled,
+.nowo-ui-pagination__link.is-disabled,
+.table-pagination .page-item.disabled .page-link,
+.issue-pagination .page-item.disabled .page-link,
+.nowo-ui-pagination .page-item.disabled .page-link {
   opacity: 0.45;
   pointer-events: none;
 }
 
 .table-pagination__ellipsis,
-.issue-pagination__ellipsis {
+.issue-pagination__ellipsis,
+.nowo-ui-pagination__ellipsis {
   padding: 0 0.25rem;
   color: color-mix(in srgb, var(--color-ink) 45%, transparent);
 }

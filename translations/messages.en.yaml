@@ -744,6 +744,7 @@ mailer_settings:
 ops_defaults:
     title: Ops defaults
     intro: Configure instance-wide defaults for ingest, metrics, inbound email, hooks, project governance, and notification delivery.
+    tabs_label: Ops defaults sections
     section:
         governance: Project governance
         governance_help: Projects inherit these retention, ingest rate, and quota values unless they define an override.

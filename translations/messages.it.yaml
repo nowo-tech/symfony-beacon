@@ -5,29 +5,29 @@ nav:
     activity: Attività
     mentions: Menzioni
     alerts: Avvisi
-    new_in_release: Nuovo in release
+    new_in_release: 'Nuovo in release'
     new_project: 'Nuovo progetto'
     log_out: Esci
     main: 'Navigazione principale'
     account: 'Menù conto'
     admin: Amministrazione
     admin_hub: "Panoramica dell'amministratore"
-    ops: Panoramica ops
+    ops: 'Panoramica ops'
     users: Utenti
     groups: Gruppi
     admin_projects: Progetti
     appearance: Aspetto
     mailer: Mailer
     mercure: Mercure
-    instance_config: Export / import
+    instance_config: 'Export / import'
     menus: Menù
     breadcrumbs: Pangrattato
-    cookie_consent: Consenso cookie
-    routing: Route per locale
-    http_log: Log HTTP
-    api_docs: Documentazione API
-    social_login: Login social
-    ops_defaults: Limiti ops
+    cookie_consent: 'Consenso cookie'
+    routing: 'Route per locale'
+    http_log: 'Log HTTP'
+    api_docs: 'Documentazione API'
+    social_login: 'Login social'
+    ops_defaults: 'Limiti ops'
     toggle_sidebar: 'Attiva/disattiva la navigazione'
     preferences: Preferenze
     account_settings: "Impostazioni dell'account"
@@ -35,85 +35,85 @@ nav:
     issues: Problemi
     performance: Prestazioni
     analytics: Analisi
-    setup: Setup iniziale
+    setup: 'Setup iniziale'
     releases: Release
 assignments:
     title: Assegnazioni
-    intro: Issue assegnate a te, ai compagni di team o non assegnate nei progetti a cui hai accesso.
-    empty: Nessuna issue corrisponde a questi filtri di assegnazione.
+    intro: 'Issue assegnate a te, ai compagni di team o non assegnate nei progetti a cui hai accesso.'
+    empty: 'Nessuna issue corrisponde a questi filtri di assegnazione.'
     filter:
         scope: Ambito
         project: Progetto
-        any_project: Qualsiasi progetto
+        any_project: 'Qualsiasi progetto'
         level: Livello
         status: Stato
         priority: Priorità
         assignee: Compagno
     scope:
-        mine: Assegnate a me
+        mine: 'Assegnate a me'
         teammates: Compagni
-        unassigned: Non assegnate
-        all: Tutte nei miei progetti
+        unassigned: 'Non assegnate'
+        all: 'Tutte nei miei progetti'
     col:
         project: Progetto
         status: Stato
 summary:
-    title: Riepilogo del giorno
-    intro: Conteggi rapidi sui progetti a cui hai accesso.
+    title: 'Riepilogo del giorno'
+    intro: 'Conteggi rapidi sui progetti a cui hai accesso.'
     card:
-        mine_open: Assegnate a me (aperte)
-        unassigned_open: Non assegnate (aperte)
-        unread_mentions: Menzioni non lette
-        failed_deliveries: Consegne non riuscite
-        errors_today: Errori oggi
+        mine_open: 'Assegnate a me (aperte)'
+        unassigned_open: 'Non assegnate (aperte)'
+        unread_mentions: 'Menzioni non lette'
+        failed_deliveries: 'Consegne non riuscite'
+        errors_today: 'Errori oggi'
         projects: Progetti
 activity:
-    title: Attività recente
-    intro: Le tue recenti azioni di prodotto nei progetti a cui hai accesso.
-    empty: Nessuna attività recente.
+    title: 'Attività recente'
+    intro: 'Le tue recenti azioni di prodotto nei progetti a cui hai accesso.'
+    empty: 'Nessuna attività recente.'
     filter:
         project: Progetto
-        any_project: Qualsiasi progetto
+        any_project: 'Qualsiasi progetto'
 mentions:
     title: Menzioni
-    intro: Commenti in cui qualcuno ti ha @menzionato.
-    empty: Nessuna menzione corrisponde a questi filtri.
-    unread: Non letto
+    intro: 'Commenti in cui qualcuno ti ha @menzionato.'
+    empty: 'Nessuna menzione corrisponde a questi filtri.'
+    unread: 'Non letto'
     by: 'Di %name%'
-    mark_read: Segna come letto
-    mark_all_read: Segna tutti come letti
+    mark_read: 'Segna come letto'
+    mark_all_read: 'Segna tutti come letti'
     filter:
         project: Progetto
-        any_project: Qualsiasi progetto
-        unread_only: Solo non letti
+        any_project: 'Qualsiasi progetto'
+        unread_only: 'Solo non letti'
 alerts:
     title: Avvisi
-    intro: Destinazioni di notifica con ultima consegna non riuscita.
-    empty: Nessuna consegna non riuscita nei tuoi progetti.
+    intro: 'Destinazioni di notifica con ultima consegna non riuscita.'
+    empty: 'Nessuna consegna non riuscita nei tuoi progetti.'
     filter:
         project: Progetto
-        any_project: Qualsiasi progetto
+        any_project: 'Qualsiasi progetto'
 new_in_release:
-    title: Nuovo in release
-    intro: Issue viste per la prima volta in una release.
-    empty: Nessuna issue new-in-release corrisponde a questi filtri.
+    title: 'Nuovo in release'
+    intro: 'Issue viste per la prima volta in una release.'
+    empty: 'Nessuna issue new-in-release corrisponde a questi filtri.'
     filter:
         project: Progetto
-        any_project: Qualsiasi progetto
+        any_project: 'Qualsiasi progetto'
         release: Release
-        any_release: Qualsiasi release
+        any_release: 'Qualsiasi release'
     col:
         project: Progetto
-        release: Prima release
+        release: 'Prima release'
 api_docs:
     title: 'Documenti API'
     intro: "Esplora l'acquisizione di Envelope e i relativi endpoint HTTP. Utilizza Authorize con un'intestazione X-Beacon-Auth (beacon_key e beacon_secret dal DSN del tuo progetto)."
     open_json: 'OpenAPI JSON'
 magic_login:
     confirm:
-        title: Continua l’accesso
-        heading: Completa il magic login
-        help: Conferma per completare l’accesso senza password. Questa pagina invia il link monouso in POST così il token non viaggia come navigazione GET.
+        title: 'Continua l’accesso'
+        heading: 'Completa il magic login'
+        help: 'Conferma per completare l’accesso senza password. Questa pagina invia il link monouso in POST così il token non viaggia come navigazione GET.'
         submit: Continua
 common:
     filter: Filtro
@@ -154,9 +154,9 @@ theme:
     switch_to_night: 'Passa alla modalità notturna'
 layout:
     width_content: Contenuto
-    width_full: Larghezza piena
-    switch_to_content: Passa alla larghezza contenuto centrata
-    switch_to_full: Passa al contenuto a tutta larghezza
+    width_full: 'Larghezza piena'
+    switch_to_content: 'Passa alla larghezza contenuto centrata'
+    switch_to_full: 'Passa al contenuto a tutta larghezza'
 auth:
     tagline: 'Tracciamento degli errori self-hosted per PHP e Symfony.'
     brand_eyebrow: 'Tracciamento degli errori'
@@ -169,7 +169,7 @@ auth:
         submit: 'Invia magic link'
         sent: "Se quell'account esiste ed è attivo, il link è in arrivo."
         throttled: 'Troppe richieste. Riprova più tardi.'
-        invalid: Questo link non è valido, è scaduto, revocato o esaurito.
+        invalid: 'Questo link non è valido, è scaduto, revocato o esaurito.'
         unavailable: "L'accesso con magic link non è disponibile finché un amministratore non configura il Mailer (DSN crittografato) in Amministrazione → Mailer."
         back_to_password: 'Accedi con password'
         email_subject: 'Il tuo magic link Beacon'
@@ -196,7 +196,7 @@ flash:
         governance_saved: 'Impostazioni di governance del progetto salvate.'
         governance_invalid: 'I valori di governance devono essere vuoti (ereditati) o numeri interi non negativi.'
         quota_approaching: 'Questo progetto si sta avvicinando alla quota di eventi giornaliera.'
-        quota_monthly_approaching: Questo progetto si sta avvicinando alla quota mensile di eventi.
+        quota_monthly_approaching: 'Questo progetto si sta avvicinando alla quota mensile di eventi.'
         history_cleared: 'La cronologia del progetto è stata cancellata.'
         deleted: 'Progetto eliminato.'
         delete_confirmation_mismatch: 'Il nome del progetto non corrispondeva. Niente è stato cancellato.'
@@ -232,8 +232,8 @@ flash:
         enabled: 'Account utente abilitato.'
         disabled: 'Account utente disabilitato.'
         cannot_disable_self: 'Non puoi disattivare il tuo account.'
-        cannot_anonymize_self: Use Account → Privacy to anonymize your own account.
-        anonymized: User account anonymized.
+        cannot_anonymize_self: 'Use Account → Privacy to anonymize your own account.'
+        anonymized: 'User account anonymized.'
         created: 'Account utente creato.'
         role_updated: 'Ruolo utente aggiornato.'
         invalid_email: 'Inserisci un indirizzo email valido.'
@@ -246,11 +246,11 @@ flash:
         project_unlink_forbidden: "Non sei autorizzato a rimuovere l'appartenenza al progetto."
         project_unlink_error: "Impossibile rimuovere l'utente dal progetto."
     privacy:
-        anonymized: Your account was anonymized. You have been signed out.
-        already_anonymized: That account is already anonymized.
-        sole_owner: Transfer sole project ownership (or add another owner) before anonymizing.
-        last_admin: Keep at least one instance administrator before anonymizing.
-        anonymize_failed: Account could not be anonymized.
+        anonymized: 'Your account was anonymized. You have been signed out.'
+        already_anonymized: 'That account is already anonymized.'
+        sole_owner: 'Transfer sole project ownership (or add another owner) before anonymizing.'
+        last_admin: 'Keep at least one instance administrator before anonymizing.'
+        anonymize_failed: 'Account could not be anonymized.'
     groups:
         created: 'Gruppo creato.'
         updated: 'Gruppo aggiornato.'
@@ -277,6 +277,13 @@ flash:
         sample_failed: "Impossibile inviare l'e-mail di esempio. Controlla il DSN Mailer e i log del server."
     mercure:
         saved: 'Impostazioni Mercure salvate.'
+    ops_defaults:
+        saved: 'Valori operativi predefiniti salvati.'
+    social_login:
+        custom_urls_required: 'I provider personalizzati richiedono gli URL authorize, token e userinfo.'
+        deleted: 'Provider di login social rimosso.'
+        provider_exists: 'Quel provider esiste già: modifica la credenziale esistente.'
+        saved: 'Provider di login social salvato.'
 project:
     label: Progetto
     no_description: 'Nessuna descrizione'
@@ -293,9 +300,9 @@ project:
         retention_max_events: 'Numero massimo di eventi memorizzati'
         ingest_rate_limit: 'Limite di velocità di acquisizione (al minuto)'
         event_quota_daily: 'Quota eventi giornaliera'
-        event_quota_monthly: Quota mensile di eventi
+        event_quota_monthly: 'Quota mensile di eventi'
         quota_usage_monthly: '%count% / %quota% eventi questo mese (UTC)'
-        month_utc_hint: Il confine del mese è UTC
+        month_utc_hint: 'Il confine del mese è UTC'
         inherit_hint: "Vuoto = eredita l'impostazione predefinita del server (%default%). Utilizzare 0 per disabilitare quando il valore predefinito è diverso da zero."
         save: 'Salvare la governance'
         quota_usage: 'Eventi oggi: %count% / %quota%'
@@ -408,12 +415,12 @@ projects:
     errors_last_7_days: '%count% errori negli ultimi 7 giorni'
     share:
         title: 'Link di condivisione'
-        help: Crea un link a tempo limitato in sola lettura per questo progetto (o una issue). I destinatari devono accedere. I nuovi link hanno 1 uso per impostazione predefinita.
+        help: 'Crea un link a tempo limitato in sola lettura per questo progetto (o una issue). I destinatari devono accedere. I nuovi link hanno 1 uso per impostazione predefinita.'
         days: 'Durata (giorni)'
-        max_uses: Usi massimi
-        max_uses_help: Lascia Usi massimi vuoto per aperture illimitate fino alla scadenza. Il valore predefinito è 1.
+        max_uses: 'Usi massimi'
+        max_uses_help: 'Lascia Usi massimi vuoto per aperture illimitate fino alla scadenza. Il valore predefinito è 1.'
         max_uses_unlimited: Illimitato
-        max_uses_invalid: Usi massimi deve essere un intero positivo (o vuoto per illimitato).
+        max_uses_invalid: 'Usi massimi deve essere un intero positivo (o vuoto per illimitato).'
         uses: 'Usi %used% / %max%'
         issue_uuid: 'UUID issue (opzionale)'
         issue_optional: "Lascia vuoto per l'intero progetto"
@@ -424,12 +431,27 @@ projects:
         scoped_issue: 'Limitato a una issue'
         created: 'Link creato — copialo ora; non verrà mostrato di nuovo.'
         revoked: 'Link di condivisione revocato.'
-        invalid: Questo link non è valido, è scaduto, revocato o esaurito.
+        invalid: 'Questo link non è valido, è scaduto, revocato o esaurito.'
         invalid_csrf: 'Token di sicurezza non valido.'
         issue_not_found: 'Issue non trovata in questo progetto.'
         expires_in_past: 'La scadenza deve essere nel futuro.'
         expires_too_far: 'I link di condivisione non possono durare più di 30 giorni.'
         issue_wrong_project: 'Quella issue non appartiene a questo progetto.'
+    read_token:
+        active: Attivo
+        copy_once: 'Copia questo token ora. Non verrà più mostrato.'
+        create: 'Crea token'
+        created: 'Token di lettura creato — copialo ora; non verrà più mostrato.'
+        empty: 'Nessun token API di lettura ancora.'
+        help: 'Crea token Bearer (prefisso brt_) per l’automazione. Sono hashati a riposo e distinti dalle chiavi di ingest. Usa Authorization: Bearer su /api/projects/{uuid}/issues.'
+        invalid_csrf: 'Token di sicurezza non valido.'
+        label: Etichetta
+        label_placeholder: 'Bot CI, script di export…'
+        last_used: 'Ultimo utilizzo'
+        revoke: Revoca
+        revoked: 'Token di lettura revocato.'
+        revoked_at: Revocato
+        title: 'Token API di lettura'
 issues:
     title: Problemi
     search_placeholder: 'Cerca titolo...'
@@ -466,12 +488,12 @@ issues:
     no_source_context: 'Nessun contesto di origine per questo frame.'
     copy_path: 'Copia percorso'
     path_copied: Copiato
-    aside_ai_export: Export IA
-    export_for_ai: Copia per IA
+    aside_ai_export: 'Export IA'
+    export_for_ai: 'Copia per IA'
     export_for_ai_copied: Copiato
-    export_for_ai_md: Scarica Markdown
-    export_for_ai_json: Scarica JSON
-    export_for_ai_help: Stack e richiesta ripuliti in formato beacon-ai-export/v1 da incollare in un assistente IA.
+    export_for_ai_md: 'Scarica Markdown'
+    export_for_ai_json: 'Scarica JSON'
+    export_for_ai_help: 'Stack e richiesta ripuliti in formato beacon-ai-export/v1 da incollare in un assistente IA.'
     breadcrumbs: Pangrattato
     raw_payload: 'Carico utile grezzo'
     highlights: 'Punti salienti'
@@ -599,6 +621,21 @@ issues:
         first_seen: 'Visto per la prima volta'
         last_seen: "Visto l'ultima volta"
     viewer_readonly: 'Hai accesso in sola lettura (viewer) a questo progetto.'
+    assignee_forbidden: 'Serve l’accesso triage su questo progetto per assegnare le issue.'
+    mail:
+        assign_body: |
+            %actor% ti ha assegnato l’issue «%issue%» del progetto %project%.
+
+            %link%
+        assign_subject: 'Ti è stata assegnata [%project%] %issue%'
+        mention_body: |
+            %author% ti ha menzionato nell’issue «%issue%» del progetto %project%.
+
+            %link%
+        mention_subject: 'Sei stato menzionato in [%project%] %issue%'
+    similar_empty: 'Nessuna issue simile in questo progetto.'
+    similar_mark_duplicate: 'Segna come duplicato'
+    similar_title: 'Issue simili'
 performance:
     title: Prestazione
     intro: 'Transazioni e analisi N+1'
@@ -739,7 +776,7 @@ users:
     cancel: Cancellare
     role_label: Ruolo
     last_admin_hint: 'Mantieni almeno un amministratore.'
-    edit_role_title: Cambia ruolo utente
+    edit_role_title: 'Cambia ruolo utente'
     edit_role_body: 'Scegli un nuovo ruolo per %name% (%email%).'
     col:
         user: Utente
@@ -769,12 +806,12 @@ users:
         enable: Abilitare
         disable: Disabilita
         update_role: Aggiornamento
-        edit_role: Modifica ruolo
+        edit_role: 'Modifica ruolo'
         self: 'Questo sei tu'
         activity: Attività
-        export: Export data
+        export: 'Export data'
         anonymize: Anonymize
-    anonymize_confirm_title: Anonymize user
+    anonymize_confirm_title: 'Anonymize user'
     anonymize_confirm_body: 'Scrub personal data for %email% and disable sign-in. Type ANONYMIZE to confirm.'
     projects_title: 'Adesioni al progetto'
     projects_intro: 'Ruoli di progetto diretti per questo account (non tramite gruppi). Gli amministratori delle istanze possono rimuoverli qui.'
@@ -787,8 +824,8 @@ users:
         timeline_title: 'Cronologia delle attività'
         recent_title: 'Attività recente'
         recent_intro: "Ultime azioni amministrative, di appartenenza e di prodotto nell'istanza."
-        audit_intro: Azioni di identità e membership per questo account (i filtri corrispondono all’audit progetto Admin).
-        audit_empty: Nessuna azione di identità registrata corrisponde ai filtri attuali.
+        audit_intro: 'Azioni di identità e membership per questo account (i filtri corrispondono all’audit progetto Admin).'
+        audit_empty: 'Nessuna azione di identità registrata corrisponde ai filtri attuali.'
         empty: 'Nessuna azione registrata ancora.'
         by: 'Entro %name%'
         by_system: 'Per sistema'
@@ -871,23 +908,23 @@ preferences:
     intro: 'Aggiorna il tuo profilo, password, lingua e preferenze del tema.'
     nav:
         profile: Profilo
-        projects: I miei progetti
-        groups: I miei gruppi
+        projects: 'I miei progetti'
+        groups: 'I miei gruppi'
         privacy: Privacy
         security: Sicurezza
-        password: Cambia password
-        password_history: Cronologia modifiche
+        password: 'Cambia password'
+        password_history: 'Cronologia modifiche'
         security_activity: Attività
-        area_label: Sezioni dell’account
+        area_label: 'Sezioni dell’account'
         display: Display
         appearance: Aspetto
-        panels: Pannelli issue
+        panels: 'Pannelli issue'
         tours: Tour
         notifications: Notifiche
     profile:
         title: Profilo
         intro: 'Controlla i dettagli dell’account e aggiorna nome visualizzato o e-mail di accesso.'
-        tabs_label: Sezioni del profilo
+        tabs_label: 'Sezioni del profilo'
         submit: 'Salva profilo'
         edit_title: 'Modifica profilo'
         account_id: 'ID account'
@@ -906,9 +943,9 @@ preferences:
         status_anonymized: Anonymized
         role_admin: Amministratore
         role_member: Membro
-        slack_user_id: Slack user ID
+        slack_user_id: 'Slack user ID'
         slack_user_id_help: 'Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack issue alerts. Find it in your Slack profile → … → Copy member ID.'
-        phone: Numero di telefono
+        phone: 'Numero di telefono'
         phone_help: 'Opzionale. Richiesto per login QR. Il salvataggio lo segna verificato fino a OTP SMS.'
         projects_title: 'I tuoi progetti'
         projects_intro: 'Progetti a cui accedi con membership diretta.'
@@ -917,52 +954,52 @@ preferences:
         groups_intro: 'Gruppi che possono concedere accesso ad altri progetti.'
         groups_empty: 'Non appartieni ad alcun gruppo.'
     privacy:
-        title: Privacy & data
-        intro: Download a copy of your account data or anonymize this account.
-        export_title: Download my data
-        export_intro: Export your profile, memberships, and security activity as JSON. Password hashes and other users' data are never included.
-        export_button: Download JSON
-        events_note: Project ingest events and issues stay with each project until retention purge — they are not part of this account export.
-        legal_link: View privacy policy
-        anonymize_title: Anonymize account
-        anonymize_intro: Scrub your email and display name, disable sign-in, and clear credentials. This cannot be undone from the UI.
-        anonymize_open: Anonymize my account
-        anonymize_confirm_title: Confirm anonymization
-        anonymize_confirm_body: Your login will stop working. Type ANONYMIZE to confirm.
+        title: 'Privacy & data'
+        intro: 'Download a copy of your account data or anonymize this account.'
+        export_title: 'Download my data'
+        export_intro: "Export your profile, memberships, and security activity as JSON. Password hashes and other users' data are never included."
+        export_button: 'Download JSON'
+        events_note: 'Project ingest events and issues stay with each project until retention purge — they are not part of this account export.'
+        legal_link: 'View privacy policy'
+        anonymize_title: 'Anonymize account'
+        anonymize_intro: 'Scrub your email and display name, disable sign-in, and clear credentials. This cannot be undone from the UI.'
+        anonymize_open: 'Anonymize my account'
+        anonymize_confirm_title: 'Confirm anonymization'
+        anonymize_confirm_body: 'Your login will stop working. Type ANONYMIZE to confirm.'
         anonymize_type_label: 'Type ANONYMIZE to confirm'
-        anonymize_confirm: Anonymize permanently
-        already_anonymized: This account has already been anonymized.
-        blocked_last_admin: You are the last instance administrator. Add another admin before anonymizing.
+        anonymize_confirm: 'Anonymize permanently'
+        already_anonymized: 'This account has already been anonymized.'
+        blocked_last_admin: 'You are the last instance administrator. Add another admin before anonymizing.'
         blocked_sole_owner: 'Transfer ownership of project “%name%” (or add another owner) before anonymizing.'
     security:
         title: Sicurezza
         intro: 'Cambia la password del tuo account.'
-        tabs_label: Sezioni di sicurezza
+        tabs_label: 'Sezioni di sicurezza'
         submit: 'Aggiorna password'
         history_title: 'Cronologia modifiche password'
         history_intro: 'Aggiornamenti recenti conservati per prevenire il riutilizzo. Gli hash non vengono mai mostrati.'
         history_current: 'Password attuale impostata il:'
         history_entry: 'Password modificata'
         history_empty: 'Nessuna modifica della password registrata.'
-        social_title: Account social collegati
-        social_intro: Provider OAuth collegati a questo account Beacon.
-        social_disabled: Il login social non è abilitato su questa istanza.
-        social_empty: Nessun account social collegato. Accedi con un provider dalla pagina di login per collegarne uno quando il login social è abilitato.
-        social_unlink_note: La rimozione dei provider da questa pagina non è ancora disponibile. Contatta un admin dell’istanza se serve rimuovere un collegamento.
-        activity_title: Attività di sicurezza
-        activity_intro: Eventi recenti di reset password e magic login per il tuo account.
-        activity_empty: Nessun evento di sicurezza registrato.
+        social_title: 'Account social collegati'
+        social_intro: 'Provider OAuth collegati a questo account Beacon.'
+        social_disabled: 'Il login social non è abilitato su questa istanza.'
+        social_empty: 'Nessun account social collegato. Accedi con un provider dalla pagina di login per collegarne uno quando il login social è abilitato.'
+        social_unlink_note: 'La rimozione dei provider da questa pagina non è ancora disponibile. Contatta un admin dell’istanza se serve rimuovere un collegamento.'
+        activity_title: 'Attività di sicurezza'
+        activity_intro: 'Eventi recenti di reset password e magic login per il tuo account.'
+        activity_empty: 'Nessun evento di sicurezza registrato.'
     display:
         title: Display
-        intro: Scegli lingua, tema, densità, dimensione testo, contrasto, barra laterale, movimento e larghezza contenuto.
-        tabs_label: Sezioni visualizzazione
+        intro: 'Scegli lingua, tema, densità, dimensione testo, contrasto, barra laterale, movimento e larghezza contenuto.'
+        tabs_label: 'Sezioni visualizzazione'
         submit: 'Salva le impostazioni di visualizzazione'
-        panels_title: Pannelli issue
-        panels_intro: Scegli quali pannelli partono compressi e cancella gli stati salvati nel browser.
+        panels_title: 'Pannelli issue'
+        panels_intro: 'Scegli quali pannelli partono compressi e cancella gli stati salvati nel browser.'
         tours_title: Tour
-        tours_intro: Controlla quali tour prodotto possono avviarsi automaticamente e ripeti il tour della dashboard.
+        tours_intro: 'Controlla quali tour prodotto possono avviarsi automaticamente e ripeti il tour della dashboard.'
         notifications_title: Notifiche
-        notifications_intro: Avvisi push opzionali per nuove issue e installazione di Beacon come app.
+        notifications_intro: 'Avvisi push opzionali per nuove issue e installazione di Beacon come app.'
         pwa_title: "Installa l'app"
         pwa_intro: "Aggiungi questo sito al tuo dispositivo per un'esperienza più veloce e autonoma. La disponibilità dipende dal tuo browser."
         pwa_prompt_title: 'Installa per un accesso più rapido'
@@ -1026,7 +1063,7 @@ preferences:
     product_tour_enabled: 'Tour attivi'
     product_tour_enabled_help: 'I tour selezionati possono avviarsi automaticamente una volta per area. Deseleziona un tour per nasconderlo; deseleziona tutti per disabilitare ogni tour.'
     product_tour_select_all: 'Seleziona tutti i tour'
-    product_tour_save_hint: Fai clic su Salva impostazioni di visualizzazione per applicare le modifiche ai tour.
+    product_tour_save_hint: 'Fai clic su Salva impostazioni di visualizzazione per applicare le modifiche ai tour.'
     product_tour_page:
         dashboard: Dashboard
         project_issues: 'Issue del progetto'
@@ -1119,9 +1156,9 @@ groups:
     delete_confirm: 'Eliminare questo gruppo? Verrà scollegato da tutti i progetti.'
     name_label: Nome
     description_label: Descrizione
-    audit_title: Cronologia audit
-    audit_intro: Azioni amministrative relative al gruppo (crea/aggiorna, membri, link ai progetti). I timestamp AuditKit sopra restano lo snapshot dell’ultimo editor.
-    audit_empty: Nessuna azione di gruppo registrata corrisponde ai filtri attuali.
+    audit_title: 'Cronologia audit'
+    audit_intro: 'Azioni amministrative relative al gruppo (crea/aggiorna, membri, link ai progetti). I timestamp AuditKit sopra restano lo snapshot dell’ultimo editor.'
+    audit_empty: 'Nessuna azione di gruppo registrata corrisponde ai filtri attuali.'
     members_title: 'Membri del gruppo'
     members_empty: 'Nessun membro ancora in questo gruppo.'
     add_member: 'Aggiungi membro'
@@ -1150,7 +1187,7 @@ admin_projects:
         audit: Audit
         actions: Azioni
     status:
-        active: Ingest attivo
+        active: 'Ingest attivo'
     back: 'Torniamo ai progetti'
     edit: Modificare
     edit_title: 'Modifica progetto'
@@ -1206,55 +1243,55 @@ admin:
             overview: Panoramica
             access: Accesso
             instance: Istanza
-            navigation: Navigazione e legale
+            navigation: 'Navigazione e legale'
             observability: Osservabilità
         users: 'Elenca account e ruoli su questa istanza.'
         groups: "Crea gruppi e gestisci i loro membri per l'accesso al progetto."
         projects: 'Elenca tutti i progetti, gestisci i membri e i collegamenti ai gruppi o elimina un progetto.'
-        ops: Picchi tra progetti, issue aperte e consegne non riuscite.
+        ops: 'Picchi tra progetti, issue aperte e consegne non riuscite.'
         appearance: 'Marchio, accenti, colori di stato e superfici.'
         menus: 'Modifica i menu di navigazione.'
         breadcrumbs: 'Gestisci le raccolte breadcrumb.'
         cookie_consent: 'Modifica testo del modal, categorie e inventario cookie first-party.'
         routing: 'Gestisci percorsi pubblici duali per locale (JSON) per controller Routable.'
-        http_log: Consulta le richieste HTTP catturate (header, stato, durata) con retention ed export.
+        http_log: 'Consulta le richieste HTTP catturate (header, stato, durata) con retention ed export.'
         mailer: 'DSN Mailer cifrato e indirizzo From per e-mail transazionali.'
-        api_docs: Esplora l’ingest Envelope e la documentazione OpenAPI HTTP correlata.
-        social_login: Credenziali OAuth (Google / GitHub / Microsoft) nel database.
-        ops_defaults: Retention, ritmo di ingest, quote e limiti di consegna.
-        mercure: Avvisi issue in tempo reale via hub Mercure (opzionale).
+        api_docs: 'Esplora l’ingest Envelope e la documentazione OpenAPI HTTP correlata.'
+        social_login: 'Credenziali OAuth (Google / GitHub / Microsoft) nel database.'
+        ops_defaults: 'Retention, ritmo di ingest, quote e limiti di consegna.'
+        mercure: 'Avvisi issue in tempo reale via hub Mercure (opzionale).'
         instance_config: 'Esporta o importa aspetto e flag istanza non segreti (JSON).'
         setup: 'Passi iniziali piattaforma / demo / seed di esempio.'
     cookie_consent:
-        tabs_label: Aree consenso cookie
+        tabs_label: 'Aree consenso cookie'
         tab_settings: Impostazioni
-        tab_cookies: Inventario cookie
-        section_tabs_label: Sezioni impostazioni
+        tab_cookies: 'Inventario cookie'
+        section_tabs_label: 'Sezioni impostazioni'
     ops:
-        title: Panoramica Ops
-        intro: Segnali di salute a livello di istanza tra i progetti. La profondità della coda Messenger è sempre a livello di istanza.
-        filter_project: Filtro progetto
-        filter_all: Tutti i progetti
-        queue_title: Coda Messenger
-        queue_instance_wide: Messaggi async in sospeso a livello di istanza (non per progetto)
-        open_issues_title: Issue aperte
-        suspended_title: Ingest sospeso
-        suspended_list_title: Progetti sospesi
-        spikes_title: Picchi di errori
+        title: 'Panoramica Ops'
+        intro: 'Segnali di salute a livello di istanza tra i progetti. La profondità della coda Messenger è sempre a livello di istanza.'
+        filter_project: 'Filtro progetto'
+        filter_all: 'Tutti i progetti'
+        queue_title: 'Coda Messenger'
+        queue_instance_wide: 'Messaggi async in sospeso a livello di istanza (non per progetto)'
+        open_issues_title: 'Issue aperte'
+        suspended_title: 'Ingest sospeso'
+        suspended_list_title: 'Progetti sospesi'
+        spikes_title: 'Picchi di errori'
         spikes_help: 'Progetti in cui gli errori di oggi superano max(3, 2 × media giornaliera su 7 giorni).'
-        spikes_empty: Nessun picco di errori al momento.
+        spikes_empty: 'Nessun picco di errori al momento.'
         spikes_metric: '%today% oggi (media 7g %avg%, soglia %threshold%)'
-        failed_title: Consegne non riuscite
-        failed_empty: Nessuna destinazione con ultimo invio fallito.
-        open_by_project_title: Issue aperte per progetto
-        open_by_project_empty: Nessuna issue aperta nell’ambito.
+        failed_title: 'Consegne non riuscite'
+        failed_empty: 'Nessuna destinazione con ultimo invio fallito.'
+        open_by_project_title: 'Issue aperte per progetto'
+        open_by_project_empty: 'Nessuna issue aperta nell’ambito.'
 tour:
     controls:
         next: Avanti
         previous: Indietro
         done: Fatto
         close: Chiudi
-        progress: "{{current}} di {{total}}"
+        progress: '{{current}} di {{total}}'
     role:
         owner: proprietario
         admin: amministratore
@@ -1263,61 +1300,61 @@ tour:
     steps:
         dashboard:
             welcome:
-                title: Benvenuto in Beacon
-                description: Breve tour della tua dashboard - progetti, navigazione e dove gestire il tuo account.
+                title: 'Benvenuto in Beacon'
+                description: 'Breve tour della tua dashboard - progetti, navigazione e dove gestire il tuo account.'
             sidebar:
                 title: Navigazione
-                description: Usa la barra laterale per spostarti tra le sezioni della dashboard per l'area corrente dell'app.
+                description: "Usa la barra laterale per spostarti tra le sezioni della dashboard per l'area corrente dell'app."
             projects:
-                title: I tuoi progetti
-                description: Ogni progetto raccoglie errori, performance e analytics dalle app che inviano telemetria Envelope.
+                title: 'I tuoi progetti'
+                description: 'Ogni progetto raccoglie errori, performance e analytics dalle app che inviano telemetria Envelope.'
             new_project:
-                title: Crea un progetto
-                description: Aggiungi un progetto per ottenere un DSN e chiavi API per i tuoi SDK client.
+                title: 'Crea un progetto'
+                description: 'Aggiungi un progetto per ottenere un DSN e chiavi API per i tuoi SDK client.'
             user_menu:
-                title: Menu account
-                description: Apri le preferenze, torna alla dashboard o esci dal menu del tuo avatar.
+                title: 'Menu account'
+                description: 'Apri le preferenze, torna alla dashboard o esci dal menu del tuo avatar.'
             admin:
                 title: Amministrazione
-                description: Gli amministratori dell'istanza gestiscono da qui utenti, gruppi, aspetto, Mailer e configurazione iniziale.
+                description: "Gli amministratori dell'istanza gestiscono da qui utenti, gruppi, aspetto, Mailer e configurazione iniziale."
         project:
             welcome:
-                title: Issue del progetto
+                title: 'Issue del progetto'
                 description: "Stai visualizzando questo progetto come %role%. Usa Issues per fare triage degli errori provenienti dall'ingest Envelope."
             nav:
-                title: Sezioni del progetto
-                description: Passa tra Issues, Performance, Analytics, Releases e Settings per questo progetto.
+                title: 'Sezioni del progetto'
+                description: 'Passa tra Issues, Performance, Analytics, Releases e Settings per questo progetto.'
             filters:
-                title: Filtri e ricerca
-                description: Restringi le issue per livello, stato, ambiente, release, assegnatario e altro.
+                title: 'Filtri e ricerca'
+                description: 'Restringi le issue per livello, stato, ambiente, release, assegnatario e altro.'
             saved_views:
-                title: Viste salvate
-                description: Salva combinazioni di filtri e riaprile in seguito per flussi di triage ricorrenti.
+                title: 'Viste salvate'
+                description: 'Salva combinazioni di filtri e riaprile in seguito per flussi di triage ricorrenti.'
             list:
-                title: Elenco issue
-                description: Apri una issue per ispezionare stack trace, eventi e stato del triage.
+                title: 'Elenco issue'
+                description: 'Apri una issue per ispezionare stack trace, eventi e stato del triage.'
             settings:
-                title: Impostazioni del progetto
-                description: Come amministratore del progetto puoi gestire chiavi API, membri, notifiche e governance.
+                title: 'Impostazioni del progetto'
+                description: 'Come amministratore del progetto puoi gestire chiavi API, membri, notifiche e governance.'
             settings_member:
-                title: Impostazioni del progetto
-                description: Controlla la configurazione del progetto. Le modifiche a membri e chiavi API richiedono un amministratore del progetto.
+                title: 'Impostazioni del progetto'
+                description: 'Controlla la configurazione del progetto. Le modifiche a membri e chiavi API richiedono un amministratore del progetto.'
         admin:
             welcome:
                 title: Amministrazione
-                description: Controlli a livello di istanza per gli operatori. Solo ROLE_ADMIN puo aprire questo hub.
+                description: 'Controlli a livello di istanza per gli operatori. Solo ROLE_ADMIN puo aprire questo hub.'
             users:
                 title: Utenti
-                description: Elenca account e ruoli, e abilita o disabilita l'accesso su questa istanza Beacon.
+                description: "Elenca account e ruoli, e abilita o disabilita l'accesso su questa istanza Beacon."
             projects:
-                title: Tutti i progetti
-                description: Ops trasversali ai progetti - membri, gruppi e azioni della danger zone per qualsiasi progetto.
+                title: 'Tutti i progetti'
+                description: 'Ops trasversali ai progetti - membri, gruppi e azioni della danger zone per qualsiasi progetto.'
             mailer:
                 title: Mailer
-                description: Configura il DSN Mailer cifrato usato per magic link ed email di notifica.
+                description: 'Configura il DSN Mailer cifrato usato per magic link ed email di notifica.'
             setup:
-                title: Procedura guidata di setup
-                description: Riesegui il platform seed, il progetto demo o la telemetria di esempio durante l'onboarding di un nuovo ambiente.
+                title: 'Procedura guidata di setup'
+                description: "Riesegui il platform seed, il progetto demo o la telemetria di esempio durante l'onboarding di un nuovo ambiente."
 legal:
     nav:
         label: Legale
@@ -1392,9 +1429,8 @@ legal:
         purpose_csrf: 'Cookie CSRF double-submit di breve durata impostato da Symfony all’invio di form protetti (pattern csrf-token_<token>; prefisso __Host- su HTTPS).'
         purpose_consent: 'Cookie_Consent e Cookie_Consent_Key registrano che è stata presa una decisione di consenso e collegano una chiave anonima al registro di audit lato server.'
         purpose_category: 'Cookie_Category_analytics e Cookie_Category_preferences memorizzano se ciascuna categoria opzionale è stata accettata o rifiutata (meccanismo di consenso, non tracker).'
-        storage_heading: Archiviazione locale
+        storage_heading: 'Archiviazione locale'
         storage_body: 'La preferenza di tema (chiaro/scuro) e alcune scelte di layout UI possono essere memorizzate nel localStorage del browser e non costituiscono cookie HTTP. Secondo le orientazioni ePrivacy tipiche può essere trattata come strettamente necessaria per un’interfaccia coerente; gli operatori devono confermare le norme applicabili nella propria giurisdizione.'
-
 releases:
     title: 'Salute delle release'
     intro: 'Scegli una release per vedere quante issue sono state viste per la prima volta li, confrontare due release oppure aprire il compare esistente della lista issue.'
@@ -1410,7 +1446,7 @@ releases:
     compare:
         label: 'Confronta con release'
         none: 'Non confrontare'
-        help: 'Facoltativamente confronta la release selezionata con un''altra release usando l''insieme corrente di issue.'
+        help: "Facoltativamente confronta la release selezionata con un'altra release usando l'insieme corrente di issue."
         summary_title: 'Confronta %a% vs %b%'
         only_a: 'Solo in %release%'
         only_b: 'Solo in %release%'
@@ -1428,13 +1464,13 @@ mailer_settings:
     title: Mailer
     intro: 'Memorizza il DSN di Symfony Mailer cifrato nel database (non in .env). Il sign-in con magic link resta nascosto finche qui non viene salvato un DSN non nullo; anche le destinazioni di notifica email usano questo trasporto.'
     status:
-        database: 'La posta in uscita usa il DSN salvato nelle impostazioni dell''istanza. Il sign-in con magic link e disponibile quando questo DSN non e un trasporto null.'
-        env_fallback: 'Nessun DSN nel database per ora - la posta in uscita ricade su MAILER_DSN dall''ambiente (tipicamente null://null). Il sign-in con magic link resta disabilitato finche non salvi qui un DSN cifrato.'
+        database: "La posta in uscita usa il DSN salvato nelle impostazioni dell'istanza. Il sign-in con magic link e disponibile quando questo DSN non e un trasporto null."
+        env_fallback: "Nessun DSN nel database per ora - la posta in uscita ricade su MAILER_DSN dall'ambiente (tipicamente null://null). Il sign-in con magic link resta disabilitato finche non salvi qui un DSN cifrato."
     current_dsn: 'DSN corrente:'
     from_preview: 'Indirizzo From: %from%'
     submit: 'Salva impostazioni Mailer'
     magic_ready: 'Le credenziali email per il magic link sono pronte'
-    magic_blocked: 'L''email per il magic link non e disponibile (salva un DSN cifrato realmente recapitabile)'
+    magic_blocked: "L'email per il magic link non e disponibile (salva un DSN cifrato realmente recapitabile)"
     sample:
         title: 'Invia email di esempio'
         intro: 'Invia un messaggio di prova usando il DSN Mailer cifrato (lo stesso trasporto usato per il sign-in con magic link).'
@@ -1449,32 +1485,32 @@ mailer_settings:
             Indirizzo From: %from%
 settings:
     instance_config:
-        title: Configurazione istanza
-        intro: Esporta o importa impostazioni non segrete consentite (aspetto e flag dell'istanza). Il DSN Mailer, i segreti Mercure e i segreti OAuth non sono mai inclusi.
+        title: 'Configurazione istanza'
+        intro: "Esporta o importa impostazioni non segrete consentite (aspetto e flag dell'istanza). Il DSN Mailer, i segreti Mercure e i segreti OAuth non sono mai inclusi."
         export_title: Esporta
-        export_help: Scarica un file JSON versionato adatto alle prove di backup. I segreti restano su questa istanza.
-        export: Scarica JSON
+        export_help: 'Scarica un file JSON versionato adatto alle prove di backup. I segreti restano su questa istanza.'
+        export: 'Scarica JSON'
         import_title: Importa
-        import_help: Ripristina aspetto e flag consentiti da un'esportazione precedente. I valori segreti vengono rifiutati e restano invariati.
-        import: Importa JSON
-        file: File di configurazione
-        imported: Configurazione istanza importata.
-        import_failed: Importazione non riuscita. Controlla la versione dello schema e che il file non contenga chiavi segrete.
-        missing_file: Scegli un file JSON da importare.
-        invalid_csrf: Token di sicurezza non valido.
+        import_help: "Ripristina aspetto e flag consentiti da un'esportazione precedente. I valori segreti vengono rifiutati e restano invariati."
+        import: 'Importa JSON'
+        file: 'File di configurazione'
+        imported: 'Configurazione istanza importata.'
+        import_failed: 'Importazione non riuscita. Controlla la versione dello schema e che il file non contenga chiavi segrete.'
+        missing_file: 'Scegli un file JSON da importare.'
+        invalid_csrf: 'Token di sicurezza non valido.'
 mercure_settings:
     title: Mercure
-    intro: 'Avvisi live facoltativi per i membri autenticati quando viene creata una nuova issue. Disabilitati per impostazione predefinita - abilitali solo quando e disponibile un hub Mercure. Il Web Push resta un''opzione separata in Account -> Display.'
+    intro: "Avvisi live facoltativi per i membri autenticati quando viene creata una nuova issue. Disabilitati per impostazione predefinita - abilitali solo quando e disponibile un hub Mercure. Il Web Push resta un'opzione separata in Account -> Display."
     manual_hint: 'Manuale operatore (hub, segreto JWT, Compose, troubleshooting): docs/ops/MERCURE.md nel repository.'
     status:
         active: 'Gli avvisi live Mercure sono abilitati per i membri.'
         inactive: 'Mercure e disattivato'
         inactive_help: 'I membri non apriranno un EventSource finche non abiliti Mercure qui e non fornisci un URL hub raggiungibile + un segreto JWT (salvati sotto o tramite ambiente).'
-        url_database: 'L''URL di publish dell''hub e memorizzato nelle impostazioni dell''istanza.'
-        url_env: 'L''URL di publish dell''hub ricade su MERCURE_URL dall''ambiente.'
-        url_missing: 'Nessun URL di publish dell''hub configurato (impostalo sotto o usa MERCURE_URL).'
-        secret_database: 'Il segreto JWT e memorizzato cifrato nelle impostazioni dell''istanza.'
-        secret_env: 'Il segreto JWT ricade su MERCURE_JWT_SECRET dall''ambiente.'
+        url_database: "L'URL di publish dell'hub e memorizzato nelle impostazioni dell'istanza."
+        url_env: "L'URL di publish dell'hub ricade su MERCURE_URL dall'ambiente."
+        url_missing: "Nessun URL di publish dell'hub configurato (impostalo sotto o usa MERCURE_URL)."
+        secret_database: "Il segreto JWT e memorizzato cifrato nelle impostazioni dell'istanza."
+        secret_env: "Il segreto JWT ricade su MERCURE_JWT_SECRET dall'ambiente."
         secret_missing: 'Nessun segreto JWT configurato (impostalo sotto o usa MERCURE_JWT_SECRET).'
     public_url_preview: 'URL hub nel browser: %url%'
     push_note: 'Il push PWA in background si configura per utente in Account -> Display (richiede chiavi VAPID_*). Non dipende da Mercure.'
@@ -1482,7 +1518,7 @@ mercure_settings:
 instance_mercure:
     enabled:
         label: 'Abilita avvisi live Mercure'
-        help: 'Quando attivo, i membri autenticati si iscrivono a topic privati del progetto per i toast di nuove issue mentre l''app e aperta.'
+        help: "Quando attivo, i membri autenticati si iscrivono a topic privati del progetto per i toast di nuove issue mentre l'app e aperta."
     url:
         label: 'URL di publish (server)'
         help: 'Lascia vuoto per usare MERCURE_URL (ad es. http://mercure/.well-known/mercure dentro Compose).'
@@ -1494,7 +1530,7 @@ instance_mercure:
     jwt_secret:
         label: 'Segreto JWT'
         help: 'Lascia vuoto per mantenere il valore cifrato corrente o ricadere su MERCURE_JWT_SECRET. Minimo 32 caratteri se impostato.'
-        placeholder: '••••••••••••••••••••••••••••••••'
+        placeholder: ••••••••••••••••••••••••••••••••
         too_short: 'Il segreto JWT deve contenere almeno 32 caratteri.'
         invalid: 'Inserisci una stringa di segreto JWT valida.'
     clear_secret:
@@ -1506,18 +1542,18 @@ instance_mailer:
         help: 'Lascia vuoto per mantenere il valore cifrato corrente. Esempio smtp://user:pass@mail.example:587 - null:// viene rifiutato (usa invece Cancella DSN memorizzato).'
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Inserisci un DSN Symfony Mailer valido (ad esempio smtp://user:pass@host:587).'
-        null_transport: 'null:// non puo consegnare email. Incolla un DSN SMTP reale (o altro), oppure usa Cancella DSN memorizzato per ricadere sull''ambiente.'
+        null_transport: "null:// non puo consegnare email. Incolla un DSN SMTP reale (o altro), oppure usa Cancella DSN memorizzato per ricadere sull'ambiente."
         scheme_not_allowed: 'Questo schema DSN Mailer non e consentito. Usa smtp, smtps, sendmail, native o uno schema provider supportato (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Cancella DSN memorizzato'
-        help: 'Rimuove il DSN dal database e ricade su MAILER_DSN dall''ambiente finche non ne salvi uno nuovo.'
+        help: "Rimuove il DSN dal database e ricade su MAILER_DSN dall'ambiente finche non ne salvi uno nuovo."
     mailer_from:
         label: 'Indirizzo From'
         help: 'Envelope From per magic login ed email di notifica. Valore predefinito beacon@localhost se vuoto.'
         placeholder: beacon@example.com
 setup:
     eyebrow: 'Primo avvio'
-    title: 'Setup dell''istanza'
+    title: "Setup dell'istanza"
     intro: 'Installa cataloghi di navigazione e dati demo facoltativi. Sono gli stessi passaggi dei layer seed CLI.'
     intro_required: 'Mancano i cataloghi di navigazione. Installa menu, breadcrumbs e il profilo di consenso cookie prima di continuare.'
     intro_bootstrap: 'I cataloghi di piattaforma sono pronti. Registra il primo amministratore, facoltativamente carica telemetria di esempio, poi segna il setup come completato.'
@@ -1534,14 +1570,14 @@ setup:
         password: Password
     token:
         title: 'Ehi — senza la chiave di setup non si passa'
-        lead: Niente di rotto. Il setup è bloccato così nessuno configura l'istanza a caso.
+        lead: "Niente di rotto. Il setup è bloccato così nessuno configura l'istanza a caso."
         body: 'Apri %path% con il SITE_SETUP_TOKEN del tuo ambiente.'
-        step_env: 'Cerca SITE_SETUP_TOKEN nel tuo .env (in .env.dist c''è il valore locale documentato).'
+        step_env: "Cerca SITE_SETUP_TOKEN nel tuo .env (in .env.dist c'è il valore locale documentato)."
         step_url: 'Apri %path% nel browser — sostituisci … con quel token.'
-        step_header: 'Oppure invia l''header X-Setup-Token con lo stesso valore.'
+        step_header: "Oppure invia l'header X-Setup-Token con lo stesso valore."
     reason:
         heading: 'Il setup e richiesto'
-        db_connection: 'Il database non e raggiungibile con l''attuale DATABASE_URL (manca, e errato oppure il servizio DB e giu).'
+        db_connection: "Il database non e raggiungibile con l'attuale DATABASE_URL (manca, e errato oppure il servizio DB e giu)."
         db_connection_hint: 'Configura un DATABASE_URL funzionante nello step database prima di continuare. Salta resta disabilitato finche la connessione non funziona.'
         db_connection_form: 'Connessione al database fallita. Inserisci un DATABASE_URL valido (scritto in .env.local). Non puoi saltare questo passaggio finche il database non risponde.'
         db_schema_empty: 'Il database si connette ma non ha ancora tabelle - migrazioni / import creeranno lo schema.'
@@ -1550,17 +1586,17 @@ setup:
         marker_done_missing: 'setup.done manca mentre require_done_marker e abilitato.'
         incomplete: 'Procedura guidata in corso: %detail%'
     database:
-        intro: 'Facoltativo - lascia vuoto e salta se DATABASE_URL nell''ambiente funziona gia.'
+        intro: "Facoltativo - lascia vuoto e salta se DATABASE_URL nell'ambiente funziona gia."
     bootstrap_login_hint: 'Preferisci creare il tuo amministratore?'
-    bootstrap_login_link: 'Accedi'
+    bootstrap_login_link: Accedi
     bootstrap_register_link: 'Registra il primo amministratore'
     banner:
-        title: 'Completa il setup dell''istanza'
+        title: "Completa il setup dell'istanza"
         body: 'Installa menu/breadcrumbs e campioni demo facoltativi per questa istanza Beacon.'
         cta: 'Apri setup'
     step_platform:
         title: 'Obbligatorio - cataloghi di piattaforma'
-        body: 'Installa i menu della dashboard, i breadcrumbs e il profilo/inventario di consenso cookie. Questo passaggio e obbligatorio prima che il resto dell''app funzioni.'
+        body: "Installa i menu della dashboard, i breadcrumbs e il profilo/inventario di consenso cookie. Questo passaggio e obbligatorio prima che il resto dell'app funzioni."
         item_menus: 'Menu (dashboard, preferences, administration)'
         item_breadcrumbs: 'Raccolta breadcrumb (predefinita)'
         item_cookies: 'Profilo di consenso cookie'
@@ -1570,7 +1606,7 @@ setup:
     step_options:
         title: 'Passi successivi facoltativi'
         body: 'Crea il primo account amministratore e/o carica un dataset completo di esempio. Puoi saltarne uno o entrambi.'
-        locked: 'Completa prima l''installazione obbligatoria della piattaforma.'
+        locked: "Completa prima l'installazione obbligatoria della piattaforma."
         register_title: 'Crea il primo utente'
         register_body: 'Registra il tuo amministratore tramite AuthKit (registrazione solo primo utente).'
         register_cta: 'Registra il primo amministratore'
@@ -1582,7 +1618,7 @@ setup:
         sample_requires_register: 'Registra il primo amministratore prima di caricare la telemetria di esempio (il progetto demo appartiene al tuo account).'
     step_demo:
         title: 'Progetto demo'
-        body: 'Crea l''amministratore demo locale (se manca) e il progetto demo con una chiave API.'
+        body: "Crea l'amministratore demo locale (se manca) e il progetto demo con una chiave API."
         cta: 'Crea progetto demo'
         exists: 'Il progetto demo e gia presente.'
     step_sample:
@@ -1603,7 +1639,7 @@ setup:
         demo_exists: 'Utente demo e progetto demo esistono gia.'
         sample_ok: 'Telemetria di esempio caricata. Gli avvisi live Mercure sono stati abilitati con i valori di ambiente predefiniti quando necessario.'
         sample_requires_user: 'Accedi o registra il primo amministratore prima di caricare i dati di esempio.'
-        sample_demo_user: 'Creato l''amministratore demo locale admin@symfony-beacon.local / admin123 come proprietario del progetto demo.'
+        sample_demo_user: "Creato l'amministratore demo locale admin@symfony-beacon.local / admin123 come proprietario del progetto demo."
         complete: 'Setup segnato come completato.'
         bootstrap_ready: 'Setup completato. Accedi o registra il primo amministratore per continuare.'
         unknown_action: 'Azione di setup sconosciuta.'
@@ -1628,17 +1664,17 @@ notifications:
     cancel: Annulla
     new_title: 'Nuova destinazione di notifica'
     edit_title: 'Modifica destinazione di notifica'
-    form_help: 'Scegli un tipo di canale e incolla l''endpoint corrispondente. I segreti sono mascherati nell''elenco delle impostazioni.'
+    form_help: "Scegli un tipo di canale e incolla l'endpoint corrispondente. I segreti sono mascherati nell'elenco delle impostazioni."
     form:
         label: Etichetta
         type: Tipo
         endpoint: Endpoint
         endpoint_help: 'Slack / Discord / Teams / HTTP: URL HTTPS del webhook. Email: indirizzo del destinatario. Telegram: bot_token@chat_id'
-        endpoint_invalid: 'L''endpoint non corrisponde al tipo selezionato.'
-        endpoint_ssrf: 'L''endpoint non deve puntare a indirizzi privati, link-local o metadati cloud.'
-        signing_secret: Interaction signing secret
+        endpoint_invalid: "L'endpoint non corrisponde al tipo selezionato."
+        endpoint_ssrf: "L'endpoint non deve puntare a indirizzi privati, link-local o metadati cloud."
+        signing_secret: 'Interaction signing secret'
         signing_secret_help: 'Optional. Enables interactive Resolve (Slack app Signing Secret, or a shared secret for Teams HttpPOST). Leave blank to keep the current value.'
-        clear_signing_secret: Clear interaction signing secret
+        clear_signing_secret: 'Clear interaction signing secret'
         enabled: Abilitata
         categories: 'Categorie di avviso'
         quiet_hours_legend: 'Ore di silenzio e digest'
@@ -1668,7 +1704,7 @@ notifications:
         info: Info
         debug: Debug
         n_plus_one: 'Rilevazioni N+1'
-        'volume.threshold': 'Soglie di volume'
+        volume.threshold: 'Soglie di volume'
         issue.resolved: 'Issue risolta'
         issue.reopened: 'Issue riaperta'
         issue.assigned: 'Issue assegnata'
@@ -1681,7 +1717,7 @@ notifications:
         disabled: 'Destinazione disabilitata.'
         deleted: 'Destinazione eliminata.'
         test_queued: 'Notifica di esempio nativa del canale accodata per la consegna.'
-        circuit_resumed: Destination circuit resumed; deliveries may proceed again.
+        circuit_resumed: 'Destination circuit resumed; deliveries may proceed again.'
     help:
         title: 'Guide di configurazione notifiche'
         link: 'Guide di configurazione'
@@ -1692,31 +1728,31 @@ notifications:
         docs_hint: 'Riferimento completo (payload, consegna, permessi): docs/product/NOTIFICATIONS.md nel repository.'
         slack:
             title: 'Slack (Incoming Webhook)'
-            lead: 'Crea un Incoming Webhook per un''app Slack e incolla l''URL HTTPS in Beacon.'
-            step1: 'Apri api.slack.com/apps e crea un''app From scratch per il tuo workspace.'
+            lead: "Crea un Incoming Webhook per un'app Slack e incolla l'URL HTTPS in Beacon."
+            step1: "Apri api.slack.com/apps e crea un'app From scratch per il tuo workspace."
             step2: 'Abilita Incoming Webhooks, poi Add New Webhook to Workspace e scegli un canale.'
-            step3: 'Copia l''URL del webhook (https://hooks.slack.com/services/...).'
-            step4: 'In Beacon scegli Slack Incoming Webhook, incolla l''URL come endpoint, seleziona le categorie e salva.'
+            step3: "Copia l'URL del webhook (https://hooks.slack.com/services/...)."
+            step4: "In Beacon scegli Slack Incoming Webhook, incolla l'URL come endpoint, seleziona le categorie e salva."
             step5: 'Fai clic su Invia test e conferma che il messaggio compaia in Slack.'
-            payload: 'JSON con text (riepilogo) e un oggetto beacon che contiene il payload completo dell''evento.'
+            payload: "JSON con text (riepilogo) e un oggetto beacon che contiene il payload completo dell'evento."
             tip: 'Preferisci un canale ops dedicato. Ruota il webhook in Slack se dovesse trapelare e aggiorna la destinazione in Beacon.'
         discord:
             title: 'Discord (webhook)'
             lead: 'Crea un webhook di canale in Discord e incolla il suo URL in Beacon.'
             step1: 'Apri Impostazioni server -> Integrazioni -> Webhook (oppure la scheda Integrazioni del canale).'
             step2: 'Crea un nuovo webhook, assegnagli un nome (ad esempio Beacon) e scegli il canale di destinazione.'
-            step3: 'Copia l''URL del webhook (https://discord.com/api/webhooks/...).'
-            step4: 'In Beacon scegli Webhook Discord, incolla l''URL, seleziona le categorie, salva e poi Invia test.'
+            step3: "Copia l'URL del webhook (https://discord.com/api/webhooks/...)."
+            step4: "In Beacon scegli Webhook Discord, incolla l'URL, seleziona le categorie, salva e poi Invia test."
             payload: 'JSON con content (riepilogo) e un array embeds (title, description, URL issue opzionale).'
             tip: 'Discord applica rate limit ai webhook; Beacon consegna in modo asincrono tramite Messenger.'
         teams:
             title: 'Microsoft Teams (Incoming Webhook)'
-            lead: 'Aggiungi un connettore Incoming Webhook a un canale Teams e incolla l''URL in Beacon.'
+            lead: "Aggiungi un connettore Incoming Webhook a un canale Teams e incolla l'URL in Beacon."
             step1: 'Nel menu del canale Teams apri Connectors (o Gestisci canale -> Connectors).'
             step2: 'Configura Incoming Webhook, assegnagli un nome e crealo.'
-            step3: 'Copia l''URL del webhook fornito da Teams.'
-            step4: 'In Beacon scegli Webhook Microsoft Teams, incolla l''URL, seleziona le categorie, salva e poi Invia test.'
-            payload: 'JSON Office 365 MessageCard con summary, title, text e un''azione Open in Beacon quando esiste un URL.'
+            step3: "Copia l'URL del webhook fornito da Teams."
+            step4: "In Beacon scegli Webhook Microsoft Teams, incolla l'URL, seleziona le categorie, salva e poi Invia test."
+            payload: "JSON Office 365 MessageCard con summary, title, text e un'azione Open in Beacon quando esiste un URL."
             tip: 'Se il tuo tenant consente solo Workflows invece dei classici Incoming Webhooks, punta una destinazione HTTP generica a un workflow che accetta POST JSON.'
         telegram:
             title: 'Telegram (bot)'
@@ -1724,30 +1760,30 @@ notifications:
             step1: 'Apri @BotFather in Telegram, esegui /newbot e copia il token del bot.'
             step2: 'Avvia una chat privata con il bot oppure aggiungilo a un gruppo e invia un messaggio.'
             step3: 'Chiama getUpdates sulla Bot API e leggi message.chat.id (gli id dei gruppi sono spesso negativi).'
-            step4: 'In Beacon scegli Bot Telegram e imposta l''endpoint su bot_token@chat_id (esempio - 123:AA...@-1001234567890).'
+            step4: "In Beacon scegli Bot Telegram e imposta l'endpoint su bot_token@chat_id (esempio - 123:AA...@-1001234567890)."
             step5: 'Salva e Invia test.'
             payload: 'sendMessage della Bot API con chat_id e text (solo riepilogo; non il payload JSON completo).'
-            tip: 'L''ultimo @ nell''endpoint separa token e chat id. I token sono cifrati a riposo come gli altri endpoint.'
+            tip: "L'ultimo @ nell'endpoint separa token e chat id. I token sono cifrati a riposo come gli altri endpoint."
         email:
             title: Email
             lead: 'Recapita gli avvisi a una casella email tramite Symfony Mailer. Configura prima il DSN Mailer in Amministrazione -> Mailer.'
-            step1: 'Apri Amministrazione -> Mailer e salva un DSN cifrato (smtp://...). MAILER_DSN nell''ambiente e solo un fallback di bootstrap; null://null non recapita nulla.'
-            step2: 'In Beacon scegli Email e imposta l''endpoint sull''indirizzo del destinatario.'
+            step1: "Apri Amministrazione -> Mailer e salva un DSN cifrato (smtp://...). MAILER_DSN nell'ambiente e solo un fallback di bootstrap; null://null non recapita nulla."
+            step2: "In Beacon scegli Email e imposta l'endpoint sull'indirizzo del destinatario."
             step3: 'Seleziona le categorie, salva, Invia test e controlla posta in arrivo/spam.'
-            payload: 'L''oggetto dell''email coincide con il riepilogo; il corpo contiene il riepilogo piu l''URL della issue o della performance quando presente.'
+            payload: "L'oggetto dell'email coincide con il riepilogo; il corpo contiene il riepilogo piu l'URL della issue o della performance quando presente."
             tip: 'Usa un alias ops condiviso. Per digest piu ricchi, preferisci Slack/Discord/Teams o un bridge HTTP.'
         http:
             title: 'Webhook HTTP generico'
             lead: 'Invia tramite POST il payload JSON canonico di Beacon a qualsiasi endpoint HTTPS di automazione.'
             step1: 'Esponi un URL HTTPS che accetti POST con Content-Type application/json.'
-            step2: 'In Beacon scegli Webhook HTTP generico, incolla l''URL, seleziona le categorie, salva e poi Invia test.'
+            step2: "In Beacon scegli Webhook HTTP generico, incolla l'URL, seleziona le categorie, salva e poi Invia test."
             step3: 'Conferma che il tuo servizio riceva il body JSON canonico (event, summary, project, issue, url, category).'
             payload: 'Payload JSON canonico come body della richiesta (User-Agent symfony-beacon-notifications/1.0).'
             tip: 'Preferisci HTTPS e autentica il destinatario. Evita di puntare a indirizzi interni o di metadati cloud.'
 thresholds:
     title: 'Avvisi di soglia'
-    intro: 'Crea avvisi di volume su finestra mobile quando eventi error o fatal superano un conteggio configurato all''interno di una finestra temporale.'
-    ingest_disabled: 'L''ingest e sospeso per questo progetto, quindi le regole di soglia non vengono valutate.'
+    intro: "Crea avvisi di volume su finestra mobile quando eventi error o fatal superano un conteggio configurato all'interno di una finestra temporale."
+    ingest_disabled: "L'ingest e sospeso per questo progetto, quindi le regole di soglia non vengono valutate."
     empty: 'Nessuna regola di soglia ancora. Aggiungine una per intercettare picchi improvvisi.'
     add: 'Aggiungi regola'
     edit: Modifica
@@ -1790,57 +1826,192 @@ thresholds:
         disabled: 'Regola di soglia disabilitata.'
         deleted: 'Regola di soglia eliminata.'
     validation:
-        label_length: 'L''etichetta deve essere lunga al massimo 120 caratteri.'
+        label_length: "L'etichetta deve essere lunga al massimo 120 caratteri."
         error_count_min: 'Il conteggio errori deve essere almeno 1.'
         window_range: 'La finestra deve essere compresa tra 1 e 1440 minuti.'
         cooldown_range: 'Il cooldown deve essere compreso tra 1 e 10080 minuti.'
-        environment_length: 'L''ambiente deve essere lungo al massimo 80 caratteri.'
+        environment_length: "L'ambiente deve essere lungo al massimo 80 caratteri."
         release_length: 'La release deve essere lunga al massimo 120 caratteri.'
-
 error:
-    home: Torna alla home
+    home: 'Torna alla home'
     sign_in: Accedi
     generic:
-        title: Deviazione inaspettata
-        lead: Quella richiesta non è arrivata a destinazione. Non hai rotto niente — riprova tra un momento.
-        hint: La nostra mascotte sta già cercando indizi sotto i cuscini del divano.
+        title: 'Deviazione inaspettata'
+        lead: 'Quella richiesta non è arrivata a destinazione. Non hai rotto niente — riprova tra un momento.'
+        hint: 'La nostra mascotte sta già cercando indizi sotto i cuscini del divano.'
     400:
-        title: Pezzi del puzzle mischiati
-        lead: Quella richiesta non combacia del tutto con la forma prevista. Sistemala e inviala di nuovo — niente vetri rotti, solo angoli che non combaciano.
-        hint: La nostra mascotte sta ancora leggendo le istruzioni al contrario. Succede ai migliori.
-        image_alt: Mascotte Beacon con pezzi di puzzle e triangolo di avviso accanto a un grande 400
+        title: 'Pezzi del puzzle mischiati'
+        lead: 'Quella richiesta non combacia del tutto con la forma prevista. Sistemala e inviala di nuovo — niente vetri rotti, solo angoli che non combaciano.'
+        hint: 'La nostra mascotte sta ancora leggendo le istruzioni al contrario. Succede ai migliori.'
+        image_alt: 'Mascotte Beacon con pezzi di puzzle e triangolo di avviso accanto a un grande 400'
     401:
-        title: Badge, per favore
-        lead: Questa porta richiede un passaggio valido. Accedi e riprova — il guardiano è gentile, solo scrupoloso.
-        hint: Anche i robot a volte dimenticano la tessera. Ne teniamo una di scorta al bancone.
-        image_alt: Mascotte Beacon a un checkpoint con tessera di accesso accanto a un grande 401
+        title: 'Badge, per favore'
+        lead: 'Questa porta richiede un passaggio valido. Accedi e riprova — il guardiano è gentile, solo scrupoloso.'
+        hint: 'Anche i robot a volte dimenticano la tessera. Ne teniamo una di scorta al bancone.'
+        image_alt: 'Mascotte Beacon a un checkpoint con tessera di accesso accanto a un grande 401'
     403:
-        title: Cancello chiuso
-        lead: Non hai le chiavi di questa pagina. Accedi con un account autorizzato o torna alla home — non è niente di personale.
-        hint: Corrompere la mascotte con i biscotti non apre comunque la serratura. Ci abbiamo provato.
-        image_alt: Mascotte Beacon accanto a un cancello protetto con 403
+        title: 'Cancello chiuso'
+        lead: 'Non hai le chiavi di questa pagina. Accedi con un account autorizzato o torna alla home — non è niente di personale.'
+        hint: 'Corrompere la mascotte con i biscotti non apre comunque la serratura. Ci abbiamo provato.'
+        image_alt: 'Mascotte Beacon accanto a un cancello protetto con 403'
     404:
-        title: Fuori mappa
-        lead: Questo percorso non esiste su questo Beacon. Controlla l'URL o segui la luce verso la home — nessuna caccia al tesoro.
-        hint: Anche i migliori esploratori sbagliano strada quando la mappa è a testa in giù.
-        image_alt: Mascotte Beacon che esplora con mappa e lente accanto a un grande 404
+        title: 'Fuori mappa'
+        lead: "Questo percorso non esiste su questo Beacon. Controlla l'URL o segui la luce verso la home — nessuna caccia al tesoro."
+        hint: 'Anche i migliori esploratori sbagliano strada quando la mappa è a testa in giù.'
+        image_alt: 'Mascotte Beacon che esplora con mappa e lente accanto a un grande 404'
     408:
-        title: Clessidra vuota
-        lead: Abbiamo aspettato con pazienza, ma la richiesta ha impiegato troppo. Riprova quando tutto sarà più snello — senza fretta da parte tua.
-        hint: La nostra mascotte fissa ancora l'orologio. I timeout succedono; il caffè aiuta.
-        image_alt: Mascotte Beacon con clessidra e sveglia accanto a un grande 408
+        title: 'Clessidra vuota'
+        lead: 'Abbiamo aspettato con pazienza, ma la richiesta ha impiegato troppo. Riprova quando tutto sarà più snello — senza fretta da parte tua.'
+        hint: "La nostra mascotte fissa ancora l'orologio. I timeout succedono; il caffè aiuta."
+        image_alt: 'Mascotte Beacon con clessidra e sveglia accanto a un grande 408'
     429:
-        title: Pausa soft
-        lead: Hai inviato richieste un po' più in fretta di quanto possiamo fare i giocolieri. Fai un respiro e continua — la coda si svuoterà.
-        hint: La mascotte ha premuto pausa sul nastro. Non è un rimprovero — più una pausa stretching.
-        image_alt: Mascotte Beacon che mette in pausa una coda di messaggi accanto a un grande 429
+        title: 'Pausa soft'
+        lead: "Hai inviato richieste un po' più in fretta di quanto possiamo fare i giocolieri. Fai un respiro e continua — la coda si svuoterà."
+        hint: 'La mascotte ha premuto pausa sul nastro. Non è un rimprovero — più una pausa stretching.'
+        image_alt: 'Mascotte Beacon che mette in pausa una coda di messaggi accanto a un grande 429'
     500:
-        title: Singhiozzo del Beacon
-        lead: Qualcosa ha inciampato dalla nostra parte, non dalla tua. Aspetta un po' e riprova — non hai fatto nulla di sbagliato.
-        hint: Stiamo dando un colpetto gentile ai server con una chiave inglese. Molto gentile.
-        image_alt: Mascotte Beacon che ripara un rack server con 500
+        title: 'Singhiozzo del Beacon'
+        lead: "Qualcosa ha inciampato dalla nostra parte, non dalla tua. Aspetta un po' e riprova — non hai fatto nulla di sbagliato."
+        hint: 'Stiamo dando un colpetto gentile ai server con una chiave inglese. Molto gentile.'
+        image_alt: 'Mascotte Beacon che ripara un rack server con 500'
     502:
-        title: Cavo staccato
-        lead: Un collegamento tra servizi si è allentato. Stiamo ripristinando — riprova tra un momento; non hai fatto nulla di sbagliato.
-        hint: La mascotte sta riconnettendo il cavo luminoso. Le scintille sono volute. Probabilmente.
-        image_alt: Mascotte Beacon che riconnette un cavo luminoso tra server accanto a un grande 502
+        title: 'Cavo staccato'
+        lead: 'Un collegamento tra servizi si è allentato. Stiamo ripristinando — riprova tra un momento; non hai fatto nulla di sbagliato.'
+        hint: 'La mascotte sta riconnettendo il cavo luminoso. Le scintille sono volute. Probabilmente.'
+        image_alt: 'Mascotte Beacon che riconnette un cavo luminoso tra server accanto a un grande 502'
+ops_defaults:
+    allow_anonymous_resolve:
+        help: 'Legacy. Se attivo, Resolve può modificare le issue senza un attore Beacon mappato. Preferisci utenti mappati + triage.'
+        label: 'Consenti Resolve anonimo Slack/Teams'
+    allow_private_urls:
+        help: 'Se attivo, i webhook in uscita possono puntare a host privati/link-local. Mantienilo disattivato in produzione.'
+        label: 'Consenti URL di notifica private'
+    circuit_breaker_cooldown:
+        help: 'Minuti prima che una destinazione messa in pausa automaticamente possa ritentare. Usa 0 per richiedere la ripresa manuale.'
+        label: 'Cooldownoldown del circuit breaker in minuti'
+    circuit_breaker_threshold:
+        help: 'Errori di consegna consecutivi prima che una destinazione di notifica venga messa in pausa automaticamente.'
+        label: 'Soglia di errori del circuit breaker'
+    clear_inbound_webhook_secret:
+        help: 'Rimuovi il secret del webhook in ingresso memorizzato.'
+        label: 'Cancella secret del webhook in ingresso'
+    clear_metrics_token:
+        help: 'Rimuovi il token di scrape memorizzato.'
+        label: 'Cancella token di scrape delle metriche'
+    delivery_history_limit:
+        help: 'Numero di tentativi di consegna recenti conservati per ogni destinazione di notifica.'
+        label: 'Limite cronologia consegne'
+    envelope_max_bytes:
+        help: 'HTTP 413 quando un body di ingest grezzo supera questa dimensione. Predefinito 2097152 (2 MiB).'
+        label: 'Dimensione max body Envelope / OTLP (byte)'
+    event_quota_daily:
+        help: 'Massimo di eventi accettati per progetto ogni giorno. Usa 0 per illimitato.'
+        label: 'Quota giornaliera eventi'
+    event_quota_monthly:
+        help: 'Massimo di eventi accettati per progetto per mese calendario UTC. Usa 0 per illimitato.'
+        label: 'Quota mensile eventi'
+    inbound_email_enabled:
+        help: 'Se attivo, le email di menzione/assegnazione possono includere token Reply-To e POST /hooks/email/inbound accetta webhook del provider.'
+        label: 'Abilita commenti via email in ingresso'
+    inbound_mail_domain:
+        help: 'Dominio usato negli indirizzi Reply-To (reply+{token}@dominio).'
+        label: 'Dominio mail in ingresso'
+    inbound_webhook_secret:
+        configured: 'È attualmente memorizzato un secret di webhook in ingresso.'
+        help: 'Secret condiviso per X-Beacon-Inbound-Secret e firma HMAC Reply-To. Lasciare vuoto conserva il secret attuale.'
+        label: 'Secret webhook in ingresso'
+    ingest_rate_limit:
+        help: 'Massimo di richieste Envelope per progetto ogni minuto. Usa 0 per illimitato.'
+        label: 'Limite di frequenza ingest al minuto'
+    ingest_reject_query_auth:
+        help: 'Se attivo, i parametri beacon_key/beacon_secret in query vengono rifiutati (401). Disattiva solo durante la migrazione a X-Beacon-Auth o DSN Envelope.'
+        label: 'Rifiuta auth ingest via query string (obsoleta)'
+    intro: 'Configura i valori predefiniti dell’istanza per ingest, metriche, email in ingresso, hook, governance dei progetti e consegna delle notifiche.'
+    metrics_require_token:
+        help: 'Se attivo, /metrics restituisce 503 finché non è memorizzato un token delle metriche. Consigliato in produzione.'
+        label: 'Richiedi token di scrape delle metriche'
+    metrics_token:
+        configured: 'È attualmente memorizzato un token di scrape delle metriche.'
+        help: 'Token Bearer per gli scraper. Lasciare vuoto conserva il token attuale.'
+        label: 'Token di scrape delle metriche'
+    retention_days:
+        help: 'Elimina la telemetria più vecchia di questo numero di giorni. Usa 0 per disattivare la retention per età.'
+        label: 'Giorni di retention'
+    retention_max_events:
+        help: 'Conserva al massimo questo numero di eventi per progetto. Usa 0 per nessun tetto per conteggio.'
+        label: 'Massimo di eventi memorizzati per progetto'
+    section:
+        governance: 'Governance dei progetti'
+        governance_help: 'I progetti ereditano questi valori di retention, frequenza ingest e quote salvo override.'
+        inbound: 'Email in ingresso'
+        inbound_help: 'Token Reply-To e webhook del provider per i commenti alle issue. Lascia vuoto il secret webhook al salvataggio per mantenere il valore attuale.'
+        ingest: 'Ingest e autenticazione'
+        ingest_help: 'Dimensione body Envelope/OTLP e policy di auth ingest via query string obsoleta.'
+        metrics: 'Metriche Prometheus'
+        metrics_help: 'Token di scrape per GET /metrics (solo Authorization Bearer). Lascia vuoto il token al salvataggio per mantenere il secret attuale.'
+        notifications: 'Consegna notifiche'
+        notifications_help: 'Policy SSRF, policy Resolve interattiva, cronologia consegne e circuit breaking sull’istanza.'
+    submit: 'Salva valori ops'
+    tabs_label: 'Sezioni valori ops'
+    title: 'Valori ops'
+social_login_credential:
+    authorize_url:
+        help: 'Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.'
+        label: 'URL di autorizzazione'
+    client_id:
+        label: 'Client ID'
+    client_secret:
+        help_edit: 'Lascia vuoto per mantenere il secret attuale.'
+        help_new: 'Secret client OAuth dalla registrazione dell’app IdP.'
+        label: 'Client secret'
+    enabled:
+        help: 'I provider disabilitati restano nel database ma non compaiono nel login.'
+        label: Abilitato
+    enterprise_sso:
+        help: 'Mostra sotto «Accedi con la tua organizzazione» invece dei pulsanti social consumer (IdP OIDC).'
+        label: 'SSO aziendale'
+    label:
+        help: 'Mostrato sul pulsante Continua con della pagina di login.'
+        label: 'Etichetta del pulsante'
+    provider:
+        help: 'Slug in minuscolo (google, github, microsoft o personalizzato).'
+        invalid: 'Usa uno slug in minuscolo che inizia con una lettera (a-z, cifre, _ o -).'
+        label: 'Chiave provider'
+    scopes:
+        help: 'Scope OAuth facoltativi separati da spazi o virgole.'
+        label: Scope
+    token_url:
+        help: 'Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.'
+        label: 'URL token'
+    userinfo_url:
+        help: 'Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.'
+        label: 'URL userinfo'
+social_login_settings:
+    add_intro: 'Esistono cataloghi di endpoint integrati per Google, GitHub e Microsoft.'
+    add_provider: 'Aggiungi %provider%'
+    add_title: 'Aggiungi un provider'
+    create: 'Aggiungi provider'
+    delete: Rimuovi
+    delete_confirm: 'Rimuovere questa credenziale OAuth del provider?'
+    disabled: 'Off'
+    edit: Modifica
+    edit_intro: 'I secret client sono memorizzati nel database. Lascia vuoto il secret in modifica per mantenere il valore attuale.'
+    edit_title: 'Modifica %provider%'
+    empty: 'Nessun provider OAuth configurato ancora.'
+    enabled: 'On'
+    endpoints_intro: 'I provider integrati Google / GitHub / Microsoft possono lasciare questi campi vuoti. Quelli personalizzati devono impostare authorize, token e userinfo.'
+    endpoints_title: 'Endpoint OAuth'
+    intro: 'Memorizza le credenziali dell’app OAuth nel database (tabella AuthKit auth_kit_social_credential). I pulsanti di login compaiono quando social_login.mode è abilitato e almeno una riga credenziale è abilitata.'
+    new_title: 'Aggiungi %provider%'
+    redirect_hint: 'Registra le URI di redirect presso ogni IdP come %uri%/login/social/{provider}/check (e /{locale}/… per le locale non predefinite).'
+    status:
+        active: 'I pulsanti di login social sono attivi nella pagina di accesso.'
+        inactive: 'Il login social non mostra ancora pulsanti (abilita la modalità del profilo AuthKit e aggiungi almeno un provider abilitato sotto).'
+    submit: 'Salva provider'
+    table:
+        actions: Azioni
+        client_id: 'Client ID'
+        enabled: Abilitato
+        label: Etichetta
+        provider: Provider
+    title: 'Login social'

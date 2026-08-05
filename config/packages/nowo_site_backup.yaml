@@ -3,7 +3,7 @@
 nowo_site_backup:
     enabled: true
     # Host CSS stack hint (Twig global nowo_site_backup_css_framework) — REQ-UI-001 / v1.6+
-    css_framework: custom
+    css_framework: tailwind
     process_timeout: 900
     templates:
         # Friendlier token gate (SVG + calm copy); wizard/done stay in the package.
@@ -18,7 +18,8 @@ nowo_site_backup:
             - migrations
             - composer.json
             - composer.lock
-            - .env
+            # Do not include .env — archives would embed APP_SECRET / DB passwords.
+            # Back up secrets separately (Halite key volume, .env.local off-box).
         exclude_patterns:
             - 'var/cache/*'
             - 'var/log/*'

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Ops defaults **section tabs** with own routes (`/settings/ops-defaults/{section}`); shared product tabs delegate to UiKit `_tabs`.
 - Form field loop convention (`077`): shared `templates/form/_fields.html.twig`; host Symfony forms paint unrendered Type children before actions (FormKit owns field attrs).
 - `nowo-tech/http-log-bundle` **1.0.1**: HTTP request/response audit log with admin UI at `/admin/http-log` (ROLE_ADMIN), kit host layout, Messenger async persist/export/purge, MDK table `nowo_http_log_entry`.
 - Dashboard **Assignments** panel (`079`): `/dashboard/assignments` — mine / teammates / unassigned across accessible projects with filters (project, level, status, priority, assignee, search).
@@ -23,12 +24,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Composer kit sync (`081-formkit-uikit-kit-sync`): host **`nowo-tech/ui-kit-bundle` 1.7.0** (`tailwind` / `ux_icon` / `row_actions_display: icon`); FormKit **2.2.0** (`auto_help` / `auto_placeholder`); AuthKit **1.15.0** (Halite on OAuth secrets/tokens); RoutingKit **1.3.0** (FormKit panel form); DashboardMenu **2.0.1**, BreadcrumbKit **2.1.3**, CookieConsent **1.6.0**, HttpLog **1.1.0**, SiteBackup **1.10.0**.
+- Authenticated product chrome composes UiKit `_shell_open` / `_shell_close`; flashes → UiKit `_toasts`; page loader embeds UiKit `_thinking_orb`; product tabs → UiKit `_tabs`.
+- Security hardening follow-ups: `OutboundUrlGuard` validates public **A + AAAA** (prefer IPv4 pin); SiteBackup `include_paths` omits `.env`; PRODUCTION docs for Messenger `failed` purge + AuthKit encrypt migrate.
+- RoutingKit host `panel/form` override uses Symfony/FormKit `form_*` (1.3+) while keeping Beacon card chrome.
+- FormKit kit profiles set explicit `translation_domain` + `auto_help`/`auto_placeholder: false` (`auth_kit`, `dashboard_menu`, `breadcrumb_kit`, `http_log`, `cookie_consent`, `routing_kit`); Settings Mailer / Mercure / Ops / Social login Types extend `FormKitAbstractType`.
+- Product + kit list pagination converge on `kit/_pagination` → UiKit host `_pagination` (`« »` + page numbers).
+- Kit admin UIs use `css_framework: tailwind` + vendor `nowo-ui.css` + `.kit-admin` token remap (Menu / Breadcrumb / Cookie admin / RoutingKit / SiteBackup / HttpLog); Vite `kit-admin` stays Bootstrap-free.
 - CI Coverage soft gate: `COVERAGE_MIN=35` (statement %; never 100%).
 - Inbound email webhook accepts secret **only** via `X-Beacon-Inbound-Secret` (body `beacon_secret` rejected).
-- Cookie Consent admin **1.5.0**: route-based settings sections (`/settings/{section}`); host drops `data-kit-form-tabs` / tabify JS and restyles vendor `.nowo-ui-tabs` to Beacon tab chrome.
-- Kit admin UIs use `css_framework: custom` + vendor `nowo-ui.css` (Menu / Breadcrumb / Cookie admin / RoutingKit / SiteBackup); Vite `kit-admin` no longer loads Bootstrap (avoids reboot fighting app shell chrome).
-- Composer pins: DashboardMenu **1.0.5**, BreadcrumbKit **2.0.12**, RoutingKit **1.1.7**, CookieConsent **1.5.0**, AuthKit **1.12.2**, Beacon client **1.6.11**, SiteBackup **1.8.1**, UX Icons **3.4.0** (Packagist).
-- SiteBackup: explicit root `css_framework: custom` + `data-css-framework` on setup/panel host shells (1.6+ / 1.8.x).
+- Cookie Consent admin **1.6.0**: route-based settings sections (`/settings/{section}`); host drops `data-kit-form-tabs` / tabify JS and restyles vendor `.nowo-ui-tabs` to Beacon tab chrome (UiKit consumer — see `081`).
+- SiteBackup: explicit root `css_framework: tailwind` + `data-css-framework` on setup/panel host shells (pin **1.10.0**; see `081`).
 - Former `BEACON_INGEST_REJECT_QUERY_AUTH`, `BEACON_METRICS_*`, `BEACON_ENVELOPE_MAX_BYTES`, `BEACON_INBOUND_*`, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS`, and `BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE` env vars are no longer read (configure via Ops defaults).
 
 ## [1.0.1] - 2026-07-31

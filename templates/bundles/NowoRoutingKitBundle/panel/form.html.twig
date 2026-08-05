@@ -1,0 +1,43 @@
+{# Host override: Beacon kit form chrome + RoutingKit 1.3 Symfony/FormKit form. #}
+{% extends '@NowoRoutingKitBundle/panel/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_routing_kit_css_framework|default('tailwind') %}
+{% set _is_edit = definition and definition.id %}
+
+{% block title %}{{ (_is_edit ? 'panel.edit_title' : 'panel.create_title')|trans({}, 'NowoRoutingKitBundle') }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+    <div class="{{ ui.toolbar(_css_fw) }}">
+        <a class="{{ ui.btn('link', null, _css_fw) }}" href="{{ path_prefix }}/">&larr; {{ 'panel.title'|trans({}, 'NowoRoutingKitBundle') }}</a>
+    </div>
+
+    <section class="nowo-ui-form-wrap card">
+        <div class="card-body">
+            <h2 class="h5 nowo-ui-section-title">{{ (_is_edit ? 'panel.edit_title' : 'panel.create_title')|trans({}, 'NowoRoutingKitBundle') }}</h2>
+            <p class="{{ ui.muted(_css_fw) }} mb-4">{{ 'panel.form_hint'|trans({}, 'NowoRoutingKitBundle') }}</p>
+
+            {% if errors %}
+                <div class="{{ ui.flash('error', _css_fw) }}" role="alert">
+                    {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+            {% if conflicts %}
+                <div class="{{ ui.flash('error', _css_fw) }}" role="alert">
+                    {% for conflict in conflicts %}<div>{{ conflict }}</div>{% endfor %}
+                </div>
+            {% endif %}
+
+            {{ form_start(form, {attr: {class: 'nowo-ui-form nowo-ui-form--stack'}}) }}
+                {% for child in form %}
+                    {% if not child.rendered %}
+                        {{ form_row(child) }}
+                    {% endif %}
+                {% endfor %}
+                <div class="nowo-ui-form-actions">
+                    <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }}">{{ 'panel.save'|trans({}, 'NowoRoutingKitBundle') }}</button>
+                    <a class="{{ ui.btn('secondary', null, _css_fw) }}" href="{{ path_prefix }}/">{{ 'panel.cancel'|trans({}, 'NowoRoutingKitBundle') }}</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}

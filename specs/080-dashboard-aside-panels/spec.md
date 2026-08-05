@@ -55,7 +55,7 @@ As a member, sidebar Dashboard items and breadcrumbs exist for every new panel r
 - **FR-008**: Summary aggregates mine-open, unassigned-open, unread mentions, failed deliveries, errors today (`DailyProjectStat` last day), project count.
 - **FR-009**: English UI + seeder/locale translations for nav and panel copy.
 - **FR-010**: Functional coverage for panel routes, mention persistence/read, and breadcrumb wrap presence.
-- **FR-011**: List panels (Assignments, Activity, Mentions, Alerts, New in release) use `PagePagination` + `shared/_table_pagination.html.twig` with `page` / `per_page` (10|25|50|100). Summary is cards-only (no list pager).
+- **FR-011**: List panels (Assignments, Activity, Mentions, Alerts, New in release) use `PagePagination` + `shared/_table_pagination.html.twig` (→ `kit/_pagination` / UiKit `_pagination`; see `081`) with `page` / `per_page` (10|25|50|100). Summary is cards-only (no list pager).
 
 ## Key Entities
 
@@ -69,11 +69,12 @@ As a member, sidebar Dashboard items and breadcrumbs exist for every new panel r
 - **SC-002**: Creating a comment with `@localpart` inserts `issue_mention` and appears in Mentions for that user.
 - **SC-003**: Breadcrumb wrap `.beacon-breadcrumb` appears on Assignments and all new panel routes (not a lone hidden root).
 - **SC-004**: Failed destination fixtures appear on Alerts; `firstRelease` fixtures appear on New in release.
-- **SC-005**: Activity, Mentions, Alerts, Assignments, and New in release expose `per_page` and use `shared/_table_pagination.html.twig` when `total > 0`.
+- **SC-005**: Activity, Mentions, Alerts, Assignments, and New in release expose `per_page` and use `shared/_table_pagination.html.twig` (UiKit pager chrome) when `total > 0`.
 
 ## Related
 
 - `079-dashboard-assignments` — Assignments panel (sibling; breadcrumbs + pagination aligned here).
+- `081-formkit-uikit-kit-sync` — shared pagination → UiKit 1.7+.
 - `040-issue-mentions-notify` — Email on mention/assign; this feature adds the in-app inbox.
 - `028-release-health` — Project-scoped new-in-release; this feature adds cross-project panel.
 - `035-ops-overview` — Admin fleet failed deliveries; Alerts is the member-scoped counterpart.

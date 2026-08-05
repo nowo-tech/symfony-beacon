@@ -1,0 +1,74 @@
+{# Host override: respect nowo_ui_kit.row_actions_display (icon) + UiKit table classes. #}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+<div class="{{ ui.table_wrap(_css_fw) }}">
+    <table class="{{ ui.table(_css_fw) }}">
+        <thead>
+            <tr>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.name'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.provider'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.purpose'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.category'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.duration'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th>{{ 'nowo_cookie_consent.admin.cookie_definition.table.allowed_by_default'|trans({}, 'NowoCookieConsentBundle') }}</th>
+                <th class="text-end">{{ 'nowo_cookie_consent.admin.cookie_definition.table.actions'|trans({}, 'NowoCookieConsentBundle') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for definition in definitions %}
+                {% set translation = definition.findTranslation(app.request.locale) ?? definition.findTranslation('en') %}
+                {% set confirm_id = 'delete-cookie-definition-' ~ definition.id %}
+                <tr>
+                    <td><code>{{ definition.name }}</code></td>
+                    <td>{{ translation ? translation.provider : '' }}</td>
+                    <td class="small text-secondary">{{ translation ? translation.purpose : '' }}</td>
+                    <td>{{ ('nowo_cookie_consent.admin.cookie_definition.category.' ~ definition.category)|trans({}, 'NowoCookieConsentBundle') }}</td>
+                    <td>{{ definition.duration }}</td>
+                    <td>{{ definition.allowedByDefault ? 'nowo_cookie_consent.admin.cookie_definition.yes'|trans({}, 'NowoCookieConsentBundle') : 'nowo_cookie_consent.admin.cookie_definition.no'|trans({}, 'NowoCookieConsentBundle') }}</td>
+                    <td class="text-end">
+                        {% include '@NowoUiKitBundle/partials/_row_actions.html.twig' with {
+                            framework: _css_fw,
+                            actions: [
+                                {
+                                    kind: 'edit',
+                                    href: path('nowo_cookie_consent_cookie_definitions_edit', { configId: config.id, id: definition.id }),
+                                    label: 'nowo_cookie_consent.admin.cookie_definition.edit'|trans({}, 'NowoCookieConsentBundle')
+                                },
+                                {
+                                    kind: 'delete',
+                                    tag: 'button',
+                                    confirm_id: confirm_id,
+                                    label: 'nowo_cookie_consent.admin.cookie_definition.delete'|trans({}, 'NowoCookieConsentBundle')
+                                }
+                            ]
+                        } %}
+                        {% set confirm_footer %}
+                            <button type="button" class="{{ ui.btn('secondary', null, _css_fw) }}" {{ ui.confirm_dismiss_attrs() }}>
+                                {{ 'nowo_cookie_consent.admin.cookie_definition.cancel'|trans({}, 'NowoCookieConsentBundle') }}
+                            </button>
+                            <form method="post" action="{{ path('nowo_cookie_consent_cookie_definitions_delete', { configId: config.id, id: definition.id }) }}" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-cookie-definition-' ~ definition.id) }}">
+                                <button type="submit" class="{{ ui.btn('danger', null, _css_fw) }}">
+                                    {{ 'nowo_cookie_consent.admin.cookie_definition.delete'|trans({}, 'NowoCookieConsentBundle') }}
+                                </button>
+                            </form>
+                        {% endset %}
+                        {% include '@NowoUiKitBundle/partials/_confirm.html.twig' with {
+                            id: confirm_id,
+                            title: 'nowo_cookie_consent.admin.cookie_definition.delete'|trans({}, 'NowoCookieConsentBundle'),
+                            body: '<p>' ~ 'nowo_cookie_consent.admin.cookie_definition.delete_confirm'|trans({'%name%': definition.name}, 'NowoCookieConsentBundle')|e ~ '</p>',
+                            footer: confirm_footer,
+                            framework: _css_fw,
+                        } %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        {{ 'nowo_cookie_consent.admin.cookie_definition.empty'|trans({}, 'NowoCookieConsentBundle') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
