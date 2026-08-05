@@ -329,4 +329,64 @@ final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
         $reloaded = $em->getRepository(Issue::class)->find($issue->getId());
         self::assertNull($reloaded->getAssignee());
     }
+
+    public function testResolveTokenCannotBeReplayed(): void
+    {
+        [$client, , $project] = $this->bootWithDemoProject('teams-replay@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $settings = self::getContainer()->get(\App\Shared\Settings\Repository\InstanceSettingsRepository::class)->getOrCreate();
+        $settings->setAllowAnonymousResolve(true);
+        $em->flush();
+
+        $destination = new NotificationDestination();
+        $destination->setProject($project);
+        $destination->setLabel('Ops Teams Replay');
+        $destination->setType(NotificationDestinationType::Teams);
+        $destination->setEndpointUrl('https://outlook.office.com/webhook/x');
+        $destination->setSigningSecret('teams-signing-secret');
+        $destination->setEnabled(true);
+        $destination->setCategories(['error']);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint(hash('sha256', 'teams-replay'));
+        $issue->setTitle('Teams replay me');
+        $issue->setCulprit('demo');
+        $issue->setLevel('error');
+        $issue->setFirstSeen(new DateTimeImmutable());
+        $issue->setLastSeen(new DateTimeImmutable());
+        $issue->incrementEventCount();
+
+        $em->persist($destination);
+        $em->persist($issue);
+        $em->flush();
+
+        $token = new InteractionActionToken()->issueResolveToken(
+            'teams-signing-secret',
+            $destination->getUuid(),
+            $project->getUuid(),
+            $issue->getUuid(),
+        );
+        $body = json_encode($token, \JSON_THROW_ON_ERROR);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/hooks/teams/actions',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            $body,
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            Request::METHOD_POST,
+            '/hooks/teams/actions',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            $body,
+        );
+        self::assertResponseStatusCodeSame(409);
+    }
 }

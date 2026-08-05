@@ -74,6 +74,12 @@ Unreleased hardening already in tree (apply on upgrade without a separate migrat
 - Multi-item Envelope first-of-day stats reuse the pending `DailyProjectStat` insert (no unique-key poison).
 - Production image uses `Caddyfile.prod` (HTTP `/api/*` cleartext ingest disabled; HTTPS DSN only).
 - Mailer DSN allowlist rejects `sendmail` / `native` (no host `?command=` execution from admin UI).
+- CSV exports neutralize spreadsheet formula cells (`=`, `+`, `-`, `@`, …).
+- AI issue export redacts nested secrets, URL userinfo/query, tags, and bearer-like breadcrumbs.
+- Share-link max-uses claimed with an atomic SQL update (no concurrent over-consume).
+- HTTP audit log ignores AuthKit reset-password and magic-login routes/paths (tokens never stored in `path`).
+- Inbound email reply tokens bind the recipient email; spoofed `From` is ignored.
+- Teams Resolve/Assign action tokens include a nonce and are consume-once via `cache.action_token`.
 
 ## Upgrading from 1.0.0 to 1.0.1
 

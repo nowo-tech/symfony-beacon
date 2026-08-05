@@ -19,10 +19,12 @@ final class InboundEmailUnitTest extends TestCase
         $svc = new InboundEmailReplyToken($this->opsDefaultsWith(static function (InstanceSettings $settings): void {
             $settings->setInboundWebhookSecret('secret');
         }));
-        $token = $svc->issue('issue-uuid', 1_700_000_000, 3600);
+        $token = $svc->issue('issue-uuid', 'alice@example.com', 1_700_000_000, 3600);
+        $parsed = $svc->parseValid($token, 1_700_000_100);
+        self::assertSame(['issueUuid' => 'issue-uuid', 'recipientEmail' => 'alice@example.com'], $parsed);
         self::assertSame('issue-uuid', $svc->isValid($token, 1_700_000_100));
-        self::assertNull($svc->isValid($token, 1_700_003_700));
-        self::assertNull($svc->isValid($token.'x', 1_700_000_100));
+        self::assertNull($svc->parseValid($token, 1_700_003_700));
+        self::assertNull($svc->parseValid($token.'x', 1_700_000_100));
     }
 
     public function testQuoteStripperRemovesQuotedReply(): void

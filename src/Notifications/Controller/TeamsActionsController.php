@@ -15,8 +15,10 @@ use App\Project\Entity\Project;
 use App\Shared\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,6 +40,8 @@ final class TeamsActionsController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
         private readonly HookMutationPolicy $hookMutationPolicy,
+        #[Autowire(service: 'cache.action_token')]
+        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -77,6 +81,23 @@ final class TeamsActionsController extends AbstractController
 
             return new Response('Invalid token', Response::HTTP_UNAUTHORIZED);
         }
+
+        $cacheKey = $this->actionToken->consumeCacheKey($payload);
+        if (null === $cacheKey) {
+            return new Response('Invalid token', Response::HTTP_UNAUTHORIZED);
+        }
+        $item = $this->cache->getItem($cacheKey);
+        if ($item->isHit()) {
+            $this->logger->info('Teams action rejected: token already used.', [
+                'destination_uuid' => $destinationUuid,
+            ]);
+
+            return new Response('Token already used', Response::HTTP_CONFLICT);
+        }
+        $item->set(1);
+        $ttl = max(1, (int) $payload['exp'] - time());
+        $item->expiresAfter($ttl);
+        $this->cache->save($item);
 
         $projectUuid = (string) $payload['p'];
         $issueUuid = (string) $payload['i'];

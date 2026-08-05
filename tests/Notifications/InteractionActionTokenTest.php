@@ -23,9 +23,14 @@ final class InteractionActionTokenTest extends TestCase
         );
 
         self::assertTrue($svc->isValidResolveToken('secret', $token, 1_700_000_100));
+        self::assertNotSame('', $token['n']);
         self::assertFalse($svc->isValidResolveToken('wrong', $token, 1_700_000_100));
         self::assertFalse($svc->isValidResolveToken('secret', $token, 1_700_003_601));
         self::assertFalse($svc->isValidAssignToken('secret', $token, 1_700_000_100));
+
+        $withoutNonce = $token;
+        unset($withoutNonce['n']);
+        self::assertFalse($svc->isValidResolveToken('secret', $withoutNonce, 1_700_000_100));
     }
 
     public function testRoundTripValidAssignToken(): void

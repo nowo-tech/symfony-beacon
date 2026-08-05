@@ -47,8 +47,8 @@ final class AiIssueExportFormatter
         $exception = $this->extractException($payload);
         $frames = $this->extractFrames($payload);
         $request = $this->scrubRequest($this->extractRequest($payload));
-        $tags = $this->normalizeTags($payload['tags'] ?? []);
-        $breadcrumbs = $this->summarizeBreadcrumbs($payload['breadcrumbs'] ?? null);
+        $tags = $this->scrubAssocSecrets($this->normalizeTags($payload['tags'] ?? []));
+        $breadcrumbs = $this->scrubBreadcrumbs($this->summarizeBreadcrumbs($payload['breadcrumbs'] ?? null));
 
         return [
             'format' => self::FORMAT,
@@ -314,6 +314,12 @@ final class AiIssueExportFormatter
         if (isset($out['data']) && \is_array($out['data'])) {
             $out['data'] = $this->scrubAssocSecrets($out['data']);
         }
+        if (isset($out['url']) && \is_string($out['url'])) {
+            $out['url'] = $this->scrubUrl($out['url']);
+        }
+        if (isset($out['query_string']) && \is_string($out['query_string'])) {
+            $out['query_string'] = $this->scrubQueryString($out['query_string']);
+        }
 
         return $out;
     }
@@ -348,7 +354,15 @@ final class AiIssueExportFormatter
         $out = [];
         foreach ($data as $key => $value) {
             $name = \is_string($key) ? strtolower($key) : '';
-            if ('' !== $name && (str_contains($name, 'password') || str_contains($name, 'secret') || str_contains($name, 'token') || str_contains($name, 'authorization'))) {
+            if ('' !== $name && $this->isSensitiveKey($name)) {
+                $out[$key] = '[redacted]';
+                continue;
+            }
+            if (\is_array($value)) {
+                $out[$key] = $this->scrubAssocSecrets($value);
+                continue;
+            }
+            if (\is_string($value) && $this->looksLikeSecretLiteral($value)) {
                 $out[$key] = '[redacted]';
                 continue;
             }
@@ -356,6 +370,63 @@ final class AiIssueExportFormatter
         }
 
         return $out;
+    }
+
+    private function isSensitiveKey(string $name): bool
+    {
+        foreach (['password', 'secret', 'token', 'authorization', 'api_key', 'apikey', 'bearer', 'credential'] as $needle) {
+            if (str_contains($name, $needle)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function looksLikeSecretLiteral(string $value): bool
+    {
+        return 1 === preg_match('/\bbearer\s+\S+/i', $value)
+            || 1 === preg_match('/\bapi[_-]?key\s*[:=]\s*\S+/i', $value);
+    }
+
+    private function scrubUrl(string $url): string
+    {
+        $parts = parse_url($url);
+        if (false === $parts) {
+            return $this->scrubQueryString($url);
+        }
+
+        $scheme = $parts['scheme'] ?? null;
+        $host = $parts['host'] ?? null;
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $path = $parts['path'] ?? '';
+        $query = isset($parts['query']) ? '?'.$this->scrubQueryString($parts['query']) : '';
+        $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
+        $user = isset($parts['user']) ? '[redacted]' : null;
+        $pass = isset($parts['pass']) ? ':[redacted]' : '';
+        $auth = null !== $user ? $user.$pass.'@' : '';
+
+        if (null === $scheme || null === $host) {
+            return $this->scrubQueryString($url);
+        }
+
+        return $scheme.'://'.$auth.$host.$port.$path.$query.$fragment;
+    }
+
+    private function scrubQueryString(string $query): string
+    {
+        if ('' === $query) {
+            return $query;
+        }
+
+        parse_str($query, $params);
+        if ([] === $params) {
+            return $query;
+        }
+        /** @var array<mixed> $params */
+        $params = $this->scrubAssocSecrets($params);
+
+        return http_build_query($params);
     }
 
     /**
@@ -409,6 +480,25 @@ final class AiIssueExportFormatter
             if ($count >= 25) {
                 break;
             }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $breadcrumbs
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function scrubBreadcrumbs(array $breadcrumbs): array
+    {
+        $out = [];
+        foreach ($breadcrumbs as $crumb) {
+            $message = $crumb['message'] ?? null;
+            if (\is_string($message) && $this->looksLikeSecretLiteral($message)) {
+                $crumb['message'] = '[redacted]';
+            }
+            $out[] = $crumb;
         }
 
         return $out;

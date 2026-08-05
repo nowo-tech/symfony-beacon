@@ -282,15 +282,15 @@ final class ProjectExportController extends AbstractController
      */
     private function csvStream(string $filename, array $headers, callable $rows): StreamedResponse
     {
-        $response = new StreamedResponse(static function () use ($headers, $rows): void {
+        $response = new StreamedResponse(function () use ($headers, $rows): void {
             $out = fopen('php://output', 'w');
             if (false === $out) {
                 return;
             }
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, $headers, ',', '"', '\\');
+            fputcsv($out, $this->csvSafeRow($headers), ',', '"', '\\');
             foreach ($rows() as $row) {
-                fputcsv($out, $row, ',', '"', '\\');
+                fputcsv($out, $this->csvSafeRow($row), ',', '"', '\\');
             }
             fclose($out);
         });
@@ -298,5 +298,26 @@ final class ProjectExportController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
 
         return $response;
+    }
+
+    /**
+     * Neutralize spreadsheet formula injection (Excel/Sheets) before CSV write.
+     *
+     * @param list<string> $row
+     *
+     * @return list<string>
+     */
+    private function csvSafeRow(array $row): array
+    {
+        return array_map($this->csvSafeCell(...), $row);
+    }
+
+    private function csvSafeCell(string $value): string
+    {
+        if ('' !== $value && 1 === preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 }

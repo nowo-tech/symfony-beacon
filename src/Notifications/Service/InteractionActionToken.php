@@ -11,6 +11,7 @@ use InvalidArgumentException;
  *
  * Claims are signed with the destination signing secret. Resolve uses HttpPOST
  * (token in the card body); Assign uses OpenUri (token in the query string).
+ * Each token includes a random nonce (`n`) so controllers can consume-once.
  */
 final class InteractionActionToken
 {
@@ -21,7 +22,7 @@ final class InteractionActionToken
     public const string ACTION_ASSIGN = 'assign';
 
     /**
-     * @return array{a: string, d: string, p: string, i: string, exp: int, sig: string}
+     * @return array{a: string, d: string, p: string, i: string, n: string, exp: int, sig: string}
      */
     public function issueActionToken(
         string $action,
@@ -43,6 +44,7 @@ final class InteractionActionToken
             'd' => $destinationUuid,
             'p' => $projectUuid,
             'i' => $issueUuid,
+            'n' => bin2hex(random_bytes(16)),
             'exp' => $exp,
         ];
         $claims['sig'] = $this->signature($signingSecret, $claims);
@@ -51,7 +53,7 @@ final class InteractionActionToken
     }
 
     /**
-     * @return array{a: string, d: string, p: string, i: string, exp: int, sig: string}
+     * @return array{a: string, d: string, p: string, i: string, n: string, exp: int, sig: string}
      */
     public function issueResolveToken(
         string $signingSecret,
@@ -73,7 +75,7 @@ final class InteractionActionToken
     }
 
     /**
-     * @return array{a: string, d: string, p: string, i: string, exp: int, sig: string}
+     * @return array{a: string, d: string, p: string, i: string, n: string, exp: int, sig: string}
      */
     public function issueAssignToken(
         string $signingSecret,
@@ -108,6 +110,7 @@ final class InteractionActionToken
         $destinationUuid = $payload['d'] ?? null;
         $projectUuid = $payload['p'] ?? null;
         $issueUuid = $payload['i'] ?? null;
+        $nonce = $payload['n'] ?? null;
         $exp = $payload['exp'] ?? null;
         $sig = $payload['sig'] ?? null;
 
@@ -115,6 +118,7 @@ final class InteractionActionToken
             || !\is_string($destinationUuid) || '' === $destinationUuid
             || !\is_string($projectUuid) || '' === $projectUuid
             || !\is_string($issueUuid) || '' === $issueUuid
+            || !\is_string($nonce) || '' === $nonce
             || !is_numeric($exp)
             || !\is_string($sig) || '' === $sig
         ) {
@@ -131,6 +135,7 @@ final class InteractionActionToken
             'd' => $destinationUuid,
             'p' => $projectUuid,
             'i' => $issueUuid,
+            'n' => $nonce,
             'exp' => $expInt,
         ]);
 
@@ -154,11 +159,26 @@ final class InteractionActionToken
     }
 
     /**
-     * @param array{a: string, d: string, p: string, i: string, exp: int} $claims
+     * Cache key for consume-once tracking (signature is unique per issued token).
+     *
+     * @param array<string, mixed> $payload
+     */
+    public function consumeCacheKey(array $payload): ?string
+    {
+        $sig = $payload['sig'] ?? null;
+        if (!\is_string($sig) || '' === $sig) {
+            return null;
+        }
+
+        return 'teams_action_'.hash('sha256', $sig);
+    }
+
+    /**
+     * @param array{a: string, d: string, p: string, i: string, n: string, exp: int} $claims
      */
     private function signature(string $signingSecret, array $claims): string
     {
-        $base = $claims['a']."\n".$claims['d']."\n".$claims['p']."\n".$claims['i']."\n".$claims['exp'];
+        $base = $claims['a']."\n".$claims['d']."\n".$claims['p']."\n".$claims['i']."\n".$claims['n']."\n".$claims['exp'];
 
         return hash_hmac('sha256', $base, $signingSecret);
     }

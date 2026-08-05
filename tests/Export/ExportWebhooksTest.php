@@ -61,6 +61,24 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
         self::assertStringContainsString($keep->getUuid(), $csv);
     }
 
+    public function testCsvExportNeutralizesSpreadsheetFormulas(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('export-formula@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $issue = $this->persistIssue($em, $project, 'export-formula', '=1+2', 'error', IssueStatus::Unresolved);
+        $issue->setCulprit('+cmd|\'/C calc\'!A0');
+        $em->flush();
+
+        $this->login($client, $owner);
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/export/issues.csv');
+        self::assertResponseIsSuccessful();
+        $csv = $this->streamedContent($client);
+        self::assertStringContainsString("'=1+2", $csv);
+        self::assertStringContainsString("'+cmd|'/C calc'!A0", $csv);
+        self::assertStringNotContainsString(",=1+2,", ','.$csv.',');
+    }
+
     public function testMemberCannotExport(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('export-deny-owner@example.com');

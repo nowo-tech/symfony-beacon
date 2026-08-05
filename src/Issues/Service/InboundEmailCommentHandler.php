@@ -47,12 +47,14 @@ final readonly class InboundEmailCommentHandler
             return 'ignored';
         }
 
-        $issueUuid = $this->replyToken->isValid($token);
-        if (null === $issueUuid) {
+        $parsed = $this->replyToken->parseValid($token);
+        if (null === $parsed) {
             $this->logger->warning('Inbound email rejected: invalid reply token.');
 
             return 'ignored';
         }
+        $issueUuid = $parsed['issueUuid'];
+        $boundEmail = $parsed['recipientEmail'];
 
         $normalizedMessageId = null !== $messageId && '' !== trim($messageId)
             ? trim($messageId)
@@ -68,7 +70,17 @@ final readonly class InboundEmailCommentHandler
             return 'ignored';
         }
 
-        $user = $this->userRepository->findOneByEmail(trim(strtolower($fromEmail)));
+        $fromNormalized = trim(strtolower($fromEmail));
+        if (!hash_equals($boundEmail, $fromNormalized)) {
+            $this->logger->info('Inbound email ignored: From does not match token recipient.', [
+                'from' => $fromEmail,
+                'bound' => $boundEmail,
+            ]);
+
+            return 'ignored';
+        }
+
+        $user = $this->userRepository->findOneByEmail($fromNormalized);
         if (!$user instanceof User) {
             $this->logger->info('Inbound email ignored: unknown From address.', [
                 'from' => $fromEmail,

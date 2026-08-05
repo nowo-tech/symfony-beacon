@@ -93,7 +93,7 @@ final readonly class IssueUserMailNotifier
                 ->subject($this->translator->trans($subjectKey, $params))
                 ->text($this->translator->trans($bodyKey, $params));
             if ($this->opsDefaults->inboundEmailEnabled() && '' !== $this->opsDefaults->inboundMailDomain()) {
-                $token = $this->inboundEmailReplyToken->issue($issue->getUuid());
+                $token = $this->inboundEmailReplyToken->issue($issue->getUuid(), $email);
                 $message->replyTo('reply+'.$token.'@'.$this->opsDefaults->inboundMailDomain());
             }
             $this->mailTransport->send($message);

@@ -128,7 +128,11 @@ final readonly class ProjectShareLinkManager
             throw new RuntimeException('issue_wrong_project');
         }
 
-        $link->markUsed();
+        if (!$this->shareLinkRepository->tryClaimUse($link)) {
+            throw new RuntimeException('share_exhausted');
+        }
+        $this->entityManager->refresh($link);
+
         $this->projectAccess->grantShareAccess(
             $project,
             $issue?->getUuid(),

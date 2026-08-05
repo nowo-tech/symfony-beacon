@@ -234,4 +234,25 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
         self::assertSame(2, $link->getUseCount());
         self::assertTrue($link->isUsable());
     }
+
+    public function testAtomicClaimRejectsSecondUseWhenMaxUsesOne(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('share-atomic@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        /** @var ProjectShareLinkManager $manager */
+        $manager = self::getContainer()->get(ProjectShareLinkManager::class);
+        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'), 1);
+        $link = $created['link'];
+
+        $repo = self::getContainer()->get(\App\Project\Repository\ProjectShareLinkRepository::class);
+        self::assertTrue($repo->tryClaimUse($link));
+        self::assertFalse($repo->tryClaimUse($link));
+
+        $em->clear();
+        $reloaded = $em->find(ProjectShareLink::class, $link->getId());
+        self::assertInstanceOf(ProjectShareLink::class, $reloaded);
+        self::assertSame(1, $reloaded->getUseCount());
+        self::assertFalse($reloaded->isUsable());
+    }
 }

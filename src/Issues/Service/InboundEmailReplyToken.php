@@ -11,6 +11,7 @@ use JsonException;
  * HMAC reply tokens embedded in Reply-To local-parts (reply+{token}).
  *
  * Token payload is base64url(json) + "." + hex hmac.
+ * Claims bind both the issue (`i`) and the intended recipient email (`u`).
  * Signing secret comes from Ops defaults (inbound webhook secret).
  */
 final readonly class InboundEmailReplyToken
@@ -22,11 +23,12 @@ final readonly class InboundEmailReplyToken
     ) {
     }
 
-    public function issue(string $issueUuid, ?int $now = null, int $ttlSeconds = self::DEFAULT_TTL_SECONDS): string
+    public function issue(string $issueUuid, string $recipientEmail, ?int $now = null, int $ttlSeconds = self::DEFAULT_TTL_SECONDS): string
     {
         $now ??= time();
         $claims = [
             'i' => $issueUuid,
+            'u' => strtolower(trim($recipientEmail)),
             'exp' => $now + $ttlSeconds,
         ];
         $payload = rtrim(strtr(base64_encode(json_encode($claims, \JSON_THROW_ON_ERROR)), '+/', '-_'), '=');
@@ -35,7 +37,10 @@ final readonly class InboundEmailReplyToken
         return $payload.'.'.$sig;
     }
 
-    public function isValid(string $token, ?int $now = null): ?string
+    /**
+     * @return array{issueUuid: string, recipientEmail: string}|null
+     */
+    public function parseValid(string $token, ?int $now = null): ?array
     {
         $now ??= time();
         $parts = explode('.', $token, 2);
@@ -62,14 +67,31 @@ final readonly class InboundEmailReplyToken
             return null;
         }
         $issueUuid = $claims['i'] ?? null;
+        $recipientEmail = $claims['u'] ?? null;
         $exp = $claims['exp'] ?? null;
-        if (!\is_string($issueUuid) || '' === $issueUuid || !is_numeric($exp)) {
+        if (!\is_string($issueUuid) || '' === $issueUuid
+            || !\is_string($recipientEmail) || '' === $recipientEmail
+            || !is_numeric($exp)
+        ) {
             return null;
         }
         if ((int) $exp < $now) {
             return null;
         }
 
-        return $issueUuid;
+        return [
+            'issueUuid' => $issueUuid,
+            'recipientEmail' => strtolower(trim($recipientEmail)),
+        ];
+    }
+
+    /**
+     * @deprecated Use {@see parseValid()}; kept for callers that only need the issue UUID
+     */
+    public function isValid(string $token, ?int $now = null): ?string
+    {
+        $parsed = $this->parseValid($token, $now);
+
+        return $parsed['issueUuid'] ?? null;
     }
 }

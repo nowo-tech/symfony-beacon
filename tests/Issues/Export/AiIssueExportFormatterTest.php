@@ -48,19 +48,24 @@ final class AiIssueExportFormatterTest extends TestCase
             ],
             'request' => [
                 'method' => 'GET',
-                'url' => 'https://example.test/oops',
+                'url' => 'https://user:pass@example.test/oops?access_token=leak&ok=1',
                 'headers' => [
                     'Authorization' => 'Bearer secret-token',
                     'Cookie' => 'session=abc',
                     'Accept' => 'text/html',
                 ],
                 'cookies' => ['session' => 'abc'],
-                'data' => ['password' => 'hunter2', 'ok' => '1'],
+                'data' => [
+                    'password' => 'hunter2',
+                    'ok' => '1',
+                    'nested' => ['api_token' => 'nested-secret', 'safe' => 'yes'],
+                ],
             ],
-            'tags' => ['env' => 'prod'],
+            'tags' => ['env' => 'prod', 'secret' => 'tag-secret'],
             'breadcrumbs' => [
                 'values' => [
                     ['category' => 'http', 'message' => 'GET /oops'],
+                    ['category' => 'auth', 'message' => 'Bearer abcdef.ghij'],
                 ],
             ],
         ]);
@@ -75,12 +80,22 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertSame('[redacted]', $data['request']['cookies']);
         self::assertSame('[redacted]', $data['request']['data']['password']);
         self::assertSame('1', $data['request']['data']['ok']);
+        self::assertSame('[redacted]', $data['request']['data']['nested']['api_token']);
+        self::assertSame('yes', $data['request']['data']['nested']['safe']);
+        self::assertStringContainsString('[redacted]', (string) $data['request']['url']);
+        self::assertStringNotContainsString('pass', (string) $data['request']['url']);
+        self::assertStringNotContainsString('leak', (string) $data['request']['url']);
+        self::assertSame('[redacted]', $data['tags']['secret']);
+        self::assertSame('prod', $data['tags']['env']);
+        self::assertSame('[redacted]', $data['breadcrumbs'][1]['message']);
 
         $md = $formatter->toMarkdown($data);
         self::assertStringContainsString('format: beacon-ai-export/v1', $md);
         self::assertStringContainsString('RuntimeException', $md);
         self::assertStringNotContainsString('Bearer secret-token', $md);
         self::assertStringNotContainsString('hunter2', $md);
+        self::assertStringNotContainsString('tag-secret', $md);
+        self::assertStringNotContainsString('nested-secret', $md);
 
         $json = $formatter->toJson($data);
         self::assertStringContainsString('"format": "beacon-ai-export/v1"', $json);

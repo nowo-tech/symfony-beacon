@@ -57,7 +57,16 @@ final class ProjectShareLinkController extends AbstractController
             return $this->redirectToRoute('nowo_auth_kit_login');
         }
 
-        $this->shareLinkManager->consume($link, $user);
+        try {
+            $this->shareLinkManager->consume($link, $user);
+        } catch (\RuntimeException $e) {
+            if (!\in_array($e->getMessage(), ['share_exhausted', 'missing_project', 'issue_wrong_project'], true)) {
+                throw $e;
+            }
+            $this->addFlash('error', 'projects.share.invalid');
+
+            return $this->redirectToRoute('nowo_auth_kit_login');
+        }
         $project = $link->getProject();
         $issue = $link->getIssue();
         if ($issue instanceof Issue && $project instanceof Project) {

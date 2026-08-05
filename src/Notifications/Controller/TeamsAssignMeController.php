@@ -14,8 +14,10 @@ use App\Notifications\Service\InteractionActionToken;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use InvalidArgumentException;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -38,6 +40,8 @@ final class TeamsAssignMeController extends AbstractController
         private readonly IssueAssigneeChanger $issueAssigneeChanger,
         private readonly ProjectAccessService $projectAccess,
         private readonly LoggerInterface $logger,
+        #[Autowire(service: 'cache.action_token')]
+        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -52,6 +56,7 @@ final class TeamsAssignMeController extends AbstractController
             'd' => $request->query->getString('d'),
             'p' => $request->query->getString('p'),
             'i' => $request->query->getString('i'),
+            'n' => $request->query->getString('n'),
             'exp' => $request->query->get('exp'),
             'sig' => $request->query->getString('sig'),
         ];
@@ -77,6 +82,30 @@ final class TeamsAssignMeController extends AbstractController
 
             throw $this->createAccessDeniedException('Invalid token');
         }
+
+        $cacheKey = $this->actionToken->consumeCacheKey($payload);
+        if (null === $cacheKey) {
+            throw $this->createAccessDeniedException('Invalid token');
+        }
+        $item = $this->cache->getItem($cacheKey);
+        if ($item->isHit()) {
+            $this->logger->info('Teams Assign rejected: token already used.', [
+                'destination_uuid' => $destinationUuid,
+            ]);
+            $this->addFlash('error', 'notifications.teams.token_used');
+
+            $projectUuid = $payload['p'];
+            $issueUuid = $payload['i'];
+
+            return $this->redirectToRoute('issue_show', [
+                'projectId' => $projectUuid,
+                'id' => $issueUuid,
+            ]);
+        }
+        $item->set(1);
+        $ttl = max(1, (int) $payload['exp'] - time());
+        $item->expiresAfter($ttl);
+        $this->cache->save($item);
 
         $projectUuid = $payload['p'];
         $issueUuid = $payload['i'];
