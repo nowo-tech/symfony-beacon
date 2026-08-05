@@ -705,8 +705,6 @@ appearance:
         colors: Cores
         colors_help: 'Ajuste destaques, cores de estado e superfícies para modos claro e escuro.'
     subtab:
-        light: Temas claros
-        dark: Temas escuros
         accents: Destaques
         status: Estado
         surfaces: Superfícies

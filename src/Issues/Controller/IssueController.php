@@ -256,11 +256,13 @@ final class IssueController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
-    public function show(
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): Response {
+    public function show(string $projectId, string $id): Response
+    {
+        $issue = $this->issueRepository->findOneByUuidHydrated($id);
+        if (!$issue instanceof Issue) {
+            throw $this->createNotFoundException();
+        }
+
         /** @var User $user */
         $user = $this->getUser();
         $project = $issue->getProject();

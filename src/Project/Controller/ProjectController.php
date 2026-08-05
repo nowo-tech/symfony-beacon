@@ -28,7 +28,6 @@ use App\Project\Service\ProjectMembershipManager;
 use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -297,15 +296,30 @@ final class ProjectController extends AbstractController
             }
         }
 
+        $canLinkAny = $this->isGranted('ROLE_ADMIN');
+        if (!$canLinkAny) {
+            $access = $this->projectAccess->resolveAccess($project, $actor);
+            $canLinkAny = $access instanceof ProjectAccess && ProjectRole::Owner === $access->role;
+        }
+
+        /** @var array<int, true> $actorGroupIds */
+        $actorGroupIds = [];
+        if (!$canLinkAny) {
+            foreach ($this->userGroupMembershipRepository->findByUser($actor) as $membership) {
+                $gid = $membership->getUserGroup()?->getId();
+                if (null !== $gid) {
+                    $actorGroupIds[$gid] = true;
+                }
+            }
+        }
+
         $groups = [];
         foreach ($this->userGroupRepository->findAllOrdered() as $group) {
             $id = $group->getId();
             if (null === $id || isset($linkedIds[$id])) {
                 continue;
             }
-            try {
-                $this->membershipManager->assertActorCanLinkGroup($actor, $group, $project);
-            } catch (RuntimeException) {
+            if (!$canLinkAny && !isset($actorGroupIds[$id])) {
                 continue;
             }
             $groups[] = $group;

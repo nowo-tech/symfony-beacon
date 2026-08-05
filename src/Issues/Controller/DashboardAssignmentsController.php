@@ -52,9 +52,9 @@ final class DashboardAssignmentsController extends AbstractController
         $priorityParam = $request->query->getString('priority');
         $priority = '' !== $priorityParam ? IssuePriority::tryFrom($priorityParam) : null;
 
+        $teammates = $this->collectTeammates($accessible, $user);
         $assigneeFilter = $this->resolveAssigneeFilter(
-            $accessible,
-            $user,
+            $teammates,
             $request->query->getString('assignee'),
         );
 
@@ -106,7 +106,7 @@ final class DashboardAssignmentsController extends AbstractController
         return $this->render('dashboard/assignments.html.twig', [
             'issues' => $issues,
             'projects' => $accessible,
-            'teammates' => $this->collectTeammates($accessible, $user),
+            'teammates' => $teammates,
             'filters' => $filters,
             'pagination' => $pagination,
             'scopes' => AssignmentScope::cases(),
@@ -131,15 +131,15 @@ final class DashboardAssignmentsController extends AbstractController
     }
 
     /**
-     * @param list<Project> $accessible
+     * @param list<User> $teammates
      */
-    private function resolveAssigneeFilter(array $accessible, User $viewer, string $raw): ?User
+    private function resolveAssigneeFilter(array $teammates, string $raw): ?User
     {
         if ('' === $raw || !ctype_digit($raw)) {
             return null;
         }
         $id = (int) $raw;
-        foreach ($this->collectTeammates($accessible, $viewer) as $teammate) {
+        foreach ($teammates as $teammate) {
             if ($teammate->getId() === $id) {
                 return $teammate;
             }
@@ -157,24 +157,14 @@ final class DashboardAssignmentsController extends AbstractController
     {
         /** @var array<int, User> $byId */
         $byId = [];
-        foreach ($projects as $project) {
-            foreach ($this->membershipRepository->findUsersByProject($project) as $member) {
-                $id = $member->getId();
-                if (null === $id || $id === $viewer->getId()) {
-                    continue;
-                }
-                $byId[$id] = $member;
+        foreach ($this->membershipRepository->findUsersByProjects($projects) as $member) {
+            $id = $member->getId();
+            if (null === $id || $id === $viewer->getId()) {
+                continue;
             }
+            $byId[$id] = $member;
         }
-        $list = array_values($byId);
-        usort(
-            $list,
-            static fn (User $a, User $b): int => strcasecmp(
-                $a->getDisplayName() ?: $a->getEmail(),
-                $b->getDisplayName() ?: $b->getEmail(),
-            ),
-        );
 
-        return $list;
+        return array_values($byId);
     }
 }

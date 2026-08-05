@@ -361,13 +361,6 @@ final class AdminUserController extends AbstractController
     /** Number of accounts with ROLE_ADMIN (used to protect the last admin). */
     private function countAdmins(): int
     {
-        $count = 0;
-        foreach ($this->userRepository->findAll() as $user) {
-            if ($this->isAppAdmin($user)) {
-                ++$count;
-            }
-        }
-
-        return $count;
+        return $this->userRepository->countAdmins();
     }
 }

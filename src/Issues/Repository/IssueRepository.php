@@ -594,6 +594,24 @@ class IssueRepository extends ServiceEntityRepository
         return $issue;
     }
 
+    /**
+     * Issue detail load with assignee + duplicateOf + project (avoids N+1 on show).
+     */
+    public function findOneByUuidHydrated(string $uuid): ?Issue
+    {
+        /** @var Issue|null $issue */
+        $issue = $this->createQueryBuilder('i')
+            ->leftJoin('i.assignee', 'assignee_user')->addSelect('assignee_user')
+            ->leftJoin('i.duplicateOf', 'duplicate_of')->addSelect('duplicate_of')
+            ->leftJoin('i.project', 'p')->addSelect('p')
+            ->andWhere('i.uuid = :uuid')
+            ->setParameter('uuid', $uuid)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $issue;
+    }
+
     public function countByProjectAndStatus(Project $project, IssueStatus $status): int
     {
         return (int) $this->createQueryBuilder('i')

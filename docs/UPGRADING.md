@@ -62,6 +62,10 @@ When this release includes kit admin `css_framework: tailwind` (no Bootstrap in 
 
 **HttpLogBundle (`nowo-tech/http-log-bundle` 1.0.1):** run migrations for `nowo_http_log_entry`, ensure Messenger workers consume `PersistHttpLogMessage` / `ExportHttpLogMessage` / `PurgeHttpLogMessage` (routed to `async`), open **Administration → HTTP log** (`/admin/http-log`, `ROLE_ADMIN`), and schedule `nowo:http-log:purge`. Re-run platform/demo seed so the administration menu and breadcrumbs include the new routes. Document HTTP audit logging (IPs / user identifiers) in operator privacy copy — see [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
 
+### Appearance theme presets (`082` / 6.32)
+
+Migrations `Version20260805120000`–`Version20260805160000` add `site_appearance.theme_id`, `footer_fixed`, `corner_style`, `border_strength`, and `theme_id_dark` (dark preset ids formerly stored in `theme_id` are moved). After migrate, open **Administration → Appearance → Themes** and confirm light/dark cards; review Brand / Layout / Colors tabs. Instance config export/import includes the new keys — see `specs/082-appearance-theme-presets/`.
+
 No further steps until the next tagged release.
 
 ### Security remediations (Codex Security medium findings)

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Shared\Appearance;
 
 /**
- * Optional second-level tabs under Themes / Colors.
+ * Optional second-level tabs under Colors.
  */
 enum AppearanceSettingsSubtab: string
 {
-    case Light = 'light';
-    case Dark = 'dark';
     case Accents = 'accents';
     case Status = 'status';
     case Surfaces = 'surfaces';

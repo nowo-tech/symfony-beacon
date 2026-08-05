@@ -102,8 +102,10 @@ class DailyProjectStatRepository extends ServiceEntityRepository
 
         $from = $this->fromDateForLastDays($days);
 
-        /** @var list<DailyProjectStat> $rows */
+        /** @var list<array{0: DailyProjectStat, projectId: int|string}> $rows */
         $rows = $this->createQueryBuilder('s')
+            ->select('s')
+            ->addSelect('IDENTITY(s.project) AS projectId')
             ->andWhere('s.project IN (:projects)')
             ->andWhere('s.statDate >= :from')
             ->setParameter('projects', $ids)
@@ -112,12 +114,9 @@ class DailyProjectStatRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        foreach ($rows as $stat) {
-            $projectId = $stat->getProject()?->getId();
-            if (null === $projectId) {
-                continue;
-            }
-            $map[$projectId][] = $stat;
+        foreach ($rows as $row) {
+            $projectId = (int) $row['projectId'];
+            $map[$projectId][] = $row[0];
         }
 
         return $map;

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Appearance **theme presets** (`082` / 6.32): named light (`beacon` / `ocean` / `slate` / `sandstone`) and dark (`midnight` / `obsidian` / `aurora` / `ember`) palettes that overwrite site colors; independent `theme_id` / `theme_id_dark`; tabbed Themes / Brand / Layout / Colors; corner style, border strength, fixed legal footer; instance config keys.
 - Ops defaults **section tabs** with own routes (`/settings/ops-defaults/{section}`); shared product tabs delegate to UiKit `_tabs`.
 - Form field loop convention (`077`): shared `templates/form/_fields.html.twig`; host Symfony forms paint unrendered Type children before actions (FormKit owns field attrs).
 - `nowo-tech/http-log-bundle` **1.0.1**: HTTP request/response audit log with admin UI at `/admin/http-log` (ROLE_ADMIN), kit host layout, Messenger async persist/export/purge, MDK table `nowo_http_log_entry`.
@@ -36,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cookie Consent admin **1.6.0**: route-based settings sections (`/settings/{section}`); host drops `data-kit-form-tabs` / tabify JS and restyles vendor `.nowo-ui-tabs` to Beacon tab chrome (UiKit consumer — see `081`).
 - SiteBackup: explicit root `css_framework: tailwind` + `data-css-framework` on setup/panel host shells (pin **1.10.0**; see `081`).
 - Former `BEACON_INGEST_REJECT_QUERY_AUTH`, `BEACON_METRICS_*`, `BEACON_ENVELOPE_MAX_BYTES`, `BEACON_INBOUND_*`, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS`, and `BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE` env vars are no longer read (configure via Ops defaults).
+
+### Fixed
+
+- Further Doctrine N+1 / hydrate helpers: issue show (`findOneByUuidHydrated`), batch project members (`findUsersByProjects`), admin count without full user hydrate (`countAdmins`).
 
 ## [1.0.1] - 2026-07-31
 

@@ -33,7 +33,6 @@ final class AppearanceSettingsController extends AbstractController
     {
         return $this->redirectToRoute('settings_appearance_section', [
             'section' => AppearanceSettingsSection::Themes->value,
-            'sub' => AppearanceSettingsSubtab::Light->value,
         ]);
     }
 
@@ -50,7 +49,7 @@ final class AppearanceSettingsController extends AbstractController
         name: 'settings_appearance_section',
         requirements: [
             'section' => 'themes|brand|layout|colors',
-            'sub' => 'light|dark|accents|status|surfaces',
+            'sub' => 'accents|status|surfaces',
         ],
         methods: ['GET', 'POST'],
     )]
@@ -119,14 +118,11 @@ final class AppearanceSettingsController extends AbstractController
             }
         }
 
-        $activeMode = AppearanceSettingsSubtab::Dark === $subEnum ? 'dark' : 'light';
-
         return $this->render('settings/appearance.html.twig', [
             'form' => $form,
             'section' => $sectionEnum,
             'subtab' => $subEnum,
             'sections' => AppearanceSettingsSection::cases(),
-            'activeThemeId' => AppearanceThemePresets::matchForMode($appearance, $activeMode),
             'activeThemeIdLight' => AppearanceThemePresets::matchLightId($appearance),
             'activeThemeIdDark' => AppearanceThemePresets::matchDarkId($appearance),
             'lightThemes' => AppearanceThemePresets::byMode('light'),

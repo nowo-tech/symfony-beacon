@@ -705,8 +705,6 @@ appearance:
         colors: Farben
         colors_help: 'Feinabstimmung von Akzenten, Statusfarben und Oberflächen für hell und dunkel.'
     subtab:
-        light: Helle Themen
-        dark: Dunkle Themen
         accents: Akzente
         status: Status
         surfaces: Oberflächen

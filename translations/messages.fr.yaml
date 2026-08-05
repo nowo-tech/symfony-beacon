@@ -705,8 +705,6 @@ appearance:
         colors: Couleurs
         colors_help: 'Ajustez accents, couleurs d’état et surfaces pour les modes clair et sombre.'
     subtab:
-        light: Thèmes clairs
-        dark: Thèmes sombres
         accents: Accents
         status: Statut
         surfaces: Surfaces

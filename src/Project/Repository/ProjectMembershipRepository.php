@@ -90,13 +90,36 @@ class ProjectMembershipRepository extends ServiceEntityRepository
      */
     public function findUsersByProject(Project $project): array
     {
+        return $this->findUsersByProjects([$project]);
+    }
+
+    /**
+     * Batch variant of {@see findUsersByProject()} (two queries total; avoids N+1 across projects).
+     *
+     * @param list<Project> $projects
+     *
+     * @return list<User>
+     */
+    public function findUsersByProjects(array $projects): array
+    {
+        $projectIds = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null !== $id) {
+                $projectIds[] = $id;
+            }
+        }
+        if ([] === $projectIds) {
+            return [];
+        }
+
         /** @var list<User> $direct */
         $direct = $this->getEntityManager()->createQueryBuilder()
-            ->select('u')
+            ->select('DISTINCT u')
             ->from(User::class, 'u')
             ->innerJoin('u.memberships', 'm')
-            ->andWhere('m.project = :project')
-            ->setParameter('project', $project)
+            ->andWhere('m.project IN (:projectIds)')
+            ->setParameter('projectIds', $projectIds)
             ->getQuery()
             ->getResult();
 
@@ -107,8 +130,8 @@ class ProjectMembershipRepository extends ServiceEntityRepository
             ->innerJoin(UserGroupMembership::class, 'gm', 'WITH', 'gm.user = u')
             ->innerJoin('gm.userGroup', 'g')
             ->innerJoin(ProjectGroupAccess::class, 'a', 'WITH', 'a.userGroup = g')
-            ->andWhere('a.project = :project')
-            ->setParameter('project', $project)
+            ->andWhere('a.project IN (:projectIds)')
+            ->setParameter('projectIds', $projectIds)
             ->getQuery()
             ->getResult();
 

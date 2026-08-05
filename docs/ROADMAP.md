@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.0.0** is the first stable major (Phases 0–6 through **6.28** Done). **v0.17.0** shipped Mailer DSN audit (`6.15`), Mailpit (`6.16`), Ops defaults, and Social login admin. **6.19**–**6.28** OTLP logs/traces/metrics, Slack/Teams Resolve/Assign, AuthKit QR image, and inbound email comments Done. **6.29**–**6.30** Dashboard Assignments + aside panels (Summary / Activity / Mentions / Alerts / New in release) Done. **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.0.0** is the first stable major (Phases 0–6 through **6.28** Done). **v0.17.0** shipped Mailer DSN audit (`6.15`), Mailpit (`6.16`), Ops defaults, and Social login admin. **6.19**–**6.28** OTLP logs/traces/metrics, Slack/Teams Resolve/Assign, AuthKit QR image, and inbound email comments Done. **6.29**–**6.31** Dashboard Assignments + aside panels + FormKit/UiKit kit sync Done. **6.32** Appearance theme presets (independent light/dark) Done. **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -294,6 +294,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.29 | **Dashboard Assignments** panel (mine / teammates / unassigned across accessible projects) | Beacon | `079-dashboard-assignments` | **Done** |
 | 6.30 | **Dashboard aside panels**: Summary, Activity, Mentions inbox (`issue_mention`), Alerts (member failed deliveries), New in release | Beacon | `080-dashboard-aside-panels` | **Done** |
 | 6.31 | **FormKit / UiKit kit sync** (UiKit host 1.7; FormKit 2.2; AuthKit 1.15; RoutingKit 1.3; Menu 2.0 / Breadcrumb 2.1 / Cookie 1.6 / HttpLog 1.1; profiles, shell, pagination, panel form) | Beacon + kits | `081-formkit-uikit-kit-sync` | **Done** |
+| 6.32 | **Appearance theme presets**: named light/dark palettes that overwrite colors; independent `theme_id` / `theme_id_dark`; tabbed Themes / Brand / Layout / Colors; corner / border / fixed footer | Beacon | `082-appearance-theme-presets` | **Done** |
 
 ### Next (immediate queue)
 
@@ -367,6 +368,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **Bundle v1.6.10** | Phase 6.13–6.14: nested console extras + Scheduler context; Monolog bridge already shipped (docs closed) |
 | **v1.0.0** | First stable major: OTLP logs/traces/metrics (`067`/`070`/`074`); Slack/Teams Resolve + Assign (`068`/`069`/`071`/`073`); AuthKit 1.12 + QR image (`072`/`075`); inbound email comments (`076`); branded 4xx/5xx expansion; Constitution Principle X |
 | **v1.0.1** | Docs layout (`product`/`ops`/`dev`); Doctrine N+1 / query amplification fixes on list/export, retention, ingest thresholds |
+| **Unreleased** | Appearance theme presets (`082` / 6.32); Codex Security remediations; further N+1 hydrates |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -378,4 +380,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-03 (**6.29** Assignments + **6.30** aside panels Done; Next = Later Phase 6+).
+Last updated: 2026-08-05 (**6.32** appearance theme presets Done; Next = Later Phase 6+).

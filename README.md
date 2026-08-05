@@ -65,7 +65,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme + kit profiles)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt); **optional** member alerts for new issues — Mercure live toasts via **Administration → Mercure** ([docs/ops/MERCURE.md](docs/ops/MERCURE.md)), Web Push via **Account → Display** ([docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md))
 - Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
-- **Appearance** settings for `ROLE_ADMIN` (brand name + accent colors) at `/settings/appearance`
+- **Appearance** settings for `ROLE_ADMIN` (named light/dark theme presets, brand, layout, colors) at `/settings/appearance` (`082`)
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/product/LEGAL-AND-COOKIES.md](docs/product/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display`

@@ -717,7 +717,7 @@ appearance:
     subtabs_label: Appearance subsections
     tab:
         themes: Themes
-        themes_help: Pick a preset to replace background, accents, and status colors at once. Manual color edits mark the palette as custom.
+        themes_help: Choose independent light and dark presets. Each replaces background, accents, and status colors for that mode. Manual color edits mark the palette as custom.
         brand: Brand
         brand_help: Instance brand name and eyebrow shown in the header and on the login screen.
         layout: Layout
@@ -725,8 +725,6 @@ appearance:
         colors: Colors
         colors_help: Fine-tune accents, status colors, and page surfaces for light and dark modes.
     subtab:
-        light: Light themes
-        dark: Dark themes
         accents: Accents
         status: Status
         surfaces: Surfaces
@@ -735,7 +733,7 @@ appearance:
         intro: Pick a preset to replace background, accents, and status colors at once. Manual color edits below mark the palette as custom.
         light: Light themes
         dark: Dark themes
-        custom: Custom colors are active for this mode — choosing a theme will overwrite them.
+        custom: Custom colors are active for light or dark — choosing a theme will overwrite that mode.
         pair: 'Active pair: %light% (light) + %dark% (dark)'
     theme:
         active: Active

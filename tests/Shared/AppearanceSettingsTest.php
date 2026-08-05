@@ -28,7 +28,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
         $client->request(Request::METHOD_GET, '/settings/appearance');
-        self::assertResponseRedirects('/settings/appearance/themes/light');
+        self::assertResponseRedirects('/settings/appearance/themes');
     }
 
     public function testAdminCanApplyNamedTheme(): void
@@ -40,15 +40,16 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/themes/light');
+        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/themes');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="appearance-tabs"]');
-        self::assertSelectorExists('[data-testid="appearance-subtabs"]');
+        self::assertSelectorNotExists('[data-testid="appearance-subtabs"]');
         self::assertSelectorExists('button[name="apply_theme"][value="ocean"]');
+        self::assertSelectorExists('button[name="apply_theme"][value="midnight"]');
 
         $form = $crawler->filter('button[name="apply_theme"][value="ocean"]')->form();
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/themes/light');
+        self::assertResponseRedirects('/settings/appearance/themes');
         $client->followRedirect();
 
         $html = $client->getResponse()->getContent() ?: '';
@@ -56,15 +57,11 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         self::assertStringContainsString('--beacon-paper: #f0f9fb', $html);
         self::assertSelectorExists('button[name="apply_theme"][value="ocean"][aria-pressed="true"]');
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/themes/dark');
-        self::assertResponseIsSuccessful();
-        $form = $crawler->filter('button[name="apply_theme"][value="midnight"]')->form();
+        $form = $client->getCrawler()->filter('button[name="apply_theme"][value="midnight"]')->form();
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/themes/dark');
+        self::assertResponseRedirects('/settings/appearance/themes');
         $client->followRedirect();
         self::assertSelectorExists('button[name="apply_theme"][value="midnight"][aria-pressed="true"]');
-
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/themes/light');
         self::assertSelectorExists('button[name="apply_theme"][value="ocean"][aria-pressed="true"]');
     }
 

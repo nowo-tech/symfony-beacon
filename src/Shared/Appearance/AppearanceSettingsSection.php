@@ -30,10 +30,6 @@ enum AppearanceSettingsSection: string
     public function subtabs(): array
     {
         return match ($this) {
-            self::Themes => [
-                AppearanceSettingsSubtab::Light,
-                AppearanceSettingsSubtab::Dark,
-            ],
             self::Colors => [
                 AppearanceSettingsSubtab::Accents,
                 AppearanceSettingsSubtab::Status,

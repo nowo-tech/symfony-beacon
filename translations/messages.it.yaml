@@ -705,8 +705,6 @@ appearance:
         colors: Colori
         colors_help: 'Regola accenti, colori di stato e superfici per modalità chiara e scura.'
     subtab:
-        light: Temi chiari
-        dark: Temi scuri
         accents: Accenti
         status: Stato
         surfaces: Superfici

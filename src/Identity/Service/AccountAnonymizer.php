@@ -158,17 +158,7 @@ final readonly class AccountAnonymizer
             return false;
         }
 
-        $admins = 0;
-        foreach ($this->userRepository->findAll() as $candidate) {
-            if ($candidate->isAnonymized()) {
-                continue;
-            }
-            if (\in_array('ROLE_ADMIN', $candidate->getRoles(), true)) {
-                ++$admins;
-            }
-        }
-
-        return $admins <= 1;
+        return $this->userRepository->countAdmins(excludeAnonymized: true) <= 1;
     }
 
     private function emailDomain(string $email): string

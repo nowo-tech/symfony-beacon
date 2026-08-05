@@ -726,7 +726,7 @@ appearance:
     subtabs_label: 'Subsecciones de apariencia'
     tab:
         themes: Temas
-        themes_help: 'Elige un preset para sustituir de golpe fondo, acentos y colores de estado. Si editas colores a mano, la paleta pasa a ser personalizada.'
+        themes_help: 'Elige presets independientes para modo claro y oscuro. Cada uno sustituye fondo, acentos y colores de estado de ese modo. Si editas colores a mano, la paleta pasa a ser personalizada.'
         brand: Marca
         brand_help: 'Nombre de marca y eyebrow de la instancia en la cabecera y la pantalla de login.'
         layout: Diseño
@@ -734,8 +734,6 @@ appearance:
         colors: Colores
         colors_help: 'Ajusta acentos, colores de estado y superficies para modo claro y oscuro.'
     subtab:
-        light: Temas claros
-        dark: Temas oscuros
         accents: Acentos
         status: Estado
         surfaces: Superficies
@@ -744,7 +742,7 @@ appearance:
         intro: 'Elige un preset para sustituir de golpe fondo, acentos y colores de estado. Si editas colores a mano abajo, la paleta pasa a ser personalizada.'
         light: Temas claros
         dark: Temas oscuros
-        custom: 'Hay colores personalizados activos — elegir un tema los sobrescribirá.'
+        custom: 'Hay colores personalizados activos en claro u oscuro — elegir un tema sobrescribirá ese modo.'
         pair: 'Par activo: %light% (claro) + %dark% (oscuro)'
     theme:
         active: Activo

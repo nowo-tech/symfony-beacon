@@ -95,7 +95,7 @@
             <div>
                 <h2 id="appearance-themes-heading" class="text-lg font-semibold">{{ section.tabLabelKey()|trans }}</h2>
                 <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ section.helpKey()|trans }}</p>
-                {% if activeThemeId == 'custom' %}
+                {% if activeThemeIdLight == 'custom' or activeThemeIdDark == 'custom' %}
                     <p class="mt-2 text-xs font-medium text-[var(--color-warn)]">{{ 'appearance.themes.custom'|trans }}</p>
                 {% endif %}
                 {% if activeThemeIdLight != 'custom' and activeThemeIdDark != 'custom' %}
@@ -110,11 +110,21 @@
 
             <form method="post" class="space-y-5">
                 <input type="hidden" name="_token" value="{{ csrf_token('appearance_theme') }}">
-                {% set themes = subtab.value == 'dark' ? darkThemes : lightThemes %}
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {% for theme in themes %}
-                        {{ ui.theme_card(theme, activeThemeId) }}
-                    {% endfor %}
+                <div>
+                    <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.light'|trans }}</h3>
+                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {% for theme in lightThemes %}
+                            {{ ui.theme_card(theme, activeThemeIdLight) }}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.dark'|trans }}</h3>
+                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {% for theme in darkThemes %}
+                            {{ ui.theme_card(theme, activeThemeIdDark) }}
+                        {% endfor %}
+                    </div>
                 </div>
             </form>
         </section>

@@ -56,6 +56,25 @@ class UserRepository extends ServiceEntityRepository
         return $users;
     }
 
+    /**
+     * Count accounts that store ROLE_ADMIN in the JSON roles column (no full-entity hydrate).
+     *
+     * Roles are persisted as JSON text; LIKE matches the encoded string on MySQL and SQLite.
+     */
+    public function countAdmins(bool $excludeAnonymized = false): int
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%');
+
+        if ($excludeAnonymized) {
+            $qb->andWhere('u.anonymizedAt IS NULL');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function save(User $user, bool $flush = true): void
     {
         $this->getEntityManager()->persist($user);
