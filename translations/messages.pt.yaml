@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: 'Você só pode vincular grupos aos quais pertence (proprietários de projetos e administradores de instância podem vincular qualquer grupo).'
     appearance:
         saved: 'Configurações de aparência salvas.'
+        theme_applied: Tema de aparência aplicado. As cores foram substituídas pelo preset.
+        theme_unknown: Esse tema de aparência não está disponível.
     preferences:
         saved: 'Preferências salvas.'
         profile_saved: 'Perfil salvo.'
@@ -691,7 +693,24 @@ analytics:
 appearance:
     title: Aparência
     intro: 'Personalize o nome da marca, destaques, cores de estado e superfícies desta instância Beacon. Somente administradores podem alterar essas configurações.'
+    themes:
+        title: Temas
+        intro: 'Escolha um preset para substituir de uma vez fundo, destaques e cores de estado. Edições manuais abaixo marcam a paleta como personalizada.'
+        light: Temas claros
+        dark: Temas escuros
+        custom: 'Cores personalizadas estão ativas — escolher um tema irá substituí-las.'
+    theme:
+        active: Ativo
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Layout
         light: 'Acentos de tema claro'
         dark: 'Acentos de tema escuro'
         danger: 'Cores de perigo/erro'
@@ -764,6 +783,23 @@ site_appearance:
         label: 'Superfície (escuro)'
         placeholder: '#151c19'
         help: 'Painéis e cartões no modo escuro.'
+    footer_fixed:
+        label: Rodapé fixo
+        help: 'Mantém o rodapé legal afixado na parte inferior da viewport enquanto o conteúdo faz scroll.'
+    corner_style:
+        label: Estilo dos cantos
+        help: 'Os cartões usam um raio maior; inputs e botões ficam mais subtis.'
+        choice:
+            sharp: Afiado
+            soft: Suave (predefinição)
+            rounded: Arredondado
+    border_strength:
+        label: Definição das bordas
+        help: 'Quão definidas ficam as bordas dos elementos em modo claro e escuro (painéis, inputs, chrome).'
+        choice:
+            subtle: Subtil
+            medium: Média (predefinição)
+            strong: Forte
     color:
         invalid: 'Use uma cor hexadecimal como #1f6f54.'
 users:
@@ -1543,7 +1579,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Introduza um DSN Symfony Mailer valido (por exemplo smtp://user:pass@host:587).'
         null_transport: 'null:// nao consegue entregar email. Cole um DSN SMTP real (ou outro), ou use Limpar DSN guardado para recorrer ao ambiente.'
-        scheme_not_allowed: 'Esse esquema de DSN Mailer nao e permitido. Use smtp, smtps, sendmail, native ou um esquema de fornecedor suportado (Mailgun, Postmark, SES, …).'
+        scheme_not_allowed: 'Esse esquema de DSN Mailer nao e permitido. Use smtp, smtps ou um esquema de fornecedor suportado (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Limpar DSN guardado'
         help: 'Remove o DSN da base de dados e recorre a MAILER_DSN do ambiente ate guardar um novo.'

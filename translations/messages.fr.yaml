@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: "Vous ne pouvez lier que les groupes auxquels vous appartenez (les propriétaires de projet et les administrateurs d'instance peuvent lier n'importe quel groupe)."
     appearance:
         saved: "Paramètres d'apparence enregistrés."
+        theme_applied: Thème d’apparence appliqué. Les couleurs ont été remplacées par le préréglage.
+        theme_unknown: Ce thème d’apparence n’est pas disponible.
     preferences:
         saved: 'Préférences enregistrées.'
         profile_saved: 'Profil enregistré.'
@@ -691,7 +693,24 @@ analytics:
 appearance:
     title: Apparence
     intro: "Personnalisez le nom de la marque, les accents, les couleurs d'état et les surfaces pour cette instance Beacon. Seuls les administrateurs peuvent modifier ces paramètres."
+    themes:
+        title: Thèmes
+        intro: 'Choisissez un préréglage pour remplacer d’un coup le fond, les accents et les couleurs d’état. Les modifications manuelles ci-dessous marquent la palette comme personnalisée.'
+        light: Thèmes clairs
+        dark: Thèmes sombres
+        custom: 'Des couleurs personnalisées sont actives — choisir un thème les écrasera.'
+    theme:
+        active: Actif
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Mise en page
         light: 'Accents de thème clair'
         dark: 'Accents de thème sombre'
         danger: 'Couleurs de danger/erreur'
@@ -764,6 +783,23 @@ site_appearance:
         label: 'Surface (sombre)'
         placeholder: '#151c19'
         help: 'Panneaux et cartes en mode sombre.'
+    footer_fixed:
+        label: Pied de page fixe
+        help: 'Garde le pied de page légal épinglé en bas de la fenêtre pendant le défilement du contenu.'
+    corner_style:
+        label: Style des coins
+        help: 'Les cartes utilisent un rayon plus grand ; champs et boutons restent plus discrets.'
+        choice:
+            sharp: Anguleux
+            soft: Doux (défaut)
+            rounded: Arrondi
+    border_strength:
+        label: Force des bordures
+        help: 'À quel point les bordures des éléments sont marquées en mode clair et sombre (panneaux, champs, chrome).'
+        choice:
+            subtle: Discrète
+            medium: Moyenne (défaut)
+            strong: Forte
     color:
         invalid: 'Utilisez une couleur hexadécimale comme #1f6f54.'
 users:
@@ -1543,7 +1579,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Saisissez un DSN Symfony Mailer valide (par exemple smtp://user:pass@host:587).'
         null_transport: "null:// ne peut pas livrer d''e-mail. Collez un vrai DSN SMTP (ou autre), ou utilisez Effacer le DSN stocke pour retomber sur l''environnement."
-        scheme_not_allowed: "Ce schema de DSN Mailer n''est pas autorise. Utilisez smtp, smtps, sendmail, native ou un fournisseur pris en charge (Mailgun, Postmark, SES, …)."
+        scheme_not_allowed: "Ce schema de DSN Mailer n''est pas autorise. Utilisez smtp, smtps ou un fournisseur pris en charge (Mailgun, Postmark, SES, …)."
     clear_dsn:
         label: 'Effacer le DSN stocke'
         help: "Supprime le DSN de la base et retombe sur MAILER_DSN de l''environnement jusqu''a ce que vous en enregistriez un nouveau."

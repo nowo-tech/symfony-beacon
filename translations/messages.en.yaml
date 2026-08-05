@@ -212,6 +212,8 @@ flash:
         group_link_forbidden: You can only link groups you belong to (project owners and instance admins may link any group).
     appearance:
         saved: Appearance settings saved.
+        theme_applied: Appearance theme applied. Color fields were replaced by the preset.
+        theme_unknown: That appearance theme is not available.
     mailer:
         saved: Mailer settings saved.
         sample_sent: Sample email sent. Check the inbox (and spam) for the magic-login credentials test.
@@ -331,6 +333,7 @@ project:
         help: Use a DSN in BEACON_DSN so your app can send errors to this project.
         inactive: inactive
         public: 'public:'
+        secret_hidden: Full DSN and secret are visible only to project owners and admins.
         label_placeholder: e.g. calm-otter
         generate: Suggest name
         generate_hint: Fill the label with a human-friendly adjective-noun name
@@ -710,7 +713,24 @@ releases:
 appearance:
     title: Appearance
     intro: Customize brand name, accents, status colors, and page surfaces for this Beacon instance. Only administrators can change these settings.
+    themes:
+        title: Themes
+        intro: Pick a preset to replace background, accents, and status colors at once. Manual color edits below mark the palette as custom.
+        light: Light themes
+        dark: Dark themes
+        custom: Custom colors are active — choosing a theme will overwrite them.
+    theme:
+        active: Active
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Layout
         light: Light theme accents
         dark: Dark theme accents
         danger: Danger / error colors
@@ -937,7 +957,7 @@ instance_mailer:
         placeholder: smtp://user:pass@mail.example:587
         invalid: Enter a valid Symfony Mailer DSN (for example smtp://user:pass@host:587).
         null_transport: null:// cannot deliver mail. Paste a real SMTP (or other) DSN, or use Clear stored DSN to fall back to the environment.
-        scheme_not_allowed: That Mailer DSN scheme is not allowed. Use smtp, smtps, sendmail, native, or a supported provider scheme (Mailgun, Postmark, SES, …).
+        scheme_not_allowed: That Mailer DSN scheme is not allowed. Use smtp, smtps, or a supported provider scheme (Mailgun, Postmark, SES, …). Sendmail/native DSNs are blocked because they can execute host commands.
     clear_dsn:
         label: Clear stored DSN
         help: Removes the database DSN and falls back to MAILER_DSN from the environment until you save a new one.
@@ -1010,6 +1030,23 @@ site_appearance:
         label: Surface (dark)
         placeholder: '#151c19'
         help: Panels and cards in dark mode.
+    footer_fixed:
+        label: Fixed footer
+        help: Keep the legal footer pinned to the bottom of the viewport while page content scrolls.
+    corner_style:
+        label: Corner style
+        help: Cards use a larger radius; inputs and buttons stay subtler.
+        choice:
+            sharp: Sharp
+            soft: Soft (default)
+            rounded: Rounded
+    border_strength:
+        label: Border strength
+        help: How defined element borders look in light and dark mode (panels, inputs, chrome).
+        choice:
+            subtle: Subtle
+            medium: Medium (default)
+            strong: Strong
     color:
         invalid: 'Use a hex color like #1f6f54.'
 users:
@@ -1373,6 +1410,7 @@ user_preferences:
         label: Current password
         help: Required only when setting a new password.
         help_required: Confirm your current password to set a new one.
+        help_email_change: Required when changing your email address (login and password-reset destination).
     plain_password:
         first:
             label: New password

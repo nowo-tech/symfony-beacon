@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: 'Solo puedes vincular grupos a los que perteneces (los propietarios del proyecto y los administradores de instancia pueden vincular cualquiera).'
     appearance:
         saved: 'Apariencia guardada.'
+        theme_applied: Tema de apariencia aplicado. Los colores se sustituyeron por el preset.
+        theme_unknown: Ese tema de apariencia no está disponible.
     mailer:
         saved: 'Ajustes de correo guardados.'
         sample_sent: 'Correo de muestra enviado. Revisa la bandeja (y spam) para la prueba de credenciales de magic login.'
@@ -720,7 +722,24 @@ releases:
 appearance:
     title: Apariencia
     intro: 'Personaliza el nombre de marca, acentos, colores de estado y superficies de esta instancia Beacon. Solo los administradores pueden cambiar estos ajustes.'
+    themes:
+        title: Temas
+        intro: 'Elige un preset para sustituir de golpe fondo, acentos y colores de estado. Si editas colores a mano abajo, la paleta pasa a ser personalizada.'
+        light: Temas claros
+        dark: Temas oscuros
+        custom: 'Hay colores personalizados activos — elegir un tema los sobrescribirá.'
+    theme:
+        active: Activo
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Diseño
         light: 'Acentos modo día'
         dark: 'Acentos modo noche'
         danger: 'Colores de peligro / error'
@@ -811,7 +830,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Introduce un DSN de Symfony Mailer válido (por ejemplo smtp://user:pass@host:587).'
         null_transport: 'null:// no puede entregar correo. Pega un DSN SMTP (u otro) real, o usa Borrar DSN guardado para volver al entorno.'
-        scheme_not_allowed: 'Ese esquema de DSN de Mailer no está permitido. Usa smtp, smtps, sendmail, native o un proveedor soportado (Mailgun, Postmark, SES, …).'
+        scheme_not_allowed: 'Ese esquema de DSN de Mailer no está permitido. Usa smtp, smtps o un proveedor soportado (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Borrar DSN guardado'
         help: 'Elimina el DSN de la base de datos y vuelve a MAILER_DSN del entorno hasta que guardes uno nuevo.'
@@ -884,6 +903,23 @@ site_appearance:
         label: 'Superficie (noche)'
         placeholder: '#151c19'
         help: 'Paneles y tarjetas en modo noche.'
+    footer_fixed:
+        label: Footer fijo
+        help: 'Mantiene el pie legal fijado al borde inferior del viewport mientras el contenido hace scroll.'
+    corner_style:
+        label: Estilo de esquinas
+        help: 'Las tarjetas usan un radio mayor; inputs y botones quedan más sutiles.'
+        choice:
+            sharp: Afilado
+            soft: Suave (por defecto)
+            rounded: Redondeado
+    border_strength:
+        label: Definición de bordes
+        help: 'Qué tan definidos se ven los bordes en modo claro y oscuro (paneles, inputs, chrome).'
+        choice:
+            subtle: Sutil
+            medium: Media (por defecto)
+            strong: Fuerte
     color:
         invalid: 'Usa un color hexadecimal como #1f6f54.'
 users:

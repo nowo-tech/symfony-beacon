@@ -85,7 +85,9 @@ Generate a key once (then back it up with other secrets):
 docker compose -f compose.prod.yaml exec php bin/console doctrine:encrypt:generate-secret-key
 ```
 
-Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `instance.mailer_updated` with **redacted** `scheme` and `host` only (never the DSN secret). Plaintext DSN input must use an allowlisted Mailer scheme (`smtp` / `smtps` / `sendmail` / `native` and common provider schemes).
+Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `instance.mailer_updated` with **redacted** `scheme` and `host` only (never the DSN secret). Plaintext DSN input must use an allowlisted Mailer scheme (`smtp` / `smtps` and common provider schemes). **`sendmail` / `native` are rejected** — Symfony’s sendmail transport accepts a free-form `?command=` that would allow host process execution from the admin UI.
+
+**HTTP ingest:** the production Caddyfile (`Caddyfile.prod`) redirects **all** HTTP traffic (including `/api/*`) to `DEFAULT_URI` HTTPS. Cleartext Envelope ingest is a **local/dev** convenience only (`compose.yaml` bind-mounts the development `Caddyfile`). Production clients must use an `https://…` DSN.
 
 **Mailer in production:** configure a real SMTP or provider DSN under **Administration → Mailer**. The local **Mailpit** catcher (`make mailpit`, Compose profile `mail` in `compose.override.yaml`) is for development only and is **absent** from [`compose.prod.yaml`](../compose.prod.yaml) — see [MAILPIT.md](ops/MAILPIT.md).
 

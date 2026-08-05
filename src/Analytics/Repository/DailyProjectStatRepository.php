@@ -29,10 +29,30 @@ class DailyProjectStatRepository extends ServiceEntityRepository
             return $stat;
         }
 
+        // Reuse an unflushed insert from the same UnitOfWork (multi-item Envelope).
+        $em = $this->getEntityManager();
+        foreach ($em->getUnitOfWork()->getScheduledEntityInsertions() as $pending) {
+            if (!$pending instanceof DailyProjectStat) {
+                continue;
+            }
+            $pendingProject = $pending->getProject();
+            $sameProject = $pendingProject === $project
+                || (
+                    null !== $pendingProject?->getId()
+                    && $pendingProject->getId() === $project->getId()
+                );
+            if (!$sameProject) {
+                continue;
+            }
+            if ($pending->getStatDate() == $day) {
+                return $pending;
+            }
+        }
+
         $stat = new DailyProjectStat();
         $stat->setProject($project);
         $stat->setStatDate($day);
-        $this->getEntityManager()->persist($stat);
+        $em->persist($stat);
 
         return $stat;
     }

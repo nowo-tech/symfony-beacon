@@ -25,6 +25,11 @@ class ProjectShareLinkRepository extends ServiceEntityRepository
         return $this->findOneBy(['tokenHash' => $tokenHash]);
     }
 
+    public function findOneByUuid(string $uuid): ?ProjectShareLink
+    {
+        return $this->findOneBy(['uuid' => $uuid]);
+    }
+
     /**
      * @return list<ProjectShareLink>
      */

@@ -33,6 +33,29 @@ final class SiteAppearanceType extends FormKitAbstractType
             $this->addTextField('brandEyebrow', [
                 'constraints' => [new NotBlank(), new Length(max: 80)],
             ]);
+            $this->addCheckboxField('footerFixed', [
+                'required' => false,
+            ]);
+            $this->addChoiceField('cornerStyle', [
+                'choices' => [
+                    'site_appearance.corner_style.choice.sharp' => SiteAppearance::CORNER_SHARP,
+                    'site_appearance.corner_style.choice.soft' => SiteAppearance::CORNER_SOFT,
+                    'site_appearance.corner_style.choice.rounded' => SiteAppearance::CORNER_ROUNDED,
+                ],
+                'choice_translation_domain' => 'messages',
+                'required' => true,
+                'placeholder' => false,
+            ]);
+            $this->addChoiceField('borderStrength', [
+                'choices' => [
+                    'site_appearance.border_strength.choice.subtle' => SiteAppearance::BORDER_SUBTLE,
+                    'site_appearance.border_strength.choice.medium' => SiteAppearance::BORDER_MEDIUM,
+                    'site_appearance.border_strength.choice.strong' => SiteAppearance::BORDER_STRONG,
+                ],
+                'choice_translation_domain' => 'messages',
+                'required' => true,
+                'placeholder' => false,
+            ]);
             $this->addNamedField('accentColor', 'color', [
                 'constraints' => $hex,
             ]);

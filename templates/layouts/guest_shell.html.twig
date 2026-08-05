@@ -1,6 +1,6 @@
 {# Guest / pre-login shell: theme + locale controls (AuthKit-aligned). #}
 <!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}">
+<html lang="{{ app.request.locale|default('en') }}"{% if site_appearance.footerFixed %} data-footer-fixed="1"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

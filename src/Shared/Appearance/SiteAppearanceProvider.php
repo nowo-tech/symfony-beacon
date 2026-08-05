@@ -47,6 +47,26 @@ final class SiteAppearanceProvider implements ResetInterface
         return $this->get()->getBrandEyebrow();
     }
 
+    public function getThemeId(): string
+    {
+        return AppearanceThemePresets::matchId($this->get());
+    }
+
+    public function isFooterFixed(): bool
+    {
+        return $this->get()->isFooterFixed();
+    }
+
+    public function getCornerStyle(): string
+    {
+        return $this->get()->getCornerStyle();
+    }
+
+    public function getBorderStrength(): string
+    {
+        return $this->get()->getBorderStrength();
+    }
+
     public function getAccentColor(): string
     {
         return $this->get()->getAccentColor();
@@ -123,26 +143,97 @@ final class SiteAppearanceProvider implements ResetInterface
     public function getCssOverrides(): string
     {
         $a = $this->get();
+        $radii = AppearanceCornerStyles::radii($a->getCornerStyle());
+        $borders = AppearanceBorderStyles::tokens($a->getBorderStrength());
 
         return implode("\n", [
+            ':root {',
+            \sprintf('  --beacon-radius-card: %s;', $radii['card']),
+            \sprintf('  --beacon-radius-control: %s;', $radii['control']),
+            \sprintf('  --beacon-border-width: %s;', $borders['width']),
+            '}',
             ':root, [data-theme="light"] {',
-            \sprintf('  --beacon-moss: %s;', $a->getAccentColor()),
-            \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColor()),
-            \sprintf('  --beacon-alert: %s;', $a->getDangerColor()),
-            \sprintf('  --beacon-warn: %s;', $a->getWarnColor()),
-            \sprintf('  --beacon-paper: %s;', $a->getPaperColor()),
-            \sprintf('  --beacon-ink: %s;', $a->getInkColor()),
-            \sprintf('  --beacon-surface: %s;', $a->getSurfaceColor()),
+            ...$this->tokenBlock(
+                moss: $a->getAccentColor(),
+                mossDeep: $a->getAccentDeepColor(),
+                alert: $a->getDangerColor(),
+                warn: $a->getWarnColor(),
+                paper: $a->getPaperColor(),
+                ink: $a->getInkColor(),
+                surface: $a->getSurfaceColor(),
+                sandMix: $borders['sandMixLight'],
+                dark: false,
+            ),
             '}',
             '[data-theme="dark"] {',
-            \sprintf('  --beacon-moss: %s;', $a->getAccentColorDark()),
-            \sprintf('  --beacon-moss-deep: %s;', $a->getAccentDeepColorDark()),
-            \sprintf('  --beacon-alert: %s;', $a->getDangerColorDark()),
-            \sprintf('  --beacon-warn: %s;', $a->getWarnColorDark()),
-            \sprintf('  --beacon-paper: %s;', $a->getPaperColorDark()),
-            \sprintf('  --beacon-ink: %s;', $a->getInkColorDark()),
-            \sprintf('  --beacon-surface: %s;', $a->getSurfaceColorDark()),
+            ...$this->tokenBlock(
+                moss: $a->getAccentColorDark(),
+                mossDeep: $a->getAccentDeepColorDark(),
+                alert: $a->getDangerColorDark(),
+                warn: $a->getWarnColorDark(),
+                paper: $a->getPaperColorDark(),
+                ink: $a->getInkColorDark(),
+                surface: $a->getSurfaceColorDark(),
+                sandMix: $borders['sandMixDark'],
+                dark: true,
+            ),
             '}',
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function tokenBlock(
+        string $moss,
+        string $mossDeep,
+        string $alert,
+        string $warn,
+        string $paper,
+        string $ink,
+        string $surface,
+        int $sandMix,
+        bool $dark,
+    ): array {
+        $lines = [
+            \sprintf('  --beacon-moss: %s;', $moss),
+            \sprintf('  --beacon-moss-deep: %s;', $mossDeep),
+            \sprintf('  --beacon-alert: %s;', $alert),
+            \sprintf('  --beacon-warn: %s;', $warn),
+            \sprintf('  --beacon-paper: %s;', $paper),
+            \sprintf('  --beacon-ink: %s;', $ink),
+            \sprintf('  --beacon-surface: %s;', $surface),
+            // Derived companions so named themes keep borders / shell / muted panels coherent.
+            \sprintf('  --beacon-sand: color-mix(in srgb, %s %d%%, %s);', $ink, $sandMix, $paper),
+            \sprintf('  --beacon-mist: color-mix(in srgb, %s 10%%, %s);', $moss, $paper),
+            \sprintf('  --beacon-surface-muted: color-mix(in srgb, %s 5%%, %s);', $ink, $surface),
+            \sprintf('  --beacon-shell-a: color-mix(in srgb, %s 8%%, %s);', $moss, $paper),
+            \sprintf('  --beacon-shell-b: color-mix(in srgb, %s 6%%, %s);', $ink, $paper),
+            \sprintf('  --beacon-mark: %s;', $moss),
+            '  --color-sand: var(--beacon-sand);',
+        ];
+
+        if ($dark) {
+            $lines[] = '  --beacon-shadow: 0 0 0;';
+        } else {
+            $lines[] = \sprintf('  --beacon-shadow: %s;', $this->rgbChannels($ink));
+        }
+
+        return $lines;
+    }
+
+    private function rgbChannels(string $hex): string
+    {
+        $value = ltrim($hex, '#');
+        if (6 !== \strlen($value) || !ctype_xdigit($value)) {
+            return '15 28 24';
+        }
+
+        return \sprintf(
+            '%d %d %d',
+            hexdec(substr($value, 0, 2)),
+            hexdec(substr($value, 2, 2)),
+            hexdec(substr($value, 4, 2)),
+        );
     }
 }

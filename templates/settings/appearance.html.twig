@@ -14,15 +14,83 @@
     </div>
 {% endmacro %}
 
+{% macro theme_card(theme, activeThemeId) %}
+    {% set selected = activeThemeId == theme.id %}
+    {% set previewPaper = theme.mode == 'dark' ? theme.paperDark : theme.paper %}
+    {% set previewSurface = theme.mode == 'dark' ? theme.surfaceDark : theme.surface %}
+    {% set previewInk = theme.mode == 'dark' ? theme.inkDark : theme.ink %}
+    {% set previewAccent = theme.mode == 'dark' ? theme.accentDark : theme.accent %}
+    <button
+        type="submit"
+        name="apply_theme"
+        value="{{ theme.id }}"
+        class="group relative flex flex-col overflow-hidden rounded-lg border text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] {% if selected %}border-[var(--color-moss)] ring-2 ring-[var(--color-moss)]/35{% else %}border-[var(--color-sand)] hover:border-[var(--color-moss)]/50{% endif %}"
+        aria-pressed="{{ selected ? 'true' : 'false' }}"
+    >
+        <span class="block h-20 w-full p-3" style="background: {{ previewPaper }};">
+            <span class="flex h-full flex-col justify-between rounded-md p-2 shadow-sm" style="background: {{ previewSurface }}; color: {{ previewInk }};">
+                <span class="block h-1.5 w-10 rounded-sm" style="background: {{ previewAccent }};"></span>
+                <span class="flex items-center justify-between gap-2">
+                    <span class="block h-1 w-8 rounded-sm opacity-40" style="background: {{ previewInk }};"></span>
+                    <span class="block h-4 w-4 rounded-sm" style="background: {{ previewAccent }};"></span>
+                </span>
+            </span>
+        </span>
+        <span class="flex items-center justify-between gap-2 bg-[var(--color-surface)] px-3 py-2">
+            <span class="text-sm font-medium text-[var(--color-ink)]">{{ ('appearance.theme.' ~ theme.id)|trans }}</span>
+            {% if selected %}
+                <span class="text-[0.65rem] font-semibold uppercase tracking-wide text-[var(--color-moss)]">{{ 'appearance.theme.active'|trans }}</span>
+            {% endif %}
+        </span>
+    </button>
+{% endmacro %}
+
 {% block body %}
 {% import _self as ui %}
 <div class="mx-auto">
     <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
     <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
 
+    <section class="panel mb-6 space-y-5" aria-labelledby="appearance-themes-heading">
+        <div>
+            <h2 id="appearance-themes-heading" class="text-lg font-semibold">{{ 'appearance.themes.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'appearance.themes.intro'|trans }}</p>
+            {% if activeThemeId == 'custom' %}
+                <p class="mt-2 text-xs font-medium text-[var(--color-warn)]">{{ 'appearance.themes.custom'|trans }}</p>
+            {% endif %}
+        </div>
+
+        <form method="post" class="space-y-5">
+            <input type="hidden" name="_token" value="{{ csrf_token('appearance_theme') }}">
+            <div>
+                <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.light'|trans }}</h3>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {% for theme in lightThemes %}
+                        {{ ui.theme_card(theme, activeThemeId) }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.dark'|trans }}</h3>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {% for theme in darkThemes %}
+                        {{ ui.theme_card(theme, activeThemeId) }}
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+    </section>
+
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
         {{ form_row(form.brandName) }}
         {{ form_row(form.brandEyebrow) }}
+
+        <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
+            <legend class="text-sm font-semibold">{{ 'appearance.section.layout'|trans }}</legend>
+            {{ form_row(form.footerFixed) }}
+            {{ form_row(form.cornerStyle) }}
+            {{ form_row(form.borderStrength) }}
+        </fieldset>
 
         <fieldset class="space-y-3 border-t border-[var(--color-sand)] pt-4">
             <legend class="text-sm font-semibold">{{ 'appearance.section.light'|trans }}</legend>

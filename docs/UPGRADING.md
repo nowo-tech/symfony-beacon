@@ -64,6 +64,17 @@ When this release includes kit admin `css_framework: tailwind` (no Bootstrap in 
 
 No further steps until the next tagged release.
 
+### Security remediations (Codex Security medium findings)
+
+Unreleased hardening already in tree (apply on upgrade without a separate migration):
+
+- Project settings hide full ingest DSN/secrets from Viewer/Member and share-link sessions (owner/admin only).
+- Revoking a share link invalidates redeemed session grants (share UUID stored in session and re-checked).
+- Changing account email requires the current password.
+- Multi-item Envelope first-of-day stats reuse the pending `DailyProjectStat` insert (no unique-key poison).
+- Production image uses `Caddyfile.prod` (HTTP `/api/*` cleartext ingest disabled; HTTPS DSN only).
+- Mailer DSN allowlist rejects `sendmail` / `native` (no host `?command=` execution from admin UI).
+
 ## Upgrading from 1.0.0 to 1.0.1
 
 ```bash
@@ -167,7 +178,7 @@ The former `BEACON_RETENTION_*`, `BEACON_INGEST_RATE_LIMIT`, `BEACON_EVENT_QUOTA
 ### Mailer DSN audit (`6.15`)
 
 - Saving or clearing Administration → Mailer records `UserAction` `instance.mailer_updated` with redacted `scheme`/`host` only (never DSN secrets).
-- `MailerDsnValidator` rejects schemes outside the allowlist (`smtp`/`smtps`/sendmail/native + common provider schemes).
+- `MailerDsnValidator` rejects schemes outside the allowlist (`smtp`/`smtps` + common provider schemes). `sendmail`/`native` are blocked (host command execution via `?command=`).
 
 ### Local Mailpit (`066`)
 

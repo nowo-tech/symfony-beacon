@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: "Puoi collegare solo i gruppi a cui appartieni (i proprietari del progetto e gli amministratori dell'istanza possono collegare qualsiasi gruppo)."
     appearance:
         saved: 'Impostazioni di aspetto salvate.'
+        theme_applied: Tema di aspetto applicato. I colori sono stati sostituiti dal preset.
+        theme_unknown: Quel tema di aspetto non è disponibile.
     preferences:
         saved: 'Preferenze salvate.'
         profile_saved: 'Profilo salvato.'
@@ -691,7 +693,24 @@ analytics:
 appearance:
     title: Aspetto
     intro: 'Personalizza il nome del marchio, gli accenti, i colori di stato e le superfici di questa istanza Beacon. Solo gli amministratori possono modificare queste impostazioni.'
+    themes:
+        title: Temi
+        intro: 'Scegli un preset per sostituire insieme sfondo, accenti e colori di stato. Le modifiche manuali sotto contrassegnano la palette come personalizzata.'
+        light: Temi chiari
+        dark: Temi scuri
+        custom: 'Sono attivi colori personalizzati — scegliere un tema li sovrascriverà.'
+    theme:
+        active: Attivo
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Layout
         light: 'Accenti di temi chiari'
         dark: 'Accenti di temi scuri'
         danger: 'Colori di pericolo/errore'
@@ -764,6 +783,23 @@ site_appearance:
         label: 'Superficie (scuro)'
         placeholder: '#151c19'
         help: 'Pannelli e schede in modalità scura.'
+    footer_fixed:
+        label: Footer fisso
+        help: 'Mantiene il footer legale fissato in basso nella viewport mentre il contenuto scorre.'
+    corner_style:
+        label: Stile angoli
+        help: 'Le card usano un raggio maggiore; input e pulsanti restano più sobri.'
+        choice:
+            sharp: Netto
+            soft: Morbido (predefinito)
+            rounded: Arrotondato
+    border_strength:
+        label: Definizione bordi
+        help: 'Quanto sono definiti i bordi degli elementi in modalità chiara e scura (pannelli, input, chrome).'
+        choice:
+            subtle: Sottile
+            medium: Media (predefinito)
+            strong: Forte
     color:
         invalid: 'Utilizza un colore esadecimale come #1f6f54.'
 users:
@@ -1543,7 +1579,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Inserisci un DSN Symfony Mailer valido (ad esempio smtp://user:pass@host:587).'
         null_transport: "null:// non puo consegnare email. Incolla un DSN SMTP reale (o altro), oppure usa Cancella DSN memorizzato per ricadere sull'ambiente."
-        scheme_not_allowed: 'Questo schema DSN Mailer non e consentito. Usa smtp, smtps, sendmail, native o uno schema provider supportato (Mailgun, Postmark, SES, …).'
+        scheme_not_allowed: 'Questo schema DSN Mailer non e consentito. Usa smtp, smtps o uno schema provider supportato (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Cancella DSN memorizzato'
         help: "Rimuove il DSN dal database e ricade su MAILER_DSN dall'ambiente finche non ne salvi uno nuovo."

@@ -40,4 +40,24 @@ final class MailerDsnValidatorTest extends TestCase
         );
         self::assertFalse($validator->isDeliverable('file:///tmp/mail.sock'));
     }
+
+    public function testRejectsSendmailAndNativeSchemes(): void
+    {
+        $validator = new MailerDsnValidator();
+
+        self::assertSame(
+            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            $validator->validatePlainDsn('sendmail://default'),
+        );
+        self::assertSame(
+            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            $validator->validatePlainDsn('sendmail://default?command=/usr/bin/env%20id%20-t'),
+        );
+        self::assertSame(
+            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            $validator->validatePlainDsn('native://default'),
+        );
+        self::assertFalse($validator->isDeliverable('sendmail://default'));
+        self::assertFalse($validator->isDeliverable('native://default'));
+    }
 }

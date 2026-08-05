@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: 'U kunt alleen groepen koppelen waartoe u behoort (projecteigenaren en instantiebeheerders kunnen elke groep koppelen).'
     appearance:
         saved: 'Weergave-instellingen opgeslagen.'
+        theme_applied: Weergavethema toegepast. Kleuren zijn vervangen door de voorinstelling.
+        theme_unknown: Dat weergavethema is niet beschikbaar.
     preferences:
         saved: 'Voorkeuren opgeslagen.'
         profile_saved: 'Profiel opgeslagen.'
@@ -691,7 +693,24 @@ analytics:
 appearance:
     title: Verschijning
     intro: 'Pas de merknaam, accenten, statuskleuren en oppervlakken aan voor dit Beacon-exemplaar. Alleen beheerders kunnen deze instellingen wijzigen.'
+    themes:
+        title: Thema’s
+        intro: 'Kies een voorinstelling om achtergrond, accenten en statuskleuren in één keer te vervangen. Handmatige kleuraanpassingen hieronder markeren het palet als aangepast.'
+        light: Lichte thema’s
+        dark: Donkere thema’s
+        custom: 'Aangepaste kleuren zijn actief — een thema kiezen overschrijft ze.'
+    theme:
+        active: Actief
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Layout
         light: 'Lichte thema-accenten'
         dark: 'Donkere thema-accenten'
         danger: Gevaar-/foutkleuren
@@ -764,6 +783,23 @@ site_appearance:
         label: 'Oppervlak (donker)'
         placeholder: '#151c19'
         help: 'Panelen en kaarten in donkere modus.'
+    footer_fixed:
+        label: Vaste footer
+        help: 'Houdt de juridische footer vast onderaan de viewport terwijl de inhoud scrollt.'
+    corner_style:
+        label: Hoekstijl
+        help: 'Kaarten gebruiken een grotere radius; invoervelden en knoppen blijven subtieler.'
+        choice:
+            sharp: Scherp
+            soft: Zacht (standaard)
+            rounded: Afgerond
+    border_strength:
+        label: Randsterkte
+        help: 'Hoe duidelijk elementranden ogen in lichte en donkere modus (panelen, invoer, chrome).'
+        choice:
+            subtle: Subtiel
+            medium: Gemiddeld (standaard)
+            strong: Sterk
     color:
         invalid: 'Gebruik een hexadecimale kleur zoals #1f6f54.'
 users:
@@ -1543,7 +1579,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Voer een geldige Symfony Mailer-DSN in (bijvoorbeeld smtp://user:pass@host:587).'
         null_transport: 'null:// kan geen e-mail afleveren. Plak een echte SMTP-DSN (of andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.'
-        scheme_not_allowed: 'Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps, sendmail, native of een ondersteund providerschema (Mailgun, Postmark, SES, …).'
+        scheme_not_allowed: 'Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps of een ondersteund providerschema (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Opgeslagen DSN wissen'
         help: 'Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving totdat je een nieuwe opslaat.'

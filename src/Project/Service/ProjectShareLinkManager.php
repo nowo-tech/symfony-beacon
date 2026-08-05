@@ -133,6 +133,7 @@ final readonly class ProjectShareLinkManager
             $project,
             $issue?->getUuid(),
             $link->getExpiresAt()->getTimestamp(),
+            $link->getUuid(),
         );
         $this->userActionRecorder->record(
             UserActionType::ProjectShareLinkOpened,

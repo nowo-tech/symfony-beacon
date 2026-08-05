@@ -6,6 +6,7 @@ namespace App\Identity\Form;
 
 use App\Identity\Entity\User;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,12 +21,20 @@ final class AccountProfileType extends FormKitAbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->withBuilder($builder, function (): void {
+        $this->withBuilder($builder, function () use ($builder): void {
             $this->addTextField('displayName', [
                 'constraints' => [new NotBlank(), new Length(max: 120)],
             ]);
             $this->addEmailField('email', [
                 'constraints' => [new NotBlank(), new Email(), new Length(max: 180)],
+            ]);
+            $builder->add('currentPassword', PasswordType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'user_preferences.current_password.label',
+                'help' => 'user_preferences.current_password.help_email_change',
+                'translation_domain' => 'messages',
+                'attr' => ['autocomplete' => 'current-password'],
             ]);
             $this->addTextField('slackUserId', [
                 'required' => false,

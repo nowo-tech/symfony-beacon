@@ -70,9 +70,13 @@
             {% for key in project.apiKeys %}
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
                     <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
-                    <code class="mt-2 block break-all text-xs">{{ key.buildDsn(baseUrl) }}</code>
+                    {% if membership.canManageApiKeys %}
+                        <code class="mt-2 block break-all text-xs" data-testid="api-key-dsn">{{ key.buildDsn(baseUrl) }}</code>
+                    {% else %}
+                        <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_hidden'|trans }}</p>
+                    {% endif %}
                     <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
-                    {% if membership.role.value in ['owner', 'admin'] and key.active %}
+                    {% if membership.canManageApiKeys and key.active %}
                         <div class="mt-3 flex flex-wrap gap-2">
                             <form method="post" action="{{ path('project_keys_rotate', {projectId: project.uuid, keyId: key.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('project_key_rotate_' ~ key.id) }}">
@@ -93,7 +97,7 @@
                 </li>
             {% endfor %}
         </ul>
-        {% if membership.role.value in ['owner', 'admin'] %}
+        {% if membership.canManageApiKeys %}
             <form
                 method="post"
                 action="{{ path('project_keys_create', {id: project.uuid}) }}"

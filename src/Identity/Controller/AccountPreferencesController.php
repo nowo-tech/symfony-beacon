@@ -79,8 +79,18 @@ final class AccountPreferencesController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($user->getEmail() !== $previousEmail) {
+                $currentPassword = (string) $form->get('currentPassword')->getData();
+                if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+                    // Revert before re-render: a mutated security user email can invalidate the session.
+                    $user->setEmail($previousEmail);
+                    $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
+
+                    return $this->renderProfile($form, $user);
+                }
+
                 $conflict = $this->userRepository->findOneByEmail($user->getEmail());
                 if ($conflict instanceof User && $conflict->getId() !== $user->getId()) {
+                    $user->setEmail($previousEmail);
                     $form->get('email')->addError(new FormError($this->translator->trans('preferences.error.email_in_use')));
 
                     return $this->renderProfile($form, $user);

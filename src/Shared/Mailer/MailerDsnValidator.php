@@ -20,8 +20,8 @@ final class MailerDsnValidator
     public const array ALLOWED_SCHEMES = [
         'smtp',
         'smtps',
-        'sendmail',
-        'native',
+        // sendmail/native omitted: Symfony SendmailTransport accepts arbitrary ?command=
+        // which would let an application admin execute host processes.
         'mailgun',
         'mailgun+api',
         'mailgun+smtp',

@@ -29,6 +29,9 @@
   --beacon-warn: #b54708;
   --beacon-surface: #ffffff;
   --beacon-surface-muted: #f7faf8;
+  --beacon-radius-card: 0.75rem;
+  --beacon-radius-control: 0.375rem;
+  --beacon-border-width: 1px;
   /* Beacon mark green from brand logos (distinct from button moss). */
   --beacon-mark: #4aad7f;
   --beacon-shell-a: #eef3f0;

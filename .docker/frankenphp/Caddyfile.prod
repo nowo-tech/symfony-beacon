@@ -28,17 +28,8 @@
 {$CADDY_EXTRA_CONFIG}
 
 # HTTP for local + Docker clients (BeaconBundle demo → host.docker.internal:9081).
-# Serve Envelope ingest on HTTP; redirect other browser traffic to HTTPS UI.
+# Production: redirect *all* HTTP (including /api/*) to HTTPS — no cleartext ingest.
 http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
-	@ingest path /api/*
-
-	handle @ingest {
-		root * /app/public
-		encode zstd br gzip
-		{$CADDY_SERVER_EXTRA_DIRECTIVES}
-		php_server
-	}
-
 	handle {
 		redir {$DEFAULT_URI:https://localhost:9444}{uri} permanent
 	}

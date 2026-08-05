@@ -18,7 +18,7 @@ Ingest **always requires** `beacon_secret` (or the secret segment of the DSN). K
 
 The **public key** is an opaque project identifier (safe to show in Settings / DSN examples). It is **not** a credential — protect the secret.
 
-Docker clients (BeaconBundle FrankenPHP demo) should prefer **HTTP ingest** on port `9081` via `host.docker.internal` — Caddy serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9444`.
+Docker clients (BeaconBundle FrankenPHP demo) on the **local** stack (`compose.yaml`) may use **HTTP ingest** on port `9081` via `host.docker.internal` — the development Caddyfile serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9444`. **Production** (`compose.prod.yaml` / `Caddyfile.prod`) does **not** accept cleartext ingest: use an `https://…` DSN only.
 
 ```text
 http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9081/1

@@ -8,8 +8,10 @@ use App\Identity\Entity\User;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Entity\ProjectShareLink;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Repository\ProjectShareLinkRepository;
 use App\Shared\ProjectRole;
 use Deprecated;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,12 +30,13 @@ final readonly class ProjectAccessService
 {
     public const string VIEW_AS_MEMBER_SESSION_KEY = '_beacon_view_as_member';
 
-    /** @var string Session map: project uuid => ['expires' => int, 'issue' => ?string] */
+    /** @var string Session map: project uuid => ['expires' => int, 'issue' => ?string, 'share' => ?string] */
     public const string SHARE_ACCESS_SESSION_KEY = '_beacon_share_access';
 
     public function __construct(
         private ProjectMembershipRepository $membershipRepository,
         private ProjectGroupAccessRepository $groupAccessRepository,
+        private ProjectShareLinkRepository $shareLinkRepository,
         private AuthorizationCheckerInterface $authorizationChecker,
         private RequestStack $requestStack,
     ) {
@@ -106,8 +109,11 @@ final readonly class ProjectAccessService
 
     /**
      * Grant temporary viewer access from a share link (session-scoped).
+     *
+     * Stores the share-link UUID so later authorization can re-check revoke/expiry
+     * without relying only on the copied session timestamp.
      */
-    public function grantShareAccess(Project $project, ?string $issueUuid, int $expiresAtUnix): void
+    public function grantShareAccess(Project $project, ?string $issueUuid, int $expiresAtUnix, string $shareLinkUuid): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request instanceof Request || !$request->hasSession()) {
@@ -115,11 +121,12 @@ final readonly class ProjectAccessService
         }
 
         $session = $request->getSession();
-        /** @var array<string, array{expires: int, issue: ?string}> $grants */
+        /** @var array<string, array{expires: int, issue: ?string, share: ?string}> $grants */
         $grants = $session->get(self::SHARE_ACCESS_SESSION_KEY, []);
         $grants[$project->getUuid()] = [
             'expires' => $expiresAtUnix,
             'issue' => $issueUuid,
+            'share' => $shareLinkUuid,
         ];
         $session->set(self::SHARE_ACCESS_SESSION_KEY, $grants);
     }
@@ -181,7 +188,7 @@ final readonly class ProjectAccessService
     }
 
     /**
-     * @return array{expires: int, issue: ?string}|null
+     * @return array{expires: int, issue: ?string, share: ?string}|null
      */
     private function getActiveShareEntry(Project $project): ?array
     {
@@ -190,17 +197,45 @@ final readonly class ProjectAccessService
             return null;
         }
 
-        /** @var array<string, array{expires?: int, issue?: ?string}> $grants */
+        /** @var array<string, array{expires?: int, issue?: ?string, share?: ?string}> $grants */
         $grants = $request->getSession()->get(self::SHARE_ACCESS_SESSION_KEY, []);
         $entry = $grants[$project->getUuid()] ?? null;
         if (!\is_array($entry)) {
             return null;
         }
 
-        $expires = (int) ($entry['expires'] ?? 0);
-        if ($expires < time()) {
+        $clearGrant = static function () use ($request, &$grants, $project): void {
             unset($grants[$project->getUuid()]);
             $request->getSession()->set(self::SHARE_ACCESS_SESSION_KEY, $grants);
+        };
+
+        $expires = (int) ($entry['expires'] ?? 0);
+        if ($expires < time()) {
+            $clearGrant();
+
+            return null;
+        }
+
+        $shareUuid = isset($entry['share']) && \is_string($entry['share']) && '' !== $entry['share']
+            ? $entry['share']
+            : null;
+        // Legacy grants without a share UUID cannot be re-validated after revoke.
+        if (null === $shareUuid) {
+            $clearGrant();
+
+            return null;
+        }
+
+        $link = $this->shareLinkRepository->findOneByUuid($shareUuid);
+        // Do not use isUsable(): max-uses exhaustion must block new opens, not revoke
+        // an already-granted session. Revoke and expiry are the session invalidators.
+        if (
+            !$link instanceof ProjectShareLink
+            || $link->getProject()?->getId() !== $project->getId()
+            || $link->isRevoked()
+            || $link->isExpired()
+        ) {
+            $clearGrant();
 
             return null;
         }
@@ -210,6 +245,7 @@ final readonly class ProjectAccessService
             'issue' => isset($entry['issue']) && \is_string($entry['issue']) && '' !== $entry['issue']
                 ? $entry['issue']
                 : null,
+            'share' => $shareUuid,
         ];
     }
 

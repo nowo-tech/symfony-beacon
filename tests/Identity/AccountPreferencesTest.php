@@ -150,6 +150,42 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('[data-testid="profile-overview"]', 'Updated Prefs');
     }
 
+    public function testEmailChangeRequiresCurrentPassword(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('prefs-email@example.com', 'OldSecret1!Abc');
+        $user->setDisplayName('Email Prefs');
+        self::getContainer()->get('doctrine')->getManager()->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/profile');
+        $form = $crawler->selectButton('Save profile')->form([
+            'user_preferences[displayName]' => 'Email Prefs',
+            'user_preferences[email]' => 'prefs-email-new@example.com',
+        ]);
+        $client->submit($form);
+        self::assertFalse($client->getResponse()->isRedirect());
+        $html = strtolower($client->getResponse()->getContent() ?: '');
+        self::assertStringContainsString('current password', $html);
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertInstanceOf(User::class, $reloaded);
+        self::assertSame('prefs-email@example.com', $reloaded->getEmail());
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/profile');
+        self::assertResponseIsSuccessful();
+        $form = $crawler->selectButton('Save profile')->form();
+        $form['user_preferences[displayName]'] = 'Email Prefs';
+        $form['user_preferences[email]'] = 'prefs-email-new@example.com';
+        $form['user_preferences[currentPassword]'] = 'OldSecret1!Abc';
+        $client->submit($form);
+        self::assertResponseRedirects('/account/profile');
+        $client->followRedirect();
+        self::assertSelectorTextContains('[data-testid="profile-overview"]', 'prefs-email-new@example.com');
+    }
+
     public function testUserCanSavePhoneForQrLogin(): void
     {
         [$client, $user] = $this->bootWithDemoProject('qr-phone@example.com');

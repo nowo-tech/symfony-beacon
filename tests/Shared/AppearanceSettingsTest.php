@@ -19,6 +19,30 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(403);
     }
 
+    public function testAdminCanApplyNamedTheme(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('admin-theme@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $user->setRoles(['ROLE_ADMIN']);
+        $em->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('button[name="apply_theme"][value="ocean"]');
+
+        $form = $crawler->filter('button[name="apply_theme"][value="ocean"]')->form();
+        $client->submit($form);
+        self::assertResponseRedirects('/settings/appearance');
+        $client->followRedirect();
+
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('--beacon-moss: #0e7490', $html);
+        self::assertStringContainsString('--beacon-paper: #f0f9fb', $html);
+        self::assertSelectorExists('button[name="apply_theme"][value="ocean"][aria-pressed="true"]');
+    }
+
     public function testAdminCanUpdateBrandAndAccent(): void
     {
         [$client, $user] = $this->bootWithDemoProject('admin-look@example.com');
@@ -61,6 +85,77 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         self::assertStringContainsString('--beacon-paper: #f0fdfa', $html);
         self::assertStringContainsString('--beacon-ink: #134e4a', $html);
         self::assertStringContainsString('--beacon-surface: #ffffff', $html);
+    }
+
+    public function testAdminCanToggleFixedFooter(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('admin-footer@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $user->setRoles(['ROLE_ADMIN']);
+        $em->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('html[data-footer-fixed="1"]');
+
+        $form = $crawler->selectButton('Save appearance')->form([
+            'site_appearance[footerFixed]' => '1',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/settings/appearance');
+        $client->followRedirect();
+        self::assertSelectorExists('html[data-footer-fixed="1"]');
+    }
+
+    public function testAdminCanChangeCornerStyle(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('admin-corners@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $user->setRoles(['ROLE_ADMIN']);
+        $em->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance');
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Save appearance')->form([
+            'site_appearance[cornerStyle]' => 'rounded',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/settings/appearance');
+        $client->followRedirect();
+
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('--beacon-radius-card: 1.25rem', $html);
+        self::assertStringContainsString('--beacon-radius-control: 0.5rem', $html);
+    }
+
+    public function testAdminCanChangeBorderStrength(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('admin-borders@example.com');
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $user->setRoles(['ROLE_ADMIN']);
+        $em->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance');
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Save appearance')->form([
+            'site_appearance[borderStrength]' => 'strong',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/settings/appearance');
+        $client->followRedirect();
+
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('--beacon-border-width: 1.5px', $html);
+        self::assertStringContainsString('26%', $html);
+        self::assertStringContainsString('30%', $html);
     }
 
     public function testUserCanPersistThemeToggleChoice(): void

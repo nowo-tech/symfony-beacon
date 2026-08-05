@@ -36,6 +36,28 @@ class SiteAppearance implements AuditableInterface
     public const DEFAULT_SURFACE = '#ffffff';
     public const DEFAULT_SURFACE_DARK = '#151c19';
 
+    public const string CORNER_SHARP = 'sharp';
+    public const string CORNER_SOFT = 'soft';
+    public const string CORNER_ROUNDED = 'rounded';
+
+    /** @var list<string> */
+    public const array CORNER_STYLES = [
+        self::CORNER_SHARP,
+        self::CORNER_SOFT,
+        self::CORNER_ROUNDED,
+    ];
+
+    public const string BORDER_SUBTLE = 'subtle';
+    public const string BORDER_MEDIUM = 'medium';
+    public const string BORDER_STRONG = 'strong';
+
+    /** @var list<string> */
+    public const array BORDER_STRENGTHS = [
+        self::BORDER_SUBTLE,
+        self::BORDER_MEDIUM,
+        self::BORDER_STRONG,
+    ];
+
     #[ORM\Id]
     #[ORM\Column]
     private int $id = 1;
@@ -87,6 +109,30 @@ class SiteAppearance implements AuditableInterface
 
     #[ORM\Column(length: 7)]
     private string $surfaceColorDark = self::DEFAULT_SURFACE_DARK;
+
+    /**
+     * Named palette id from AppearanceThemePresets, or "custom" when colors were edited by hand.
+     */
+    #[ORM\Column(length: 40)]
+    private string $themeId = 'beacon';
+
+    /**
+     * When true, the legal footer stays pinned to the viewport bottom while content scrolls.
+     */
+    #[ORM\Column]
+    private bool $footerFixed = false;
+
+    /**
+     * Corner radius preset: sharp | soft | rounded (cards rounder than controls).
+     */
+    #[ORM\Column(length: 20)]
+    private string $cornerStyle = self::CORNER_SOFT;
+
+    /**
+     * How defined UI borders look: subtle | medium | strong (light + dark).
+     */
+    #[ORM\Column(length: 20)]
+    private string $borderStrength = self::BORDER_MEDIUM;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -298,6 +344,61 @@ class SiteAppearance implements AuditableInterface
         return $this;
     }
 
+    public function getThemeId(): string
+    {
+        return $this->themeId;
+    }
+
+    public function setThemeId(string $themeId): self
+    {
+        $normalized = strtolower(trim($themeId));
+        $this->themeId = '' === $normalized ? 'custom' : $normalized;
+
+        return $this;
+    }
+
+    public function isFooterFixed(): bool
+    {
+        return $this->footerFixed;
+    }
+
+    public function setFooterFixed(bool $footerFixed): self
+    {
+        $this->footerFixed = $footerFixed;
+
+        return $this;
+    }
+
+    public function getCornerStyle(): string
+    {
+        return $this->cornerStyle;
+    }
+
+    public function setCornerStyle(string $cornerStyle): self
+    {
+        $normalized = strtolower(trim($cornerStyle));
+        $this->cornerStyle = \in_array($normalized, self::CORNER_STYLES, true)
+            ? $normalized
+            : self::CORNER_SOFT;
+
+        return $this;
+    }
+
+    public function getBorderStrength(): string
+    {
+        return $this->borderStrength;
+    }
+
+    public function setBorderStrength(string $borderStrength): self
+    {
+        $normalized = strtolower(trim($borderStrength));
+        $this->borderStrength = \in_array($normalized, self::BORDER_STRENGTHS, true)
+            ? $normalized
+            : self::BORDER_MEDIUM;
+
+        return $this;
+    }
+
     public function resetToDefaults(): self
     {
         $this->brandName = self::DEFAULT_BRAND_NAME;
@@ -316,6 +417,10 @@ class SiteAppearance implements AuditableInterface
         $this->inkColorDark = self::DEFAULT_INK_DARK;
         $this->surfaceColor = self::DEFAULT_SURFACE;
         $this->surfaceColorDark = self::DEFAULT_SURFACE_DARK;
+        $this->themeId = 'beacon';
+        $this->footerFixed = false;
+        $this->cornerStyle = self::CORNER_SOFT;
+        $this->borderStrength = self::BORDER_MEDIUM;
 
         return $this;
     }

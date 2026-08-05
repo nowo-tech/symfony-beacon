@@ -127,6 +127,46 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
         self::assertResponseRedirects('/en/login');
     }
 
+    public function testRevokeInvalidatesAlreadyRedeemedShareSession(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('share-revoke-session@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $recipient = new User();
+        $recipient->setEmail('share-revoke-session-user@example.com');
+        $recipient->setDisplayName('Recipient');
+        $recipient->setPassword($hasher->hashPassword($recipient, 'secret'));
+        $em->persist($recipient);
+        $em->flush();
+
+        /** @var ProjectShareLinkManager $manager */
+        $manager = self::getContainer()->get(ProjectShareLinkManager::class);
+        $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'));
+
+        $this->login($client, $recipient);
+        $client->request(Request::METHOD_GET, '/share/'.$created['rawToken']);
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
+        self::assertResponseIsSuccessful();
+
+        $em->clear();
+        $ownerReloaded = $em->find(User::class, $owner->getId());
+        $linkReloaded = $em->find(ProjectShareLink::class, $created['link']->getId());
+        self::assertInstanceOf(User::class, $ownerReloaded);
+        self::assertInstanceOf(ProjectShareLink::class, $linkReloaded);
+        $manager->revoke($linkReloaded, $ownerReloaded);
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
+        self::assertResponseStatusCodeSame(403);
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testShareLinkMaxUsesExhaustedAfterSingleOpen(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('share-max-uses@example.com');

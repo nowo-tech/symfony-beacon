@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Service;
 
+use App\Shared\Appearance\AppearanceBorderStyles;
+use App\Shared\Appearance\AppearanceCornerStyles;
+use App\Shared\Appearance\AppearanceThemePresets;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use App\Shared\Appearance\SiteAppearanceProvider;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -67,6 +70,10 @@ final readonly class InstanceConfigPortability
             'appearance' => [
                 'brand_name' => $appearance->getBrandName(),
                 'brand_eyebrow' => $appearance->getBrandEyebrow(),
+                'theme_id' => AppearanceThemePresets::matchId($appearance),
+                'footer_fixed' => $appearance->isFooterFixed() ? '1' : '0',
+                'corner_style' => $appearance->getCornerStyle(),
+                'border_strength' => $appearance->getBorderStrength(),
                 'accent_color' => $appearance->getAccentColor(),
                 'accent_deep_color' => $appearance->getAccentDeepColor(),
                 'accent_color_dark' => $appearance->getAccentColorDark(),
@@ -161,6 +168,27 @@ final readonly class InstanceConfigPortability
             $appearance->setBrandEyebrow($data['brand_eyebrow']);
         }
 
+        if (\array_key_exists('footer_fixed', $data)) {
+            $appearance->setFooterFixed(filter_var($data['footer_fixed'], \FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (isset($data['corner_style']) && \is_string($data['corner_style']) && AppearanceCornerStyles::isValid($data['corner_style'])) {
+            $appearance->setCornerStyle($data['corner_style']);
+        }
+
+        if (isset($data['border_strength']) && \is_string($data['border_strength']) && AppearanceBorderStyles::isValid($data['border_strength'])) {
+            $appearance->setBorderStrength($data['border_strength']);
+        }
+
+        // Named themes override individual color keys (same semantics as the settings UI).
+        if (isset($data['theme_id']) && \is_string($data['theme_id']) && AppearanceThemePresets::has($data['theme_id'])) {
+            AppearanceThemePresets::apply($appearance, $data['theme_id']);
+            $this->appearanceRepository->save($appearance);
+            $this->appearanceProvider->refresh();
+
+            return;
+        }
+
         $colorMap = [
             'accent_color' => 'setAccentColor',
             'accent_deep_color' => 'setAccentDeepColor',
@@ -187,6 +215,8 @@ final readonly class InstanceConfigPortability
             }
             $appearance->{$setter}($color);
         }
+
+        $appearance->setThemeId(AppearanceThemePresets::matchId($appearance));
 
         $this->appearanceRepository->save($appearance);
         $this->appearanceProvider->refresh();

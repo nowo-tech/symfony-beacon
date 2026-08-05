@@ -222,6 +222,8 @@ flash:
         group_link_forbidden: 'Sie können nur Gruppen verknüpfen, denen Sie angehören (Projekteigentümer und Instanzadministratoren können jede Gruppe verknüpfen).'
     appearance:
         saved: 'Darstellungseinstellungen gespeichert.'
+        theme_applied: Erscheinungsbild-Thema angewendet. Farbfelder wurden durch das Preset ersetzt.
+        theme_unknown: Dieses Erscheinungsbild-Thema ist nicht verfügbar.
     preferences:
         saved: 'Einstellungen gespeichert.'
         profile_saved: 'Profil gespeichert.'
@@ -691,7 +693,24 @@ analytics:
 appearance:
     title: Aussehen
     intro: 'Passen Sie Markennamen, Akzente, Statusfarben und Oberflächen für diese Beacon-Instanz an. Nur Administratoren können diese Einstellungen ändern.'
+    themes:
+        title: Themen
+        intro: 'Wählen Sie ein Preset, um Hintergrund, Akzente und Statusfarben auf einmal zu ersetzen. Manuelle Farbänderungen unten markieren die Palette als benutzerdefiniert.'
+        light: Helle Themen
+        dark: Dunkle Themen
+        custom: 'Benutzerdefinierte Farben sind aktiv — die Wahl eines Themas überschreibt sie.'
+    theme:
+        active: Aktiv
+        beacon: Beacon
+        ocean: Ocean
+        slate: Slate
+        sandstone: Sandstone
+        midnight: Midnight
+        obsidian: Obsidian
+        aurora: Aurora
+        ember: Ember
     section:
+        layout: Layout
         light: 'Leichte Themenakzente'
         dark: 'Dunkle Themenakzente'
         danger: Gefahren-/Fehlerfarben
@@ -764,6 +783,23 @@ site_appearance:
         label: 'Oberfläche (dunkel)'
         placeholder: '#151c19'
         help: 'Panels und Karten im Dunkelmodus.'
+    footer_fixed:
+        label: Feste Fußzeile
+        help: 'Hält die rechtliche Fußzeile am unteren Rand des Viewports, während der Inhalt scrollt.'
+    corner_style:
+        label: Eckenstil
+        help: 'Karten nutzen einen größeren Radius; Eingaben und Schaltflächen bleiben dezenter.'
+        choice:
+            sharp: Scharf
+            soft: Weich (Standard)
+            rounded: Abgerundet
+    border_strength:
+        label: Randstärke
+        help: 'Wie deutlich Elementränder im hellen und dunklen Modus wirken (Panels, Eingaben, Chrome).'
+        choice:
+            subtle: Dezent
+            medium: Mittel (Standard)
+            strong: Stark
     color:
         invalid: 'Verwenden Sie eine Hex-Farbe wie #1f6f54.'
 users:
@@ -1543,7 +1579,7 @@ instance_mailer:
         placeholder: 'smtp://user:pass@mail.example:587'
         invalid: 'Geben Sie ein gultiges Symfony Mailer DSN ein (zum Beispiel smtp://user:pass@host:587).'
         null_transport: 'null:// kann keine E-Mails zustellen. Fugen Sie ein echtes SMTP-DSN (oder ein anderes) ein oder verwenden Sie Gespeichertes DSN loschen, um auf die Umgebung zuruckzufallen.'
-        scheme_not_allowed: 'Dieses Mailer-DSN-Schema ist nicht erlaubt. Verwenden Sie smtp, smtps, sendmail, native oder ein unterstutztes Provider-Schema (Mailgun, Postmark, SES, …).'
+        scheme_not_allowed: 'Dieses Mailer-DSN-Schema ist nicht erlaubt. Verwenden Sie smtp, smtps oder ein unterstutztes Provider-Schema (Mailgun, Postmark, SES, …).'
     clear_dsn:
         label: 'Gespeichertes DSN loschen'
         help: 'Entfernt das Datenbank-DSN und fallt auf MAILER_DSN aus der Umgebung zuruck, bis Sie ein neues speichern.'

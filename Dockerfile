@@ -65,6 +65,8 @@ ENV APP_ENV=prod
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link .docker/frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
+# TLS-only ingest: override base Caddyfile (dev bind-mount keeps HTTP /api/* for local Docker clients).
+COPY --link .docker/frankenphp/Caddyfile.prod /etc/caddy/Caddyfile
 
 COPY --link composer.* symfony.* package.json ./
 RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
