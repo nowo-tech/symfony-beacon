@@ -11,17 +11,17 @@ https://<public_key>:<secret_key>@<host>:<port>/<project_id>
 Example (local HTTPS UI):
 
 ```text
-https://9cb5e28adc3ed7a40052e2a17e327220:abcdef0123456789@localhost:9444/1
+https://9cb5e28adc3ed7a40052e2a17e327220:abcdef0123456789@localhost:9447/1
 ```
 
 Ingest **always requires** `beacon_secret` (or the secret segment of the DSN). Keys created by Beacon always include a secret; public-key-only auth is rejected with HTTP 403.
 
 The **public key** is an opaque project identifier (safe to show in Settings / DSN examples). It is **not** a credential — protect the secret.
 
-Docker clients (BeaconBundle FrankenPHP demo) on the **local** stack (`compose.yaml`) may use **HTTP ingest** on port `9081` via `host.docker.internal` — the development Caddyfile serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9444`. **Production** (`compose.prod.yaml` / `Caddyfile.prod`) does **not** accept cleartext ingest: use an `https://…` DSN only.
+Docker clients (BeaconBundle FrankenPHP demo) on the **local** stack (`compose.yaml`) may use **HTTP ingest** on port `9084` via `host.docker.internal` — the development Caddyfile serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9447`. **Production** (`compose.prod.yaml` / `Caddyfile.prod`) does **not** accept cleartext ingest: use an `https://…` DSN only.
 
 ```text
-http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9081/1
+http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9084/1
 ```
 
 Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo` / `make seed` / `make ready` (after `make seed-platform` or `make bootstrap`).
@@ -40,7 +40,7 @@ Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops even
 
 ### Local demo sync (external BeaconBundle)
 
-`make seed` writes `.demo-client.env` with a Docker-ready client `BEACON_DSN` (`http://…@host.docker.internal:9081/{id}`).
+`make seed` writes `.demo-client.env` with a Docker-ready client `BEACON_DSN` (`http://…@host.docker.internal:9084/{id}`).
 
 In the sibling repo `BeaconBundle/demo/symfony8`:
 
@@ -55,7 +55,7 @@ Override the Beacon checkout path with `BEACON_REPO=/path/to/symfony-beacon`.
 Install [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) and set `BEACON_DSN` to this server (any host/port):
 
 ```env
-BEACON_DSN=https://PUBLIC:SECRET@localhost:9444/1
+BEACON_DSN=https://PUBLIC:SECRET@localhost:9447/1
 ```
 
 The bundle authenticates with `X-Beacon-Auth` (`beacon_key` + `beacon_secret`) and embeds the full DSN in the envelope header. Content-Type is `application/x-beacon-envelope`.
@@ -147,4 +147,4 @@ The HTTP endpoint validates the key and envelope, dispatches `ProcessEnvelopeMes
 
 Details: [EVENT-CONTEXT.md](product/EVENT-CONTEXT.md#tags-and-before_send-beaconbundle), Bundle [USAGE.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/USAGE.md) / [CONFIGURATION.md](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md).
 
-From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC:SECRET@host.docker.internal:9081/1`.
+From a FrankenPHP demo container, prefer HTTP to the published host port, e.g. `http://PUBLIC:SECRET@host.docker.internal:9084/1`.

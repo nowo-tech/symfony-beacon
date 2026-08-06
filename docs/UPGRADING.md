@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.1.0)](#unreleased-main-after-110)
+- [Unreleased (main after 1.2.0)](#unreleased-main-after-120)
+- [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120)
 - [Upgrading from 1.0.1 to 1.1.0](#upgrading-from-101-to-110)
 - [Upgrading from 1.0.0 to 1.0.1](#upgrading-from-100-to-101)
 - [Upgrading from 0.17.0 to 1.0.0](#upgrading-from-0170-to-100)
@@ -46,16 +47,29 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.1.0)
+## Unreleased (main after 1.2.0)
 
-Developer-facing only — **no migrations** and no operator config changes versus **1.1.0**.
+No further upgrade steps yet — follow [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120) when moving off **1.1.0**.
+
+## Upgrading from 1.1.0 to 1.2.0
+
+**No migrations.** Developer + local Compose changes only.
 
 ```bash
-git pull
-composer install   # unchanged lock for this change set
-pnpm install       # adds vitest / jsdom / @vitest/coverage-v8
-make vite-build    # optional if you only run PHP tests
+git fetch --tags
+git checkout v1.2.0   # or pull main at the release commit
+composer install
+pnpm install          # adds vitest / jsdom / @vitest/coverage-v8
+docker compose up -d  # picks up env_file + port defaults
+make vite-build       # optional if you only run PHP tests
 ```
+
+### Local Compose / `.env`
+
+- Compose services load secrets via `env_file: .env` (keep a real `.env` from `.env.dist`; do not commit it).
+- Fresh `.env.dist` defaults: HTTPS `9447`, HTTP ingest `9084`, Vite `5177`, Mailpit UI `18026` / SMTP `1027`. Existing `.env` values are kept — update bookmarks / BeaconBundle client DSNs if you adopt the new defaults.
+- MySQL is **not** published on the host. Use `docker compose exec database mysql …` (or attach another Compose service on the same network). Update any host tooling that used `localhost:3308`.
+- Prod (`compose.prod.yaml`) still fail-fast on missing `APP_SECRET` / MySQL / Mercure / SiteBackup secrets; other keys come from `.env`.
 
 ### Vitest (frontend unit)
 
@@ -66,7 +80,7 @@ make vite-build    # optional if you only run PHP tests
 ### PHPUnit / Playwright
 
 - Additional Unit tests under `tests/Unit/` (AuthKit, Issues changers, Setup, Ops, …). Filter: `make test ARGS='--testsuite Unit'`.
-- Extra Playwright deep specs (`e2e/*-deep.spec.ts`, cookie consent, share access). Same `make test-e2e` flow as **1.1.0**.
+- Extra Playwright deep specs (`e2e/*-deep.spec.ts`, cookie consent, share access). Same `make test-e2e` flow as **1.1.0** (default base URL `https://localhost:9447`).
 
 ## Upgrading from 1.0.1 to 1.1.0
 
@@ -106,9 +120,9 @@ Tests live under `tests/Unit/`, `tests/Functional/`, `tests/Integration/`, with 
 
 After `make up` + `make seed` (+ `make seed-sample` for issue/performance flows): `make test-e2e`. See `e2e/README.md`.
 
-### Vitest (developers; also on main after 1.1.0)
+### Vitest (developers; shipped in 1.2.0)
 
-Frontend unit tests: `make test-unit-js` / `make test-unit-js-coverage`. See [Unreleased (main after 1.1.0)](#unreleased-main-after-110).
+Frontend unit tests: `make test-unit-js` / `make test-unit-js-coverage`. See [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120).
 
 ### Security remediations (Codex Security medium findings)
 
@@ -235,8 +249,8 @@ The former `BEACON_RETENTION_*`, `BEACON_INGEST_RATE_LIMIT`, `BEACON_EVENT_QUOTA
 ### Local Mailpit (`066`)
 
 - The Flex `mailer` service in `compose.override.yaml` is now behind Compose profile **`mail`** (not started by `make up`).
-- Start with `make mailpit` (or `docker compose --profile mail up -d mailer`). UI default: http://localhost:18025; PHP DSN: `smtp://mailer:1025` under **Administration → Mailer**.
-- Host ports: `MAILPIT_UI_PORT` / `MAILPIT_SMTP_PORT` in `.env` (defaults 18025 / 1026 in `.env.dist`). Guide: [MAILPIT.md](ops/MAILPIT.md).
+- Start with `make mailpit` (or `docker compose --profile mail up -d mailer`). UI default: http://localhost:18026; PHP DSN: `smtp://mailer:1025` under **Administration → Mailer**.
+- Host ports: `MAILPIT_UI_PORT` / `MAILPIT_SMTP_PORT` in `.env` (defaults 18026 / 1027 in `.env.dist`). Guide: [MAILPIT.md](ops/MAILPIT.md).
 - Production (`compose.prod.yaml`) never includes Mailpit.
 
 ### Social login admin (extends `060`)
@@ -1155,7 +1169,7 @@ Then in `BeaconBundle/demo/symfony8`: `make sync-beacon` (see [DSN.md](DSN.md)).
 make qa
 # or
 make test
-curl -fsS http://localhost:9081/health/live
+curl -fsS http://localhost:9084/health/live
 ```
 
 ### Stack versions (0.7.0)
@@ -1312,7 +1326,7 @@ docker compose restart php
 BeaconBundle demos should use:
 
 ```env
-BEACON_DSN=http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9081/1
+BEACON_DSN=http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9084/1
 ```
 
 See [`DSN.md`](DSN.md).
@@ -1325,7 +1339,7 @@ Review public legal placeholders under `/legal/*` and cookie categories in `conf
 
 ```bash
 make test
-# https://localhost:9444/dashboard → open a project → Issues
+# https://localhost:9447/dashboard → open a project → Issues
 # Project Settings → API keys / Danger zone
 # From BeaconBundle demo: http://localhost:8011/report → issue appears
 ```
@@ -1374,8 +1388,8 @@ Update bookmarks, reverse proxies, and any hard-coded links to use `/dashboard` 
 ```bash
 make console ARGS='doctrine:migrations:migrate -n'
 make test
-# https://localhost:9444/ → /en/login
-# https://localhost:9444/en/register (empty DB) or /dashboard when authenticated
+# https://localhost:9447/ → /en/login
+# https://localhost:9447/en/register (empty DB) or /dashboard when authenticated
 ```
 
 No database schema migration is required for 0.3.0 auth/i18n changes.
@@ -1402,13 +1416,13 @@ docker compose exec vite pnpm install
 - Login/logout route names are now `nowo_auth_kit_login` / `nowo_auth_kit_logout`.
 - `form_login` uses nested fields: `login_form[_username]`, `login_form[_password]`, `login_form[_csrf_token]`.
 - Custom `App\Identity\Controller\SecurityController` was removed — use AuthKit + Twig overrides under `templates/bundles/NowoAuthKitBundle/`.
-- Empty databases can bootstrap via **https://localhost:9444/en/register** (first user only, `ROLE_ADMIN`). After any user exists, register redirects to login.
+- Empty databases can bootstrap via **https://localhost:9447/en/register** (first user only, `ROLE_ADMIN`). After any user exists, register redirects to login.
 - Existing users continue to work; no schema migration is required for AuthKit in 0.2.0.
 
 ### 3. Frontend / Vite
 
 - Styles entry is TypeScript + SCSS + Tailwind: `assets/app.ts` imports `styles/tailwind.css` and `styles/app.scss`.
-- Caddy proxies `/build*` to the Vite container. Ensure `DEFAULT_URI` matches your public HTTPS URL (default `https://localhost:9444`).
+- Caddy proxies `/build*` to the Vite container. Ensure `DEFAULT_URI` matches your public HTTPS URL (default `https://localhost:9447`).
 - Rebuild/restart so PHP picks up the Caddyfile and Vite listens on **5173** inside Compose:
 
 ```bash
@@ -1422,7 +1436,7 @@ Hard-refresh the browser if old HTTP Vite URLs were cached.
 ```bash
 make console ARGS='doctrine:migrations:migrate -n'
 make test
-# Open https://localhost:9444/en/login — Tailwind UI should load
+# Open https://localhost:9447/en/login — Tailwind UI should load
 ```
 
 ---
@@ -1442,10 +1456,10 @@ make bootstrap   # migrate + seed (or: make console ARGS='doctrine:migrations:mi
 
 Then either:
 
-- Register the first admin at https://localhost:9444/en/register, or
+- Register the first admin at https://localhost:9447/en/register, or
 - Use the seeded demo login from `make bootstrap` / `make seed`: `admin@symfony-beacon.local` / `admin123`
 
-Open https://localhost:9444/ (redirects to `/en/login`). After login you land on `/dashboard`.
+Open https://localhost:9447/ (redirects to `/en/login`). After login you land on `/dashboard`.
 
 ### Breaking expectations for consumers
 

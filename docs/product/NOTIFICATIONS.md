@@ -162,7 +162,7 @@ Classic Incoming Webhooks can carry MessageCard actions. To enable **Resolve** a
 3. In Beacon: type **Email**, set endpoint to the **recipient address** (e.g. `ops@example.com`).
 4. Choose categories, save, **Send test**, and check the inbox (and spam).
 
-**Local development:** start Mailpit with `make mailpit`, then save DSN `smtp://mailer:1025` under Administration → Mailer and inspect messages at http://localhost:18025 (default host UI port). Full guide: [MAILPIT.md](../ops/MAILPIT.md). Mailpit is **not** started by `make up` and is **not** part of the production Compose stack.
+**Local development:** start Mailpit with `make mailpit`, then save DSN `smtp://mailer:1025` under Administration → Mailer and inspect messages at http://localhost:18026 (default host UI port). Full guide: [MAILPIT.md](../ops/MAILPIT.md). Mailpit is **not** started by `make up` and is **not** part of the production Compose stack.
 
 **What Beacon sends:** email subject = summary; body = summary plus the issue/performance URL when present. From address comes from Mailer settings.
 

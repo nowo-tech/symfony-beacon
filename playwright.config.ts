@@ -4,9 +4,9 @@ import { defineConfig, devices } from '@playwright/test';
  * Browser E2E against the local Compose stack (FrankenPHP + Caddy TLS).
  *
  * Prerequisites: `make up` + `make seed` (demo admin). Optional: `make seed-sample`.
- * Base URL defaults to https://localhost:9444 (see DEFAULT_URI / HTTPS_PORT).
+ * Base URL defaults to https://localhost:9447 (see DEFAULT_URI / HTTPS_PORT).
  */
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'https://localhost:9444';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'https://localhost:9447';
 
 export default defineConfig({
   testDir: './e2e',

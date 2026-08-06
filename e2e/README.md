@@ -24,7 +24,7 @@ Filters / overrides:
 ```bash
 make test-e2e ARGS='e2e/public.spec.ts'
 make test-e2e ARGS='e2e/mutations.spec.ts'
-PLAYWRIGHT_BASE_URL=https://localhost:9444 make test-e2e
+PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 ```
 
 When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `helpers.ts`).

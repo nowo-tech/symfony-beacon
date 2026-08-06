@@ -40,13 +40,14 @@ The prod image runs `pnpm install --frozen-lockfile` and `pnpm run build` so `pu
 
 ## Run (example)
 
-Minimal one-off HTTP process (MySQL must be reachable via `DATABASE_URL`):
+Minimal one-off HTTP process (MySQL must be reachable via `DATABASE_URL` on the Compose/Docker network — DB ports are **not** published on the host):
 
 ```bash
 docker run --rm -p 8080:80 -p 8443:443 \
+  --network <compose-project>_default \
   -e APP_ENV=prod \
   -e APP_SECRET="$(openssl rand -hex 16)" \
-  -e DATABASE_URL="mysql://app:CHANGE_ME@host.docker.internal:3307/app?serverVersion=9.7&charset=utf8mb4" \
+  -e DATABASE_URL="mysql://app:CHANGE_ME@database:3306/app?serverVersion=9.7&charset=utf8mb4" \
   -e MESSENGER_TRANSPORT_DSN="doctrine://default?auto_setup=0" \
   -e FRANKENPHP_MODE=worker \
   symfony-frankenphp:prod

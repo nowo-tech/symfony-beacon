@@ -49,7 +49,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **Copy for AI** (`beacon-ai-export/v1` Markdown/JSON — [docs/product/AI-EXPORT.md](docs/product/AI-EXPORT.md)), **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (`X-Beacon-Auth` / envelope `dsn`; query auth **deprecated**); per-project suspend + daily quota; secret always required
 - **OTLP HTTP JSON** adapters: `POST /api/{project_id}/otlp/v1/logs|traces|metrics` (WARN+ logs, ERROR spans, failure-like metric data points → Issues; same DSN auth)
-- Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9081` (`host.docker.internal`)
+- Fast ACK + async processing (Messenger); Docker clients can ingest over HTTP `:9084` (`host.docker.internal`)
 - Daily **analytics** at `/projects/{uuid}/analytics`: Chart.js series, period presets / custom UTC range, env/release/level filters, plus zero-filled daily table (`025-analytics-charts`)
 - **Release health** at `/projects/{uuid}/releases` (new-in-release counts + compare)
 - Operator **OpenAPI** panel at `/admin/api/doc` (Nelmio) — see [docs/API.md](docs/API.md)
@@ -88,30 +88,30 @@ make up          # starts stack + builds frontend into public/build/
 make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # or: make bootstrap && make seed
 # Optional QA samples: make seed-sample
-# Optional local SMTP: make mailpit  (UI http://localhost:18025 — docs/ops/MAILPIT.md)
-# Option A — register the first admin in the UI: https://localhost:9444/en/register
+# Optional local SMTP: make mailpit  (UI http://localhost:18026 — docs/ops/MAILPIT.md)
+# Option A — register the first admin in the UI: https://localhost:9447/en/register
 # Option B — demo login after make ready / make seed (see below)
 ```
 
-- HTTP: http://localhost:9081  
-- HTTPS: https://localhost:9444  
-- MySQL: `localhost:3308`
-- Mailpit (after `make mailpit`): http://localhost:18025 — save `smtp://mailer:1025` in Administration → Mailer
+- HTTP: http://localhost:9084  
+- HTTPS: https://localhost:9447  
+- MySQL: Compose service `database` only (no host port; `docker compose exec database mysql …`)
+- Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailer:1025` in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
 - Browser E2E (Playwright): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
-- First-user registration (empty DB only): https://localhost:9444/register
-- Login: https://localhost:9444/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
-- OpenAPI (after login, admin): https://localhost:9444/admin/api/doc
+- First-user registration (empty DB only): https://localhost:9447/register
+- Login: https://localhost:9447/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
+- OpenAPI (after login, admin): https://localhost:9447/admin/api/doc
 
 > After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs).
 
 Seed prints DSNs and writes `.demo-client.env` for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
 
 ```text
-UI DSN: https://<public_key>:<secret>@localhost:9444/<project_id>
-Client DSN (Docker): http://<public_key>:<secret>@host.docker.internal:9081/<project_id>
+UI DSN: https://<public_key>:<secret>@localhost:9447/<project_id>
+Client DSN (Docker): http://<public_key>:<secret>@host.docker.internal:9084/<project_id>
 Self DSN (dogfood): http://<public_key>:<secret>@127.0.0.1/<project_id>
 ```
 

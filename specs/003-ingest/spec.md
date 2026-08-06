@@ -25,7 +25,7 @@ As an SDK / BeaconBundle client, I POST to `POST /api/{project_id}/envelope/` wi
 1. **Given** a valid project API key via Envelope auth header, query string, or envelope `dsn` including **public and secret** when the key stores a secret, **When** I POST a well-formed envelope, **Then** the HTTP layer acknowledges success promptly.
 2. **Given** an invalid or missing public key, **When** I POST, **Then** the request is rejected without processing (`401` / `403` as appropriate).
 3. **Given** an API key that has a stored secret, **When** I POST with only `beacon_key` (no `beacon_secret` / DSN secret), **Then** the request is rejected with **HTTP 403**.
-4. **Given** Docker local clients, **When** DSN points at host port **9081** / `host.docker.internal`, **Then** ingest is reachable (documented in README).
+4. **Given** Docker local clients, **When** DSN points at host port **9084** / `host.docker.internal`, **Then** ingest is reachable (documented in README).
 
 ### User Story 2 - Async processing (Priority: P1)
 

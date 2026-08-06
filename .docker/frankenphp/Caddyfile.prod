@@ -1,7 +1,7 @@
 {
 	{$CADDY_GLOBAL_OPTIONS}
 
-	# Dev publishes HTTPS on a non-default host port (e.g. 9444→443). Caddy still
+	# Dev publishes HTTPS on a non-default host port (e.g. 9447→443). Caddy still
 	# advertises Alt-Svc h3=":443", so browsers try HTTP/3 on localhost:443 (nothing
 	# listens) and XHR like /_wdt stay "pending". Stick to h1/h2 for local stack.
 	servers {
@@ -19,7 +19,7 @@
 		{$FRANKENPHP_CONFIG}
 	}
 
-	# Host maps container :80/:443 to HTTP_PORT/HTTPS_PORT (e.g. 9081/9444).
+	# Host maps container :80/:443 to HTTP_PORT/HTTPS_PORT (e.g. 9084/9447).
 	# Caddy's default HTTP→HTTPS redirect would send browsers to https://localhost/
 	# (port 443). Disable it and redirect to DEFAULT_URI instead.
 	auto_https disable_redirects
@@ -27,11 +27,11 @@
 
 {$CADDY_EXTRA_CONFIG}
 
-# HTTP for local + Docker clients (BeaconBundle demo → host.docker.internal:9081).
+# HTTP for local + Docker clients (BeaconBundle demo → host.docker.internal:9084).
 # Production: redirect *all* HTTP (including /api/*) to HTTPS — no cleartext ingest.
 http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	handle {
-		redir {$DEFAULT_URI:https://localhost:9444}{uri} permanent
+		redir {$DEFAULT_URI:https://localhost:9447}{uri} permanent
 	}
 }
 
@@ -41,7 +41,7 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	}
 
 	# Instruct browsers to forget a previously advertised HTTP/3 endpoint
-	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9444).
+	# (old Caddy default Alt-Svc h3=":443" broke XHR on :9447).
 	header {
 		Alt-Svc "clear"
 		# Baseline browser hardening (053). CSP is set in PHP (ContentSecurityPolicySubscriber)
@@ -54,7 +54,7 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	}
 
 	# HSTS by default on real hosts. Skip localhost / loopback so local self-signed
-	# HTTPS (e.g. :9444) does not sticky-pin browsers. Override via CADDY_SERVER_EXTRA_DIRECTIVES.
+	# HTTPS (e.g. :9447) does not sticky-pin browsers. Override via CADDY_SERVER_EXTRA_DIRECTIVES.
 	@enableHsts not host localhost 127.0.0.1
 	header @enableHsts Strict-Transport-Security "max-age=31536000; includeSubDomains"
 

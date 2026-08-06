@@ -28,7 +28,7 @@ Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/
 2. Replace the default JWT secret with a strong value (**≥ 32 characters**). The same string must reach:
 
    - PHP / Messenger (`MERCURE_JWT_SECRET`)
-   - Hub (`MERCURE_PUBLISHER_JWT_KEY` and `MERCURE_SUBSCRIBER_JWT_KEY` in `compose.yaml` — both are wired to `${MERCURE_JWT_SECRET}`)
+   - Hub (`MERCURE_PUBLISHER_JWT_KEY` and `MERCURE_SUBSCRIBER_JWT_KEY` in `compose.yaml` `environment:` — both remap `${MERCURE_JWT_SECRET}` from `.env`)
 
    Generate one:
 

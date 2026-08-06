@@ -12,7 +12,7 @@ As a developer, I can start Docker Compose and reach the AuthKit login page for 
 
 **Acceptance Scenarios**:
 
-1. Given a fresh clone with `.env` from `.env.dist`, when I run `make up`, then the stack starts on ports 9081/9444.
+1. Given a fresh clone with `.env` from `.env.dist`, when I run `make up`, then the stack starts on ports 9084/9447.
 2. Given the stack is up, when I open `/{DEFAULT_LOCALE}/login` (or bare `/login`, which redirects there), then I see the brand **symfony-beacon** (AuthKit UI, not a custom SecurityController). `.env.dist` ships `DEFAULT_LOCALE=en`; this project's local `.env` uses `es`.
 
 ### User Story 2 - Modular layout + security skeleton (Priority: P1)

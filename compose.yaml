@@ -1,5 +1,7 @@
 ---
 # Local / default stack: FrankenPHP dev image + bind-mounted app.
+# App secrets/config come from `.env` via `env_file` (cp .env.dist .env).
+# `environment:` only for renames, forced values, and keys not in `.env`.
 # Production image: docker compose build --build-arg… or
 #   docker build --target frankenphp_prod -t symfony-frankenphp .
 services:
@@ -12,26 +14,9 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
-      SERVER_NAME: ${SERVER_NAME:-localhost}
-      DEFAULT_URI: ${DEFAULT_URI:-https://localhost:9444}
-      APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${APP_SECRET:-ChangeMePleaseUseARealSecret}
-      # Doctrine / MySQL (`database` service)
-      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=1}
-      MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://localhost:9444/.well-known/mercure}
-      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
-      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
-      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
-      # --- FrankenPHP classic ↔ worker (see .docker/frankenphp/docker-entrypoint.sh) ---
-      FRANKENPHP_MODE: ${FRANKENPHP_MODE:-classic}
-      FRANKENPHP_WORKER_NUM: ${FRANKENPHP_WORKER_NUM:-}
-      FRANKENPHP_LOOP_MAX: ${FRANKENPHP_LOOP_MAX:-500}
-      FRANKENPHP_RESET_KERNEL: ${FRANKENPHP_RESET_KERNEL:-false}
-      XDEBUG_MODE: ${XDEBUG_MODE:-off}
       # Host bind-mount ./:/app is not owned by container root; silence Git "dubious ownership".
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
@@ -48,13 +33,13 @@ services:
       - caddy_config:/config
     ports:
       - target: 80
-        published: ${HTTP_PORT:-9080}
+        published: ${HTTP_PORT:-9084}
         protocol: tcp
       - target: 443
-        published: ${HTTPS_PORT:-9443}
+        published: ${HTTPS_PORT:-9447}
         protocol: tcp
       # HTTP/3/UDP disabled locally: Caddy Alt-Svc h3=":443" does not match the
-      # published HTTPS_PORT (e.g. 9444) and browsers leave /_wdt pending.
+      # published HTTPS_PORT (e.g. 9447) and browsers leave /_wdt pending.
     extra_hosts:
       - host.docker.internal:host-gateway
     tty: true
@@ -76,14 +61,12 @@ services:
     depends_on:
       php:
         condition: service_started
+    env_file:
+      - .env
     environment:
       # Always bind to the compose target port (host publishes VITE_PORT → 5173).
       VITE_LISTEN_PORT: "5173"
       VITE_PORT: "5173"
-      VITE_DEV_SERVER_HOST: ${VITE_DEV_SERVER_HOST:-localhost}
-      VITE_USE_POLLING: ${VITE_USE_POLLING:-0}
-      DEFAULT_URI: ${DEFAULT_URI:-https://localhost:9444}
-      HTTPS_PORT: ${HTTPS_PORT:-9444}
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
       GIT_CONFIG_VALUE_0: /app
@@ -92,7 +75,7 @@ services:
       - /app/var
     ports:
       - target: 5173
-        published: ${VITE_PORT:-5173}
+        published: ${VITE_PORT:-5177}
         protocol: tcp
     command: ["pnpm", "run", "dev"]
     # Image HEALTHCHECK probes FrankenPHP :2019; this service only runs Vite.
@@ -109,18 +92,12 @@ services:
   database:
     image: mysql:${MYSQL_VERSION:-9.7}
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
-      MYSQL_USER: ${MYSQL_USER:-app}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-!ChangeMe!}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-!ChangeMeRoot!}
+    env_file:
+      - .env
     volumes:
       # Host-visible MySQL data (gitignored). Recreate DB: rm -rf .data/mysql && docker compose up -d database
       - ./.data/mysql:/var/lib/mysql
-    ports:
-      - target: 3306
-        published: ${MYSQL_PORT:-3307}
-        protocol: tcp
+    # No host ports — reach via Compose network only (REQ-FP-006): docker compose exec database …
     healthcheck:
       test:
         [
@@ -151,18 +128,9 @@ services:
         condition: service_healthy
       php:
         condition: service_started
+    env_file:
+      - .env
     environment:
-      APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${APP_SECRET:-ChangeMePleaseUseARealSecret}
-      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=1}
-      MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://localhost:9444/.well-known/mercure}
-      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
-      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
-      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
-      XDEBUG_MODE: ${XDEBUG_MODE:-off}
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
       GIT_CONFIG_VALUE_0: /app
@@ -200,18 +168,9 @@ services:
         condition: service_healthy
       php:
         condition: service_started
+    env_file:
+      - .env
     environment:
-      APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${APP_SECRET:-ChangeMePleaseUseARealSecret}
-      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=1}
-      MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://localhost:9444/.well-known/mercure}
-      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
-      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
-      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
-      XDEBUG_MODE: ${XDEBUG_MODE:-off}
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
       GIT_CONFIG_VALUE_0: /app
@@ -238,12 +197,15 @@ services:
   mercure:
     image: dunglas/mercure
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
+      # Hub image expects its own key names (not MERCURE_JWT_SECRET from .env).
       SERVER_NAME: ':80'
       MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_EXTRA_DIRECTIVES: |
-        cors_origins ${DEFAULT_URI:-https://localhost:9444}
+        cors_origins ${DEFAULT_URI:-https://localhost:9447}
         anonymous
     command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
     healthcheck:

@@ -50,7 +50,7 @@ function themeBootIife(): Plugin {
 /**
  * Inside Docker, Vite always listens on 5173 (compose maps host VITE_PORT → 5173).
  * Assets are served over HTTPS via Caddy reverse_proxy (/build → vite:5173)
- * so the browser does not hit mixed-content blocks on https://localhost:9444.
+ * so the browser does not hit mixed-content blocks on https://localhost:9447.
  */
 const listenPort = Number(process.env.VITE_LISTEN_PORT || process.env.VITE_PORT || 5173);
 const publicOrigin = process.env.DEFAULT_URI || process.env.VITE_ORIGIN || '';

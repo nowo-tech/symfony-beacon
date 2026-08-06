@@ -1578,7 +1578,7 @@ instance_mercure:
     public_url:
         label: 'URL pubblica (browser)'
         help: 'Lascia vuoto per usare MERCURE_PUBLIC_URL (di solito same-origin /.well-known/mercure tramite Caddy).'
-        placeholder: 'https://localhost:9444/.well-known/mercure'
+        placeholder: 'https://localhost:9447/.well-known/mercure'
     jwt_secret:
         label: 'Segreto JWT'
         help: 'Lascia vuoto per mantenere il valore cifrato corrente o ricadere su MERCURE_JWT_SECRET. Minimo 32 caratteri se impostato.'

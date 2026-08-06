@@ -260,7 +260,7 @@ jobs:
     env:
       CI: "1"
       PLAYWRIGHT_REQUIRE_SAMPLE: "1"
-      PLAYWRIGHT_BASE_URL: https://localhost:9444
+      PLAYWRIGHT_BASE_URL: https://localhost:9447
       COMPOSER_ALLOW_SUPERUSER: "1"
 
     steps:
@@ -279,7 +279,7 @@ jobs:
           docker compose up -d
           # Entrypoint installs vendor/node_modules and migrates when DB is ready.
           for i in $(seq 1 90); do
-            if curl -kfsS https://localhost:9444/health/live >/dev/null 2>&1; then
+            if curl -kfsS https://localhost:9447/health/live >/dev/null 2>&1; then
               echo "Stack is live"
               exit 0
             fi

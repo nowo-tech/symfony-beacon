@@ -94,7 +94,7 @@ test.describe('Ingest API smoke', () => {
     ].join('\n');
 
     // Prefer HTTP cleartext ingest port used by Docker clients; fall back to HTTPS base.
-    const httpBase = process.env.PLAYWRIGHT_INGEST_BASE_URL ?? 'http://localhost:9081';
+    const httpBase = process.env.PLAYWRIGHT_INGEST_BASE_URL ?? 'http://localhost:9084';
     const authHeader = `Beacon beacon_key=${publicKey}, beacon_secret=${secretKey}`;
 
     const response = await request.post(`${httpBase}/api/${projectId}/envelope/`, {

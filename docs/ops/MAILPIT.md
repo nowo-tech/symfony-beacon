@@ -30,7 +30,7 @@ Image: [`axllent/mailpit`](https://hub.docker.com/r/axllent/mailpit). Defined in
    make mailpit
    ```
 
-   Open the UI URL printed by Make (default **http://localhost:18025**).
+   Open the UI URL printed by Make (default **http://localhost:18026**).
 
 3. As `ROLE_ADMIN`, open **Administration → Mailer** (`/settings/mailer`) and save:
 
@@ -68,7 +68,7 @@ docker compose --profile mail up -d mailer
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `MAILPIT_UI_PORT` | `18025` | Host port → Mailpit web UI (container `8025`) |
+| `MAILPIT_UI_PORT` | `18026` | Host port → Mailpit web UI (container `8025`) |
 | `MAILPIT_SMTP_PORT` | `1026` | Host port → Mailpit SMTP (container `1025`; for host-side tools only) |
 | `MAILER_DSN` | `null://null` | Symfony fallback when no DB DSN is stored — prefer Admin → Mailer |
 

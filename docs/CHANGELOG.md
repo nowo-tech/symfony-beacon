@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-06
+
 ### Added
 
 - **Vitest** frontend unit tests (`assets/**/*.test.ts`, jsdom): Stimulus controllers, `theme-boot`, Thinking Orbs presets/theme/profiles; `make test-unit-js` / `make test-unit-js-coverage` → `var/coverage-js/`.
@@ -17,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CONTRIBUTING / README document Vitest alongside PHPUnit and Playwright.
 - `applyThemeBoot` exported from `assets/theme-boot.ts` for unit tests (side-effect on import unchanged).
+- Compose loads app config via `env_file: .env` (local + prod); `environment:` only for renames, fail-fast `${VAR:?…}`, and forced overrides.
+- Local/default host ports in `.env.dist` moved to avoid clashes: HTTPS `9447`, HTTP `9084`, Vite `5177`, Mailpit UI `18026` / SMTP `1027`.
+- MySQL is Compose-network only (no host-published DB ports); use `docker compose exec database mysql …`.
 
 ## [1.1.0] - 2026-08-06
 
@@ -733,7 +738,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...v1.0.0

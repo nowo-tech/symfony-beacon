@@ -43,7 +43,7 @@ As an operator deploying with `compose.prod.yaml` or the prod image, I never get
 ## Requirements *(mandatory)*
 
 - **FR-001**: Define Mailpit in `compose.override.yaml` as service `mailer` (Symfony Flex convention) with Compose profile `mail`.
-- **FR-002**: Publish host ports via `MAILPIT_UI_PORT` (default 18025) and `MAILPIT_SMTP_PORT` (default 1026); container ports remain 8025 / 1025.
+- **FR-002**: Publish host ports via `MAILPIT_UI_PORT` (default 18026) and `MAILPIT_SMTP_PORT` (default 1027); container ports remain 8025 / 1025.
 - **FR-003**: Makefile targets `mailpit` and `mailpit-logs`; `down` includes `--profile mail`; `print-urls` / `up` hint or show Mailpit when running.
 - **FR-004**: Document in `docs/ops/MAILPIT.md`, cross-link from INSTALL / NOTIFICATIONS / PRODUCTION / README / CHANGELOG; `.env.dist` comments for ports + DSN.
 - **FR-005**: Spec artifact `066-local-mailpit`; ROADMAP note that local Mailpit is available for Mailer testing and is not a production dependency.

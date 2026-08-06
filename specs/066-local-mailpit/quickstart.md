@@ -6,7 +6,7 @@ make up
 make mailpit
 ```
 
-1. Open the Mailpit UI (default http://localhost:18025).
+1. Open the Mailpit UI (default http://localhost:18026).
 2. Administration → Mailer → save DSN `smtp://mailer:1025` (+ optional From).
 3. **Send sample email** (or magic login / project email **Send test**).
 4. Confirm the message in Mailpit.

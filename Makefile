@@ -86,8 +86,8 @@ print-urls:
 	HTTPS_PUB=$$(docker compose port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
 	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
 	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
-	HTTP_PUB=$${HTTP_PUB:-9081}; \
-	HTTPS_PUB=$${HTTPS_PUB:-9444}; \
+	HTTP_PUB=$${HTTP_PUB:-9084}; \
+	HTTPS_PUB=$${HTTPS_PUB:-9447}; \
 	echo ""; \
 	echo "Beacon is up:"; \
 	echo "  HTTP:  http://localhost:$${HTTP_PUB}"; \
@@ -152,7 +152,7 @@ mailpit:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	docker compose --profile mail up -d mailer
 	@UI_PUB=$$(docker compose --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
-	UI_PUB=$${UI_PUB:-18025}; \
+	UI_PUB=$${UI_PUB:-18026}; \
 	echo ""; \
 	echo "Mailpit is up (dev/test only — not used in production):"; \
 	echo "  UI:   http://localhost:$${UI_PUB}"; \
@@ -250,12 +250,12 @@ test-unit-js-coverage:
 	docker compose exec -T php pnpm run test:unit:coverage $(ARGS)
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
-# Override: PLAYWRIGHT_BASE_URL=https://localhost:9444 make test-e2e
+# Override: PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 # Filter:  make test-e2e ARGS='e2e/public.spec.ts'
 # Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
 # CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
 PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
-PLAYWRIGHT_BASE_URL ?= https://localhost:9444
+PLAYWRIGHT_BASE_URL ?= https://localhost:9447
 test-e2e:
 	@docker compose exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
