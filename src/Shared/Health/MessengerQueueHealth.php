@@ -9,7 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Throwable;
 
 /**
- * Instance-wide Messenger async queue depth for health probes and project Health UI.
+ * Instance-wide Messenger queue depth for health probes and project Health UI
+ * (`async_ingest` Envelope drain + `async` notifications / HTTP-log).
  */
 final readonly class MessengerQueueHealth
 {
@@ -44,7 +45,7 @@ final readonly class MessengerQueueHealth
             }
 
             $count = $connection->fetchOne(
-                "SELECT COUNT(*) FROM messenger_messages WHERE queue_name = 'async' AND delivered_at IS NULL",
+                "SELECT COUNT(*) FROM messenger_messages WHERE queue_name IN ('async_ingest', 'async') AND delivered_at IS NULL",
             );
 
             return false === $count ? null : (int) $count;

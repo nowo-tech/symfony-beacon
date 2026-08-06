@@ -14,7 +14,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Shared\Metrics\MetricsCollector;
+use App\Ops\Metrics\MetricsCollector;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use DateTimeInterface;

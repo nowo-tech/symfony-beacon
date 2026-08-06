@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Project\Service;
 
 use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use DateTimeImmutable;
 
 /**
@@ -22,7 +22,7 @@ use DateTimeImmutable;
 final readonly class ProjectOpsStatsService
 {
     public function __construct(
-        private IssueRepository $issueRepository,
+        private IssueSearchRepository $issueRepository,
         private EventRepository $eventRepository,
     ) {
     }

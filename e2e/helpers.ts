@@ -1,7 +1,18 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 export const DEMO_EMAIL = process.env.PLAYWRIGHT_DEMO_EMAIL ?? 'admin@symfony-beacon.local';
 export const DEMO_PASSWORD = process.env.PLAYWRIGHT_DEMO_PASSWORD ?? 'admin123';
+
+/** CI / PLAYWRIGHT_REQUIRE_SAMPLE=1: missing demo sample data fails instead of skip. */
+export function requireSampleOrSkip(ready: boolean, reason: string): void {
+  if (ready) {
+    return;
+  }
+  if (process.env.CI || process.env.PLAYWRIGHT_REQUIRE_SAMPLE === '1') {
+    throw new Error(reason);
+  }
+  test.skip(true, reason);
+}
 
 /** Wait for the Beacon page-loader overlay to release pointer events. */
 export async function waitForPageLoader(page: Page): Promise<void> {
@@ -22,10 +33,9 @@ export async function dismissCookieConsent(page: Page): Promise<void> {
   const acceptAll = openModal.locator('#cookie_consent_use_all_cookies');
   const functionalOnly = openModal.locator('#cookie_consent_use_only_functional_cookies');
 
-  // Bundle buttons are type=button and rely on JS; wait for handler readiness then force-click.
-  await page.waitForTimeout(300);
   const target = (await acceptAll.isVisible().catch(() => false)) ? acceptAll : functionalOnly;
   await target.waitFor({ state: 'visible', timeout: 5_000 });
+  await expect(target).toBeEnabled();
   await target.evaluate((el: HTMLElement) => el.click());
 
   await openModal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
@@ -58,11 +68,11 @@ export async function dismissProductTour(page: Page): Promise<void> {
       .first();
     if (await next.isVisible().catch(() => false)) {
       await next.click({ force: true }).catch(() => undefined);
-      await page.waitForTimeout(150);
+      await popover.first().waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
       continue;
     }
     await page.keyboard.press('Escape').catch(() => undefined);
-    await page.waitForTimeout(150);
+    await popover.first().waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
   }
 }
 
@@ -113,7 +123,7 @@ export async function expectAuthenticatedPage(page: Page, path: string): Promise
   await dismissProductTour(page);
   expect(response, `No response for ${path}`).not.toBeNull();
   const status = response!.status();
-  expect(status, `${path} returned ${status}`).toBeLessThan(500);
+  expect(status, `${path} returned ${status}`).toBeLessThan(400);
   await expect(page, `Expected auth for ${path}`).not.toHaveURL(/\/login(\?|$|\/)/);
   await expect(page.locator('body')).toBeVisible();
 }
@@ -123,7 +133,7 @@ export async function expectGuestPage(page: Page, path: string): Promise<void> {
   await dismissCookieConsent(page);
   expect(response, `No response for ${path}`).not.toBeNull();
   const status = response!.status();
-  expect(status, `${path} returned ${status}`).toBeLessThan(500);
+  expect(status, `${path} returned ${status}`).toBeLessThan(400);
   await expect(page.locator('body')).toBeVisible();
 }
 

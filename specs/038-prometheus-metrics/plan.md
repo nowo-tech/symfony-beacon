@@ -46,15 +46,17 @@ specs/038-prometheus-metrics/
 ### Source Code
 
 ```text
+src/Ops/Metrics/
+└── MetricsCollector.php          # counters + gauge assembly (`085`; was Shared)
+
 src/Shared/Metrics/
-├── MetricsCollector.php          # counters + gauge assembly
 ├── PrometheusTextFormatter.php   # text/plain exposition
-└── MetricsController.php         # GET /metrics
+└── MetricsController.php         # GET /metrics (scrape chrome stays Shared)
 
 config/packages/security.yaml     # PUBLIC_ACCESS + controller gate
 config/parameters.yaml / .env.dist # BEACON_METRICS_TOKEN
 docs/PRODUCTION.md
-tests/Shared/MetricsEndpointTest.php
+tests/Functional/Shared/MetricsEndpointTest.php
 ```
 
 ## Complexity Tracking

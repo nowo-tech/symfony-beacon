@@ -10,7 +10,7 @@ use App\Identity\Tour\ProductTourPage;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;

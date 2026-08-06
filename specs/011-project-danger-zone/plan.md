@@ -4,4 +4,4 @@
 
 UI on **project Settings**; `ProjectHistoryClearer`; Stimulus `confirm-dialog`; routes `project_clear_history` / `project_delete`.
 
-See `spec.md`. Tests: `ProjectDangerZoneTest`.
+See `spec.md`. Tests: `tests/Functional/Project/ProjectDangerZoneTest.php`.

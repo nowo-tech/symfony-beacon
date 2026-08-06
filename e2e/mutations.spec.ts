@@ -3,6 +3,7 @@ import {
   dismissProductTour,
   expectAuthenticatedPage,
   openFirstIssue,
+  requireSampleOrSkip,
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from './helpers';
@@ -66,7 +67,7 @@ test.describe('Mutations — issue triage', () => {
     const uuid = await resolveDemoProjectUuid(page);
     const issueUuid = await openFirstIssue(page, uuid);
     if (!issueUuid) {
-      test.skip(true, 'No issues available — run make seed-sample');
+      requireSampleOrSkip(false, 'No issues available — run make seed-sample');
       return;
     }
 
@@ -118,13 +119,13 @@ test.describe('Mutations — issue triage', () => {
     const uuid = await resolveDemoProjectUuid(page);
     const issueUuid = await openFirstIssue(page, uuid);
     if (!issueUuid) {
-      test.skip(true, 'No issues available — run make seed-sample');
+      requireSampleOrSkip(false, 'No issues available — run make seed-sample');
       return;
     }
 
     const priorityForm = page.locator('form.issue-priority-form');
     if ((await priorityForm.count()) === 0) {
-      test.skip(true, 'Priority form not visible (collapsed panel or permissions)');
+      requireSampleOrSkip(false, 'Priority form not visible (collapsed panel or permissions)');
       return;
     }
     await priorityForm.locator('select[name="priority"]').selectOption({ index: 1 });

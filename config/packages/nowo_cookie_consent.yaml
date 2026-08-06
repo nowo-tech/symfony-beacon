@@ -43,6 +43,9 @@ nowo_cookie_consent:
     # Floating cookie bubble only on login/register (included manually in AuthKit layout).
     preferences_bubble_enabled: false
     preferences_bubble_position: bottom-right
+    # Custom bubble art (YAML fallback when DB profile icon is empty).
+    preferences_bubble_icon: '<img class="nowo-cookie-consent__preferences-bubble-svg" src="/illustrations/cookie-consent-bubble.svg" alt="" width="62" height="62" decoding="async">'
+    preferences_bubble_border_color: '#EE922D'
 
     # Auto-open the consent modal only on auth entry points
     route_targeting_mode: only

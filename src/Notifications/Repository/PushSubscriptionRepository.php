@@ -58,7 +58,7 @@ class PushSubscriptionRepository extends ServiceEntityRepository
             ->innerJoin('s.user', 'u')
             ->addSelect('u')
             ->andWhere('s.user IN (:users)')
-            ->andWhere('u.pushNotificationsEnabled = true')
+            ->andWhere('u.uiPreferences.pushNotificationsEnabled = true')
             ->setParameter('users', $users)
             ->getQuery()
             ->getResult();

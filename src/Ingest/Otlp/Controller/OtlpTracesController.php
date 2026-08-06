@@ -1,0 +1,127 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Ingest\Otlp\Controller;
+
+use App\Ingest\Message\ProcessEnvelopeMessage;
+use App\Ingest\Otlp\Service\OtlpIngestGateway;
+use App\Ingest\Otlp\Service\OtlpTracesMapper;
+use DateTimeImmutable;
+use DateTimeInterface;
+use InvalidArgumentException;
+use OpenApi\Attributes as OA;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Attribute\Route;
+
+/**
+ * OTLP HTTP JSON traces ingest: maps ERROR spans to Beacon events via the Envelope worker.
+ */
+#[AsController]
+final readonly class OtlpTracesController
+{
+    public function __construct(
+        private OtlpIngestGateway $otlpIngestGateway,
+        private OtlpTracesMapper $otlpTracesMapper,
+        private MessageBusInterface $bus,
+        private LoggerInterface $logger,
+    ) {
+    }
+
+    #[Route('/api/{projectId}/otlp/v1/traces', name: 'ingest_otlp_traces', requirements: ['projectId' => '\d+'], methods: ['POST'])]
+    #[OA\Post(
+        path: '/api/{projectId}/otlp/v1/traces',
+        operationId: 'ingestOtlpTraces',
+        description: <<<'MD'
+Accepts an OTLP **ExportTraceServiceRequest** JSON body (`resourceSpans` / `scopeSpans` / `spans`).
+
+Maps **ERROR** spans (status code ERROR and/or exception attributes) into Beacon events and queues the same async Envelope worker.
+At most **200** spans are accepted per request. Metrics, gRPC, protobuf, and full Performance waterfall ingest are out of scope for v1.
+
+**Auth (required):** `X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…` bound to `{projectId}`.
+Query-string auth is **not** accepted on this endpoint.
+MD,
+        summary: 'Ingest OTLP traces (HTTP JSON)',
+        security: [['BeaconAuth' => []]],
+        tags: ['Ingest'],
+    )]
+    #[OA\Parameter(
+        name: 'projectId',
+        description: 'Numeric project id from the Beacon DSN path.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'integer', example: 1, minimum: 1),
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\MediaType(
+            mediaType: 'application/json',
+            schema: new OA\Schema(type: 'object'),
+            example: [
+                'resourceSpans' => [[
+                    'resource' => [
+                        'attributes' => [
+                            ['key' => 'service.name', 'value' => ['stringValue' => 'demo']],
+                            ['key' => 'deployment.environment', 'value' => ['stringValue' => 'prod']],
+                        ],
+                    ],
+                    'scopeSpans' => [[
+                        'spans' => [[
+                            'traceId' => 'aabbccdd',
+                            'spanId' => '11223344',
+                            'name' => 'POST /checkout',
+                            'endTimeUnixNano' => '1721491200000000000',
+                            'status' => ['code' => 2, 'message' => 'payment failed'],
+                            'attributes' => [
+                                ['key' => 'exception.type', 'value' => ['stringValue' => 'RuntimeException']],
+                                ['key' => 'exception.message', 'value' => ['stringValue' => 'payment failed']],
+                            ],
+                        ]],
+                    ]],
+                ]],
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Accepted; async processing queued. Empty body.')]
+    #[OA\Response(response: 400, description: 'Invalid JSON.')]
+    #[OA\Response(response: 401, description: 'Missing authorization.')]
+    #[OA\Response(response: 403, description: 'Forbidden / ingest disabled.')]
+    #[OA\Response(response: 404, description: 'Project not found.')]
+    #[OA\Response(response: 413, description: 'Body too large.')]
+    #[OA\Response(response: 429, description: 'Rate limit or quota exceeded.')]
+    public function __invoke(int $projectId, Request $request): Response
+    {
+        $accepted = $this->otlpIngestGateway->accept($projectId, $request);
+        if ($accepted instanceof Response) {
+            return $accepted;
+        }
+
+        try {
+            $payloads = $this->otlpTracesMapper->mapToEventPayloads($accepted['body']);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->notice('OTLP traces parse rejected.', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->otlpIngestGateway->respond('invalid otlp payload', Response::HTTP_BAD_REQUEST);
+        }
+
+        if ([] === $payloads) {
+            return $this->otlpIngestGateway->respond('', Response::HTTP_OK);
+        }
+
+        $envelope = $this->otlpTracesMapper->toEnvelopeBody($payloads);
+        $this->bus->dispatch(new ProcessEnvelopeMessage(
+            $projectId,
+            $envelope,
+            new DateTimeImmutable()->format(DateTimeInterface::ATOM),
+        ));
+
+        return $this->otlpIngestGateway->respond('', Response::HTTP_OK);
+    }
+}

@@ -52,22 +52,22 @@ specs/017-export-webhooks/
 src/Notifications/NotificationCategories.php
 src/Notifications/Service/NotificationPayloadBuilder.php
 src/Notifications/Service/NotificationDispatcher.php
-src/Issues/Controller/IssueController.php
+src/Issues/Controller/IssueDetailController.php  # triage mutations (`083`); was IssueController
 src/Project/Controller/ProjectExportController.php
 src/Issues/Repository/EventRepository.php          # filtered event export query
 docs/product/NOTIFICATIONS.md
 docs/CHANGELOG.md
 translations/messages.en.yaml
 translations/messages.es.yaml
-tests/Export/ExportWebhooksTest.php
-tests/Notifications/NotificationDispatcherTest.php
+tests/Functional/Export/ExportWebhooksTest.php
+tests/Unit/Notifications/NotificationDispatcherTest.php
 ```
 
 ## Implementation Decisions
 
 1. **Export routes** — `GET /projects/{uuid}/export/issues.{csv|json}` and `events.{csv|json}`; `ProjectAccessService::requireRole(..., Admin)`; same list filters as issue index where applicable (q, level, status, environment, release, priority, assignee); events join issue and apply environment/release/level/status/q; hard cap 1,000 rows; CSV via `StreamedResponse` + `fputcsv`.
 2. **Lifecycle categories** — add string constants to `NotificationCategories::ALL` so destination forms expose them; dispatch matches on category = event type (not issue level).
-3. **Dispatch hooks** — `IssueController` status / assign / comment / duplicate call new `NotificationDispatcher` methods after a successful change; payload includes prior/new assignee and duplicate canonical ids when relevant.
+3. **Dispatch hooks** — `IssueDetailController` status / assign / comment / duplicate call new `NotificationDispatcher` methods after a successful change (`083`); payload includes prior/new assignee and duplicate canonical ids when relevant.
 4. **Delivery** — unchanged `DeliverNotificationMessage` + retry / SSRF guards.
 
 ## Complexity Tracking

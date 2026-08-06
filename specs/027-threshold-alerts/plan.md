@@ -15,7 +15,7 @@ Add per-project rolling error volume rules so owners and admins can alert on sud
 |------|----------|
 | Entity | `App\Notifications\Entity\ProjectThresholdRule` with project relation, public UUID, rolling thresholds, optional filters, and `lastFiredAt` cooldown marker |
 | Count source | `EventRepository::countReceivedSince()` joins `event` to `issue` and counts only `error` / `fatal` issue levels |
-| Trigger point | `ProcessEnvelopeHandler` calls `VolumeThresholdEvaluator` only after a persisted `error` or `fatal` event |
+| Trigger point | Thin `ProcessEnvelopeHandler` calls `VolumeThresholdEvaluator` only after a persisted `error` or `fatal` event (`085`; writers own persist) |
 | Delivery | New category `volume.threshold` routed by `NotificationDispatcher`, so Messenger, quiet hours, digests, and destination health continue to apply |
 | Cooldown | Rule-level `lastFiredAt` + `cooldownMinutes` suppress repeated alerts while volume stays high |
 | UI | Project Settings adds Threshold alerts CRUD (owner/admin only) with create, edit, enable/disable, and delete actions |
@@ -40,10 +40,11 @@ src/Notifications/Service/VolumeThresholdEvaluator.php
 src/Notifications/Service/NotificationDispatcher.php
 src/Notifications/Service/NotificationPayloadBuilder.php
 src/Notifications/NotificationCategories.php
-src/Ingest/MessageHandler/ProcessEnvelopeHandler.php
+src/Ingest/MessageHandler/ProcessEnvelopeHandler.php  # thin orchestration; post-flush evaluator (`085`)
+src/Issues/Service/IssueEnvelopeWriter.php
 src/Issues/Repository/EventRepository.php
 templates/project/settings.html.twig
-tests/Notifications/ThresholdAlertTest.php
+tests/Integration/Notifications/ThresholdAlertTest.php
 migrations/Version20260721190000.php
 docs/product/NOTIFICATIONS.md
 ```

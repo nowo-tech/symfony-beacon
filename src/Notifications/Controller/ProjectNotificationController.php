@@ -10,7 +10,7 @@ use App\Notifications\Form\NotificationDestinationFormType;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

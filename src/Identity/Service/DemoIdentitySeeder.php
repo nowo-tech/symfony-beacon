@@ -11,7 +11,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTime;
 use LogicException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

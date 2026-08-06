@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveDemoProjectUuid } from './helpers';
+import { requireSampleOrSkip, resolveDemoProjectUuid } from './helpers';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +28,7 @@ test.describe('Ingest API smoke', () => {
       }
     }
     if (!envText) {
-      test.skip(true, '.demo-client.env missing/unreadable — run make seed');
+      requireSampleOrSkip(false, '.demo-client.env missing/unreadable — run make seed');
       return;
     }
 
@@ -61,7 +61,7 @@ test.describe('Ingest API smoke', () => {
     }
 
     if (!projectId || !publicKey || !secretKey) {
-      test.skip(true, 'Could not parse demo ingest credentials from .demo-client.env');
+      requireSampleOrSkip(false, 'Could not parse demo ingest credentials from .demo-client.env');
       return;
     }
 

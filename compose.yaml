@@ -169,8 +169,55 @@ services:
     volumes:
       - ./:/app
       - /app/var
-    # Entrypoint prepares vendor/DB; then consumes the async queue.
+    # Entrypoint prepares vendor/DB; then consumes Envelope ingest queue only.
     # --time-limit restarts the process periodically (Compose brings it back up).
+    # Outbound notifications / HTTP-log / Web Push use messenger-notify.
+    command:
+      [
+        "php",
+        "bin/console",
+        "messenger:consume",
+        "async_ingest",
+        "-vv",
+        "--time-limit=3600",
+        "--memory-limit=256M",
+      ]
+    # Image HEALTHCHECK expects FrankenPHP :2019; this process only runs Messenger.
+    healthcheck:
+      disable: true
+    tty: true
+
+  # Outbound notifications, HTTP-log, and Web Push (async transport).
+  # Separate from messenger so notify backlog cannot starve Envelope ingest.
+  messenger-notify:
+    image: ${IMAGES_PREFIX:-}symfony-beacon-dev
+    build:
+      context: .
+      target: frankenphp_dev
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+      php:
+        condition: service_started
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      APP_SECRET: ${APP_SECRET:-ChangeMePleaseUseARealSecret}
+      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=1}
+      MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
+      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://localhost:9444/.well-known/mercure}
+      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /app
+    volumes:
+      - ./:/app
+      - /app/var
     command:
       [
         "php",
@@ -181,7 +228,6 @@ services:
         "--time-limit=3600",
         "--memory-limit=256M",
       ]
-    # Image HEALTHCHECK expects FrankenPHP :2019; this process only runs Messenger.
     healthcheck:
       disable: true
     tty: true

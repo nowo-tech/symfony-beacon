@@ -98,7 +98,7 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 - MySQL: `localhost:3308`
 - Mailpit (after `make mailpit`): http://localhost:18025 — save `smtp://mailer:1025` in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
-- Browser E2E (Playwright, host): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
+- Browser E2E (Playwright): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
 - First-user registration (empty DB only): https://localhost:9444/register
@@ -133,12 +133,15 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 | Module | Responsibility |
 |--------|----------------|
 | `Identity` | Users (AuthKit login/register), account prefs, magic login, seed command |
-| `Project` | Projects, API keys, memberships (`viewer` + share links), Settings / danger zone |
-| `Ingest` | Envelope API + async pipeline |
+| `Project` | Projects, API keys, memberships (`viewer` + share links), Settings / danger zone / admin project ops |
+| `Ingest` | Envelope API + OTLP adapters + async pipeline |
 | `Issues` | Grouping, list/filter, FULLTEXT, assignee, status + history, event detail |
 | `Performance` | Transactions, spans, N+1 |
 | `Analytics` | Daily aggregates + charts/filters (`025`); table + Chart.js |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history |
+| `Ops` | Instance ops overview, retention purge, Prometheus metrics collector |
+| `Setup` | Platform / sample seed commands + demo fixtures |
+| `Api` | Read API (Bearer project tokens) |
 | `Shared` | Appearance, menus/breadcrumbs glue, legal pages, instance Mailer / Mercure |
 
 ## Spec-Driven Development
@@ -149,20 +152,28 @@ Specs live under `specs/`. Constitution: `.specify/memory/constitution.md`.
 
 ```bash
 make test
+# Suites: Unit | Functional | Integration
+make test ARGS='--testsuite Unit'
 # or
 docker compose exec php vendor/bin/phpunit
 
 # HTML + Clover report (Xdebug in Compose); optional soft gate:
 make test-coverage
 # COVERAGE_MIN=40 make test-coverage
+
+# Browser E2E (after make up + make seed):
+make test-e2e
 ```
 
-CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. Soft threshold is off by default (`COVERAGE_MIN` empty) — never a 100% gate. See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and `specs/033-coverage-ci/`.
+Layout: `tests/Unit/` (pure `TestCase`), `tests/Functional/` (HTTP), `tests/Integration/` (kernel/DB/commands), helpers in `tests/Support/`.
+
+CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. Soft gate defaults to `COVERAGE_MIN=35` in CI (never 100%). See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and `specs/033-coverage-ci/`.
 
 | Suite | Notes |
 |-------|--------|
-| PHP | PHPUnit (`make test` / CI) |
+| PHP | PHPUnit (`make test` / CI) — Unit / Functional / Integration |
 | Coverage | `make test-coverage` / CI Coverage job |
+| E2E | Playwright (`make test-e2e` / CI) |
 | TS/JS | Vite build in CI Docker job (no Istanbul gate) |
 
 ## Documentation

@@ -72,39 +72,28 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+# Symfony Beacon (DEFAULT) — modular src + typed PHPUnit suites
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── Identity/
+├── Project/
+├── Issues/
+├── Ingest/
+├── Notifications/
+├── Shared/
+└── …
 
 tests/
-├── contract/
-├── integration/
-└── unit/
+├── Support/          # DatabaseWebTestCase, shared traits
+├── Unit/             # PHPUnit\Framework\TestCase (pure logic)
+├── Functional/       # HTTP / KernelBrowser + DatabaseWebTestCase
+├── Integration/      # Kernel + DB / commands / services (no HTTP)
+├── bootstrap.php
+└── phpstan/
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+# [REMOVE IF UNUSED] Option: monorepo / multi-app (only if detected)
+apps/
+packages/
+└── …
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real

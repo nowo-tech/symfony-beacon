@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-03
 
-**Status**: Done (F0.1 + F2A admin user/group/project Form Types; settings Types extend FormKitAbstractType; residual F2B structure only — see tasks)
+**Status**: Done (F0.1 + F2A admin Form Types; F2B structure closed via `083` / `085`)
 
 **Input**: User description: "In Twig form templates, render fields with a loop in the same order as the Form Type so new Type fields appear automatically; manage field styles only in the Type; only paint a field if it was not already painted earlier. Apply to all Symfony forms and record this as a spec condition."
 
@@ -90,7 +90,7 @@ As a maintainer, when a form needs a special layout (color picker grid, quiet-ho
 - FormKit (`nowo-tech/form-kit-bundle` **≥ 2.2**) remains the preferred way to set field options and defaults. Host kit profiles set `auto_help` / `auto_placeholder: false` where kits only supply labels (`081-formkit-uikit-kit-sync`).
 - Global form theme (`templates/form/beacon_theme.html.twig`) continues to supply baseline widget/row markup; Types supply field-specific attrs.
 - Kit-owned AuthKit security pages are only in scope where this repo already overrides them under `templates/bundles/` (AuthKit **≥ 1.14** disables convention help/placeholder on login/register/reset forms).
-- Admin user/group/project create-edit forms use Form Types + this loop (F2A done). Residual F2B is code layout only (IssueController / AdminProject move), not form Twig convention.
+- Admin user/group/project create-edit forms use Form Types + this loop (F2A done). F2B layout (Issue controller split / AdminProject in Project) delivered under `083` / `085`.
 
 ## Related
 

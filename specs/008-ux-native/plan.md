@@ -25,7 +25,7 @@ Enable Beacon to power Hotwire Native iOS/Android shells by integrating Symfony 
 - Spec-first: this feature has `spec` / `plan` / `tasks`.
 - Docker-first: no host PHP required; commands via Compose.
 - English docs/PHPDoc/UI.
-- Tests required: `tests/Native/NativeConfigEndpointsTest.php`.
+- Tests required: `tests/Functional/Native/NativeConfigEndpointsTest.php`.
 
 ## Related packages
 

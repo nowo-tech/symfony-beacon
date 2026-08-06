@@ -97,7 +97,7 @@ As `ROLE_ADMIN`, kit dashboards keep Beacon look: host `templates/kit/*_layout.h
 ## Assumptions
 
 - FormKit **2.2** inherits form-level `translation_domain` into fields via `FormOptionsTrait::addWithDefaults` when the field omits the option.
-- Settings Mailer / Mercure / Ops / Social credential Types extending `FormKitAbstractType` remain under `077` / `079-ops-env-to-db`.
+- Settings Mailer / Mercure / Ops / Social credential Types extending `FormKitAbstractType` remain under `077` / `084-ops-env-to-db`.
 - Legal/cookie **public** modal stays on `nowo-tech/cookie-consent-bundle` (`ui_theme: tailwind`); this feature does not rewrite legal copy.
 - Host Twig forks listed in CONTRIBUTING are accepted interim bridges, not a permanent pattern — prefer layout-only overrides.
 
@@ -105,7 +105,7 @@ As `ROLE_ADMIN`, kit dashboards keep Beacon look: host `templates/kit/*_layout.h
 
 - `064-routing-kit` — RoutingKit install; this feature advances panel FormKit + pagination.
 - `077-form-type-field-loop` — host Form Type field loop; FormKit remains preferred for attrs.
-- `079-ops-env-to-db` — Ops defaults UI (section tabs + FormKit Types).
+- `084-ops-env-to-db` — Ops defaults UI (section tabs + FormKit Types).
 - `080-dashboard-aside-panels` / `079-dashboard-assignments` — list pagination convention.
 - `056-setup-wizard` — SiteBackup host layouts stay Tailwind + UiKit tokens.
 - `037-authkit-identity-migration` — AuthKit pin / FormKit `auth_kit` profile.

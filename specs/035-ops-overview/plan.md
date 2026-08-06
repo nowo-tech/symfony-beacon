@@ -15,7 +15,7 @@ Add `ROLE_ADMIN` Ops overview that aggregates existing Issue / Analytics / Notif
 | Data | `ProjectOpsStatsService`, `IssueRepository`, `DailyProjectStatRepository` / `EventRepository`, `NotificationDestination` + `NotificationDeliveryAttemptRepository`, `MessengerQueueHealth` |
 | Spike rule (MVP) | Projects where `errors_last_1d > max(3, 2 × avg(errors_last_7d))` (tune in impl; keep test-stable) |
 | Caps | Top 25 spikes, 25 failed deliveries, 50 open-issue project rows |
-| Tests | PHPUnit functional under `tests/` |
+| Tests | PHPUnit functional under `tests/Functional/` (Ops overview) |
 
 ## Constitution Check
 
@@ -29,12 +29,16 @@ Add `ROLE_ADMIN` Ops overview that aggregates existing Issue / Analytics / Notif
 
 ## Implementation
 
-1. `OpsOverviewService` (or controller-local query object) assembling DTO for Twig.
-2. `AdminOpsOverviewController` + route `/admin/ops` (name `admin_ops_overview`).
+1. `App\Ops\Service\OpsOverviewService` assembling DTO for Twig (`085`; moved out of Shared).
+2. `App\Ops\Controller\AdminOpsOverviewController` + route `/admin/ops` (name `admin_ops_overview`).
 3. Twig `templates/admin/ops/overview.html.twig`; hub card + menu seeder key.
 4. Destination repository helpers for cross-project failed last-delivery / recent attempts.
 5. i18n keys `admin.ops.*`; PHPUnit access + filter + empty/healthy fixtures.
 6. CHANGELOG / ROADMAP / UPGRADING pointer.
+
+## As-built ownership (`085`)
+
+Ops overview lives under `src/Ops/` so Shared stays presentation/instance chrome only. Behaviour and routes unchanged.
 
 ## Risks
 

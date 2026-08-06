@@ -1,6 +1,6 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
-	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
+	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
@@ -42,10 +42,10 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
-	@echo "  make test-e2e        Playwright browser E2E (host; needs make up + make seed)"
+	@echo "  make test-e2e        Playwright browser E2E (Docker image; needs make up + make seed[+sample])"
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
-	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
+	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test"
 	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
 	@echo "  make update-deps     composer update + pnpm update (in php container)"
 	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
@@ -53,17 +53,22 @@ help:
 	@echo "Git hygiene:"
 	@echo "  make setup-hooks                    Install .githooks (strips Cursor co-authors)"
 	@echo "  make check-no-cursor-coauthor       Fail if Cursor trailers exist in history"
+	@echo "  make check-module-boundaries         Fail if AdminProjectController leaves Project"
 	@echo "  make check-envelope-goldens         Diff Envelope fixtures vs sibling BeaconBundle"
 	@echo "  make strip-cursor-coauthor-from-history  Rewrite local history to remove them"
 
 setup-hooks:
-	@chmod +x .githooks/commit-msg .githooks/prepare-commit-msg .scripts/check-no-cursor-coauthor.sh .scripts/strip-cursor-coauthor-from-history.sh
+	@chmod +x .githooks/commit-msg .githooks/prepare-commit-msg .scripts/check-no-cursor-coauthor.sh .scripts/strip-cursor-coauthor-from-history.sh .scripts/check-module-boundaries.sh
 	@git config core.hooksPath .githooks
 	@echo "✅ Git hooks installed (.githooks — strips Cursor Co-authored-by / Made-with trailers)."
 
 check-no-cursor-coauthor:
 	@chmod +x .scripts/check-no-cursor-coauthor.sh
 	@./.scripts/check-no-cursor-coauthor.sh HEAD
+
+check-module-boundaries:
+	@chmod +x .scripts/check-module-boundaries.sh
+	@./.scripts/check-module-boundaries.sh
 
 check-envelope-goldens:
 	@chmod +x .scripts/check-envelope-goldens.sh
@@ -234,12 +239,13 @@ rector-fix:
 	docker compose exec -T php vendor/bin/rector process
 
 test:
-	docker compose exec -T php vendor/bin/phpunit
+	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
 # Override: PLAYWRIGHT_BASE_URL=https://localhost:9444 make test-e2e
 # Filter:  make test-e2e ARGS='e2e/public.spec.ts'
 # Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
+# CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
 PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
 PLAYWRIGHT_BASE_URL ?= https://localhost:9444
 test-e2e:
@@ -251,23 +257,25 @@ else
 		--user "$(shell id -u):$(shell id -g)" \
 		-v "$(CURDIR):/work" -w /work \
 		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_BASE_URL)" \
+		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
+		-e CI="$(CI)" \
 		-e HOME=/tmp \
 		-e XDG_CACHE_HOME=/tmp/.cache \
 		$(PLAYWRIGHT_IMAGE) \
-		bash -lc 'mkdir -p /tmp/.cache && npx --yes playwright test $(ARGS)'
+		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
 endif
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke:
 	docker compose exec -T php vendor/bin/phpunit \
-		tests/Identity/AuthKitBootstrapTest.php \
-		tests/Identity/MagicLoginTest.php \
-		tests/Identity/PasswordResetTest.php \
-		tests/Identity/LoginThrottleTest.php
+		tests/Functional/Identity/AuthKitBootstrapTest.php \
+		tests/Functional/Identity/MagicLoginTest.php \
+		tests/Functional/Identity/PasswordResetTest.php \
+		tests/Functional/Identity/LoginThrottleTest.php
 
 # Soft gate: COVERAGE_MIN defaults in CI; override locally e.g. COVERAGE_MIN=35 make test-coverage
 test-coverage:
-	docker compose exec -T php mkdir -p var/coverage var/coverage-html
+	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && mkdir -p var/coverage var/coverage-html'
 	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
 		--coverage-text \
 		--coverage-clover var/coverage/clover.xml \
@@ -280,7 +288,7 @@ secrets-scan:
 	docker run --rm -v "$(CURDIR):/repo:ro" -w /repo "zricethezav/gitleaks:v$(GITLEAKS_VERSION)" \
 		detect --source . --verbose --redact --exit-code 1
 
-qa: cs twig-cs phpstan rector test
+qa: cs twig-cs phpstan rector check-module-boundaries test
 
 qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
 

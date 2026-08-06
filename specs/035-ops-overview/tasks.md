@@ -6,12 +6,12 @@
 ## Phase 1: Service & queries
 
 - [x] T001 Add cross-project helpers on notification destinations / delivery attempts (failed last delivery + recent failures; no secrets)
-- [x] T002 `OpsOverviewService` (queue depth, open issues, suspended count, spikes, failed deliveries; optional project UUID filter; caps)
+- [x] T002 `App\Ops\Service\OpsOverviewService` (queue depth, open issues, suspended count, spikes, failed deliveries; optional project UUID filter; caps; `085`)
 - [x] T003 Deterministic spike rule + unit/fixture coverage for the calculation
 
 ## Phase 2: UI & nav
 
-- [x] T004 `AdminOpsOverviewController` + `/admin/ops` (`ROLE_ADMIN`)
+- [x] T004 `App\Ops\Controller\AdminOpsOverviewController` + `/admin/ops` (`ROLE_ADMIN`; `085`)
 - [x] T005 Twig overview (healthy/empty states, filter, drill-down links)
 - [x] T006 Admin hub card + platform menu/breadcrumb seed keys for Ops overview
 

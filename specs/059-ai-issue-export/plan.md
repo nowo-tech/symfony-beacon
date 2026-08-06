@@ -9,6 +9,6 @@
 ## Implementation
 
 1. Formatter service + scrub helpers.
-2. Controller actions (or IssueController methods) with `requireIssueRead`.
+2. `IssueAiExportController` actions with `requireIssueRead` (routes unchanged; extracted from detail in `085`).
 3. Twig buttons + clipboard.
 4. Unit + functional tests; CHANGELOG.

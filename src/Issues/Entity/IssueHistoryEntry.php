@@ -7,7 +7,7 @@ namespace App\Issues\Entity;
 use App\Identity\Entity\User;
 use App\Issues\IssueHistoryKind;
 use App\Issues\Repository\IssueHistoryEntryRepository;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 

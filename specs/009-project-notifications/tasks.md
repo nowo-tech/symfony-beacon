@@ -12,7 +12,7 @@
 
 - [x] T004 `DeliverNotificationMessage` + handler (HttpClient POST; Slack text vs JSON body)
 - [x] T005 `NotificationDispatcher` (match enabled destinations + categories)
-- [x] T006 Wire into `ProcessEnvelopeHandler` (new issue, regression, N+1)
+- [x] T006 Wire into Envelope writers / thin `ProcessEnvelopeHandler` (new issue, regression, N+1; `085`)
 - [x] T007 Reopen `ignored` → `unresolved` like `resolved`
 - [x] T008 Route `DeliverNotificationMessage` to `async` Messenger transport
 

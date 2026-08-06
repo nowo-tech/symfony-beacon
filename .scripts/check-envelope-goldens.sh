@@ -5,7 +5,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 BEACON_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 BUNDLE_FIXTURES="${BUNDLE_FIXTURES:-$BEACON_ROOT/../../bundles/BeaconBundle/tests/Contract/fixtures/envelope}"
-BEACON_FIXTURES="$BEACON_ROOT/tests/Ingest/fixtures/envelope"
+BEACON_FIXTURES="$BEACON_ROOT/tests/Functional/Ingest/fixtures/envelope"
 
 if [ ! -d "$BUNDLE_FIXTURES" ]; then
   echo "SKIP: sibling BeaconBundle fixtures not found at $BUNDLE_FIXTURES"

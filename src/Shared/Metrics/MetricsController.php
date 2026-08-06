@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Metrics;
 
+use App\Ops\Metrics\MetricsCollector;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

@@ -16,7 +16,7 @@ Add a project-scoped **Release health** panel at `/projects/{uuid}/releases` so 
 | Route | New authenticated project page: `project_releases` at `/projects/{id}/releases` |
 | Access | Reuse `ProjectAccessService::requireMembership()` |
 | Release source | Merge distinct releases from `Issue.firstRelease` / `Issue.lastRelease` plus `Event.releaseVersion` for catalog completeness |
-| New issue counts | Add `IssueRepository` helpers keyed by `firstRelease` |
+| New issue counts | Add `IssueSearchRepository` helpers keyed by `firstRelease` (`083`) |
 | New issue sample | Query latest issues where `firstRelease = :release` for a small preview list |
 | Release compare | Compare issue sets where `firstRelease = :release OR lastRelease = :release`; classify only-A / both / only-B |
 | Environment compare | Deep-link to existing `IssueController` environment compare (`environment` + `compare`) |
@@ -28,14 +28,15 @@ Add a project-scoped **Release health** panel at `/projects/{uuid}/releases` so 
 ## Files
 
 - `src/Project/Controller/ProjectReleaseHealthController.php`
-- `src/Issues/Repository/IssueRepository.php`
+- `src/Issues/Repository/IssueSearchRepository.php` (release-scoped list helpers; `083`)
+- `src/Issues/Repository/IssueRepository.php` (entity lookups)
 - `src/Issues/Repository/EventRepository.php`
 - `src/Shared/Breadcrumb/BreadcrumbDemoSeeder.php`
 - `templates/project/_nav.html.twig`
 - `templates/project/releases.html.twig`
 - `translations/messages.en.yaml`
 - `translations/messages.es.yaml`
-- `tests/Project/ReleaseHealthControllerTest.php`
+- `tests/Functional/Project/ReleaseHealthControllerTest.php`
 - `specs/028-release-health/tasks.md`
 - `docs/ROADMAP.md`
 - `docs/CHANGELOG.md`

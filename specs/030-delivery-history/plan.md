@@ -38,7 +38,7 @@ src/Notifications/MessageHandler/DeliverNotificationHandler.php
 templates/project/settings.html.twig
 translations/messages.en.yaml
 translations/messages.es.yaml
-tests/Notifications/NotificationDeliveryHistoryRecorderTest.php
-tests/Notifications/ProjectHealthUiTest.php
+tests/Integration/Notifications/NotificationDeliveryHistoryRecorderTest.php
+tests/Functional/Notifications/ProjectHealthUiTest.php
 migrations/Version20260721192000.php
 ```

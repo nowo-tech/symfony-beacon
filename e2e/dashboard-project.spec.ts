@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, loginAsDemo, logout, resolveDemoProjectUuid } from './helpers';
+import { dismissProductTour, expectAuthenticatedPage, loginAsDemo, logout, requireSampleOrSkip, resolveDemoProjectUuid } from './helpers';
 
 test.describe('Dashboard & navigation', () => {
   test('dashboard loads with project list', async ({ page }) => {
@@ -77,7 +77,7 @@ test.describe('Project surfaces', () => {
 
     const issueLink = page.locator(`a[href*="/projects/${uuid}/issues/"]`).first();
     if ((await issueLink.count()) === 0) {
-      test.info().annotations.push({ type: 'note', description: 'No issues seeded — skip detail' });
+      requireSampleOrSkip(false, 'No issues seeded — run make seed-sample');
       return;
     }
 

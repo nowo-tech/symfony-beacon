@@ -1,0 +1,126 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Functional\Identity;
+
+use App\Identity\Entity\User;
+use App\Tests\Support\DatabaseWebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+final class AuthKitBootstrapTest extends DatabaseWebTestCase
+{
+    public function testLoginPageIsPublic(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/login');
+        // AuthKit locale.unlocalized: serve — bare /login is canonical for DEFAULT_LOCALE.
+        if ($client->getResponse()->isRedirection()) {
+            self::assertResponseRedirects('/en/login');
+            $client->followRedirect();
+        }
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'symfony-beacon');
+        self::assertSelectorExists('input[name="login_form[_remember_me]"]');
+        $html = $client->getResponse()->getContent() ?: '';
+        self::assertMatchesRegularExpression('#href="[^"]*/login/qr"#', $html);
+        self::assertStringContainsString('Sign in with phone', $html);
+    }
+
+    public function testQrLoginStartIsPublic(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/login/qr');
+        self::assertTrue(
+            $client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection(),
+            'QR start should be publicly reachable (200 or redirect to show).',
+        );
+        self::assertNotSame(403, $client->getResponse()->getStatusCode());
+        self::assertNotSame(401, $client->getResponse()->getStatusCode());
+    }
+
+    public function testPathLocaleSwitchShowsSpanishLogin(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/es/login');
+        self::assertResponseIsSuccessful();
+        // PWA install prompt also uses h2; AuthKit heading is h1 inside the panel.
+        self::assertSelectorTextContains('.nowo-auth-kit__panel h1', 'Iniciar sesión');
+        // DEFAULT_LOCALE (en in PHPUnit) is canonical as bare /login, not /en/login.
+        self::assertSelectorExists('a[href="/login"]');
+    }
+
+    public function testGermanLoginRendersInPathLocale(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/de/login');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.nowo-auth-kit__panel h1', 'Anmelden');
+    }
+
+    public function testRegisterPageAvailableWhenNoUsers(): void
+    {
+        $client = self::createClient();
+        $client->request(Request::METHOD_GET, '/register');
+        // AuthKit locale.unlocalized: serve — bare /register is canonical for DEFAULT_LOCALE.
+        if ($client->getResponse()->isRedirection()) {
+            self::assertResponseRedirects('/en/register');
+            $client->followRedirect();
+        }
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
+    }
+
+    public function testFirstUserCanRegisterThenLogin(): void
+    {
+        $client = self::createClient();
+        // Seed platform catalogs so post-login dashboard is not forced to /setup.
+        $this->seedPlatformCatalogs();
+        $crawler = $client->request(Request::METHOD_GET, '/en/register');
+        self::assertResponseIsSuccessful();
+
+        $button = $crawler->selectButton('Register');
+        self::assertGreaterThan(0, $button->count(), 'Register submit button not found');
+
+        $form = $button->form();
+        $values = $form->getPhpValues();
+        self::assertArrayHasKey('registration_form', $values);
+
+        $formValues = [
+            'registration_form' => [
+                'email' => 'admin@example.com',
+                'displayName' => 'Admin',
+                'password' => 'Secret123!',
+                'password_confirm' => 'Secret123!',
+                '_token' => $values['registration_form']['_token'] ?? null,
+            ],
+        ];
+
+        foreach ($values['registration_form'] as $key => $value) {
+            if (!\array_key_exists((string) $key, $formValues['registration_form'])) {
+                $formValues['registration_form'][$key] = $value;
+            }
+        }
+
+        $client->request(Request::METHOD_POST, '/en/register', $formValues);
+        self::assertTrue(
+            $client->getResponse()->isRedirect(),
+            'Expected redirect after registration, got '.$client->getResponse()->getStatusCode().': '.$client->getResponse()->getContent()
+        );
+        $client->followRedirect();
+        $status = $client->getResponse()->getStatusCode();
+        if ($status >= 300 && $status < 400) {
+            $client->followRedirect();
+        }
+        self::assertResponseIsSuccessful();
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $user = $em->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
+        self::assertInstanceOf(User::class, $user);
+        self::assertContains('ROLE_ADMIN', $user->getRoles());
+
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        self::assertTrue($hasher->isPasswordValid($user, 'Secret123!'));
+    }
+}

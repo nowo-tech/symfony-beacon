@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Tour;
 
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 
 /**
  * Runtime context used to filter tour steps by page, instance role, and project permissions.

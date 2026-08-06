@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Identity\Entity;
 
+use App\Identity\Entity\Embeddable\UserUiPreferences;
 use App\Identity\Repository\UserRepository;
-use App\Identity\Tour\ProductTourPage;
-use App\Identity\UserDisplayPreferenceDefaults;
-use App\Issues\IssuePanelIds;
 use App\Project\Entity\ProjectMembership;
 use App\Shared\Doctrine\PublicUuidTrait;
 use DateTime;
@@ -29,7 +27,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Application user (AuthKit / Security / UserKit) with locale, theme, and issue panel preferences.
+ * Application user (AuthKit / Security / UserKit).
+ *
+ * Display / tour / push preferences live in {@see UserUiPreferences} (embedded columns).
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'app_user')]
@@ -101,63 +101,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $passwordHistory;
 
-    /** Preferred UI locale (`en` / `es` / …); null only for legacy / anonymized rows. */
-    #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredLocale = null;
-
-    /** Preferred color theme (`light` / `dark`). Default `light` for new users; locale is filled on PrePersist from `%default_locale%`. */
-    #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredTheme = UserDisplayPreferenceDefaults::THEME;
-
-    /** Main content width: `content` (centered max-width) or `full`. Null = content. */
-    #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredContentWidth = UserDisplayPreferenceDefaults::CONTENT_WIDTH;
-
-    /** UI density: `comfortable` (default) or `compact`. Null = comfortable. */
-    #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredUiDensity = UserDisplayPreferenceDefaults::UI_DENSITY;
-
     /**
-     * Motion preference: `system` (follow OS), `reduce`, or `full`.
+     * UI preferences (locale, theme, density, tours, push). Same DB columns as before (`columnPrefix: false`).
      */
-    #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredMotion = UserDisplayPreferenceDefaults::MOTION;
-
-    /** Root font scale: `sm` | `md` (default) | `lg`. Null = md. */
-    #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredFontScale = UserDisplayPreferenceDefaults::FONT_SCALE;
-
-    /** Contrast: `system` (follow device) or `more`. */
-    #[ORM\Column(length: 8, nullable: true)]
-    private ?string $preferredContrast = UserDisplayPreferenceDefaults::CONTRAST;
-
-    /** Desktop sidebar default: `expanded` (default) or `collapsed`. Null = expanded. */
-    #[ORM\Column(length: 16, nullable: true)]
-    private ?string $preferredSidebar = UserDisplayPreferenceDefaults::SIDEBAR;
-
-    /**
-     * Issue/event panel ids that should start collapsed (browser can override via localStorage).
-     *
-     * @var list<string>|null
-     */
-    #[ORM\Column(nullable: true)]
-    private ?array $preferredCollapsedIssuePanels = null;
-
-    /** When set, all product tours are suppressed (Account → Display checkbox). */
-    #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $productTourSeenAt = null;
-
-    /**
-     * Tour page ids already completed (e.g. dashboard, project_issues, admin).
-     *
-     * @var list<string>|null
-     */
-    #[ORM\Column(nullable: true)]
-    private ?array $productTourSeenPages = null;
-
-    /** Opt-in for PWA / browser push alerts on new issues in associated projects. */
-    #[ORM\Column(options: ['default' => false])]
-    private bool $pushNotificationsEnabled = false;
+    #[ORM\Embedded(class: UserUiPreferences::class, columnPrefix: false)]
+    private UserUiPreferences $uiPreferences;
 
     /** When set, personal identifiers were scrubbed (GDPR anonymize); login remains disabled. */
     #[ORM\Column(nullable: true)]
@@ -180,6 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         $this->ensureUuid();
         $this->memberships = new ArrayCollection();
         $this->passwordHistory = new ArrayCollection();
+        $this->uiPreferences = new UserUiPreferences();
     }
 
     public function getId(): ?int
@@ -400,170 +349,144 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
+    public function getUiPreferences(): UserUiPreferences
+    {
+        return $this->uiPreferences;
+    }
+
     public function getPreferredLocale(): string
     {
-        return $this->preferredLocale ?? UserDisplayPreferenceDefaults::LOCALE;
+        return $this->uiPreferences->getPreferredLocale();
     }
 
     /** Stored column before defaults (PrePersist / legacy null rows). */
     public function getPreferredLocaleRaw(): ?string
     {
-        return $this->preferredLocale;
+        return $this->uiPreferences->getPreferredLocaleRaw();
     }
 
     public function setPreferredLocale(?string $preferredLocale): self
     {
-        $normalized = null !== $preferredLocale ? strtolower(trim($preferredLocale)) : null;
-        $this->preferredLocale = '' !== $normalized ? $normalized : null;
+        $this->uiPreferences->setPreferredLocale($preferredLocale);
 
         return $this;
     }
 
     public function getPreferredTheme(): string
     {
-        return $this->preferredTheme ?? UserDisplayPreferenceDefaults::THEME;
+        return $this->uiPreferences->getPreferredTheme();
     }
 
     public function getPreferredThemeRaw(): ?string
     {
-        return $this->preferredTheme;
+        return $this->uiPreferences->getPreferredThemeRaw();
     }
 
     public function setPreferredTheme(?string $preferredTheme): self
     {
-        $normalized = null !== $preferredTheme ? strtolower(trim($preferredTheme)) : null;
-        if (null !== $normalized && !\in_array($normalized, ['light', 'dark'], true)) {
-            $normalized = null;
-        }
-        $this->preferredTheme = $normalized;
+        $this->uiPreferences->setPreferredTheme($preferredTheme);
 
         return $this;
     }
 
     public function getPreferredContentWidth(): string
     {
-        return 'full' === $this->preferredContentWidth ? 'full' : UserDisplayPreferenceDefaults::CONTENT_WIDTH;
+        return $this->uiPreferences->getPreferredContentWidth();
     }
 
     public function getPreferredContentWidthRaw(): ?string
     {
-        return $this->preferredContentWidth;
+        return $this->uiPreferences->getPreferredContentWidthRaw();
     }
 
     public function setPreferredContentWidth(?string $preferredContentWidth): self
     {
-        $normalized = null !== $preferredContentWidth ? strtolower(trim($preferredContentWidth)) : null;
-        if (!\in_array($normalized, ['content', 'full'], true)) {
-            $normalized = null;
-        }
-        $this->preferredContentWidth = $normalized;
+        $this->uiPreferences->setPreferredContentWidth($preferredContentWidth);
 
         return $this;
     }
 
     public function getPreferredUiDensity(): string
     {
-        return 'compact' === $this->preferredUiDensity ? 'compact' : UserDisplayPreferenceDefaults::UI_DENSITY;
+        return $this->uiPreferences->getPreferredUiDensity();
     }
 
     public function getPreferredUiDensityRaw(): ?string
     {
-        return $this->preferredUiDensity;
+        return $this->uiPreferences->getPreferredUiDensityRaw();
     }
 
     public function setPreferredUiDensity(?string $preferredUiDensity): self
     {
-        $normalized = null !== $preferredUiDensity ? strtolower(trim($preferredUiDensity)) : null;
-        if (!\in_array($normalized, ['comfortable', 'compact'], true)) {
-            $normalized = null;
-        }
-        $this->preferredUiDensity = $normalized;
+        $this->uiPreferences->setPreferredUiDensity($preferredUiDensity);
 
         return $this;
     }
 
     public function getPreferredMotion(): string
     {
-        return $this->preferredMotion ?? UserDisplayPreferenceDefaults::MOTION;
+        return $this->uiPreferences->getPreferredMotion();
     }
 
     public function getPreferredMotionRaw(): ?string
     {
-        return $this->preferredMotion;
+        return $this->uiPreferences->getPreferredMotionRaw();
     }
 
     public function setPreferredMotion(?string $preferredMotion): self
     {
-        $normalized = null !== $preferredMotion ? strtolower(trim($preferredMotion)) : null;
-        if (null !== $normalized && !\in_array($normalized, ['system', 'reduce', 'full'], true)) {
-            $normalized = null;
-        }
-        $this->preferredMotion = $normalized;
+        $this->uiPreferences->setPreferredMotion($preferredMotion);
 
         return $this;
     }
 
     public function getPreferredFontScale(): string
     {
-        return \in_array($this->preferredFontScale, ['sm', 'lg'], true)
-            ? $this->preferredFontScale
-            : UserDisplayPreferenceDefaults::FONT_SCALE;
+        return $this->uiPreferences->getPreferredFontScale();
     }
 
     public function getPreferredFontScaleRaw(): ?string
     {
-        return $this->preferredFontScale;
+        return $this->uiPreferences->getPreferredFontScaleRaw();
     }
 
     public function setPreferredFontScale(?string $preferredFontScale): self
     {
-        $normalized = null !== $preferredFontScale ? strtolower(trim($preferredFontScale)) : null;
-        if (!\in_array($normalized, ['sm', 'md', 'lg'], true)) {
-            $normalized = null;
-        }
-        $this->preferredFontScale = $normalized;
+        $this->uiPreferences->setPreferredFontScale($preferredFontScale);
 
         return $this;
     }
 
     public function getPreferredContrast(): string
     {
-        return $this->preferredContrast ?? UserDisplayPreferenceDefaults::CONTRAST;
+        return $this->uiPreferences->getPreferredContrast();
     }
 
     public function getPreferredContrastRaw(): ?string
     {
-        return $this->preferredContrast;
+        return $this->uiPreferences->getPreferredContrastRaw();
     }
 
     public function setPreferredContrast(?string $preferredContrast): self
     {
-        $normalized = null !== $preferredContrast ? strtolower(trim($preferredContrast)) : null;
-        if (null !== $normalized && !\in_array($normalized, ['system', 'more'], true)) {
-            $normalized = null;
-        }
-        $this->preferredContrast = $normalized;
+        $this->uiPreferences->setPreferredContrast($preferredContrast);
 
         return $this;
     }
 
     public function getPreferredSidebar(): string
     {
-        return 'collapsed' === $this->preferredSidebar ? 'collapsed' : UserDisplayPreferenceDefaults::SIDEBAR;
+        return $this->uiPreferences->getPreferredSidebar();
     }
 
     public function getPreferredSidebarRaw(): ?string
     {
-        return $this->preferredSidebar;
+        return $this->uiPreferences->getPreferredSidebarRaw();
     }
 
     public function setPreferredSidebar(?string $preferredSidebar): self
     {
-        $normalized = null !== $preferredSidebar ? strtolower(trim($preferredSidebar)) : null;
-        if (!\in_array($normalized, ['expanded', 'collapsed'], true)) {
-            $normalized = null;
-        }
-        $this->preferredSidebar = $normalized;
+        $this->uiPreferences->setPreferredSidebar($preferredSidebar);
 
         return $this;
     }
@@ -573,11 +496,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     public function getPreferredCollapsedIssuePanels(): array
     {
-        if (null === $this->preferredCollapsedIssuePanels) {
-            return IssuePanelIds::defaultCollapsed();
-        }
-
-        return IssuePanelIds::sanitize($this->preferredCollapsedIssuePanels);
+        return $this->uiPreferences->getPreferredCollapsedIssuePanels();
     }
 
     /**
@@ -585,43 +504,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     public function setPreferredCollapsedIssuePanels(?array $preferredCollapsedIssuePanels): self
     {
-        if (null === $preferredCollapsedIssuePanels) {
-            $this->preferredCollapsedIssuePanels = null;
-
-            return $this;
-        }
-
-        $this->preferredCollapsedIssuePanels = IssuePanelIds::sanitize($preferredCollapsedIssuePanels);
+        $this->uiPreferences->setPreferredCollapsedIssuePanels($preferredCollapsedIssuePanels);
 
         return $this;
     }
 
     public function getProductTourSeenAt(): ?DateTimeImmutable
     {
-        return $this->productTourSeenAt;
+        return $this->uiPreferences->getProductTourSeenAt();
     }
 
     public function isProductTourSeen(): bool
     {
-        return $this->productTourSeenAt instanceof DateTimeImmutable;
+        return $this->uiPreferences->isProductTourSeen();
     }
 
     public function markProductTourSeen(?DateTimeImmutable $at = null): self
     {
-        $this->productTourSeenAt = $at ?? new DateTimeImmutable();
-        $pages = [];
-        foreach (ProductTourPage::all() as $page) {
-            $pages[] = $page->value;
-        }
-        $this->productTourSeenPages = $pages;
+        $this->uiPreferences->markProductTourSeen($at);
 
         return $this;
     }
 
     public function clearProductTourSeen(): self
     {
-        $this->productTourSeenAt = null;
-        $this->productTourSeenPages = null;
+        $this->uiPreferences->clearProductTourSeen();
 
         return $this;
     }
@@ -631,49 +538,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     public function getProductTourSeenPages(): array
     {
-        if (null === $this->productTourSeenPages) {
-            return [];
-        }
-
-        $allowed = array_map(
-            static fn (ProductTourPage $page): string => $page->value,
-            ProductTourPage::all(),
-        );
-
-        return array_values(array_unique(array_filter(
-            $this->productTourSeenPages,
-            static fn (mixed $id): bool => \is_string($id) && \in_array($id, $allowed, true),
-        )));
+        return $this->uiPreferences->getProductTourSeenPages();
     }
 
     public function hasSeenTourPage(string $page): bool
     {
-        if ($this->isProductTourSeen()) {
-            return true;
-        }
-
-        return \in_array($page, $this->getProductTourSeenPages(), true);
+        return $this->uiPreferences->hasSeenTourPage($page);
     }
 
     public function markTourPageSeen(string $page): self
     {
-        $allowed = array_map(
-            static fn (ProductTourPage $p): string => $p->value,
-            ProductTourPage::all(),
-        );
-        if (!\in_array($page, $allowed, true)) {
-            return $this;
-        }
-
-        $pages = $this->getProductTourSeenPages();
-        if (!\in_array($page, $pages, true)) {
-            $pages[] = $page;
-        }
-        $this->productTourSeenPages = $pages;
-
-        if (\count($pages) >= \count($allowed)) {
-            $this->productTourSeenAt ??= new DateTimeImmutable();
-        }
+        $this->uiPreferences->markTourPageSeen($page);
 
         return $this;
     }
@@ -685,15 +560,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     public function getEnabledProductTourPages(): array
     {
-        $all = array_map(
-            static fn (ProductTourPage $page): string => $page->value,
-            ProductTourPage::all(),
-        );
-        if ($this->isProductTourSeen()) {
-            return [];
-        }
-
-        return array_values(array_diff($all, $this->getProductTourSeenPages()));
+        return $this->uiPreferences->getEnabledProductTourPages();
     }
 
     /**
@@ -703,37 +570,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
      */
     public function syncEnabledProductTourPages(array $enabledPages): self
     {
-        $allowed = array_map(
-            static fn (ProductTourPage $page): string => $page->value,
-            ProductTourPage::all(),
-        );
-        $enabled = array_values(array_unique(array_filter(
-            $enabledPages,
-            static fn (mixed $id): bool => \is_string($id) && \in_array($id, $allowed, true),
-        )));
-        $completed = array_values(array_diff($allowed, $enabled));
-
-        if ([] === $completed) {
-            $this->productTourSeenAt = null;
-            $this->productTourSeenPages = null;
-
-            return $this;
-        }
-
-        $this->productTourSeenPages = $completed;
-        $this->productTourSeenAt = \count($completed) >= \count($allowed) ? new DateTimeImmutable() : null;
+        $this->uiPreferences->syncEnabledProductTourPages($enabledPages);
 
         return $this;
     }
 
     public function isPushNotificationsEnabled(): bool
     {
-        return $this->pushNotificationsEnabled;
+        return $this->uiPreferences->isPushNotificationsEnabled();
     }
 
     public function setPushNotificationsEnabled(bool $pushNotificationsEnabled): self
     {
-        $this->pushNotificationsEnabled = $pushNotificationsEnabled;
+        $this->uiPreferences->setPushNotificationsEnabled($pushNotificationsEnabled);
 
         return $this;
     }

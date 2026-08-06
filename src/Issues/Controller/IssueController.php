@@ -11,41 +11,29 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueSavedView;
-use App\Issues\Export\AiIssueExportFormatter;
-use App\Issues\Form\IssueAssigneeType;
 use App\Issues\IssueListSort;
 use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueCommentRepository;
-use App\Issues\Repository\IssueHistoryEntryRepository;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
-use App\Issues\Service\IssueAssigneeChanger;
-use App\Issues\Service\IssueCommentCreator;
-use App\Issues\Service\IssueHistoryRecorder;
-use App\Issues\Service\IssueMergeService;
-use App\Issues\Service\IssueStatusChanger;
-use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\IssueLevel;
-use App\Shared\IssuePriority;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueLevel;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Project issues list/detail, assignee updates, and status changes.
+ * Project issues list, filters, and saved views.
  */
 #[IsGranted('ROLE_USER')]
 final class IssueController extends AbstractController
@@ -57,23 +45,14 @@ final class IssueController extends AbstractController
     ];
 
     public function __construct(
-        private readonly IssueRepository $issueRepository,
-        private readonly EventRepository $eventRepository,
-        private readonly IssueHistoryEntryRepository $historyEntryRepository,
-        private readonly IssueCommentRepository $commentRepository,
-        private readonly IssueSavedViewRepository $savedViewRepository,
-        private readonly IssueHistoryRecorder $historyRecorder,
-        private readonly IssueStatusChanger $issueStatusChanger,
-        private readonly IssueAssigneeChanger $issueAssigneeChanger,
-        private readonly IssueCommentCreator $issueCommentCreator,
-        private readonly IssueMergeService $issueMergeService,
-        private readonly UserActionRecorder $userActionRecorder,
-        private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly ProjectAccessService $projectAccess,
-        private readonly NotificationDispatcher $notificationDispatcher,
         private readonly EntityManagerInterface $entityManager,
+        private readonly EventRepository $eventRepository,
+        private readonly IssueSearchRepository $issueSearchRepository,
+        private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
-        private readonly AiIssueExportFormatter $aiIssueExportFormatter,
+        private readonly ProjectAccessService $projectAccess,
+        private readonly IssueSavedViewRepository $savedViewRepository,
+        private readonly UserActionRecorder $userActionRecorder,
     ) {
     }
 
@@ -126,7 +105,7 @@ final class IssueController extends AbstractController
         $priorityParam = $request->query->getString('priority');
         $priority = '' !== $priorityParam ? IssuePriority::tryFrom($priorityParam) : null;
 
-        $total = $this->issueRepository->countSearch(
+        $total = $this->issueSearchRepository->countSearch(
             $project,
             $q,
             $level,
@@ -144,7 +123,7 @@ final class IssueController extends AbstractController
         $page = $pagination['page'];
         $perPage = $pagination['per_page'];
 
-        $issues = $this->issueRepository->search(
+        $issues = $this->issueSearchRepository->search(
             $project,
             $q,
             $level,
@@ -207,13 +186,10 @@ final class IssueController extends AbstractController
         ]);
     }
 
-    /**
-     * @return array{environmentA: string, environmentB: string, onlyA: list<Issue>, onlyB: list<Issue>, both: list<Issue>}
-     */
     private function buildEnvironmentCompare(Project $project, string $environmentA, string $environmentB): array
     {
-        $setA = $this->issueRepository->findByLastEnvironment($project, $environmentA);
-        $setB = $this->issueRepository->findByLastEnvironment($project, $environmentB);
+        $setA = $this->issueSearchRepository->findByLastEnvironment($project, $environmentA);
+        $setB = $this->issueSearchRepository->findByLastEnvironment($project, $environmentB);
 
         $byIdA = [];
         foreach ($setA as $issue) {
@@ -253,434 +229,6 @@ final class IssueController extends AbstractController
             'onlyB' => \array_slice($onlyB, 0, 50),
             'both' => \array_slice($both, 0, 50),
         ];
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
-    public function show(string $projectId, string $id): Response
-    {
-        $issue = $this->issueRepository->findOneByUuidHydrated($id);
-        if (!$issue instanceof Issue) {
-            throw $this->createNotFoundException();
-        }
-
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $access = $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
-
-        $this->userActionRecorder->recordAndFlush(UserActionType::IssueOpened, $user, $user, [
-            'project_uuid' => $project->getUuid(),
-            'project_name' => $project->getName(),
-            'issue_uuid' => $issue->getUuid(),
-            'issue_title' => $issue->getTitle(),
-        ]);
-
-        $events = $this->eventRepository->findLatestForIssue($issue);
-        $latestEvent = $events[0] ?? null;
-        $occurrence = $this->eventRepository->occurrenceStatsForIssue($issue);
-        $assigneeForm = $this->createForm(IssueAssigneeType::class, $issue, [
-            'project_id' => $project->getId(),
-            'action' => $this->generateUrl('issue_assign', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-            'method' => 'POST',
-        ]);
-        $history = $this->historyEntryRepository->findLatestForIssue($issue);
-        $comments = $this->commentRepository->findLatestForIssue($issue);
-        $duplicateCandidates = $this->issueRepository->findDuplicateCandidates($project, $issue);
-        $similarIssues = $this->issueRepository->findSimilarIssues($issue);
-
-        return $this->render('issue/show.html.twig', [
-            'project' => $project,
-            'issue' => $issue,
-            'events' => $events,
-            'latestEvent' => $latestEvent,
-            'occurrence' => $occurrence,
-            'assigneeForm' => $assigneeForm->createView(),
-            'issueHistory' => $history,
-            'comments' => $comments,
-            'duplicateCandidates' => $duplicateCandidates,
-            'similarIssues' => $similarIssues,
-            'priorities' => IssuePriority::cases(),
-            'can_triage' => $access->canTriageIssues(),
-        ]);
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/export/ai.md', name: 'issue_export_ai_md', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
-    public function exportAiMarkdown(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): Response {
-        return $this->exportAi($request, $projectId, $issue, 'md');
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/export/ai.json', name: 'issue_export_ai_json', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
-    public function exportAiJson(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): Response {
-        return $this->exportAi($request, $projectId, $issue, 'json');
-    }
-
-    /**
-     * @param 'md'|'json' $format
-     */
-    private function exportAi(Request $request, string $projectId, Issue $issue, string $format): Response
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
-
-        $event = null;
-        $eventId = $request->query->getString('event');
-        if ('' !== $eventId) {
-            $event = $this->eventRepository->findOneByProjectAndEventId($project, $eventId);
-            if (!$event instanceof Event || $event->getIssue()?->getId() !== $issue->getId()) {
-                throw $this->createNotFoundException();
-            }
-        } else {
-            $events = $this->eventRepository->findLatestForIssue($issue, 1);
-            $event = $events[0] ?? null;
-        }
-
-        $absoluteUrl = $this->generateUrl(
-            'issue_show',
-            ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
-        $data = $this->aiIssueExportFormatter->buildCanonical($project, $issue, $event, $absoluteUrl);
-
-        if ('json' === $format) {
-            return new Response(
-                $this->aiIssueExportFormatter->toJson($data),
-                Response::HTTP_OK,
-                [
-                    'Content-Type' => 'application/json; charset=UTF-8',
-                    'Content-Disposition' => 'attachment; filename="beacon-issue-'.$issue->getUuid().'.ai.json"',
-                ],
-            );
-        }
-
-        return new Response(
-            $this->aiIssueExportFormatter->toMarkdown($data),
-            Response::HTTP_OK,
-            [
-                'Content-Type' => 'text/markdown; charset=UTF-8',
-                'Content-Disposition' => 'attachment; filename="beacon-issue-'.$issue->getUuid().'.ai.md"',
-            ],
-        );
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/assign', name: 'issue_assign', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
-    public function assign(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireTriage($project, $user);
-
-        $previousAssignee = $issue->getAssignee();
-
-        $form = $this->createForm(IssueAssigneeType::class, $issue, [
-            'project_id' => $project->getId(),
-        ]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $assignee = $issue->getAssignee();
-            // Form already mutated the entity; restore previous so the changer can detect a real change.
-            $issue->setAssignee($previousAssignee);
-            try {
-                if ($this->issueAssigneeChanger->assign($issue, $assignee, $user)) {
-                    $this->addFlash('success', 'issues.assignee_saved');
-                }
-            } catch (InvalidArgumentException) {
-                $this->addFlash('error', 'issues.assignee_not_member');
-
-                return $this->redirectToRoute('issue_show', [
-                    'projectId' => $project->getUuid(),
-                    'id' => $issue->getUuid(),
-                ]);
-            }
-
-            return $this->redirectToRoute('issue_show', [
-                'projectId' => $project->getUuid(),
-                'id' => $issue->getUuid(),
-            ]);
-        }
-
-        $this->addFlash('error', 'issues.assignee_invalid');
-
-        return $this->redirectToRoute('issue_show', [
-            'projectId' => $project->getUuid(),
-            'id' => $issue->getUuid(),
-        ]);
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/status', name: 'issue_status', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
-    public function status(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireTriage($project, $user);
-
-        if (!$this->isCsrfTokenValid('issue_status', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'issues.status_invalid');
-
-            return $this->redirectToRoute('issue_show', [
-                'projectId' => $project->getUuid(),
-                'id' => $issue->getUuid(),
-            ]);
-        }
-
-        $next = IssueStatus::tryFrom($request->request->getString('status'));
-        if (!$next instanceof IssueStatus) {
-            $this->addFlash('error', 'issues.status_invalid');
-
-            return $this->redirectToRoute('issue_show', [
-                'projectId' => $project->getUuid(),
-                'id' => $issue->getUuid(),
-            ]);
-        }
-
-        if ($this->issueStatusChanger->change($issue, $next, $user)) {
-            $this->addFlash('success', 'issues.status_saved');
-        }
-
-        return $this->redirectToRoute('issue_show', [
-            'projectId' => $project->getUuid(),
-            'id' => $issue->getUuid(),
-        ]);
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/priority', name: 'issue_priority', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
-    public function priority(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireTriage($project, $user);
-
-        $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
-
-        if (!$this->isCsrfTokenValid('issue_priority', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'issues.priority_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $next = IssuePriority::tryFrom($request->request->getString('priority'));
-        if (!$next instanceof IssuePriority) {
-            $this->addFlash('error', 'issues.priority_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $previous = $issue->getPriority();
-        if ($previous !== $next) {
-            $issue->setPriority($next);
-            $this->userActionRecorder->record(
-                UserActionType::IssuePriorityChanged,
-                $user,
-                $user,
-                [
-                    'project_uuid' => $project->getUuid(),
-                    'project_name' => $project->getName(),
-                    'issue_uuid' => $issue->getUuid(),
-                    'issue_title' => $issue->getTitle(),
-                    'from' => $previous->value,
-                    'to' => $next->value,
-                ],
-            );
-            $this->entityManager->flush();
-            $this->addFlash('success', 'issues.priority_saved');
-        }
-
-        return $this->redirectToRoute('issue_show', $showParams);
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/comments', name: 'issue_comment_add', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
-    public function addComment(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireTriage($project, $user);
-
-        $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
-
-        if (!$this->isCsrfTokenValid('issue_comment', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'issues.comment_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $body = trim($request->request->getString('body'));
-        try {
-            $this->issueCommentCreator->create($issue, $user, $body);
-            $this->addFlash('success', 'issues.comment_saved');
-        } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', match ($e->getMessage()) {
-                'empty' => 'issues.comment_empty',
-                'too_long' => 'issues.comment_too_long',
-                default => 'issues.comment_invalid',
-            });
-        }
-
-        return $this->redirectToRoute('issue_show', $showParams);
-    }
-
-    #[Route('/projects/{projectId}/issues/{id}/duplicate', name: 'issue_mark_duplicate', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
-    public function markDuplicate(
-        Request $request,
-        string $projectId,
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Issue $issue,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireTriage($project, $user);
-
-        $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
-
-        if (!$this->isCsrfTokenValid('issue_duplicate', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'issues.duplicate_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $canonicalUuid = trim($request->request->getString('canonical_uuid'));
-        if ('' === $canonicalUuid) {
-            $this->addFlash('error', 'issues.duplicate_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        if ($canonicalUuid === $issue->getUuid()) {
-            $this->addFlash('error', 'issues.duplicate_self');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $canonical = $this->issueRepository->findOneByProjectAndUuid($project, $canonicalUuid);
-        if (!$canonical instanceof Issue) {
-            $this->addFlash('error', 'issues.duplicate_not_found');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        try {
-            $this->issueMergeService->assertCanMarkAsDuplicate($issue, $canonical);
-        } catch (InvalidArgumentException $e) {
-            $flash = match ($e->getMessage()) {
-                'circular' => 'issues.duplicate_circular',
-                'wrong_project' => 'issues.duplicate_not_found',
-                default => 'issues.duplicate_invalid',
-            };
-            $this->addFlash('error', $flash);
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $mergeEvents = $request->request->getBoolean('merge_events');
-        if ($mergeEvents) {
-            try {
-                $moved = $this->issueMergeService->mergeIntoCanonical($issue, $canonical, $user);
-            } catch (InvalidArgumentException) {
-                $this->addFlash('error', 'issues.merge_failed');
-
-                return $this->redirectToRoute('issue_show', $showParams);
-            }
-            $this->userActionRecorder->record(
-                UserActionType::IssueMerged,
-                $user,
-                $user,
-                [
-                    'project_uuid' => $project->getUuid(),
-                    'project_name' => $project->getName(),
-                    'issue_uuid' => $issue->getUuid(),
-                    'issue_title' => $issue->getTitle(),
-                    'canonical_uuid' => $canonical->getUuid(),
-                    'canonical_title' => $canonical->getTitle(),
-                    'events_moved' => $moved,
-                ],
-            );
-            $this->notificationDispatcher->dispatchIssueDuplicated($project, $issue, $canonical);
-            $this->addFlash('success', 'issues.merge_saved');
-
-            return $this->redirectToRoute('issue_show', [
-                'projectId' => $project->getUuid(),
-                'id' => $canonical->getUuid(),
-            ]);
-        }
-
-        $previousStatus = $issue->getStatus();
-        $issue->setDuplicateOf($canonical);
-        $issue->setStatus(IssueStatus::Ignored);
-        if (IssueStatus::Ignored !== $previousStatus) {
-            $this->historyRecorder->recordStatusChange($issue, $previousStatus, IssueStatus::Ignored, $user);
-        }
-
-        $this->userActionRecorder->record(
-            UserActionType::IssueMarkedDuplicate,
-            $user,
-            $user,
-            [
-                'project_uuid' => $project->getUuid(),
-                'project_name' => $project->getName(),
-                'issue_uuid' => $issue->getUuid(),
-                'issue_title' => $issue->getTitle(),
-                'canonical_uuid' => $canonical->getUuid(),
-                'canonical_title' => $canonical->getTitle(),
-            ],
-        );
-        $this->notificationDispatcher->dispatchIssueDuplicated($project, $issue, $canonical);
-        $this->entityManager->flush();
-        $this->addFlash('success', 'issues.duplicate_saved');
-
-        return $this->redirectToRoute('issue_show', $showParams);
     }
 
     #[Route('/projects/{id}/issues/views', name: 'issue_view_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
@@ -778,9 +326,6 @@ final class IssueController extends AbstractController
         return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
     }
 
-    /**
-     * @return array<string, string|int>
-     */
     private function filterQueryFromRequest(Request $request): array
     {
         $query = [];
@@ -807,34 +352,4 @@ final class IssueController extends AbstractController
         return $query;
     }
 
-    #[Route('/projects/{projectId}/events/{eventId}', name: 'event_show', requirements: ['projectId' => Requirement::UUID], methods: ['GET'])]
-    public function eventShow(string $projectId, string $eventId): Response
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $event = $this->eventRepository->findOneByEventId($eventId);
-        $project = $event?->getIssue()?->getProject();
-        if (!$event instanceof Event || !$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-        $issue = $event->getIssue();
-        if (!$issue instanceof Issue) {
-            throw $this->createNotFoundException();
-        }
-        $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
-
-        $this->userActionRecorder->recordAndFlush(UserActionType::EventOpened, $user, $user, [
-            'project_uuid' => $project->getUuid(),
-            'project_name' => $project->getName(),
-            'issue_uuid' => $issue->getUuid(),
-            'issue_title' => $issue->getTitle(),
-            'event_id' => $event->getEventId(),
-        ]);
-
-        return $this->render('issue/event.html.twig', [
-            'project' => $project,
-            'issue' => $issue,
-            'event' => $event,
-        ]);
-    }
 }

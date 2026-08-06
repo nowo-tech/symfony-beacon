@@ -8,7 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -70,4 +70,4 @@ As a project owner, I can hand ownership to another direct member and become an 
 
 - **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; non-admin members cannot clear.
 - **SC-002**: Cancelling a modal leaves data unchanged.
-- **SC-003**: Covered by `ProjectDangerZoneTest` / `ProjectMembersTest` (or equivalent) under `tests/`.
+- **SC-003**: Covered by `tests/Functional/Project/ProjectDangerZoneTest.php` / `tests/Functional/Project/ProjectMembersTest.php` (or equivalent).

@@ -51,9 +51,9 @@ test.describe('Public / guest surfaces', () => {
 
   test('health endpoints respond', async ({ request }) => {
     const live = await request.get('/health/live');
-    expect(live.status()).toBeLessThan(500);
+    expect(live.status(), 'live').toBe(200);
     const ready = await request.get('/health/ready');
-    expect(ready.status()).toBeLessThan(500);
+    expect(ready.status(), 'ready').toBeLessThan(500);
   });
 
   test('invalid credentials stay on login', async ({ page }) => {

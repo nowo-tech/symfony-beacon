@@ -18,6 +18,12 @@ controllers_ingest:
         namespace: App\Ingest\Controller
     type: attribute
 
+controllers_ingest_otlp:
+    resource:
+        path: ../src/Ingest/Otlp/Controller/
+        namespace: App\Ingest\Otlp\Controller
+    type: attribute
+
 controllers_read_api:
     resource:
         path: ../src/Api/Read/Controller/
@@ -64,6 +70,12 @@ controllers_admin_hub:
     resource:
         path: ../src/Shared/Controller/
         namespace: App\Shared\Controller
+    type: attribute
+
+controllers_ops:
+    resource:
+        path: ../src/Ops/Controller/
+        namespace: App\Ops\Controller
     type: attribute
 
 controllers_legal:

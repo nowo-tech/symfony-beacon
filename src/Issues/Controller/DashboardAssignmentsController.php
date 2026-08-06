@@ -7,12 +7,12 @@ namespace App\Issues\Controller;
 use App\Identity\Entity\User;
 use App\Issues\AssignmentScope;
 use App\Issues\IssueListSort;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\IssuePriority;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +29,7 @@ final class DashboardAssignmentsController extends AbstractController
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueSearchRepository $issueRepository,
     ) {
     }
 

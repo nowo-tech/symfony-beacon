@@ -23,10 +23,9 @@ use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
 use App\Shared\Health\MessengerQueueHealth;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,27 +39,26 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
- * Project CRUD, Settings (keys/members), and danger-zone clear/delete actions.
+ * Project create/show and settings (including governance save).
  */
 #[IsGranted('ROLE_USER')]
 final class ProjectController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
-        private readonly ProjectAccessService $projectAccess,
-        private readonly ProjectHistoryClearer $historyClearer,
-        private readonly ProjectMembershipManager $membershipManager,
-        private readonly ProjectGovernanceResolver $governanceResolver,
-        private readonly UserGroupRepository $userGroupRepository,
-        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ProjectGovernanceResolver $governanceResolver,
+        private readonly ProjectMembershipManager $membershipManager,
+        private readonly MessengerQueueHealth $messengerQueueHealth,
+        private readonly ProjectAccessService $projectAccess,
+        private readonly ProjectRepository $projectRepository,
+        private readonly ProjectReadTokenRepository $readTokenRepository,
+        private readonly ProjectShareLinkRepository $shareLinkRepository,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $userActionRecorder,
-        private readonly DailyProjectStatRepository $dailyProjectStatRepository,
-        private readonly MessengerQueueHealth $messengerQueueHealth,
-        private readonly ProjectShareLinkRepository $shareLinkRepository,
-        private readonly ProjectReadTokenRepository $readTokenRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly UserGroupRepository $userGroupRepository,
     ) {
     }
 
@@ -340,118 +338,6 @@ final class ProjectController extends AbstractController
         return $count;
     }
 
-    #[Route('/projects/{id}/keys', name: 'project_keys_create', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
-    public function createKey(
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Project $project,
-        Request $request,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
-
-        if (!$this->isCsrfTokenValid('project_key_create_'.$project->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        $label = trim($request->request->getString('label'));
-        if ('' === $label) {
-            $label = $this->tokenGenerator->generateLabel();
-        }
-        $key = $this->createApiKey($project, $label);
-        $project->addApiKey($key);
-        $this->userActionRecorder->record(UserActionType::ProjectApiKeyCreated, $user, $user, [
-            'project_uuid' => $project->getUuid(),
-            'project_name' => $project->getName(),
-            'label' => $label,
-        ]);
-        $this->entityManager->flush();
-
-        $this->addFlash('success', 'flash.project.api_key_created');
-
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-    }
-
-    #[Route(
-        '/projects/{projectId}/keys/{keyId}/revoke',
-        name: 'project_keys_revoke',
-        requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
-        methods: ['POST'],
-    )]
-    public function revokeKey(
-        #[MapEntity(mapping: ['projectId' => 'uuid'])]
-        Project $project,
-        #[MapEntity(id: 'keyId')]
-        ProjectApiKey $apiKey,
-        Request $request,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
-        $this->assertKeyBelongsToProject($apiKey, $project);
-
-        if (!$this->isCsrfTokenValid('project_key_revoke_'.$apiKey->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        $apiKey->setActive(false);
-        $this->userActionRecorder->record(UserActionType::ProjectApiKeyRevoked, $user, $user, [
-            'project_uuid' => $project->getUuid(),
-            'project_name' => $project->getName(),
-            'label' => $apiKey->getLabel(),
-        ]);
-        $this->entityManager->flush();
-
-        $this->addFlash('success', 'flash.project.api_key_revoked');
-
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-    }
-
-    #[Route(
-        '/projects/{projectId}/keys/{keyId}/rotate',
-        name: 'project_keys_rotate',
-        requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
-        methods: ['POST'],
-    )]
-    public function rotateKey(
-        #[MapEntity(mapping: ['projectId' => 'uuid'])]
-        Project $project,
-        #[MapEntity(id: 'keyId')]
-        ProjectApiKey $apiKey,
-        Request $request,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
-        $this->assertKeyBelongsToProject($apiKey, $project);
-
-        if (!$this->isCsrfTokenValid('project_key_rotate_'.$apiKey->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        $label = $apiKey->getLabel();
-        $apiKey->setActive(false);
-        $newKey = $this->createApiKey($project, $label);
-        $project->addApiKey($newKey);
-        $this->userActionRecorder->record(UserActionType::ProjectApiKeyRotated, $user, $user, [
-            'project_uuid' => $project->getUuid(),
-            'project_name' => $project->getName(),
-            'label' => $label,
-        ]);
-        $this->entityManager->flush();
-
-        $this->addFlash('success', 'flash.project.api_key_rotated');
-
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-    }
-
-    private function assertKeyBelongsToProject(ProjectApiKey $apiKey, Project $project): void
-    {
-        if ($apiKey->getProject()?->getId() !== $project->getId()) {
-            throw $this->createNotFoundException();
-        }
-    }
-
     /**
      * Empty string → null (inherit env). Invalid / negative → false.
      */
@@ -492,98 +378,6 @@ final class ProjectController extends AbstractController
         }
     }
 
-    #[Route('/projects/{id}/clear-history', name: 'project_clear_history', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
-    public function clearHistory(
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Project $project,
-        Request $request,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
-
-        if (!$this->isCsrfTokenValid('project_clear_'.$project->getId(), (string) $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        $projectUuid = $project->getUuid();
-        $projectName = $project->getName();
-        $userId = $user->getId();
-        $this->historyClearer->clear($project);
-
-        $managedUser = null !== $userId
-            ? $this->entityManager->find(User::class, $userId)
-            : null;
-        $this->userActionRecorder->recordAndFlush(
-            UserActionType::ProjectHistoryCleared,
-            $managedUser,
-            $managedUser,
-            [
-                'project_uuid' => $projectUuid,
-                'project_name' => $projectName,
-            ],
-        );
-
-        $this->addFlash('success', 'flash.project.history_cleared');
-
-        return $this->redirectToRoute('project_settings', ['id' => $projectUuid]);
-    }
-
-    #[Route('/projects/{id}/delete', name: 'project_delete', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
-    public function delete(
-        #[MapEntity(mapping: ['id' => 'uuid'])]
-        Project $project,
-        Request $request,
-    ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Owner);
-
-        if (!$this->isCsrfTokenValid('project_delete_'.$project->getId(), (string) $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        $confirmation = (string) $request->request->get('confirmation');
-        if ($confirmation !== $project->getName()) {
-            $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
-
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-        }
-
-        // Clear telemetry first so SQLite (and ORM) stay consistent without relying on DB cascades alone.
-        $projectUuid = $project->getUuid();
-        $projectName = $project->getName();
-        $projectId = $project->getId();
-        $userId = $user->getId();
-        $this->historyClearer->clear($project);
-
-        $managedUser = null !== $userId
-            ? $this->entityManager->find(User::class, $userId)
-            : null;
-        $project = null !== $projectId
-            ? $this->projectRepository->find($projectId)
-            : null;
-
-        $this->userActionRecorder->record(
-            UserActionType::ProjectDeleted,
-            $managedUser,
-            $managedUser,
-            [
-                'project_uuid' => $projectUuid,
-                'project_name' => $projectName,
-            ],
-        );
-
-        if ($project instanceof Project) {
-            $this->entityManager->remove($project);
-        }
-        $this->entityManager->flush();
-
-        $this->addFlash('success', 'flash.project.deleted');
-
-        return $this->redirectToRoute('dashboard_home');
-    }
-
     private function createApiKey(Project $project, string $label): ProjectApiKey
     {
         for ($attempt = 0; $attempt < 8; ++$attempt) {
@@ -595,4 +389,5 @@ final class ProjectController extends AbstractController
 
         return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4));
     }
+
 }

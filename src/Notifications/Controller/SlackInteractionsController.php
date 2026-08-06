@@ -18,7 +18,7 @@ use App\Notifications\Service\SlackRequestSignatureVerifier;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use JsonException;

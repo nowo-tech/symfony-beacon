@@ -93,12 +93,21 @@ Admin changes to the instance Mailer DSN / From are recorded as `UserAction` `in
 
 ## Messenger in production
 
-Keep the **HTTP** container separate from the **`messenger:consume`** process (same as local Compose). Scale consumers independently; do not confuse them with `FRANKENPHP_MODE=worker`.
+Keep the **HTTP** container separate from Messenger consumers (same as local Compose). Two Compose services isolate ingest from outbound work:
 
-Example (two consumer replicas):
+| Service | Transport | Role |
+|---------|-----------|------|
+| `messenger` | `async_ingest` | Envelope persistence |
+| `messenger-notify` | `async` | Notifications, HTTP-log, Web Push |
+
+Scale each independently; do not confuse them with `FRANKENPHP_MODE=worker`.
+
+Example (scale ingest workers):
 
 ```bash
 docker compose up -d --scale messenger=2
+# Optional: scale outbound independently
+docker compose up -d --scale messenger-notify=2
 ```
 
 Monitor queue depth via `GET /health/ready` → `checks.messenger_async_pending` (Doctrine transport).

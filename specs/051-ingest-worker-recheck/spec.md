@@ -4,7 +4,7 @@
 **Created**: 2026-07-21  
 **Status**: Implemented (v0.12.2) — retrospective SDD artifact
 
-**Input**: After HTTP ACK, `ProcessEnvelopeHandler` must re-check ingest suspend and daily quota before persisting.
+**Input**: After HTTP ACK, thin `ProcessEnvelopeHandler` must re-check ingest suspend and daily quota before domain writers persist (`085`).
 
 ## User Scenarios & Testing
 

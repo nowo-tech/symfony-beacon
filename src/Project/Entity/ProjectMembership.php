@@ -6,7 +6,7 @@ namespace App\Project\Entity;
 
 use App\Identity\Entity\User;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 

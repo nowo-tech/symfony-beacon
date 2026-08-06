@@ -17,7 +17,7 @@ Split the overloaded `app:seed-demo` into three CLI layers: **platform** (idempo
 | **Language/Version** | PHP 8.5 / Symfony 8.1 |
 | **Primary Dependencies** | Existing seeders (`DashboardMenuDemoSeeder`, `BreadcrumbDemoSeeder`, `AnalyticsDemoSeeder`, `PerformanceDemoSeeder`); Doctrine ORM; Symfony Console |
 | **Storage** | MySQL via current entities; **no new tables for MVP** (sample purge scoped to target project telemetry) |
-| **Testing** | PHPUnit functional/command tests under `tests/` |
+| **Testing** | PHPUnit under `tests/Unit|Functional|Integration/` (seed commands live in Integration) |
 | **Target Platform** | Docker Compose `php` service (`make …`) |
 | **Project Type** | Modular Symfony CLI + docs |
 | **Performance Goals** | Profile `dev` &lt; 5 minutes on a developer machine; `load`/`huge` batch inserts with `EntityManager::clear()` / flush chunks |
@@ -66,9 +66,9 @@ src/Issues/Service/IssueSampleSeeder.php            # NEW — profiled issues/ev
 Makefile                                            # bootstrap / seed-platform / seed / seed-sample
 docs/INSTALL.md                                     # NEW short install layers guide (or section)
 README.md, docs/UPGRADING.md, docs/CHANGELOG.md, docs/CONTRIBUTING.md
-tests/Shared/SeedPlatformCommandTest.php
-tests/Identity/SeedDemoCommandTest.php
-tests/Shared/SeedSampleCommandTest.php
+tests/Integration/Shared/SeedPlatformCommandTest.php
+tests/Integration/Identity/SeedDemoCommandTest.php
+tests/Integration/Shared/SeedSampleCommandTest.php
 ```
 
 **Structure Decision**: Keep menu/breadcrumb seeders in `Shared`; add platform + sample commands under `Shared\Command`; leave demo identity in `Identity\Command`. Optional later rename `*DemoSeeder` → `*PlatformSeeder` without behavior change (tasks may alias).

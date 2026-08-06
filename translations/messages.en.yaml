@@ -162,6 +162,11 @@ auth:
     brand_eyebrow: Error tracking
     bootstrap_eyebrow: Bootstrap
     bootstrap_hint: Create the first administrator account. Registration closes after this user exists.
+    qr_login:
+        approved: Approved — signing you in…
+        denied: Sign-in was denied on the phone.
+        expired: This code has expired.
+        retry: Generate a new QR code
     magic:
         title: Magic link sign-in
         intro: Enter your email and we will send a one-time sign-in link (valid for 10 minutes).

@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="beacon-cc-title beacon-cc-desc">
+  <title id="beacon-cc-title">Friendly round cookie</title>
+  <desc id="beacon-cc-desc">Vector illustration of a smiling round cookie with chocolate chips, a bite, arms, and confetti.</desc>
+
+  <defs>
+    <radialGradient id="beacon-cc-cookieGradient" cx="38%" cy="30%" r="72%">
+      <stop offset="0%" stop-color="#FFE7A1"/>
+      <stop offset="58%" stop-color="#FFC95F"/>
+      <stop offset="100%" stop-color="#EE922D"/>
+    </radialGradient>
+
+    <linearGradient id="beacon-cc-edgeGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E98524"/>
+      <stop offset="100%" stop-color="#C86418"/>
+    </linearGradient>
+
+    <linearGradient id="beacon-cc-cheekGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9C98"/>
+      <stop offset="100%" stop-color="#FF6E88"/>
+    </linearGradient>
+
+    <radialGradient id="beacon-cc-chipGradient" cx="32%" cy="26%" r="78%">
+      <stop offset="0%" stop-color="#9B5A33"/>
+      <stop offset="45%" stop-color="#6E3219"/>
+      <stop offset="100%" stop-color="#3F1A0D"/>
+    </radialGradient>
+
+    <filter id="beacon-cc-softShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="13" stdDeviation="12" flood-color="#7A3C18" flood-opacity=".24"/>
+    </filter>
+
+    <filter id="beacon-cc-smallShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#51210F" flood-opacity=".28"/>
+    </filter>
+
+    <mask id="beacon-cc-cookieMask">
+      <rect width="512" height="512" fill="black"/>
+      <circle cx="256" cy="267" r="168" fill="white"/>
+      <circle cx="394" cy="122" r="34" fill="black"/>
+      <circle cx="422" cy="147" r="34" fill="black"/>
+      <circle cx="435" cy="183" r="32" fill="black"/>
+    </mask>
+
+    <clipPath id="beacon-cc-cookieClip">
+      <circle cx="256" cy="267" r="164"/>
+    </clipPath>
+  </defs>
+
+  <g opacity=".95">
+    <path d="M86 132l10-21 10 21 21 10-21 10-10 21-10-21-21-10z" fill="#65D8CC"/>
+    <path d="M421 139l7-15 7 15 15 7-15 7-7 15-7-15-15-7z" fill="#FF8EAB"/>
+    <path d="M435 344l8-17 8 17 17 8-17 8-8 17-8-17-17-8z" fill="#A58BFF"/>
+    <circle cx="104" cy="355" r="10" fill="#A58BFF"/>
+    <circle cx="405" cy="91" r="8" fill="#FFB347"/>
+    <circle cx="105" cy="83" r="9" fill="#FF94AA"/>
+    <circle cx="455" cy="256" r="7" fill="#6EDCCF"/>
+  </g>
+
+  <g fill="none" stroke="url(#beacon-cc-edgeGradient)" stroke-width="13" stroke-linecap="round">
+    <path d="M109 282c-34-14-48-37-57-62"/>
+    <path d="M403 286c33-13 47-36 56-60"/>
+  </g>
+
+  <g fill="#FFD676" stroke="#D87822" stroke-width="6">
+    <circle cx="49" cy="213" r="14"/>
+    <circle cx="462" cy="219" r="14"/>
+  </g>
+
+  <g filter="url(#beacon-cc-softShadow)">
+    <circle cx="256" cy="267" r="172" fill="url(#beacon-cc-edgeGradient)" mask="url(#beacon-cc-cookieMask)"/>
+    <circle cx="256" cy="267" r="163" fill="url(#beacon-cc-cookieGradient)" mask="url(#beacon-cc-cookieMask)"/>
+  </g>
+
+  <g clip-path="url(#beacon-cc-cookieClip)" fill="#FFF0B9" opacity=".68">
+    <circle cx="178" cy="154" r="7"/>
+    <circle cx="218" cy="128" r="5"/>
+    <circle cx="306" cy="147" r="6"/>
+    <circle cx="146" cy="230" r="5"/>
+    <circle cx="351" cy="251" r="7"/>
+    <circle cx="181" cy="342" r="6"/>
+    <circle cx="307" cy="371" r="7"/>
+    <circle cx="254" cy="414" r="5"/>
+    <circle cx="120" cy="304" r="5"/>
+    <circle cx="376" cy="321" r="5"/>
+  </g>
+
+  <g fill="url(#beacon-cc-chipGradient)" filter="url(#beacon-cc-smallShadow)">
+    <circle cx="184" cy="174" r="15"/>
+    <circle cx="300" cy="163" r="13"/>
+    <circle cx="351" cy="222" r="16"/>
+    <circle cx="145" cy="282" r="14"/>
+    <circle cx="198" cy="367" r="16"/>
+    <circle cx="320" cy="377" r="14"/>
+    <circle cx="271" cy="227" r="11"/>
+  </g>
+
+  <g fill="#D99A74" opacity=".8">
+    <circle cx="179" cy="168" r="5"/>
+    <circle cx="296" cy="159" r="4"/>
+    <circle cx="346" cy="216" r="5"/>
+    <circle cx="140" cy="277" r="4"/>
+    <circle cx="193" cy="361" r="5"/>
+    <circle cx="316" cy="372" r="4"/>
+    <circle cx="267" cy="223" r="3.5"/>
+  </g>
+
+  <g>
+    <ellipse cx="206" cy="267" rx="18" ry="24" fill="#3A1C14"/>
+    <ellipse cx="306" cy="267" rx="18" ry="24" fill="#3A1C14"/>
+
+    <circle cx="200" cy="259" r="6" fill="#FFFFFF"/>
+    <circle cx="300" cy="259" r="6" fill="#FFFFFF"/>
+
+    <ellipse cx="166" cy="302" rx="28" ry="14" fill="url(#beacon-cc-cheekGradient)" opacity=".86"/>
+    <ellipse cx="346" cy="302" rx="28" ry="14" fill="url(#beacon-cc-cheekGradient)" opacity=".86"/>
+
+    <path d="M221 301c7 23 24 35 35 35s28-12 35-35c2-7-5-12-11-7-8 7-16 10-24 10s-16-3-24-10c-6-5-13 0-11 7z" fill="#3A1C14"/>
+    <path d="M235 321c7 8 14 11 21 11s15-3 21-11c-8-7-14-9-21-9s-13 2-21 9z" fill="#FF7E91"/>
+    <path d="M237 319c6-3 12-5 19-5 7 0 13 2 19 5" fill="none" stroke="#FFB1BA" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g fill="#D97824">
+    <circle cx="394" cy="420" r="9"/>
+    <circle cx="417" cy="404" r="6"/>
+    <circle cx="91" cy="405" r="7"/>
+    <circle cx="73" cy="423" r="4.5"/>
+  </g>
+
+  <g fill="#FFFFFF" opacity=".82">
+    <circle cx="165" cy="207" r="5"/>
+    <circle cx="363" cy="302" r="5"/>
+    <circle cx="236" cy="147" r="4"/>
+    <circle cx="278" cy="395" r="4"/>
+  </g>
+</svg>

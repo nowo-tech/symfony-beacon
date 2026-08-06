@@ -11,7 +11,7 @@
 
 ## Backend
 
-- [x] T004 Add `IssueRepository` helpers for distinct releases, first-release counts, and release-scoped issue queries
+- [x] T004 Add `IssueSearchRepository` helpers for distinct releases, first-release counts, and release-scoped issue queries (`083`; was `IssueRepository`)
 - [x] T005 Add `EventRepository` helper for distinct project release versions
 - [x] T006 Add `ProjectReleaseHealthController` with membership enforcement and release-compare summary
 

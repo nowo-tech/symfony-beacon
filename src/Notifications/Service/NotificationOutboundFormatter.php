@@ -6,8 +6,14 @@ namespace App\Notifications\Service;
 
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
+use App\Notifications\Formatter\ChannelHttpFormatterInterface;
+use App\Notifications\Formatter\DiscordChannelFormatter;
+use App\Notifications\Formatter\HttpChannelFormatter;
+use App\Notifications\Formatter\OutboundPayloadFacts;
+use App\Notifications\Formatter\SlackChannelFormatter;
+use App\Notifications\Formatter\TeamsChannelFormatter;
+use App\Notifications\Formatter\TelegramChannelFormatter;
 use InvalidArgumentException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Builds type-specific outbound request bodies / addresses for notification delivery.
@@ -17,10 +23,25 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 final readonly class NotificationOutboundFormatter
 {
+    /**
+     * @var list<ChannelHttpFormatterInterface>
+     */
+    private array $formatters;
+
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
-        private InteractionActionToken $actionToken,
+        SlackChannelFormatter $slackFormatter,
+        DiscordChannelFormatter $discordFormatter,
+        TeamsChannelFormatter $teamsFormatter,
+        private TelegramChannelFormatter $telegramFormatter,
+        HttpChannelFormatter $httpFormatter,
     ) {
+        $this->formatters = [
+            $slackFormatter,
+            $discordFormatter,
+            $teamsFormatter,
+            $this->telegramFormatter,
+            $httpFormatter,
+        ];
     }
 
     /**
@@ -34,138 +55,11 @@ final readonly class NotificationOutboundFormatter
         array $payload,
         ?NotificationDestination $destination = null,
     ): array {
-        $summary = (string) ($payload['summary'] ?? 'Beacon notification');
-
-        return match ($type) {
-            NotificationDestinationType::Slack => [
-                'url' => $endpoint,
-                'json' => $this->slackPayload($payload, $summary, $destination),
-            ],
-            NotificationDestinationType::Discord => [
-                'url' => $endpoint,
-                'json' => [
-                    'content' => $summary,
-                    'embeds' => [$this->discordEmbed($payload, $summary)],
-                ],
-            ],
-            NotificationDestinationType::Teams => [
-                'url' => $endpoint,
-                'json' => $this->teamsMessageCard($payload, $summary, $destination),
-            ],
-            NotificationDestinationType::Telegram => $this->telegramRequest($endpoint, $this->plainTextBody($payload, $summary)),
-            NotificationDestinationType::Http => [
-                'url' => $endpoint,
-                'json' => $payload,
-            ],
-            NotificationDestinationType::Email => throw new InvalidArgumentException('Email destinations are not delivered over HTTP.'),
-        };
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>
-     */
-    private function slackPayload(array $payload, string $summary, ?NotificationDestination $destination): array
-    {
-        $json = [
-            'text' => $summary,
-            'attachments' => [$this->slackAttachment($payload, $summary)],
-            'beacon' => $payload,
-        ];
-
-        $resolveBlock = $this->slackResolveActionsBlock($payload, $destination);
-        if (null !== $resolveBlock) {
-            $json['blocks'] = [
-                [
-                    'type' => 'section',
-                    'text' => [
-                        'type' => 'mrkdwn',
-                        'text' => $summary,
-                    ],
-                ],
-                $resolveBlock,
-            ];
+        if (NotificationDestinationType::Email === $type) {
+            throw new InvalidArgumentException('Email destinations are not delivered over HTTP.');
         }
 
-        return $json;
-    }
-
-    /**
-     * Block Kit Resolve button when the Slack destination has a signing secret and the
-     * payload identifies a real project/issue (not sample sends).
-     *
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>|null
-     */
-    private function slackResolveActionsBlock(array $payload, ?NotificationDestination $destination): ?array
-    {
-        if (!$destination instanceof NotificationDestination || !$destination->hasSigningSecret()) {
-            return null;
-        }
-
-        if (true === ($payload['test'] ?? false)) {
-            return null;
-        }
-
-        $event = (string) ($payload['event'] ?? '');
-        if (!\in_array($event, ['issue.new', 'issue.regression', 'issue.reopened'], true)) {
-            return null;
-        }
-
-        $project = $payload['project'] ?? null;
-        $issue = $payload['issue'] ?? null;
-        if (!\is_array($project) || !\is_array($issue)) {
-            return null;
-        }
-
-        $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
-        $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
-        $destinationUuid = $destination->getUuid();
-        if (\in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
-            return null;
-        }
-
-        $valueResolve = json_encode([
-            'a' => 'resolve',
-            'd' => $destinationUuid,
-            'p' => $projectUuid,
-            'i' => $issueUuid,
-        ], \JSON_THROW_ON_ERROR);
-        $valueAssign = json_encode([
-            'a' => 'assign',
-            'd' => $destinationUuid,
-            'p' => $projectUuid,
-            'i' => $issueUuid,
-        ], \JSON_THROW_ON_ERROR);
-
-        return [
-            'type' => 'actions',
-            'elements' => [
-                [
-                    'type' => 'button',
-                    'action_id' => 'beacon_resolve',
-                    'text' => [
-                        'type' => 'plain_text',
-                        'text' => 'Resolve',
-                        'emoji' => false,
-                    ],
-                    'style' => 'primary',
-                    'value' => $valueResolve,
-                ],
-                [
-                    'type' => 'button',
-                    'action_id' => 'beacon_assign',
-                    'text' => [
-                        'type' => 'plain_text',
-                        'text' => 'Assign to me',
-                        'emoji' => false,
-                    ],
-                    'value' => $valueAssign,
-                ],
-            ],
-        ];
+        return $this->formatterFor($type)->format($endpoint, $payload, $destination);
     }
 
     /**
@@ -177,7 +71,7 @@ final readonly class NotificationOutboundFormatter
     {
         $summary = (string) ($payload['summary'] ?? 'Beacon notification');
 
-        return $this->plainTextBody($payload, $summary);
+        return OutboundPayloadFacts::plainTextBody($payload, $summary);
     }
 
     /**
@@ -187,317 +81,20 @@ final readonly class NotificationOutboundFormatter
      */
     public function parseTelegramEndpoint(string $endpoint): array
     {
-        $endpoint = trim($endpoint);
-        $at = strrpos($endpoint, '@');
-        if (false === $at || 0 === $at || $at === \strlen($endpoint) - 1) {
-            throw new InvalidArgumentException('Telegram endpoint must be bot_token@chat_id.');
-        }
-
-        $token = substr($endpoint, 0, $at);
-        $chatId = substr($endpoint, $at + 1);
-        if ('' === $token || '' === $chatId) {
-            throw new InvalidArgumentException('Telegram endpoint must be bot_token@chat_id.');
-        }
-
-        return ['token' => $token, 'chat_id' => $chatId];
+        return $this->telegramFormatter->parseTelegramEndpoint($endpoint);
     }
 
     /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>
+     * Resolves the HTTP formatter responsible for the given destination type.
      */
-    private function slackAttachment(array $payload, string $summary): array
+    private function formatterFor(NotificationDestinationType $type): ChannelHttpFormatterInterface
     {
-        $attachment = [
-            'color' => true === ($payload['test'] ?? false) ? '#C9A227' : '#1F6F54',
-            'fallback' => $summary,
-            'title' => (string) ($payload['event'] ?? 'Beacon notification'),
-            'text' => $summary,
-            'fields' => $this->factFields($payload),
-            'footer' => true === ($payload['test'] ?? false) ? 'Beacon · sample send' : 'Beacon',
-        ];
-
-        if (isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']) {
-            $attachment['title_link'] = $payload['url'];
-        }
-
-        return $attachment;
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>
-     */
-    private function discordEmbed(array $payload, string $summary): array
-    {
-        return array_filter([
-            'title' => (string) ($payload['event'] ?? 'Beacon'),
-            'description' => $summary,
-            'url' => isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']
-                ? $payload['url']
-                : null,
-            'color' => true === ($payload['test'] ?? false) ? 0xC9A227 : 0x1F6F54,
-            'fields' => $this->discordFields($payload),
-            'footer' => [
-                'text' => true === ($payload['test'] ?? false) ? 'Beacon · sample send' : 'Beacon',
-            ],
-        ], static fn (mixed $v): bool => null !== $v && [] !== $v);
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>
-     */
-    private function teamsMessageCard(array $payload, string $summary, ?NotificationDestination $destination): array
-    {
-        $facts = [];
-        foreach ($this->factFields($payload) as $field) {
-            $facts[] = [
-                'name' => (string) ($field['title'] ?? ''),
-                'value' => (string) ($field['value'] ?? ''),
-            ];
-        }
-
-        $card = [
-            '@type' => 'MessageCard',
-            '@context' => 'https://schema.org/extensions',
-            'summary' => $summary,
-            'themeColor' => true === ($payload['test'] ?? false) ? 'C9A227' : '1F6F54',
-            'title' => (string) ($payload['event'] ?? 'Beacon notification'),
-            'text' => $summary,
-            'sections' => [] !== $facts ? [['facts' => $facts]] : [],
-            'potentialAction' => [],
-        ];
-
-        $actions = [];
-        if (isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']) {
-            $actions[] = [
-                '@type' => 'OpenUri',
-                'name' => 'Open in Beacon',
-                'targets' => [[
-                    'os' => 'default',
-                    'uri' => $payload['url'],
-                ]],
-            ];
-        }
-
-        $resolve = $this->teamsResolveHttpPost($payload, $destination);
-        if (null !== $resolve) {
-            $actions[] = $resolve;
-        }
-
-        $assign = $this->teamsAssignOpenUri($payload, $destination);
-        if (null !== $assign) {
-            $actions[] = $assign;
-        }
-
-        $card['potentialAction'] = $actions;
-
-        return $card;
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array{projectUuid: string, issueUuid: string, destinationUuid: string}|null
-     */
-    private function teamsInteractiveContext(array $payload, ?NotificationDestination $destination): ?array
-    {
-        if (!$destination instanceof NotificationDestination || !$destination->hasSigningSecret()) {
-            return null;
-        }
-
-        if (true === ($payload['test'] ?? false)) {
-            return null;
-        }
-
-        $event = (string) ($payload['event'] ?? '');
-        if (!\in_array($event, ['issue.new', 'issue.regression', 'issue.reopened'], true)) {
-            return null;
-        }
-
-        $project = $payload['project'] ?? null;
-        $issue = $payload['issue'] ?? null;
-        if (!\is_array($project) || !\is_array($issue)) {
-            return null;
-        }
-
-        $projectUuid = isset($project['uuid']) && \is_string($project['uuid']) ? $project['uuid'] : '';
-        $issueUuid = isset($issue['uuid']) && \is_string($issue['uuid']) ? $issue['uuid'] : '';
-        $destinationUuid = $destination->getUuid();
-        if (\in_array('', [$projectUuid, $issueUuid, $destinationUuid], true)) {
-            return null;
-        }
-
-        return [
-            'projectUuid' => $projectUuid,
-            'issueUuid' => $issueUuid,
-            'destinationUuid' => $destinationUuid,
-        ];
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>|null
-     */
-    private function teamsResolveHttpPost(array $payload, ?NotificationDestination $destination): ?array
-    {
-        $ctx = $this->teamsInteractiveContext($payload, $destination);
-        if (null === $ctx || !$destination instanceof NotificationDestination) {
-            return null;
-        }
-
-        $token = $this->actionToken->issueResolveToken(
-            (string) $destination->getSigningSecret(),
-            $ctx['destinationUuid'],
-            $ctx['projectUuid'],
-            $ctx['issueUuid'],
-        );
-
-        $target = $this->urlGenerator->generate('hooks_teams_actions', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return [
-            '@type' => 'HttpPOST',
-            'name' => 'Resolve',
-            'target' => $target,
-            'body' => json_encode($token, \JSON_THROW_ON_ERROR),
-            'bodyContentType' => 'application/json',
-            'headers' => [
-                [
-                    'name' => 'Content-Type',
-                    'value' => 'application/json',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * OpenUri Assign: MessageCard HttpPOST cannot identify the clicker.
-     *
-     * @param array<string, mixed> $payload
-     *
-     * @return array<string, mixed>|null
-     */
-    private function teamsAssignOpenUri(array $payload, ?NotificationDestination $destination): ?array
-    {
-        $ctx = $this->teamsInteractiveContext($payload, $destination);
-        if (null === $ctx || !$destination instanceof NotificationDestination) {
-            return null;
-        }
-
-        $token = $this->actionToken->issueAssignToken(
-            (string) $destination->getSigningSecret(),
-            $ctx['destinationUuid'],
-            $ctx['projectUuid'],
-            $ctx['issueUuid'],
-        );
-
-        $uri = $this->urlGenerator->generate(
-            'hooks_teams_assign_me',
-            $token,
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
-
-        return [
-            '@type' => 'OpenUri',
-            'name' => 'Assign to me',
-            'targets' => [[
-                'os' => 'default',
-                'uri' => $uri,
-            ]],
-        ];
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return list<array{title: string, value: string, short: bool}>
-     */
-    private function factFields(array $payload): array
-    {
-        $fields = [];
-        $project = $payload['project'] ?? null;
-        if (\is_array($project) && isset($project['name']) && \is_scalar($project['name'])) {
-            $fields[] = ['title' => 'Project', 'value' => (string) $project['name'], 'short' => true];
-        }
-
-        $issue = $payload['issue'] ?? null;
-        if (\is_array($issue)) {
-            if (isset($issue['level']) && \is_scalar($issue['level'])) {
-                $fields[] = ['title' => 'Level', 'value' => (string) $issue['level'], 'short' => true];
-            }
-            if (isset($issue['title']) && \is_scalar($issue['title'])) {
-                $fields[] = ['title' => 'Issue', 'value' => (string) $issue['title'], 'short' => false];
-            }
-            if (isset($issue['culprit']) && \is_scalar($issue['culprit']) && '' !== (string) $issue['culprit']) {
-                $fields[] = ['title' => 'Culprit', 'value' => (string) $issue['culprit'], 'short' => false];
+        foreach ($this->formatters as $formatter) {
+            if ($formatter->supports($type)) {
+                return $formatter;
             }
         }
 
-        if (true === ($payload['test'] ?? false)) {
-            $fields[] = ['title' => 'Sample', 'value' => 'yes', 'short' => true];
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     *
-     * @return list<array{name: string, value: string, inline: bool}>
-     */
-    private function discordFields(array $payload): array
-    {
-        $fields = [];
-        foreach ($this->factFields($payload) as $field) {
-            $fields[] = [
-                'name' => $field['title'],
-                'value' => $field['value'],
-                'inline' => $field['short'],
-            ];
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function plainTextBody(array $payload, string $summary): string
-    {
-        $lines = [$summary];
-        foreach ($this->factFields($payload) as $field) {
-            if ('Sample' === $field['title']) {
-                continue;
-            }
-            $lines[] = $field['title'].': '.$field['value'];
-        }
-        if (isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']) {
-            $lines[] = '';
-            $lines[] = $payload['url'];
-        }
-
-        return implode("\n", $lines);
-    }
-
-    /**
-     * @return array{url: string, json: array<string, mixed>}
-     */
-    private function telegramRequest(string $endpoint, string $text): array
-    {
-        $parts = $this->parseTelegramEndpoint($endpoint);
-
-        return [
-            'url' => \sprintf('https://api.telegram.org/bot%s/sendMessage', $parts['token']),
-            'json' => [
-                'chat_id' => $parts['chat_id'],
-                'text' => $text,
-                'disable_web_page_preview' => true,
-            ],
-        ];
+        throw new InvalidArgumentException('Unsupported notification destination type: '.$type->value);
     }
 }

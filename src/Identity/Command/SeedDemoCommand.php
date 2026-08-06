@@ -6,9 +6,9 @@ namespace App\Identity\Command;
 
 use App\Identity\Service\DemoIdentitySeeder;
 use App\Project\Entity\ProjectApiKey;
-use App\Shared\Breadcrumb\BreadcrumbDemoSeeder;
-use App\Shared\CookieConsent\CookieConsentDemoSeeder;
-use App\Shared\Menu\DashboardMenuDemoSeeder;
+use App\Setup\Demo\BreadcrumbDemoSeeder;
+use App\Setup\Demo\CookieConsentDemoSeeder;
+use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use LogicException;
 use RuntimeException;

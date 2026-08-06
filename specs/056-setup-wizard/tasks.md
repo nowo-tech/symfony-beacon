@@ -9,7 +9,7 @@
 - [x] T002 Extract `DemoIdentitySeeder` for CLI + wizard reuse
 - [x] T003 ~~`SetupWizardController` bare `/setup` + locale dual paths~~ (removed; see Phase 2)
 - [x] T004 Twig catalogues for enabled locales; dashboard banner + admin hub card (links now `nowo_site_backup_setup`)
-- [x] T005 ~~`SetupWizardTest`~~ → replaced by `tests/Setup/SiteBackupSetupTest.php`; docs (INSTALL / UPGRADING / CHANGELOG / ROADMAP / ADDING-LOCALES)
+- [x] T005 ~~`SetupWizardTest`~~ → replaced by `tests/Functional/Setup/SiteBackupSetupTest.php`; docs (INSTALL / UPGRADING / CHANGELOG / ROADMAP / ADDING-LOCALES)
 - [x] T006 Platform-empty HTML auto-redirect (`PlatformBootstrapState` + subscriber; class renamed in Phase 2)
 - [x] T007 Anonymous bootstrap hardening / no fixed-password demo admin from public wizard (`DemoIdentitySeeder`)
 - [x] T008 ~~Setup POST rate limit (`SetupWizardRateLimitSubscriber`)~~ (removed; SiteBackup owns gate)

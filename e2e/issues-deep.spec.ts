@@ -3,6 +3,7 @@ import {
   dismissProductTour,
   expectAuthenticatedPage,
   openFirstIssue,
+  requireSampleOrSkip,
   resolveDemoProjectUuid,
 } from './helpers';
 
@@ -13,17 +14,15 @@ test.describe('Issues & performance deep', () => {
     await dismissProductTour(page);
     await expect(page.locator('[data-tour="issue-filters"]')).toBeVisible();
     const rows = page.locator('table.issue-table tbody tr');
-    // Sample seed adds issues; tolerate empty but prefer rows.
-    if ((await rows.count()) > 0) {
-      await expect(rows.first()).toBeVisible();
-    }
+    requireSampleOrSkip((await rows.count()) > 0, 'No issue rows — run make seed-sample');
+    await expect(rows.first()).toBeVisible();
   });
 
   test('issue detail shows comments and triage panels', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
     const issueUuid = await openFirstIssue(page, uuid);
     if (!issueUuid) {
-      test.skip(true, 'No issues — run make seed-sample');
+      requireSampleOrSkip(false, 'No issues — run make seed-sample');
       return;
     }
     await expect(page.locator('[data-testid="issue-comments"]')).toBeVisible();
@@ -34,7 +33,7 @@ test.describe('Issues & performance deep', () => {
     const uuid = await resolveDemoProjectUuid(page);
     const issueUuid = await openFirstIssue(page, uuid);
     if (!issueUuid) {
-      test.skip(true, 'No issues — run make seed-sample');
+      requireSampleOrSkip(false, 'No issues — run make seed-sample');
       return;
     }
 

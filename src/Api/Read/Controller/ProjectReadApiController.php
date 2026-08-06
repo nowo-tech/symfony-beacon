@@ -6,11 +6,12 @@ namespace App\Api\Read\Controller;
 
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectReadTokenManager;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ final readonly class ProjectReadApiController
         private ProjectReadTokenManager $tokenManager,
         private ProjectRepository $projectRepository,
         private IssueRepository $issueRepository,
+        private IssueSearchRepository $issueSearchRepository,
     ) {
     }
 
@@ -45,7 +47,7 @@ final readonly class ProjectReadApiController
         $limit = max(1, min(1000, $request->query->getInt('limit', 100)));
         $statusRaw = $request->query->getString('status');
         $status = '' !== $statusRaw ? IssueStatus::tryFrom($statusRaw) : null;
-        $issues = $this->issueRepository->search(
+        $issues = $this->issueSearchRepository->search(
             project: $project,
             query: $request->query->getString('q') ?: null,
             level: $request->query->getString('level') ?: null,

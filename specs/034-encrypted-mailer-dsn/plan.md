@@ -41,7 +41,7 @@ migrations/Version20260721193000.php
 config/packages/doctrine.yaml
 config/routes.yaml
 config/services.yaml
-tests/Shared/InstanceMailerSettingsTest.php
+tests/Functional/Shared/InstanceMailerSettingsTest.php
 ```
 
 ## Related specs

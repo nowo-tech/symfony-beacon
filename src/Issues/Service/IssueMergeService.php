@@ -10,7 +10,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;

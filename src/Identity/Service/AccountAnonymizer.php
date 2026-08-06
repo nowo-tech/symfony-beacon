@@ -11,7 +11,7 @@ use App\Identity\Repository\UserRepository;
 use App\Identity\UserActionType;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
@@ -64,11 +64,7 @@ final readonly class AccountAnonymizer
         $subject->setAnonymizedAt(new DateTimeImmutable());
         $subject->setPasswordResetToken(null);
         $subject->setPasswordResetExpiresAt(null);
-        $subject->setPushNotificationsEnabled(false);
-        $subject->setPreferredLocale(null);
-        $subject->setPreferredTheme(null);
-        $subject->setPreferredMotion(null);
-        $subject->setPreferredContrast(null);
+        $subject->getUiPreferences()->resetForAnonymize();
         $subject->setRoles([]);
 
         $random = bin2hex(random_bytes(32));

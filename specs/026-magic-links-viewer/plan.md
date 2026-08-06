@@ -30,7 +30,7 @@ Add read-only **`ProjectRole::Viewer`**, passwordless **magic login** via Symfon
 ## Project Structure
 
 ```text
-src/Shared/ProjectRole.php
+src/Project/Enum/ProjectRole.php
 src/Project/Service/ProjectAccessService.php
 src/Project/Service/ProjectMembershipManager.php
 src/Identity/Controller/MagicLoginController.php

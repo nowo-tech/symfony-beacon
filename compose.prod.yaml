@@ -109,6 +109,45 @@ services:
         "php",
         "bin/console",
         "messenger:consume",
+        "async_ingest",
+        "-vv",
+        "--time-limit=3600",
+        "--memory-limit=256M",
+      ]
+
+  # Outbound notifications, HTTP-log, and Web Push (async transport).
+  messenger-notify:
+    image: ${IMAGES_PREFIX:-}symfony-frankenphp
+    build:
+      context: .
+      target: frankenphp_prod
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+      php:
+        condition: service_started
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-9.7}&charset=utf8mb4
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
+      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
+      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
+      SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
+      SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@localhost}
+      APP_ENCRYPT_KEY: ${APP_ENCRYPT_KEY:-}
+    volumes:
+      - php_secrets:/app/var/secrets
+    command:
+      [
+        "php",
+        "bin/console",
+        "messenger:consume",
         "async",
         "-vv",
         "--time-limit=3600",

@@ -231,7 +231,7 @@ final class AdminSocialLoginController extends AbstractController
      */
     private function persistFromForm(string $provider, array $data, ?SocialLoginCredential $existing): void
     {
-        $secret = trim($data['client_secret']);
+        $secret = trim((string) ($data['client_secret'] ?? ''));
         if ('' === $secret && $existing instanceof SocialLoginCredential) {
             $secret = $existing->getClientSecret();
         }
@@ -245,7 +245,7 @@ final class AdminSocialLoginController extends AbstractController
             $this->nullableUrl($data['authorize_url']),
             $this->nullableUrl($data['token_url']),
             $this->nullableUrl($data['userinfo_url']),
-            $this->parseScopes($data['scopes']),
+            $this->parseScopes($data['scopes'] ?? ''),
             flush: true,
             enterpriseSso: (bool) $data['enterprise_sso'],
         );
@@ -263,9 +263,9 @@ final class AdminSocialLoginController extends AbstractController
         return !\in_array('', [trim($data['authorize_url']), trim($data['token_url']), trim($data['userinfo_url'])], true);
     }
 
-    private function nullableUrl(string $value): ?string
+    private function nullableUrl(?string $value): ?string
     {
-        $trimmed = trim($value);
+        $trimmed = trim($value ?? '');
 
         return '' === $trimmed ? null : $trimmed;
     }

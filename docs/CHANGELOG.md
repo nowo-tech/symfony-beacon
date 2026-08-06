@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-06
+
 ### Added
 
 - Appearance **theme presets** (`082` / 6.32): named light (`beacon` / `ocean` / `slate` / `sandstone`) and dark (`midnight` / `obsidian` / `aurora` / `ember`) palettes that overwrite site colors; independent `theme_id` / `theme_id_dark`; tabbed Themes / Brand / Layout / Colors; corner style, border strength, fixed legal footer; instance config keys.
@@ -21,7 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `HookMutationPolicy` / Ops defaults **Allow anonymous Resolve** (default off): Slack/Teams Resolve requires a mapped Beacon actor unless legacy flag is enabled.
 - `OutboundUrlGuard` validates **A + AAAA** DNS answers and prefers an IPv4 pin when both exist.
 - Admin **User / Group / Project** create-edit forms use FormKit Types + `form/_fields.html.twig` (077).
-- **Ops env → database** (`079`): envelope max bytes, reject query auth, metrics token/require, inbound email, allow private URLs, anonymous Resolve moved to **Administration → Ops defaults** (encrypted secrets); instance config export **v3**.
+- **Ops env → database** (`084`, was `079-ops-env-to-db`): envelope max bytes, reject query auth, metrics token/require, inbound email, allow private URLs, anonymous Resolve moved to **Administration → Ops defaults** (encrypted secrets); instance config export **v3**.
+- **Module boundary hardening** (`083` / 6.33): map `Api` / `Setup`; Shared growth rules; Identity↔Project direction; Analytics/Performance suite retention in CI.
+- **Architecture convergence** (`085` / 6.34): `Ops` module (overview / retention / metrics collector); Envelope domain writers; Compose `messenger-notify`; channel formatters; AI export controller; `UserUiPreferences` embeddable; demo JSON fixtures under `Setup\Demo`.
+- **Playwright E2E** (`make test-e2e`): browser suite against Compose HTTPS; CI Playwright job with optional sample seed.
+- PHPUnit layout: `tests/Unit|Functional|Integration/` + `tests/Support/` (`DatabaseWebTestCase`); suites in `phpunit.dist.xml`; per-process SQLite via `BEACON_TEST_DATABASE_URL`.
+- Expanded PHPUnit coverage (unit + functional + integration) across governance, notifications, Ops metrics, Identity allowlists, Project access, and admin surfaces.
 
 ### Changed
 
@@ -37,10 +44,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cookie Consent admin **1.6.0**: route-based settings sections (`/settings/{section}`); host drops `data-kit-form-tabs` / tabify JS and restyles vendor `.nowo-ui-tabs` to Beacon tab chrome (UiKit consumer — see `081`).
 - SiteBackup: explicit root `css_framework: tailwind` + `data-css-framework` on setup/panel host shells (pin **1.10.0**; see `081`).
 - Former `BEACON_INGEST_REJECT_QUERY_AUTH`, `BEACON_METRICS_*`, `BEACON_ENVELOPE_MAX_BYTES`, `BEACON_INBOUND_*`, `BEACON_NOTIFICATIONS_ALLOW_PRIVATE_URLS`, and `BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE` env vars are no longer read (configure via Ops defaults).
+- Domain enums moved under owning modules (`Issues\Enum\*`, `Project\Enum\ProjectRole`); OTLP code under `Ingest\Otlp\`; Project admin HTTP under `Project` (not Identity).
+- Spec paths and CONTRIBUTING document the Unit / Functional / Integration PHPUnit layout.
 
 ### Fixed
 
 - Further Doctrine N+1 / hydrate helpers: issue show (`findOneByUuidHydrated`), batch project members (`findUsersByProjects`), admin count without full user hydrate (`countAdmins`).
+- Admin social login form null-safe secret / URL / scopes when editing credentials.
+- PHPUnit SQLite isolation (per-PID `BEACON_TEST_DATABASE_URL`) avoids readonly DB errors under concurrent coverage runs.
 
 ## [1.0.1] - 2026-07-31
 
@@ -711,7 +722,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.17.0...v1.0.0
 [0.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v0.16.0...v0.17.0

@@ -16,7 +16,7 @@ Add issue triage workflow: priority (`low`|`medium`|`high`|`critical`, default `
 
 **Storage**: MySQL/MariaDB via Doctrine migrations (MDK where applicable)
 
-**Testing**: PHPUnit `DatabaseWebTestCase` functional coverage in `tests/Issues/IssueWorkflowTest.php`
+**Testing**: PHPUnit `DatabaseWebTestCase` functional coverage in `tests/Functional/Issues/IssueWorkflowTest.php`
 
 **Target Platform**: Self-hosted Beacon (Docker Compose + FrankenPHP)
 
@@ -49,21 +49,22 @@ specs/015-issue-workflow/
 ### Source Code
 
 ```text
-src/Shared/IssuePriority.php
+src/Issues/Enum/IssuePriority.php
 src/Issues/Entity/Issue.php                    # priority, duplicateOf
 src/Issues/Entity/IssueComment.php
 src/Issues/Entity/IssueSavedView.php
 src/Issues/Repository/IssueCommentRepository.php
 src/Issues/Repository/IssueSavedViewRepository.php
-src/Issues/Repository/IssueRepository.php      # priority filter
-src/Issues/Controller/IssueController.php      # priority, comment, duplicate, views
+src/Issues/Repository/IssueRepository.php      # priority filter (as-built: list filters on IssueSearchRepository — `083`)
+src/Issues/Controller/IssueController.php      # list / saved views (`083`)
+src/Issues/Controller/IssueDetailController.php # priority, comment, duplicate (`083`)
 migrations/Version20260721161000.php           # priority + comments + duplicateOf
 migrations/Version20260721162000.php           # issue_saved_view
 templates/issue/show.html.twig
 templates/issue/index.html.twig
 translations/messages.en.yaml
 translations/messages.es.yaml
-tests/Issues/IssueWorkflowTest.php
+tests/Functional/Issues/IssueWorkflowTest.php
 docs/CHANGELOG.md
 ```
 

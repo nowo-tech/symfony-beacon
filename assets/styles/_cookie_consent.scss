@@ -84,7 +84,10 @@ html[data-theme="dark"] .nowo-cookie-consent,
   color: var(--nowo-cc-secondary);
 }
 
-.nowo-cookie-consent .nowo-cookie-consent__header {
+/* Vendor header/footer use Tailwind px-* in templates; without those utilities
+   in the host build they sit flush. Mirror scrollable horizontal inset here. */
+.nowo-cookie-consent .nowo-cookie-consent__header,
+.nowo-cookie-consent .nowo-cookie-consent__section-header {
   border-bottom: 1px solid var(--nowo-cc-separator);
   padding: 1rem 1.25rem;
 }
@@ -102,6 +105,12 @@ html[data-theme="dark"] .nowo-cookie-consent,
   flex-direction: column;
   gap: 0.75rem;
   padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.nowo-cookie-consent .nowo-cookie-consent__section-footer,
+.nowo-cookie-consent .nowo-cookie-consent__btn-group.nowo-cookie-consent__section-footer {
+  border-top: 1px solid var(--nowo-cc-separator);
+  padding: 1rem 1.25rem;
 }
 
 .nowo-cookie-consent .nowo-cookie-consent__read-more {
@@ -164,4 +173,80 @@ html[data-theme="dark"] .nowo-cookie-consent,
 
 .nowo-cookie-consent.nowo-cookie-consent--variant-wide .nowo-cookie-consent__dialog {
   max-width: min(36rem, calc(100vw - 2rem));
+}
+
+/* Preferences bubble: vendor styles are injected by deferred nowo-consent-modal.js
+   (same-specificity rules win by order). Use nested selectors so host sizes stick. */
+.nowo-cookie-consent__preferences-bubble.nowo-cookie-consent__preferences-bubble {
+  align-items: center;
+  backdrop-filter: blur(4px);
+  background: transparent;
+  border: 2px solid var(--nowo-cc-bubble-accent, var(--beacon-moss, #1f6f54));
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  color: var(--nowo-cc-bubble-accent, var(--beacon-moss, #1f6f54));
+  cursor: pointer;
+  display: inline-flex;
+  height: 4.25rem;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  position: fixed;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  width: 4.25rem;
+  z-index: 1040;
+}
+
+.nowo-cookie-consent__preferences-bubble.nowo-cookie-consent__preferences-bubble:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.nowo-cookie-consent__preferences-bubble.nowo-cookie-consent__preferences-bubble:focus-visible {
+  outline: 2px solid var(--nowo-cc-bubble-accent, var(--beacon-moss, #1f6f54));
+  outline-offset: 3px;
+}
+
+.nowo-cookie-consent__preferences-bubble .nowo-cookie-consent__preferences-bubble-icon {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  height: 3.95rem;
+  justify-content: center;
+  width: 3.95rem;
+}
+
+.nowo-cookie-consent__preferences-bubble .nowo-cookie-consent__preferences-bubble-svg {
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.nowo-cookie-consent__preferences-bubble-emoji {
+  display: block;
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+.nowo-cookie-consent__preferences-bubble--bottom-right {
+  bottom: 1.25rem;
+  right: 1.25rem;
+}
+
+.nowo-cookie-consent__preferences-bubble--bottom-left {
+  bottom: 1.25rem;
+  left: 1.25rem;
+}
+
+.nowo-cookie-consent__preferences-bubble--top-right {
+  right: 1.25rem;
+  top: 1.25rem;
+}
+
+.nowo-cookie-consent__preferences-bubble--top-left {
+  left: 1.25rem;
+  top: 1.25rem;
 }

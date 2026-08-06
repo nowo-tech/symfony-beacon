@@ -52,7 +52,7 @@ Symfony’s default role hierarchy is **not** customized in this repo. In practi
 
 ## Project membership roles (not `ROLE_*`)
 
-Enum: `App\Shared\ProjectRole` (`owner` | `admin` | `member` | `viewer`).
+Enum: `App\Project\Enum\ProjectRole` (`owner` | `admin` | `member` | `viewer`).
 
 | Role | Typical capabilities |
 |------|----------------------|

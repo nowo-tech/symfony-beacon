@@ -8,7 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueHistoryEntry;
 use App\Issues\IssueHistoryKind;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

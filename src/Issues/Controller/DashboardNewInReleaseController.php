@@ -6,7 +6,7 @@ namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Pagination\PagePagination;
@@ -24,7 +24,7 @@ final class DashboardNewInReleaseController extends AbstractController
 {
     public function __construct(
         private readonly ProjectRepository $projectRepository,
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueSearchRepository $issueRepository,
     ) {
     }
 

@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0 → 1.4.0 (MINOR: new Principle X — no Cursor / agent attribution)
-- Modified principles: none renamed
-- Added sections: Principle X (commits, issues, PRs/MRs)
+- Version change: 1.4.1 → 1.4.2 (PATCH: Principle II module list includes Ops; Shared/Ops ownership)
+- Modified principles: II (Canonical stack — modular layout)
+- Added sections: none
 - Removed sections: none
-- Templates: .specify/templates/plan-template.md ✅; docs/CONTRIBUTING.md ✅; .cursor/rules/no-cursor-attribution.mdc ✅; .cursor/rules/no-cursor-coauthor.mdc ✅
-- Follow-up: CI Git hygiene already enforces commit trailers; agents MUST also keep issue/PR bodies clean
+- Templates: unchanged
+- Follow-up: keep docs/ARCHITECTURE.md in sync with `085-architecture-convergence`
 -->
 
 # symfony-beacon Constitution
@@ -25,7 +25,9 @@ Artifacts under `specs/` are the source of truth; code must align with them.
 - **Docker Compose** as the required local environment
 - FrankenPHP in **classic** or **worker** mode, switched only via `FRANKENPHP_MODE`
 - **MySQL 9.7**, Symfony Messenger (async ingest), Pentatrion Vite + **Tailwind CSS**
-- Modular Symfony layout under `src/{Identity,Project,Ingest,Issues,Performance,Analytics,Notifications,Shared}`
+- Modular Symfony layout under `src/{Identity,Project,Ingest,Issues,Performance,Analytics,Notifications,Shared,Ops,Api,Setup}`
+- `Shared` is cross-cutting presentation / instance config only — not domain write ownership (see `083` / `085` and `docs/ARCHITECTURE.md`)
+- `Ops` owns instance ops overview, retention purge, and metrics collection that compose other modules
 - Prefer official `nowo-tech/*` kits for auth/users/cookies/menus where applicable (AuthKit, UserKit, AuditKit, cookie-consent, etc.)
 - Progressive Web App via `nowo-tech/pwa-bundle` for browser installability
 - **UI typeface**: Montserrat (self-hosted) for brand and app chrome; IBM Plex Mono for code
@@ -118,4 +120,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Commits, issues, and PRs/MRs MUST comply with **Principle X** (no Cursor / agent attribution).
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.4.0 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-07-31
+**Version**: 1.4.2 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-08-06

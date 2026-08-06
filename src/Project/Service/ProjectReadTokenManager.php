@@ -10,7 +10,7 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
 use App\Project\Repository\ProjectReadTokenRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 

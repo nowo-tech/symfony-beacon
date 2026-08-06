@@ -54,7 +54,7 @@ migrations/Version20260731140000.php
 templates/account/privacy.html.twig
 templates/account/_profile_tabs.html.twig
 docs/product/LEGAL-AND-COOKIES.md, CHANGELOG, ROADMAP, UPGRADING, docs/dev/DATABASE.md
-tests/Identity/GdprAccountExportTest.php
+tests/Functional/Identity/GdprAccountExportTest.php
 ```
 
 ## Complexity Tracking

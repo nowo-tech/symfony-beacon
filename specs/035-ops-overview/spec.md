@@ -6,6 +6,8 @@
 
 **Input**: Instance-admin **Ops overview** that surfaces cross-project error spikes, open issues, and failed notification deliveries (with optional project filter), so operators do not need to open every project. Complements per-project Health (`021` / `030`) and Admin → Projects (`019`). Prefer aggregating existing repositories/services over new telemetry stores.
 
+**As-built (`085`)**: Service + controller live under `App\Ops\` (not Shared).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Instance ops at a glance (Priority: P1)

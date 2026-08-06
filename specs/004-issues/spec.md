@@ -107,7 +107,7 @@ As ingest, similar events merge into one issue; resolved and ignored issues reop
 ### Non-Functional
 
 - **NFR-001**: Docs/UI/PHPDoc in English; Twig `lang="en"`.
-- **NFR-002**: PHPUnit coverage under `tests/` for grouping, list/sort, assignee, status/history, and UI-critical behaviour.
+- **NFR-002**: PHPUnit coverage under `tests/Unit|Functional|Integration/` for grouping, list/sort, assignee, status/history, and UI-critical behaviour.
 
 ## Success Criteria *(mandatory)*
 

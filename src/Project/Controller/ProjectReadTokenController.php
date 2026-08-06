@@ -10,7 +10,7 @@ use App\Project\Entity\ProjectReadToken;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectReadTokenManager;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;

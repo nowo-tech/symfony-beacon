@@ -60,11 +60,9 @@ test.describe('Administration', () => {
   test('OpenAPI JSON is available', async ({ page }) => {
     // Use page request so auth cookies from storageState apply.
     const res = await page.request.get('/admin/api/doc.json');
-    expect(res.status()).toBeLessThan(500);
-    if (res.status() === 200) {
-      const ct = res.headers()['content-type'] ?? '';
-      expect(ct).toMatch(/json|html/i);
-    }
+    expect(res.status()).toBe(200);
+    const ct = res.headers()['content-type'] ?? '';
+    expect(ct).toMatch(/json/i);
   });
 
   test('first admin user activity page when list has links', async ({ page }) => {

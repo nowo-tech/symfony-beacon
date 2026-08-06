@@ -16,7 +16,7 @@ Extend the project issues list with tag / URL / user (event actor) filters along
 
 **Storage**: MySQL/MariaDB in Docker; SQLite for PHPUnit (`when@test`)
 
-**Testing**: PHPUnit `DatabaseWebTestCase` — `tests/Issues/IssueSearchScaleTest.php`
+**Testing**: PHPUnit `DatabaseWebTestCase` — `tests/Functional/Issues/IssueSearchScaleTest.php`
 
 **Target Platform**: Self-hosted Beacon (Docker Compose + FrankenPHP)
 
@@ -50,12 +50,12 @@ specs/016-issue-search/
 
 ```text
 src/Issues/IssueListSort.php                 # occurrence fields are SQL-sortable
-src/Issues/Repository/IssueRepository.php    # tag/url/user filters; SQL occurrence ORDER BY
+src/Issues/Repository/IssueSearchRepository.php    # tag/url/user filters; SQL occurrence ORDER BY (`083`; was IssueRepository)
 src/Issues/Controller/IssueController.php    # wire filters; remove PHP sort path
 templates/issue/index.html.twig              # tag/url/user inputs + saved-view keys
 translations/messages.en.yaml
 translations/messages.es.yaml
-tests/Issues/IssueSearchScaleTest.php
+tests/Functional/Issues/IssueSearchScaleTest.php
 docs/CHANGELOG.md
 ```
 

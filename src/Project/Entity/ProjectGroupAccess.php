@@ -7,7 +7,7 @@ namespace App\Project\Entity;
 use App\Identity\Entity\UserGroup;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Shared\Doctrine\PublicUuidTrait;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;

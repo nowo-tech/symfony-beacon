@@ -52,6 +52,9 @@ jobs:
       - name: Block Cursor co-author / Made-with trailers
         run: sh .scripts/check-no-cursor-coauthor.sh HEAD
 
+      - name: Module boundaries (AdminProject ownership)
+        run: sh .scripts/check-module-boundaries.sh
+
   qa:
     name: Quality (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -142,7 +145,10 @@ jobs:
         run: vendor/bin/rector process --dry-run
 
       - name: PHPUnit
-        run: vendor/bin/phpunit
+        run: |
+          rm -rf var/cache/test
+          php bin/console cache:warmup --env=test
+          vendor/bin/phpunit
 
   # Informational coverage (PCOV). Soft gate only when COVERAGE_MIN is set (never 100% by default).
   coverage:
@@ -225,6 +231,8 @@ jobs:
 
       - name: PHPUnit with coverage
         run: |
+          rm -rf var/cache/test
+          php bin/console cache:warmup --env=test
           mkdir -p var/coverage var/coverage-html
           vendor/bin/phpunit \
             --coverage-text \
@@ -244,6 +252,83 @@ jobs:
             var/coverage-html
           if-no-files-found: warn
           retention-days: 14
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: "1"
+      PLAYWRIGHT_REQUIRE_SAMPLE: "1"
+      PLAYWRIGHT_BASE_URL: https://localhost:9444
+      COMPOSER_ALLOW_SUPERUSER: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Prepare environment
+        run: cp .env.dist .env
+
+      - name: Build and start Compose stack
+        run: |
+          docker compose build
+          docker compose up -d
+          # Entrypoint installs vendor/node_modules and migrates when DB is ready.
+          for i in $(seq 1 90); do
+            if curl -kfsS https://localhost:9444/health/live >/dev/null 2>&1; then
+              echo "Stack is live"
+              exit 0
+            fi
+            echo "Waiting for HTTPS… (${i}/90)"
+            sleep 5
+          done
+          echo "Timed out waiting for /health/live" >&2
+          docker compose logs --tail=200
+          exit 1
+
+      - name: Setup Node (host Playwright deps mount)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.4 --activate
+
+      - name: Ensure node_modules on host
+        run: |
+          if [ ! -d node_modules/@playwright/test ]; then
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Build frontend assets
+        run: make vite-build
+
+      - name: Seed demo + sample data
+        run: |
+          make ready
+          make seed-sample
+
+      - name: Playwright E2E
+        run: make test-e2e
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down Compose
+        if: always()
+        run: docker compose --profile hmr --profile mail down -v || true
 
   docker:
     name: Docker build

@@ -19,7 +19,7 @@
 - [x] T020 Add `NotificationCategories::VOLUME_THRESHOLD`
 - [x] T021 Add volume threshold payload builder and dispatcher methods
 - [x] T022 Add `VolumeThresholdEvaluator` with cooldown and suspended-ingest guard
-- [x] T023 Call evaluator from `ProcessEnvelopeHandler` only for persisted error/fatal events
+- [x] T023 Call evaluator from thin `ProcessEnvelopeHandler` only for persisted error/fatal events (`085`)
 
 ## Phase 4: Settings UI
 

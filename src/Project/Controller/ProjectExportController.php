@@ -8,13 +8,13 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\IssuePriority;
-use App\Shared\IssueStatus;
-use App\Shared\ProjectRole;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
+use App\Project\Enum\ProjectRole;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +34,7 @@ final class ProjectExportController extends AbstractController
     public const int EXPORT_LIMIT = 1000;
 
     public function __construct(
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueSearchRepository $issueRepository,
         private readonly EventRepository $eventRepository,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,

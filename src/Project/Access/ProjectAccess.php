@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Project\Access;
 
 use App\Project\Entity\ProjectMembership;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 
 /**
  * Effective project access for a user (direct membership and/or via groups).

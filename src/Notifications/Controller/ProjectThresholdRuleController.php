@@ -9,7 +9,7 @@ use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

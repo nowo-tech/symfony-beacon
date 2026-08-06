@@ -18,7 +18,7 @@ Add a filterable audit timeline to Admin -> Project show using existing `user_ac
 | Included actions | Project admin operations from `019-admin-projects-ops` and related settings/history/key actions |
 | Filters | Query params `action`, `from`, `to` (`Y-m-d`, inclusive end date) |
 | Ordering | `created_at DESC, id DESC` |
-| Access | Existing `#[IsGranted('ROLE_ADMIN')]` on `AdminProjectController` |
+| Access | Existing `#[IsGranted('ROLE_ADMIN')]` on `App\Project\Controller\AdminProjectController` (`083`) |
 | UI | Extend `templates/admin/projects/show.html.twig`; English UI copy with EN + ES translations |
 | Testing | Functional PHPUnit coverage for empty state, timeline ordering, action filter, and date range filter |
 

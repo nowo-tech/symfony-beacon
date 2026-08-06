@@ -13,7 +13,7 @@
 
 ## Phase 2: Dispatch from issue actions
 
-- [x] T005 Wire `NotificationDispatcher` into `IssueController` (status → resolved/reopened, assign, comment, duplicate)
+- [x] T005 Wire `NotificationDispatcher` into `IssueDetailController` (status → resolved/reopened, assign, comment, duplicate; `083`; was `IssueController`)
 
 ## Phase 3: Export endpoints
 
@@ -24,6 +24,6 @@
 
 - [x] T008 Document lifecycle events briefly in `docs/product/NOTIFICATIONS.md`
 - [x] T009 Changelog Unreleased bullets (English)
-- [x] T010 `tests/Export/ExportWebhooksTest.php` (export + lifecycle webhook delivery)
+- [x] T010 `tests/Functional/Export/ExportWebhooksTest.php` (export + lifecycle webhook delivery)
 - [x] T011 Extend `NotificationDispatcherTest` for a lifecycle category
 - [x] T012 Mark plan/tasks complete; run PHPUnit via Docker

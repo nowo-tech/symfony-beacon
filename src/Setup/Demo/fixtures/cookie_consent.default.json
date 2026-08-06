@@ -1,0 +1,365 @@
+{
+  "config": {
+    "name": "Beacon default",
+    "default": true,
+    "enabled": true,
+    "settings": {
+      "disablePageInteraction": true,
+      "colorTheme": "light",
+      "darkModeEnabled": false,
+      "preferencesBubbleEnabled": false,
+      "preferencesBubblePosition": "bottom-right",
+      "preferencesBubbleIcon": "<img class=\"nowo-cookie-consent__preferences-bubble-svg\" src=\"/illustrations/cookie-consent-bubble.svg\" alt=\"\" width=\"62\" height=\"62\" decoding=\"async\">",
+      "preferencesBubbleBorderColor": "#EE922D",
+      "autoShow": true,
+      "autoShowRouteMode": "only",
+      "autoShowRoutes": [
+        "nowo_auth_kit_login",
+        "nowo_auth_kit_register"
+      ],
+      "granularCookieSelection": false,
+      "hideFromBots": true,
+      "privacyRoute": "legal_privacy"
+    }
+  },
+  "modalCopy": {
+    "en": {
+      "title": "Cookie notice",
+      "intro": "This service uses cookies and similar technologies to operate securely and to remember your choices. Strictly necessary cookies are required for core functionality (authentication, security, and recording your consent) and cannot be disabled. Optional cookies — including analytics and preference storage — are used only where you give prior consent. You may accept all categories, refuse non-essential cookies, or review each category. You may withdraw or change your consent at any time via Cookie settings. Further information is available in our Privacy policy.",
+      "footer": "Privacy policy",
+      "acceptAll": "Accept all cookies",
+      "acceptNecessary": "Necessary cookies only",
+      "showPreferences": "Cookie settings",
+      "preferencesTitle": "Cookie settings",
+      "save": "Confirm selection"
+    },
+    "es": {
+      "title": "Aviso de cookies",
+      "intro": "Este servicio utiliza cookies y tecnologías similares para funcionar de forma segura y recordar sus elecciones. Las cookies estrictamente necesarias son imprescindibles para la funcionalidad esencial (autenticación, seguridad y registro de su consentimiento) y no pueden desactivarse. Las cookies opcionales —incluidas las de analítica y de preferencias— se utilizan únicamente cuando usted otorga su consentimiento previo. Puede aceptar todas las categorías, rechazar las no esenciales o revisar cada categoría. Puede retirar o modificar su consentimiento en cualquier momento mediante Configuración de cookies. Encontrará más información en nuestra Política de privacidad.",
+      "footer": "Política de privacidad",
+      "acceptAll": "Aceptar todas las cookies",
+      "acceptNecessary": "Solo cookies necesarias",
+      "showPreferences": "Configuración de cookies",
+      "preferencesTitle": "Configuración de cookies",
+      "save": "Confirmar selección"
+    },
+    "de": {
+      "title": "Cookie-Hinweis",
+      "intro": "Dieser Dienst verwendet Cookies und ähnliche Technologien, um sicher zu funktionieren und Ihre Auswahl zu speichern. Unbedingt erforderliche Cookies sind für Kernfunktionen (Authentifizierung, Sicherheit und Speicherung Ihrer Einwilligung) notwendig und können nicht deaktiviert werden. Optionale Cookies — einschließlich Analyse und Präferenzen — werden nur mit Ihrer vorherigen Einwilligung eingesetzt. Sie können alle Kategorien akzeptieren, nicht erforderliche ablehnen oder jede Kategorie prüfen. Sie können Ihre Einwilligung jederzeit über die Cookie-Einstellungen widerrufen oder ändern. Weitere Informationen finden Sie in unserer Datenschutzerklärung.",
+      "footer": "Datenschutzerklärung",
+      "acceptAll": "Alle Cookies akzeptieren",
+      "acceptNecessary": "Nur notwendige Cookies",
+      "showPreferences": "Cookie-Einstellungen",
+      "preferencesTitle": "Cookie-Einstellungen",
+      "save": "Auswahl bestätigen"
+    },
+    "nl": {
+      "title": "Cookiemelding",
+      "intro": "Deze dienst gebruikt cookies en vergelijkbare technologieën om veilig te functioneren en uw keuzes te onthouden. Strikt noodzakelijke cookies zijn vereist voor kernfunctionaliteit (authenticatie, beveiliging en vastlegging van uw toestemming) en kunnen niet worden uitgeschakeld. Optionele cookies — waaronder analyse en voorkeuren — worden alleen gebruikt met uw voorafgaande toestemming. U kunt alle categorieën accepteren, niet-essentiële weigeren of elke categorie beoordelen. U kunt uw toestemming te allen tijde intrekken of wijzigen via Cookie-instellingen. Meer informatie vindt u in ons Privacybeleid.",
+      "footer": "Privacybeleid",
+      "acceptAll": "Alle cookies accepteren",
+      "acceptNecessary": "Alleen noodzakelijke cookies",
+      "showPreferences": "Cookie-instellingen",
+      "preferencesTitle": "Cookie-instellingen",
+      "save": "Selectie bevestigen"
+    },
+    "fr": {
+      "title": "Avis relatif aux cookies",
+      "intro": "Ce service utilise des cookies et des technologies similaires afin de fonctionner de manière sécurisée et de mémoriser vos choix. Les cookies strictement nécessaires sont indispensables au fonctionnement essentiel (authentification, sécurité et enregistrement de votre consentement) et ne peuvent pas être désactivés. Les cookies facultatifs — y compris ceux d’analyse et de préférences — ne sont utilisés qu’avec votre consentement préalable. Vous pouvez accepter toutes les catégories, refuser les cookies non essentiels ou examiner chaque catégorie. Vous pouvez retirer ou modifier votre consentement à tout moment via les Paramètres des cookies. Pour plus d’informations, consultez notre Politique de confidentialité.",
+      "footer": "Politique de confidentialité",
+      "acceptAll": "Accepter tous les cookies",
+      "acceptNecessary": "Cookies nécessaires uniquement",
+      "showPreferences": "Paramètres des cookies",
+      "preferencesTitle": "Paramètres des cookies",
+      "save": "Confirmer la sélection"
+    },
+    "it": {
+      "title": "Informativa sui cookie",
+      "intro": "Questo servizio utilizza cookie e tecnologie simili per operare in modo sicuro e ricordare le sue scelte. I cookie strettamente necessari sono indispensabili per le funzionalità essenziali (autenticazione, sicurezza e registrazione del consenso) e non possono essere disattivati. I cookie opzionali — inclusi quelli di analisi e di preferenze — sono utilizzati solo previo consenso. Può accettare tutte le categorie, rifiutare i non essenziali o esaminare ciascuna categoria. Può revocare o modificare il consenso in qualsiasi momento tramite Impostazioni cookie. Ulteriori informazioni sono disponibili nella Privacy policy.",
+      "footer": "Informativa sulla privacy",
+      "acceptAll": "Accetta tutti i cookie",
+      "acceptNecessary": "Solo cookie necessari",
+      "showPreferences": "Impostazioni cookie",
+      "preferencesTitle": "Impostazioni cookie",
+      "save": "Conferma selezione"
+    },
+    "pt": {
+      "title": "Aviso de cookies",
+      "intro": "Este serviço utiliza cookies e tecnologias semelhantes para funcionar de forma segura e recordar as suas escolhas. Os cookies estritamente necessários são imprescindíveis para a funcionalidade essencial (autenticação, segurança e registo do seu consentimento) e não podem ser desativados. Os cookies opcionais — incluindo análise e preferências — são utilizados apenas com o seu consentimento prévio. Pode aceitar todas as categorias, recusar as não essenciais ou analisar cada categoria. Pode retirar ou alterar o consentimento a qualquer momento através das Definições de cookies. Encontrará mais informações na nossa Política de privacidade.",
+      "footer": "Política de privacidade",
+      "acceptAll": "Aceitar todos os cookies",
+      "acceptNecessary": "Apenas cookies necessários",
+      "showPreferences": "Definições de cookies",
+      "preferencesTitle": "Definições de cookies",
+      "save": "Confirmar seleção"
+    }
+  },
+  "cookies": [
+    {
+      "name": "PHPSESSID",
+      "duration": "Session",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 0,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Maintains the authenticated HTTP session required to access protected areas of the service."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Erhält die authentifizierte HTTP-Sitzung aufrecht, die für den Zugriff auf geschützte Bereiche des Dienstes erforderlich ist."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde delen van de dienst te gebruiken."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Maintient la session HTTP authentifiée nécessaire pour accéder aux zones protégées du service."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Mantiene la sessione HTTP autenticata necessaria per accedere alle aree protette del servizio."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Mantém a sessão HTTP autenticada necessária para aceder às áreas protegidas do serviço."
+        }
+      }
+    },
+    {
+      "name": "REMEMBERME",
+      "duration": "7 days",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 10,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Enables persistent authentication when the user selects “Remember me” at sign-in (secure token; limited lifetime)."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Permite la autenticación persistente cuando el usuario selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada)."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Ermöglicht dauerhafte Authentifizierung, wenn der Nutzer bei der Anmeldung „Angemeldet bleiben“ wählt (sicheres Token; begrenzte Laufzeit)."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Maakt persistente authenticatie mogelijk wanneer de gebruiker bij het inloggen “Onthoud mij” selecteert (veilig token; beperkte geldigheid)."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Permet une authentification persistante lorsque l’utilisateur sélectionne « Se souvenir de moi » à la connexion (jeton sécurisé ; durée limitée)."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Consente l’autenticazione persistente quando l’utente seleziona “Ricordami” all’accesso (token sicuro; durata limitata)."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Permite autenticação persistente quando o utilizador seleciona “Lembrar-me” no início de sessão (token seguro; validade limitada)."
+        }
+      }
+    },
+    {
+      "name": "csrf-token_*",
+      "duration": "Session",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 15,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Short-lived double-submit CSRF cookie set by Symfony when submitting protected forms (name pattern csrf-token_<token>; __Host- prefix on HTTPS)."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Cookie CSRF de doble envío de corta duración que Symfony establece al enviar formularios protegidos (patrón csrf-token_<token>; prefijo __Host- en HTTPS)."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Kurzlebiger Double-Submit-CSRF-Cookie, den Symfony beim Absenden geschützter Formulare setzt (Muster csrf-token_<token>; __Host- Präfix bei HTTPS)."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Kortdurende double-submit CSRF-cookie die Symfony zet bij het verzenden van beveiligde formulieren (patroon csrf-token_<token>; __Host- prefix op HTTPS)."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Cookie CSRF double-soumission de courte durée défini par Symfony lors de l’envoi de formulaires protégés (motif csrf-token_<token> ; préfixe __Host- en HTTPS)."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Cookie CSRF double-submit di breve durata impostato da Symfony all’invio di form protetti (pattern csrf-token_<token>; prefisso __Host- su HTTPS)."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Cookie CSRF de double-submit de curta duração definido pelo Symfony ao submeter formulários protegidos (padrão csrf-token_<token>; prefixo __Host- em HTTPS)."
+        }
+      }
+    },
+    {
+      "nameEnum": "COOKIE_CONSENT_NAME",
+      "duration": "1 year",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 20,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Records that a cookie-consent decision was made so the banner is not shown again until preferences change or expire."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Registra que se tomó una decisión de consentimiento de cookies para no volver a mostrar el aviso hasta que se modifiquen o caduquen las preferencias."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Speichert, dass eine Cookie-Einwilligungsentscheidung getroffen wurde, damit der Hinweis nicht erneut angezeigt wird, bis Präferenzen geändert werden oder ablaufen."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Registreert dat een cookietoestemmingskeuze is gemaakt, zodat de melding niet opnieuw wordt getoond tot voorkeuren wijzigen of verlopen."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Enregistre qu’une décision de consentement aux cookies a été prise afin de ne pas réafficher l’avis tant que les préférences n’ont pas changé ou expiré."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Registra che è stata presa una decisione di consenso ai cookie affinché l’avviso non venga riproposto finché le preferenze non cambiano o scadono."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Regista que foi tomada uma decisão de consentimento de cookies para não voltar a apresentar o aviso até que as preferências sejam alteradas ou caduquem."
+        }
+      }
+    },
+    {
+      "nameEnum": "COOKIE_CONSENT_KEY_NAME",
+      "duration": "1 year",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 30,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Anonymous technical key linking the browser consent record to the server-side consent audit log (accountability)."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Clave técnica anónima que vincula el registro de consentimiento del navegador con el registro de auditoría en el servidor (responsabilidad)."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Anonyme technische Kennung, die den Browser-Einwilligungsdatensatz mit dem serverseitigen Audit-Protokoll verknüpft (Rechenschaftspflicht)."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Anonieme technische sleutel die het browser-toestemmingsrecord koppelt aan het server-side auditlogboek (verantwoording)."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Clé technique anonyme reliant l’enregistrement de consentement du navigateur au journal d’audit côté serveur (responsabilité)."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Chiave tecnica anonima che collega il record di consenso del browser al registro di audit lato server (responsabilità)."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Chave técnica anónima que associa o registo de consentimento do navegador ao registo de auditoria no servidor (responsabilização)."
+        }
+      }
+    },
+    {
+      "nameCategory": "analytics",
+      "duration": "1 year",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 40,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Stores whether the analytics category was accepted or refused (consent machinery; not an analytics tracker itself)."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Almacena si la categoría de analítica fue aceptada o rechazada (mecanismo de consentimiento; no es un rastreador de analítica)."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Speichert, ob die Analyse-Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik; kein Analyse-Tracker)."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Slaat op of de analysecategorie is geaccepteerd of geweigerd (toestemmingsmechanisme; geen analysetracker)."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Enregistre si la catégorie analytique a été acceptée ou refusée (mécanisme de consentement ; pas un outil d’analyse)."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Memorizza se la categoria analytics è stata accettata o rifiutata (meccanismo di consenso; non è un tracker analytics)."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Armazena se a categoria de análise foi aceite ou recusada (mecanismo de consentimento; não é um rastreador de análise)."
+        }
+      }
+    },
+    {
+      "nameCategory": "preferences",
+      "duration": "1 year",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 50,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Stores whether the preferences category was accepted or refused (consent machinery)."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Almacena si la categoría de preferencias fue aceptada o rechazada (mecanismo de consentimiento)."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "Speichert, ob die Präferenz-Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik)."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "Slaat op of de voorkeurencategorie is geaccepteerd of geweigerd (toestemmingsmechanisme)."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Enregistre si la catégorie préférences a été acceptée ou refusée (mécanisme de consentement)."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Memorizza se la categoria preferences è stata accettata o rifiutata (meccanismo di consenso)."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Armazena se a categoria de preferências foi aceite ou recusada (mecanismo de consentimento)."
+        }
+      }
+    }
+  ]
+}

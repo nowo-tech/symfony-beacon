@@ -1,0 +1,523 @@
+{
+  "menus": [
+    {
+      "code": "dashboard",
+      "name": "Dashboard",
+      "ulId": "dashboard-menu-navigation",
+      "kind": "flat",
+      "items": [
+        {
+          "position": 10,
+          "label": "Projects",
+          "route": "dashboard_home",
+          "permission": null,
+          "translations": {
+            "en": "Projects",
+            "es": "Proyectos",
+            "de": "Projekte",
+            "nl": "Projecten",
+            "fr": "Projets",
+            "it": "Progetti",
+            "pt": "Projetos"
+          }
+        },
+        {
+          "position": 20,
+          "label": "Assignments",
+          "route": "dashboard_assignments",
+          "permission": null,
+          "translations": {
+            "en": "Assignments",
+            "es": "Asignaciones",
+            "de": "Zuweisungen",
+            "nl": "Toewijzingen",
+            "fr": "Affectations",
+            "it": "Assegnazioni",
+            "pt": "Atribuições"
+          }
+        },
+        {
+          "position": 30,
+          "label": "Summary",
+          "route": "dashboard_summary",
+          "permission": null,
+          "translations": {
+            "en": "Summary",
+            "es": "Resumen",
+            "de": "Übersicht",
+            "nl": "Samenvatting",
+            "fr": "Résumé",
+            "it": "Riepilogo",
+            "pt": "Resumo"
+          }
+        },
+        {
+          "position": 40,
+          "label": "Activity",
+          "route": "dashboard_activity",
+          "permission": null,
+          "translations": {
+            "en": "Activity",
+            "es": "Actividad",
+            "de": "Aktivität",
+            "nl": "Activiteit",
+            "fr": "Activité",
+            "it": "Attività",
+            "pt": "Atividade"
+          }
+        },
+        {
+          "position": 50,
+          "label": "Mentions",
+          "route": "dashboard_mentions",
+          "permission": null,
+          "translations": {
+            "en": "Mentions",
+            "es": "Menciones",
+            "de": "Erwähnungen",
+            "nl": "Vermeldingen",
+            "fr": "Mentions",
+            "it": "Menzioni",
+            "pt": "Menções"
+          }
+        },
+        {
+          "position": 60,
+          "label": "Alerts",
+          "route": "dashboard_alerts",
+          "permission": null,
+          "translations": {
+            "en": "Alerts",
+            "es": "Alertas",
+            "de": "Warnungen",
+            "nl": "Meldingen",
+            "fr": "Alertes",
+            "it": "Avvisi",
+            "pt": "Alertas"
+          }
+        },
+        {
+          "position": 70,
+          "label": "New in release",
+          "route": "dashboard_new_in_release",
+          "permission": null,
+          "translations": {
+            "en": "New in release",
+            "es": "Nuevo en release",
+            "de": "Neu in Release",
+            "nl": "Nieuw in release",
+            "fr": "Nouveau en release",
+            "it": "Nuovo in release",
+            "pt": "Novo na release"
+          }
+        }
+      ]
+    },
+    {
+      "code": "preferences",
+      "name": "Preferences",
+      "ulId": "preferences-menu-navigation",
+      "kind": "flat",
+      "items": [
+        {
+          "position": 10,
+          "label": "Profile",
+          "route": "account_profile",
+          "permission": null,
+          "translations": {
+            "en": "Profile",
+            "es": "Perfil",
+            "de": "Profil",
+            "nl": "Profiel",
+            "fr": "Profil",
+            "it": "Profilo",
+            "pt": "Perfil"
+          }
+        },
+        {
+          "position": 20,
+          "label": "Security",
+          "route": "account_security",
+          "permission": null,
+          "translations": {
+            "en": "Security",
+            "es": "Seguridad",
+            "de": "Sicherheit",
+            "nl": "Beveiliging",
+            "fr": "Sécurité",
+            "it": "Sicurezza",
+            "pt": "Segurança"
+          }
+        },
+        {
+          "position": 30,
+          "label": "Display",
+          "route": "account_display",
+          "permission": null,
+          "translations": {
+            "en": "Display",
+            "es": "Interfaz",
+            "de": "Anzeige",
+            "nl": "Weergave",
+            "fr": "Affichage",
+            "it": "Visualizzazione",
+            "pt": "Interface"
+          }
+        }
+      ]
+    },
+    {
+      "code": "administration",
+      "name": "Administration",
+      "ulId": "administration-menu-navigation",
+      "kind": "nested",
+      "sections": [
+        {
+          "position": 10,
+          "label": "Overview",
+          "translations": {
+            "en": "Overview",
+            "es": "Visión general",
+            "de": "Übersicht",
+            "nl": "Overzicht",
+            "fr": "Aperçu",
+            "it": "Panoramica",
+            "pt": "Visão geral"
+          },
+          "children": [
+            {
+              "position": 10,
+              "label": "Overview",
+              "route": "admin_hub",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Overview",
+                "es": "Resumen",
+                "de": "Übersicht",
+                "nl": "Overzicht",
+                "fr": "Aperçu",
+                "it": "Panoramica",
+                "pt": "Resumo"
+              }
+            },
+            {
+              "position": 20,
+              "label": "Ops overview",
+              "route": "admin_ops_overview",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Ops overview",
+                "es": "Resumen ops",
+                "de": "Ops-Übersicht",
+                "nl": "Ops-overzicht",
+                "fr": "Vue ops",
+                "it": "Panoramica ops",
+                "pt": "Visão ops"
+              }
+            }
+          ]
+        },
+        {
+          "position": 20,
+          "label": "Access",
+          "translations": {
+            "en": "Access",
+            "es": "Acceso",
+            "de": "Zugriff",
+            "nl": "Toegang",
+            "fr": "Accès",
+            "it": "Accesso",
+            "pt": "Acesso"
+          },
+          "children": [
+            {
+              "position": 10,
+              "label": "Users",
+              "route": "admin_users",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Users",
+                "es": "Usuarios",
+                "de": "Benutzer",
+                "nl": "Gebruikers",
+                "fr": "Utilisateurs",
+                "it": "Utenti",
+                "pt": "Utilizadores"
+              }
+            },
+            {
+              "position": 20,
+              "label": "Groups",
+              "route": "admin_groups",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Groups",
+                "es": "Grupos",
+                "de": "Gruppen",
+                "nl": "Groepen",
+                "fr": "Groupes",
+                "it": "Gruppi",
+                "pt": "Grupos"
+              }
+            },
+            {
+              "position": 30,
+              "label": "Projects",
+              "route": "admin_projects",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Projects",
+                "es": "Proyectos",
+                "de": "Projekte",
+                "nl": "Projecten",
+                "fr": "Projets",
+                "it": "Progetti",
+                "pt": "Projetos"
+              }
+            }
+          ]
+        },
+        {
+          "position": 30,
+          "label": "Instance",
+          "translations": {
+            "en": "Instance",
+            "es": "Instancia",
+            "de": "Instanz",
+            "nl": "Instantie",
+            "fr": "Instance",
+            "it": "Istanza",
+            "pt": "Instância"
+          },
+          "children": [
+            {
+              "position": 10,
+              "label": "Appearance",
+              "route": "settings_appearance",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Appearance",
+                "es": "Apariencia",
+                "de": "Erscheinungsbild",
+                "nl": "Weergave",
+                "fr": "Apparence",
+                "it": "Aspetto",
+                "pt": "Aparência"
+              }
+            },
+            {
+              "position": 20,
+              "label": "Mailer",
+              "route": "settings_mailer",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Mailer",
+                "es": "Correo",
+                "de": "Mailer",
+                "nl": "Mailer",
+                "fr": "Mailer",
+                "it": "Mailer",
+                "pt": "Mailer"
+              }
+            },
+            {
+              "position": 30,
+              "label": "Mercure",
+              "route": "settings_mercure",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Mercure",
+                "es": "Mercure",
+                "de": "Mercure",
+                "nl": "Mercure",
+                "fr": "Mercure",
+                "it": "Mercure",
+                "pt": "Mercure"
+              }
+            },
+            {
+              "position": 40,
+              "label": "Social login",
+              "route": "admin_social_login",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Social login",
+                "es": "Login social",
+                "de": "Social Login",
+                "nl": "Sociale login",
+                "fr": "Connexion sociale",
+                "it": "Login social",
+                "pt": "Login social"
+              }
+            },
+            {
+              "position": 50,
+              "label": "Ops defaults",
+              "route": "settings_ops_defaults",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Ops defaults",
+                "es": "Límites ops",
+                "de": "Ops-Standards",
+                "nl": "Ops-standaarden",
+                "fr": "Limites ops",
+                "it": "Limiti ops",
+                "pt": "Limites ops"
+              }
+            },
+            {
+              "position": 60,
+              "label": "Instance config",
+              "route": "settings_instance_config",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Instance config",
+                "es": "Exportar / importar",
+                "de": "Instanzexport",
+                "nl": "Instantie-export",
+                "fr": "Export / import",
+                "it": "Export / import",
+                "pt": "Exportar / importar"
+              }
+            },
+            {
+              "position": 70,
+              "label": "Setup",
+              "route": "nowo_site_backup_setup",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Setup",
+                "es": "Setup inicial",
+                "de": "Einrichtung",
+                "nl": "Setup",
+                "fr": "Setup initial",
+                "it": "Setup iniziale",
+                "pt": "Setup inicial"
+              }
+            }
+          ]
+        },
+        {
+          "position": 40,
+          "label": "Navigation & legal",
+          "translations": {
+            "en": "Navigation & legal",
+            "es": "Navegación y legal",
+            "de": "Navigation & Rechtliches",
+            "nl": "Navigatie & juridisch",
+            "fr": "Navigation et légal",
+            "it": "Navigazione e legale",
+            "pt": "Navegação e legal"
+          },
+          "children": [
+            {
+              "position": 10,
+              "label": "Menus",
+              "route": "nowo_dashboard_menu_dashboard_index",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Menus",
+                "es": "Menús",
+                "de": "Menüs",
+                "nl": "Menu’s",
+                "fr": "Menus",
+                "it": "Menu",
+                "pt": "Menus"
+              }
+            },
+            {
+              "position": 20,
+              "label": "Breadcrumbs",
+              "route": "nowo_breadcrumb_kit_dashboard_collections_index",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Breadcrumbs",
+                "es": "Migas de pan",
+                "de": "Brotkrumen",
+                "nl": "Broodkruimels",
+                "fr": "Fil d’Ariane",
+                "it": "Breadcrumb",
+                "pt": "Navegação"
+              }
+            },
+            {
+              "position": 30,
+              "label": "Cookie consent",
+              "route": "admin_cookie_consent",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Cookie consent",
+                "es": "Consentimiento de cookies",
+                "de": "Cookie-Einwilligung",
+                "nl": "Cookie-toestemming",
+                "fr": "Consentement cookies",
+                "it": "Consenso cookie",
+                "pt": "Consentimento de cookies"
+              }
+            },
+            {
+              "position": 40,
+              "label": "Locale routes",
+              "route": "nowo_routing_kit_panel",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Locale routes",
+                "es": "Rutas por idioma",
+                "de": "Locale-Routen",
+                "nl": "Locale-routes",
+                "fr": "Routes par locale",
+                "it": "Route per locale",
+                "pt": "Rotas por locale"
+              }
+            }
+          ]
+        },
+        {
+          "position": 50,
+          "label": "Observability",
+          "translations": {
+            "en": "Observability",
+            "es": "Observabilidad",
+            "de": "Observability",
+            "nl": "Observability",
+            "fr": "Observabilité",
+            "it": "Osservabilità",
+            "pt": "Observabilidade"
+          },
+          "children": [
+            {
+              "position": 10,
+              "label": "HTTP log",
+              "route": "nowo_http_log_admin_index",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "HTTP log",
+                "es": "Log HTTP",
+                "de": "HTTP-Protokoll",
+                "nl": "HTTP-log",
+                "fr": "Journal HTTP",
+                "it": "Log HTTP",
+                "pt": "Log HTTP"
+              }
+            },
+            {
+              "position": 20,
+              "label": "API docs",
+              "route": "admin_api_doc",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "API docs",
+                "es": "Docs API",
+                "de": "API-Doku",
+                "nl": "API-docs",
+                "fr": "Docs API",
+                "it": "Documentazione API",
+                "pt": "Docs da API"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

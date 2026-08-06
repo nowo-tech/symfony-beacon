@@ -10,7 +10,7 @@
 
 ## Phase 2: Enforcement
 
-- [x] T004 `RetentionPurger` prefers project override then env defaults
+- [x] T004 `App\Ops\Retention\RetentionPurger` prefers project override then env defaults (`085`)
 - [x] T005 `IngestRateLimiter` accepts optional per-project limit
 - [x] T006 Envelope: `403` when `ingestEnabled` false; quota + rate checks via `ProjectGovernanceResolver`
 

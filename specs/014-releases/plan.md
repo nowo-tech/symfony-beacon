@@ -12,8 +12,8 @@ Denormalize release and environment context onto `Issue` during Envelope ingest,
 | Area | Choice |
 |------|--------|
 | Storage | Nullable columns on `issue`: `first_release` (120), `last_release` (120), `last_environment` (80); index `(project_id, last_release)` |
-| Write path | `ProcessEnvelopeHandler::ingestEvent` after event persist; normalize trim / empty→null / truncate |
-| Filter | `IssueRepository` optional `release` → `lastRelease = :release OR firstRelease = :release` |
+| Write path | `IssueEnvelopeWriter` after event persist (orchestrated by thin `ProcessEnvelopeHandler`; `085`); normalize trim / empty→null / truncate |
+| Filter | `IssueSearchRepository` optional `release` → `lastRelease = :release OR firstRelease = :release` (`083`) |
 | Compare | When `environment` + `compare` query params set, load sets by `lastEnvironment`, classify onlyA / onlyB / both (cap 50) |
 | UI | Issues index filters + compare panel + badge |
 
@@ -21,10 +21,11 @@ Denormalize release and environment context onto `Issue` during Envelope ingest,
 
 - `src/Issues/Entity/Issue.php`
 - `migrations/Version20260721160000.php`
-- `src/Ingest/MessageHandler/ProcessEnvelopeHandler.php`
-- `src/Issues/Repository/IssueRepository.php`
+- `src/Ingest/MessageHandler/ProcessEnvelopeHandler.php` (orchestration)
+- `src/Issues/Service/IssueEnvelopeWriter.php` (release/environment denormalize; `085`)
+- `src/Issues/Repository/IssueSearchRepository.php`
 - `src/Issues/Controller/IssueController.php`
 - `templates/issue/index.html.twig`
 - `translations/messages.en.yaml` / `messages.es.yaml`
-- `tests/Issues/IssueReleasesTest.php`
+- `tests/Functional/Issues/IssueReleasesTest.php`
 - `docs/CHANGELOG.md` / `docs/UPGRADING.md`

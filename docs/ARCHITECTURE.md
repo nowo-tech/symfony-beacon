@@ -23,7 +23,7 @@ Those constraints favour a familiar Symfony modular app over an academic layered
 | Controllers + Doctrine entities + focused services | Matches Symfony Flex conventions contributors already know; less ceremony than ports/adapters for a single deployable app. |
 | Explicit “no full DDD/hexagonal” | Hexagonal layers pay off when many adapters or bounded contexts compete. Beacon has one primary write path (Envelope → Messenger → persistence) and one primary read path (Twig UI). Extra layers would slow Spec Kit delivery without clear gain. |
 
-Modules stay **thin and directional**: Ingest writes Issues/Performance/Analytics; UI modules read them. Shared holds cross-cutting UI glue (appearance, legal, menus), not a generic “domain kernel”.
+Modules stay **thin and directional**: Ingest writes Issues/Performance/Analytics; UI modules read them. **Ops** owns instance overview, retention purge, and metrics collection. **Setup** owns platform/sample seeders and demo fixtures. Shared holds cross-cutting UI glue (appearance, legal, menus), not a generic “domain kernel”. Domain enums live in the owning module (`Issues\Enum`, `Project\Enum`).
 
 ## Why FrankenPHP + Docker (not Nginx+FPM on the host)
 
@@ -43,8 +43,8 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 |--------|-----------|
 | `POST /api/{project_id}/envelope/` | Envelope-compatible URL shape; SDKs and `nowo-tech/beacon-bundle` can point a DSN at any host/port. |
 | Auth via `X-Beacon-Auth` and/or envelope `dsn` (query string **deprecated**) | Wire compatibility with Envelope clients; mapped to project API keys. See [DSN.md](DSN.md). |
-| Messenger (`ProcessEnvelopeMessage`) | Grouping, fingerprinting, N+1 detection, and daily stats are CPU/DB heavy — they must not block the ACK. |
-| Separate `messenger` Compose service | Ingest HTTP workers stay responsive while a dedicated consumer drains the queue. |
+| Messenger (`ProcessEnvelopeMessage` → `async_ingest`) | Grouping, fingerprinting, N+1 detection, and daily stats are CPU/DB heavy — they must not block the ACK. Notifications / HTTP-log use a separate `async` queue so outbound backlog does not starve ingest (`083`). |
+| Separate `messenger` + `messenger-notify` Compose services | `messenger` consumes `async_ingest` only; `messenger-notify` consumes `async` (notifications / HTTP-log / Web Push) so outbound backlog cannot starve ingest (`085`). |
 | Worker re-check (`051`) | After ACK, the consumer re-validates ingest suspend + daily quota before persisting. |
 
 ## Why Twig + Vite/Stimulus (not a separate SPA)
@@ -84,20 +84,25 @@ Features are specified under `specs/` before large changes. That matches an open
 
 - Acceptance criteria must stay reviewable without reading every PR.
 - Architecture decisions (this doc + constitution) are amendable, not tribal knowledge.
-- PHPUnit coverage is tied to scenarios in each feature spec.
+- PHPUnit coverage is tied to scenarios in each feature spec. Suites live under `tests/Unit/`, `tests/Functional/`, and `tests/Integration/` (helpers in `tests/Support/`).
 
 ## Module map (as-built)
 
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
-| `Identity` | Users, account prefs, magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](product/ROLES.md) |
-| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
-| `Ingest` | Envelope HTTP + async pipeline | Latency-sensitive write path |
+| `Identity` | Users, account prefs (`UserUiPreferences` embeddable), magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](product/ROLES.md) |
+| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links; admin project ops (target owner per `083`) | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
+| `Ingest` | Envelope HTTP + async pipeline; OTLP HTTP JSON adapters into the same pipeline | Latency-sensitive write path |
 | `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
 | `Analytics` | Daily aggregates + period charts/filters (`025`) | Read models from `DailyProjectStat`; filtered errors from `Event` |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history | Outbound alerts after ingest |
-| `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer / Mercure settings | Cross-cutting presentation / instance config |
+| `Shared` | Appearance, menus/breadcrumbs glue, legal, instance Mailer / Mercure / instance settings, health/metrics scrape chrome | Cross-cutting presentation / instance config — **not** domain write ownership (see `083` / `085`) |
+| `Ops` | Admin ops overview, retention purge, Prometheus metrics collector | Instance ops that *compose* Project/Issues/Notifications/Analytics — not Shared |
+| `Setup` | First-run / SiteBackup bootstrap; **platform & sample demo seeders** under `Setup\Demo` + JSON fixtures in `Setup\Demo/fixtures` + `app:seed-platform` / `app:seed-sample` | Cold-start and QA seed path — not day-to-day product UI |
+| `Api` | Bearer read API for automation (`ProjectReadApiController`) | JSON read path separate from Twig UI and Envelope ingest |
+
+Boundary hardening (`083` / `085`): Shared growth rules, `Ops` module, Envelope domain writers, Identity↔Project direction, Issues/Ingest maintainability, process-level async drain isolation.
 
 Entity tables, columns, and FK relationships (Mermaid ER): [DATABASE.md](dev/DATABASE.md).
 
@@ -148,6 +153,9 @@ flowchart TB
   Project[Project]
   Identity[Identity]
   Shared[Shared]
+  Ops[Ops]
+  Api[Api]
+  Setup[Setup]
 
   Ingest -->|events / grouping| Issues
   Ingest -->|transactions / spans| Perf
@@ -161,8 +169,19 @@ flowchart TB
   Notifications -->|destinations| Project
   Project -->|members| Identity
 
+  Ops -->|compose overview / retention / metrics| Project
+  Ops -->|open issues / purge| Issues
+  Ops -->|failed deliveries| Notifications
+  Ops -->|daily spikes| Analytics
+
   Shared -->|appearance / legal / menus / mailer| Identity
+  Api -->|read issues| Issues
+  Api -->|read tokens| Project
+  Setup -->|bootstrap| Shared
+  Setup -->|seed users| Identity
 ```
+
+> Solid arrows: primary runtime dependencies. `Ops` *composes* Project/Issues/Notifications/Analytics for overview / retention / metrics — Shared must not own those paths (`085`).
 
 ### Envelope ingest (fast ACK)
 

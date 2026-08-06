@@ -40,7 +40,7 @@
 **Independent test**: migrate → `app:seed-platform` twice → menus present, no duplicate routes; no demo user
 
 - [x] T007 [US1] Ensure menu/breadcrumb seeders upsert (existing behavior) and surface clear success/note messages from `SeedPlatformCommand`
-- [x] T008 [US1] PHPUnit `tests/Shared/SeedPlatformCommandTest.php`: run twice; assert menu/breadcrumb presence; assert zero `User` with demo email created
+- [x] T008 [US1] PHPUnit `tests/Integration/Shared/SeedPlatformCommandTest.php`: run twice; assert menu/breadcrumb presence; assert zero `User` with demo email created
 - [x] T009 [US1] Fail gracefully with actionable message if kit tables missing (migration not applied)
 
 ---
@@ -54,7 +54,7 @@
 - [x] T011 [US2] Add `--with-platform` option that optionally runs platform seed logic (or dispatches `seed-platform`)
 - [x] T012 [US2] Update command description/PHPDoc to match contracts
 - [x] T013 [US2] `make seed` runs `seed-platform` then `app:seed-demo`
-- [x] T014 [US2] PHPUnit `tests/Identity/SeedDemoCommandTest.php`: create-once user/project; no `DailyProjectStat` / N+1 tx from demo alone
+- [x] T014 [US2] PHPUnit `tests/Integration/Identity/SeedDemoCommandTest.php`: create-once user/project; no `DailyProjectStat` / N+1 tx from demo alone
 
 ---
 
@@ -69,7 +69,7 @@
 - [x] T018 [US3] Implement purge: delete issues/events/perf/stats for target project only
 - [x] T019 [US3] Refuse `huge` without `--force`
 - [x] T020 [US3] `make seed-sample` with `PROFILE ?= dev`
-- [x] T021 [US3] PHPUnit `tests/Shared/SeedSampleCommandTest.php`: dev seed counts in range; purge clears telemetry; second project untouched
+- [x] T021 [US3] PHPUnit `tests/Integration/Shared/SeedSampleCommandTest.php`: dev seed counts in range; purge clears telemetry; second project untouched
 
 ---
 

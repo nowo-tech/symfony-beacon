@@ -1,0 +1,93 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Functional\Notifications;
+
+use App\Notifications\Realtime\IssueRealtimeTopics;
+use App\Notifications\Repository\PushSubscriptionRepository;
+use App\Shared\Mercure\ConfiguredMercure;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Tests\Support\DatabaseWebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+
+final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
+{
+    public function testGuestCannotFetchRealtimeConfig(): void
+    {
+        $client = static::createClient();
+        $client->request(Request::METHOD_GET, '/account/realtime/config');
+        self::assertResponseRedirects();
+    }
+
+    public function testMemberReceivesMercureTopicsForAccessibleProjects(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('realtime-config@example.com');
+
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings->setMercureEnabled(true);
+        $settings->setMercureUrl('http://mercure/.well-known/mercure');
+        $settings->setMercurePublicUrl('https://beacon.test/.well-known/mercure');
+        $settings->setMercureJwtSecret('!ChangeThisMercureHubJWTSecretKey!');
+        self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
+        self::getContainer()->get(ConfiguredMercure::class)->reset();
+
+        $this->login($client, $user);
+        $client->request(Request::METHOD_GET, '/account/realtime/config');
+        self::assertResponseIsSuccessful();
+
+        $payload = json_decode($client->getResponse()->getContent() ?: '', true);
+        self::assertIsArray($payload);
+        self::assertTrue($payload['mercure']['enabled']);
+        self::assertSame('https://beacon.test/.well-known/mercure', $payload['mercure']['hubUrl']);
+        self::assertContains(IssueRealtimeTopics::forProject($project->getUuid()), $payload['mercure']['topics']);
+        self::assertIsString($payload['mercure']['token']);
+        self::assertNotSame('', $payload['mercure']['token']);
+        self::assertFalse($payload['push']['preferenceEnabled']);
+    }
+
+    public function testPushSubscribeRejectsInvalidCsrfAndDisabledPreference(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('realtime-push@example.com');
+        $this->login($client, $user);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
+        self::assertResponseIsSuccessful();
+        $csrf = $crawler->filter('[data-issue-realtime-csrf-token-value]')->attr('data-issue-realtime-csrf-token-value');
+
+        $client->request(
+            Request::METHOD_POST,
+            '/account/push/subscribe',
+            server: ['CONTENT_TYPE' => 'application/json', 'HTTP_X-CSRF-TOKEN' => 'invalid'],
+            content: '{"endpoint":"https://fcm.googleapis.com/fcm/send/abc","keys":{"p256dh":"key","auth":"auth"}}',
+        );
+        self::assertResponseStatusCodeSame(403);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/account/push/subscribe',
+            server: ['CONTENT_TYPE' => 'application/json', 'HTTP_X-CSRF-TOKEN' => $csrf],
+            content: '{"endpoint":"https://fcm.googleapis.com/fcm/send/abc","keys":{"p256dh":"key","auth":"auth"}}',
+        );
+        self::assertResponseStatusCodeSame(400);
+        self::assertSame('preference_disabled', json_decode($client->getResponse()->getContent() ?: '', true)['error'] ?? null);
+    }
+
+    public function testPushUnsubscribeAcceptsValidCsrfAndClearsSubscriptions(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('realtime-unsub@example.com');
+        $this->login($client, $user);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
+        self::assertResponseIsSuccessful();
+        $csrf = $crawler->filter('[data-issue-realtime-csrf-token-value]')->attr('data-issue-realtime-csrf-token-value');
+
+        $client->request(
+            Request::METHOD_POST,
+            '/account/push/unsubscribe',
+            server: ['CONTENT_TYPE' => 'application/json', 'HTTP_X-CSRF-TOKEN' => $csrf],
+            content: '{}',
+        );
+        self::assertResponseIsSuccessful();
+        self::assertSame(['ok' => true], json_decode($client->getResponse()->getContent() ?: '', true));
+        self::assertSame([], self::getContainer()->get(PushSubscriptionRepository::class)->findByUser($user));
+    }
+}

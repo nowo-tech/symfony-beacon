@@ -12,8 +12,8 @@
 | Storage | `notification_destination` table (project FK, cascade delete) |
 | Types | `slack` \| `http` enums |
 | Categories | JSON list: issue levels + `n_plus_one` |
-| Dispatch | After issue create/regression or N+1 tx in `ProcessEnvelopeHandler` → `MessageBus` |
-| Delivery | `DeliverNotificationMessage` on `async` transport (retries via Messenger) |
+| Dispatch | After issue create/regression or N+1 from `IssueEnvelopeWriter` / `PerformanceEnvelopeWriter` via thin `ProcessEnvelopeHandler` → `MessageBus` (`085`) |
+| Delivery | `DeliverNotificationMessage` on `async` transport (retries via Messenger; Compose `messenger-notify` in `085`) |
 | HTTP | `symfony/http-client` already required |
 | UI | Project Settings section + CRUD routes (owner/admin) |
 | Regression | Reopen both `resolved` and `ignored` → `unresolved` on matching event |

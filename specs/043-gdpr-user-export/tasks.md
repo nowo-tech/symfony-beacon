@@ -29,5 +29,5 @@
 
 ## Phase 4: Tests & polish
 
-- [x] T013 `tests/Identity/GdprAccountExportTest.php`
+- [x] T013 `tests/Functional/Identity/GdprAccountExportTest.php`
 - [x] T014 CHANGELOG / ROADMAP / UPGRADING; mark spec Implemented

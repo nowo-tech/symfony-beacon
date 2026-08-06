@@ -169,8 +169,8 @@ Admin can also edit labels under **Administration → Menus** / **Breadcrumbs** 
 
 Update locale-sensitive tests when the switcher or AuthKit paths change, for example:
 
-- `tests/Identity/AccountLocaleRoutingTest.php` — asserts switcher forms for each enabled locale
-- `tests/Identity/AuthKitBootstrapTest.php` — AuthKit `/en/…` smoke paths
+- `tests/Functional/Identity/AccountLocaleRoutingTest.php` — asserts switcher forms for each enabled locale
+- `tests/Functional/Identity/AuthKitBootstrapTest.php` — AuthKit `/en/…` smoke paths
 
 Add at least one assertion that `/account/locale/{new}` (or the switcher form) exists for the new code.
 

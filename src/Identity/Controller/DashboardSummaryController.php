@@ -8,10 +8,10 @@ use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Issues\AssignmentScope;
 use App\Issues\Repository\IssueMentionRepository;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,7 +25,7 @@ final class DashboardSummaryController extends AbstractController
 {
     public function __construct(
         private readonly ProjectRepository $projectRepository,
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueSearchRepository $issueRepository,
         private readonly IssueMentionRepository $mentionRepository,
         private readonly NotificationDestinationRepository $destinationRepository,
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,

@@ -13,7 +13,7 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectMembershipManager;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;

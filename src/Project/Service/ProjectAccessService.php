@@ -12,7 +12,7 @@ use App\Project\Entity\ProjectShareLink;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Deprecated;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

@@ -43,7 +43,7 @@ As an admin, instance config export/import includes `theme_id`, `theme_id_dark`,
 
 Automated tests cover redirect, apply light+dark on one Themes page, form sections, and preset catalogue helpers.
 
-**Acceptance**: `tests/Shared/AppearanceSettingsTest.php`, `AppearanceThemePresetsTest.php`, `AppearanceCornerStylesTest.php`, `AppearanceBorderStylesTest.php`.
+**Acceptance**: `tests/Functional/Shared/AppearanceSettingsTest.php`, `tests/Unit/Shared/AppearanceThemePresetsTest.php`, `tests/Unit/Shared/AppearanceCornerStylesTest.php`, `tests/Unit/Shared/AppearanceBorderStylesTest.php`.
 
 ## Requirements
 

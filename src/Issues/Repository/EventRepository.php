@@ -8,7 +8,7 @@ use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

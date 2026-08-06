@@ -15,7 +15,7 @@
 
 ## Phase 2: Controllers & list filter
 
-- [x] T007 Priority POST on issue detail + priority filter on issue index (`IssueRepository` / `IssueController`)
+- [x] T007 Priority POST on issue detail + priority filter on issue index (`IssueSearchRepository` / `IssueController`; `083` moved list filters off `IssueRepository`)
 - [x] T008 Comment POST + load comments on issue show
 - [x] T009 Mark-as-duplicate POST (link + ignored; reject self/circular)
 - [x] T010 Saved views: save current filters, apply (redirect), delete
@@ -29,7 +29,7 @@
 
 ## Phase 4: Tests & docs
 
-- [x] T015 `tests/Issues/IssueWorkflowTest.php` (priority, comment, duplicate, saved view)
+- [x] T015 `tests/Functional/Issues/IssueWorkflowTest.php` (priority, comment, duplicate, saved view)
 - [x] T016 Changelog Unreleased bullets (English)
 - [x] T017 Mark plan/tasks complete
 

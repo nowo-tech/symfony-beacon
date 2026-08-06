@@ -187,6 +187,11 @@ auth:
     brand_eyebrow: 'Seguimiento de errores'
     bootstrap_eyebrow: Arranque
     bootstrap_hint: 'Crea la primera cuenta de administrador. El registro se cierra cuando exista este usuario.'
+    qr_login:
+        approved: 'Aprobado — entrando…'
+        denied: 'El acceso se denegó en el teléfono.'
+        expired: 'Este código ha caducado.'
+        retry: 'Generar un nuevo código QR'
 flash:
     project:
         created: 'Proyecto creado.'

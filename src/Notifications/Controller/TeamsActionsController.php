@@ -12,7 +12,7 @@ use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\InteractionActionToken;
 use App\Project\Entity\Project;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Psr\Cache\CacheItemPoolInterface;

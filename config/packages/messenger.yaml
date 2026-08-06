@@ -5,6 +5,18 @@ framework:
         failure_transport: failed
 
         transports:
+            # Envelope / OTLP ingest drain — isolated from outbound side effects.
+            async_ingest:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: async_ingest
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+                    max_delay: 10000
+
+            # Notifications, Web Push, HTTP-log (may backlog without blocking ingest).
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -20,7 +32,7 @@ framework:
             sync: 'sync://'
 
         routing:
-            App\Ingest\Message\ProcessEnvelopeMessage: async
+            App\Ingest\Message\ProcessEnvelopeMessage: async_ingest
             App\Notifications\Message\DeliverNotificationMessage: async
             App\Notifications\Message\DeliverWebPushForProjectMessage: async
             Nowo\HttpLogBundle\Message\PersistHttpLogMessage: async
@@ -31,5 +43,6 @@ when@test:
     framework:
         messenger:
             transports:
+                async_ingest: 'sync://'
                 async: 'sync://'
                 failed: 'in-memory://'

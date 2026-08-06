@@ -9,7 +9,7 @@ use App\Identity\Entity\UserGroupMembership;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

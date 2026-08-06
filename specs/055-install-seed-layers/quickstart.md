@@ -72,5 +72,5 @@ docker compose exec -T php bin/console app:seed-sample --size=huge --force
 ## Verify tests
 
 ```bash
-docker compose exec -T php vendor/bin/phpunit tests/Shared/SeedPlatformCommandTest.php tests/Identity/SeedDemoCommandTest.php tests/Shared/SeedSampleCommandTest.php
+docker compose exec -T php vendor/bin/phpunit tests/Integration/Shared/SeedPlatformCommandTest.php tests/Integration/Identity/SeedDemoCommandTest.php tests/Integration/Shared/SeedSampleCommandTest.php
 ```

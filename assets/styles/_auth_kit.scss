@@ -63,6 +63,86 @@
   text-align: center;
 }
 
+/* QR challenge: centered stack (AuthKit leaves layout to the host skin). */
+.nowo-auth-kit__panel--qr {
+  text-align: center;
+}
+
+.nowo-auth-kit__panel--qr h1 {
+  margin-bottom: 1.25rem;
+}
+
+.nowo-auth-kit__qr-challenge {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.nowo-auth-kit__qr-image {
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--nowo-auth-kit-text) 8%, transparent);
+  display: block;
+  height: auto;
+  max-width: 100%;
+  padding: 0.65rem;
+}
+
+.nowo-auth-kit__qr-code,
+.nowo-auth-kit__qr-status,
+.nowo-auth-kit__qr-expires {
+  margin: 0;
+}
+
+.nowo-auth-kit__qr-code {
+  color: var(--nowo-auth-kit-muted);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  max-width: 22rem;
+}
+
+.nowo-auth-kit__qr-code strong {
+  color: var(--nowo-auth-kit-text);
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.05em;
+  letter-spacing: 0.06em;
+  margin-inline-start: 0.2em;
+}
+
+.nowo-auth-kit__qr-status {
+  color: var(--nowo-auth-kit-muted);
+  font-size: 0.875rem;
+}
+
+.nowo-auth-kit__qr-expires {
+  color: var(--nowo-auth-kit-muted);
+  font-size: 0.875rem;
+}
+
+.nowo-auth-kit__qr-expires time {
+  color: var(--nowo-auth-kit-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin-inline-start: 0.25em;
+}
+
+.nowo-auth-kit__qr-actions {
+  margin: 0;
+}
+
+.nowo-auth-kit__qr-retry {
+  color: var(--nowo-auth-kit-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nowo-auth-kit__qr-retry:hover {
+  color: var(--nowo-auth-kit-primary-hover);
+  text-decoration: underline;
+}
+
 .nowo-auth-kit__social {
   border-top: 1px solid color-mix(in srgb, var(--nowo-auth-kit-text) 10%, transparent);
   margin-top: 1.5rem;

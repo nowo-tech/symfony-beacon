@@ -10,7 +10,7 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
-use App\Shared\IssueStatus;
+use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

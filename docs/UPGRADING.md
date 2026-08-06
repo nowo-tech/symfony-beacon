@@ -4,7 +4,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Upgrading from 1.0.1 to the next release](#upgrading-from-101-to-the-next-release)
+- [Upgrading from 1.0.1 to 1.1.0](#upgrading-from-101-to-110)
 - [Upgrading from 1.0.0 to 1.0.1](#upgrading-from-100-to-101)
 - [Upgrading from 0.17.0 to 1.0.0](#upgrading-from-0170-to-100)
 - [Upgrading from 0.16.0 to 0.17.0](#upgrading-from-0160-to-0170)
@@ -45,10 +45,11 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Upgrading from 1.0.1 to the next release
+## Upgrading from 1.0.1 to 1.1.0
 
 ```bash
-git pull
+git fetch --tags
+git checkout v1.1.0   # or pull main at the release commit
 composer install
 docker compose up -d
 php bin/console doctrine:migrations:migrate --no-interaction
@@ -66,11 +67,25 @@ When this release includes kit admin `css_framework: tailwind` (no Bootstrap in 
 
 Migrations `Version20260805120000`–`Version20260805160000` add `site_appearance.theme_id`, `footer_fixed`, `corner_style`, `border_strength`, and `theme_id_dark` (dark preset ids formerly stored in `theme_id` are moved). After migrate, open **Administration → Appearance → Themes** and confirm light/dark cards; review Brand / Layout / Colors tabs. Instance config export/import includes the new keys — see `specs/082-appearance-theme-presets/`.
 
-No further steps until the next tagged release.
+### Ops env → database (`084`)
+
+Configure envelope max bytes, reject-query-auth, metrics token, inbound email, SSRF / anonymous Resolve under **Administration → Ops defaults** (no longer via `BEACON_*` env). Copy any previous env values into the UI once, then remove the obsolete env keys from `.env` / Compose. Instance config export is **v3**.
+
+### Architecture / modules (`083` / `085`)
+
+No operator action beyond migrate + seed. Code moved: `Ops` module, `Ingest\Otlp\*`, domain enums under Issues/Project, Project admin controllers under `Project`, demo fixtures under `Setup\Demo`. Optional Compose service `messenger-notify` for notification drain isolation — see [ARCHITECTURE.md](ARCHITECTURE.md) / `compose.yaml`.
+
+### PHPUnit layout (developers)
+
+Tests live under `tests/Unit/`, `tests/Functional/`, `tests/Integration/`, with helpers in `tests/Support/`. Filter by suite: `vendor/bin/phpunit --testsuite Unit`. PHPUnit uses `BEACON_TEST_DATABASE_URL` (default SQLite under `/dev/shm`; per-PID override in `tests/bootstrap.php`). See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Playwright E2E (developers)
+
+After `make up` + `make seed` (+ `make seed-sample` for issue/performance flows): `make test-e2e`. See `e2e/README.md`.
 
 ### Security remediations (Codex Security medium findings)
 
-Unreleased hardening already in tree (apply on upgrade without a separate migration):
+Hardening included in **1.1.0** (apply on upgrade without a separate migration):
 
 - Project settings hide full ingest DSN/secrets from Viewer/Member and share-link sessions (owner/admin only).
 - Revoking a share link invalidates redeemed session grants (share UUID stored in session and re-checked).
@@ -952,7 +967,7 @@ Issue detail sidebar supports **Mark resolved**, **Reopen**, and **Ignore**. Ass
 ```bash
 make test
 # or
-docker compose exec php vendor/bin/phpunit tests/Identity/ tests/Ingest/EnvelopeAuthParserTest.php tests/Shared/ApiDocAccessTest.php
+docker compose exec php vendor/bin/phpunit tests/Functional/Identity/ tests/Unit/Ingest/EnvelopeAuthParserTest.php tests/Functional/Shared/ApiDocAccessTest.php
 ```
 
 Log in as admin, open `/admin/api/doc`, and confirm OpenAPI title **Symfony Beacon API**. Send a test Envelope with BeaconBundle **1.5+**.
@@ -985,7 +1000,7 @@ Markdown under `docs/` is now **UPPERCASE** (e.g. `docs/architecture.md` → `do
 ```bash
 make test
 # or at least
-docker compose exec php vendor/bin/phpunit tests/Shared/NowoKitsUiTest.php
+docker compose exec php vendor/bin/phpunit tests/Functional/Shared/NowoKitsUiTest.php
 ```
 
 ---
@@ -1017,7 +1032,7 @@ Run `make hooks` so commits cannot pick up Cursor `Co-authored-by` trailers. See
 ```bash
 make test
 # or at least ingest tests
-docker compose exec php vendor/bin/phpunit tests/Ingest
+docker compose exec php vendor/bin/phpunit tests/Unit/Ingest tests/Functional/Ingest tests/Integration/Ingest
 ```
 
 ---

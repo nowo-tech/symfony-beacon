@@ -12,7 +12,7 @@ use App\Project\Entity\ProjectShareLink;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectShareLinkManager;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;

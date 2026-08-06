@@ -11,7 +11,7 @@ use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Shared\ProjectRole;
+use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;

@@ -7,7 +7,7 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectReleaseHealthController extends AbstractController
 {
     public function __construct(
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueSearchRepository $issueRepository,
         private readonly EventRepository $eventRepository,
         private readonly ProjectAccessService $projectAccess,
     ) {
