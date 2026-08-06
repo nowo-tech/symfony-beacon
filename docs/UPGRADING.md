@@ -4,6 +4,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
+- [Unreleased (main after 1.1.0)](#unreleased-main-after-110)
 - [Upgrading from 1.0.1 to 1.1.0](#upgrading-from-101-to-110)
 - [Upgrading from 1.0.0 to 1.0.1](#upgrading-from-100-to-101)
 - [Upgrading from 0.17.0 to 1.0.0](#upgrading-from-0170-to-100)
@@ -45,6 +46,28 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
+## Unreleased (main after 1.1.0)
+
+Developer-facing only — **no migrations** and no operator config changes versus **1.1.0**.
+
+```bash
+git pull
+composer install   # unchanged lock for this change set
+pnpm install       # adds vitest / jsdom / @vitest/coverage-v8
+make vite-build    # optional if you only run PHP tests
+```
+
+### Vitest (frontend unit)
+
+- Run asset unit tests in the php container: `make test-unit-js` (or `pnpm run test:unit`).
+- Coverage HTML/LCOV: `make test-unit-js-coverage` → `var/coverage-js/`.
+- Specs live next to sources as `assets/**/*.test.ts`; config: `vitest.config.ts`. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### PHPUnit / Playwright
+
+- Additional Unit tests under `tests/Unit/` (AuthKit, Issues changers, Setup, Ops, …). Filter: `make test ARGS='--testsuite Unit'`.
+- Extra Playwright deep specs (`e2e/*-deep.spec.ts`, cookie consent, share access). Same `make test-e2e` flow as **1.1.0**.
+
 ## Upgrading from 1.0.1 to 1.1.0
 
 ```bash
@@ -82,6 +105,10 @@ Tests live under `tests/Unit/`, `tests/Functional/`, `tests/Integration/`, with 
 ### Playwright E2E (developers)
 
 After `make up` + `make seed` (+ `make seed-sample` for issue/performance flows): `make test-e2e`. See `e2e/README.md`.
+
+### Vitest (developers; also on main after 1.1.0)
+
+Frontend unit tests: `make test-unit-js` / `make test-unit-js-coverage`. See [Unreleased (main after 1.1.0)](#unreleased-main-after-110).
 
 ### Security remediations (Codex Security medium findings)
 

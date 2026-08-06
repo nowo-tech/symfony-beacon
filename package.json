@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "watch": "vite build --watch",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -19,13 +22,16 @@
     "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
     "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "@tailwindcss/vite": "4.3.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.1",
+    "jsdom": "^30.0.1",
     "sass": "1.102.0",
     "tailwindcss": "4.3.3",
     "tom-select": "2.6.2",
     "typescript": "7.0.2",
     "vite": "8.1.5",
-    "vite-plugin-symfony": "8.2.4"
+    "vite-plugin-symfony": "8.2.4",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",

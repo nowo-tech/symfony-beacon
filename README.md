@@ -161,11 +161,15 @@ docker compose exec php vendor/bin/phpunit
 make test-coverage
 # COVERAGE_MIN=40 make test-coverage
 
+# Frontend unit (Vitest + jsdom in the php container):
+make test-unit-js
+make test-unit-js-coverage   # → var/coverage-js/
+
 # Browser E2E (after make up + make seed):
 make test-e2e
 ```
 
-Layout: `tests/Unit/` (pure `TestCase`), `tests/Functional/` (HTTP), `tests/Integration/` (kernel/DB/commands), helpers in `tests/Support/`.
+Layout: `tests/Unit/` (pure `TestCase`), `tests/Functional/` (HTTP), `tests/Integration/` (kernel/DB/commands), helpers in `tests/Support/`. Frontend unit specs: `assets/**/*.test.ts` (`vitest.config.ts`).
 
 CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. Soft gate defaults to `COVERAGE_MIN=35` in CI (never 100%). See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and `specs/033-coverage-ci/`.
 
@@ -173,8 +177,9 @@ CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that upl
 |-------|--------|
 | PHP | PHPUnit (`make test` / CI) — Unit / Functional / Integration |
 | Coverage | `make test-coverage` / CI Coverage job |
+| Frontend unit | Vitest (`make test-unit-js`) — Stimulus + libs |
 | E2E | Playwright (`make test-e2e` / CI) |
-| TS/JS | Vite build in CI Docker job (no Istanbul gate) |
+| Build | Vite build in CI Docker job |
 
 ## Documentation
 

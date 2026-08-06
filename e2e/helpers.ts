@@ -91,7 +91,17 @@ export async function loginAsDemo(page: Page, email = DEMO_EMAIL, password = DEM
 /** Resolve demo project UUID from dashboard project cards. */
 export async function resolveDemoProjectUuid(page: Page): Promise<string> {
   if (!page.url().includes('/dashboard') || page.url().includes('/login')) {
-    await page.goto('/dashboard');
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await page.goto('/dashboard');
+        break;
+      } catch (err) {
+        if (attempt === 2 || !/ERR_NETWORK_CHANGED|net::ERR_/i.test(String(err))) {
+          throw err;
+        }
+        await page.waitForTimeout(500);
+      }
+    }
   }
   await dismissProductTour(page);
 

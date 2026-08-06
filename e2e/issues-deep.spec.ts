@@ -88,4 +88,37 @@ test.describe('Issues & performance deep', () => {
     await expectAuthenticatedPage(page, `/projects/${uuid}/threshold-rules/new`);
     await expect(page.getByRole('main').locator('form').first()).toBeVisible();
   });
+
+  test('environment compare panel renders with query params', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await page.goto(`/projects/${uuid}/issues?environment=production&compare=staging`);
+    await dismissProductTour(page);
+    await expect(page.locator('[data-testid="issue-compare"]')).toBeVisible();
+    await expect(page.locator('[data-tour="issue-filters"]')).toBeVisible();
+  });
+
+  test('issue list pagination and per_page query params work', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await expectAuthenticatedPage(page, `/projects/${uuid}/issues?per_page=10&page=1&sort=last_seen&dir=desc`);
+    await expect(page.locator('[data-tour="issue-filters"]')).toBeVisible();
+    await expect(page.locator('table.issue-table').first()).toBeVisible();
+  });
+
+  test('issue detail triage chrome includes AI export and comments', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    const issueUuid = await openFirstIssue(page, uuid);
+    if (!issueUuid) {
+      requireSampleOrSkip(false, 'No issues — run make seed-sample');
+      return;
+    }
+    await expect(page.locator('[data-testid="issue-ai-export"]')).toBeVisible();
+    await expect(page.locator('[data-testid="issue-comments"]')).toBeVisible();
+    // Optional panels when the issue graph has neighbors / triage tools.
+    if ((await page.locator('[data-testid="similar-issues"]').count()) > 0) {
+      await expect(page.locator('[data-testid="similar-issues"]')).toBeAttached();
+    }
+    if ((await page.locator('[data-testid="mark-duplicate"]').count()) > 0) {
+      await expect(page.locator('[data-testid="mark-duplicate"]')).toBeAttached();
+    }
+  });
 });

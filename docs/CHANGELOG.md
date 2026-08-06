@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Vitest** frontend unit tests (`assets/**/*.test.ts`, jsdom): Stimulus controllers, `theme-boot`, Thinking Orbs presets/theme/profiles; `make test-unit-js` / `make test-unit-js-coverage` → `var/coverage-js/`.
+- Broader **PHPUnit Unit** coverage for AuthKit mail/gate/audit subscribers, locale subscribers, Issue changers/comment/history, Setup detectors/provisioner, Ops/Project stats, Web Push factory, rate limiter, breadcrumbs, PlatformBootstrapState, and related Twig/menu helpers.
+- Playwright **deep** E2E specs: dashboard panels, account, settings, cookie consent, share access, project settings; expanded `issues-deep`.
+
+### Changed
+
+- CONTRIBUTING / README document Vitest alongside PHPUnit and Playwright.
+- `applyThemeBoot` exported from `assets/theme-boot.ts` for unit tests (side-effect on import unchanged).
+
 ## [1.1.0] - 2026-08-06
 
 ### Added

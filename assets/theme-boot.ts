@@ -15,7 +15,8 @@ declare global {
   }
 }
 
-function applyThemeBoot(): void {
+/** Apply theme / density / motion / font / contrast prefs onto <html>. Exported for unit tests. */
+export function applyThemeBoot(): void {
   try {
     const root = document.documentElement;
     const themeKey = 'beacon-theme';

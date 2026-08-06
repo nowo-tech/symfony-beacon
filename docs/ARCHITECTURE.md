@@ -84,7 +84,7 @@ Features are specified under `specs/` before large changes. That matches an open
 
 - Acceptance criteria must stay reviewable without reading every PR.
 - Architecture decisions (this doc + constitution) are amendable, not tribal knowledge.
-- PHPUnit coverage is tied to scenarios in each feature spec. Suites live under `tests/Unit/`, `tests/Functional/`, and `tests/Integration/` (helpers in `tests/Support/`).
+- PHPUnit coverage is tied to scenarios in each feature spec. Suites live under `tests/Unit/`, `tests/Functional/`, and `tests/Integration/` (helpers in `tests/Support/`). Frontend unit tests use Vitest (`assets/**/*.test.ts`; `make test-unit-js`).
 
 ## Module map (as-built)
 

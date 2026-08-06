@@ -371,7 +371,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.0.0** | First stable major: OTLP logs/traces/metrics (`067`/`070`/`074`); Slack/Teams Resolve + Assign (`068`/`069`/`071`/`073`); AuthKit 1.12 + QR image (`072`/`075`); inbound email comments (`076`); branded 4xx/5xx expansion; Constitution Principle X |
 | **v1.0.1** | Docs layout (`product`/`ops`/`dev`); Doctrine N+1 / query amplification fixes on list/export, retention, ingest thresholds |
 | **v1.1.0** | Appearance presets (`082` / 6.32); FormKit/UiKit sync (`081` / 6.31); dashboard Assignments + aside panels (`079`/`080`); Ops env→DB (`084`); module boundaries + architecture convergence (`083`/`085` / 6.33–6.34); Playwright E2E; PHPUnit Unit/Functional/Integration layout + coverage expansion; Codex Security remediations |
-| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
+| **Next** | Vitest frontend unit + deeper PHPUnit/E2E on main (see Unreleased); Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

@@ -1,5 +1,5 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
@@ -42,6 +42,8 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
+	@echo "  make test-unit-js    Vitest unit tests for assets/"
+	@echo "  make test-unit-js-coverage  Vitest + V8 coverage → var/coverage-js/"
 	@echo "  make test-e2e        Playwright browser E2E (Docker image; needs make up + make seed[+sample])"
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
@@ -240,6 +242,12 @@ rector-fix:
 
 test:
 	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
+
+test-unit-js:
+	docker compose exec -T php pnpm run test:unit $(ARGS)
+
+test-unit-js-coverage:
+	docker compose exec -T php pnpm run test:unit:coverage $(ARGS)
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
 # Override: PLAYWRIGHT_BASE_URL=https://localhost:9444 make test-e2e
