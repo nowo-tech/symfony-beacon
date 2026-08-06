@@ -821,10 +821,15 @@ class IssueRepository extends ServiceEntityRepository
     /**
      * MySQL: FULLTEXT MATCH…AGAINST on title+culprit (BOOLEAN MODE).
      * SQLite / other platforms: LIKE fallback (tests and non-MySQL).
+     *
+     * MATCH…AGAINST is MySQL SQL, not DQL — Doctrine's parser rejects it as a
+     * "known function". Resolve matching ids with native SQL, then restrict the
+     * QueryBuilder (same pattern as tag/url payload filters).
      */
     private function applyFullTextOrLikeQuery(QueryBuilder $qb, string $query): void
     {
-        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $conn = $this->getEntityManager()->getConnection();
+        $platform = $conn->getDatabasePlatform();
         if ($platform instanceof AbstractMySQLPlatform) {
             $boolean = $this->toBooleanFulltextQuery($query);
             if ('' === $boolean) {
@@ -833,8 +838,14 @@ class IssueRepository extends ServiceEntityRepository
 
                 return;
             }
-            $qb->andWhere('MATCH(i.title, i.culprit) AGAINST (:ftq IN BOOLEAN MODE)')
-                ->setParameter('ftq', $boolean);
+
+            /** @var list<int|string> $rows */
+            $rows = $conn->fetchFirstColumn(
+                'SELECT id FROM issue WHERE MATCH(title, culprit) AGAINST (? IN BOOLEAN MODE)',
+                [$boolean],
+            );
+            $ids = array_map(static fn (int|string $id): int => (int) $id, $rows);
+            $this->restrictToIssueIds($qb, $ids, 'fulltextIssueIds');
 
             return;
         }

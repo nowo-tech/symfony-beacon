@@ -98,8 +98,9 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 - MySQL: `localhost:3308`
 - Mailpit (after `make mailpit`): http://localhost:18025 — save `smtp://mailer:1025` in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
-- After seed, open Performance with N+1 filter: `/projects/1/performance?nplus1=1` (transaction `demo.nplus1.products`)
-- After seed, open Analytics: `/projects/1/analytics` (14 days of error / transaction / N+1 counters)
+- Browser E2E (Playwright, host): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
+- After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
+- After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
 - First-user registration (empty DB only): https://localhost:9444/register
 - Login: https://localhost:9444/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
 - OpenAPI (after login, admin): https://localhost:9444/admin/api/doc

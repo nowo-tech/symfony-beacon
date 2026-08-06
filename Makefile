@@ -1,5 +1,5 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
 
 help:
@@ -42,6 +42,7 @@ help:
 	@echo "  make rector-fix      Rector apply"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
+	@echo "  make test-e2e        Playwright browser E2E (host; needs make up + make seed)"
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + test"
@@ -234,6 +235,27 @@ rector-fix:
 
 test:
 	docker compose exec -T php vendor/bin/phpunit
+
+# Browser E2E via official Playwright image (WSL-friendly Chromium deps).
+# Override: PLAYWRIGHT_BASE_URL=https://localhost:9444 make test-e2e
+# Filter:  make test-e2e ARGS='e2e/public.spec.ts'
+# Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
+PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
+PLAYWRIGHT_BASE_URL ?= https://localhost:9444
+test-e2e:
+	@docker compose exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
+ifeq ($(PLAYWRIGHT_ON_HOST),1)
+	pnpm exec playwright test $(ARGS)
+else
+	docker run --rm --network=host \
+		--user "$(shell id -u):$(shell id -g)" \
+		-v "$(CURDIR):/work" -w /work \
+		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_BASE_URL)" \
+		-e HOME=/tmp \
+		-e XDG_CACHE_HOME=/tmp/.cache \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'mkdir -p /tmp/.cache && npx --yes playwright test $(ARGS)'
+endif
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke:
