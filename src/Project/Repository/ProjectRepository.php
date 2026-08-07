@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Project\Repository;
 
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserGroup;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
@@ -99,6 +100,32 @@ class ProjectRepository extends ServiceEntityRepository
             ->setParameter('project', $project)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Collect linked and assignable group ids for member-count lookups.
+     *
+     * @param iterable<UserGroup> $availableGroups
+     *
+     * @return list<int>
+     */
+    public static function collectGroupIds(Project $project, iterable $availableGroups): array
+    {
+        $groupIds = [];
+        foreach ($project->getGroupAccesses() as $accessRow) {
+            $groupId = $accessRow->getUserGroup()?->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+        foreach ($availableGroups as $group) {
+            $groupId = $group->getId();
+            if (null !== $groupId) {
+                $groupIds[] = $groupId;
+            }
+        }
+
+        return array_values(array_unique($groupIds));
     }
 
     /**

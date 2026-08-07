@@ -22,6 +22,8 @@ use Nowo\CookieConsentBundle\Repository\CookieDefinitionRepository;
  */
 final readonly class CookieConsentDemoSeeder
 {
+    use StrictFixtureReader;
+
     private const string FIXTURE_FILE = 'cookie_consent.default.json';
 
     public function __construct(
@@ -156,8 +158,8 @@ final readonly class CookieConsentDemoSeeder
         $changed = false;
 
         foreach ($modalCopy as $locale => $copy) {
-            if (!is_string($locale) || !is_array($copy)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" expects modalCopy to be a map of objects.', self::FIXTURE_FILE));
+            if (!\is_string($locale) || !\is_array($copy)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" expects modalCopy to be a map of objects.', self::FIXTURE_FILE));
             }
 
             $translation = $config->findTranslation($locale);
@@ -181,16 +183,16 @@ final readonly class CookieConsentDemoSeeder
             ];
 
             $translation
-                ->setConsentModalTitle($this->requireString($copy, 'title', sprintf('modalCopy.%s', $locale)))
-                ->setConsentModalDescription($this->requireString($copy, 'intro', sprintf('modalCopy.%s', $locale)))
-                ->setConsentModalFooter($this->requireString($copy, 'footer', sprintf('modalCopy.%s', $locale)))
-                ->setConsentModalAcceptAllBtn($this->requireString($copy, 'acceptAll', sprintf('modalCopy.%s', $locale)))
-                ->setConsentModalAcceptNecessaryBtn($this->requireString($copy, 'acceptNecessary', sprintf('modalCopy.%s', $locale)))
-                ->setConsentModalShowPreferencesBtn($this->requireString($copy, 'showPreferences', sprintf('modalCopy.%s', $locale)))
-                ->setPreferencesModalTitle($this->requireString($copy, 'preferencesTitle', sprintf('modalCopy.%s', $locale)))
-                ->setPreferencesModalSavePreferencesBtn($this->requireString($copy, 'save', sprintf('modalCopy.%s', $locale)))
-                ->setPreferencesModalAcceptAllBtn($this->requireString($copy, 'acceptAll', sprintf('modalCopy.%s', $locale)))
-                ->setPreferencesModalAcceptNecessaryBtn($this->requireString($copy, 'acceptNecessary', sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalTitle($this->requireString($copy, 'title', \sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalDescription($this->requireString($copy, 'intro', \sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalFooter($this->requireString($copy, 'footer', \sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalAcceptAllBtn($this->requireString($copy, 'acceptAll', \sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalAcceptNecessaryBtn($this->requireString($copy, 'acceptNecessary', \sprintf('modalCopy.%s', $locale)))
+                ->setConsentModalShowPreferencesBtn($this->requireString($copy, 'showPreferences', \sprintf('modalCopy.%s', $locale)))
+                ->setPreferencesModalTitle($this->requireString($copy, 'preferencesTitle', \sprintf('modalCopy.%s', $locale)))
+                ->setPreferencesModalSavePreferencesBtn($this->requireString($copy, 'save', \sprintf('modalCopy.%s', $locale)))
+                ->setPreferencesModalAcceptAllBtn($this->requireString($copy, 'acceptAll', \sprintf('modalCopy.%s', $locale)))
+                ->setPreferencesModalAcceptNecessaryBtn($this->requireString($copy, 'acceptNecessary', \sprintf('modalCopy.%s', $locale)))
                 ->setPrivacyRoute($privacyRoute);
 
             $after = [
@@ -227,11 +229,11 @@ final readonly class CookieConsentDemoSeeder
 
         $wantedNames = [];
         foreach ($cookies as $index => $row) {
-            if (!is_array($row)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" has a non-object cookie definition at index %d.', self::FIXTURE_FILE, $index));
+            if (!\is_array($row)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" has a non-object cookie definition at index %d.', self::FIXTURE_FILE, $index));
             }
 
-            $context = sprintf('cookies[%d]', $index);
+            $context = \sprintf('cookies[%d]', $index);
             $name = $this->resolveCookieName($row, $context);
             $wantedNames[$name] = true;
             $definition = $existing[$name] ?? null;
@@ -326,31 +328,31 @@ final readonly class CookieConsentDemoSeeder
     private function resolveCookieName(array $row, string $context): string
     {
         $literalName = $row['name'] ?? null;
-        if (is_string($literalName)) {
+        if (\is_string($literalName)) {
             return $literalName;
         }
 
         $enumName = $row['nameEnum'] ?? null;
-        if (is_string($enumName)) {
+        if (\is_string($enumName)) {
             $constant = CookieNameEnum::class.'::'.$enumName;
-            if (!defined($constant)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" references unknown CookieNameEnum constant "%s" at %s.', self::FIXTURE_FILE, $enumName, $context));
+            if (!\defined($constant)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" references unknown CookieNameEnum constant "%s" at %s.', self::FIXTURE_FILE, $enumName, $context));
             }
 
-            $resolved = constant($constant);
-            if (!is_string($resolved)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" constant "%s" did not resolve to a string at %s.', self::FIXTURE_FILE, $enumName, $context));
+            $resolved = \constant($constant);
+            if (!\is_string($resolved)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" constant "%s" did not resolve to a string at %s.', self::FIXTURE_FILE, $enumName, $context));
             }
 
             return $resolved;
         }
 
         $categoryName = $row['nameCategory'] ?? null;
-        if (is_string($categoryName)) {
+        if (\is_string($categoryName)) {
             return CookieNameEnum::getCookieCategoryName($categoryName);
         }
 
-        throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s to define name, nameEnum, or nameCategory.', self::FIXTURE_FILE, $context));
+        throw new InvalidArgumentException(\sprintf('Fixture "%s" expects %s to define name, nameEnum, or nameCategory.', self::FIXTURE_FILE, $context));
     }
 
     /**
@@ -364,117 +366,16 @@ final readonly class CookieConsentDemoSeeder
         $translations = [];
 
         foreach ($value as $locale => $copy) {
-            if (!is_string($locale) || !is_array($copy)) {
-                throw new InvalidArgumentException(
-                    sprintf('Fixture "%s" expects %s.%s to be a map of translation objects.', self::FIXTURE_FILE, $context, $key),
-                );
+            if (!\is_string($locale) || !\is_array($copy)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" expects %s.%s to be a map of translation objects.', self::FIXTURE_FILE, $context, $key));
             }
 
             $translations[$locale] = [
-                'provider' => $this->requireString($copy, 'provider', sprintf('%s.%s.%s', $context, $key, $locale)),
-                'purpose' => $this->requireString($copy, 'purpose', sprintf('%s.%s.%s', $context, $key, $locale)),
+                'provider' => $this->requireString($copy, 'provider', \sprintf('%s.%s.%s', $context, $key, $locale)),
+                'purpose' => $this->requireString($copy, 'purpose', \sprintf('%s.%s.%s', $context, $key, $locale)),
             ];
         }
 
         return $translations;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return array<mixed>
-     */
-    private function requireArray(array $source, string $key, string $context): array
-    {
-        $value = $source[$key] ?? null;
-        if (!is_array($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be an object.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return list<mixed>
-     */
-    private function requireList(array $source, string $key, string $context): array
-    {
-        $value = $source[$key] ?? null;
-        if (!is_array($value) || !array_is_list($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a list.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireString(array $source, string $key, string $context): string
-    {
-        $value = $source[$key] ?? null;
-        if (!is_string($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a string.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireBool(array $source, string $key, string $context): bool
-    {
-        $value = $source[$key] ?? null;
-        if (!is_bool($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a boolean.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireInt(array $source, string $key, string $context): int
-    {
-        $value = $source[$key] ?? null;
-        if (!is_int($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be an integer.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireNullableString(array $source, string $key, string $context): ?string
-    {
-        $value = $source[$key] ?? null;
-        if (null !== $value && !is_string($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a string or null.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return list<string>
-     */
-    private function requireStringList(array $source, string $key, string $context): array
-    {
-        $value = $this->requireList($source, $key, $context);
-        foreach ($value as $entry) {
-            if (!is_string($entry)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to contain only strings.', self::FIXTURE_FILE, $context, $key));
-            }
-        }
-
-        return $value;
     }
 }

@@ -44,41 +44,40 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="ANONYMIZE">
-                <button type="button" class="btn-danger" data-action="confirm-dialog#open" data-testid="account-privacy-anonymize-open">
-                    {{ 'preferences.privacy.anonymize_open'|trans }}
-                </button>
-                <dialog
-                    class="confirm-dialog"
-                    data-confirm-dialog-target="dialog"
-                    aria-labelledby="privacy-anonymize-confirm-title"
-                >
-                    <form method="post" action="{{ path('account_privacy_anonymize') }}" class="confirm-dialog__panel">
-                        <div class="confirm-dialog__header">
-                            <h2 id="privacy-anonymize-confirm-title" class="confirm-dialog__title">{{ 'preferences.privacy.anonymize_confirm_title'|trans }}</h2>
-                            <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
-                        </div>
-                        <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
-                            {{ 'preferences.privacy.anonymize_type_label'|trans }}
-                        </label>
-                        <input
-                            id="privacy-anonymize-confirm-input"
-                            class="input w-full"
-                            type="text"
-                            autocomplete="off"
-                            data-confirm-dialog-target="confirmInput"
-                            required
-                        >
-                        <input type="hidden" name="_token" value="{{ csrf_token('account_privacy_anonymize') }}">
-                        <div class="confirm-dialog__actions">
-                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
-                            <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled data-testid="account-privacy-anonymize-submit">
-                                {{ 'preferences.privacy.anonymize_confirm'|trans }}
-                            </button>
-                        </div>
-                    </form>
-                </dialog>
-            </div>
+            {% embed 'shared/_confirm_dialog.html.twig' with {
+                expected_value: 'ANONYMIZE',
+                trigger_class: 'btn-danger',
+                trigger_label: 'preferences.privacy.anonymize_open'|trans,
+                trigger_testid: 'account-privacy-anonymize-open',
+                form_action: path('account_privacy_anonymize'),
+                title: 'preferences.privacy.anonymize_confirm_title'|trans,
+                title_id: 'privacy-anonymize-confirm-title',
+                aria_labelledby: 'privacy-anonymize-confirm-title',
+                header_wrapper: true,
+                cancel_label: 'common.cancel'|trans,
+                submit_label: 'preferences.privacy.anonymize_confirm'|trans,
+                submit_class: 'btn-danger',
+                submit_disabled: true,
+                submit_testid: 'account-privacy-anonymize-submit',
+            } %}
+                {% block body %}
+                    <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
+                {% endblock %}
+                {% block fields %}
+                    <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
+                        {{ 'preferences.privacy.anonymize_type_label'|trans }}
+                    </label>
+                    <input
+                        id="privacy-anonymize-confirm-input"
+                        class="input w-full"
+                        type="text"
+                        autocomplete="off"
+                        data-confirm-dialog-target="confirmInput"
+                        required
+                    >
+                    <input type="hidden" name="_token" value="{{ csrf_token('account_privacy_anonymize') }}">
+                {% endblock %}
+            {% endembed %}
         {% endif %}
     </section>
 </div>

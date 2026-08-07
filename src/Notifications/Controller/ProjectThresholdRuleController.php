@@ -8,8 +8,9 @@ use App\Identity\Entity\User;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Project\Entity\Project;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Enum\ProjectRole;
+use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectChildEntityGuard;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +29,7 @@ final class ProjectThresholdRuleController extends AbstractController
 {
     public function __construct(
         private readonly ProjectAccessService $projectAccess,
+        private readonly ProjectChildEntityGuard $childEntityGuard,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -132,15 +134,13 @@ final class ProjectThresholdRuleController extends AbstractController
 
     private function requireManagedRule(string $projectId, ProjectThresholdRule $rule): Project
     {
-        $project = $rule->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
 
-        return $project;
+        return $this->childEntityGuard->requireManagedChild(
+            $projectId,
+            $rule->getProject(),
+            $user,
+        );
     }
 }

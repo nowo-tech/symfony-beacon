@@ -1,0 +1,52 @@
+{#
+    Shared layout for dashboard feed pages: header, filters, empty state, results + pagination.
+
+    Required vars: title_key, intro_key, filter_route, filters, filters_testid,
+                   empty_testid, empty_key, results_testid, pagination, pagination_route,
+                   filter_query, item_count.
+
+    Blocks: feed_header, filter_fields, filter_hidden, results.
+#}
+{% set filterQuery = filter_query %}
+
+{% block feed_header %}
+<div class="mb-6{% if feed_header_class is defined %} {{ feed_header_class }}{% endif %}">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ title_key|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ intro_key|trans }}</p>
+    </div>
+    {% block feed_header_extra %}{% endblock %}
+</div>
+{% endblock %}
+
+<form
+    method="get"
+    action="{{ path(filter_route) }}"
+    class="issue-filters panel mb-6 grid gap-3 {{ filter_grid_class|default('sm:grid-cols-2 lg:grid-cols-3') }}"
+    data-testid="{{ filters_testid }}"
+>
+    <input type="hidden" name="page" value="1">
+    {% block filter_hidden %}{% endblock %}
+    {% block filter_fields %}{% endblock %}
+    <div class="issue-filters__actions">
+        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
+        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path(filter_route) }}">{{ 'common.clear_filters'|trans }}</a>
+    </div>
+</form>
+
+{% if pagination.total == 0 %}
+    <div class="panel text-[var(--color-ink)]/70" data-testid="{{ empty_testid }}">{{ empty_key|trans }}</div>
+{% else %}
+    <div class="panel" data-testid="{{ results_testid }}">
+        {% block results %}{% endblock %}
+
+        {% include 'shared/_table_pagination.html.twig' with {
+            pagination: pagination,
+            item_count: item_count,
+            route: pagination_route,
+            route_params: pagination_route_params|default({}),
+            query: filterQuery,
+            nav_label: 'issues.pagination.nav'
+        } %}
+    </div>
+{% endif %}

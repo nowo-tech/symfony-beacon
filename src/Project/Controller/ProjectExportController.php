@@ -7,14 +7,15 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueSearchRepository;
-use App\Project\Entity\Project;
-use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Service\ProjectAccessService;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Repository\EventRepository;
+use App\Issues\Repository\IssueSearchRepository;
+use App\Issues\Service\IssueJsonNormalizer;
+use App\Project\Entity\Project;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Service\ProjectAccessService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,6 +39,7 @@ final class ProjectExportController extends AbstractController
         private readonly EventRepository $eventRepository,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectAccessService $projectAccess,
+        private readonly IssueJsonNormalizer $issueJsonNormalizer,
     ) {
     }
 
@@ -67,7 +69,7 @@ final class ProjectExportController extends AbstractController
                 ],
                 'limit' => self::EXPORT_LIMIT,
                 'count' => \count($issues),
-                'issues' => array_map($this->issueToArray(...), $issues),
+                'issues' => array_map($this->issueJsonNormalizer->normalize(...), $issues),
             ]);
         }
 
@@ -230,29 +232,6 @@ final class ProjectExportController extends AbstractController
             url: $request->query->getString('url') ?: null,
             user: $request->query->getString('user') ?: null,
         );
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function issueToArray(Issue $issue): array
-    {
-        return [
-            'uuid' => $issue->getUuid(),
-            'title' => $issue->getTitle(),
-            'level' => $issue->getLevel(),
-            'status' => $issue->getStatus()->value,
-            'priority' => $issue->getPriority()->value,
-            'culprit' => $issue->getCulprit(),
-            'event_count' => $issue->getEventCount(),
-            'first_seen' => $issue->getFirstSeen()->format(\DATE_ATOM),
-            'last_seen' => $issue->getLastSeen()->format(\DATE_ATOM),
-            'first_release' => $issue->getFirstRelease(),
-            'last_release' => $issue->getLastRelease(),
-            'last_environment' => $issue->getLastEnvironment(),
-            'assignee_email' => $issue->getAssignee()?->getEmail(),
-            'duplicate_of_uuid' => $issue->getDuplicateOf()?->getUuid(),
-        ];
     }
 
     /**

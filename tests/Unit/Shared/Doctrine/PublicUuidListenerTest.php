@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Shared\Doctrine;
 
 use App\Shared\Doctrine\PublicUuidListener;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PrePersistEventArgs;
-use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
 final class PublicUuidListenerTest extends TestCase
@@ -22,7 +22,7 @@ final class PublicUuidListenerTest extends TestCase
             }
         };
 
-        $args = new PrePersistEventArgs($entity, $this->createStub(ObjectManager::class));
+        $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
         (new PublicUuidListener())->prePersist($args);
 
         self::assertTrue($entity->called);
@@ -34,7 +34,7 @@ final class PublicUuidListenerTest extends TestCase
             public string $name = 'plain';
         };
 
-        $args = new PrePersistEventArgs($entity, $this->createStub(ObjectManager::class));
+        $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
         (new PublicUuidListener())->prePersist($args);
 
         $this->addToAssertionCount(1);

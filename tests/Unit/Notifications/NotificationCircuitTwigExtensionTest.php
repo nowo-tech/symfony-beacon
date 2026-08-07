@@ -31,7 +31,8 @@ final class NotificationCircuitTwigExtensionTest extends TestCase
         self::assertSame('beacon_notification_circuit_open', $functions[0]->getName());
         self::assertFalse($extension->isCircuitOpen($destination));
 
-        $destination->openCircuit(new DateTimeImmutable('2026-08-06 12:00:00'));
+        // Use "now" so the cooldown window has not expired (isOpen() expires cooled circuits).
+        $destination->openCircuit(new DateTimeImmutable());
         self::assertTrue($extension->isCircuitOpen($destination));
     }
 }

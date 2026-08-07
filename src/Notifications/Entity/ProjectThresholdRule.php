@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Entity;
 
+use App\Issues\Entity\Issue;
 use App\Notifications\Repository\ProjectThresholdRuleRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\PublicUuidTrait;
@@ -211,30 +212,12 @@ class ProjectThresholdRule
 
     public static function normalizeEnvironment(?string $value): ?string
     {
-        if (null === $value) {
-            return null;
-        }
-
-        $trimmed = trim($value);
-        if ('' === $trimmed) {
-            return null;
-        }
-
-        return mb_substr($trimmed, 0, 80);
+        return Issue::normalizeEnvironment($value);
     }
 
     public static function normalizeRelease(?string $value): ?string
     {
-        if (null === $value) {
-            return null;
-        }
-
-        $trimmed = trim($value);
-        if ('' === $trimmed) {
-            return null;
-        }
-
-        return mb_substr($trimmed, 0, 120);
+        return Issue::normalizeRelease($value);
     }
 
     private function normalizeLabel(?string $value): ?string

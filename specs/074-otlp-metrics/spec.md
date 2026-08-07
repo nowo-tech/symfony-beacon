@@ -46,6 +46,10 @@ As an operator, metrics ingest honors ingest suspend, rate limit, daily/monthly 
 
 - OTLP gRPC / protobuf / Bundle exporter / Performance TSDB (extends this slice)
 
+## As-built follow-ups
+
+- Shared gate/map/dispatch with logs/traces: **`086-dry-refactor`** (`OtlpIngestPipeline`; HTTP contracts unchanged).
+
 ## Assumptions
 
 - Clients speak OTLP/HTTP JSON (`resourceMetrics` camelCase; snake_case accepted as alias).

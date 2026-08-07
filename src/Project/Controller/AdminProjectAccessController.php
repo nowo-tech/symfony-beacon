@@ -10,16 +10,16 @@ use App\Identity\Repository\UserGroupRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
-use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Service\ProjectMembershipManager;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Service\ProjectAccessFlashKeys;
+use App\Project\Service\ProjectMembershipManager;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -56,7 +56,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->addByEmail($project, $actor, $request->request->getString('email'), $role);
             $this->addFlash('success', 'flash.project.member_added');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -94,7 +94,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->changeRole($project, $actor, $target, $role);
             $this->addFlash('success', 'flash.project.member_role_updated');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -125,7 +125,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->remove($project, $actor, $target);
             $this->addFlash('success', 'flash.project.member_removed');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -156,7 +156,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->addGroup($project, $actor, $group, $role);
             $this->addFlash('success', 'flash.project.group_added');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -196,7 +196,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->changeGroupRole($project, $actor, $groupAccess, $role);
             $this->addFlash('success', 'flash.project.group_role_updated');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -229,7 +229,7 @@ final class AdminProjectAccessController extends AbstractController
             $this->membershipManager->removeGroup($project, $actor, $groupAccess);
             $this->addFlash('success', 'flash.project.group_removed');
         } catch (RuntimeException|InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
@@ -244,20 +244,4 @@ final class AdminProjectAccessController extends AbstractController
 
         return $membership;
     }
-
-    private function flashKeyForCode(string $code): string
-    {
-        return match ($code) {
-            'user_not_found' => 'flash.project.member_user_not_found',
-            'user_disabled' => 'flash.project.member_user_disabled',
-            'already_member' => 'flash.project.member_already',
-            'invalid_role' => 'flash.project.member_invalid_role',
-            'last_owner' => 'flash.project.member_last_owner',
-            'cannot_manage_owner' => 'flash.project.member_cannot_manage_owner',
-            'group_already_linked' => 'flash.project.group_already',
-            'group_link_forbidden' => 'flash.project.group_link_forbidden',
-            default => 'flash.project.member_error',
-        };
-    }
-
 }

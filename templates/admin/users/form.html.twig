@@ -9,11 +9,10 @@
     <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'users.create_intro'|trans }}</p>
 </div>
 
-{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
-    {% include 'form/_fields.html.twig' with {form: form} only %}
-    <div class="flex flex-wrap gap-2">
-        <button class="btn-primary" type="submit">{{ 'users.create'|trans }}</button>
-        <a class="btn-ghost no-underline" href="{{ path('admin_users') }}">{{ 'users.cancel'|trans }}</a>
-    </div>
-{{ form_end(form) }}
+{% include 'admin/_crud_form.html.twig' with {
+    form: form,
+    submit_label: 'users.create',
+    cancel_href: path('admin_users'),
+    cancel_label: 'users.cancel',
+} only %}
 {% endblock %}

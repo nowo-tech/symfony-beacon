@@ -25,7 +25,7 @@ final class MagicLoginAuditSubscriberTest extends TestCase
 
         $users = $this->createStub(UserRepository::class);
         $users->method('findOneByEmail')->willReturnCallback(
-            static function (string $email) use ($subject): ?User {
+            static function (string $email) use ($subject): User {
                 self::assertSame('magic@example.com', $email);
 
                 return $subject;

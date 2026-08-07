@@ -84,7 +84,7 @@ final class AdminSocialLoginTest extends DatabaseWebTestCase
         $form = $crawler->selectButton('Save provider')->form();
         $form['social_login_credential[label]'] = 'Google Workspace';
         $form['social_login_credential[client_id]'] = 'google-id-updated';
-        $form['social_login_credential[enabled]'] = true;
+        $form['social_login_credential[enabled]'] = '1';
         $client->submit($form);
         self::assertResponseRedirects('/admin/social-login');
 

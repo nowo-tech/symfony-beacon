@@ -64,7 +64,7 @@ nowo_pwa:
         dismiss_days: 14
         # Single BEM root — extra classes break {{ css_class }}__mark / --banner concatenation in the bundle template.
         css_class: nowo-pwa-install
-        mark_asset: /brand/beacon-mark.svg
+        # Mark is inlined via templates/bundles/NowoPwaBundle/pwa/install_prompt.html.twig (theme --beacon-mark).
         title: preferences.display.pwa_prompt_title
         button_class: btn-primary
         dismiss_button_class: btn-ghost

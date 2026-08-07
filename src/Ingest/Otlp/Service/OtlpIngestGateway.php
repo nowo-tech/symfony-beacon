@@ -6,12 +6,12 @@ namespace App\Ingest\Otlp\Service;
 
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\IngestRateLimiter;
+use App\Ops\Metrics\MetricsCollector;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Ops\Metrics\MetricsCollector;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Issues\Entity;
 
 use App\Identity\Entity\User;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueHistoryKind;
 use App\Issues\Repository\IssueHistoryEntryRepository;
-use App\Issues\Enum\IssueStatus;
-use DateTimeImmutable;
+use App\Shared\Doctrine\CreatedAtImmutableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,6 +19,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_history_issue_created', columns: ['issue_id', 'created_at'])]
 class IssueHistoryEntry
 {
+    use CreatedAtImmutableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,12 +51,9 @@ class IssueHistoryEntry
     #[ORM\Column(length: 20, nullable: true, enumType: IssueStatus::class)]
     private ?IssueStatus $toStatus = null;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
+        $this->initializeCreatedAt();
     }
 
     public function getId(): ?int
@@ -142,18 +141,6 @@ class IssueHistoryEntry
     public function setToStatus(?IssueStatus $toStatus): self
     {
         $this->toStatus = $toStatus;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }

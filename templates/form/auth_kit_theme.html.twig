@@ -52,12 +52,12 @@
 {%- endblock checkbox_row -%}
 
 {%- block checkbox_widget -%}
-    <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--color-ink)]/80">
+    <label class="checkbox-label">
         <input type="checkbox"
             {{ block('widget_attributes') }}
             {% if value is defined %} value="{{ value }}"{% endif %}
             {% if checked %} checked="checked"{% endif %}
-            class="size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30"
+            class="checkbox"
         >
         {% if label is not same as(false) -%}
             <span>{{ label|trans({}, translation_domain) }}</span>

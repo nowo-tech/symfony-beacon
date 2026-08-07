@@ -245,6 +245,10 @@ html[data-theme='dark'][data-contrast='more'] {
 
 html[data-contrast='more'] .panel,
 html[data-contrast='more'] .input,
+html[data-contrast='more'] input[type='checkbox'].checkbox,
+html[data-contrast='more'] .confirm-dialog__check > input[type='checkbox'],
+html[data-contrast='more'] .checkbox-label > input[type='checkbox'],
+html[data-contrast='more'] .nowo-ui-check > input[type='checkbox'],
 html[data-contrast='more'] .btn-ghost {
   border-width: 1.5px;
 }
@@ -541,6 +545,8 @@ html[data-motion='reduce'] .app-sidebar-backdrop {
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.4;
+  color: var(--color-ink);
+  cursor: pointer;
 
   input {
     margin-top: 0.2rem;
@@ -1277,48 +1283,125 @@ textarea.input {
   }
 }
 
-/* Password toggle (PasswordToggleBundle) — Bootstrap input-group without Bootstrap CSS */
+/* Platform checkbox — same moss/sand/surface tokens as .input (native accent is browser-blue). */
+input[type='checkbox'].checkbox,
+.confirm-dialog__check > input[type='checkbox'],
+.checkbox-label > input[type='checkbox'],
+.nowo-ui-check > input[type='checkbox'] {
+  appearance: none;
+  box-sizing: border-box;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  border: var(--beacon-border-width, 1px) solid var(--color-sand);
+  border-radius: 0.25rem;
+  background-color: var(--color-surface);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.75rem 0.75rem;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--color-moss) 55%, var(--color-sand));
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    border-color: var(--color-moss);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 20%, transparent);
+  }
+
+  &:checked {
+    border-color: var(--color-moss);
+    background-color: var(--color-moss);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.checkbox-label--start {
+  align-items: flex-start;
+}
+
+.checkbox-label--start > input[type='checkbox'] {
+  margin-top: 0.2rem;
+}
+
+/* Password toggle (PasswordToggleBundle) — eye on the right with a horizontal gap.
+   Host YAML: button_classes include input-group-text (see nowo_password_toggle.yaml).
+   Also target [data-controller=password-toggle] so custom button_classes still layout. */
 .input-group.form-password-toggle {
   display: flex;
   width: 100%;
   align-items: stretch;
   min-width: 0;
+  gap: 0.5rem;
+  border-radius: var(--beacon-radius-control, 0.375rem);
 }
 
 .input-group.form-password-toggle > input.input {
   flex: 1 1 auto;
+  width: 1%;
   min-width: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  /* Separate control — full radius (not merged with the eye). */
+  border-radius: var(--beacon-radius-control, 0.375rem);
 }
 
-.input-group.form-password-toggle > .input-group-text {
+/* Hide browser native reveal/clear — we ship our own eye control. */
+.input-group.form-password-toggle > input.input::-ms-reveal,
+.input-group.form-password-toggle > input.input::-ms-clear {
+  display: none;
+}
+
+.input-group.form-password-toggle > .input-group-text,
+.input-group.form-password-toggle > [data-controller~='password-toggle'] {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   width: 2.75rem;
+  min-height: 100%;
   padding: 0;
   border: 1px solid var(--color-sand);
-  border-left: 0;
-  border-radius: 0 var(--beacon-radius-control, 0.375rem) var(--beacon-radius-control, 0.375rem) 0;
+  border-radius: var(--beacon-radius-control, 0.375rem);
   background: var(--color-surface);
   color: color-mix(in srgb, var(--color-ink) 70%, transparent);
-  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.input-group.form-password-toggle > .input-group-text:hover {
+.input-group.form-password-toggle > .input-group-text:hover,
+.input-group.form-password-toggle > [data-controller~='password-toggle']:hover {
   background: color-mix(in srgb, var(--color-moss) 10%, var(--color-surface));
   color: var(--color-ink);
 }
 
-.input-group.form-password-toggle > input.input:focus {
-  position: relative;
-  z-index: 1;
-}
-
-.input-group.form-password-toggle > input.input:focus + .input-group-text {
+.input-group.form-password-toggle > .input-group-text:focus-visible,
+.input-group.form-password-toggle > [data-controller~='password-toggle']:focus-visible {
+  outline: none;
   border-color: var(--color-moss);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-moss) 20%, transparent);
 }
 
 /* nowo-tech/password-strength-bundle generator (account security + AuthKit) */
@@ -4008,14 +4091,22 @@ html[data-footer-fixed='1'] .site-legal-footer {
 }
 
 .nowo-pwa-install__mark {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: var(--nowo-pwa-install-mark-size);
   height: var(--nowo-pwa-install-mark-size);
   max-width: var(--nowo-pwa-install-mark-size);
   max-height: var(--nowo-pwa-install-mark-size);
   margin: 0;
-  object-fit: contain;
+  color: var(--beacon-mark, var(--color-moss));
   border-radius: var(--nowo-pwa-install-mark-radius);
+}
+
+.nowo-pwa-install__mark .brand-mark__icon-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .nowo-pwa-install__eyebrow {
@@ -4045,18 +4136,56 @@ html[data-footer-fixed='1'] .site-legal-footer {
 .nowo-pwa-install__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.95rem;
 }
 
-.nowo-pwa-install__actions button {
-  padding: unset;
-  font-weight: unset;
-  border: unset;
-  border-radius: unset;
+/* Beat pwa.css `.nowo-pwa-install__actions button` / [data-pwa-install-action] so Beacon btn-* wins. */
+.nowo-pwa-install__actions button.btn-primary,
+.nowo-pwa-install__actions button.btn-ghost {
+  @include beacon-btn-base;
   cursor: pointer;
-  color: unset;
-  background: unset;
+}
+
+.nowo-pwa-install__actions button.btn-primary {
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-moss);
+  border: 1px solid var(--color-moss);
+  box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 8%);
+
+  &:hover {
+    background: var(--color-moss-deep);
+    border-color: var(--color-moss-deep);
+    box-shadow: 0 2px 8px rgb(var(--beacon-shadow) / 12%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
+}
+
+[data-theme='dark'] .nowo-pwa-install__actions button.btn-primary {
+  color: #0c1210;
+}
+
+.nowo-pwa-install__actions button.btn-ghost {
+  font-weight: 500;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border: var(--beacon-border-width, 1px) solid var(--color-sand);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
+    background: var(--color-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 2px;
+  }
 }
 
 .beacon-pwa-install__never {

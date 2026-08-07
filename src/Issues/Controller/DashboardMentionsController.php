@@ -7,8 +7,8 @@ namespace App\Issues\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Entity\IssueMention;
 use App\Issues\Repository\IssueMentionRepository;
-use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +36,7 @@ final class DashboardMentionsController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
+        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
         $unreadOnly = $request->query->getBoolean('unread');
 
@@ -97,23 +97,6 @@ final class DashboardMentionsController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('dashboard_mentions', $this->redirectQuery($request));
-    }
-
-    /**
-     * @param list<Project> $accessible
-     */
-    private function resolveProjectFilter(array $accessible, string $uuid): ?Project
-    {
-        if ('' === $uuid) {
-            return null;
-        }
-        foreach ($accessible as $project) {
-            if ($project->getUuid() === $uuid) {
-                return $project;
-            }
-        }
-
-        return null;
     }
 
     /**

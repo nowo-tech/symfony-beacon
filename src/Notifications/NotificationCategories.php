@@ -52,7 +52,7 @@ final class NotificationCategories
     ];
 
     /**
-     * @param list<string> $categories
+     * @param list<mixed> $categories
      *
      * @return list<string>
      */

@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace App\Ingest\Otlp\Controller;
 
-use App\Ingest\Message\ProcessEnvelopeMessage;
-use App\Ingest\Otlp\Service\OtlpIngestGateway;
+use App\Ingest\Otlp\Service\OtlpIngestPipeline;
 use App\Ingest\Otlp\Service\OtlpLogsMapper;
-use DateTimeImmutable;
-use DateTimeInterface;
-use InvalidArgumentException;
 use OpenApi\Attributes as OA;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -25,10 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final readonly class OtlpLogsController
 {
     public function __construct(
-        private OtlpIngestGateway $otlpIngestGateway,
+        private OtlpIngestPipeline $otlpIngestPipeline,
         private OtlpLogsMapper $otlpLogsMapper,
-        private MessageBusInterface $bus,
-        private LoggerInterface $logger,
     ) {
     }
 
@@ -90,34 +82,6 @@ MD,
     #[OA\Response(response: 429, description: 'Rate limit or quota exceeded.')]
     public function __invoke(int $projectId, Request $request): Response
     {
-        $accepted = $this->otlpIngestGateway->accept($projectId, $request);
-        if ($accepted instanceof Response) {
-            return $accepted;
-        }
-
-        try {
-            $payloads = $this->otlpLogsMapper->mapToEventPayloads($accepted['body']);
-        } catch (InvalidArgumentException $e) {
-            $this->logger->notice('OTLP logs parse rejected.', [
-                'project_id' => $projectId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return $this->otlpIngestGateway->respond('invalid otlp payload', Response::HTTP_BAD_REQUEST);
-        }
-
-        if ([] === $payloads) {
-            // Valid OTLP with only dropped severities — ACK without queue work.
-            return $this->otlpIngestGateway->respond('', Response::HTTP_OK);
-        }
-
-        $envelope = $this->otlpLogsMapper->toEnvelopeBody($payloads);
-        $this->bus->dispatch(new ProcessEnvelopeMessage(
-            $projectId,
-            $envelope,
-            new DateTimeImmutable()->format(DateTimeInterface::ATOM),
-        ));
-
-        return $this->otlpIngestGateway->respond('', Response::HTTP_OK);
+        return $this->otlpIngestPipeline->ingest($projectId, $request, $this->otlpLogsMapper, 'logs');
     }
 }

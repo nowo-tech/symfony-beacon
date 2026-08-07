@@ -56,7 +56,7 @@ final class MenuTwigExtensionTest extends TestCase
     public function testDelegatesAdministrationMarking(): void
     {
         $httpLog = new class {
-            public function getRouteName(): ?string
+            public function getRouteName(): string
             {
                 return 'nowo_http_log_admin_index';
             }

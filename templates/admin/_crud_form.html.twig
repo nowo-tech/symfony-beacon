@@ -1,0 +1,12 @@
+{#
+    Shared admin CRUD form shell: panel, fields, submit/cancel actions.
+
+    Required: form, submit_label, cancel_href, cancel_label (translation keys or strings)
+#}
+{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
+    {% include 'form/_fields.html.twig' with {form: form} only %}
+    <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" type="submit">{{ submit_label|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ cancel_href }}">{{ cancel_label|trans }}</a>
+    </div>
+{{ form_end(form) }}

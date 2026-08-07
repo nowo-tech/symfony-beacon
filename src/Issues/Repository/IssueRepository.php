@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Issues\Repository;
 
 use App\Issues\Entity\Issue;
-use App\Project\Entity\Project;
 use App\Issues\Enum\IssueStatus;
+use App\Project\Entity\Project;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,7 +18,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class IssueRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Issue::class);
@@ -59,6 +59,7 @@ class IssueRepository extends ServiceEntityRepository
         return $issue;
     }
 
+    /** @return list<Issue> */
     public function findDuplicateCandidates(Project $project, Issue $exclude, int $limit = 100): array
     {
         $qb = $this->createQueryBuilder('i')
@@ -75,6 +76,7 @@ class IssueRepository extends ServiceEntityRepository
         return $result;
     }
 
+    /** @return list<Issue> */
     public function findSimilarIssues(Issue $issue, int $limit = 5): array
     {
         $project = $issue->getProject();
@@ -111,7 +113,7 @@ class IssueRepository extends ServiceEntityRepository
         foreach ($tokens as $i => $token) {
             $param = 'sim'.$i;
             $ors[] = 'LOWER(i.title) LIKE :'.$param;
-            $qb->setParameter($param, '%'.$this->escapeLike(mb_strtolower($token)).'%');
+            $qb->setParameter($param, '%'.SqlLikeEscaper::escape(mb_strtolower($token)).'%');
         }
         $qb->andWhere('('.implode(' OR ', $ors).')');
 
@@ -153,10 +155,5 @@ class IssueRepository extends ServiceEntityRepository
         }
 
         return $out;
-    }
-
-    private function escapeLike(string $value): string
-    {
-        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 }

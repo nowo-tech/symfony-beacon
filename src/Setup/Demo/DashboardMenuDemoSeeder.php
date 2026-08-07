@@ -17,6 +17,8 @@ use Nowo\DashboardMenuBundle\Repository\MenuRepository;
  */
 final readonly class DashboardMenuDemoSeeder
 {
+    use StrictFixtureReader;
+
     private const string FIXTURE_FILE = 'menus.json';
 
     #[Deprecated(message: 'Use AppSection::Dashboard->menuCode()')]
@@ -95,11 +97,11 @@ final readonly class DashboardMenuDemoSeeder
         $wantedSectionLabels = [];
 
         foreach ($sections as $index => $sectionData) {
-            if (!is_array($sectionData)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" has a non-object section at index %d.', self::FIXTURE_FILE, $index));
+            if (!\is_array($sectionData)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" has a non-object section at index %d.', self::FIXTURE_FILE, $index));
             }
 
-            $sectionContext = sprintf('menus[administration].sections[%d]', $index);
+            $sectionContext = \sprintf('menus[administration].sections[%d]', $index);
             $sectionPosition = $this->requireInt($sectionData, 'position', $sectionContext);
             $sectionLabel = $this->requireString($sectionData, 'label', $sectionContext);
             $sectionTranslations = $this->requireTranslations($sectionData, 'translations', $sectionContext);
@@ -115,13 +117,11 @@ final readonly class DashboardMenuDemoSeeder
             }
 
             foreach ($children as $childIndex => $itemData) {
-                if (!is_array($itemData)) {
-                    throw new InvalidArgumentException(
-                        sprintf('Fixture "%s" has a non-object child at %s.children[%d].', self::FIXTURE_FILE, $sectionContext, $childIndex),
-                    );
+                if (!\is_array($itemData)) {
+                    throw new InvalidArgumentException(\sprintf('Fixture "%s" has a non-object child at %s.children[%d].', self::FIXTURE_FILE, $sectionContext, $childIndex));
                 }
 
-                $itemContext = sprintf('%s.children[%d]', $sectionContext, $childIndex);
+                $itemContext = \sprintf('%s.children[%d]', $sectionContext, $childIndex);
                 $position = $this->requireInt($itemData, 'position', $itemContext);
                 $label = $this->requireString($itemData, 'label', $itemContext);
                 $translations = $this->requireTranslations($itemData, 'translations', $itemContext);
@@ -144,7 +144,7 @@ final readonly class DashboardMenuDemoSeeder
         }
 
         foreach ($menu->getItems()->toArray() as $item) {
-            if ($item->getItemType() === MenuItem::ITEM_TYPE_SECTION) {
+            if (MenuItem::ITEM_TYPE_SECTION === $item->getItemType()) {
                 if (!\in_array($item->getLabel(), $wantedSectionLabels, true)) {
                     $menu->removeItem($item);
                     $this->entityManager->remove($item);
@@ -193,11 +193,11 @@ final readonly class DashboardMenuDemoSeeder
             }
         }
 
-        if ($menu->getNestedCollapsible() !== true) {
+        if (true !== $menu->getNestedCollapsible()) {
             $menu->setNestedCollapsible(true);
             $changed = true;
         }
-        if ($menu->getNestedCollapsibleSections() !== true) {
+        if (true !== $menu->getNestedCollapsibleSections()) {
             $menu->setNestedCollapsibleSections(true);
             $changed = true;
         }
@@ -211,9 +211,9 @@ final readonly class DashboardMenuDemoSeeder
     private function ensureFlatMenu(array $definition): bool
     {
         $code = $this->requireString($definition, 'code', 'flat menu');
-        $name = $this->requireString($definition, 'name', sprintf('menus[%s]', $code));
-        $ulId = $this->requireString($definition, 'ulId', sprintf('menus[%s]', $code));
-        $definitions = $this->requireList($definition, 'items', sprintf('menus[%s]', $code));
+        $name = $this->requireString($definition, 'name', \sprintf('menus[%s]', $code));
+        $ulId = $this->requireString($definition, 'ulId', \sprintf('menus[%s]', $code));
+        $definitions = $this->requireList($definition, 'items', \sprintf('menus[%s]', $code));
 
         $changed = false;
         $menu = $this->menuRepository->findOneByCodeAndContext($code, null);
@@ -239,11 +239,11 @@ final readonly class DashboardMenuDemoSeeder
 
         $wantedRoutes = [];
         foreach ($definitions as $index => $itemData) {
-            if (!is_array($itemData)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" has a non-object flat menu item at index %d.', self::FIXTURE_FILE, $index));
+            if (!\is_array($itemData)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" has a non-object flat menu item at index %d.', self::FIXTURE_FILE, $index));
             }
 
-            $context = sprintf('menus[%s].items[%d]', $code, $index);
+            $context = \sprintf('menus[%s].items[%d]', $code, $index);
             $position = $this->requireInt($itemData, 'position', $context);
             $label = $this->requireString($itemData, 'label', $context);
             $translations = $this->requireTranslations($itemData, 'translations', $context);
@@ -292,7 +292,7 @@ final readonly class DashboardMenuDemoSeeder
     private function findSectionByLabel(Menu $menu, string $label): ?MenuItem
     {
         foreach ($menu->getItems() as $item) {
-            if ($item->getItemType() === MenuItem::ITEM_TYPE_SECTION && $item->getLabel() === $label) {
+            if (MenuItem::ITEM_TYPE_SECTION === $item->getItemType() && $item->getLabel() === $label) {
                 return $item;
             }
         }
@@ -322,15 +322,15 @@ final readonly class DashboardMenuDemoSeeder
             $item->setTranslations($translations);
             $changed = true;
         }
-        if ($item->getParent() !== null) {
+        if (null !== $item->getParent()) {
             $item->setParent(null);
             $changed = true;
         }
-        if ($item->getSectionCollapsible() !== true) {
+        if (true !== $item->getSectionCollapsible()) {
             $item->setSectionCollapsible(true);
             $changed = true;
         }
-        if ($item->getPermissionKey() !== 'ROLE_ADMIN') {
+        if ('ROLE_ADMIN' !== $item->getPermissionKey()) {
             $item->setPermissionKey('ROLE_ADMIN');
             $changed = true;
         }
@@ -366,11 +366,11 @@ final readonly class DashboardMenuDemoSeeder
             $item->setParent($parent);
             $changed = true;
         }
-        if ($item->getItemType() !== MenuItem::ITEM_TYPE_LINK) {
+        if (MenuItem::ITEM_TYPE_LINK !== $item->getItemType()) {
             $item->setItemType(MenuItem::ITEM_TYPE_LINK);
             $changed = true;
         }
-        if ($item->getLinkType() !== MenuItem::LINK_TYPE_ROUTE) {
+        if (MenuItem::LINK_TYPE_ROUTE !== $item->getLinkType()) {
             $item->setLinkType(MenuItem::LINK_TYPE_ROUTE);
             $changed = true;
         }
@@ -438,11 +438,11 @@ final readonly class DashboardMenuDemoSeeder
         $definitions = [];
 
         foreach ($menus as $index => $menuData) {
-            if (!is_array($menuData)) {
-                throw new InvalidArgumentException(sprintf('Fixture "%s" has a non-object menu at index %d.', self::FIXTURE_FILE, $index));
+            if (!\is_array($menuData)) {
+                throw new InvalidArgumentException(\sprintf('Fixture "%s" has a non-object menu at index %d.', self::FIXTURE_FILE, $index));
             }
 
-            $code = $this->requireString($menuData, 'code', sprintf('menus[%d]', $index));
+            $code = $this->requireString($menuData, 'code', \sprintf('menus[%d]', $index));
             $definitions[$code] = $menuData;
         }
 
@@ -457,107 +457,15 @@ final readonly class DashboardMenuDemoSeeder
     private function requireMenuDefinition(array $definitions, string $code, string $kind): array
     {
         $definition = $definitions[$code] ?? null;
-        if (!is_array($definition)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" is missing menu "%s".', self::FIXTURE_FILE, $code));
+        if (!\is_array($definition)) {
+            throw new InvalidArgumentException(\sprintf('Fixture "%s" is missing menu "%s".', self::FIXTURE_FILE, $code));
         }
 
-        $actualKind = $this->requireString($definition, 'kind', sprintf('menus[%s]', $code));
+        $actualKind = $this->requireString($definition, 'kind', \sprintf('menus[%s]', $code));
         if ($actualKind !== $kind) {
-            throw new InvalidArgumentException(
-                sprintf('Fixture "%s" expects menu "%s" to have kind "%s", got "%s".', self::FIXTURE_FILE, $code, $kind, $actualKind),
-            );
+            throw new InvalidArgumentException(\sprintf('Fixture "%s" expects menu "%s" to have kind "%s", got "%s".', self::FIXTURE_FILE, $code, $kind, $actualKind));
         }
 
         return $definition;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return array<mixed>
-     */
-    private function requireArray(array $source, string $key, string $context): array
-    {
-        $value = $source[$key] ?? null;
-        if (!is_array($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be an object.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return list<mixed>
-     */
-    private function requireList(array $source, string $key, string $context): array
-    {
-        $value = $source[$key] ?? null;
-        if (!is_array($value) || !array_is_list($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a list.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireString(array $source, string $key, string $context): string
-    {
-        $value = $source[$key] ?? null;
-        if (!is_string($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a string.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireNullableString(array $source, string $key, string $context): ?string
-    {
-        $value = $source[$key] ?? null;
-        if (null !== $value && !is_string($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be a string or null.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     */
-    private function requireInt(array $source, string $key, string $context): int
-    {
-        $value = $source[$key] ?? null;
-        if (!is_int($value)) {
-            throw new InvalidArgumentException(sprintf('Fixture "%s" expects %s.%s to be an integer.', self::FIXTURE_FILE, $context, $key));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<mixed> $source
-     *
-     * @return array<string, string>
-     */
-    private function requireTranslations(array $source, string $key, string $context): array
-    {
-        $value = $this->requireArray($source, $key, $context);
-        $translations = [];
-        foreach ($value as $locale => $translation) {
-            if (!is_string($locale) || !is_string($translation)) {
-                throw new InvalidArgumentException(
-                    sprintf('Fixture "%s" expects %s.%s to be a string map.', self::FIXTURE_FILE, $context, $key),
-                );
-            }
-            $translations[$locale] = $translation;
-        }
-
-        return $translations;
     }
 }

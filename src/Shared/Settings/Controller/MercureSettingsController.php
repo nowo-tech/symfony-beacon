@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
+use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Mercure\ConfiguredMercure;
 use App\Shared\Settings\Form\InstanceMercureSettingsType;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -33,14 +34,11 @@ final class MercureSettingsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (true === $form->get('clearMercureJwtSecret')->getData()) {
-                $settings->setMercureJwtSecret(null);
-            } else {
-                $plainSecret = trim((string) $form->get('plainMercureJwtSecret')->getData());
-                if ('' !== $plainSecret) {
-                    $settings->setMercureJwtSecret($plainSecret);
-                }
-            }
+            EncryptedSecretFormApplier::apply(
+                true === $form->get('clearMercureJwtSecret')->getData(),
+                trim((string) $form->get('plainMercureJwtSecret')->getData()),
+                $settings->setMercureJwtSecret(...),
+            );
 
             $this->repository->save($settings);
             $this->configuredMercure->reset();

@@ -3,29 +3,16 @@
 {% block title %}{{ 'groups.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-    <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'groups.title'|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'groups.intro'|trans }}</p>
-    </div>
-    <a class="btn-primary no-underline" href="{{ path('admin_groups_new') }}">{{ 'groups.create'|trans }}</a>
-</div>
-
-<form method="get" action="{{ path('admin_groups') }}" class="mb-4 flex flex-wrap gap-2">
-    <input
-        class="input min-w-56 flex-1"
-        type="search"
-        name="q"
-        value="{{ q }}"
-        placeholder="{{ 'groups.search_placeholder'|trans }}"
-        autocomplete="off"
-    >
-    <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
-    <a class="btn-ghost no-underline" href="{{ path('admin_groups') }}">{{ 'common.clear_filters'|trans }}</a>
-</form>
-
-<section class="panel overflow-x-auto">
-    <table class="w-full text-left text-sm">
+{% embed 'admin/_list_page.html.twig' with {
+    title: 'groups.title',
+    intro: 'groups.intro',
+    create_route: 'admin_groups_new',
+    create_label: 'groups.create',
+    search_route: 'admin_groups',
+    search_placeholder: 'groups.search_placeholder',
+    q: q,
+} %}
+    {% block table_head %}
         <thead>
             <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
                 <th class="px-2 py-2 font-medium">{{ 'groups.col.group'|trans }}</th>
@@ -36,6 +23,8 @@
                 <th class="px-2 py-2 font-medium">{{ 'groups.col.actions'|trans }}</th>
             </tr>
         </thead>
+    {% endblock %}
+    {% block table_body %}
         <tbody>
             {% for group in groups %}
                 <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
@@ -70,6 +59,6 @@
                 </tr>
             {% endfor %}
         </tbody>
-    </table>
-</section>
+    {% endblock %}
+{% endembed %}
 {% endblock %}

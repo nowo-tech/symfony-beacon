@@ -7,17 +7,15 @@ namespace App\Notifications\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
-use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
-use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\ActionTokenConsumer;
+use App\Notifications\Service\ActionTokenConsumeResult;
+use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\InteractionActionToken;
-use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use InvalidArgumentException;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -35,13 +33,12 @@ final class TeamsAssignMeController extends AbstractController
 {
     public function __construct(
         private readonly InteractionActionToken $actionToken,
-        private readonly NotificationDestinationRepository $destinationRepository,
+        private readonly HookDestinationContextResolver $destinationContextResolver,
+        private readonly ActionTokenConsumer $actionTokenConsumer,
         private readonly IssueRepository $issueRepository,
         private readonly IssueAssigneeChanger $issueAssigneeChanger,
         private readonly ProjectAccessService $projectAccess,
         private readonly LoggerInterface $logger,
-        #[Autowire(service: 'cache.action_token')]
-        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -66,16 +63,12 @@ final class TeamsAssignMeController extends AbstractController
             throw $this->createAccessDeniedException('Incomplete token');
         }
 
-        $destination = $this->destinationRepository->findOneBy(['uuid' => $destinationUuid]);
-        if (!$destination instanceof NotificationDestination
-            || NotificationDestinationType::Teams !== $destination->getType()
-            || !$destination->hasSigningSecret()
-        ) {
+        $context = $this->destinationContextResolver->resolve($destinationUuid, NotificationDestinationType::Teams);
+        if (null === $context) {
             throw $this->createAccessDeniedException('Unknown destination');
         }
 
-        $secret = (string) $destination->getSigningSecret();
-        if (!$this->actionToken->isValidAssignToken($secret, $payload)) {
+        if (!$this->actionToken->isValidAssignToken($context->signingSecret, $payload)) {
             $this->logger->warning('Teams Assign rejected: invalid token.', [
                 'destination_uuid' => $destinationUuid,
             ]);
@@ -83,35 +76,26 @@ final class TeamsAssignMeController extends AbstractController
             throw $this->createAccessDeniedException('Invalid token');
         }
 
-        $cacheKey = $this->actionToken->consumeCacheKey($payload);
-        if (null === $cacheKey) {
-            throw $this->createAccessDeniedException('Invalid token');
-        }
-        $item = $this->cache->getItem($cacheKey);
-        if ($item->isHit()) {
+        $consumeResult = $this->actionTokenConsumer->consumeOnce($payload);
+        if (ActionTokenConsumeResult::AlreadyUsed === $consumeResult) {
             $this->logger->info('Teams Assign rejected: token already used.', [
                 'destination_uuid' => $destinationUuid,
             ]);
             $this->addFlash('error', 'notifications.teams.token_used');
 
-            $projectUuid = $payload['p'];
-            $issueUuid = $payload['i'];
-
             return $this->redirectToRoute('issue_show', [
-                'projectId' => $projectUuid,
-                'id' => $issueUuid,
+                'projectId' => $payload['p'],
+                'id' => $payload['i'],
             ]);
         }
-        $item->set(1);
-        $ttl = max(1, (int) $payload['exp'] - time());
-        $item->expiresAfter($ttl);
-        $this->cache->save($item);
+        if (ActionTokenConsumeResult::Invalid === $consumeResult) {
+            throw $this->createAccessDeniedException('Invalid token');
+        }
 
         $projectUuid = $payload['p'];
         $issueUuid = $payload['i'];
 
-        $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
+        if ($context->project->getUuid() !== $projectUuid) {
             throw $this->createAccessDeniedException('Project mismatch');
         }
 
@@ -121,12 +105,12 @@ final class TeamsAssignMeController extends AbstractController
         }
 
         try {
-            $this->projectAccess->requireTriage($project, $user);
+            $this->projectAccess->requireTriage($context->project, $user);
         } catch (AccessDeniedHttpException) {
             $this->addFlash('error', 'issues.assignee_forbidden');
 
             return $this->redirectToRoute('issue_show', [
-                'projectId' => $project->getUuid(),
+                'projectId' => $context->project->getUuid(),
                 'id' => $issue->getUuid(),
             ]);
         }
@@ -140,7 +124,7 @@ final class TeamsAssignMeController extends AbstractController
         }
 
         return $this->redirectToRoute('issue_show', [
-            'projectId' => $project->getUuid(),
+            'projectId' => $context->project->getUuid(),
             'id' => $issue->getUuid(),
         ]);
     }

@@ -6,10 +6,12 @@ namespace App\Tests\Integration\Shared;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\Service\IssueMergeService;
-use App\Project\Repository\ProjectRepository;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Repository\EventRepository;
+use App\Issues\Service\IssueMergeService;
 use App\Ops\Retention\RetentionPurger;
+use App\Project\Repository\ProjectRepository;
+use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
@@ -65,7 +67,7 @@ final class RetentionPurgerTest extends DatabaseWebTestCase
             $em,
             self::getContainer()->get(ProjectRepository::class),
             self::getContainer()->get(IssueMergeService::class),
-            $this->opsDefaults(),
+            $this->governanceResolver(),
         );
         $result = $purger->purgeProject($project);
 
@@ -112,7 +114,7 @@ final class RetentionPurgerTest extends DatabaseWebTestCase
             $em,
             self::getContainer()->get(ProjectRepository::class),
             self::getContainer()->get(IssueMergeService::class),
-            $this->opsDefaults(),
+            $this->governanceResolver(),
         );
         $purger->purgeProject($project);
 
@@ -123,12 +125,15 @@ final class RetentionPurgerTest extends DatabaseWebTestCase
         self::assertNotNull($em->getRepository(Event::class)->findOneBy(['eventId' => 'fresh-recount']));
     }
 
-    private function opsDefaults(): InstanceOpsDefaults
+    private function governanceResolver(): ProjectGovernanceResolver
     {
         $settings = InstanceSettings::defaults()->setRetentionDays(30);
         $repository = $this->createStub(InstanceSettingsRepository::class);
         $repository->method('getOrCreate')->willReturn($settings);
 
-        return new InstanceOpsDefaults($repository);
+        return new ProjectGovernanceResolver(
+            self::getContainer()->get(EventRepository::class),
+            new InstanceOpsDefaults($repository),
+        );
     }
 }

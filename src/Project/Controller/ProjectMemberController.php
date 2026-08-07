@@ -11,9 +11,10 @@ use App\Identity\Repository\UserRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
+use App\Project\Service\ProjectAccessFlashKeys;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectMembershipManager;
-use App\Project\Enum\ProjectRole;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -65,9 +66,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -111,9 +112,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -150,9 +151,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -204,9 +205,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -244,9 +245,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -288,9 +289,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -325,9 +326,9 @@ final class ProjectMemberController extends AbstractController
             if ('forbidden' === $e->getMessage()) {
                 throw $this->createAccessDeniedException();
             }
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         } catch (InvalidArgumentException $e) {
-            $this->addFlash('error', $this->flashKeyForCode($e->getMessage()));
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
         }
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
@@ -342,25 +343,5 @@ final class ProjectMemberController extends AbstractController
         }
 
         return $membership;
-    }
-
-    /**
-     * Map domain exception message codes to translation keys under `flash.project.*`.
-     */
-    private function flashKeyForCode(string $code): string
-    {
-        return match ($code) {
-            'user_not_found' => 'flash.project.member_user_not_found',
-            'user_disabled' => 'flash.project.member_user_disabled',
-            'already_member' => 'flash.project.member_already',
-            'invalid_role' => 'flash.project.member_invalid_role',
-            'last_owner' => 'flash.project.member_last_owner',
-            'cannot_manage_owner' => 'flash.project.member_cannot_manage_owner',
-            'cannot_transfer_to_self' => 'flash.project.transfer_to_self',
-            'already_owner' => 'flash.project.transfer_already_owner',
-            'group_already_linked' => 'flash.project.group_already',
-            'group_link_forbidden' => 'flash.project.group_link_forbidden',
-            default => 'flash.project.member_error',
-        };
     }
 }

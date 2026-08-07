@@ -14,18 +14,18 @@ use App\Identity\UserActionType;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
-use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
 use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectFactory;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Project\Service\ProjectMembershipManager;
 use App\Shared\Health\MessengerQueueHealth;
-use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +36,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Project create/show and settings (including governance save).
@@ -53,6 +52,7 @@ final class ProjectController extends AbstractController
         private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly ProjectAccessService $projectAccess,
         private readonly ProjectRepository $projectRepository,
+        private readonly ProjectFactory $projectFactory,
         private readonly ProjectReadTokenRepository $readTokenRepository,
         private readonly ProjectShareLinkRepository $shareLinkRepository,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
@@ -81,27 +81,7 @@ final class ProjectController extends AbstractController
             $name = trim((string) $data['name']);
             $description = trim((string) ($data['description'] ?? ''));
 
-            $slugger = new AsciiSlugger();
-            $slug = strtolower($slugger->slug($name)->toString());
-            if ('' === $slug) {
-                $slug = 'project-'.bin2hex(random_bytes(3));
-            }
-            if (null !== $this->projectRepository->findOneBy(['slug' => $slug])) {
-                $slug .= '-'.bin2hex(random_bytes(2));
-            }
-
-            $project = new Project();
-            $project->setName($name);
-            $project->setSlug($slug);
-            $project->setDescription('' !== $description ? $description : null);
-
-            $membership = new ProjectMembership();
-            $membership->setUser($user);
-            $membership->setRole(ProjectRole::Owner);
-            $project->addMembership($membership);
-
-            $apiKey = $this->createApiKey($project, 'Default');
-            $project->addApiKey($apiKey);
+            $project = $this->projectFactory->create($user, $name, '' !== $description ? $description : null);
 
             $this->projectRepository->save($project);
 
@@ -174,20 +154,7 @@ final class ProjectController extends AbstractController
 
         $this->projectRepository->hydrateAccessGraph($project);
         $availableGroups = $this->availableGroupsForProject($project, $user);
-        $groupIds = [];
-        foreach ($project->getGroupAccesses() as $accessRow) {
-            $groupId = $accessRow->getUserGroup()?->getId();
-            if (null !== $groupId) {
-                $groupIds[] = $groupId;
-            }
-        }
-        foreach ($availableGroups as $group) {
-            $groupId = $group->getId();
-            if (null !== $groupId) {
-                $groupIds[] = $groupId;
-            }
-        }
-        $groupIds = array_values(array_unique($groupIds));
+        $groupIds = ProjectRepository::collectGroupIds($project, $availableGroups);
 
         $destinations = $project->getNotificationDestinations()->toArray();
 
@@ -377,17 +344,4 @@ final class ProjectController extends AbstractController
             }
         }
     }
-
-    private function createApiKey(Project $project, string $label): ProjectApiKey
-    {
-        for ($attempt = 0; $attempt < 8; ++$attempt) {
-            $publicKey = $this->tokenGenerator->generateKey();
-            if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $publicKey])) {
-                return ProjectApiKey::generate($project, $label, $publicKey);
-            }
-        }
-
-        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4));
-    }
-
 }

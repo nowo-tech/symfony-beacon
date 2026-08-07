@@ -8,12 +8,8 @@ require dirname(__DIR__).'/vendor/autoload.php';
 
 new Dotenv()->bootEnv(dirname(__DIR__).'/.env');
 
-// Isolate SQLite per PHPUnit process after Dotenv so concurrent runners do not share
-// /dev/shm/symfony-beacon-phpunit.db (readonly / lock errors under parallel coverage).
-$testDbPath = sprintf('/dev/shm/symfony-beacon-phpunit-%d.db', getmypid());
-$_SERVER['BEACON_TEST_DATABASE_URL'] = 'sqlite:///'.$testDbPath;
-$_ENV['BEACON_TEST_DATABASE_URL'] = $_SERVER['BEACON_TEST_DATABASE_URL'];
-putenv('BEACON_TEST_DATABASE_URL='.$_SERVER['BEACON_TEST_DATABASE_URL']);
+// Per-process SQLite isolation is handled by PidSqliteUrlEnvVarProcessor (FrankenPHP-safe:
+// no putenv / $_ENV mutation). See doctrine.yaml when@test.
 
 if (!empty($_SERVER['APP_DEBUG'])) {
     umask(0000);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity\AuthKit;
 
+use App\Identity\AuthKit\AuthKitMailDelivery;
 use App\Identity\AuthKit\AuthKitPasswordResetMailNotifier;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Mailer\MailerDsnValidator;
@@ -24,7 +25,7 @@ final class AuthKitPasswordResetMailNotifierTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::never())->method('trans');
 
-        $notifier = new AuthKitPasswordResetMailNotifier($this->mailer(available: false), $translator);
+        $notifier = new AuthKitPasswordResetMailNotifier($this->mailDelivery($translator, available: false));
         $notifier->notify($this->token(PasswordResetDeliveryMode::Link), $this->context('user@example.com'));
     }
 
@@ -33,7 +34,7 @@ final class AuthKitPasswordResetMailNotifierTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::never())->method('trans');
 
-        $notifier = new AuthKitPasswordResetMailNotifier($this->mailer(available: true), $translator);
+        $notifier = new AuthKitPasswordResetMailNotifier($this->mailDelivery($translator, available: true));
         $notifier->notify($this->token(PasswordResetDeliveryMode::Link), $this->context('bad'));
     }
 
@@ -51,13 +52,18 @@ final class AuthKitPasswordResetMailNotifierTest extends TestCase
             },
         );
 
-        $notifier = new AuthKitPasswordResetMailNotifier($this->mailer(available: true), $translator);
+        $notifier = new AuthKitPasswordResetMailNotifier($this->mailDelivery($translator, available: true));
         $notifier->notify(
             $this->token(PasswordResetDeliveryMode::Both, 'linktok:123456'),
             $this->context('reset@example.com'),
         );
 
         self::assertSame('123456', $seenCode);
+    }
+
+    private function mailDelivery(TranslatorInterface $translator, bool $available): AuthKitMailDelivery
+    {
+        return new AuthKitMailDelivery($this->mailer($available), $translator);
     }
 
     private function mailer(bool $available): ConfiguredMailer

@@ -24,7 +24,7 @@ nowo_form_kit:
                         rows: 3
                 checkbox:
                     attr:
-                        class: 'size-4 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30'
+                        class: 'checkbox'
                     row_attr:
                         class: 'flex items-center gap-2'
                 choice:

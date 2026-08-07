@@ -186,6 +186,15 @@ final class IssueController extends AbstractController
         ]);
     }
 
+    /**
+     * @return array{
+     *     environmentA: string,
+     *     environmentB: string,
+     *     onlyA: list<Issue>,
+     *     onlyB: list<Issue>,
+     *     both: list<Issue>
+     * }
+     */
     private function buildEnvironmentCompare(Project $project, string $environmentA, string $environmentB): array
     {
         $setA = $this->issueSearchRepository->findByLastEnvironment($project, $environmentA);
@@ -326,6 +335,7 @@ final class IssueController extends AbstractController
         return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
     }
 
+    /** @return array<string, int|string> */
     private function filterQueryFromRequest(Request $request): array
     {
         $query = [];

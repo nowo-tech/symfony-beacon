@@ -109,6 +109,7 @@ As `ROLE_ADMIN`, kit dashboards keep Beacon look: host `templates/kit/*_layout.h
 - `080-dashboard-aside-panels` / `079-dashboard-assignments` — list pagination convention.
 - `056-setup-wizard` — SiteBackup host layouts stay Tailwind + UiKit tokens.
 - `037-authkit-identity-migration` — AuthKit pin / FormKit `auth_kit` profile.
+- `086-dry-refactor` — platform `.checkbox` + FormKit checkbox class; password-toggle gap/eye chrome; shared Twig shells (confirm / admin list / feed); does not change FormKit package pins.
 
 ## Out of Scope
 

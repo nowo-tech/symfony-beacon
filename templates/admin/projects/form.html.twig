@@ -10,11 +10,10 @@
     </h1>
 </div>
 
-{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
-    {% include 'form/_fields.html.twig' with {form: form} only %}
-    <div class="flex flex-wrap gap-2">
-        <button class="btn-primary" type="submit">{{ is_edit ? 'admin_projects.save'|trans : 'admin_projects.create'|trans }}</button>
-        <a class="btn-ghost no-underline" href="{{ is_edit ? path('admin_projects_show', {id: project.uuid}) : path('admin_projects') }}">{{ 'admin_projects.cancel'|trans }}</a>
-    </div>
-{{ form_end(form) }}
+{% include 'admin/_crud_form.html.twig' with {
+    form: form,
+    submit_label: is_edit ? 'admin_projects.save' : 'admin_projects.create',
+    cancel_href: is_edit ? path('admin_projects_show', {id: project.uuid}) : path('admin_projects'),
+    cancel_label: 'admin_projects.cancel',
+} only %}
 {% endblock %}

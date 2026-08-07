@@ -3,7 +3,6 @@
 {% set css_class = install_prompt.css_class|default('nowo-pwa-install') %}
 {# BEM suffixes must use a single root token; extra classes on css_class stay on the root only. #}
 {% set bem = css_class|trim|split(' ')|filter(c => c != '')|first|default('nowo-pwa-install') %}
-{% set mark_asset = install_prompt.mark_asset|default(null) %}
 {% set install_title = install_prompt.title is defined and install_prompt.title is not same as(null) and install_prompt.title is not same as('')
     ? install_prompt.title|trans
     : 'install.action'|trans({}, 'NowoPwaBundle') %}
@@ -40,11 +39,12 @@
     {% endif %}
     <div class="{{ bem }}__panel">
         {% block pwa_install_mark %}
-            {% if mark_asset %}
-                <div class="{{ bem }}__brand">
-                    <img src="{{ mark_asset }}" alt="{{ manifest.short_name|default(manifest.name|default('App')) }}" class="{{ bem }}__mark" width="40" height="40">
-                </div>
-            {% endif %}
+            {# Inline mark follows SiteAppearance --beacon-mark (not a hardcoded SVG asset). #}
+            <div class="{{ bem }}__brand">
+                <span class="{{ bem }}__mark" aria-hidden="true">
+                    {% include '_brand_icon.html.twig' %}
+                </span>
+            </div>
         {% endblock %}
 
         {% block pwa_install_eyebrow %}

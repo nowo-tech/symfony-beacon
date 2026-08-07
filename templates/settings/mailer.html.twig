@@ -26,14 +26,7 @@
         </p>
     </div>
 
-    {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
-        {% include 'form/_fields.html.twig' with {form: form} only %}
-
-        <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
-            <button class="btn-primary" type="submit">{{ 'mailer_settings.submit'|trans }}</button>
-            <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
-        </div>
-    {{ form_end(form) }}
+    {% include 'settings/_instance_form.html.twig' with {form: form, submit_label: 'mailer_settings.submit'} only %}
 
     <div class="panel mt-6 space-y-3">
         <h2 class="text-lg font-semibold">{{ 'mailer_settings.sample.title'|trans }}</h2>

@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`). **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -297,6 +297,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.32 | **Appearance theme presets**: named light/dark palettes that overwrite colors; independent `theme_id` / `theme_id_dark`; tabbed Themes / Brand / Layout / Colors; corner / border / fixed footer | Beacon | `082-appearance-theme-presets` | **Done** (v1.1.0) |
 | 6.33 | **Module boundary hardening**: map `Api`/`Setup`; Shared growth rules; Identity↔Project direction; Issues/Ingest maintainability; async drain isolation; unique spec numbers; Analytics/Performance tests | Beacon | `083-module-boundaries` | **Done** (v1.1.0) |
 | 6.34 | **Architecture convergence**: Envelope domain writers; `Ops` module; Compose `messenger-notify`; AI export controller; channel formatters; Project admin tests; CI boundaries; `UserUiPreferences` embeddable; demo JSON fixtures | Beacon | `085-architecture-convergence` | **Done** (v1.1.0) |
+| 6.35 | **DRY refactor**: `OtlpIngestPipeline` + mappers; Project/Issue factories & normalizers; Twig shells; `make ensure-up`; platform `.checkbox` + password-toggle gap/eye | Beacon | `086-dry-refactor` | **Done** (v1.3.0) |
 
 ### Next (immediate queue)
 
@@ -372,6 +373,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.0.1** | Docs layout (`product`/`ops`/`dev`); Doctrine N+1 / query amplification fixes on list/export, retention, ingest thresholds |
 | **v1.1.0** | Appearance presets (`082` / 6.32); FormKit/UiKit sync (`081` / 6.31); dashboard Assignments + aside panels (`079`/`080`); Ops env→DB (`084`); module boundaries + architecture convergence (`083`/`085` / 6.33–6.34); Playwright E2E; PHPUnit Unit/Functional/Integration layout + coverage expansion; Codex Security remediations |
 | **v1.2.0** | Vitest frontend unit + deeper PHPUnit/Playwright; Compose `env_file: .env`; local port defaults; MySQL host ports removed |
+| **v1.3.0** | DRY maintainability (`086` / 6.35): OTLP pipeline, factories, Twig shells, `ensure-up`, platform checkboxes + password-toggle chrome |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -383,4 +385,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-06 (**v1.2.0** cut; Vitest + Compose env_file / ports; **6.34** / **6.33** Done in **v1.1.0**).
+Last updated: 2026-08-07 (**v1.3.0** cut; **6.35** / `086-dry-refactor` Done).

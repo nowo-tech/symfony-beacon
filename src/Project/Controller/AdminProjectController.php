@@ -14,19 +14,17 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Entity\Project;
-use App\Project\Entity\ProjectApiKey;
-use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
+use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectFactory;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Project\Form\ProjectType;
 use App\Shared\Health\MessengerQueueHealth;
 use App\Shared\Http\SafeInternalRedirect;
-use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +34,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Instance-admin project list, CRUD, ingest toggle, and view-as-member.
@@ -56,7 +53,7 @@ final class AdminProjectController extends AbstractController
         private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly ProjectOpsStatsService $opsStats,
         private readonly ProjectRepository $projectRepository,
-        private readonly HumanFriendlyTokenGenerator $tokenGenerator,
+        private readonly ProjectFactory $projectFactory,
         private readonly UserActionRepository $userActionRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
         private readonly UserGroupRepository $userGroupRepository,
@@ -133,20 +130,7 @@ final class AdminProjectController extends AbstractController
 
         $this->projectRepository->hydrateAccessGraph($project);
         $availableGroups = $this->availableGroups($project);
-        $groupIds = [];
-        foreach ($project->getGroupAccesses() as $accessRow) {
-            $groupId = $accessRow->getUserGroup()?->getId();
-            if (null !== $groupId) {
-                $groupIds[] = $groupId;
-            }
-        }
-        foreach ($availableGroups as $group) {
-            $groupId = $group->getId();
-            if (null !== $groupId) {
-                $groupIds[] = $groupId;
-            }
-        }
-        $groupIds = array_values(array_unique($groupIds));
+        $groupIds = ProjectRepository::collectGroupIds($project, $availableGroups);
         $destinations = $project->getNotificationDestinations()->toArray();
 
         return $this->render('admin/projects/show.html.twig', [
@@ -341,28 +325,7 @@ final class AdminProjectController extends AbstractController
 
     private function createProject(string $name, string $description, User $owner): Project
     {
-        $slugger = new AsciiSlugger();
-        $slug = strtolower($slugger->slug($name)->toString());
-        if ('' === $slug) {
-            $slug = 'project-'.bin2hex(random_bytes(3));
-        }
-        if (null !== $this->projectRepository->findOneBy(['slug' => $slug])) {
-            $slug .= '-'.bin2hex(random_bytes(2));
-        }
-
-        $project = new Project();
-        $project->setName($name);
-        $project->setSlug($slug);
-        $trimmed = trim($description);
-        $project->setDescription('' !== $trimmed ? $trimmed : null);
-
-        $membership = new ProjectMembership();
-        $membership->setUser($owner);
-        $membership->setRole(ProjectRole::Owner);
-        $project->addMembership($membership);
-
-        $apiKey = $this->createApiKey($project, 'Default');
-        $project->addApiKey($apiKey);
+        $project = $this->projectFactory->create($owner, $name, '' !== trim($description) ? trim($description) : null);
 
         $this->projectRepository->save($project, false);
         $this->actionRecorder->record(
@@ -377,18 +340,6 @@ final class AdminProjectController extends AbstractController
         $this->entityManager->flush();
 
         return $project;
-    }
-
-    private function createApiKey(Project $project, string $label): ProjectApiKey
-    {
-        for ($attempt = 0; $attempt < 8; ++$attempt) {
-            $publicKey = $this->tokenGenerator->generateKey();
-            if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $publicKey])) {
-                return ProjectApiKey::generate($project, $label, $publicKey);
-            }
-        }
-
-        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4));
     }
 
     /** @return list<UserGroup> */
@@ -448,5 +399,4 @@ final class AdminProjectController extends AbstractController
             UserActionType::ProjectDeleted,
         ];
     }
-
 }

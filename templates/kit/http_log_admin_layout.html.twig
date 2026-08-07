@@ -2,14 +2,18 @@
    Admin pages fill {% block nowo_ui_content %}.
    Prefer this shell + kit/_kit_admin_styles; list/filter structure lives in
    templates/bundles/NowoHttpLogBundle/admin/ (Beacon panel cards). #}
-{% extends 'base.html.twig' %}
+{% extends 'kit/_kit_admin_layout.html.twig' %}
 
-{% block title %}{{ 'nav.http_log'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+{% set kit_admin_inline = true %}
+{% set kit_admin_heading %}{% block page_title %}{{ 'nav.http_log'|trans }}{% endblock %}{% endset %}
+{% set kit_admin_intro = 'admin.hub.http_log'|trans %}
+{% set kit_admin_wrapper_class = ' nowo-http-log' %}
+{% set kit_admin_css_framework = nowo_http_log_css_framework|default('tailwind') %}
+{% set kit_admin_data_testid = 'admin-http-log' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {{ vite_entry_link_tags('kit-admin') }}
-    {% include 'kit/_kit_admin_styles.html.twig' %}
+{% block title %}{{ kit_admin_heading|striptags|trim }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block kit_admin_extra_styles %}
     <style>
         /* Http log list: separate filter + results panels (issues-style). */
         .kit-admin.nowo-http-log .http-log-filters {
@@ -126,23 +130,4 @@
             text-decoration: underline;
         }
     </style>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {{ vite_entry_script_tags('kit-admin') }}
-{% endblock %}
-
-{% block body %}
-    <header class="kit-admin-page-header mb-6">
-        <h1 class="kit-admin-page-header__title">{% block page_title %}{{ 'nav.http_log'|trans }}{% endblock %}</h1>
-        <p class="kit-admin-page-header__intro">{{ 'admin.hub.http_log'|trans }}</p>
-    </header>
-    <div
-        class="kit-admin nowo-http-log"
-        data-css-framework="{{ nowo_http_log_css_framework|default('tailwind') }}"
-        data-testid="admin-http-log"
-    >
-        {% block nowo_ui_content %}{% endblock %}
-    </div>
 {% endblock %}

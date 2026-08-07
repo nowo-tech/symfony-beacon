@@ -13,7 +13,6 @@ use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\PerformanceDemoSeeder;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
-use App\Setup\Demo\MercureSampleSeeder;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 

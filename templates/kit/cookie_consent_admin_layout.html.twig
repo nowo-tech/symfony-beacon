@@ -2,30 +2,8 @@
    Admin pages fill {% block body %}; wrap via body_before/after (same Twig body collision as menus).
    Prefer this shell + kit/_kit_admin_styles over forking admin CRUD Twig.
    Area/section tabs ship in CookieConsentBundle (route-based); restyle .nowo-ui-tabs here. #}
-{% extends 'base.html.twig' %}
+{% extends 'kit/_kit_admin_layout.html.twig' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {{ vite_entry_link_tags('kit-admin') }}
-    {% include 'kit/_kit_admin_styles.html.twig' %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {{ vite_entry_script_tags('kit-admin') }}
-{% endblock %}
-
-{% block body_before %}
-    <header class="kit-admin-page-header mb-6">
-        <h1 class="kit-admin-page-header__title">{{ 'nav.cookie_consent'|trans }}</h1>
-        <p class="kit-admin-page-header__intro">{{ 'admin.hub.cookie_consent'|trans }}</p>
-    </header>
-    <div
-        class="kit-admin"
-        data-css-framework="{{ nowo_cookie_consent_css_framework|default('tailwind') }}"
-    >
-{% endblock %}
-
-{% block body_after %}
-    </div>
-{% endblock %}
+{% set kit_admin_heading = 'nav.cookie_consent'|trans %}
+{% set kit_admin_intro = 'admin.hub.cookie_consent'|trans %}
+{% set kit_admin_css_framework = nowo_cookie_consent_css_framework|default('tailwind') %}

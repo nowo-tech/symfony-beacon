@@ -9,8 +9,9 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Form\NotificationDestinationFormType;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Enum\ProjectRole;
+use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectChildEntityGuard;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,7 @@ final class ProjectNotificationController extends AbstractController
 {
     public function __construct(
         private readonly ProjectAccessService $projectAccess,
+        private readonly ProjectChildEntityGuard $childEntityGuard,
         private readonly NotificationDispatcher $notificationDispatcher,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -197,15 +199,13 @@ final class ProjectNotificationController extends AbstractController
 
     private function requireManagedDestination(string $projectId, NotificationDestination $destination): Project
     {
-        $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
-
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
 
-        return $project;
+        return $this->childEntityGuard->requireManagedChild(
+            $projectId,
+            $destination->getProject(),
+            $user,
+        );
     }
 }

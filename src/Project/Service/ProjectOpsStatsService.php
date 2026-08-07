@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use DateTimeImmutable;
 
 /**

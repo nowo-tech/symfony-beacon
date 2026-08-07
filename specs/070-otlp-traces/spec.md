@@ -45,6 +45,7 @@ As an operator, traces ingest honors ingest suspend, rate limit, daily/monthly q
 ## As-built follow-ups
 
 - OTLP metrics HTTP JSON: **`074-otlp-metrics`** (Phase 6.26 Done).
+- Shared gate/map/dispatch with logs/metrics: **`086-dry-refactor`** (`OtlpIngestPipeline`; HTTP contracts unchanged).
 - gRPC / protobuf / Bundle exporter / Performance TSDB: ROADMAP **Later**.
 
 ## Assumptions

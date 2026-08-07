@@ -9,12 +9,13 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
+use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectShareLinkManager;
-use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -59,7 +60,7 @@ final class ProjectShareLinkController extends AbstractController
 
         try {
             $this->shareLinkManager->consume($link, $user);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             if (!\in_array($e->getMessage(), ['share_exhausted', 'missing_project', 'issue_wrong_project'], true)) {
                 throw $e;
             }

@@ -3,87 +3,86 @@
 {% block title %}{{ 'assignments.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-{% set filterQuery = {
-    scope: filters.scope,
-    project: filters.project,
-    q: filters.q,
-    level: filters.level,
-    status: filters.status,
-    priority: filters.priority,
-    assignee: filters.assignee,
-    sort: filters.sort,
-    dir: filters.dir,
-    per_page: filters.per_page,
+{% embed 'dashboard/_feed_layout.html.twig' with {
+    title_key: 'assignments.title',
+    intro_key: 'assignments.intro',
+    filter_route: 'dashboard_assignments',
+    filter_grid_class: 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+    filters: filters,
+    filters_testid: 'assignments-filters',
+    empty_testid: 'assignments-empty',
+    empty_key: 'assignments.empty',
+    results_testid: 'assignments-results',
+    pagination: pagination,
+    pagination_route: 'dashboard_assignments',
+    filter_query: {
+        scope: filters.scope,
+        project: filters.project,
+        q: filters.q,
+        level: filters.level,
+        status: filters.status,
+        priority: filters.priority,
+        assignee: filters.assignee,
+        sort: filters.sort,
+        dir: filters.dir,
+        per_page: filters.per_page,
+    },
+    item_count: issues|length,
 } %}
+    {% block filter_hidden %}
+        <input type="hidden" name="sort" value="{{ filters.sort }}">
+        <input type="hidden" name="dir" value="{{ filters.dir }}">
+    {% endblock %}
+    {% block filter_fields %}
+        <select class="input" name="scope" aria-label="{{ 'assignments.filter.scope'|trans }}">
+            {% for scope in scopes %}
+                <option value="{{ scope.value }}" {% if filters.scope == scope.value %}selected{% endif %}>{{ ('assignments.scope.' ~ scope.value)|trans }}</option>
+            {% endfor %}
+        </select>
 
-<div class="mb-6">
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'assignments.title'|trans }}</h1>
-    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'assignments.intro'|trans }}</p>
-</div>
+        <select class="input" name="project" aria-label="{{ 'assignments.filter.project'|trans }}">
+            <option value="">{{ 'assignments.filter.any_project'|trans }}</option>
+            {% for project in projects %}
+                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+            {% endfor %}
+        </select>
 
-<form method="get" action="{{ path('dashboard_assignments') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-testid="assignments-filters">
-    <input type="hidden" name="sort" value="{{ filters.sort }}">
-    <input type="hidden" name="dir" value="{{ filters.dir }}">
-    <input type="hidden" name="page" value="1">
+        <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
 
-    <select class="input" name="scope" aria-label="{{ 'assignments.filter.scope'|trans }}">
-        {% for scope in scopes %}
-            <option value="{{ scope.value }}" {% if filters.scope == scope.value %}selected{% endif %}>{{ ('assignments.scope.' ~ scope.value)|trans }}</option>
-        {% endfor %}
-    </select>
+        <select class="input" name="level" aria-label="{{ 'assignments.filter.level'|trans }}">
+            <option value="">{{ 'issues.filter.any_level'|trans }}</option>
+            {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
+                <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+        </select>
 
-    <select class="input" name="project" aria-label="{{ 'assignments.filter.project'|trans }}">
-        <option value="">{{ 'assignments.filter.any_project'|trans }}</option>
-        {% for project in projects %}
-            <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-        {% endfor %}
-    </select>
+        <select class="input" name="status" aria-label="{{ 'assignments.filter.status'|trans }}">
+            {% for status in ['unresolved', 'resolved', 'ignored'] %}
+                <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+        </select>
 
-    <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
+        <select class="input" name="priority" aria-label="{{ 'assignments.filter.priority'|trans }}">
+            <option value="">{{ 'issues.filter.any_priority'|trans }}</option>
+            {% for p in ['low', 'medium', 'high', 'critical'] %}
+                <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ ('issues.priority.' ~ p)|trans }}</option>
+            {% endfor %}
+        </select>
 
-    <select class="input" name="level" aria-label="{{ 'assignments.filter.level'|trans }}">
-        <option value="">{{ 'issues.filter.any_level'|trans }}</option>
-        {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
-            <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
-        {% endfor %}
-    </select>
+        <select class="input" name="assignee" aria-label="{{ 'assignments.filter.assignee'|trans }}" {% if filters.scope == 'mine' or filters.scope == 'unassigned' %}disabled{% endif %}>
+            <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
+            {% for mate in teammates %}
+                <option value="{{ mate.id }}" {% if filters.assignee == (mate.id ~ '') %}selected{% endif %}>{{ mate.displayName ?: mate.email }}</option>
+            {% endfor %}
+        </select>
 
-    <select class="input" name="status" aria-label="{{ 'assignments.filter.status'|trans }}">
-        {% for status in ['unresolved', 'resolved', 'ignored'] %}
-            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status }}</option>
-        {% endfor %}
-    </select>
-
-    <select class="input" name="priority" aria-label="{{ 'assignments.filter.priority'|trans }}">
-        <option value="">{{ 'issues.filter.any_priority'|trans }}</option>
-        {% for p in ['low', 'medium', 'high', 'critical'] %}
-            <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ ('issues.priority.' ~ p)|trans }}</option>
-        {% endfor %}
-    </select>
-
-    <select class="input" name="assignee" aria-label="{{ 'assignments.filter.assignee'|trans }}" {% if filters.scope == 'mine' or filters.scope == 'unassigned' %}disabled{% endif %}>
-        <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
-        {% for mate in teammates %}
-            <option value="{{ mate.id }}" {% if filters.assignee == (mate.id ~ '') %}selected{% endif %}>{{ mate.displayName ?: mate.email }}</option>
-        {% endfor %}
-    </select>
-
-    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-        {% for size in [10, 25, 50, 100] %}
-            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-        {% endfor %}
-    </select>
-
-    <div class="issue-filters__actions">
-        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
-        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('dashboard_assignments') }}">{{ 'common.clear_filters'|trans }}</a>
-    </div>
-</form>
-
-{% if pagination.total == 0 %}
-    <div class="panel text-[var(--color-ink)]/70" data-testid="assignments-empty">{{ 'assignments.empty'|trans }}</div>
-{% else %}
-    <div class="panel" data-testid="assignments-results">
+        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
+            {% for size in [10, 25, 50, 100] %}
+                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
+            {% endfor %}
+        </select>
+    {% endblock %}
+    {% block results %}
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
@@ -119,15 +118,6 @@
                 </tbody>
             </table>
         </div>
-
-        {% include 'shared/_table_pagination.html.twig' with {
-            pagination: pagination,
-            item_count: issues|length,
-            route: 'dashboard_assignments',
-            route_params: {},
-            query: filterQuery,
-            nav_label: 'issues.pagination.nav'
-        } %}
-    </div>
-{% endif %}
+    {% endblock %}
+{% endembed %}
 {% endblock %}

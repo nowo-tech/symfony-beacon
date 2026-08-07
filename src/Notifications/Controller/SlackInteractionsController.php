@@ -7,18 +7,16 @@ namespace App\Notifications\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueStatusChanger;
-use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
-use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\SlackRequestSignatureVerifier;
 use App\Project\Access\ProjectAccess;
-use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use JsonException;
@@ -40,7 +38,7 @@ final class SlackInteractionsController extends AbstractController
 {
     public function __construct(
         private readonly SlackRequestSignatureVerifier $signatureVerifier,
-        private readonly NotificationDestinationRepository $destinationRepository,
+        private readonly HookDestinationContextResolver $destinationContextResolver,
         private readonly IssueRepository $issueRepository,
         private readonly UserRepository $userRepository,
         private readonly IssueStatusChanger $issueStatusChanger,
@@ -107,15 +105,15 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Incomplete action value', Response::HTTP_BAD_REQUEST);
         }
 
-        $destination = $this->destinationRepository->findOneBy(['uuid' => $destinationUuid]);
-        if (!$destination instanceof NotificationDestination
-            || NotificationDestinationType::Slack !== $destination->getType()
-            || !$destination->hasSigningSecret()
-        ) {
+        $context = $this->destinationContextResolver->resolve(
+            $destinationUuid,
+            NotificationDestinationType::Slack,
+        );
+        if (null === $context) {
             return new Response('Unknown destination', Response::HTTP_UNAUTHORIZED);
         }
 
-        $secret = (string) $destination->getSigningSecret();
+        $secret = $context->signingSecret;
         $timestamp = $request->headers->get('X-Slack-Request-Timestamp', '');
         $signature = $request->headers->get('X-Slack-Signature', '');
         if (!$this->signatureVerifier->isValid($secret, $timestamp, $signature, $rawBody)) {
@@ -126,8 +124,8 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Invalid signature', Response::HTTP_UNAUTHORIZED);
         }
 
-        $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
+        $project = $context->project;
+        if ($project->getUuid() !== $projectUuid) {
             return new Response('Project mismatch', Response::HTTP_FORBIDDEN);
         }
 

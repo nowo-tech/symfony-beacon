@@ -84,7 +84,7 @@ Incoming Webhooks alone cannot receive button clicks. To enable **Resolve** from
 4. New issue alerts will show **Resolve** and **Assign to me**.
 5. For **Assign to me**, each person must link their Slack member ID under **Account → Profile → Slack user ID** (Slack profile → ⋯ → Copy member ID). They also need triage access on the project.
 
-Beacon verifies `X-Slack-Signature` (5-minute window) before changing status or assignee. Resolve still works without a linked Slack ID (actor stays null). Assign requires a linked ID + triage. Teams Assign uses OpenUri + Beacon session instead of a Teams user id (see Teams section below).
+Beacon verifies `X-Slack-Signature` (5-minute window) before changing status or assignee. Resolve still works without a linked Slack ID (actor stays null). Assign requires a linked ID + triage. Teams Assign uses OpenUri + Beacon session instead of a Teams user id (see Teams section below). Shared destination lookup / action-token helpers live under `Notifications\Service` (`HookDestinationContextResolver`, `ActionTokenConsumer`; see `086-dry-refactor`).
 
 ---
 

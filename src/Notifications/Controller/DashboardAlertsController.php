@@ -6,8 +6,8 @@ namespace App\Notifications\Controller;
 
 use App\Identity\Entity\User;
 use App\Notifications\Repository\NotificationDestinationRepository;
-use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +33,7 @@ final class DashboardAlertsController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
+        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
 
         $total = $this->destinationRepository->countWithFailedLastDeliveryInProjects($projects);
@@ -53,22 +53,5 @@ final class DashboardAlertsController extends AbstractController
             ],
             'pagination' => $pagination,
         ]);
-    }
-
-    /**
-     * @param list<Project> $accessible
-     */
-    private function resolveProjectFilter(array $accessible, string $uuid): ?Project
-    {
-        if ('' === $uuid) {
-            return null;
-        }
-        foreach ($accessible as $project) {
-            if ($project->getUuid() === $uuid) {
-                return $project;
-            }
-        }
-
-        return null;
     }
 }

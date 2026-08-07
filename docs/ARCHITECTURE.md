@@ -91,9 +91,9 @@ Features are specified under `specs/` before large changes. That matches an open
 | Module | Responsibility | Why it is separate |
 |--------|----------------|--------------------|
 | `Identity` | Users, account prefs (`UserUiPreferences` embeddable), magic login (Mailer-gated), seed; instance `ROLE_USER` / `ROLE_ADMIN` | Auth boundary; AuthKit + Security `login_link` (`026`); see [ROLES.md](product/ROLES.md) |
-| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links; admin project ops (target owner per `083`) | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
-| `Ingest` | Envelope HTTP + async pipeline; OTLP HTTP JSON adapters into the same pipeline | Latency-sensitive write path |
-| `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT | Primary debugging UX |
+| `Project` | Projects, keys, memberships (`owner`/`admin`/`member`/`viewer`), Settings / danger zone, share links; admin project ops (target owner per `083`); `ProjectFactory` / `ProjectApiKeyFactory` / `AccessibleProjectFilter` for create + list filters | Multi-tenant tenancy unit; membership roles ≠ Security `ROLE_*` |
+| `Ingest` | Envelope HTTP + async pipeline; OTLP HTTP JSON adapters via `OtlpIngestPipeline` + per-signal mappers (`logs` / `traces` / `metrics`) into the same Envelope worker | Latency-sensitive write path |
+| `Issues` | Fingerprint grouping, list/detail, assignee, status UI, `issue_history`, FULLTEXT; shared `IssueJsonNormalizer` for export / read API | Primary debugging UX |
 | `Performance` | Transactions, spans, N+1 | Distinct Envelope item type and UI |
 | `Analytics` | Daily aggregates + period charts/filters (`025`) | Read models from `DailyProjectStat`; filtered errors from `Event` |
 | `Notifications` | Slack / Discord / Teams / Telegram / email / HTTP; digests, thresholds, delivery history | Outbound alerts after ingest |
@@ -102,7 +102,7 @@ Features are specified under `specs/` before large changes. That matches an open
 | `Setup` | First-run / SiteBackup bootstrap; **platform & sample demo seeders** under `Setup\Demo` + JSON fixtures in `Setup\Demo/fixtures` + `app:seed-platform` / `app:seed-sample` | Cold-start and QA seed path — not day-to-day product UI |
 | `Api` | Bearer read API for automation (`ProjectReadApiController`) | JSON read path separate from Twig UI and Envelope ingest |
 
-Boundary hardening (`083` / `085`): Shared growth rules, `Ops` module, Envelope domain writers, Identity↔Project direction, Issues/Ingest maintainability, process-level async drain isolation.
+Boundary hardening (`083` / `085`): Shared growth rules, `Ops` module, Envelope domain writers, Identity↔Project direction, Issues/Ingest maintainability, process-level async drain isolation. Internal DRY (`086`): thin OTLP controllers behind `OtlpIngestPipeline`, Project/Issue factories & normalizers, shared Twig shells (`_confirm_dialog`, admin `_list_page`, dashboard `_feed_layout`).
 
 Entity tables, columns, and FK relationships (Mermaid ER): [DATABASE.md](dev/DATABASE.md).
 
@@ -211,6 +211,34 @@ sequenceDiagram
     Q->>Handler: consume
     Handler->>Handler: re-check suspend + daily quota
     Handler->>Handler: persist event or transaction
+  end
+```
+
+### OTLP HTTP JSON → Envelope worker
+
+Logs, traces, and metrics share one pipeline: authenticate and apply Ops limits via the gateway, map with a signal-specific mapper, then dispatch the same `ProcessEnvelopeMessage` path as Envelope ingest. Controllers stay thin (`086`).
+
+```mermaid
+sequenceDiagram
+  participant Client as OTLP exporter
+  participant HTTP as OtlpLogs|Traces|MetricsController
+  participant Pipe as OtlpIngestPipeline
+  participant Map as OtlpSignalMapper
+  participant Bus as MessageBus
+  participant Q as async_ingest
+  participant Handler as ProcessEnvelopeHandler
+
+  Client->>HTTP: POST /api/{project_id}/otlp/v1/{logs|traces|metrics}
+  HTTP->>Pipe: ingest(request, mapper)
+  Pipe->>Pipe: auth + body/quota/rate (OtlpIngestGateway)
+  alt rejected
+    Pipe-->>Client: 401 / 403 / 413 / 429
+  else accepted
+    Pipe->>Map: map JSON → Beacon event payloads (cap 200)
+    Pipe->>Bus: dispatch ProcessEnvelopeMessage (no DSN secrets)
+    Bus->>Q: enqueue
+    Pipe-->>Client: 200 ACK
+    Q->>Handler: consume (same as Envelope)
   end
 ```
 

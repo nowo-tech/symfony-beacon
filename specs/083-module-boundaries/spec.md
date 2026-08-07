@@ -21,7 +21,7 @@ There is no new end-user product surface. Success is measurable as: docs ↔ cod
 | Admin projects | `App\Project\Controller\AdminProjectController` — same `/admin/projects*` route names |
 | Issues queries | `IssueSearchRepository` (list/filter/search); `IssueRepository` (fingerprint/uuid/similarity lookups) |
 | Issues HTTP | `IssueController` (index + saved views); `IssueDetailController` (show / triage / event); AI export → `IssueAiExportController` (`085`) |
-| OTLP | `App\Ingest\Otlp\{Controller,Service}`; route import `controllers_ingest_otlp` |
+| OTLP | `App\Ingest\Otlp\{Controller,Service}` (`OtlpIngestPipeline` + mappers in `086`); route import `controllers_ingest_otlp` |
 | Messenger | Transports `async_ingest` vs `async`; Compose process split completed in `085` (`messenger` / `messenger-notify`) |
 | Spec hygiene | `079-ops-env-to-db` renumbered → `084-ops-env-to-db`; `079-dashboard-assignments` kept |
 | Tests | `AnalyticsPeriodResolverTest` + `AnalyticsSeriesServiceTest`; Performance list + `nplus1` filter |

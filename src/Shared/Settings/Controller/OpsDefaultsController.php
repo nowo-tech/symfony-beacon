@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
+use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Settings\Form\InstanceOpsDefaultsType;
 use App\Shared\Settings\OpsDefaultsSection;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -52,26 +53,20 @@ final class OpsDefaultsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($sectionEnum === OpsDefaultsSection::Metrics) {
-                if (true === $form->get('clearMetricsToken')->getData()) {
-                    $settings->setMetricsToken(null);
-                } else {
-                    $plainMetrics = trim((string) $form->get('plainMetricsToken')->getData());
-                    if ('' !== $plainMetrics) {
-                        $settings->setMetricsToken($plainMetrics);
-                    }
-                }
+            if (OpsDefaultsSection::Metrics === $sectionEnum) {
+                EncryptedSecretFormApplier::apply(
+                    true === $form->get('clearMetricsToken')->getData(),
+                    trim((string) $form->get('plainMetricsToken')->getData()),
+                    $settings->setMetricsToken(...),
+                );
             }
 
-            if ($sectionEnum === OpsDefaultsSection::Inbound) {
-                if (true === $form->get('clearInboundWebhookSecret')->getData()) {
-                    $settings->setInboundWebhookSecret(null);
-                } else {
-                    $plainInbound = trim((string) $form->get('plainInboundWebhookSecret')->getData());
-                    if ('' !== $plainInbound) {
-                        $settings->setInboundWebhookSecret($plainInbound);
-                    }
-                }
+            if (OpsDefaultsSection::Inbound === $sectionEnum) {
+                EncryptedSecretFormApplier::apply(
+                    true === $form->get('clearInboundWebhookSecret')->getData(),
+                    trim((string) $form->get('plainInboundWebhookSecret')->getData()),
+                    $settings->setInboundWebhookSecret(...),
+                );
             }
 
             $this->repository->save($settings);

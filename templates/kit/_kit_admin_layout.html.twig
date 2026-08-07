@@ -1,0 +1,45 @@
+{# Base host layout for nowo-tech kit admin UIs (menus, breadcrumbs, cookie consent, routing, http log).
+   Wrap mode (default): bundle pages fill {% block body %}; host wraps via body_before/after.
+   Inline mode ({% set kit_admin_inline = true %}): pages fill {% block kit_admin_content %} or nowo_ui_content.
+
+   Twig note: many kit pages define their own {% block body %}, so wrap mode uses body_before/after
+   (not body). Modals belong in {% block kit_admin_modals %}. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ kit_admin_heading|default('')|striptags|trim }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ vite_entry_link_tags('kit-admin') }}
+    {# Load before vendor nowo-ui.css append; .kit-admin .nowo-ui-* specificity still wins. #}
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+    {% block kit_admin_extra_styles %}{% endblock %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% block kit_admin_boot_json %}{% endblock %}
+    {{ vite_entry_script_tags('kit-admin') }}
+    {% block kit_admin_extra_javascripts %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+    {% if kit_admin_inline|default(false) %}
+        {% include 'kit/_kit_admin_shell_open.html.twig' %}
+        {% block kit_admin_content %}{% block nowo_ui_content %}{% endblock %}{% endblock %}
+        {% include 'kit/_kit_admin_shell_close.html.twig' %}
+    {% endif %}
+{% endblock %}
+
+{% block body_before %}
+    {% if not kit_admin_inline|default(false) %}
+        {% include 'kit/_kit_admin_shell_open.html.twig' %}
+    {% endif %}
+{% endblock %}
+
+{% block body_after %}
+    {% if not kit_admin_inline|default(false) %}
+        {% include 'kit/_kit_admin_shell_close.html.twig' %}
+        {% block kit_admin_modals %}{% endblock %}
+    {% endif %}
+{% endblock %}

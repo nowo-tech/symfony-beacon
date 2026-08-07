@@ -3,29 +3,16 @@
 {% block title %}{{ 'admin_projects.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-    <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin_projects.title'|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin_projects.intro'|trans }}</p>
-    </div>
-    <a class="btn-primary no-underline" href="{{ path('admin_projects_new') }}">{{ 'admin_projects.create'|trans }}</a>
-</div>
-
-<form method="get" action="{{ path('admin_projects') }}" class="mb-4 flex flex-wrap gap-2">
-    <input
-        class="input min-w-56 flex-1"
-        type="search"
-        name="q"
-        value="{{ q }}"
-        placeholder="{{ 'admin_projects.search_placeholder'|trans }}"
-        autocomplete="off"
-    >
-    <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
-    <a class="btn-ghost no-underline" href="{{ path('admin_projects') }}">{{ 'common.clear_filters'|trans }}</a>
-</form>
-
-<section class="panel overflow-x-auto">
-    <table class="w-full text-left text-sm">
+{% embed 'admin/_list_page.html.twig' with {
+    title: 'admin_projects.title',
+    intro: 'admin_projects.intro',
+    create_route: 'admin_projects_new',
+    create_label: 'admin_projects.create',
+    search_route: 'admin_projects',
+    search_placeholder: 'admin_projects.search_placeholder',
+    q: q,
+} %}
+    {% block table_head %}
         <thead>
             <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
                 <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.project'|trans }}</th>
@@ -38,6 +25,8 @@
                 <th class="px-2 py-2 font-medium">{{ 'admin_projects.col.actions'|trans }}</th>
             </tr>
         </thead>
+    {% endblock %}
+    {% block table_body %}
         <tbody>
             {% for project in projects %}
                 {% set stats = opsStats[project.id] ?? null %}
@@ -90,6 +79,6 @@
                 </tr>
             {% endfor %}
         </tbody>
-    </table>
-</section>
+    {% endblock %}
+{% endembed %}
 {% endblock %}

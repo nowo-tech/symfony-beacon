@@ -59,6 +59,7 @@ As a security reviewer, OTLP never accepts query-string credentials and never pu
 
 - OTLP traces HTTP JSON: **`070-otlp-traces`** (Phase 6.22 Done).
 - OTLP metrics HTTP JSON: **`074-otlp-metrics`** (Phase 6.26 Done).
+- Shared gate/map/dispatch for all three signals: **`086-dry-refactor`** (`OtlpIngestPipeline` + `OtlpSignalMapperInterface`; HTTP contracts unchanged).
 - gRPC / protobuf / Bundle exporter / Performance TSDB: ROADMAP **Later**.
 
 ## Assumptions

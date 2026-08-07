@@ -1,11 +1,12 @@
 .PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
-	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-halite-secrets print-urls
+	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
 	@echo "  make up              Start stack (php + mysql + messenger) + vite-build; prints HTTP/HTTPS ports"
+	@echo "  make ensure-up       Start stack if php is not running (no rebuild / no vite)"
 	@echo "  make classic         FrankenPHP HTTP in classic mode"
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
 	@echo "  make down            Stop containers"
@@ -80,6 +81,16 @@ strip-cursor-coauthor-from-history:
 	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
 	@./.scripts/strip-cursor-coauthor-from-history.sh main
 
+# Bring the Compose stack up if the php service cannot exec (no --build, no vite).
+# Used as a prerequisite by targets that need a running container. Does not call `make up`
+# (avoids recursion when `up` itself runs vite-build).
+ensure-up:
+	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@docker compose exec -T php true >/dev/null 2>&1 || { \
+		echo "Stack is down — starting (docker compose up -d)…"; \
+		docker compose up -d; \
+	}
+
 # Print published app ports (from running compose, else .env / defaults).
 print-urls:
 	@HTTP_PUB=$$(docker compose port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
@@ -129,7 +140,7 @@ build-prod:
 logs:
 	docker compose logs -f php
 
-vite-hmr:
+vite-hmr: ensure-up
 	docker compose --profile hmr up -d vite
 	@echo "Vite HMR is on — entrypoints use viteServer (browser shows a pending HMR WebSocket)."
 	@echo "For stable UI without HMR: docker compose --profile hmr stop vite && make vite-build"
@@ -137,13 +148,13 @@ vite-hmr:
 vite:
 	docker compose logs -f vite
 
-vite-build:
+vite-build: ensure-up
 	docker compose exec -T php pnpm run build
 
-vite-watch:
+vite-watch: ensure-up
 	docker compose exec php pnpm run watch
 
-pnpm:
+pnpm: ensure-up
 	docker compose exec -T php pnpm $(ARGS)
 
 # Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
@@ -166,14 +177,14 @@ mailpit-logs:
 messenger-logs:
 	docker compose logs -f messenger
 
-shell:
+shell: ensure-up
 	docker compose exec php sh
 
-console:
+console: ensure-up
 	docker compose exec php bin/console $(ARGS)
 
 # Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
-ensure-halite-secrets:
+ensure-halite-secrets: ensure-up
 	docker compose exec -T php mkdir -p var/secrets
 
 seed-platform: ensure-halite-secrets
@@ -204,11 +215,11 @@ ready: bootstrap seed
 	@echo "Ready: demo project seeded; restart php if BEACON_DSN was just written (make restart)"
 	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
 
-restart:
+restart: ensure-up
 	docker compose restart php messenger
 	@$(MAKE) vite-build
 
-mysql:
+mysql: ensure-up
 	docker compose exec database mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}
 
 specify-check:
@@ -218,35 +229,35 @@ specify-check:
 	@echo "Cursor skills: .cursor/skills/"
 	@echo "Specs: specs/"
 
-cs:
+cs: ensure-up
 	docker compose exec -T php vendor/bin/php-cs-fixer check --diff
 
-cs-fix:
+cs-fix: ensure-up
 	docker compose exec -T php vendor/bin/php-cs-fixer fix
 
-twig-cs:
+twig-cs: ensure-up
 	docker compose exec -T php vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.dist.php
 
-twig-cs-fix:
+twig-cs-fix: ensure-up
 	docker compose exec -T php vendor/bin/twig-cs-fixer fix --config=.twig-cs-fixer.dist.php
 
-phpstan:
+phpstan: ensure-up
 	docker compose exec -T php bin/console cache:warmup --env=dev
 	docker compose exec -T php vendor/bin/phpstan analyse --memory-limit=512M -c phpstan.neon.dist
 
-rector:
+rector: ensure-up
 	docker compose exec -T php vendor/bin/rector process --dry-run
 
-rector-fix:
+rector-fix: ensure-up
 	docker compose exec -T php vendor/bin/rector process
 
-test:
+test: ensure-up
 	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
 
-test-unit-js:
+test-unit-js: ensure-up
 	docker compose exec -T php pnpm run test:unit $(ARGS)
 
-test-unit-js-coverage:
+test-unit-js-coverage: ensure-up
 	docker compose exec -T php pnpm run test:unit:coverage $(ARGS)
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
@@ -256,7 +267,7 @@ test-unit-js-coverage:
 # CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
 PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
 PLAYWRIGHT_BASE_URL ?= https://localhost:9447
-test-e2e:
+test-e2e: ensure-up
 	@docker compose exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
 	pnpm exec playwright test $(ARGS)
@@ -274,7 +285,7 @@ else
 endif
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
-kit-smoke:
+kit-smoke: ensure-up
 	docker compose exec -T php vendor/bin/phpunit \
 		tests/Functional/Identity/AuthKitBootstrapTest.php \
 		tests/Functional/Identity/MagicLoginTest.php \
@@ -282,7 +293,7 @@ kit-smoke:
 		tests/Functional/Identity/LoginThrottleTest.php
 
 # Soft gate: COVERAGE_MIN defaults in CI; override locally e.g. COVERAGE_MIN=35 make test-coverage
-test-coverage:
+test-coverage: ensure-up
 	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && mkdir -p var/coverage var/coverage-html'
 	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
 		--coverage-text \
@@ -301,12 +312,12 @@ qa: cs twig-cs phpstan rector check-module-boundaries test
 qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
 
 # Update PHP (Composer) and frontend (pnpm) lockfiles within constraint ranges.
-update-deps:
+update-deps: ensure-up
 	docker compose exec -T php composer update
 	docker compose exec -T php pnpm update
 	@echo "Dependencies updated. Consider: make vite-build && make qa"
 
 # Suggest pinned composer require commands for outdated direct deps (runs in php container).
 # The helper may exit non-zero when outdated packages are found; still print suggestions.
-composer-outdated:
+composer-outdated: ensure-up
 	-docker compose exec -T php bash ./generate-composer-require.sh

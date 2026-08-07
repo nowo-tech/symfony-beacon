@@ -1,0 +1,12 @@
+{#
+    Shared instance settings form shell (mailer, mercure, etc.).
+
+    Required: form, submit_label (translation key)
+#}
+{{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
+    {% include 'form/_fields.html.twig' with {form: form} only %}
+    <div class="flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+        <button class="btn-primary" type="submit">{{ submit_label|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ path('admin_hub') }}">{{ 'common.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}

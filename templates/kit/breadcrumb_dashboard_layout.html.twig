@@ -1,28 +1,21 @@
 {# Beacon host layout for breadcrumb-kit CRUD.
    Bundle pages: @NowoBreadcrumbKitBundle/dashboard/*.html.twig → base → this shell.
-   Do NOT fork dashboard pages — only this layout + CSS so kit upgrades flow in.
-
-   Twig note: kit pages also define `{% block body %}`, so wrap with body_before/after.
-   Restyle with kit/_kit_admin_styles (.kit-admin .nowo-ui-*). #}
-{% extends 'base.html.twig' %}
+   Do NOT fork dashboard pages — only this layout + CSS so kit upgrades flow in. #}
+{% extends 'kit/_kit_admin_layout.html.twig' %}
 {% trans_default_domain 'NowoBreadcrumbKitBundle' %}
 
-{% set kit_heading %}{% block dashboard_title %}{{ 'nav.breadcrumbs'|trans({}, 'messages') }}{% endblock %}{% endset %}
+{% set kit_admin_heading %}{% block dashboard_title %}{{ 'nav.breadcrumbs'|trans({}, 'messages') }}{% endblock %}{% endset %}
+{% set kit_admin_intro = 'admin.hub.breadcrumbs'|trans %}
+{% set kit_admin_css_framework = nowo_breadcrumb_kit_css_framework|default('tailwind') %}
+{% set kit_admin_split_filters = true %}
 
-{% block title %}{{ kit_heading|striptags|trim }} — {{ site_appearance.brandName }}{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {{ vite_entry_link_tags('kit-admin') }}
-    {# Load before vendor nowo-ui.css append; .kit-admin .nowo-ui-* specificity still wins. #}
-    {% include 'kit/_kit_admin_styles.html.twig' %}
+{% block kit_admin_extra_styles %}
     <style>
         body > .ts-dropdown { z-index: 1060; }
     </style>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
+{% block kit_admin_boot_json %}
     {% set _bk_dr = dashboard_routes|default({}) %}
     <script type="application/json" id="beacon-breadcrumb-kit-boot">{{ {
         cssFramework: nowo_breadcrumb_kit_css_framework|default('tailwind'),
@@ -37,20 +30,12 @@
             deleteItemConfirm: 'dashboard.delete_item_confirm'|trans,
         },
     }|json_encode|raw }}</script>
-    {{ vite_entry_script_tags('kit-admin') }}
+{% endblock %}
+
+{% block kit_admin_extra_javascripts %}
     {% include 'kit/_kit_modal_body_portals.html.twig' %}
 {% endblock %}
 
-{% block body_before %}
-    <header class="kit-admin-page-header mb-6">
-        <h1 class="kit-admin-page-header__title">{{ kit_heading }}</h1>
-        <p class="kit-admin-page-header__intro">{{ 'admin.hub.breadcrumbs'|trans }}</p>
-    </header>
-    {# panel class applied by kit-admin.ts (search stays outside the card). #}
-    <div class="kit-admin" data-kit-split-filters data-css-framework="{{ nowo_breadcrumb_kit_css_framework|default('tailwind') }}">
-{% endblock %}
-
-{% block body_after %}
-    </div>
+{% block kit_admin_modals %}
     {% include '@NowoBreadcrumbKitBundle/dashboard/_dashboard_modals.html.twig' %}
 {% endblock %}

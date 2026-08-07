@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Identity\AuthKit;
 
 use App\Identity\AuthKit\AuthKitMagicLoginMailNotifier;
+use App\Identity\AuthKit\AuthKitMailDelivery;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
@@ -21,7 +22,7 @@ final class AuthKitMagicLoginMailNotifierTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::never())->method('trans');
 
-        $notifier = new AuthKitMagicLoginMailNotifier($this->mailer(available: false), $translator);
+        $notifier = new AuthKitMagicLoginMailNotifier($this->mailDelivery($translator, available: false));
         $notifier->notify($this->context('user@example.com'));
     }
 
@@ -30,7 +31,7 @@ final class AuthKitMagicLoginMailNotifierTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::never())->method('trans');
 
-        $notifier = new AuthKitMagicLoginMailNotifier($this->mailer(available: true), $translator);
+        $notifier = new AuthKitMagicLoginMailNotifier($this->mailDelivery($translator, available: true));
         $notifier->notify($this->context('not-an-email'));
         $notifier->notify($this->context('   '));
     }
@@ -42,10 +43,15 @@ final class AuthKitMagicLoginMailNotifierTest extends TestCase
             static fn (string $id, array $params = []): string => $id.'|'.($params['%link%'] ?? ''),
         );
 
-        $notifier = new AuthKitMagicLoginMailNotifier($this->mailer(available: true), $translator);
+        $notifier = new AuthKitMagicLoginMailNotifier($this->mailDelivery($translator, available: true));
         $notifier->notify($this->context('  User@Example.COM '));
 
         $this->addToAssertionCount(1);
+    }
+
+    private function mailDelivery(TranslatorInterface $translator, bool $available): AuthKitMailDelivery
+    {
+        return new AuthKitMailDelivery($this->mailer($available), $translator);
     }
 
     private function mailer(bool $available): ConfiguredMailer

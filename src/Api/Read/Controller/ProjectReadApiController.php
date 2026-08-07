@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Api\Read\Controller;
 
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Repository\IssueSearchRepository;
+use App\Issues\Service\IssueJsonNormalizer;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectReadTokenManager;
-use App\Issues\Enum\IssueStatus;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,7 @@ final readonly class ProjectReadApiController
         private ProjectRepository $projectRepository,
         private IssueRepository $issueRepository,
         private IssueSearchRepository $issueSearchRepository,
+        private IssueJsonNormalizer $issueJsonNormalizer,
     ) {
     }
 
@@ -61,7 +63,7 @@ final readonly class ProjectReadApiController
             'project' => ['uuid' => $project->getUuid(), 'name' => $project->getName()],
             'limit' => $limit,
             'count' => \count($issues),
-            'issues' => array_map($this->issueToArray(...), $issues),
+            'issues' => array_map($this->issueJsonNormalizer->normalize(...), $issues),
         ]);
     }
 
@@ -82,7 +84,7 @@ final readonly class ProjectReadApiController
 
         return new JsonResponse([
             'project' => ['uuid' => $project->getUuid(), 'name' => $project->getName()],
-            'issue' => $this->issueToArray($issue),
+            'issue' => $this->issueJsonNormalizer->normalize($issue),
         ]);
     }
 
@@ -112,28 +114,5 @@ final readonly class ProjectReadApiController
         }
 
         return [$project, $token];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function issueToArray(Issue $issue): array
-    {
-        return [
-            'uuid' => $issue->getUuid(),
-            'title' => $issue->getTitle(),
-            'level' => $issue->getLevel(),
-            'status' => $issue->getStatus()->value,
-            'priority' => $issue->getPriority()->value,
-            'culprit' => $issue->getCulprit(),
-            'event_count' => $issue->getEventCount(),
-            'first_seen' => $issue->getFirstSeen()->format(\DATE_ATOM),
-            'last_seen' => $issue->getLastSeen()->format(\DATE_ATOM),
-            'first_release' => $issue->getFirstRelease(),
-            'last_release' => $issue->getLastRelease(),
-            'last_environment' => $issue->getLastEnvironment(),
-            'assignee_email' => $issue->getAssignee()?->getEmail(),
-            'duplicate_of_uuid' => $issue->getDuplicateOf()?->getUuid(),
-        ];
     }
 }

@@ -6,13 +6,14 @@ namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
 use App\Issues\AssignmentScope;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Issues\Enum\IssuePriority;
-use App\Issues\Enum\IssueStatus;
+use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +42,7 @@ final class DashboardAssignmentsController extends AbstractController
         $accessible = $this->projectRepository->findAccessibleByUser($user);
 
         $scope = AssignmentScope::tryFromQuery($request->query->getString('scope') ?: null);
-        $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
+        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
 
         $statusParam = $request->query->getString('status');
@@ -111,23 +112,6 @@ final class DashboardAssignmentsController extends AbstractController
             'pagination' => $pagination,
             'scopes' => AssignmentScope::cases(),
         ]);
-    }
-
-    /**
-     * @param list<Project> $accessible
-     */
-    private function resolveProjectFilter(array $accessible, string $uuid): ?Project
-    {
-        if ('' === $uuid) {
-            return null;
-        }
-        foreach ($accessible as $project) {
-            if ($project->getUuid() === $uuid) {
-                return $project;
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -31,7 +31,7 @@ Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
 ```
 
-Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches Ops defaults envelope max bytes (default 2 MiB). Spec: `067-otlp-ingest`.
+Accepts an OTLP **ExportLogsServiceRequest** JSON body (`resourceLogs` → `scopeLogs` → `logRecords`). WARN+ records (severityNumber ≥ 13) are mapped to Beacon events and processed by the same Messenger worker as Envelope (cap **200** records per request). DEBUG/INFO are dropped. Query-string auth is **not** accepted. Body size limit matches Ops defaults envelope max bytes (default 2 MiB). Shared gate/map/dispatch: `OtlpIngestPipeline` (`086`). Spec: `067-otlp-ingest`.
 
 ## OTLP traces ingest (v1)
 
@@ -41,7 +41,7 @@ Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
 ```
 
-Accepts an OTLP **ExportTraceServiceRequest** JSON body (`resourceSpans` → `scopeSpans` → `spans`). **ERROR** spans (status code ERROR and/or exception attributes) map to Beacon events via the same worker (cap **200** spans per request). OK/UNSET spans without exceptions are dropped. Query-string auth is **not** accepted. Spec: `070-otlp-traces`.
+Accepts an OTLP **ExportTraceServiceRequest** JSON body (`resourceSpans` → `scopeSpans` → `spans`). **ERROR** spans (status code ERROR and/or exception attributes) map to Beacon events via the same worker (cap **200** spans per request). OK/UNSET spans without exceptions are dropped. Query-string auth is **not** accepted. Shared gate/map/dispatch: `OtlpIngestPipeline` (`086`). Spec: `070-otlp-traces`.
 
 ## OTLP metrics ingest (v1)
 
@@ -51,7 +51,7 @@ Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=…, beacon_secret=…
 ```
 
-Accepts an OTLP **ExportMetricsServiceRequest** JSON body (`resourceMetrics` → `scopeMetrics` → `metrics`). Failure-like **data points** (metric name matching `.error` / `.errors` / `_errors`, or attributes `error.type` / `exception.*` / `otel.status_code=ERROR`) map to Beacon events via the same worker (cap **200** data points per request). Healthy points are dropped. Query-string auth is **not** accepted. Spec: `074-otlp-metrics`.
+Accepts an OTLP **ExportMetricsServiceRequest** JSON body (`resourceMetrics` → `scopeMetrics` → `metrics`). Failure-like **data points** (metric name matching `.error` / `.errors` / `_errors`, or attributes `error.type` / `exception.*` / `otel.status_code=ERROR`) map to Beacon events via the same worker (cap **200** data points per request). Healthy points are dropped. Query-string auth is **not** accepted. Shared gate/map/dispatch: `OtlpIngestPipeline` (`086`). Spec: `074-otlp-metrics`.
 
 Out of scope for OTLP v1 adapters: gRPC, protobuf Content-Type, time-series storage / Performance dashboards.
 

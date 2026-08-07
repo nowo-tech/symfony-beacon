@@ -7,13 +7,12 @@
     <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ is_edit ? 'groups.edit_title'|trans : 'groups.create'|trans }}</h1>
 </div>
 
-{{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
-    {% include 'form/_fields.html.twig' with {form: form} only %}
-    <div class="flex flex-wrap gap-2">
-        <button class="btn-primary" type="submit">{{ is_edit ? 'groups.save'|trans : 'groups.create'|trans }}</button>
-        <a class="btn-ghost no-underline" href="{{ is_edit ? path('admin_groups_show', {id: group.uuid}) : path('admin_groups') }}">{{ 'groups.cancel'|trans }}</a>
-    </div>
-{{ form_end(form) }}
+{% include 'admin/_crud_form.html.twig' with {
+    form: form,
+    submit_label: is_edit ? 'groups.save' : 'groups.create',
+    cancel_href: is_edit ? path('admin_groups_show', {id: group.uuid}) : path('admin_groups'),
+    cancel_label: 'groups.cancel',
+} only %}
 
 {% if is_edit and group %}
     <section class="panel mt-6 max-w-xl">

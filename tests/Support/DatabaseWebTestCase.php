@@ -24,7 +24,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Functional tests against a disposable SQLite database (`var/cache/test/phpunit.db`).
+ * Functional tests against a disposable SQLite database (per-PID under `/dev/shm` via
+ * {@see \App\Shared\Doctrine\PidSqliteUrlEnvVarProcessor}).
  *
  * Each test deletes the DB file and recreates the schema so suites stay isolated
  * (dropSchema alone is unreliable with SQLite + foreign keys).
@@ -111,10 +112,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $candidates[] = $projectDir.'/var/test.db';
         $candidates[] = '/tmp/symfony-beacon-phpunit.db';
         $candidates[] = '/dev/shm/symfony-beacon-phpunit.db';
-        $envUrl = $_SERVER['BEACON_TEST_DATABASE_URL'] ?? $_ENV['BEACON_TEST_DATABASE_URL'] ?? null;
-        if (\is_string($envUrl) && str_starts_with($envUrl, 'sqlite:///')) {
-            $candidates[] = substr($envUrl, \strlen('sqlite:///'));
-        }
+        $candidates[] = sprintf('/dev/shm/symfony-beacon-phpunit-%d.db', getmypid());
 
         foreach (array_unique($candidates) as $file) {
             $dir = \dirname($file);

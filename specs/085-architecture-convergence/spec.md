@@ -44,6 +44,7 @@ Close the residual structural debt left after `083-module-boundaries` without a 
 ## Related
 
 - `083-module-boundaries` (predecessor)
+- Internal DRY follow-up: **`086-dry-refactor`** (OTLP pipeline, Twig shells, `ensure-up`)
 - Roadmap **6.34**
 - Proposals canvas: architecture-audit-proposals-2026-08-06
 - Prior surfaces: `035-ops-overview`, `038-prometheus-metrics`, `059-ai-issue-export`, `009` / `068`–`073` (notifications)

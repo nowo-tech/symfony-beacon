@@ -1,0 +1,9 @@
+<a
+    class="panel no-underline transition hover:border-[var(--color-moss)]"
+    href="{{ href }}"
+    {% if tour is defined and tour %}data-tour="{{ tour }}"{% endif %}
+    {% if testid is defined and testid %}data-testid="{{ testid }}"{% endif %}
+>
+    <h3 class="text-lg font-semibold text-[var(--color-ink)]">{{ title|trans }}</h3>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ intro|trans }}</p>
+</a>

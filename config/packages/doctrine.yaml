@@ -86,9 +86,9 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # Per-process path (BEACON_TEST_DATABASE_URL from tests/bootstrap.php) avoids
-            # readonly SQLite errors when concurrent PHPUnit / coverage runs share /dev/shm.
-            url: '%env(resolve:BEACON_TEST_DATABASE_URL)%'
+            # Per-process SQLite path via pid_sqlite (PidSqliteUrlEnvVarProcessor) — no putenv/$_ENV.
+            # Avoids readonly/lock errors when concurrent PHPUnit / coverage runs share /dev/shm.
+            url: '%env(pid_sqlite:resolve:BEACON_TEST_DATABASE_URL)%'
             dbname_suffix: ''
 
 when@prod:

@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueStatusChanger;
-use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
-use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Notifications\Service\ActionTokenConsumer;
+use App\Notifications\Service\ActionTokenConsumeResult;
+use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\InteractionActionToken;
-use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -34,14 +32,13 @@ final class TeamsActionsController extends AbstractController
 {
     public function __construct(
         private readonly InteractionActionToken $actionToken,
-        private readonly NotificationDestinationRepository $destinationRepository,
+        private readonly HookDestinationContextResolver $destinationContextResolver,
+        private readonly ActionTokenConsumer $actionTokenConsumer,
         private readonly IssueRepository $issueRepository,
         private readonly IssueStatusChanger $issueStatusChanger,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
         private readonly HookMutationPolicy $hookMutationPolicy,
-        #[Autowire(service: 'cache.action_token')]
-        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -65,16 +62,12 @@ final class TeamsActionsController extends AbstractController
             return new Response('Incomplete token', Response::HTTP_BAD_REQUEST);
         }
 
-        $destination = $this->destinationRepository->findOneBy(['uuid' => $destinationUuid]);
-        if (!$destination instanceof NotificationDestination
-            || NotificationDestinationType::Teams !== $destination->getType()
-            || !$destination->hasSigningSecret()
-        ) {
+        $context = $this->destinationContextResolver->resolve($destinationUuid, NotificationDestinationType::Teams);
+        if (null === $context) {
             return new Response('Unknown destination', Response::HTTP_UNAUTHORIZED);
         }
 
-        $secret = (string) $destination->getSigningSecret();
-        if (!$this->actionToken->isValidResolveToken($secret, $payload)) {
+        if (!$this->actionToken->isValidResolveToken($context->signingSecret, $payload)) {
             $this->logger->warning('Teams action rejected: invalid token.', [
                 'destination_uuid' => $destinationUuid,
             ]);
@@ -82,28 +75,22 @@ final class TeamsActionsController extends AbstractController
             return new Response('Invalid token', Response::HTTP_UNAUTHORIZED);
         }
 
-        $cacheKey = $this->actionToken->consumeCacheKey($payload);
-        if (null === $cacheKey) {
-            return new Response('Invalid token', Response::HTTP_UNAUTHORIZED);
-        }
-        $item = $this->cache->getItem($cacheKey);
-        if ($item->isHit()) {
+        $consumeResult = $this->actionTokenConsumer->consumeOnce($payload);
+        if (ActionTokenConsumeResult::AlreadyUsed === $consumeResult) {
             $this->logger->info('Teams action rejected: token already used.', [
                 'destination_uuid' => $destinationUuid,
             ]);
 
             return new Response('Token already used', Response::HTTP_CONFLICT);
         }
-        $item->set(1);
-        $ttl = max(1, (int) $payload['exp'] - time());
-        $item->expiresAfter($ttl);
-        $this->cache->save($item);
+        if (ActionTokenConsumeResult::Invalid === $consumeResult) {
+            return new Response('Invalid token', Response::HTTP_UNAUTHORIZED);
+        }
 
         $projectUuid = (string) $payload['p'];
         $issueUuid = (string) $payload['i'];
 
-        $project = $destination->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectUuid) {
+        if ($context->project->getUuid() !== $projectUuid) {
             return new Response('Project mismatch', Response::HTTP_FORBIDDEN);
         }
 

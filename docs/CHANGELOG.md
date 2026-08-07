@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-07
+
+### Added
+
+- **DRY maintainability** (`086` / 6.35): `OtlpIngestPipeline` + `OtlpSignalMapperInterface` / `OtlpAttributeCodec`; `ProjectFactory` + `ProjectApiKeyFactory`; `AccessibleProjectFilter`; `IssueJsonNormalizer`; Shared helpers (`SqlLikeEscaper`, `CreatedAtImmutableTrait`, encrypted-secret form apply, hook destination context / action token consumer).
+- Twig shells: `shared/_confirm_dialog.html.twig`, `admin/_list_page.html.twig`, `dashboard/_feed_layout.html.twig` (plus kit admin / hub / legal / settings chrome reuse).
+- Makefile **`ensure-up`**: starts Compose (`docker compose up -d`) when `php` is not running; prerequisite for exec-based targets (no rebuild / no Vite).
+- Platform **`.checkbox`** styles (moss/sand/surface tokens) for native checkboxes, confirm-dialog checks, AuthKit / kit-admin forms; FormKit `checkbox` field class aligned to `checkbox`.
+- `PidSqliteUrlEnvVarProcessor` (`pid_sqlite:`) for per-process PHPUnit SQLite URLs without `putenv` / `$_ENV` mutation.
+
+### Changed
+
+- OTLP logs/traces/metrics controllers stay thin; shared gate/map/dispatch lives in `Ingest\Otlp\Service\OtlpIngestPipeline` (contracts unchanged).
+- Password toggle layout: eye on the **right** with **0.5rem** gap (separate controls); `nowo_password_toggle` uses `input-group-text` (host SCSS owns flex — no Tailwind container flex/gap).
+- PWA install prompt mark inlined via host Twig (theme `--beacon-mark`) instead of a static `mark_asset` path.
+- CONTRIBUTING / ARCHITECTURE / INSTALL / UPGRADING document Twig shells, checkbox paint, password-toggle chrome, and `ensure-up`.
+
+### Fixed
+
+- Confirm-dialog Twig includes stay `strict_variables`-safe (`dialog_modifier|default`).
+- PHPStan clean including FrankenPHP bootstrap ignores where required.
+- Password toggle no longer drops the eye below the field when container utilities conflicted with SCSS.
+
 ## [1.2.0] - 2026-08-06
 
 ### Added
@@ -738,7 +761,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.0...v1.0.1

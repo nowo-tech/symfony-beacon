@@ -38,10 +38,6 @@
         <a href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
     </p>
 
-    <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
-        <a href="{{ path('legal_notice', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.notice.title'|trans }}</a>
-        <a href="{{ path('legal_terms', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.terms.title'|trans }}</a>
-        <a href="{{ path('legal_cookies', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.cookies.title'|trans }}</a>
-    </nav>
+    {% include 'legal/_nav.html.twig' with {current: 'privacy'} only %}
 </article>
 {% endblock %}

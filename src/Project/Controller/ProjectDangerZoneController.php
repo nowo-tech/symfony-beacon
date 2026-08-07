@@ -7,18 +7,16 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
-use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectHistoryClearer;
-use App\Project\Enum\ProjectRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -129,5 +127,4 @@ final class ProjectDangerZoneController extends AbstractController
 
         return $this->redirectToRoute('dashboard_home');
     }
-
 }

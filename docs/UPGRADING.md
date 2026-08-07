@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.2.0)](#unreleased-main-after-120)
+- [Unreleased (main after 1.3.0)](#unreleased-main-after-130)
+- [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130)
 - [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120)
 - [Upgrading from 1.0.1 to 1.1.0](#upgrading-from-101-to-110)
 - [Upgrading from 1.0.0 to 1.0.1](#upgrading-from-100-to-101)
@@ -47,9 +48,28 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.2.0)
+## Unreleased (main after 1.3.0)
 
-No further upgrade steps yet — follow [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120) when moving off **1.1.0**.
+No further upgrade steps yet — follow [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130) when moving off **1.2.0**.
+
+## Upgrading from 1.2.0 to 1.3.0
+
+**No migrations.** Maintainability + form chrome (`086-dry-refactor`). Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.3.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make vite-build         # required for .checkbox + password-toggle CSS in public/build/
+```
+
+### Operator notes
+
+- OTLP HTTP paths and Envelope contracts are unchanged; shared PHP/Twig structure and host form chrome only.
+- `make test` / `make phpstan` / `make shell` (and other exec targets) auto-call `ensure-up` if Compose is down — they do **not** rebuild images or run Vite. Use `make up` when you need `--build` + asset build.
+- If the password field “shrinks” on focus while a password manager is enabled, disable the extension to confirm — that UI is injected by the extension (e.g. NordPass), not by Beacon.
+- PHPUnit test DB URL uses `pid_sqlite:` (`BEACON_TEST_DATABASE_URL` comment in `.env.dist`); no operator action for production.
 
 ## Upgrading from 1.1.0 to 1.2.0
 

@@ -1,0 +1,19 @@
+{#
+    Cross-links between legal pages. Omits the page matching `current`.
+
+    @param current string One of: notice, privacy, terms, cookies
+#}
+{% set _locale = app.request.locale|default(default_locale) %}
+{% set _links = {
+    notice: {route: 'legal_notice', label: 'legal.notice.title'},
+    privacy: {route: 'legal_privacy', label: 'legal.privacy.title'},
+    terms: {route: 'legal_terms', label: 'legal.terms.title'},
+    cookies: {route: 'legal_cookies', label: 'legal.cookies.title'},
+} %}
+<nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
+    {% for key, link in _links %}
+        {% if key != current %}
+            <a href="{{ path(link.route, {_locale: _locale}) }}">{{ link.label|trans }}</a>
+        {% endif %}
+    {% endfor %}
+</nav>

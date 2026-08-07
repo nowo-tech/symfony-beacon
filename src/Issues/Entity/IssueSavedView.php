@@ -7,8 +7,8 @@ namespace App\Issues\Entity;
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueSavedViewRepository;
 use App\Project\Entity\Project;
+use App\Shared\Doctrine\CreatedAtImmutableTrait;
 use App\Shared\Doctrine\PublicUuidTrait;
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_saved_view_user_project', columns: ['user_id', 'project_id'])]
 class IssueSavedView
 {
+    use CreatedAtImmutableTrait;
     use PublicUuidTrait;
 
     public const int NAME_MAX_LENGTH = 80;
@@ -44,13 +45,10 @@ class IssueSavedView
     #[ORM\Column(type: 'json')]
     private array $queryJson = [];
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     public function __construct()
     {
         $this->ensureUuid();
-        $this->createdAt = new DateTimeImmutable();
+        $this->initializeCreatedAt();
     }
 
     public function getId(): ?int
@@ -110,10 +108,5 @@ class IssueSavedView
         $this->queryJson = $queryJson;
 
         return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
     }
 }

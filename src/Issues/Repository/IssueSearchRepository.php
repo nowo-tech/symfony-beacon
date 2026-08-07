@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Issues\Repository;
 
 use App\Identity\Entity\User;
+use App\Issues\AssignmentScope;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\AssignmentScope;
-use App\Issues\IssueListSort;
-use App\Project\Entity\Project;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\IssueListSort;
+use App\Project\Entity\Project;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ArrayParameterType;
@@ -28,12 +29,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class IssueSearchRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Issue::class);
     }
 
+    /** @return list<Issue> */
     public function search(
         Project $project,
         ?string $query = null,
@@ -86,6 +87,12 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * @param list<Project> $projects
+     *
+     * @return list<Issue>
+     */
     public function searchAssignments(
         array $projects,
         AssignmentScope $scope,
@@ -130,6 +137,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /** @param list<Project> $projects */
     public function countAssignments(
         array $projects,
         AssignmentScope $scope,
@@ -158,6 +167,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /** @param list<Project> $projects */
     private function createAssignmentQueryBuilder(
         array $projects,
         AssignmentScope $scope,
@@ -196,6 +207,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
     private function applyTeammatesAssigneeFilter(QueryBuilder $qb, User $viewer, ?User $assigneeFilter): void
     {
         if ($assigneeFilter instanceof User) {
@@ -211,6 +223,7 @@ class IssueSearchRepository extends ServiceEntityRepository
             ->andWhere('i.assignee != :viewer')
             ->setParameter('viewer', $viewer);
     }
+
     private function applyOptionalAssigneeFilter(QueryBuilder $qb, ?User $assigneeFilter): void
     {
         if ($assigneeFilter instanceof User) {
@@ -218,6 +231,7 @@ class IssueSearchRepository extends ServiceEntityRepository
                 ->setParameter('assigneeFilter', $assigneeFilter);
         }
     }
+
     public function countSearch(
         Project $project,
         ?string $query = null,
@@ -256,6 +270,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /** @return list<Issue> */
     public function findByLastEnvironment(Project $project, string $environment, int $limit = 500): array
     {
         $normalized = Issue::normalizeEnvironment($environment);
@@ -277,6 +293,12 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * @param list<Project> $projects
+     *
+     * @return list<Issue>
+     */
     public function searchNewInRelease(
         array $projects,
         ?string $release = null,
@@ -303,6 +325,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /** @param list<Project> $projects */
     public function countNewInRelease(array $projects, ?string $release = null): int
     {
         if ([] === $projects) {
@@ -314,6 +338,12 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * @param list<Project> $projects
+     *
+     * @return list<string>
+     */
     public function findDistinctFirstReleasesAcrossProjects(array $projects, int $limit = 40): array
     {
         if ([] === $projects) {
@@ -360,6 +390,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return array_values(array_unique($releases));
     }
+
+    /** @param list<Project> $projects */
     private function createNewInReleaseQueryBuilder(array $projects, ?string $release): QueryBuilder
     {
         $qb = $this->createQueryBuilder('i')
@@ -374,6 +406,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    /** @return list<string> */
     public function findDistinctReleases(Project $project): array
     {
         $projectId = $project->getId();
@@ -415,6 +449,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return array_values(array_unique($releases));
     }
+
     public function countNewIssuesByFirstRelease(Project $project, string $release): int
     {
         $normalized = Issue::normalizeRelease($release);
@@ -431,6 +466,8 @@ class IssueSearchRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /** @return array<string, int> */
     public function countNewIssuesByFirstReleaseMap(Project $project): array
     {
         $rows = $this->createQueryBuilder('i')
@@ -453,6 +490,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $counts;
     }
+
+    /** @return list<Issue> */
     public function findByRelease(Project $project, string $release, int $limit = 500): array
     {
         $normalized = Issue::normalizeRelease($release);
@@ -474,6 +513,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /** @return list<Issue> */
     public function findLatestNewIssuesByFirstRelease(Project $project, string $release, int $limit = 8): array
     {
         $normalized = Issue::normalizeRelease($release);
@@ -495,6 +536,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $result;
     }
+
     public function countByProjectAndStatus(Project $project, IssueStatus $status): int
     {
         return (int) $this->createQueryBuilder('i')
@@ -506,6 +548,12 @@ class IssueSearchRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @param list<int> $projectIds
+     *
+     * @return array<int, int>
+     */
     public function countByStatusForProjectIds(array $projectIds, IssueStatus $status): array
     {
         if ([] === $projectIds) {
@@ -530,6 +578,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $map;
     }
+
     private function createFilteredQueryBuilder(
         Project $project,
         ?string $query,
@@ -585,6 +634,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
     private function applyFullTextOrLikeQuery(QueryBuilder $qb, string $query): void
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -612,6 +662,7 @@ class IssueSearchRepository extends ServiceEntityRepository
         $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
             ->setParameter('q', '%'.$query.'%');
     }
+
     private function toBooleanFulltextQuery(string $query): string
     {
         $tokens = preg_split('/\s+/u', $query) ?: [];
@@ -627,6 +678,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return implode(' ', $parts);
     }
+
     private function applyTagFilter(QueryBuilder $qb, Project $project, ?string $tag): void
     {
         if (null === $tag || '' === trim($tag) || null === $project->getId()) {
@@ -637,6 +689,7 @@ class IssueSearchRepository extends ServiceEntityRepository
         $ids = $this->issueIdsMatchingPayload($project, $needle, useJsonSearch: true);
         $this->restrictToIssueIds($qb, $ids, 'tagFilterIssueIds');
     }
+
     private function applyUrlFilter(QueryBuilder $qb, Project $project, ?string $url): void
     {
         if (null === $url || '' === trim($url) || null === $project->getId()) {
@@ -647,6 +700,7 @@ class IssueSearchRepository extends ServiceEntityRepository
         $ids = $this->issueIdsMatchingPayload($project, $needle, useJsonSearch: false);
         $this->restrictToIssueIds($qb, $ids, 'urlFilterIssueIds');
     }
+
     private function applyUserFilter(QueryBuilder $qb, ?string $user): void
     {
         if (null === $user || '' === trim($user)) {
@@ -657,6 +711,8 @@ class IssueSearchRepository extends ServiceEntityRepository
             'EXISTS (SELECT 1 FROM '.Event::class.' ue WHERE ue.issue = i AND ue.userIdentifier LIKE :userLike)',
         )->setParameter('userLike', '%'.trim($user).'%');
     }
+
+    /** @return list<int> */
     private function issueIdsMatchingPayload(Project $project, string $needle, bool $useJsonSearch): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -675,7 +731,7 @@ class IssueSearchRepository extends ServiceEntityRepository
                 .' WHERE i.project_id = ? AND JSON_SEARCH(e.payload, \'one\', ?) IS NOT NULL';
             $params = [$projectId, $needle];
         } else {
-            $like = '%'.$this->escapeLike($needle).'%';
+            $like = '%'.SqlLikeEscaper::escape($needle).'%';
             if ($isSqlite) {
                 $sql = 'SELECT DISTINCT e.issue_id FROM event e'
                     .' INNER JOIN issue i ON i.id = e.issue_id'
@@ -693,6 +749,8 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         return array_map(static fn (int|string $id): int => (int) $id, $rows);
     }
+
+    /** @param list<int> $ids */
     private function restrictToIssueIds(QueryBuilder $qb, array $ids, string $param): void
     {
         if ([] === $ids) {
@@ -703,10 +761,7 @@ class IssueSearchRepository extends ServiceEntityRepository
 
         $qb->andWhere('i.id IN (:'.$param.')')->setParameter($param, $ids);
     }
-    private function escapeLike(string $value): string
-    {
-        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-    }
+
     private function applySqlSort(QueryBuilder $qb, IssueListSort $sort): void
     {
         $dir = strtoupper($sort->direction);
@@ -730,6 +785,7 @@ class IssueSearchRepository extends ServiceEntityRepository
             default => $qb->orderBy('i.lastSeen', 'DESC')->addOrderBy('i.id', 'DESC'),
         };
     }
+
     private function applyOccurrenceSqlSort(QueryBuilder $qb, IssueListSort $sort): void
     {
         $now = new DateTimeImmutable('now');

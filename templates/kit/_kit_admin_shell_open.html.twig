@@ -1,0 +1,13 @@
+<header class="kit-admin-page-header mb-6">
+    <h1 class="kit-admin-page-header__title">{% block kit_admin_heading %}{{ kit_admin_heading|default('') }}{% endblock %}</h1>
+    <p class="kit-admin-page-header__intro">{% block kit_admin_intro %}{{ kit_admin_intro|default('') }}{% endblock %}</p>
+</header>
+{# panel class applied by kit-admin.ts (search stays outside the card) when data-kit-split-filters is set. #}
+<div
+    class="kit-admin{{ kit_admin_wrapper_class|default('') }}"
+    {% block kit_admin_wrapper_attrs %}
+        {% if kit_admin_css_framework is defined %}data-css-framework="{{ kit_admin_css_framework }}"{% endif %}
+        {% if kit_admin_data_testid is defined %}data-testid="{{ kit_admin_data_testid }}"{% endif %}
+        {% if kit_admin_split_filters|default(false) %} data-kit-split-filters{% endif %}
+    {% endblock %}
+>

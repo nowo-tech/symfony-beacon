@@ -1,0 +1,39 @@
+{#
+    Shared shell for admin index/list pages: header, search form, table panel.
+
+    Blocks: header_actions, search_extras, table_head, table_body, after_table.
+#}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ title|trans }}</h1>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ intro|trans }}</p>
+    </div>
+    {% block header_actions %}
+        {% if create_route is defined %}
+            <a class="btn-primary no-underline" href="{{ path(create_route) }}">{{ create_label|trans }}</a>
+        {% endif %}
+    {% endblock %}
+</div>
+
+<form method="get" action="{{ path(search_route) }}" class="mb-4 flex flex-wrap gap-2">
+    <input
+        class="input min-w-56 flex-1"
+        type="search"
+        name="q"
+        value="{{ q }}"
+        placeholder="{{ search_placeholder|trans }}"
+        autocomplete="off"
+    >
+    {% block search_extras %}{% endblock %}
+    <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
+    <a class="btn-ghost no-underline" href="{{ path(search_route) }}">{{ 'common.clear_filters'|trans }}</a>
+</form>
+
+<section class="panel overflow-x-auto">
+    <table class="w-full text-left text-sm">
+        {% block table_head %}{% endblock %}
+        {% block table_body %}{% endblock %}
+    </table>
+</section>
+
+{% block after_table %}{% endblock %}

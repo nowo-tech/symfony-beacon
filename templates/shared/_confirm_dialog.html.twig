@@ -1,0 +1,112 @@
+{#
+    Reusable Stimulus confirm-dialog wrapper.
+
+    Modes:
+    - Full (default): wrapper div + optional trigger + dialog form.
+    - only_dialog: dialog form only (controller/trigger live in the parent template).
+
+    Override blocks: trigger, header, body, content, fields, actions, form_open, form_close.
+#}
+{% set _wrapper = wrapper|default(true) %}
+{% set _only_dialog = only_dialog|default(false) %}
+{% set _form_method = form_method|default('post') %}
+{% set _dialog_modifier = dialog_modifier|default('') %}
+{% set _dialog_class = 'confirm-dialog' ~ (_dialog_modifier ? ' ' ~ _dialog_modifier : '') %}
+{% set _submit_class = submit_class|default('btn-primary') %}
+
+{% if _wrapper and not _only_dialog %}
+<div
+    data-controller="confirm-dialog"
+    {% if expected_value is defined and expected_value is not null %}data-confirm-dialog-expected-value="{{ expected_value|e('html_attr') }}"{% endif %}
+    {% if open_on_connect is defined %}data-confirm-dialog-open-on-connect-value="{{ open_on_connect }}"{% endif %}
+>
+    {% block trigger %}
+        {% if trigger_label is defined %}
+            <button
+                type="button"
+                class="{{ trigger_class|default('btn-ghost') }}"
+                data-action="confirm-dialog#open"
+                {% if trigger_title is defined %}title="{{ trigger_title }}"{% endif %}
+                {% if trigger_aria_label is defined %}aria-label="{{ trigger_aria_label }}"{% endif %}
+                {% if trigger_testid is defined %}data-testid="{{ trigger_testid }}"{% endif %}
+                {% if trigger_disabled|default(false) %}disabled{% endif %}
+            >{{ trigger_label }}</button>
+        {% endif %}
+    {% endblock %}
+{% endif %}
+
+<dialog
+    class="{{ _dialog_class }}"
+    data-confirm-dialog-target="dialog"
+    {% if aria_labelledby is defined %}aria-labelledby="{{ aria_labelledby }}"{% endif %}
+>
+    {% if custom_form|default(false) %}
+        {% block form %}{% endblock %}
+    {% else %}
+    <form
+        method="{{ _form_method }}"
+        {% if form_action is defined %}action="{{ form_action }}"{% endif %}
+        class="{{ form_class|default('confirm-dialog__panel') }}"
+        {% if form_attr is defined %}
+            {% for attr, val in form_attr %}
+                {{ attr }}="{{ val|e('html_attr') }}"
+            {% endfor %}
+        {% endif %}
+    >
+        {% block form_open %}{% endblock %}
+
+        {% block header %}
+            {% if header_wrapper|default(false) %}
+                <div class="confirm-dialog__header">
+            {% endif %}
+            {% if title is defined %}
+                <h2{% if title_id is defined %} id="{{ title_id }}"{% endif %} class="confirm-dialog__title">{{ title }}</h2>
+            {% endif %}
+            {% block body %}
+                {% if body is defined %}
+                    <p class="confirm-dialog__body">{{ body }}</p>
+                {% endif %}
+            {% endblock %}
+            {% if header_wrapper|default(false) %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block content %}
+            {% if content_wrapper|default(false) %}
+                <div class="confirm-dialog__content">
+            {% endif %}
+            {% if csrf_token is defined %}
+                <input type="hidden" name="_token" value="{{ csrf_token }}">
+            {% endif %}
+            {% block fields %}{% endblock %}
+            {% if content_wrapper|default(false) %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block actions %}
+            {% if show_actions|default(true) %}
+                <div class="confirm-dialog__actions">
+                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ cancel_label|default('common.cancel'|trans) }}</button>
+                    {% if submit_label is defined %}
+                        <button
+                            type="submit"
+                            class="{{ _submit_class }}"
+                            {% if submit_confirm_target|default(submit_disabled|default(false)) %}data-confirm-dialog-target="submit"{% endif %}
+                            {% if submit_disabled|default(false) %}disabled{% endif %}
+                            {% if submit_testid is defined %}data-testid="{{ submit_testid }}"{% endif %}
+                        >{{ submit_label }}</button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block form_close %}{% endblock %}
+    </form>
+    {% endif %}
+</dialog>
+
+{% if _wrapper and not _only_dialog %}
+</div>
+{% endif %}

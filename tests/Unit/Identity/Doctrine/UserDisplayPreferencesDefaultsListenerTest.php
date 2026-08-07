@@ -8,8 +8,8 @@ use App\Identity\Doctrine\UserDisplayPreferencesDefaultsListener;
 use App\Identity\Entity\User;
 use App\Identity\UserDisplayPreferenceDefaults;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PrePersistEventArgs;
-use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
 final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
@@ -20,7 +20,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
             public string $name = 'not-a-user';
         };
 
-        $args = new PrePersistEventArgs($entity, $this->createStub(ObjectManager::class));
+        $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
         (new UserDisplayPreferencesDefaultsListener('en'))->prePersist($args);
 
         $this->addToAssertionCount(1);
@@ -32,7 +32,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
         $user->setAnonymizedAt(new DateTimeImmutable());
         self::assertNull($user->getPreferredLocaleRaw());
 
-        $args = new PrePersistEventArgs($user, $this->createStub(ObjectManager::class));
+        $args = new PrePersistEventArgs($user, $this->createStub(EntityManagerInterface::class));
         (new UserDisplayPreferencesDefaultsListener('es'))->prePersist($args);
 
         self::assertNull($user->getPreferredLocaleRaw());
@@ -43,7 +43,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
         $user = new User();
         self::assertNull($user->getPreferredLocaleRaw());
 
-        $args = new PrePersistEventArgs($user, $this->createStub(ObjectManager::class));
+        $args = new PrePersistEventArgs($user, $this->createStub(EntityManagerInterface::class));
         (new UserDisplayPreferencesDefaultsListener('es'))->prePersist($args);
 
         self::assertSame('es', $user->getPreferredLocaleRaw());

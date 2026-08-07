@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Service;
 
-use InvalidArgumentException;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use InvalidArgumentException;
 
 /**
  * Blocks SSRF to private / link-local / metadata addresses for outbound notification HTTP URLs.
@@ -117,7 +117,7 @@ final readonly class OutboundUrlGuard
         $aRecords = @dns_get_record($host, \DNS_A);
         if (\is_array($aRecords)) {
             foreach ($aRecords as $row) {
-                if (isset($row['ip']) && \is_string($row['ip']) && $row['ip'] !== '') {
+                if (isset($row['ip']) && \is_string($row['ip']) && '' !== $row['ip']) {
                     $candidates[] = $row['ip'];
                 }
             }
@@ -126,14 +126,14 @@ final readonly class OutboundUrlGuard
         $aaaaRecords = @dns_get_record($host, \DNS_AAAA);
         if (\is_array($aaaaRecords)) {
             foreach ($aaaaRecords as $row) {
-                if (isset($row['ipv6']) && \is_string($row['ipv6']) && $row['ipv6'] !== '') {
+                if (isset($row['ipv6']) && \is_string($row['ipv6']) && '' !== $row['ipv6']) {
                     $candidates[] = $row['ipv6'];
                 }
             }
         }
 
         // Fallback when dns_get_record is unavailable / empty (common in some containers).
-        if ($candidates === []) {
+        if ([] === $candidates) {
             $fallback = @gethostbynamel($host);
             if (\is_array($fallback)) {
                 $candidates = $fallback;

@@ -7,8 +7,8 @@ namespace App\Issues\Controller;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueSearchRepository;
-use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,7 @@ final class DashboardNewInReleaseController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = $this->resolveProjectFilter($accessible, $request->query->getString('project'));
+        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
 
         $releaseRaw = trim($request->query->getString('release'));
@@ -60,22 +60,5 @@ final class DashboardNewInReleaseController extends AbstractController
             ],
             'pagination' => $pagination,
         ]);
-    }
-
-    /**
-     * @param list<Project> $accessible
-     */
-    private function resolveProjectFilter(array $accessible, string $uuid): ?Project
-    {
-        if ('' === $uuid) {
-            return null;
-        }
-        foreach ($accessible as $project) {
-            if ($project->getUuid() === $uuid) {
-                return $project;
-            }
-        }
-
-        return null;
     }
 }

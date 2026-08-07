@@ -69,10 +69,6 @@
     <h2>{{ 'legal.cookies.storage_heading'|trans }}</h2>
     <p>{{ 'legal.cookies.storage_body'|trans }}</p>
 
-    <nav class="legal-doc__nav" aria-label="{{ 'legal.nav.label'|trans }}">
-        <a href="{{ path('legal_notice', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.notice.title'|trans }}</a>
-        <a href="{{ path('legal_privacy', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.privacy.title'|trans }}</a>
-        <a href="{{ path('legal_terms', {_locale: app.request.locale|default(default_locale)}) }}">{{ 'legal.terms.title'|trans }}</a>
-    </nav>
+    {% include 'legal/_nav.html.twig' with {current: 'cookies'} only %}
 </article>
 {% endblock %}

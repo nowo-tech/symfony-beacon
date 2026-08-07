@@ -7,18 +7,17 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
-use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
+use App\Project\Enum\ProjectRole;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
-use App\Project\Enum\ProjectRole;
+use App\Project\Service\ProjectApiKeyFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -32,6 +31,7 @@ final class ProjectApiKeyController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectAccessService $projectAccess,
+        private readonly ProjectApiKeyFactory $projectApiKeyFactory,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
@@ -55,7 +55,7 @@ final class ProjectApiKeyController extends AbstractController
         if ('' === $label) {
             $label = $this->tokenGenerator->generateLabel();
         }
-        $key = $this->createApiKey($project, $label);
+        $key = $this->projectApiKeyFactory->create($project, $label);
         $project->addApiKey($key);
         $this->userActionRecorder->record(UserActionType::ProjectApiKeyCreated, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -128,7 +128,7 @@ final class ProjectApiKeyController extends AbstractController
 
         $label = $apiKey->getLabel();
         $apiKey->setActive(false);
-        $newKey = $this->createApiKey($project, $label);
+        $newKey = $this->projectApiKeyFactory->create($project, $label);
         $project->addApiKey($newKey);
         $this->userActionRecorder->record(UserActionType::ProjectApiKeyRotated, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -148,17 +148,4 @@ final class ProjectApiKeyController extends AbstractController
             throw $this->createNotFoundException();
         }
     }
-
-    private function createApiKey(Project $project, string $label): ProjectApiKey
-    {
-        for ($attempt = 0; $attempt < 8; ++$attempt) {
-            $publicKey = $this->tokenGenerator->generateKey();
-            if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $publicKey])) {
-                return ProjectApiKey::generate($project, $label, $publicKey);
-            }
-        }
-
-        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4));
-    }
-
 }

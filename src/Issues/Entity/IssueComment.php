@@ -6,8 +6,8 @@ namespace App\Issues\Entity;
 
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueCommentRepository;
+use App\Shared\Doctrine\CreatedAtImmutableTrait;
 use App\Shared\Doctrine\PublicUuidTrait;
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_comment_issue_created', columns: ['issue_id', 'created_at'])]
 class IssueComment
 {
+    use CreatedAtImmutableTrait;
     use PublicUuidTrait;
 
     public const int BODY_MAX_LENGTH = 5000;
@@ -39,13 +40,10 @@ class IssueComment
     #[ORM\Column(type: 'text')]
     private string $body = '';
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     public function __construct()
     {
         $this->ensureUuid();
-        $this->createdAt = new DateTimeImmutable();
+        $this->initializeCreatedAt();
     }
 
     public function getId(): ?int
@@ -85,18 +83,6 @@ class IssueComment
     public function setBody(string $body): self
     {
         $this->body = $body;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }

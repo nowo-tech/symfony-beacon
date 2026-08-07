@@ -28,7 +28,9 @@ make ready              # migrate + platform + demo + dogfood BEACON_DSN when em
 make seed-sample        # optional: PROFILE=dev samples
 # Optional local SMTP catcher (not production):
 # make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/ops/MAILPIT.md
-```
+#
+# Later: make test / make phpstan / make shell auto-call `make ensure-up`
+# (starts Compose if php is down — no rebuild / no Vite). Use `make up` for first boot.```
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
 

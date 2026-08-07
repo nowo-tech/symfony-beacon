@@ -7,6 +7,7 @@ namespace App\Shared\Settings\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Mailer\MailerDsnAudit;
 use App\Shared\Settings\Form\InstanceMailerSettingsType;
@@ -47,14 +48,11 @@ final class MailerSettingsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (true === $form->get('clearMailerDsn')->getData()) {
-                $settings->setMailerDsn(null);
-            } else {
-                $plainDsn = trim((string) $form->get('plainMailerDsn')->getData());
-                if ('' !== $plainDsn) {
-                    $settings->setMailerDsn($plainDsn);
-                }
-            }
+            EncryptedSecretFormApplier::apply(
+                true === $form->get('clearMailerDsn')->getData(),
+                trim((string) $form->get('plainMailerDsn')->getData()),
+                $settings->setMailerDsn(...),
+            );
 
             $this->repository->save($settings);
             $this->configuredMailer->reset();

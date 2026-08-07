@@ -6,6 +6,7 @@ namespace App\Issues\Entity;
 
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueMentionRepository;
+use App\Shared\Doctrine\CreatedAtImmutableTrait;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,6 +20,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'uniq_issue_mention_comment_user', columns: ['comment_id', 'mentioned_user_id'])]
 class IssueMention
 {
+    use CreatedAtImmutableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,15 +35,12 @@ class IssueMention
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $mentionedUser = null;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $readAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
+        $this->initializeCreatedAt();
     }
 
     public function getId(): ?int
@@ -70,11 +70,6 @@ class IssueMention
         $this->mentionedUser = $mentionedUser;
 
         return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
     }
 
     public function getReadAt(): ?DateTimeImmutable

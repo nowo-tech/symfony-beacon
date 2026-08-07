@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Setup\Demo;
 
 use App\Shared\Mercure\ConfiguredMercure;
-
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 

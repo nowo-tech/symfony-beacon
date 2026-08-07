@@ -3,52 +3,51 @@
 {% block title %}{{ 'mentions.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block body %}
-{% set filterQuery = {
-    project: filters.project,
-    unread: filters.unread,
-    per_page: filters.per_page,
+{% embed 'dashboard/_feed_layout.html.twig' with {
+    title_key: 'mentions.title',
+    intro_key: 'mentions.intro',
+    feed_header_class: 'flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between',
+    filter_route: 'dashboard_mentions',
+    filters: filters,
+    filters_testid: 'mentions-filters',
+    empty_testid: 'mentions-empty',
+    empty_key: 'mentions.empty',
+    results_testid: 'mentions-results',
+    pagination: pagination,
+    pagination_route: 'dashboard_mentions',
+    filter_query: {
+        project: filters.project,
+        unread: filters.unread,
+        per_page: filters.per_page,
+    },
+    item_count: mentions|length,
 } %}
-
-<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mentions.title'|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'mentions.intro'|trans }}</p>
-    </div>
-    {% if unread_count > 0 %}
-        <form method="post" action="{{ path('dashboard_mentions_read_all') }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('mention_read_all') }}">
-            <button class="btn-ghost" type="submit">{{ 'mentions.mark_all_read'|trans }}</button>
-        </form>
-    {% endif %}
-</div>
-
-<form method="get" action="{{ path('dashboard_mentions') }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="mentions-filters">
-    <input type="hidden" name="page" value="1">
-    <select class="input" name="project" aria-label="{{ 'mentions.filter.project'|trans }}">
-        <option value="">{{ 'mentions.filter.any_project'|trans }}</option>
-        {% for project in projects %}
-            <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-        {% endfor %}
-    </select>
-    <label class="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="unread" value="1" {% if filters.unread %}checked{% endif %}>
-        {{ 'mentions.filter.unread_only'|trans }}
-    </label>
-    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-        {% for size in [10, 25, 50, 100] %}
-            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-        {% endfor %}
-    </select>
-    <div class="issue-filters__actions">
-        <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
-        <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('dashboard_mentions') }}">{{ 'common.clear_filters'|trans }}</a>
-    </div>
-</form>
-
-{% if pagination.total == 0 %}
-    <div class="panel text-[var(--color-ink)]/70" data-testid="mentions-empty">{{ 'mentions.empty'|trans }}</div>
-{% else %}
-    <div class="panel" data-testid="mentions-results">
+    {% block feed_header_extra %}
+        {% if unread_count > 0 %}
+            <form method="post" action="{{ path('dashboard_mentions_read_all') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('mention_read_all') }}">
+                <button class="btn-ghost" type="submit">{{ 'mentions.mark_all_read'|trans }}</button>
+            </form>
+        {% endif %}
+    {% endblock %}
+    {% block filter_fields %}
+        <select class="input" name="project" aria-label="{{ 'mentions.filter.project'|trans }}">
+            <option value="">{{ 'mentions.filter.any_project'|trans }}</option>
+            {% for project in projects %}
+                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
+            {% endfor %}
+        </select>
+        <label class="checkbox-label">
+            <input type="checkbox" class="checkbox" name="unread" value="1" {% if filters.unread %}checked{% endif %}>
+            {{ 'mentions.filter.unread_only'|trans }}
+        </label>
+        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
+            {% for size in [10, 25, 50, 100] %}
+                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
+            {% endfor %}
+        </select>
+    {% endblock %}
+    {% block results %}
         <ul class="divide-y divide-[var(--color-sand)]/70">
             {% for mention in mentions %}
                 {% set comment = mention.comment %}
@@ -80,15 +79,6 @@
                 </li>
             {% endfor %}
         </ul>
-
-        {% include 'shared/_table_pagination.html.twig' with {
-            pagination: pagination,
-            item_count: mentions|length,
-            route: 'dashboard_mentions',
-            route_params: {},
-            query: filterQuery,
-            nav_label: 'issues.pagination.nav'
-        } %}
-    </div>
-{% endif %}
+    {% endblock %}
+{% endembed %}
 {% endblock %}

@@ -9,8 +9,8 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
-use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectReadTokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 

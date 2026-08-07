@@ -7,7 +7,7 @@ namespace App\Ops\Retention;
 use App\Issues\Service\IssueMergeService;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\Settings\Service\InstanceOpsDefaults;
+use App\Project\Service\ProjectGovernanceResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,7 +24,7 @@ final readonly class RetentionPurger
         private EntityManagerInterface $entityManager,
         private ProjectRepository $projectRepository,
         private IssueMergeService $issueMergeService,
-        private InstanceOpsDefaults $opsDefaults,
+        private ProjectGovernanceResolver $governanceResolver,
     ) {
     }
 
@@ -47,8 +47,8 @@ final readonly class RetentionPurger
             if (!$project instanceof Project || null === $project->getId()) {
                 continue;
             }
-            $days = $this->effectiveRetentionDays($project);
-            $maxEvents = $this->effectiveMaxEvents($project);
+            $days = $this->governanceResolver->effectiveRetentionDays($project);
+            $maxEvents = $this->governanceResolver->effectiveRetentionMaxEvents($project);
             if ($days < 1 && $maxEvents < 1) {
                 continue;
             }
@@ -84,8 +84,8 @@ final readonly class RetentionPurger
             return ['events' => 0, 'issues' => 0, 'transactions' => 0, 'stats' => 0];
         }
 
-        $retentionDays = $this->effectiveRetentionDays($project);
-        $maxEvents = $this->effectiveMaxEvents($project);
+        $retentionDays = $this->governanceResolver->effectiveRetentionDays($project);
+        $maxEvents = $this->governanceResolver->effectiveRetentionMaxEvents($project);
 
         $connection = $this->entityManager->getConnection();
         $events = 0;
@@ -160,15 +160,5 @@ final readonly class RetentionPurger
         }
 
         return ['events' => $events, 'issues' => $issues, 'transactions' => $transactions, 'stats' => $stats];
-    }
-
-    private function effectiveRetentionDays(Project $project): int
-    {
-        return $project->getRetentionDays() ?? $this->opsDefaults->retentionDays();
-    }
-
-    private function effectiveMaxEvents(Project $project): int
-    {
-        return $project->getRetentionMaxEvents() ?? $this->opsDefaults->retentionMaxEvents();
     }
 }
