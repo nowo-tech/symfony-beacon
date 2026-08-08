@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-08-08
+
+### Added
+
+- `OtlpIngestGatewayInterface` — injectable gate for `OtlpIngestPipeline` (unit-testable without mocking `final` gateway).
+- Unit tests: `OtlpIngestPipelineTest`, `HookDestinationContextResolverTest`, `ActionTokenConsumerTest`, `ProjectFactoryTest`.
+- `ProjectFactory` / `ProjectApiKeyFactory` optional deterministic slug + API key material (demo/dogfood).
+
+### Changed
+
+- **All host Symfony Form Types** extend `FormKitAbstractType` (notifications, thresholds, issue assignee / project-member autocomplete; account profile/security use FormKit option merge + PasswordToggle).
+- Demo/dogfood project bootstrap goes through `ProjectFactory` + `ProjectApiKeyFactory` (closes `086` FR-002; no `new Project()` outside the factory).
+
+### Fixed
+
+- Account security / profile password fields wire FormKit `parent::__construct` + `mergeFieldOptions` (no more FormKit-in-name-only Types).
+
 ## [1.3.0] - 2026-08-07
 
 ### Added
@@ -761,7 +778,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.0.1...v1.1.0

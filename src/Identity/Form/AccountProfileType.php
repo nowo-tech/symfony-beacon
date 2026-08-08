@@ -15,27 +15,32 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Account profile: display name and email.
+ * Account profile: display name and email (FormKit).
  */
 final class AccountProfileType extends FormKitAbstractType
 {
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->withBuilder($builder, function () use ($builder): void {
+        $this->withBuilder($builder, function (): void {
             $this->addTextField('displayName', [
                 'constraints' => [new NotBlank(), new Length(max: 120)],
             ]);
             $this->addEmailField('email', [
                 'constraints' => [new NotBlank(), new Email(), new Length(max: 180)],
             ]);
-            $builder->add('currentPassword', PasswordType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'user_preferences.current_password.label',
-                'help' => 'user_preferences.current_password.help_email_change',
-                'translation_domain' => 'messages',
-                'attr' => ['autocomplete' => 'current-password'],
-            ]);
+            $this->boundBuilder()->add(
+                'currentPassword',
+                PasswordType::class,
+                $this->mergeFieldOptions('currentPassword', 'password', [
+                    'mapped' => false,
+                    'required' => false,
+                    'label' => 'user_preferences.current_password.label',
+                    'help' => 'user_preferences.current_password.help_email_change',
+                    'translation_domain' => 'messages',
+                    'attr' => ['autocomplete' => 'current-password'],
+                ]),
+            );
             $this->addTextField('slackUserId', [
                 'required' => false,
                 'label' => 'preferences.profile.slack_user_id',
@@ -51,6 +56,7 @@ final class AccountProfileType extends FormKitAbstractType
         });
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

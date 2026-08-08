@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class OtlpIngestPipeline
 {
     public function __construct(
-        private OtlpIngestGateway $otlpIngestGateway,
+        private OtlpIngestGatewayInterface $otlpIngestGateway,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
     ) {

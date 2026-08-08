@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Controllers keep OpenAPI attributes and signal-specific mapping/dispatch only.
  */
-final readonly class OtlpIngestGateway
+final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
 {
     public function __construct(
         private EnvelopeAuthParser $authParser,

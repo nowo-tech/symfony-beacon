@@ -22,13 +22,29 @@ final readonly class ProjectFactory
     ) {
     }
 
-    public function create(User $owner, string $name, ?string $description = null): Project
-    {
+    /**
+     * @param string|null $slug            Fixed slug when set (demo/dogfood); otherwise derived from $name
+     * @param string|null $apiKeyPublicKey Deterministic public key (demo); otherwise generated
+     * @param string|null $apiKeySecretKey Deterministic secret (demo); otherwise generated
+     */
+    public function create(
+        User $owner,
+        string $name,
+        ?string $description = null,
+        ?string $slug = null,
+        string $apiKeyLabel = 'Default',
+        ?string $apiKeyPublicKey = null,
+        ?string $apiKeySecretKey = null,
+    ): Project {
         $name = trim($name);
-        $slugger = new AsciiSlugger();
-        $slug = strtolower($slugger->slug($name)->toString());
-        if ('' === $slug) {
-            $slug = 'project-'.bin2hex(random_bytes(3));
+        if (null !== $slug && '' !== trim($slug)) {
+            $slug = strtolower(trim($slug));
+        } else {
+            $slugger = new AsciiSlugger();
+            $slug = strtolower($slugger->slug($name)->toString());
+            if ('' === $slug) {
+                $slug = 'project-'.bin2hex(random_bytes(3));
+            }
         }
         if (null !== $this->projectRepository->findOneBy(['slug' => $slug])) {
             $slug .= '-'.bin2hex(random_bytes(2));
@@ -45,7 +61,12 @@ final readonly class ProjectFactory
         $membership->setRole(ProjectRole::Owner);
         $project->addMembership($membership);
 
-        $project->addApiKey($this->apiKeyFactory->create($project, 'Default'));
+        $project->addApiKey($this->apiKeyFactory->create(
+            $project,
+            $apiKeyLabel,
+            $apiKeyPublicKey,
+            $apiKeySecretKey,
+        ));
 
         return $project;
     }

@@ -12,13 +12,12 @@ use App\Notifications\Service\OutboundUrlGuard;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
+use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
+use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -28,19 +27,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Create/edit a project notification destination.
- *
- * @extends AbstractType<NotificationDestination>
+ * Create/edit a project notification destination (FormKit).
  */
-final class NotificationDestinationFormType extends AbstractType
+final class NotificationDestinationFormType extends FormKitAbstractType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly NotificationOutboundFormatter $outboundFormatter,
         private readonly OutboundUrlGuard $outboundUrlGuard,
         private readonly TranslatorInterface $translator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $categoryChoices = [];
@@ -48,48 +49,56 @@ final class NotificationDestinationFormType extends AbstractType
             $categoryChoices['notifications.category.'.$category] = $category;
         }
 
-        $builder
-            ->add('label', TextType::class, [
+        $this->withBuilder($builder, function () use ($categoryChoices): void {
+            $this->addTextField('label', [
                 'label' => 'notifications.form.label',
                 'constraints' => [
                     new Assert\NotBlank(),
                     new Assert\Length(max: 120),
                 ],
-            ])
-            ->add('type', EnumType::class, [
-                'class' => NotificationDestinationType::class,
-                'label' => 'notifications.form.type',
-                'choice_label' => static fn (NotificationDestinationType $type): string => 'notifications.type.'.$type->value,
-                'choice_translation_domain' => 'messages',
-            ])
-            ->add('endpointUrl', TextType::class, [
+            ]);
+            $this->boundBuilder()->add(
+                'type',
+                EnumType::class,
+                $this->mergeFieldOptions('type', 'choice', [
+                    'class' => NotificationDestinationType::class,
+                    'label' => 'notifications.form.type',
+                    'choice_label' => static fn (NotificationDestinationType $type): string => 'notifications.type.'.$type->value,
+                    'choice_translation_domain' => 'messages',
+                ]),
+            );
+            $this->addTextField('endpointUrl', [
                 'label' => 'notifications.form.endpoint',
                 'help' => 'notifications.form.endpoint_help',
                 'constraints' => [
                     new Assert\NotBlank(),
                     new Assert\Length(max: 2048),
                 ],
-            ])
-            ->add('signingSecret', PasswordType::class, [
-                'label' => 'notifications.form.signing_secret',
-                'help' => 'notifications.form.signing_secret_help',
-                'required' => false,
-                'mapped' => false,
-                'always_empty' => true,
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                ],
-            ])
-            ->add('clearSigningSecret', CheckboxType::class, [
+            ]);
+            $this->boundBuilder()->add(
+                'signingSecret',
+                PasswordType::class,
+                $this->mergeFieldOptions('signingSecret', 'password', [
+                    'label' => 'notifications.form.signing_secret',
+                    'help' => 'notifications.form.signing_secret_help',
+                    'required' => false,
+                    'mapped' => false,
+                    'always_empty' => true,
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                    ],
+                ]),
+            );
+            $this->addCheckboxField('clearSigningSecret', [
                 'label' => 'notifications.form.clear_signing_secret',
                 'required' => false,
                 'mapped' => false,
-            ])
-            ->add('enabled', CheckboxType::class, [
+            ]);
+            $this->addCheckboxField('enabled', [
                 'label' => 'notifications.form.enabled',
                 'required' => false,
-            ])
-            ->add('categories', ChoiceType::class, [
+            ]);
+            $this->addChoiceField('categories', [
                 'label' => 'notifications.form.categories',
                 'choices' => $categoryChoices,
                 'multiple' => true,
@@ -112,13 +121,13 @@ final class NotificationDestinationFormType extends AbstractType
                 'constraints' => [
                     new Assert\Count(min: 1),
                 ],
-            ])
-            ->add('quietHoursEnabled', CheckboxType::class, [
+            ]);
+            $this->addCheckboxField('quietHoursEnabled', [
                 'label' => 'notifications.form.quiet_hours_enabled',
                 'required' => false,
                 'help' => 'notifications.form.quiet_hours_help',
-            ])
-            ->add('quietHoursTimezone', TextType::class, [
+            ]);
+            $this->addTextField('quietHoursTimezone', [
                 'label' => 'notifications.form.quiet_hours_timezone',
                 'required' => false,
                 'empty_data' => 'UTC',
@@ -126,22 +135,23 @@ final class NotificationDestinationFormType extends AbstractType
                     new Assert\NotBlank(),
                     new Assert\Length(max: 64),
                 ],
-            ])
-            ->add('quietHoursStart', TextType::class, [
+            ]);
+            $this->addTextField('quietHoursStart', [
                 'label' => 'notifications.form.quiet_hours_start',
                 'required' => false,
                 'attr' => ['placeholder' => '22:00'],
-            ])
-            ->add('quietHoursEnd', TextType::class, [
+            ]);
+            $this->addTextField('quietHoursEnd', [
                 'label' => 'notifications.form.quiet_hours_end',
                 'required' => false,
                 'attr' => ['placeholder' => '07:00'],
-            ])
-            ->add('digestEnabled', CheckboxType::class, [
+            ]);
+            $this->addCheckboxField('digestEnabled', [
                 'label' => 'notifications.form.digest_enabled',
                 'required' => false,
                 'help' => 'notifications.form.digest_help',
             ]);
+        });
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             /** @var NotificationDestination $data */
@@ -230,6 +240,7 @@ final class NotificationDestinationFormType extends AbstractType
         });
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

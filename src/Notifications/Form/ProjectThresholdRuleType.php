@@ -5,60 +5,58 @@ declare(strict_types=1);
 namespace App\Notifications\Form;
 
 use App\Notifications\Entity\ProjectThresholdRule;
+use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Override;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Create/edit a project error-volume threshold rule.
- *
- * @extends AbstractType<ProjectThresholdRule>
+ * Create/edit a project error-volume threshold rule (FormKit).
  */
-final class ProjectThresholdRuleType extends AbstractType
+final class ProjectThresholdRuleType extends FormKitAbstractType
 {
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('label', TextType::class, [
+        $this->withBuilder($builder, function (): void {
+            $this->addTextField('label', [
                 'label' => 'thresholds.form.label',
                 'required' => false,
                 'help' => 'thresholds.form.label_help',
-            ])
-            ->add('enabled', CheckboxType::class, [
+            ]);
+            $this->addCheckboxField('enabled', [
                 'label' => 'thresholds.form.enabled',
                 'required' => false,
-            ])
-            ->add('errorCount', IntegerType::class, [
+            ]);
+            $this->addIntegerField('errorCount', [
                 'label' => 'thresholds.form.error_count',
                 'help' => 'thresholds.form.error_count_help',
                 'attr' => ['min' => 1, 'max' => 1000000],
-            ])
-            ->add('windowMinutes', IntegerType::class, [
+            ]);
+            $this->addIntegerField('windowMinutes', [
                 'label' => 'thresholds.form.window_minutes',
                 'help' => 'thresholds.form.window_minutes_help',
                 'attr' => ['min' => 1, 'max' => 1440],
-            ])
-            ->add('cooldownMinutes', IntegerType::class, [
+            ]);
+            $this->addIntegerField('cooldownMinutes', [
                 'label' => 'thresholds.form.cooldown_minutes',
                 'help' => 'thresholds.form.cooldown_minutes_help',
                 'attr' => ['min' => 1, 'max' => 10080],
-            ])
-            ->add('environment', TextType::class, [
+            ]);
+            $this->addTextField('environment', [
                 'label' => 'thresholds.form.environment',
                 'required' => false,
                 'help' => 'thresholds.form.environment_help',
-            ])
-            ->add('releaseVersion', TextType::class, [
+            ]);
+            $this->addTextField('releaseVersion', [
                 'label' => 'thresholds.form.release',
                 'required' => false,
                 'help' => 'thresholds.form.release_help',
             ]);
+        });
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

@@ -10,8 +10,10 @@ use App\Identity\Repository\UserRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
-use App\Project\Repository\ProjectRepository;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectRepository;
+use App\Project\Service\ProjectApiKeyFactory;
+use App\Project\Service\ProjectFactory;
 use DateTime;
 use LogicException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -29,6 +31,8 @@ final readonly class DemoIdentitySeeder
         private UserRepository $userRepository,
         private ProjectRepository $projectRepository,
         private UserPasswordHasherInterface $passwordHasher,
+        private ProjectFactory $projectFactory,
+        private ProjectApiKeyFactory $apiKeyFactory,
     ) {
     }
 
@@ -85,7 +89,7 @@ final readonly class DemoIdentitySeeder
             $first = $project->getApiKeys()->first();
             $apiKey = $first instanceof ProjectApiKey ? $first : null;
             if (!$apiKey instanceof ProjectApiKey) {
-                $apiKey = ProjectApiKey::generate(
+                $apiKey = $this->apiKeyFactory->create(
                     $project,
                     SeedDemoCommand::DEMO_API_KEY_NAME,
                     SeedDemoCommand::DEMO_PUBLIC_KEY,
@@ -171,23 +175,15 @@ final readonly class DemoIdentitySeeder
 
     private function createDogfoodProject(User $owner): Project
     {
-        $project = new Project();
-        $project->setName(SeedDemoCommand::DEMO_PROJECT_NAME);
-        $project->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
-        $project->setDescription(SeedDemoCommand::DEMO_PROJECT_DESCRIPTION);
-
-        $membership = new ProjectMembership();
-        $membership->setUser($owner);
-        $membership->setRole(ProjectRole::Owner);
-        $project->addMembership($membership);
-
-        $apiKey = ProjectApiKey::generate(
-            $project,
+        $project = $this->projectFactory->create(
+            $owner,
+            SeedDemoCommand::DEMO_PROJECT_NAME,
+            SeedDemoCommand::DEMO_PROJECT_DESCRIPTION,
+            SeedDemoCommand::DEMO_PROJECT_SLUG,
             SeedDemoCommand::DEMO_API_KEY_NAME,
             SeedDemoCommand::DEMO_PUBLIC_KEY,
             SeedDemoCommand::DEMO_SECRET_KEY,
         );
-        $project->addApiKey($apiKey);
         $this->projectRepository->save($project);
 
         return $project;

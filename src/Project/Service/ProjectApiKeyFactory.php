@@ -9,7 +9,7 @@ use App\Project\Entity\ProjectApiKey;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Creates ProjectApiKey rows with a unique publicKey.
+ * Creates ProjectApiKey rows with a unique publicKey (or deterministic demo material).
  */
 final readonly class ProjectApiKeyFactory
 {
@@ -19,15 +19,23 @@ final readonly class ProjectApiKeyFactory
     ) {
     }
 
-    public function create(Project $project, string $label): ProjectApiKey
-    {
+    public function create(
+        Project $project,
+        string $label,
+        ?string $publicKey = null,
+        ?string $secretKey = null,
+    ): ProjectApiKey {
+        if (null !== $publicKey && '' !== $publicKey) {
+            return ProjectApiKey::generate($project, $label, $publicKey, $secretKey);
+        }
+
         for ($attempt = 0; $attempt < 8; ++$attempt) {
-            $publicKey = $this->tokenGenerator->generateKey();
-            if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $publicKey])) {
-                return ProjectApiKey::generate($project, $label, $publicKey);
+            $generatedPublicKey = $this->tokenGenerator->generateKey();
+            if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $generatedPublicKey])) {
+                return ProjectApiKey::generate($project, $label, $generatedPublicKey, $secretKey);
             }
         }
 
-        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4));
+        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4), $secretKey);
     }
 }

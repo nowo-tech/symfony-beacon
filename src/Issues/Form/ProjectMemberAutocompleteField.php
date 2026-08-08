@@ -8,23 +8,22 @@ use App\Identity\Entity\User;
 use Closure;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Override;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 
 /**
- * Autocomplete for project members (used as issue assignee).
+ * Autocomplete for project members (used as issue assignee) — FormKit field type.
  *
  * Pass signed `extra_options.project_id` so results stay scoped to that project.
- *
- * @extends AbstractType<User>
  */
 #[AsEntityAutocompleteField(alias: 'project_member')]
-final class ProjectMemberAutocompleteField extends AbstractType
+final class ProjectMemberAutocompleteField extends FormKitAbstractType
 {
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

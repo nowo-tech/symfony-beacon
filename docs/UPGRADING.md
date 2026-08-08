@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.3.0)](#unreleased-main-after-130)
+- [Unreleased (main after 1.3.1)](#unreleased-main-after-131)
+- [Upgrading from 1.3.0 to 1.3.1](#upgrading-from-130-to-131)
 - [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130)
 - [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120)
 - [Upgrading from 1.0.1 to 1.1.0](#upgrading-from-101-to-110)
@@ -48,9 +49,27 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.3.0)
+## Unreleased (main after 1.3.1)
 
-No further upgrade steps yet — follow [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130) when moving off **1.2.0**.
+No further upgrade steps yet — follow [Upgrading from 1.3.0 to 1.3.1](#upgrading-from-130-to-131) when moving off **1.3.0**.
+
+## Upgrading from 1.3.0 to 1.3.1
+
+**No migrations.** FormKit host-form completion + `086` demo-factory follow-up + unit tests. Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.3.1   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+# make vite-build       # not required for this patch (no asset changes)
+```
+
+### Operator notes
+
+- Envelope / OTLP HTTP contracts unchanged.
+- Demo/dogfood seed still uses the same fixed public/secret keys; creation path now goes through `ProjectFactory`.
+- Host admin UI forms (notification destinations, thresholds, issue assignee) use FormKit Types — no operator config change.
 
 ## Upgrading from 1.2.0 to 1.3.0
 
