@@ -67,7 +67,7 @@ As a project admin, I enable only the lifecycle event types I care about.
 - **FR-001**: Project members MUST be able to export filtered issues as CSV and as JSON.
 - **FR-002**: Export MUST respect the same authorization as viewing the issues list.
 - **FR-003**: System MUST support lifecycle webhook event types including at least `issue.resolved` and `issue.assigned`, plus documented siblings (e.g. reopened, ignored) as implemented.
-- **FR-004**: Project admins MUST be able to register webhook endpoints and select enabled lifecycle types.
+- **FR-004**: Actors with `project.settings.manage` MUST be able to register webhook endpoints and select enabled lifecycle types (HTTP 403 otherwise; see `002` FR-013).
 - **FR-005**: Deliveries MUST include event type, timestamp, project id, and issue id (plus change-specific fields).
 - **FR-006**: Failed deliveries MUST be observable (status/log) and subject to retry rules consistent with existing outbound notification infrastructure where applicable.
 - **FR-007**: Webhook configuration MUST reuse security controls against unsafe destinations (SSRF protection).

@@ -28,7 +28,6 @@ services:
       - ./.docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./.docker/frankenphp/conf.d/10-app.ini:/usr/local/etc/php/app.conf.d/10-app.ini:ro
       - ./.docker/frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
-      - /app/var
       - caddy_data:/data
       - caddy_config:/config
     ports:
@@ -72,7 +71,6 @@ services:
       GIT_CONFIG_VALUE_0: /app
     volumes:
       - ./:/app
-      - /app/var
     ports:
       - target: 5173
         published: ${VITE_PORT:-5177}
@@ -136,7 +134,6 @@ services:
       GIT_CONFIG_VALUE_0: /app
     volumes:
       - ./:/app
-      - /app/var
     # Entrypoint prepares vendor/DB; then consumes Envelope ingest queue only.
     # --time-limit restarts the process periodically (Compose brings it back up).
     # Outbound notifications / HTTP-log / Web Push use messenger-notify.
@@ -176,7 +173,6 @@ services:
       GIT_CONFIG_VALUE_0: /app
     volumes:
       - ./:/app
-      - /app/var
     command:
       [
         "php",

@@ -13,11 +13,12 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Fail closed outside local `dev`/`test` when SiteBackup still uses documented local defaults
- * (panel password hash / setup token from `.env.dist`).
+ * Fail closed outside local `dev`/`test` when SiteBackup or APP_SECRET still use
+ * documented local defaults from `.env.dist`.
  *
  * Applies to `prod`, `staging`, and any other non-local environment name so misnamed
- * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked.
+ * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked,
+ * or ship with a known `APP_SECRET` (CSRF, remember-me, magic-login signatures).
  *
  * Instance latch (not static) so FrankenPHP workers do not share mutable static state.
  *
@@ -33,6 +34,9 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 
     /** Documented local setup token from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_SETUP_TOKEN = 'beacon-local-setup';
+
+    /** Documented local APP_SECRET from `.env.dist` — must be rotated outside local development. */
+    public const string LOCAL_DEV_APP_SECRET = 'ChangeMePleaseUseARealSecret';
 
     /** @var list<string> */
     private const array SKIP_CONSOLE_COMMANDS = [
@@ -50,6 +54,8 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
         private readonly ?string $setupToken,
         #[Autowire('%env(default::SITE_BACKUP_PASSWORD_HASH)%')]
         private readonly ?string $panelPasswordHash,
+        #[Autowire('%kernel.secret%')]
+        private readonly string $appSecret = '',
     ) {
     }
 
@@ -102,6 +108,17 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
         }
         if (hash_equals(self::LOCAL_DEV_PANEL_PASSWORD_HASH, $hash)) {
             throw new RuntimeException('SITE_BACKUP_PASSWORD_HASH is still the documented local default (password "beacon-local-panel"). Generate a new hash with: bin/console nowo:site-backup:hash-password');
+        }
+
+        $secret = trim($this->appSecret);
+        if ('' === $secret) {
+            throw new RuntimeException('APP_SECRET must be set outside local development (dev/test). Generate a random value (e.g. openssl rand -hex 32) — see docs/PRODUCTION.md.');
+        }
+        if (hash_equals(self::LOCAL_DEV_APP_SECRET, $secret)) {
+            throw new RuntimeException('APP_SECRET is still the documented local default (ChangeMePleaseUseARealSecret). Set a unique secret before exposing this instance (docs/PRODUCTION.md).');
+        }
+        if (\strlen($secret) < 16) {
+            throw new RuntimeException('APP_SECRET must be at least 16 characters outside local development (dev/test).');
         }
     }
 

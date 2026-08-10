@@ -28,10 +28,11 @@ As a developer, after `make up` I run `make ready` (bootstrap + seed) and get a 
 
 **Acceptance Scenarios**:
 
-1. **Given** no demo project, **When** I run `app:seed-demo`, **Then** demo project API key uses documented stable public and secret keys.
+1. **Given** no demo project and local `dev`/`test`, **When** I run `app:seed-demo`, **Then** demo project API key uses documented stable public and secret keys.
 2. **Given** `BEACON_DSN` empty in `.env`, **When** seed completes, **Then** `.env` contains a loopback DSN for the demo project id.
 3. **Given** `BEACON_DSN` already set, **When** seed runs again, **Then** the existing server DSN is left unchanged.
 4. **Given** `make bootstrap`, **When** it finishes, **Then** no demo user is created (platform only; demo remains in `make seed` / `make ready` / `make dogfood`).
+5. **Given** a non-local `APP_ENV`, **When** `app:seed-demo` runs without `--allow-non-local`, **Then** the command fails closed (`087` / extends `055` FR-002a). Stable DEMO_* keys MUST NOT be installed outside local.
 
 ### User Story 3 - Dedicated dogfood Make target (Priority: P2)
 

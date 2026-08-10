@@ -38,6 +38,7 @@ final readonly class DemoIdentitySeeder
 
     /**
      * @param bool $createDemoUser when false (dogfood), never create admin@…; use existing ROLE_ADMIN
+     * @param bool $useStableDemoKeys when true (local only), use documented DEMO_PUBLIC_KEY / DEMO_SECRET_KEY
      *
      * @return array{
      *     user_created: bool,
@@ -54,6 +55,7 @@ final readonly class DemoIdentitySeeder
         string $email = 'admin@symfony-beacon.local',
         string $password = 'admin123',
         bool $createDemoUser = true,
+        bool $useStableDemoKeys = true,
     ): array {
         $userCreated = false;
         $user = $this->userRepository->findOneByEmail($email);
@@ -81,7 +83,7 @@ final readonly class DemoIdentitySeeder
                 throw new LogicException('Cannot create the Symfony Beacon project without an existing user. Register an admin first, or run app:seed-demo without --skip-demo-user.');
             }
 
-            $project = $this->createDogfoodProject($user);
+            $project = $this->createDogfoodProject($user, $useStableDemoKeys);
             $apiKey = $project->getApiKeys()->first();
             $projectCreated = true;
         } else {
@@ -89,12 +91,14 @@ final readonly class DemoIdentitySeeder
             $first = $project->getApiKeys()->first();
             $apiKey = $first instanceof ProjectApiKey ? $first : null;
             if (!$apiKey instanceof ProjectApiKey) {
-                $apiKey = $this->apiKeyFactory->create(
-                    $project,
-                    SeedDemoCommand::DEMO_API_KEY_NAME,
-                    SeedDemoCommand::DEMO_PUBLIC_KEY,
-                    SeedDemoCommand::DEMO_SECRET_KEY,
-                );
+                $apiKey = $useStableDemoKeys
+                    ? $this->apiKeyFactory->create(
+                        $project,
+                        SeedDemoCommand::DEMO_API_KEY_NAME,
+                        SeedDemoCommand::DEMO_PUBLIC_KEY,
+                        SeedDemoCommand::DEMO_SECRET_KEY,
+                    )
+                    : $this->apiKeyFactory->create($project, SeedDemoCommand::DEMO_API_KEY_NAME);
                 $project->addApiKey($apiKey);
                 $this->projectRepository->save($project);
                 $projectCreated = true;
@@ -173,17 +177,25 @@ final readonly class DemoIdentitySeeder
         }
     }
 
-    private function createDogfoodProject(User $owner): Project
+    private function createDogfoodProject(User $owner, bool $useStableDemoKeys = true): Project
     {
-        $project = $this->projectFactory->create(
-            $owner,
-            SeedDemoCommand::DEMO_PROJECT_NAME,
-            SeedDemoCommand::DEMO_PROJECT_DESCRIPTION,
-            SeedDemoCommand::DEMO_PROJECT_SLUG,
-            SeedDemoCommand::DEMO_API_KEY_NAME,
-            SeedDemoCommand::DEMO_PUBLIC_KEY,
-            SeedDemoCommand::DEMO_SECRET_KEY,
-        );
+        $project = $useStableDemoKeys
+            ? $this->projectFactory->create(
+                $owner,
+                SeedDemoCommand::DEMO_PROJECT_NAME,
+                SeedDemoCommand::DEMO_PROJECT_DESCRIPTION,
+                SeedDemoCommand::DEMO_PROJECT_SLUG,
+                SeedDemoCommand::DEMO_API_KEY_NAME,
+                SeedDemoCommand::DEMO_PUBLIC_KEY,
+                SeedDemoCommand::DEMO_SECRET_KEY,
+            )
+            : $this->projectFactory->create(
+                $owner,
+                SeedDemoCommand::DEMO_PROJECT_NAME,
+                SeedDemoCommand::DEMO_PROJECT_DESCRIPTION,
+                SeedDemoCommand::DEMO_PROJECT_SLUG,
+                SeedDemoCommand::DEMO_API_KEY_NAME,
+            );
         $this->projectRepository->save($project);
 
         return $project;

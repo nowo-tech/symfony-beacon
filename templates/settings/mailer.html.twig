@@ -32,7 +32,7 @@
         <h2 class="text-lg font-semibold">{{ 'mailer_settings.sample.title'|trans }}</h2>
         <p class="text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.sample.intro'|trans }}</p>
         {% if magicLoginAvailable %}
-            <form method="post" action="{{ path('settings_mailer_test') }}" class="space-y-3">
+            <form method="post" action="{{ path('admin_mailer_test') }}" class="space-y-3">
                 <input type="hidden" name="_token" value="{{ csrf_token('mailer_sample') }}">
                 <label class="block text-sm font-medium" for="mailer-sample-to">{{ 'mailer_settings.sample.to_label'|trans }}</label>
                 <input

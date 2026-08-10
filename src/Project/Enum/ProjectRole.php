@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Project\Enum;
 
+use App\Project\Security\ProjectPermission;
+
 /**
  * Membership role within a project, with capability helpers.
+ *
+ * Logical permission keys live in {@see ProjectPermission}; helpers below are
+ * convenience wrappers over that matrix.
  */
 enum ProjectRole: string
 {
@@ -14,19 +19,47 @@ enum ProjectRole: string
     case Member = 'member';
     case Viewer = 'viewer';
 
+    public function grants(string $permission): bool
+    {
+        return ProjectPermission::roleGrants($this, $permission);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function permissions(): array
+    {
+        return ProjectPermission::forRole($this);
+    }
+
     public function canManageMembers(): bool
     {
-        return self::Owner === $this || self::Admin === $this;
+        return $this->grants(ProjectPermission::MEMBERS_MANAGE);
     }
 
     public function canManageApiKeys(): bool
     {
-        return self::Owner === $this || self::Admin === $this;
+        return $this->grants(ProjectPermission::API_KEYS_MANAGE);
+    }
+
+    public function canManageSettings(): bool
+    {
+        return $this->grants(ProjectPermission::SETTINGS_MANAGE);
+    }
+
+    public function canManageNotifications(): bool
+    {
+        return $this->grants(ProjectPermission::NOTIFICATIONS_MANAGE);
+    }
+
+    public function canManageShareLinks(): bool
+    {
+        return $this->grants(ProjectPermission::SHARE_LINKS_MANAGE);
     }
 
     public function canDeleteProject(): bool
     {
-        return self::Owner === $this;
+        return $this->grants(ProjectPermission::DELETE);
     }
 
     /**
@@ -34,7 +67,7 @@ enum ProjectRole: string
      */
     public function canTriageIssues(): bool
     {
-        return self::Viewer !== $this;
+        return $this->grants(ProjectPermission::ISSUES_TRIAGE);
     }
 
     /**

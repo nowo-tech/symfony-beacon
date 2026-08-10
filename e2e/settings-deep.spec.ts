@@ -3,7 +3,7 @@ import { dismissProductTour, expectAuthenticatedPage, waitForPageLoader } from '
 
 test.describe('Settings deep checks', () => {
   test('appearance tabs switch between sections', async ({ page }) => {
-    await page.goto('/settings/appearance');
+    await page.goto('/admin/appearance');
     await dismissProductTour(page);
 
     const tabs = page.locator('[data-testid="appearance-tabs"]');
@@ -14,13 +14,13 @@ test.describe('Settings deep checks', () => {
       await expect(tab).toBeVisible();
       await tab.click();
       await waitForPageLoader(page);
-      await expect(page).toHaveURL(new RegExp(`/settings/appearance/${section}`));
+      await expect(page).toHaveURL(new RegExp(`/admin/appearance/${section}`));
       await expect(page.getByRole('main').locator('form').first()).toBeVisible();
     }
   });
 
   test('appearance colors subtabs are reachable', async ({ page }) => {
-    await expectAuthenticatedPage(page, '/settings/appearance/colors');
+    await expectAuthenticatedPage(page, '/admin/appearance/colors');
     const subtabs = page.locator('[data-testid="appearance-subtabs"]');
     if ((await subtabs.count()) === 0) {
       return;
@@ -32,12 +32,12 @@ test.describe('Settings deep checks', () => {
       }
       await link.click();
       await waitForPageLoader(page);
-      await expect(page).toHaveURL(new RegExp(`/settings/appearance/colors/${sub}`));
+      await expect(page).toHaveURL(new RegExp(`/admin/appearance/colors/${sub}`));
     }
   });
 
   test('ops defaults tabs and forms load', async ({ page }) => {
-    await page.goto('/settings/ops-defaults');
+    await page.goto('/admin/ops-defaults');
     await dismissProductTour(page);
     await expect(page.locator('[data-testid="ops-defaults-tabs"]')).toBeVisible();
 
@@ -46,7 +46,7 @@ test.describe('Settings deep checks', () => {
       await expect(tab).toBeVisible();
       await tab.click();
       await waitForPageLoader(page);
-      await expect(page).toHaveURL(new RegExp(`/settings/ops-defaults/${section}`));
+      await expect(page).toHaveURL(new RegExp(`/admin/ops-defaults/${section}`));
       const form = page.locator('[data-testid="ops-defaults-form"]');
       await expect(form).toBeVisible();
       await expect(form).toHaveAttribute('data-ops-section', section);
@@ -55,7 +55,7 @@ test.describe('Settings deep checks', () => {
   });
 
   test('instance config export and import panels load', async ({ page }) => {
-    await expectAuthenticatedPage(page, '/settings/instance-config');
+    await expectAuthenticatedPage(page, '/admin/instance-config');
     await expect(page.locator('[data-testid="instance-config-export"]')).toBeVisible();
     await expect(page.locator('[data-testid="instance-config-download"]')).toBeVisible();
     await expect(page.locator('[data-testid="instance-config-import"]')).toBeVisible();
@@ -65,7 +65,7 @@ test.describe('Settings deep checks', () => {
   test('instance config export download is reachable', async ({ page }) => {
     const [download] = await Promise.all([
       page.waitForEvent('download', { timeout: 20_000 }).catch(() => null),
-      page.goto('/settings/instance-config/export', { waitUntil: 'commit' }).catch((err: Error) => {
+      page.goto('/admin/instance-config/export', { waitUntil: 'commit' }).catch((err: Error) => {
         if (!/Download is starting/i.test(err.message)) {
           throw err;
         }

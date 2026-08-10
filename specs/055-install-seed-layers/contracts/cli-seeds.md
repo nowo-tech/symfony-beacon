@@ -8,7 +8,7 @@ php bin/console app:seed-platform
 
 | Aspect | Contract |
 |--------|----------|
-| Side effects | Upsert menus + breadcrumbs only |
+| Side effects | Upsert menus + breadcrumbs + cookie consent profile + permission catalog (`project.*` via `InstanceRbacSeeder`); purge leftover `admin.*` permission rows; remove legacy operator InstanceRoles if present |
 | Exit 0 | Catalogs present/updated |
 | Idempotent | Yes |
 | Forbidden | Creating users, projects, issues, events, perf, analytics samples |

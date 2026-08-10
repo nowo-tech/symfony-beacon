@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Setup\Command;
 
+use App\Identity\Service\InstanceRbacSeeder;
 use App\Setup\Demo\BreadcrumbDemoSeeder;
 use App\Setup\Demo\CookieConsentDemoSeeder;
 use App\Setup\Demo\DashboardMenuDemoSeeder;
@@ -15,13 +16,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 /**
- * Idempotent product catalogs (menus + breadcrumbs + cookie consent) for install and upgrade.
+ * Idempotent product catalogs (menus + breadcrumbs + cookie consent + RBAC permissions/roles) for install and upgrade.
  *
  * Does not create users, projects, or sample telemetry.
  */
 #[AsCommand(
     name: 'app:seed-platform',
-    description: 'Seed/upsert platform navigation and cookie consent — safe for production upgrades',
+    description: 'Seed/upsert platform navigation, cookie consent, and instance permissions — safe for production upgrades',
 )]
 final class SeedPlatformCommand extends Command
 {
@@ -29,6 +30,7 @@ final class SeedPlatformCommand extends Command
         private readonly DashboardMenuDemoSeeder $dashboardMenuDemoSeeder,
         private readonly BreadcrumbDemoSeeder $breadcrumbDemoSeeder,
         private readonly CookieConsentDemoSeeder $cookieConsentDemoSeeder,
+        private readonly InstanceRbacSeeder $instanceRbacSeeder,
     ) {
         parent::__construct();
     }
@@ -54,6 +56,12 @@ final class SeedPlatformCommand extends Command
                 $io->success('Seeded / updated cookie consent profile and inventory');
             } else {
                 $io->note('Cookie consent profile already up to date');
+            }
+
+            if ($this->instanceRbacSeeder->seedIfEmpty()) {
+                $io->success('Seeded / updated permission catalog and project roles (removed legacy operator roles if present)');
+            } else {
+                $io->note('Permission catalog and project roles already up to date');
             }
         } catch (Throwable $e) {
             $io->error('Platform seed failed. Run doctrine:migrations:migrate first, then retry.');

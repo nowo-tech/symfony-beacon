@@ -59,7 +59,7 @@
         {% endif %}
         {% set tab_items = tab_items|merge([{
             label: item.tabLabelKey()|trans,
-            href: path('settings_appearance_section', href_params),
+            href: path('admin_appearance_section', href_params),
             current: item == section,
             attr: {'data-testid': 'appearance-tab-' ~ item.value},
         }]) %}
@@ -77,7 +77,7 @@
         {% for item in section_subtabs %}
             {% set sub_items = sub_items|merge([{
                 label: item.tabLabelKey()|trans,
-                href: path('settings_appearance_section', {section: section.value, sub: item.value}),
+                href: path('admin_appearance_section', {section: section.value, sub: item.value}),
                 current: subtab is not null and item == subtab,
                 attr: {'data-testid': 'appearance-subtab-' ~ item.value},
             }]) %}

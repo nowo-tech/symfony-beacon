@@ -26,7 +26,7 @@ final class MercureSettingsController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/mercure', name: 'settings_mercure', methods: ['GET', 'POST'])]
+    #[Route('/admin/mercure', name: 'admin_mercure', methods: ['GET', 'POST'])]
     public function edit(Request $request): Response
     {
         $settings = $this->repository->getOrCreate();
@@ -44,7 +44,7 @@ final class MercureSettingsController extends AbstractController
             $this->configuredMercure->reset();
             $this->addFlash('success', 'flash.mercure.saved');
 
-            return $this->redirectToRoute('settings_mercure');
+            return $this->redirectToRoute('admin_mercure');
         }
 
         return $this->render('settings/mercure.html.twig', [

@@ -36,6 +36,17 @@ enum UserActionType: string
     case GroupMemberAdded = 'group.member_added';
     case GroupMemberRemoved = 'group.member_removed';
 
+    case InstanceRoleCreated = 'instance_role.created';
+    case InstanceRoleUpdated = 'instance_role.updated';
+    case InstanceRoleDeleted = 'instance_role.deleted';
+    case InstanceRolePermissionsUpdated = 'instance_role.permissions_updated';
+    case InstanceRoleUserAdded = 'instance_role.user_added';
+    case InstanceRoleUserRemoved = 'instance_role.user_removed';
+
+    case InstancePermissionCreated = 'instance_permission.created';
+    case InstancePermissionUpdated = 'instance_permission.updated';
+    case InstancePermissionDeleted = 'instance_permission.deleted';
+
     case ProjectMemberAdded = 'project.member_added';
     case ProjectMemberRoleChanged = 'project.member_role_changed';
     case ProjectMemberRemoved = 'project.member_removed';

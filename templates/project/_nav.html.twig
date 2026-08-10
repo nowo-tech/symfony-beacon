@@ -1,7 +1,41 @@
 {#
   Shared project section header + tabs.
   Expects: project, current (issues|performance|analytics|releases|settings)
+
+  Settings tab is shown only when the current user may open the Settings surface
+  (any project manage/delete permission). See project_can_open_settings() /
+  docs/product/ROLES.md.
 #}
+{% set nav_items = [
+    {
+        label: 'nav.issues'|trans,
+        href: path('issue_index', {id: project.uuid}),
+        current: current == 'issues',
+    },
+    {
+        label: 'nav.performance'|trans,
+        href: path('performance_index', {id: project.uuid}),
+        current: current == 'performance',
+    },
+    {
+        label: 'nav.analytics'|trans,
+        href: path('analytics_show', {id: project.uuid}),
+        current: current == 'analytics',
+    },
+    {
+        label: 'nav.releases'|trans,
+        href: path('project_releases', {id: project.uuid}),
+        current: current == 'releases',
+    },
+] %}
+{% if project_can_open_settings(project) %}
+    {% set nav_items = nav_items|merge([{
+        label: 'project.settings.nav'|trans,
+        href: path('project_settings', {id: project.uuid}),
+        current: current == 'settings',
+        attr: {'data-tour': 'project-settings'},
+    }]) %}
+{% endif %}
 <div class="project-nav mb-6" data-tour="project-nav">
     <div class="mb-3">
         <a href="{{ path('dashboard_home') }}" class="text-sm no-underline text-[var(--color-ink)]/55 hover:text-[var(--color-ink)]">{{ 'projects.title'|trans }}</a>
@@ -12,33 +46,6 @@
     </div>
     {% include 'shared/_tabs.html.twig' with {
         aria_label: 'project.nav.label'|trans,
-        items: [
-            {
-                label: 'nav.issues'|trans,
-                href: path('issue_index', {id: project.uuid}),
-                current: current == 'issues',
-            },
-            {
-                label: 'nav.performance'|trans,
-                href: path('performance_index', {id: project.uuid}),
-                current: current == 'performance',
-            },
-            {
-                label: 'nav.analytics'|trans,
-                href: path('analytics_show', {id: project.uuid}),
-                current: current == 'analytics',
-            },
-            {
-                label: 'nav.releases'|trans,
-                href: path('project_releases', {id: project.uuid}),
-                current: current == 'releases',
-            },
-            {
-                label: 'project.settings.nav'|trans,
-                href: path('project_settings', {id: project.uuid}),
-                current: current == 'settings',
-                attr: {'data-tour': 'project-settings'},
-            },
-        ],
+        items: nav_items,
     } only %}
 </div>

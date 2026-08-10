@@ -7,8 +7,8 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
-use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectReadTokenRepository;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectReadTokenManager;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -38,7 +38,7 @@ final class ProjectReadTokenController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_read_token_create', $request->request->getString('_token'))) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');
@@ -62,7 +62,7 @@ final class ProjectReadTokenController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_read_token_revoke', $request->request->getString('_token'))) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');

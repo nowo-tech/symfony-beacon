@@ -93,22 +93,22 @@ final class ConfiguredMercure implements ResetInterface
 
     public function isUsingDatabaseSecret(): bool
     {
-        return $this->settings()->hasMercureJwtSecret();
+        return null !== $this->usableSecret($this->settings()->getMercureJwtSecret());
     }
 
     public function isUsingDatabaseUrl(): bool
     {
-        return null !== $this->settings()->getMercureUrl() && '' !== $this->settings()->getMercureUrl();
+        return null !== $this->usableHttpUrl($this->settings()->getMercureUrl());
     }
 
     public function envUrlConfigured(): bool
     {
-        return '' !== trim($this->envUrl);
+        return null !== $this->usableHttpUrl($this->envUrl);
     }
 
     public function envJwtConfigured(): bool
     {
-        return '' !== trim($this->envJwtSecret);
+        return null !== $this->usableSecret($this->envJwtSecret);
     }
 
     private function hub(): Hub
@@ -147,31 +147,56 @@ final class ConfiguredMercure implements ResetInterface
 
     private function resolvedUrl(): string
     {
-        $fromDb = $this->settings()->getMercureUrl();
-        if (\is_string($fromDb) && '' !== trim($fromDb)) {
-            return trim($fromDb);
-        }
-
-        return trim($this->envUrl);
+        return $this->usableHttpUrl($this->settings()->getMercureUrl())
+            ?? $this->usableHttpUrl($this->envUrl)
+            ?? '';
     }
 
     private function resolvedPublicUrl(): string
     {
-        $fromDb = $this->settings()->getMercurePublicUrl();
-        if (\is_string($fromDb) && '' !== trim($fromDb)) {
-            return trim($fromDb);
-        }
-
-        return trim($this->envPublicUrl);
+        return $this->usableHttpUrl($this->settings()->getMercurePublicUrl())
+            ?? $this->usableHttpUrl($this->envPublicUrl)
+            ?? '';
     }
 
     private function resolvedJwtSecret(): string
     {
-        $fromDb = $this->settings()->getMercureJwtSecret();
-        if (\is_string($fromDb) && '' !== trim($fromDb)) {
-            return trim($fromDb);
+        return $this->usableSecret($this->settings()->getMercureJwtSecret())
+            ?? $this->usableSecret($this->envJwtSecret)
+            ?? '';
+    }
+
+    /**
+     * Reject empty values and Halite ciphertext left behind when decrypt fails
+     * (encrypt subscriber strips the `<ENC>` marker but cannot recover plaintext).
+     */
+    private function usableHttpUrl(?string $value): ?string
+    {
+        $trimmed = trim((string) $value);
+        if ('' === $trimmed || $this->looksLikeUndecryptedCiphertext($trimmed)) {
+            return null;
+        }
+        if (false === filter_var($trimmed, \FILTER_VALIDATE_URL)) {
+            return null;
+        }
+        $scheme = strtolower((string) parse_url($trimmed, \PHP_URL_SCHEME));
+
+        return \in_array($scheme, ['http', 'https'], true) ? $trimmed : null;
+    }
+
+    private function usableSecret(?string $value): ?string
+    {
+        $trimmed = trim((string) $value);
+        if ('' === $trimmed || $this->looksLikeUndecryptedCiphertext($trimmed)) {
+            return null;
         }
 
-        return trim($this->envJwtSecret);
+        return $trimmed;
+    }
+
+    private function looksLikeUndecryptedCiphertext(string $value): bool
+    {
+        // Halite sealed messages in this bundle commonly start with "MUIF" + base64url.
+        return 1 === preg_match('/^MUIF[A-Za-z0-9_-]+={0,2}$/', $value);
     }
 }

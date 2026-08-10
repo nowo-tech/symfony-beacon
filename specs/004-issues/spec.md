@@ -17,7 +17,7 @@ Cross-links: [`docs/product/EVENT-CONTEXT.md`](../../docs/product/EVENT-CONTEXT.
 - **Grouping**: Client `fingerprint` array wins when present; otherwise exception type + normalized message + file/function (no line numbers). Volatile tokens (UUIDs, hex, digits) are normalized.
 - **Regression**: Matching events reopen both **`resolved` and `ignored`** issues to **`unresolved`** (aligned with `009-project-notifications`). Each reopen is recorded on `issue_history` with no human actor (ingest / system).
 - **Assignee**: Optional project member; filter `assignee=<userId>` or `assignee=unassigned`. Assign/unassign is recorded on `issue_history`.
-- **Status UI**: Project members can mark an issue **resolved**, **unresolved** (reopen), or **ignored** from the issue sidebar (`POST …/status`). Changes are recorded on `issue_history`.
+- **Status UI**: Actors with `project.issues.triage` can mark an issue **resolved**, **unresolved** (reopen), or **ignored** from the issue sidebar (`POST …/status`). Changes are recorded on `issue_history`. Viewers see read-only UI (`project_grants`); POST without triage returns 403 (`requireTriage`).
 - **History**: Table `issue_history` stores assignee changes (`assignee_changed`) and status changes (`status_changed`) with optional actor, previous/next values, and timestamp.
 - **Occurrence windows**: Total event count plus last **24h / 7d / 30d** (computed for list + detail).
 

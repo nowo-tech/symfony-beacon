@@ -32,7 +32,7 @@ class InstanceSettings implements AuditableInterface
     public const DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES = 0;
     public const DEFAULT_ENVELOPE_MAX_BYTES = 2_097_152;
     public const DEFAULT_INGEST_REJECT_QUERY_AUTH = true;
-    public const DEFAULT_METRICS_REQUIRE_TOKEN = false;
+    public const DEFAULT_METRICS_REQUIRE_TOKEN = true;
     public const DEFAULT_INBOUND_EMAIL_ENABLED = false;
     public const DEFAULT_ALLOW_PRIVATE_URLS = false;
     public const DEFAULT_ALLOW_ANONYMOUS_RESOLVE = false;

@@ -21,7 +21,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject('mailer-member@example.com');
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/settings/mailer');
+        $client->request(Request::METHOD_GET, '/admin/mailer');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -37,7 +37,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $client->disableReboot();
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'falls back to MAILER_DSN');
 
@@ -46,7 +46,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
             'instance_mailer_settings[mailerFrom]' => 'alerts@example.com',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/mailer');
+        self::assertResponseRedirects('/admin/mailer');
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'uses the DSN saved in instance settings');
         self::assertSelectorTextContains('body', 'alerts@example.com');
@@ -106,12 +106,12 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $repo->save($settings);
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
             'instance_mailer_settings[clearMailerDsn]' => '1',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/mailer');
+        self::assertResponseRedirects('/admin/mailer');
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'falls back to MAILER_DSN');
 
@@ -142,7 +142,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
             'instance_mailer_settings[plainMailerDsn]' => 'not-a-valid-dsn',
         ]);
@@ -150,7 +150,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('body', 'scheme is not allowed');
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
             'instance_mailer_settings[plainMailerDsn]' => 'file:///tmp/mail.sock',
         ]);
@@ -158,7 +158,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('body', 'scheme is not allowed');
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
             'instance_mailer_settings[plainMailerDsn]' => 'null://null',
         ]);
@@ -183,19 +183,19 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
 
         $client->disableReboot();
         $this->login($client, $user);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mailer');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Magic-link email credentials are ready');
-        self::assertSelectorExists('form[action$="/settings/mailer/test"]');
+        self::assertSelectorExists('form[action$="/admin/mailer/test"]');
 
-        $token = $crawler->filter('form[action$="/settings/mailer/test"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/admin/mailer/test"] input[name="_token"]')->attr('value');
         self::assertNotEmpty($token);
 
-        $client->request(Request::METHOD_POST, '/settings/mailer/test', [
+        $client->request(Request::METHOD_POST, '/admin/mailer/test', [
             '_token' => $token,
             'to' => 'mailer-sample@example.com',
         ]);
-        self::assertResponseRedirects('/settings/mailer');
+        self::assertResponseRedirects('/admin/mailer');
         $client->followRedirect();
         $body = $client->getResponse()->getContent() ?: '';
         self::assertTrue(
@@ -212,11 +212,11 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/settings/mailer');
+        $client->request(Request::METHOD_GET, '/admin/mailer');
         self::assertSelectorTextContains('body', 'Magic-link email is unavailable');
-        self::assertSelectorNotExists('form[action$="/settings/mailer/test"]');
+        self::assertSelectorNotExists('form[action$="/admin/mailer/test"]');
 
-        $client->request(Request::METHOD_POST, '/settings/mailer/test', [
+        $client->request(Request::METHOD_POST, '/admin/mailer/test', [
             '_token' => 'invalid',
             'to' => 'x@example.com',
         ]);

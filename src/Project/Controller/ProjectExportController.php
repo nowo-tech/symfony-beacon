@@ -13,8 +13,8 @@ use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Issues\Service\IssueJsonNormalizer;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,7 +57,7 @@ final class ProjectExportController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $issues = $this->resolveIssues($project, $request);
 
@@ -128,7 +128,7 @@ final class ProjectExportController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $statusParam = $request->query->getString('status');
         $status = '' !== $statusParam ? IssueStatus::tryFrom($statusParam) : null;

@@ -12,6 +12,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessFlashKeys;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectMembershipManager;
@@ -50,7 +51,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::MEMBERS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_member_add_'.$project->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -90,7 +91,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $target = $this->requireTargetMembership($project, $memberUser);
 
@@ -136,7 +137,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $target = $this->requireTargetMembership($project, $memberUser);
 
@@ -222,7 +223,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_group_add_'.$project->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -269,7 +270,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_group_role_'.$groupAccess->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -313,7 +314,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_group_remove_'.$groupAccess->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');

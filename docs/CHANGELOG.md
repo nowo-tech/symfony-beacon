@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-10
+
+### Added
+
+- Security audit hardening (`087` / 6.36): show-once API key DSN after create/rotate; `app:seed-demo` blocked outside `dev`/`test` (optional `--allow-non-local` with random keys only); `SiteBackupSecurityDefaultsGuard` rejects documented/short `APP_SECRET`; instance config import cannot weaken SSRF / query-auth / anonymous-resolve / metrics-token flags; high-entropy API public keys; prod session `cookie_secure` / `samesite=lax` / `httponly`; Slack interactions reject unsigned `url_verification` echo.
+- `ProjectPermission` logical keys (`project.view`, `project.issues.triage`, `project.members.manage`, `project.api_keys.manage`, `project.settings.manage`, `project.notifications.manage`, `project.share_links.manage`, `project.delete`) mapped from `ProjectRole`; `ProjectAccessService::requirePermission()`.
+- `ProjectPermissionCatalog` seeded into the shared `permission` table via `app:seed-platform` (categories: access / issues / collaboration / integration / settings / danger).
+- System InstanceRoles mirroring `ProjectRole`: `ROLE_PROJECT_VIEWER`, `ROLE_PROJECT_MEMBER`, `ROLE_PROJECT_ADMIN`, `ROLE_PROJECT_OWNER` (matrices = `project.*` only).
+- Administration **Roles** / **Permissions** UI (`ROLE_ADMIN`) over shared `permission` / `role` / `role_permission` / `role_user` tables (+ `permission_translation`).
+- `RbacPermissionTranslator` + Twig filters `rbac_permission_name` / `rbac_permission_description` (`permissions.catalog.<slug>.*`, REQ-RBAC-008).
+- Full `roles` / `permissions` / `flash.roles` / `flash.permissions` UI strings (incl. permission catalog labels and `roles.catalog.*`) for `en`, `es`, `de`, `fr`, `it`, `nl`, `pt`.
+- Twig project permission helpers: `project_grants`, `project_access`, `project_can_open_settings` (`ProjectPermissionTwigExtension`); `ProjectAccessService::requireSettingsSurface()` / `requireAnyPermission()`.
+
+### Changed
+
+- New installs default `metrics_require_token` to **true** (`InstanceSettings` + migration `Version20260810100000` column default; existing rows unchanged) — `087` / extends `038`.
+- Removed built-in `admin.*` permission catalog; Administration stays `ROLE_ADMIN`-only. Platform seed keeps `project.*` + `ROLE_PROJECT_*` and purges leftover `admin.*` rows. Admin menu items use `ROLE_ADMIN`.
+- Instance administration URLs move from `/settings/*` to `/admin/*` (route names `admin_*`); legacy paths **301** redirect.
+- Dashboard Menu **2.1.0**: sidebar current state via tagged `MenuCurrentMatcherInterface` (`AdministrationMenuCurrentMatcher` / `PreferencesMenuCurrentMatcher`); removed Twig `beacon_*_menu_current` post-process.
+- Confirm dialogs with fields use structured chrome (`header_wrapper` + `content_wrapper`) on admin user role/anonymize and project member/group role (and add-member) embeds; prefer `submit_disabled` over custom action blocks (`086` T8 / FR-003b).
+- Product access for `ROLE_USER` is `ProjectRole` / `ProjectPermission`; instance Administration is `ROLE_ADMIN` (no seeded operator InstanceRoles / no `admin.*` keys).
+- `app:seed-platform` removes legacy operator InstanceRoles (`ROLE_SUPPORT`, `ROLE_OPS_VIEWER`, `ROLE_PLATFORM`, `ROLE_NAV_EDITOR`, `ROLE_PROJECT_OPS`) when present.
+- Product mutations and Settings GET enforce `project.*` via `requirePermission` / `requireSettingsSurface` (403); Settings nav and triage/saved-view forms gated in Twig (`docs/product/ROLES.md`).
+- Specs aligned: `002` FR-012/FR-013/FR-014/SC-005/SC-006; `004`, `009`, `011`, `018`, `027`, `042`, `055` reference named `project.*` keys + Twig gating; `087` security audit hardening + predecessor cross-links.
+
+### Fixed
+
+- Confirm-dialog `open_on_connect`: omit the Stimulus data attribute unless explicitly true (empty/`null` was opening every `/admin/permissions` edit modal — `086` FR-003c).
+- Modal backdrop in dark theme: black scrim for `<dialog>::backdrop` and kit Bootstrap `.modal-backdrop` instead of light `--color-ink` wash (`086` FR-003d).
+- `AdminInstancePermissionType` calls FormKit `parent::__construct` (permissions admin forms no longer 500).
+- `InstanceRbacSeeder` flushes permissions before assigning role matrices so seeded roles are not empty.
+
 ## [1.3.1] - 2026-08-08
 
 ### Added
@@ -778,7 +810,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.1.0...v1.2.0

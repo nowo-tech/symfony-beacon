@@ -1,0 +1,30 @@
+{#
+  Permission create/edit body: key + category, then locale tabs for Translatable labels.
+  @var form \Symfony\Component\Form\FormView
+  @var tabs_id string Unique Tabs id prefix for this dialog instance.
+  @var label_prefix string Translation key prefix (default: permissions)
+#}
+{% set label_prefix = label_prefix|default('permissions') %}
+{% set locales = form.vars.enabled_locales|default([]) %}
+{% set default_locale = form.vars.default_locale|default(locales|first|default('')) %}
+
+{% for field in form %}
+    {% set fieldName = field.vars.name %}
+    {% if field.rendered %}
+        {# already painted #}
+    {% elseif fieldName starts with 'name_' or fieldName starts with 'description_' %}
+        {# rendered inside locale tabs #}
+    {% else %}
+        {{ form_row(field) }}
+    {% endif %}
+{% endfor %}
+
+{% if locales is not empty %}
+    {% include 'admin/permissions/_locale_tabs.html.twig' with {
+        form: form,
+        locales: locales,
+        default_locale: default_locale,
+        tabs_id: tabs_id,
+        label_prefix: label_prefix,
+    } only %}
+{% endif %}

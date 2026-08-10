@@ -18,7 +18,8 @@
 <div
     data-controller="confirm-dialog"
     {% if expected_value is defined and expected_value is not null %}data-confirm-dialog-expected-value="{{ expected_value|e('html_attr') }}"{% endif %}
-    {% if open_on_connect is defined %}data-confirm-dialog-open-on-connect-value="{{ open_on_connect }}"{% endif %}
+    {# Stimulus Boolean: attribute present with empty/"null" is still true — only emit for explicit true. #}
+    {% if open_on_connect|default(false) in [true, 1, '1', 'true', 'TRUE'] %}data-confirm-dialog-open-on-connect-value="true"{% endif %}
 >
     {% block trigger %}
         {% if trigger_label is defined %}

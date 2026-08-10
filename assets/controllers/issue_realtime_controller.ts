@@ -74,6 +74,11 @@ export default class extends Controller {
       this.closeEventSource();
       return;
     }
+    // Absolute http(s) only — relative/ciphertext hubs would hit the Symfony app as a document/event-stream.
+    if (!/^https?:\/\//i.test(hubUrl)) {
+      this.closeEventSource();
+      return;
+    }
 
     const url = new URL(hubUrl, window.location.origin);
     for (const topic of topics) {

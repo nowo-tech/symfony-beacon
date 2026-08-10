@@ -37,7 +37,8 @@ As a project owner, I store the Slack app Signing Secret on the destination (enc
 |----|-------------|
 | FR-001 | Optional encrypted `signingSecret` on `NotificationDestination` |
 | FR-002 | Slack outbound includes Block Kit Resolve when secret set + issue/project UUIDs on `issue.new` / `issue.regression` / `issue.reopened` (not sample sends) |
-| FR-003 | `POST /hooks/slack/interactions` public; verify `X-Slack-Signature` + ±5 min timestamp |
+| FR-003 | `POST /hooks/slack/interactions` public; verify `X-Slack-Signature` + ±5 min timestamp for Resolve/Assign actions |
+| FR-003a (`087`, 2026-08-10) | Interactions endpoint MUST NOT echo unsigned Events-style `url_verification` challenges (reject / bad request; Events API belongs on a dedicated route if added later) |
 | FR-004 | Shared `IssueStatusChanger` for UI and Slack paths (history, UserAction, resolve/reopen notify) |
 | FR-005 | Resolve actor is `null` unless Slack user → Beacon member mapping exists (`071-slack-assign-mapping`) |
 | FR-006 | Document Slack App Interactivity URL + signing secret in docs/product/NOTIFICATIONS.md |

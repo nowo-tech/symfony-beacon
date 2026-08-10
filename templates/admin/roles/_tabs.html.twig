@@ -1,0 +1,23 @@
+{# Instance role detail tabs — UiKit via shared/_tabs. #}
+{% set route = app.request.attributes.get('_route') %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'roles.tabs_label'|trans,
+    nav_class: 'mb-6',
+    items: [
+        {
+            label: 'roles.tab.overview'|trans,
+            href: path('admin_roles_show', {id: role.uuid}),
+            current: route == 'admin_roles_show',
+        },
+        {
+            label: 'roles.tab.permissions'|trans,
+            href: path('admin_roles_permissions', {id: role.uuid}),
+            current: route == 'admin_roles_permissions',
+        },
+        {
+            label: 'roles.tab.users'|trans,
+            href: path('admin_roles_users', {id: role.uuid}),
+            current: route == 'admin_roles_users',
+        },
+    ],
+} only %}

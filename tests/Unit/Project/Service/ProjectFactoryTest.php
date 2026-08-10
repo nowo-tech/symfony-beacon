@@ -9,7 +9,6 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectRepository;
-use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectApiKeyFactory;
 use App\Project\Service\ProjectFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +33,7 @@ final class ProjectFactoryTest extends TestCase
 
         $factory = new ProjectFactory(
             $repository,
-            new ProjectApiKeyFactory($em, new HumanFriendlyTokenGenerator()),
+            new ProjectApiKeyFactory($em),
         );
         $project = $factory->create(
             $owner,
@@ -72,7 +71,7 @@ final class ProjectFactoryTest extends TestCase
 
         $factory = new ProjectFactory(
             $repository,
-            new ProjectApiKeyFactory($em, new HumanFriendlyTokenGenerator()),
+            new ProjectApiKeyFactory($em),
         );
         $project = $factory->create($owner, 'My Cool App', null);
 
@@ -98,7 +97,7 @@ final class ProjectFactoryTest extends TestCase
 
         $factory = new ProjectFactory(
             $repository,
-            new ProjectApiKeyFactory($em, new HumanFriendlyTokenGenerator()),
+            new ProjectApiKeyFactory($em),
         );
         $project = $factory->create(
             $owner,

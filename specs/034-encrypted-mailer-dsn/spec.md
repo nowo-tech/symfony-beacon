@@ -14,13 +14,13 @@ As an instance admin, I open Administration → Mailer and save an SMTP (or othe
 
 **Why this priority**: Operators need a secure, UI-managed transport for magic login and email alerts.
 
-**Independent Test**: As `ROLE_ADMIN`, open `/settings/mailer`, submit a DSN + From address, reload; assert masked DSN shown and ciphertext at rest.
+**Independent Test**: As `ROLE_ADMIN`, open `/admin/mailer`, submit a DSN + From address, reload; assert masked DSN shown and ciphertext at rest.
 
 **Acceptance Scenarios**:
 
-1. **Given** I am an instance admin, **When** I open `/settings/mailer`, **Then** I can enter a Mailer DSN and optional From address and save.
+1. **Given** I am an instance admin, **When** I open `/admin/mailer`, **Then** I can enter a Mailer DSN and optional From address and save.
 2. **Given** a DSN is saved, **When** I view the page again, **Then** I see a masked DSN (not the full secret) and confirmation that the database DSN is active.
-3. **Given** I am not an admin, **When** I open `/settings/mailer`, **Then** access is denied (403).
+3. **Given** I am not an admin, **When** I open `/admin/mailer`, **Then** access is denied (403).
 
 ### User Story 2 - Encryption at rest (Priority: P1)
 
@@ -74,7 +74,7 @@ As a guest on the login page, I only see **magic login** and **forgot password**
 ## Requirements *(mandatory)*
 
 - **FR-001**: Singleton `instance_settings` row (id=1) with encrypted `mailer_dsn` (`#[Encrypted]`) and optional `mailer_from`.
-- **FR-002**: Admin UI at `/settings/mailer` (`ROLE_ADMIN`) with hub card, sidebar menu, and breadcrumb seed entries.
+- **FR-002**: Admin UI at `/admin/mailer` (`ROLE_ADMIN`) with hub card, sidebar menu, and breadcrumb seed entries.
 - **FR-003**: `ConfiguredMailer` implements `MailerInterface`, prefers DB DSN, falls back to `%env(MAILER_DSN)%`.
 - **FR-004**: Magic login and email notification delivery use `ConfiguredMailer` (including From).
 - **FR-005**: `.env` / `.env.dist` document `MAILER_DSN` as bootstrap/fallback only.

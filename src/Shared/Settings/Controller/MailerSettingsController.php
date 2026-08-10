@@ -37,7 +37,7 @@ final class MailerSettingsController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/mailer', name: 'settings_mailer', methods: ['GET', 'POST'])]
+    #[Route('/admin/mailer', name: 'admin_mailer', methods: ['GET', 'POST'])]
     public function edit(Request $request): Response
     {
         $settings = $this->repository->getOrCreate();
@@ -59,7 +59,7 @@ final class MailerSettingsController extends AbstractController
             $this->recordMailerAudit($beforeDsn, $beforeFrom, $settings->getMailerDsn(), $settings->getMailerFrom());
             $this->addFlash('success', 'flash.mailer.saved');
 
-            return $this->redirectToRoute('settings_mailer');
+            return $this->redirectToRoute('admin_mailer');
         }
 
         $user = $this->getUser();
@@ -75,7 +75,7 @@ final class MailerSettingsController extends AbstractController
         ]);
     }
 
-    #[Route('/settings/mailer/test', name: 'settings_mailer_test', methods: ['POST'])]
+    #[Route('/admin/mailer/test', name: 'admin_mailer_test', methods: ['POST'])]
     public function sendSample(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('mailer_sample', $request->request->getString('_token'))) {
@@ -85,7 +85,7 @@ final class MailerSettingsController extends AbstractController
         if (!$this->configuredMailer->isMagicLoginAvailable()) {
             $this->addFlash('error', 'flash.mailer.sample_unavailable');
 
-            return $this->redirectToRoute('settings_mailer');
+            return $this->redirectToRoute('admin_mailer');
         }
 
         $to = trim($request->request->getString('to'));
@@ -97,7 +97,7 @@ final class MailerSettingsController extends AbstractController
         if ('' === $to || false === filter_var($to, \FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('error', 'flash.mailer.sample_invalid_recipient');
 
-            return $this->redirectToRoute('settings_mailer');
+            return $this->redirectToRoute('admin_mailer');
         }
 
         try {
@@ -111,7 +111,7 @@ final class MailerSettingsController extends AbstractController
             $this->addFlash('error', 'flash.mailer.sample_failed');
         }
 
-        return $this->redirectToRoute('settings_mailer');
+        return $this->redirectToRoute('admin_mailer');
     }
 
     private function recordMailerAudit(?string $beforeDsn, ?string $beforeFrom, ?string $afterDsn, ?string $afterFrom): void

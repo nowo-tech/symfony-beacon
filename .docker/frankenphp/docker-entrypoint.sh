@@ -86,6 +86,9 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ] || [ 
 		pnpm install --frozen-lockfile || pnpm install
 	fi
 
+	# Halite field-encryption key parent dir (doctrine-encrypt-bundle does not mkdir).
+	mkdir -p var/secrets
+
 	if [ -f bin/console ] && { [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; }; then
 		php bin/console -V || true
 	fi

@@ -43,8 +43,11 @@ You should receive an acknowledgement within a few business days. We will work w
 | --- | --- | --- |
 | Magic login (`login_link`) | Lifetime **600s**, **max_uses: 1**, used-link cache `cache.app` | Request rate limit 5 / 15 minutes per IP; disabled accounts rejected. **Requires** an encrypted non-null Mailer DSN under Administration → Mailer; otherwise `/login/magic` redirects to password login and the link is hidden. |
 | Share links | Max **30 days**; SHA-256 hashed token; **max uses** (UI default **1**; empty = unlimited until expiry) | Grants session viewer access only; never embeds Envelope API secrets |
+| Project API keys / DSN | Secret shown **once** after create/rotate (session flash) | Settings list shows public key only; rotate to mint a new DSN |
 
 Operators should keep the **Mailer DSN** (Administration → Mailer, encrypted at rest) and `kernel.secret` production-grade; rotating the secret invalidates outstanding magic links. Env `MAILER_DSN` is only a fallback for other outbound mail when no database DSN is configured — it does **not** enable magic-link sign-in.
+
+Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the documented `.env.dist` `APP_SECRET` (`ChangeMePleaseUseARealSecret`). `app:seed-demo` is blocked outside local environments unless `--allow-non-local` (random keys only).
 
 ## Safe harbour
 

@@ -79,9 +79,38 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
             $environment,
             'unique-production-setup-token',
             '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'production-grade-app-secret-32',
         );
         $guard->assertProductionSecretsSafe();
         $this->addToAssertionCount(1);
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsDocumentedAppSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            SiteBackupSecurityDefaultsGuard::LOCAL_DEV_APP_SECRET,
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('APP_SECRET is still the documented local default');
+        $guard->assertProductionSecretsSafe();
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsShortAppSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'tooshort',
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('APP_SECRET must be at least 16 characters');
+        $guard->assertProductionSecretsSafe();
     }
 
     #[DataProvider('cacheBuildConsoleCommandsProvider')]

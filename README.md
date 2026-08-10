@@ -38,8 +38,8 @@ This application is **FrankenPHP worker mode friendly**.
 - **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`; AuthKit dual URLs (bare for `DEFAULT_LOCALE`, prefixed for others — see [ADDING-LOCALES.md](docs/dev/ADDING-LOCALES.md)); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
 - Sensitive fields encrypted at rest via [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (API key secrets, notification webhook URLs, push subscriptions, **instance Mailer DSN/From**, **Mercure URL/JWT**)
-- **Administration → Mailer** (`/settings/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login — local catcher: `make mailpit` ([docs/ops/MAILPIT.md](docs/ops/MAILPIT.md))
-- **Administration → Mercure** (`/settings/mercure`): optional live new-issue toasts (hub + JWT); see [docs/ops/MERCURE.md](docs/ops/MERCURE.md)
+- **Administration → Mailer** (`/admin/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login — local catcher: `make mailpit` ([docs/ops/MAILPIT.md](docs/ops/MAILPIT.md))
+- **Administration → Mercure** (`/admin/mercure`): optional live new-issue toasts (hub + JWT); see [docs/ops/MERCURE.md](docs/ops/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
 - Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all) + optional **Web Push**; PWA install
 - Install seed layers + **SiteBackup** setup wizard (`/setup`; auto-redirect when catalogs/schema need bootstrap); ops panel `/_site_backup`; contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
@@ -65,7 +65,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Forms via [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) (Tailwind / Beacon theme + kit profiles)
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt); **optional** member alerts for new issues — Mercure live toasts via **Administration → Mercure** ([docs/ops/MERCURE.md](docs/ops/MERCURE.md)), Web Push via **Account → Display** ([docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md))
 - Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
-- **Appearance** settings for `ROLE_ADMIN` (named light/dark theme presets, brand, layout, colors) at `/settings/appearance` (`082`)
+- **Appearance** settings for `ROLE_ADMIN` (named light/dark theme presets, brand, layout, colors) at `/admin/appearance` (`082`)
 - Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/product/LEGAL-AND-COOKIES.md](docs/product/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display`

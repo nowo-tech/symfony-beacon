@@ -9,7 +9,7 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
-use App\Project\Enum\ProjectRole;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectApiKeyFactory;
@@ -45,7 +45,7 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_key_create_'.$project->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -65,6 +65,7 @@ final class ProjectApiKeyController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'flash.project.api_key_created');
+        $request->getSession()->set('_beacon_last_api_key_dsn', $key->buildDsn($this->settingsBaseUrl($request)));
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
@@ -84,7 +85,7 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
         if (!$this->isCsrfTokenValid('project_key_revoke_'.$apiKey->getId(), $request->request->getString('_token'))) {
@@ -119,7 +120,7 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
         if (!$this->isCsrfTokenValid('project_key_rotate_'.$apiKey->getId(), $request->request->getString('_token'))) {
@@ -138,6 +139,7 @@ final class ProjectApiKeyController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'flash.project.api_key_rotated');
+        $request->getSession()->set('_beacon_last_api_key_dsn', $newKey->buildDsn($this->settingsBaseUrl($request)));
 
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
@@ -147,5 +149,10 @@ final class ProjectApiKeyController extends AbstractController
         if ($apiKey->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
+    }
+
+    private function settingsBaseUrl(Request $request): string
+    {
+        return $request->getSchemeAndHttpHost();
     }
 }

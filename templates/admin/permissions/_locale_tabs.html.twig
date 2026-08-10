@@ -1,0 +1,73 @@
+{#
+  Locale tabs for permission Translatable name/description fields.
+  @var form \Symfony\Component\Form\FormView
+  @var locales list<string> ordered with DEFAULT_LOCALE first
+  @var default_locale string
+  @var tabs_id string Unique prefix per dialog instance
+  @var label_prefix string Translation key prefix (e.g. permissions)
+#}
+{% set label_prefix = label_prefix|default('permissions') %}
+{% set defaultTab = tabs_id ~ '-' ~ default_locale %}
+
+<div class="grid gap-2" data-testid="permission-locale-tabs">
+    <div>
+        <p class="text-sm font-medium leading-none text-[var(--color-ink)]">{{ (label_prefix ~ '.locale_details')|trans }}</p>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ (label_prefix ~ '.locale_details_help')|trans({'%locale%': default_locale|upper}) }}</p>
+    </div>
+
+    <div
+        data-controller="tabs"
+        data-tabs-active-tab-value="{{ defaultTab }}"
+        class="grid gap-3"
+    >
+        <nav
+            role="tablist"
+            class="flex h-auto w-full flex-wrap justify-start gap-1 border-b border-[var(--color-sand)]"
+        >
+            {% for locale in locales %}
+                {% set tabId = tabs_id ~ '-' ~ locale %}
+                {% set open = locale is same as(default_locale) %}
+                <button
+                    type="button"
+                    id="tab-{{ tabId }}"
+                    data-action="click->tabs#open"
+                    data-tabs-target="trigger"
+                    data-tab-id="{{ tabId }}"
+                    role="tab"
+                    aria-controls="tab-{{ tabId }}-description"
+                    aria-selected="{{ open ? 'true' : 'false' }}"
+                    {% if open %}data-active{% endif %}
+                    class="relative inline-flex min-w-10 items-center justify-center px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink)]/55 transition-colors hover:text-[var(--color-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] data-[active]:text-[var(--color-ink)] data-[active]:after:absolute data-[active]:after:inset-x-0 data-[active]:after:bottom-[-1px] data-[active]:after:h-0.5 data-[active]:after:bg-[var(--color-ink)]"
+                >{{ locale|upper }}</button>
+            {% endfor %}
+        </nav>
+
+        {% for locale in locales %}
+            {% set tabId = tabs_id ~ '-' ~ locale %}
+            {% set open = locale is same as(default_locale) %}
+            {# Outer panel: no display:grid/flex — only show/hide. Inner holds layout. #}
+            <div
+                id="tab-{{ tabId }}-description"
+                data-tabs-target="tab"
+                data-tab-id="{{ tabId }}"
+                role="tabpanel"
+                aria-labelledby="tab-{{ tabId }}"
+                {% if open %}data-active{% endif %}
+                data-state="{{ open ? 'active' : 'inactive' }}"
+                class="{% if not open %}hidden{% endif %}"
+                {% if not open %}hidden{% endif %}
+            >
+                <div class="grid gap-3 pt-1">
+                    {{ form_row(attribute(form, 'name_' ~ locale), {
+                        label: (label_prefix ~ '.name_label')|trans,
+                        translation_domain: false,
+                    }) }}
+                    {{ form_row(attribute(form, 'description_' ~ locale), {
+                        label: (label_prefix ~ '.description_label')|trans,
+                        translation_domain: false,
+                    }) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

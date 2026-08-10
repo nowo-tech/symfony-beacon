@@ -4,7 +4,7 @@
 **Created**: 2026-07-21  
 **Status**: Implemented  
 
-**Input**: Split first-install / upgrade seeding into clear layers: (1) extract idempotent platform seed (menus/breadcrumbs/cookie consent) from `app:seed-demo`; (2) leave `app:seed-demo` for identity + Symfony Beacon project + DSN client env only; (3) add `app:seed-sample` with volume profiles for QA/load; (4) document upgrade as migrate + platform seed. Visual cold-start UI is **out of scope** here — see `056-setup-wizard` (SiteBackupBundle `/setup`).
+**Input**: Split first-install / upgrade seeding into clear layers: (1) extract idempotent platform seed (menus/breadcrumbs/cookie consent/permission catalogs) from `app:seed-demo`; (2) leave `app:seed-demo` for identity + Symfony Beacon project + DSN client env only; (3) add `app:seed-sample` with volume profiles for QA/load; (4) document upgrade as migrate + platform seed. Visual cold-start UI is **out of scope** here — see `056-setup-wizard` (SiteBackupBundle `/setup`).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -18,7 +18,7 @@ As an operator installing or upgrading Beacon, I run schema migrations and then 
 
 **Acceptance Scenarios**:
 
-1. **Given** a migrated empty database, **When** I run platform seed, **Then** required dashboard menus and breadcrumbs exist (or are updated) for current product routes.
+1. **Given** a migrated empty database, **When** I run platform seed, **Then** required dashboard menus, breadcrumbs, cookie consent profile, and permission catalog rows (`project.*`) exist (or are updated) for current product routes.
 2. **Given** an existing instance whose menus are missing a newly shipped admin item (e.g. Mailer), **When** I run platform seed again, **Then** the missing item appears and existing customizations that share the same stable keys are updated for position/label/permission without duplicating rows.
 3. **Given** a production database with real users and projects, **When** I run platform seed, **Then** no demo admin user, demo project, or sample issues/events are created.
 
@@ -88,8 +88,9 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 
 ### Functional Requirements
 
-- **FR-001**: System MUST provide an idempotent **platform seed** command that upserts product-required navigation catalogs (dashboard menus and breadcrumbs at minimum) without creating demo users, projects, or telemetry samples.
+- **FR-001**: System MUST provide an idempotent **platform seed** command that upserts product-required catalogs (dashboard menus and breadcrumbs at minimum; cookie consent profile; permission catalog `project.*` per `002-identity-project` FR-012) without creating demo users, projects, or telemetry samples.
 - **FR-002**: System MUST provide a **demo seed** command (evolved from current `app:seed-demo`) limited to demo identity, demo project, API key, and optional client-env DSN write; it MUST invoke or document prerequisite platform seed so menus are not a side effect of demo-only data.
+- **FR-002a** (`087`, 2026-08-10): `app:seed-demo` MUST fail closed outside `dev`/`test` unless `--allow-non-local` is passed; stable DEMO_* API key material MUST be used only in local environments. `--allow-non-local` MUST generate random keys (never DEMO_* constants).
 - **FR-003**: System MUST provide a **sample seed** command with named profiles (`dev`, `load`, `huge`) that generate tagged sample telemetry for validation/load testing.
 - **FR-004**: Sample data MUST be identifiable (project slug and/or explicit sample marker) so purge can remove it without deleting unrelated operator data.
 - **FR-005**: `make bootstrap` MUST run schema migrate + platform seed; demo and sample MUST be separate optional Make targets (or clearly optional steps after bootstrap). Seed-related Make targets that encrypt fields (`bootstrap`, `seed-platform`, `seed-sample`, `dogfood`) MUST ensure `var/secrets/` exists before console (Halite key file parent directory).
@@ -102,7 +103,7 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 
 ### Key Entities
 
-- **Platform catalog entries**: Menu items and breadcrumb definitions keyed by stable route (and locale labels where applicable).
+- **Platform catalog entries**: Menu items and breadcrumb definitions keyed by stable route (and locale labels where applicable); cookie consent profile; permission rows from `ProjectPermissionCatalog` (product runtime still uses per-project `ProjectAccessService` / Twig `project_grants` — see `002` FR-013 / FR-014). Seed purges leftover `admin.*` permission rows.
 - **Demo identity**: Known local admin user + demo project + API key used for Envelope DSN examples.
 - **Sample telemetry**: Issues, events, performance rows, and/or daily stats generated for testing, marked as sample for purge.
 - **Seed revision (optional)**: Record of applied platform seed version so operators/support can see whether catalogs are current (nice-to-have in plan if low cost; not blocking MVP).

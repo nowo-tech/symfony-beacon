@@ -24,10 +24,16 @@ As an operator, I scrape Prometheus metrics from a documented path.
 - **FR-003**: Export Messenger async pending depth.
 - **FR-004**: Export notification delivery failure counters (no secrets in labels).
 
+## Amendment (`087-security-audit-hardening`, 2026-08-10)
+
+- **FR-005**: New `instance_settings` rows MUST default `metrics_require_token` to **true** (DB column default aligned via migration). Existing rows keep stored values on upgrade.
+- Ops UI remains the operator path to set the encrypted metrics Bearer token; when require-token is on and token empty, `/metrics` returns 503 (fail closed).
+
 ## Success Criteria
 
 - **SC-001**: Metrics format is valid Prometheus text exposition.
 - **SC-002**: PRODUCTION.md documents exposure constraints.
+- **SC-003**: New installs default to requiring a metrics token (`087`).
 
 ## Out of scope
 

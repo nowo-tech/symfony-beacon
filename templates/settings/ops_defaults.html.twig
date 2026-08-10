@@ -13,7 +13,7 @@
 {% for item in sections %}
     {% set tab_items = tab_items|merge([{
         label: item.tabLabelKey()|trans,
-        href: path('settings_ops_defaults_section', {section: item.value}),
+        href: path('admin_ops_defaults_section', {section: item.value}),
         current: item == section,
         attr: {'data-testid': 'ops-defaults-tab-' ~ item.value},
     }]) %}

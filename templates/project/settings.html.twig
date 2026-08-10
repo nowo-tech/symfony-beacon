@@ -13,7 +13,7 @@
     </div>
 {% endif %}
 
-{% if membership.role.value in ['owner', 'admin'] %}
+{% if membership.canManageSettings %}
 <section class="panel mb-6">
     <h2 class="mb-2 text-lg font-semibold">{{ 'project.governance.title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'project.governance.help'|trans }}</p>
@@ -71,11 +71,11 @@
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
                     <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
                     {% if membership.canManageApiKeys %}
-                        <code class="mt-2 block break-all text-xs" data-testid="api-key-dsn">{{ key.buildDsn(baseUrl) }}</code>
+                        <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
+                        <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_once_hint'|trans }}</p>
                     {% else %}
                         <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_hidden'|trans }}</p>
                     {% endif %}
-                    <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
                     {% if membership.canManageApiKeys and key.active %}
                         <div class="mt-3 flex flex-wrap gap-2">
                             <form method="post" action="{{ path('project_keys_rotate', {projectId: project.uuid, keyId: key.id}) }}">
@@ -97,6 +97,10 @@
                 </li>
             {% endfor %}
         </ul>
+        {% if membership.canManageApiKeys and lastApiKeyDsn|default(null) %}
+            <p class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all font-mono" data-testid="api-key-dsn">{{ lastApiKeyDsn }}</p>
+            <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.secret_once_banner'|trans }}</p>
+        {% endif %}
         {% if membership.canManageApiKeys %}
             <form
                 method="post"
@@ -137,6 +141,8 @@
                     form_action: path('project_members_add', {id: project.uuid}),
                     title: 'project.members.add_title'|trans,
                     body: 'project.members.add_help'|trans,
+                    header_wrapper: true,
+                    content_wrapper: true,
                     csrf_token: csrf_token('project_member_add_' ~ project.id),
                     cancel_label: 'project.danger.cancel'|trans,
                     submit_label: 'project.members.add'|trans,
@@ -196,9 +202,12 @@
                                 {% embed 'shared/_confirm_dialog.html.twig' with {
                                     form_action: path('project_members_role', {projectId: project.uuid, userId: memberUser.uuid}),
                                     title: 'project.members.edit_role_title'|trans,
+                                    header_wrapper: true,
+                                    content_wrapper: true,
                                     csrf_token: csrf_token('project_member_role_' ~ member.id),
                                     cancel_label: 'project.danger.cancel'|trans,
                                     submit_label: 'project.members.update_role'|trans,
+                                    submit_disabled: isLastOwner,
                                 } %}
                                     {% block trigger %}
                                         <button
@@ -235,12 +244,6 @@
                                             {% endif %}
                                         </select>
                                     {% endblock %}
-                                    {% block actions %}
-                                        <div class="confirm-dialog__actions">
-                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
-                                            <button class="btn-primary" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.update_role'|trans }}</button>
-                                        </div>
-                                    {% endblock %}
                                 {% endembed %}
 
                                 {% embed 'shared/_confirm_dialog.html.twig' with {
@@ -250,6 +253,7 @@
                                     cancel_label: 'project.danger.cancel'|trans,
                                     submit_label: 'project.members.remove'|trans,
                                     submit_class: 'btn-danger',
+                                    submit_disabled: isLastOwner,
                                 } %}
                                     {% block trigger %}
                                         <button
@@ -271,12 +275,6 @@
                                             <p class="confirm-dialog__body">{{ 'project.members.remove_confirm'|trans({'%email%': memberUser.email}) }}</p>
                                         {% endif %}
                                     {% endblock %}
-                                    {% block actions %}
-                                        <div class="confirm-dialog__actions">
-                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
-                                            <button class="btn-danger" type="submit" {% if isLastOwner %}disabled{% endif %}>{{ 'project.members.remove'|trans }}</button>
-                                        </div>
-                                    {% endblock %}
                                 {% endembed %}
                             </div>
                         {% endif %}
@@ -288,7 +286,7 @@
     </section>
 </div>
 
-{% if membership.role.value in ['owner', 'admin'] %}
+{% if membership.canManageSettings %}
 <section class="panel mt-6" data-testid="read-api-tokens">
     <h2 class="mb-2 text-lg font-semibold">{{ 'projects.read_token.title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'projects.read_token.help'|trans }}</p>
@@ -331,7 +329,9 @@
         {% endfor %}
     </ul>
 </section>
+{% endif %}
 
+{% if membership.canManageShareLinks %}
 <section class="panel mt-6" data-testid="share-links">
     <h2 class="mb-2 text-lg font-semibold">{{ 'projects.share.title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'projects.share.help'|trans }}</p>
@@ -399,6 +399,8 @@
                                 form_action: path('project_groups_role', {projectId: project.uuid, groupAccessId: groupAccess.uuid}),
                                 title: 'project.groups.edit_role_title'|trans,
                                 body: 'project.groups.edit_role_body'|trans({'%name%': linkedGroup.name}),
+                                header_wrapper: true,
+                                content_wrapper: true,
                                 csrf_token: csrf_token('project_group_role_' ~ groupAccess.id),
                                 cancel_label: 'project.danger.cancel'|trans,
                                 submit_label: 'project.members.update_role'|trans,
@@ -536,7 +538,7 @@
                             {{ 'project.health.never_delivered'|trans }}
                         {% endif %}
                     </div>
-                    {% if beacon_notification_circuit_open(destination) and membership.role.value in ['owner', 'admin'] %}
+                    {% if beacon_notification_circuit_open(destination) and membership.canManageNotifications %}
                         <form class="mt-2" method="post" action="{{ path('project_notification_resume', {projectId: project.uuid, id: destination.uuid}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('notif_resume_' ~ destination.id) }}">
                             <button class="btn-ghost" type="submit">{{ 'notifications.resume'|trans }}</button>
@@ -579,7 +581,7 @@
     {% endif %}
 </section>
 
-{% if membership.role.value in ['owner', 'admin'] %}
+{% if membership.canManageNotifications %}
 <section class="panel mt-6">
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
@@ -662,7 +664,7 @@
         <h2 class="text-lg font-semibold">{{ 'notifications.title'|trans }}</h2>
         <div class="flex flex-wrap gap-2">
             <a class="btn-ghost" href="{{ path('project_notification_help', {id: project.uuid}) }}">{{ 'notifications.help.link'|trans }}</a>
-            {% if membership.role.value in ['owner', 'admin'] %}
+            {% if membership.canManageNotifications %}
                 <a class="btn-primary" href="{{ path('project_notification_new', {id: project.uuid}) }}">{{ 'notifications.add'|trans }}</a>
             {% endif %}
         </div>
@@ -696,7 +698,7 @@
                                 {% endfor %}
                             </div>
                         </div>
-                        {% if membership.role.value in ['owner', 'admin'] %}
+                        {% if membership.canManageNotifications %}
                             <div class="flex flex-wrap gap-2">
                                 <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.uuid, id: destination.uuid}) }}">{{ 'notifications.edit'|trans }}</a>
                                 {% if beacon_notification_circuit_open(destination) %}
@@ -732,12 +734,13 @@
     {% endif %}
 </section>
 
-{% if membership.role.value in ['owner', 'admin'] %}
+{% if membership.canManageSettings or membership.canDeleteProject %}
 <section class="panel panel--danger mt-6">
     <h2 class="mb-2 text-lg font-semibold text-[var(--color-alert)]">{{ 'project.danger.title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'project.danger.intro'|trans }}</p>
 
     <div class="flex flex-wrap gap-3">
+        {% if membership.canManageSettings %}
         {% embed 'shared/_confirm_dialog.html.twig' with {
             trigger_class: 'btn-ghost',
             trigger_label: 'project.danger.clear_open'|trans,
@@ -750,8 +753,9 @@
             submit_class: 'btn-danger',
         } %}
         {% endembed %}
+        {% endif %}
 
-        {% if membership.role.value == 'owner' %}
+        {% if membership.canDeleteProject %}
             {% embed 'shared/_confirm_dialog.html.twig' with {
                 expected_value: project.name,
                 trigger_class: 'btn-ghost',

@@ -19,7 +19,7 @@ As an integrator, I list/get issues with a project read token.
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Project-scoped read tokens (create/revoke in Settings; hashed at rest).
+- **FR-001**: Project-scoped read tokens (create/revoke in Settings; hashed at rest). Create/revoke MUST require `project.settings.manage`; Settings UI section gated with `canManageSettings`.
 - **FR-002**: Endpoints for issues list/detail; export may reuse `017` auth model.
 - **FR-003**: No public unauthenticated boards; rate-limit documented (reverse proxy; OpenAPI tag).
 - **FR-004**: Tokens must not equal ingest public/secret key material.

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.3.1)](#unreleased-main-after-131)
+- [Unreleased (main after 1.4.0)](#unreleased-main-after-140)
+- [Upgrading from 1.3.1 to 1.4.0](#upgrading-from-131-to-140)
 - [Upgrading from 1.3.0 to 1.3.1](#upgrading-from-130-to-131)
 - [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130)
 - [Upgrading from 1.1.0 to 1.2.0](#upgrading-from-110-to-120)
@@ -49,9 +50,49 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.3.1)
+## Unreleased (main after 1.4.0)
 
-No further upgrade steps yet — follow [Upgrading from 1.3.0 to 1.3.1](#upgrading-from-130-to-131) when moving off **1.3.0**.
+No further upgrade steps yet — follow [Upgrading from 1.3.1 to 1.4.0](#upgrading-from-131-to-140) when moving off **1.3.1**.
+
+## Upgrading from 1.3.1 to 1.4.0
+
+**Project permissions + Administration RBAC + security audit hardening** (`087` / 6.36). Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.4.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate
+make seed-platform      # or: make seed — menus/permissions catalog + ROLE_ADMIN menu items
+make vite-build         # Stimulus tabs + confirm-dialog / kit SCSS
+```
+
+### Migrations (since 1.3.1)
+
+| Migration | Purpose |
+|---|---|
+| `Version20260809120000` | Create instance permission/role assignment tables |
+| `Version20260809120100` | Rename `.system` → `is_system` (MySQL reserved word) |
+| `Version20260809160000` | Rename to shared `permission` / `role` / `role_permission` / `role_user` |
+| `Version20260810013000` | Temporary JSON translation columns on `permission` |
+| `Version20260810023000` | `permission_translation` table; drop JSON translation columns |
+| `Version20260810030000` | Ops defaults columns on `instance_settings` (envelope/metrics/inbound/SSRF) when missing |
+| `Version20260810100000` | `metrics_require_token` column default **true** for new rows |
+
+### Operator notes
+
+- **API keys / DSN**: Settings no longer re-renders the full `public:secret` DSN on every load. Copy the DSN from the one-shot banner after **Add key** or **Rotate**. Existing keys keep working; rotate if you lost the secret (`087`).
+- **`APP_SECRET`**: Outside `dev`/`test`, documented `.env.dist` values (`ChangeMePleaseUseARealSecret`) and secrets shorter than 16 characters fail boot. Generate with `openssl rand -hex 32` before exposing the instance.
+- **`app:seed-demo`**: Blocked outside local environments unless `--allow-non-local` (random API keys only — never stable DEMO_* material). Prefer `make dogfood` only on laptop stacks.
+- **Metrics**: New installs default `metrics_require_token` to **true**. Existing rows keep their stored value — enable require-token and set a Bearer token under Administration → Ops defaults if you scrape `/metrics`.
+- **Instance config import**: JSON import cannot weaken SSRF private-URL allow, anonymous hook resolve, query-auth reject, or metrics require-token; it may still tighten those flags.
+- **Sessions (prod)**: Cookies use `secure` + `httponly` + `SameSite=Lax`.
+- **Slack**: Interactions URL no longer echoes unsigned Events-style `url_verification` challenges.
+- **Project access**: Product mutations and project Settings use named `project.*` permissions from membership role (`docs/product/ROLES.md`). Administration remains `ROLE_ADMIN`-only (no `admin.*` catalog).
+- **Admin URLs**: `/settings/*` → `/admin/*` with **301** redirects. Re-run platform seed so menus/breadcrumbs use `admin_*` routes.
+- **Dashboard Menu 2.1.0**: required for tagged `MenuCurrentMatcherInterface` sidebar highlighting.
+- Built-in `admin.*` permission rows are purged by platform seed; custom keys you added under other prefixes are kept.
 
 ## Upgrading from 1.3.0 to 1.3.1
 

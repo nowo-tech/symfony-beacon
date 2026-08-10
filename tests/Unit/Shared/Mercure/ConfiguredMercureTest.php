@@ -50,4 +50,29 @@ final class ConfiguredMercureTest extends TestCase
         self::assertSame('https://localhost/.well-known/mercure', $mercure->getPublicUrl());
         self::assertNotNull($mercure->createSubscriberToken(['/projects/x/issues']));
     }
+
+    public function testFallsBackWhenDatabaseValuesAreUndecryptedCiphertext(): void
+    {
+        $settings = InstanceSettings::defaults();
+        $settings->setMercureEnabled(true);
+        $cipher = 'MUIFAF1ene-U5Wd17tCqXXkkbzQFjYovX_aTv4DhkRuMMGHvQJwsex8xbphYtyxYRypbsVoaBg6VBl5CYm4OntYanYEv3tmoyqtQ4eVKLaxuJkBGWFjFNC9Jr46IveyM360xcHP3CZQaGl-Iofz-t5hsliBhs2Fa8MS87ikmeXI2Z-GITNWi8ajWxUo-UTBweXKat2ucQakpf_Rq51yivYXBzq-zyA==';
+        $settings->setMercureUrl($cipher);
+        $settings->setMercurePublicUrl($cipher);
+        $settings->setMercureJwtSecret($cipher);
+
+        $repo = $this->createStub(InstanceSettingsRepository::class);
+        $repo->method('getOrCreate')->willReturn($settings);
+
+        $mercure = new ConfiguredMercure(
+            $repo,
+            'http://mercure/.well-known/mercure',
+            'https://localhost/.well-known/mercure',
+            '!ChangeThisMercureHubJWTSecretKey!',
+        );
+
+        self::assertTrue($mercure->isEnabled());
+        self::assertFalse($mercure->isUsingDatabaseUrl());
+        self::assertFalse($mercure->isUsingDatabaseSecret());
+        self::assertSame('https://localhost/.well-known/mercure', $mercure->getPublicUrl());
+    }
 }

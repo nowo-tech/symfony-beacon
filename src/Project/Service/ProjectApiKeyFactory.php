@@ -9,13 +9,15 @@ use App\Project\Entity\ProjectApiKey;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Creates ProjectApiKey rows with a unique publicKey (or deterministic demo material).
+ * Creates ProjectApiKey rows with a unique high-entropy publicKey (or deterministic demo material).
+ *
+ * Human-friendly adjective-noun tokens are reserved for labels only — public keys use
+ * {@see random_bytes()} so identifiers are not enumerable under rate limits.
  */
 final readonly class ProjectApiKeyFactory
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private HumanFriendlyTokenGenerator $tokenGenerator,
     ) {
     }
 
@@ -30,12 +32,12 @@ final readonly class ProjectApiKeyFactory
         }
 
         for ($attempt = 0; $attempt < 8; ++$attempt) {
-            $generatedPublicKey = $this->tokenGenerator->generateKey();
+            $generatedPublicKey = bin2hex(random_bytes(16));
             if (null === $this->entityManager->getRepository(ProjectApiKey::class)->findOneBy(['publicKey' => $generatedPublicKey])) {
                 return ProjectApiKey::generate($project, $label, $generatedPublicKey, $secretKey);
             }
         }
 
-        return ProjectApiKey::generate($project, $label, $this->tokenGenerator->generateKey(4), $secretKey);
+        return ProjectApiKey::generate($project, $label, bin2hex(random_bytes(24)), $secretKey);
     }
 }

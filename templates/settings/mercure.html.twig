@@ -4,7 +4,161 @@
 
 {% block body %}
 <div class="mx-auto">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mercure_settings.title'|trans }}</h1>
+    <div class="mb-2 flex flex-wrap items-start justify-between gap-3">
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mercure_settings.title'|trans }}</h1>
+        {% embed 'shared/_confirm_dialog.html.twig' with {
+            custom_form: true,
+            dialog_modifier: 'confirm-dialog--guide',
+            aria_labelledby: 'mercure-guide-title',
+        } %}
+            {% block trigger %}
+                <button
+                    type="button"
+                    class="btn-ghost"
+                    data-action="confirm-dialog#open"
+                    data-testid="mercure-guide-open"
+                >{{ 'mercure_settings.guide.open'|trans }}</button>
+            {% endblock %}
+            {% block form %}
+                <div class="confirm-dialog__panel">
+                    <div class="confirm-dialog__header">
+                        <h2 id="mercure-guide-title" class="confirm-dialog__title">{{ 'mercure_settings.guide.title'|trans }}</h2>
+                        <p class="confirm-dialog__body">{{ 'mercure_settings.guide.intro'|trans }}</p>
+                    </div>
+                    <div class="confirm-dialog__content space-y-5 text-sm leading-relaxed text-[var(--color-ink)]/85">
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.overview.title'|trans }}</h3>
+                            <p class="mt-2">{{ 'mercure_settings.guide.overview.body'|trans }}</p>
+                            <ul class="mt-3 list-disc space-y-1.5 pl-5">
+                                <li>{{ 'mercure_settings.guide.overview.item_hub'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.overview.item_jwt'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.overview.item_admin'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.overview.item_proxy'|trans }}</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.env.title'|trans }}</h3>
+                            <p class="mt-2">{{ 'mercure_settings.guide.env.lead'|trans }}</p>
+                            <ol class="mt-3 list-decimal space-y-3 pl-5">
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.env.step1'|trans }}</p>
+                                    <pre class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.env.step1_example'|trans }}</pre>
+                                </li>
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.env.step2'|trans }}</p>
+                                    <pre class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.env.step2_example'|trans }}</pre>
+                                    <p class="mt-2 text-xs text-[var(--color-ink)]/60">{{ 'mercure_settings.guide.env.step2_note'|trans }}</p>
+                                </li>
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.env.step3'|trans }}</p>
+                                    <div class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs">
+                                        <table class="w-full text-left">
+                                            <thead>
+                                                <tr class="text-[var(--color-ink)]/55">
+                                                    <th class="py-1 pr-3 font-medium">{{ 'mercure_settings.guide.env.table_var'|trans }}</th>
+                                                    <th class="py-1 font-medium">{{ 'mercure_settings.guide.env.table_meaning'|trans }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="align-top">
+                                                <tr class="border-t border-[var(--color-sand)]/70">
+                                                    <td class="py-2 pr-3 font-mono whitespace-nowrap">MERCURE_URL</td>
+                                                    <td class="py-2">{{ 'mercure_settings.guide.env.row_url'|trans }}</td>
+                                                </tr>
+                                                <tr class="border-t border-[var(--color-sand)]/70">
+                                                    <td class="py-2 pr-3 font-mono whitespace-nowrap">MERCURE_PUBLIC_URL</td>
+                                                    <td class="py-2">{{ 'mercure_settings.guide.env.row_public'|trans }}</td>
+                                                </tr>
+                                                <tr class="border-t border-[var(--color-sand)]/70">
+                                                    <td class="py-2 pr-3 font-mono whitespace-nowrap">MERCURE_JWT_SECRET</td>
+                                                    <td class="py-2">{{ 'mercure_settings.guide.env.row_jwt'|trans }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </li>
+                            </ol>
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.start.title'|trans }}</h3>
+                            <ol class="mt-3 list-decimal space-y-3 pl-5">
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.start.step1'|trans }}</p>
+                                    <pre class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.start.step1_example'|trans }}</pre>
+                                </li>
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.start.step2'|trans }}</p>
+                                    <pre class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.start.step2_example'|trans }}</pre>
+                                </li>
+                                <li>
+                                    <p>{{ 'mercure_settings.guide.start.step3'|trans }}</p>
+                                    <pre class="mt-2 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.start.step3_example'|trans }}</pre>
+                                </li>
+                            </ol>
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.admin.title'|trans }}</h3>
+                            <ol class="mt-3 list-decimal space-y-2 pl-5">
+                                <li>{{ 'mercure_settings.guide.admin.step1'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.admin.step2'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.admin.step3'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.admin.step4'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.admin.step5'|trans }}</li>
+                            </ol>
+                            {% if resolved_public_url %}
+                                <p class="mt-3 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 px-3 py-2 text-xs">
+                                    {{ 'mercure_settings.guide.admin.current_url'|trans({'%url%': resolved_public_url}) }}
+                                </p>
+                            {% endif %}
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.verify.title'|trans }}</h3>
+                            <ol class="mt-3 list-decimal space-y-2 pl-5">
+                                <li>{{ 'mercure_settings.guide.verify.step1'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.verify.step2'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.verify.step3'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.verify.step4'|trans }}</li>
+                            </ol>
+                            <pre class="mt-3 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.verify.curl_example'|trans }}</pre>
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.external.title'|trans }}</h3>
+                            <p class="mt-2">{{ 'mercure_settings.guide.external.lead'|trans }}</p>
+                            <ol class="mt-3 list-decimal space-y-2 pl-5">
+                                <li>{{ 'mercure_settings.guide.external.step1'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.external.step2'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.external.step3'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.external.step4'|trans }}</li>
+                            </ol>
+                            <pre class="mt-3 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.external.example'|trans }}</pre>
+                        </section>
+
+                        <section>
+                            <h3 class="text-base font-semibold text-[var(--color-ink)]">{{ 'mercure_settings.guide.troubleshoot.title'|trans }}</h3>
+                            <ul class="mt-3 list-disc space-y-2 pl-5">
+                                <li>{{ 'mercure_settings.guide.troubleshoot.inactive'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.troubleshoot.publish'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.troubleshoot.unauthorized'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.troubleshoot.cors'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.troubleshoot.ciphertext'|trans }}</li>
+                                <li>{{ 'mercure_settings.guide.troubleshoot.push'|trans }}</li>
+                            </ul>
+                            <pre class="mt-3 overflow-x-auto rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-xs font-mono text-[var(--color-ink)]" tabindex="0">{{ 'mercure_settings.guide.troubleshoot.recreate'|trans }}</pre>
+                        </section>
+
+                        <p class="text-xs text-[var(--color-ink)]/55">{{ 'mercure_settings.guide.docs_hint'|trans }}</p>
+                    </div>
+                    <div class="confirm-dialog__actions">
+                        <button type="button" class="btn-primary" data-confirm-dialog-close data-testid="mercure-guide-close">{{ 'mercure_settings.guide.close'|trans }}</button>
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+    </div>
     <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'mercure_settings.intro'|trans }}</p>
     <p class="mb-6 text-sm text-[var(--color-ink)]/55">{{ 'mercure_settings.manual_hint'|trans }}</p>
 

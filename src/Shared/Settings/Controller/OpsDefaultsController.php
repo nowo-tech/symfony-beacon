@@ -25,17 +25,17 @@ final class OpsDefaultsController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/ops-defaults', name: 'settings_ops_defaults', methods: ['GET'])]
+    #[Route('/admin/ops-defaults', name: 'admin_ops_defaults', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->redirectToRoute('settings_ops_defaults_section', [
+        return $this->redirectToRoute('admin_ops_defaults_section', [
             'section' => OpsDefaultsSection::Governance->value,
         ]);
     }
 
     #[Route(
-        '/settings/ops-defaults/{section}',
-        name: 'settings_ops_defaults_section',
+        '/admin/ops-defaults/{section}',
+        name: 'admin_ops_defaults_section',
         requirements: ['section' => 'governance|ingest|metrics|inbound|notifications'],
         methods: ['GET', 'POST'],
     )]
@@ -72,7 +72,7 @@ final class OpsDefaultsController extends AbstractController
             $this->repository->save($settings);
             $this->addFlash('success', 'flash.ops_defaults.saved');
 
-            return $this->redirectToRoute('settings_ops_defaults_section', [
+            return $this->redirectToRoute('admin_ops_defaults_section', [
                 'section' => $sectionEnum->value,
             ]);
         }

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'roles.permissions_title'|trans }} — {{ role|rbac_role_name }}{% endblock %}
+
+{% block body %}
+{% include 'admin/roles/_header.html.twig' %}
+{% include 'admin/roles/_tabs.html.twig' %}
+
+<section class="panel" data-testid="admin-role-permissions">
+    <h2 class="mb-1 text-lg font-semibold">{{ 'roles.permissions_title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'roles.permissions_intro'|trans }}</p>
+
+    <form method="post" action="{{ path('admin_roles_permissions', {id: role.uuid}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_permissions_' ~ role.id) }}">
+        {% if permissions_by_category is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55">{{ 'roles.permissions_empty'|trans }}</p>
+        {% else %}
+            <div class="flex flex-col gap-6">
+                {% for category, permissions in permissions_by_category %}
+                    <div>
+                        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">
+                            {{ category|rbac_permission_category_name }}
+                        </h3>
+                        {% set category_description = category|rbac_permission_category_description %}
+                        {% if category_description %}
+                            <p class="mb-2 text-xs text-[var(--color-ink)]/55">{{ category_description }}</p>
+                        {% endif %}
+                        <ul class="space-y-2 text-sm">
+                            {% for permission in permissions %}
+                                <li class="flex items-start gap-3 border-b border-[var(--color-sand)]/70 py-2 last:border-0">
+                                    <input
+                                        class="mt-1"
+                                        type="checkbox"
+                                        id="perm-{{ permission.id }}"
+                                        name="permission_ids[]"
+                                        value="{{ permission.id }}"
+                                        {% if role.hasPermissionKey(permission.key) %}checked{% endif %}
+                                    >
+                                    <label class="min-w-0 flex-1 cursor-pointer" for="perm-{{ permission.id }}">
+                                        <span class="font-medium">{{ permission|rbac_permission_name }}</span>
+                                        <code class="ml-2 text-xs text-[var(--color-ink)]/55">{{ permission.key }}</code>
+                                        {% set permission_description = permission|rbac_permission_description %}
+                                        {% if permission_description %}
+                                            <div class="mt-0.5 text-xs text-[var(--color-ink)]/55">{{ permission_description }}</div>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-4">
+                <button class="btn-primary" type="submit">{{ 'roles.save_permissions'|trans }}</button>
+            </div>
+        {% endif %}
+    </form>
+</section>
+{% endblock %}

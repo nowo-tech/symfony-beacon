@@ -6,11 +6,11 @@ namespace App\Project\Service;
 
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectRole;
+use App\Project\Security\ProjectPermission;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Ensures a project-scoped entity belongs to the URL project and the actor is admin.
+ * Ensures a project-scoped entity belongs to the URL project and the actor may manage notifications.
  */
 final readonly class ProjectChildEntityGuard
 {
@@ -25,7 +25,7 @@ final readonly class ProjectChildEntityGuard
             throw new NotFoundHttpException();
         }
 
-        $this->projectAccess->requireRole($entityProject, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($entityProject, $user, ProjectPermission::NOTIFICATIONS_MANAGE);
 
         return $entityProject;
     }

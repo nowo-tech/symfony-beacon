@@ -30,13 +30,13 @@ final class InstanceConfigController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/instance-config', name: 'settings_instance_config', methods: ['GET'])]
+    #[Route('/admin/instance-config', name: 'admin_instance_config', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('settings/instance_config.html.twig');
     }
 
-    #[Route('/settings/instance-config/export', name: 'settings_instance_config_export', methods: ['GET'])]
+    #[Route('/admin/instance-config/export', name: 'admin_instance_config_export', methods: ['GET'])]
     public function export(): Response
     {
         /** @var User $user */
@@ -57,7 +57,7 @@ final class InstanceConfigController extends AbstractController
         ]);
     }
 
-    #[Route('/settings/instance-config/import', name: 'settings_instance_config_import', methods: ['POST'])]
+    #[Route('/admin/instance-config/import', name: 'admin_instance_config_import', methods: ['POST'])]
     public function import(Request $request): RedirectResponse
     {
         /** @var User $user */
@@ -66,14 +66,14 @@ final class InstanceConfigController extends AbstractController
         if (!$this->isCsrfTokenValid('instance_config_import', $request->request->getString('_token'))) {
             $this->addFlash('error', 'settings.instance_config.invalid_csrf');
 
-            return $this->redirectToRoute('settings_instance_config');
+            return $this->redirectToRoute('admin_instance_config');
         }
 
         $file = $request->files->get('config');
         if (!$file instanceof UploadedFile || !$file->isValid()) {
             $this->addFlash('error', 'settings.instance_config.missing_file');
 
-            return $this->redirectToRoute('settings_instance_config');
+            return $this->redirectToRoute('admin_instance_config');
         }
 
         try {
@@ -86,7 +86,7 @@ final class InstanceConfigController extends AbstractController
         } catch (JsonException|InvalidArgumentException) {
             $this->addFlash('error', 'settings.instance_config.import_failed');
 
-            return $this->redirectToRoute('settings_instance_config');
+            return $this->redirectToRoute('admin_instance_config');
         }
 
         $this->userActionRecorder->recordAndFlush(
@@ -101,6 +101,6 @@ final class InstanceConfigController extends AbstractController
         );
         $this->addFlash('success', 'settings.instance_config.imported');
 
-        return $this->redirectToRoute('settings_instance_config');
+        return $this->redirectToRoute('admin_instance_config');
     }
 }

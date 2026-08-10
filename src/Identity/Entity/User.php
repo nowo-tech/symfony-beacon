@@ -115,6 +115,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $memberships;
 
+    /**
+     * Assignable instance RBAC roles (permission bundles). Codes merge into {@see getRoles()}.
+     *
+     * @var Collection<int, InstanceRole>
+     */
+    #[ORM\ManyToMany(targetEntity: InstanceRole::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'role_user')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private Collection $instanceRoles;
+
     #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -127,6 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     {
         $this->ensureUuid();
         $this->memberships = new ArrayCollection();
+        $this->instanceRoles = new ArrayCollection();
         $this->passwordHistory = new ArrayCollection();
         $this->uiPreferences = new UserUiPreferences();
     }
@@ -241,6 +254,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
+        foreach ($this->instanceRoles as $instanceRole) {
+            if ($instanceRole->isEnabled()) {
+                $roles[] = $instanceRole->getCode();
+            }
+        }
 
         return array_values(array_unique($roles));
     }
@@ -615,6 +633,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     public function getMemberships(): Collection
     {
         return $this->memberships;
+    }
+
+    /**
+     * @return Collection<int, InstanceRole>
+     */
+    public function getInstanceRoles(): Collection
+    {
+        return $this->instanceRoles;
+    }
+
+    public function addInstanceRole(InstanceRole $role): self
+    {
+        if (!$this->instanceRoles->contains($role)) {
+            $this->instanceRoles->add($role);
+        }
+
+        return $this;
+    }
+
+    public function removeInstanceRole(InstanceRole $role): self
+    {
+        $this->instanceRoles->removeElement($role);
+
+        return $this;
+    }
+
+    public function hasInstanceRole(InstanceRole $role): bool
+    {
+        return $this->instanceRoles->contains($role);
     }
 
     public function getCreatedBy(): ?object

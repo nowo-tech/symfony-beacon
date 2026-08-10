@@ -74,7 +74,7 @@ As an operator installing from `.env.dist`, I no longer see (or need) the migrat
 - **FR-004**: Instance config export/import includes non-secret flags; secrets never exported; secret keys forbidden on import; bump schema version.
 - **FR-005**: Remove migrated keys from `.env.dist` and stop binding them in `parameters.yaml` / env-based package overrides.
 - **FR-006**: Document upgrade path and production checklist for re-applying former env values in the UI (especially prod metrics require-token).
-- **FR-007**: Ops defaults MUST use route-based sections (`/settings/ops-defaults` → `/settings/ops-defaults/{section}` for governance|ingest|metrics|inbound|notifications) with shared product tabs (`shared/_tabs` → UiKit `_tabs`).
+- **FR-007**: Ops defaults MUST use route-based sections (`/admin/ops-defaults` → `/admin/ops-defaults/{section}` for governance|ingest|metrics|inbound|notifications) with shared product tabs (`shared/_tabs` → UiKit `_tabs`).
 - **FR-008**: Ops defaults (and sibling settings Mailer / Mercure / Social credential) Form Types MUST extend FormKit (`FormKitAbstractType` / profile `beacon`) and paint fields via `form/_fields.html.twig` (`077`).
 
 ### Key Entities

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'roles.users_title'|trans }} — {{ role|rbac_role_name }}{% endblock %}
+
+{% block body %}
+{% include 'admin/roles/_header.html.twig' %}
+{% include 'admin/roles/_tabs.html.twig' %}
+
+<section class="panel" data-testid="admin-role-users">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'roles.users_title'|trans }}</h2>
+    <ul class="space-y-2 text-sm">
+        {% for user in role.users %}
+            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0">
+                <div>
+                    <div class="font-medium">{{ user.displayName }}</div>
+                    <div class="text-xs text-[var(--color-ink)]/55">{{ user.email }}</div>
+                </div>
+                <form method="post" action="{{ path('admin_roles_users_remove', {id: role.uuid, userId: user.uuid}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_user_remove_' ~ role.id ~ '_' ~ user.id) }}">
+                    <button class="btn-ghost" type="submit">{{ 'roles.remove_user'|trans }}</button>
+                </form>
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'roles.users_empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ path('admin_roles_users_add', {id: role.uuid}) }}" class="mt-4 flex flex-wrap gap-2">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_user_add_' ~ role.id) }}">
+        <input class="input min-w-56 flex-1" type="email" name="email" required placeholder="{{ 'roles.user_email_placeholder'|trans }}" autocomplete="off">
+        <button class="btn-primary" type="submit">{{ 'roles.add_user'|trans }}</button>
+    </form>
+    <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'roles.add_user_help'|trans }}</p>
+</section>
+{% endblock %}

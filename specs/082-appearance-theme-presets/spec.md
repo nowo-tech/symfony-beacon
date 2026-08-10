@@ -12,11 +12,11 @@
 
 As an instance admin, I open **Themes** and see light presets (`beacon`, `ocean`, `slate`, `sandstone`) and dark presets (`midnight`, `obsidian`, `aurora`, `ember`). Choosing a card applies that palette and overwrites the matching light or dark color fields.
 
-**Independent Test**: `GET /settings/appearance/themes` as admin; click `ocean` then `midnight`; CSS variables and `aria-pressed` reflect both selections.
+**Independent Test**: `GET /admin/appearance/themes` as admin; click `ocean` then `midnight`; CSS variables and `aria-pressed` reflect both selections.
 
 **Acceptance Scenarios**:
 
-1. **Given** `ROLE_ADMIN`, **When** I open `/settings/appearance`, **Then** I am redirected to `/settings/appearance/themes` (no light/dark sub-route).
+1. **Given** `ROLE_ADMIN`, **When** I open `/admin/appearance`, **Then** I am redirected to `/admin/appearance/themes` (no light/dark sub-route).
 2. **Given** Themes section, **When** I apply a light preset, **Then** only light color columns change and `theme_id` stores that id; dark selection stays.
 3. **Given** Themes section, **When** I apply a dark preset, **Then** only dark color columns change and `theme_id_dark` stores that id; light selection stays.
 4. **Given** Colors edited manually away from a preset, **When** Themes reloads, **Then** the mismatched mode shows as `custom` (warn copy when either mode is custom).
@@ -25,7 +25,7 @@ As an instance admin, I open **Themes** and see light presets (`beacon`, `ocean`
 
 As an admin, Appearance is split into **Themes**, **Brand**, **Layout**, and **Colors** routes. Colors has subtabs Accents / Status / Surfaces. Save and Restore use shared `common.save` / `common.restore` labels.
 
-**Acceptance**: Routes `/settings/appearance/{themes|brand|layout|colors}` and `/settings/appearance/colors/{accents|status|surfaces}`; `[data-testid="appearance-tabs"]` present; Themes has no `[data-testid="appearance-subtabs"]`.
+**Acceptance**: Routes `/admin/appearance/{themes|brand|layout|colors}` and `/admin/appearance/colors/{accents|status|surfaces}`; `[data-testid="appearance-tabs"]` present; Themes has no `[data-testid="appearance-subtabs"]`.
 
 ### User Story 3 - Layout knobs (Priority: P2)
 

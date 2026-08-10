@@ -18,7 +18,7 @@ final class MercureSettingsTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject('mercure-member@example.com');
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/settings/mercure');
+        $client->request(Request::METHOD_GET, '/admin/mercure');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -32,7 +32,7 @@ final class MercureSettingsTest extends DatabaseWebTestCase
         $client->disableReboot();
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mercure');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mercure');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Mercure is off');
 
@@ -43,7 +43,7 @@ final class MercureSettingsTest extends DatabaseWebTestCase
             'instance_mercure_settings[plainMercureJwtSecret]' => '!ChangeThisMercureHubJWTSecretKey!',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/mercure');
+        self::assertResponseRedirects('/admin/mercure');
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Live Mercure alerts are enabled');
 
@@ -69,12 +69,12 @@ final class MercureSettingsTest extends DatabaseWebTestCase
         $client->disableReboot();
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/mercure');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/mercure');
         $form = $crawler->selectButton('Save Mercure settings')->form([
             'instance_mercure_settings[clearMercureJwtSecret]' => '1',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/mercure');
+        self::assertResponseRedirects('/admin/mercure');
 
         $em->clear();
         $reloaded = $em->getRepository(InstanceSettings::class)->find($settings->getId());

@@ -38,6 +38,7 @@
             {% endfor %}
         </select>
     </div>
+    {% if project_grants(project, 'project.issues.triage') %}
     <form method="post" action="{{ path('issue_view_save', {id: project.uuid}) }}" class="flex flex-wrap items-end gap-2 grow">
         <input type="hidden" name="_token" value="{{ csrf_token('issue_view_save') }}">
         {% for key, value in filterQuery %}
@@ -60,6 +61,7 @@
                 </form>
             {% endfor %}
         </div>
+    {% endif %}
     {% endif %}
 </div>
 

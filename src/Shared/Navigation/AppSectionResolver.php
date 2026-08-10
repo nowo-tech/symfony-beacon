@@ -14,7 +14,7 @@ final readonly class AppSectionResolver
     /** @var list<string> */
     private const array ADMINISTRATION_PREFIXES = [
         'admin_',
-        'settings_',
+        'legacy_settings_',
         'nowo_dashboard_menu_',
         'nowo_breadcrumb_kit_',
         'nowo_cookie_consent_',

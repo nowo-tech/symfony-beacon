@@ -8,7 +8,7 @@ use App\Identity\Entity\User;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectRole;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +42,7 @@ final class ProjectThresholdRuleController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::NOTIFICATIONS_MANAGE);
 
         $rule = new ProjectThresholdRule();
         $rule->setProject($project);

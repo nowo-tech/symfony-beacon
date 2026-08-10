@@ -111,7 +111,7 @@ As a project admin, I can send a test notification to a configured destination s
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow project owners and admins to manage notification destinations scoped to a single project.
+- **FR-001**: System MUST allow actors with `project.notifications.manage` to manage notification destinations scoped to a single project (`requirePermission` / `ProjectChildEntityGuard`; UI via `canManageNotifications` / `project_grants`).
 - **FR-002**: Each destination MUST support: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP** webhook.
 - **FR-003**: Each destination MUST store: display name/label, type, endpoint credentials/URL, enabled flag, and selected alert categories.
 - **FR-004**: Alert categories MUST include issue severity filters covering at least `error` and `warning` (and allow selecting other known levels the product already uses, such as `fatal` / `info` / `debug`), plus an N+1 performance category.
@@ -120,7 +120,7 @@ As a project admin, I can send a test notification to a configured destination s
 - **FR-007**: N+1-oriented notifications MUST include project identity, a transaction summary, N+1 count (or equivalent), and a deep link into the related performance view when available.
 - **FR-008**: Outbound notification delivery MUST run asynchronously after ingest acknowledgment so destination latency cannot block Envelope ACK.
 - **FR-009**: Delivery failures MUST be retried with bounded attempts; permanent misconfiguration must not break ingest or issue persistence.
-- **FR-010**: Members without project manage rights MUST NOT create, edit, disable, enable, test, or delete destinations.
+- **FR-010**: Actors without `project.notifications.manage` MUST NOT create, edit, disable, enable, test, or delete destinations (hidden controls + HTTP 403).
 - **FR-011**: System MUST provide a way to send a test notification for a saved destination.
 - **FR-012**: Destination secrets MUST NOT be exposed in full in list views or ordinary page HTML where avoidable (masked display); MUST be encryptable at rest.
 - **FR-013**: Automated tests MUST cover permission rules, filter matching (issue levels and N+1), first-occurrence vs duplicate silence, regression notify, and that ingest ACK does not depend on destination success.

@@ -49,7 +49,8 @@ final class AppSectionTest extends TestCase
         yield 'dashboard' => ['dashboard_home', AppSection::Dashboard];
         yield 'account' => ['account_profile', AppSection::Preferences];
         yield 'admin' => ['admin_hub', AppSection::Administration];
-        yield 'settings' => ['settings_ops_defaults', AppSection::Administration];
+        yield 'admin ops defaults' => ['admin_ops_defaults', AppSection::Administration];
+        yield 'legacy settings' => ['legacy_settings_mailer', AppSection::Administration];
         yield 'http log' => ['nowo_http_log_index', AppSection::Administration];
         yield 'issues' => ['issue_index', AppSection::Dashboard];
     }

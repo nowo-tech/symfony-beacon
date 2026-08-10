@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'permissions.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+{% embed 'admin/_list_page.html.twig' with {
+    title: 'permissions.title',
+    intro: 'permissions.intro',
+    search_route: 'admin_permissions',
+    search_placeholder: 'permissions.search_placeholder',
+    q: q,
+} %}
+    {% block header_actions %}
+        <div class="flex flex-wrap gap-2">
+            <a class="btn-ghost no-underline" href="{{ path('admin_roles') }}">{{ 'permissions.link_roles'|trans }}</a>
+            {% embed 'shared/_confirm_dialog.html.twig' with {
+                custom_form: true,
+                dialog_modifier: 'confirm-dialog--md',
+                open_on_connect: open_create,
+                aria_labelledby: 'permission-create-dialog-title',
+            } %}
+                {% block trigger %}
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        data-action="confirm-dialog#open"
+                        data-testid="admin-permission-create"
+                    >{{ 'permissions.create'|trans }}</button>
+                {% endblock %}
+                {% block form %}
+                    {{ form_start(createForm, {attr: {class: 'confirm-dialog__panel'}}) }}
+                        <div class="confirm-dialog__header">
+                            <h2 id="permission-create-dialog-title" class="confirm-dialog__title">{{ 'permissions.create'|trans }}</h2>
+                            <p class="confirm-dialog__body">{{ 'permissions.form_intro'|trans }}</p>
+                        </div>
+                        <div class="confirm-dialog__content">
+                            {% include 'admin/permissions/_form_fields.html.twig' with {
+                                form: createForm,
+                                tabs_id: 'permission-create',
+                            } only %}
+                        </div>
+                        <div class="confirm-dialog__actions">
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'permissions.cancel'|trans }}</button>
+                            <button class="btn-primary" type="submit">{{ 'permissions.create'|trans }}</button>
+                        </div>
+                    {{ form_end(createForm) }}
+                {% endblock %}
+            {% endembed %}
+        </div>
+    {% endblock %}
+    {% block table_head %}
+        <thead>
+            <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                <th class="px-2 py-2 font-medium">{{ 'permissions.col.permission'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'permissions.col.key'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'permissions.col.category'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'permissions.col.type'|trans }}</th>
+                <th class="px-2 py-2 font-medium">{{ 'permissions.col.actions'|trans }}</th>
+            </tr>
+        </thead>
+    {% endblock %}
+    {% block table_body %}
+        <tbody>
+            {% for permission in permissions %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0" data-testid="admin-permission-row">
+                    <td class="px-2 py-3">
+                        <div class="font-medium">{{ permission|rbac_permission_name }}</div>
+                        {% set permission_description = permission|rbac_permission_description %}
+                        {% if permission_description %}
+                            <div class="mt-1 line-clamp-2 text-xs text-[var(--color-ink)]/55">{{ permission_description }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3"><code class="text-xs" title="{{ 'permissions.key_help'|trans }}">{{ permission.key }}</code></td>
+                    <td class="px-2 py-3">
+                        <div class="font-medium">{{ permission|rbac_permission_category_name }}</div>
+                        {% set category_description = permission|rbac_permission_category_description %}
+                        {% if category_description %}
+                            <div class="mt-1 line-clamp-2 text-xs text-[var(--color-ink)]/55">{{ category_description }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        {% if permission.system %}
+                            <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/65">{{ 'permissions.type.system'|trans }}</span>
+                        {% else %}
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'permissions.type.custom'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            {% if editForms[permission.id] is defined %}
+                                {% embed 'shared/_confirm_dialog.html.twig' with {
+                                    custom_form: true,
+                                    dialog_modifier: 'confirm-dialog--md',
+                                    open_on_connect: open_edit_uuid is same as(permission.uuid),
+                                    aria_labelledby: 'permission-edit-dialog-title-' ~ permission.id,
+                                } %}
+                                    {% block trigger %}
+                                        <button
+                                            type="button"
+                                            class="btn-ghost btn-sm"
+                                            data-action="confirm-dialog#open"
+                                            data-testid="admin-permission-edit"
+                                        >{{ 'permissions.edit'|trans }}</button>
+                                    {% endblock %}
+                                    {% block form %}
+                                        {{ form_start(editForms[permission.id], {attr: {class: 'confirm-dialog__panel'}}) }}
+                                            <div class="confirm-dialog__header">
+                                                <h2 id="permission-edit-dialog-title-{{ permission.id }}" class="confirm-dialog__title">{{ 'permissions.edit_title'|trans }}</h2>
+                                                <p class="confirm-dialog__body"><code class="text-xs">{{ permission.key }}</code></p>
+                                            </div>
+                                            <div class="confirm-dialog__content">
+                                                {% include 'admin/permissions/_form_fields.html.twig' with {
+                                                    form: editForms[permission.id],
+                                                    tabs_id: 'permission-edit-' ~ permission.id,
+                                                } only %}
+                                            </div>
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'permissions.cancel'|trans }}</button>
+                                                <button class="btn-primary" type="submit">{{ 'permissions.save'|trans }}</button>
+                                            </div>
+                                        {{ form_end(editForms[permission.id]) }}
+                                    {% endblock %}
+                                {% endembed %}
+                            {% endif %}
+                            {% if not permission.system %}
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_permissions_delete', {id: permission.uuid}) }}"
+                                    data-controller="confirm-submit"
+                                    data-confirm-submit-message-value="{{ 'permissions.delete_confirm'|trans|e('html_attr') }}"
+                                    data-action="submit->confirm-submit#confirm"
+                                >
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_permission_delete_' ~ permission.id) }}">
+                                    <button class="btn-danger btn-sm" type="submit">{{ 'permissions.delete'|trans }}</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="5">{{ 'permissions.empty'|trans }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endblock %}
+{% endembed %}
+{% endblock %}

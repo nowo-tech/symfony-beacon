@@ -16,7 +16,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/settings/appearance');
+        $client->request(Request::METHOD_GET, '/admin/appearance');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -28,8 +28,8 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/settings/appearance');
-        self::assertResponseRedirects('/settings/appearance/themes');
+        $client->request(Request::METHOD_GET, '/admin/appearance');
+        self::assertResponseRedirects('/admin/appearance/themes');
     }
 
     public function testAdminCanApplyNamedTheme(): void
@@ -41,7 +41,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/themes');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/themes');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="appearance-tabs"]');
         self::assertSelectorNotExists('[data-testid="appearance-subtabs"]');
@@ -50,7 +50,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $form = $crawler->filter('button[name="apply_theme"][value="ocean"]')->form();
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/themes');
+        self::assertResponseRedirects('/admin/appearance/themes');
         $client->followRedirect();
 
         $html = $client->getResponse()->getContent() ?: '';
@@ -60,7 +60,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $form = $client->getCrawler()->filter('button[name="apply_theme"][value="midnight"]')->form();
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/themes');
+        self::assertResponseRedirects('/admin/appearance/themes');
         $client->followRedirect();
         self::assertSelectorExists('button[name="apply_theme"][value="midnight"][aria-pressed="true"]');
         self::assertSelectorExists('button[name="apply_theme"][value="ocean"][aria-pressed="true"]');
@@ -75,7 +75,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/brand');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/brand');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save appearance')->form([
@@ -83,11 +83,11 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
             'site_appearance[brandEyebrow]' => 'Ops monitoring',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/brand');
+        self::assertResponseRedirects('/admin/appearance/brand');
         $client->followRedirect();
         self::assertSelectorTextContains('a.brand-mark', 'Acme Beacon');
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/colors/accents');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/colors/accents');
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[accentColor]' => '#0d9488',
             'site_appearance[accentDeepColor]' => '#0f766e',
@@ -95,10 +95,10 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
             'site_appearance[accentDeepColorDark]' => '#5eead4',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/colors/accents');
+        self::assertResponseRedirects('/admin/appearance/colors/accents');
         $client->followRedirect();
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/colors/status');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/colors/status');
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[dangerColor]' => '#c2410c',
             'site_appearance[dangerColorDark]' => '#fb923c',
@@ -107,7 +107,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
         ]);
         $client->submit($form);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/colors/surfaces');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/colors/surfaces');
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[paperColor]' => '#f0fdfa',
             'site_appearance[paperColorDark]' => '#042f2e',
@@ -138,7 +138,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/layout');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/layout');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('html[data-footer-fixed="1"]');
 
@@ -146,7 +146,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
             'site_appearance[footerFixed]' => '1',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/layout');
+        self::assertResponseRedirects('/admin/appearance/layout');
         $client->followRedirect();
         self::assertSelectorExists('html[data-footer-fixed="1"]');
     }
@@ -160,14 +160,14 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/layout');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/layout');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[cornerStyle]' => 'rounded',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/layout');
+        self::assertResponseRedirects('/admin/appearance/layout');
         $client->followRedirect();
 
         $html = $client->getResponse()->getContent() ?: '';
@@ -184,14 +184,14 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/layout');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/layout');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[borderStrength]' => 'strong',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/appearance/layout');
+        self::assertResponseRedirects('/admin/appearance/layout');
         $client->followRedirect();
 
         $html = $client->getResponse()->getContent() ?: '';
@@ -286,7 +286,7 @@ final class AppearanceSettingsTest extends DatabaseWebTestCase
 
         $this->seedPlatformCatalogs();
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/appearance/brand');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/appearance/brand');
         $form = $crawler->selectButton('Save appearance')->form([
             'site_appearance[brandName]' => 'Custom Ops',
             'site_appearance[brandEyebrow]' => 'Signals',

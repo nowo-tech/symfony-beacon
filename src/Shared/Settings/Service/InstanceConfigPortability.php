@@ -264,7 +264,21 @@ final readonly class InstanceConfigPortability
             if (!\array_key_exists($key, $data)) {
                 continue;
             }
-            $settings->{$setter}((bool) $data[$key]);
+            $incoming = (bool) $data[$key];
+            // Fail-closed: never weaken security-sensitive flags via silent JSON import.
+            if ('ingest_reject_query_auth' === $key && !$incoming && $settings->isIngestRejectQueryAuth()) {
+                continue;
+            }
+            if ('metrics_require_token' === $key && !$incoming && $settings->isMetricsRequireToken()) {
+                continue;
+            }
+            if ('notifications_allow_private_urls' === $key && $incoming && !$settings->isAllowPrivateUrls()) {
+                continue;
+            }
+            if ('hooks_allow_anonymous_resolve' === $key && $incoming && !$settings->isAllowAnonymousResolve()) {
+                continue;
+            }
+            $settings->{$setter}($incoming);
         }
 
         if (\array_key_exists('inbound_email_mail_domain', $data) && (\is_string($data['inbound_email_mail_domain']) || null === $data['inbound_email_mail_domain'])) {

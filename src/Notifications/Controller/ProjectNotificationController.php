@@ -9,7 +9,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Form\NotificationDestinationFormType;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectRole;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,7 +44,7 @@ final class ProjectNotificationController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::NOTIFICATIONS_MANAGE);
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
@@ -83,7 +83,7 @@ final class ProjectNotificationController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::NOTIFICATIONS_MANAGE);
 
         $form = $this->createForm(NotificationDestinationFormType::class, $destination);
         $form->handleRequest($request);

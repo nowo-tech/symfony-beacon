@@ -9,8 +9,8 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
-use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectShareLinkRepository;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectShareLinkManager;
 use DateTimeImmutable;
@@ -89,7 +89,7 @@ final class ProjectShareLinkController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_share_create', $request->request->getString('_token'))) {
             $this->addFlash('error', 'projects.share.invalid_csrf');
@@ -145,7 +145,7 @@ final class ProjectShareLinkController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_share_revoke', $request->request->getString('_token'))) {
             $this->addFlash('error', 'projects.share.invalid_csrf');

@@ -20,6 +20,8 @@
         heading: 'admin.hub.section.access',
         tiles: [
             {href: path('admin_users'), title: 'nav.users', intro: 'admin.hub.users', tour: 'admin-users'},
+            {href: path('admin_roles'), title: 'nav.roles', intro: 'admin.hub.roles', testid: 'admin-roles'},
+            {href: path('admin_permissions'), title: 'nav.permissions', intro: 'admin.hub.permissions', testid: 'admin-permissions'},
             {href: path('admin_groups'), title: 'nav.groups', intro: 'admin.hub.groups'},
             {href: path('admin_projects'), title: 'nav.admin_projects', intro: 'admin.hub.projects', tour: 'admin-projects'},
         ],
@@ -27,12 +29,12 @@
     {
         heading: 'admin.hub.section.instance',
         tiles: [
-            {href: path('settings_appearance'), title: 'nav.appearance', intro: 'admin.hub.appearance'},
-            {href: path('settings_mailer'), title: 'nav.mailer', intro: 'admin.hub.mailer', tour: 'admin-mailer'},
-            {href: path('settings_mercure'), title: 'nav.mercure', intro: 'admin.hub.mercure'},
+            {href: path('admin_appearance'), title: 'nav.appearance', intro: 'admin.hub.appearance'},
+            {href: path('admin_mailer'), title: 'nav.mailer', intro: 'admin.hub.mailer', tour: 'admin-mailer'},
+            {href: path('admin_mercure'), title: 'nav.mercure', intro: 'admin.hub.mercure'},
             {href: path('admin_social_login'), title: 'nav.social_login', intro: 'admin.hub.social_login', testid: 'admin-social-login'},
-            {href: path('settings_ops_defaults'), title: 'nav.ops_defaults', intro: 'admin.hub.ops_defaults', testid: 'admin-ops-defaults'},
-            {href: path('settings_instance_config'), title: 'nav.instance_config', intro: 'admin.hub.instance_config', testid: 'admin-instance-config'},
+            {href: path('admin_ops_defaults'), title: 'nav.ops_defaults', intro: 'admin.hub.ops_defaults', testid: 'admin-ops-defaults'},
+            {href: path('admin_instance_config'), title: 'nav.instance_config', intro: 'admin.hub.instance_config', testid: 'admin-instance-config'},
             {href: path('nowo_site_backup_setup'), title: 'nav.setup', intro: 'admin.hub.setup', tour: 'admin-setup'},
         ],
     },

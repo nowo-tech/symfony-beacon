@@ -13,6 +13,7 @@ use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
+use App\Project\Security\ProjectPermission;
 use Deprecated;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -294,8 +295,48 @@ final readonly class ProjectAccessService
      */
     public function requireTriage(Project $project, User $user): ProjectAccess
     {
+        return $this->requirePermission($project, $user, ProjectPermission::ISSUES_TRIAGE);
+    }
+
+    /**
+     * Requires effective access that grants a {@see ProjectPermission} key.
+     *
+     * @throws AccessDeniedHttpException when access or permission is insufficient
+     */
+    public function requirePermission(Project $project, User $user, string $permission): ProjectAccess
+    {
         $access = $this->requireAccess($project, $user);
-        if (!$access->canTriageIssues()) {
+        if (!$access->grants($permission)) {
+            throw new AccessDeniedHttpException('Insufficient project permissions.');
+        }
+
+        return $access;
+    }
+
+    /**
+     * Requires effective access that grants at least one of the given permission keys.
+     *
+     * @throws AccessDeniedHttpException when access or permission is insufficient
+     */
+    public function requireAnyPermission(Project $project, User $user, string ...$permissions): ProjectAccess
+    {
+        $access = $this->requireAccess($project, $user);
+        if ([] === $permissions || !$access->grantsAny(...$permissions)) {
+            throw new AccessDeniedHttpException('Insufficient project permissions.');
+        }
+
+        return $access;
+    }
+
+    /**
+     * Requires access that may open the project Settings surface (any manage/delete grant).
+     *
+     * @throws AccessDeniedHttpException
+     */
+    public function requireSettingsSurface(Project $project, User $user): ProjectAccess
+    {
+        $access = $this->requireAccess($project, $user);
+        if (!$access->canOpenSettings()) {
             throw new AccessDeniedHttpException('Insufficient project permissions.');
         }
 

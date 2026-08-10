@@ -12,13 +12,13 @@
 <section class="panel mb-6" data-testid="instance-config-export">
     <h2 class="mb-2 text-lg font-semibold">{{ 'settings.instance_config.export_title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'settings.instance_config.export_help'|trans }}</p>
-    <a class="btn-primary inline-block no-underline" href="{{ path('settings_instance_config_export') }}" data-testid="instance-config-download">{{ 'settings.instance_config.export'|trans }}</a>
+    <a class="btn-primary inline-block no-underline" href="{{ path('admin_instance_config_export') }}" data-testid="instance-config-download">{{ 'settings.instance_config.export'|trans }}</a>
 </section>
 
 <section class="panel" data-testid="instance-config-import">
     <h2 class="mb-2 text-lg font-semibold">{{ 'settings.instance_config.import_title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'settings.instance_config.import_help'|trans }}</p>
-    <form method="post" action="{{ path('settings_instance_config_import') }}" enctype="multipart/form-data" class="flex flex-wrap items-end gap-3">
+    <form method="post" action="{{ path('admin_instance_config_import') }}" enctype="multipart/form-data" class="flex flex-wrap items-end gap-3">
         <input type="hidden" name="_token" value="{{ csrf_token('instance_config_import') }}">
         <label class="text-sm">
             <span class="mb-1 block">{{ 'settings.instance_config.file'|trans }}</span>

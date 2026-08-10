@@ -375,7 +375,8 @@ html[data-motion='reduce'] .app-sidebar-backdrop {
   }
 
   &::backdrop {
-    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+    /* Always a dark scrim. Do not use --color-ink / --beacon-ink: in dark theme ink is light and the overlay turns white. */
+    background: rgb(0 0 0 / 0.45);
   }
 
   /* Aliases kept for existing markup */
@@ -383,10 +384,25 @@ html[data-motion='reduce'] .app-sidebar-backdrop {
     --cd-width: min(32rem, calc(100vw - 2rem));
   }
 
+  /* Medium (≈ Tailwind max-w-md) — admin edit forms in tables */
+  &--md {
+    --cd-width: min(28rem, calc(100vw - 2rem));
+  }
+
   &--wide,
   &--duplicate {
     --cd-width: min(36rem, calc(100vw - 2rem));
   }
+
+  /* Long operator guides (e.g. Administration → Mercure) */
+  &--guide {
+    --cd-width: min(48rem, calc(100vw - 2rem));
+    --cd-max-height: min(90vh, 52rem);
+  }
+}
+
+html[data-theme='dark'] .confirm-dialog::backdrop {
+  background: rgb(0 0 0 / 0.68);
 }
 
 .confirm-dialog__panel {

@@ -9,8 +9,8 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
-use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectReadTokenRepository;
+use App\Project\Security\ProjectPermission;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -32,7 +32,7 @@ final readonly class ProjectReadTokenManager
      */
     public function create(Project $project, User $actor, string $label): array
     {
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::SETTINGS_MANAGE);
         $label = trim($label);
         if ('' === $label) {
             $label = 'Read token';
@@ -69,7 +69,7 @@ final readonly class ProjectReadTokenManager
         if (!$project instanceof Project) {
             throw new RuntimeException('missing_project');
         }
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::SETTINGS_MANAGE);
         if (!$token->isActive()) {
             return;
         }

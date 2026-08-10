@@ -1,11 +1,6 @@
 {# Sidebar nav for the current app section (dashboard | preferences | administration). #}
 {% set menuCode = app_section.current.menuCode %}
 {% set menuTree = dashboard_menu_tree(menuCode) %}
-{% if menuCode == 'preferences' %}
-    {% set menuTree = beacon_preferences_menu_current(menuTree, app.request.attributes.get('_route')) %}
-{% elseif menuCode == 'administration' %}
-    {% set menuTree = beacon_administration_menu_current(menuTree, app.request.attributes.get('_route')) %}
-{% endif %}
 {% set menuConfig = dashboard_menu_config(menuCode) %}
 {% if menuTree is not empty %}
     <div

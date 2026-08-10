@@ -30,10 +30,21 @@ As an instance admin, I restore allowlisted settings from a file.
 - **FR-002**: Import validates schema/version; rejects unknown/secret keys.
 - **FR-003**: Audit log (UserAction) for import/export.
 
+## Amendment (`087-security-audit-hardening`, 2026-08-10)
+
+- **FR-004**: Import MUST NOT weaken security-sensitive booleans:
+  - `ingest_reject_query_auth` (cannot turn off if currently on)
+  - `metrics_require_token` (cannot turn off if currently on)
+  - `notifications_allow_private_urls` (cannot turn on if currently off)
+  - `hooks_allow_anonymous_resolve` (cannot turn on if currently off)
+- Import MAY tighten those flags and MAY apply other allowlisted non-secret fields (retention, quotas, appearance, …).
+- Covered by `InstanceConfigPortabilitySecurityFlagsTest`.
+
 ## Success Criteria
 
 - **SC-001**: Round-trip test without leaking DSN/OAuth secrets (`InstanceConfigPortabilityTest`).
 - **SC-002**: CSRF on import.
+- **SC-003**: Weaken-attempt import leaves secure flags unchanged (`087`).
 
 ## Out of scope
 

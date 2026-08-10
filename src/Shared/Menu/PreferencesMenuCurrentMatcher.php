@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Shared\Menu;
 
+use Nowo\DashboardMenuBundle\Service\AbstractRoutePrefixMenuCurrentMatcher;
+
 /**
  * Marks preferences sidebar links current for whole account areas (exact path match is too narrow).
  *
  * Preserves {@see \Nowo\DashboardMenuBundle\Service\CurrentRouteTreeDecorator} matches and
  * ORs account route-prefix rules so related pages keep the same nav item highlighted.
  */
-final class PreferencesMenuCurrentMarker extends RoutePrefixMenuCurrentMarker
+final class PreferencesMenuCurrentMatcher extends AbstractRoutePrefixMenuCurrentMatcher
 {
     /** @var array<string, list<string>> */
     private const array ROUTE_PREFIXES = [

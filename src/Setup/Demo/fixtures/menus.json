@@ -247,6 +247,36 @@
             },
             {
               "position": 20,
+              "label": "Roles",
+              "route": "admin_roles",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Roles",
+                "es": "Roles",
+                "de": "Rollen",
+                "nl": "Rollen",
+                "fr": "Rôles",
+                "it": "Ruoli",
+                "pt": "Funções"
+              }
+            },
+            {
+              "position": 30,
+              "label": "Permissions",
+              "route": "admin_permissions",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Permissions",
+                "es": "Permisos",
+                "de": "Berechtigungen",
+                "nl": "Rechten",
+                "fr": "Permissions",
+                "it": "Permessi",
+                "pt": "Permissões"
+              }
+            },
+            {
+              "position": 40,
               "label": "Groups",
               "route": "admin_groups",
               "permission": "ROLE_ADMIN",
@@ -261,7 +291,7 @@
               }
             },
             {
-              "position": 30,
+              "position": 50,
               "label": "Projects",
               "route": "admin_projects",
               "permission": "ROLE_ADMIN",
@@ -293,7 +323,7 @@
             {
               "position": 10,
               "label": "Appearance",
-              "route": "settings_appearance",
+              "route": "admin_appearance",
               "permission": "ROLE_ADMIN",
               "translations": {
                 "en": "Appearance",
@@ -308,7 +338,7 @@
             {
               "position": 20,
               "label": "Mailer",
-              "route": "settings_mailer",
+              "route": "admin_mailer",
               "permission": "ROLE_ADMIN",
               "translations": {
                 "en": "Mailer",
@@ -323,7 +353,7 @@
             {
               "position": 30,
               "label": "Mercure",
-              "route": "settings_mercure",
+              "route": "admin_mercure",
               "permission": "ROLE_ADMIN",
               "translations": {
                 "en": "Mercure",
@@ -353,7 +383,7 @@
             {
               "position": 50,
               "label": "Ops defaults",
-              "route": "settings_ops_defaults",
+              "route": "admin_ops_defaults",
               "permission": "ROLE_ADMIN",
               "translations": {
                 "en": "Ops defaults",
@@ -368,7 +398,7 @@
             {
               "position": 60,
               "label": "Instance config",
-              "route": "settings_instance_config",
+              "route": "admin_instance_config",
               "permission": "ROLE_ADMIN",
               "translations": {
                 "en": "Instance config",

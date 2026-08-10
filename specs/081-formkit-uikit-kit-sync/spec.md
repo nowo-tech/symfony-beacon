@@ -71,7 +71,7 @@ As a signed-in member, the app shell uses UiKit `_shell_open` / `_shell_close` f
 
 1. **Given** an authenticated session, **When** any app page renders, **Then** layout includes UiKit shell open/close with Beacon slot content (not a raw duplicate `app-shell` markup tree).
 2. **Given** a Symfony flash, **When** the page renders, **Then** toasts come from `@NowoUiKitBundle/partials/_toasts` (host may override under `templates/bundles/NowoUiKitBundle/`).
-3. **Given** Ops defaults, **When** section tabs switch, **Then** routes under `/settings/ops-defaults/{section}` stay active via shared `_tabs`.
+3. **Given** Ops defaults, **When** section tabs switch, **Then** routes under `/admin/ops-defaults/{section}` stay active via shared `_tabs`.
 
 ---
 

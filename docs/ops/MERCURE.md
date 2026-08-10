@@ -51,7 +51,7 @@ Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/
    }
    ```
 
-5. Open **Administration → Mercure** (`/settings/mercure`):
+5. Open **Administration → Mercure** (`/admin/mercure`):
 
    - Turn on **Enable Mercure live alerts**
    - Leave URL / public URL / JWT blank to use the env values, **or** fill them to override (JWT saved in the DB is encrypted)
@@ -118,7 +118,7 @@ All Mercure overrides in `instance_settings` (URLs + JWT) use Halite field encry
 
 ## Administration UI checklist
 
-Path: **Administration → Mercure** (`settings_mercure`).
+Path: **Administration → Mercure** (`admin_mercure`).
 
 1. Hub reachable from PHP (`MERCURE_URL` or Publish URL).
 2. Browser URL reachable same-origin when possible (`MERCURE_PUBLIC_URL` or Public URL).

@@ -27,16 +27,16 @@ test.describe('Administration', () => {
   test('ops and settings pages load', async ({ page }) => {
     for (const path of [
       '/admin/ops',
-      '/settings/mailer',
-      '/settings/mercure',
-      '/settings/appearance',
-      '/settings/ops-defaults',
-      '/settings/ops-defaults/governance',
-      '/settings/ops-defaults/ingest',
-      '/settings/ops-defaults/metrics',
-      '/settings/ops-defaults/inbound',
-      '/settings/ops-defaults/notifications',
-      '/settings/instance-config',
+      '/admin/mailer',
+      '/admin/mercure',
+      '/admin/appearance',
+      '/admin/ops-defaults',
+      '/admin/ops-defaults/governance',
+      '/admin/ops-defaults/ingest',
+      '/admin/ops-defaults/metrics',
+      '/admin/ops-defaults/inbound',
+      '/admin/ops-defaults/notifications',
+      '/admin/instance-config',
     ]) {
       await expectAuthenticatedPage(page, path);
     }

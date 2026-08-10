@@ -10,8 +10,8 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
-use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectShareLinkRepository;
+use App\Project\Security\ProjectPermission;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +36,7 @@ final readonly class ProjectShareLinkManager
      */
     public function create(Project $project, User $actor, ?Issue $issue, DateTimeImmutable $expiresAt, ?int $maxUses = null): array
     {
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::SHARE_LINKS_MANAGE);
 
         if ($issue instanceof Issue && $issue->getProject()?->getId() !== $project->getId()) {
             throw new InvalidArgumentException('issue_wrong_project');
@@ -88,7 +88,7 @@ final readonly class ProjectShareLinkManager
         if (!$project instanceof Project) {
             throw new RuntimeException('missing_project');
         }
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::SHARE_LINKS_MANAGE);
         if ($link->isRevoked()) {
             return;
         }

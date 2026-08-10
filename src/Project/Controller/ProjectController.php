@@ -20,6 +20,7 @@ use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectFactory;
@@ -142,7 +143,7 @@ final class ProjectController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $access = $this->projectAccess->requireMembership($project, $user);
+        $access = $this->projectAccess->requireSettingsSurface($project, $user);
         $baseUrl = $request->getSchemeAndHttpHost();
 
         $this->userActionRecorder->recordAndFlush(UserActionType::ProjectSettingsViewed, $user, $user, [
@@ -183,6 +184,7 @@ final class ProjectController extends AbstractController
             'lastShareUrl' => $request->getSession()->remove('_beacon_last_share_url'),
             'readTokens' => $this->readTokenRepository->findByProject($project),
             'lastReadToken' => $request->getSession()->remove('_beacon_last_read_token'),
+            'lastApiKeyDsn' => $request->getSession()->remove('_beacon_last_api_key_dsn'),
         ]);
     }
 
@@ -194,7 +196,7 @@ final class ProjectController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireRole($project, $user, ProjectRole::Admin);
+        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         if (!$this->isCsrfTokenValid('project_governance_'.$project->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -323,7 +325,7 @@ final class ProjectController extends AbstractController
 
     private function maybeFlashApproachingQuota(Request $request, Project $project, ProjectAccess $access): void
     {
-        if (!\in_array($access->role, [ProjectRole::Owner, ProjectRole::Admin], true)) {
+        if (!$access->canManageSettings()) {
             return;
         }
 

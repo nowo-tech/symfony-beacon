@@ -32,7 +32,7 @@ Image: [`axllent/mailpit`](https://hub.docker.com/r/axllent/mailpit). Defined in
 
    Open the UI URL printed by Make (default **http://localhost:18026**).
 
-3. As `ROLE_ADMIN`, open **Administration → Mailer** (`/settings/mailer`) and save:
+3. As `ROLE_ADMIN`, open **Administration → Mailer** (`/admin/mailer`) and save:
 
    | Field | Value |
    |-------|--------|

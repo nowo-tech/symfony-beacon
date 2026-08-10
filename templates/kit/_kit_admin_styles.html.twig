@@ -547,10 +547,14 @@ p.kit-admin-page-header__intro {
 
 .modal-backdrop {
   --bs-backdrop-zindex: 1070;
-  /* Align with Beacon <dialog>::backdrop */
-  --bs-backdrop-bg: color-mix(in srgb, var(--beacon-ink) 45%, transparent);
-  --bs-backdrop-opacity: 1;
+  /* Align with Beacon <dialog>::backdrop — always dark (ink is light in dark theme). */
+  --bs-backdrop-bg: rgb(0 0 0);
+  --bs-backdrop-opacity: 0.45;
   z-index: var(--bs-backdrop-zindex);
+}
+
+html[data-theme='dark'] .modal-backdrop {
+  --bs-backdrop-opacity: 0.68;
 }
 
 .modal .modal-dialog {

@@ -16,7 +16,7 @@
 
 ## Phase 3: Admin UI and i18n
 
-- [x] T007 `/settings/mailer` form (unmapped DSN password field, clear checkbox, From)
+- [x] T007 `/admin/mailer` form (unmapped DSN password field, clear checkbox, From)
 - [x] T008 Hub card + dashboard menu + breadcrumb seeders
 - [x] T009 English + Spanish catalogues (other locales fall back / nav key)
 

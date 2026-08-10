@@ -70,8 +70,10 @@ final class SlackInteractionsController extends AbstractController
             return new Response('Invalid payload', Response::HTTP_BAD_REQUEST);
         }
 
-        if (isset($payload['type']) && 'url_verification' === $payload['type'] && isset($payload['challenge'])) {
-            return new Response((string) $payload['challenge'], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        // Events API url_verification does not belong on the interactions endpoint.
+        // Never echo a challenge without HMAC (open reflector). Use a dedicated Events route if needed.
+        if (isset($payload['type']) && 'url_verification' === $payload['type']) {
+            return new Response('Unsupported on interactions endpoint', Response::HTTP_BAD_REQUEST);
         }
 
         $actions = $payload['actions'] ?? null;

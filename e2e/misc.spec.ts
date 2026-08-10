@@ -3,10 +3,10 @@ import { dismissProductTour, expectAuthenticatedPage, resolveDemoProjectUuid } f
 
 test.describe('Appearance & PWA smoke', () => {
   test('appearance theme sections load', async ({ page }) => {
-    await expectAuthenticatedPage(page, '/settings/appearance');
+    await expectAuthenticatedPage(page, '/admin/appearance');
     // Nested sections vary by kit version — hit known roots.
     for (const path of [
-      '/settings/appearance',
+      '/admin/appearance',
     ]) {
       await expectAuthenticatedPage(page, path);
     }

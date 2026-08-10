@@ -80,7 +80,7 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         self::assertSame('jwt-super-secret', $reloadedSettings->getMercureJwtSecret());
 
         $this->login($client, $admin);
-        $client->request(Request::METHOD_GET, '/settings/instance-config/export');
+        $client->request(Request::METHOD_GET, '/admin/instance-config/export');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Export Brand', (string) $client->getResponse()->getContent());
         self::assertStringNotContainsString('super-secret', (string) $client->getResponse()->getContent());
@@ -116,7 +116,7 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         [$client, $admin] = $this->bootAdmin('config-ui@example.com');
         $user = $this->makeUser('config-member@example.com');
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/settings/instance-config');
+        $client->request(Request::METHOD_GET, '/admin/instance-config');
         self::assertResponseStatusCodeSame(403);
 
         $payload = self::getContainer()->get(InstanceConfigPortability::class)->export();
@@ -126,14 +126,14 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         file_put_contents($tmp, json_encode($payload, \JSON_THROW_ON_ERROR));
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/settings/instance-config');
+        $crawler = $client->request(Request::METHOD_GET, '/admin/instance-config');
         self::assertResponseIsSuccessful();
         $form = $crawler->selectButton('Import JSON')->form();
         $configField = $form->get('config');
         self::assertInstanceOf(FileFormField::class, $configField);
         $configField->upload($tmp);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/instance-config');
+        self::assertResponseRedirects('/admin/instance-config');
         $client->followRedirect();
         self::assertSame(
             'Imported Via UI',

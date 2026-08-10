@@ -71,7 +71,7 @@ test.describe('UI chrome & navigation', () => {
   });
 
   test('appearance form is present', async ({ page }) => {
-    await expectAuthenticatedPage(page, '/settings/appearance');
+    await expectAuthenticatedPage(page, '/admin/appearance');
     const form = page.locator('[data-testid="appearance-form"]');
     if ((await form.count()) > 0) {
       await expect(form.first()).toBeVisible();
@@ -81,9 +81,9 @@ test.describe('UI chrome & navigation', () => {
   });
 
   test('mailer and mercure settings show forms', async ({ page }) => {
-    await expectAuthenticatedPage(page, '/settings/mailer');
+    await expectAuthenticatedPage(page, '/admin/mailer');
     await expect(page.getByRole('main').locator('form').first()).toBeVisible();
-    await expectAuthenticatedPage(page, '/settings/mercure');
+    await expectAuthenticatedPage(page, '/admin/mercure');
     await expect(page.getByRole('main').locator('form').first()).toBeVisible();
   });
 });
@@ -92,7 +92,7 @@ test.describe('Guest access control', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('protected routes redirect to login', async ({ page }) => {
-    for (const path of ['/dashboard', '/admin', '/account', '/projects/new', '/settings/mailer']) {
+    for (const path of ['/dashboard', '/admin', '/account', '/projects/new', '/admin/mailer']) {
       await page.goto(path);
       await dismissCookieConsent(page);
       await expect(page, path).toHaveURL(/\/login/);

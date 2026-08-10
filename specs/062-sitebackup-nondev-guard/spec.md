@@ -16,7 +16,13 @@ Fail closed in **every environment except `dev` and `test`**.
 4. Docs: PRODUCTION.md, SECURITY.md, CHANGELOG, UPGRADING as needed.
 5. Console `cache:clear` / `cache:warmup` / `assets:install` MUST skip the guard so `frankenphp_prod` Docker builds (`composer post-install-cmd`) can warm caches without embedding runtime SiteBackup secrets. HTTP and other console commands still enforce.
 
+## Amendment (`087-security-audit-hardening`, 2026-08-10)
+
+6. Outside `dev`/`test`, empty `APP_SECRET`, the documented `.env.dist` value `ChangeMePleaseUseARealSecret`, or secrets shorter than **16** characters MUST also fail closed (same guard).
+7. Unit tests cover APP_SECRET documented-default and short-secret reject for `prod`/`staging`.
+
 ## Out of scope
 
 - Share-link max uses (`061`)
 - Changing SiteBackup authentication mechanism
+- Show-once API DSN / seed-demo env gate (see `087`)

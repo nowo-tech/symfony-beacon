@@ -73,6 +73,8 @@ final class SeedDemoCommand extends Command
         private readonly InstanceSettingsRepository $instanceSettingsRepository,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
     ) {
         parent::__construct();
     }
@@ -86,18 +88,35 @@ final class SeedDemoCommand extends Command
             ->addOption('ingest-base-url', null, InputOption::VALUE_REQUIRED, 'Docker client ingest base URL for BEACON_DSN', 'http://host.docker.internal:9084')
             ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)')
             ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb/cookie-consent seed')
-            ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create the demo admin user; use existing ROLE_ADMIN accounts');
+            ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create the demo admin user; use existing ROLE_ADMIN accounts')
+            ->addOption('allow-non-local', null, InputOption::VALUE_NONE, 'Allow running outside dev/test (never uses stable demo API keys)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $allowNonLocal = (bool) $input->getOption('allow-non-local');
+        $isLocal = \in_array($this->environment, ['dev', 'test'], true);
+
+        if (!$isLocal && !$allowNonLocal) {
+            $io->error(\sprintf(
+                'app:seed-demo is blocked in "%s". Use only in local development (dev/test), or pass --allow-non-local (random API keys; never stable DEMO_* secrets).',
+                $this->environment,
+            ));
+
+            return Command::FAILURE;
+        }
+
+        if (!$isLocal && $allowNonLocal) {
+            $io->warning('Running seed-demo outside local development: stable DEMO_* API keys are disabled; credentials are generated randomly.');
+        }
+
         $email = (string) $input->getOption('email');
         $password = (string) $input->getOption('password');
         $baseUrl = (string) $input->getOption('base-url');
         $ingestBaseUrl = (string) $input->getOption('ingest-base-url');
         $skipDemoUser = (bool) $input->getOption('skip-demo-user');
-
+        $useStableDemoKeys = $isLocal;
         if ((bool) $input->getOption('with-platform')) {
             if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
                 $io->success('Seeded / updated default breadcrumb collection');
@@ -111,7 +130,7 @@ final class SeedDemoCommand extends Command
         }
 
         try {
-            $result = $this->demoIdentitySeeder->seed($email, $password, !$skipDemoUser);
+            $result = $this->demoIdentitySeeder->seed($email, $password, !$skipDemoUser, $useStableDemoKeys);
         } catch (LogicException $e) {
             $io->error($e->getMessage());
 

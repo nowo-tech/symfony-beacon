@@ -19,8 +19,8 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         [$client, $admin] = $this->bootAdmin('ops-defaults-redirect@example.com');
         $this->login($client, $admin);
 
-        $client->request(Request::METHOD_GET, '/settings/ops-defaults');
-        self::assertResponseRedirects('/settings/ops-defaults/governance');
+        $client->request(Request::METHOD_GET, '/admin/ops-defaults');
+        self::assertResponseRedirects('/admin/ops-defaults/governance');
     }
 
     public function testAdminCanSaveOpsDefaultsPerSection(): void
@@ -81,7 +81,7 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         [$client] = $this->bootAdmin('ops-admin-seed@example.com');
         $user = $this->makeUser('ops-member@example.com');
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/settings/ops-defaults/governance');
+        $client->request(Request::METHOD_GET, '/admin/ops-defaults/governance');
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -90,7 +90,7 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
      */
     private function submitSection(KernelBrowser $client, string $section, array $values): void
     {
-        $crawler = $client->request(Request::METHOD_GET, '/settings/ops-defaults/'.$section);
+        $crawler = $client->request(Request::METHOD_GET, '/admin/ops-defaults/'.$section);
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="ops-defaults-tabs"]');
         self::assertSelectorExists('[data-testid="ops-defaults-tab-'.$section.'"]');
@@ -98,7 +98,7 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
 
         $form = $crawler->filter('[data-testid="ops-defaults-form"]')->form($values);
         $client->submit($form);
-        self::assertResponseRedirects('/settings/ops-defaults/'.$section);
+        self::assertResponseRedirects('/admin/ops-defaults/'.$section);
         $client->followRedirect();
         self::assertResponseIsSuccessful();
     }

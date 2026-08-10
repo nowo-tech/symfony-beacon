@@ -66,9 +66,12 @@
                                 title: 'users.edit_role_title'|trans,
                                 title_id: 'user-role-dialog-title-' ~ user.id,
                                 aria_labelledby: 'user-role-dialog-title-' ~ user.id,
+                                header_wrapper: true,
+                                content_wrapper: true,
                                 csrf_token: csrf_token('admin_user_role_' ~ user.id),
                                 cancel_label: 'users.cancel'|trans,
                                 submit_label: 'users.actions.update_role'|trans,
+                                submit_disabled: isLastAdmin,
                             } %}
                                 {% block trigger %}
                                     <button
@@ -101,12 +104,6 @@
                                         <option value="user" {% if not isAdminRole %}selected{% endif %}>{{ 'users.role.user'|trans }}</option>
                                         <option value="admin" {% if isAdminRole %}selected{% endif %}>{{ 'users.role.admin'|trans }}</option>
                                     </select>
-                                {% endblock %}
-                                {% block actions %}
-                                    <div class="confirm-dialog__actions">
-                                        <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
-                                        <button class="btn-primary" type="submit" {% if isLastAdmin %}disabled{% endif %}>{{ 'users.actions.update_role'|trans }}</button>
-                                    </div>
                                 {% endblock %}
                             {% endembed %}
                         {% endif %}
@@ -142,6 +139,7 @@
                                     title_id: 'admin-user-anonymize-' ~ user.id,
                                     aria_labelledby: 'admin-user-anonymize-' ~ user.id,
                                     header_wrapper: true,
+                                    content_wrapper: true,
                                     cancel_label: 'users.cancel'|trans,
                                     submit_label: 'users.actions.anonymize'|trans,
                                     submit_class: 'btn-danger',

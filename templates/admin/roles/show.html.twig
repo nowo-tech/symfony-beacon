@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ role|rbac_role_name }} — {{ 'roles.title'|trans }}{% endblock %}
+
+{% block body %}
+{% include 'admin/roles/_header.html.twig' %}
+{% include 'admin/roles/_tabs.html.twig' %}
+
+<section class="panel" data-testid="admin-role-overview">
+    <h2 class="mb-1 text-lg font-semibold">{{ 'roles.overview_title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'roles.overview_intro'|trans }}</p>
+
+    {% set role_description = role|rbac_role_description %}
+    {% if role_description %}
+        <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ role_description }}</p>
+    {% endif %}
+
+    <dl class="grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'roles.col.code'|trans }}</dt>
+            <dd class="mt-1"><code>{{ role.code }}</code></dd>
+        </div>
+        <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'roles.col.status'|trans }}</dt>
+            <dd class="mt-1">
+                {% if role.enabled %}
+                    {{ 'roles.status.enabled'|trans }}
+                {% else %}
+                    {{ 'roles.status.disabled'|trans }}
+                {% endif %}
+                {% if role.system %}
+                    · {{ 'roles.status.system'|trans }}
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'roles.col.permissions'|trans }}</dt>
+            <dd class="mt-1">{{ role.permissions|length }}</dd>
+        </div>
+        <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink)]/45">{{ 'roles.col.users'|trans }}</dt>
+            <dd class="mt-1">{{ role.users|length }}</dd>
+        </div>
+    </dl>
+</section>
+{% endblock %}

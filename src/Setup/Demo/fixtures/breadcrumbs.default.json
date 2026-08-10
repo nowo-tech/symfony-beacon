@@ -533,6 +533,151 @@
       }
     },
     {
+      "route": "admin_roles",
+      "label": "Roles",
+      "parent": "admin_hub",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "Roles",
+        "es": "Roles",
+        "de": "Rollen",
+        "nl": "Rollen",
+        "fr": "Rôles",
+        "it": "Ruoli",
+        "pt": "Funções"
+      }
+    },
+    {
+      "route": "admin_roles_new",
+      "label": "New role",
+      "parent": "admin_roles",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "New role",
+        "es": "Nuevo rol",
+        "de": "Neue Rolle",
+        "nl": "Nieuwe rol",
+        "fr": "Nouveau rôle",
+        "it": "Nuovo ruolo",
+        "pt": "Nova função"
+      }
+    },
+    {
+      "route": "admin_roles_show",
+      "label": "Role",
+      "parent": "admin_roles",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Role",
+        "es": "Rol",
+        "de": "Rolle",
+        "nl": "Rol",
+        "fr": "Rôle",
+        "it": "Ruolo",
+        "pt": "Função"
+      }
+    },
+    {
+      "route": "admin_roles_permissions",
+      "label": "Permissions",
+      "parent": "admin_roles_show",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Permissions",
+        "es": "Permisos",
+        "de": "Berechtigungen",
+        "nl": "Rechten",
+        "fr": "Permissions",
+        "it": "Permessi",
+        "pt": "Permissões"
+      }
+    },
+    {
+      "route": "admin_roles_users",
+      "label": "Users",
+      "parent": "admin_roles_show",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Users",
+        "es": "Usuarios",
+        "de": "Benutzer",
+        "nl": "Gebruikers",
+        "fr": "Utilisateurs",
+        "it": "Utenti",
+        "pt": "Utilizadores"
+      }
+    },
+    {
+      "route": "admin_roles_edit",
+      "label": "Edit",
+      "parent": "admin_roles_show",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Edit",
+        "es": "Editar",
+        "de": "Bearbeiten",
+        "nl": "Bewerken",
+        "fr": "Modifier",
+        "it": "Modifica",
+        "pt": "Editar"
+      }
+    },
+    {
+      "route": "admin_permissions",
+      "label": "Permissions",
+      "parent": "admin_hub",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "Permissions",
+        "es": "Permisos",
+        "de": "Berechtigungen",
+        "nl": "Rechten",
+        "fr": "Permissions",
+        "it": "Permessi",
+        "pt": "Permissões"
+      }
+    },
+    {
+      "route": "admin_permissions_new",
+      "label": "New permission",
+      "parent": "admin_permissions",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "New permission",
+        "es": "Nuevo permiso",
+        "de": "Neue Berechtigung",
+        "nl": "Nieuw recht",
+        "fr": "Nouvelle permission",
+        "it": "Nuovo permesso",
+        "pt": "Nova permissão"
+      }
+    },
+    {
+      "route": "admin_permissions_edit",
+      "label": "Edit",
+      "parent": "admin_permissions",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Edit",
+        "es": "Editar",
+        "de": "Bearbeiten",
+        "nl": "Bewerken",
+        "fr": "Modifier",
+        "it": "Modifica",
+        "pt": "Editar"
+      }
+    },
+    {
       "route": "admin_projects",
       "label": "Projects",
       "parent": "admin_hub",
@@ -597,7 +742,7 @@
       }
     },
     {
-      "route": "settings_appearance",
+      "route": "admin_appearance",
       "label": "Appearance",
       "parent": "admin_hub",
       "dynamicParamKeys": [],
@@ -612,7 +757,7 @@
       }
     },
     {
-      "route": "settings_mailer",
+      "route": "admin_mailer",
       "label": "Mailer",
       "parent": "admin_hub",
       "dynamicParamKeys": [],
@@ -627,7 +772,7 @@
       }
     },
     {
-      "route": "settings_mercure",
+      "route": "admin_mercure",
       "label": "Mercure",
       "parent": "admin_hub",
       "dynamicParamKeys": [],
@@ -642,7 +787,7 @@
       }
     },
     {
-      "route": "settings_ops_defaults",
+      "route": "admin_ops_defaults",
       "label": "Ops defaults",
       "parent": "admin_hub",
       "dynamicParamKeys": [],
@@ -657,7 +802,7 @@
       }
     },
     {
-      "route": "settings_ops_defaults_section",
+      "route": "admin_ops_defaults_section",
       "label": "Ops defaults",
       "parent": "admin_hub",
       "dynamicParamKeys": [
@@ -674,7 +819,7 @@
       }
     },
     {
-      "route": "settings_instance_config",
+      "route": "admin_instance_config",
       "label": "Instance config",
       "parent": "admin_hub",
       "dynamicParamKeys": [],

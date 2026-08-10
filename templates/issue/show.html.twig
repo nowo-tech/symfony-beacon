@@ -59,7 +59,7 @@
                     {% endfor %}
                 </ol>
             {% endif %}
-            {% if can_triage|default(false) %}
+            {% if project_grants(project, 'project.issues.triage') %}
             <form method="post" action="{{ path('issue_comment_add', {projectId: project.uuid, id: issue.uuid}) }}" class="issue-comments__form">
                 <input type="hidden" name="_token" value="{{ csrf_token('issue_comment') }}">
                 <label class="sr-only" for="issue-comment-body">{{ 'issues.comment_body'|trans }}</label>
@@ -137,7 +137,7 @@
             {% endblock %}
         {% endembed %}
 
-        {% if can_triage|default(false) %}
+        {% if project_grants(project, 'project.issues.triage') %}
         {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
             {% block body %}
                 <div class="issue-triage">
@@ -209,7 +209,7 @@
                                         <span class="font-medium">{{ similar.title }}</span>
                                         <span class="block text-xs text-[var(--color-ink)]/55">{{ ('issues.status.' ~ similar.status.value)|trans }} · {{ similar.lastSeen|date('Y-m-d') }}</span>
                                     </a>
-                                    {% if can_triage|default(false) %}
+                                    {% if project_grants(project, 'project.issues.triage') %}
                                         <form method="post" action="{{ path('issue_mark_duplicate', {projectId: project.uuid, id: issue.uuid}) }}" class="shrink-0">
                                             <input type="hidden" name="_token" value="{{ csrf_token('issue_duplicate') }}">
                                             <input type="hidden" name="canonical_uuid" value="{{ similar.uuid }}">

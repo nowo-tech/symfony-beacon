@@ -28,25 +28,25 @@ final class AppearanceSettingsController extends AbstractController
     ) {
     }
 
-    #[Route('/settings/appearance', name: 'settings_appearance', methods: ['GET'])]
+    #[Route('/admin/appearance', name: 'admin_appearance', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->redirectToRoute('settings_appearance_section', [
+        return $this->redirectToRoute('admin_appearance_section', [
             'section' => AppearanceSettingsSection::Themes->value,
         ]);
     }
 
     #[Route(
-        '/settings/appearance/{section}',
-        name: 'settings_appearance_section',
+        '/admin/appearance/{section}',
+        name: 'admin_appearance_section',
         requirements: ['section' => 'themes|brand|layout|colors'],
         defaults: ['sub' => null],
         methods: ['GET', 'POST'],
         priority: 10,
     )]
     #[Route(
-        '/settings/appearance/{section}/{sub}',
-        name: 'settings_appearance_section',
+        '/admin/appearance/{section}/{sub}',
+        name: 'admin_appearance_section',
         requirements: [
             'section' => 'themes|brand|layout|colors',
             'sub' => 'accents|status|surfaces',
@@ -62,7 +62,7 @@ final class AppearanceSettingsController extends AbstractController
 
         $subEnum = $this->resolveSubtab($sectionEnum, $sub);
         if (null !== $sectionEnum->defaultSubtab() && null === $subEnum) {
-            return $this->redirectToRoute('settings_appearance_section', [
+            return $this->redirectToRoute('admin_appearance_section', [
                 'section' => $sectionEnum->value,
                 'sub' => $sectionEnum->defaultSubtab()->value,
             ]);
@@ -86,12 +86,12 @@ final class AppearanceSettingsController extends AbstractController
                 $this->appearanceProvider->refresh();
                 $this->addFlash('success', 'flash.appearance.theme_applied');
 
-                return $this->redirectToRoute('settings_appearance_section', $redirectParams);
+                return $this->redirectToRoute('admin_appearance_section', $redirectParams);
             }
 
             $this->addFlash('error', 'flash.appearance.theme_unknown');
 
-            return $this->redirectToRoute('settings_appearance_section', $redirectParams);
+            return $this->redirectToRoute('admin_appearance_section', $redirectParams);
         }
 
         $form = null;
@@ -114,7 +114,7 @@ final class AppearanceSettingsController extends AbstractController
                 $this->appearanceProvider->refresh();
                 $this->addFlash('success', 'flash.appearance.saved');
 
-                return $this->redirectToRoute('settings_appearance_section', $redirectParams);
+                return $this->redirectToRoute('admin_appearance_section', $redirectParams);
             }
         }
 

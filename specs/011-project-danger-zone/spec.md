@@ -13,7 +13,7 @@
 ### Session 2026-07-20
 
 - **Q1 (clear history scope)**: Removes issues + events, performance transactions/spans, and daily analytics stats. Keeps the project, memberships, and API keys.
-- **Q2 (permissions)**: Clear history — Owner or Admin. Delete project — Owner only.
+- **Q2 (permissions)**: Clear history — `project.settings.manage` (admin/owner matrix). Delete project — `project.delete` (owner only). Transfer ownership — project owner (`requireRole(Owner)`). See `002` FR-013 / `docs/product/ROLES.md`.
 - **Q3 (typed confirm)**: Delete requires typing the project **name** exactly (case-sensitive). Clear history uses a warning modal with an explicit confirm button (no typed phrase).
 - **Q4 (UI placement)**: Danger zone section on the **project Settings** page (`/projects/{id}/settings`). (Project show redirects to Issues; management actions live in Settings.)
 
@@ -27,8 +27,8 @@ As a project owner or admin, I can empty telemetry history so the project stays 
 
 **Acceptance Scenarios**:
 
-1. **Given** I am owner/admin on a project with history, **When** I open Clear history on Settings and confirm in the modal, **Then** issues/events/perf/stats for that project are removed and I stay on Settings with a success flash.
-2. **Given** I am a member (not admin), **When** I view Settings, **Then** I do not see Clear history (or the action is denied).
+1. **Given** I have `project.settings.manage` on a project with history, **When** I open Clear history on Settings and confirm in the modal, **Then** issues/events/perf/stats for that project are removed and I stay on Settings with a success flash.
+2. **Given** I am a viewer/member without Settings-surface grants, **When** I request Settings, **Then** I receive **403** and do not see Clear history; POST clear without the grant is denied.
 3. **Given** the clear modal is open, **When** I cancel, **Then** no data is deleted.
 
 ### User Story 2 - Delete project with typed confirmation (Priority: P1)
@@ -42,7 +42,7 @@ As a project owner, I can permanently delete a project after typing its name in 
 1. **Given** I am the owner, **When** I open Delete project on Settings, **Then** a modal warns that deletion is permanent and asks me to type the project name.
 2. **Given** the typed name does not match, **When** I try to submit, **Then** the delete does not proceed (client disables submit; server rejects mismatch).
 3. **Given** I type the exact project name and confirm, **When** the form posts, **Then** the project and related data are removed and I am redirected to the dashboard with a success flash.
-4. **Given** I am admin or member (not owner), **When** I view Settings, **Then** Delete project is not available (or denied).
+4. **Given** I lack `project.delete` (admin/member/viewer), **When** I view Settings (if allowed) or POST delete, **Then** Delete project is not available / denied (403).
 
 ### User Story 3 - Transfer ownership with typed confirmation (Priority: P2)
 
@@ -60,14 +60,14 @@ As a project owner, I can hand ownership to another direct member and become an 
 ## Requirements *(mandatory)*
 
 - **FR-001**: Danger zone on **project Settings** with Clear history, Transfer ownership, and Delete project (`project_clear_history`, `project_transfer_ownership`, `project_delete`).
-- **FR-002**: Destructive / ownership actions open warning modals (native `<dialog>` via Stimulus `confirm-dialog`).
+- **FR-002**: Destructive / ownership actions open warning modals (native `<dialog>` via Stimulus `confirm-dialog`). Typed-confirm dialogs that collect fields (delete / transfer) SHOULD use structured chrome (`header_wrapper` + `content_wrapper`) per `086` FR-003b; body-only confirms may stay flat.
 - **FR-003**: Delete and transfer require CSRF + exact project name confirmation server-side.
-- **FR-004**: Clear requires CSRF + explicit confirm; removes history only (`ProjectHistoryClearer`).
-- **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project.
-- **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to admin (`ProjectMembershipManager::transferOwnership`).
+- **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`).
+- **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
+- **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to admin (`ProjectMembershipManager::transferOwnership`); MUST require project owner (`requireRole(Owner)`).
 
 ## Success Criteria
 
-- **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; non-admin members cannot clear.
+- **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; actors without `project.settings.manage` cannot clear.
 - **SC-002**: Cancelling a modal leaves data unchanged.
 - **SC-003**: Covered by `tests/Functional/Project/ProjectDangerZoneTest.php` / `tests/Functional/Project/ProjectMembersTest.php` (or equivalent).

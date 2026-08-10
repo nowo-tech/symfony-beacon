@@ -16,6 +16,7 @@ import PageLoaderController from './controllers/page_loader_controller';
 import PasswordConfirmMirrorController from './controllers/password_confirm_mirror_controller';
 import PasswordToggleController from './controllers/password_toggle_controller';
 import QrLoginController from './controllers/qr_login_controller';
+import TabsController from './controllers/tabs_controller';
 import ThinkingOrbController from './controllers/thinking_orb_controller';
 import ToastStackController from './controllers/toast_stack_controller';
 
@@ -36,6 +37,7 @@ app.register('page-loader', PageLoaderController);
 app.register('password-confirm-mirror', PasswordConfirmMirrorController);
 app.register('password-toggle', PasswordToggleController);
 app.register('qr-login', QrLoginController);
+app.register('tabs', TabsController);
 app.register('thinking-orb', ThinkingOrbController);
 app.register('toast-stack', ToastStackController);
 

@@ -18,7 +18,7 @@ Move the operational Symfony Mailer DSN from `.env` into encrypted instance sett
 | From | Plain `mailer_from` column; effective default `beacon@localhost` |
 | Runtime | `App\Shared\Mailer\ConfiguredMailer` aliased as `MailerInterface`; lazy `Transport::fromDsn`; `ResetInterface` |
 | Fallback | `%env(MAILER_DSN)%` when DB DSN empty |
-| UI | `/settings/mailer`, hub card, menu/breadcrumb seeders |
+| UI | `/admin/mailer`, hub card, menu/breadcrumb seeders |
 | Mapping | Doctrine mapping `SharedSettings` + routes `controllers_settings` |
 
 ## Constitution Check
@@ -35,7 +35,7 @@ src/Shared/Settings/Repository/InstanceSettingsRepository.php
 src/Shared/Settings/Controller/MailerSettingsController.php
 src/Shared/Settings/Form/InstanceMailerSettingsType.php
 src/Shared/Mailer/ConfiguredMailer.php
-templates/settings/mailer.html.twig
+templates/admin/mailer.html.twig
 templates/admin/hub.html.twig
 migrations/Version20260721193000.php
 config/packages/doctrine.yaml
