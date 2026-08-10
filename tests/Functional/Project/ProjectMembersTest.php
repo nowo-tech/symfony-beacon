@@ -171,23 +171,15 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         ]));
     }
 
-    public function testCannotRemoveLastOwner(): void
+    public function testOwnerRowHasNoEditOrRemoveActions(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-last@example.com');
         $this->login($client, $owner);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $removeForm = $crawler->filter('form[action$="/members/'.$owner->getUuid().'/remove"]');
-        self::assertGreaterThan(0, $removeForm->count());
-        self::assertNotNull($removeForm->filter('button[disabled]')->getNode(0));
-
-        $token = $removeForm->filter('input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members/'.$owner->getUuid().'/remove', [
-            '_token' => $token,
-        ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
-        $client->followRedirect();
-        self::assertSelectorTextContains('.flash', 'at least one owner');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('form[action$="/members/'.$owner->getUuid().'/role"]');
+        self::assertSelectorNotExists('form[action$="/members/'.$owner->getUuid().'/remove"]');
     }
 
     public function testOwnerCanTransferOwnership(): void

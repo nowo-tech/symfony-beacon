@@ -9,7 +9,7 @@
     <div class="{{ ui.toolbar() }}" style="justify-content:space-between;">
         <div class="{{ ui.row_actions() }}" style="align-items:center;">
             <a href="{{ path(dashboard_routes.collections_index|default('nowo_breadcrumb_kit_dashboard_collections_index')) }}" class="{{ ui.btn('link') }}">{{ 'dashboard.back_collections'|trans }}</a>
-            <h1 class="h3 d-inline nowo-ui-page-title" style="margin:0;font-size:1.25rem;"><code>{{ collection.code }}</code>{% if collection.name %} <span class="{{ ui.muted() }}">({{ collection.name }})</span>{% endif %}</h1>
+            <h2 class="nowo-ui-page-title" style="margin:0;font-size:1.25rem;font-weight:600;"><code>{{ collection.code }}</code>{% if collection.name %} <span class="{{ ui.muted() }}">({{ collection.name }})</span>{% endif %}</h2>
         </div>
         <div class="{{ ui.row_actions() }}">
             <a href="{{ path(dashboard_routes.export|default('nowo_breadcrumb_kit_dashboard_collections_export'), {id: collection.id}) }}" class="{{ ui.btn('secondary') }}" target="_blank" rel="noopener noreferrer">{{ 'dashboard.export_collection'|trans }}</a>

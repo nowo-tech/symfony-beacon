@@ -98,6 +98,8 @@ Logical keys: `App\Project\Security\ProjectPermission` (checked via `ProjectAcce
 
 `full` matches `owner` for every `project.*` key but is **not** primary owner: it cannot transfer ownership and does not count as the last-owner guard. Groups may only be `admin` / `member` / `viewer` (never `owner` or `full`). After ownership transfer, the former primary owner is demoted to `full`. A `full` member must be demoted before removal.
 
+Membership UI: rows with role **`owner`** do not show edit-role or remove actions (project Settings and Administration → Projects). Hand off primary ownership only via **Transfer ownership**.
+
 Helpers on `ProjectRole` / `ProjectAccess` (`canTriageIssues()`, `canManageSettings()`, `isPrimaryOwner()`, …) wrap that matrix. Resolved by `ProjectAccessService` from direct membership, group links, share grants, and the instance-`ROLE_ADMIN` shortcut (effective owner unless view-as-member).
 
 Admin UI labels “Admin” / “User” on `/admin/users` map to **`ROLE_ADMIN` / no `ROLE_ADMIN`** (instance). Project role labels use the membership enum strings.
@@ -147,12 +149,12 @@ Examples:
 {% endif %}
 ```
 
-On Settings templates that already receive `membership` (`ProjectAccess`), prefer the typed helpers (`membership.canManageSettings`, `membership.canManageApiKeys`, …) so section gates stay aligned with the matrix.
+On Settings templates that already receive `membership` (`ProjectAccess`), prefer the typed helpers (`membership.canManageSettings`, `membership.canManageApiKeys`, `membership.canManageNotifications`, `membership.canManageShareLinks`, `membership.canDeleteProject`, `membership.isPrimaryOwner`, …) so **panels/cards** stay aligned with the matrix. Spec `002` FR-014 lists the panel → Twig → controller map.
 
 **Rules of thumb**
 
-1. Hide UI with Twig (`project_grants` / `canManage*`) so viewers never see forbidden actions.
-2. Enforce the same key again in the controller/manager with `requirePermission` (or `requireSettingsSurface` for the Settings GET).
+1. Hide UI with Twig (`project_grants` / `canManage*` / Settings tab via `project_can_open_settings`) so users never see forbidden tabs, cards, or forms.
+2. Enforce the same key again in the controller/manager with `requirePermission` (or `requireSettingsSurface` for the Settings GET, `requirePrimaryOwner` for transfer) so forged URLs/POSTs return **403**.
 3. Never call `is_granted('project.…')` for product access — that hits instance `InstancePermissionVoter`, which is the wrong layer.
 
 ## Quick reference for contributors

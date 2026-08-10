@@ -13,7 +13,7 @@
 ### Session 2026-07-20
 
 - **Q1 (clear history scope)**: Removes issues + events, performance transactions/spans, and daily analytics stats. Keeps the project, memberships, and API keys.
-- **Q2 (permissions)**: Clear history — `project.settings.manage` (admin/owner matrix). Delete project — `project.delete` (owner only). Transfer ownership — project owner (`requireRole(Owner)`). See `002` FR-013 / `docs/product/ROLES.md`.
+- **Q2 (permissions)**: Clear history — `project.settings.manage` (admin/owner/full matrix). Delete project — `project.delete` (owner and **full**). Transfer ownership — primary project owner (`requirePrimaryOwner()`). See `002` FR-013 / `docs/product/ROLES.md`. Owner membership rows have no edit/remove UI; transfer is the only ownership hand-off.
 - **Q3 (typed confirm)**: Delete requires typing the project **name** exactly (case-sensitive). Clear history uses a warning modal with an explicit confirm button (no typed phrase).
 - **Q4 (UI placement)**: Danger zone section on the **project Settings** page (`/projects/{id}/settings`). (Project show redirects to Issues; management actions live in Settings.)
 
@@ -56,6 +56,7 @@ As a project owner, I can hand ownership to another direct member and become a *
 2. **Given** the typed name does not match, **When** I submit, **Then** ownership is unchanged.
 3. **Given** I confirm correctly, **When** the form posts, **Then** the target is owner, I am **full**, and Settings shows a success flash.
 4. **Given** I am admin, member, **full**, or the only direct member, **When** I view Settings, **Then** Transfer ownership is unavailable (or the control is disabled).
+5. **Given** a membership row with role `owner`, **When** I view Settings members (or Admin → Projects members), **Then** edit-role and remove actions are absent for that row.
 
 ## Requirements *(mandatory)*
 
@@ -65,9 +66,11 @@ As a project owner, I can hand ownership to another direct member and become a *
 - **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`).
 - **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
 - **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to **full** (`ProjectMembershipManager::transferOwnership`); MUST require primary project owner (`ProjectAccessService::requirePrimaryOwner()` — exact `Owner`, not rank).
+- **FR-007**: Settings (and Admin → Projects) MUST NOT show edit-role or remove controls on membership rows whose role is `owner`. Changing primary ownership MUST go through Transfer ownership (FR-006), not member role CRUD.
+- **FR-008**: Danger-zone controls follow dual gating (`002` FR-013 / FR-014): Clear / Transfer / Delete are hidden without the matching Twig helper and POSTs without the matching server check return **403**.
 
 ## Success Criteria
 
-- **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; actors without `project.settings.manage` cannot clear.
+- **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; actors without `project.settings.manage` cannot clear; owner member rows have no edit/remove controls.
 - **SC-002**: Cancelling a modal leaves data unchanged.
 - **SC-003**: Covered by `tests/Functional/Project/ProjectDangerZoneTest.php` / `tests/Functional/Project/ProjectMembersTest.php` (or equivalent).

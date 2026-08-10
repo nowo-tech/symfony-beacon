@@ -28,7 +28,7 @@
                         <strong>{{ menu.code }}</strong>
                         {% set _itemsCount = menu_item_counts[menu.id]|default(0) %}
                         <span class="{{ ui.badge() }}" title="{{ _itemsCount }}">{{ _itemsCount }}</span>
-                        {% if menu.base %}<span class="badge bg-secondary ms-1" title="{{ 'dashboard.base_badge_title'|trans({}, 'NowoDashboardMenuBundle') }}">{{ 'dashboard.base'|trans({}, 'NowoDashboardMenuBundle') }}</span>{% endif %}
+                        {% if menu.base %}<span class="{{ ui.badge() }}" title="{{ 'dashboard.base_badge_title'|trans({}, 'NowoDashboardMenuBundle') }}">{{ 'dashboard.base'|trans({}, 'NowoDashboardMenuBundle') }}</span>{% endif %}
                         {% if menu.name %}<span class="{{ ui.muted() }}"> — {{ menu.name }}</span>{% endif %}
                         {% if menu.context is defined and menu.context is iterable and menu.context is not empty %}
                             <br><span class="small {{ ui.muted() }}">{{ 'dashboard.context'|trans({}, 'NowoDashboardMenuBundle') }}: {{ menu.context|keys|join(', ') }}</span>

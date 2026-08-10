@@ -17,6 +17,7 @@ Operators need a **non-primary** membership that keeps the full project permissi
 |----|------|-----------|
 | R1 | `ProjectRole::Full` | Same `ProjectPermission` matrix as owner; `rank()` = owner; `isPrimaryOwner()` = false |
 | R2 | Transfer | `transferOwnership` demotes actor to `full`; UI + `requirePrimaryOwner()` exact `Owner` |
+| R2b | Owner row UI | No edit-role / remove on `owner` memberships (Settings + Admin projects); hand-off only via Transfer |
 | R3 | Membership guards | Cannot remove `full` without demoting first; admins cannot mutate owner/full; groups reject full |
 | R4 | Instance mirror | Seeded `ROLE_PROJECT_FULL` (`InstanceRoleCatalog`) |
 | R5 | Admin Roles UI | Block delete when users assigned (`flash.roles.in_use`); hide delete control |
@@ -54,11 +55,14 @@ As an instance admin, I cannot delete an InstanceRole assigned to users.
 - **FR-002**: Primary-ownership gates (transfer, last-owner counting) use exact `Owner`, not rank.
 - **FR-003**: `transferOwnership` demotes the acting owner to `full` (audit `actor_new_role: full`).
 - **FR-004**: `remove` of a `full` membership fails until role change; groups cannot be assigned `owner` or `full`.
+- **FR-004b**: Member list UI MUST omit edit-role and remove for rows with role `owner` (Settings and Admin → Projects). Primary ownership changes only via Transfer.
 - **FR-005**: Seed / upsert `ROLE_PROJECT_FULL`; Admin cannot delete system roles or roles with assigned users.
 - **FR-006**: UI labels + flashes in EN (+ locale catalogs) for `full`, `flash.roles.in_use`, `flash.project.member_cannot_remove_full`.
+- **FR-007**: Product surfaces keep dual gating (`002` FR-013 / FR-014): Settings tab/panels and mutation forms hide without the grant; direct URLs and forged POSTs return **403**. `full` sees delete (and other owner-matrix panels) but not Transfer (`isPrimaryOwner` / `requirePrimaryOwner`).
 
 ## Success Criteria
 
 - **SC-001**: Transfer demotes to `full`; Full cannot transfer; Full can delete project.
+- **SC-001b**: Owner membership rows have no edit/remove actions (`ProjectMembersTest::testOwnerRowHasNoEditOrRemoveActions` or equivalent).
 - **SC-002**: Admin role delete in-use blocked; Twig hides delete when users assigned.
 - **SC-003**: Covered by unit + `ProjectMembersTest` / `AdminInstanceRbacTest` (or equivalent).

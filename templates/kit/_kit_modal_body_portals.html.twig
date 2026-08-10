@@ -1,14 +1,14 @@
 {#
-  Bootstrap appends .modal-backdrop to <body>, but kit modals live under
-  .app-main__inner / .page-shell (stacking contexts). Reparent via kit-admin.ts.
+  Kit modals (.nowo-ui-modal) are portaled to <body> by kit-admin.ts so they escape
+  .app-main__inner stacking contexts. Token remap for portaled modals lives in
+  _kit_admin_styles.html.twig (.nowo-ui-modal { --nowo-ui-*: … }).
 #}
 <style>
+  body > .nowo-ui-modal,
   body > .modal {
-    --bs-modal-zindex: 1080;
     z-index: 1080;
   }
   body > .modal-backdrop {
-    --bs-backdrop-zindex: 1070;
     z-index: 1070;
   }
 </style>

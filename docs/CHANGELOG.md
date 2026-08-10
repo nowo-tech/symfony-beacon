@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-08-10
+
+### Changed
+
+- Membership UI: rows with role **`owner`** no longer show edit-role or remove actions (project Settings and Administration → Projects); hand off primary ownership only via **Transfer ownership** (`088` R2b / `011` FR-007).
+- Specs / product docs: dual Settings gating (`002` FR-014 panel map), owner-row rules, and `requirePrimaryOwner()` notes (`docs/product/ROLES.md`, `002` / `011` / `018` / `088`).
+
+### Fixed
+
+- Kit admin (Menus / Breadcrumbs) modal chrome for UiKit Tailwind `.nowo-ui-modal` when portaled to `<body>`: Beacon tokens, dark scrim, confirm-dialog-sized dialog, form controls (no leftover Bootstrap `.modal` / slate defaults).
+- Kit admin list/table surfaces and page titles (breadcrumb items, dashboard menu base badge) align with host `nowo-ui-*` tokens.
+
 ## [1.5.0] - 2026-08-10
 
 ### Added
@@ -825,7 +837,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...v1.3.1

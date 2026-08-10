@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`). **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`); **v1.5.1** polishes owner-row membership UI and kit admin modal chrome. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -380,6 +380,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.3.1** | FormKit host-form parity; demo `ProjectFactory`; `OtlpIngestGatewayInterface`; unit tests (pipeline / hooks / factory) |
 | **v1.4.0** | Project `project.*` permissions + Admin Roles/Permissions UI; `/admin` settings URLs; security audit hardening (`087` / 6.36) |
 | **v1.5.0** | Project membership role `full` + InstanceRole delete-in-use guards (`088` / 6.37) |
+| **v1.5.1** | Owner membership row UI (no edit/remove); kit admin `.nowo-ui-modal` Beacon chrome |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -391,4 +392,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-10 (**v1.5.0** cut; `088` / 6.37 project role `full`).
+Last updated: 2026-08-10 (**v1.5.1** cut; owner-row UI + kit admin modal chrome).

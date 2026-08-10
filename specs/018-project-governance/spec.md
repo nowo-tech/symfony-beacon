@@ -71,7 +71,7 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 - **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret **shown once** (session one-shot after create/rotate; ordinary Settings GET MUST NOT re-embed the secret/DSN). See `087` FR-001.
 - **FR-005**: System MUST surface approaching-limit warnings to actors with `project.settings.manage` before hard enforcement.
 - **FR-006**: Governance changes MUST be attributable (who changed what) where audit facilities exist.
-- **FR-007**: Actors without the matching `project.*` grant MUST NOT modify governance or keys (UI hidden + HTTP 403). See `002` FR-013 / FR-014.
+- **FR-007**: Actors without the matching `project.*` grant MUST NOT see or modify governance or keys (**panel hidden** + HTTP **403** on GET Settings when lacking Settings-surface grants, and on POST without the key). See `002` FR-013 / FR-014.
 - **FR-008**: Retention purge aggregate recompute MUST use SQL aggregates (see `012-safe-self-hosting` FR-001), not hydrate all events per issue.
 
 ### Key Entities

@@ -22,8 +22,12 @@ p.kit-admin-page-header__intro {
   color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 65%, transparent);
 }
 
-/* —— Kit admin (Menus / Breadcrumbs) — type + control scale —— */
-.kit-admin {
+/* —— Kit admin (Menus / Breadcrumbs) — type + control scale ——
+ * Tokens also on .nowo-ui-modal: kit-admin.ts portals modals to <body>,
+ * so they leave .kit-admin and would otherwise keep UiKit slate/blue :root defaults.
+ */
+.kit-admin,
+.nowo-ui-modal {
   --kit-font-body: 0.875rem;
   --kit-font-label: 0.8125rem;
   --kit-font-meta: 0.75rem;
@@ -66,9 +70,11 @@ p.kit-admin-page-header__intro {
   --bs-focus-ring-color: color-mix(in srgb, var(--beacon-moss) 35%, transparent);
   font-size: var(--kit-font-body);
   line-height: 1.45;
+  color: var(--beacon-ink);
 }
 
-[data-theme="dark"] .kit-admin {
+[data-theme="dark"] .kit-admin,
+[data-theme="dark"] .nowo-ui-modal {
   --bs-primary-rgb: 74, 173, 127;
   --nowo-ui-primary-contrast: #0c1210;
 }
@@ -521,69 +527,46 @@ p.kit-admin-page-header__intro {
 }
 
 /*
- * Kit modals: Bootstrap often moves .modal to <body>, so do not require .kit-admin ancestry.
- * These rules only load on Menus / Breadcrumbs admin layouts.
+ * Kit modals (css_framework: tailwind): UiKit opens via .nowo-ui-modal-open (not Bootstrap .show).
+ * kit-admin.ts portals .nowo-ui-modal to <body> — match Beacon .confirm-dialog chrome.
+ * Specificity must beat vendor .nowo-ui-modal.nowo-ui-modal-open .modal-* (nowo-ui.css).
  */
-.modal {
-  --kit-font-body: 0.875rem;
-  --kit-font-label: 0.8125rem;
-  --kit-font-meta: 0.75rem;
-  --kit-btn-font: 0.875rem;
-  --kit-btn-pad-y: 0.5rem;
-  --kit-btn-pad-x: 1rem;
-  --kit-btn-sm: 2rem;
-  --kit-btn-sm-font: 0.8125rem;
-  --kit-btn-radius: 0.375rem;
-  --bs-modal-zindex: 1080;
-  --bs-modal-border-radius: 0.75rem;
-  --bs-modal-border-color: var(--beacon-sand);
-  --bs-modal-bg: var(--beacon-surface);
-  --bs-modal-color: var(--beacon-ink);
-  --bs-modal-header-border-color: var(--beacon-sand);
-  --bs-modal-footer-border-color: var(--beacon-sand);
-  --bs-modal-padding: 1.15rem 1.25rem;
-  z-index: var(--bs-modal-zindex);
+.nowo-ui-modal.nowo-ui-modal-open {
+  z-index: 1080;
+  background: rgb(0 0 0 / 0.45);
+  padding: 1.25rem;
+  align-items: flex-start;
 }
 
-.modal-backdrop {
-  --bs-backdrop-zindex: 1070;
-  /* Align with Beacon <dialog>::backdrop — always dark (ink is light in dark theme). */
-  --bs-backdrop-bg: rgb(0 0 0);
-  --bs-backdrop-opacity: 0.45;
-  z-index: var(--bs-backdrop-zindex);
+html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
+  background: rgb(0 0 0 / 0.68);
 }
 
-html[data-theme='dark'] .modal-backdrop {
-  --bs-backdrop-opacity: 0.68;
-}
-
-.modal .modal-dialog {
-  /* Match Beacon .confirm-dialog default width */
+.nowo-ui-modal.nowo-ui-modal-open .modal-dialog {
+  /* Match Beacon .confirm-dialog default width (vendor defaults to 560px) */
   max-width: min(32rem, calc(100vw - 2rem));
-  margin: 1.25rem auto;
+  margin: auto;
 }
 
-.modal .modal-dialog.modal-lg {
-  /* Match Beacon .confirm-dialog--wide */
+.nowo-ui-modal.nowo-ui-modal-open .modal-dialog.modal-lg {
   max-width: min(36rem, calc(100vw - 2rem));
 }
 
-.modal .modal-dialog.modal-xl {
+.nowo-ui-modal.nowo-ui-modal-open .modal-dialog.modal-xl {
   max-width: min(56rem, calc(100vw - 2rem));
 }
 
-.modal .modal-content {
+.nowo-ui-modal.nowo-ui-modal-open .modal-content {
   border-radius: 0.75rem;
   border: 1px solid var(--beacon-sand);
   background: var(--beacon-surface);
   color: var(--beacon-ink);
   box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 22%);
   overflow: hidden;
-  font-size: var(--kit-font-body);
+  font-size: var(--kit-font-body, 0.875rem);
 }
 
-.modal .modal-header {
-  display: flex;
+.nowo-ui-modal.nowo-ui-modal-open .modal-header {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1.15rem 1.25rem 0.9rem;
@@ -591,7 +574,7 @@ html[data-theme='dark'] .modal-backdrop {
   background: color-mix(in srgb, var(--beacon-mist) 35%, var(--beacon-surface));
 }
 
-.modal .modal-title {
+.nowo-ui-modal.nowo-ui-modal-open .modal-title {
   margin: 0;
   flex: 1;
   font-size: 1.125rem;
@@ -601,46 +584,40 @@ html[data-theme='dark'] .modal-backdrop {
   color: var(--beacon-ink);
 }
 
-.modal .modal-header .btn-close {
+.nowo-ui-modal.nowo-ui-modal-open .btn-close {
   margin: 0.1rem -0.15rem 0 0;
   padding: 0.45rem;
   border-radius: 0.3rem;
+  color: var(--beacon-ink);
   opacity: 0.55;
 }
 
-.modal .modal-header .btn-close:hover,
-.modal .modal-header .btn-close:focus-visible {
+.nowo-ui-modal.nowo-ui-modal-open .btn-close:hover,
+.nowo-ui-modal.nowo-ui-modal-open .btn-close:focus-visible {
   opacity: 1;
+  background: color-mix(in srgb, var(--beacon-mist) 55%, var(--beacon-surface));
 }
 
-[data-theme="dark"] .modal .modal-header .btn-close {
-  filter: invert(1) grayscale(100%);
-  opacity: 0.7;
-}
-
-.modal .modal-body {
+.nowo-ui-modal.nowo-ui-modal-open .modal-body {
   padding: 1.15rem 1.25rem 1.25rem;
+  color: var(--beacon-ink);
 }
 
-.modal .modal-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem;
+.nowo-ui-modal.nowo-ui-modal-open .modal-footer {
   padding: 0.9rem 1.25rem 1.15rem;
   border-top: 1px solid var(--beacon-sand);
   background: color-mix(in srgb, var(--beacon-mist) 25%, var(--beacon-surface));
 }
 
-.modal .kit-modal__lead {
+.nowo-ui-modal .kit-modal__lead {
   margin: 0 0 1rem;
-  font-size: var(--kit-font-body);
+  font-size: var(--kit-font-body, 0.875rem);
   line-height: 1.45;
   color: color-mix(in srgb, var(--beacon-ink) 72%, transparent);
 }
 
-.modal .kit-modal__actions,
-.modal .kit-modal__actions-form .kit-modal__actions {
+.nowo-ui-modal .kit-modal__actions,
+.nowo-ui-modal .kit-modal__actions-form .kit-modal__actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -648,80 +625,99 @@ html[data-theme='dark'] .modal-backdrop {
   margin-top: 0.25rem;
 }
 
-.modal .modal-body > form,
-.modal .modal-body form:not(.kit-modal__actions-form) {
+.nowo-ui-modal .modal-body > form,
+.nowo-ui-modal .modal-body form:not(.kit-modal__actions-form) {
   display: flex;
   flex-direction: column;
+  gap: 0.85rem;
 }
 
-.modal .modal-body form > button.btn-primary:last-child,
-.modal .modal-body form > button[type="submit"].btn:last-child {
+.nowo-ui-modal .modal-body form > button.nowo-ui-btn--primary:last-child,
+.nowo-ui-modal .modal-body form > button.btn-primary:last-child,
+.nowo-ui-modal .modal-body form > button[type="submit"].nowo-ui-btn:last-child,
+.nowo-ui-modal .modal-body form > button[type="submit"].btn:last-child {
   align-self: flex-end;
   margin-top: 1.15rem;
   min-width: 7.5rem;
 }
 
-.modal .modal-body form > .d-flex:last-child {
+.nowo-ui-modal .modal-body .nowo-ui-row-actions {
   justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1.15rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--beacon-sand);
+  margin-top: 0.5rem;
 }
 
-.modal .form-label {
+.nowo-ui-modal label,
+.nowo-ui-modal .form-label {
   margin-bottom: 0.35rem;
-  font-size: var(--kit-font-label);
+  font-size: var(--kit-font-label, 0.8125rem);
   font-weight: 500;
   color: color-mix(in srgb, var(--beacon-ink) 78%, transparent);
 }
 
-.modal .form-control,
-.modal .form-select {
-  border-radius: var(--kit-btn-radius);
+.nowo-ui-modal .input,
+.nowo-ui-modal .form-control,
+.nowo-ui-modal .form-select,
+.nowo-ui-modal .nowo-ui-input,
+.nowo-ui-modal select,
+.nowo-ui-modal textarea,
+.nowo-ui-modal input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]):not([type="submit"]):not([type="button"]) {
+  border-radius: var(--kit-btn-radius, 0.375rem);
   background-color: var(--beacon-surface);
-  border-color: var(--beacon-sand);
+  border: 1px solid var(--beacon-sand);
   color: var(--beacon-ink);
   padding: 0.5rem 0.75rem;
-  font-size: var(--kit-font-body);
+  font-size: var(--kit-font-body, 0.875rem);
   min-height: 2.25rem;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
-.modal .form-control:focus,
-.modal .form-select:focus {
-  background-color: var(--beacon-surface);
+.nowo-ui-modal .input:focus,
+.nowo-ui-modal .form-control:focus,
+.nowo-ui-modal .form-select:focus,
+.nowo-ui-modal .nowo-ui-input:focus,
+.nowo-ui-modal select:focus,
+.nowo-ui-modal textarea:focus,
+.nowo-ui-modal input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]):focus {
+  outline: 0;
   border-color: var(--beacon-moss);
-  color: var(--beacon-ink);
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--beacon-moss) 20%, transparent);
 }
 
-.modal .form-text,
-.modal .text-muted,
-.modal h6.text-muted {
+.nowo-ui-modal .form-text,
+.nowo-ui-modal .text-muted,
+.nowo-ui-modal .text-slate-500,
+.nowo-ui-modal .nowo-ui-muted,
+.nowo-ui-modal h6.text-muted {
   color: color-mix(in srgb, var(--beacon-ink) 55%, transparent) !important;
-  font-size: var(--kit-font-meta);
+  font-size: var(--kit-font-meta, 0.75rem);
 }
 
-.modal h6 {
+.nowo-ui-modal h6 {
   margin-top: 0.35rem;
-  font-size: var(--kit-font-meta);
+  font-size: var(--kit-font-meta, 0.75rem);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.modal .row {
-  --bs-gutter-x: 0.75rem;
-  --bs-gutter-y: 0.65rem;
-}
-
-.modal .row > [class*="col-"] {
-  margin-bottom: 0.15rem;
-}
-
-.modal hr {
-  border-color: var(--beacon-sand);
+.nowo-ui-modal hr {
+  border: 0;
+  border-top: 1px solid var(--beacon-sand);
   opacity: 1;
+}
+
+/* Legacy Bootstrap .modal hooks (if a kit still emits .modal.show without nowo open class). */
+.modal-backdrop {
+  --bs-backdrop-zindex: 1070;
+  --bs-backdrop-bg: rgb(0 0 0);
+  --bs-backdrop-opacity: 0.45;
+  z-index: var(--bs-backdrop-zindex);
+}
+
+html[data-theme='dark'] .modal-backdrop {
+  --bs-backdrop-opacity: 0.68;
 }
 
 .modal-backdrop.show {
@@ -791,9 +787,15 @@ html[data-theme='dark'] .modal-backdrop {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 0;
+  border: 0 !important;
   border-radius: 0;
   background: transparent;
+}
+
+.kit-admin .nowo-ui-list.divide-y > :not([hidden]) ~ :not([hidden]),
+.kit-admin .nowo-ui-list > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: transparent !important;
+  border-top-width: 0 !important;
 }
 
 .kit-admin .nowo-ui-list-item,
@@ -855,6 +857,10 @@ html[data-theme='dark'] .modal-backdrop {
 .kit-admin .table-responsive {
   margin: 0;
   overflow-x: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .kit-admin .nowo-ui-table,
@@ -862,6 +868,8 @@ html[data-theme='dark'] .modal-backdrop {
   width: 100%;
   margin: 0;
   border-collapse: collapse;
+  color: var(--beacon-ink);
+  background: transparent;
 }
 
 .kit-admin .nowo-ui-table th,
@@ -874,6 +882,7 @@ html[data-theme='dark'] .modal-backdrop {
   vertical-align: middle;
   font-size: var(--kit-font-body);
   color: var(--beacon-ink);
+  background: transparent;
 }
 
 .kit-admin .nowo-ui-table thead th,
@@ -897,39 +906,122 @@ html[data-theme='dark'] .modal-backdrop {
   background: color-mix(in srgb, var(--beacon-mist) 70%, transparent);
 }
 
+.kit-admin .nowo-ui-table code,
+.kit-admin .table code {
+  font-size: var(--kit-font-meta);
+  color: var(--beacon-moss);
+  word-break: break-all;
+}
+
 .kit-admin .nowo-ui-empty {
   margin: 0;
   padding: 1rem 0.15rem;
   font-size: var(--kit-font-body);
 }
 
-/* Colours from --nowo-ui-* on .kit-admin; keep Beacon control metrics only. */
-.kit-admin .nowo-ui-input {
+/* Colours from --nowo-ui-* on .kit-admin / .nowo-ui-modal; keep Beacon control metrics.
+ * UiKit tailwind macros also emit bg-blue-600 / border-slate-* — force Beacon colours.
+ */
+.kit-admin .nowo-ui-input,
+.nowo-ui-modal .nowo-ui-input {
   font-size: var(--kit-font-body);
   min-height: 2.25rem;
   padding: 0.5rem 0.75rem;
+  border-color: var(--beacon-sand) !important;
+  background: var(--beacon-surface) !important;
+  color: var(--beacon-ink) !important;
 }
 
-.kit-admin .nowo-ui-input:focus {
-  border-color: var(--nowo-ui-primary);
+.kit-admin .nowo-ui-input:focus,
+.nowo-ui-modal .nowo-ui-input:focus {
+  border-color: var(--nowo-ui-primary) !important;
   outline: 0;
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--nowo-ui-primary) 20%, transparent);
 }
 
-.kit-admin .nowo-ui-btn {
+.kit-admin .nowo-ui-btn,
+.nowo-ui-modal .nowo-ui-btn {
   justify-content: center;
   min-height: 2.25rem;
   padding: var(--kit-btn-pad-y) var(--kit-btn-pad-x);
   font-size: var(--kit-btn-font);
   font-weight: 500;
+  border-radius: var(--kit-btn-radius);
 }
 
-.kit-admin .nowo-ui-btn--primary {
+.kit-admin .nowo-ui-btn--primary,
+.kit-admin .nowo-ui-btn--primary.bg-blue-600,
+.nowo-ui-modal .nowo-ui-btn--primary,
+.nowo-ui-modal .nowo-ui-btn--primary.bg-blue-600 {
+  background: var(--beacon-moss) !important;
+  border-color: var(--beacon-moss) !important;
+  color: var(--nowo-ui-primary-contrast, #fff) !important;
   font-weight: 600;
 }
 
+.kit-admin .nowo-ui-btn--primary:hover,
+.kit-admin .nowo-ui-btn--primary.bg-blue-600:hover,
+.nowo-ui-modal .nowo-ui-btn--primary:hover,
+.nowo-ui-modal .nowo-ui-btn--primary.bg-blue-600:hover {
+  background: var(--beacon-moss-deep) !important;
+  border-color: var(--beacon-moss-deep) !important;
+  color: var(--nowo-ui-primary-contrast, #fff) !important;
+}
+
+.kit-admin .nowo-ui-btn--secondary,
+.kit-admin .nowo-ui-btn--secondary.border-slate-300,
+.nowo-ui-modal .nowo-ui-btn--secondary,
+.nowo-ui-modal .nowo-ui-btn--secondary.border-slate-300 {
+  background: transparent !important;
+  border: 1px solid var(--beacon-sand) !important;
+  color: var(--beacon-ink) !important;
+}
+
+.kit-admin .nowo-ui-btn--secondary:hover,
+.nowo-ui-modal .nowo-ui-btn--secondary:hover {
+  border-color: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand)) !important;
+  background: var(--beacon-surface) !important;
+  color: var(--beacon-ink) !important;
+}
+
+.kit-admin .nowo-ui-btn--danger,
+.kit-admin .nowo-ui-btn--danger.border-red-500,
+.nowo-ui-modal .nowo-ui-btn--danger,
+.nowo-ui-modal .nowo-ui-btn--danger.border-red-500 {
+  background: transparent !important;
+  border: 1px solid color-mix(in srgb, var(--beacon-alert) 55%, var(--beacon-sand)) !important;
+  color: var(--beacon-alert) !important;
+}
+
+.kit-admin .nowo-ui-btn--danger:hover,
+.nowo-ui-modal .nowo-ui-btn--danger:hover {
+  background: color-mix(in srgb, var(--beacon-alert) 12%, var(--beacon-surface)) !important;
+  border-color: var(--beacon-alert) !important;
+  color: var(--beacon-alert) !important;
+}
+
+.kit-admin .nowo-ui-btn--link,
+.kit-admin .nowo-ui-btn--link.text-blue-600,
+.nowo-ui-modal .nowo-ui-btn--link,
+.nowo-ui-modal .nowo-ui-btn--link.text-blue-600 {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--beacon-moss) !important;
+  min-height: 0;
+  padding-left: 0;
+  padding-right: 0;
+  text-decoration: none;
+}
+
+.kit-admin .nowo-ui-btn--link:hover,
+.nowo-ui-modal .nowo-ui-btn--link:hover {
+  color: var(--beacon-moss-deep) !important;
+  text-decoration: underline;
+}
+
 /* Compact size for labeled toolbar/filter buttons (not forced square). */
-.kit-admin .nowo-ui-btn--sm {
+.kit-admin .nowo-ui-btn--sm,
+.nowo-ui-modal .nowo-ui-btn--sm {
   min-height: var(--kit-btn-sm);
   padding: 0.35rem 0.65rem;
   font-size: var(--kit-btn-sm-font);
@@ -939,12 +1031,47 @@ html[data-theme='dark'] .modal-backdrop {
 .kit-admin .nowo-ui-action.nowo-ui-btn--sm,
 .kit-admin .nowo-ui-row-actions .nowo-ui-btn--sm,
 .kit-admin .nowo-dashboard-menu-actions .nowo-ui-btn--sm,
-.kit-admin .nowo-dashboard-menu-move-stack .nowo-ui-btn--sm {
+.kit-admin .nowo-dashboard-menu-move-stack .nowo-ui-btn--sm,
+.nowo-ui-modal .nowo-ui-action.nowo-ui-btn--sm,
+.nowo-ui-modal .nowo-ui-row-actions .nowo-ui-btn--sm {
   width: var(--kit-btn-sm);
   min-width: var(--kit-btn-sm);
   height: var(--kit-btn-sm);
   min-height: var(--kit-btn-sm);
   padding: 0.35rem;
+}
+
+/* Neutralize UiKit Tailwind slate/blue utilities inside kit surfaces + portaled modals. */
+.kit-admin .text-slate-500,
+.kit-admin .text-slate-700,
+.kit-admin .nowo-ui-muted,
+.nowo-ui-modal .text-slate-500,
+.nowo-ui-modal .text-slate-700,
+.nowo-ui-modal .nowo-ui-muted {
+  color: color-mix(in srgb, var(--beacon-ink) 55%, transparent) !important;
+}
+
+.kit-admin .border-slate-200,
+.kit-admin .border-slate-300,
+.kit-admin .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+.nowo-ui-modal .border-slate-200,
+.nowo-ui-modal .border-slate-300 {
+  border-color: var(--beacon-sand) !important;
+}
+
+.kit-admin .hover\:bg-slate-50:hover,
+.nowo-ui-modal .hover\:bg-slate-50:hover {
+  background-color: color-mix(in srgb, var(--beacon-mist) 55%, transparent) !important;
+}
+
+.kit-admin .hover\:bg-blue-500:hover,
+.nowo-ui-modal .hover\:bg-blue-500:hover {
+  background-color: var(--beacon-moss-deep) !important;
+}
+
+.kit-admin .hover\:bg-red-50:hover,
+.nowo-ui-modal .hover\:bg-red-50:hover {
+  background-color: color-mix(in srgb, var(--beacon-alert) 12%, var(--beacon-surface)) !important;
 }
 
 .kit-admin .visually-hidden,
