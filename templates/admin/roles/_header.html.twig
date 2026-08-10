@@ -42,7 +42,7 @@
                 {% endblock %}
             {% endembed %}
         {% endif %}
-        {% if not role.system %}
+        {% if not role.system and role.users|length == 0 %}
             <form
                 method="post"
                 action="{{ path('admin_roles_delete', {id: role.uuid}) }}"

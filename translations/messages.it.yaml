@@ -223,11 +223,12 @@ flash:
     member_already: Quell'utente è già membro del progetto.
     member_invalid_role: Ruolo di appartenenza non valido.
     member_last_owner: Il progetto deve mantenere almeno un proprietario.
+    member_cannot_remove_full: Cambia il ruolo full in admin, member o viewer prima di rimuovere questo membro.
     member_cannot_manage_owner: Gli amministratori non possono modificare o rimuovere
-      i proprietari.
+      i proprietari né i membri full.
     member_error: Impossibile aggiornare i membri del progetto.
     ownership_transferred: La proprietà del progetto è stata trasferita. Ora sei un
-      amministratore.
+      membro full.
     transfer_confirmation_mismatch: Il nome del progetto non corrispondeva. La proprietà
       non è stata trasferita.
     transfer_to_self: Non puoi trasferire la proprietà a te stesso.
@@ -316,6 +317,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -418,6 +420,7 @@ project:
     last_owner_hint: Il progetto deve mantenere almeno un proprietario.
     role:
       owner: Proprietario
+      full: Full
       admin: Ammin
       member: Membro
       viewer: Viewer
@@ -1490,6 +1493,7 @@ tour:
     progress: '{{current}} di {{total}}'
   role:
     owner: proprietario
+    full: full
     admin: amministratore
     member: membro
     viewer: osservatore
@@ -2513,6 +2517,9 @@ roles:
     role_project_admin:
       name: 'Admin progetto'
       description: 'Membri, API key, settings, notifiche e share link (specchio di ProjectRole admin).'
+    role_project_full:
+      name: 'Progetto full'
+      description: 'Matrice project.* completa incluso eliminazione (specchio ProjectRole full). Non è proprietario primario — non può trasferire la proprietà. L’accesso al prodotto richiede ancora l’appartenenza al progetto.'
     role_project_owner:
       name: 'Owner progetto'
       description: 'Controllo completo incluso eliminazione (specchio di ProjectRole owner).'

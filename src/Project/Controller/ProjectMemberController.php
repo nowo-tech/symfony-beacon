@@ -176,7 +176,7 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requireRole($project, $actor, ProjectRole::Owner);
+        $this->projectAccess->requirePrimaryOwner($project, $actor);
 
         if (!$this->isCsrfTokenValid('project_transfer_ownership_'.$project->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');

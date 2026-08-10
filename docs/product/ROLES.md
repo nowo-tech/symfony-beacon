@@ -1,12 +1,12 @@
 # Roles and access control
 
-Beacon uses **layered access**. Do not confuse Symfony Security `ROLE_*` strings (instance-wide) with project membership roles (`owner` / `admin` / `member` / `viewer`) or with dotted **instance permission keys**.
+Beacon uses **layered access**. Do not confuse Symfony Security `ROLE_*` strings (instance-wide) with project membership roles (`owner` / `full` / `admin` / `member` / `viewer`) or with dotted **instance permission keys**.
 
 | Layer | Where stored | Values | Purpose |
 |-------|--------------|--------|---------|
 | **Instance (Security)** | `user.roles` JSON + implicit `ROLE_USER` + assigned `role.code` (`InstanceRole`) | `ROLE_USER`, `ROLE_ADMIN`, custom `ROLE_*` | Login gate, Administration UI, kit admin dashboards |
 | **Instance RBAC catalog** | `permission` + `role` + `role_permission` + `role_user` (entity matrix) | Built-in `project.*` keys + optional custom dotted keys; `ROLE_PROJECT_*` mirror roles | Document / edit project capability catalog and mirror roles in Admin UI — **not** a substitute for Administration `ROLE_ADMIN` |
-| **Project membership** | `project_membership.role` / group links | `owner`, `admin`, `member`, `viewer` | Per-project capabilities (Settings, triage, delete, …) |
+| **Project membership** | `project_membership.role` / group links | `owner`, `full`, `admin`, `member`, `viewer` | Per-project capabilities (Settings, triage, delete, …) |
 
 Share-link grants are a third path (time-limited viewer session); see product Settings → share links. They are **not** Symfony roles.
 
@@ -58,9 +58,11 @@ Day-to-day product access for `ROLE_USER` is **`ProjectRole` + `ProjectPermissio
   | `ROLE_PROJECT_VIEWER` | `viewer` | `project.view` |
   | `ROLE_PROJECT_MEMBER` | `member` | view + `project.issues.triage` |
   | `ROLE_PROJECT_ADMIN` | `admin` | member set + members / api_keys / settings / notifications / share_links |
-  | `ROLE_PROJECT_OWNER` | `owner` | all `project.*` including `project.delete` |
+  | `ROLE_PROJECT_FULL` | `full` | all `project.*` including `project.delete` (not primary owner) |
+  | `ROLE_PROJECT_OWNER` | `owner` | all `project.*` including `project.delete` + primary ownership |
 
   Assigning these InstanceRoles on a user does **not** replace project membership; product gates use `ProjectAccessService`.
+  System roles cannot be deleted; custom roles with assigned users also cannot be deleted until unassigned.
 - **Legacy cleanup:** `app:seed-platform` **removes** formerly seeded operator codes (`ROLE_SUPPORT`, `ROLE_OPS_VIEWER`, `ROLE_PLATFORM`, `ROLE_NAV_EDITOR`, `ROLE_PROJECT_OPS`) if present, and purges leftover `admin.*` permission rows.
 - **Admin UI:** Administration → **Roles** / **Permissions** (project catalog + optional custom keys). Closed permission dialogs must not auto-open (`086` FR-003c).
 - **Voter:** `InstancePermissionVoter` grants catalogued dotted keys for `ROLE_ADMIN` or an assigned InstanceRole that includes the key.
@@ -80,21 +82,23 @@ Symfony’s default role hierarchy is **not** customized in this repo. In practi
 
 ## Project membership roles (not `ROLE_*`)
 
-Enum: `App\Project\Enum\ProjectRole` (`owner` | `admin` | `member` | `viewer`).
+Enum: `App\Project\Enum\ProjectRole` (`owner` | `full` | `admin` | `member` | `viewer`).
 Logical keys: `App\Project\Security\ProjectPermission` (checked via `ProjectAccess` / `ProjectAccessService::requirePermission()`). Seed metadata: `ProjectPermissionCatalog` → shared `permission` table for catalog UI; runtime access is still **per-project membership**, not `InstancePermissionVoter`.
 
-| Permission key | viewer | member | admin | owner |
-|----------------|:------:|:------:|:-----:|:-----:|
-| `project.view` | ✓ | ✓ | ✓ | ✓ |
-| `project.issues.triage` | | ✓ | ✓ | ✓ |
-| `project.members.manage` | | | ✓ | ✓ |
-| `project.api_keys.manage` | | | ✓ | ✓ |
-| `project.settings.manage` | | | ✓ | ✓ |
-| `project.notifications.manage` | | | ✓ | ✓ |
-| `project.share_links.manage` | | | ✓ | ✓ |
-| `project.delete` | | | | ✓ |
+| Permission key | viewer | member | admin | full | owner |
+|----------------|:------:|:------:|:-----:|:----:|:-----:|
+| `project.view` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `project.issues.triage` | | ✓ | ✓ | ✓ | ✓ |
+| `project.members.manage` | | | ✓ | ✓ | ✓ |
+| `project.api_keys.manage` | | | ✓ | ✓ | ✓ |
+| `project.settings.manage` | | | ✓ | ✓ | ✓ |
+| `project.notifications.manage` | | | ✓ | ✓ | ✓ |
+| `project.share_links.manage` | | | ✓ | ✓ | ✓ |
+| `project.delete` | | | | ✓ | ✓ |
 
-Helpers on `ProjectRole` / `ProjectAccess` (`canTriageIssues()`, `canManageSettings()`, …) wrap that matrix. Resolved by `ProjectAccessService` from direct membership, group links, share grants, and the instance-`ROLE_ADMIN` shortcut (effective owner unless view-as-member).
+`full` matches `owner` for every `project.*` key but is **not** primary owner: it cannot transfer ownership and does not count as the last-owner guard. Groups may only be `admin` / `member` / `viewer` (never `owner` or `full`). After ownership transfer, the former primary owner is demoted to `full`. A `full` member must be demoted before removal.
+
+Helpers on `ProjectRole` / `ProjectAccess` (`canTriageIssues()`, `canManageSettings()`, `isPrimaryOwner()`, …) wrap that matrix. Resolved by `ProjectAccessService` from direct membership, group links, share grants, and the instance-`ROLE_ADMIN` shortcut (effective owner unless view-as-member).
 
 Admin UI labels “Admin” / “User” on `/admin/users` map to **`ROLE_ADMIN` / no `ROLE_ADMIN`** (instance). Project role labels use the membership enum strings.
 
@@ -111,7 +115,7 @@ Product HTTP actions must call `ProjectAccessService` **before** reading sensiti
 | Settings page GET | `requireSettingsSurface()` (any manage/delete grant) |
 | Governance, read tokens, clear history, export | `requirePermission(…, ProjectPermission::SETTINGS_MANAGE)` |
 | Members / group links | `requirePermission(…, ProjectPermission::MEMBERS_MANAGE)` |
-| Transfer ownership | `requireRole(…, ProjectRole::Owner)` (owner-only; not a separate key) |
+| Transfer ownership | `requirePrimaryOwner()` (exact `Owner`; not `full`) |
 | API keys create/rotate/revoke | `requirePermission(…, ProjectPermission::API_KEYS_MANAGE)` |
 | Notification destinations / thresholds | `requirePermission(…, ProjectPermission::NOTIFICATIONS_MANAGE)` |
 | Share links | `requirePermission(…, ProjectPermission::SHARE_LINKS_MANAGE)` |

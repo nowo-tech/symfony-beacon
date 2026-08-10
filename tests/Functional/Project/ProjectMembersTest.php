@@ -70,8 +70,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
 
         $this->login($client, $member);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('form[action$="/members"]');
+        self::assertResponseStatusCodeSame(403);
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
             '_token' => 'x',
@@ -234,7 +233,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
             'project' => $project->getId(),
             'user' => $member->getId(),
         ]);
-        self::assertSame(ProjectRole::Admin, $ownerMembership?->getRole());
+        self::assertSame(ProjectRole::Full, $ownerMembership?->getRole());
         self::assertSame(ProjectRole::Owner, $newOwnerMembership?->getRole());
     }
 
@@ -305,6 +304,86 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('form[action$="/transfer-ownership"]');
+
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/transfer-ownership', [
+            '_token' => 'x',
+            'user' => $member->getUuid(),
+            'confirmation' => $project->getName(),
+        ]);
+        self::assertResponseStatusCodeSame(403);
+        unset($owner);
+    }
+
+    public function testCannotRemoveFullMemberWithoutDemotingFirst(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('owner-remove-full@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $full = new User();
+        $full->setEmail('full-member@example.com');
+        $full->setDisplayName('Full Member');
+        $full->setPassword($hasher->hashPassword($full, 'secret'));
+        $membership = new ProjectMembership();
+        $membership->setUser($full);
+        $membership->setRole(ProjectRole::Full);
+        $project->addMembership($membership);
+        $em->persist($full);
+        $em->flush();
+
+        $this->login($client, $owner);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $removeForm = $crawler->filter('form[action$="/members/'.$full->getUuid().'/remove"]');
+        self::assertGreaterThan(0, $removeForm->count());
+        $token = $removeForm->filter('input[name="_token"]')->attr('value');
+
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members/'.$full->getUuid().'/remove', [
+            '_token' => $token,
+        ]);
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        $client->followRedirect();
+        self::assertSelectorTextContains('.flash', 'full role');
+
+        $em->clear();
+        $stillThere = $em->getRepository(ProjectMembership::class)->findOneBy([
+            'project' => $project->getId(),
+            'user' => $full->getId(),
+        ]);
+        self::assertSame(ProjectRole::Full, $stillThere?->getRole());
+    }
+
+    public function testFullMemberCannotTransferOwnership(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('full-transfer-deny@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $full = new User();
+        $full->setEmail('full-actor@example.com');
+        $full->setDisplayName('Full Actor');
+        $full->setPassword($hasher->hashPassword($full, 'secret'));
+        $fullMembership = new ProjectMembership();
+        $fullMembership->setUser($full);
+        $fullMembership->setRole(ProjectRole::Full);
+        $project->addMembership($fullMembership);
+
+        $member = new User();
+        $member->setEmail('full-transfer-target@example.com');
+        $member->setDisplayName('Transfer Target');
+        $member->setPassword($hasher->hashPassword($member, 'secret'));
+        $memberMembership = new ProjectMembership();
+        $memberMembership->setUser($member);
+        $memberMembership->setRole(ProjectRole::Member);
+        $project->addMembership($memberMembership);
+
+        $em->persist($full);
+        $em->persist($member);
+        $em->flush();
+
+        $this->login($client, $full);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('form[action$="/transfer-ownership"]');

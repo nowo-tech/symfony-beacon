@@ -61,9 +61,15 @@ final class InstanceRoleCatalog
                 'permission_keys' => ProjectPermission::forRole(ProjectRole::Admin),
             ],
             [
+                'code' => 'ROLE_PROJECT_FULL',
+                'name' => 'Project full',
+                'description' => 'Full project.* matrix including delete (mirrors ProjectRole full). Not primary owner — cannot transfer ownership. Product access still requires project membership.',
+                'permission_keys' => ProjectPermission::forRole(ProjectRole::Full),
+            ],
+            [
                 'code' => 'ROLE_PROJECT_OWNER',
                 'name' => 'Project owner',
-                'description' => 'Full project control including delete (mirrors ProjectRole owner). Product access still requires project membership.',
+                'description' => 'Full project control including delete and primary ownership (mirrors ProjectRole owner). Product access still requires project membership.',
                 'permission_keys' => ProjectPermission::forRole(ProjectRole::Owner),
             ],
         ];

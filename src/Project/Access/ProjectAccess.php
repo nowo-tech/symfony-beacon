@@ -91,10 +91,16 @@ final readonly class ProjectAccess
         return $this->role->canManageShareLinks();
     }
 
-    /** Whether the role may delete the project (owner only). */
+    /** Whether the role may delete the project (owner or full). */
     public function canDeleteProject(): bool
     {
         return $this->role->canDeleteProject();
+    }
+
+    /** Primary owner only (transfer / last-owner); {@see ProjectRole::Full} is false. */
+    public function isPrimaryOwner(): bool
+    {
+        return $this->role->isPrimaryOwner();
     }
 
     /** Whether the role may mutate issues / triage / comments / saved views. */

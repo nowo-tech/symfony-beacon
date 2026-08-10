@@ -160,6 +160,13 @@ final class AdminInstanceRoleController extends AbstractController
             return $this->redirectToRoute('admin_roles_show', ['id' => $role->getUuid()]);
         }
 
+        $this->roleRepository->hydrateDetail($role);
+        if ($this->roleRepository->countAssignedUsers($role) > 0) {
+            $this->addFlash('error', 'flash.roles.in_use');
+
+            return $this->redirectToRoute('admin_roles_show', ['id' => $role->getUuid()]);
+        }
+
         if (!$this->isCsrfTokenValid('admin_instance_role_delete_'.$role->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }

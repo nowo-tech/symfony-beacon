@@ -274,7 +274,9 @@ final readonly class ProjectAccessService
     }
 
     /**
-     * Requires effective access with at least the given role (viewer < member < admin < owner).
+     * Requires effective access with at least the given role (viewer < member < admin < full = owner by rank).
+     *
+     * For primary ownership (transfer), use {@see requirePrimaryOwner()} — rank alone lets {@see ProjectRole::Full} through.
      *
      * @throws AccessDeniedHttpException when access or role is insufficient
      */
@@ -282,6 +284,23 @@ final readonly class ProjectAccessService
     {
         $access = $this->requireAccess($project, $user);
         if ($access->role->rank() < $minimum->rank()) {
+            throw new AccessDeniedHttpException('Insufficient project permissions.');
+        }
+
+        return $access;
+    }
+
+    /**
+     * Requires primary project owner ({@see ProjectRole::Owner} exactly), not {@see ProjectRole::Full}.
+     *
+     * Instance ROLE_ADMIN resolves as Owner and passes.
+     *
+     * @throws AccessDeniedHttpException
+     */
+    public function requirePrimaryOwner(Project $project, User $user): ProjectAccess
+    {
+        $access = $this->requireAccess($project, $user);
+        if (ProjectRole::Owner !== $access->role) {
             throw new AccessDeniedHttpException('Insufficient project permissions.');
         }
 

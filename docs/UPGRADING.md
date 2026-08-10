@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.4.0)](#unreleased-main-after-140)
+- [Unreleased (main after 1.5.0)](#unreleased-main-after-150)
+- [Upgrading from 1.4.0 to 1.5.0](#upgrading-from-140-to-150)
 - [Upgrading from 1.3.1 to 1.4.0](#upgrading-from-131-to-140)
 - [Upgrading from 1.3.0 to 1.3.1](#upgrading-from-130-to-131)
 - [Upgrading from 1.2.0 to 1.3.0](#upgrading-from-120-to-130)
@@ -50,9 +51,30 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.4.0)
+## Unreleased (main after 1.5.0)
 
-No further upgrade steps yet — follow [Upgrading from 1.3.1 to 1.4.0](#upgrading-from-131-to-140) when moving off **1.3.1**.
+No further upgrade steps yet — follow [Upgrading from 1.4.0 to 1.5.0](#upgrading-from-140-to-150) when moving off **1.4.0**.
+
+## Upgrading from 1.4.0 to 1.5.0
+
+**Project role `full` + InstanceRole delete guards** (`088`). Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.5.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # no new migrations expected for this release
+make seed-platform      # upserts ROLE_PROJECT_FULL + refreshes system role matrices
+make vite-build         # if frontend assets changed in your tree
+```
+
+### Notes
+
+- No Doctrine schema migration: `project_membership.role` already stores a string (`length: 20`) and accepts the new `full` value.
+- After upgrade, re-run `make seed-platform` (or `app:seed-platform`) so `ROLE_PROJECT_FULL` appears under Administration → Roles.
+- Existing projects are unchanged until the next ownership transfer (former owner becomes `full` instead of `admin`).
+- Operators can manually assign membership role `full` where appropriate; groups still cannot use `owner` / `full`.
 
 ## Upgrading from 1.3.1 to 1.4.0
 

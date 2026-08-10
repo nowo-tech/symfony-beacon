@@ -226,10 +226,10 @@ flash:
     member_already: Cet utilisateur est déjà membre du projet.
     member_invalid_role: Rôle de membre invalide.
     member_last_owner: Le projet doit garder au moins un propriétaire.
-    member_cannot_manage_owner: Les administrateurs ne peuvent pas modifier ou supprimer
-      des propriétaires.
+    member_cannot_remove_full: Changez le rôle full en admin, member ou viewer avant de retirer ce membre.
+    member_cannot_manage_owner: Les administrateurs ne peuvent pas modifier ou supprimer les propriétaires ni les membres full.
     member_error: Impossible de mettre à jour les membres du projet.
-    ownership_transferred: Propriété du projet transférée. Vous êtes maintenant administrateur.
+    ownership_transferred: Propriété du projet transférée. Vous êtes maintenant membre full.
     transfer_confirmation_mismatch: Le nom du projet ne correspond pas. La propriété
       n'a pas été transférée.
     transfer_to_self: Vous ne pouvez pas vous transférer la propriété.
@@ -321,6 +321,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -422,6 +423,7 @@ project:
     last_owner_hint: Le projet doit garder au moins un propriétaire.
     role:
       owner: Propriétaire
+      full: Full
       admin: Administrateur
       member: Membre
       viewer: Viewer
@@ -1508,6 +1510,7 @@ tour:
     progress: '{{current}} sur {{total}}'
   role:
     owner: proprietaire
+    full: full
     admin: administrateur
     member: membre
     viewer: observateur
@@ -2548,6 +2551,9 @@ roles:
     role_project_admin:
       name: 'Admin de projet'
       description: 'Membres, clés API, paramètres, notifications et liens de partage (miroir de ProjectRole admin).'
+    role_project_full:
+      name: 'Projet full'
+      description: 'Matrice project.* complète y compris suppression (miroir ProjectRole full). Pas propriétaire primaire — ne peut pas transférer la propriété. L’accès produit nécessite toujours une adhésion au projet.'
     role_project_owner:
       name: 'Owner de projet'
       description: 'Contrôle total y compris suppression (miroir de ProjectRole owner).'

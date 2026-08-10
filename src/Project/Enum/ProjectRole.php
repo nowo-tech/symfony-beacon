@@ -15,6 +15,8 @@ use App\Project\Security\ProjectPermission;
 enum ProjectRole: string
 {
     case Owner = 'owner';
+    /** Full project.* matrix (same as owner) without primary-ownership (transfer / last-owner). */
+    case Full = 'full';
     case Admin = 'admin';
     case Member = 'member';
     case Viewer = 'viewer';
@@ -71,7 +73,10 @@ enum ProjectRole: string
     }
 
     /**
-     * Numeric rank for comparing roles (viewer < member < admin < owner).
+     * Numeric rank for comparing roles (viewer < member < admin < full = owner).
+     *
+     * Primary ownership gates (transfer / last-owner) MUST use exact {@see self::Owner},
+     * not rank — {@see self::Full} shares rank 3 for maxRole/permission comparison only.
      */
     public function rank(): int
     {
@@ -79,7 +84,13 @@ enum ProjectRole: string
             self::Viewer => 0,
             self::Member => 1,
             self::Admin => 2,
-            self::Owner => 3,
+            self::Full, self::Owner => 3,
         };
+    }
+
+    /** Whether this role is the primary project owner (transfer / last-owner). */
+    public function isPrimaryOwner(): bool
+    {
+        return self::Owner === $this;
     }
 }

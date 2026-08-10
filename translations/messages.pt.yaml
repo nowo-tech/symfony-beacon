@@ -223,9 +223,10 @@ flash:
     member_already: Esse usuário já é membro do projeto.
     member_invalid_role: Função de associação inválida.
     member_last_owner: O projeto deve manter pelo menos um proprietário.
-    member_cannot_manage_owner: Os administradores não podem alterar ou remover proprietários.
+    member_cannot_remove_full: Altere a função full para admin, member ou viewer antes de remover este membro.
+    member_cannot_manage_owner: Os administradores não podem alterar ou remover proprietários nem membros full.
     member_error: Não foi possível atualizar os membros do projeto.
-    ownership_transferred: Propriedade do projeto transferida. Agora você é um administrador.
+    ownership_transferred: Propriedade do projeto transferida. Agora você é um membro full.
     transfer_confirmation_mismatch: O nome do projeto não corresponde. A propriedade
       não foi transferida.
     transfer_to_self: Você não pode transferir a propriedade para si mesmo.
@@ -315,6 +316,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -417,6 +419,7 @@ project:
     last_owner_hint: O projeto deve manter pelo menos um proprietário.
     role:
       owner: Proprietário
+      full: Full
       admin: Administrador
       member: Membro
       viewer: Viewer
@@ -1478,6 +1481,7 @@ tour:
     progress: '{{current}} de {{total}}'
   role:
     owner: proprietario
+    full: full
     admin: administrador
     member: membro
     viewer: visualizador
@@ -2482,6 +2486,9 @@ roles:
     role_project_admin:
       name: 'Admin de projeto'
       description: 'Membros, API keys, settings, notificações e share links (espelho de ProjectRole admin).'
+    role_project_full:
+      name: 'Projeto full'
+      description: 'Matriz project.* completa incluindo exclusão (espelha ProjectRole full). Não é proprietário primário — não pode transferir a propriedade. O acesso ao produto ainda requer associação ao projeto.'
     role_project_owner:
       name: 'Owner de projeto'
       description: 'Controlo total incluindo eliminar (espelho de ProjectRole owner).'

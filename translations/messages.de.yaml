@@ -227,10 +227,11 @@ flash:
     member_already: Dieser Benutzer ist bereits Projektmitglied.
     member_invalid_role: Ungültige Mitgliedschaftsrolle.
     member_last_owner: Das Projekt muss mindestens einen Eigentümer behalten.
-    member_cannot_manage_owner: Administratoren können Eigentümer nicht ändern oder
+    member_cannot_remove_full: Ändern Sie die Full-Rolle zu Admin, Mitglied oder Viewer, bevor Sie dieses Mitglied entfernen.
+    member_cannot_manage_owner: Administratoren können Eigentümer oder Full-Mitglieder nicht ändern oder
       entfernen.
     member_error: Projektmitglieder konnten nicht aktualisiert werden.
-    ownership_transferred: Eigentumsübertragung am Projekt. Sie sind jetzt Administrator.
+    ownership_transferred: Eigentumsübertragung am Projekt. Sie sind jetzt Full-Mitglied.
     transfer_confirmation_mismatch: Der Projektname stimmte nicht überein. Das Eigentum
       wurde nicht übertragen.
     transfer_to_self: Sie können das Eigentum nicht auf sich selbst übertragen.
@@ -323,6 +324,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -425,6 +427,7 @@ project:
     last_owner_hint: Das Projekt muss mindestens einen Eigentümer behalten.
     role:
       owner: Eigentümer
+      full: Full
       admin: Admin
       member: Mitglied
       viewer: Viewer
@@ -1503,6 +1506,7 @@ tour:
     progress: '{{current}} von {{total}}'
   role:
     owner: Eigentumer
+    full: full
     admin: Administrator
     member: Mitglied
     viewer: Betrachter
@@ -2536,6 +2540,9 @@ roles:
     role_project_admin:
       name: 'Projekt-Admin'
       description: 'Mitglieder, API-Keys, Settings, Benachrichtigungen und Share-Links (entspricht ProjectRole admin).'
+    role_project_full:
+      name: 'Projekt Full'
+      description: 'Vollständige project.*-Matrix einschließlich Löschen (spiegelt ProjectRole full). Kein Primäreigentümer — kann Eigentum nicht übertragen. Produktzugriff erfordert weiterhin Projektmitgliedschaft.'
     role_project_owner:
       name: 'Projekt-Owner'
       description: 'Volle Kontrolle einschließlich Löschen (entspricht ProjectRole owner).'

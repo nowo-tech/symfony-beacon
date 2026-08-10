@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Identity;
 
 use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\InstanceRole;
+use App\Identity\Entity\User;
 use App\Identity\Service\InstanceRbacSeeder;
 use App\Tests\Support\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +57,13 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         $projectOwner = $em->getRepository(InstanceRole::class)->findOneBy(['code' => 'ROLE_PROJECT_OWNER']);
         self::assertInstanceOf(InstanceRole::class, $projectOwner);
         self::assertTrue($projectOwner->hasPermissionKey('project.delete'));
-        self::assertCount(4, $em->getRepository(InstanceRole::class)->findBy(['system' => true]));
+
+        /** @var InstanceRole $projectFull */
+        $projectFull = $em->getRepository(InstanceRole::class)->findOneBy(['code' => 'ROLE_PROJECT_FULL']);
+        self::assertInstanceOf(InstanceRole::class, $projectFull);
+        self::assertTrue($projectFull->isSystem());
+        self::assertTrue($projectFull->hasPermissionKey('project.delete'));
+        self::assertCount(5, $em->getRepository(InstanceRole::class)->findBy(['system' => true]));
 
         $this->login($client, $admin);
 
@@ -171,5 +178,43 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         self::assertCount(1, $role->getUsers());
         self::assertSame('ROLE_MATRIX_HELPER', $role->getCode());
         self::assertSame('Matrix helper renamed', $role->getName());
+    }
+
+    public function testCannotDeleteRoleAssignedToUsers(): void
+    {
+        [$client, $admin] = $this->bootWithDemoProject('rbac-role-in-use@example.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->flush();
+
+        self::getContainer()->get(InstanceRbacSeeder::class)->seedIfEmpty();
+        $em->clear();
+
+        $role = new InstanceRole();
+        $role->setCode('ROLE_TEMP_IN_USE');
+        $role->setName('Temp in use');
+        $role->setDescription('Delete guard');
+        $role->setEnabled(true);
+        $role->setSystem(false);
+        $admin = $em->getRepository(User::class)->findOneBy(['email' => 'rbac-role-in-use@example.com']);
+        self::assertNotNull($admin);
+        $admin->addInstanceRole($role);
+        $em->persist($role);
+        $em->flush();
+
+        $this->login($client, $admin);
+        $crawler = $client->request(Request::METHOD_GET, '/admin/roles/'.$role->getUuid());
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists(sprintf('form[action="%s"]', '/admin/roles/'.$role->getUuid().'/delete'));
+
+        $client->request(Request::METHOD_POST, '/admin/roles/'.$role->getUuid().'/delete', [
+            '_token' => 'x',
+        ]);
+        self::assertResponseRedirects('/admin/roles/'.$role->getUuid());
+        $client->followRedirect();
+        self::assertSelectorTextContains('.flash', 'assigned to one or more users');
+
+        $em->clear();
+        self::assertNotNull($em->getRepository(InstanceRole::class)->findOneBy(['code' => 'ROLE_TEMP_IN_USE']));
     }
 }

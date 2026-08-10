@@ -42,20 +42,20 @@ As a project owner, I can permanently delete a project after typing its name in 
 1. **Given** I am the owner, **When** I open Delete project on Settings, **Then** a modal warns that deletion is permanent and asks me to type the project name.
 2. **Given** the typed name does not match, **When** I try to submit, **Then** the delete does not proceed (client disables submit; server rejects mismatch).
 3. **Given** I type the exact project name and confirm, **When** the form posts, **Then** the project and related data are removed and I am redirected to the dashboard with a success flash.
-4. **Given** I lack `project.delete` (admin/member/viewer), **When** I view Settings (if allowed) or POST delete, **Then** Delete project is not available / denied (403).
+4. **Given** I lack `project.delete` (admin/member/viewer), **When** I view Settings (if allowed) or POST delete, **Then** Delete project is not available / denied (403). Owner and **full** retain `project.delete`.
 
 ### User Story 3 - Transfer ownership with typed confirmation (Priority: P2)
 
-As a project owner, I can hand ownership to another direct member and become an admin afterward.
+As a project owner, I can hand ownership to another direct member and become a **full** member afterward (same `project.*` matrix as owner, without primary ownership).
 
-**Independent Test**: As owner with a second member, open transfer modal, select member, type project name, submit; assert new owner role and former owner is admin.
+**Independent Test**: As owner with a second member, open transfer modal, select member, type project name, submit; assert new owner role and former owner is `full`.
 
 **Acceptance Scenarios**:
 
 1. **Given** I am the owner and another direct member exists, **When** I open Transfer ownership on Settings, **Then** I can select that member and must type the project name.
 2. **Given** the typed name does not match, **When** I submit, **Then** ownership is unchanged.
-3. **Given** I confirm correctly, **When** the form posts, **Then** the target is owner, I am admin, and Settings shows a success flash.
-4. **Given** I am admin or member (not owner), or I am the only direct member, **When** I view Settings, **Then** Transfer ownership is unavailable (or the control is disabled).
+3. **Given** I confirm correctly, **When** the form posts, **Then** the target is owner, I am **full**, and Settings shows a success flash.
+4. **Given** I am admin, member, **full**, or the only direct member, **When** I view Settings, **Then** Transfer ownership is unavailable (or the control is disabled).
 
 ## Requirements *(mandatory)*
 
@@ -64,7 +64,7 @@ As a project owner, I can hand ownership to another direct member and become an 
 - **FR-003**: Delete and transfer require CSRF + exact project name confirmation server-side.
 - **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`).
 - **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
-- **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to admin (`ProjectMembershipManager::transferOwnership`); MUST require project owner (`requireRole(Owner)`).
+- **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to **full** (`ProjectMembershipManager::transferOwnership`); MUST require primary project owner (`ProjectAccessService::requirePrimaryOwner()` — exact `Owner`, not rank).
 
 ## Success Criteria
 

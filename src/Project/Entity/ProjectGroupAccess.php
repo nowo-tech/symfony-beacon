@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
 /**
- * Grants every member of a user group a project role (admin, member, or viewer; owners stay direct).
+ * Grants every member of a user group a project role (admin, member, or viewer; owner/full stay direct).
  */
 #[ORM\Entity(repositoryClass: ProjectGroupAccessRepository::class)]
 #[ORM\Table(name: 'project_group_access')]
@@ -84,8 +84,8 @@ class ProjectGroupAccess
 
     public function setRole(ProjectRole $role): self
     {
-        if (ProjectRole::Owner === $role) {
-            throw new InvalidArgumentException('Groups cannot be assigned the owner role.');
+        if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
+            throw new InvalidArgumentException('Groups cannot be assigned the owner or full role.');
         }
         $this->role = $role;
 

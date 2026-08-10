@@ -133,6 +133,9 @@ final readonly class ProjectMembershipManager
         if (ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
             throw new RuntimeException('last_owner');
         }
+        if (ProjectRole::Full === $target->getRole()) {
+            throw new RuntimeException('cannot_remove_full');
+        }
 
         $subject = $target->getUser();
         $removedRole = $target->getRole()->value;
@@ -155,7 +158,8 @@ final readonly class ProjectMembershipManager
      * Transfer project ownership to another direct member.
      *
      * Promotes the target to owner. If the actor has a direct owner membership,
-     * demotes the actor to admin so ownership is handed off atomically.
+     * demotes the actor to {@see ProjectRole::Full} so they keep the full permission
+     * matrix without remaining the primary owner.
      *
      * @throws InvalidArgumentException when the target cannot receive ownership
      * @throws RuntimeException         when the actor cannot transfer ownership
@@ -187,7 +191,7 @@ final readonly class ProjectMembershipManager
         $actorFormerRole = null;
         if ($actorWillDemote && $actorMembership instanceof ProjectMembership) {
             $actorFormerRole = $actorMembership->getRole()->value;
-            $actorMembership->setRole(ProjectRole::Admin);
+            $actorMembership->setRole(ProjectRole::Full);
         }
 
         $this->actionRecorder->record(
@@ -200,7 +204,7 @@ final readonly class ProjectMembershipManager
                 'from' => $fromRole,
                 'to' => ProjectRole::Owner->value,
                 'actor_former_role' => $actorFormerRole,
-                'actor_new_role' => $actorWillDemote ? ProjectRole::Admin->value : null,
+                'actor_new_role' => $actorWillDemote ? ProjectRole::Full->value : null,
             ],
         );
         $this->entityManager->flush();
@@ -215,7 +219,7 @@ final readonly class ProjectMembershipManager
     {
         $this->assertActorCanManage($project, $actor);
         $this->assertActorCanLinkGroup($actor, $group, $project);
-        if (ProjectRole::Owner === $role) {
+        if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
             throw new InvalidArgumentException('invalid_role');
         }
         $this->assertAssignableGroupRole($actor, $project, $role);
@@ -280,7 +284,7 @@ final readonly class ProjectMembershipManager
         if ($target->getProject()?->getId() !== $project->getId()) {
             throw new InvalidArgumentException('wrong_project');
         }
-        if (ProjectRole::Owner === $role) {
+        if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
             throw new InvalidArgumentException('invalid_role');
         }
         $this->assertAssignableGroupRole($actor, $project, $role);
@@ -343,7 +347,7 @@ final readonly class ProjectMembershipManager
     public function assignableRoles(User $actor, Project $project): array
     {
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
+            return [ProjectRole::Owner, ProjectRole::Full, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
         }
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
@@ -352,14 +356,14 @@ final readonly class ProjectMembershipManager
         }
 
         if (ProjectRole::Owner === $access->role) {
-            return [ProjectRole::Owner, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
+            return [ProjectRole::Owner, ProjectRole::Full, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
         }
 
         return [ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
     }
 
     /**
-     * Roles the actor may assign to linked groups (never owner).
+     * Roles the actor may assign to linked groups (never owner or full).
      *
      * @return list<ProjectRole>
      */
@@ -367,7 +371,7 @@ final readonly class ProjectMembershipManager
     {
         return array_values(array_filter(
             $this->assignableRoles($actor, $project),
-            static fn (ProjectRole $role): bool => ProjectRole::Owner !== $role,
+            static fn (ProjectRole $role): bool => !\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true),
         ));
     }
 
@@ -422,7 +426,7 @@ final readonly class ProjectMembershipManager
     }
 
     /**
-     * Admins cannot mutate owner memberships (instance ROLE_ADMIN may).
+     * Admins cannot mutate owner or full memberships (instance ROLE_ADMIN may).
      *
      * @throws RuntimeException
      */
@@ -437,7 +441,7 @@ final readonly class ProjectMembershipManager
             throw new RuntimeException('forbidden');
         }
 
-        if (ProjectRole::Admin === $access->role && ProjectRole::Owner === $target->getRole()) {
+        if (ProjectRole::Admin === $access->role && \in_array($target->getRole(), [ProjectRole::Owner, ProjectRole::Full], true)) {
             throw new RuntimeException('cannot_manage_owner');
         }
     }

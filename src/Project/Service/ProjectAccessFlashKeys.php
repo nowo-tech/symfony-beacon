@@ -17,6 +17,7 @@ final class ProjectAccessFlashKeys
             'already_member' => 'flash.project.member_already',
             'invalid_role' => 'flash.project.member_invalid_role',
             'last_owner' => 'flash.project.member_last_owner',
+            'cannot_remove_full' => 'flash.project.member_cannot_remove_full',
             'cannot_manage_owner' => 'flash.project.member_cannot_manage_owner',
             'cannot_transfer_to_self' => 'flash.project.transfer_to_self',
             'already_owner' => 'flash.project.transfer_already_owner',

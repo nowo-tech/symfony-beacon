@@ -43,4 +43,16 @@ final class ProjectPermissionTest extends TestCase
         );
         self::assertTrue(ProjectRole::Owner->canDeleteProject());
     }
+
+    public function testFullMatchesOwnerPermissionsWithoutBeingPrimaryOwner(): void
+    {
+        self::assertSame(
+            ProjectPermission::forRole(ProjectRole::Owner),
+            ProjectPermission::forRole(ProjectRole::Full),
+        );
+        self::assertTrue(ProjectRole::Full->canDeleteProject());
+        self::assertSame(ProjectRole::Owner->rank(), ProjectRole::Full->rank());
+        self::assertTrue(ProjectRole::Owner->isPrimaryOwner());
+        self::assertFalse(ProjectRole::Full->isPrimaryOwner());
+    }
 }

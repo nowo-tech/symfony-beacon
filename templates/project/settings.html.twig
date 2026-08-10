@@ -185,9 +185,10 @@
             {% for member in project.memberships %}
                 {% set memberUser = member.user %}
                 {% set isLastOwner = member.role.value == 'owner' and ownerCount <= 1 %}
+                {% set isProtectedFull = member.role.value == 'full' %}
                 {% set actorIsOwner = membership.role.value == 'owner' %}
                 {% set canManageThis = assignableRoles is not empty
-                    and (actorIsOwner or member.role.value != 'owner') %}
+                    and (actorIsOwner or member.role.value not in ['owner', 'full']) %}
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div class="min-w-0">
@@ -253,7 +254,7 @@
                                     cancel_label: 'project.danger.cancel'|trans,
                                     submit_label: 'project.members.remove'|trans,
                                     submit_class: 'btn-danger',
-                                    submit_disabled: isLastOwner,
+                                    submit_disabled: isLastOwner or isProtectedFull,
                                 } %}
                                     {% block trigger %}
                                         <button
@@ -262,6 +263,7 @@
                                             data-action="confirm-dialog#open"
                                             title="{{ 'project.members.remove'|trans }}"
                                             aria-label="{{ 'project.members.remove'|trans }}"
+                                            {% if isLastOwner or isProtectedFull %}disabled{% endif %}
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                                 <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -271,6 +273,8 @@
                                     {% block body %}
                                         {% if isLastOwner %}
                                             <p class="confirm-dialog__body">{{ 'project.members.last_owner_hint'|trans }}</p>
+                                        {% elseif isProtectedFull %}
+                                            <p class="confirm-dialog__body">{{ 'flash.project.member_cannot_remove_full'|trans }}</p>
                                         {% else %}
                                             <p class="confirm-dialog__body">{{ 'project.members.remove_confirm'|trans({'%email%': memberUser.email}) }}</p>
                                         {% endif %}
@@ -755,7 +759,7 @@
         {% endembed %}
         {% endif %}
 
-        {% if membership.canDeleteProject %}
+        {% if membership.isPrimaryOwner %}
             {% embed 'shared/_confirm_dialog.html.twig' with {
                 expected_value: project.name,
                 trigger_class: 'btn-ghost',
@@ -812,7 +816,9 @@
                     </div>
                 {% endblock %}
             {% endembed %}
+        {% endif %}
 
+        {% if membership.canDeleteProject %}
             {% embed 'shared/_confirm_dialog.html.twig' with {
                 expected_value: project.name,
                 trigger_class: 'btn-danger',

@@ -222,9 +222,10 @@ flash:
     member_already: Die gebruiker is al projectlid.
     member_invalid_role: Ongeldige lidmaatschapsrol.
     member_last_owner: Het project moet minimaal één eigenaar behouden.
-    member_cannot_manage_owner: Beheerders kunnen eigenaren niet wijzigen of verwijderen.
+    member_cannot_remove_full: Wijzig de full-rol naar admin, member of viewer voordat u dit lid verwijdert.
+    member_cannot_manage_owner: Beheerders kunnen eigenaren of full-leden niet wijzigen of verwijderen.
     member_error: Kan projectleden niet updaten.
-    ownership_transferred: Projecteigendom overgedragen. U bent nu een beheerder.
+    ownership_transferred: Projecteigendom overgedragen. U bent nu een full-lid.
     transfer_confirmation_mismatch: De projectnaam kwam niet overeen. Het eigendom
       werd niet overgedragen.
     transfer_to_self: U kunt het eigendom niet aan uzelf overdragen.
@@ -312,6 +313,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -414,6 +416,7 @@ project:
     last_owner_hint: Het project moet minimaal één eigenaar behouden.
     role:
       owner: Eigenaar
+      full: Full
       admin: Beheerder
       member: Lid
       viewer: Viewer
@@ -1484,6 +1487,7 @@ tour:
     progress: '{{current}} van {{total}}'
   role:
     owner: eigenaar
+    full: full
     admin: beheerder
     member: lid
     viewer: kijker
@@ -2492,6 +2496,9 @@ roles:
     role_project_admin:
       name: 'Projectbeheerder'
       description: 'Leden, API-keys, settings, notificaties en sharelinks (spiegel van ProjectRole admin).'
+    role_project_full:
+      name: 'Project full'
+      description: 'Volledige project.*-matrix inclusief verwijderen (spiegel ProjectRole full). Geen primaire eigenaar — kan eigendom niet overdragen. Producttoegang vereist nog steeds projectlidmaatschap.'
     role_project_owner:
       name: 'Projecteigenaar'
       description: 'Volledige controle inclusief verwijderen (spiegel van ProjectRole owner).'

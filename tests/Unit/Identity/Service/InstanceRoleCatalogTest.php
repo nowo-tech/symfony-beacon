@@ -19,13 +19,21 @@ final class InstanceRoleCatalogTest extends TestCase
         }
 
         self::assertSame(
-            ['ROLE_PROJECT_VIEWER', 'ROLE_PROJECT_MEMBER', 'ROLE_PROJECT_ADMIN', 'ROLE_PROJECT_OWNER'],
+            [
+                'ROLE_PROJECT_VIEWER',
+                'ROLE_PROJECT_MEMBER',
+                'ROLE_PROJECT_ADMIN',
+                'ROLE_PROJECT_FULL',
+                'ROLE_PROJECT_OWNER',
+            ],
             array_keys($byCode),
         );
         self::assertSame(ProjectPermission::forRole(ProjectRole::Viewer), $byCode['ROLE_PROJECT_VIEWER']);
         self::assertSame(ProjectPermission::forRole(ProjectRole::Member), $byCode['ROLE_PROJECT_MEMBER']);
         self::assertSame(ProjectPermission::forRole(ProjectRole::Admin), $byCode['ROLE_PROJECT_ADMIN']);
+        self::assertSame(ProjectPermission::forRole(ProjectRole::Full), $byCode['ROLE_PROJECT_FULL']);
         self::assertSame(ProjectPermission::forRole(ProjectRole::Owner), $byCode['ROLE_PROJECT_OWNER']);
+        self::assertSame($byCode['ROLE_PROJECT_OWNER'], $byCode['ROLE_PROJECT_FULL']);
     }
 
     public function testSeededRolesOnlyUseProjectPermissionKeys(): void

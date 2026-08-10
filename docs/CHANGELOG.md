@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-08-10
+
+### Added
+
+- Project membership role **`full`**: same `project.*` matrix as `owner` (including `project.delete`) without primary ownership (transfer / last-owner). Spec `088-project-full-role`.
+- System InstanceRole mirror `ROLE_PROJECT_FULL` (seeded via `app:seed-platform`).
+- Admin Roles: block delete when the role still has assigned users (`flash.roles.in_use`); hide delete control in the UI.
+- Membership guard: cannot remove a `full` member until demoted (`flash.project.member_cannot_remove_full`).
+
+### Changed
+
+- Ownership transfer demotes the acting owner to **`full`** (was `admin`); transfer requires exact primary `Owner` (`requirePrimaryOwner()`).
+- Groups cannot be assigned `owner` or `full`.
+- Docs: `docs/product/ROLES.md`, specs `011` / `002` / `088`.
+
 ## [1.4.0] - 2026-08-10
 
 ### Added
@@ -810,7 +825,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.2.0...v1.3.0

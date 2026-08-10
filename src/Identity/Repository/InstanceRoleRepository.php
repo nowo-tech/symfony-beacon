@@ -6,6 +6,7 @@ namespace App\Identity\Repository;
 
 use App\Identity\Entity\InstanceRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -62,7 +63,19 @@ class InstanceRoleRepository extends ServiceEntityRepository
             ->andWhere('r = :role')
             ->setParameter('role', $role)
             ->getQuery()
+            ->setHint(Query::HINT_REFRESH, true)
             ->getResult();
+    }
+
+    public function countAssignedUsers(InstanceRole $role): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(u.id)')
+            ->innerJoin('r.users', 'u')
+            ->andWhere('r = :role')
+            ->setParameter('role', $role)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**

@@ -39,12 +39,13 @@ final class ProjectAccessTest extends TestCase
         self::assertFalse($access->grantsAny(ProjectPermission::SETTINGS_MANAGE, ProjectPermission::DELETE));
     }
 
-    public function testAdminCanOpenSettings(): void
+    public function testFullIsNotPrimaryOwnerButCanDelete(): void
     {
-        $access = new ProjectAccess(ProjectRole::Admin);
+        $access = new ProjectAccess(ProjectRole::Full);
 
+        self::assertTrue($access->canDeleteProject());
         self::assertTrue($access->canOpenSettings());
-        self::assertTrue($access->grantsAny(ProjectPermission::MEMBERS_MANAGE, ProjectPermission::DELETE));
-        self::assertFalse($access->grantsAny(ProjectPermission::DELETE));
+        self::assertFalse($access->isPrimaryOwner());
+        self::assertTrue((new ProjectAccess(ProjectRole::Owner))->isPrimaryOwner());
     }
 }

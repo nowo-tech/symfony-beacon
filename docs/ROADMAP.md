@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`). **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -300,6 +300,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.35 | **DRY refactor**: `OtlpIngestPipeline` + mappers; Project/Issue factories & normalizers; Twig shells; `make ensure-up`; platform `.checkbox` + password-toggle gap/eye | Beacon | `086-dry-refactor` | **Done** (v1.3.0) |
 | 6.35b | **FormKit host parity + 086 follow-up**: all host Form Types on `FormKitAbstractType`; demo via `ProjectFactory`; `OtlpIngestGatewayInterface`; unit tests for pipeline / hooks / factory | Beacon | extends `086` | **Done** (v1.3.1) |
 | 6.36 | **Security audit hardening**: show-once API DSN; seed-demo env gate; APP_SECRET fail-closed; metrics require-token default; fail-closed config import; high-entropy public keys; prod session cookies; Slack challenge reflector removed | Beacon | `087-security-audit-hardening` | **Done** (v1.4.0) |
+| 6.37 | **Project role `full`**: same `project.*` as owner without primary ownership; transfer demotes to full; InstanceRole delete blocked when users assigned | Beacon | `088-project-full-role` | **Done** (v1.5.0) |
 
 ### Next (immediate queue)
 
@@ -378,6 +379,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.3.0** | DRY maintainability (`086` / 6.35): OTLP pipeline, factories, Twig shells, `ensure-up`, platform checkboxes + password-toggle chrome |
 | **v1.3.1** | FormKit host-form parity; demo `ProjectFactory`; `OtlpIngestGatewayInterface`; unit tests (pipeline / hooks / factory) |
 | **v1.4.0** | Project `project.*` permissions + Admin Roles/Permissions UI; `/admin` settings URLs; security audit hardening (`087` / 6.36) |
+| **v1.5.0** | Project membership role `full` + InstanceRole delete-in-use guards (`088` / 6.37) |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -389,4 +391,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-10 (**v1.4.0** cut; `087` / 6.36 + project permissions RBAC).
+Last updated: 2026-08-10 (**v1.5.0** cut; `088` / 6.37 project role `full`).

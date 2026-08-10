@@ -227,9 +227,10 @@ flash:
     member_already: That user is already a project member.
     member_invalid_role: Invalid membership role.
     member_last_owner: The project must keep at least one owner.
-    member_cannot_manage_owner: Admins cannot change or remove owners.
+    member_cannot_remove_full: Change the full role to admin, member, or viewer before removing this member.
+    member_cannot_manage_owner: Admins cannot change or remove owners or full members.
     member_error: Could not update project members.
-    ownership_transferred: Project ownership transferred. You are now an admin.
+    ownership_transferred: Project ownership transferred. You are now a full member.
     transfer_confirmation_mismatch: Project name did not match. Ownership was not
       transferred.
     transfer_to_self: You cannot transfer ownership to yourself.
@@ -317,6 +318,7 @@ flash:
     deleted: Role deleted.
     code_taken: That role code is already in use.
     system_locked: System roles cannot be deleted.
+    in_use: This role is assigned to one or more users and cannot be deleted. Remove those assignments first.
     permissions_updated: Role permissions updated.
     user_not_found: No user found with that email.
     user_already: That user already has this role.
@@ -420,13 +422,14 @@ project:
     last_owner_hint: The project must keep at least one owner.
     role:
       owner: Owner
+      full: Full
       admin: Admin
       member: Member
       viewer: Viewer
   groups:
     title: Groups
     help: Link a group so every group member gets the chosen role on this project.
-      Owners must be added as individual users.
+      Owner and full roles must be assigned to individual users.
     empty: No groups linked yet.
     select: Select a group…
     add: Link group
@@ -1987,6 +1990,7 @@ tour:
     progress: '{{current}} of {{total}}'
   role:
     owner: owner
+    full: full
     admin: admin
     member: member
     viewer: viewer
@@ -2547,9 +2551,12 @@ roles:
     role_project_admin:
       name: 'Project admin'
       description: 'Members, API keys, settings, notifications, and share links (mirrors ProjectRole admin). Product access still requires project membership.'
+    role_project_full:
+      name: 'Project full'
+      description: 'Full project.* matrix including delete (mirrors ProjectRole full). Not primary owner — cannot transfer ownership. Product access still requires project membership.'
     role_project_owner:
       name: 'Project owner'
-      description: 'Full project control including delete (mirrors ProjectRole owner). Product access still requires project membership.'
+      description: 'Full project control including delete and primary ownership (mirrors ProjectRole owner). Product access still requires project membership.'
 permissions:
   title: Permissions
   intro: Capability keys for the shared catalog (built-in project.* membership keys).

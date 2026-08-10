@@ -65,7 +65,7 @@ final class ProjectPermission
     }
 
     /**
-     * Permissions granted by a membership role (viewer ⊂ member ⊂ admin ⊂ owner).
+     * Permissions granted by a membership role (viewer ⊂ member ⊂ admin ⊂ full = owner).
      *
      * @return list<string>
      */
@@ -88,7 +88,7 @@ final class ProjectPermission
                 self::NOTIFICATIONS_MANAGE,
                 self::SHARE_LINKS_MANAGE,
             ],
-            ProjectRole::Owner => self::allValues(),
+            ProjectRole::Full, ProjectRole::Owner => self::allValues(),
         };
     }
 

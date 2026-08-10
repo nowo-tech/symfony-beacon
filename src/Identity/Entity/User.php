@@ -647,6 +647,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
     {
         if (!$this->instanceRoles->contains($role)) {
             $this->instanceRoles->add($role);
+            if (!$role->getUsers()->contains($this)) {
+                $role->getUsers()->add($this);
+            }
         }
 
         return $this;
@@ -654,7 +657,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
 
     public function removeInstanceRole(InstanceRole $role): self
     {
-        $this->instanceRoles->removeElement($role);
+        if ($this->instanceRoles->removeElement($role)) {
+            $role->getUsers()->removeElement($this);
+        }
 
         return $this;
     }
