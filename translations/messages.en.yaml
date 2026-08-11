@@ -417,8 +417,14 @@ project:
   config:
     title: Export / import project
     help: 'Portable JSON for this project (code: %code%). Includes memberships by email; never includes API secrets.'
+    tabs_label: Export or import
+    tab_export: Export
+    tab_import: Import
+    export_help: Download a JSON bundle for this project. API secrets are never included.
+    import_help: Choose a beacon-project-bundle JSON file. Only this project is updated when the code matches.
     export: Export JSON
     import: Import JSON
+    file: JSON file
     panel_note: Import updates this project only when the bundle code matches. Unknown emails are skipped (users are not created here).
   members:
     title: Members
@@ -1775,9 +1781,15 @@ admin_projects:
   config:
     title: Export / import projects
     help: Download all projects as JSON, or import a bundle. Missing users are created disabled (identified by email).
+    tabs_label: Export or import
+    tab_export: Export
+    tab_import: Import
+    export_help: Download every project as a beacon-project-bundle JSON file.
+    import_help: Upload a bundle to upsert projects by code. Missing users are created disabled.
     export_all: Export all JSON
     export_one: Export JSON
     import: Import JSON
+    file: JSON file
     note: Idempotent by project code. API key secrets are never included.
   col:
     project: Project

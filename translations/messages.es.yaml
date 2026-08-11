@@ -423,8 +423,14 @@ project:
   config:
     title: Exportar / importar proyecto
     help: 'JSON portable de este proyecto (código: %code%). Incluye membresías por email; nunca incluye secretos de API.'
+    tabs_label: Exportar o importar
+    tab_export: Exportar
+    tab_import: Importar
+    export_help: Descarga un paquete JSON de este proyecto. Los secretos de API nunca se incluyen.
+    import_help: Elige un archivo JSON beacon-project-bundle. Solo se actualiza este proyecto si el código coincide.
     export: Exportar JSON
     import: Importar JSON
+    file: Archivo JSON
     panel_note: La importación solo actualiza este proyecto si el código coincide. Los emails desconocidos se omiten (aquí no se crean usuarios).
   members:
     title: Miembros
@@ -1635,9 +1641,15 @@ admin_projects:
   config:
     title: Exportar / importar proyectos
     help: Descarga todos los proyectos como JSON o importa un paquete. Los usuarios que falten se crean desactivados (identificados por email).
+    tabs_label: Exportar o importar
+    tab_export: Exportar
+    tab_import: Importar
+    export_help: Descarga todos los proyectos como un archivo JSON beacon-project-bundle.
+    import_help: Sube un paquete para hacer upsert por código. Los usuarios que falten se crean desactivados.
     export_all: Exportar todo JSON
     export_one: Exportar JSON
     import: Importar JSON
+    file: Archivo JSON
     note: Idempotente por código de proyecto. Los secretos de API nunca se incluyen.
   col:
     project: Proyecto

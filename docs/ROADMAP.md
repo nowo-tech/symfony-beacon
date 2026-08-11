@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`); **v1.5.1** polishes owner-row membership UI and kit admin modal chrome. **v1.6.0** adds project config export/import **6.38** (`089`), DSN UUID path, and AuthKit 1.16. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`); **v1.5.1** polishes owner-row membership UI and kit admin modal chrome. **v1.6.0** adds project config export/import **6.38** (`089`), DSN UUID path, and AuthKit 1.16. **v1.6.1** hardens ingest gate / config import + Mercure JWT guard; **v1.6.2** tabs the export/import Settings card. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -383,6 +383,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.5.0** | Project membership role `full` + InstanceRole delete-in-use guards (`088` / 6.37) |
 | **v1.5.1** | Owner membership row UI (no edit/remove); kit admin `.nowo-ui-modal` Beacon chrome |
 | **v1.6.0** | Project config export/import (`089` / 6.38); DSN UUID path; AuthKit 1.16 magic-login confirm; revoked API keys hide DSN |
+| **v1.6.1** | IngestProjectAccessGate; config import N+1 + ownership guards; Mercure JWT secret fail-closed; notify/threshold query batching; Dashboard Menu 2.1.1 / Cookie Consent 1.6.2 |
+| **v1.6.2** | Export/import Settings + Admin projects card uses Export \| Import tabs |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -394,4 +396,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-11 (**v1.6.0** cut; project config export/import `089` / 6.38).
+Last updated: 2026-08-11 (**v1.6.2** cut; export/import Settings tabs).

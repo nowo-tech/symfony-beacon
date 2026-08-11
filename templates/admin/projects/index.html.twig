@@ -82,17 +82,87 @@
     {% endblock %}
 {% endembed %}
 
-<section class="panel mt-6">
+<section class="panel mt-6" data-testid="admin-projects-config-portability">
     <h2 class="mb-2 text-lg font-semibold">{{ 'admin_projects.config.title'|trans }}</h2>
     <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.help'|trans }}</p>
-    <div class="flex flex-wrap items-center gap-3">
-        <a class="btn-ghost no-underline" href="{{ path('admin_projects_export') }}">{{ 'admin_projects.config.export_all'|trans }}</a>
-        <form method="post" action="{{ path('admin_projects_import') }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
-            <input type="hidden" name="_token" value="{{ csrf_token('admin_projects_import') }}">
-            <input class="input" type="file" name="bundle" accept="application/json,.json" required>
-            <button class="btn-primary" type="submit">{{ 'admin_projects.config.import'|trans }}</button>
-        </form>
+
+    <div
+        data-controller="tabs"
+        data-tabs-active-tab-value="admin-projects-config-export"
+        class="grid gap-3"
+    >
+        <nav
+            role="tablist"
+            aria-label="{{ 'admin_projects.config.tabs_label'|trans|e('html_attr') }}"
+            class="flex h-auto w-full flex-wrap justify-start gap-1 border-b border-[var(--color-sand)]"
+        >
+            <button
+                type="button"
+                id="tab-admin-projects-config-export"
+                data-action="click->tabs#open"
+                data-tabs-target="trigger"
+                data-tab-id="admin-projects-config-export"
+                role="tab"
+                aria-controls="tab-admin-projects-config-export-panel"
+                aria-selected="true"
+                data-active
+                class="relative inline-flex min-w-10 items-center justify-center px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink)]/55 transition-colors hover:text-[var(--color-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] data-[active]:text-[var(--color-ink)] data-[active]:after:absolute data-[active]:after:inset-x-0 data-[active]:after:bottom-[-1px] data-[active]:after:h-0.5 data-[active]:after:bg-[var(--color-ink)]"
+            >{{ 'admin_projects.config.tab_export'|trans }}</button>
+            <button
+                type="button"
+                id="tab-admin-projects-config-import"
+                data-action="click->tabs#open"
+                data-tabs-target="trigger"
+                data-tab-id="admin-projects-config-import"
+                role="tab"
+                aria-controls="tab-admin-projects-config-import-panel"
+                aria-selected="false"
+                class="relative inline-flex min-w-10 items-center justify-center px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink)]/55 transition-colors hover:text-[var(--color-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] data-[active]:text-[var(--color-ink)] data-[active]:after:absolute data-[active]:after:inset-x-0 data-[active]:after:bottom-[-1px] data-[active]:after:h-0.5 data-[active]:after:bg-[var(--color-ink)]"
+            >{{ 'admin_projects.config.tab_import'|trans }}</button>
+        </nav>
+
+        <div
+            id="tab-admin-projects-config-export-panel"
+            data-tabs-target="tab"
+            data-tab-id="admin-projects-config-export"
+            role="tabpanel"
+            aria-labelledby="tab-admin-projects-config-export"
+            data-active
+            data-state="active"
+        >
+            <div class="grid gap-3 pt-1">
+                <p class="text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.export_help'|trans }}</p>
+                <div>
+                    <a class="btn-primary no-underline" href="{{ path('admin_projects_export') }}">{{ 'admin_projects.config.export_all'|trans }}</a>
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="tab-admin-projects-config-import-panel"
+            data-tabs-target="tab"
+            data-tab-id="admin-projects-config-import"
+            role="tabpanel"
+            aria-labelledby="tab-admin-projects-config-import"
+            data-state="inactive"
+            class="hidden"
+            hidden
+        >
+            <div class="grid gap-3 pt-1">
+                <p class="text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.import_help'|trans }}</p>
+                <form method="post" action="{{ path('admin_projects_import') }}" enctype="multipart/form-data" class="grid gap-3 sm:max-w-md">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_projects_import') }}">
+                    <label class="grid gap-1.5">
+                        <span class="text-sm font-medium text-[var(--color-ink)]">{{ 'admin_projects.config.file'|trans }}</span>
+                        <input class="input" type="file" name="bundle" accept="application/json,.json" required>
+                    </label>
+                    <div>
+                        <button class="btn-primary" type="submit">{{ 'admin_projects.config.import'|trans }}</button>
+                    </div>
+                </form>
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.config.note'|trans }}</p>
+            </div>
+        </div>
     </div>
-    <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.config.note'|trans }}</p>
 </section>
 {% endblock %}
