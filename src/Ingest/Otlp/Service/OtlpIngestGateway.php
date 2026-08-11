@@ -5,19 +5,14 @@ declare(strict_types=1);
 namespace App\Ingest\Otlp\Service;
 
 use App\Ingest\Service\EnvelopeAuthParser;
-use App\Ingest\Service\IngestRateLimiter;
+use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ops\Metrics\MetricsCollector;
-use App\Project\Entity\Project;
-use App\Project\Entity\ProjectApiKey;
-use App\Project\Repository\ProjectApiKeyRepository;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Shared OTLP HTTP ingress gate: body limits, auth, project governance, rate limit, metrics.
+ * Shared OTLP HTTP ingress gate: body limits, auth parse, project access, metrics.
  *
  * Controllers keep OpenAPI attributes and signal-specific mapping/dispatch only.
  */
@@ -25,10 +20,7 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
 {
     public function __construct(
         private EnvelopeAuthParser $authParser,
-        private ProjectRepository $projectRepository,
-        private ProjectApiKeyRepository $apiKeyRepository,
-        private IngestRateLimiter $ingestRateLimiter,
-        private ProjectGovernanceResolver $governanceResolver,
+        private IngestProjectAccessGate $projectAccessGate,
         private MetricsCollector $metricsCollector,
         private InstanceOpsDefaults $opsDefaults,
     ) {
@@ -37,7 +29,7 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
     /**
      * Validate request and authorize ingest for `{projectId}` (UUID or legacy numeric id).
      *
-     * @return Response|array{project: Project, body: string} Error response, or accepted body + project
+     * @return Response|array{project: \App\Project\Entity\Project, body: string} Error response, or accepted body + project
      */
     public function accept(string $projectRef, Request $request): Response|array
     {
@@ -57,60 +49,18 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
             );
         }
 
-        $pathProject = $this->projectRepository->findOneByIngestPath($projectRef);
-        if (!$pathProject instanceof Project || null === $pathProject->getId()) {
-            return $this->respond('project not found', Response::HTTP_NOT_FOUND);
-        }
-        $projectId = $pathProject->getId();
-
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
             '',
         );
 
-        if (null === $auth['public_key']) {
-            return $this->respond('missing authorization information', Response::HTTP_UNAUTHORIZED);
-        }
-
-        $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['public_key']);
-        if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
-            return $this->respond('forbidden', Response::HTTP_FORBIDDEN);
-        }
-
-        $project = $apiKey->getProject();
-        $storedSecret = $apiKey->getSecretKey();
-        $providedSecret = $auth['secret_key'];
-        if (null === $storedSecret || '' === $storedSecret
-            || null === $providedSecret || !hash_equals($storedSecret, $providedSecret)
-        ) {
-            return $this->respond('forbidden', Response::HTTP_FORBIDDEN);
-        }
-
-        if (!$project->isIngestEnabled()) {
-            return $this->respond('ingest disabled', Response::HTTP_FORBIDDEN);
-        }
-
-        if ($this->governanceResolver->isDailyQuotaExceeded($project)) {
-            return $this->respond('daily event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
-                'Retry-After' => '60',
-            ]);
-        }
-
-        if ($this->governanceResolver->isMonthlyQuotaExceeded($project)) {
-            return $this->respond('monthly event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
-                'Retry-After' => '3600',
-            ]);
-        }
-
-        $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
-        if (!$this->ingestRateLimiter->accept($projectId, $rateLimit)) {
-            return $this->respond('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, [
-                'Retry-After' => '60',
-            ]);
+        $access = $this->projectAccessGate->authorize($projectRef, $auth['public_key'], $auth['secret_key']);
+        if (!$access['ok']) {
+            return $this->respond($access['message'], $access['status'], $access['headers']);
         }
 
         return [
-            'project' => $project,
+            'project' => $access['project'],
             'body' => $body,
         ];
     }

@@ -8,13 +8,8 @@ use App\Ingest\IngestRouteRequirements;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ingest\Service\IngestQueryAuthSettings;
-use App\Ingest\Service\IngestRateLimiter;
-use App\Project\Entity\Project;
-use App\Project\Entity\ProjectApiKey;
-use App\Project\Repository\ProjectApiKeyRepository;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\ProjectGovernanceResolver;
 use App\Ops\Metrics\MetricsCollector;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
@@ -45,10 +40,7 @@ ENVELOPE;
     public function __construct(
         private EnvelopeAuthParser $authParser,
         private EnvelopeParser $envelopeParser,
-        private ProjectRepository $projectRepository,
-        private ProjectApiKeyRepository $apiKeyRepository,
-        private IngestRateLimiter $ingestRateLimiter,
-        private ProjectGovernanceResolver $governanceResolver,
+        private IngestProjectAccessGate $projectAccessGate,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
         private MetricsCollector $metricsCollector,
@@ -190,12 +182,6 @@ MD,
             return new Response('envelope too large', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
 
-        $pathProject = $this->projectRepository->findOneByIngestPath($projectId);
-        if (!$pathProject instanceof Project || null === $pathProject->getId()) {
-            return $this->ingestResponse('project not found', Response::HTTP_NOT_FOUND, false);
-        }
-        $numericProjectId = $pathProject->getId();
-
         $envelopeDsn = null;
         try {
             $headerLine = strtok(str_replace("\r\n", "\n", $body), "\n") ?: '';
@@ -213,7 +199,7 @@ MD,
         $usedQueryAuth = $this->authParser->queryContainsCredentials($queryString);
         if ($usedQueryAuth) {
             $this->logger->warning('Deprecated Envelope ingest auth via query string; prefer X-Beacon-Auth or envelope dsn.', [
-                'project_id' => $numericProjectId,
+                'project_ref' => $projectId,
                 'client_ip' => $request->getClientIp(),
             ]);
             if ($this->queryAuthSettings->shouldRejectQueryAuth()) {
@@ -231,24 +217,13 @@ MD,
             $envelopeDsn,
         );
 
-        if (null === $auth['public_key']) {
-            return $this->ingestResponse('missing authorization information', Response::HTTP_UNAUTHORIZED, $usedQueryAuth);
+        $access = $this->projectAccessGate->authorizeCredentials($projectId, $auth['public_key'], $auth['secret_key']);
+        if (!$access['ok']) {
+            return $this->ingestResponse($access['message'], $access['status'], $usedQueryAuth, $access['headers']);
         }
 
-        $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['public_key']);
-        if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $numericProjectId) {
-            return $this->ingestResponse('forbidden', Response::HTTP_FORBIDDEN, $usedQueryAuth);
-        }
-
-        $project = $apiKey->getProject();
-
-        $storedSecret = $apiKey->getSecretKey();
-        $providedSecret = $auth['secret_key'];
-        if (null === $storedSecret || '' === $storedSecret
-            || null === $providedSecret || !hash_equals($storedSecret, $providedSecret)
-        ) {
-            return $this->ingestResponse('forbidden', Response::HTTP_FORBIDDEN, $usedQueryAuth);
-        }
+        $project = $access['project'];
+        $numericProjectId = $access['project_id'];
 
         // Validate parseability early (fail fast) without doing heavy work.
         try {
@@ -262,27 +237,9 @@ MD,
             return $this->ingestResponse('invalid envelope', Response::HTTP_BAD_REQUEST, $usedQueryAuth);
         }
 
-        if (!$project->isIngestEnabled()) {
-            return $this->ingestResponse('ingest disabled', Response::HTTP_FORBIDDEN, $usedQueryAuth);
-        }
-
-        if ($this->governanceResolver->isDailyQuotaExceeded($project)) {
-            return $this->ingestResponse('daily event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
-                'Retry-After' => '60',
-            ]);
-        }
-
-        if ($this->governanceResolver->isMonthlyQuotaExceeded($project)) {
-            return $this->ingestResponse('monthly event quota exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
-                'Retry-After' => '3600',
-            ]);
-        }
-
-        $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
-        if (!$this->ingestRateLimiter->accept($numericProjectId, $rateLimit)) {
-            return $this->ingestResponse('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
-                'Retry-After' => '60',
-            ]);
+        $allowed = $this->projectAccessGate->assertIngestAllowed($project);
+        if (!$allowed['ok']) {
+            return $this->ingestResponse($allowed['message'], $allowed['status'], $usedQueryAuth, $allowed['headers']);
         }
 
         $this->bus->dispatch(new ProcessEnvelopeMessage(

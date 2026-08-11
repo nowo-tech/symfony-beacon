@@ -26,3 +26,4 @@
 - [x] ROADMAP / CHANGELOG note `089` / 6.38 (**v1.6.0**)
 - [x] Related specs amended (`002`, `018`, `019`, `044`)
 - [x] UPGRADING from 1.5.1 → 1.6.0
+- [x] Post-ship N+1 amendment (2026-08-11): batch hydrate / email prefetch / `PortableUserProvisioner` documented in `spec.md`

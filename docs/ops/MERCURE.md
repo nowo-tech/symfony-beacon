@@ -82,7 +82,7 @@ MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
 
 Keep publisher and subscriber keys **identical** to `MERCURE_JWT_SECRET` unless you intentionally run a custom split-key setup (not required for Beacon).
 
-**Production (`compose.prod.yaml`):** `MERCURE_JWT_SECRET` and `DEFAULT_URI` are required (`:?` interpolation). Do not ship the `.env.dist` placeholder.
+**Production (`compose.prod.yaml`):** `MERCURE_JWT_SECRET` and `DEFAULT_URI` are required (`:?` interpolation). Do not ship the `.env.dist` placeholder — outside `dev`/`test`, `SiteBackupSecurityDefaultsGuard` rejects that placeholder (and values shorter than 32 characters when the env var is set).
 
 ---
 

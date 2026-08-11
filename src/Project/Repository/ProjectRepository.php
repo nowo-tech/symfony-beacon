@@ -74,17 +74,70 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * Load projects by public UUID in one query (admin config export selection).
+     *
+     * @param list<string> $uuids
+     *
+     * @return list<Project>
+     */
+    public function findByUuids(array $uuids): array
+    {
+        $normalized = [];
+        foreach ($uuids as $uuid) {
+            $uuid = trim($uuid);
+            if ('' !== $uuid) {
+                $normalized[$uuid] = true;
+            }
+        }
+        $list = array_keys($normalized);
+        if ([] === $list) {
+            return [];
+        }
+
+        /** @var list<Project> $projects */
+        $projects = $this->createQueryBuilder('p')
+            ->andWhere('p.uuid IN (:uuids)')
+            ->setParameter('uuids', $list)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $projects;
+    }
+
+    /**
+     * Eager-load memberships + users for config export/import (avoids N+1).
+     *
+     * @param list<Project> $projects
+     */
+    public function hydrateMembershipsForProjects(array $projects): void
+    {
+        $ids = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null !== $id) {
+                $ids[] = $id;
+            }
+        }
+        if ([] === $ids) {
+            return;
+        }
+
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.memberships', 'm')->addSelect('m')
+            ->leftJoin('m.user', 'mu')->addSelect('mu')
+            ->andWhere('p.id IN (:ids)')
+            ->setParameter('ids', array_values(array_unique($ids)))
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Hydrate settings/admin associations without cartesian products across collections.
      */
     public function hydrateAccessGraph(Project $project): void
     {
-        $this->createQueryBuilder('p')
-            ->leftJoin('p.memberships', 'm')->addSelect('m')
-            ->leftJoin('m.user', 'mu')->addSelect('mu')
-            ->andWhere('p = :project')
-            ->setParameter('project', $project)
-            ->getQuery()
-            ->getResult();
+        $this->hydrateMembershipsForProjects([$project]);
 
         $this->createQueryBuilder('p')
             ->leftJoin('p.groupAccesses', 'ga')->addSelect('ga')

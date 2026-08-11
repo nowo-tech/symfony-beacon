@@ -62,6 +62,11 @@ As a security reviewer, OTLP never accepts query-string credentials and never pu
 - Shared gate/map/dispatch for all three signals: **`086-dry-refactor`** (`OtlpIngestPipeline` + `OtlpSignalMapperInterface`; HTTP contracts unchanged).
 - gRPC / protobuf / Bundle exporter / Performance TSDB: ROADMAP **Later**.
 
+## Amendment (`IngestProjectAccessGate`, 2026-08-11)
+
+- Credential + ingest-allowed checks for OTLP and Envelope share `IngestProjectAccessGate` (reduces auth/governance drift). OTLP still goes through `OtlpIngestPipeline` for map/dispatch; HTTP contracts unchanged.
+- Cross-links: `003-ingest`, `086-dry-refactor`.
+
 ## Assumptions
 
 - Clients speak OTLP/HTTP JSON (`resourceLogs` camelCase; snake_case accepted as alias).

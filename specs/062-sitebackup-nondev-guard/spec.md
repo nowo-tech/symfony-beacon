@@ -21,6 +21,11 @@ Fail closed in **every environment except `dev` and `test`**.
 6. Outside `dev`/`test`, empty `APP_SECRET`, the documented `.env.dist` value `ChangeMePleaseUseARealSecret`, or secrets shorter than **16** characters MUST also fail closed (same guard).
 7. Unit tests cover APP_SECRET documented-default and short-secret reject for `prod`/`staging`.
 
+## Amendment (`MERCURE_JWT_SECRET`, 2026-08-11)
+
+8. Outside `dev`/`test`, when `MERCURE_JWT_SECRET` is **set** (non-empty after trim), it MUST NOT equal the documented `.env.dist` / compose placeholder `!ChangeThisMercureHubJWTSecretKey!`, and MUST be at least **32** characters. Empty env (Mercure unused; admin DB override may still apply) MUST remain allowed.
+9. Unit tests cover documented-default and short Mercure secret reject for `prod`/`staging`. Docs: `docs/PRODUCTION.md`, `docs/ops/MERCURE.md`.
+
 ## Out of scope
 
 - Share-link max uses (`061`)

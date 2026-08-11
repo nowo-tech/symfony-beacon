@@ -65,3 +65,8 @@ As ingest, I store full `payload` and promote common columns (see `010-rich-even
 - **SC-001**: PHPUnit covers auth rejection (missing key, missing secret when required), multi-request ingest with durable Halite test key, async processing happy path, and resolved/ignored reopen.
 - **SC-002**: Constitution ingest latency principle remains satisfied (ACK before heavy work).
 - **SC-003**: Queued `ProcessEnvelopeMessage` bodies MUST NOT retain envelope-header `dsn` after successful auth.
+
+## Amendment (`IngestProjectAccessGate`, 2026-08-11)
+
+- Envelope HTTP auth + governance/rate checks share `App\Ingest\Service\IngestProjectAccessGate` with OTLP (`authorizeCredentials` + `assertIngestAllowed`). Controllers keep body-size limits, auth parsing, and response shaping.
+- Cross-links: `067-otlp-ingest`, `086-dry-refactor`.

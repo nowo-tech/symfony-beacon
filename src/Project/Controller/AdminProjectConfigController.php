@@ -41,17 +41,14 @@ final class AdminProjectConfigController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $ids = $request->query->all('ids');
-        if (\is_array($ids) && [] !== $ids) {
-            $projects = [];
+        if ([] !== $ids) {
+            $uuids = [];
             foreach ($ids as $uuid) {
-                if (!\is_string($uuid) || '' === $uuid) {
-                    continue;
-                }
-                $project = $this->projectRepository->findOneBy(['uuid' => $uuid]);
-                if ($project instanceof Project) {
-                    $projects[] = $project;
+                if (\is_string($uuid) && '' !== $uuid) {
+                    $uuids[] = $uuid;
                 }
             }
+            $projects = $this->projectRepository->findByUuids($uuids);
         } else {
             $projects = $this->projectRepository->findAllOrdered();
         }

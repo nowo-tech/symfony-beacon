@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.6.0)](#unreleased-main-after-160)
+- [Unreleased (main after 1.6.1)](#unreleased-main-after-161)
+- [Upgrading from 1.6.0 to 1.6.1](#upgrading-from-160-to-161)
 - [Upgrading from 1.5.1 to 1.6.0](#upgrading-from-151-to-160)
 - [Upgrading from 1.5.0 to 1.5.1](#upgrading-from-150-to-151)
 - [Upgrading from 1.4.0 to 1.5.0](#upgrading-from-140-to-150)
@@ -53,9 +54,29 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.6.0)
+## Unreleased (main after 1.6.1)
 
-No further upgrade steps yet — follow [Upgrading from 1.5.1 to 1.6.0](#upgrading-from-151-to-160) when moving off **1.5.1**.
+No further upgrade steps yet — follow [Upgrading from 1.6.0 to 1.6.1](#upgrading-from-160-to-161) when moving off **1.6.0**.
+
+## Upgrading from 1.6.0 to 1.6.1
+
+**Perf / ingest DRY / Mercure JWT guard + kit pins.** Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.6.1   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # no new migrations for this release
+make vite-build         # if frontend lockfile / assets changed in your tree
+```
+
+### Notes
+
+- No Doctrine schema or seed changes required.
+- Kit pins: Dashboard Menu **2.1.1**, Cookie Consent **1.6.2**.
+- Outside `dev`/`test`, if `MERCURE_JWT_SECRET` is set it must not be the `.env.dist` placeholder and must be at least 32 characters (`SiteBackupSecurityDefaultsGuard`). Empty remains allowed when Mercure is unused.
+- Project config export/import: N+1 fixes are transparent. Panel import still cannot promote to `owner`/`full`; import (panel or admin) will not demote/deactivate the last active owner.
 
 ## Upgrading from 1.5.1 to 1.6.0
 

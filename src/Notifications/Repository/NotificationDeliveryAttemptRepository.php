@@ -114,4 +114,41 @@ final class NotificationDeliveryAttemptRepository extends ServiceEntityRepositor
             $em->remove($attempt);
         }
     }
+
+    /**
+     * Delete attempts beyond the newest `$keep` rows without hydrating the full collection.
+     */
+    public function trimOlderThanKeep(NotificationDestination $destination, int $keep): int
+    {
+        $destinationId = $destination->getId();
+        if (null === $destinationId) {
+            return 0;
+        }
+
+        $limit = max(1, $keep);
+
+        /** @var list<int|string> $keepIds */
+        $keepIds = $this->createQueryBuilder('a')
+            ->select('a.id')
+            ->andWhere('a.destination = :destination')
+            ->setParameter('destination', $destination)
+            ->orderBy('a.attemptedAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        if ([] === $keepIds) {
+            return 0;
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->delete(NotificationDeliveryAttempt::class, 'a')
+            ->andWhere('a.destination = :destination')
+            ->andWhere('a.id NOT IN (:keepIds)')
+            ->setParameter('destination', $destination)
+            ->setParameter('keepIds', $keepIds);
+
+        return (int) $qb->getQuery()->execute();
+    }
 }

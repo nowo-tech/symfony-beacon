@@ -66,3 +66,7 @@ As a project admin, I can see that a threshold fired (last fire time / failure) 
 - Native PagerDuty.
 - ML-based anomaly detection.
 - Instance-wide cross-project thresholds.
+
+## Amendment (batch COUNT, 2026-08-11)
+
+- `VolumeThresholdEvaluator` batches `COUNT` queries by `(environment, release, windowMinutes)` so multiple rules sharing the same scope share one `countReceivedSince` call per evaluate pass (notify-worker N+1 reduction). Behaviour and cooldown semantics unchanged.

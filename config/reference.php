@@ -1733,6 +1733,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     form_action?: scalar|Param|null, // Optional route name used as the form action URL. // Default: null
  *     csrf_protection?: bool|Param, // Enable CSRF protection on the consent form. // Default: true
  *     disabled_routes?: list<scalar|Param|null>,
+ *     skip_render_routes?: list<scalar|Param|null>,
  *     route_targeting_mode?: "all"|"only"|"except"|Param, // Controls where the modal auto-opens: all pages, only listed routes, or all except listed routes. // Default: "all"
  *     target_routes?: list<scalar|Param|null>,
  *     default_locale?: scalar|Param|null, // Fallback locale when no supported language can be detected. // Default: "en"

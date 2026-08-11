@@ -27,7 +27,7 @@ final readonly class NotificationDeliveryHistoryRecorder
 
         $destination->recordDeliverySuccess($timestamp);
         $this->attemptRepository->record($destination, true, attemptedAt: $timestamp);
-        $this->attemptRepository->removeAll($destination->trimDeliveryAttempts($this->opsDefaults->deliveryHistoryLimit()));
+        $this->attemptRepository->trimOlderThanKeep($destination, $this->opsDefaults->deliveryHistoryLimit());
     }
 
     public function recordFailure(
@@ -40,6 +40,6 @@ final readonly class NotificationDeliveryHistoryRecorder
         $destination->recordDeliveryFailure($error, $timestamp);
         $this->circuitBreaker->onFailure($destination, $timestamp);
         $this->attemptRepository->record($destination, false, $error, $timestamp);
-        $this->attemptRepository->removeAll($destination->trimDeliveryAttempts($this->opsDefaults->deliveryHistoryLimit()));
+        $this->attemptRepository->trimOlderThanKeep($destination, $this->opsDefaults->deliveryHistoryLimit());
     }
 }

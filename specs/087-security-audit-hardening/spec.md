@@ -100,7 +100,7 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 - **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). **Active** keys MAY list a copyable DSN when the secret is available. **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
 - **FR-002**: `app:seed-demo` MUST refuse non-local environments unless `--allow-non-local`; stable DEMO_* material MUST be local-only.
-- **FR-003**: Outside `dev`/`test`, APP_SECRET MUST NOT be empty, MUST NOT equal the documented `.env.dist` default, and MUST be at least 16 characters (`SiteBackupSecurityDefaultsGuard`, extending `062`).
+- **FR-003**: Outside `dev`/`test`, APP_SECRET MUST NOT be empty, MUST NOT equal the documented `.env.dist` default, and MUST be at least 16 characters (`SiteBackupSecurityDefaultsGuard`, extending `062`). When `MERCURE_JWT_SECRET` is set, it MUST NOT equal the documented Mercure placeholder and MUST be at least 32 characters (empty allowed when Mercure unused; see `062` Mercure amendment).
 - **FR-004**: New instance settings MUST default `metrics_require_token` to true; column DB default MUST match for new rows.
 - **FR-005**: Instance config import MUST ignore inbound values that would weaken the four security-sensitive booleans listed in Scope S5; tightening MUST remain allowed.
 - **FR-006**: Newly generated API public keys MUST use cryptographically strong random identifiers (not human-friendly adjective-noun tokens).
@@ -118,6 +118,10 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 ## Amendment (API key DSN listing, 2026-08-11)
 
 As-built product UX lists a copyable DSN under **active** keys for managers (recoverability) while keeping the create/rotate one-shot banner. **Revoked** keys remain redacted. Supersedes the stricter “never re-embed on ordinary GET” reading of original FR-001 for active keys only; inactive-key redaction is mandatory. Cross-links: `002` FR-003, `018` FR-003 / FR-004.
+
+## Amendment (`MERCURE_JWT_SECRET` bootstrap, 2026-08-11)
+
+Extends FR-003 / `062`: `SiteBackupSecurityDefaultsGuard` rejects documented / short `MERCURE_JWT_SECRET` outside `dev`/`test` when the env var is set. Covered by `SiteBackupSecurityDefaultsGuardTest`. Docs: PRODUCTION.md, MERCURE.md.
 
 ## Related
 

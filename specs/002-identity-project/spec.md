@@ -120,4 +120,8 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - **SC-005**: Platform seed + Admin permissions UI cover **8** built-in `project.*` keys and **5** system project-mirror roles (`ROLE_PROJECT_VIEWER` / `MEMBER` / `ADMIN` / `FULL` / `OWNER`); leftover `admin.*` rows and legacy operator InstanceRoles are removed; `ProjectPermission` / `InstanceRoleCatalog` / `AdminInstanceRbacTest` assert catalog keys, role matrices, and closed dialogs on `/admin/permissions`.
 - **SC-006**: Viewer cannot open Settings (403) and does not see the Settings nav tab; Settings panels and mutation forms are Twig-gated per FR-014 and controller-enforced per FR-013; owner/admin Settings + API key DSN visibility (active vs inactive) covered (`ProjectApiKeyVisibilityTest`); Twig extension unit-tested (`ProjectPermissionTwigExtensionTest`).
 
+## Amendment (`089` Identity boundary, 2026-08-11)
+
+- Disabled user creation for admin project-config import lives in Identity `PortableUserProvisioner` (not Project). Batch email lookup: `UserRepository::findIndexedByEmails`. Details: `089-project-config-export` N+1 amendment.
+
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

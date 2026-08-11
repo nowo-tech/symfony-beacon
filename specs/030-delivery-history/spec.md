@@ -41,3 +41,7 @@ As an operator, retention of delivery rows is bounded per destination so the tab
 
 - Full searchable log warehouse / ELK.
 - Payload body archival of every notification.
+
+## Amendment (SQL trim, 2026-08-11)
+
+- Prune uses `NotificationDeliveryAttemptRepository::trimOlderThanKeep` (SQL `DELETE` of excess ids) instead of hydrating the full attempt collection on the notify worker. FR-002 / SC-002 semantics unchanged (keep newest N per destination).

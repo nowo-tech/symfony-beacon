@@ -40,6 +40,8 @@ final readonly class VolumeThresholdEvaluator
     /**
      * Evaluate once per unique environment/release pair (loads rules a single time).
      *
+     * COUNT queries are batched by (environment, release, windowMinutes).
+     *
      * @param list<array{0: ?string, 1: ?string}> $contexts
      */
     public function evaluateContexts(
@@ -57,8 +59,10 @@ final readonly class VolumeThresholdEvaluator
             return;
         }
 
-        $updated = false;
+        /** @var array<int, true> $checkedRuleIds */
         $checkedRuleIds = [];
+        /** @var array<string, array{environment: ?string, release: ?string, window: int, rules: list<ProjectThresholdRule>}> $countGroups */
+        $countGroups = [];
 
         foreach ($contexts as [$eventEnvironment, $eventReleaseVersion]) {
             $eventEnvironment = ProjectThresholdRule::normalizeEnvironment($eventEnvironment);
@@ -80,14 +84,33 @@ final readonly class VolumeThresholdEvaluator
                     $checkedRuleIds[$ruleId] = true;
                 }
 
-                $since = $now->modify(\sprintf('-%d minutes', $rule->getWindowMinutes()));
-                $actualCount = $this->eventRepository->countReceivedSince(
-                    $project,
-                    $since,
-                    $rule->getEnvironment(),
-                    $rule->getReleaseVersion(),
-                );
+                $environment = $rule->getEnvironment();
+                $release = $rule->getReleaseVersion();
+                $window = $rule->getWindowMinutes();
+                $groupKey = ($environment ?? '')."\0".($release ?? '')."\0".$window;
+                if (!isset($countGroups[$groupKey])) {
+                    $countGroups[$groupKey] = [
+                        'environment' => $environment,
+                        'release' => $release,
+                        'window' => $window,
+                        'rules' => [],
+                    ];
+                }
+                $countGroups[$groupKey]['rules'][] = $rule;
+            }
+        }
 
+        $updated = false;
+        foreach ($countGroups as $group) {
+            $since = $now->modify(\sprintf('-%d minutes', $group['window']));
+            $actualCount = $this->eventRepository->countReceivedSince(
+                $project,
+                $since,
+                $group['environment'],
+                $group['release'],
+            );
+
+            foreach ($group['rules'] as $rule) {
                 if ($actualCount < $rule->getErrorCount()) {
                     continue;
                 }

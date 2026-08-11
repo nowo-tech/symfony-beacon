@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-08-11
+
+### Changed
+
+- Dashboard Menu **2.1.1**: request-scoped memoization for `MenuRepository::findOneByCodeAndContext` (avoids repeated `dashboard_menu` lookups from Twig `dashboard_menu_config` + platform setup detectors per HTML request).
+- Cookie Consent **1.6.2** pin bump.
+- Shared `IngestProjectAccessGate` for Envelope + OTLP credential/governance checks (reduces auth drift).
+- Project config import user creation moved to Identity `PortableUserProvisioner` (089 boundary).
+- Volume threshold evaluation batches `COUNT` queries by (environment, release, window).
+- Delivery history trim uses SQL delete of excess rows (no full-collection hydrate on notify worker).
+
+### Fixed
+
+- Project config export/import (`089`): batch-hydrate memberships + users on export; admin export-by-ids uses `uuid IN (…)`; import prefetches users by email and maps memberships in memory (no per-row email lookup / flush).
+
+### Security
+
+- `SiteBackupSecurityDefaultsGuard` rejects documented / short `MERCURE_JWT_SECRET` outside `dev`/`test` when the env var is set (docs: `PRODUCTION.md`, `ops/MERCURE.md`).
+- Project config panel import: block Full→Owner promotion and preserve last active owner (no Transfer/`last_owner` bypass via JSON).
+
 ## [1.6.0] - 2026-08-11
 
 ### Added
@@ -854,7 +874,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...v1.5.0

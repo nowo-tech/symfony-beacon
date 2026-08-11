@@ -80,6 +80,51 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
             'unique-production-setup-token',
             '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
             'production-grade-app-secret-32',
+            'production-grade-mercure-jwt-secret-32chars',
+        );
+        $guard->assertProductionSecretsSafe();
+        $this->addToAssertionCount(1);
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsDocumentedMercureJwtSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'production-grade-app-secret-32',
+            SiteBackupSecurityDefaultsGuard::LOCAL_DEV_MERCURE_JWT_SECRET,
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('MERCURE_JWT_SECRET is still the documented local default');
+        $guard->assertProductionSecretsSafe();
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsShortMercureJwtSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'production-grade-app-secret-32',
+            'tooshort-mercure-secret',
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('MERCURE_JWT_SECRET must be at least 32 characters');
+        $guard->assertProductionSecretsSafe();
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalAllowsEmptyMercureJwtSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'production-grade-app-secret-32',
+            '',
         );
         $guard->assertProductionSecretsSafe();
         $this->addToAssertionCount(1);

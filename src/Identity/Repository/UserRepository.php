@@ -23,6 +23,42 @@ class UserRepository extends ServiceEntityRepository
         return $this->findOneBy(['email' => strtolower(trim($email))]);
     }
 
+    /**
+     * Batch lookup by email (config import). Keys are lowercase trimmed emails.
+     *
+     * @param list<string> $emails
+     *
+     * @return array<string, User>
+     */
+    public function findIndexedByEmails(array $emails): array
+    {
+        $normalized = [];
+        foreach ($emails as $email) {
+            $email = strtolower(trim($email));
+            if ('' !== $email) {
+                $normalized[$email] = true;
+            }
+        }
+        $list = array_keys($normalized);
+        if ([] === $list) {
+            return [];
+        }
+
+        /** @var list<User> $users */
+        $users = $this->createQueryBuilder('u')
+            ->andWhere('u.email IN (:emails)')
+            ->setParameter('emails', $list)
+            ->getQuery()
+            ->getResult();
+
+        $map = [];
+        foreach ($users as $user) {
+            $map[strtolower(trim($user->getEmail()))] = $user;
+        }
+
+        return $map;
+    }
+
     public function findOneBySlackUserId(string $slackUserId): ?User
     {
         $slackUserId = trim($slackUserId);

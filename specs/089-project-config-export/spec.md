@@ -81,7 +81,7 @@ As a project admin with members manage, I disable a member’s access without re
 - **FR-004**: Panel export/import MUST require `project.settings.manage`. Membership deactivate/reactivate MUST require `project.members.manage`. CSRF on import POSTs.
 - **FR-005**: `ProjectMembership.active` defaults to true. `ProjectAccessService` MUST ignore inactive direct memberships for grants. Active-owner counts (last-owner / transfer guards) MUST count only active owners. Dashboard accessible-project queries MUST exclude inactive direct memberships.
 - **FR-006**: Audit UserActions: `project.config_exported`, `project.config_imported`, `project.member_activated`, `project.member_deactivated`.
-- **FR-007**: Panel import MUST NOT promote users to `owner`/`full` via import alone when that would bypass Transfer / role UI (warn and clamp to `admin` when appropriate).
+- **FR-007**: Panel import MUST NOT promote users to `owner`/`full` via import alone when that would bypass Transfer / role UI (warn and clamp: non-owner cannot become `owner`; non-owner/non-full cannot become `full`). Import MUST NOT deactivate or demote the last **active** owner (warn and preserve).
 - **FR-008**: Dual gating for Settings config panel follows `002` FR-013 / FR-014 (`canManageSettings` + controller permission).
 
 ## Success Criteria
@@ -103,11 +103,18 @@ As a project admin with members manage, I disable a member’s access without re
 - Disabled users created by admin import are enabled later by operators (password reset / admin UI).
 - Group access remains out of band for v1.
 
+## Amendment (N+1, 2026-08-11)
+
+- Export hydrates `memberships` + `user` in one query for all projects (`ProjectRepository::hydrateMembershipsForProjects`).
+- Admin export-by-ids uses `findByUuids` (`IN`).
+- Import prefetches users by email (`UserRepository::findIndexedByEmails`); membership lookup is O(1) by email map; new users persist without per-row flush.
+- Disabled user creation for admin import lives in Identity `PortableUserProvisioner` (not Project).
+
 ## Cross-links
 
-- `002-identity-project` — FR-013/FR-014 settings + members surfaces  
-- `018-project-governance` — governance fields in bundle  
-- `019-admin-projects-ops` — admin project list export/import UI  
-- `044-instance-config-export` — instance-level sibling pattern  
-- `088-project-full-role` — roles in membership payload  
+- `002-identity-project` — FR-013/FR-014 settings + members surfaces
+- `018-project-governance` — governance fields in bundle
+- `019-admin-projects-ops` — admin project list export/import UI
+- `044-instance-config-export` — instance-level sibling pattern
+- `088-project-full-role` — roles in membership payload
 - `docs/product/ROLES.md`

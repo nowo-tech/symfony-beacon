@@ -40,6 +40,10 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 
     /** Documented placeholder APP_SECRET from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_APP_SECRET = 'ChangeMePleaseUseARealSecret';
+
+    /** Documented placeholder Mercure JWT secret from `.env.dist` / compose defaults. */
+    public const string LOCAL_DEV_MERCURE_JWT_SECRET = '!ChangeThisMercureHubJWTSecretKey!';
+
     /** @var list<string> */
     private const array SKIP_CONSOLE_COMMANDS = [
         'cache:clear',
@@ -58,6 +62,8 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
         private readonly ?string $panelPasswordHash,
         #[Autowire('%kernel.secret%')]
         private readonly string $appSecret = '',
+        #[Autowire('%env(default::MERCURE_JWT_SECRET)%')]
+        private readonly ?string $mercureJwtSecret = null,
     ) {
     }
 
@@ -121,6 +127,16 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
         }
         if (\strlen($secret) < 16) {
             throw new RuntimeException('APP_SECRET must be at least 16 characters outside local development (dev/test).');
+        }
+
+        $mercure = trim((string) $this->mercureJwtSecret);
+        if ('' !== $mercure) {
+            if (hash_equals(self::LOCAL_DEV_MERCURE_JWT_SECRET, $mercure)) {
+                throw new RuntimeException('MERCURE_JWT_SECRET is still the documented local default (!ChangeThisMercureHubJWTSecretKey!). Set a unique secret (≥32 characters) shared with the Mercure hub — see docs/ops/MERCURE.md.');
+            }
+            if (\strlen($mercure) < 32) {
+                throw new RuntimeException('MERCURE_JWT_SECRET must be at least 32 characters outside local development (dev/test) when set.');
+            }
         }
     }
 

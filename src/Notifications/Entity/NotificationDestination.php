@@ -392,6 +392,9 @@ class NotificationDestination implements AuditableInterface
     }
 
     /**
+     * Keep the newest `$keep` attempts in the in-memory collection (tests / rare sync paths).
+     * Hot path (notify worker) uses {@see NotificationDeliveryAttemptRepository::trimOlderThanKeep()}.
+     *
      * @return list<NotificationDeliveryAttempt>
      */
     public function trimDeliveryAttempts(int $keep): array

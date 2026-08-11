@@ -160,3 +160,7 @@ As a member on AuthKit login/register/reset, the show/hide control stays **to th
 - Product roles reference: `docs/product/ROLES.md`
 - Roadmap **6.35**
 - Sibling hosts (same chrome): open-agendesk-v2 / symfony-frankenphp-boilerplate-v2 platform form CSS
+
+## Amendment (`IngestProjectAccessGate`, 2026-08-11)
+
+- Follow-on DRY for Envelope + OTLP credential/governance: shared `App\Ingest\Service\IngestProjectAccessGate` (`authorizeCredentials` + `assertIngestAllowed`). Complements D1 (`OtlpIngestPipeline`); HTTP contracts unchanged. Cross-links: `003-ingest`, `067-otlp-ingest`.

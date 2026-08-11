@@ -6,14 +6,13 @@ namespace App\Project\Service;
 
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
+use App\Identity\Service\PortableUserProvisioner;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectRepository;
-use DateTime;
 use DateTimeImmutable;
 use InvalidArgumentException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
@@ -30,7 +29,7 @@ final readonly class ProjectConfigPortability
     public function __construct(
         private ProjectRepository $projectRepository,
         private UserRepository $userRepository,
-        private UserPasswordHasherInterface $passwordHasher,
+        private PortableUserProvisioner $portableUserProvisioner,
         private ProjectFactory $projectFactory,
     ) {
     }
@@ -47,6 +46,8 @@ final readonly class ProjectConfigPortability
      */
     public function export(array $projects): array
     {
+        $this->projectRepository->hydrateMembershipsForProjects($projects);
+
         $rows = [];
         foreach ($projects as $project) {
             $rows[] = $this->exportOne($project);
@@ -128,10 +129,24 @@ final readonly class ProjectConfigPortability
         $warnings = [];
         $upserted = 0;
 
+        $allEmails = [];
+        foreach ($projects as $row) {
+            foreach ($row['memberships'] as $membership) {
+                $allEmails[] = $membership['email'];
+            }
+        }
+        $usersByEmail = $this->userRepository->findIndexedByEmails($allEmails);
+
         foreach ($projects as $row) {
             $project = $this->upsertProject($row, $actor, createIfMissing: true);
             ++$upserted;
-            $result = $this->applyMemberships($project, $row['memberships'], createMissingUsers: true, actor: $actor);
+            $result = $this->applyMemberships(
+                $project,
+                $row['memberships'],
+                createMissingUsers: true,
+                actor: $actor,
+                usersByEmail: $usersByEmail,
+            );
             $usersCreated += $result['users_created'];
             $membershipsApplied += $result['applied'];
             $skipped = [...$skipped, ...$result['skipped']];
@@ -364,59 +379,95 @@ final readonly class ProjectConfigPortability
 
     /**
      * @param list<array{email: string, display_name: string, role: string, active: bool}> $memberships
+     * @param array<string, User>                                                          $usersByEmail
      *
      * @return array{applied: int, users_created: int, skipped: list<string>, warnings: list<string>}
      */
-    private function applyMemberships(Project $project, array $memberships, bool $createMissingUsers, User $actor): array
-    {
+    private function applyMemberships(
+        Project $project,
+        array $memberships,
+        bool $createMissingUsers,
+        User $actor,
+        array &$usersByEmail = [],
+    ): array {
+        $this->projectRepository->hydrateMembershipsForProjects([$project]);
+
+        /** @var array<string, ProjectMembership> $byEmail */
+        $byEmail = [];
+        foreach ($project->getMemberships() as $membership) {
+            $email = strtolower(trim((string) $membership->getUser()?->getEmail()));
+            if ('' !== $email) {
+                $byEmail[$email] = $membership;
+            }
+        }
+
+        if ([] === $usersByEmail && [] !== $memberships) {
+            $usersByEmail = $this->userRepository->findIndexedByEmails(array_column($memberships, 'email'));
+        }
+
         $applied = 0;
         $usersCreated = 0;
         $skipped = [];
         $warnings = [];
 
         foreach ($memberships as $row) {
-            $user = $this->userRepository->findOneByEmail($row['email']);
+            $user = $usersByEmail[$row['email']] ?? null;
             if (!$user instanceof User) {
                 if (!$createMissingUsers) {
                     $skipped[] = $row['email'];
                     continue;
                 }
-                $user = $this->createDisabledUser($row['email'], $row['display_name']);
+                $user = $this->portableUserProvisioner->createDisabledUser($row['email'], $row['display_name']);
+                $usersByEmail[$row['email']] = $user;
                 ++$usersCreated;
             }
 
             $role = ProjectRole::from($row['role']);
-            if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true) && !$createMissingUsers) {
-                // Panel cannot promote to owner/full via import — keep existing or demote to admin.
-                $existing = null;
-                foreach ($project->getMemberships() as $m) {
-                    if ($m->getUser()?->getId() === $user->getId()) {
-                        $existing = $m;
-                        break;
-                    }
-                }
-                if (!$existing instanceof ProjectMembership || !\in_array($existing->getRole(), [ProjectRole::Owner, ProjectRole::Full], true)) {
-                    if (ProjectRole::Owner === $role || ProjectRole::Full === $role) {
-                        $warnings[] = \sprintf('%s: role %s ignored on panel import (use Transfer / role UI)', $row['email'], $role->value);
-                        $role = ProjectRole::Admin;
-                    }
+            $active = $row['active'];
+            $existing = $byEmail[$row['email']] ?? null;
+            $isPanel = !$createMissingUsers;
+
+            if ($isPanel) {
+                // Panel must not promote to owner/full (bypass Transfer / role UI). Spec 089 FR-007.
+                if (ProjectRole::Owner === $role
+                    && (!$existing instanceof ProjectMembership || ProjectRole::Owner !== $existing->getRole())
+                ) {
+                    $warnings[] = \sprintf('%s: role owner ignored on panel import (use Transfer ownership)', $row['email']);
+                    $role = $existing instanceof ProjectMembership && ProjectRole::Full === $existing->getRole()
+                        ? ProjectRole::Full
+                        : ProjectRole::Admin;
+                } elseif (ProjectRole::Full === $role
+                    && (!$existing instanceof ProjectMembership || !\in_array($existing->getRole(), [ProjectRole::Owner, ProjectRole::Full], true))
+                ) {
+                    $warnings[] = \sprintf('%s: role full ignored on panel import (use role UI)', $row['email']);
+                    $role = ProjectRole::Admin;
                 }
             }
 
-            $membership = null;
-            foreach ($project->getMemberships() as $m) {
-                if ($m->getUser()?->getId() === $user->getId()) {
-                    $membership = $m;
-                    break;
+            // Never deactivate or demote the last active owner via import (panel or admin).
+            if ($existing instanceof ProjectMembership
+                && ProjectRole::Owner === $existing->getRole()
+                && $existing->isActive()
+                && $this->countActiveOwners($project) <= 1
+            ) {
+                $wouldDemote = ProjectRole::Owner !== $role;
+                $wouldDeactivate = !$active;
+                if ($wouldDemote || $wouldDeactivate) {
+                    $warnings[] = \sprintf('%s: last active owner preserved on import', $row['email']);
+                    $role = ProjectRole::Owner;
+                    $active = true;
                 }
             }
+
+            $membership = $existing;
             if (!$membership instanceof ProjectMembership) {
                 $membership = new ProjectMembership();
                 $membership->setUser($user);
                 $project->addMembership($membership);
+                $byEmail[$row['email']] = $membership;
             }
             $membership->setRole($role);
-            $membership->setActive($row['active']);
+            $membership->setActive($active);
             ++$applied;
         }
 
@@ -430,19 +481,16 @@ final readonly class ProjectConfigPortability
         ];
     }
 
-    private function createDisabledUser(string $email, string $displayName): User
+    private function countActiveOwners(Project $project): int
     {
-        $user = new User();
-        $user->setEmail($email);
-        $user->setDisplayName('' !== $displayName ? $displayName : $email);
-        $user->setRoles([]);
-        $user->setEnabled(false);
-        $plain = bin2hex(random_bytes(24));
-        $user->setPassword($this->passwordHasher->hashPassword($user, $plain));
-        $user->setPasswordChangedAt(new DateTime());
-        $this->userRepository->save($user);
+        $count = 0;
+        foreach ($project->getMemberships() as $membership) {
+            if ($membership->isActive() && ProjectRole::Owner === $membership->getRole()) {
+                ++$count;
+            }
+        }
 
-        return $user;
+        return $count;
     }
 
     private function nullableInt(mixed $value): ?int

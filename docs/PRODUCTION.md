@@ -32,7 +32,7 @@ CI already builds this target (`.github/workflows/ci.yml`).
 - `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit)
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
 
-`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty or a historically known local value, `SITE_BACKUP_PASSWORD_HASH` is empty or a historically known local hash, or `APP_SECRET` is empty / still `ChangeMePleaseUseARealSecret` / shorter than 16 characters. `compose.prod.yaml` also requires secrets via `${VAR:?…}`.
+`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty or a historically known local value, `SITE_BACKUP_PASSWORD_HASH` is empty or a historically known local hash, `APP_SECRET` is empty / still `ChangeMePleaseUseARealSecret` / shorter than 16 characters, or `MERCURE_JWT_SECRET` is set to the documented `.env.dist` placeholder / shorter than 32 characters when non-empty. Empty `MERCURE_JWT_SECRET` is allowed when Mercure is unused (admin DB override may still apply). `compose.prod.yaml` also requires secrets via `${VAR:?…}`.
 
 Do **not** run `app:seed-demo` on production instances (blocked unless `--allow-non-local`, which never installs the documented stable DEMO_* API keys). Configure Prometheus scrape with a metrics Bearer token under Administration → Ops defaults (`metrics_require_token` defaults to on for new installs).
 
