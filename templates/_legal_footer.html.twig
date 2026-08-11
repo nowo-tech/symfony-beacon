@@ -6,6 +6,10 @@
         <a href="{{ path('legal_privacy', {_locale: loc}) }}">{{ 'legal.privacy.title'|trans }}</a>
         <a href="{{ path('legal_terms', {_locale: loc}) }}">{{ 'legal.terms.title'|trans }}</a>
         <a href="{{ path('legal_cookies', {_locale: loc}) }}">{{ 'legal.cookies.title'|trans }}</a>
-        <a href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
+        {% if nowo_cookie_consent_should_render() %}
+            <a href="#" data-nowo-open-consent>{{ 'legal.manage_cookies'|trans }}</a>
+        {% else %}
+            <a href="{{ path('legal_cookies', {_locale: loc}) }}">{{ 'legal.manage_cookies'|trans }}</a>
+        {% endif %}
     </nav>
 </footer>

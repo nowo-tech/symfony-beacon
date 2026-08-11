@@ -68,7 +68,7 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 - **FR-001**: Project Settings MUST expose per-project retention, rate limit, and quota controls for actors with `project.settings.manage` (`ProjectAccessService::requirePermission`).
 - **FR-002**: Ingest MUST enforce the project's rate and quota settings.
 - **FR-003**: Actors with `project.api_keys.manage` MUST be able to revoke API keys so they can no longer authenticate ingest. Revoked (`active=false`) keys MUST NOT render a copyable DSN, secret, or clipboard-copy control in Settings.
-- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). **Active** keys MAY list a copyable full DSN for managers when the secret is available (`002` FR-003). See also `087` amendment (2026-08-11).
+- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). Ordinary Settings GET MUST NOT re-list the full DSN (`002` FR-003 / `087`).
 - **FR-005**: System MUST surface approaching-limit warnings to actors with `project.settings.manage` before hard enforcement.
 - **FR-006**: Governance changes MUST be attributable (who changed what) where audit facilities exist.
 - **FR-007**: Actors without the matching `project.*` grant MUST NOT see or modify governance or keys (**panel hidden** + HTTP **403** on GET Settings when lacking Settings-surface grants, and on POST without the key). See `002` FR-013 / FR-014.
@@ -107,5 +107,5 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 
 ## Amendment (API key DSN visibility, 2026-08-11)
 
-- Revoked / inactive API keys MUST NOT show a copyable DSN or secret in Settings (FR-003). Covered by `ProjectApiKeyVisibilityTest::testOwnerSeesCopyableDsnForActiveKeysOnly`.
-- Active-key DSN listing for managers is documented in `002` FR-003; session one-shot banner after create/rotate remains.
+- Revoked / inactive API keys MUST NOT show a copyable DSN or secret in Settings (FR-003). Covered by `ProjectApiKeyVisibilityTest`.
+- Active keys also MUST NOT re-list DSN on ordinary GET; create/rotate one-shot banner only (`002` FR-003 / `087` show-once restore).

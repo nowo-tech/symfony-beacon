@@ -51,3 +51,7 @@ As an instance admin, I restore allowlisted settings from a file.
 - Full DB dump.
 - SiteBackup media/DB — use SiteBackupBundle.
 - Per-project metadata/memberships portability — see sibling `089-project-config-export` (`beacon-project-bundle`).
+
+## Amendment (import size, 2026-08-11)
+
+- Instance config JSON upload MUST be ≤ **2 MiB** (`JsonUploadReader`), same cap as project config import (`089`).

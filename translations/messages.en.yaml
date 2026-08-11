@@ -227,6 +227,7 @@ flash:
     member_user_not_found: No user exists with that email. They must register first.
     config_invalid_csrf: Invalid security token. Try again.
     config_missing_file: Choose a JSON project bundle to import.
+    config_file_too_large: Project config JSON is too large (max 2 MiB).
     config_import_failed: Could not import the project bundle (invalid JSON or schema).
     config_code_mismatch: Bundle project code does not match this project.
     config_imported_admin: Projects imported (users created when missing).
@@ -401,9 +402,9 @@ project:
     inactive: inactive
     inactive_dsn_hidden: Revoked keys cannot authenticate ingest. DSN and secret are not shown.
     public: 'public:'
-    secret_hidden: Full DSN and secret are visible only to project owners and admins.
-    secret_once_hint: Rotate this key to mint a new secret and DSN.
-    secret_once_banner: New DSN ready — copy it into your client. It also stays listed under the key above.
+    secret_hidden: Full DSN and secret are shown only once after create or rotate (not to viewers).
+    secret_once_hint: Create or rotate this key to reveal the DSN once. The secret is not shown again on this page.
+    secret_once_banner: New DSN ready — copy it into your client now. It will not stay listed after you leave this page.
     dsn_help: Copy this DSN for clients (path is the project UUID). Rotate to mint a new secret.
     copy_dsn: Copy DSN
     dsn_copied: Copied
@@ -1012,6 +1013,7 @@ settings:
     import_failed: Import failed. Check schema version and that the file has no secret
       keys.
     missing_file: Choose a JSON file to import.
+    file_too_large: Instance config JSON is too large (max 2 MiB).
     invalid_csrf: Invalid security token.
 social_login_settings:
   title: Social login

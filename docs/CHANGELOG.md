@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-08-11
+
+### Changed
+
+- Cookie Consent **1.6.3**: public-only consent via `render_routes` whitelist + Twig `nowo_cookie_consent_should_render()`; auto-open limited to AuthKit entry routes (`route_targeting_mode: only`).
+
+### Security
+
+- API key DSN is show-once again: Settings ordinary GET lists public key only; create/rotate flash (`_beacon_last_api_key_dsn`) remains the only secret reveal (with copy control).
+- Project / admin / instance JSON config imports reject uploads over **2 MiB** (`JsonUploadReader`).
+
 ## [1.6.2] - 2026-08-11
 
 ### Changed
@@ -880,7 +891,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.1...v1.6.0

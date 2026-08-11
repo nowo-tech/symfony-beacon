@@ -21,6 +21,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 
 | Setting | Beacon value |
 |---------|----------------|
+| Pin | `nowo-tech/cookie-consent-bundle` **1.6.3** |
 | `ui_theme` | `tailwind` |
 | `web_ui` | enabled; Administration → **Cookie consent** (`/admin/cookie-consent` → `/cookie-consent-config/{id}/settings/profile`, CookieConsent **1.5+**) |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
@@ -33,22 +34,25 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | `use_cookie_inventory` | `true` (DB inventory after platform seed; YAML fallback until then) |
 | `preferences_bubble_enabled` | `false` (AuthKit layout can include the bubble manually) |
 | `enabled_locales` | `en`, `es`, `de`, `nl`, `fr`, `it`, `pt` |
-| `disabled_routes` | legal pages (banner does not auto-open there) |
+| `route_targeting_mode` | `only` — auto-open on public AuthKit entry routes (login/register/magic/reset/QR start) |
+| `disabled_routes` | Legal pages (`legal_*`) — no auto-open; fragment still renders for “Manage cookies” |
+| `render_routes` | Public whitelist (`legal_*`, `nowo_auth_kit_*`, `nowo_site_backup_setup*`, `guest_locale_switch`, `app_home_redirect`) — consent markup only there |
+| `skip_render_routes` | empty (whitelist is enough; deny would still win if set) |
 
 Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/` — CookieConsent **1.4.5+** prepends that path automatically. Skin tokens: `assets/styles/_cookie_consent.scss`. Do **not** fork the modal Twig for skinning; prefer tokens. XHR CSRF double-submit lives in vendor `nowo-consent-modal.js` (**≥1.4.8**).
 
 Routes: `config/routes/nowo_cookie_consent.yaml`  
 Privacy link from the modal: `translations/NowoCookieConsentBundle.*.yaml` → `legal_privacy`.
 
-Layouts embed the modal when needed:
+Layouts embed the modal only on public routes:
 
 ```twig
-{% if nowo_cookie_consent_should_embed_modal() %}
-    {{ render(path('nowo_cookie_consent.show_if_not_set')) }}
+{% if nowo_cookie_consent_should_render() %}
+    {{ render(path('nowo_cookie_consent.show')) }}
 {% endif %}
 ```
 
-Footer links and `data-nowo-open-consent` appear on app + AuthKit layouts (`templates/_legal_footer.html.twig`).
+On app shells where the fragment is skipped, the footer “Manage cookies” link goes to `/legal/cookies` instead of `data-nowo-open-consent` (`templates/_legal_footer.html.twig`).
 
 ### Database
 

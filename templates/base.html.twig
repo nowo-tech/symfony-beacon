@@ -132,7 +132,9 @@
             {% include '_legal_footer.html.twig' %}
         {% endif %}
 
-        {# Modal available site-wide for footer “Cookie settings”; no floating bubble here. #}
-        {{ render(path('nowo_cookie_consent.show')) }}
+        {# Consent modal only on public routes (skip_render_routes omits app/admin shells). #}
+        {% if nowo_cookie_consent_should_render() %}
+            {{ render(path('nowo_cookie_consent.show')) }}
+        {% endif %}
     </body>
 </html>

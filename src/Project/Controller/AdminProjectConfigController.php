@@ -10,8 +10,8 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectConfigPortability;
+use App\Shared\Http\JsonUploadReader;
 use InvalidArgumentException;
-use JsonException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -106,21 +106,16 @@ final class AdminProjectConfigController extends AbstractController
         }
 
         $file = $request->files->get('bundle');
-        if (!$file instanceof UploadedFile || !$file->isValid()) {
-            $this->addFlash('error', 'flash.project.config_missing_file');
-
-            return $this->redirectToRoute('admin_projects');
-        }
-
         try {
-            /** @var array<string, mixed> $payload */
-            $payload = json_decode((string) file_get_contents($file->getPathname()), true, 512, \JSON_THROW_ON_ERROR);
-            if (!\is_array($payload)) {
-                throw new InvalidArgumentException('invalid_json');
-            }
+            $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $result = $this->portability->importAdmin($payload, $user);
-        } catch (JsonException|InvalidArgumentException $e) {
-            $this->addFlash('error', 'flash.project.config_import_failed');
+        } catch (InvalidArgumentException $e) {
+            $key = match ($e->getMessage()) {
+                'missing_file' => 'flash.project.config_missing_file',
+                'too_large' => 'flash.project.config_file_too_large',
+                default => 'flash.project.config_import_failed',
+            };
+            $this->addFlash('error', $key);
 
             return $this->redirectToRoute('admin_projects');
         }

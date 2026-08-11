@@ -50,7 +50,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
     }
 
-    public function testOwnerSeesCopyableDsnForActiveKeysOnly(): void
+    public function testOwnerDoesNotSeeSecretOnOrdinarySettingsGet(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('api-key-owner@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -65,8 +65,9 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $this->login($client, $owner);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('[data-testid="api-key-dsn"]');
-        self::assertStringContainsString($secret, (string) $client->getResponse()->getContent());
+        self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
+        self::assertSelectorExists('[data-testid="api-key-dsn-redacted"]');
+        self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
 
         $apiKey->setActive(false);
         $em->flush();
@@ -76,5 +77,48 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-testid="api-key-inactive"]');
         self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
         self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
+    }
+
+    public function testOwnerSeesOneShotDsnBannerAfterRotate(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('api-key-rotate@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        /** @var ProjectApiKey $apiKey */
+        $apiKey = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project, 'active' => true]);
+        self::assertInstanceOf(ProjectApiKey::class, $apiKey);
+        $oldSecret = (string) $apiKey->getSecretKey();
+
+        $this->login($client, $owner);
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseIsSuccessful();
+        $rotateAction = '/projects/'.$project->getUuid().'/keys/'.$apiKey->getId().'/rotate';
+        $token = $crawler->filter('form[action$="'.$rotateAction.'"] input[name="_token"]')->attr('value');
+        self::assertNotNull($token);
+        $client->request(
+            Request::METHOD_POST,
+            $rotateAction,
+            ['_token' => $token],
+        );
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="api-key-dsn-flash"]');
+        $html = (string) $client->getResponse()->getContent();
+        self::assertStringNotContainsString($oldSecret, $html);
+
+        $em->clear();
+        /** @var ProjectApiKey $rotated */
+        $rotated = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project, 'active' => true]);
+        self::assertInstanceOf(ProjectApiKey::class, $rotated);
+        $newSecret = (string) $rotated->getSecretKey();
+        self::assertNotSame('', $newSecret);
+        self::assertNotSame($oldSecret, $newSecret);
+        self::assertStringContainsString($newSecret, $html);
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('[data-testid="api-key-dsn-flash"]');
+        self::assertStringNotContainsString($newSecret, (string) $client->getResponse()->getContent());
     }
 }

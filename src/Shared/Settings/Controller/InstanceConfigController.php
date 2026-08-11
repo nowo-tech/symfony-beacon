@@ -7,9 +7,9 @@ namespace App\Shared\Settings\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Http\JsonUploadReader;
 use App\Shared\Settings\Service\InstanceConfigPortability;
 use InvalidArgumentException;
-use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -70,21 +70,16 @@ final class InstanceConfigController extends AbstractController
         }
 
         $file = $request->files->get('config');
-        if (!$file instanceof UploadedFile || !$file->isValid()) {
-            $this->addFlash('error', 'settings.instance_config.missing_file');
-
-            return $this->redirectToRoute('admin_instance_config');
-        }
-
         try {
-            /** @var array<string, mixed> $payload */
-            $payload = json_decode((string) file_get_contents($file->getPathname()), true, 512, \JSON_THROW_ON_ERROR);
-            if (!\is_array($payload)) {
-                throw new InvalidArgumentException('invalid_json');
-            }
+            $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $applied = $this->portability->import($payload);
-        } catch (JsonException|InvalidArgumentException) {
-            $this->addFlash('error', 'settings.instance_config.import_failed');
+        } catch (InvalidArgumentException $e) {
+            $key = match ($e->getMessage()) {
+                'missing_file' => 'settings.instance_config.missing_file',
+                'too_large' => 'settings.instance_config.file_too_large',
+                default => 'settings.instance_config.import_failed',
+            };
+            $this->addFlash('error', $key);
 
             return $this->redirectToRoute('admin_instance_config');
         }

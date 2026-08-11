@@ -15,7 +15,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 | ID | Area | Delivered |
 |----|------|-----------|
-| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); **as-built follow-up**: active keys may list copyable DSN for managers; revoked keys never (2026-08-11) |
+| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); ordinary GET shows public key only (show-once restored 2026-08-11); revoked keys never expose secret/DSN |
 | S2 | Demo seed | `app:seed-demo` blocked outside `dev`/`test` unless `--allow-non-local` (never stable DEMO_* keys outside local) |
 | S3 | Bootstrap guard | `SiteBackupSecurityDefaultsGuard` also rejects empty / documented / short `APP_SECRET` |
 | S4 | Metrics | `InstanceSettings::DEFAULT_METRICS_REQUIRE_TOKEN = true`; migration sets column default true (existing rows unchanged) |
@@ -23,7 +23,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 | S6 | API keys | `ProjectApiKeyFactory` uses `bin2hex(random_bytes(16+))` for public keys; human-friendly tokens remain labels only |
 | S7 | Sessions | `when@prod` session `cookie_secure` / `cookie_samesite: lax` / `cookie_httponly` |
 | S8 | Slack hooks | Interactions endpoint rejects unsigned `url_verification` challenge echo |
-| QA | Tests | Guard unit tests; portability security-flag unit tests; `ProjectApiKeyVisibilityTest` (active DSN vs revoked hidden); factory constructor update |
+| QA | Tests | Guard unit tests; portability security-flag unit tests; `ProjectApiKeyVisibilityTest` (show-once + revoked hidden); factory constructor update |
 | Docs | Ops | `SECURITY.md`, `PRODUCTION.md`, CHANGELOG / UPGRADING / ROADMAP |
 
 ## Non-goals (deferred)
@@ -98,7 +98,7 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). **Active** keys MAY list a copyable DSN when the secret is available. **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
+- **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`) cleared from session on that render. Ordinary Settings GET MUST NOT re-embed the secret/DSN for active keys (public key + rotate hint only). **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
 - **FR-002**: `app:seed-demo` MUST refuse non-local environments unless `--allow-non-local`; stable DEMO_* material MUST be local-only.
 - **FR-003**: Outside `dev`/`test`, APP_SECRET MUST NOT be empty, MUST NOT equal the documented `.env.dist` default, and MUST be at least 16 characters (`SiteBackupSecurityDefaultsGuard`, extending `062`). When `MERCURE_JWT_SECRET` is set, it MUST NOT equal the documented Mercure placeholder and MUST be at least 32 characters (empty allowed when Mercure unused; see `062` Mercure amendment).
 - **FR-004**: New instance settings MUST default `metrics_require_token` to true; column DB default MUST match for new rows.
@@ -110,14 +110,14 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 ## Success Criteria
 
-- **SC-001**: Functional visibility test proves active-key DSN for managers, revoked-key DSN hidden, and viewer 403 without secret (`ProjectApiKeyVisibilityTest`).
+- **SC-001**: Functional visibility test proves ordinary Settings GET never embeds the secret, one-shot flash after rotate does, revoked keys stay redacted, and viewer 403 without secret (`ProjectApiKeyVisibilityTest`).
 - **SC-002**: Guard unit suite covers APP_SECRET documented + short reject on prod/staging.
 - **SC-003**: Portability unit suite covers weaken-ignore and tighten-apply.
 - **SC-004**: Spec catalog lists `087` and cross-links predecessors (`018`, `038`, `044`, `052`, `055`, `058`, `062`, `068`).
 
 ## Amendment (API key DSN listing, 2026-08-11)
 
-As-built product UX lists a copyable DSN under **active** keys for managers (recoverability) while keeping the create/rotate one-shot banner. **Revoked** keys remain redacted. Supersedes the stricter “never re-embed on ordinary GET” reading of original FR-001 for active keys only; inactive-key redaction is mandatory. Cross-links: `002` FR-003, `018` FR-003 / FR-004.
+Briefly allowed listing a copyable DSN under **active** keys for managers (recoverability). **Superseded** the same day: restore strict show-once (ordinary GET = public key only; create/rotate flash only). Inactive-key redaction remains mandatory. Cross-links: `002` FR-003, `018` FR-003 / FR-004.
 
 ## Amendment (`MERCURE_JWT_SECRET` bootstrap, 2026-08-11)
 

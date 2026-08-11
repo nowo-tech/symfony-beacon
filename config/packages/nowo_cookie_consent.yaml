@@ -47,18 +47,36 @@ nowo_cookie_consent:
     preferences_bubble_icon: '<img class="nowo-cookie-consent__preferences-bubble-svg" src="/illustrations/cookie-consent-bubble.svg" alt="" width="62" height="62" decoding="async">'
     preferences_bubble_border_color: '#EE922D'
 
-    # Auto-open the consent modal only on auth entry points
+    # Auto-open the consent modal only on public auth entry points (guest shell).
     route_targeting_mode: only
     target_routes:
         - nowo_auth_kit_login
+        - nowo_auth_kit_login_unlocalized
         - nowo_auth_kit_register
+        - nowo_auth_kit_register_unlocalized
+        - nowo_auth_kit_magic_login_request
+        - nowo_auth_kit_magic_login_request_unlocalized
+        - nowo_auth_kit_reset_password_request
+        - nowo_auth_kit_reset_password_request_unlocalized
+        - nowo_auth_kit_qr_login_start
+        - nowo_auth_kit_qr_login_start_unlocalized
 
-    # Do not auto-open the modal on legal pages
+    # Do not auto-open the modal on legal pages (still render for “Manage cookies”).
     disabled_routes:
         - legal_privacy
         - legal_notice
         - legal_terms
         - legal_cookies
+
+    # CookieConsent ≥1.6.3: whitelist public HTML shells only (deny list empty — whitelist is enough).
+    # Authenticated product/admin/kit routes never match → no consent markup / inventory queries.
+    render_routes:
+        - legal_*
+        - nowo_auth_kit_*
+        - nowo_site_backup_setup*
+        - guest_locale_switch
+        - app_home_redirect
+    skip_render_routes: []
 
     # CSRF enabled: modal JS (bundle ≥1.4.8) prepares Symfony SameOrigin double-submit
     # for XHR (native submit never fires). Keep aligned with framework.csrf_protection.

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.6.2)](#unreleased-main-after-162)
+- [Unreleased (main after 1.6.3)](#unreleased-main-after-163)
+- [Upgrading from 1.6.2 to 1.6.3](#upgrading-from-162-to-163)
 - [Upgrading from 1.6.1 to 1.6.2](#upgrading-from-161-to-162)
 - [Upgrading from 1.6.0 to 1.6.1](#upgrading-from-160-to-161)
 - [Upgrading from 1.5.1 to 1.6.0](#upgrading-from-151-to-160)
@@ -55,9 +56,28 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.6.2)
+## Unreleased (main after 1.6.3)
 
-No further upgrade steps yet — follow [Upgrading from 1.6.1 to 1.6.2](#upgrading-from-161-to-162) when moving off **1.6.1**.
+No further upgrade steps yet — follow [Upgrading from 1.6.2 to 1.6.3](#upgrading-from-162-to-163) when moving off **1.6.2**.
+
+## Upgrading from 1.6.2 to 1.6.3
+
+**Show-once DSN restore, 2 MiB JSON import cap, Cookie Consent public-only routes.** Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.6.3   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # no new migrations for this release
+```
+
+### Notes
+
+- No Doctrine schema or seed changes required.
+- Kit pin: Cookie Consent **1.6.3** (`render_routes` whitelist). Host config renders consent only on public shells (`legal_*`, `nowo_auth_kit_*`, setup, guest locale, home redirect). Authenticated dashboards omit the fragment; footer “Manage cookies” links to `/legal/cookies`.
+- **API keys / DSN**: Settings ordinary GET shows the **public key only**. Full DSN appears once after create/rotate (session flash + copy control) and is not re-listed on later page loads. Rotate to mint a new secret.
+- **Config imports**: project Settings, Administration → Projects, and instance config reject JSON uploads over **2 MiB**.
 
 ## Upgrading from 1.6.1 to 1.6.2
 

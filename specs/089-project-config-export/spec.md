@@ -109,6 +109,7 @@ As a project admin with members manage, I disable a member’s access without re
 - Admin export-by-ids uses `findByUuids` (`IN`).
 - Import prefetches users by email (`UserRepository::findIndexedByEmails`); membership lookup is O(1) by email map; new users persist without per-row flush.
 - Disabled user creation for admin import lives in Identity `PortableUserProvisioner` (not Project).
+- JSON import uploads MUST be ≤ **2 MiB** (`JsonUploadReader::DEFAULT_MAX_BYTES`) for panel and Administration (and sibling instance-config import).
 
 ## Cross-links
 

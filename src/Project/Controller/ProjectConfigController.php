@@ -11,8 +11,8 @@ use App\Project\Entity\Project;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectConfigPortability;
+use App\Shared\Http\JsonUploadReader;
 use InvalidArgumentException;
-use JsonException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -84,21 +84,13 @@ final class ProjectConfigController extends AbstractController
         }
 
         $file = $request->files->get('bundle');
-        if (!$file instanceof UploadedFile || !$file->isValid()) {
-            $this->addFlash('error', 'flash.project.config_missing_file');
-
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-        }
-
         try {
-            /** @var array<string, mixed> $payload */
-            $payload = json_decode((string) file_get_contents($file->getPathname()), true, 512, \JSON_THROW_ON_ERROR);
-            if (!\is_array($payload)) {
-                throw new InvalidArgumentException('invalid_json');
-            }
+            $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $result = $this->portability->importPanel($payload, $project, $user);
-        } catch (JsonException|InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $key = match ($e->getMessage()) {
+                'missing_file' => 'flash.project.config_missing_file',
+                'too_large' => 'flash.project.config_file_too_large',
                 'code_mismatch', 'project_not_in_bundle' => 'flash.project.config_code_mismatch',
                 default => 'flash.project.config_import_failed',
             };

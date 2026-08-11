@@ -241,6 +241,7 @@ flash:
     transfer_to_self: No puedes ceder la propiedad a ti mismo.
     config_invalid_csrf: Token de seguridad no válido. Inténtalo de nuevo.
     config_missing_file: Elige un JSON de proyecto para importar.
+    config_file_too_large: El JSON de configuración del proyecto es demasiado grande (máx. 2 MiB).
     config_import_failed: No se pudo importar el paquete (JSON o esquema inválido).
     config_code_mismatch: El código del proyecto en el paquete no coincide con este proyecto.
     config_imported_admin: Proyectos importados (usuarios creados si faltaban).
@@ -406,9 +407,9 @@ project:
     inactive: inactiva
     inactive_dsn_hidden: Las claves revocadas no autentican ingest. No se muestra el DSN ni el secreto.
     public: 'pública:'
-    secret_hidden: El DSN completo y el secreto solo son visibles para propietarios y administradores del proyecto.
-    secret_once_hint: Rota esta clave para generar un secreto y DSN nuevos.
-    secret_once_banner: DSN nuevo listo — cópialo en tu cliente. También queda listado bajo la clave.
+    secret_hidden: El DSN completo y el secreto solo se muestran una vez tras crear o rotar (no a viewers).
+    secret_once_hint: Crea o rota esta clave para ver el DSN una sola vez. El secreto no se vuelve a mostrar en esta página.
+    secret_once_banner: DSN nuevo listo — cópialo ahora en tu cliente. No seguirá listado al salir de esta página.
     dsn_help: Copia este DSN para los clientes (la ruta es el UUID del proyecto). Rota para generar un secreto nuevo.
     copy_dsn: Copiar DSN
     dsn_copied: Copiado
@@ -934,6 +935,7 @@ settings:
     import_failed: Falló la importación. Comprueba la versión del esquema y que el
       archivo no tenga claves secretas.
     missing_file: Elige un archivo JSON para importar.
+    file_too_large: El JSON de configuración de instancia es demasiado grande (máx. 2 MiB).
     invalid_csrf: Token de seguridad no válido.
 mercure_settings:
   title: Mercure

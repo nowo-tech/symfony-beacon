@@ -27,5 +27,5 @@
 
 ## Amendment (API key DSN visibility, 2026-08-11)
 
-- Managers MAY see a copyable DSN under **active** keys when the secret is available (`002` FR-003).
-- **Revoked / inactive** keys MUST NOT show secret or copyable DSN (`018` FR-003; `087` amendment).
+- Ordinary Settings GET MUST NOT re-list a copyable DSN for active keys (show-once create/rotate flash only; `002` FR-003 / `087`).
+- **Revoked / inactive** keys MUST NOT show secret or copyable DSN (`018` FR-003; `087`).

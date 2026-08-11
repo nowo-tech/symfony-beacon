@@ -35,7 +35,9 @@
     {% block javascripts %}{% endblock %}
     {{ nowo_pwa_install_prompt() }}
     {% include '_legal_footer.html.twig' %}
-    {{ render(path('nowo_cookie_consent.show')) }}
+    {% if nowo_cookie_consent_should_render() %}
+        {{ render(path('nowo_cookie_consent.show')) }}
+    {% endif %}
     {% block cookie_consent_extras %}{% endblock %}
 </body>
 </html>
