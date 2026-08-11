@@ -68,8 +68,8 @@ make seed-platform
 
 | Cookie | Category | Notes |
 |--------|----------|--------|
-| `PHPSESSID` | required | Framework session |
-| `REMEMBERME` | required | AuthKit remember-me (7 days) |
+| `SYMFONY_BEACON_SESSID` | required | Framework session (1 day) |
+| `REMEMBERME` | required | AuthKit remember-me (30 days) |
 | `csrf-token_*` | required | Symfony double-submit CSRF (`__Host-` on HTTPS) |
 | `Cookie_Consent` | required | Consent decision marker (bundle) |
 | `Cookie_Consent_Key` | required | Anonymous audit key (bundle) |

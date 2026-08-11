@@ -13,5 +13,7 @@ parameters:
     beacon.mercure.env_url: '%env(string:MERCURE_URL)%'
     beacon.mercure.env_public_url: '%env(string:MERCURE_PUBLIC_URL)%'
     beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
+    # Session cookie name (project-scoped; avoid colliding with other apps on localhost).
+    beacon.session_cookie_name: SYMFONY_BEACON_SESSID
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true

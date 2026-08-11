@@ -40,7 +40,8 @@ security:
         failure_path: nowo_auth_kit_magic_login_request
       remember_me:
         secret: '%kernel.secret%'
-        lifetime: 604800
+        # 30 days when “Remember me” is checked at login.
+        lifetime: 2592000
         path: /
         remember_me_parameter: 'login_form[_remember_me]'
       login_throttling:

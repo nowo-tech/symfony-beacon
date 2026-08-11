@@ -15,6 +15,10 @@ final class PwaEndpointsTest extends WebTestCase
         $client->request(Request::METHOD_GET, '/manifest.webmanifest');
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('content-type', 'application/manifest+json');
+        self::assertNull(
+            $client->getResponse()->headers->get('Set-Cookie'),
+            'Manifest must not Set-Cookie (overwrites authenticated session cookie in browsers).',
+        );
         $payload = json_decode($client->getResponse()->getContent() ?: '', true);
         self::assertIsArray($payload);
         self::assertSame('symfony-beacon', $payload['name'] ?? null);
@@ -27,6 +31,10 @@ final class PwaEndpointsTest extends WebTestCase
         $client->request(Request::METHOD_GET, '/sw.js');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('javascript', $client->getResponse()->headers->get('content-type') ?? '');
+        self::assertNull(
+            $client->getResponse()->headers->get('Set-Cookie'),
+            'Service worker must not Set-Cookie (same session overwrite risk as the manifest).',
+        );
     }
 
     public function testOfflinePageIsPublic(): void

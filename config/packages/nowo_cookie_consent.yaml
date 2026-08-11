@@ -90,30 +90,30 @@ nowo_cookie_consent:
     # First-party cookies used by this Beacon instance (YAML fallback when DB inventory is empty).
     # Names must match CookieConsentBundle CookieNameEnum + Symfony session / remember_me / CSRF.
     cookie_inventory:
-        - name: PHPSESSID
-          duration: Session
+        - name: '%beacon.session_cookie_name%'
+          duration: 1 day
           category: required
           type: first_party
           sort_order: 0
           translations:
               en:
                   provider: Beacon (first-party)
-                  purpose: Maintains the authenticated HTTP session required to access protected areas of the service.
+                  purpose: Maintains the authenticated HTTP session required to access protected areas of the service (up to 1 day without Remember me).
               es:
                   provider: Beacon (primera parte)
-                  purpose: Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio.
+                  purpose: Mantiene la sesión HTTP autenticada necesaria para acceder a las áreas protegidas del servicio (hasta 1 día sin Recordarme).
         - name: REMEMBERME
-          duration: 7 days
+          duration: 30 days
           category: required
           type: first_party
           sort_order: 10
           translations:
               en:
                   provider: Beacon (first-party)
-                  purpose: Enables persistent authentication when the user selects “Remember me” at sign-in (secure token; limited lifetime).
+                  purpose: Enables persistent authentication when the user selects “Remember me” at sign-in (secure token; up to 30 days).
               es:
                   provider: Beacon (primera parte)
-                  purpose: Permite la autenticación persistente cuando el usuario selecciona «Recordarme» al iniciar sesión (token seguro; duración limitada).
+                  purpose: Permite la autenticación persistente cuando el usuario selecciona «Recordarme» al iniciar sesión (token seguro; hasta 30 días).
         - name: csrf-token_*
           duration: Session
           category: required

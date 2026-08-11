@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\Jwt\FactoryTokenProvider;
+use Symfony\Component\Mercure\Jwt\Grant;
 use Symfony\Component\Mercure\Jwt\LcobucciFactory;
 use Symfony\Component\Mercure\Update;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -79,7 +80,10 @@ final class ConfiguredMercure implements ResetInterface
         /** @var non-empty-string $secret */
         $factory = new LcobucciFactory($secret);
 
-        return $factory->create($topics, []);
+        // symfony/mercure ≥0.8: create() takes Grant objects (not topic string lists).
+        return $factory->create([
+            new Grant([Grant::ACTION_SUBSCRIBE], $topics),
+        ]);
     }
 
     public function publish(Update $update): void
@@ -125,7 +129,9 @@ final class ConfiguredMercure implements ResetInterface
 
         /** @var non-empty-string $secret */
         $factory = new LcobucciFactory($secret);
-        $provider = new FactoryTokenProvider($factory, [], ['*']);
+        $provider = new FactoryTokenProvider($factory, [
+            new Grant([Grant::ACTION_PUBLISH], ['*']),
+        ]);
         $public = $this->resolvedPublicUrl();
         $client = $this->httpClient ?? HttpClient::create();
 

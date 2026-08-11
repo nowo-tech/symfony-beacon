@@ -6,6 +6,7 @@ twig:
     globals:
         enabled_locales: '%kernel.enabled_locales%'
         default_locale: '%kernel.default_locale%'
+        session_cookie_name: '%beacon.session_cookie_name%'
         site_appearance: '@App\Shared\Appearance\SiteAppearanceProvider'
         app_section: '@App\Shared\Navigation\AppSectionResolver'
 

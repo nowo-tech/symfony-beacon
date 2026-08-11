@@ -1,7 +1,14 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-    session: true
+    # Session auth without Remember me: keep login for 1 day (cookie + server GC).
+    # Cookie name: %beacon.session_cookie_name% (config/parameters.yaml).
+    session:
+        name: '%beacon.session_cookie_name%'
+        cookie_lifetime: 86400
+        gc_maxlifetime: 86400
+        cookie_samesite: lax
+        cookie_httponly: true
     form: true
     csrf_protection: true
     validation: { enable_attributes: true }
@@ -11,8 +18,6 @@ when@prod:
     framework:
         session:
             cookie_secure: true
-            cookie_samesite: lax
-            cookie_httponly: true
 
 when@test:
     framework:

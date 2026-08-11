@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.4] - 2026-08-11
+
+### Changed
+
+- Session lifetime without Remember me is **1 day** (`framework.session` + PHP `gc_maxlifetime`); Remember me cookie is **30 days**.
+- Session cookie name is `beacon.session_cookie_name` in `config/parameters.yaml` (`SYMFONY_BEACON_SESSID`).
+
+### Fixed
+
+- Spontaneous logouts: `/manifest.webmanifest` and `/sw.js` no longer emit `Set-Cookie` (guest session was overwriting the authenticated session cookie).
+- Mercure subscriber/publisher JWTs adapted to `symfony/mercure` **0.8** `Grant` API (`/account/realtime/config` no longer 500).
+
 ## [1.6.3] - 2026-08-11
 
 ### Changed
@@ -891,7 +903,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...HEAD
+[1.6.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.0...v1.6.1

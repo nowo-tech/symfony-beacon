@@ -2212,8 +2212,8 @@ legal:
     col_category: Category
     col_duration: Duration
     col_purpose: Purpose
-    duration_session: Session
-    duration_remember: Up to 7 days
+    duration_session: Up to 1 day
+    duration_remember: Up to 30 days
     duration_consent: Approximately 1 year
     purpose_session: Maintains the authenticated HTTP session required to access protected
       areas of the service.

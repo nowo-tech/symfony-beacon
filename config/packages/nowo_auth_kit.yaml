@@ -27,7 +27,8 @@ nowo_auth_kit:
                 - password
             remember_me:
                 enabled: true
-                lifetime: 604800
+                # Keep in sync with security.firewalls.main.remember_me.lifetime (30 days).
+                lifetime: 2592000
                 path: /
             password_strength:
                 enabled: true
