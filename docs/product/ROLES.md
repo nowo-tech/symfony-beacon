@@ -98,9 +98,9 @@ Logical keys: `App\Project\Security\ProjectPermission` (checked via `ProjectAcce
 
 `full` matches `owner` for every `project.*` key but is **not** primary owner: it cannot transfer ownership and does not count as the last-owner guard. Groups may only be `admin` / `member` / `viewer` (never `owner` or `full`). After ownership transfer, the former primary owner is demoted to `full`. A `full` member must be demoted before removal.
 
-Membership UI: rows with role **`owner`** do not show edit-role or remove actions (project Settings and Administration → Projects). Hand off primary ownership only via **Transfer ownership**.
+Membership UI: rows with role **`owner`** do not show edit-role or remove actions (project Settings and Administration → Projects). Hand off primary ownership only via **Transfer ownership**. Direct memberships also have an **`active`** flag (`089`): inactive rows grant no product access and are excluded from last-owner counts; activate/deactivate requires `project.members.manage`.
 
-Helpers on `ProjectRole` / `ProjectAccess` (`canTriageIssues()`, `canManageSettings()`, `isPrimaryOwner()`, …) wrap that matrix. Resolved by `ProjectAccessService` from direct membership, group links, share grants, and the instance-`ROLE_ADMIN` shortcut (effective owner unless view-as-member).
+Helpers on `ProjectRole` / `ProjectAccess` (`canTriageIssues()`, `canManageSettings()`, `isPrimaryOwner()`, …) wrap that matrix. Resolved by `ProjectAccessService` from **active** direct membership, group links, share grants, and the instance-`ROLE_ADMIN` shortcut (effective owner unless view-as-member).
 
 Admin UI labels “Admin” / “User” on `/admin/users` map to **`ROLE_ADMIN` / no `ROLE_ADMIN`** (instance). Project role labels use the membership enum strings.
 
@@ -115,8 +115,8 @@ Product HTTP actions must call `ProjectAccessService` **before** reading sensiti
 | Open Issues / Performance / Analytics / Releases | `requireAccess()` / `requireMembership()` (`project.view`) |
 | Triage / comments / saved-view mutations | `requireTriage()` or `requirePermission(…, ProjectPermission::ISSUES_TRIAGE)` |
 | Settings page GET | `requireSettingsSurface()` (any manage/delete grant) |
-| Governance, read tokens, clear history, export | `requirePermission(…, ProjectPermission::SETTINGS_MANAGE)` |
-| Members / group links | `requirePermission(…, ProjectPermission::MEMBERS_MANAGE)` |
+| Governance, read tokens, clear history, export issues/events, **project config export/import** | `requirePermission(…, ProjectPermission::SETTINGS_MANAGE)` |
+| Members / group links / **activate·deactivate membership** | `requirePermission(…, ProjectPermission::MEMBERS_MANAGE)` |
 | Transfer ownership | `requirePrimaryOwner()` (exact `Owner`; not `full`) |
 | API keys create/rotate/revoke | `requirePermission(…, ProjectPermission::API_KEYS_MANAGE)` |
 | Notification destinations / thresholds | `requirePermission(…, ProjectPermission::NOTIFICATIONS_MANAGE)` |

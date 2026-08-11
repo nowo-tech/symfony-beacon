@@ -160,6 +160,46 @@ final class ProjectMemberController extends AbstractController
         return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
     }
 
+    /** Activate or deactivate a direct membership without deleting it (089). */
+    #[Route(
+        '/projects/{projectId}/members/{userId}/active',
+        name: 'project_members_set_active',
+        requirements: ['projectId' => Requirement::UUID, 'userId' => Requirement::UUID],
+        methods: ['POST'],
+    )]
+    public function setActive(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        #[MapEntity(mapping: ['userId' => 'uuid'])]
+        User $memberUser,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
+
+        $target = $this->requireTargetMembership($project, $memberUser);
+        $active = $request->request->getBoolean('active');
+
+        if (!$this->isCsrfTokenValid('project_member_active_'.$target->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        try {
+            $this->membershipManager->setActive($project, $actor, $target, $active);
+            $this->addFlash('success', $active ? 'flash.project.member_activated' : 'flash.project.member_deactivated');
+        } catch (RuntimeException $e) {
+            if ('forbidden' === $e->getMessage()) {
+                throw $this->createAccessDeniedException();
+            }
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('error', ProjectAccessFlashKeys::forCode($e->getMessage()));
+        }
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+    }
+
     /**
      * Transfer project ownership to another direct member (owner or instance ROLE_ADMIN).
      */

@@ -1868,8 +1868,8 @@ setup:
     lead: Está tudo bem. O setup está fechado para ninguém configurar a instância
       ao acaso.
     body: Abre %path% com o SITE_SETUP_TOKEN do teu ambiente.
-    step_env: Procura SITE_SETUP_TOKEN no teu .env (em .env.dist está o valor local
-      documentado).
+    step_env: Procura SITE_SETUP_TOKEN no teu .env (gera um valor aleatório se
+      estiver vazio — ver docs/INSTALL.md).
     step_url: Abre %path% no browser — substitui … por esse token.
     step_header: Ou envia o cabeçalho X-Setup-Token com o mesmo valor.
   reason:

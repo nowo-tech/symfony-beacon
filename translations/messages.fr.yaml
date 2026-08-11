@@ -1907,8 +1907,8 @@ setup:
     lead: Rien n'est cassé. Le setup est verrouillé pour empêcher une configuration
       au hasard.
     body: Ouvrez %path% avec le SITE_SETUP_TOKEN de votre environnement.
-    step_env: Trouvez SITE_SETUP_TOKEN dans votre .env (la valeur locale documentée
-      est dans .env.dist).
+    step_env: Trouvez SITE_SETUP_TOKEN dans votre .env (générez une valeur
+      aléatoire si vide — voir docs/INSTALL.md).
     step_url: Ouvrez %path% dans le navigateur — remplacez … par ce jeton.
     step_header: Ou envoyez l'en-tête X-Setup-Token avec la même valeur.
   reason:

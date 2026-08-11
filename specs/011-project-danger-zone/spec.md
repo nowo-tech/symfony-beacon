@@ -66,7 +66,7 @@ As a project owner, I can hand ownership to another direct member and become a *
 - **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`).
 - **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
 - **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to **full** (`ProjectMembershipManager::transferOwnership`); MUST require primary project owner (`ProjectAccessService::requirePrimaryOwner()` — exact `Owner`, not rank).
-- **FR-007**: Settings (and Admin → Projects) MUST NOT show edit-role or remove controls on membership rows whose role is `owner`. Changing primary ownership MUST go through Transfer ownership (FR-006), not member role CRUD.
+- **FR-007**: Settings (and Admin → Projects) MUST NOT show edit-role or remove controls on membership rows whose role is `owner`. Changing primary ownership MUST go through Transfer ownership (FR-006), not member role CRUD. Deactivating membership (`089`) MUST NOT deactivate the last **active** owner (same last-owner guard family as remove/demote).
 - **FR-008**: Danger-zone controls follow dual gating (`002` FR-013 / FR-014): Clear / Transfer / Delete are hidden without the matching Twig helper and POSTs without the matching server check return **403**.
 
 ## Success Criteria

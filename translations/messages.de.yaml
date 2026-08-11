@@ -1902,8 +1902,8 @@ setup:
     lead: Alles in Ordnung. Setup ist gesperrt, damit Fremde die Instanz nicht konfigurieren
       können.
     body: Öffnen Sie %path% mit dem SITE_SETUP_TOKEN aus Ihrer Umgebung.
-    step_env: Finden Sie SITE_SETUP_TOKEN in Ihrer .env (den lokalen Standard dokumentiert
-      .env.dist).
+    step_env: Finden Sie SITE_SETUP_TOKEN in Ihrer .env (bei leerem Wert zufällig
+      erzeugen — siehe docs/INSTALL.md).
     step_url: Öffnen Sie %path% im Browser — ersetzen Sie … durch diesen Token.
     step_header: Oder senden Sie den Header X-Setup-Token mit demselben Wert.
   reason:

@@ -44,6 +44,8 @@ nowo_auth_kit:
                 mode: enabled
                 lifetime: 600
                 max_uses: 1
+                # Pair with security.login_link.check_post_only (AuthKit 1.16+).
+                confirm_interstitial: true
             # OAuth buttons appear only when mode=enabled AND ≥1 enabled row in auth_kit_social_credential.
             # create_user_if_missing:false — link existing users by email (avoids ROLE_ADMIN social sign-ups).
             social_login:
@@ -70,6 +72,7 @@ nowo_auth_kit:
                 login: '@NowoAuthKitBundle/security/login.html.twig'
                 register: '@NowoAuthKitBundle/security/register.html.twig'
                 magic_login_request: '@NowoAuthKitBundle/security/magic_login_request.html.twig'
+                magic_login_confirm: '@NowoAuthKitBundle/security/magic_login_confirm.html.twig'
                 reset_request: '@NowoAuthKitBundle/security/reset_request.html.twig'
                 reset_password: '@NowoAuthKitBundle/security/reset_password.html.twig'
                 reset_password_code: '@NowoAuthKitBundle/security/reset_password_code.html.twig'

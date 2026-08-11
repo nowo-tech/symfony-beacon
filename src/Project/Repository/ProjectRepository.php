@@ -58,7 +58,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->leftJoin('p.groupAccesses', 'ga')
             ->leftJoin('ga.userGroup', 'g')
             ->leftJoin('g.memberships', 'gm')
-            ->andWhere('m.user = :user OR gm.user = :user')
+            ->andWhere('(m.user = :user AND m.active = true) OR gm.user = :user')
             ->setParameter('user', $user)
             ->orderBy('p.name', 'ASC');
 
@@ -174,6 +174,23 @@ class ProjectRepository extends ServiceEntityRepository
         }
 
         return $map;
+    }
+
+    /**
+     * Resolve an ingest path segment: public UUID (preferred) or legacy numeric primary key.
+     */
+    public function findOneByIngestPath(string $projectRef): ?Project
+    {
+        $projectRef = trim($projectRef);
+        if ('' === $projectRef) {
+            return null;
+        }
+
+        if (ctype_digit($projectRef)) {
+            return $this->find((int) $projectRef);
+        }
+
+        return $this->findOneBy(['uuid' => $projectRef]);
     }
 
     public function save(Project $project, bool $flush = true): void

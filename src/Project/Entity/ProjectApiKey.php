@@ -137,13 +137,14 @@ class ProjectApiKey
     }
 
     /**
-     * Envelope-compatible DSN: https://{public}:{secret}@{host}/{projectId}.
+     * Envelope-compatible DSN: https://{public}:{secret}@{host}/{projectUuid}.
      *
      * The secret is included whenever present so clients can satisfy ingest auth.
+     * Path uses the public project UUID (numeric id remains accepted on ingest for back-compat).
      */
     public function buildDsn(string $baseUrl): string
     {
-        $projectId = $this->project?->getId() ?? 0;
+        $projectUuid = $this->project?->getUuid() ?? '';
         $host = parse_url(rtrim($baseUrl, '/'), \PHP_URL_HOST) ?: 'localhost';
         $scheme = parse_url(rtrim($baseUrl, '/'), \PHP_URL_SCHEME) ?: 'https';
         $port = parse_url(rtrim($baseUrl, '/'), \PHP_URL_PORT);
@@ -153,6 +154,6 @@ class ProjectApiKey
             $userinfo .= ':'.$this->secretKey;
         }
 
-        return \sprintf('%s://%s@%s/%d', $scheme, $userinfo, $authority, $projectId);
+        return \sprintf('%s://%s@%s/%s', $scheme, $userinfo, $authority, $projectUuid);
     }
 }

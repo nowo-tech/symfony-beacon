@@ -5,23 +5,23 @@ symfony-beacon accepts the **Envelope** wire protocol.
 ## DSN format
 
 ```text
-https://<public_key>:<secret_key>@<host>:<port>/<project_id>
+https://<public_key>:<secret_key>@<host>:<port>/<project_uuid>
 ```
 
 Example (local HTTPS UI):
 
 ```text
-https://9cb5e28adc3ed7a40052e2a17e327220:abcdef0123456789@localhost:9447/1
+https://9cb5e28adc3ed7a40052e2a17e327220:abcdef0123456789@localhost:9447/019fea2d-507b-7890-8b33-ca488db6f696
 ```
 
 Ingest **always requires** `beacon_secret` (or the secret segment of the DSN). Keys created by Beacon always include a secret; public-key-only auth is rejected with HTTP 403.
 
-The **public key** is an opaque project identifier (safe to show in Settings / DSN examples). It is **not** a credential — protect the secret.
+The **public key** is an opaque credential identifier (safe to show in Settings). The DSN path is the project **UUID**. Legacy numeric project ids in the path are still accepted for older clients.
 
 Docker clients (BeaconBundle FrankenPHP demo) on the **local** stack (`compose.yaml`) may use **HTTP ingest** on port `9084` via `host.docker.internal` — the development Caddyfile serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9447`. **Production** (`compose.prod.yaml` / `Caddyfile.prod`) does **not** accept cleartext ingest: use an `https://…` DSN only.
 
 ```text
-http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9084/1
+http://PUBLIC_KEY:SECRET_KEY@host.docker.internal:9084/<project_uuid>
 ```
 
 Create keys from the project settings page (owner/admin) or via `bin/console app:seed-demo` / `make seed` / `make ready` (after `make seed-platform` or `make bootstrap`).
@@ -33,14 +33,14 @@ This repository requires [`nowo-tech/beacon-bundle`](https://github.com/nowo-tec
 After `make seed` / `make ready`, when `BEACON_DSN` is empty, demo seed writes a **loopback** DSN into `.env`:
 
 ```text
-http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_id}
+http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_uuid}
 ```
 
 Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops events whose request path contains `/envelope/` to avoid ingest feedback loops. See `config/packages/nowo_beacon.yaml`.
 
 ### Local demo sync (external BeaconBundle)
 
-`make seed` writes `.demo-client.env` with a Docker-ready client `BEACON_DSN` (`http://…@host.docker.internal:9084/{id}`).
+`make seed` writes `.demo-client.env` with a Docker-ready client `BEACON_DSN` (`http://…@host.docker.internal:9084/{uuid}`).
 
 In the sibling repo `BeaconBundle/demo/symfony8`:
 
@@ -55,7 +55,7 @@ Override the Beacon checkout path with `BEACON_REPO=/path/to/symfony-beacon`.
 Install [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) and set `BEACON_DSN` to this server (any host/port):
 
 ```env
-BEACON_DSN=https://PUBLIC:SECRET@localhost:9447/1
+BEACON_DSN=https://PUBLIC:SECRET@localhost:9447/<project_uuid>
 ```
 
 The bundle authenticates with `X-Beacon-Auth` (`beacon_key` + `beacon_secret`) and embeds the full DSN in the envelope header. Content-Type is `application/x-beacon-envelope`.
@@ -63,7 +63,7 @@ The bundle authenticates with `X-Beacon-Auth` (`beacon_key` + `beacon_secret`) a
 Ingest endpoint:
 
 ```http
-POST /api/{project_id}/envelope/
+POST /api/{project_uuid}/envelope/
 Content-Type: application/x-beacon-envelope
 ```
 
@@ -72,7 +72,7 @@ Content-Type: application/x-beacon-envelope
 Collectors / SDKs that speak OTLP can POST logs (same project credentials):
 
 ```http
-POST /api/{project_id}/otlp/v1/logs
+POST /api/{project_uuid}/otlp/v1/logs
 Content-Type: application/json
 X-Beacon-Auth: Beacon beacon_key=PUBLIC, beacon_secret=SECRET
 ```

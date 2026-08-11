@@ -23,6 +23,7 @@ use Nowo\AuditKitBundle\Model\TimestampableTrait;
 #[ORM\Table(name: 'project')]
 #[ORM\UniqueConstraint(name: 'uniq_project_slug', columns: ['slug'])]
 #[ORM\UniqueConstraint(name: 'uniq_project_uuid', columns: ['uuid'])]
+#[ORM\UniqueConstraint(name: 'uniq_project_code', columns: ['code'])]
 class Project implements AuditableInterface
 {
     use PublicUuidTrait;
@@ -38,6 +39,10 @@ class Project implements AuditableInterface
 
     #[ORM\Column(length: 120)]
     private string $slug = '';
+
+    /** Stable portability key (unique); defaults to slug when empty. */
+    #[ORM\Column(length: 120)]
+    private string $code = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
@@ -134,6 +139,21 @@ class Project implements AuditableInterface
     public function setSlug(string $slug): self
     {
         $this->slug = strtolower(trim($slug));
+        if ('' === $this->code) {
+            $this->code = $this->slug;
+        }
+
+        return $this;
+    }
+
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = strtolower(trim($code));
 
         return $this;
     }

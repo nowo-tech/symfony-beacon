@@ -18,6 +18,7 @@
         </p>
     </div>
     <div class="flex flex-wrap gap-2">
+        <a class="btn-ghost no-underline" href="{{ path('admin_project_export', {id: project.uuid}) }}">{{ 'admin_projects.config.export_one'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('issue_index', {id: project.uuid}) }}">{{ 'admin_projects.open_issues'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'admin_projects.open_settings'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('admin_projects_edit', {id: project.uuid}) }}">{{ 'admin_projects.edit'|trans }}</a>

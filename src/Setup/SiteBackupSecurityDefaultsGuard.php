@@ -29,15 +29,17 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
 {
-    /** bcrypt hash for local password "beacon-local-panel" shipped in `.env.dist`. */
+    /**
+     * Historically documented bcrypt for password "beacon-local-panel".
+     * Must not appear in `.env.dist`; still rejected outside local development.
+     */
     public const string LOCAL_DEV_PANEL_PASSWORD_HASH = '$2y$12$h4X4XEsjEForb/3ZYVEXkuKT6B5GHlsAVx6EwJBBpJ15WnkrptgtW';
 
-    /** Documented local setup token from `.env.dist` — must be rotated outside local development. */
+    /** Historically documented setup token — rejected outside local development. */
     public const string LOCAL_DEV_SETUP_TOKEN = 'beacon-local-setup';
 
-    /** Documented local APP_SECRET from `.env.dist` — must be rotated outside local development. */
+    /** Documented placeholder APP_SECRET from `.env.dist` — must be rotated outside local development. */
     public const string LOCAL_DEV_APP_SECRET = 'ChangeMePleaseUseARealSecret';
-
     /** @var list<string> */
     private const array SKIP_CONSOLE_COMMANDS = [
         'cache:clear',

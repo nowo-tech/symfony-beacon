@@ -46,6 +46,7 @@ class ProjectMembershipRepository extends ServiceEntityRepository
             ->select('IDENTITY(m.project) AS projectId, COUNT(m.id) AS cnt')
             ->andWhere('m.project IN (:projectIds)')
             ->andWhere('m.role = :role')
+            ->andWhere('m.active = true')
             ->setParameter('projectIds', $projectIds)
             ->setParameter('role', ProjectRole::Owner)
             ->groupBy('m.project')
@@ -119,6 +120,7 @@ class ProjectMembershipRepository extends ServiceEntityRepository
             ->from(User::class, 'u')
             ->innerJoin('u.memberships', 'm')
             ->andWhere('m.project IN (:projectIds)')
+            ->andWhere('m.active = true')
             ->setParameter('projectIds', $projectIds)
             ->getQuery()
             ->getResult();

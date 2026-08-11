@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ingest\Controller;
 
+use App\Ingest\IngestRouteRequirements;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\EnvelopeParser;
@@ -34,7 +35,7 @@ use Throwable;
 final readonly class EnvelopeController
 {
     private const string ENVELOPE_EXAMPLE = <<<'ENVELOPE'
-{"dsn":"https://PUBLIC:SECRET@beacon.example/1"}
+{"dsn":"https://PUBLIC:SECRET@beacon.example/019fea2d-507b-7890-8b33-ca488db6f696"}
 {"type":"event","length":120}
 {"event_id":"a1b2c3d4e5f6478899aabbccddeeff00","message":"Something broke","level":"error","platform":"php","timestamp":1721491200.0}
 ENVELOPE;
@@ -56,26 +57,26 @@ ENVELOPE;
     ) {
     }
 
-    #[Route('/api/{projectId}/envelope/', name: 'ingest_envelope', requirements: ['projectId' => '\d+'], methods: ['POST'])]
+    #[Route('/api/{projectId}/envelope/', name: 'ingest_envelope', requirements: ['projectId' => IngestRouteRequirements::PROJECT_REF], methods: ['POST'])]
     #[OA\Post(path: '/api/{projectId}/envelope/', operationId: 'ingestEnvelope', description: <<<'MD'
 Accepts an Envelope body (newline-separated JSON header, item header, and payload).
 
 **Auth (preferred first):**
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
-- Envelope first-line JSON `"dsn": "https://public:secret@host/projectId"`
+- Envelope first-line JSON `"dsn": "https://public:secret@host/projectUuid"`
 - **Deprecated:** query `beacon_key` + `beacon_secret` (leaks into logs/Referer; responses include `Warning` / `Deprecation`). When ingest reject-query-auth is enabled (Ops defaults; default on), query auth is refused with **401**.
 
-The public key is an opaque identifier and MUST belong to `{projectId}`. Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
+The public key is an opaque identifier and MUST belong to `{projectId}` (project UUID; legacy numeric id still accepted). Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [
         ['BeaconAuth' => []],
         ['BeaconKeyQuery' => [], 'BeaconSecretQuery' => []],
     ], tags: ['Ingest'])]
     #[OA\Parameter(
         name: 'projectId',
-        description: 'Numeric project id from the Beacon DSN path (not the project UUID).',
+        description: 'Project public UUID from the Beacon DSN path (legacy numeric primary key still accepted).',
         in: 'path',
         required: true,
-        schema: new OA\Schema(type: 'integer', example: 1, minimum: 1),
+        schema: new OA\Schema(type: 'string', example: '019fea2d-507b-7890-8b33-ca488db6f696'),
     )]
     #[OA\Parameter(
         name: 'beacon_key',
@@ -143,7 +144,7 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
     )]
     #[OA\Response(
         response: 404,
-        description: 'Project id does not exist.',
+        description: 'Project UUID (or legacy numeric id) does not exist.',
         content: new OA\MediaType(
             mediaType: 'text/plain',
             schema: new OA\Schema(type: 'string', example: 'project not found'),
@@ -178,7 +179,7 @@ MD,
             ),
         ),
     )]
-    public function __invoke(int $projectId, Request $request): Response
+    public function __invoke(string $projectId, Request $request): Response
     {
         $body = $request->getContent();
         if ('' === $body) {
@@ -188,6 +189,12 @@ MD,
         if (\strlen($body) > $this->opsDefaults->envelopeMaxBytes()) {
             return new Response('envelope too large', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
+
+        $pathProject = $this->projectRepository->findOneByIngestPath($projectId);
+        if (!$pathProject instanceof Project || null === $pathProject->getId()) {
+            return $this->ingestResponse('project not found', Response::HTTP_NOT_FOUND, false);
+        }
+        $numericProjectId = $pathProject->getId();
 
         $envelopeDsn = null;
         try {
@@ -206,7 +213,7 @@ MD,
         $usedQueryAuth = $this->authParser->queryContainsCredentials($queryString);
         if ($usedQueryAuth) {
             $this->logger->warning('Deprecated Envelope ingest auth via query string; prefer X-Beacon-Auth or envelope dsn.', [
-                'project_id' => $projectId,
+                'project_id' => $numericProjectId,
                 'client_ip' => $request->getClientIp(),
             ]);
             if ($this->queryAuthSettings->shouldRejectQueryAuth()) {
@@ -229,7 +236,7 @@ MD,
         }
 
         $apiKey = $this->apiKeyRepository->findActiveByPublicKey($auth['public_key']);
-        if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
+        if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $numericProjectId) {
             return $this->ingestResponse('forbidden', Response::HTTP_FORBIDDEN, $usedQueryAuth);
         }
 
@@ -248,15 +255,11 @@ MD,
             $this->envelopeParser->parse($body);
         } catch (Throwable $e) {
             $this->logger->notice('Envelope parse rejected.', [
-                'project_id' => $projectId,
+                'project_id' => $numericProjectId,
                 'error' => $e->getMessage(),
             ]);
 
             return $this->ingestResponse('invalid envelope', Response::HTTP_BAD_REQUEST, $usedQueryAuth);
-        }
-
-        if (null === $this->projectRepository->find($projectId)) {
-            return $this->ingestResponse('project not found', Response::HTTP_NOT_FOUND, $usedQueryAuth);
         }
 
         if (!$project->isIngestEnabled()) {
@@ -276,14 +279,14 @@ MD,
         }
 
         $rateLimit = $this->governanceResolver->effectiveIngestRateLimit($project);
-        if (!$this->ingestRateLimiter->accept($projectId, $rateLimit)) {
+        if (!$this->ingestRateLimiter->accept($numericProjectId, $rateLimit)) {
             return $this->ingestResponse('rate limit exceeded', Response::HTTP_TOO_MANY_REQUESTS, $usedQueryAuth, [
                 'Retry-After' => '60',
             ]);
         }
 
         $this->bus->dispatch(new ProcessEnvelopeMessage(
-            $projectId,
+            $numericProjectId,
             $this->scrubEnvelopeCredentials($body),
             new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ));

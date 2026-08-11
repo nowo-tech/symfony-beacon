@@ -6,7 +6,7 @@
 
 ## Content Quality
 
-- [x] Focused on operator/security outcomes (show-once secrets, fail-closed bootstrap)
+- [x] Focused on operator/security outcomes (DSN gating for managers, revoked-key redaction, fail-closed bootstrap)
 - [x] Mandatory sections completed (scenarios, FRs, success criteria, non-goals)
 - [x] English prose (constitution Principle VI)
 
@@ -21,6 +21,6 @@
 
 ## Feature Readiness
 
-- [x] Implemented code matches Scope table S1–S8
+- [x] Implemented code matches Scope table S1–S8 (S1 amended 2026-08-11: active DSN listing + revoked hidden)
 - [x] PHPUnit coverage listed under QA
 - [x] ROADMAP / CHANGELOG / UPGRADING updated with `087`

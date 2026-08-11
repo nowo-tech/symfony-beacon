@@ -23,4 +23,9 @@
 ## Amendment (`087-security-audit-hardening`, 2026-08-10)
 
 - Newly generated public keys MUST use high-entropy random material (`bin2hex(random_bytes(16+))`). Human-friendly adjective-noun tokens remain **labels only** (`ProjectApiKeyFactory`).
-- Settings MUST NOT re-render the secret/DSN on every GET; show-once after create/rotate (see `087` FR-001 / `018` FR-004).
+- Create/rotate one-shot DSN banner; see `087` FR-001.
+
+## Amendment (API key DSN visibility, 2026-08-11)
+
+- Managers MAY see a copyable DSN under **active** keys when the secret is available (`002` FR-003).
+- **Revoked / inactive** keys MUST NOT show secret or copyable DSN (`018` FR-003; `087` amendment).

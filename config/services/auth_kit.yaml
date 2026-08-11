@@ -11,8 +11,3 @@ services:
     Nowo\AuthKitBundle\MagicLogin\MagicLoginRequestHandler:
         arguments:
             $loginLinkHandler: '@security.authenticator.login_link_handler.main'
-
-    # Decorates AuthKitRouteLoader only — must not also register as a second routing.loader.
-    App\Identity\Routing\MagicLoginCheckRouteLoaderDecorator:
-        autoconfigure: false
-        decorates: Nowo\AuthKitBundle\Routing\AuthKitRouteLoader

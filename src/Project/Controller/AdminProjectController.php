@@ -370,6 +370,7 @@ final class AdminProjectController extends AbstractController
         return $this->membershipRepository->count([
             'project' => $project,
             'role' => ProjectRole::Owner,
+            'active' => true,
         ]);
     }
 
@@ -385,6 +386,10 @@ final class AdminProjectController extends AbstractController
             UserActionType::ProjectMemberAdded,
             UserActionType::ProjectMemberRoleChanged,
             UserActionType::ProjectMemberRemoved,
+            UserActionType::ProjectMemberActivated,
+            UserActionType::ProjectMemberDeactivated,
+            UserActionType::ProjectConfigExported,
+            UserActionType::ProjectConfigImported,
             UserActionType::ProjectOwnershipTransferred,
             UserActionType::ProjectGroupLinked,
             UserActionType::ProjectGroupRoleChanged,

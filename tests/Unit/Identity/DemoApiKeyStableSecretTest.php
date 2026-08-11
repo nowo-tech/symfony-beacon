@@ -16,6 +16,7 @@ final class DemoApiKeyStableSecretTest extends TestCase
         $project = new Project();
         $project->setName(SeedDemoCommand::DEMO_PROJECT_NAME);
         $project->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
+        $project->ensureUuid();
 
         $key = ProjectApiKey::generate(
             $project,
@@ -28,6 +29,9 @@ final class DemoApiKeyStableSecretTest extends TestCase
         self::assertSame(SeedDemoCommand::DEMO_SECRET_KEY, $key->getSecretKey());
 
         $dsn = $key->buildDsn(SeedDemoCommand::SELF_INGEST_BASE_URL);
-        self::assertStringStartsWith('http://'.SeedDemoCommand::DEMO_PUBLIC_KEY.':'.SeedDemoCommand::DEMO_SECRET_KEY.'@127.0.0.1/', $dsn);
+        self::assertSame(
+            'http://'.SeedDemoCommand::DEMO_PUBLIC_KEY.':'.SeedDemoCommand::DEMO_SECRET_KEY.'@127.0.0.1/'.$project->getUuid(),
+            $dsn,
+        );
     }
 }

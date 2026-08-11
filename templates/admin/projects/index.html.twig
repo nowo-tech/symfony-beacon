@@ -81,4 +81,18 @@
         </tbody>
     {% endblock %}
 {% endembed %}
+
+<section class="panel mt-6">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'admin_projects.config.title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.help'|trans }}</p>
+    <div class="flex flex-wrap items-center gap-3">
+        <a class="btn-ghost no-underline" href="{{ path('admin_projects_export') }}">{{ 'admin_projects.config.export_all'|trans }}</a>
+        <form method="post" action="{{ path('admin_projects_import') }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_projects_import') }}">
+            <input class="input" type="file" name="bundle" accept="application/json,.json" required>
+            <button class="btn-primary" type="submit">{{ 'admin_projects.config.import'|trans }}</button>
+        </form>
+    </div>
+    <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.config.note'|trans }}</p>
+</section>
 {% endblock %}

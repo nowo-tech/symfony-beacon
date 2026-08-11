@@ -16,7 +16,7 @@ interface OtlpIngestGatewayInterface
     /**
      * @return Response|array{project: Project, body: string}
      */
-    public function accept(int $projectId, Request $request): Response|array;
+    public function accept(string $projectRef, Request $request): Response|array;
 
     /**
      * @param array<string, string> $extraHeaders

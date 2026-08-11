@@ -17,9 +17,11 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 
 ```bash
 cp .env.dist .env
-# Local defaults: SITE_SETUP_TOKEN=beacon-local-setup
-#                 SITE_BACKUP_PASSWORD_HASH → password "beacon-local-panel"
-# Rotate both before any internet-facing deploy (see docs/PRODUCTION.md).
+# Set SiteBackup secrets in .env (do not commit them):
+#   SITE_SETUP_TOKEN=$(openssl rand -hex 24)
+#   docker compose exec php bin/console nowo:site-backup:hash-password
+#   → paste into SITE_BACKUP_PASSWORD_HASH
+# Outside dev/test, empty or historically known local values fail closed (docs/PRODUCTION.md).
 make up
 make ready              # migrate + platform + demo + dogfood BEACON_DSN when empty
 # or step by step:
@@ -30,13 +32,14 @@ make seed-sample        # optional: PROFILE=dev samples
 # make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/ops/MAILPIT.md
 #
 # Later: make test / make phpstan / make shell auto-call `make ensure-up`
-# (starts Compose if php is down — no rebuild / no Vite). Use `make up` for first boot.```
+# (starts Compose if php is down — no rebuild / no Vite). Use `make up` for first boot.
+```
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
 
 To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 
-Alternatively open the app with an empty (or catalog-less) database: the SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`** (local default `beacon-local-setup`). Choose **guided** (migrations, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
+Alternatively open the app with an empty (or catalog-less) database: the SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`**. Choose **guided** (migrations, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
 
 Headless equivalent:
 
@@ -77,15 +80,16 @@ Purge removes issues/events/performance/stats for the target project; the projec
 
 ## Backup / restore panel + setup token
 
-| Secret | Purpose | Local default (`.env.dist`) | Production |
-|--------|---------|-------------------------------|------------|
-| `SITE_SETUP_TOKEN` | Gate `/setup` (`?token=` or `X-Setup-Token`) | `beacon-local-setup` | **Required unique** — empty/local default refused at boot |
-| `SITE_BACKUP_PASSWORD_HASH` | Password for `/_site_backup` | hash of `beacon-local-panel` | **Required unique** — local default refused at boot |
+| Secret | Purpose | `.env.dist` | Production |
+|--------|---------|-------------|------------|
+| `SITE_SETUP_TOKEN` | Gate `/setup` (`?token=` or `X-Setup-Token`) | empty (set in `.env`) | **Required unique** — empty / known-local values refused at boot |
+| `SITE_BACKUP_PASSWORD_HASH` | Password for `/_site_backup` | empty (generate into `.env`) | **Required unique** — empty / known-local hashes refused at boot |
 
 ```bash
-# Generate a panel password hash
+# Generate secrets into .env (never commit .env)
+openssl rand -hex 24   # → SITE_SETUP_TOKEN=
 docker compose exec php bin/console nowo:site-backup:hash-password
-# Put the hash in SITE_BACKUP_PASSWORD_HASH and a random SITE_SETUP_TOKEN in .env
+# → SITE_BACKUP_PASSWORD_HASH='…'
 ```
 
 Docs: [SiteBackupBundle](https://github.com/nowo-tech/SiteBackupBundle/tree/main/docs), [PRODUCTION.md](PRODUCTION.md).

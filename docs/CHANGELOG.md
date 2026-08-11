@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-08-11
+
+### Added
+
+- Project config export/import (`089` / 6.38): JSON bundle `beacon-project-bundle` v1 with stable unique `project.code`, memberships by email + `active` flag. Administration (`ROLE_ADMIN`) can export all / one and import (creates missing users **disabled**). Project Settings (`project.settings.manage`) export/import without creating users. Membership deactivate/reactivate (`project.members.manage`). Migration `Version20260811110000`.
+- AuthKit **1.16.0**: kit-owned magic-login confirm interstitial (`confirm_interstitial` + `magic_login_confirm` template); removed host `MagicLoginConfirmController` / route-loader decorator.
+
+### Changed
+
+- Envelope / OTLP DSN path uses the project **UUID** (legacy numeric project ids still accepted on ingest). Docs: `docs/DSN.md`, Settings copyable DSN under **active** keys for managers.
+- `.env.dist` layout aligned (Compose project name, section order); SiteBackup password hash / setup token templates stay empty (fail-closed guard unchanged).
+- Specs / product docs: `089`, amendments to `002` / `011` / `018` / `019` / `044` / `052` / `087` / `088`; `docs/product/ROLES.md` membership `active` + config export gates.
+
+### Fixed
+
+- Project Settings: revoked (inactive) API keys no longer show a copyable DSN or secret.
+
 ## [1.5.1] - 2026-08-10
 
 ### Changed
@@ -837,7 +854,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.3.1...v1.4.0

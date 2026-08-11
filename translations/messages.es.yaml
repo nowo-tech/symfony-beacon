@@ -224,6 +224,8 @@ flash:
     member_added: Miembro añadido al proyecto.
     member_role_updated: Rol del miembro actualizado.
     member_removed: Miembro eliminado del proyecto.
+    member_activated: Acceso del miembro reactivado.
+    member_deactivated: Acceso del miembro desactivado.
     member_user_not_found: No existe un usuario con ese email. Debe registrarse antes.
     member_user_disabled: Esa cuenta de usuario está desactivada.
     member_already: Ese usuario ya es miembro del proyecto.
@@ -237,6 +239,13 @@ flash:
     transfer_confirmation_mismatch: El nombre del proyecto no coincide. No se cedió
       la propiedad.
     transfer_to_self: No puedes ceder la propiedad a ti mismo.
+    config_invalid_csrf: Token de seguridad no válido. Inténtalo de nuevo.
+    config_missing_file: Elige un JSON de proyecto para importar.
+    config_import_failed: No se pudo importar el paquete (JSON o esquema inválido).
+    config_code_mismatch: El código del proyecto en el paquete no coincide con este proyecto.
+    config_imported_admin: Proyectos importados (usuarios creados si faltaban).
+    config_imported_panel: Ajustes y membresías del proyecto actualizados desde el paquete.
+    config_users_skipped: Algunas membresías se omitieron porque esos emails no están registrados en esta instancia.
     transfer_already_owner: Ese miembro ya es propietario.
     group_added: Grupo vinculado al proyecto.
     group_role_updated: Rol del grupo actualizado.
@@ -395,7 +404,14 @@ project:
     title: Claves API / DSN
     help: Usa un DSN en BEACON_DSN para que tu app envíe errores a este proyecto.
     inactive: inactiva
+    inactive_dsn_hidden: Las claves revocadas no autentican ingest. No se muestra el DSN ni el secreto.
     public: 'pública:'
+    secret_hidden: El DSN completo y el secreto solo son visibles para propietarios y administradores del proyecto.
+    secret_once_hint: Rota esta clave para generar un secreto y DSN nuevos.
+    secret_once_banner: DSN nuevo listo — cópialo en tu cliente. También queda listado bajo la clave.
+    dsn_help: Copia este DSN para los clientes (la ruta es el UUID del proyecto). Rota para generar un secreto nuevo.
+    copy_dsn: Copiar DSN
+    dsn_copied: Copiado
     label_placeholder: p. ej. calm-otter
     generate: Sugerir nombre
     generate_hint: Rellena la etiqueta con un nombre legible (adjetivo-sustantivo)
@@ -404,11 +420,20 @@ project:
     revoke_confirm: ¿Revocar esta clave API? El ingest con este secreto fallará de
       inmediato.
     rotate: Rotar
+  config:
+    title: Exportar / importar proyecto
+    help: 'JSON portable de este proyecto (código: %code%). Incluye membresías por email; nunca incluye secretos de API.'
+    export: Exportar JSON
+    import: Importar JSON
+    panel_note: La importación solo actualiza este proyecto si el código coincide. Los emails desconocidos se omiten (aquí no se crean usuarios).
   members:
     title: Miembros
     help: Miembros directos de este proyecto. Propietarios y administradores gestionan
       la membresía. El acceso también puede venir de grupos vinculados.
     your_role: 'Tu rol:'
+    inactive: inactivo
+    activate: Activar acceso
+    deactivate: Desactivar acceso
     email_label: Email del miembro
     email_placeholder: usuario@ejemplo.com
     role_label: Rol
@@ -1607,6 +1632,13 @@ admin_projects:
   create: Nuevo proyecto
   empty: Aún no hay proyectos.
   open: Gestionar
+  config:
+    title: Exportar / importar proyectos
+    help: Descarga todos los proyectos como JSON o importa un paquete. Los usuarios que falten se crean desactivados (identificados por email).
+    export_all: Exportar todo JSON
+    export_one: Exportar JSON
+    import: Importar JSON
+    note: Idempotente por código de proyecto. Los secretos de API nunca se incluyen.
   col:
     project: Proyecto
     slug: Slug
@@ -1754,8 +1786,8 @@ setup:
     lead: Tranquilo, no está roto. El setup está cerrado para que nadie configure
       la instancia al azar.
     body: Abre %path% con el SITE_SETUP_TOKEN de tu entorno.
-    step_env: Busca SITE_SETUP_TOKEN en tu .env (en .env.dist está el valor local
-      documentado).
+    step_env: Busca SITE_SETUP_TOKEN en tu .env (genera un valor aleatorio si
+      está vacío — ver docs/INSTALL.md).
     step_url: Abre %path% en el navegador — sustituye … por ese token.
     step_header: O envía la cabecera X-Setup-Token con el mismo valor.
   reason:

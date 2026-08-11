@@ -34,9 +34,9 @@ As a project admin, I revoke a compromised key and rotate to a new key without d
 
 **Acceptance Scenarios**:
 
-1. **Given** an active API key, **When** I revoke it, **Then** subsequent ingest using that key is rejected.
-2. **Given** I rotate a key, **When** rotation completes, **Then** a new secret is shown once (banner / session one-shot) and the previous secret stops working after the documented cutover; reloading Settings does not show the secret again (`087`).
-3. **Given** multiple keys, **When** I revoke one, **Then** other keys remain valid.
+1. **Given** an active API key, **When** I revoke it, **Then** subsequent ingest using that key is rejected **and** Settings no longer shows a copyable DSN/secret for that key (public id + inactive badge only).
+2. **Given** I rotate a key, **When** rotation completes, **Then** a new secret is available to managers (one-shot banner and/or listed under the **active** replacement key) and the previous key is inactive (no copyable DSN); ingest with the old secret fails after cutover.
+3. **Given** multiple keys, **When** I revoke one, **Then** other **active** keys remain valid and may still show a copyable DSN.
 
 ---
 
@@ -67,8 +67,8 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 
 - **FR-001**: Project Settings MUST expose per-project retention, rate limit, and quota controls for actors with `project.settings.manage` (`ProjectAccessService::requirePermission`).
 - **FR-002**: Ingest MUST enforce the project's rate and quota settings.
-- **FR-003**: Actors with `project.api_keys.manage` MUST be able to revoke API keys so they can no longer authenticate ingest.
-- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret **shown once** (session one-shot after create/rotate; ordinary Settings GET MUST NOT re-embed the secret/DSN). See `087` FR-001.
+- **FR-003**: Actors with `project.api_keys.manage` MUST be able to revoke API keys so they can no longer authenticate ingest. Revoked (`active=false`) keys MUST NOT render a copyable DSN, secret, or clipboard-copy control in Settings.
+- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). **Active** keys MAY list a copyable full DSN for managers when the secret is available (`002` FR-003). See also `087` amendment (2026-08-11).
 - **FR-005**: System MUST surface approaching-limit warnings to actors with `project.settings.manage` before hard enforcement.
 - **FR-006**: Governance changes MUST be attributable (who changed what) where audit facilities exist.
 - **FR-007**: Actors without the matching `project.*` grant MUST NOT see or modify governance or keys (**panel hidden** + HTTP **403** on GET Settings when lacking Settings-surface grants, and on POST without the key). See `002` FR-013 / FR-014.
@@ -100,3 +100,12 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 ## Out of scope (deferred)
 
 - Monthly event quota alongside daily → `032-monthly-quota`.
+
+## Amendment (`089-project-config-export`, 2026-08-11)
+
+- Governance fields (`ingest_enabled`, retention, rate, daily/monthly quotas) are included in the project config JSON bundle for portability. API keys remain **out** of that bundle (rotate/create remains FR-003 / FR-004 here). See `089` FR-002.
+
+## Amendment (API key DSN visibility, 2026-08-11)
+
+- Revoked / inactive API keys MUST NOT show a copyable DSN or secret in Settings (FR-003). Covered by `ProjectApiKeyVisibilityTest::testOwnerSeesCopyableDsnForActiveKeysOnly`.
+- Active-key DSN listing for managers is documented in `002` FR-003; session one-shot banner after create/rotate remains.

@@ -15,7 +15,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 | ID | Area | Delivered |
 |----|------|-----------|
-| S1 | Project Settings | API key DSN/secret shown **once** after create/rotate (`_beacon_last_api_key_dsn`); list shows public key + rotate hint |
+| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); **as-built follow-up**: active keys may list copyable DSN for managers; revoked keys never (2026-08-11) |
 | S2 | Demo seed | `app:seed-demo` blocked outside `dev`/`test` unless `--allow-non-local` (never stable DEMO_* keys outside local) |
 | S3 | Bootstrap guard | `SiteBackupSecurityDefaultsGuard` also rejects empty / documented / short `APP_SECRET` |
 | S4 | Metrics | `InstanceSettings::DEFAULT_METRICS_REQUIRE_TOKEN = true`; migration sets column default true (existing rows unchanged) |
@@ -23,7 +23,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 | S6 | API keys | `ProjectApiKeyFactory` uses `bin2hex(random_bytes(16+))` for public keys; human-friendly tokens remain labels only |
 | S7 | Sessions | `when@prod` session `cookie_secure` / `cookie_samesite: lax` / `cookie_httponly` |
 | S8 | Slack hooks | Interactions endpoint rejects unsigned `url_verification` challenge echo |
-| QA | Tests | Guard unit tests; portability security-flag unit tests; `ProjectApiKeyVisibilityTest` show-once; factory constructor update |
+| QA | Tests | Guard unit tests; portability security-flag unit tests; `ProjectApiKeyVisibilityTest` (active DSN vs revoked hidden); factory constructor update |
 | Docs | Ops | `SECURITY.md`, `PRODUCTION.md`, CHANGELOG / UPGRADING / ROADMAP |
 
 ## Non-goals (deferred)
@@ -37,19 +37,20 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Owners copy DSN once (Priority: P1)
+### User Story 1 - Owners obtain DSN after create/rotate (Priority: P1)
 
-As a project owner, after I create or rotate an API key I see the full DSN once; reloading Settings does not embed the secret again.
+As a project owner, after I create or rotate an API key I see the full DSN in a one-shot banner; Settings also lists a copyable DSN under **active** keys when the secret is available. **Revoked** keys never show a copyable DSN.
 
-**Why this priority**: Persistent secret-in-DOM was the highest-impact XSS/session-share finding.
+**Why this priority**: Persistent secret-in-DOM for unused/revoked credentials and anonymous viewers remains a high-impact finding; managers need a recoverable DSN for live keys.
 
-**Independent Test**: `ProjectApiKeyVisibilityTest` — Settings GET after seed has no secret; POST create shows `data-testid="api-key-dsn"` once; subsequent GET redacts.
+**Independent Test**: `ProjectApiKeyVisibilityTest` — active key with secret shows `data-testid="api-key-dsn"`; after revoke, `api-key-inactive` and no DSN/secret in HTML; viewer Settings → 403.
 
 **Acceptance Scenarios**:
 
-1. **Given** `project.api_keys.manage`, **When** I open Settings without a fresh create/rotate, **Then** I see the public key and a rotate hint, not the secret/DSN.
-2. **Given** I create or rotate a key, **When** I land on Settings after redirect, **Then** the full DSN appears once in a banner and is cleared from session on that render.
-3. **Given** a viewer, **When** Settings is requested, **Then** HTTP 403 and no secret appears (unchanged from `052` / visibility tests).
+1. **Given** `project.api_keys.manage` and an **active** key with secret, **When** I open Settings, **Then** I may see a copyable full DSN under that key (`002` FR-003).
+2. **Given** I create or rotate a key, **When** I land on Settings after redirect, **Then** the full DSN appears in a one-shot banner (`_beacon_last_api_key_dsn`) cleared from session on that render.
+3. **Given** a **revoked** / inactive key, **When** I open Settings, **Then** I see public id + inactive badge only — no secret, no copyable DSN, no clipboard-copy for that key.
+4. **Given** a viewer, **When** Settings is requested, **Then** HTTP 403 and no secret appears (unchanged from `052` / visibility tests).
 
 ### User Story 2 - Demo seed cannot poison prod (Priority: P1)
 
@@ -97,7 +98,7 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Settings MUST NOT render API key secrets/DSN on ordinary GET; secrets MUST appear at most once after create/rotate (session one-shot), for `project.api_keys.manage` only.
+- **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). **Active** keys MAY list a copyable DSN when the secret is available. **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
 - **FR-002**: `app:seed-demo` MUST refuse non-local environments unless `--allow-non-local`; stable DEMO_* material MUST be local-only.
 - **FR-003**: Outside `dev`/`test`, APP_SECRET MUST NOT be empty, MUST NOT equal the documented `.env.dist` default, and MUST be at least 16 characters (`SiteBackupSecurityDefaultsGuard`, extending `062`).
 - **FR-004**: New instance settings MUST default `metrics_require_token` to true; column DB default MUST match for new rows.
@@ -109,10 +110,14 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 ## Success Criteria
 
-- **SC-001**: Functional visibility test proves secret absent on cold Settings GET and present only after create.
+- **SC-001**: Functional visibility test proves active-key DSN for managers, revoked-key DSN hidden, and viewer 403 without secret (`ProjectApiKeyVisibilityTest`).
 - **SC-002**: Guard unit suite covers APP_SECRET documented + short reject on prod/staging.
 - **SC-003**: Portability unit suite covers weaken-ignore and tighten-apply.
 - **SC-004**: Spec catalog lists `087` and cross-links predecessors (`018`, `038`, `044`, `052`, `055`, `058`, `062`, `068`).
+
+## Amendment (API key DSN listing, 2026-08-11)
+
+As-built product UX lists a copyable DSN under **active** keys for managers (recoverability) while keeping the create/rotate one-shot banner. **Revoked** keys remain redacted. Supersedes the stricter “never re-embed on ordinary GET” reading of original FR-001 for active keys only; inactive-key redaction is mandatory. Cross-links: `002` FR-003, `018` FR-003 / FR-004.
 
 ## Related
 

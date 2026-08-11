@@ -299,7 +299,7 @@ final class ProjectController extends AbstractController
     {
         $count = 0;
         foreach ($project->getMemberships() as $member) {
-            if (ProjectRole::Owner === $member->getRole()) {
+            if ($member->isActive() && ProjectRole::Owner === $member->getRole()) {
                 ++$count;
             }
         }

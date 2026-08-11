@@ -50,3 +50,4 @@ As an instance admin, I restore allowlisted settings from a file.
 
 - Full DB dump.
 - SiteBackup media/DB — use SiteBackupBundle.
+- Per-project metadata/memberships portability — see sibling `089-project-config-export` (`beacon-project-bundle`).

@@ -68,11 +68,31 @@
         <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans }}</p>
         <ul class="space-y-3">
             {% for key in project.apiKeys %}
-                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                {% set keyDsn = membership.canManageApiKeys and key.active and key.secretKey ? key.buildDsn(baseUrl) : null %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm"{% if not key.active %} data-testid="api-key-inactive"{% endif %}>
                     <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
                     {% if membership.canManageApiKeys %}
                         <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
-                        <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_once_hint'|trans }}</p>
+                        {% if keyDsn %}
+                            <div class="mt-2 flex flex-wrap items-start gap-2">
+                                <code class="block min-w-0 flex-1 break-all rounded-md border border-[var(--color-sand)] bg-[var(--color-mist)]/40 px-2 py-1.5 text-xs font-mono" data-testid="api-key-dsn">{{ keyDsn }}</code>
+                                <button
+                                    type="button"
+                                    class="btn-ghost btn-sm shrink-0"
+                                    data-controller="clipboard-copy"
+                                    data-clipboard-copy-text-value="{{ keyDsn|e('html_attr') }}"
+                                    data-clipboard-copy-label-value="{{ 'project.api_keys.copy_dsn'|trans|e('html_attr') }}"
+                                    data-clipboard-copy-done-label-value="{{ 'project.api_keys.dsn_copied'|trans|e('html_attr') }}"
+                                    data-action="click->clipboard-copy#copy"
+                                    aria-label="{{ 'project.api_keys.copy_dsn'|trans }}"
+                                >{{ 'project.api_keys.copy_dsn'|trans }}</button>
+                            </div>
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.dsn_help'|trans }}</p>
+                        {% elseif key.active %}
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_once_hint'|trans }}</p>
+                        {% else %}
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.inactive_dsn_hidden'|trans }}</p>
+                        {% endif %}
                     {% else %}
                         <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_hidden'|trans }}</p>
                     {% endif %}
@@ -98,7 +118,7 @@
             {% endfor %}
         </ul>
         {% if membership.canManageApiKeys and lastApiKeyDsn|default(null) %}
-            <p class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all font-mono" data-testid="api-key-dsn">{{ lastApiKeyDsn }}</p>
+            <p class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all font-mono" data-testid="api-key-dsn-flash">{{ lastApiKeyDsn }}</p>
             <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.secret_once_banner'|trans }}</p>
         {% endif %}
         {% if membership.canManageApiKeys %}
@@ -197,6 +217,9 @@
                             <div class="text-xs text-[var(--color-ink)]/60">{{ memberUser.email }}</div>
                             <div class="mt-1">
                                 <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ member.role.value)|trans }}</span>
+                                {% if not member.active %}
+                                    <span class="badge badge-error">{{ 'project.members.inactive'|trans }}</span>
+                                {% endif %}
                             </div>
                         </div>
                         {% if canManageThis %}
@@ -273,6 +296,14 @@
                                         {% endif %}
                                     {% endblock %}
                                 {% endembed %}
+
+                                <form method="post" action="{{ path('project_members_set_active', {projectId: project.uuid, userId: memberUser.uuid}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('project_member_active_' ~ member.id) }}">
+                                    <input type="hidden" name="active" value="{{ member.active ? '0' : '1' }}">
+                                    <button class="btn-ghost btn-sm" type="submit" title="{{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}">
+                                        {{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}
+                                    </button>
+                                </form>
                             </div>
                         {% endif %}
                     </div>
@@ -730,6 +761,22 @@
         </ul>
     {% endif %}
 </section>
+
+{% if membership.canManageSettings %}
+<section class="panel mt-6">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'project.config.title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.config.help'|trans({'%code%': project.code != '' ? project.code : project.slug}) }}</p>
+    <div class="flex flex-wrap items-center gap-3">
+        <a class="btn-ghost no-underline" href="{{ path('project_config_export', {id: project.uuid}) }}">{{ 'project.config.export'|trans }}</a>
+        <form method="post" action="{{ path('project_config_import', {id: project.uuid}) }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('project_config_import_' ~ project.id) }}">
+            <input class="input" type="file" name="bundle" accept="application/json,.json" required>
+            <button class="btn-primary" type="submit">{{ 'project.config.import'|trans }}</button>
+        </form>
+    </div>
+    <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.config.panel_note'|trans }}</p>
+</section>
+{% endif %}
 
 {% if membership.canManageSettings or membership.canDeleteProject %}
 <section class="panel panel--danger mt-6">

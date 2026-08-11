@@ -113,3 +113,9 @@ As a platform admin, I temporarily view a project as a specific member would, fo
 ## Out of scope (deferred)
 
 - Filterable audit timeline on Admin project show → `031-admin-project-audit`.
+
+## Amendment (`089-project-config-export`, 2026-08-11)
+
+- **FR-007**: Platform admins (`ROLE_ADMIN`) MUST be able to export all projects or one project as `beacon-project-bundle` JSON, and import to upsert by `project.code` (creating missing users disabled). UI on Administration → Projects (index + show). Does not replace suspend/stats/view-as.
+- Audit UserActions for config export/import are recorded (`project.config_exported` / `project.config_imported`).
+- Details and panel (non-admin) rules: `089-project-config-export`.

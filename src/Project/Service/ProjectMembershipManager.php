@@ -446,16 +446,54 @@ final readonly class ProjectMembershipManager
         }
     }
 
-    /** Count direct (not group-derived) owner memberships on the project. */
+    /** Count direct (not group-derived) **active** owner memberships on the project. */
     private function countDirectOwners(Project $project): int
     {
         $count = 0;
         foreach ($project->getMemberships() as $membership) {
-            if (ProjectRole::Owner === $membership->getRole()) {
+            if ($membership->isActive() && ProjectRole::Owner === $membership->getRole()) {
                 ++$count;
             }
         }
 
         return $count;
+    }
+
+    /**
+     * Activate or deactivate a direct membership (does not delete the row).
+     *
+     * @throws RuntimeException when domain rules block the change
+     */
+    public function setActive(Project $project, User $actor, ProjectMembership $target, bool $active): void
+    {
+        $this->assertActorCanManage($project, $actor);
+        $this->assertCanMutateTarget($actor, $project, $target);
+
+        if ($target->getProject()?->getId() !== $project->getId()) {
+            throw new RuntimeException('forbidden');
+        }
+
+        if (!$active && ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
+            throw new RuntimeException('last_owner');
+        }
+
+        if ($target->isActive() === $active) {
+            return;
+        }
+
+        $target->setActive($active);
+        $user = $target->getUser();
+        $this->actionRecorder->record(
+            $active ? UserActionType::ProjectMemberActivated : UserActionType::ProjectMemberDeactivated,
+            $actor,
+            $user,
+            [
+                'project' => $project->getName(),
+                'project_uuid' => $project->getUuid(),
+                'role' => $target->getRole()->value,
+                'active' => $active ? 1 : 0,
+            ],
+        );
+        $this->entityManager->flush();
     }
 }

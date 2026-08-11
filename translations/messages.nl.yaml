@@ -1876,7 +1876,8 @@ setup:
     lead: Er is niets kapot. Setup is vergrendeld zodat vreemden de instantie niet
       kunnen configureren.
     body: Open %path% met de SITE_SETUP_TOKEN uit je omgeving.
-    step_env: Zoek SITE_SETUP_TOKEN in je .env (de lokale standaard staat in .env.dist).
+    step_env: Zoek SITE_SETUP_TOKEN in je .env (genereer een willekeurige waarde
+      als leeg — zie docs/INSTALL.md).
     step_url: Open %path% in de browser — vervang … door die token.
     step_header: Of stuur de header X-Setup-Token met dezelfde waarde.
   reason:

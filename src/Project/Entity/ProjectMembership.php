@@ -34,6 +34,10 @@ class ProjectMembership
     #[ORM\Column(length: 20, enumType: ProjectRole::class)]
     private ProjectRole $role = ProjectRole::Member;
 
+    /** When false, direct membership grants no project access (089). */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $active = true;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -79,6 +83,18 @@ class ProjectMembership
     public function setRole(ProjectRole $role): self
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
 
         return $this;
     }

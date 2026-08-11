@@ -35,11 +35,11 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
     }
 
     /**
-     * Validate request and authorize ingest for `{projectId}`.
+     * Validate request and authorize ingest for `{projectId}` (UUID or legacy numeric id).
      *
      * @return Response|array{project: Project, body: string} Error response, or accepted body + project
      */
-    public function accept(int $projectId, Request $request): Response|array
+    public function accept(string $projectRef, Request $request): Response|array
     {
         $body = $request->getContent();
         if ('' === $body) {
@@ -56,6 +56,12 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
                 Response::HTTP_UNAUTHORIZED,
             );
         }
+
+        $pathProject = $this->projectRepository->findOneByIngestPath($projectRef);
+        if (!$pathProject instanceof Project || null === $pathProject->getId()) {
+            return $this->respond('project not found', Response::HTTP_NOT_FOUND);
+        }
+        $projectId = $pathProject->getId();
 
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
@@ -78,10 +84,6 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
             || null === $providedSecret || !hash_equals($storedSecret, $providedSecret)
         ) {
             return $this->respond('forbidden', Response::HTTP_FORBIDDEN);
-        }
-
-        if (null === $this->projectRepository->find($projectId)) {
-            return $this->respond('project not found', Response::HTTP_NOT_FOUND);
         }
 
         if (!$project->isIngestEnabled()) {

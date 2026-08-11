@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-identity-project`  
 **Created**: 2026-07-19  
-**Status**: Completed (as-built; dashboard create modal, group-link policy, CSRF on API keys; dual public locale routes — 2026-07-21; AuthKit `unlocalized: serve` + SiteBackup setup locale — 2026-07-31; `project.*` permission catalog + i18n; product `project.*` Twig gating + controller 403; `admin.*` catalog removed — 2026-08-10)  
+**Status**: Completed (as-built; dashboard create modal, group-link policy, CSRF on API keys; dual public locale routes — 2026-07-21; AuthKit `unlocalized: serve` + SiteBackup setup locale — 2026-07-31; `project.*` permission catalog + i18n; product `project.*` Twig gating + controller 403; `admin.*` catalog removed — 2026-08-10; project `code` + membership `active` + config portability — 2026-08-11 / `089`)  
 
 ## Summary
 
@@ -39,8 +39,8 @@ As an authenticated user, I manage projects from `/dashboard`, open Issues as th
 
 1. **Given** the dashboard, **When** I create a project, **Then** creation is a **modal** next to the project search (not a sidebar nav item); `GET /projects/new` redirects to `/dashboard?new=1` and opens the modal.
 2. **Given** I create a project, **When** I open `/projects/{id}`, **Then** I am redirected to Issues.
-3. **Given** I have a manage/delete grant on the project (admin/owner matrix), **When** I open `/projects/{uuid}/settings`, **Then** I can manage API keys (create POST requires **CSRF**), **direct members** (add by email with roles), **linked groups** (admin/member), and DSN helpers that include **public and secret** key material. Member/group role and add-member modals use structured `confirm-dialog` chrome (`086` FR-003b). Mutations enforce named `ProjectPermission` keys via `ProjectAccessService::requirePermission()` (see FR-013).
-4. **Given** membership roles owner/full/admin/member/viewer (direct or via group; owner/full are never via group), **When** a non-member opens a project URL, **Then** access is denied (403); the dashboard lists only accessible projects. Effective capabilities follow the `ProjectRole` → `ProjectPermission` matrix (`project.view`, `project.issues.triage`, members/share/api keys/settings/notifications, `project.delete` for owner and **full** — see `docs/product/ROLES.md`).
+3. **Given** I have a manage/delete grant on the project (admin/owner matrix), **When** I open `/projects/{uuid}/settings`, **Then** I can manage API keys (create POST requires **CSRF**), **direct members** (add by email with roles), **linked groups** (admin/member), and DSN helpers that include **public and secret** key material for **active** keys only (revoked/inactive keys show public id + inactive badge, never a copyable DSN). Member/group role and add-member modals use structured `confirm-dialog` chrome (`086` FR-003b). Mutations enforce named `ProjectPermission` keys via `ProjectAccessService::requirePermission()` (see FR-013).
+4. **Given** membership roles owner/full/admin/member/viewer (direct or via group; owner/full are never via group), **When** a non-member opens a project URL, **Then** access is denied (403); the dashboard lists only accessible projects. **Inactive** direct memberships (`active=false`, `089`) grant no product access and MUST NOT appear as accessible projects. Effective capabilities follow the `ProjectRole` → `ProjectPermission` matrix (`project.view`, `project.issues.triage`, members/share/api keys/settings/notifications, `project.delete` for owner and **full** — see `docs/product/ROLES.md`).
 5. **Given** a **viewer** or **member** (view/triage only), **When** they open Issues, **Then** the Settings nav tab is hidden (`project_can_open_settings`); **When** they request `/projects/{uuid}/settings` directly, **Then** the response is **403** (`requireSettingsSurface`). Triage-only forms (comments, saved-view save/delete) are hidden without `project.issues.triage` and POST returns 403.
 6. **Given** I can open Settings with a partial manage matrix (e.g. admin without `project.delete`), **When** I view Settings, **Then** panels/cards I lack are hidden (`canManageSettings` / `canManageApiKeys` / `canManageNotifications` / `canManageShareLinks` / `canDeleteProject` / `isPrimaryOwner`) and forged POSTs to those routes still return **403** (FR-013). Add-member / role / remove controls follow `assignableRoles` and owner-row rules (FR-002).
 7. **Given** a project admin who is **not** a member of group G, **When** they try to link G to the project, **Then** the action is denied; owners and instance `ROLE_ADMIN` may link any group; project admins may only link groups they belong to.
@@ -62,11 +62,12 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 ## Requirements *(mandatory)*
 
 - **FR-001**: AuthKit owns login/register/password UX; app does not maintain a parallel SecurityController login.
-- **FR-002**: Project Settings is the management surface for actors with Settings-surface grants; project show routes to Issues; actors with `project.members.manage` add/remove **direct** members and assign roles (`full` / `admin` / `member` / `viewer` where applicable — and `owner` only via **Transfer ownership**, not the member edit/remove controls). Member rows with role `owner` MUST NOT show edit-role or remove actions (Settings and Admin → Projects). Server-side: the last owner cannot be removed or demoted; a **full** member cannot be removed until demoted. Capability checks MUST use `ProjectRole` / `ProjectPermission` (or equivalent helpers on `ProjectAccess`).
-- **FR-003**: API keys support labels and safe public identifiers for operators; creating a key MUST validate CSRF; DSNs MUST include secret when present (`https://public:secret@host/projectId`). Mutations MUST require `project.api_keys.manage`.
+- **FR-002**: Project Settings is the management surface for actors with Settings-surface grants; project show routes to Issues; actors with `project.members.manage` add/remove **direct** members, **activate/deactivate** memberships (`089`), and assign roles (`full` / `admin` / `member` / `viewer` where applicable — and `owner` only via **Transfer ownership**, not the member edit/remove controls). Member rows with role `owner` MUST NOT show edit-role or remove actions (Settings and Admin → Projects). Server-side: the last **active** owner cannot be removed, demoted, or deactivated; a **full** member cannot be removed until demoted. Capability checks MUST use `ProjectRole` / `ProjectPermission` (or equivalent helpers on `ProjectAccess`).
+- **FR-003**: API keys support labels and safe public identifiers for operators; creating a key MUST validate CSRF; DSNs MUST include secret when present (`https://public:secret@host/{projectUuid}`). Mutations MUST require `project.api_keys.manage`. Settings MUST show a copyable full DSN for managers when the key is **active** and the secret is available. **Revoked / inactive** keys MUST NOT render a copyable DSN, secret, or clipboard-copy control (public key + inactive badge only). Create/rotate MAY still flash a one-shot DSN banner (`_beacon_last_api_key_dsn`).
 - **FR-004**: Account Display preferences include default collapsed issue panels. New users MUST persist concrete locale (`%default_locale%`), theme, contrast, and motion defaults; legacy null columns heal on `/account/display`.
 - **FR-005**: Kits may include dashboard-menu, breadcrumb-kit, form-kit, cookie-consent, PWA, and RoutingKit (as configured in the app).
-- **FR-006**: Project data is membership-scoped: dashboard lists only accessible projects; controllers enforce `ProjectAccessService` (direct membership **or** linked group **or** share grant). Prefer `requirePermission(ProjectPermission::…)` over raw role rank where a named capability exists.
+- **FR-006**: Project data is membership-scoped: dashboard lists only accessible projects; controllers enforce `ProjectAccessService` (**active** direct membership **or** linked group **or** share grant). Prefer `requirePermission(ProjectPermission::…)` over raw role rank where a named capability exists.
+- **FR-006b** (`089`): Each `Project` MUST have a unique `code` (slug-like portability key; backfilled from `slug`). Direct `ProjectMembership` MUST support `active` (default true). Project Settings config export/import MUST require `project.settings.manage` and MUST NOT create users; see `089-project-config-export`.
 - **FR-007**: Admins manage **user groups**; projects may link groups with `admin`/`member` role so all group users gain access. Owner role is direct-user only. Linking policy: instance admin or project **owner** may link any group; project **admin** only groups they belong to.
 - **FR-008**: New project UX is dashboard-modal (search row), not Dashboard sidebar menu.
 - **FR-009**: Disabling a user account MUST invalidate existing sessions (`nowo_user_kit` account_status).
@@ -83,8 +84,8 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
   | Issues / Performance / Analytics / Releases (read) | `requireAccess` / `requireMembership` (`project.view`) |
   | Triage, comments, saved-view mutations | `requireTriage` / `project.issues.triage` |
   | Settings page GET | `requireSettingsSurface()` (any of members/api_keys/settings/notifications/share_links/delete) |
-  | Governance, read tokens, clear history, export | `project.settings.manage` |
-  | Members / group links | `project.members.manage` |
+  | Governance, read tokens, clear history, issue/event export, **project config export/import** (`089`) | `project.settings.manage` |
+  | Members / group links / **activate·deactivate membership** (`089`) | `project.members.manage` |
   | Transfer ownership | `requirePrimaryOwner()` (exact `Owner`; not `full`) |
   | API keys create/rotate/revoke | `project.api_keys.manage` |
   | Notification destinations / thresholds | `project.notifications.manage` (`ProjectChildEntityGuard` included) |
@@ -96,9 +97,10 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
      | Panel / control | Twig gate | Controller (POST / sensitive) |
      |-----------------|-----------|-------------------------------|
      | Governance / quota / retention | `canManageSettings` | `project.settings.manage` |
+     | Project config export/import (`089`) | `canManageSettings` | `project.settings.manage` |
      | API keys / DSN | `canManageApiKeys` | `project.api_keys.manage` |
      | Read API tokens | `canManageSettings` | `project.settings.manage` |
-     | Members add / role / remove (non-owner rows) | `assignableRoles` + FR-002 | `project.members.manage` |
+     | Members add / role / remove / activate·deactivate (non-owner rows) | `assignableRoles` + FR-002 | `project.members.manage` |
      | Group links | `assignableGroupRoles` / members manage | `project.members.manage` |
      | Share links | `canManageShareLinks` | `project.share_links.manage` |
      | Notifications / thresholds | `canManageNotifications` | `project.notifications.manage` (+ `ProjectChildEntityGuard`) |
@@ -112,10 +114,10 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 ## Success Criteria
 
 - **SC-001**: First-boot registration + login + project membership flows are covered by tests.
-- **SC-002**: Operators can copy a DSN (with secret) and manage keys without leaving Settings.
+- **SC-002**: Operators can copy a DSN (with secret) for **active** keys and manage keys without leaving Settings; revoked keys never expose a copyable DSN (`ProjectApiKeyVisibilityTest`).
 - **SC-003**: Dashboard create-project modal and group-link restrictions are covered by functional tests.
 - **SC-004**: Dual public locale routing (AuthKit/SiteBackup `both` + `serve`, legal bare→default, functional tests) is covered.
 - **SC-005**: Platform seed + Admin permissions UI cover **8** built-in `project.*` keys and **5** system project-mirror roles (`ROLE_PROJECT_VIEWER` / `MEMBER` / `ADMIN` / `FULL` / `OWNER`); leftover `admin.*` rows and legacy operator InstanceRoles are removed; `ProjectPermission` / `InstanceRoleCatalog` / `AdminInstanceRbacTest` assert catalog keys, role matrices, and closed dialogs on `/admin/permissions`.
-- **SC-006**: Viewer cannot open Settings (403) and does not see the Settings nav tab; Settings panels and mutation forms are Twig-gated per FR-014 and controller-enforced per FR-013; owner/admin Settings + API key DSN visibility covered (`ProjectApiKeyVisibilityTest`); Twig extension unit-tested (`ProjectPermissionTwigExtensionTest`).
+- **SC-006**: Viewer cannot open Settings (403) and does not see the Settings nav tab; Settings panels and mutation forms are Twig-gated per FR-014 and controller-enforced per FR-013; owner/admin Settings + API key DSN visibility (active vs inactive) covered (`ProjectApiKeyVisibilityTest`); Twig extension unit-tested (`ProjectPermissionTwigExtensionTest`).
 
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

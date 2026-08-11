@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.5.1)](#unreleased-main-after-151)
+- [Unreleased (main after 1.6.0)](#unreleased-main-after-160)
+- [Upgrading from 1.5.1 to 1.6.0](#upgrading-from-151-to-160)
 - [Upgrading from 1.5.0 to 1.5.1](#upgrading-from-150-to-151)
 - [Upgrading from 1.4.0 to 1.5.0](#upgrading-from-140-to-150)
 - [Upgrading from 1.3.1 to 1.4.0](#upgrading-from-131-to-140)
@@ -52,9 +53,31 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.5.1)
+## Unreleased (main after 1.6.0)
 
-No further upgrade steps yet — follow [Upgrading from 1.5.0 to 1.5.1](#upgrading-from-150-to-151) when moving off **1.5.0**.
+No further upgrade steps yet — follow [Upgrading from 1.5.1 to 1.6.0](#upgrading-from-151-to-160) when moving off **1.5.1**.
+
+## Upgrading from 1.5.1 to 1.6.0
+
+**Project config export/import (`089`), DSN UUID path, AuthKit 1.16.** Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.6.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # Version20260811110000 — project.code + membership.active
+make vite-build         # if frontend lockfile / assets changed in your tree
+```
+
+### Notes
+
+- Migration backfills `project.code` from `slug` and sets `project_membership.active=true` for existing rows.
+- New UI: Administration → Projects export/import; Project Settings export/import (`beacon-project-bundle` v1). API secrets are never exported. Admin import may create **disabled** users; Settings import skips unknown emails.
+- Memberships can be deactivated/reactivated without delete (`project.members.manage`). Inactive memberships grant no product access.
+- **DSN path**: newly copied DSNs use the project **UUID**. Legacy numeric ids in the path still work on ingest. Prefer re-copying DSN from Settings for new clients (`docs/DSN.md`).
+- **API keys**: managers may copy DSN under **active** keys; **revoked** keys never show a copyable DSN.
+- AuthKit **1.16**: magic-login confirm interstitial is kit-owned (`confirm_interstitial: true`). Host decorator / custom confirm controller removed; optional Twig override under `templates/bundles/NowoAuthKitBundle/`.
 
 ## Upgrading from 1.5.0 to 1.5.1
 
@@ -124,7 +147,7 @@ make vite-build         # Stimulus tabs + confirm-dialog / kit SCSS
 
 ### Operator notes
 
-- **API keys / DSN**: Settings no longer re-renders the full `public:secret` DSN on every load. Copy the DSN from the one-shot banner after **Add key** or **Rotate**. Existing keys keep working; rotate if you lost the secret (`087`).
+- **API keys / DSN**: Managers with `project.api_keys.manage` may copy the full DSN under **active** keys when the secret is available; create/rotate still flashes a one-shot banner. **Revoked** keys never show a copyable DSN (`087` amendment 2026-08-11 / `002` FR-003).
 - **`APP_SECRET`**: Outside `dev`/`test`, documented `.env.dist` values (`ChangeMePleaseUseARealSecret`) and secrets shorter than 16 characters fail boot. Generate with `openssl rand -hex 32` before exposing the instance.
 - **`app:seed-demo`**: Blocked outside local environments unless `--allow-non-local` (random API keys only — never stable DEMO_* material). Prefer `make dogfood` only on laptop stacks.
 - **Metrics**: New installs default `metrics_require_token` to **true**. Existing rows keep their stored value — enable require-token and set a Bearer token under Administration → Ops defaults if you scrape `/metrics`.

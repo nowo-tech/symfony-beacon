@@ -53,6 +53,7 @@ final readonly class ProjectFactory
         $project = new Project();
         $project->setName($name);
         $project->setSlug($slug);
+        $project->setCode($slug);
         $trimmed = null !== $description ? trim($description) : '';
         $project->setDescription('' !== $trimmed ? $trimmed : null);
 

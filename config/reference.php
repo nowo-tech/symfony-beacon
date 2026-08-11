@@ -1386,6 +1386,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             reset_password?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password.html.twig"
  *             reset_password_code?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/reset_password_code.html.twig"
  *             magic_login_request?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/magic_login_request.html.twig"
+ *             magic_login_confirm?: scalar|Param|null, // Default: "@NowoAuthKitBundle/security/magic_login_confirm.html.twig"
  *             form_theme?: list<scalar|Param|null>,
  *         },
  *         css?: array{
@@ -1420,6 +1421,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             max_uses?: int|Param, // How many times the signed login link can be used (Symfony login_link max_uses). // Default: 1
  *             request_rate_limit?: int|Param, // Max magic-login requests per client IP per window (0 = disabled). // Default: 5
  *             request_rate_window?: int|Param, // Seconds for request_rate_limit window. // Default: 900
+ *             confirm_interstitial?: bool|Param, // When true, magic_login_check accepts GET+POST: GET renders a confirm form (for login_link.check_post_only); POST is handled by Symfony login_link. // Default: false
  *         },
  *         social_login?: array{
  *             mode?: "disabled"|"enabled"|Param, // disabled: hide social login. enabled: OAuth buttons when provider credentials exist in the database. // Default: "disabled"
@@ -2285,8 +2287,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.

@@ -26,14 +26,19 @@ final readonly class OtlpIngestPipeline
     }
 
     public function ingest(
-        int $projectId,
+        string $projectRef,
         Request $request,
         OtlpSignalMapperInterface $mapper,
         string $signalLabel,
     ): Response {
-        $accepted = $this->otlpIngestGateway->accept($projectId, $request);
+        $accepted = $this->otlpIngestGateway->accept($projectRef, $request);
         if ($accepted instanceof Response) {
             return $accepted;
+        }
+
+        $projectId = $accepted['project']->getId();
+        if (null === $projectId) {
+            return $this->otlpIngestGateway->respond('project not found', Response::HTTP_NOT_FOUND);
         }
 
         try {

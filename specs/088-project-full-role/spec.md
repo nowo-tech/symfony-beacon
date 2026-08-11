@@ -66,3 +66,7 @@ As an instance admin, I cannot delete an InstanceRole assigned to users.
 - **SC-001b**: Owner membership rows have no edit/remove actions (`ProjectMembersTest::testOwnerRowHasNoEditOrRemoveActions` or equivalent).
 - **SC-002**: Admin role delete in-use blocked; Twig hides delete when users assigned.
 - **SC-003**: Covered by unit + `ProjectMembersTest` / `AdminInstanceRbacTest` (or equivalent).
+
+## Cross-links
+
+- Project config export/import membership payload may include role `full`; panel import MUST NOT promote to `owner`/`full` in ways that bypass Transfer / role UI (`089` FR-007).

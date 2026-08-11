@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ingest\Otlp\Controller;
 
+use App\Ingest\IngestRouteRequirements;
 use App\Ingest\Otlp\Service\OtlpIngestPipeline;
 use App\Ingest\Otlp\Service\OtlpTracesMapper;
 use OpenApi\Attributes as OA;
@@ -24,7 +25,7 @@ final readonly class OtlpTracesController
     ) {
     }
 
-    #[Route('/api/{projectId}/otlp/v1/traces', name: 'ingest_otlp_traces', requirements: ['projectId' => '\d+'], methods: ['POST'])]
+    #[Route('/api/{projectId}/otlp/v1/traces', name: 'ingest_otlp_traces', requirements: ['projectId' => IngestRouteRequirements::PROJECT_REF], methods: ['POST'])]
     #[OA\Post(
         path: '/api/{projectId}/otlp/v1/traces',
         operationId: 'ingestOtlpTraces',
@@ -43,10 +44,10 @@ MD,
     )]
     #[OA\Parameter(
         name: 'projectId',
-        description: 'Numeric project id from the Beacon DSN path.',
+        description: 'Project public UUID from the Beacon DSN path (legacy numeric id still accepted).',
         in: 'path',
         required: true,
-        schema: new OA\Schema(type: 'integer', example: 1, minimum: 1),
+        schema: new OA\Schema(type: 'string', example: '019fea2d-507b-7890-8b33-ca488db6f696'),
     )]
     #[OA\RequestBody(
         required: true,
@@ -85,7 +86,7 @@ MD,
     #[OA\Response(response: 404, description: 'Project not found.')]
     #[OA\Response(response: 413, description: 'Body too large.')]
     #[OA\Response(response: 429, description: 'Rate limit or quota exceeded.')]
-    public function __invoke(int $projectId, Request $request): Response
+    public function __invoke(string $projectId, Request $request): Response
     {
         return $this->otlpIngestPipeline->ingest($projectId, $request, $this->otlpTracesMapper, 'traces');
     }

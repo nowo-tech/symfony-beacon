@@ -51,6 +51,12 @@ enum UserActionType: string
     case ProjectMemberRoleChanged = 'project.member_role_changed';
     case ProjectMemberRemoved = 'project.member_removed';
 
+    /** Direct membership re-enabled (089). */
+    case ProjectMemberActivated = 'project.member_activated';
+
+    /** Direct membership deactivated without delete (089). */
+    case ProjectMemberDeactivated = 'project.member_deactivated';
+
     /** Project ownership transferred to another direct member. */
     case ProjectOwnershipTransferred = 'project.ownership_transferred';
 
@@ -148,6 +154,12 @@ enum UserActionType: string
 
     /** Instance non-secret config JSON imported. */
     case InstanceConfigImported = 'instance.config_imported';
+
+    /** Project config bundle exported (089). */
+    case ProjectConfigExported = 'project.config_exported';
+
+    /** Project config bundle imported (089). */
+    case ProjectConfigImported = 'project.config_imported';
 
     /** Instance Mailer DSN and/or From updated (context is redacted — no secrets). */
     case InstanceMailerUpdated = 'instance.mailer_updated';

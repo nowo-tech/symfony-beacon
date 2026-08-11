@@ -19,8 +19,6 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-            # Registered in services/auth_kit.yaml with autoconfigure: false (AsDecorator).
-            - '../src/Identity/Routing/MagicLoginCheckRouteLoaderDecorator.php'
 
 when@test:
     parameters:

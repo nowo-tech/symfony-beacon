@@ -222,7 +222,16 @@ flash:
     member_added: Member added to the project.
     member_role_updated: Member role updated.
     member_removed: Member removed from the project.
+    member_activated: Member access re-enabled.
+    member_deactivated: Member access deactivated.
     member_user_not_found: No user exists with that email. They must register first.
+    config_invalid_csrf: Invalid security token. Try again.
+    config_missing_file: Choose a JSON project bundle to import.
+    config_import_failed: Could not import the project bundle (invalid JSON or schema).
+    config_code_mismatch: Bundle project code does not match this project.
+    config_imported_admin: Projects imported (users created when missing).
+    config_imported_panel: Project settings and memberships updated from the bundle.
+    config_users_skipped: Some memberships were skipped because those emails are not registered on this instance.
     member_user_disabled: That user account is disabled.
     member_already: That user is already a project member.
     member_invalid_role: Invalid membership role.
@@ -390,10 +399,14 @@ project:
     title: API keys / DSN
     help: Use a DSN in BEACON_DSN so your app can send errors to this project.
     inactive: inactive
+    inactive_dsn_hidden: Revoked keys cannot authenticate ingest. DSN and secret are not shown.
     public: 'public:'
     secret_hidden: Full DSN and secret are visible only to project owners and admins.
-    secret_once_hint: Secret is shown only once after create or rotate. Copy it now, or rotate to mint a new DSN.
-    secret_once_banner: Copy this DSN now — it will not be shown again. Rotate the key if you lose it.
+    secret_once_hint: Rotate this key to mint a new secret and DSN.
+    secret_once_banner: New DSN ready — copy it into your client. It also stays listed under the key above.
+    dsn_help: Copy this DSN for clients (path is the project UUID). Rotate to mint a new secret.
+    copy_dsn: Copy DSN
+    dsn_copied: Copied
     label_placeholder: e.g. calm-otter
     generate: Suggest name
     generate_hint: Fill the label with a human-friendly adjective-noun name
@@ -401,11 +414,20 @@ project:
     revoke: Revoke
     revoke_confirm: Revoke this API key? Ingest with this secret will fail immediately.
     rotate: Rotate
+  config:
+    title: Export / import project
+    help: 'Portable JSON for this project (code: %code%). Includes memberships by email; never includes API secrets.'
+    export: Export JSON
+    import: Import JSON
+    panel_note: Import updates this project only when the bundle code matches. Unknown emails are skipped (users are not created here).
   members:
     title: Members
     help: Direct members of this project. Owners and admins manage membership. Access
       can also come from linked groups below.
     your_role: 'Your role:'
+    inactive: inactive
+    activate: Enable access
+    deactivate: Disable access
     email_label: Member email
     email_placeholder: user@example.com
     role_label: Role
@@ -1750,6 +1772,13 @@ admin_projects:
   create: New project
   empty: No projects yet.
   open: Manage
+  config:
+    title: Export / import projects
+    help: Download all projects as JSON, or import a bundle. Missing users are created disabled (identified by email).
+    export_all: Export all JSON
+    export_one: Export JSON
+    import: Import JSON
+    note: Idempotent by project code. API key secrets are never included.
   col:
     project: Project
     slug: Slug
@@ -1892,8 +1921,8 @@ setup:
     title: Hey — you need the setup key to pass
     lead: Nothing is broken. Setup is locked so strangers cannot configure this instance.
     body: Open %path% with the SITE_SETUP_TOKEN from your environment.
-    step_env: Find SITE_SETUP_TOKEN in your .env (see .env.dist for the documented
-      local default).
+    step_env: Find SITE_SETUP_TOKEN in your .env (set a random value if empty —
+      see docs/INSTALL.md).
     step_url: Open %path% in the browser — replace … with that token.
     step_header: Or send the header X-Setup-Token with the same value.
   reason:

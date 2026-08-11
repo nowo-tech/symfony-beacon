@@ -46,11 +46,11 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
         self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('[data-tour="project-settings"]');
+        self::assertSelectorNotExists('[data-nav="project-settings"]');
         self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
     }
 
-    public function testOwnerSeesApiKeyDsnOnlyAfterCreateOrRotate(): void
+    public function testOwnerSeesCopyableDsnForActiveKeysOnly(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('api-key-owner@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -59,29 +59,22 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $apiKey = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project]);
         self::assertInstanceOf(ProjectApiKey::class, $apiKey);
         $secret = (string) $apiKey->getSecretKey();
+        self::assertNotSame('', $secret);
+        self::assertTrue($apiKey->isActive());
 
         $this->login($client, $owner);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('[data-testid="api-key-dsn-redacted"]');
-        self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
-        self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
-        self::assertSelectorExists('[data-tour="project-settings"]');
-
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $form = $crawler->filter('form[action$="/keys"]')->form([
-            'label' => 'show-once-key',
-        ]);
-        $client->submit($form);
-        self::assertResponseRedirects();
-        $client->followRedirect();
-        self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="api-key-dsn"]');
-        $html = (string) $client->getResponse()->getContent();
-        self::assertStringContainsString('show-once-key', $html);
+        self::assertStringContainsString($secret, (string) $client->getResponse()->getContent());
+
+        $apiKey->setActive(false);
+        $em->flush();
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="api-key-inactive"]');
         self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
+        self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
     }
 }

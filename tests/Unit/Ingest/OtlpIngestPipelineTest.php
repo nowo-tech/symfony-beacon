@@ -12,6 +12,7 @@ use App\Project\Entity\Project;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Envelope;
@@ -27,7 +28,7 @@ final class OtlpIngestPipelineTest extends TestCase
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
         $gateway->expects(self::once())
             ->method('accept')
-            ->with(7, $request)
+            ->with('7', $request)
             ->willReturn($denied);
         $gateway->expects(self::never())->method('respond');
 
@@ -41,7 +42,7 @@ final class OtlpIngestPipelineTest extends TestCase
         );
 
         $response = $pipeline->ingest(
-            7,
+            '7',
             $request,
             $this->createStub(OtlpSignalMapperInterface::class),
             'logs',
@@ -53,7 +54,7 @@ final class OtlpIngestPipelineTest extends TestCase
     public function testInvalidMapperPayloadReturnsBadRequest(): void
     {
         $request = Request::create('/otlp', 'POST', content: '{bad');
-        $project = new Project();
+        $project = $this->projectWithId(3);
 
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
         $gateway->expects(self::once())->method('accept')->willReturn([
@@ -77,7 +78,7 @@ final class OtlpIngestPipelineTest extends TestCase
             ->willThrowException(new InvalidArgumentException('broken json'));
 
         $pipeline = new OtlpIngestPipeline($gateway, $bus, $logger);
-        $response = $pipeline->ingest(3, $request, $mapper, 'traces');
+        $response = $pipeline->ingest('3', $request, $mapper, 'traces');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -85,7 +86,7 @@ final class OtlpIngestPipelineTest extends TestCase
     public function testEmptyPayloadsAckWithoutDispatch(): void
     {
         $request = Request::create('/otlp', 'POST', content: '{}');
-        $project = new Project();
+        $project = $this->projectWithId(1);
 
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
         $gateway->expects(self::once())->method('accept')->willReturn([
@@ -109,7 +110,7 @@ final class OtlpIngestPipelineTest extends TestCase
             $bus,
             $this->createStub(LoggerInterface::class),
         );
-        $response = $pipeline->ingest(1, $request, $mapper, 'metrics');
+        $response = $pipeline->ingest('1', $request, $mapper, 'metrics');
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
@@ -117,7 +118,7 @@ final class OtlpIngestPipelineTest extends TestCase
     public function testNonEmptyPayloadsDispatchProcessEnvelopeMessage(): void
     {
         $request = Request::create('/otlp', 'POST', content: '{"ok":true}');
-        $project = new Project();
+        $project = $this->projectWithId(42);
         $payloads = [['message' => 'boom']];
         $envelopeBody = "header\n{\"message\":\"boom\"}\n";
 
@@ -151,8 +152,17 @@ final class OtlpIngestPipelineTest extends TestCase
             $bus,
             $this->createStub(LoggerInterface::class),
         );
-        $response = $pipeline->ingest(42, $request, $mapper, 'logs');
+        $response = $pipeline->ingest('019fea2d-507b-7890-8b33-ca488db6f696', $request, $mapper, 'logs');
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    private function projectWithId(int $id): Project
+    {
+        $project = new Project();
+        $prop = new ReflectionProperty(Project::class, 'id');
+        $prop->setValue($project, $id);
+
+        return $project;
     }
 }

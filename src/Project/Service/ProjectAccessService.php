@@ -65,6 +65,9 @@ final readonly class ProjectAccessService
     public function resolveAccess(Project $project, User $user): ?ProjectAccess
     {
         $direct = $this->getDirectMembership($project, $user);
+        if ($direct instanceof ProjectMembership && !$direct->isActive()) {
+            $direct = null;
+        }
         $groupRole = $this->groupAccessRepository->findHighestGroupRoleForUser($project, $user);
         // Issue-scoped share grants do not unlock project-wide surfaces (list, analytics, …).
         $shareViewer = $this->hasProjectWideShareGrant($project);
