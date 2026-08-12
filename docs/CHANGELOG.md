@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `nowo-tech/routing-kit-bundle` **1.4.0**: panel export/clear-cache/import/delete use Symfony forms; host override uses `export_form` / `clear_cache_form` / `import_form` / `delete_forms`.
+
 ## [1.6.4] - 2026-08-11
 
 ### Changed

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "459753d6c7ebe7cfd48fd3aa6b722971",
+    "content-hash": "acd362c69abdeada4231f11b679ca543",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3331,16 +3331,16 @@
         },
         {
             "name": "nowo-tech/routing-kit-bundle",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/RoutingKitBundle.git",
-                "reference": "a086c66f2f3d485bdd7d5a64a219fea23de8e59a"
+                "reference": "b7651f6a0331fc67bf32846255796f8b8b7257ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/RoutingKitBundle/zipball/a086c66f2f3d485bdd7d5a64a219fea23de8e59a",
-                "reference": "a086c66f2f3d485bdd7d5a64a219fea23de8e59a",
+                "url": "https://api.github.com/repos/nowo-tech/RoutingKitBundle/zipball/b7651f6a0331fc67bf32846255796f8b8b7257ae",
+                "reference": "b7651f6a0331fc67bf32846255796f8b8b7257ae",
                 "shasum": ""
             },
             "require": {
@@ -3424,7 +3424,7 @@
                 "issues": "https://github.com/nowo-tech/RoutingKitBundle/issues",
                 "source": "https://github.com/nowo-tech/RoutingKitBundle"
             },
-            "time": "2026-08-04T23:12:17+00:00"
+            "time": "2026-08-12T09:36:43+00:00"
         },
         {
             "name": "nowo-tech/select-all-choice-bundle",
