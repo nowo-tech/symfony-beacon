@@ -144,6 +144,15 @@ pagination:
   per_page_option: '%count% / page'
 toast:
   dismiss: Dismiss
+  view_issue: View issue
+  fallback_title: New alert
+  event:
+    issue.new: New issue
+    issue.regression: Issue regression
+    issue.resolved: Issue resolved
+    issue.reopened: Issue reopened
+    issue.assigned: Issue assigned
+    issue.commented: New comment
 locale:
   nav: Language
   en: English
@@ -279,6 +288,9 @@ flash:
     profile_saved: Profile saved.
     password_saved: Password updated.
     display_saved: Display preferences saved.
+    member_alerts_project_saved: Project alert preferences saved.
+    member_alerts_invalid: Could not save alert preferences. Check the form and try
+      again.
     locale_saved: Language updated.
   users:
     enabled: User account enabled.
@@ -1582,8 +1594,9 @@ preferences:
     tours_intro: Control which product tours may auto-start, and replay the dashboard
       tour.
     notifications_title: Notifications
-    notifications_intro: Optional push alerts for new issues, and install Beacon as
-      an app on your device.
+    notifications_intro: Choose your account-wide live and push alert defaults. Defaults
+      are on — turn off what you do not need. Per-project overrides live in each project’s
+      settings. Optionally enable browser push and install Beacon as an app.
     pwa_title: Install app
     pwa_intro: Add this site to your device for a faster, standalone experience. Availability
       depends on your browser.
@@ -1633,14 +1646,70 @@ preferences:
   product_tour_replay_intro: Clears completion flags and opens the dashboard tour
     once. Enable the tours you want under Active tours first.
   product_tour_replay: Replay dashboard tour
-  push_notifications: Push notifications for new issues
-  push_notifications_help: Optional. When enabled, Beacon asks the browser for permission
-    and can alert you about new issues on projects you belong to — even when the app
-    is in the background (installed PWA or supported browser). Live in-app toasts
-    require Administration → Mercure to be enabled separately.
-  push_title: Push notifications
+  member_alerts:
+    title: Member alerts
+    intro: Live toasts (Mercure) and Web Push use these account defaults. Everything
+      is on by default; turn off the master switch or an event type to reduce noise.
+      Scope can limit alerts to issues where you are assignee or mentioned. Fine-tune
+      each project under Project → Settings.
+    master: Enable member alerts
+    master_help: When off, you receive no live toasts or Web Push for member issue
+      events. Your event and project choices are kept.
+    master_off_hint: Member alerts are off. Turn the switch on to configure account
+      defaults, per-project overrides, and browser push.
+    events_title: Account event defaults
+    events_help: Applies to every project unless you override them in that project’s
+      settings.
+    projects_title: Per project
+    projects_help: Only projects you can access are listed. Delivery requires the
+      account master above and the project enabled here.
+    projects_account_hint: Open a project to fine-tune alerts for that project only
+      (modal). Delivery still requires the account master switch above.
+    projects_empty: You are not a member of any project yet.
+    project_page_title: My alerts for this project
+    project_page_intro: These preferences apply only to you for this project. They
+      combine with your account defaults and the project’s team destinations —
+      member toasts/push fire when your prefs and the event match; destinations notify
+      external channels independently.
+    account_defaults_link: Edit account alert defaults
+    project_save: Save my project alerts
+    modal_close: Close
+    project_enabled: Alerts for this project
+    project_off_hint: Alerts for this project are off. Turn the switch on to set event
+      overrides, or leave off to silence this project while keeping account defaults.
+    project_overrides: Event overrides for this project
+    reset_overrides: Reset overrides (inherit account defaults)
+    reset_overrides_help: Clears saved per-event overrides for this project on save.
+    has_overrides: Custom overrides saved
+    enabled: Notify for this event
+    scope_label: Scope
+    scope_switch_help: Off = all issues in the project; on = only when you are involved
+    scope:
+      all: All issues
+      involved: Involved only
+    event:
+      'issue.new': New issue
+      'issue.regression': Regression
+      'issue.resolved': Resolved
+      'issue.reopened': Reopened
+      'issue.assigned': Assigned
+      'issue.commented': Comment
+    event_help:
+      'issue.new': When a new issue is ingested in a project you can access.
+      'issue.regression': When a previously resolved issue happens again.
+      'issue.resolved': When an issue is marked resolved.
+      'issue.reopened': When a resolved issue is reopened.
+      'issue.assigned': When an issue is assigned (or reassigned).
+      'issue.commented': When someone comments on an issue.
+  push_notifications: Browser push (device)
+  push_notifications_help: Optional device opt-in. When enabled, Beacon asks the browser
+    for permission and can deliver alerts matching your member-alert preferences —
+    even when the app is in the background (installed PWA or supported browser). Live
+    in-app toasts require Administration → Mercure separately, and the member-alerts
+    master switch above.
+  push_title: Browser push
   push_intro: Enable the checkbox below, save, then allow notifications when your
-    browser asks. Alerts cover new issues on projects you are associated with.
+    browser asks. Delivery still follows your member-alert preferences above.
   push_privacy: Browser push uses a device subscription endpoint (not marketing cookies).
     You can turn this off anytime; see Privacy and Cookie settings for related choices.
   push_unavailable_title: Push notifications unavailable
@@ -2235,6 +2304,9 @@ notifications:
   title: Notifications
   intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP
     endpoint when new issues, regressions, threshold spikes, or N+1 groups appear.
+  project_layer_help: These destinations belong to the project (team channels), independent
+    of each member’s personal alert prefs above. Outbound delivery uses destination
+    categories; member toasts/push use the member preference matrix.
   empty: No destinations yet. Add a channel to notify your team.
   add: Add destination
   edit: Edit

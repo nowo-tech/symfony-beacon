@@ -10,7 +10,6 @@ use App\Notifications\Realtime\IssueRealtimeTopics;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
 use App\Notifications\Service\WebPushEndpointGuard;
-use App\Project\Repository\ProjectRepository;
 use App\Shared\Mercure\ConfiguredMercure;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -29,7 +28,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MemberRealtimeController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
         private readonly ConfiguredMercure $mercure,
         private readonly WebPushClientFactory $webPushFactory,
         private readonly WebPushEndpointGuard $webPushEndpointGuard,
@@ -50,17 +48,15 @@ final class MemberRealtimeController extends AbstractController
         $topics = [];
         $token = null;
         $hubUrl = null;
-        if ($this->mercure->isEnabled()) {
-            foreach ($this->projectRepository->findAccessibleByUser($user) as $project) {
-                $topics[] = IssueRealtimeTopics::forProject($project->getUuid());
-            }
+        if ($this->mercure->isEnabled() && $user->isMemberAlertsEnabled()) {
+            $topics[] = IssueRealtimeTopics::forUser($user->getUuid());
             $token = $this->mercure->createSubscriberToken($topics);
             $hubUrl = $this->browserMercureHubUrl($request, $this->mercure->getPublicUrl());
         }
 
         return $this->json([
             'mercure' => [
-                'enabled' => $this->mercure->isEnabled(),
+                'enabled' => $this->mercure->isEnabled() && $user->isMemberAlertsEnabled() && [] !== $topics,
                 'hubUrl' => $hubUrl,
                 'token' => $token,
                 'topics' => $topics,

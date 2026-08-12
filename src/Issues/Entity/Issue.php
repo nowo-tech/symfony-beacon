@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Issues\Entity;
 
 use App\Identity\Entity\User;
-use App\Issues\Repository\IssueRepository;
-use App\Project\Entity\Project;
-use App\Shared\Doctrine\PublicUuidTrait;
 use App\Issues\Enum\IssueLevel;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Repository\IssueRepository;
+use App\Project\Entity\Project;
+use App\Shared\Doctrine\PublicUuidTrait;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

@@ -13,6 +13,7 @@ use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
 use Nowo\AuthKitBundle\SocialLogin\SocialLoginGate;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 
 final class AccountSocialAccountsTest extends TestCase
 {
@@ -29,7 +30,7 @@ final class AccountSocialAccountsTest extends TestCase
     public function testSocialLoginEnabledWhenModeOnAndCredentialsExist(): void
     {
         $credentials = $this->createStub(SocialLoginCredentialRepository::class);
-        $credentials->method('findEnabledOrdered')->willReturn([new \stdClass()]);
+        $credentials->method('findEnabledOrdered')->willReturn([new stdClass()]);
 
         $accounts = new AccountSocialAccounts(
             $this->gate(mode: 'enabled', credentials: $credentials),
@@ -81,7 +82,7 @@ final class AccountSocialAccountsTest extends TestCase
         string $mode,
         ?SocialLoginCredentialRepository $credentials = null,
     ): SocialLoginGate {
-        if (null === $credentials) {
+        if (!$credentials instanceof SocialLoginCredentialRepository) {
             $credentials = $this->createStub(SocialLoginCredentialRepository::class);
             $credentials->method('findEnabledOrdered')->willReturn([]);
         }

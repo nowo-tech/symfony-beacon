@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
+use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;

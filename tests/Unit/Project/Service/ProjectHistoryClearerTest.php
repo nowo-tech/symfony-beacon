@@ -18,7 +18,7 @@ final class ProjectHistoryClearerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('getConnection');
 
-        (new ProjectHistoryClearer($em))->clear(new Project());
+        new ProjectHistoryClearer($em)->clear(new Project());
     }
 
     public function testClearDeletesTelemetryTables(): void
@@ -36,6 +36,6 @@ final class ProjectHistoryClearerTest extends TestCase
         $em->method('getConnection')->willReturn($connection);
         $em->expects(self::once())->method('clear');
 
-        (new ProjectHistoryClearer($em))->clear($project);
+        new ProjectHistoryClearer($em)->clear($project);
     }
 }

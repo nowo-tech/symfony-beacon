@@ -8,31 +8,45 @@
 {% block title %}{{ 'admin.index.title'|trans({}, _td) }} — {{ parent() }}{% endblock %}
 
 {% set kit_admin_header_actions %}
-    {% set exportCsvForm = csrf_action_form(path('nowo_http_log_admin_export'), 'http_log_export', 'POST', false) %}
-    {{ form_start(exportCsvForm, {attr: {class: 'inline'}}) }}
-        <input type="hidden" name="format" value="csv">
+    <div class="http-log-results__actions inline-flex flex-wrap items-center gap-2">
+        {% set exportCriteriaFields = {} %}
         {% for key, value in criteria %}
-            <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
+            {% set exportCriteriaFields = exportCriteriaFields|merge({
+                (key): value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value
+            }) %}
         {% endfor %}
-        <button type="submit" class="btn-ghost">{{ 'admin.action.export_csv'|trans({}, _td) }}</button>
-    {{ form_end(exportCsvForm) }}
-    {% set exportJsonForm = csrf_action_form(path('nowo_http_log_admin_export'), 'http_log_export', 'POST', false) %}
-    {{ form_start(exportJsonForm, {attr: {class: 'inline'}}) }}
-        <input type="hidden" name="format" value="json">
-        {% for key, value in criteria %}
-            <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
-        {% endfor %}
-        <button type="submit" class="btn-ghost">{{ 'admin.action.export_json'|trans({}, _td) }}</button>
-    {{ form_end(exportJsonForm) }}
-    {% set purgeForm = csrf_action_form(path('nowo_http_log_admin_purge'), 'http_log_purge', 'POST', false) %}
-    {{ form_start(purgeForm, {
-        attr: {
-            class: 'inline',
-            onsubmit: "return confirm('" ~ 'admin.purge.confirm'|trans({}, _td)|e('js') ~ "');",
-        },
-    }) }}
-        <button type="submit" class="btn-danger">{{ 'admin.action.purge'|trans({}, _td) }}</button>
-    {{ form_end(purgeForm) }}
+        {% set exportCsvForm = csrf_action_form(
+            path('nowo_http_log_admin_export'),
+            'http_log_export',
+            'POST',
+            false,
+            '_token',
+            exportCriteriaFields|merge({format: 'csv'})
+        ) %}
+        {{ form_start(exportCsvForm, {attr: {class: 'inline'}}) }}
+            <button type="submit" class="btn-ghost nowo-ui-btn-export">{{ 'admin.action.export_csv'|trans({}, _td) }}</button>
+        {{ form_end(exportCsvForm) }}
+        {% set exportJsonForm = csrf_action_form(
+            path('nowo_http_log_admin_export'),
+            'http_log_export',
+            'POST',
+            false,
+            '_token',
+            exportCriteriaFields|merge({format: 'json'})
+        ) %}
+        {{ form_start(exportJsonForm, {attr: {class: 'inline'}}) }}
+            <button type="submit" class="btn-ghost nowo-ui-btn-export">{{ 'admin.action.export_json'|trans({}, _td) }}</button>
+        {{ form_end(exportJsonForm) }}
+        {% set purgeForm = csrf_action_form(path('nowo_http_log_admin_purge'), 'http_log_purge', 'POST', false) %}
+        {{ form_start(purgeForm, {
+            attr: {
+                class: 'inline',
+                onsubmit: "return confirm('" ~ 'admin.purge.confirm'|trans({}, _td)|e('js') ~ "');",
+            },
+        }) }}
+            <button type="submit" class="btn-danger nowo-ui-btn-purge">{{ 'admin.action.purge'|trans({}, _td) }}</button>
+        {{ form_end(purgeForm) }}
+    </div>
 {% endset %}
 
 {% block nowo_ui_content %}

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
+use App\Setup\Demo\DashboardMenuDemoSeeder;
+use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
-use App\Project\Entity\ProjectMembership;
 use App\Issues\Enum\IssueStatus;
+use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -42,7 +44,7 @@ final class DashboardAssignmentsFunctionalTest extends DatabaseWebTestCase
         $em->persist($open);
         $em->flush();
 
-        self::getContainer()->get(\App\Setup\Demo\DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $owner);
 
         $client->request(Request::METHOD_GET, '/dashboard/assignments');
@@ -70,7 +72,7 @@ final class DashboardAssignmentsFunctionalTest extends DatabaseWebTestCase
         self::assertStringContainsString('Unassigned issue', $html);
     }
 
-    private function makeIssue(\App\Project\Entity\Project $project, string $title, ?User $assignee): Issue
+    private function makeIssue(Project $project, string $title, ?User $assignee): Issue
     {
         $issue = new Issue();
         $issue->setProject($project);

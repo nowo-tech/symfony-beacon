@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
+use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueMention;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Service\IssueCommentCreator;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\ProjectMembership;
-use App\Issues\Enum\IssueStatus;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -69,7 +70,7 @@ final class DashboardAsidePanelsFunctionalTest extends DatabaseWebTestCase
             'test',
         );
 
-        self::getContainer()->get(\App\Setup\Demo\DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $owner);
 
         foreach ([

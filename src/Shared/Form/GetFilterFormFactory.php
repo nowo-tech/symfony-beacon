@@ -18,7 +18,7 @@ final readonly class GetFilterFormFactory
     }
 
     /**
-     * @param class-string $type
+     * @param class-string         $type
      * @param array<string, mixed> $data
      * @param array<string, mixed> $options
      */

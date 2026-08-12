@@ -605,6 +605,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, HasPass
         return $this;
     }
 
+    public function isMemberAlertsEnabled(): bool
+    {
+        return $this->uiPreferences->isMemberAlertsEnabled();
+    }
+
+    public function setMemberAlertsEnabled(bool $memberAlertsEnabled): self
+    {
+        $this->uiPreferences->setMemberAlertsEnabled($memberAlertsEnabled);
+
+        return $this;
+    }
+
     public function getAnonymizedAt(): ?DateTimeImmutable
     {
         return $this->anonymizedAt;

@@ -1,0 +1,5 @@
+# Ignore specific historical findings by fingerprint (gitleaks detect report).
+# https://github.com/gitleaks/gitleaks#gitleaksignore
+#
+# generic-api-key false positive in CSRF scope table prose (token …, notification/threshold)
+add88143fab76f523e67165ed78b9afd7ab0bee9:specs/090-csrf-symfony-forms/spec.md:generic-api-key:29

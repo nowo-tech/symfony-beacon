@@ -8,8 +8,9 @@
     {% for msg in app.flashes('success') %}
         <div class="{{ ui.flash('success', _css_fw) }}">{{ msg }}</div>
     {% endfor %}
-    {{ form_start(form, { attr: { enctype: 'multipart/form-data', class: 'kit-modal__panel dm-dashboard-form import-form', 'data-import-form': '1' } }) }}
-        <input type="hidden" name="_modal" value="1">
+    {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'kit-modal__panel dm-dashboard-form import-form', 'data-import-form': '1'}}) }}
+        {% set modalFlagForm = flat_hidden_fields({_modal: '1'}) %}
+        {{ form_widget(modalFlagForm._modal) }}
         <div class="confirm-dialog__content">
             <p class="kit-modal__lead">{{ 'dashboard.import_help'|trans({}, 'NowoDashboardMenuBundle') }}</p>
             {{ form_row(form.file) }}

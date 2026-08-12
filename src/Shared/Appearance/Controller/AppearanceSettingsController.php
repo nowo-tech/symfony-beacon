@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Shared\Appearance\AppearanceSettingsSection;
 use App\Shared\Appearance\AppearanceSettingsSubtab;
 use App\Shared\Appearance\AppearanceThemePresets;
@@ -30,7 +31,7 @@ final class AppearanceSettingsController extends AbstractController
     }
 
     #[Route('/admin/appearance', name: 'admin_appearance', methods: ['GET'])]
-    public function index(): Response
+    public function index(): RedirectResponse
     {
         return $this->redirectToRoute('admin_appearance_section', [
             'section' => AppearanceSettingsSection::Themes->value,
@@ -62,7 +63,7 @@ final class AppearanceSettingsController extends AbstractController
         }
 
         $subEnum = $this->resolveSubtab($sectionEnum, $sub);
-        if (null !== $sectionEnum->defaultSubtab() && null === $subEnum) {
+        if (null !== $sectionEnum->defaultSubtab() && !$subEnum instanceof AppearanceSettingsSubtab) {
             return $this->redirectToRoute('admin_appearance_section', [
                 'section' => $sectionEnum->value,
                 'sub' => $sectionEnum->defaultSubtab()->value,
@@ -142,7 +143,7 @@ final class AppearanceSettingsController extends AbstractController
     private function sectionParams(AppearanceSettingsSection $section, ?AppearanceSettingsSubtab $sub): array
     {
         $params = ['section' => $section->value];
-        if (null !== $sub) {
+        if ($sub instanceof AppearanceSettingsSubtab) {
             $params['sub'] = $sub->value;
         }
 

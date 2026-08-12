@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Notifications;
 
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\InteractionActionToken;
 use App\Project\Entity\ProjectMembership;
-use App\Issues\Enum\IssueStatus;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -334,7 +335,7 @@ final class TeamsActionsFunctionalTest extends DatabaseWebTestCase
     {
         [$client, , $project] = $this->bootWithDemoProject('teams-replay@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
-        $settings = self::getContainer()->get(\App\Shared\Settings\Repository\InstanceSettingsRepository::class)->getOrCreate();
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         $settings->setAllowAnonymousResolve(true);
         $em->flush();
 

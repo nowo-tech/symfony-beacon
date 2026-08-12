@@ -35,6 +35,7 @@ describe('issue-realtime controller', () => {
         data-issue-realtime-subscribe-url-value="/subscribe"
         data-issue-realtime-unsubscribe-url-value="/unsubscribe"
         data-issue-realtime-csrf-token-value="csrf"
+        data-issue-realtime-labels-value='{"viewIssue":"View issue","fallbackTitle":"New alert","events":{"issue.assigned":"Issue assigned"}}'
       ></div>
     `;
   });
@@ -60,7 +61,7 @@ describe('issue-realtime controller', () => {
     ) as IssueRealtimeController;
   };
 
-  it('connects Mercure and shows toast on message', async () => {
+  it('connects Mercure and shows structured toast on message', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -79,14 +80,35 @@ describe('issue-realtime controller', () => {
     const es = FakeEventSource.instances[0];
     es.onmessage?.(
       new MessageEvent('message', {
-        data: JSON.stringify({ summary: 'Boom', url: '/issues/1' }),
+        data: JSON.stringify({
+          event: 'issue.assigned',
+          summary:
+            'Issue assigned: [error] Symfony\\Component\\Mercure\\Exception\\InvalidArgumentException: "$grants" must be a list',
+          url: '/issues/1',
+          project: { name: 'Symfony Beacon' },
+          issue: {
+            id: 4110,
+            title:
+              'Symfony\\Component\\Mercure\\Exception\\InvalidArgumentException: "$grants" must be a list of Grant instances, string given.',
+            culprit: 'App\\Fail::run',
+            level: 'error',
+          },
+        }),
       }),
     );
 
     const toast = document.querySelector('.flash-toast') as HTMLElement;
     expect(toast).toBeTruthy();
-    expect(toast.querySelector('a')?.getAttribute('href')).toBe('/issues/1');
-    expect(toast.textContent).toContain('Boom');
+    expect(toast.classList.contains('flash-info')).toBe(true);
+    expect(toast.querySelector('.nowo-ui-toast__title')?.textContent).toBe('Issue assigned');
+    expect(toast.querySelector('.nowo-ui-toast__message')?.textContent).toContain('Symfony Beacon ·');
+    expect(toast.querySelector('.nowo-ui-toast__message')?.textContent).toContain('InvalidArgumentException');
+    expect(toast.querySelector('.nowo-ui-toast__message')?.textContent).not.toContain(
+      'Symfony\\Component\\Mercure',
+    );
+    const link = toast.querySelector('a.nowo-ui-toast__action') as HTMLAnchorElement;
+    expect(link.getAttribute('href')).toBe('/issues/1');
+    expect(link.textContent).toBe('View issue');
   });
 
   it('ignores invalid hub URLs and disabled mercure', async () => {
@@ -112,7 +134,61 @@ describe('issue-realtime controller', () => {
     expect(FakeEventSource.instances).toHaveLength(0);
   });
 
-  it('shows plain toast on invalid JSON payload', async () => {
+  it('drops javascript and cross-origin toast URLs', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        mercure: {
+          enabled: true,
+          hubUrl: 'https://hub.example/m',
+          token: 'tok',
+          topics: ['t'],
+        },
+        push: { preferenceEnabled: false, vapidPublicKey: null, configured: false },
+      }),
+    });
+    await start();
+    FakeEventSource.instances[0].onmessage?.(
+      new MessageEvent('message', {
+        data: JSON.stringify({
+          event: 'issue.new',
+          url: 'javascript:alert(1)',
+          project: { name: 'P' },
+          issue: { title: 'T' },
+        }),
+      }),
+    );
+    expect(document.querySelector('a.nowo-ui-toast__action')).toBeNull();
+
+    document.body.querySelector('.flash-toast')?.remove();
+    FakeEventSource.instances[0].onmessage?.(
+      new MessageEvent('message', {
+        data: JSON.stringify({
+          event: 'issue.new',
+          url: 'https://evil.example/phish',
+          project: { name: 'P' },
+          issue: { title: 'T' },
+        }),
+      }),
+    );
+    expect(document.querySelector('a.nowo-ui-toast__action')).toBeNull();
+
+    document.body.querySelector('.flash-toast')?.remove();
+    FakeEventSource.instances[0].onmessage?.(
+      new MessageEvent('message', {
+        data: JSON.stringify({
+          event: 'issue.new',
+          url: `${window.location.origin}/issues/9`,
+          project: { name: 'P' },
+          issue: { title: 'T' },
+        }),
+      }),
+    );
+    const link = document.querySelector('a.nowo-ui-toast__action') as HTMLAnchorElement;
+    expect(link.getAttribute('href')).toBe('/issues/9');
+  });
+
+  it('shows fallback toast on invalid JSON payload', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -127,7 +203,7 @@ describe('issue-realtime controller', () => {
     });
     await start();
     FakeEventSource.instances[0].onmessage?.(new MessageEvent('message', { data: 'not-json' }));
-    expect(document.querySelector('.flash-toast')?.textContent).toContain('New issue');
+    expect(document.querySelector('.flash-toast .nowo-ui-toast__title')?.textContent).toBe('New alert');
   });
 
   it('no-ops when disabled', async () => {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
+use App\Project\Entity\ProjectMembership;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Project\Entity\ProjectGroupAccess;
@@ -87,7 +88,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
         $member->setEmail('invalid-role@example.com');
         $member->setDisplayName('Invalid Role');
         $member->setPassword($hasher->hashPassword($member, 'secret'));
-        $project->addMembership((new \App\Project\Entity\ProjectMembership())->setUser($member)->setRole(ProjectRole::Member));
+        $project->addMembership(new ProjectMembership()->setUser($member)->setRole(ProjectRole::Member));
         $em->persist($member);
         $em->flush();
 

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Identity\Entity\User;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceConfigPortability;
+use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;

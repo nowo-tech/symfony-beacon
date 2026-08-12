@@ -57,7 +57,7 @@
             {% for locale in enabled_locales %}
                 <li role="option" aria-selected="{{ locale == current_locale ? 'true' : 'false' }}">
                     {% if app.user and not use_path_locale %}
-                        {% set form = csrf_action_form(path('account_locale_switch', {locale: locale}), 'account_locale', fields={redirect: app.request.requestUri}) %}
+                        {% set form = csrf_action_form(path('account_locale_switch', {locale: locale}), 'account_locale', fields: {redirect: app.request.requestUri}) %}
                         {{ form_start(form, {attr: {class: 'm-0'}}) }}
                             <button
                                 type="submit"
@@ -92,7 +92,7 @@
                             <span>{{ ('locale.' ~ locale)|trans }}</span>
                         </a>
                     {% else %}
-                        {% set form = csrf_action_form(path('guest_locale_switch', {locale: locale}), 'guest_locale', fields={redirect: app.request.requestUri}) %}
+                        {% set form = csrf_action_form(path('guest_locale_switch', {locale: locale}), 'guest_locale', fields: {redirect: app.request.requestUri}) %}
                         {{ form_start(form, {attr: {class: 'm-0'}}) }}
                             <button
                                 type="submit"

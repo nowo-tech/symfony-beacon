@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40fc67bb9b93d504f701fe47b664d4d3",
+    "content-hash": "52ffc15c522fa10477bdb04acb78fd2f",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3771,16 +3771,16 @@
         },
         {
             "name": "nowo-tech/user-kit-bundle",
-            "version": "v1.1.5",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/UserKitBundle.git",
-                "reference": "d3178d3367a5fc256f3fbd161be0c5d633025c3e"
+                "reference": "c5176328ca7e782f77941dbfb7351addfff9de4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/UserKitBundle/zipball/d3178d3367a5fc256f3fbd161be0c5d633025c3e",
-                "reference": "d3178d3367a5fc256f3fbd161be0c5d633025c3e",
+                "url": "https://api.github.com/repos/nowo-tech/UserKitBundle/zipball/c5176328ca7e782f77941dbfb7351addfff9de4c",
+                "reference": "c5176328ca7e782f77941dbfb7351addfff9de4c",
                 "shasum": ""
             },
             "require": {
@@ -3857,7 +3857,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-29T17:45:02+00:00"
+            "time": "2026-08-12T12:49:31+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

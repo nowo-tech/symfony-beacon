@@ -10,7 +10,7 @@ use App\Project\Security\ProjectPermission;
  * Seed metadata for project capability keys ({@see ProjectPermission}).
  *
  * Rows land in the shared `permission` table for Administration catalog visibility.
- * Runtime project checks stay on {@see \App\Project\Service\ProjectAccessService}
+ * Runtime project checks stay on {@see ProjectAccessService}
  * (membership role matrix), not {@see \App\Identity\Security\InstancePermissionVoter}.
  *
  * @see docs/product/ROLES.md

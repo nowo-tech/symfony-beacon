@@ -58,6 +58,11 @@ final readonly class DashboardMenuDemoSeeder
             $this->entityManager->flush();
         }
 
+        // Dashboard Menu Bundle memoizes findOneByCodeAndContext misses; the kit's
+        // MenuCacheInvalidationSubscriber is not always registered in this host, so
+        // clear the request memo after seeding so PlatformBootstrapState sees menus.
+        $this->menuRepository->reset();
+
         return $changed;
     }
 
@@ -322,7 +327,7 @@ final readonly class DashboardMenuDemoSeeder
             $item->setTranslations($translations);
             $changed = true;
         }
-        if (null !== $item->getParent()) {
+        if ($item->getParent() instanceof MenuItem) {
             $item->setParent(null);
             $changed = true;
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Form;
 
+use Override;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,6 +38,7 @@ final class AdminGroupMemberAddType extends FormKitAbstractType
         ]);
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return '';

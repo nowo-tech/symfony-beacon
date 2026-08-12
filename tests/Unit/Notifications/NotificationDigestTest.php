@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Notifications;
 
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\NotificationDigestBuffer;
 use App\Notifications\Enum\NotificationDestinationType;
@@ -18,7 +19,6 @@ use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
 use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;

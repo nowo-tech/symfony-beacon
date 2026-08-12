@@ -55,11 +55,17 @@ test.describe('Account area deep checks', () => {
       '/account/display',
       '/account/display/panels',
       '/account/display/tours',
-      '/account/display/notifications',
     ]) {
       await expectAuthenticatedPage(page, path);
       await expect(page.getByRole('main').locator('form').first()).toBeVisible();
     }
+
+    // Notifications: form only when VAPID is configured; otherwise the unavailable panel (no form).
+    await expectAuthenticatedPage(page, '/account/display/notifications');
+    const main = page.getByRole('main');
+    const pushForm = main.locator('[data-testid="display-push-form"], form').first();
+    const pushUnavailable = main.locator('[data-testid="display-push-unavailable"]');
+    await expect(pushForm.or(pushUnavailable)).toBeVisible();
   });
 
   test('authenticated locale switch posts without 500', async ({ page }) => {

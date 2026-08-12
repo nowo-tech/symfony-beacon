@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Analytics\Entity\DailyProjectStat;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
@@ -12,6 +11,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Ops\Service\OpsOverviewService;
 use App\Project\Entity\Project;
+use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;

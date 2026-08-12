@@ -8,7 +8,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Service\ProjectApiKeyFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectApiKeyFactoryTest extends TestCase
@@ -22,7 +22,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
         $project->setSlug('demo');
         $project->setName('Demo');
 
-        $key = (new ProjectApiKeyFactory($em))->create($project, 'CI', 'fixed-public', 'fixed-secret');
+        $key = new ProjectApiKeyFactory($em)->create($project, 'CI', 'fixed-public', 'fixed-secret');
 
         self::assertSame('fixed-public', $key->getPublicKey());
         self::assertSame('CI', $key->getLabel());
@@ -31,7 +31,8 @@ final class ProjectApiKeyFactoryTest extends TestCase
 
     public function testCreateRegeneratesWhenCollisionThenSucceeds(): void
     {
-        $repo = $this->createMock(ObjectRepository::class);
+        /** @var EntityRepository<ProjectApiKey>&\PHPUnit\Framework\MockObject\MockObject $repo */
+        $repo = $this->createMock(EntityRepository::class);
         $repo->expects(self::exactly(2))
             ->method('findOneBy')
             ->willReturnOnConsecutiveCalls(new ProjectApiKey(), null);
@@ -43,14 +44,15 @@ final class ProjectApiKeyFactoryTest extends TestCase
         $project->setSlug('demo');
         $project->setName('Demo');
 
-        $key = (new ProjectApiKeyFactory($em))->create($project, 'Auto');
+        $key = new ProjectApiKeyFactory($em)->create($project, 'Auto');
         self::assertSame(32, \strlen($key->getPublicKey()));
         self::assertSame('Auto', $key->getLabel());
     }
 
     public function testCreateFallsBackAfterEightCollisions(): void
     {
-        $repo = $this->createStub(ObjectRepository::class);
+        /** @var EntityRepository<ProjectApiKey>&\PHPUnit\Framework\MockObject\Stub $repo */
+        $repo = $this->createStub(EntityRepository::class);
         $repo->method('findOneBy')->willReturn(new ProjectApiKey());
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -60,7 +62,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
         $project->setSlug('demo');
         $project->setName('Demo');
 
-        $key = (new ProjectApiKeyFactory($em))->create($project, 'Fallback');
+        $key = new ProjectApiKeyFactory($em)->create($project, 'Fallback');
         self::assertSame(48, \strlen($key->getPublicKey()));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ingest\MessageHandler;
 
+use App\Issues\Entity\Issue;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeParser;
 use App\Issues\Service\IssueEnvelopeWriter;
@@ -98,7 +99,7 @@ final readonly class ProcessEnvelopeHandler
 
             if ('event' === $type) {
                 $result = $this->issueEnvelopeWriter->write($project, $payload, $receivedAt);
-                if ($result->skipped || null === $result->issue) {
+                if ($result->skipped || !$result->issue instanceof Issue) {
                     continue;
                 }
 

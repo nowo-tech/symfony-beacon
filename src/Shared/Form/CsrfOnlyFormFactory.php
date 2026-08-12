@@ -10,17 +10,17 @@ use Symfony\Component\Form\FormInterface;
 /**
  * Creates lightweight CSRF-only forms for single POST actions.
  */
-final class CsrfOnlyFormFactory
+final readonly class CsrfOnlyFormFactory
 {
     public function __construct(
-        private readonly FormFactoryInterface $formFactory,
+        private FormFactoryInterface $formFactory,
     ) {
     }
 
     /**
-     * @param bool   $named          When true, form name is `csrf_only` (nested `csrf_only[_token]`).
-     *                               When false, empty block prefix → flat `_token` / custom field name (kit controllers).
-     * @param string $csrfFieldName  Symfony CSRF field name (`_token` or kit `_csrf_token`)
+     * @param bool   $named         When true, form name is `csrf_only` (nested `csrf_only[_token]`).
+     *                              When false, empty block prefix → flat `_token` / custom field name (kit controllers).
+     * @param string $csrfFieldName Symfony CSRF field name (`_token` or kit `_csrf_token`)
      */
     public function create(
         string $action,
@@ -44,15 +44,20 @@ final class CsrfOnlyFormFactory
     }
 
     /**
-     * CSRF form with typed flat hidden fields (empty block prefix).
+     * CSRF form with typed flat fields (empty block prefix).
      *
-     * @param array<string, scalar|null> $fields Field name => default value
+     * @param array<string, scalar|null>              $fields         Field name => default value
+     * @param array<string, string>                   $fieldTypes     Field name => FormKit snake type (default hidden)
+     * @param array<string, array<string, mixed>>     $fieldOptions   Per-field Form Type options
      */
     public function createWithFields(
         string $action,
         string $csrfTokenId,
         array $fields,
         string $method = 'POST',
+        string $csrfFieldName = '_token',
+        array $fieldTypes = [],
+        array $fieldOptions = [],
     ): FormInterface {
         $data = [];
         foreach ($fields as $name => $value) {
@@ -63,7 +68,10 @@ final class CsrfOnlyFormFactory
             'action' => $action,
             'method' => strtoupper(trim($method)),
             'csrf_token_id' => $csrfTokenId,
+            'csrf_field_name' => $csrfFieldName,
             'fields' => array_keys($data),
+            'field_types' => $fieldTypes,
+            'field_options' => $fieldOptions,
         ]);
     }
 }

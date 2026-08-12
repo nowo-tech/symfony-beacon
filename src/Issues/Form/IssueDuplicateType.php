@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * CSRF-protected issue duplicate / merge form.
+ *
+ * {@code query} is an unmapped combobox search widget (Stimulus); submitted value is {@code canonical_uuid}.
  */
 final class IssueDuplicateType extends FormKitAbstractType
 {
@@ -21,7 +24,29 @@ final class IssueDuplicateType extends FormKitAbstractType
                 'constraints' => [
                     new NotBlank(),
                 ],
+                'attr' => [
+                    'data-combobox-target' => 'value',
+                ],
             ]);
+            $this->boundBuilder()->add('query', SearchType::class, $this->mergeFieldOptions('query', 'text', [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'issues.duplicate_canonical',
+                'label_attr' => [
+                    'class' => 'confirm-dialog__label',
+                ],
+                'attr' => [
+                    'class' => 'input w-full',
+                    'autocomplete' => 'off',
+                    'placeholder' => 'issues.duplicate_search_placeholder',
+                    'data-combobox-target' => 'query',
+                    'data-confirm-dialog-target' => 'confirmInput',
+                    'data-required-message' => 'issues.duplicate_choose',
+                    'data-action' => 'input->combobox#filter focus->combobox#onQueryFocus keydown->combobox#onQueryKeydown',
+                    'aria-autocomplete' => 'list',
+                    'aria-controls' => 'issue-duplicate-options',
+                ],
+            ]));
             $this->addCheckboxField('merge_events', [
                 'required' => false,
                 'label' => 'issues.merge_events_label',

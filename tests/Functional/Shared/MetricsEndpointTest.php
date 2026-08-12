@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Ops\Metrics\MetricsCollector;
 use App\Shared\Metrics\MetricsController;
 use App\Shared\Metrics\PrometheusTextFormatter;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use App\Tests\Support\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MetricsEndpointTest extends DatabaseWebTestCase

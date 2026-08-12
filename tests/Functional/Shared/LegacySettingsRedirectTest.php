@@ -33,7 +33,7 @@ final class LegacySettingsRedirectTest extends DatabaseWebTestCase
 
         foreach ($cases as $from => $to) {
             $client->request(Request::METHOD_GET, $from);
-            self::assertResponseStatusCodeSame(Response::HTTP_MOVED_PERMANENTLY, sprintf('Expected 301 for %s', $from));
+            self::assertResponseStatusCodeSame(Response::HTTP_MOVED_PERMANENTLY, \sprintf('Expected 301 for %s', $from));
             self::assertResponseRedirects($to);
         }
     }

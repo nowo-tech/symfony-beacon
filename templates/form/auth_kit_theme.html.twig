@@ -52,13 +52,9 @@
 {%- endblock checkbox_row -%}
 
 {%- block checkbox_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' checkbox')|trim}) %}
     <label class="checkbox-label">
-        <input type="checkbox"
-            {{ block('widget_attributes') }}
-            {% if value is defined %} value="{{ value }}"{% endif %}
-            {% if checked %} checked="checked"{% endif %}
-            class="checkbox"
-        >
+        {{- parent() -}}
         {% if label is not same as(false) -%}
             <span>{{ label|trans({}, translation_domain) }}</span>
         {%- endif %}

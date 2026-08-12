@@ -43,7 +43,7 @@ final class IdentityAllowlistsAndAuditFilterTest extends TestCase
 
     public function testAdminAuditFilterParsesValidQuery(): void
     {
-        $request = Request::create('/', 'GET', [
+        $request = Request::create('/', Request::METHOD_GET, [
             'action' => UserActionType::UserCreated->value,
             'from' => '2026-01-02',
             'to' => '2026-01-03',
@@ -61,7 +61,7 @@ final class IdentityAllowlistsAndAuditFilterTest extends TestCase
 
     public function testAdminAuditFilterRejectsUnknownActionAndBadDates(): void
     {
-        $request = Request::create('/', 'GET', [
+        $request = Request::create('/', Request::METHOD_GET, [
             'action' => UserActionType::IssueOpened->value,
             'from' => 'not-a-date',
             'to' => '2026-13-40',

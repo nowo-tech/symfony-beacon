@@ -11,6 +11,7 @@ use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Security\InstancePermissionVoter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -52,7 +53,7 @@ final class InstancePermissionVoterTest extends TestCase
     public function testAssignedPermissionGranted(): void
     {
         $user = new User();
-        $ref = new \ReflectionProperty(User::class, 'id');
+        $ref = new ReflectionProperty(User::class, 'id');
         $ref->setValue($user, 7);
 
         $permission = new InstancePermission();

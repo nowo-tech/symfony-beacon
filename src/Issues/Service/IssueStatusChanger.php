@@ -8,9 +8,9 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

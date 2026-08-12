@@ -36,7 +36,7 @@ final class ProjectOpsStatsServiceTest extends TestCase
             ->with($project)
             ->willReturn($last);
 
-        $stats = (new ProjectOpsStatsService($issues, $events))->forProject($project);
+        $stats = new ProjectOpsStatsService($issues, $events)->forProject($project);
 
         self::assertSame(4, $stats['open_issues']);
         self::assertSame(12, $stats['events_last_7d']);
@@ -58,7 +58,7 @@ final class ProjectOpsStatsServiceTest extends TestCase
         $events->method('countReceivedSinceForProjectIds')->willReturn([1 => 9, 2 => 1]);
         $events->method('findLastReceivedAtForProjectIds')->willReturn([2 => new DateTimeImmutable('2024-01-01')]);
 
-        $map = (new ProjectOpsStatsService($issues, $events))->forProjects([$a, $b, $orphan]);
+        $map = new ProjectOpsStatsService($issues, $events)->forProjects([$a, $b, $orphan]);
 
         self::assertArrayNotHasKey(0, $map);
         self::assertSame(3, $map[1]['open_issues']);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Doctrine;
 
+use Closure;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 final class PidSqliteUrlEnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
+    public function getEnv(string $prefix, string $name, Closure $getEnv): mixed
     {
         $url = $getEnv($name);
         if (!\is_string($url)) {

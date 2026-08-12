@@ -13,11 +13,11 @@ use App\Identity\Form\AdminRoleUserAddType;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Repository\UserRepository;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\GetFilterFormFactory;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,7 +35,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminInstanceRoleController extends AbstractController
 {
-    private const DETAIL_ROUTES = [
+    private const array DETAIL_ROUTES = [
         'admin_roles_show',
         'admin_roles_users',
         'admin_roles_permissions',
@@ -95,7 +95,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->renderIndex($request, $form, openCreate: true);
     }
 
-    #[Route('/admin/roles/{id}', name: 'admin_roles_show', methods: ['GET'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}', name: 'admin_roles_show', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
     public function show(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -104,7 +104,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->renderRoleDetail($request, $role, 'admin_roles_show');
     }
 
-    #[Route('/admin/roles/{id}/edit', name: 'admin_roles_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/edit', name: 'admin_roles_edit', requirements: ['id' => Requirement::UUID], methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -155,7 +155,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->renderRoleDetail($request, $role, $returnRoute, $form, openEdit: true);
     }
 
-    #[Route('/admin/roles/{id}/delete', name: 'admin_roles_delete', methods: ['POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/delete', name: 'admin_roles_delete', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
     public function delete(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -198,7 +198,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->redirectToRoute('admin_roles');
     }
 
-    #[Route('/admin/roles/{id}/permissions', name: 'admin_roles_permissions', methods: ['GET', 'POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/permissions', name: 'admin_roles_permissions', requirements: ['id' => Requirement::UUID], methods: ['GET', 'POST'])]
     public function permissions(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -274,7 +274,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->renderRoleDetail($request, $role, 'admin_roles_permissions', permissionsForm: $form);
     }
 
-    #[Route('/admin/roles/{id}/users', name: 'admin_roles_users', methods: ['GET'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/users', name: 'admin_roles_users', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
     public function users(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -283,7 +283,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->renderRoleDetail($request, $role, 'admin_roles_users');
     }
 
-    #[Route('/admin/roles/{id}/users/add', name: 'admin_roles_users_add', methods: ['POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/users/add', name: 'admin_roles_users_add', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
     public function addUser(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -329,7 +329,7 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->redirectToRoute('admin_roles_users', ['id' => $role->getUuid()]);
     }
 
-    #[Route('/admin/roles/{id}/users/{userId}/remove', name: 'admin_roles_users_remove', methods: ['POST'], requirements: ['id' => Requirement::UUID, 'userId' => Requirement::UUID])]
+    #[Route('/admin/roles/{id}/users/{userId}/remove', name: 'admin_roles_users_remove', requirements: ['id' => Requirement::UUID, 'userId' => Requirement::UUID], methods: ['POST'])]
     public function removeUser(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]

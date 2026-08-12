@@ -11,6 +11,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
+use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
@@ -39,39 +40,46 @@ final readonly class NotificationDispatcher
 
     public function dispatchNewIssue(Project $project, Issue $issue): void
     {
+        $payload = $this->payloadBuilder->forNewIssue($project, $issue);
         $this->dispatchIssuePayload(
             $project,
             $issue->getLevel(),
-            $this->payloadBuilder->forNewIssue($project, $issue),
+            $payload,
         );
-        $this->memberRealtimeNotifier->notifyNewIssue($project, $issue);
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueNew, $project, $issue, $payload);
     }
 
     public function dispatchIssueRegression(Project $project, Issue $issue): void
     {
+        $payload = $this->payloadBuilder->forIssueRegression($project, $issue);
         $this->dispatchIssuePayload(
             $project,
             $issue->getLevel(),
-            $this->payloadBuilder->forIssueRegression($project, $issue),
+            $payload,
         );
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueRegression, $project, $issue, $payload);
     }
 
     public function dispatchIssueResolved(Project $project, Issue $issue): void
     {
+        $payload = $this->payloadBuilder->forIssueResolved($project, $issue);
         $this->dispatchCategoryPayload(
             $project,
             NotificationCategories::ISSUE_RESOLVED,
-            $this->payloadBuilder->forIssueResolved($project, $issue),
+            $payload,
         );
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueResolved, $project, $issue, $payload);
     }
 
     public function dispatchIssueReopened(Project $project, Issue $issue): void
     {
+        $payload = $this->payloadBuilder->forIssueReopened($project, $issue);
         $this->dispatchCategoryPayload(
             $project,
             NotificationCategories::ISSUE_REOPENED,
-            $this->payloadBuilder->forIssueReopened($project, $issue),
+            $payload,
         );
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueReopened, $project, $issue, $payload);
     }
 
     public function dispatchIssueAssigned(
@@ -80,20 +88,24 @@ final readonly class NotificationDispatcher
         ?User $previousAssignee,
         ?User $newAssignee,
     ): void {
+        $payload = $this->payloadBuilder->forIssueAssigned($project, $issue, $previousAssignee, $newAssignee);
         $this->dispatchCategoryPayload(
             $project,
             NotificationCategories::ISSUE_ASSIGNED,
-            $this->payloadBuilder->forIssueAssigned($project, $issue, $previousAssignee, $newAssignee),
+            $payload,
         );
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueAssigned, $project, $issue, $payload);
     }
 
     public function dispatchIssueCommented(Project $project, Issue $issue, IssueComment $comment): void
     {
+        $payload = $this->payloadBuilder->forIssueCommented($project, $issue, $comment);
         $this->dispatchCategoryPayload(
             $project,
             NotificationCategories::ISSUE_COMMENTED,
-            $this->payloadBuilder->forIssueCommented($project, $issue, $comment),
+            $payload,
         );
+        $this->memberRealtimeNotifier->notify(MemberAlertEvent::IssueCommented, $project, $issue, $payload);
     }
 
     public function dispatchIssueDuplicated(Project $project, Issue $issue, Issue $canonical): void

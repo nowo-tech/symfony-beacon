@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Form;
 
+use Override;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,6 +31,7 @@ final class CsrfOnlyType extends FormKitAbstractType
         $resolver->setAllowedTypes('csrf_token_id', 'string');
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return '';

@@ -1,0 +1,44 @@
+{# Compact event row with Live cascading: scope only when notify is on. #}
+{% set _enabled = eventRow.enabled %}
+{% set _involved = eventRow.involved %}
+{% set _eventKey = eventRow.vars.name|replace({'_': '.'}) %}
+{% set _formName = form.vars.name %}
+<li class="pref-alert-row" data-testid="member-alert-event-row" data-event-key="{{ eventRow.vars.name }}">
+    <div class="pref-alert-row__main">
+        <div class="pref-alert-row__copy min-w-0 flex-1">
+            <p class="pref-alert-row__title">{{ eventRow.vars.label|trans }}</p>
+            <p class="pref-alert-row__help">{{ ('preferences.member_alerts.event_help.' ~ _eventKey)|trans }}</p>
+        </div>
+        <label class="pref-switch" title="{{ 'preferences.member_alerts.enabled'|trans }}">
+            <span class="sr-only">{{ 'preferences.member_alerts.enabled'|trans }}</span>
+            {{ form_widget(_enabled, {attr: {
+                class: 'pref-switch__input',
+                role: 'switch',
+                'data-model': 'on(change)|' ~ _formName ~ '.events.' ~ eventRow.vars.name ~ '.enabled',
+                'aria-checked': _enabled.vars.checked ? 'true' : 'false',
+            }}) }}
+            <span class="pref-switch__track" aria-hidden="true"></span>
+        </label>
+    </div>
+    {% if _enabled.vars.checked %}
+        <div class="pref-alert-row__scope" data-testid="member-alert-event-scope">
+            <span class="pref-alert-row__scope-label{{ not _involved.vars.checked ? ' is-active' : '' }}">{{ 'preferences.member_alerts.scope.all'|trans }}</span>
+            <label class="pref-switch" title="{{ 'preferences.member_alerts.scope_switch_help'|trans }}">
+                <span class="sr-only">{{ 'preferences.member_alerts.scope_switch_help'|trans }}</span>
+                {{ form_widget(_involved, {attr: {
+                    class: 'pref-switch__input',
+                    role: 'switch',
+                    'data-model': 'on(change)|' ~ _formName ~ '.events.' ~ eventRow.vars.name ~ '.involved',
+                    'aria-checked': _involved.vars.checked ? 'true' : 'false',
+                }}) }}
+                <span class="pref-switch__track" aria-hidden="true"></span>
+            </label>
+            <span class="pref-alert-row__scope-label{{ _involved.vars.checked ? ' is-active' : '' }}">{{ 'preferences.member_alerts.scope.involved'|trans }}</span>
+        </div>
+    {% else %}
+        {# Keep value in Live form state when scope UI is hidden. #}
+        <div class="hidden">{{ form_widget(_involved) }}</div>
+    {% endif %}
+    {{ form_errors(_enabled) }}
+    {{ form_errors(_involved) }}
+</li>

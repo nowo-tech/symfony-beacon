@@ -10,6 +10,7 @@ use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceConfigPortability;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionMethod;
 
 final class InstanceConfigPortabilitySecurityFlagsTest extends TestCase
@@ -69,16 +70,16 @@ final class InstanceConfigPortabilitySecurityFlagsTest extends TestCase
 
         // SiteAppearanceProvider is final; constructor needs a real instance but instance-only
         // import never touches appearance — pass an unconstructed proxy via reflection-free stub of repos only.
-        $portability = (new ReflectionMethod(InstanceConfigPortability::class, '__construct'))->getDeclaringClass()
+        $portability = new ReflectionMethod(InstanceConfigPortability::class, '__construct')->getDeclaringClass()
             ->newInstanceWithoutConstructor();
 
-        $ref = new \ReflectionClass($portability);
+        $ref = new ReflectionClass($portability);
         $ref->getProperty('appearanceRepository')->setValue($portability, $this->createStub(SiteAppearanceRepository::class));
         $ref->getProperty('instanceSettingsRepository')->setValue($portability, $settingsRepo);
         // Leave appearanceProvider unset; applyInstanceFlags does not use it.
         $ref->getProperty('appearanceProvider')->setValue(
             $portability,
-            (new \ReflectionClass(SiteAppearanceProvider::class))->newInstanceWithoutConstructor(),
+            new ReflectionClass(SiteAppearanceProvider::class)->newInstanceWithoutConstructor(),
         );
 
         $method = new ReflectionMethod(InstanceConfigPortability::class, 'applyInstanceFlags');

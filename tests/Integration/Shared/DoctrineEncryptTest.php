@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\ProjectApiKey;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

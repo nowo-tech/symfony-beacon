@@ -16,9 +16,9 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
+use App\Project\Exception\ProjectAccessException;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Exception\ProjectAccessException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 

@@ -80,7 +80,7 @@ final class ProjectReleaseHealthController extends AbstractController
             ];
         }
 
-        $releaseChoices = array_combine($releases, $releases) ?: [];
+        $releaseChoices = array_combine($releases, $releases);
         $compareChoices = [];
         foreach ($releases as $release) {
             if ($release === $selectedRelease) {

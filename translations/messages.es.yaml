@@ -145,6 +145,15 @@ pagination:
   per_page_option: '%count% / página'
 toast:
   dismiss: Cerrar
+  view_issue: Ver incidencia
+  fallback_title: Nueva alerta
+  event:
+    issue.new: Incidencia nueva
+    issue.regression: Regresión
+    issue.resolved: Incidencia resuelta
+    issue.reopened: Incidencia reabierta
+    issue.assigned: Incidencia asignada
+    issue.commented: Nuevo comentario
 locale:
   nav: Idioma
   en: English
@@ -276,6 +285,9 @@ flash:
     profile_saved: Perfil guardado.
     password_saved: Contraseña actualizada.
     display_saved: Preferencias de interfaz guardadas.
+    member_alerts_project_saved: Preferencias de alertas del proyecto guardadas.
+    member_alerts_invalid: No se pudieron guardar las preferencias de alertas. Revisa
+      el formulario e inténtalo de nuevo.
     locale_saved: Idioma actualizado.
   users:
     enabled: Cuenta de usuario activada.
@@ -1439,8 +1451,10 @@ preferences:
     tours_intro: Controla qué tours del producto pueden iniciarse solos y vuelve a
       reproducir el tour del panel.
     notifications_title: Notificaciones
-    notifications_intro: Alertas push opcionales para incidencias nuevas e instalación
-      de Beacon como aplicación.
+    notifications_intro: Elige tus valores por defecto de alertas en vivo y push a
+      nivel de cuenta. Todo está activado por defecto; desactiva lo que no necesites.
+      Los ajustes por proyecto están en Ajustes de cada proyecto. Opcionalmente activa
+      el push del navegador e instala Beacon como aplicación.
     pwa_title: Instalar aplicación
     pwa_intro: Añade este sitio a tu dispositivo para una experiencia más rápida y
       autónoma. La disponibilidad depende del navegador.
@@ -1492,14 +1506,74 @@ preferences:
   product_tour_replay_intro: Borra las marcas de completado y abre el tour del panel
     una vez. Activa antes los tours que quieras en Tours activos.
   product_tour_replay: Repetir tour del panel
-  push_notifications: Notificaciones push de incidencias nuevas
-  push_notifications_help: Opcional. Si lo activas, Beacon pide permiso al navegador
-    y puede avisarte de incidencias nuevas en proyectos a los que perteneces, también
-    con la app en segundo plano (PWA o navegador compatible). Los toasts en vivo requieren
-    que Administración → Mercure esté activado por separado.
-  push_title: Notificaciones push
+  member_alerts:
+    title: Alertas de miembro
+    intro: Los toasts en vivo (Mercure) y el Web Push usan estos valores de cuenta.
+      Todo está activado por defecto; desactiva el interruptor general o un tipo de
+      evento para reducir ruido. El alcance puede limitar las alertas a incidencias
+      donde eres asignado o mencionado. Afina cada proyecto en Proyecto → Ajustes.
+    master: Activar alertas de miembro
+    master_help: Si está desactivado, no recibes toasts en vivo ni Web Push por eventos
+      de incidencias. Se conservan tus elecciones de eventos y proyectos.
+    master_off_hint: Las alertas de miembro están desactivadas. Activa el interruptor
+      para configurar valores de cuenta, anulaciones por proyecto y push del navegador.
+    events_title: Valores por defecto de la cuenta
+    events_help: Se aplican a todos los proyectos salvo que los anules en los ajustes
+      de ese proyecto.
+    projects_title: Por proyecto
+    projects_help: Solo aparecen los proyectos a los que tienes acceso. El envío requiere
+      el interruptor de cuenta anterior y el proyecto activado aquí.
+    projects_account_hint: Abre un proyecto para afinar alertas solo de ese proyecto
+      (modal). El envío sigue requiriendo el interruptor de cuenta de arriba.
+    projects_empty: Aún no eres miembro de ningún proyecto.
+    project_page_title: Mis alertas en este proyecto
+    project_page_intro: Estas preferencias solo te afectan a ti en este proyecto. Se
+      combinan con los valores de tu cuenta y con los destinos del equipo — los
+      toasts/push de miembro se lanzan cuando coinciden tus prefs y el evento; los
+      destinos notifican canales externos de forma independiente.
+    account_defaults_link: Editar valores por defecto de la cuenta
+    project_save: Guardar mis alertas del proyecto
+    modal_close: Cerrar
+    project_enabled: Alertas para este proyecto
+    project_off_hint: Las alertas de este proyecto están desactivadas. Activa el interruptor
+      para definir anulaciones de eventos, o déjalo apagado para silenciar este proyecto
+      manteniendo los valores de la cuenta.
+    project_overrides: Anulaciones de eventos en este proyecto
+    reset_overrides: Restablecer anulaciones (heredar valores de la cuenta)
+    reset_overrides_help: Al guardar, borra las anulaciones por evento guardadas para
+      este proyecto.
+    has_overrides: Anulaciones personalizadas guardadas
+    enabled: Notificar este evento
+    scope_label: Alcance
+    scope_switch_help: Apagado = todas las incidencias del proyecto; encendido = solo
+      cuando estás involucrado
+    scope:
+      all: Todas
+      involved: Involucrado
+    event:
+      'issue.new': Incidencia nueva
+      'issue.regression': Regresión
+      'issue.resolved': Resuelta
+      'issue.reopened': Reabierta
+      'issue.assigned': Asignada
+      'issue.commented': Comentario
+    event_help:
+      'issue.new': Cuando se ingiere una incidencia nueva en un proyecto al que tienes
+        acceso.
+      'issue.regression': Cuando una incidencia ya resuelta vuelve a ocurrir.
+      'issue.resolved': Cuando una incidencia se marca como resuelta.
+      'issue.reopened': Cuando se reabre una incidencia resuelta.
+      'issue.assigned': Cuando se asigna (o reasigna) una incidencia.
+      'issue.commented': Cuando alguien comenta en una incidencia.
+  push_notifications: Push del navegador (dispositivo)
+  push_notifications_help: Opt-in opcional del dispositivo. Si lo activas, Beacon pide
+    permiso al navegador y puede entregar alertas según tus preferencias de miembro —
+    también con la app en segundo plano (PWA o navegador compatible). Los toasts en
+    vivo requieren Administración → Mercure por separado, y el interruptor de alertas
+    de miembro de arriba.
+  push_title: Push del navegador
   push_intro: Activa la casilla de abajo, guarda y acepta el permiso cuando el navegador
-    lo pida. Los avisos cubren incidencias nuevas en proyectos asociados.
+    lo pida. El envío sigue tus preferencias de alertas de miembro de arriba.
   push_privacy: El push del navegador usa un endpoint de suscripción del dispositivo
     (no cookies de marketing). Puedes desactivarlo cuando quieras; consulta Privacidad
     y Ajustes de cookies.
@@ -2109,6 +2183,10 @@ notifications:
   intro: Envía alertas a Slack, Discord, Teams, Telegram, email o un endpoint HTTP
     genérico cuando aparezcan incidencias nuevas, regresiones, picos de volumen o
     grupos N+1.
+  project_layer_help: Estos destinos pertenecen al proyecto (canales del equipo),
+    independientes de las preferencias personales de cada miembro de arriba. El envío
+    externo usa las categorías del destino; los toasts/push de miembro usan la matriz
+    de preferencias del miembro.
   empty: Aún no hay destinos. Añade un canal para avisar a tu equipo.
   add: Añadir destino
   edit: Editar

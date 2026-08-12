@@ -9,6 +9,8 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Form\IssueAssigneeType;
 use App\Issues\Form\IssueCommentType;
 use App\Issues\Form\IssueDuplicateType;
@@ -26,8 +28,6 @@ use App\Issues\Service\IssueStatusChanger;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
-use App\Issues\Enum\IssuePriority;
-use App\Issues\Enum\IssueStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -514,5 +514,4 @@ final class IssueDetailController extends AbstractController
             'event' => $event,
         ]);
     }
-
 }

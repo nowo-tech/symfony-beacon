@@ -374,13 +374,7 @@ final class AiIssueExportFormatter
 
     private function isSensitiveKey(string $name): bool
     {
-        foreach (['password', 'secret', 'token', 'authorization', 'api_key', 'apikey', 'bearer', 'credential'] as $needle) {
-            if (str_contains($name, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(['password', 'secret', 'token', 'authorization', 'api_key', 'apikey', 'bearer', 'credential'], fn(string $needle): bool => str_contains($name, $needle));
     }
 
     private function looksLikeSecretLiteral(string $value): bool

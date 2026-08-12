@@ -44,14 +44,15 @@ final class SharedTwigExtensionsTest extends TestCase
         $formFactory->expects(self::once())
             ->method('createNamed')
             ->willReturn($form);
-        $formFactory->expects(self::exactly(2))
+        $formFactory->expects(self::exactly(3))
             ->method('create')
             ->willReturn($form);
 
         $ext = new CsrfActionTwigExtension(new CsrfOnlyFormFactory($formFactory), $formFactory);
-        self::assertCount(2, $ext->getFunctions());
+        self::assertCount(3, $ext->getFunctions());
         self::assertSame($view, $ext->csrfActionForm('/action', 'token-id'));
         self::assertSame($view, $ext->csrfActionForm('/action', 'token-id', fields: ['enabled' => '1']));
         self::assertSame($view, $ext->searchQueryForm('/search', 'q', ['placeholder' => 'Search']));
+        self::assertSame($view, $ext->flatHiddenFields(['_section' => 'config']));
     }
 }

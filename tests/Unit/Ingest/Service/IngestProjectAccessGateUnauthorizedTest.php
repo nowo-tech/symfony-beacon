@@ -12,6 +12,7 @@ use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,10 +25,10 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
     public function testCredentialFailuresShareUniformUnauthorized(): void
     {
         $known = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($known, 42);
+        new ReflectionProperty(Project::class, 'id')->setValue($known, 42);
 
         $other = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($other, 99);
+        new ReflectionProperty(Project::class, 'id')->setValue($other, 99);
 
         $apiKey = ProjectApiKey::generate($known, 'Test');
         // Bind secret for hash_equals path.
@@ -46,12 +47,10 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
 
         $keys = $this->createMock(ProjectApiKeyRepository::class);
         $keys->method('findActiveByPublicKey')->willReturnCallback(
-            static function (string $publicKey) use ($apiKey, $wrongProjectKey): ?ProjectApiKey {
-                return match ($publicKey) {
-                    $apiKey->getPublicKey() => $apiKey,
-                    $wrongProjectKey->getPublicKey() => $wrongProjectKey,
-                    default => null,
-                };
+            static fn(string $publicKey): ?ProjectApiKey => match ($publicKey) {
+                $apiKey->getPublicKey() => $apiKey,
+                $wrongProjectKey->getPublicKey() => $wrongProjectKey,
+                default => null,
             },
         );
 
@@ -76,7 +75,7 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
             self::assertSame(IngestProjectAccessGate::UNAUTHORIZED_MESSAGE, $reject['message']);
         }
 
-        $ok = $gate->authorizeCredentials('42', $apiKey->getPublicKey(), (string) $secret);
+        $ok = $gate->authorizeCredentials('42', $apiKey->getPublicKey(), $secret);
         self::assertTrue($ok['ok']);
         self::assertSame(42, $ok['project_id']);
     }
@@ -84,7 +83,7 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
     public function testIngestDisabledReturnsForbiddenAfterAuth(): void
     {
         $project = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 7);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 7);
         $project->setIngestEnabled(false);
 
         $gate = new IngestProjectAccessGate(
@@ -105,6 +104,6 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
      */
     private function unusedGovernance(): ProjectGovernanceResolver
     {
-        return (new \ReflectionClass(ProjectGovernanceResolver::class))->newInstanceWithoutConstructor();
+        return new ReflectionClass(ProjectGovernanceResolver::class)->newInstanceWithoutConstructor();
     }
 }

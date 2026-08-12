@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Identity\Command\SeedDemoCommand;
 use App\Identity\Repository\UserRepository;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
-use App\Shared\Mercure\ConfiguredMercure;
 use App\Project\Enum\ProjectRole;
+use App\Shared\Mercure\ConfiguredMercure;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;

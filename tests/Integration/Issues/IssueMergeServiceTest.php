@@ -6,10 +6,10 @@ namespace App\Tests\Integration\Issues;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Service\IssueMergeService;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
-use App\Issues\Enum\IssueStatus;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;

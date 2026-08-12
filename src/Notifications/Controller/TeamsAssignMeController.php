@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Notifications\Service\HookDestinationContext;
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
@@ -64,7 +65,7 @@ final class TeamsAssignMeController extends AbstractController
         }
 
         $context = $this->destinationContextResolver->resolve($destinationUuid, NotificationDestinationType::Teams);
-        if (null === $context) {
+        if (!$context instanceof HookDestinationContext) {
             throw $this->createAccessDeniedException('Unknown destination');
         }
 

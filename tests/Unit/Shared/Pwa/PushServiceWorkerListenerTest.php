@@ -21,6 +21,9 @@ final class PushServiceWorkerListenerTest extends TestCase
         self::assertStringContainsString('/* base sw */', (string) $response->getContent());
         self::assertStringContainsString('Beacon Web Push', (string) $response->getContent());
         self::assertStringContainsString("self.addEventListener('push'", (string) $response->getContent());
+        self::assertStringContainsString('BEACON_PUSH_EVENT_TITLES', (string) $response->getContent());
+        self::assertStringContainsString('beaconPushIssuePreview', (string) $response->getContent());
+        self::assertStringContainsString("'issue.assigned': 'Issue assigned'", (string) $response->getContent());
     }
 
     public function testSkipsSubRequests(): void

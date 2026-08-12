@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared;
 
-use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use PHPUnit\Framework\TestCase;
 
 final class InstanceOpsDefaultsTest extends TestCase

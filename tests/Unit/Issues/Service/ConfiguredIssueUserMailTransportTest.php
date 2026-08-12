@@ -38,13 +38,13 @@ final class ConfiguredIssueUserMailTransportTest extends TestCase
         $settings = InstanceSettings::defaults();
         $settings->setMailerDsn('smtp://user:pass@127.0.0.1:2525');
 
-        $email = (new Email())
+        $email = new Email()
             ->from('beacon@example.com')
             ->to('user@example.com')
             ->subject('Hi')
             ->text('body');
 
-        (new ConfiguredIssueUserMailTransport($this->mailer($settings)))->send($email);
+        new ConfiguredIssueUserMailTransport($this->mailer($settings))->send($email);
 
         $this->addToAssertionCount(1);
     }

@@ -4,7 +4,7 @@
 {% for msg in app.flashes('error') %}
     <div class="{{ ui.flash('error', _css_fw) }}">{{ msg }}</div>
 {% endfor %}
-{{ form_start(form, { attr: { class: 'kit-modal__panel dm-dashboard-form' } }) }}
+{{ form_start(form, {attr: {class: 'kit-modal__panel dm-dashboard-form'}}) }}
     <div class="confirm-dialog__content">
         <p class="kit-modal__lead">{{ 'dashboard.copy_menu_help'|trans({}, 'NowoDashboardMenuBundle') }}</p>
         {% for field in form.children %}

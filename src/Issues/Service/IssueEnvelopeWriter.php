@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Issues\Service;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
-use App\Issues\Service\EventTimestampParser;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;

@@ -22,6 +22,7 @@ use App\Project\Service\ProjectMembershipManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -50,7 +51,7 @@ final class ProjectMembershipManagerTest extends TestCase
             new RequestStack(),
         );
 
-        $actionRecorder = (new \ReflectionClass(UserActionRecorder::class))->newInstanceWithoutConstructor();
+        $actionRecorder = new ReflectionClass(UserActionRecorder::class)->newInstanceWithoutConstructor();
 
         $this->manager = new ProjectMembershipManager(
             $this->createMock(UserRepository::class),
@@ -108,7 +109,7 @@ final class ProjectMembershipManagerTest extends TestCase
         $admin = $this->userWithId(20);
         $adminMembership = $this->membership($project, $admin, ProjectRole::Admin);
         $group = new UserGroup();
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($group, 5);
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, 5);
 
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($adminMembership);
         $this->groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
@@ -159,7 +160,7 @@ final class ProjectMembershipManagerTest extends TestCase
     private function projectWithId(int $id): Project
     {
         $project = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
@@ -169,7 +170,7 @@ final class ProjectMembershipManagerTest extends TestCase
         $user = new User();
         $user->setEmail('u'.$id.'@example.com');
         $user->setDisplayName('User '.$id);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

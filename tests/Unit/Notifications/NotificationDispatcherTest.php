@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Notifications;
 
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Message\DeliverNotificationMessage;
@@ -18,7 +19,6 @@ use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
@@ -57,7 +57,7 @@ final class NotificationDispatcherTest extends TestCase
         );
 
         $realtime = $this->createMock(MemberIssueRealtimeNotifierInterface::class);
-        $realtime->expects(self::once())->method('notifyNewIssue');
+        $realtime->expects(self::once())->method('notify');
 
         $dispatcher = $this->dispatcher($repo, $bus, $realtime);
 

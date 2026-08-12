@@ -57,7 +57,7 @@ final class JsonUploadReader
             throw new InvalidArgumentException('invalid_json');
         }
 
-        /** @var array<string, mixed> $payload */
+        /* @var array<string, mixed> $payload */
         return $payload;
     }
 }

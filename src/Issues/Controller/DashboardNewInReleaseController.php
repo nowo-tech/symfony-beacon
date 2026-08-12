@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
+use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Form\DashboardNewInReleaseFilterType;
@@ -38,7 +39,7 @@ final class DashboardNewInReleaseController extends AbstractController
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
         $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
+        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
 
         $releaseRaw = trim($request->query->getString('release'));
         $release = '' !== $releaseRaw ? Issue::normalizeRelease($releaseRaw) : null;
@@ -57,7 +58,7 @@ final class DashboardNewInReleaseController extends AbstractController
         foreach ($accessible as $project) {
             $projectChoices[$project->getName()] = $project->getUuid();
         }
-        $releaseChoices = array_combine($availableReleases, $availableReleases) ?: [];
+        $releaseChoices = array_combine($availableReleases, $availableReleases);
 
         return $this->render('dashboard/new_in_release.html.twig', [
             'issues' => $issues,

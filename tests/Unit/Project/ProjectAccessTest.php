@@ -46,6 +46,6 @@ final class ProjectAccessTest extends TestCase
         self::assertTrue($access->canDeleteProject());
         self::assertTrue($access->canOpenSettings());
         self::assertFalse($access->isPrimaryOwner());
-        self::assertTrue((new ProjectAccess(ProjectRole::Owner))->isPrimaryOwner());
+        self::assertTrue(new ProjectAccess(ProjectRole::Owner)->isPrimaryOwner());
     }
 }

@@ -203,9 +203,9 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/admin/roles/'.$role->getUuid());
+        $client->request(Request::METHOD_GET, '/admin/roles/'.$role->getUuid());
         self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists(sprintf('form[action="%s"]', '/admin/roles/'.$role->getUuid().'/delete'));
+        self::assertSelectorNotExists(\sprintf('form[action="%s"]', '/admin/roles/'.$role->getUuid().'/delete'));
 
         $client->request(Request::METHOD_POST, '/admin/roles/'.$role->getUuid().'/delete', [
             'csrf_only' => ['_token' => 'x'],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ops\Form;
 
+use Override;
 use App\Shared\Form\AbstractGetFilterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -37,6 +38,7 @@ final class AdminOpsOverviewFilterType extends AbstractGetFilterType
         ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

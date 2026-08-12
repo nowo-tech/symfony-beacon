@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Form;
 
+use Override;
 use App\Shared\Form\AbstractGetFilterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -67,7 +68,7 @@ final class IssueIndexFilterType extends AbstractGetFilterType
             ->add('level', ChoiceType::class, [
                 'label' => false,
                 'required' => false,
-                'choices' => array_combine($levelChoices, $levelChoices) ?: [],
+                'choices' => array_combine($levelChoices, $levelChoices),
                 'choice_translation_domain' => false,
                 'placeholder' => $this->translator->trans('issues.filter.any_level'),
                 'attr' => [
@@ -159,6 +160,7 @@ final class IssueIndexFilterType extends AbstractGetFilterType
             ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

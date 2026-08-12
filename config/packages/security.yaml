@@ -20,6 +20,8 @@ security:
     main:
       lazy: true
       provider: app_user_provider
+      # UserKit AccountStatusUserChecker (≥1.1.6) covers checkPreAuth + checkPostAuth
+      # (AuthKit Security::login magic/social/QR and form login). Do not override user_checker.
       form_login:
         login_path: nowo_auth_kit_login
         check_path: nowo_auth_kit_login

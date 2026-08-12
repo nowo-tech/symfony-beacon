@@ -36,7 +36,7 @@ final class AppSectionTest extends TestCase
             $stack->push($request);
         }
 
-        self::assertSame($expected, (new AppSectionResolver($stack))->current());
+        self::assertSame($expected, new AppSectionResolver($stack)->current());
     }
 
     /**

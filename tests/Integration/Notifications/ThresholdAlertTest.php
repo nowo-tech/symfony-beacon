@@ -6,12 +6,12 @@ namespace App\Tests\Integration\Notifications;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Service\VolumeThresholdEvaluator;
-use App\Issues\Enum\IssueStatus;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

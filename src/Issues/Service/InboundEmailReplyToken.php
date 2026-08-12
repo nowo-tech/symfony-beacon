@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Service;
 
+use Deprecated;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use JsonException;
 
@@ -85,9 +86,7 @@ final readonly class InboundEmailReplyToken
         ];
     }
 
-    /**
-     * @deprecated Use {@see parseValid()}; kept for callers that only need the issue UUID
-     */
+    #[Deprecated(message: 'Use {@see parseValid()}; kept for callers that only need the issue UUID')]
     public function isValid(string $token, ?int $now = null): ?string
     {
         $parsed = $this->parseValid($token, $now);

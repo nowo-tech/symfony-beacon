@@ -17,9 +17,12 @@ use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountSocialAccounts;
 use App\Identity\UserDisplayPreferenceDefaults;
 use App\Issues\IssuePanelIds;
+use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Repository\PushSubscriptionRepository;
+use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Repository\ProjectRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,7 +30,6 @@ use Nowo\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +52,8 @@ final class AccountPreferencesController extends AbstractController
         private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipRepository $projectMembershipRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
+        private readonly ProjectRepository $projectRepository,
+        private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
         private readonly PushSubscriptionRepository $pushSubscriptionRepository,
         private readonly WebPushClientFactory $webPushFactory,
         private readonly AccountSocialAccounts $accountSocialAccounts,
@@ -317,15 +321,44 @@ final class AccountPreferencesController extends AbstractController
         );
     }
 
-    #[Route('/account/display/notifications', name: 'account_display_notifications', methods: ['GET', 'POST'])]
-    public function displayNotifications(Request $request): Response
+    #[Route('/account/display/notifications', name: 'account_display_notifications', methods: ['GET'])]
+    public function displayNotifications(): Response
     {
-        return $this->handleDisplaySection(
-            $request,
-            AccountDisplayType::SECTION_NOTIFICATIONS,
-            'account_display_notifications',
-            'account/display_notifications.html.twig',
-        );
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->healDisplayPreferencesIfNeeded($user);
+
+        $pushAvailable = $this->webPushFactory->isConfigured();
+        $accessibleProjects = $this->projectRepository->findAccessibleByUser($user);
+        $projectRows = $this->memberAlertPreferenceManager->projectRowsForUi($user, $accessibleProjects);
+
+        /** @var list<array{uuid: string, name: string, hasOverrides: bool, formData: array<string, mixed>}> $projects */
+        $projects = [];
+        foreach ($projectRows as $row) {
+            $project = $row['project'];
+            $projects[] = [
+                'uuid' => $project->getUuid(),
+                'name' => $project->getName(),
+                'hasOverrides' => $row['hasOverrides'],
+                'formData' => [
+                    'enabled' => $row['enabled'],
+                    'resetOverrides' => false,
+                    'events' => MemberAlertEvent::mapEventsToFormKeys($row['events']),
+                ],
+            ];
+        }
+
+        return $this->render('account/display_notifications.html.twig', [
+            'push_available' => $pushAvailable,
+            'member_alert_initial' => [
+                'memberAlertsEnabled' => $user->isMemberAlertsEnabled(),
+                'events' => MemberAlertEvent::mapEventsToFormKeys(
+                    $this->memberAlertPreferenceManager->accountEventsForUi($user),
+                ),
+                'pushNotificationsEnabled' => $user->isPushNotificationsEnabled(),
+            ],
+            'member_alert_projects' => $projects,
+        ]);
     }
 
     private function handleDisplaySection(

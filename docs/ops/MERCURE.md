@@ -1,6 +1,6 @@
 # Mercure setup (live member alerts)
 
-Beacon can show **live toasts** to signed-in members when a **new issue** is created on a project they belong to. That path uses [Mercure](https://mercure.rocks/) (Server-Sent Events). It is **optional** and **off by default**.
+Beacon can show **live toasts** to signed-in members for issue lifecycle events (new, regression, resolve, reopen, assign, comment) on projects they belong to, subject to **Account → Display → Notifications** preferences (opt-out defaults). That path uses [Mercure](https://mercure.rocks/) (Server-Sent Events). It is **optional** and **off by default** at the instance level.
 
 Background / locked-screen alerts use **Web Push** (VAPID) instead — see [NOTIFICATIONS.md](../product/NOTIFICATIONS.md#web-push-pwa). Mercure and Web Push are independent.
 
@@ -90,8 +90,8 @@ Keep publisher and subscriber keys **identical** to `MERCURE_JWT_SECRET` unless 
 
 Mercure authorizes **publish** and **subscribe** with JWTs signed with an HMAC key (the “JWT secret”).
 
-1. When Beacon publishes a new-issue update, Symfony Mercure signs a **publisher** JWT with the resolved secret and POSTs to `MERCURE_URL` (or the admin override).
-2. When a member’s browser needs to subscribe, Beacon issues a short-lived **subscriber** JWT (topics such as `/projects/{projectUuid}/issues`) via `GET /account/realtime/config` — only if Mercure is **enabled** and configured.
+1. When Beacon publishes a member-alert update, Symfony Mercure signs a **publisher** JWT with the resolved secret and POSTs to `MERCURE_URL` (or the admin override).
+2. When a member’s browser needs to subscribe, Beacon issues a short-lived **subscriber** JWT for `/users/{userUuid}/member-alerts` via `GET /account/realtime/config` — only if Mercure is **enabled**, configured, and the member’s **member alerts** master preference is on.
 3. The hub verifies both tokens with `MERCURE_*_JWT_KEY`. If the secret in PHP does not match the hub keys, publish fails and/or EventSource never receives updates.
 
 ### Where the secret can live
@@ -132,10 +132,10 @@ Web Push note on that screen is intentional: VAPID opt-in under **Account → Di
 
 ## Topics and privacy
 
-- Updates are **private** Mercure topics: `/projects/{projectUuid}/issues`.
-- Only members who receive a subscriber JWT for topics they are allowed to see can subscribe.
+- Updates are **private** Mercure topics: `/users/{userUuid}/member-alerts` (preference-filtered server-side).
+- Only that member’s subscriber JWT can subscribe to their topic; project-wide `/projects/{projectUuid}/issues` is not used for member alert delivery.
 - Publishing runs only when admin Mercure is enabled and URL + secret resolve.
-- Disabling Mercure stops new EventSource configs and skips publish; it does not delete Web Push subscriptions.
+- Disabling Mercure (or the member’s alerts master) stops new EventSource configs and skips publish; it does not delete Web Push subscriptions.
 
 ---
 

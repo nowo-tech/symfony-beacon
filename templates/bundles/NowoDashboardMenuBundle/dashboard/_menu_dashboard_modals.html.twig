@@ -59,9 +59,9 @@
     </div>
 </dialog>
 
+{% set delete_menu_modal_form = delete_menu_modal_form|default(csrf_action_form('#', 'delete_menu_modal', 'POST', false)) %}
 <dialog class="nowo-ui-modal confirm-dialog" id="modal-delete-confirm" aria-labelledby="modal-delete-label">
-    <form id="form-delete-confirm" method="post" action="" class="confirm-dialog__panel">
-        <input type="hidden" name="_token" value="">
+    {{ form_start(delete_menu_modal_form, {attr: {id: 'form-delete-confirm', class: 'confirm-dialog__panel'}}) }}
         <div class="confirm-dialog__header">
             <h2 class="confirm-dialog__title" id="modal-delete-label">{{ 'dashboard.confirm_delete'|trans }}</h2>
             <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
@@ -73,12 +73,12 @@
             <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans }}</button>
             <button type="submit" class="btn-danger">{{ 'dashboard.delete'|trans }}</button>
         </div>
-    </form>
+    {{ form_end(delete_menu_modal_form) }}
 </dialog>
 
+{% set delete_item_modal_form = delete_item_modal_form|default(csrf_action_form('#', 'delete_item_modal', 'POST', false)) %}
 <dialog class="nowo-ui-modal confirm-dialog" id="modal-delete-item-confirm" aria-labelledby="modal-delete-item-label">
-    <form id="form-delete-item-confirm" method="post" action="" class="confirm-dialog__panel">
-        <input type="hidden" name="_token" value="">
+    {{ form_start(delete_item_modal_form, {attr: {id: 'form-delete-item-confirm', class: 'confirm-dialog__panel'}}) }}
         <div class="confirm-dialog__header">
             <h2 class="confirm-dialog__title" id="modal-delete-item-label">{{ 'dashboard.confirm_delete'|trans }}</h2>
             <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
@@ -90,5 +90,5 @@
             <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans }}</button>
             <button type="submit" class="btn-danger">{{ 'dashboard.delete'|trans }}</button>
         </div>
-    </form>
+    {{ form_end(delete_item_modal_form) }}
 </dialog>

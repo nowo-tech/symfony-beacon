@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-12
+
+### Added
+
+- **Member alert preferences (`091` / 6.40)**: Account → Display → Notifications matrix (master + per-event enable/scope + per-project enable/overrides for every accessible project, including viewers). Optional Project Settings `#member-alerts` shortcut for Settings-capable roles. Mercure publishes to `/users/{uuid}/member-alerts`; Web Push recipients filtered by the same evaluator. Defaults all on (opt-out). Run migrations (`make migrate`). Spec: `specs/091-member-push-preferences/`.
+
+### Changed
+
+- UserKit **1.1.6**: disabled accounts blocked in `checkPreAuth` (AuthKit magic/social/QR). Removed host `RejectDisabledUserChecker` and firewall `user_checker` override so the tagged UserKit checker applies.
+- Member realtime toasts / Web Push copy: structured event titles, truncated issue preview, same-origin toast link guard; service worker push titles aligned.
+- CSRF Forms follow-ups: `HiddenFieldsCsrfType` optional field types/options; Site Backup / kit Twig forks use typed forms; LiveComponent member-alert forms document UX CSRF (form CSRF off for Live re-renders).
+
+### Security
+
+- Per-project member alert saves use `ProjectAccessService::requireAccess` (viewer+), not Settings-admin — personal prefs stay editable from Account without opening DSN/keys surfaces.
+
 ## [1.7.0] - 2026-08-12
 
 ### Fixed
@@ -923,7 +939,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.2...v1.6.3

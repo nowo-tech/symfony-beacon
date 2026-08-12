@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Project\Form;
 
+use Override;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -48,6 +49,7 @@ final class ProjectShareCreateType extends FormKitAbstractType
         ]);
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return '';

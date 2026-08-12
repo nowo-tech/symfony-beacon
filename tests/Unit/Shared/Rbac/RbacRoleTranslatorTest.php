@@ -96,11 +96,11 @@ final class RbacRoleTranslatorTest extends TestCase
      */
     private function role(string $code, string $name, ?string $description): object
     {
-        return new class($code, $name, $description) {
+        return new readonly class($code, $name, $description) {
             public function __construct(
-                private readonly string $code,
-                private readonly string $name,
-                private readonly ?string $description,
+                private string $code,
+                private string $name,
+                private ?string $description,
             ) {
             }
 

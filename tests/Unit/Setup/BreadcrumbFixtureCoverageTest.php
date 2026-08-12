@@ -19,7 +19,7 @@ final class BreadcrumbFixtureCoverageTest extends TestCase
      *
      * @return list<string>
      */
-    private static function requiredPageRoutes(): array
+    private function requiredPageRoutes(): array
     {
         return [
             'admin_hub',
@@ -55,7 +55,7 @@ final class BreadcrumbFixtureCoverageTest extends TestCase
     #[Test]
     public function defaultBreadcrumbFixtureCoversRequiredPageRoutes(): void
     {
-        $data = (new DemoFixtureLoader())->load('breadcrumbs.default.json');
+        $data = new DemoFixtureLoader()->load('breadcrumbs.default.json');
         self::assertIsArray($data['items'] ?? null);
 
         $routes = [];
@@ -65,14 +65,14 @@ final class BreadcrumbFixtureCoverageTest extends TestCase
             $routes[] = $item['route'];
         }
 
-        $missing = array_values(array_diff(self::requiredPageRoutes(), $routes));
+        $missing = array_values(array_diff($this->requiredPageRoutes(), $routes));
         self::assertSame([], $missing, 'Add missing routes to breadcrumbs.default.json');
     }
 
     #[Test]
     public function appearanceSectionMirrorsOpsDefaultsPattern(): void
     {
-        $data = (new DemoFixtureLoader())->load('breadcrumbs.default.json');
+        $data = new DemoFixtureLoader()->load('breadcrumbs.default.json');
         $byRoute = [];
         foreach ($data['items'] as $item) {
             $byRoute[$item['route']] = $item;

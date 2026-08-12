@@ -1,4 +1,7 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# Enable stateless CSRF protection for forms and logins/logouts.
+# LiveComponent forms that re-render (member alerts, etc.) set csrf_protection: false —
+# SameOrigin `submit` is one-shot and fails validation on save after toggles; the Live
+# endpoint still requires X-Requested-With (Symfony UX CSRF guard).
 framework:
     form:
         csrf_protection:

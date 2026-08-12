@@ -93,7 +93,7 @@ final class Version20260809160000 extends AbstractMigration
     }
 
     /**
-     * @param array<string, mixed> $indexes
+     * @param array<string, mixed>  $indexes
      * @param array<string, string> $fromTo
      */
     private function queueIndexRenames(string $table, array $indexes, array $fromTo): void
@@ -102,7 +102,7 @@ final class Version20260809160000 extends AbstractMigration
             if (!isset($indexes[$from]) || isset($indexes[$to])) {
                 continue;
             }
-            $this->addSql(sprintf(
+            $this->addSql(\sprintf(
                 'ALTER TABLE `%s` RENAME INDEX `%s` TO `%s`',
                 $table,
                 $from,

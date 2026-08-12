@@ -19,7 +19,7 @@ final class SecurityIsGrantedMenuPermissionCheckerTest extends TestCase
         $item = new MenuItem();
         $item->setPermissionKeys([]);
 
-        self::assertTrue((new SecurityIsGrantedMenuPermissionChecker($security))->canView($item));
+        self::assertTrue(new SecurityIsGrantedMenuPermissionChecker($security)->canView($item));
     }
 
     public function testVisibleWhenAnyKeyGranted(): void
@@ -32,7 +32,7 @@ final class SecurityIsGrantedMenuPermissionCheckerTest extends TestCase
         $item = new MenuItem();
         $item->setPermissionKeys(['ROLE_USER', 'ROLE_ADMIN']);
 
-        self::assertTrue((new SecurityIsGrantedMenuPermissionChecker($security))->canView($item));
+        self::assertTrue(new SecurityIsGrantedMenuPermissionChecker($security)->canView($item));
     }
 
     public function testHiddenWhenNoKeyGranted(): void
@@ -43,6 +43,6 @@ final class SecurityIsGrantedMenuPermissionCheckerTest extends TestCase
         $item = new MenuItem();
         $item->setPermissionKeys(['ROLE_ADMIN']);
 
-        self::assertFalse((new SecurityIsGrantedMenuPermissionChecker($security))->canView($item));
+        self::assertFalse(new SecurityIsGrantedMenuPermissionChecker($security)->canView($item));
     }
 }

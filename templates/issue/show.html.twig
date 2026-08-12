@@ -260,23 +260,16 @@
                                 </div>
 
                                 <div class="confirm-dialog__content">
-                                    {{ form_widget(duplicateDialogForm.canonical_uuid, {attr: {'data-combobox-target': 'value'}}) }}
+                                    {{ form_widget(duplicateDialogForm.canonical_uuid) }}
 
-                                    <label class="confirm-dialog__label" for="issue-duplicate-query">{{ 'issues.duplicate_canonical'|trans }}</label>
+                                    {{ form_label(duplicateDialogForm.query) }}
                                     <div class="combobox combobox--stacked">
-                                        <input
-                                            id="issue-duplicate-query"
-                                            type="search"
-                                            class="input w-full"
-                                            autocomplete="off"
-                                            placeholder="{{ 'issues.duplicate_search_placeholder'|trans }}"
-                                            data-combobox-target="query"
-                                            data-confirm-dialog-target="confirmInput"
-                                            data-required-message="{{ 'issues.duplicate_choose'|trans }}"
-                                            data-action="input->combobox#filter focus->combobox#onQueryFocus keydown->combobox#onQueryKeydown"
-                                            aria-autocomplete="list"
-                                            aria-controls="issue-duplicate-options"
-                                        >
+                                        {{ form_widget(duplicateDialogForm.query, {
+                                            attr: {
+                                                placeholder: 'issues.duplicate_search_placeholder'|trans,
+                                                'data-required-message': 'issues.duplicate_choose'|trans,
+                                            }
+                                        }) }}
                                         <ul
                                             id="issue-duplicate-options"
                                             class="combobox__list"

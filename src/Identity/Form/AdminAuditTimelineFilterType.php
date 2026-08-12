@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Form;
 
+use Override;
 use App\Shared\Form\AbstractGetFilterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -55,6 +56,7 @@ final class AdminAuditTimelineFilterType extends AbstractGetFilterType
             ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

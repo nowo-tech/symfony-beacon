@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Project\Twig;
 
+use Symfony\Component\HttpFoundation\Request;
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
@@ -16,6 +17,7 @@ use App\Project\Service\ProjectAccessService;
 use App\Project\Twig\ProjectPermissionTwigExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -82,9 +84,9 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         $membership->setUser($user);
         $membership->setRole(ProjectRole::Member);
 
-        $projectId = new \ReflectionProperty(Project::class, 'id');
+        $projectId = new ReflectionProperty(Project::class, 'id');
         $projectId->setValue($project, 7);
-        $userId = new \ReflectionProperty(User::class, 'id');
+        $userId = new ReflectionProperty(User::class, 'id');
         $userId->setValue($user, 3);
 
         $this->security->method('getUser')->willReturn($user);
@@ -93,7 +95,7 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
             ->with($project, $user)
             ->willReturn($membership);
 
-        $request = new \Symfony\Component\HttpFoundation\Request();
+        $request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($request);
 

@@ -11,16 +11,16 @@ final class PrometheusTextFormatterTest extends TestCase
 {
     public function testFormatEscapesLabelsAndSpecialValues(): void
     {
-        $text = (new PrometheusTextFormatter())->format([
+        $text = new PrometheusTextFormatter()->format([
             [
                 'name' => 'beacon_demo',
                 'type' => 'gauge',
                 'help' => 'Demo metric',
                 'samples' => [
                     ['labels' => [], 'value' => 1.5],
-                    ['labels' => ['reason' => "a\"b\\c\nd"], 'value' => NAN],
-                    ['labels' => ['sign' => 'pos'], 'value' => INF],
-                    ['labels' => ['sign' => 'neg'], 'value' => -INF],
+                    ['labels' => ['reason' => "a\"b\\c\nd"], 'value' => \NAN],
+                    ['labels' => ['sign' => 'pos'], 'value' => \INF],
+                    ['labels' => ['sign' => 'neg'], 'value' => -\INF],
                     ['labels' => ['z' => 'zero'], 'value' => 0.0],
                 ],
             ],

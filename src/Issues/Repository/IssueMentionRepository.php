@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Repository;
 
 use App\Identity\Entity\User;
+use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueMention;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
@@ -102,6 +103,21 @@ class IssueMentionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
 
         return $mention;
+    }
+
+    public function isUserMentionedOnIssue(User $user, Issue $issue): bool
+    {
+        $count = (int) $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->innerJoin('m.comment', 'c')
+            ->andWhere('m.mentionedUser = :user')
+            ->andWhere('c.issue = :issue')
+            ->setParameter('user', $user)
+            ->setParameter('issue', $issue)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count > 0;
     }
 
     /**

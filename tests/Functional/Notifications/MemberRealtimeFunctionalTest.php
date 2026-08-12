@@ -15,7 +15,7 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
 {
     public function testGuestCannotFetchRealtimeConfig(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request(Request::METHOD_GET, '/account/realtime/config');
         self::assertResponseRedirects();
     }
@@ -39,8 +39,10 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
         $payload = json_decode($client->getResponse()->getContent() ?: '', true);
         self::assertIsArray($payload);
         self::assertTrue($payload['mercure']['enabled']);
-        self::assertSame('https://beacon.test/.well-known/mercure', $payload['mercure']['hubUrl']);
-        self::assertContains(IssueRealtimeTopics::forProject($project->getUuid()), $payload['mercure']['topics']);
+        // Same-origin hub URL for EventSource + CSP connect-src 'self'.
+        self::assertSame('http://localhost/.well-known/mercure', $payload['mercure']['hubUrl']);
+        self::assertContains(IssueRealtimeTopics::forUser($user->getUuid()), $payload['mercure']['topics']);
+        self::assertSame([IssueRealtimeTopics::forUser($user->getUuid())], $payload['mercure']['topics']);
         self::assertIsString($payload['mercure']['token']);
         self::assertNotSame('', $payload['mercure']['token']);
         self::assertFalse($payload['push']['preferenceEnabled']);

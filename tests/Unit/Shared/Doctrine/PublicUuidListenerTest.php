@@ -23,7 +23,7 @@ final class PublicUuidListenerTest extends TestCase
         };
 
         $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
-        (new PublicUuidListener())->prePersist($args);
+        new PublicUuidListener()->prePersist($args);
 
         self::assertTrue($entity->called);
     }
@@ -35,7 +35,7 @@ final class PublicUuidListenerTest extends TestCase
         };
 
         $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
-        (new PublicUuidListener())->prePersist($args);
+        new PublicUuidListener()->prePersist($args);
 
         $this->addToAssertionCount(1);
     }

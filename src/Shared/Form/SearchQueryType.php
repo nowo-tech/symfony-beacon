@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Form;
 
+use Override;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -38,6 +39,7 @@ final class SearchQueryType extends FormKitAbstractType
         $resolver->setAllowedTypes('input_attr', 'array');
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return '';

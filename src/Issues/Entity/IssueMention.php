@@ -86,6 +86,6 @@ class IssueMention
 
     public function isUnread(): bool
     {
-        return null === $this->readAt;
+        return !$this->readAt instanceof DateTimeImmutable;
     }
 }

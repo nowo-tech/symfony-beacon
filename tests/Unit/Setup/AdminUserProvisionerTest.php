@@ -30,7 +30,7 @@ final class AdminUserProvisionerTest extends TestCase
 
         $hasher = $this->createStub(UserPasswordHasherInterface::class);
 
-        self::assertFalse((new AdminUserProvisioner($users, $hasher))->adminExists());
+        self::assertFalse(new AdminUserProvisioner($users, $hasher)->adminExists());
     }
 
     public function testCreateAdminHashesPasswordAndSaves(): void
@@ -73,7 +73,7 @@ final class AdminUserProvisionerTest extends TestCase
             },
         ));
 
-        (new AdminUserProvisioner($users, $hasher))->createAdmin([
+        new AdminUserProvisioner($users, $hasher)->createAdmin([
             'email' => 'not-an-email',
             'password' => 'x',
             'roles' => [],

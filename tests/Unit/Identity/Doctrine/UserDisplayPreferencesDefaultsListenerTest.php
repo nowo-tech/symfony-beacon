@@ -21,7 +21,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
         };
 
         $args = new PrePersistEventArgs($entity, $this->createStub(EntityManagerInterface::class));
-        (new UserDisplayPreferencesDefaultsListener('en'))->prePersist($args);
+        new UserDisplayPreferencesDefaultsListener('en')->prePersist($args);
 
         $this->addToAssertionCount(1);
     }
@@ -33,7 +33,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
         self::assertNull($user->getPreferredLocaleRaw());
 
         $args = new PrePersistEventArgs($user, $this->createStub(EntityManagerInterface::class));
-        (new UserDisplayPreferencesDefaultsListener('es'))->prePersist($args);
+        new UserDisplayPreferencesDefaultsListener('es')->prePersist($args);
 
         self::assertNull($user->getPreferredLocaleRaw());
     }
@@ -44,7 +44,7 @@ final class UserDisplayPreferencesDefaultsListenerTest extends TestCase
         self::assertNull($user->getPreferredLocaleRaw());
 
         $args = new PrePersistEventArgs($user, $this->createStub(EntityManagerInterface::class));
-        (new UserDisplayPreferencesDefaultsListener('es'))->prePersist($args);
+        new UserDisplayPreferencesDefaultsListener('es')->prePersist($args);
 
         self::assertSame('es', $user->getPreferredLocaleRaw());
         self::assertSame(UserDisplayPreferenceDefaults::THEME, $user->getPreferredThemeRaw());

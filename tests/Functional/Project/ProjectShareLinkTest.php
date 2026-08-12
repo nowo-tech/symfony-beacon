@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
+use App\Project\Repository\ProjectShareLinkRepository;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Entity\ProjectShareLink;
-use App\Project\Service\ProjectShareLinkManager;
 use App\Project\Enum\ProjectRole;
+use App\Project\Service\ProjectShareLinkManager;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -245,7 +246,7 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
         $created = $manager->create($project, $owner, null, new DateTimeImmutable('+1 day'), 1);
         $link = $created['link'];
 
-        $repo = self::getContainer()->get(\App\Project\Repository\ProjectShareLinkRepository::class);
+        $repo = self::getContainer()->get(ProjectShareLinkRepository::class);
         self::assertTrue($repo->tryClaimUse($link));
         self::assertFalse($repo->tryClaimUse($link));
 

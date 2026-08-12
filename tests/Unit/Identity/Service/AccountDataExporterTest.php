@@ -18,6 +18,7 @@ use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
 use Nowo\AuthKitBundle\SocialLogin\SocialLoginGate;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 
 final class AccountDataExporterTest extends TestCase
 {
@@ -47,7 +48,7 @@ final class AccountDataExporterTest extends TestCase
         $actions->method('findForUser')->willReturn([]);
 
         $push = $this->createStub(PushSubscriptionRepository::class);
-        $push->method('findByUser')->willReturn([new \stdClass(), new \stdClass()]);
+        $push->method('findByUser')->willReturn([new stdClass(), new stdClass()]);
 
         $exporter = new AccountDataExporter(
             $projects,

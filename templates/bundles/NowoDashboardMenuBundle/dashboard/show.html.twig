@@ -54,18 +54,18 @@
         </button>
     {% endif %}
     {% if items|length > 0 %}
-        <form method="post" action="{{ path(dashboard_routes.items_reindex_positions|default('nowo_dashboard_menu_dashboard_items_reindex_positions'), {id: menu.id}) }}" class="inline">
-            <input type="hidden" name="_token" value="{{ csrf_token('reindex_positions_' ~ menu.id) }}">
+        {% set reindex_positions_form = reindex_positions_form|default(csrf_action_form(path(dashboard_routes.items_reindex_positions|default('nowo_dashboard_menu_dashboard_items_reindex_positions'), {id: menu.id}), 'reindex_positions_' ~ menu.id, 'POST', false)) %}
+        {% set check_parent_cycles_form = check_parent_cycles_form|default(csrf_action_form(path(dashboard_routes.items_check_parent_cycles|default('nowo_dashboard_menu_dashboard_items_check_parent_cycles'), {id: menu.id}), 'check_parent_cycles_' ~ menu.id, 'POST', false)) %}
+        {{ form_start(reindex_positions_form, {attr: {class: 'inline'}}) }}
             <button type="submit" class="btn-ghost" title="{{ 'dashboard.reindex_positions_title'|trans({'%step%': position_step}, _td) }}">
                 {{ 'dashboard.reindex_positions'|trans({'%step%': position_step}, _td) }}
             </button>
-        </form>
-        <form method="post" action="{{ path(dashboard_routes.items_check_parent_cycles|default('nowo_dashboard_menu_dashboard_items_check_parent_cycles'), {id: menu.id}) }}" class="inline">
-            <input type="hidden" name="_token" value="{{ csrf_token('check_parent_cycles_' ~ menu.id) }}">
+        {{ form_end(reindex_positions_form) }}
+        {{ form_start(check_parent_cycles_form, {attr: {class: 'inline'}}) }}
             <button type="submit" class="btn-ghost" title="{{ 'dashboard.check_parent_cycles_title'|trans({}, _td) }}">
                 {{ 'dashboard.check_parent_cycles'|trans({}, _td) }}
             </button>
-        </form>
+        {{ form_end(check_parent_cycles_form) }}
     {% endif %}
     <button
         type="button"
@@ -154,7 +154,7 @@
                                 <div>Pos: {{ item.position }}</div>
                             </td>
                             <td class="px-2 py-3">
-                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with { item: item } only %}
+                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with {item: item} only %}
                                 {{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}
                             </td>
                             <td class="px-2 py-3 text-xs">
@@ -188,31 +188,33 @@
                                 </div>
                             </td>
                             <td class="px-2 py-3" style="padding-left: {{ 0.5 + depth * 1.25 }}rem;">
-                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with { item: item } only %}
+                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with {item: item} only %}
                                 <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">{{ item.itemType }}</span>
                                 {{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}
                             </td>
                             <td class="w-0 px-2 py-3 text-end whitespace-nowrap">
                                 <div class="inline-flex max-w-full items-center justify-end gap-1 {{ _display == 'icon' ? '' : 'flex-wrap' }} nowo-ui-row-actions nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}" aria-label="{{ 'dashboard.actions'|trans({}, _td) }}">
                                     {% if prev_sibling[item.id] is defined and prev_sibling[item.id] is not null %}
-                                        <form method="post" action="{{ path(dashboard_routes.item_move_up|default('nowo_dashboard_menu_dashboard_item_move_up'), {id: menu.id, itemId: item.id}) }}" class="inline">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('item_move_up_' ~ item.id) }}">
+                                        {% set item_move_up_forms = item_move_up_forms|default({}) %}
+                                        {% set item_move_up_form = item_move_up_forms[item.id]|default(csrf_action_form(path(dashboard_routes.item_move_up|default('nowo_dashboard_menu_dashboard_item_move_up'), {id: menu.id, itemId: item.id}), 'item_move_up_' ~ item.id, 'POST', false)) %}
+                                        {{ form_start(item_move_up_form, {attr: {class: 'inline'}}) }}
                                             <button type="submit" class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}" title="{{ _label_up }}" aria-label="{{ _label_up }}">
                                                 {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'prev', label: _label_up} only %}
                                             </button>
-                                        </form>
+                                        {{ form_end(item_move_up_form) }}
                                     {% else %}
                                         <span class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} opacity-40" title="{{ 'dashboard.first'|trans({}, _td) }}" aria-hidden="true">
                                             {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'prev', label: _label_up} only %}
                                         </span>
                                     {% endif %}
                                     {% if next_sibling[item.id] is defined and next_sibling[item.id] is not null %}
-                                        <form method="post" action="{{ path(dashboard_routes.item_move_down|default('nowo_dashboard_menu_dashboard_item_move_down'), {id: menu.id, itemId: item.id}) }}" class="inline">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('item_move_down_' ~ item.id) }}">
+                                        {% set item_move_down_forms = item_move_down_forms|default({}) %}
+                                        {% set item_move_down_form = item_move_down_forms[item.id]|default(csrf_action_form(path(dashboard_routes.item_move_down|default('nowo_dashboard_menu_dashboard_item_move_down'), {id: menu.id, itemId: item.id}), 'item_move_down_' ~ item.id, 'POST', false)) %}
+                                        {{ form_start(item_move_down_form, {attr: {class: 'inline'}}) }}
                                             <button type="submit" class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}" title="{{ _label_down }}" aria-label="{{ _label_down }}">
                                                 {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'next', label: _label_down} only %}
                                             </button>
-                                        </form>
+                                        {{ form_end(item_move_down_form) }}
                                     {% else %}
                                         <span class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} opacity-40" title="{{ 'dashboard.last'|trans({}, _td) }}" aria-hidden="true">
                                             {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'next', label: _label_down} only %}
@@ -282,7 +284,7 @@
                                         data-item-id="{{ item.id }}"
                                         data-name="{{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}"
                                         data-url="{{ path(dashboard_routes.item_delete|default('nowo_dashboard_menu_dashboard_item_delete'), {id: menu.id, itemId: item.id}) }}"
-                                        data-token="{{ csrf_token('delete_item_' ~ item.id) }}"
+                                        data-token="{{ (item_delete_tokens|default({}))[item.id]|default(csrf_token('delete_item_' ~ item.id)) }}"
                                         {{ ui.modal_toggle_attrs(_css_fw)|raw }}
                                         {{ ui.modal_target_attr('modal-delete-item-confirm', _css_fw)|raw }}
                                     >

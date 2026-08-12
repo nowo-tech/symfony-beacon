@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ingest\Service;
 
+use SensitiveParameter;
+
 /**
  * Extracts public key / secret from Envelope auth mechanisms.
  */
@@ -29,12 +31,11 @@ final class EnvelopeAuthParser
      * @return array{public_key: ?string, secret_key: ?string}
      */
     public function parseFromRequest(
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         ?string $authHeader,
         string $queryString,
         ?string $envelopeDsn = null,
-    ): array
-    {
+    ): array {
         $key = null;
         $secret = null;
 

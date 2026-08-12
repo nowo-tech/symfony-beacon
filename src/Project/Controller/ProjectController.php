@@ -6,8 +6,11 @@ namespace App\Project\Controller;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
+use App\Identity\Form\MemberProjectAlertPreferencesType;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Notifications\Enum\MemberAlertEvent;
+use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Form\ProjectGovernanceType;
@@ -21,6 +24,7 @@ use App\Project\Service\ProjectSettingsPageBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +47,8 @@ final class ProjectController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly ProjectFactory $projectFactory,
         private readonly ProjectSettingsPageBuilder $settingsPageBuilder,
+        private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
+        private readonly FormFactoryInterface $formFactory,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
     }
@@ -140,6 +146,70 @@ final class ProjectController extends AbstractController
             'project/settings.html.twig',
             $this->settingsPageBuilder->build($project, $user, $access, $request),
         );
+    }
+
+    #[Route('/projects/{id}/settings/member-alerts', name: 'project_member_alerts_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    public function saveMemberAlerts(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+        Request $request,
+    ): RedirectResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        // Own member-alert prefs: any project access (viewer+). Settings page UI stays
+        // gated by requireSettingsSurface; Account modals use the LiveComponent path.
+        $this->projectAccess->requireAccess($project, $user);
+
+        $rows = $this->memberAlertPreferenceManager->projectRowsForUi($user, [$project]);
+        $row = $rows[0] ?? null;
+        $formData = [
+            'enabled' => $row['enabled'] ?? true,
+            'resetOverrides' => false,
+            'events' => MemberAlertEvent::mapEventsToFormKeys($row['events'] ?? []),
+        ];
+
+        $form = $this->formFactory->createNamed(
+            MemberProjectAlertPreferencesType::formNameForProject($project),
+            MemberProjectAlertPreferencesType::class,
+            $formData,
+            [
+                'action' => $this->generateUrl('project_member_alerts_save', [
+                    'id' => $project->getUuid(),
+                    'return' => $request->query->getString('return'),
+                ]),
+                'method' => 'POST',
+            ],
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'flash.preferences.member_alerts_invalid');
+
+            return $this->redirectAfterMemberAlertsSave($project, $request);
+        }
+
+        /** @var array<string, mixed> $data */
+        $data = $form->getData();
+        /** @var array<string, mixed> $projectEvents */
+        $projectEvents = \is_array($data['events'] ?? null) ? $data['events'] : [];
+        $this->memberAlertPreferenceManager->saveProjectPreferences($user, [[
+            'project' => $project,
+            'enabled' => \array_key_exists('enabled', $data) ? (bool) $data['enabled'] : true,
+            'resetOverrides' => (bool) ($data['resetOverrides'] ?? false),
+            'events' => MemberAlertEvent::mapEventsFromFormKeys($projectEvents),
+        ]]);
+        $this->entityManager->flush();
+        $this->addFlash('success', 'flash.preferences.member_alerts_project_saved');
+
+        return $this->redirectAfterMemberAlertsSave($project, $request);
+    }
+
+    private function redirectAfterMemberAlertsSave(Project $project, Request $request): RedirectResponse
+    {
+        if ('account' === $request->query->getString('return')) {
+            return $this->redirectToRoute('account_display_notifications');
+        }
+
+        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid(), '_fragment' => 'member-alerts']);
     }
 
     #[Route('/projects/{id}/governance', name: 'project_governance_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use App\Shared\Health\HealthController;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -35,14 +37,14 @@ final class HealthControllerTest extends TestCase
 
     public function testReadyPayloadOmitsMessengerQueueDepth(): void
     {
-        $connection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('executeQuery')->willReturn(
-            $this->createStub(\Doctrine\DBAL\Result::class),
+            $this->createStub(Result::class),
         );
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);
 
-        $response = (new HealthController($em, new NullLogger()))->ready();
+        $response = new HealthController($em, new NullLogger())->ready();
         $payload = json_decode($response->getContent() ?: '[]', true);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());

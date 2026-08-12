@@ -34,7 +34,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/dashboard');
         $event = $this->mainEvent($request);
 
-        (new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, 'en'))
+        new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, 'en')
             ->onKernelRequest($event);
 
         self::assertSame('en', $translator->locale);
@@ -49,7 +49,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request->attributes->set('_route', 'nowo_auth_kit_login');
         $event = $this->mainEvent($request);
 
-        (new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en'))
+        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
             ->onKernelRequest($event);
 
         self::assertSame('en', $translator->locale);
@@ -59,10 +59,10 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
     {
         $user = $this->userWithLocale('fr');
         $translator = new RecordingTranslator();
-        $request = Request::create('/projects', 'GET', ['_locale' => 'es', 'page' => '2']);
+        $request = Request::create('/projects', Request::METHOD_GET, ['_locale' => 'es', 'page' => '2']);
         $event = $this->mainEvent($request);
 
-        (new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en'))
+        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
             ->onKernelRequest($event);
 
         $response = $event->getResponse();
@@ -79,7 +79,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request->setSession($session);
         $event = $this->mainEvent($request);
 
-        (new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en'))
+        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
             ->onKernelRequest($event);
 
         self::assertSame('fr', $request->getLocale());
@@ -95,7 +95,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/projects');
         $event = $this->mainEvent($request);
 
-        (new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'de'))
+        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'de')
             ->onKernelRequest($event);
 
         self::assertSame('de', $request->getLocale());

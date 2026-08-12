@@ -144,6 +144,15 @@ pagination:
   per_page_option: '%count% / pagina'
 toast:
   dismiss: Congedare
+  view_issue: Vedi issue
+  fallback_title: Nuovo avviso
+  event:
+    issue.new: Nuova issue
+    issue.regression: Regressione
+    issue.resolved: Issue risolta
+    issue.reopened: Issue riaperta
+    issue.assigned: Issue assegnata
+    issue.commented: Nuovo commento
 locale:
   nav: Lingua
   en: English
@@ -1244,6 +1253,37 @@ preferences:
   product_tour_replay_title: Ripeti un tour
   product_tour_replay_intro: Cancella i flag di completamento e apre il tour della
     dashboard una volta. Abilita prima i tour desiderati in Tour attivi.
+  member_alerts:
+    title: Member alerts
+    intro: Live toasts (Mercure) and Web Push use these preferences. Everything is
+      on by default; turn off the master switch, a project, or an event type to reduce
+      noise. Scope can limit alerts to issues where you are assignee or mentioned.
+    master: Enable member alerts
+    master_help: When off, you receive no live toasts or Web Push for member issue
+      events. Your event and project choices are kept.
+    events_title: Account event defaults
+    events_help: Applies to every project unless you set a project override below.
+    projects_title: Per project
+    projects_help: Only projects you can access are listed. Delivery requires the
+      account master above and the project enabled here.
+    projects_empty: You are not a member of any project yet.
+    project_enabled: Alerts for this project
+    project_overrides: Event overrides for this project
+    reset_overrides: Reset overrides (inherit account defaults)
+    reset_overrides_help: Clears saved per-event overrides for this project on save.
+    has_overrides: Custom overrides saved
+    enabled: Notify for this event
+    scope_label: Scope
+    scope:
+      all: All issues in the project
+      involved: Only when I am involved
+    event:
+      'issue.new': New issue
+      'issue.regression': Regression
+      'issue.resolved': Resolved
+      'issue.reopened': Reopened
+      'issue.assigned': Assigned
+      'issue.commented': Comment
   push_notifications: Notifiche push per nuove issue
   push_notifications_help: Opzionale. Se abilitato, Beacon chiede al browser l'autorizzazione
     e può avvisarti sulle nuove issue nei progetti a cui appartieni — anche in background

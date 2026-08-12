@@ -35,14 +35,14 @@ final class UserActionRecorderTest extends TestCase
 
     public function testRecordCapturesClientIpFromRequest(): void
     {
-        $request = Request::create('/', 'GET', server: ['REMOTE_ADDR' => '203.0.113.10']);
+        $request = Request::create('/', Request::METHOD_GET, server: ['REMOTE_ADDR' => '203.0.113.10']);
         $stack = new RequestStack();
         $stack->push($request);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('persist')->with(self::isInstanceOf(UserAction::class));
 
-        $entry = (new UserActionRecorder($em, $stack))->record(UserActionType::UserEnabled, null);
+        $entry = new UserActionRecorder($em, $stack)->record(UserActionType::UserEnabled, null);
 
         self::assertSame('203.0.113.10', $entry->getIpAddress());
     }
@@ -53,7 +53,7 @@ final class UserActionRecorderTest extends TestCase
         $em->expects(self::once())->method('persist')->with(self::isInstanceOf(UserAction::class));
         $em->expects(self::once())->method('flush');
 
-        $entry = (new UserActionRecorder($em, new RequestStack()))->recordAndFlush(
+        $entry = new UserActionRecorder($em, new RequestStack())->recordAndFlush(
             UserActionType::AccountExported,
             null,
         );

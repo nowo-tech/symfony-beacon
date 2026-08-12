@@ -91,7 +91,11 @@
 {%- endblock checkbox_row -%}
 
 {%- block checkbox_widget -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' checkbox')|trim}) -%}
+    {%- if 'pref-switch__input' in (attr.class|default('')) -%}
+        {%- set attr = attr|merge({class: attr.class|default('')|trim}) -%}
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' checkbox')|trim}) -%}
+    {%- endif -%}
     {{- parent() -}}
 {%- endblock checkbox_widget -%}
 

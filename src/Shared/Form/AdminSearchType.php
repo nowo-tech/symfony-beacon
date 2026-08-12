@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Form;
 
+use Override;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,6 +29,7 @@ final class AdminSearchType extends AbstractGetFilterType
         ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

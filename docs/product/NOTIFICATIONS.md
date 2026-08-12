@@ -4,19 +4,32 @@ Beacon can notify external systems when a project records a **new issue**, an **
 
 Supported channels: **Slack**, **Discord**, **Microsoft Teams**, **Telegram**, **email**, and **generic HTTP**.
 
-In addition, **optional** member alerts for **new issues** on projects they belong to:
+In addition, **member alerts** (live Mercure toasts + optional Web Push) cover **new issue**, **regression**, **resolved**, **reopened**, **assigned**, and **commented**. Delivery is **opt-out by default** (all on until the member turns something off):
 
 | Channel | When | How to enable |
 |---|---|---|
-| Mercure (SSE) | App open (browser or installed PWA) | **Administration → Mercure** (off by default; **enabled automatically** when you run `app:seed-sample` / Setup sample data). Hub URL / JWT from that screen or `MERCURE_*` env — see [MERCURE.md](../ops/MERCURE.md) |
-| Web Push | Background / locked screen | **Account → Display → Push notifications** (off by default; requires `VAPID_*` env keys) |
+| Mercure (SSE) | App open (browser or installed PWA) | **Administration → Mercure** (off by default; **enabled automatically** when you run `app:seed-sample` / Setup sample data). Hub URL / JWT from that screen or `MERCURE_*` env — see [MERCURE.md](../ops/MERCURE.md). Members also need **Account → Display → Notifications → Enable member alerts** (on by default). |
+| Web Push | Background / locked screen | Same Account notifications prefs (member alerts matrix) **plus** explicit **browser push** device opt-in (off by default; requires `VAPID_*` env keys) |
 
 Neither channel is required for Envelope ingest or webhook destinations.
 
-See feature specs `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](../ROADMAP.md).
-In the app, open **Project → Settings → Notifications → Setup guides** for the same manuals.
+Member preference matrix and per-project gates: feature spec `specs/091-member-push-preferences/`. Also see `specs/009-project-notifications/`, `specs/017-export-webhooks/`, `specs/020-notification-digest/`, and `specs/027-threshold-alerts/`, and the product [ROADMAP](../ROADMAP.md).
+In the app, open **Project → Settings → Notifications → Setup guides** for destination manuals.
 
 ## Member push (Mercure + Web Push)
+
+### Account preferences (opt-out)
+
+Signed-in members manage alerts under **Account → Display → Notifications** (account-wide defaults and per-project overrides for every accessible project). Members who can open **Project → Settings** also see **My alerts for this project** there as a shortcut:
+
+1. **Master** — `memberAlertsEnabled` (default **on**). Off stops live toasts and Web Push for member issue events.
+2. **Account event defaults** — per-event enable + scope (`all` issues vs **involved** = assignee or `@mention`).
+3. **Per project** — enable/disable that project; optional event/scope overrides; reset clears overrides. Any member with **project access** (viewer+) may save their own overrides; Settings admin rights are not required.
+4. **Browser push** — separate device opt-in (`pushNotificationsEnabled`, default **off**). Still filtered by the matrix above.
+
+**Project destinations** (Slack, email, …) on the same settings page are project-owned and independent of member prefs.
+
+Missing preference rows mean **on** / scope **all** / project enabled.
 
 ### Mercure hub
 
@@ -27,13 +40,13 @@ Summary:
 1. Optionally start the Compose `mercure` service and keep Caddy proxying `/.well-known/mercure`.
 2. Set a strong `MERCURE_JWT_SECRET` (≥ 32 chars) shared with the hub’s `MERCURE_*_JWT_KEY`.
 3. Open **Administration → Mercure**, enable live alerts, and set publish URL / public URL / JWT secret (or leave blank to use `MERCURE_URL`, `MERCURE_PUBLIC_URL`, `MERCURE_JWT_SECRET`).
-4. When enabled, each **new issue** publishes a **private** update on topic `/projects/{projectUuid}/issues`. Signed-in clients fetch a short-lived subscriber JWT from `GET /account/realtime/config` only if Mercure is enabled.
+4. When enabled, matching lifecycle events publish a **private** update on topic `/users/{userUuid}/member-alerts` for each eligible member. Signed-in clients fetch a short-lived subscriber JWT from `GET /account/realtime/config` only if Mercure is enabled **and** the member’s alerts master is on.
 
 ### Web Push (PWA)
 
 1. Generate VAPID keys and set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` (e.g. `mailto:ops@example.com`). Leave keys empty to hide the Account push option.
-2. Members opt in under **Account → Display**. The browser service worker (`/sw.js`, extended with push handlers) shows notifications; taps open the issue URL.
-3. Subscription endpoints are stored encrypted in `push_subscription`. Opting out deletes stored subscriptions.
+2. Members keep member alerts on (matrix), then opt in under **Account → Display → Notifications → Browser push**. The browser service worker (`/sw.js`, extended with push handlers) shows notifications; taps open the issue URL.
+3. Subscription endpoints are stored encrypted in `push_subscription`. Opting out deletes stored subscriptions. Recipients are filtered through the same preference evaluator as Mercure.
 
 **Privacy:** Web Push is a device subscription, not a marketing cookie. Still offer Privacy / Terms / Cookie settings for operators; use `nowo-tech/cookie-consent-bundle` when adding non-essential tracking.
 

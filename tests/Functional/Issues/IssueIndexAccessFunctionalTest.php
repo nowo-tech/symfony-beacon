@@ -131,7 +131,7 @@ final class IssueIndexAccessFunctionalTest extends DatabaseWebTestCase
             '_token' => $deleteToken,
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
-        $crawler = $client->followRedirect();
+        $client->followRedirect();
         self::assertSelectorTextNotContains('#saved-view-select', 'Error unresolved');
 
         $em->clear();

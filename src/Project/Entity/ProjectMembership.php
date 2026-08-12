@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Project\Entity;
 
 use App\Identity\Entity\User;
-use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectMembershipRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 

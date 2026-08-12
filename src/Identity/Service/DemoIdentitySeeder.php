@@ -37,7 +37,7 @@ final readonly class DemoIdentitySeeder
     }
 
     /**
-     * @param bool $createDemoUser when false (dogfood), never create admin@…; use existing ROLE_ADMIN
+     * @param bool $createDemoUser    when false (dogfood), never create admin@…; use existing ROLE_ADMIN
      * @param bool $useStableDemoKeys when true (local only), use documented DEMO_PUBLIC_KEY / DEMO_SECRET_KEY
      *
      * @return array{

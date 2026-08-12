@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Form;
 
+use Override;
 use App\Shared\Form\AbstractGetFilterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -56,6 +57,7 @@ final class DashboardAlertsFilterType extends AbstractGetFilterType
             ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

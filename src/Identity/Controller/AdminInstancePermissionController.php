@@ -8,11 +8,11 @@ use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\User;
 use App\Identity\Form\AdminInstancePermissionType;
 use App\Identity\Repository\InstancePermissionRepository;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\GetFilterFormFactory;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -90,7 +90,7 @@ final class AdminInstancePermissionController extends AbstractController
         return $this->renderIndex($request, invalidCreateForm: $form, openCreate: true);
     }
 
-    #[Route('/admin/permissions/{id}/edit', name: 'admin_permissions_edit', methods: ['GET', 'POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/permissions/{id}/edit', name: 'admin_permissions_edit', requirements: ['id' => Requirement::UUID], methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -138,7 +138,7 @@ final class AdminInstancePermissionController extends AbstractController
         return $this->renderIndex($request, $permission, $form);
     }
 
-    #[Route('/admin/permissions/{id}/delete', name: 'admin_permissions_delete', methods: ['POST'], requirements: ['id' => Requirement::UUID])]
+    #[Route('/admin/permissions/{id}/delete', name: 'admin_permissions_delete', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
     public function delete(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]

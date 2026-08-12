@@ -1,0 +1,157 @@
+<div{{ attributes }} data-testid="member-alert-preferences-live">
+    {% set _formName = form.vars.name %}
+    {% set _master = this.isMasterEnabled() %}
+
+    {#
+      Project Live forms must stay OUTSIDE this <form>. Nested <form> is invalid HTML;
+      browsers close the outer form early so Guardar sometimes never fires.
+    #}
+    {{ form_start(form, {
+        attr: {
+            'data-testid': 'member-alert-preferences-form',
+        },
+    }) }}
+        <div class="pref-switch-row">
+            <span class="pref-switch-row__copy">
+                <span class="pref-switch-row__title">{{ 'preferences.member_alerts.master'|trans }}</span>
+                <span class="pref-switch-row__help">{{ 'preferences.member_alerts.master_help'|trans }}</span>
+            </span>
+            <label class="pref-switch">
+                <span class="sr-only">{{ 'preferences.member_alerts.master'|trans }}</span>
+                {{ form_widget(form.memberAlertsEnabled, {attr: {
+                    class: 'pref-switch__input',
+                    role: 'switch',
+                    'data-model': 'on(change)|' ~ _formName ~ '.memberAlertsEnabled',
+                    'aria-checked': form.memberAlertsEnabled.vars.checked ? 'true' : 'false',
+                }}) }}
+                <span class="pref-switch__track" aria-hidden="true"></span>
+            </label>
+        </div>
+        {{ form_errors(form.memberAlertsEnabled) }}
+
+        {% if _master %}
+            <div class="mt-4 space-y-2 border-t border-[var(--color-sand)] pt-4" data-testid="member-alerts-events">
+                <h3 class="text-sm font-semibold text-[var(--color-ink)]">{{ 'preferences.member_alerts.events_title'|trans }}</h3>
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.member_alerts.events_help'|trans }}</p>
+                <ul class="pref-alert-list">
+                    {% for eventRow in form.events %}
+                        {% include 'account/_member_alert_event_row.html.twig' with {
+                            eventRow: eventRow,
+                            form: form,
+                        } only %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mt-4 space-y-3 border-t border-[var(--color-sand)] pt-4" aria-labelledby="display-push-heading" data-testid="member-alerts-push">
+                <div>
+                    <h3 id="display-push-heading" class="text-sm font-semibold text-[var(--color-ink)]">{{ 'preferences.push_title'|trans }}</h3>
+                    <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'preferences.push_intro'|trans }}</p>
+                </div>
+                {% if form.pushNotificationsEnabled is defined %}
+                    <div class="pref-switch-row">
+                        <span class="pref-switch-row__copy">
+                            <span class="pref-switch-row__title">{{ 'preferences.push_notifications'|trans }}</span>
+                            <span class="pref-switch-row__help">{{ 'preferences.push_notifications_help'|trans }}</span>
+                        </span>
+                        <label class="pref-switch">
+                            <span class="sr-only">{{ 'preferences.push_notifications'|trans }}</span>
+                            {{ form_widget(form.pushNotificationsEnabled, {attr: {
+                                class: 'pref-switch__input',
+                                role: 'switch',
+                                'data-model': 'on(change)|' ~ _formName ~ '.pushNotificationsEnabled',
+                                'aria-checked': form.pushNotificationsEnabled.vars.checked ? 'true' : 'false',
+                            }}) }}
+                            <span class="pref-switch__track" aria-hidden="true"></span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.push_privacy'|trans }}</p>
+                {% else %}
+                    <div class="rounded-md border border-[var(--color-sand)] bg-[var(--color-sand)]/30 px-3 py-2 text-sm text-[var(--color-ink)]/65" data-testid="display-push-unavailable">
+                        <p class="font-medium text-[var(--color-ink)]">{{ 'preferences.push_unavailable_title'|trans }}</p>
+                        <p class="mt-1 text-xs">{{ 'preferences.push_unavailable_help'|trans }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="mt-4 border-t border-[var(--color-sand)] pt-4 text-sm text-[var(--color-ink)]/55" data-testid="member-alerts-master-off-hint">
+                {{ 'preferences.member_alerts.master_off_hint'|trans }}
+            </p>
+            <div class="hidden">
+                {% for eventRow in form.events %}
+                    {{ form_widget(eventRow.enabled) }}
+                    {{ form_widget(eventRow.involved) }}
+                {% endfor %}
+                {% if form.pushNotificationsEnabled is defined %}
+                    {{ form_widget(form.pushNotificationsEnabled) }}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% include 'form/_fields.html.twig' with {form: form} only %}
+    {{ form_end(form) }}
+
+    {% if _master %}
+        <div class="mt-4 space-y-2 border-t border-[var(--color-sand)] pt-4" data-testid="member-alerts-projects-hint">
+            <h3 class="text-sm font-semibold text-[var(--color-ink)]">{{ 'preferences.member_alerts.projects_title'|trans }}</h3>
+            <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.member_alerts.projects_account_hint'|trans }}</p>
+            {% if this.projects is empty %}
+                <p class="text-sm text-[var(--color-ink)]/55">{{ 'preferences.member_alerts.projects_empty'|trans }}</p>
+            {% else %}
+                <ul class="flex flex-wrap gap-2 text-sm">
+                    {% for project in this.projects %}
+                        <li>
+                            {% embed 'shared/_confirm_dialog.html.twig' with {
+                                aria_labelledby: 'member-alerts-project-title-' ~ project.uuid,
+                                dialog_modifier: 'confirm-dialog--wide',
+                            } %}
+                                {% block trigger %}
+                                    <button
+                                        type="button"
+                                        class="btn-ghost"
+                                        data-action="confirm-dialog#open"
+                                        data-testid="member-alerts-project-open"
+                                        data-project-uuid="{{ project.uuid }}"
+                                    >
+                                        {{ project.name }}
+                                        {% if project.hasOverrides %}
+                                            <span class="ml-1 text-xs text-[var(--color-ink)]/45">({{ 'preferences.member_alerts.has_overrides'|trans }})</span>
+                                        {% endif %}
+                                    </button>
+                                {% endblock %}
+                                {% block form %}
+                                    <div class="confirm-dialog__panel">
+                                        <div class="confirm-dialog__header">
+                                            <h2 id="member-alerts-project-title-{{ project.uuid }}" class="confirm-dialog__title">{{ project.name }}</h2>
+                                            <p class="confirm-dialog__body">{{ 'preferences.member_alerts.project_page_intro'|trans }}</p>
+                                        </div>
+                                        <div class="confirm-dialog__content">
+                                            {{ component('MemberProjectAlertPreferencesLive', {
+                                                projectUuid: project.uuid,
+                                                projectName: project.name,
+                                                initialFormData: project.formData,
+                                                returnTo: 'account',
+                                                showModalActions: true,
+                                            }) }}
+                                        </div>
+                                    </div>
+                                {% endblock %}
+                            {% endembed %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-sand)] pt-4">
+        <button
+            class="btn-primary"
+            type="button"
+            data-action="live#action"
+            data-live-action-param="save"
+            data-loading="addAttribute(disabled)"
+            data-testid="member-alerts-save"
+        >{{ 'preferences.display.submit'|trans }}</button>
+    </div>
+</div>

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.7.0)](#unreleased-main-after-170)
+- [Unreleased (main after 1.8.0)](#unreleased-main-after-180)
+- [Upgrading from 1.7.0 to 1.8.0](#upgrading-from-170-to-180)
 - [Upgrading from 1.6.4 to 1.7.0](#upgrading-from-164-to-170)
 - [Upgrading from 1.6.3 to 1.6.4](#upgrading-from-163-to-164)
 - [Upgrading from 1.6.2 to 1.6.3](#upgrading-from-162-to-163)
@@ -58,9 +59,32 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.7.0)
+## Unreleased (main after 1.8.0)
 
-No operator steps beyond `composer install` / `make migrate` until the next tagged release. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.7.0 to 1.8.0
+
+**Member alert preferences (`091` / 6.40), UserKit 1.1.6, Mercure per-user topics.** Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.8.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # member_alerts_enabled + member_*_alert_* tables
+make vite-build         # issue-realtime toast labels + SW push titles
+php bin/console cache:clear
+```
+
+### Notes
+
+- **Migrations**: `Version20260812140000` adds `app_user.member_alerts_enabled` (default on) and relational preference tables. Missing rows mean **on** / scope **all** (opt-out).
+- **Mercure**: member live alerts use private topics `/users/{userUuid}/member-alerts` (no longer project `/projects/{uuid}/issues` for this channel). Re-open browser tabs after upgrade so EventSource picks up the new JWT topics. Hub enablement unchanged (**Administration → Mercure**).
+- **Prefs UI**: **Account → Display → Notifications** is primary (viewers included). Project Settings `#member-alerts` is an optional shortcut only when the member can open Settings; saving own overrides requires project access, not Settings-admin.
+- **UserKit 1.1.6**: disabled accounts are rejected in `checkPreAuth` for form + magic/social/QR. Host no longer overrides `security.firewalls.main.user_checker` — do not reintroduce a custom checker that skips UserKit. Smoke-test a disabled account on all AuthKit login paths.
+- **Web Push**: still requires VAPID + device opt-in; delivery now honors the member preference matrix. Rebuild assets so `/sw.js` event titles match toasts.
+- Docs: [NOTIFICATIONS.md](product/NOTIFICATIONS.md), [MERCURE.md](ops/MERCURE.md), `[1.8.0]` in [CHANGELOG.md](CHANGELOG.md).
 
 ## Upgrading from 1.6.4 to 1.7.0
 

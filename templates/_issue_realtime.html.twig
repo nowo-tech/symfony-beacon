@@ -1,5 +1,17 @@
 {# Mercure live issue toasts + optional Web Push sync for logged-in members. #}
 {% if app.user %}
+    {% set realtime_toast_labels = {
+        viewIssue: 'toast.view_issue'|trans,
+        fallbackTitle: 'toast.fallback_title'|trans,
+        events: {
+            'issue.new': 'toast.event.issue.new'|trans,
+            'issue.regression': 'toast.event.issue.regression'|trans,
+            'issue.resolved': 'toast.event.issue.resolved'|trans,
+            'issue.reopened': 'toast.event.issue.reopened'|trans,
+            'issue.assigned': 'toast.event.issue.assigned'|trans,
+            'issue.commented': 'toast.event.issue.commented'|trans,
+        },
+    } %}
     <div
         class="sr-only"
         aria-hidden="true"
@@ -9,5 +21,6 @@
         data-issue-realtime-unsubscribe-url-value="{{ path('account_push_unsubscribe') }}"
         data-issue-realtime-csrf-token-value="{{ csrf_token('account_push') }}"
         data-issue-realtime-enabled-value="true"
+        data-issue-realtime-labels-value="{{ realtime_toast_labels|json_encode|e('html_attr') }}"
     ></div>
 {% endif %}

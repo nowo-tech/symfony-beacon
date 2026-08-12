@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
+use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
@@ -45,7 +46,7 @@ final class AdminProjectAccessTest extends DatabaseWebTestCase
 
         $em->clear();
         $admin = $em->getRepository(User::class)->find($admin->getId());
-        $project = $em->getRepository(\App\Project\Entity\Project::class)->find($project->getId());
+        $project = $em->getRepository(Project::class)->find($project->getId());
         self::assertNotNull($admin);
         self::assertNotNull($project);
 

@@ -35,7 +35,7 @@ final class RejectDisabledMagicLoginSubscriberTest extends TestCase
         $this->expectException(CustomUserMessageAccountStatusException::class);
         $this->expectExceptionMessage('Account is disabled.');
 
-        (new RejectDisabledMagicLoginSubscriber())->checkPassport($event);
+        new RejectDisabledMagicLoginSubscriber()->checkPassport($event);
     }
 
     public function testAllowsEnabledBeaconUser(): void
@@ -44,7 +44,7 @@ final class RejectDisabledMagicLoginSubscriberTest extends TestCase
         $user->setEmail('ok@example.com');
         $user->setEnabled(true);
 
-        (new RejectDisabledMagicLoginSubscriber())->checkPassport($this->eventFor($user));
+        new RejectDisabledMagicLoginSubscriber()->checkPassport($this->eventFor($user));
 
         $this->addToAssertionCount(1);
     }
@@ -53,7 +53,7 @@ final class RejectDisabledMagicLoginSubscriberTest extends TestCase
     {
         $user = new InMemoryUser('guest', null);
 
-        (new RejectDisabledMagicLoginSubscriber())->checkPassport($this->eventFor($user));
+        new RejectDisabledMagicLoginSubscriber()->checkPassport($this->eventFor($user));
 
         $this->addToAssertionCount(1);
     }

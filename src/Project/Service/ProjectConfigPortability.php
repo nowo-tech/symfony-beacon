@@ -94,7 +94,7 @@ final readonly class ProjectConfigPortability
         }
 
         return [
-            'code' => $project->getCode() !== '' ? $project->getCode() : $project->getSlug(),
+            'code' => '' !== $project->getCode() ? $project->getCode() : $project->getSlug(),
             'uuid' => $project->getUuid(),
             'slug' => $project->getSlug(),
             'name' => $project->getName(),
@@ -182,14 +182,8 @@ final readonly class ProjectConfigPortability
             throw new InvalidArgumentException('empty_projects');
         }
 
-        $targetCode = $target->getCode() !== '' ? $target->getCode() : $target->getSlug();
-        $match = null;
-        foreach ($projects as $row) {
-            if ($row['code'] === $targetCode || $row['uuid'] === $target->getUuid()) {
-                $match = $row;
-                break;
-            }
-        }
+        $targetCode = '' !== $target->getCode() ? $target->getCode() : $target->getSlug();
+        $match = array_find($projects, fn($row): bool => $row['code'] === $targetCode || $row['uuid'] === $target->getUuid());
         if (null === $match) {
             if (1 === \count($projects)) {
                 throw new InvalidArgumentException('code_mismatch');
@@ -233,10 +227,10 @@ final readonly class ProjectConfigPortability
             throw new InvalidArgumentException('invalid_schema');
         }
         $version = $payload['version'] ?? null;
-        if (!\is_int($version) && !(\is_string($version) && ctype_digit($version))) {
+        if (!\is_int($version) && (!\is_string($version) || !ctype_digit($version))) {
             throw new InvalidArgumentException('invalid_version');
         }
-        if ((int) $version !== self::VERSION) {
+        if (self::VERSION !== (int) $version) {
             throw new InvalidArgumentException('unsupported_version');
         }
         $list = $payload['projects'] ?? null;

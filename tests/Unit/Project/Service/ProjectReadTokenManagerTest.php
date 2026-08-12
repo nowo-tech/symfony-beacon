@@ -80,7 +80,7 @@ final class ProjectReadTokenManagerTest extends TestCase
         $token->setLabel('bot');
         $token->setPrefix(substr($raw, 0, 12));
         $token->setTokenHash(hash('sha256', $raw));
-        $token->setProject((new Project())->setSlug('p')->setName('P'));
+        $token->setProject(new Project()->setSlug('p')->setName('P'));
 
         $repo = $this->createStub(ProjectReadTokenRepository::class);
         $repo->method('findActiveByTokenHash')->willReturn($token);

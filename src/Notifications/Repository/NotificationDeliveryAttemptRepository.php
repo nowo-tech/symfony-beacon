@@ -117,6 +117,8 @@ final class NotificationDeliveryAttemptRepository extends ServiceEntityRepositor
 
     /**
      * Delete attempts beyond the newest `$keep` rows without hydrating the full collection.
+     *
+     * Doctrine ORM 3 no longer auto-flushes before DQL, so pending persists are flushed first.
      */
     public function trimOlderThanKeep(NotificationDestination $destination, int $keep): int
     {
@@ -124,6 +126,9 @@ final class NotificationDeliveryAttemptRepository extends ServiceEntityRepositor
         if (null === $destinationId) {
             return 0;
         }
+
+        $em = $this->getEntityManager();
+        $em->flush();
 
         $limit = max(1, $keep);
 
@@ -142,7 +147,7 @@ final class NotificationDeliveryAttemptRepository extends ServiceEntityRepositor
             return 0;
         }
 
-        $qb = $this->getEntityManager()->createQueryBuilder()
+        $qb = $em->createQueryBuilder()
             ->delete(NotificationDeliveryAttempt::class, 'a')
             ->andWhere('a.destination = :destination')
             ->andWhere('a.id NOT IN (:keepIds)')

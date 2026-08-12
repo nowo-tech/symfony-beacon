@@ -41,7 +41,8 @@
         }
     }) }}
         {% if _section_focus != '' %}
-            <input type="hidden" name="_section" value="{{ _section_focus }}">
+            {% set sectionFlagForm = flat_hidden_fields({_section: _section_focus}) %}
+            {{ form_widget(sectionFlagForm._section) }}
         {% endif %}
         <div class="confirm-dialog__content">
         {% if _show_basic %}
@@ -53,16 +54,16 @@
             {% endif %}
             <div class="flex flex-col gap-3">
                 <div class="row">
-                    {{ form_row(form.basic.label, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.basic.label' } }) }}
+                    {{ form_row(form.basic.label, {attr: {'data-model': 'on(change)|' ~ formName ~ '.basic.label'}}) }}
                 </div>
                 {% if isEdit and locales is not empty %}
                     <div class="row mb-0">
                         {% for locale in locales %}
                             {% set fieldName = 'label_' ~ locale %}
                             {% if attribute(form.basic, fieldName) is defined %}
-                                {% set inputAttr = { 'data-model': 'on(change)|' ~ formName ~ '.basic.' ~ fieldName } %}
+                                {% set inputAttr = {'data-model': 'on(change)|' ~ formName ~ '.basic.' ~ fieldName} %}
                                 <div class="col-md-6">
-                                    {{ form_row(attribute(form.basic, fieldName), { attr: inputAttr }) }}
+                                    {{ form_row(attribute(form.basic, fieldName), {attr: inputAttr}) }}
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -78,23 +79,23 @@
             <p class="kit-modal__section">{{ 'form.menu_item_type.section_icon'|trans({}, 'NowoDashboardMenuBundle') }}</p>
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(form.icon.itemType, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.icon.itemType' } }) }}
+                    {{ form_row(form.icon.itemType, {attr: {'data-model': 'on(change)|' ~ formName ~ '.icon.itemType'}}) }}
                 </div>
-                {% set positionAttr = { 'data-model': 'on(change)|' ~ formName ~ '.icon.position' } %}
+                {% set positionAttr = {'data-model': 'on(change)|' ~ formName ~ '.icon.position'} %}
                 {% if not isEdit %}
-                    {% set positionAttr = positionAttr|merge({ 'disabled': 'disabled' }) %}
+                    {% set positionAttr = positionAttr|merge({'disabled': 'disabled'}) %}
                 {% endif %}
                 <div class="col-md-6 {{ isEdit ? '' : 'd-none' }}">
-                    {{ form_row(form.icon.position, { attr: positionAttr }) }}
+                    {{ form_row(form.icon.position, {attr: positionAttr}) }}
                 </div>
             </div>
 
-            {% set iconAttr = { 'data-model': 'on(change)|' ~ formName ~ '.icon.icon' } %}
+            {% set iconAttr = {'data-model': 'on(change)|' ~ formName ~ '.icon.icon'} %}
             {% if not isEdit %}
-                {% set iconAttr = iconAttr|merge({ 'disabled': 'disabled' }) %}
+                {% set iconAttr = iconAttr|merge({'disabled': 'disabled'}) %}
             {% endif %}
             <div class="{{ isEdit ? '' : 'd-none' }}">
-                {{ form_row(form.icon.icon, { attr: iconAttr }) }}
+                {{ form_row(form.icon.icon, {attr: iconAttr}) }}
             </div>
         </div>
         {% endif %}
@@ -114,19 +115,19 @@
             {% if form.config.sectionCollapsible is defined %}
                 {% if this.showSectionCollapsibleField() %}
                     {% set formName = form.vars.name %}
-                    {{ form_row(form.config.sectionCollapsible, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.sectionCollapsible' } }) }}
+                    {{ form_row(form.config.sectionCollapsible, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.sectionCollapsible'}}) }}
                 {% else %}
                     <div class="d-none">{{ form_row(form.config.sectionCollapsible) }}</div>
                 {% endif %}
             {% endif %}
             <div class="row">
                 {% if this.showLinkFields() and form.config.linkType is defined %}
-                    <div class="col-md-6">{{ form_row(form.config.linkType, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.linkType' } }) }}</div>
+                    <div class="col-md-6">{{ form_row(form.config.linkType, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.linkType'}}) }}</div>
                 {% endif %}
             </div>
             {% if this.showServiceLinkFields() and form.config.linkResolver is defined %}
                 <div class="mb-2" id="item_service_link_block">
-                    {{ form_row(form.config.linkResolver, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.linkResolver' } }) }}
+                    {{ form_row(form.config.linkResolver, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.linkResolver'}}) }}
                     {% if form.config.routeParams is defined %}
                         <small class="form-text text-muted d-block mb-2">{{ 'form.menu_item_type.link_resolver.route_params_hint'|trans({}, 'NowoDashboardMenuBundle') }}</small>
                     {% endif %}
@@ -136,13 +137,13 @@
                 <div class="mb-2" id="item_classic_link_block">
                     {% if form.config.routeName is defined %}
                     <div class="mb-2 {{ not this.showRouteFields() ? 'd-none' : '' }}" id="route_name_row">
-                        {{ form_row(form.config.routeName, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.routeName' } }) }}
+                        {{ form_row(form.config.routeName, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.routeName'}}) }}
                     </div>
                     {% endif %}
                 </div>
                 {% if form.config.externalUrl is defined %}
                 <div class="mb-2 {{ not this.showExternalUrlField() ? 'd-none' : '' }}" id="item_external_link_block">
-                    {{ form_row(form.config.externalUrl, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.externalUrl' } }) }}
+                    {{ form_row(form.config.externalUrl, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.externalUrl'}}) }}
                 </div>
                 {% endif %}
             {% endif %}
@@ -151,7 +152,7 @@
                     class="mb-2 {% if this.showLinkFields() and not this.showRouteFields() %}d-none{% endif %}"
                     id="route_fields"
                 >
-                    {{ form_row(form.config.routeParams, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.routeParams' } }) }}
+                    {{ form_row(form.config.routeParams, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.routeParams'}}) }}
                     {% if this.showRouteFields() %}
                         {% set suggested = this.suggestedRouteParams %}
                         {% if suggested is not empty %}
@@ -162,16 +163,16 @@
                 </div>
             {% endif %}
             {% if (this.showLinkFields() or this.showServiceLinkFields()) and form.config.targetBlank is defined %}
-                {{ form_row(form.config.targetBlank, { row_attr: { class: 'form-check ms-0 mb-1' }, attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.targetBlank' } }) }}
+                {{ form_row(form.config.targetBlank, {row_attr: {class: 'form-check ms-0 mb-1'}, attr: {'data-model': 'on(change)|' ~ formName ~ '.config.targetBlank'}}) }}
             {% elseif not this.showServiceLinkFields() %}
                 <div class="d-none">
-                    {% if form.config.linkType is defined %}{{ form_row(form.config.linkType, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.linkType' } }) }}{% endif %}
-                    {% if form.config.routeName is defined %}{{ form_row(form.config.routeName, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.routeName' } }) }}{% endif %}
-                    {% if form.config.routeParams is defined %}{{ form_row(form.config.routeParams, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.routeParams' } }) }}{% endif %}
-                    {% if form.config.externalUrl is defined %}{{ form_row(form.config.externalUrl, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.externalUrl' } }) }}{% endif %}
-                    {% if form.config.targetBlank is defined %}{{ form_row(form.config.targetBlank, { row_attr: { class: 'form-check ms-0 mb-1' }, attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.targetBlank' } }) }}{% endif %}
+                    {% if form.config.linkType is defined %}{{ form_row(form.config.linkType, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.linkType'}}) }}{% endif %}
+                    {% if form.config.routeName is defined %}{{ form_row(form.config.routeName, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.routeName'}}) }}{% endif %}
+                    {% if form.config.routeParams is defined %}{{ form_row(form.config.routeParams, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.routeParams'}}) }}{% endif %}
+                    {% if form.config.externalUrl is defined %}{{ form_row(form.config.externalUrl, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.externalUrl'}}) }}{% endif %}
+                    {% if form.config.targetBlank is defined %}{{ form_row(form.config.targetBlank, {row_attr: {class: 'form-check ms-0 mb-1'}, attr: {'data-model': 'on(change)|' ~ formName ~ '.config.targetBlank'}}) }}{% endif %}
                     {% if form.config.linkResolver is defined %}
-                        {{ form_row(form.config.linkResolver, { attr: { 'data-model': 'on(change)|' ~ formName ~ '.config.linkResolver' } }) }}
+                        {{ form_row(form.config.linkResolver, {attr: {'data-model': 'on(change)|' ~ formName ~ '.config.linkResolver'}}) }}
                     {% endif %}
                 </div>
             {% endif %}
@@ -180,7 +181,7 @@
             {% else %}
                 {{ form_row(form.config.permissionKey) }}
             {% endif %}
-            {{ form_row(form.config.isUnanimous, { row_attr: { class: 'form-check ms-0 mb-1' } }) }}
+            {{ form_row(form.config.isUnanimous, {row_attr: {class: 'form-check ms-0 mb-1'}}) }}
         </div>
         {% endif %}
         {{ form_rest(form) }}

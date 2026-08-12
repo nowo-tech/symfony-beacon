@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Issues\Export;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\Export\AiIssueExportFormatter;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Export\AiIssueExportFormatter;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;

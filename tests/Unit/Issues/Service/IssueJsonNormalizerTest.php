@@ -40,7 +40,7 @@ final class IssueJsonNormalizerTest extends TestCase
         $issue->setLastRelease('1.0.1');
         $issue->setLastEnvironment('prod');
 
-        $payload = (new IssueJsonNormalizer())->normalize($issue);
+        $payload = new IssueJsonNormalizer()->normalize($issue);
 
         self::assertSame($issue->getUuid(), $payload['uuid']);
         self::assertSame('Boom', $payload['title']);
@@ -73,7 +73,7 @@ final class IssueJsonNormalizerTest extends TestCase
         $issue->setAssignee($assignee);
         $issue->setDuplicateOf($canonical);
 
-        $payload = (new IssueJsonNormalizer())->normalize($issue);
+        $payload = new IssueJsonNormalizer()->normalize($issue);
 
         self::assertSame('dev@example.com', $payload['assignee_email']);
         self::assertSame($canonical->getUuid(), $payload['duplicate_of_uuid']);

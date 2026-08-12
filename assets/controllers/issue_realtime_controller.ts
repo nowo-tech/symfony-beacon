@@ -14,9 +14,34 @@ type RealtimeConfig = {
   };
 };
 
+type RealtimeAlertPayload = {
+  event?: string;
+  summary?: string;
+  url?: string;
+  project?: { name?: string };
+  issue?: { id?: number; title?: string; culprit?: string; level?: string };
+};
+
+type ToastLabels = {
+  viewIssue: string;
+  fallbackTitle: string;
+  events: Record<string, string>;
+};
+
+const DEFAULT_EVENT_LABELS: Record<string, string> = {
+  "issue.new": "New issue",
+  "issue.regression": "Issue regression",
+  "issue.resolved": "Issue resolved",
+  "issue.reopened": "Issue reopened",
+  "issue.assigned": "Issue assigned",
+  "issue.commented": "New comment",
+};
+
+const ISSUE_PREVIEW_MAX = 110;
+
 /**
- * Subscribes to Mercure issue topics (foreground toasts) and manages Web Push
- * when the user opted in under Account → Display.
+ * Subscribes to Mercure member-alert topics (foreground toasts) and manages Web Push
+ * when the user opted in under Account → Display → Notifications.
  */
 export default class extends Controller {
   static values = {
@@ -25,7 +50,10 @@ export default class extends Controller {
     unsubscribeUrl: String,
     csrfToken: String,
     enabled: Boolean,
+    labels: Object,
   };
+
+  declare labelsValue: Partial<ToastLabels>;
 
   private eventSource: EventSource | null = null;
   private refreshTimer: number | null = null;
@@ -90,14 +118,10 @@ export default class extends Controller {
     this.eventSource = new EventSource(url.toString(), { withCredentials: true });
     this.eventSource.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data) as {
-          summary?: string;
-          url?: string;
-          project?: { name?: string };
-        };
-        this.showToast(data.summary ?? "New issue", data.url);
+        const data = JSON.parse(event.data) as RealtimeAlertPayload;
+        this.showToast(data);
       } catch {
-        this.showToast("New issue");
+        this.showToast({});
       }
     };
   }
@@ -180,7 +204,7 @@ export default class extends Controller {
     }
   }
 
-  private showToast(message: string, url?: string): void {
+  private showToast(payload: RealtimeAlertPayload): void {
     let stack = document.querySelector<HTMLElement>(
       ".nowo-ui-toast-stack[data-controller~='toast-stack'], .toast-stack[data-controller~='toast-stack']",
     );
@@ -193,23 +217,38 @@ export default class extends Controller {
       document.body.appendChild(stack);
     }
 
+    const { title, message, url, linkLabel } = this.formatToast(payload);
+
     const toast = document.createElement("div");
     toast.className = "nowo-ui-toast flash flash-toast flash-info";
     toast.setAttribute("data-nowo-ui-toast", "");
     toast.setAttribute("data-toast-stack-target", "toast");
-    toast.dataset.timeout = "8000";
+    toast.dataset.timeout = "10000";
     toast.setAttribute("role", "status");
 
     const content = document.createElement("div");
     content.className = "nowo-ui-toast__content flash__content";
 
-    const text = document.createElement(url ? "a" : "p");
-    text.textContent = message;
-    text.className = url ? "flash-toast__link" : "nowo-ui-toast__message flash__message";
-    if (url && text instanceof HTMLAnchorElement) {
-      text.href = url;
+    const titleEl = document.createElement("p");
+    titleEl.className = "nowo-ui-toast__title flash__title";
+    titleEl.textContent = title;
+    content.appendChild(titleEl);
+
+    if (message) {
+      const messageEl = document.createElement("p");
+      messageEl.className = "nowo-ui-toast__message flash__message";
+      messageEl.textContent = message;
+      content.appendChild(messageEl);
     }
-    content.appendChild(text);
+
+    if (url) {
+      const link = document.createElement("a");
+      link.className = "nowo-ui-toast__action flash-toast__link";
+      link.href = url;
+      link.textContent = linkLabel;
+      content.appendChild(link);
+    }
+
     toast.appendChild(content);
 
     const dismiss = document.createElement("button");
@@ -222,6 +261,94 @@ export default class extends Controller {
     toast.appendChild(dismiss);
 
     stack.appendChild(toast);
+  }
+
+  private formatToast(payload: RealtimeAlertPayload): {
+    title: string;
+    message: string;
+    url?: string;
+    linkLabel: string;
+  } {
+    const labels = this.resolveLabels();
+    const eventKey = typeof payload.event === "string" ? payload.event : "";
+    const title =
+      (eventKey && (labels.events[eventKey] || DEFAULT_EVENT_LABELS[eventKey])) ||
+      labels.fallbackTitle;
+
+    const preview = this.formatIssuePreview(payload.issue?.title, payload.issue?.culprit);
+    const projectName = payload.project?.name?.trim() ?? "";
+    let message = "";
+    if (projectName && preview) {
+      message = `${projectName} · ${preview}`;
+    } else if (preview) {
+      message = preview;
+    } else if (projectName) {
+      message = projectName;
+    } else if (payload.summary && !eventKey) {
+      // Legacy / unknown payloads: avoid dumping a raw exception as the title alone.
+      message = this.truncate(payload.summary, ISSUE_PREVIEW_MAX);
+    }
+
+    return {
+      title,
+      message,
+      url: this.safeToastUrl(payload.url),
+      linkLabel: labels.viewIssue,
+    };
+  }
+
+  /**
+   * Only same-origin absolute URLs or root-relative paths (defense in depth vs
+   * javascript:/external links if a publisher JWT were compromised).
+   */
+  private safeToastUrl(raw: unknown): string | undefined {
+    if (typeof raw !== "string" || raw === "") {
+      return undefined;
+    }
+    const value = raw.trim();
+    if (value.startsWith("/") && !value.startsWith("//")) {
+      return value;
+    }
+    try {
+      const parsed = new URL(value, window.location.origin);
+      if (parsed.origin === window.location.origin && /^https?:$/i.test(parsed.protocol)) {
+        return parsed.pathname + parsed.search + parsed.hash;
+      }
+    } catch {
+      // ignore invalid URLs
+    }
+    return undefined;
+  }
+
+  private resolveLabels(): ToastLabels {
+    const raw = this.labelsValue ?? {};
+    return {
+      viewIssue: typeof raw.viewIssue === "string" && raw.viewIssue !== "" ? raw.viewIssue : "View issue",
+      fallbackTitle:
+        typeof raw.fallbackTitle === "string" && raw.fallbackTitle !== ""
+          ? raw.fallbackTitle
+          : "New alert",
+      events: raw.events && typeof raw.events === "object" ? { ...DEFAULT_EVENT_LABELS, ...raw.events } : { ...DEFAULT_EVENT_LABELS },
+    };
+  }
+
+  /** Short, human-readable issue blurb — strip FQCN noise and truncate. */
+  private formatIssuePreview(title?: string, culprit?: string): string {
+    let text = (title ?? "").trim() || (culprit ?? "").trim();
+    if (!text) {
+      return "";
+    }
+    text = (text.split(/\r?\n/)[0] ?? text).trim();
+    // Symfony\Component\Foo\BarException: msg → BarException: msg
+    text = text.replace(/^((?:[A-Za-z_][\w$]*\\)+)([A-Za-z_][\w$]*)\b/, "$2");
+    return this.truncate(text, ISSUE_PREVIEW_MAX);
+  }
+
+  private truncate(value: string, max: number): string {
+    if (value.length <= max) {
+      return value;
+    }
+    return `${value.slice(0, max - 1).trimEnd()}…`;
   }
 
   private urlBase64ToUint8Array(base64String: string): Uint8Array {

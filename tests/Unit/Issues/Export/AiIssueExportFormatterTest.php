@@ -6,10 +6,10 @@ namespace App\Tests\Unit\Issues\Export;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
-use App\Issues\Export\AiIssueExportFormatter;
-use App\Project\Entity\Project;
 use App\Issues\Enum\IssueLevel;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Export\AiIssueExportFormatter;
+use App\Project\Entity\Project;
 use PHPUnit\Framework\TestCase;
 
 final class AiIssueExportFormatterTest extends TestCase

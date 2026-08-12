@@ -24,7 +24,7 @@ final class IssueHistoryRecorderTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('persist');
 
-        (new IssueHistoryRecorder($em))->recordAssigneeChange($issue, $user, $user, null);
+        new IssueHistoryRecorder($em)->recordAssigneeChange($issue, $user, $user, null);
 
         self::assertCount(0, $issue->getHistoryEntries());
     }
@@ -36,7 +36,7 @@ final class IssueHistoryRecorderTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('persist');
 
-        (new IssueHistoryRecorder($em))->recordAssigneeChange($issue, null, null, null);
+        new IssueHistoryRecorder($em)->recordAssigneeChange($issue, null, null, null);
 
         self::assertCount(0, $issue->getHistoryEntries());
     }
@@ -62,7 +62,7 @@ final class IssueHistoryRecorderTest extends TestCase
             },
         ));
 
-        (new IssueHistoryRecorder($em))->recordAssigneeChange($issue, $from, $to, $actor);
+        new IssueHistoryRecorder($em)->recordAssigneeChange($issue, $from, $to, $actor);
 
         self::assertCount(1, $issue->getHistoryEntries());
     }
@@ -74,7 +74,7 @@ final class IssueHistoryRecorderTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('persist');
 
-        (new IssueHistoryRecorder($em))->recordStatusChange(
+        new IssueHistoryRecorder($em)->recordStatusChange(
             $issue,
             IssueStatus::Unresolved,
             IssueStatus::Unresolved,
@@ -103,7 +103,7 @@ final class IssueHistoryRecorderTest extends TestCase
             },
         ));
 
-        (new IssueHistoryRecorder($em))->recordStatusChange(
+        new IssueHistoryRecorder($em)->recordStatusChange(
             $issue,
             IssueStatus::Unresolved,
             IssueStatus::Resolved,

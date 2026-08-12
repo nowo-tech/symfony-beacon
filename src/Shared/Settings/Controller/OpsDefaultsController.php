@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Settings\Form\InstanceOpsDefaultsType;
 use App\Shared\Settings\OpsDefaultsSection;
@@ -26,7 +27,7 @@ final class OpsDefaultsController extends AbstractController
     }
 
     #[Route('/admin/ops-defaults', name: 'admin_ops_defaults', methods: ['GET'])]
-    public function index(): Response
+    public function index(): RedirectResponse
     {
         return $this->redirectToRoute('admin_ops_defaults_section', [
             'section' => OpsDefaultsSection::Governance->value,

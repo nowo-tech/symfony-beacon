@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Issues;
 
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
-use App\Issues\Enum\IssueStatus;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

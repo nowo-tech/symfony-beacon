@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Form;
 
+use Symfony\Component\Validator\Constraint;
 use App\Shared\Appearance\AppearanceSettingsSection;
 use App\Shared\Appearance\AppearanceSettingsSubtab;
 use App\Shared\Appearance\Entity\SiteAppearance;
@@ -94,7 +95,7 @@ final class SiteAppearanceType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $hex
+     * @param list<Constraint> $hex
      */
     private function addColorFields(?AppearanceSettingsSubtab $subtab, array $hex): void
     {
@@ -107,7 +108,7 @@ final class SiteAppearanceType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $hex
+     * @param list<Constraint> $hex
      */
     private function addAccentColorFields(array $hex): void
     {
@@ -118,7 +119,7 @@ final class SiteAppearanceType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $hex
+     * @param list<Constraint> $hex
      */
     private function addStatusColorFields(array $hex): void
     {
@@ -129,7 +130,7 @@ final class SiteAppearanceType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $hex
+     * @param list<Constraint> $hex
      */
     private function addSurfaceColorFields(array $hex): void
     {

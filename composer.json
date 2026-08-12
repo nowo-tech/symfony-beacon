@@ -53,7 +53,7 @@
         "nowo-tech/site-backup-bundle": "1.10.0",
         "nowo-tech/tag-input-bundle": "1.1.0",
         "nowo-tech/ui-kit-bundle": "1.7.0",
-        "nowo-tech/user-kit-bundle": "1.1.5",
+        "nowo-tech/user-kit-bundle": "1.1.6",
         "pentatrion/vite-bundle": "8.2.4",
         "symfony/console": "8.1.2",
         "symfony/doctrine-messenger": "8.1.2",

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Project\Entity;
 
 use App\Identity\Entity\UserGroup;
+use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Shared\Doctrine\PublicUuidTrait;
-use App\Project\Enum\ProjectRole;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;

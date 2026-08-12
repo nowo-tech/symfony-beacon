@@ -7,12 +7,12 @@ namespace App\Tests\Functional\Export;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueStatus;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
-use App\Issues\Enum\IssueStatus;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -76,7 +76,7 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
         $csv = $this->streamedContent($client);
         self::assertStringContainsString("'=1+2", $csv);
         self::assertStringContainsString("'+cmd|'/C calc'!A0", $csv);
-        self::assertStringNotContainsString(",=1+2,", ','.$csv.',');
+        self::assertStringNotContainsString(',=1+2,', ','.$csv.',');
     }
 
     public function testMemberCannotExport(): void

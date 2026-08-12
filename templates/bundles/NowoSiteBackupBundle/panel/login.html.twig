@@ -1,0 +1,36 @@
+{# Host override: panel login via FormKit Types (password + CSRF). #}
+{% extends nowo_site_backup_panel_layout_template %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_site_backup_css_framework|default('tailwind') %}
+
+{% block nowo_ui_document_title %}Login — Site Backup{% endblock %}
+
+{% block nowo_site_backup_panel_content %}
+<section class="nowo-ui-card card">
+    <h2>Site Backup panel</h2>
+    {% if misconfigured|default(false) %}
+        <p class="{{ ui.flash('error', _css_fw) }}">Password protection is enabled but <code>security.password_hash</code> is not set. Configure a hash (see <code>nowo:site-backup:hash-password</code>) before using the panel.</p>
+    {% elseif not protectionEnabled %}
+        <p>Password protection is disabled. The panel is open to whoever can reach this URL — enable a hash in production.</p>
+    {% else %}
+        {% set loginForm = csrf_action_form(
+            path('nowo_site_backup_panel'),
+            'nowo_site_backup_login',
+            'POST',
+            false,
+            '_csrf_token',
+            {action: 'login', password: ''},
+            {password: 'password'},
+            {password: {
+                label: 'Password',
+                required: true,
+                attr: {autofocus: true, class: ui.input(_css_fw)},
+            }}
+        ) %}
+        {{ form_start(loginForm, {attr: {class: 'nowo-ui-form'}}) }}
+            {{ form_row(loginForm.password) }}
+            <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }}">Sign in</button>
+        {{ form_end(loginForm) }}
+    {% endif %}
+</section>
+{% endblock %}

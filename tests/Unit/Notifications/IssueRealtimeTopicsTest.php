@@ -16,4 +16,12 @@ final class IssueRealtimeTopicsTest extends TestCase
             IssueRealtimeTopics::forProject('00000000-0000-4000-8000-000000000099'),
         );
     }
+
+    public function testForUserBuildsMemberAlertTopic(): void
+    {
+        self::assertSame(
+            '/users/00000000-0000-4000-8000-000000000099/member-alerts',
+            IssueRealtimeTopics::forUser('00000000-0000-4000-8000-000000000099'),
+        );
+    }
 }

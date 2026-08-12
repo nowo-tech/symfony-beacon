@@ -53,9 +53,7 @@ final class PlatformBootstrapStateTest extends TestCase
 
         $breadcrumbs = $this->createStub(BreadcrumbCollectionRepository::class);
         $breadcrumbs->method('findOneByCodeAndContextKey')->willReturnCallback(
-            static function (string $code, string $contextKey) use ($collection): ?BreadcrumbCollection {
-                return 'default' === $code && '' === $contextKey ? $collection : null;
-            },
+            static fn(string $code, string $contextKey): ?BreadcrumbCollection => 'default' === $code && '' === $contextKey ? $collection : null,
         );
 
         $state = new PlatformBootstrapState(

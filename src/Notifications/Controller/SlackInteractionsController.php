@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Notifications\Service\HookDestinationContext;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
 use App\Issues\Entity\Issue;
@@ -111,7 +112,7 @@ final class SlackInteractionsController extends AbstractController
             $destinationUuid,
             NotificationDestinationType::Slack,
         );
-        if (null === $context) {
+        if (!$context instanceof HookDestinationContext) {
             return new Response('Unknown destination', Response::HTTP_UNAUTHORIZED);
         }
 

@@ -8,13 +8,13 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
+use App\Issues\Service\InboundEmailReplyToken;
 use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueAssigneeGuard;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Issues\Service\IssueMentionParser;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Issues\Service\IssueUserMailTransport;
-use App\Issues\Service\InboundEmailReplyToken;
 use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
@@ -33,13 +33,13 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Psr\Log\NullLogger;
 
 final class IssueAssigneeChangerTest extends TestCase
 {

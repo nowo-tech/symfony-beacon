@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Notifications\Realtime;
 
 use App\Issues\Entity\Issue;
+use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Message\DeliverWebPushForProjectMessage;
-use App\Notifications\Service\NotificationPayloadBuilder;
+use App\Notifications\Service\MemberAlertPreferenceEvaluator;
 use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Entity\Project;
+use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Mercure\ConfiguredMercure;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mercure\Update;
@@ -16,33 +18,50 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 /**
- * Publishes optional Mercure updates and queues optional Web Push for new issues.
+ * Publishes optional Mercure updates and queues optional Web Push for member alerts.
  */
 final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeNotifierInterface
 {
     public function __construct(
         private ConfiguredMercure $mercure,
         private WebPushClientFactory $webPushFactory,
-        private NotificationPayloadBuilder $payloadBuilder,
+        private MemberAlertPreferenceEvaluator $preferenceEvaluator,
+        private ProjectMembershipRepository $membershipRepository,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
     ) {
     }
 
-    public function notifyNewIssue(Project $project, Issue $issue): void
+    public function notify(MemberAlertEvent $event, Project $project, Issue $issue, array $payload): void
     {
-        $payload = $this->payloadBuilder->forNewIssue($project, $issue);
-        $topic = IssueRealtimeTopics::forProject($project->getUuid());
+        $payload['event'] = $event->value;
+        $users = $this->membershipRepository->findUsersByProject($project);
+        $eligibleIds = [];
+        $mercureTopics = [];
 
-        if ($this->mercure->isEnabled()) {
+        foreach ($users as $user) {
+            if (!$this->preferenceEvaluator->shouldNotify($user, $project, $issue, $event)) {
+                continue;
+            }
+            $id = $user->getId();
+            if (null !== $id) {
+                $eligibleIds[] = $id;
+            }
+            if ($this->mercure->isEnabled()) {
+                $mercureTopics[] = IssueRealtimeTopics::forUser($user->getUuid());
+            }
+        }
+
+        if ($this->mercure->isEnabled() && [] !== $mercureTopics) {
             try {
                 $this->mercure->publish(new Update(
-                    $topic,
+                    $mercureTopics,
                     json_encode($payload, \JSON_THROW_ON_ERROR),
                     true,
                 ));
             } catch (Throwable $e) {
-                $this->logger->warning('Mercure publish failed for new issue.', [
+                $this->logger->warning('Mercure publish failed for member alert.', [
+                    'event' => $event->value,
                     'project' => $project->getUuid(),
                     'issue' => $issue->getUuid(),
                     'exception' => $e,
@@ -50,7 +69,7 @@ final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeN
             }
         }
 
-        if (!$this->webPushFactory->isConfigured()) {
+        if (!$this->webPushFactory->isConfigured() || [] === $eligibleIds) {
             return;
         }
 
@@ -59,6 +78,6 @@ final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeN
             return;
         }
 
-        $this->bus->dispatch(new DeliverWebPushForProjectMessage($projectId, $payload));
+        $this->bus->dispatch(new DeliverWebPushForProjectMessage($projectId, $payload, $eligibleIds));
     }
 }

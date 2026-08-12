@@ -26,7 +26,7 @@ Controllers validate mutable posts with `$form->isSubmitted() && $form->isValid(
 | F3 | Mentions | `MentionsMarkReadType`, `MentionsMarkAllReadType` on dashboard Mentions |
 | F4 | Danger zone | `ProjectClearHistoryType`, `ProjectDeleteType` (typed name on delete) |
 | F5 | Account tours | `AccountProductTourReplayType` on Display → Tours |
-| F6 | Single-action POSTs | Locale switch, view-as disable, API key revoke/rotate, member activate/deactivate/remove, share/read-token revoke, notification/threshold toggles/deletes/tests, admin permission delete, admin project ingest/access toggles — via `CsrfOnlyType` / factory / `HiddenFieldsCsrfType` |
+| F6 | Single-action POSTs | Locale switch, view-as disable, API key revoke/rotate, member activate/deactivate/remove, share and read-token revoke, notification and threshold toggles/deletes/tests, admin permission delete, admin project ingest/access toggles — via `CsrfOnlyType` / factory / `HiddenFieldsCsrfType` |
 | F7 | Settings / admin fielded POSTs | Governance, API key / read-token / share / group / member add+role, config import (project + admin + instance), appearance theme picker, mailer test, group-member add, role permissions / role-user add, user role confirm, privacy anonymize (`TypeToConfirmType`), … |
 | F8 | GET filters | `AbstractGetFilterType` + `GetFilterFormFactory`; Issues index, Assignments/Mentions/New-in-release/Alerts/Activity, dashboard project search, admin search / audit timeline, analytics, ops overview, release environment compare |
 | UX | Dashboard titles | Product dashboard `h1` / intro weight reduced (`text-2xl font-semibold` + quieter intro; kit admin page-header aligned) |

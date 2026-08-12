@@ -30,7 +30,7 @@ final readonly class DemoFixtureLoader
         try {
             $decoded = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new InvalidArgumentException(\sprintf('Demo fixture "%s" contains invalid JSON: %s', $fixtureName, $exception->getMessage()), previous: $exception);
+            throw new InvalidArgumentException(\sprintf('Demo fixture "%s" contains invalid JSON: %s', $fixtureName, $exception->getMessage()), $exception->getCode(), previous: $exception);
         }
 
         if (!\is_array($decoded)) {

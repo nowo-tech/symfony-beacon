@@ -56,12 +56,6 @@ final class ProductTourStepsBuilderTest extends DatabaseWebTestCase
      */
     private function hasElement(array $steps, string $selector): bool
     {
-        foreach ($steps as $step) {
-            if (($step['element'] ?? null) === $selector) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($steps, fn(array $step): bool => ($step['element'] ?? null) === $selector);
     }
 }

@@ -73,6 +73,10 @@ class UserUiPreferences
     #[ORM\Column(options: ['default' => false])]
     private bool $pushNotificationsEnabled = false;
 
+    /** Master switch for member live/push alert content (opt-out; default on). */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $memberAlertsEnabled = true;
+
     public function getPreferredLocale(): string
     {
         return $this->preferredLocale ?? UserDisplayPreferenceDefaults::LOCALE;
@@ -406,6 +410,18 @@ class UserUiPreferences
         return $this;
     }
 
+    public function isMemberAlertsEnabled(): bool
+    {
+        return $this->memberAlertsEnabled;
+    }
+
+    public function setMemberAlertsEnabled(bool $memberAlertsEnabled): self
+    {
+        $this->memberAlertsEnabled = $memberAlertsEnabled;
+
+        return $this;
+    }
+
     /**
      * Clear display prefs for GDPR anonymize (locale/theme/motion/contrast + push + tours/panels).
      */
@@ -423,6 +439,7 @@ class UserUiPreferences
         $this->productTourSeenAt = null;
         $this->productTourSeenPages = null;
         $this->pushNotificationsEnabled = false;
+        $this->memberAlertsEnabled = true;
 
         return $this;
     }

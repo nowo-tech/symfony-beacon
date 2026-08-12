@@ -70,13 +70,13 @@ final class OpsOverviewServiceTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
 
-        $overview = (new OpsOverviewService(
+        $overview = new OpsOverviewService(
             new MessengerQueueHealth($em),
             $projects,
             new ProjectOpsStatsService($issues, $events),
             $daily,
             $destinations,
-        ))->build();
+        )->build();
 
         self::assertSame(['pending' => null, 'available' => false], $overview['messenger']);
         self::assertSame(5, $overview['open_issues_total']);
@@ -115,13 +115,13 @@ final class OpsOverviewServiceTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
 
-        $overview = (new OpsOverviewService(
+        $overview = new OpsOverviewService(
             new MessengerQueueHealth($em),
             $projects,
             new ProjectOpsStatsService($issues, $events),
             $daily,
             $destinations,
-        ))->build($only);
+        )->build($only);
 
         self::assertSame(2, $overview['open_issues_total']);
         self::assertSame($only, $overview['filter_project']);

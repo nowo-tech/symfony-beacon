@@ -8,8 +8,8 @@ use App\Identity\Entity\User;
 use App\Issues\AssignmentScope;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
-use App\Issues\IssueListSort;
 use App\Issues\Form\DashboardAssignmentsFilterType;
+use App\Issues\IssueListSort;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
@@ -46,7 +46,7 @@ final class DashboardAssignmentsController extends AbstractController
 
         $scope = AssignmentScope::tryFromQuery($request->query->getString('scope') ?: null);
         $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
+        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
 
         $statusParam = $request->query->getString('status');
         $status = '' === $statusParam

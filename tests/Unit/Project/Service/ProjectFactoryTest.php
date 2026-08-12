@@ -73,7 +73,7 @@ final class ProjectFactoryTest extends TestCase
             $repository,
             new ProjectApiKeyFactory($em),
         );
-        $project = $factory->create($owner, 'My Cool App', null);
+        $project = $factory->create($owner, 'My Cool App');
 
         self::assertSame('my-cool-app', $project->getSlug());
         self::assertNull($project->getDescription());

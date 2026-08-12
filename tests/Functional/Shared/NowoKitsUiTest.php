@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Shared;
 
-use App\Tests\Support\DatabaseWebTestCase;
 use App\Issues\Entity\Issue;
 use App\Setup\Demo\BreadcrumbDemoSeeder;
 use App\Setup\Demo\DashboardMenuDemoSeeder;
+use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Nowo\CookieConsentBundle\Entity\CookieConsentConfig;
 use Symfony\Component\HttpFoundation\Request;

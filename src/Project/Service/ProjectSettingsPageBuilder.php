@@ -8,7 +8,9 @@ use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
+use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
+use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectRole;
@@ -46,6 +48,7 @@ final readonly class ProjectSettingsPageBuilder
         private FormFactoryInterface $formFactory,
         private UrlGeneratorInterface $urlGenerator,
         private AuthorizationCheckerInterface $authorizationChecker,
+        private MemberAlertPreferenceManager $memberAlertPreferenceManager,
         private ProjectRepository $projectRepository,
         private ProjectReadTokenRepository $readTokenRepository,
         private ProjectShareLinkRepository $shareLinkRepository,
@@ -195,6 +198,14 @@ final readonly class ProjectSettingsPageBuilder
 
         $transferOwnershipChoices = ProjectMembershipUiHelper::transferOwnershipChoices($project, $user);
 
+        $memberAlertRows = $this->memberAlertPreferenceManager->projectRowsForUi($user, [$project]);
+        $memberAlertRow = $memberAlertRows[0] ?? null;
+        $memberAlertsInitial = [
+            'enabled' => $memberAlertRow['enabled'] ?? true,
+            'resetOverrides' => false,
+            'events' => MemberAlertEvent::mapEventsToFormKeys($memberAlertRow['events'] ?? []),
+        ];
+
         return [
             'project' => $project,
             'access' => $access,
@@ -210,6 +221,8 @@ final readonly class ProjectSettingsPageBuilder
             'delivery_attempts_by_destination' => $this->deliveryAttemptRepository->findRecentByDestinations($destinations),
             'ownerCount' => $this->countOwners($project),
             'transferCandidates' => $transferOwnershipChoices,
+            'memberAlertsInitial' => $memberAlertsInitial,
+            'memberAlertsHasOverrides' => (bool) ($memberAlertRow['hasOverrides'] ?? false),
             'governanceDefaults' => $this->governanceResolver->envDefaults(),
             'eventsToday' => $this->governanceResolver->eventsReceivedToday($project),
             'effectiveQuota' => $this->governanceResolver->effectiveEventQuotaDaily($project),

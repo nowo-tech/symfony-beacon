@@ -139,17 +139,17 @@ final class RbacPermissionTranslatorTest extends TestCase
         array $nameTranslations = [],
         array $descriptionTranslations = [],
     ): object {
-        return new class($key, $name, $description, $nameTranslations, $descriptionTranslations) {
+        return new readonly class($key, $name, $description, $nameTranslations, $descriptionTranslations) {
             /**
              * @param array<string, string> $nameTranslations
              * @param array<string, string> $descriptionTranslations
              */
             public function __construct(
-                private readonly string $key,
-                private readonly string $name,
-                private readonly ?string $description,
-                private readonly array $nameTranslations,
-                private readonly array $descriptionTranslations,
+                private string $key,
+                private string $name,
+                private ?string $description,
+                private array $nameTranslations,
+                private array $descriptionTranslations,
             ) {
             }
 

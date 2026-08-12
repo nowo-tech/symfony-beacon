@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Notifications\Form\DashboardAlertsFilterType;
 use App\Notifications\Repository\NotificationDestinationRepository;
@@ -37,7 +38,7 @@ final class DashboardAlertsController extends AbstractController
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
         $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
+        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
 
         $total = $this->destinationRepository->countWithFailedLastDeliveryInProjects($projects);
         $pagination = PagePagination::fromRequest($request, $total);

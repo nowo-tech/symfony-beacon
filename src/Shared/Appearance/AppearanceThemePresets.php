@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance;
 
+use Deprecated;
 use App\Shared\Appearance\Entity\SiteAppearance;
 
 /**
@@ -288,9 +289,7 @@ final class AppearanceThemePresets
         return true;
     }
 
-    /**
-     * @deprecated Use matchLightId() / matchDarkId() for independent modes.
-     */
+    #[Deprecated(message: 'use matchLightId() / matchDarkId() for independent modes')]
     public static function matchId(SiteAppearance $appearance): string
     {
         $light = self::matchLightId($appearance);

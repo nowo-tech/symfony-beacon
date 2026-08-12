@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ingest\Otlp\Service;
 
+use App\Project\Entity\Project;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ops\Metrics\MetricsCollector;
@@ -29,7 +30,7 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
     /**
      * Validate request and authorize ingest for `{projectId}` (UUID or legacy numeric id).
      *
-     * @return Response|array{project: \App\Project\Entity\Project, body: string} Error response, or accepted body + project
+     * @return Response|array{project: Project, body: string} Error response, or accepted body + project
      */
     public function accept(string $projectRef, Request $request): Response|array
     {

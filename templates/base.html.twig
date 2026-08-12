@@ -99,7 +99,7 @@
                             {% if is_granted('ROLE_ADMIN') and app.session.get('_beacon_view_as_member') %}
                                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm" role="status">
                                     <span>{{ 'admin_projects.view_as_banner'|trans }}</span>
-                                    {% set form = csrf_action_form(path('admin_view_as_member_disable'), 'admin_view_as_member_disable', fields={redirect: app.request.requestUri}) %}
+                                    {% set form = csrf_action_form(path('admin_view_as_member_disable'), 'admin_view_as_member_disable', fields: {redirect: app.request.requestUri}) %}
                                     {{ form_start(form) }}
                                         <button class="btn-ghost btn-sm" type="submit">{{ 'admin_projects.view_as_exit'|trans }}</button>
                                     {{ form_end(form) }}

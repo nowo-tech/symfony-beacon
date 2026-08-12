@@ -6,7 +6,6 @@ namespace App\Shared\Encryption;
 
 use RuntimeException;
 use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -41,7 +40,7 @@ final readonly class EnsureHaliteSecretsDirectoryListener
     }
 
     #[AsEventListener(event: ConsoleEvents::COMMAND, priority: 1024)]
-    public function onConsoleCommand(ConsoleCommandEvent $event): void
+    public function onConsoleCommand(): void
     {
         $this->ensure();
     }

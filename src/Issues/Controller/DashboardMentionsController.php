@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
+use App\Project\Entity\Project;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Identity\Entity\User;
 use App\Issues\Entity\IssueMention;
 use App\Issues\Form\DashboardMentionsFilterType;
@@ -43,7 +45,7 @@ final class DashboardMentionsController extends AbstractController
         $user = $this->getUser();
         $accessible = $this->projectRepository->findAccessibleByUser($user);
         $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = null !== $projectFilter ? [$projectFilter] : $accessible;
+        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
         $unreadOnly = $request->query->getBoolean('unread');
 
         $total = $this->mentionRepository->countInboxForUser($user, $projects, $unreadOnly);
@@ -111,7 +113,7 @@ final class DashboardMentionsController extends AbstractController
     }
 
     #[Route('/dashboard/mentions/read-all', name: 'dashboard_mentions_read_all', methods: ['POST'])]
-    public function markAllRead(Request $request): Response
+    public function markAllRead(Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -130,7 +132,7 @@ final class DashboardMentionsController extends AbstractController
     }
 
     #[Route('/dashboard/mentions/{id}/read', name: 'dashboard_mentions_read', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function markRead(Request $request, int $id): Response
+    public function markRead(Request $request, int $id): RedirectResponse
     {
         /** @var User $user */
         $user = $this->getUser();

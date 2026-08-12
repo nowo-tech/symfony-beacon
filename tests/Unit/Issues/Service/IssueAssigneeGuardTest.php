@@ -7,14 +7,14 @@ namespace App\Tests\Unit\Issues\Service;
 use App\Identity\Entity\User;
 use App\Issues\Service\IssueAssigneeGuard;
 use App\Project\Entity\Project;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class IssueAssigneeGuardTest extends TestCase
 {

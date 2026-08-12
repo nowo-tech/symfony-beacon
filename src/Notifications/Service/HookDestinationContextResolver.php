@@ -47,7 +47,7 @@ final readonly class HookDestinationContextResolver
         string $projectUuid,
     ): ?HookDestinationContext {
         $context = $this->resolve($destinationUuid, $expectedType);
-        if (null === $context || $context->project->getUuid() !== $projectUuid) {
+        if (!$context instanceof HookDestinationContext || $context->project->getUuid() !== $projectUuid) {
             return null;
         }
 

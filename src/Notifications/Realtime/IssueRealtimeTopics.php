@@ -13,4 +13,9 @@ final class IssueRealtimeTopics
     {
         return \sprintf('/projects/%s/issues', $projectUuid);
     }
+
+    public static function forUser(string $userUuid): string
+    {
+        return \sprintf('/users/%s/member-alerts', $userUuid);
+    }
 }

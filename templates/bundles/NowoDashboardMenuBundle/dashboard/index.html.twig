@@ -139,7 +139,7 @@
                                     data-id="{{ menu.id }}"
                                     data-name="{{ menu.code }}{% if menu.name %} — {{ menu.name }}{% endif %}"
                                     data-url="{{ path(dashboard_routes.menu_delete|default('nowo_dashboard_menu_dashboard_menu_delete'), {id: menu.id}) }}"
-                                    data-token="{{ csrf_token('delete_menu_' ~ menu.id) }}"
+                                    data-token="{{ (menu_delete_tokens|default({}))[menu.id]|default(csrf_token('delete_menu_' ~ menu.id)) }}"
                                     {{ ui.modal_toggle_attrs(_css_fw)|raw }}
                                     {{ ui.modal_target_attr('modal-delete-confirm', _css_fw)|raw }}
                                     title="{{ _label_delete }}"

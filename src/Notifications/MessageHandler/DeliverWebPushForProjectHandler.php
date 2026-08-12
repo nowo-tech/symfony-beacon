@@ -46,6 +46,16 @@ final readonly class DeliverWebPushForProjectHandler
         }
 
         $users = $this->membershipRepository->findUsersByProject($project);
+        if (null !== $message->eligibleUserIds) {
+            if ([] === $message->eligibleUserIds) {
+                return;
+            }
+            $allowed = array_fill_keys($message->eligibleUserIds, true);
+            $users = array_values(array_filter(
+                $users,
+                static fn ($user): bool => null !== $user->getId() && isset($allowed[$user->getId()]),
+            ));
+        }
         $subscriptions = $this->subscriptionRepository->findForPushEnabledUsers($users);
         if ([] === $subscriptions) {
             return;

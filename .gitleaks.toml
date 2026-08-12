@@ -6,7 +6,7 @@ title = "symfony-beacon"
 # Inherit default rule set (API keys, private keys, tokens, …).
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "Paths that are never scanned as application secrets"
 paths = [
   '''(^|/)vendor/''',
@@ -15,4 +15,13 @@ paths = [
   '''(^|/)\.php-cs-fixer\.cache$''',
   '''(^|/)\.twig-cs-fixer\.cache$''',
   '''(^|/)\.phpunit\.cache/''',
+]
+
+# False positive: prose "…token revoke, notification/threshold…" matches generic-api-key
+# (comma treated as assignment; slash allowed in the captured "secret").
+[[allowlists]]
+description = "CSRF spec prose — notification/threshold is not a credential"
+targetRules = ["generic-api-key"]
+stopwords = [
+  '''notification/threshold''',
 ]

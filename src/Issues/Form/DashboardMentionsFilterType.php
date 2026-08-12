@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Form;
 
+use Override;
 use App\Shared\Form\AbstractGetFilterType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -64,6 +65,7 @@ final class DashboardMentionsFilterType extends AbstractGetFilterType
             ]);
     }
 
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

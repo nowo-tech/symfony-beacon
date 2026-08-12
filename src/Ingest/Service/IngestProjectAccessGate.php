@@ -36,8 +36,6 @@ final readonly class IngestProjectAccessGate
 
     /**
      * Resolve path project + active API key/secret (no governance / rate yet).
-     *
-     * @return Accept|Reject
      */
     public function authorizeCredentials(string $projectRef, ?string $publicKey, ?string $secretKey): array
     {
@@ -73,8 +71,6 @@ final readonly class IngestProjectAccessGate
 
     /**
      * Ingest enabled + quotas + rate limit for an already-authenticated project.
-     *
-     * @return Accept|Reject
      */
     public function assertIngestAllowed(Project $project): array
     {
@@ -109,8 +105,6 @@ final readonly class IngestProjectAccessGate
 
     /**
      * Credentials + governance in one step (OTLP and other adapters without a mid-parse step).
-     *
-     * @return Accept|Reject
      */
     public function authorize(string $projectRef, ?string $publicKey, ?string $secretKey): array
     {

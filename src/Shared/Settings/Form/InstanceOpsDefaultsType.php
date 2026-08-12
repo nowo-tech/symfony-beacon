@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
+use Symfony\Component\Validator\Constraint;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\OpsDefaultsSection;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
@@ -60,7 +61,7 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $nonNegative
+     * @param list<Constraint> $nonNegative
      */
     private function addGovernanceFields(array $nonNegative): void
     {
@@ -97,7 +98,7 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $positive
+     * @param list<Constraint> $positive
      */
     private function addIngestFields(array $positive): void
     {
@@ -185,8 +186,8 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
     }
 
     /**
-     * @param list<\Symfony\Component\Validator\Constraint> $nonNegative
-     * @param list<\Symfony\Component\Validator\Constraint> $positive
+     * @param list<Constraint> $nonNegative
+     * @param list<Constraint> $positive
      */
     private function addNotificationFields(array $nonNegative, array $positive): void
     {

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Identity\Entity\User;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Issues\Service\InboundEmailReplyToken;
@@ -120,15 +124,15 @@ final class InboundEmailFunctionalTest extends DatabaseWebTestCase
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('inbound-spoof@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
-        $hasher = self::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 
-        $other = new \App\Identity\Entity\User();
+        $other = new User();
         $other->setEmail('inbound-other@example.com');
         $other->setDisplayName('Other');
         $other->setPassword($hasher->hashPassword($other, 'secret'));
-        $membership = new \App\Project\Entity\ProjectMembership();
+        $membership = new ProjectMembership();
         $membership->setUser($other);
-        $membership->setRole(\App\Project\Enum\ProjectRole::Member);
+        $membership->setRole(ProjectRole::Member);
         $project->addMembership($membership);
         $em->persist($other);
 

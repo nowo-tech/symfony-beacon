@@ -17,12 +17,12 @@ use Doctrine\ORM\EntityManagerInterface;
  *
  * Also removes legacy Administration-operator InstanceRoles and obsolete {@code admin.*} catalog rows.
  */
-final class InstanceRbacSeeder
+final readonly class InstanceRbacSeeder
 {
     public function __construct(
-        private readonly InstancePermissionRepository $permissionRepository,
-        private readonly InstanceRoleRepository $roleRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private InstancePermissionRepository $permissionRepository,
+        private InstanceRoleRepository $roleRepository,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 

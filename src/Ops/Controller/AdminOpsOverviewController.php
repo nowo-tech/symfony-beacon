@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Ops\Controller;
 
 use App\Ops\Form\AdminOpsOverviewFilterType;
-use App\Project\Repository\ProjectRepository;
 use App\Ops\Service\OpsOverviewService;
+use App\Project\Repository\ProjectRepository;
 use App\Shared\Form\GetFilterFormFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

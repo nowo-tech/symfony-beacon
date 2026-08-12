@@ -40,12 +40,12 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
         $request = $this->requestWithSession('fr');
         $event = $this->mainEvent($request);
 
-        (new GuestSessionLocaleSubscriber(
+        new GuestSessionLocaleSubscriber(
             $tokenStorage,
             $translator,
             ['en', 'fr'],
             'en',
-        ))->onKernelRequest($event);
+        )->onKernelRequest($event);
 
         self::assertSame('en', $request->getLocale());
         self::assertSame('en', $translator->locale);
@@ -58,12 +58,12 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
         $request->attributes->set('_locale', 'es');
         $event = $this->mainEvent($request);
 
-        (new GuestSessionLocaleSubscriber(
+        new GuestSessionLocaleSubscriber(
             new TokenStorage(),
             $translator,
             ['en', 'fr', 'es'],
             'en',
-        ))->onKernelRequest($event);
+        )->onKernelRequest($event);
 
         self::assertSame('en', $request->getLocale());
         self::assertSame('en', $translator->locale);
@@ -75,12 +75,12 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
         $request = $this->requestWithSession('fr');
         $event = $this->mainEvent($request);
 
-        (new GuestSessionLocaleSubscriber(
+        new GuestSessionLocaleSubscriber(
             new TokenStorage(),
             $translator,
             ['en', 'fr'],
             'en',
-        ))->onKernelRequest($event);
+        )->onKernelRequest($event);
 
         self::assertSame('fr', $request->getLocale());
         self::assertSame('fr', $translator->locale);
@@ -92,12 +92,12 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
         $request = $this->requestWithSession('xx');
         $event = $this->mainEvent($request);
 
-        (new GuestSessionLocaleSubscriber(
+        new GuestSessionLocaleSubscriber(
             new TokenStorage(),
             $translator,
             ['en', 'fr'],
             'en',
-        ))->onKernelRequest($event);
+        )->onKernelRequest($event);
 
         self::assertSame('en', $request->getLocale());
         self::assertSame('en', $translator->locale);

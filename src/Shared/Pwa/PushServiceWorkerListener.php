@@ -17,6 +17,32 @@ final class PushServiceWorkerListener
     private const string PUSH_SCRIPT = <<<'JS'
 
 /* Beacon Web Push (appended) */
+const BEACON_PUSH_EVENT_TITLES = {
+  'issue.new': 'New issue',
+  'issue.regression': 'Issue regression',
+  'issue.resolved': 'Issue resolved',
+  'issue.reopened': 'Issue reopened',
+  'issue.assigned': 'Issue assigned',
+  'issue.commented': 'New comment',
+};
+
+function beaconPushTruncate(text, max) {
+  if (!text || text.length <= max) {
+    return text || '';
+  }
+  return text.slice(0, max - 1).trimEnd() + '…';
+}
+
+function beaconPushIssuePreview(title, culprit) {
+  let text = (title || '').trim() || (culprit || '').trim();
+  if (!text) {
+    return '';
+  }
+  text = (text.split(/\r?\n/)[0] || text).trim();
+  text = text.replace(/^((?:[A-Za-z_][\w$]*\\)+)([A-Za-z_][\w$]*)\b/, '$2');
+  return beaconPushTruncate(text, 110);
+}
+
 self.addEventListener('push', (event) => {
   let data = {};
   try {
@@ -24,9 +50,25 @@ self.addEventListener('push', (event) => {
   } catch (error) {
     data = { summary: event.data ? event.data.text() : 'New Beacon alert' };
   }
-  const title = data.summary || 'New issue';
+  const eventKey = typeof data.event === 'string' ? data.event : '';
+  const title = BEACON_PUSH_EVENT_TITLES[eventKey] || (eventKey ? 'New alert' : null) || beaconPushTruncate(data.summary || 'New alert', 80);
+  const preview = beaconPushIssuePreview(
+    data.issue && data.issue.title,
+    data.issue && data.issue.culprit,
+  );
+  const projectName = data.project && data.project.name ? String(data.project.name).trim() : '';
+  let body = '';
+  if (projectName && preview) {
+    body = projectName + ' · ' + preview;
+  } else if (preview) {
+    body = preview;
+  } else if (projectName) {
+    body = projectName;
+  } else if (data.summary && data.summary !== title) {
+    body = beaconPushTruncate(String(data.summary), 110);
+  }
   const options = {
-    body: (data.project && data.project.name ? data.project.name + ': ' : '') + (data.issue && data.issue.title ? data.issue.title : title),
+    body: body || title,
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     data: { url: data.url || '/dashboard' },

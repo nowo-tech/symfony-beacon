@@ -22,7 +22,7 @@ final class OtlpIngestPipelineTest extends TestCase
 {
     public function testReturnsGatewayResponseWithoutMappingOrDispatch(): void
     {
-        $request = Request::create('/otlp', 'POST', content: '{}');
+        $request = Request::create('/otlp', Request::METHOD_POST, content: '{}');
         $denied = new Response('forbidden', Response::HTTP_FORBIDDEN);
 
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
@@ -53,7 +53,7 @@ final class OtlpIngestPipelineTest extends TestCase
 
     public function testInvalidMapperPayloadReturnsBadRequest(): void
     {
-        $request = Request::create('/otlp', 'POST', content: '{bad');
+        $request = Request::create('/otlp', Request::METHOD_POST, content: '{bad');
         $project = $this->projectWithId(3);
 
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
@@ -85,7 +85,7 @@ final class OtlpIngestPipelineTest extends TestCase
 
     public function testEmptyPayloadsAckWithoutDispatch(): void
     {
-        $request = Request::create('/otlp', 'POST', content: '{}');
+        $request = Request::create('/otlp', Request::METHOD_POST, content: '{}');
         $project = $this->projectWithId(1);
 
         $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
@@ -117,7 +117,7 @@ final class OtlpIngestPipelineTest extends TestCase
 
     public function testNonEmptyPayloadsDispatchProcessEnvelopeMessage(): void
     {
-        $request = Request::create('/otlp', 'POST', content: '{"ok":true}');
+        $request = Request::create('/otlp', Request::METHOD_POST, content: '{"ok":true}');
         $project = $this->projectWithId(42);
         $payloads = [['message' => 'boom']];
         $envelopeBody = "header\n{\"message\":\"boom\"}\n";
@@ -139,12 +139,10 @@ final class OtlpIngestPipelineTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->with(self::callback(static function (object $message) use ($envelopeBody): bool {
-                return $message instanceof ProcessEnvelopeMessage
-                    && 42 === $message->projectId
-                    && $envelopeBody === $message->rawEnvelope
-                    && '' !== $message->receivedAtIso;
-            }))
+            ->with(self::callback(static fn(object $message): bool => $message instanceof ProcessEnvelopeMessage
+                && 42 === $message->projectId
+                && $envelopeBody === $message->rawEnvelope
+                && '' !== $message->receivedAtIso))
             ->willReturnCallback(static fn (object $message): Envelope => new Envelope($message));
 
         $pipeline = new OtlpIngestPipeline(

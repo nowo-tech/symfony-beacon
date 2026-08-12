@@ -8,21 +8,20 @@ use App\Identity\Entity\User;
 use App\Identity\Service\ProductTourStepsBuilder;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
-use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueSavedView;
+use App\Issues\Enum\IssueLevel;
+use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueStatus;
 use App\Issues\Form\IssueIndexFilterType;
 use App\Issues\Form\IssueSavedViewType;
 use App\Issues\IssueListSort;
 use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueSearchRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
+use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectAccessService;
-use App\Issues\Enum\IssueLevel;
-use App\Issues\Enum\IssuePriority;
-use App\Issues\Enum\IssueStatus;
 use App\Shared\Form\CsrfOnlyType;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
@@ -397,5 +396,4 @@ final class IssueController extends AbstractController
 
         return $query;
     }
-
 }
