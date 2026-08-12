@@ -6,7 +6,7 @@
 {% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
 
 <h1 class="mb-2 text-2xl font-semibold">{{ (is_edit ? 'thresholds.edit_title' : 'thresholds.new_title')|trans }}</h1>
-<p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'thresholds.form_help'|trans }}</p>
+<p class="mb-6 text-xs text-[var(--color-ink)]/55">{{ 'thresholds.form_help'|trans }}</p>
 
 {{ form_start(form, {attr: {class: 'panel max-w-xl space-y-4'}}) }}
     {{ form_row(form.label) }}

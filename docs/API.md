@@ -58,7 +58,7 @@ Out of scope for OTLP v1 adapters: gRPC, protobuf Content-Type, time-series stor
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /health/live` | Liveness |
-| `GET /health/ready` | Readiness (DB / queue signals). On failure, body uses a generic `error: unavailable` — no exception text (`050`). |
+| `GET /health/ready` | Readiness (database). On failure, body uses a generic `error: unavailable` — no exception text (`050`). Messenger backlog is on authenticated `/metrics`, not this probe. |
 
 Bind these carefully in production ([PRODUCTION.md](PRODUCTION.md)).
 

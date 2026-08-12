@@ -1,7 +1,7 @@
 {# Beacon host layout for Http Log admin UI.
-   Admin pages fill {% block nowo_ui_content %}.
-   Prefer this shell + kit/_kit_admin_styles; list/filter structure lives in
-   templates/bundles/NowoHttpLogBundle/admin/ (Beacon panel cards). #}
+   Admin pages fill {% block nowo_ui_content %} (host forks skip vendor admin/base).
+   List/detail chrome: templates/bundles/NowoHttpLogBundle/admin/
+   (Beacon panel + kit_admin_header_actions + text row actions). #}
 {% extends 'kit/_kit_admin_layout.html.twig' %}
 
 {% set kit_admin_inline = true %}
@@ -14,83 +14,11 @@
 {% block title %}{{ kit_admin_heading|striptags|trim }} — {{ site_appearance.brandName }}{% endblock %}
 
 {% block kit_admin_extra_styles %}
-    <style>
-        /* Http log list: separate filter + results panels (issues-style). */
-        .kit-admin.nowo-http-log .http-log-filters {
-            display: grid;
-            gap: 0.75rem;
-            align-items: end;
-            grid-template-columns: 1fr;
-        }
-        @media (min-width: 640px) {
-            .kit-admin.nowo-http-log .http-log-filters {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-        @media (min-width: 1024px) {
-            .kit-admin.nowo-http-log .http-log-filters {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-        @media (min-width: 1280px) {
-            .kit-admin.nowo-http-log .http-log-filters {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-        .kit-admin.nowo-http-log .http-log-filters .form-group,
-        .kit-admin.nowo-http-log .http-log-filters > div {
+    <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
+        .kit-admin.nowo-http-log .http-log-filters > * {
             min-width: 0;
-            margin: 0;
         }
-        .kit-admin.nowo-http-log .http-log-filters label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.75rem;
-            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 60%, transparent);
-        }
-        .kit-admin.nowo-http-log .http-log-filters input,
-        .kit-admin.nowo-http-log .http-log-filters select {
-            display: block;
-            width: 100%;
-            min-width: 0;
-            border-radius: 0.375rem;
-            border: 1px solid var(--color-sand, var(--beacon-sand));
-            background: var(--color-surface, var(--beacon-surface));
-            color: var(--color-ink, var(--beacon-ink));
-            padding: 0.5rem 0.75rem;
-            font-size: 0.875rem;
-            line-height: 1.25;
-        }
-        .kit-admin.nowo-http-log .http-log-filters__actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-            grid-column: 1 / -1;
-        }
-        .kit-admin.nowo-http-log .http-log-results__toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        .kit-admin.nowo-http-log .http-log-results__summary {
-            margin: 0;
-            font-size: 0.875rem;
-            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 70%, transparent);
-        }
-        .kit-admin.nowo-http-log .http-log-results__actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .kit-admin.nowo-http-log .http-log-results__action {
-            display: inline-flex;
-            margin: 0;
-        }
+
         .kit-admin.nowo-http-log .http-log-details {
             display: grid;
             grid-template-columns: minmax(8rem, 12rem) 1fr;
@@ -120,14 +48,6 @@
             font-size: 1rem;
             font-weight: 600;
             margin: 1.25rem 0 0.5rem;
-        }
-        .kit-admin.nowo-http-log .nowo-ui-back a {
-            color: var(--color-moss, var(--beacon-moss));
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-        .kit-admin.nowo-http-log .nowo-ui-back a:hover {
-            text-decoration: underline;
         }
     </style>
 {% endblock %}

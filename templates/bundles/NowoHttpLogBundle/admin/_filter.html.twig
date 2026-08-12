@@ -1,14 +1,83 @@
+{# Host override: Issues/admin filter standard — widgets + placeholders, Beacon input/btn. #}
 {% trans_default_domain 'NowoHttpLogBundle' %}
-{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
-{% set _css_fw = nowo_http_log_css_framework|default('tailwind') %}
-{{ form_start(filterForm, {attr: {class: 'http-log-filters panel mb-6', 'data-testid': 'http-log-filters'}}) }}
-    {% for field in filterForm %}
-        {% if not field.rendered and field.vars.name != '_token' %}
-            <div>{{ form_row(field) }}</div>
-        {% endif %}
-    {% endfor %}
-    <div class="http-log-filters__actions">
-        <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }} nowo-ui-btn-filter">{{ 'admin.action.filter'|trans({}, 'NowoHttpLogBundle') }}</button>
-        <a class="{{ ui.btn('secondary', null, _css_fw) }}" href="{{ path('nowo_http_log_admin_index') }}">{{ 'common.clear_filters'|trans({}, 'messages') }}</a>
+{% set _td = 'NowoHttpLogBundle' %}
+{% set _input = 'input w-full min-w-0' %}
+
+{{ form_start(filterForm, {
+    attr: {
+        class: 'http-log-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+        'data-testid': 'http-log-filters',
+        role: 'search',
+    },
+}) }}
+    {{ form_widget(filterForm.q, {
+        attr: {
+            class: _input ~ ' sm:col-span-2',
+            placeholder: 'filter.q'|trans({}, _td),
+            'aria-label': 'filter.q'|trans({}, _td),
+            autocomplete: 'off',
+        },
+    }) }}
+    {{ form_widget(filterForm.method, {
+        attr: {
+            class: _input,
+            'aria-label': 'filter.method'|trans({}, _td),
+            title: 'filter.method'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.routeName, {
+        attr: {
+            class: _input,
+            placeholder: 'filter.route_name'|trans({}, _td),
+            'aria-label': 'filter.route_name'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.statusCode, {
+        attr: {
+            class: _input,
+            placeholder: 'filter.status_code'|trans({}, _td),
+            'aria-label': 'filter.status_code'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.clientIp, {
+        attr: {
+            class: _input,
+            placeholder: 'filter.client_ip'|trans({}, _td),
+            'aria-label': 'filter.client_ip'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.path, {
+        attr: {
+            class: _input,
+            placeholder: 'filter.path'|trans({}, _td),
+            'aria-label': 'filter.path'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.bodyContentType, {
+        attr: {
+            class: _input,
+            'aria-label': 'filter.body_content_type'|trans({}, _td),
+            title: 'filter.body_content_type'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.createdFrom, {
+        attr: {
+            class: _input,
+            'aria-label': 'filter.created_from'|trans({}, _td),
+            title: 'filter.created_from'|trans({}, _td),
+        },
+    }) }}
+    {{ form_widget(filterForm.createdTo, {
+        attr: {
+            class: _input,
+            'aria-label': 'filter.created_to'|trans({}, _td),
+            title: 'filter.created_to'|trans({}, _td),
+        },
+    }) }}
+
+    <div class="col-span-full flex flex-wrap items-center gap-2">
+        <button type="submit" class="btn-ghost">{{ 'common.filter'|trans({}, 'messages') }}</button>
+        <a class="btn-ghost no-underline" href="{{ path('nowo_http_log_admin_index') }}">{{ 'common.clear_filters'|trans({}, 'messages') }}</a>
     </div>
-{{ form_end(filterForm) }}
+    {{ form_rest(filterForm) }}
+{{ form_end(filterForm, {render_rest: false}) }}

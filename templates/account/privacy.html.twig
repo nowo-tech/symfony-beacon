@@ -5,8 +5,8 @@
 {% block body %}
 <div class="mx-auto space-y-6">
     <div>
-        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.title'|trans }}</h1>
-        <p class="text-sm text-[var(--color-ink)]/65">{{ 'preferences.intro'|trans }}</p>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'preferences.title'|trans }}</h1>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.intro'|trans }}</p>
     </div>
 
     {% include 'account/_area_nav.html.twig' %}
@@ -49,33 +49,33 @@
                 trigger_class: 'btn-danger',
                 trigger_label: 'preferences.privacy.anonymize_open'|trans,
                 trigger_testid: 'account-privacy-anonymize-open',
-                form_action: path('account_privacy_anonymize'),
-                title: 'preferences.privacy.anonymize_confirm_title'|trans,
-                title_id: 'privacy-anonymize-confirm-title',
+                custom_form: true,
                 aria_labelledby: 'privacy-anonymize-confirm-title',
-                header_wrapper: true,
-                cancel_label: 'common.cancel'|trans,
-                submit_label: 'preferences.privacy.anonymize_confirm'|trans,
-                submit_class: 'btn-danger',
-                submit_disabled: true,
-                submit_testid: 'account-privacy-anonymize-submit',
             } %}
-                {% block body %}
-                    <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
-                {% endblock %}
-                {% block fields %}
-                    <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
-                        {{ 'preferences.privacy.anonymize_type_label'|trans }}
-                    </label>
-                    <input
-                        id="privacy-anonymize-confirm-input"
-                        class="input w-full"
-                        type="text"
-                        autocomplete="off"
-                        data-confirm-dialog-target="confirmInput"
-                        required
-                    >
-                    <input type="hidden" name="_token" value="{{ csrf_token('account_privacy_anonymize') }}">
+                {% block form %}
+                    {{ form_start(anonymizeForm, {attr: {class: 'confirm-dialog__panel'}}) }}
+                        <div class="confirm-dialog__header">
+                            <h2 id="privacy-anonymize-confirm-title" class="confirm-dialog__title">{{ 'preferences.privacy.anonymize_confirm_title'|trans }}</h2>
+                            <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
+                        </div>
+                        <div class="confirm-dialog__content">
+                            <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
+                                {{ 'preferences.privacy.anonymize_type_label'|trans }}
+                            </label>
+                            {{ form_widget(anonymizeForm.confirmation, {
+                                attr: {
+                                    id: 'privacy-anonymize-confirm-input',
+                                    class: 'input w-full',
+                                    autocomplete: 'off',
+                                    'data-confirm-dialog-target': 'confirmInput',
+                                }
+                            }) }}
+                        </div>
+                        <div class="confirm-dialog__actions">
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
+                            <button type="submit" class="btn-danger" data-testid="account-privacy-anonymize-submit" data-confirm-dialog-target="submit" disabled>{{ 'preferences.privacy.anonymize_confirm'|trans }}</button>
+                        </div>
+                    {{ form_end(anonymizeForm) }}
                 {% endblock %}
             {% endembed %}
         {% endif %}

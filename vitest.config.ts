@@ -19,6 +19,10 @@ export default defineConfig({
         'assets/vitest.setup.ts',
         'assets/stimulus-env.d.ts',
         'assets/**/*.d.ts',
+        // Type-only / re-export barrels (no meaningful runtime statements for V8).
+        'assets/lib/thinking-orbs/types.ts',
+        'assets/lib/thinking-orbs/engine/types.ts',
+        'assets/lib/thinking-orbs/index.ts',
         // Canvas draw engines need a real WebGL/canvas loop; covered via E2E / manual.
         'assets/lib/thinking-orbs/engine/{core,lattice,morph,orbits,ribbon,registry}.ts',
       ],

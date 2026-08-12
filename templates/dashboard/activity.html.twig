@@ -7,6 +7,7 @@
     title_key: 'activity.title',
     intro_key: 'activity.intro',
     filter_route: 'dashboard_activity',
+    filterForm: filterForm,
     filters: filters,
     filters_testid: 'activity-filters',
     empty_testid: 'activity-empty',
@@ -21,17 +22,8 @@
     item_count: actions|length,
 } %}
     {% block filter_fields %}
-        <select class="input" name="project" aria-label="{{ 'activity.filter.project'|trans }}">
-            <option value="">{{ 'activity.filter.any_project'|trans }}</option>
-            {% for project in projects %}
-                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-            {% endfor %}
-        </select>
-        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-            {% for size in [10, 25, 50, 100] %}
-                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-            {% endfor %}
-        </select>
+        {{ form_widget(filterForm.project) }}
+        {{ form_widget(filterForm.per_page) }}
     {% endblock %}
     {% block results %}
         <ul class="divide-y divide-[var(--color-sand)]/70">

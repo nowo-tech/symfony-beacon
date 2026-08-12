@@ -6,12 +6,42 @@
 {% embed 'admin/_list_page.html.twig' with {
     title: 'users.title',
     intro: 'users.intro',
-    create_route: 'admin_users_new',
-    create_label: 'users.create',
     search_route: 'admin_users',
     search_placeholder: 'users.search_placeholder',
     q: q,
 } %}
+    {% block header_actions %}
+        {% embed 'shared/_confirm_dialog.html.twig' with {
+            custom_form: true,
+            dialog_modifier: 'confirm-dialog--md',
+            open_on_connect: open_create,
+            aria_labelledby: 'user-create-dialog-title',
+        } %}
+            {% block trigger %}
+                <button
+                    type="button"
+                    class="btn-primary"
+                    data-action="confirm-dialog#open"
+                    data-testid="admin-user-create"
+                >{{ 'users.create'|trans }}</button>
+            {% endblock %}
+            {% block form %}
+                {{ form_start(createForm, {attr: {class: 'confirm-dialog__panel'}}) }}
+                    <div class="confirm-dialog__header">
+                        <h2 id="user-create-dialog-title" class="confirm-dialog__title">{{ 'users.create'|trans }}</h2>
+                        <p class="confirm-dialog__body">{{ 'users.create_intro'|trans }}</p>
+                    </div>
+                    <div class="confirm-dialog__content">
+                        {% include 'form/_fields.html.twig' with {form: createForm} only %}
+                    </div>
+                    <div class="confirm-dialog__actions">
+                        <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
+                        <button class="btn-primary" type="submit">{{ 'users.create'|trans }}</button>
+                    </div>
+                {{ form_end(createForm) }}
+            {% endblock %}
+        {% endembed %}
+    {% endblock %}
     {% block table_head %}
         <thead>
             <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
@@ -62,16 +92,8 @@
                             <div class="mt-1 text-xs text-[var(--color-ink)]/45">{{ 'users.actions.self'|trans }}</div>
                         {% else %}
                             {% embed 'shared/_confirm_dialog.html.twig' with {
-                                form_action: path('admin_users_role', {id: user.uuid}),
-                                title: 'users.edit_role_title'|trans,
-                                title_id: 'user-role-dialog-title-' ~ user.id,
+                                custom_form: true,
                                 aria_labelledby: 'user-role-dialog-title-' ~ user.id,
-                                header_wrapper: true,
-                                content_wrapper: true,
-                                csrf_token: csrf_token('admin_user_role_' ~ user.id),
-                                cancel_label: 'users.cancel'|trans,
-                                submit_label: 'users.actions.update_role'|trans,
-                                submit_disabled: isLastAdmin,
                             } %}
                                 {% block trigger %}
                                     <button
@@ -87,23 +109,30 @@
                                         </svg>
                                     </button>
                                 {% endblock %}
-                                {% block body %}
-                                    <p class="confirm-dialog__body">{{ 'users.edit_role_body'|trans({'%name%': user.displayName, '%email%': user.email}) }}</p>
-                                    {% if isLastAdmin %}
-                                        <p class="confirm-dialog__body">{{ 'users.last_admin_hint'|trans }}</p>
-                                    {% endif %}
-                                {% endblock %}
-                                {% block fields %}
-                                    <label class="confirm-dialog__label" for="user-role-{{ user.id }}">{{ 'users.role_label'|trans }}</label>
-                                    <select
-                                        id="user-role-{{ user.id }}"
-                                        class="input w-full"
-                                        name="role"
-                                        {% if isLastAdmin %}disabled{% endif %}
-                                    >
-                                        <option value="user" {% if not isAdminRole %}selected{% endif %}>{{ 'users.role.user'|trans }}</option>
-                                        <option value="admin" {% if isAdminRole %}selected{% endif %}>{{ 'users.role.admin'|trans }}</option>
-                                    </select>
+                                {% block form %}
+                                    {{ form_start(roleForms[user.id], {attr: {class: 'confirm-dialog__panel'}}) }}
+                                        <div class="confirm-dialog__header">
+                                            <h2 id="user-role-dialog-title-{{ user.id }}" class="confirm-dialog__title">{{ 'users.edit_role_title'|trans }}</h2>
+                                            <p class="confirm-dialog__body">{{ 'users.edit_role_body'|trans({'%name%': user.displayName, '%email%': user.email}) }}</p>
+                                            {% if isLastAdmin %}
+                                                <p class="confirm-dialog__body">{{ 'users.last_admin_hint'|trans }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="confirm-dialog__content">
+                                            <label class="confirm-dialog__label" for="user-role-{{ user.id }}">{{ 'users.role_label'|trans }}</label>
+                                            {{ form_widget(roleForms[user.id].role, {
+                                                attr: {
+                                                    id: 'user-role-' ~ user.id,
+                                                    class: 'input w-full',
+                                                    disabled: isLastAdmin,
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
+                                            <button type="submit" class="btn-primary" {% if isLastAdmin %}disabled{% endif %}>{{ 'users.actions.update_role'|trans }}</button>
+                                        </div>
+                                    {{ form_end(roleForms[user.id]) }}
                                 {% endblock %}
                             {% endembed %}
                         {% endif %}
@@ -120,8 +149,7 @@
                             {% elseif user.anonymized %}
                                 <span class="badge bg-[var(--color-ink)]/10 text-[var(--color-ink)]/70">{{ 'users.status.anonymized'|trans }}</span>
                             {% else %}
-                                <form method="post" action="{{ path('admin_users_toggle_enabled', {id: user.uuid}) }}">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_user_' ~ user.id) }}">
+                                {{ form_start(toggleEnabledForms[user.id]) }}
                                     <button type="submit" class="btn-secondary btn-sm">
                                         {% if user.enabled %}
                                             {{ 'users.actions.disable'|trans }}
@@ -129,38 +157,38 @@
                                             {{ 'users.actions.enable'|trans }}
                                         {% endif %}
                                     </button>
-                                </form>
+                                {{ form_end(toggleEnabledForms[user.id]) }}
                                 {% embed 'shared/_confirm_dialog.html.twig' with {
                                     expected_value: 'ANONYMIZE',
                                     trigger_class: 'btn-danger btn-sm',
                                     trigger_label: 'users.actions.anonymize'|trans,
-                                    form_action: path('admin_users_anonymize', {id: user.uuid}),
-                                    title: 'users.anonymize_confirm_title'|trans,
-                                    title_id: 'admin-user-anonymize-' ~ user.id,
+                                    custom_form: true,
                                     aria_labelledby: 'admin-user-anonymize-' ~ user.id,
-                                    header_wrapper: true,
-                                    content_wrapper: true,
-                                    cancel_label: 'users.cancel'|trans,
-                                    submit_label: 'users.actions.anonymize'|trans,
-                                    submit_class: 'btn-danger',
-                                    submit_disabled: true,
                                 } %}
-                                    {% block body %}
-                                        <p class="confirm-dialog__body">{{ 'users.anonymize_confirm_body'|trans({'%email%': user.email}) }}</p>
-                                    {% endblock %}
-                                    {% block fields %}
-                                        <label class="confirm-dialog__label" for="admin-user-anonymize-input-{{ user.id }}">
-                                            {{ 'preferences.privacy.anonymize_type_label'|trans }}
-                                        </label>
-                                        <input
-                                            id="admin-user-anonymize-input-{{ user.id }}"
-                                            class="input w-full"
-                                            type="text"
-                                            autocomplete="off"
-                                            data-confirm-dialog-target="confirmInput"
-                                            required
-                                        >
-                                        <input type="hidden" name="_token" value="{{ csrf_token('admin_user_anonymize_' ~ user.id) }}">
+                                    {% block form %}
+                                        {{ form_start(anonymizeForms[user.id], {attr: {class: 'confirm-dialog__panel'}}) }}
+                                            <div class="confirm-dialog__header">
+                                                <h2 id="admin-user-anonymize-{{ user.id }}" class="confirm-dialog__title">{{ 'users.anonymize_confirm_title'|trans }}</h2>
+                                                <p class="confirm-dialog__body">{{ 'users.anonymize_confirm_body'|trans({'%email%': user.email}) }}</p>
+                                            </div>
+                                            <div class="confirm-dialog__content">
+                                                <label class="confirm-dialog__label" for="admin-user-anonymize-input-{{ user.id }}">
+                                                    {{ 'preferences.privacy.anonymize_type_label'|trans }}
+                                                </label>
+                                                {{ form_widget(anonymizeForms[user.id].confirmation, {
+                                                    attr: {
+                                                        id: 'admin-user-anonymize-input-' ~ user.id,
+                                                        class: 'input w-full',
+                                                        autocomplete: 'off',
+                                                        'data-confirm-dialog-target': 'confirmInput',
+                                                    }
+                                                }) }}
+                                            </div>
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
+                                                <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'users.actions.anonymize'|trans }}</button>
+                                            </div>
+                                        {{ form_end(anonymizeForms[user.id]) }}
                                     {% endblock %}
                                 {% endembed %}
                             {% endif %}

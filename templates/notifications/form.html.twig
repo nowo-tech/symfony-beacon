@@ -6,7 +6,7 @@
 {% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
 
 <h1 class="mb-2 text-2xl font-semibold">{{ (is_edit ? 'notifications.edit_title' : 'notifications.new_title')|trans }}</h1>
-<p class="mb-6 text-sm text-[var(--color-ink)]/65">
+<p class="mb-6 text-xs text-[var(--color-ink)]/55">
     {{ 'notifications.form_help'|trans }}
     <a href="{{ path('project_notification_help', {id: project.uuid}) }}">{{ 'notifications.help.link'|trans }}</a>
 </p>

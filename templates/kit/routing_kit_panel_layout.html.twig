@@ -1,6 +1,6 @@
 {# Beacon host layout for RoutingKit admin panel (REQ-UI-001).
    Panel pages fill {% block body %}; wrap via body_before/after.
-   nowo-ui.css is loaded from @NowoRoutingKitBundle/panel/base.html.twig. #}
+   Host forks: templates/bundles/NowoRoutingKitBundle/panel/ (Menus chrome). #}
 {% extends 'kit/_kit_admin_layout.html.twig' %}
 
 {% block title %}{{ 'nav.routing'|trans }} — {{ site_appearance.brandName }}{% endblock %}
@@ -10,3 +10,7 @@
 {% set kit_admin_wrapper_class = ' nowo-ui-routing-kit-panel' %}
 {% set kit_admin_css_framework = nowo_routing_kit_css_framework|default('tailwind') %}
 {% set kit_admin_data_testid = 'admin-routing-kit' %}
+
+{% block kit_admin_extra_javascripts %}
+    {% include 'kit/_kit_modal_body_portals.html.twig' %}
+{% endblock %}

@@ -18,18 +18,16 @@ use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Exception\ProjectAccessException;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
-use RuntimeException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Adds, updates, and removes direct project memberships and group access links.
  *
  * Every mutating method records a {@see UserActionType} via {@see UserActionRecorder}
- * and flushes the entity manager. Domain failure codes are thrown as
- * {@see InvalidArgumentException} or {@see RuntimeException} message strings
- * (mapped to flash keys by the controller).
+ * and flushes the entity manager. Domain failures raise {@see ProjectAccessException}
+ * (mapped to flash keys by the controller via {@see ProjectAccessFlashKeys}).
  */
 final readonly class ProjectMembershipManager
 {
@@ -48,8 +46,7 @@ final readonly class ProjectMembershipManager
     /**
      * Add an existing enabled user by email as a direct project member.
      *
-     * @throws InvalidArgumentException when the email/role cannot be applied
-     * @throws RuntimeException         when domain rules block the change
+     * @throws ProjectAccessException
      */
     public function addByEmail(Project $project, User $actor, string $email, ProjectRole $role): ProjectMembership
     {
@@ -58,13 +55,13 @@ final readonly class ProjectMembershipManager
 
         $user = $this->userRepository->findOneByEmail($email);
         if (!$user instanceof User) {
-            throw new InvalidArgumentException('user_not_found');
+            throw ProjectAccessException::of(ProjectAccessException::USER_NOT_FOUND);
         }
         if (!$user->isEnabled()) {
-            throw new InvalidArgumentException('user_disabled');
+            throw ProjectAccessException::of(ProjectAccessException::USER_DISABLED);
         }
         if ($this->membershipRepository->findOneByProjectAndUser($project, $user) instanceof ProjectMembership) {
-            throw new InvalidArgumentException('already_member');
+            throw ProjectAccessException::of(ProjectAccessException::ALREADY_MEMBER);
         }
 
         $membership = new ProjectMembership();
@@ -89,8 +86,7 @@ final readonly class ProjectMembershipManager
     /**
      * Change a direct member's role (cannot remove the last owner).
      *
-     * @throws InvalidArgumentException when the role is invalid for the actor
-     * @throws RuntimeException         when domain rules block the change
+     * @throws ProjectAccessException
      */
     public function changeRole(Project $project, User $actor, ProjectMembership $target, ProjectRole $role): void
     {
@@ -100,7 +96,7 @@ final readonly class ProjectMembershipManager
         $this->assertAssignableRole($actor, $project, $role);
 
         if (ProjectRole::Owner === $target->getRole() && ProjectRole::Owner !== $role && $this->countDirectOwners($project) <= 1) {
-            throw new RuntimeException('last_owner');
+            throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
 
         $from = $target->getRole()->value;
@@ -122,7 +118,7 @@ final readonly class ProjectMembershipManager
     /**
      * Remove a direct membership (cannot remove the last owner).
      *
-     * @throws RuntimeException when domain rules block the removal
+     * @throws ProjectAccessException
      */
     public function remove(Project $project, User $actor, ProjectMembership $target): void
     {
@@ -131,10 +127,10 @@ final readonly class ProjectMembershipManager
         $this->assertCanMutateTarget($actor, $project, $target);
 
         if (ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
-            throw new RuntimeException('last_owner');
+            throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
         if (ProjectRole::Full === $target->getRole()) {
-            throw new RuntimeException('cannot_remove_full');
+            throw ProjectAccessException::of(ProjectAccessException::CANNOT_REMOVE_FULL);
         }
 
         $subject = $target->getUser();
@@ -161,8 +157,7 @@ final readonly class ProjectMembershipManager
      * demotes the actor to {@see ProjectRole::Full} so they keep the full permission
      * matrix without remaining the primary owner.
      *
-     * @throws InvalidArgumentException when the target cannot receive ownership
-     * @throws RuntimeException         when the actor cannot transfer ownership
+     * @throws ProjectAccessException
      */
     public function transferOwnership(Project $project, User $actor, ProjectMembership $target): void
     {
@@ -171,10 +166,10 @@ final readonly class ProjectMembershipManager
 
         $newOwner = $target->getUser();
         if ($newOwner->getId() === $actor->getId()) {
-            throw new InvalidArgumentException('cannot_transfer_to_self');
+            throw ProjectAccessException::of(ProjectAccessException::CANNOT_TRANSFER_TO_SELF);
         }
         if (!$newOwner->isEnabled()) {
-            throw new InvalidArgumentException('user_disabled');
+            throw ProjectAccessException::of(ProjectAccessException::USER_DISABLED);
         }
 
         $actorMembership = $this->membershipRepository->findOneByProjectAndUser($project, $actor);
@@ -182,7 +177,7 @@ final readonly class ProjectMembershipManager
             && ProjectRole::Owner === $actorMembership->getRole();
 
         if (ProjectRole::Owner === $target->getRole() && !$actorWillDemote) {
-            throw new InvalidArgumentException('already_owner');
+            throw ProjectAccessException::of(ProjectAccessException::ALREADY_OWNER);
         }
 
         $fromRole = $target->getRole()->value;
@@ -213,19 +208,19 @@ final readonly class ProjectMembershipManager
     /**
      * Link a user group to the project (admin/member only).
      *
-     * @throws InvalidArgumentException|RuntimeException
+     * @throws ProjectAccessException
      */
     public function addGroup(Project $project, User $actor, UserGroup $group, ProjectRole $role): ProjectGroupAccess
     {
         $this->assertActorCanManage($project, $actor);
         $this->assertActorCanLinkGroup($actor, $group, $project);
         if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw new InvalidArgumentException('invalid_role');
+            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
         }
         $this->assertAssignableGroupRole($actor, $project, $role);
 
         if ($this->groupAccessRepository->findOneByProjectAndGroup($project, $group) instanceof ProjectGroupAccess) {
-            throw new InvalidArgumentException('group_already_linked');
+            throw ProjectAccessException::of(ProjectAccessException::GROUP_ALREADY_LINKED);
         }
 
         $access = new ProjectGroupAccess();
@@ -253,7 +248,7 @@ final readonly class ProjectMembershipManager
      * Instance ROLE_ADMIN or project owner may link any group.
      * Project admins may only link groups they belong to.
      *
-     * @throws RuntimeException when the actor cannot link this group
+     * @throws ProjectAccessException
      */
     public function assertActorCanLinkGroup(User $actor, UserGroup $group, Project $project): void
     {
@@ -270,22 +265,22 @@ final readonly class ProjectMembershipManager
             return;
         }
 
-        throw new RuntimeException('group_link_forbidden');
+        throw ProjectAccessException::of(ProjectAccessException::GROUP_LINK_FORBIDDEN);
     }
 
     /**
      * Change the role of a linked group (admin/member only).
      *
-     * @throws InvalidArgumentException|RuntimeException
+     * @throws ProjectAccessException
      */
     public function changeGroupRole(Project $project, User $actor, ProjectGroupAccess $target, ProjectRole $role): void
     {
         $this->assertActorCanManage($project, $actor);
         if ($target->getProject()?->getId() !== $project->getId()) {
-            throw new InvalidArgumentException('wrong_project');
+            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
         }
         if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw new InvalidArgumentException('invalid_role');
+            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
         }
         $this->assertAssignableGroupRole($actor, $project, $role);
 
@@ -311,13 +306,13 @@ final readonly class ProjectMembershipManager
     /**
      * Unlink a group from the project.
      *
-     * @throws InvalidArgumentException|RuntimeException
+     * @throws ProjectAccessException
      */
     public function removeGroup(Project $project, User $actor, ProjectGroupAccess $target): void
     {
         $this->assertActorCanManage($project, $actor);
         if ($target->getProject()?->getId() !== $project->getId()) {
-            throw new InvalidArgumentException('wrong_project');
+            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
         }
 
         $group = $target->getUserGroup();
@@ -375,7 +370,7 @@ final readonly class ProjectMembershipManager
         ));
     }
 
-    /** @throws RuntimeException when the actor cannot manage members */
+    /** @throws ProjectAccessException */
     private function assertActorCanManage(Project $project, User $actor): void
     {
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
@@ -384,11 +379,11 @@ final readonly class ProjectMembershipManager
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess || !$access->canManageMembers()) {
-            throw new RuntimeException('forbidden');
+            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
         }
     }
 
-    /** @throws RuntimeException when the actor cannot transfer project ownership */
+    /** @throws ProjectAccessException */
     private function assertActorCanTransferOwnership(Project $project, User $actor): void
     {
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
@@ -397,38 +392,38 @@ final readonly class ProjectMembershipManager
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess || ProjectRole::Owner !== $access->role) {
-            throw new RuntimeException('forbidden');
+            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
         }
     }
 
-    /** @throws InvalidArgumentException when the role is not assignable by this actor */
+    /** @throws ProjectAccessException */
     private function assertAssignableRole(User $actor, Project $project, ProjectRole $role): void
     {
         if (!\in_array($role, $this->assignableRoles($actor, $project), true)) {
-            throw new InvalidArgumentException('invalid_role');
+            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
         }
     }
 
-    /** @throws InvalidArgumentException when the group role is not assignable by this actor */
+    /** @throws ProjectAccessException */
     private function assertAssignableGroupRole(User $actor, Project $project, ProjectRole $role): void
     {
         if (!\in_array($role, $this->assignableGroupRoles($actor, $project), true)) {
-            throw new InvalidArgumentException('invalid_role');
+            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
         }
     }
 
-    /** @throws InvalidArgumentException when the membership belongs to another project */
+    /** @throws ProjectAccessException */
     private function assertSameProject(Project $project, ProjectMembership $target): void
     {
         if ($target->getProject()?->getId() !== $project->getId()) {
-            throw new InvalidArgumentException('wrong_project');
+            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
         }
     }
 
     /**
      * Admins cannot mutate owner or full memberships (instance ROLE_ADMIN may).
      *
-     * @throws RuntimeException
+     * @throws ProjectAccessException
      */
     private function assertCanMutateTarget(User $actor, Project $project, ProjectMembership $target): void
     {
@@ -438,31 +433,29 @@ final readonly class ProjectMembershipManager
 
         $access = $this->projectAccess->resolveAccess($project, $actor);
         if (!$access instanceof ProjectAccess) {
-            throw new RuntimeException('forbidden');
+            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
         }
 
         if (ProjectRole::Admin === $access->role && \in_array($target->getRole(), [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw new RuntimeException('cannot_manage_owner');
+            throw ProjectAccessException::of(ProjectAccessException::CANNOT_MANAGE_OWNER);
         }
     }
 
     /** Count direct (not group-derived) **active** owner memberships on the project. */
     private function countDirectOwners(Project $project): int
     {
-        $count = 0;
-        foreach ($project->getMemberships() as $membership) {
-            if ($membership->isActive() && ProjectRole::Owner === $membership->getRole()) {
-                ++$count;
-            }
+        $projectId = $project->getId();
+        if (null === $projectId) {
+            return 0;
         }
 
-        return $count;
+        return $this->membershipRepository->countOwnersByProjectIds([$projectId])[$projectId] ?? 0;
     }
 
     /**
      * Activate or deactivate a direct membership (does not delete the row).
      *
-     * @throws RuntimeException when domain rules block the change
+     * @throws ProjectAccessException
      */
     public function setActive(Project $project, User $actor, ProjectMembership $target, bool $active): void
     {
@@ -470,11 +463,11 @@ final readonly class ProjectMembershipManager
         $this->assertCanMutateTarget($actor, $project, $target);
 
         if ($target->getProject()?->getId() !== $project->getId()) {
-            throw new RuntimeException('forbidden');
+            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
         }
 
         if (!$active && ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
-            throw new RuntimeException('last_owner');
+            throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
 
         if ($target->isActive() === $active) {

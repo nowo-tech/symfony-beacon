@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyThemeBoot } from './theme-boot';
 
 describe('applyThemeBoot', () => {
@@ -43,5 +43,36 @@ describe('applyThemeBoot', () => {
     document.documentElement.dataset.userTheme = 'auto';
     applyThemeBoot();
     expect(document.documentElement.dataset.theme).toBe('dark');
+  });
+
+  it('uses prefers-color-scheme and prefers-contrast when unset', () => {
+    const matchMedia = window.matchMedia as unknown as ReturnType<typeof vi.fn>;
+    matchMedia.mockImplementation((query: string) => ({
+      matches: query.includes('prefers-color-scheme: dark') || query.includes('prefers-contrast: more'),
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    applyThemeBoot();
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    expect(document.documentElement.dataset.contrast).toBe('more');
+  });
+
+  it('seeds sidebar preference into localStorage when unset', () => {
+    document.documentElement.dataset.userSidebar = 'collapsed';
+    applyThemeBoot();
+    expect(localStorage.getItem('beacon-sidebar')).toBe('collapsed');
+    expect(window.__BEACON_USER_SIDEBAR__).toBe('collapsed');
+  });
+
+  it('falls back panel defaults when JSON is a non-array', () => {
+    document.documentElement.dataset.issuePanelDefaults = '{"a":1}';
+    applyThemeBoot();
+    expect(window.__BEACON_ISSUE_PANEL_DEFAULTS__).toEqual(['raw', 'extra']);
   });
 });

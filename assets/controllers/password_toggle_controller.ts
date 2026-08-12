@@ -4,6 +4,9 @@ import { Controller } from '@hotwired/stimulus';
  * Show/hide password without inline onclick= (CSP script-src 'self').
  *
  * Replaces nowo-tech/password-toggle-bundle native handlers on the host form theme.
+ * Icon visibility: toggles {@code is-password-visible} (PasswordToggleBundle ≥2.1.1 CSS
+ * and host `_components.scss`); do not set element.style (CSP style-src with a nonce
+ * ignores 'unsafe-inline').
  *
  * Usage (on the toggle button next to the password input):
  *   data-controller="password-toggle"
@@ -26,28 +29,15 @@ export default class extends Controller {
       return;
     }
 
-    const iconHidden = this.element.querySelector<HTMLElement>('.icon-hidden');
-    const iconVisible = this.element.querySelector<HTMLElement>('.icon-visible');
-
     if (input.type === 'password') {
       input.type = 'text';
-      if (iconHidden) {
-        iconHidden.style.display = 'none';
-      }
-      if (iconVisible) {
-        iconVisible.style.display = '';
-      }
+      this.element.classList.add('is-password-visible');
       this.element.setAttribute('aria-label', this.hideLabelValue);
       return;
     }
 
     input.type = 'password';
-    if (iconHidden) {
-      iconHidden.style.display = '';
-    }
-    if (iconVisible) {
-      iconVisible.style.display = 'none';
-    }
+    this.element.classList.remove('is-password-visible');
     this.element.setAttribute('aria-label', this.showLabelValue);
   }
 

@@ -1,9 +1,10 @@
 {#
-  Kit modals (.nowo-ui-modal) are portaled to <body> by kit-admin.ts so they escape
-  .app-main__inner stacking contexts. Token remap for portaled modals lives in
+  Kit modals (dialog.nowo-ui-modal / legacy .modal) are portaled to <body> by kit-admin.ts
+  so they escape .app-main__inner stacking contexts. Token remap for portaled modals lives in
   _kit_admin_styles.html.twig (.nowo-ui-modal { --nowo-ui-*: … }).
 #}
-<style>
+<style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
+  body > dialog.nowo-ui-modal,
   body > .nowo-ui-modal,
   body > .modal {
     z-index: 1080;

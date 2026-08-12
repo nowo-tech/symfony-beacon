@@ -1,12 +1,11 @@
-{# Host override: UiKit burger + Beacon sidebar toggle hooks (app.ts). #}
-{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
-{% set framework = framework|default(null) %}
+{# Host override: Beacon sidebar toggle chrome only — skip ui.burger() (adds nowo-ui-btn
+   secondary + Tailwind slate/blue utilities that fight .app-sidebar-toggle). #}
 {% set controls = controls|default('app-sidebar') %}
 {% set expanded = expanded|default(true) %}
 {% set label = label|default('nav.toggle_sidebar'|trans) %}
 <button
     type="button"
-    class="{{ ui.burger(framework) }} app-sidebar-toggle"
+    class="nowo-ui-burger app-sidebar-toggle"
     data-nowo-ui-burger
     data-sidebar-toggle
     aria-controls="{{ controls }}"

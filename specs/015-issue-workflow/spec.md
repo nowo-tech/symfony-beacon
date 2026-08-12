@@ -94,6 +94,7 @@ As a project member, I queue two issues for a future merge without merging event
 - **FR-006**: Members MUST be able to create, open, and delete named saved views of list filters/sort.
 - **FR-007**: Members MUST be able to queue and cancel a merge-later relationship without merging event data.
 - **FR-008**: Priority, duplicate, and comment actions MUST be attributable to the acting member where history exists.
+- **FR-009**: Priority, duplicate, and saved-view create/delete POSTs MUST use Symfony Form Types (`IssuePriorityType`, `IssueDuplicateType`, `IssueSavedViewType`, CSRF-only delete) per `090` — not hand-rolled Twig `csrf_token()` forms.
 
 ### Key Entities
 
@@ -119,3 +120,7 @@ As a project member, I queue two issues for a future merge without merging event
 - Saved views are per-user within a project (not shared team-wide in v1).
 - Full issue merge (fingerprints/events) is out of scope; only "merge later" intent.
 - Builds on `004-issues` status/assignee/history behaviour.
+
+## Amendment (Symfony Forms, 2026-08-11)
+
+Issue show/index triage mutations (priority, duplicate, saved views) and status (`004`) use named Form Types / `CsrfOnlyType`. See `090-csrf-symfony-forms`.

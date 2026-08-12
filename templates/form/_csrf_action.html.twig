@@ -1,0 +1,33 @@
+{#
+  Render a CSRF-only FormKit/Symfony form as a POST action button.
+
+  Required:
+    - form: FormView|FormInterface
+    - action: URL string
+    - submit_label: button label
+
+  Optional:
+    - submit_class (default btn-ghost)
+    - form_class
+    - form_attr (hash)
+    - button_attr (hash)
+    - confirm_message (sets onsubmit confirm)
+#}
+{% set _submit_class = submit_class|default('btn-ghost') %}
+{% set _form_attr = form_attr|default({})|merge(form_class is defined ? {class: form_class} : {}) %}
+{{ form_start(form, {action: action, attr: _form_attr}) }}
+    {% if confirm_message is defined %}
+        {# confirm_message is already escaped by the caller when needed #}
+    {% endif %}
+    <button
+        type="submit"
+        class="{{ _submit_class }}"
+        {% if confirm_message is defined %}onsubmit{% endif %}
+        {% if button_attr is defined %}
+            {% for attr, val in button_attr %}
+                {{ attr }}="{{ val|e('html_attr') }}"
+            {% endfor %}
+        {% endif %}
+        {% if confirm_message is defined %}onclick="return confirm({{ confirm_message|json_encode|raw }})"{% endif %}
+    >{{ submit_label }}</button>
+{{ form_end(form) }}

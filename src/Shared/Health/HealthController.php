@@ -15,13 +15,15 @@ use Throwable;
 
 /**
  * Liveness and readiness probes for orchestrators (no auth).
+ *
+ * Readiness checks database only. Messenger backlog is exposed via authenticated
+ * {@code /metrics} ({@see \App\Shared\Metrics\MetricsController}), not the public probe.
  */
 #[AsController]
 final readonly class HealthController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private MessengerQueueHealth $messengerQueueHealth,
         private LoggerInterface $logger,
     ) {
     }
@@ -45,7 +47,7 @@ final readonly class HealthController
     }
 
     #[Route('/health/ready', name: 'health_ready', methods: ['GET'])]
-    #[OA\Get(path: '/health/ready', operationId: 'healthReady', description: 'Checks database connectivity and optionally reports pending Messenger `async` messages.', summary: 'Readiness probe', security: [], tags: ['Health'])]
+    #[OA\Get(path: '/health/ready', operationId: 'healthReady', description: 'Checks database connectivity. Does not expose Messenger queue depth (use `/metrics` when authorized).', summary: 'Readiness probe', security: [], tags: ['Health'])]
     #[OA\Response(
         response: 200,
         description: 'Dependencies are ready.',
@@ -57,7 +59,6 @@ final readonly class HealthController
                     property: 'checks',
                     properties: [
                         new OA\Property(property: 'database', type: 'boolean', example: true),
-                        new OA\Property(property: 'messenger_async_pending', type: 'integer', example: 0, nullable: true),
                     ],
                     type: 'object',
                 ),
@@ -82,15 +83,12 @@ final readonly class HealthController
     {
         $checks = [
             'database' => false,
-            'messenger_async_pending' => null,
         ];
 
         try {
             $connection = $this->entityManager->getConnection();
             $connection->executeQuery('SELECT 1');
             $checks['database'] = true;
-            $queue = $this->messengerQueueHealth->asyncPending();
-            $checks['messenger_async_pending'] = $queue['pending'];
         } catch (Throwable $e) {
             $this->logger->error('Readiness probe failed.', [
                 'exception' => $e,

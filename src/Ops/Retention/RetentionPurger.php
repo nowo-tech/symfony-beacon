@@ -42,7 +42,7 @@ final readonly class RetentionPurger
             'stats' => 0,
         ];
 
-        $projectIds = [];
+        $eligible = [];
         foreach ($this->projectRepository->findAll() as $project) {
             if (!$project instanceof Project || null === $project->getId()) {
                 continue;
@@ -52,14 +52,23 @@ final readonly class RetentionPurger
             if ($days < 1 && $maxEvents < 1) {
                 continue;
             }
-            $projectIds[] = $project->getId();
+            $eligible[] = $project;
         }
 
-        foreach ($projectIds as $projectId) {
-            $project = $this->projectRepository->find($projectId);
-            if (!$project instanceof Project) {
-                continue;
+        foreach ($eligible as $project) {
+            // purgeProject may clear the EM after event deletes — reload detached entities.
+            if (!$this->entityManager->contains($project)) {
+                $projectId = $project->getId();
+                if (null === $projectId) {
+                    continue;
+                }
+                $reloaded = $this->projectRepository->find($projectId);
+                if (!$reloaded instanceof Project) {
+                    continue;
+                }
+                $project = $reloaded;
             }
+
             ++$totals['projects'];
             $result = $this->purgeProject($project, $now);
             $totals['events'] += $result['events'];

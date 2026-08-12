@@ -1,0 +1,30 @@
+{# Host override: load Beacon kit remaps AFTER vendor nowo-ui.css (underline tabs / blue defaults). #}
+{% extends nowo_cookie_consent_layout_template|default('@NowoCookieConsentBundle/admin/layout.html.twig') %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+
+{% block nowo_ui_flashes %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="{{ ui.flash(label == 'error' ? 'error' : label, _css_fw) }}" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% block nowo_ui_styles %}
+        {% if nowo_cookie_consent_css_framework|default('bootstrap5') not in ['bootstrap', 'bootstrap5', 'bootstrap4', 'tabler'] %}
+            <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
+        {% endif %}
+    {% endblock %}
+    {# Re-apply host remaps so they win over nowo-ui.css append above. #}
+    {% include 'kit/_kit_admin_styles.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% block nowo_ui_scripts %}
+        <script src="{{ asset('js/nowo-ui-confirm.js', 'nowo_ui_kit') }}" defer></script>
+    {% endblock %}
+{% endblock %}

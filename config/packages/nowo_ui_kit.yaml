@@ -6,5 +6,7 @@
 nowo_ui_kit:
     css_framework: tailwind
     icon_set: ux_icon
-    # Table/list row actions: icon only (label is visually hidden + aria-label/title).
-    row_actions_display: icon
+    # Table/list row actions: text | icon | icon_text.
+    # Beacon Menus/Breadcrumbs use text labels (btn-sm btn-label); kit CSS must not square-crush them.
+    row_actions_display: text
+    

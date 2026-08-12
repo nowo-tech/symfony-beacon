@@ -14,3 +14,15 @@
 - [x] Interim host forks: Menu / Breadcrumb / Cookie pagination+table / HttpLog filter loop / SiteBackup panel lists
 - [x] Security follow-ups: OutboundUrlGuard A+AAAA; SiteBackup omit `.env`; PRODUCTION failed-queue + encrypt migrate notes
 - [x] Docs: CHANGELOG, CONTRIBUTING, UPGRADING, ROADMAP 6.31; this spec + related specs (`037`, `064`, `077`, `079*`, `080`)
+- [x] Kit admin tables: Menu / Breadcrumb catalogs → `panel nowo-ui-table-wrap` + UiKit table; items actions last; drop `kit_admin_split_filters` when panel is explicit
+- [x] RoutingKit panel index: table card, Import modal, toolbar order, host i18n Export/Import/yes/no/confirm, no duplicate intro
+- [x] Breadcrumb layout intro `admin.hub.breadcrumbs` via `messages`; fixture ES trail label `Migas de pan`
+- [x] Http Log filters: Issues/admin widget+placeholder standard; FormKit `http_log` → `nowo-ui-input` + Tailwind; `ui.btn` CTAs
+- [x] Pin bumps post-sync: AuthKit **1.17**, RoutingKit **1.4**, DashboardMenu **2.1.1**, CookieConsent **≥ 1.6.3**, SiteBackup **1.10.1** (see CHANGELOG); FR-001 floors updated
+- [x] Dashboard Menu host rewrite: `index` / `show` / `show_items_reorder` → Administration chrome; kit JS/modals preserved
+- [x] `nowo_ui_kit.row_actions_display: text` + kit CSS `btn-label` / `--text` auto-width (no square-crush)
+- [x] Breadcrumb host rewrite: `dashboard/base` + `collection/index` + `item/index` → Administration chrome / header CTAs / text row actions
+- [x] Breadcrumb actions column: wider `min-w-*` + kit `.nowo-ui-row-actions--text` nowrap so multiple text chips stay on one line
+- [x] RoutingKit host rewrite: `panel/base` + `index` / `form` → Administration chrome / header CTAs / text row actions / Import modal portals
+- [x] Http Log host rewrite: `admin/index|_filter|show` → header export/purge, panel results, filters in `panel` + `.input` / `btn-ghost`
+- [x] CSP kit admin: style nonces; `style-src-elem` / `style-src-attr`; empty `stimulus_script_url`; `kit-admin` `showModal` + config boot island

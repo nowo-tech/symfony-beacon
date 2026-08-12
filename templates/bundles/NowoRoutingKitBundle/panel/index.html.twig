@@ -1,84 +1,96 @@
-{# Host override: Beacon kit chrome + icon row actions (nowo_ui_kit.row_actions_display). #}
-{# RoutingKit ≥ 1.4.0: export_form / clear_cache_form / import_form / delete_forms. #}
+{# Host rewrite: Beacon Administration list chrome (Menus pattern).
+   Row actions: btn-ghost/btn-danger + _action_inner (nowo_ui_kit.row_actions_display).
+   RoutingKit ≥ 1.4.0: export_form / clear_cache_form / import_form / delete_forms. #}
 {% extends '@NowoRoutingKitBundle/panel/base.html.twig' %}
 {% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
 {% set _css_fw = nowo_routing_kit_css_framework|default('tailwind') %}
+{% set _td = 'NowoRoutingKitBundle' %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
+
+{% set kit_admin_header_actions %}
+    {{ form_start(export_form, {
+        action: path_prefix ~ '/export',
+        method: 'POST',
+        attr: {class: 'inline'},
+    }) }}
+        {{ form_rest(export_form) }}
+        <button type="submit" class="btn-ghost">{{ 'panel.export'|trans({}, _td) }}</button>
+    {{ form_end(export_form, {render_rest: false}) }}
+    {{ form_start(clear_cache_form, {
+        action: path_prefix ~ '/clear-cache',
+        method: 'POST',
+        attr: {class: 'inline'},
+    }) }}
+        {{ form_rest(clear_cache_form) }}
+        <button type="submit" class="btn-ghost">{{ 'panel.clear_cache'|trans({}, _td) }}</button>
+    {{ form_end(clear_cache_form, {render_rest: false}) }}
+    <button
+        type="button"
+        class="btn-ghost"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-routing-import', _css_fw)|raw }}
+    >{{ 'panel.import'|trans({}, _td) }}</button>
+    <a class="btn-primary no-underline" href="{{ path_prefix }}/new">{{ 'panel.new'|trans({}, _td) }}</a>
+{% endset %}
 
 {% block body %}
-    <p class="{{ ui.muted(_css_fw) }} mb-4">{{ 'panel.subtitle'|trans({'%default%': default}, 'NowoRoutingKitBundle') }}</p>
-
-    <div class="{{ ui.toolbar(_css_fw) }}">
-        <a class="{{ ui.btn('primary', null, _css_fw) }}" href="{{ path_prefix }}/new">{{ 'panel.new'|trans({}, 'NowoRoutingKitBundle') }}</a>
-        {{ form_start(export_form, {
-            action: path_prefix ~ '/export',
-            method: 'POST',
-            attr: {class: 'inline'},
-        }) }}
-            {{ form_rest(export_form) }}
-            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Export</button>
-        {{ form_end(export_form, {render_rest: false}) }}
-        {{ form_start(clear_cache_form, {
-            action: path_prefix ~ '/clear-cache',
-            method: 'POST',
-            attr: {class: 'inline'},
-        }) }}
-            {{ form_rest(clear_cache_form) }}
-            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.clear_cache'|trans({}, 'NowoRoutingKitBundle') }}</button>
-        {{ form_end(clear_cache_form, {render_rest: false}) }}
-    </div>
-
-    <p class="{{ ui.muted(_css_fw) }} mb-3">{{ total }} row(s) · page {{ page }}/{{ pages }} ({{ page_size }}/page)</p>
-
-    <div class="{{ ui.table_wrap(_css_fw) }}">
-        <table class="{{ ui.table(_css_fw) }}">
+    <section class="panel overflow-x-auto" data-testid="routing-kit-definitions-table">
+        <table class="w-full text-left text-sm">
             <thead>
-                <tr>
-                    <th>{{ 'panel.col.route'|trans({}, 'NowoRoutingKitBundle') }}</th>
-                    <th>{{ 'panel.col.locale'|trans({}, 'NowoRoutingKitBundle') }}</th>
-                    <th>{{ 'panel.col.path'|trans({}, 'NowoRoutingKitBundle') }}</th>
-                    <th>{{ 'panel.col.canonical'|trans({}, 'NowoRoutingKitBundle') }}</th>
-                    <th>{{ 'panel.col.enabled'|trans({}, 'NowoRoutingKitBundle') }}</th>
-                    <th></th>
+                <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                    <th class="px-2 py-2 font-medium">{{ 'panel.col.route'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.col.locale'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.col.path'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.col.canonical'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.col.enabled'|trans({}, _td) }}</th>
+                    <th class="w-0 px-2 py-2 text-end font-medium whitespace-nowrap">{{ 'panel.col.actions'|trans({}, _td) }}</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in definitions %}
-                <tr>
-                    <td><code>{{ row.routeName }}</code></td>
-                    <td>{{ row.locale }}</td>
-                    <td><code>{{ row.path }}</code></td>
-                    <td>{{ row.canonicalStyle.value }}</td>
-                    <td>
+                {% set _label_edit = 'panel.edit'|trans({}, _td) %}
+                {% set _label_delete = 'panel.delete'|trans({}, _td) %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                    <td class="px-2 py-3"><code>{{ row.routeName }}</code></td>
+                    <td class="px-2 py-3">{{ row.locale }}</td>
+                    <td class="px-2 py-3"><code>{{ row.path }}</code></td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ row.canonicalStyle.value }}</td>
+                    <td class="px-2 py-3">
                         {% if row.enabled %}
-                            <span class="{{ ui.badge('success', _css_fw) }}">yes</span>
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">{{ 'panel.yes'|trans({}, _td) }}</span>
                         {% else %}
-                            <span class="{{ ui.badge(null, _css_fw) }}">no</span>
+                            <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">{{ 'panel.no'|trans({}, _td) }}</span>
                         {% endif %}
                     </td>
-                    <td>
-                        <div class="{{ ui.row_actions(_css_fw) }}">
+                    <td class="w-0 px-2 py-3 text-end whitespace-nowrap">
+                        <div class="inline-flex max-w-full items-center justify-end gap-1 {{ _display == 'icon' ? '' : 'flex-wrap' }} nowo-ui-row-actions nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}" aria-label="{{ 'panel.col.actions'|trans({}, _td) }}">
                             <a
-                                class="{{ ui.action('edit', _css_fw) }}"
                                 href="{{ path_prefix }}/edit/{{ row.id }}"
-                                title="{{ 'panel.edit'|trans({}, 'NowoRoutingKitBundle') }}"
-                                aria-label="{{ 'panel.edit'|trans({}, 'NowoRoutingKitBundle') }}"
-                            >{{ 'panel.edit'|trans({}, 'NowoRoutingKitBundle') }}</a>
+                                class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} no-underline"
+                                title="{{ _label_edit }}"
+                                aria-label="{{ _label_edit }}"
+                            >
+                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'edit', label: _label_edit} only %}
+                            </a>
                             {% if delete_forms[row.id] is defined %}
                                 {{ form_start(delete_forms[row.id], {
                                     action: path_prefix ~ '/delete/' ~ row.id,
                                     method: 'POST',
                                     attr: {
-                                        class: 'nowo-ui-row-actions__form',
-                                        onsubmit: "return confirm('Delete this path definition?');",
+                                        class: 'inline',
+                                        'data-confirm': 'panel.delete_confirm'|trans({}, _td),
+                                        onsubmit: 'return confirm(this.dataset.confirm);',
                                     },
                                 }) }}
                                     {{ form_rest(delete_forms[row.id]) }}
                                     <button
                                         type="submit"
-                                        class="{{ ui.action('delete', _css_fw) }}"
-                                        title="{{ 'panel.delete'|trans({}, 'NowoRoutingKitBundle') }}"
-                                        aria-label="{{ 'panel.delete'|trans({}, 'NowoRoutingKitBundle') }}"
-                                    >{{ 'panel.delete'|trans({}, 'NowoRoutingKitBundle') }}</button>
+                                        class="btn-danger {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}"
+                                        title="{{ _label_delete }}"
+                                        aria-label="{{ _label_delete }}"
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'delete', label: _label_delete} only %}
+                                    </button>
                                 {{ form_end(delete_forms[row.id], {render_rest: false}) }}
                             {% endif %}
                         </div>
@@ -86,39 +98,47 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="{{ ui.muted(_css_fw) }}">{{ 'panel.empty'|trans({}, 'NowoRoutingKitBundle') }}</td>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="6">{{ 'panel.empty'|trans({}, _td) }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-    </div>
 
-    {% include 'kit/_pagination.html.twig' with {
-        page: page,
-        pages: pages,
-        total: total,
-        page_size: page_size,
-        item_count: definitions|length,
-        route: 'nowo_routing_kit_panel',
-        route_params: {},
-        query: {},
-        framework: _css_fw,
-    } %}
+        {% if definitions is not empty %}
+            {% include 'kit/_pagination.html.twig' with {
+                page: page,
+                pages: pages,
+                total: total,
+                page_size: page_size,
+                item_count: definitions|length,
+                route: 'nowo_routing_kit_panel',
+                route_params: {},
+                query: {},
+                framework: _css_fw,
+            } %}
+        {% endif %}
+    </section>
 
-    <section class="nowo-ui-form-wrap card mt-6">
-        <div class="card-body">
-            <h2 class="h5 nowo-ui-section-title">Import (signed JSON)</h2>
+    <dialog class="nowo-ui-modal confirm-dialog" id="modal-routing-import" aria-labelledby="modal-routing-import-label">
+        <div class="confirm-dialog__panel">
+            <div class="confirm-dialog__header">
+                <h2 class="confirm-dialog__title" id="modal-routing-import-label">{{ 'panel.import_title'|trans({}, _td) }}</h2>
+                <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'panel.cancel'|trans({}, _td) }}"></button>
+            </div>
             {{ form_start(import_form, {
                 action: path_prefix ~ '/import',
                 method: 'POST',
-                attr: {class: 'nowo-ui-form nowo-ui-form--stack'},
+                attr: {class: 'kit-modal__panel'},
             }) }}
-                {{ form_row(import_form.payload_json) }}
-                {{ form_row(import_form.replace_all) }}
-                <div class="nowo-ui-form-actions">
-                    <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">Import</button>
+                <div class="confirm-dialog__content">
+                    {{ form_row(import_form.payload_json, {label: 'panel.import_payload'|trans({}, _td)}) }}
+                    {{ form_row(import_form.replace_all, {label: 'panel.import_replace_all'|trans({}, _td)}) }}
+                </div>
+                <div class="confirm-dialog__actions">
+                    <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'panel.cancel'|trans({}, _td) }}</button>
+                    <button type="submit" class="btn-primary">{{ 'panel.import'|trans({}, _td) }}</button>
                 </div>
             {{ form_end(import_form) }}
         </div>
-    </section>
+    </dialog>
 {% endblock %}

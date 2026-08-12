@@ -1,0 +1,4 @@
+# Host overrides — table column labels for kit admin lists.
+
+dashboard:
+  table_items: Items

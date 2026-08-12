@@ -568,7 +568,40 @@ initTheme();
 initContentWidth();
 initSidebar();
 initColorHexLabels();
+initThemePreviews();
 initBreadcrumbInlineEdit();
+
+/** Paint appearance theme cards without inline style attributes (CSP style-src). */
+function initThemePreviews(): void {
+  document.querySelectorAll<HTMLElement>('.js-theme-preview').forEach((root) => {
+    const paper = root.dataset.paper;
+    const surface = root.dataset.surface;
+    const ink = root.dataset.ink;
+    const accent = root.dataset.accent;
+    if (paper) {
+      root.style.background = paper;
+    }
+    const surfaceEl = root.querySelector<HTMLElement>('.js-theme-preview-surface');
+    if (surfaceEl) {
+      if (surface) {
+        surfaceEl.style.background = surface;
+      }
+      if (ink) {
+        surfaceEl.style.color = ink;
+      }
+    }
+    root.querySelectorAll<HTMLElement>('.js-theme-preview-accent').forEach((el) => {
+      if (accent) {
+        el.style.background = accent;
+      }
+    });
+    root.querySelectorAll<HTMLElement>('.js-theme-preview-ink').forEach((el) => {
+      if (ink) {
+        el.style.background = ink;
+      }
+    });
+  });
+}
 
 function initColorHexLabels(): void {
   document.querySelectorAll<HTMLInputElement>('input[type="color"]').forEach((input) => {

@@ -4,6 +4,12 @@ framework:
     messenger:
         failure_transport: failed
 
+        # JSON + HMAC signatures (via AsMessageHandler sign: true) — avoid PHP native unserialize gadgets
+        # and forged ProcessEnvelopeMessage rows in the Doctrine queue. Drain async queues before deploy
+        # when switching from native PHP serialization.
+        serializer:
+            default_serializer: messenger.transport.symfony_serializer
+
         transports:
             # Envelope / OTLP ingest drain — isolated from outbound side effects.
             async_ingest:

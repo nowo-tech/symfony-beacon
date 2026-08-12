@@ -65,6 +65,25 @@ nowo_form_kit:
             translation_domain: NowoHttpLogBundle
             auto_placeholder: false
             auto_help: false
+            # Kit admin is Tailwind + UiKit; nowo-ui-input remaps slate/blue → Beacon moss under .kit-admin.
+            defaults:
+                attr:
+                    class: 'nowo-ui-input block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm'
+                row_attr:
+                    class: 'flex flex-col gap-2 min-w-0'
+            field_types:
+                textarea:
+                    attr:
+                        class: 'nowo-ui-input block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm'
+                        rows: 3
+                checkbox:
+                    attr:
+                        class: 'checkbox'
+                    row_attr:
+                        class: 'flex items-center gap-2'
+                choice:
+                    attr:
+                        class: 'nowo-ui-input block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm'
 
         # CookieConsent FormKit forms label keys live in NowoCookieConsentBundle, not messages.
         cookie_consent:

@@ -25,7 +25,7 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
         $canonical = new Issue();
         $canonical->setProject($project);
         $canonical->setFingerprint(hash('sha256', 'workflow-canonical'));
-        $canonical->setTitle('Canonical issue');
+        $canonical->setTitle('Workflow duplicate canonical issue');
         $canonical->setCulprit('demo');
         $canonical->setLevel('error');
         $canonical->setFirstSeen(new DateTimeImmutable());
@@ -35,7 +35,7 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
         $duplicate = new Issue();
         $duplicate->setProject($project);
         $duplicate->setFingerprint(hash('sha256', 'workflow-duplicate'));
-        $duplicate->setTitle('Duplicate candidate');
+        $duplicate->setTitle('Workflow duplicate candidate issue');
         $duplicate->setCulprit('demo');
         $duplicate->setLevel('error');
         $duplicate->setFirstSeen(new DateTimeImmutable());
@@ -55,31 +55,71 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form.issue-status-actions__form input[name$="[status]"]');
         self::assertSelectorExists('form.issue-priority-form');
         self::assertSelectorExists('[data-testid="issue-comments"]');
         self::assertSelectorExists('[data-testid="mark-duplicate"]');
+        self::assertSelectorExists('[data-testid="similar-issues"] form');
 
-        $priorityToken = $crawler->filter('form.issue-priority-form input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/priority', [
-            '_token' => $priorityToken,
-            'priority' => IssuePriority::Critical->value,
+        $statusForm = $crawler->filter('form.issue-status-actions__form')->first()->form([
+            'issue_status[status]' => IssueStatus::Resolved->value,
         ]);
+        $client->submit($statusForm);
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());
+        $client->followRedirect();
+        self::assertSelectorTextContains('.issue-badge--status', 'Resolved');
+
+        $em->clear();
+        /** @var Issue $reloaded */
+        $reloaded = $em->getRepository(Issue::class)->find($duplicate->getId());
+        self::assertSame(IssueStatus::Resolved, $reloaded->getStatus());
+
+        $crawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
+        );
+        $statusForm = $crawler->filter('form.issue-status-actions__form')->first()->form([
+            'issue_status[status]' => IssueStatus::Unresolved->value,
+        ]);
+        $client->submit($statusForm);
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());
+        $client->followRedirect();
+        self::assertSelectorTextContains('.issue-badge--status', 'Unresolved');
+
+        $em->clear();
+        $reloaded = $em->getRepository(Issue::class)->find($duplicate->getId());
+        self::assertSame(IssueStatus::Unresolved, $reloaded->getStatus());
+
+        $crawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
+        );
+        $priorityForm = $crawler->filter('form.issue-priority-form')->form([
+            'issue_priority[priority]' => IssuePriority::Critical->value,
+        ]);
+        $client->submit($priorityForm);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('.issue-badge--priority', 'Critical');
 
         $em->clear();
-        /** @var Issue $reloaded */
         $reloaded = $em->getRepository(Issue::class)->find($duplicate->getId());
         self::assertSame(IssuePriority::Critical, $reloaded->getPriority());
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?priority=critical');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('body', 'Duplicate candidate');
+        self::assertSelectorTextContains('body', 'Workflow duplicate candidate issue');
 
+        $crawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
+        );
+        $priorityToken = $crawler->filter('form.issue-priority-form input[name$="[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/priority', [
-            '_token' => $priorityToken,
-            'priority' => 'not-a-priority',
+            'issue_priority' => [
+                '_token' => $priorityToken,
+                'priority' => 'not-a-priority',
+            ],
         ]);
         self::assertResponseRedirects();
         $em->clear();
@@ -111,26 +151,26 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
-        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/duplicate', [
-            '_token' => $dupToken,
-            'canonical_uuid' => $duplicate->getUuid(),
+        $duplicateForm = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel')->form([
+            'issue_duplicate[canonical_uuid]' => $duplicate->getUuid(),
         ]);
+        $client->submit($duplicateForm);
         self::assertResponseRedirects();
         $em->clear();
         $reloaded = $em->getRepository(Issue::class)->find($duplicate->getId());
         self::assertNull($reloaded->getDuplicateOf());
         self::assertSame(IssueStatus::Unresolved, $reloaded->getStatus());
 
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/duplicate', [
-            '_token' => $dupToken,
-            'canonical_uuid' => $canonical->getUuid(),
-        ]);
+        $crawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
+        );
+        $quickDuplicateForm = $crawler->filter('[data-testid="similar-issues"] form')->first()->form();
+        $client->submit($quickDuplicateForm);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());
         $client->followRedirect();
         self::assertSelectorExists('[data-testid="duplicate-of"]');
-        self::assertSelectorTextContains('[data-testid="duplicate-of"]', 'Canonical issue');
+        self::assertSelectorTextContains('[data-testid="duplicate-of"]', 'Workflow duplicate canonical issue');
 
         $em->clear();
         $reloaded = $em->getRepository(Issue::class)->find($duplicate->getId());
@@ -139,16 +179,15 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues?priority=critical&status=ignored');
         self::assertResponseIsSuccessful();
-        $viewToken = $crawler->filter('form[action*="/issues/views"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/views', [
-            '_token' => $viewToken,
-            'name' => 'Critical ignored',
-            'priority' => 'critical',
-            'status' => 'ignored',
-            'sort' => 'last_seen',
-            'dir' => 'desc',
-            'per_page' => '25',
+        $viewForm = $crawler->filter('form[action$="/issues/views"]')->form([
+            'issue_saved_view[name]' => 'Critical ignored',
+            'issue_saved_view[priority]' => 'critical',
+            'issue_saved_view[status]' => 'ignored',
+            'issue_saved_view[sort]' => 'last_seen',
+            'issue_saved_view[dir]' => 'desc',
+            'issue_saved_view[per_page]' => '25',
         ]);
+        $client->submit($viewForm);
         self::assertResponseRedirects();
         $client->followRedirect();
 
@@ -168,7 +207,9 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
         self::assertStringContainsString('status=ignored', $location);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
-        $deleteToken = $crawler->filter('form[action*="/delete"] input[name="_token"]')->attr('value');
+        $deleteToken = $crawler->filter('form[action$="/issues/views/'.$views[0]->getUuid().'/delete"] input')->reduce(
+            static fn ($node): bool => str_contains((string) $node->attr('name'), '_token')
+        )->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/views/'.$views[0]->getUuid().'/delete', [
             '_token' => $deleteToken,
         ]);
@@ -246,13 +287,11 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
-        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/duplicate', [
-            '_token' => $dupToken,
-            'canonical_uuid' => $canonical->getUuid(),
-            'merge_events' => '1',
+        $duplicateForm = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel')->form([
+            'issue_duplicate[canonical_uuid]' => $canonical->getUuid(),
+            'issue_duplicate[merge_events]' => '1',
         ]);
+        $client->submit($duplicateForm);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$canonical->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Events merged into the canonical issue');

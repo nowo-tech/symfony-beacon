@@ -57,6 +57,24 @@
   --color-warn: var(--beacon-warn);
   --color-surface: var(--beacon-surface);
   --color-surface-muted: var(--beacon-surface-muted);
+  /* Remap UiKit tokens (nowo-ui.css loads before app) so kit modals stay Beacon. */
+  --nowo-ui-primary: var(--beacon-moss);
+  --nowo-ui-primary-contrast: #ffffff;
+  --nowo-ui-danger: var(--beacon-alert);
+  --nowo-ui-danger-text: var(--beacon-alert);
+  --nowo-ui-danger-bg: var(--beacon-flash-error-bg);
+  --nowo-ui-danger-border: var(--beacon-flash-error-border);
+  --nowo-ui-danger-text-strong: var(--beacon-alert);
+  --nowo-ui-success-bg: var(--beacon-flash-ok-bg);
+  --nowo-ui-success-border: var(--beacon-flash-ok-border);
+  --nowo-ui-success-text: var(--beacon-flash-ok-text);
+  --nowo-ui-surface: var(--beacon-surface);
+  --nowo-ui-surface-muted: var(--beacon-mist);
+  --nowo-ui-border: var(--beacon-sand);
+  --nowo-ui-border-strong: var(--beacon-sand);
+  --nowo-ui-text: var(--beacon-ink);
+  --nowo-ui-muted: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  --nowo-ui-radius: var(--beacon-radius-control, 0.375rem);
 }
 
 [data-theme="dark"] {
@@ -94,6 +112,24 @@
   --color-warn: var(--beacon-warn);
   --color-surface: var(--beacon-surface);
   --color-surface-muted: var(--beacon-surface-muted);
+  /* Beat UiKit [data-theme=dark] slate-blue (#0f172a / #60a5fa). */
+  --nowo-ui-primary: var(--beacon-moss);
+  --nowo-ui-primary-contrast: #0c1210;
+  --nowo-ui-danger: var(--beacon-alert);
+  --nowo-ui-danger-text: var(--beacon-alert);
+  --nowo-ui-danger-bg: var(--beacon-flash-error-bg);
+  --nowo-ui-danger-border: var(--beacon-flash-error-border);
+  --nowo-ui-danger-text-strong: var(--beacon-alert);
+  --nowo-ui-success-bg: var(--beacon-flash-ok-bg);
+  --nowo-ui-success-border: var(--beacon-flash-ok-border);
+  --nowo-ui-success-text: var(--beacon-flash-ok-text);
+  --nowo-ui-surface: var(--beacon-surface);
+  --nowo-ui-surface-muted: var(--beacon-mist);
+  --nowo-ui-border: var(--beacon-sand);
+  --nowo-ui-border-strong: var(--beacon-sand);
+  --nowo-ui-text: var(--beacon-ink);
+  --nowo-ui-muted: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  --nowo-ui-radius: var(--beacon-radius-control, 0.375rem);
 }
 
 @layer base {

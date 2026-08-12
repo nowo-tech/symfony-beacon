@@ -1,0 +1,39 @@
+{# Host: modal menu create/edit — Beacon confirm-dialog content + footer actions. #}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{% set _section_focus = section_focus|default('') %}
+{% set _show_definition = form.definition is defined and (_section_focus == '' or _section_focus == 'basic') %}
+{% set _show_config = form.config is defined and (_section_focus == 'config' or (_section_focus == '' and is_edit|default(false))) %}
+{{ form_start(form, { attr: { class: 'kit-modal__panel dm-dashboard-form' } }) }}
+    {% if _section_focus != '' %}
+        <input type="hidden" name="_section" value="{{ _section_focus }}">
+    {% endif %}
+    <div class="confirm-dialog__content">
+        {% if _show_definition %}
+            <div id="menu_definition_section" class="flex flex-col gap-3">
+                <p class="kit-modal__section">{{ 'form.menu_type.section_definition'|trans({}, 'NowoDashboardMenuBundle') }}</p>
+                {% for field in form.definition %}
+                    {{ form_row(field) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if _show_config %}
+            <div id="menu_config_section" class="flex flex-col gap-3">
+                {% if _show_definition %}<hr class="my-1 border-[var(--color-sand)]">{% endif %}
+                <p class="kit-modal__section">{{ 'form.menu_type.section_config'|trans({}, 'NowoDashboardMenuBundle') }}</p>
+                {% for field in form.config %}
+                    {% if field.vars.name == 'classMenu' %}
+                        <hr class="my-1 border-[var(--color-sand)]">
+                        <p class="kit-modal__section">{{ 'form.menu_type.css_section_heading'|trans({}, 'NowoDashboardMenuBundle') }}</p>
+                    {% endif %}
+                    {{ form_row(field) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="confirm-dialog__actions">
+        <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans({}, 'NowoDashboardMenuBundle') }}</button>
+        <button type="submit" class="btn-primary">{{ (is_edit|default(false) ? 'dashboard.update' : 'dashboard.create')|trans({}, 'NowoDashboardMenuBundle') }}</button>
+    </div>
+{{ form_end(form) }}

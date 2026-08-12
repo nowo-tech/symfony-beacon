@@ -1,7 +1,8 @@
 # nowo-tech/http-log-bundle — HTTP request/response audit log + admin UI
 # https://github.com/nowo-tech/HttpLogBundle
 #
-# Host shell only: kit/http_log_admin_layout.html.twig — do not fork admin/*.twig.
+# Host shell: kit/http_log_admin_layout.html.twig
+# List/detail chrome: templates/bundles/NowoHttpLogBundle/admin/ (Beacon panel + text row actions).
 nowo_http_log:
     enabled: true
     environments: []

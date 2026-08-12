@@ -133,7 +133,7 @@
             <div class="grid gap-3 pt-1">
                 <p class="text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.export_help'|trans }}</p>
                 <div>
-                    <a class="btn-primary no-underline" href="{{ path('admin_projects_export') }}">{{ 'admin_projects.config.export_all'|trans }}</a>
+                    <a class="btn-primary no-underline" href="{{ path('admin_projects_export') }}" data-testid="admin-projects-config-download">{{ 'admin_projects.config.export_all'|trans }}</a>
                 </div>
             </div>
         </div>
@@ -148,18 +148,17 @@
             class="hidden"
             hidden
         >
-            <div class="grid gap-3 pt-1">
+            <div class="grid gap-3 pt-1" data-testid="admin-projects-config-import">
                 <p class="text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.import_help'|trans }}</p>
-                <form method="post" action="{{ path('admin_projects_import') }}" enctype="multipart/form-data" class="grid gap-3 sm:max-w-md">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_projects_import') }}">
+                {{ form_start(importForm, {attr: {class: 'grid gap-3 sm:max-w-md', 'data-testid': 'admin-projects-config-import-form'}}) }}
                     <label class="grid gap-1.5">
                         <span class="text-sm font-medium text-[var(--color-ink)]">{{ 'admin_projects.config.file'|trans }}</span>
-                        <input class="input" type="file" name="bundle" accept="application/json,.json" required>
+                        {{ form_widget(importForm.bundle, {attr: {class: 'input', accept: 'application/json,.json', 'data-testid': 'admin-projects-config-file'}}) }}
                     </label>
                     <div>
-                        <button class="btn-primary" type="submit">{{ 'admin_projects.config.import'|trans }}</button>
+                        <button class="btn-primary" type="submit" data-testid="admin-projects-config-import-submit">{{ 'admin_projects.config.import'|trans }}</button>
                     </div>
-                </form>
+                {{ form_end(importForm) }}
                 <p class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.config.note'|trans }}</p>
             </div>
         </div>

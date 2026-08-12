@@ -1,0 +1,119 @@
+{# Host rewrite: Beacon chrome for sortable reorder; Sortable payload / kit JS unchanged.
+   Header CTAs + row_actions_display (btn-sm btn-label in text mode). #}
+{% extends '@NowoDashboardMenuBundle/dashboard/base.html.twig' %}
+{% import '@NowoDashboardMenuBundle/dashboard/_sortable_tree_macro.html.twig' as sortable %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _td = 'NowoDashboardMenuBundle' %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
+{% set _show = dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show') %}
+
+{% block dashboard_title %}{{ 'dashboard.menu'|trans({}, _td) }}: {{ menu.code }} — {{ 'dashboard.sortable_page_heading'|trans({}, _td) }}{% endblock %}
+
+{% set kit_admin_header_actions %}
+    <a href="{{ path(_show, {id: menu.id}) }}" class="btn-ghost no-underline">{{ 'dashboard.back_to_items_table'|trans({}, _td) }}</a>
+    <a
+        href="{{ path(dashboard_routes.export_menu|default('nowo_dashboard_menu_dashboard_export_menu'), {id: menu.id}) }}"
+        class="btn-ghost no-underline"
+        target="_blank"
+        rel="noopener noreferrer"
+    >{{ 'dashboard.export'|trans({}, _td) }}</a>
+    <button
+        type="button"
+        class="btn-ghost btn-copy-menu"
+        data-id="{{ menu.id }}"
+        data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), {id: menu.id}) }}"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-menu-copy', _css_fw)|raw }}
+    >{{ 'dashboard.copy'|trans({}, _td) }}</button>
+    <button
+        type="button"
+        class="btn-ghost btn-edit-menu"
+        data-id="{{ menu.id }}"
+        data-section="basic"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+        title="{{ 'dashboard.edit_identity'|trans({}, _td) }}"
+    >{{ 'dashboard.edit_menu'|trans({}, _td) }}</button>
+    {% if not menu.base %}
+        {% set _label_config = 'dashboard.edit_config'|trans({}, _td) %}
+        <button
+            type="button"
+            class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-menu btn-edit-menu-config"
+            data-id="{{ menu.id }}"
+            data-section="config"
+            {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+            {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+            title="{{ _label_config }}"
+            aria-label="{{ _label_config }}"
+        >
+            {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'config', label: _label_config} only %}
+        </button>
+    {% endif %}
+    <button
+        type="button"
+        class="btn-primary btn-add-item"
+        data-id="{{ menu.id }}"
+        data-parent=""
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+    >{{ 'dashboard.add_item'|trans({}, _td) }}</button>
+{% endset %}
+
+{% block body %}
+    {% if menu.permissionChecker or menu.depthLimit is not null or menu.collapsible is not null or menu.collapsibleExpanded is not null or menu.nestedCollapsible is not null or menu.nestedCollapsibleSections is not null %}
+        <section class="panel mb-4 text-sm text-[var(--color-ink)]/75">
+            {% if menu.permissionChecker %}<strong>{{ 'dashboard.permission_checker'|trans({}, _td) }}:</strong> <code>{{ menu.permissionChecker }}</code>{% endif %}
+            {% if menu.depthLimit is not null %} {% if menu.permissionChecker %}·{% endif %} <strong>{{ 'dashboard.depth_limit'|trans({}, _td) }}:</strong> {{ menu.depthLimit }}{% endif %}
+            {% if menu.collapsible is not null %} · <strong>{{ 'dashboard.collapsible'|trans({}, _td) }}:</strong> {{ menu.collapsible ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.collapsibleExpanded is not null %} · <strong>{{ 'dashboard.collapsible_expanded'|trans({}, _td) }}:</strong> {{ menu.collapsibleExpanded ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.nestedCollapsible is not null %} · <strong>{{ 'dashboard.nested_collapsible'|trans({}, _td) }}:</strong> {{ menu.nestedCollapsible ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.nestedCollapsibleSections is not null %} · <strong>{{ 'form.menu_type.nested_collapsible_sections.label'|trans({}, _td) }}:</strong> {{ menu.nestedCollapsibleSections ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+        </section>
+    {% endif %}
+
+    {% set currentLocale = app.request.locale|default('en') %}
+    {% if items_tree is not defined or items_tree is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">
+            {{ 'dashboard.no_items'|trans({}, _td) }}
+            <button
+                type="button"
+                class="btn-ghost btn-sm align-baseline btn-add-item"
+                data-id="{{ menu.id }}"
+                data-parent=""
+                {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+            >{{ 'dashboard.add_one'|trans({}, _td) }}</button>.
+        </p>
+    {% else %}
+        <section class="panel" data-testid="dashboard-menu-sortable">
+            <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-sand)] pb-3">
+                <h3 class="text-base font-semibold">{{ 'dashboard.sortable_title'|trans({}, _td) }}</h3>
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'dashboard.sortable_help'|trans({}, _td) }}</p>
+            </div>
+            <div id="nowo-menu-sortable-root">
+                <ul class="nowo-menu-sortable-list mb-0 list-none p-0" data-parent-id="">
+                    {{ sortable.sortable_items(items_tree, currentLocale) }}
+                </ul>
+            </div>
+            <form
+                id="nowo-menu-sortable-form"
+                method="post"
+                action="{{ path(dashboard_routes.items_reorder_tree|default('nowo_dashboard_menu_dashboard_items_reorder_tree'), {id: menu.id}) }}"
+                class="mt-4"
+            >
+                <input type="hidden" name="_token" value="{{ csrf_token('reorder_tree_' ~ menu.id) }}">
+                <input type="hidden" name="tree" id="nowo-menu-sortable-payload" value="">
+                <button type="submit" class="btn-primary">{{ 'dashboard.sortable_apply'|trans({}, _td) }}</button>
+            </form>
+        </section>
+    {% endif %}
+
+    <script>
+    window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
+        baseUrl: {{ path(dashboard_show_route|default(_show), {id: menu.id})|json_encode|raw }},
+        menuId: {{ menu.id }},
+        debug: {{ app.debug ? 'true' : 'false' }}
+    });
+    </script>
+{% endblock %}

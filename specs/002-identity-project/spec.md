@@ -124,4 +124,11 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 
 - Disabled user creation for admin project-config import lives in Identity `PortableUserProvisioner` (not Project). Batch email lookup: `UserRepository::findIndexedByEmails`. Details: `089-project-config-export` N+1 amendment.
 
+## Amendment (session + cookie consent, 2026-08-11)
+
+- Session cookie name: `beacon.session_cookie_name` → `SYMFONY_BEACON_SESSID` by default (`087`).
+- Session without Remember me: **1 day**; Remember me: **30 days** (AuthKit + firewall lifetimes aligned).
+- Cookie Consent modal: public-only `render_routes` whitelist (`081` Cookie Consent amendment); not on authenticated product shells.
+- Locale switch / guest locale POSTs: Symfony `csrf_action_form()` (`090`).
+
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

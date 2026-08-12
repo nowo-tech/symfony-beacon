@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Ops\Controller;
 
+use App\Ops\Form\AdminOpsOverviewFilterType;
 use App\Project\Repository\ProjectRepository;
 use App\Ops\Service\OpsOverviewService;
+use App\Shared\Form\GetFilterFormFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +21,7 @@ final class AdminOpsOverviewController extends AbstractController
     public function __construct(
         private readonly OpsOverviewService $opsOverviewService,
         private readonly ProjectRepository $projectRepository,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -31,8 +34,20 @@ final class AdminOpsOverviewController extends AbstractController
             $filterProject = $this->projectRepository->findOneBy(['uuid' => $projectFilter]);
         }
 
+        $overview = $this->opsOverviewService->build($filterProject);
+        $projectChoices = [];
+        foreach ($overview['projects'] as $project) {
+            $projectChoices[$project->getName()] = $project->getUuid();
+        }
+
         return $this->render('admin/ops/overview.html.twig', [
-            'overview' => $this->opsOverviewService->build($filterProject),
+            'overview' => $overview,
+            'filterForm' => $this->getFilterFormFactory->create(AdminOpsOverviewFilterType::class, [
+                'project' => $projectFilter,
+            ], [
+                'action' => $this->generateUrl('admin_ops_overview'),
+                'project_choices' => $projectChoices,
+            ])->createView(),
         ]);
     }
 }

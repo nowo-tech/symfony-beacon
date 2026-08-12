@@ -1,93 +1,191 @@
+{# Host rewrite: Beacon Administration list chrome; kit JS/modals/routes unchanged.
+   Row actions: btn-ghost/btn-danger + _action_inner (nowo_ui_kit.row_actions_display). #}
 {% extends '@NowoDashboardMenuBundle/dashboard/base.html.twig' %}
 {% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
-{% import '@NowoDashboardMenuBundle/dashboard/_icons.html.twig' as icons %}
+{% set _td = 'NowoDashboardMenuBundle' %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
+{% set _index = dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index') %}
+{% set _show = dashboard_show_route|default(dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show')) %}
 
-{% block dashboard_title %}{{ 'dashboard.menus'|trans({}, 'NowoDashboardMenuBundle') }}{% endblock %}
+{% block dashboard_title %}{{ 'dashboard.menus'|trans({}, _td) }}{% endblock %}
+
+{# Administration pattern: primary/secondary CTAs sit with the page header, not under the filter. #}
+{% set kit_admin_header_actions %}
+    <a
+        href="{{ path(dashboard_routes.export_all|default('nowo_dashboard_menu_dashboard_export_all')) }}"
+        class="btn-ghost no-underline"
+        target="_blank"
+        rel="noopener noreferrer"
+    >{{ 'dashboard.export_all'|trans({}, _td) }}</a>
+    <button
+        type="button"
+        class="btn-ghost btn-import"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-import', _css_fw)|raw }}
+        data-import-url="{{ path(dashboard_routes.import|default('nowo_dashboard_menu_dashboard_import')) }}"
+    >{{ 'dashboard.import'|trans({}, _td) }}</button>
+    <button
+        type="button"
+        class="btn-primary"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-menu-new', _css_fw)|raw }}
+    >{{ 'dashboard.new_menu'|trans({}, _td) }}</button>
+{% endset %}
 
 {% block body %}
-    <form method="get" action="{{ path(dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index')) }}" class="{{ ui.search_form() }}" role="search">
-        <input type="search" name="q" value="{{ search|e('html_attr') }}" class="{{ ui.search_input() }}" placeholder="{{ 'dashboard.search_placeholder'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.search'|trans({}, 'NowoDashboardMenuBundle') }}" autocomplete="off">
-        <button type="submit" class="{{ ui.btn('secondary') }}">{{ 'dashboard.filter'|trans({}, 'NowoDashboardMenuBundle') }}</button>
-        <a href="{{ path(dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index')) }}" class="{{ ui.btn('secondary') }}">{{ 'dashboard.clear_filters'|trans({}, 'NowoDashboardMenuBundle') }}</a>
-    </form>
+    {% set searchForm = search_query_form(path(_index), search, {
+        class: 'input min-w-56 flex-1',
+        placeholder: 'dashboard.search_placeholder'|trans({}, _td),
+        'aria-label': 'dashboard.search'|trans({}, _td),
+        autocomplete: 'off'
+    }) %}
+    {{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap gap-2', role: 'search'}}) }}
+        {{ form_widget(searchForm.q) }}
+        <button type="submit" class="btn-ghost">{{ 'dashboard.filter'|trans({}, _td) }}</button>
+        <a href="{{ path(_index) }}" class="btn-ghost no-underline">{{ 'dashboard.clear_filters'|trans({}, _td) }}</a>
+    {{ form_end(searchForm) }}
 
-    <div class="{{ ui.toolbar() }}">
-        <a href="{{ path(dashboard_routes.export_all|default('nowo_dashboard_menu_dashboard_export_all')) }}" class="{{ ui.btn('secondary') }}" target="_blank" rel="noopener noreferrer">{{ 'dashboard.export_all'|trans({}, 'NowoDashboardMenuBundle') }}</a>
-        <button type="button" class="{{ ui.btn('secondary') }} btn-import" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-import')|raw }} data-import-url="{{ path(dashboard_routes.import|default('nowo_dashboard_menu_dashboard_import')) }}">{{ 'dashboard.import'|trans({}, 'NowoDashboardMenuBundle') }}</button>
-        <button type="button" class="{{ ui.btn('primary') }}" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-menu-new')|raw }}>{{ 'dashboard.new_menu'|trans({}, 'NowoDashboardMenuBundle') }}</button>
-    </div>
-
-    {% if menus|length == 0 %}
-        <p class="{{ ui.empty() }}">{{ 'dashboard.no_menus_yet'|trans({}, 'NowoDashboardMenuBundle') }}</p>
-    {% else %}
-        <ul class="{{ ui.list() }}">
+    <section class="panel overflow-x-auto" data-testid="dashboard-menu-menus-table">
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                    <th class="px-2 py-2 font-medium">{{ 'dashboard.table_code'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'dashboard.table_name'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'dashboard.table_items'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'dashboard.table_context'|trans({}, _td) }}</th>
+                    <th class="w-0 px-2 py-2 text-end font-medium whitespace-nowrap">{{ 'dashboard.actions'|trans({}, _td) }}</th>
+                </tr>
+            </thead>
+            <tbody>
             {% for menu in menus %}
-                <li class="{{ ui.list_item() }}">
-                    <div>
-                        {% if menu.icon %}<span class="{{ ui.muted() }} me-1" title="{{ menu.icon }}">🔣</span>{% endif %}
-                        <strong>{{ menu.code }}</strong>
-                        {% set _itemsCount = menu_item_counts[menu.id]|default(0) %}
-                        <span class="{{ ui.badge() }}" title="{{ _itemsCount }}">{{ _itemsCount }}</span>
-                        {% if menu.base %}<span class="{{ ui.badge() }}" title="{{ 'dashboard.base_badge_title'|trans({}, 'NowoDashboardMenuBundle') }}">{{ 'dashboard.base'|trans({}, 'NowoDashboardMenuBundle') }}</span>{% endif %}
-                        {% if menu.name %}<span class="{{ ui.muted() }}"> — {{ menu.name }}</span>{% endif %}
+                {% set _itemsCount = menu_item_counts[menu.id]|default(0) %}
+                {% set _label_items = 'dashboard.edit_items'|trans({}, _td) %}
+                {% set _label_copy = 'dashboard.copy'|trans({}, _td) %}
+                {% set _label_edit = 'dashboard.edit_identity'|trans({}, _td) %}
+                {% set _label_config = 'dashboard.edit_config'|trans({}, _td) %}
+                {% set _label_delete = 'dashboard.delete'|trans({}, _td) %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                    <td class="px-2 py-3">
+                        <a class="font-medium no-underline" href="{{ path(_show, {id: menu.id}) }}"><code>{{ menu.code }}</code></a>
+                        {% if menu.base %}
+                            <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]" title="{{ 'dashboard.base_badge_title'|trans({}, _td) }}">{{ 'dashboard.base'|trans({}, _td) }}</span>
+                        {% endif %}
+                        {% if menu.icon %}
+                            <div class="mt-0.5 text-xs text-[var(--color-ink)]/55" title="{{ menu.icon }}">{{ menu.icon }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ menu.name|default('—') }}</td>
+                    <td class="px-2 py-3">
+                        <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">{{ _itemsCount }}</span>
+                    </td>
+                    <td class="px-2 py-3 text-xs text-[var(--color-ink)]/55">
                         {% if menu.context is defined and menu.context is iterable and menu.context is not empty %}
-                            <br><span class="small {{ ui.muted() }}">{{ 'dashboard.context'|trans({}, 'NowoDashboardMenuBundle') }}: {{ menu.context|keys|join(', ') }}</span>
+                            {{ menu.context|keys|join(', ') }}
+                        {% else %}
+                            —
                         {% endif %}
-                    </div>
-                    <div class="{{ ui.row_actions() }}">
-                        <a href="{{ path(dashboard_show_route|default(dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show')), {id: menu.id}) }}" class="{{ ui.action('view') }}" title="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_items'|trans({}, 'NowoDashboardMenuBundle') }}">
-                            {{ icons.items()|raw }}
-                        </a>
-                        <button type="button" class="{{ ui.action('edit') }} btn-copy-menu" data-id="{{ menu.id }}" data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), {id: menu.id}) }}" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-menu-copy')|raw }} title="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.copy'|trans({}, 'NowoDashboardMenuBundle') }}">
-                            {{ icons.copy()|raw }}
-                        </button>
-                        <button type="button" class="{{ ui.action('edit') }} btn-edit-menu" data-id="{{ menu.id }}" data-section="basic" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-menu-form')|raw }} title="{{ 'dashboard.edit_identity'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_identity'|trans({}, 'NowoDashboardMenuBundle') }}">
-                            {{ icons.edit()|raw }}
-                        </button>
-                        {% if not menu.base %}
-                            <button type="button" class="{{ ui.action('edit') }} btn-edit-menu btn-edit-menu-config" data-id="{{ menu.id }}" data-section="config" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-menu-form')|raw }} title="{{ 'dashboard.edit_config'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.edit_config'|trans({}, 'NowoDashboardMenuBundle') }}">
-                                {{ icons.config()|raw }}
+                    </td>
+                    <td class="w-0 px-2 py-3 text-end whitespace-nowrap">
+                        <div class="inline-flex max-w-full items-center justify-end gap-1 {{ _display == 'icon' ? '' : 'flex-wrap' }} nowo-ui-row-actions nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}">
+                            <a
+                                href="{{ path(_show, {id: menu.id}) }}"
+                                class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}"
+                                title="{{ _label_items }}"
+                                aria-label="{{ _label_items }}"
+                            >
+                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'view', label: _label_items} only %}
+                            </a>
+                            <button
+                                type="button"
+                                class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-copy-menu"
+                                data-id="{{ menu.id }}"
+                                data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), {id: menu.id}) }}"
+                                {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                {{ ui.modal_target_attr('modal-menu-copy', _css_fw)|raw }}
+                                title="{{ _label_copy }}"
+                                aria-label="{{ _label_copy }}"
+                            >
+                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'copy', label: _label_copy} only %}
                             </button>
-                        {% endif %}
-                        {% if not menu.base %}
-                            <button type="button" class="{{ ui.action('delete') }} btn-delete-menu" data-id="{{ menu.id }}" data-name="{{ menu.code }}{% if menu.name %} — {{ menu.name }}{% endif %}" data-url="{{ path(dashboard_routes.menu_delete|default('nowo_dashboard_menu_dashboard_menu_delete'), {id: menu.id}) }}" data-token="{{ csrf_token('delete_menu_' ~ menu.id) }}" {{ ui.modal_toggle_attrs()|raw }} {{ ui.modal_target_attr('modal-delete-confirm')|raw }} title="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}" aria-label="{{ 'dashboard.delete'|trans({}, 'NowoDashboardMenuBundle') }}">
-                                {{ icons.trash()|raw }}
+                            <button
+                                type="button"
+                                class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-menu"
+                                data-id="{{ menu.id }}"
+                                data-section="basic"
+                                {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+                                title="{{ _label_edit }}"
+                                aria-label="{{ _label_edit }}"
+                            >
+                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'edit', label: _label_edit} only %}
                             </button>
-                        {% endif %}
-                    </div>
-                </li>
+                            {% if not menu.base %}
+                                <button
+                                    type="button"
+                                    class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-menu btn-edit-menu-config"
+                                    data-id="{{ menu.id }}"
+                                    data-section="config"
+                                    {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                    {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+                                    title="{{ _label_config }}"
+                                    aria-label="{{ _label_config }}"
+                                >
+                                    {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'config', label: _label_config} only %}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn-danger {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-delete-menu"
+                                    data-id="{{ menu.id }}"
+                                    data-name="{{ menu.code }}{% if menu.name %} — {{ menu.name }}{% endif %}"
+                                    data-url="{{ path(dashboard_routes.menu_delete|default('nowo_dashboard_menu_dashboard_menu_delete'), {id: menu.id}) }}"
+                                    data-token="{{ csrf_token('delete_menu_' ~ menu.id) }}"
+                                    {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                    {{ ui.modal_target_attr('modal-delete-confirm', _css_fw)|raw }}
+                                    title="{{ _label_delete }}"
+                                    aria-label="{{ _label_delete }}"
+                                >
+                                    {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'delete', label: _label_delete} only %}
+                                </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="5">{{ 'dashboard.no_menus_yet'|trans({}, _td) }}</td>
+                </tr>
             {% endfor %}
-        </ul>
-        {% if pagination is not null %}
+            </tbody>
+        </table>
+
+        {% if pagination is not null and menus|length > 0 %}
             {% include 'kit/_pagination.html.twig' with {
                 pagination: pagination,
                 item_count: menus|length,
-                route: dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index'),
+                route: _index,
                 route_params: {},
                 query: search is not empty ? {q: search} : {},
                 nav_label: 'pagination.nav',
             } %}
         {% endif %}
-    {% endif %}
+    </section>
 
-    {# Modal: New menu (inline form) #}
-    <div class="modal fade nowo-ui-modal" id="modal-menu-new" tabindex="-1" aria-labelledby="modal-menu-new-label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable {{ modal_classes.menu_form|default('') }}">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-menu-new-label">{{ 'dashboard.new_menu'|trans({}, 'NowoDashboardMenuBundle') }}</h5>
-                    <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs()|raw }} aria-label="{{ 'dashboard.close'|trans({}, 'NowoDashboardMenuBundle') }}"></button>
-                </div>
-                <div class="modal-body">
-                    {{ include('@NowoDashboardMenuBundle/dashboard/_menu_form_partial.html.twig', {form: new_menu_form, is_edit: false}) }}
-                </div>
+    <dialog class="nowo-ui-modal confirm-dialog" id="modal-menu-new" aria-labelledby="modal-menu-new-label">
+        <div class="confirm-dialog__panel">
+            <div class="confirm-dialog__header">
+                <h2 class="confirm-dialog__title" id="modal-menu-new-label">{{ 'dashboard.new_menu'|trans({}, _td) }}</h2>
+                <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans({}, _td) }}"></button>
+            </div>
+            <div class="kit-modal__body">
+                {{ include('@NowoDashboardMenuBundle/dashboard/_menu_form_partial.html.twig', {form: new_menu_form, is_edit: false}) }}
             </div>
         </div>
-    </div>
+    </dialog>
 
     <script>
     window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
-        dashboardBase: {{ path(dashboard_routes.index|default('nowo_dashboard_menu_dashboard_index'))|json_encode|raw }}
+        dashboardBase: {{ path(_index)|json_encode|raw }}
     });
     </script>
 {% endblock %}

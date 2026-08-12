@@ -62,8 +62,8 @@ As a project owner, I can hand ownership to another direct member and become a *
 
 - **FR-001**: Danger zone on **project Settings** with Clear history, Transfer ownership, and Delete project (`project_clear_history`, `project_transfer_ownership`, `project_delete`).
 - **FR-002**: Destructive / ownership actions open warning modals (native `<dialog>` via Stimulus `confirm-dialog`). Typed-confirm dialogs that collect fields (delete / transfer) SHOULD use structured chrome (`header_wrapper` + `content_wrapper`) per `086` FR-003b; body-only confirms may stay flat.
-- **FR-003**: Delete and transfer require CSRF + exact project name confirmation server-side.
-- **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`).
+- **FR-003**: Delete and transfer require CSRF + exact project name confirmation server-side. Delete POST MUST use `ProjectDeleteType` (Symfony Form / FormKit) per `090`.
+- **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`). Clear POST MUST use `ProjectClearHistoryType` per `090`.
 - **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
 - **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to **full** (`ProjectMembershipManager::transferOwnership`); MUST require primary project owner (`ProjectAccessService::requirePrimaryOwner()` — exact `Owner`, not rank).
 - **FR-007**: Settings (and Admin → Projects) MUST NOT show edit-role or remove controls on membership rows whose role is `owner`. Changing primary ownership MUST go through Transfer ownership (FR-006), not member role CRUD. Deactivating membership (`089`) MUST NOT deactivate the last **active** owner (same last-owner guard family as remove/demote).
@@ -74,3 +74,7 @@ As a project owner, I can hand ownership to another direct member and become a *
 - **SC-001**: Owner can clear history, transfer ownership, and delete with typed name; non-owners cannot delete or transfer; actors without `project.settings.manage` cannot clear; owner member rows have no edit/remove controls.
 - **SC-002**: Cancelling a modal leaves data unchanged.
 - **SC-003**: Covered by `tests/Functional/Project/ProjectDangerZoneTest.php` / `tests/Functional/Project/ProjectMembersTest.php` (or equivalent).
+
+## Amendment (Symfony Forms, 2026-08-11)
+
+Clear history and delete project POSTs use `ProjectClearHistoryType` / `ProjectDeleteType` instead of hand-rolled Twig `csrf_token()` forms. Transfer may retain confirm-dialog field collection until migrated under `090`. See `090-csrf-symfony-forms`.

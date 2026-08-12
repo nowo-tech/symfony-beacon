@@ -1,0 +1,24 @@
+{# Host override: Beacon shared tabs (same chrome as Appearance / roles). #}
+{% set route = app.request.attributes.get('_route')|default('') %}
+{% set config_id = config.id|default(app.request.attributes.get('configId')) %}
+{% if config_id %}
+    {% set on_cookies = route starts with 'nowo_cookie_consent_cookie_definitions_' %}
+    {% set on_settings = route starts with 'nowo_cookie_consent_config_settings_' %}
+    {% include 'shared/_tabs.html.twig' with {
+        aria_label: 'nowo_cookie_consent.admin.area_nav.label'|trans({}, 'NowoCookieConsentBundle'),
+        nav_class: 'mb-4 nowo-ui-tabs--area',
+        attr: {'data-turbo': 'false', 'data-testid': 'cookie-consent-area-tabs'},
+        items: [
+            {
+                label: 'nowo_cookie_consent.admin.area_nav.settings'|trans({}, 'NowoCookieConsentBundle'),
+                href: path('nowo_cookie_consent_config_settings_edit', {configId: config_id}),
+                current: on_settings,
+            },
+            {
+                label: 'nowo_cookie_consent.admin.area_nav.cookies'|trans({}, 'NowoCookieConsentBundle'),
+                href: path('nowo_cookie_consent_cookie_definitions_index', {configId: config_id}),
+                current: on_cookies,
+            },
+        ],
+    } only %}
+{% endif %}

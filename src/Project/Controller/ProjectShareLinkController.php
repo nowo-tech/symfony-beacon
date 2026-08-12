@@ -9,10 +9,12 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
+use App\Project\Form\ProjectShareCreateType;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectShareLinkManager;
+use App\Shared\Form\CsrfOnlyType;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use RuntimeException;
@@ -91,25 +93,25 @@ final class ProjectShareLinkController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_share_create', $request->request->getString('_token'))) {
+        $form = $this->createForm(ProjectShareCreateType::class, null, [
+            'csrf_token_id' => 'project_share_create',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.share.invalid_csrf');
 
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
-        $days = max(1, min(30, $request->request->getInt('days', 7)));
+        /** @var array{days?: int|null, max_uses?: int|null, issue_uuid?: string|null} $data */
+        $data = $form->getData();
+        $days = max(1, min(30, (int) ($data['days'] ?? 7)));
         $expiresAt = new DateTimeImmutable(\sprintf('+%d days', $days));
-        $maxUsesRaw = trim($request->request->getString('max_uses'));
-        $maxUses = null;
-        if ('' !== $maxUsesRaw) {
-            if (!ctype_digit($maxUsesRaw) || (int) $maxUsesRaw < 1) {
-                $this->addFlash('error', 'projects.share.max_uses_invalid');
-
-                return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
-            }
-            $maxUses = min(10_000, (int) $maxUsesRaw);
+        $maxUses = $data['max_uses'] ?? null;
+        if (null !== $maxUses) {
+            $maxUses = min(10_000, (int) $maxUses);
         }
-        $issueUuid = trim($request->request->getString('issue_uuid'));
+        $issueUuid = trim((string) ($data['issue_uuid'] ?? ''));
         $issue = null;
         if ('' !== $issueUuid) {
             $issue = $this->issueRepository->findOneBy(['uuid' => $issueUuid, 'project' => $project]);
@@ -147,7 +149,11 @@ final class ProjectShareLinkController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_share_revoke', $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'project_share_revoke',
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.share.invalid_csrf');
 
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);

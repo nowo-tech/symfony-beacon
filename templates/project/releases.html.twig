@@ -29,26 +29,15 @@
         </aside>
 
         <div class="space-y-6">
-            <form method="get" class="panel space-y-4">
+            {{ form_start(releaseFilterForm, {attr: {class: 'panel space-y-4'}}) }}
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="release-select">{{ 'releases.focus.label'|trans }}</label>
-                        <select id="release-select" class="input w-full" name="release">
-                            {% for release in releases %}
-                                <option value="{{ release }}" {% if release == selected_release %}selected{% endif %}>{{ release }}</option>
-                            {% endfor %}
-                        </select>
+                        {{ form_widget(releaseFilterForm.release, {attr: {id: 'release-select', class: 'input w-full'}}) }}
                     </div>
                     <div>
                         <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="compare-select">{{ 'releases.compare.label'|trans }}</label>
-                        <select id="compare-select" class="input w-full" name="compare">
-                            <option value="">{{ 'releases.compare.none'|trans }}</option>
-                            {% for release in releases %}
-                                {% if release != selected_release %}
-                                    <option value="{{ release }}" {% if release == compare_release %}selected{% endif %}>{{ release }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                        {{ form_widget(releaseFilterForm.compare, {attr: {id: 'compare-select', class: 'input w-full'}}) }}
                         <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'releases.compare.help'|trans }}</p>
                     </div>
                 </div>
@@ -56,7 +45,7 @@
                     <button class="btn-primary" type="submit">{{ 'releases.focus.submit'|trans }}</button>
                     <a class="btn-ghost no-underline" href="{{ path('project_releases', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
                 </div>
-            </form>
+            {{ form_end(releaseFilterForm, {render_rest: false}) }}
 
             {% if selected_release %}
                 <section class="panel">
@@ -116,23 +105,20 @@
             <section class="panel">
                 <h2 class="mb-2 text-lg font-semibold">{{ 'releases.environment_compare.title'|trans }}</h2>
                 <p class="mb-3 text-sm text-[var(--color-ink)]/65">{{ 'releases.environment_compare.help'|trans }}</p>
-                <form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="grid gap-3 sm:grid-cols-3">
-                    <input type="hidden" name="status" value="">
-                    {% if selected_release %}
-                        <input type="hidden" name="release" value="{{ selected_release }}">
-                    {% endif %}
+                {{ form_start(environmentCompareForm, {attr: {class: 'grid gap-3 sm:grid-cols-3'}}) }}
                     <div>
                         <label class="mb-1 block text-xs uppercase tracking-wide text-[var(--color-ink)]/60" for="env-a">{{ 'releases.environment_compare.environment_a'|trans }}</label>
-                        <input id="env-a" class="input w-full" name="environment" value="{{ environment_a }}" placeholder="production">
+                        {{ form_widget(environmentCompareForm.environment, {attr: {id: 'env-a', class: 'input w-full'}}) }}
                     </div>
                     <div>
                         <label class="mb-1 block text-xs uppercase tracking-wide text-[var(--color-ink)]/60" for="env-b">{{ 'releases.environment_compare.environment_b'|trans }}</label>
-                        <input id="env-b" class="input w-full" name="compare" value="{{ environment_b }}" placeholder="staging">
+                        {{ form_widget(environmentCompareForm.compare, {attr: {id: 'env-b', class: 'input w-full'}}) }}
                     </div>
                     <div class="flex items-end">
                         <button class="btn-primary" type="submit">{{ 'releases.environment_compare.open_issue_list'|trans }}</button>
                     </div>
-                </form>
+                    {{ form_rest(environmentCompareForm) }}
+                {{ form_end(environmentCompareForm, {render_rest: false}) }}
             </section>
         </div>
     </div>

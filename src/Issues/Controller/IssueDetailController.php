@@ -10,6 +10,10 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Form\IssueAssigneeType;
+use App\Issues\Form\IssueCommentType;
+use App\Issues\Form\IssueDuplicateType;
+use App\Issues\Form\IssuePriorityType;
+use App\Issues\Form\IssueStatusType;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueCommentRepository;
 use App\Issues\Repository\IssueHistoryEntryRepository;
@@ -93,6 +97,42 @@ final class IssueDetailController extends AbstractController
         $comments = $this->commentRepository->findLatestForIssue($issue);
         $duplicateCandidates = $this->issueRepository->findDuplicateCandidates($project, $issue);
         $similarIssues = $this->issueRepository->findSimilarIssues($issue);
+        $statusForms = [];
+        foreach (IssueStatus::cases() as $status) {
+            if ($issue->getStatus() === $status) {
+                continue;
+            }
+
+            $statusForms[$status->value] = $this->createForm(IssueStatusType::class, [
+                'status' => $status->value,
+            ], [
+                'action' => $this->generateUrl('issue_status', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'issue_status',
+            ])->createView();
+        }
+        $priorityForm = $this->createForm(IssuePriorityType::class, [
+            'priority' => $issue->getPriority()->value,
+        ], [
+            'action' => $this->generateUrl('issue_priority', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
+            'method' => 'POST',
+            'csrf_token_id' => 'issue_priority',
+        ]);
+        $quickDuplicateForms = [];
+        foreach ($similarIssues as $similarIssue) {
+            $quickDuplicateForms[$similarIssue->getId()] = $this->createForm(IssueDuplicateType::class, [
+                'canonical_uuid' => $similarIssue->getUuid(),
+            ], [
+                'action' => $this->generateUrl('issue_mark_duplicate', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'issue_duplicate',
+            ])->createView();
+        }
+        $duplicateDialogForm = $this->createForm(IssueDuplicateType::class, null, [
+            'action' => $this->generateUrl('issue_mark_duplicate', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
+            'method' => 'POST',
+            'csrf_token_id' => 'issue_duplicate',
+        ]);
 
         return $this->render('issue/show.html.twig', [
             'project' => $project,
@@ -105,7 +145,17 @@ final class IssueDetailController extends AbstractController
             'comments' => $comments,
             'duplicateCandidates' => $duplicateCandidates,
             'similarIssues' => $similarIssues,
-            'priorities' => IssuePriority::cases(),
+            'statusForms' => $statusForms,
+            'priorityForm' => $priorityForm->createView(),
+            'quickDuplicateForms' => $quickDuplicateForms,
+            'duplicateDialogForm' => $duplicateDialogForm->createView(),
+            'commentForm' => $this->createForm(IssueCommentType::class, [
+                'body' => '',
+            ], [
+                'action' => $this->generateUrl('issue_comment_add', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'issue_comment',
+            ])->createView(),
             'can_triage' => $access->canTriageIssues(),
         ]);
     }
@@ -177,8 +227,12 @@ final class IssueDetailController extends AbstractController
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);
+        $form = $this->createForm(IssueStatusType::class, null, [
+            'csrf_token_id' => 'issue_status',
+        ]);
+        $form->handleRequest($request);
 
-        if (!$this->isCsrfTokenValid('issue_status', $request->request->getString('_token'))) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'issues.status_invalid');
 
             return $this->redirectToRoute('issue_show', [
@@ -187,7 +241,8 @@ final class IssueDetailController extends AbstractController
             ]);
         }
 
-        $next = IssueStatus::tryFrom($request->request->getString('status'));
+        $data = $form->getData();
+        $next = IssueStatus::tryFrom((string) ((\is_array($data) ? $data['status'] : null) ?? ''));
         if (!$next instanceof IssueStatus) {
             $this->addFlash('error', 'issues.status_invalid');
 
@@ -223,14 +278,19 @@ final class IssueDetailController extends AbstractController
         $this->projectAccess->requireTriage($project, $user);
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
+        $form = $this->createForm(IssuePriorityType::class, null, [
+            'csrf_token_id' => 'issue_priority',
+        ]);
+        $form->handleRequest($request);
 
-        if (!$this->isCsrfTokenValid('issue_priority', $request->request->getString('_token'))) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'issues.priority_invalid');
 
             return $this->redirectToRoute('issue_show', $showParams);
         }
 
-        $next = IssuePriority::tryFrom($request->request->getString('priority'));
+        $data = $form->getData();
+        $next = IssuePriority::tryFrom((string) ((\is_array($data) ? $data['priority'] : null) ?? ''));
         if (!$next instanceof IssuePriority) {
             $this->addFlash('error', 'issues.priority_invalid');
 
@@ -277,13 +337,19 @@ final class IssueDetailController extends AbstractController
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
 
-        if (!$this->isCsrfTokenValid('issue_comment', $request->request->getString('_token'))) {
+        $form = $this->createForm(IssueCommentType::class, null, [
+            'csrf_token_id' => 'issue_comment',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'issues.comment_invalid');
 
             return $this->redirectToRoute('issue_show', $showParams);
         }
 
-        $body = trim($request->request->getString('body'));
+        /** @var array{body?: string|null} $data */
+        $data = $form->getData();
+        $body = trim((string) ($data['body'] ?? ''));
         try {
             $this->issueCommentCreator->create($issue, $user, $body);
             $this->addFlash('success', 'issues.comment_saved');
@@ -314,14 +380,19 @@ final class IssueDetailController extends AbstractController
         $this->projectAccess->requireTriage($project, $user);
 
         $showParams = ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()];
+        $form = $this->createForm(IssueDuplicateType::class, null, [
+            'csrf_token_id' => 'issue_duplicate',
+        ]);
+        $form->handleRequest($request);
 
-        if (!$this->isCsrfTokenValid('issue_duplicate', $request->request->getString('_token'))) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'issues.duplicate_invalid');
 
             return $this->redirectToRoute('issue_show', $showParams);
         }
 
-        $canonicalUuid = trim($request->request->getString('canonical_uuid'));
+        $data = $form->getData();
+        $canonicalUuid = trim((string) ((\is_array($data) ? $data['canonical_uuid'] : null) ?? ''));
         if ('' === $canonicalUuid) {
             $this->addFlash('error', 'issues.duplicate_invalid');
 
@@ -354,7 +425,7 @@ final class IssueDetailController extends AbstractController
             return $this->redirectToRoute('issue_show', $showParams);
         }
 
-        $mergeEvents = $request->request->getBoolean('merge_events');
+        $mergeEvents = (bool) ((\is_array($data) ? $data['merge_events'] : null) ?? false);
         if ($mergeEvents) {
             try {
                 $moved = $this->issueMergeService->mergeIntoCanonical($issue, $canonical, $user);

@@ -98,6 +98,7 @@ test.describe('Project surfaces', () => {
       `/projects/${uuid}/export/issues.json`,
       `/projects/${uuid}/export/events.csv`,
       `/projects/${uuid}/export/events.json`,
+      `/projects/${uuid}/config/export`,
     ]) {
       const [download] = await Promise.all([
         page.waitForEvent('download', { timeout: 15_000 }).catch(() => null),
@@ -116,4 +117,12 @@ test.describe('Project surfaces', () => {
       await expect(page, path).not.toHaveURL(/\/login/);
     }
   });
+
+  test('project show overview renders for demo project', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await expectAuthenticatedPage(page, `/projects/${uuid}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('[data-tour="project-nav"]')).toBeVisible();
+  });
 });
+

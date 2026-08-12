@@ -5,8 +5,8 @@
 {% block body %}
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'social_login_settings.title'|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.intro'|trans }}</p>
+        <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'social_login_settings.title'|trans }}</h1>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'social_login_settings.intro'|trans }}</p>
     </div>
     <a class="btn-primary no-underline" href="{{ path('admin_social_login_new') }}" data-tour="admin-social-login-new">{{ 'social_login_settings.create'|trans }}</a>
 </div>
@@ -52,10 +52,13 @@
                         <td class="px-2 py-3">
                             <div class="flex flex-wrap items-center gap-2">
                                 <a class="btn-ghost no-underline" href="{{ path('admin_social_login_edit', {provider: credential.provider}) }}">{{ 'social_login_settings.edit'|trans }}</a>
-                                <form method="post" action="{{ path('admin_social_login_delete', {provider: credential.provider}) }}" onsubmit="return confirm({{ 'social_login_settings.delete_confirm'|trans|json_encode|raw }});">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_social_login_delete_' ~ credential.provider) }}">
+                                {{ form_start(deleteForms[credential.provider], {
+                                    attr: {
+                                        onsubmit: 'return confirm(' ~ ('social_login_settings.delete_confirm'|trans|json_encode|raw) ~ ');',
+                                    }
+                                }) }}
                                     <button class="btn-ghost" type="submit">{{ 'social_login_settings.delete'|trans }}</button>
-                                </form>
+                                {{ form_end(deleteForms[credential.provider]) }}
                             </div>
                         </td>
                     </tr>

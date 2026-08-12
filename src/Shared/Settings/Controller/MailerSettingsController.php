@@ -11,6 +11,7 @@ use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Mailer\ConfiguredMailer;
 use App\Shared\Mailer\MailerDsnAudit;
 use App\Shared\Settings\Form\InstanceMailerSettingsType;
+use App\Shared\Settings\Form\MailerTestType;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,13 +73,24 @@ final class MailerSettingsController extends AbstractController
             'envFallbackActive' => !$this->configuredMailer->isConfiguredFromDatabase(),
             'magicLoginAvailable' => $this->configuredMailer->isMagicLoginAvailable(),
             'defaultSampleTo' => $defaultSampleTo,
+            'mailerTestForm' => $this->createForm(MailerTestType::class, [
+                'to' => $defaultSampleTo,
+            ], [
+                'action' => $this->generateUrl('admin_mailer_test'),
+                'method' => 'POST',
+                'csrf_token_id' => 'mailer_sample',
+            ])->createView(),
         ]);
     }
 
     #[Route('/admin/mailer/test', name: 'admin_mailer_test', methods: ['POST'])]
     public function sendSample(Request $request): RedirectResponse
     {
-        if (!$this->isCsrfTokenValid('mailer_sample', $request->request->getString('_token'))) {
+        $form = $this->createForm(MailerTestType::class, null, [
+            'csrf_token_id' => 'mailer_sample',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -88,7 +100,9 @@ final class MailerSettingsController extends AbstractController
             return $this->redirectToRoute('admin_mailer');
         }
 
-        $to = trim($request->request->getString('to'));
+        /** @var array{to?: string|null} $data */
+        $data = $form->getData();
+        $to = trim((string) ($data['to'] ?? ''));
         if ('' === $to) {
             $user = $this->getUser();
             $to = $user instanceof User ? $user->getEmail() : '';

@@ -30,8 +30,13 @@ As a user, I can clear seen flags and replay from Display preferences (`/dashboa
 - **FR-002**: Auto-start per page when setup is complete and that page is not yet seen.
 - **FR-003**: Steps filtered by `ROLE_ADMIN` and `ProjectRole` capabilities.
 - **FR-004**: English UI strings; other locales at least EN copy.
+- **FR-005**: Replay / mark-seen POSTs from Account → Display → Tours MUST use `AccountProductTourReplayType` (Symfony Form), not a hand-rolled Twig CSRF form (`090`).
 
 ## Out of Scope
 
 - Tours for every secondary screen (performance/analytics detail).
 - Auto-start while the setup wizard is still pending.
+
+## Amendment (Symfony Forms, 2026-08-11)
+
+Tour replay POST is backed by `AccountProductTourReplayType`. See `090-csrf-symfony-forms`.

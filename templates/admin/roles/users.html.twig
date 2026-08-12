@@ -15,21 +15,25 @@
                     <div class="font-medium">{{ user.displayName }}</div>
                     <div class="text-xs text-[var(--color-ink)]/55">{{ user.email }}</div>
                 </div>
-                <form method="post" action="{{ path('admin_roles_users_remove', {id: role.uuid, userId: user.uuid}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_user_remove_' ~ role.id ~ '_' ~ user.id) }}">
+                {{ form_start(removeUserForms[user.id]) }}
                     <button class="btn-ghost" type="submit">{{ 'roles.remove_user'|trans }}</button>
-                </form>
+                {{ form_end(removeUserForms[user.id]) }}
             </li>
         {% else %}
             <li class="text-[var(--color-ink)]/55">{{ 'roles.users_empty'|trans }}</li>
         {% endfor %}
     </ul>
 
-    <form method="post" action="{{ path('admin_roles_users_add', {id: role.uuid}) }}" class="mt-4 flex flex-wrap gap-2">
-        <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_user_add_' ~ role.id) }}">
-        <input class="input min-w-56 flex-1" type="email" name="email" required placeholder="{{ 'roles.user_email_placeholder'|trans }}" autocomplete="off">
+    {{ form_start(addUserForm, {attr: {class: 'mt-4 flex flex-wrap gap-2'}}) }}
+        {{ form_widget(addUserForm.email, {
+            attr: {
+                class: 'input min-w-56 flex-1',
+                placeholder: 'roles.user_email_placeholder'|trans,
+                autocomplete: 'off',
+            }
+        }) }}
         <button class="btn-primary" type="submit">{{ 'roles.add_user'|trans }}</button>
-    </form>
+    {{ form_end(addUserForm) }}
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'roles.add_user_help'|trans }}</p>
 </section>
 {% endblock %}

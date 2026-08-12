@@ -97,13 +97,12 @@ final class IssueIndexAccessFunctionalTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('table.issue-table', 'Filtered error issue');
 
-        $token = $crawler->filter('form[action$="/issues/views"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/views', [
-            '_token' => $token,
-            'name' => 'Error unresolved',
-            'level' => 'error',
-            'status' => 'unresolved',
+        $saveViewForm = $crawler->filter('form[action$="/issues/views"]')->form([
+            'issue_saved_view[name]' => 'Error unresolved',
+            'issue_saved_view[level]' => 'error',
+            'issue_saved_view[status]' => 'unresolved',
         ]);
+        $client->submit($saveViewForm);
         self::assertResponseRedirects();
         $location = (string) $client->getResponse()->headers->get('Location');
         self::assertStringContainsString('level=error', $location);
@@ -125,12 +124,14 @@ final class IssueIndexAccessFunctionalTest extends DatabaseWebTestCase
         $crawler = $client->followRedirect();
         self::assertSelectorTextContains('table.issue-table', 'Filtered error issue');
 
-        $deleteToken = $crawler->filter('form[action$="/issues/views/'.$viewUuid.'/delete"] input[name="_token"]')->attr('value');
+        $deleteToken = $crawler->filter('form[action$="/issues/views/'.$viewUuid.'/delete"] input')->reduce(
+            static fn ($node): bool => str_contains((string) $node->attr('name'), '_token')
+        )->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/views/'.$viewUuid.'/delete', [
             '_token' => $deleteToken,
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');
-        $client->followRedirect();
+        $crawler = $client->followRedirect();
         self::assertSelectorTextNotContains('#saved-view-select', 'Error unresolved');
 
         $em->clear();

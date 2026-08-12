@@ -6,12 +6,17 @@ namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
 use App\Issues\Entity\IssueMention;
+use App\Issues\Form\DashboardMentionsFilterType;
+use App\Issues\Form\MentionsMarkAllReadType;
+use App\Issues\Form\MentionsMarkReadType;
 use App\Issues\Repository\IssueMentionRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,6 +32,7 @@ final class DashboardMentionsController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly IssueMentionRepository $mentionRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -50,16 +56,57 @@ final class DashboardMentionsController extends AbstractController
             $pagination['offset'],
         );
 
+        $unreadCount = $this->mentionRepository->countInboxForUser($user, $accessible, true);
+        $filters = [
+            'project' => $projectFilter?->getUuid() ?? '',
+            'unread' => $unreadOnly ? '1' : '',
+            'page' => 1,
+            'per_page' => $pagination['per_page'],
+        ];
+        $redirectQuery = array_filter(
+            [
+                'project' => $filters['project'],
+                'unread' => $filters['unread'],
+                'per_page' => (string) $filters['per_page'],
+            ],
+            static fn (string $value): bool => '' !== $value,
+        );
+
+        $markReadForms = [];
+        foreach ($mentions as $mention) {
+            if (!$mention->isUnread()) {
+                continue;
+            }
+            $markReadForms[$mention->getId()] = $this->createForm(MentionsMarkReadType::class, null, [
+                'csrf_token_id' => 'mention_read_'.$mention->getId(),
+                'redirect_query' => $redirectQuery,
+            ])->createView();
+        }
+
+        $projectChoices = [];
+        foreach ($accessible as $project) {
+            $projectChoices[$project->getName()] = $project->getUuid();
+        }
+
         return $this->render('dashboard/mentions.html.twig', [
             'mentions' => $mentions,
             'projects' => $accessible,
-            'filters' => [
-                'project' => $projectFilter?->getUuid() ?? '',
-                'unread' => $unreadOnly ? '1' : '',
+            'filters' => $filters,
+            'filterForm' => $this->getFilterFormFactory->create(DashboardMentionsFilterType::class, [
+                'project' => $filters['project'],
+                'unread' => '1' === $filters['unread'],
+                'page' => 1,
                 'per_page' => $pagination['per_page'],
-            ],
+            ], [
+                'action' => $this->generateUrl('dashboard_mentions'),
+                'project_choices' => $projectChoices,
+            ])->createView(),
             'pagination' => $pagination,
-            'unread_count' => $this->mentionRepository->countInboxForUser($user, $accessible, true),
+            'unread_count' => $unreadCount,
+            'markAllReadForm' => $unreadCount > 0
+                ? $this->createForm(MentionsMarkAllReadType::class)
+                : null,
+            'markReadForms' => $markReadForms,
         ]);
     }
 
@@ -68,7 +115,10 @@ final class DashboardMentionsController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$this->isCsrfTokenValid('mention_read_all', $request->request->getString('_token'))) {
+
+        $form = $this->createForm(MentionsMarkAllReadType::class);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -84,7 +134,12 @@ final class DashboardMentionsController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$this->isCsrfTokenValid('mention_read_'.$id, $request->request->getString('_token'))) {
+
+        $form = $this->createForm(MentionsMarkReadType::class, null, [
+            'csrf_token_id' => 'mention_read_'.$id,
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -96,20 +151,20 @@ final class DashboardMentionsController extends AbstractController
         $mention->markRead();
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('dashboard_mentions', $this->redirectQuery($request));
+        return $this->redirectToRoute('dashboard_mentions', $this->redirectQuery($form));
     }
 
     /**
      * @return array<string, scalar>
      */
-    private function redirectQuery(Request $request): array
+    private function redirectQuery(FormInterface $form): array
     {
         $query = [];
-        foreach (['project', 'unread', 'page', 'per_page'] as $key) {
-            $value = $request->request->getString($key);
-            if ('' === $value) {
-                $value = $request->query->getString($key);
+        foreach (['project', 'unread', 'per_page'] as $key) {
+            if (!$form->has($key)) {
+                continue;
             }
+            $value = (string) ($form->get($key)->getData() ?? '');
             if ('' !== $value) {
                 $query[$key] = $value;
             }

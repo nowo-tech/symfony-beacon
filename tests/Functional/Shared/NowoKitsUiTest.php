@@ -260,12 +260,16 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $user);
 
+        // User create is a confirm-dialog modal on the directory (same pattern as roles/permissions).
         $client->request(Request::METHOD_GET, '/admin/users/new');
+        self::assertResponseRedirects('/admin/users?new=1');
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.beacon-breadcrumb-wrap');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Administration');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Users');
-        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New user');
+        self::assertSelectorExists('[data-testid="admin-user-create"]');
+        self::assertSelectorExists('#user-create-dialog-title');
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
         self::assertResponseIsSuccessful();
@@ -274,10 +278,12 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New threshold rule');
 
         // Menu create/edit forms are kit modal partials (no app shell); seed still registers the routes.
+        // admin_users_new remains in the fixture for deep links / legacy crumbs even though GET redirects.
         $seededRoutes = self::getContainer()->get('doctrine')->getConnection()->fetchFirstColumn(
             'SELECT route_name FROM dashboard_breadcrumb_item ORDER BY route_name ASC',
         );
         foreach ([
+            'admin_users_new',
             'admin_users_activity',
             'project_notification_edit',
             'project_threshold_rule_edit',

@@ -32,11 +32,9 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Ops stats');
 
-        $token = $crawler->filter('form[action$="/ingest"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/ingest', [
-            '_token' => $token,
+        $client->submit($crawler->filter('form[action$="/ingest"]')->form([
             'enabled' => '0',
-        ]);
+        ]));
         self::assertResponseRedirects('/admin/projects/'.$project->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Ingest suspended');
@@ -56,11 +54,9 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         self::assertSame('ingest disabled', $client->getResponse()->getContent());
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
-        $token = $crawler->filter('form[action$="/ingest"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/ingest', [
-            '_token' => $token,
+        $client->submit($crawler->filter('form[action$="/ingest"]')->form([
             'enabled' => '1',
-        ]);
+        ]));
         self::assertResponseRedirects();
 
         $em->clear();
@@ -232,11 +228,9 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
 
         $this->login($client, $admin);
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
-        $token = $crawler->filter('form[action$="/view-as-member/enable"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/admin/view-as-member/enable', [
-            '_token' => $token,
+        $client->submit($crawler->filter('form[action$="/view-as-member/enable"]')->form([
             'redirect' => '/projects/'.$project->getUuid().'/settings',
-        ]);
+        ]));
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'viewing projects as a member');

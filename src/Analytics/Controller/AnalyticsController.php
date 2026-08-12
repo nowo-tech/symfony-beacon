@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Analytics\Controller;
 
 use App\Analytics\Dto\AnalyticsDayPoint;
+use App\Analytics\Form\AnalyticsFilterType;
 use App\Analytics\Service\AnalyticsPeriodResolver;
 use App\Analytics\Service\AnalyticsSeriesService;
 use App\Identity\Entity\User;
@@ -12,6 +13,7 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,6 +34,7 @@ final class AnalyticsController extends AbstractController
         private readonly AnalyticsSeriesService $seriesService,
         private readonly ProjectAccessService $projectAccess,
         private readonly UserActionRecorder $userActionRecorder,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -88,6 +91,16 @@ final class AnalyticsController extends AbstractController
             'period' => $resolved['period'],
             'from' => $resolved['from'],
             'to' => $resolved['to'],
+            'filterForm' => $this->getFilterFormFactory->create(AnalyticsFilterType::class, [
+                'from' => $resolved['from']->format('Y-m-d'),
+                'to' => $resolved['to']->format('Y-m-d'),
+                'period' => 'custom',
+                'environment' => $environment ?? '',
+                'release' => $release ?? '',
+                'level' => $level ?? '',
+            ], [
+                'action' => $this->generateUrl('analytics_show', ['id' => $project->getUuid()]),
+            ])->createView(),
             'environment' => $environment ?? '',
             'release' => $release ?? '',
             'level' => $level ?? '',

@@ -1,0 +1,24 @@
+{# Host override: kit page header already set; toolbar + panel table (no duplicate h1). #}
+{% extends '@NowoCookieConsentBundle/admin/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+
+{% block title %}{{ 'nowo_cookie_consent.admin.cookie_definition.title'|trans({'%profile%': config.displayName}, 'NowoCookieConsentBundle') }}{% endblock %}
+
+{% block body %}
+    {% include '@NowoCookieConsentBundle/admin/_admin_area_nav.html.twig' with {config: config} only %}
+
+    <div class="{{ ui.toolbar(_css_fw) }}">
+        <p class="{{ ui.muted(_css_fw) }} mb-0">
+            {{ 'nowo_cookie_consent.admin.cookie_definition.lead'|trans({}, 'NowoCookieConsentBundle') }}
+        </p>
+        <a class="btn-primary nowo-ui-action-create" href="{{ path('nowo_cookie_consent_cookie_definitions_new', {configId: config.id}) }}">
+            {{ 'nowo_cookie_consent.admin.cookie_definition.new'|trans({}, 'NowoCookieConsentBundle') }}
+        </a>
+    </div>
+
+    <div class="panel nowo-ui-table-wrap" data-testid="cookie-consent-definitions-table">
+        {% include '@NowoCookieConsentBundle/admin/cookie_definition/_table.html.twig' %}
+        {% include '@NowoCookieConsentBundle/admin/_pagination.html.twig' %}
+    </div>
+{% endblock %}

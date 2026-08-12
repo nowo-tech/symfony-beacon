@@ -120,26 +120,18 @@ MD, summary: 'Ingest a Beacon Envelope', security: [
     )]
     #[OA\Response(
         response: 401,
-        description: 'Missing authorization (no public key in header, query, or envelope DSN).',
+        description: 'Unauthorized — missing credentials, unknown project, inactive/mismatched key, or invalid secret (uniform body; no existence oracle).',
         content: new OA\MediaType(
             mediaType: 'text/plain',
-            schema: new OA\Schema(type: 'string', example: 'missing authorization information'),
+            schema: new OA\Schema(type: 'string', example: 'unauthorized'),
         ),
     )]
     #[OA\Response(
         response: 403,
-        description: 'Unknown/inactive key, project mismatch, or missing/invalid secret when the API key requires one.',
+        description: 'Authenticated but ingest is disabled for the project.',
         content: new OA\MediaType(
             mediaType: 'text/plain',
-            schema: new OA\Schema(type: 'string', example: 'forbidden'),
-        ),
-    )]
-    #[OA\Response(
-        response: 404,
-        description: 'Project UUID (or legacy numeric id) does not exist.',
-        content: new OA\MediaType(
-            mediaType: 'text/plain',
-            schema: new OA\Schema(type: 'string', example: 'project not found'),
+            schema: new OA\Schema(type: 'string', example: 'ingest disabled'),
         ),
     )]
     #[OA\Response(

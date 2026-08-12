@@ -11,7 +11,8 @@ security:
       pattern: ^/(_profiler|_wdt|assets|build)/
       security: false
     ingest:
-      pattern: ^/api/\d+/(envelope|otlp)
+      # INT (legacy) or UUID project ref — keep in sync with IngestRouteRequirements::PROJECT_REF
+      pattern: ^/api/(\d+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/(envelope|otlp)
       security: false
     read_api:
       pattern: ^/api/projects/
@@ -83,7 +84,7 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/locale/
       roles: PUBLIC_ACCESS
-    - path: ^/api/\d+/(envelope|otlp)
+    - path: ^/api/(\d+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/(envelope|otlp)
       roles: PUBLIC_ACCESS
     - path: ^/api/projects/
       roles: PUBLIC_ACCESS

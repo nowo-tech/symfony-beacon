@@ -1,29 +1,54 @@
 {# Host restyle for kit admin (UiKit nowo-ui.css + nowo_ui_kit: tailwind; remap --nowo-ui-*). #}
-<style>
+<style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
 /*
- * Page chrome (outside .kit-admin): title/intro match admin users/groups
- * (text-3xl + muted intro). Element+class > bare h1/p.
+ * Page chrome (outside .kit-admin): title/intro match panel page headers
+ * (text-2xl semibold + muted intro). Element+class > bare h1/p.
  */
 h1.kit-admin-page-header__title {
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.875rem;
-  font-weight: 700;
-  line-height: 2.25rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
   letter-spacing: normal;
   color: var(--color-ink, var(--beacon-ink));
   margin: 0;
 }
 
+/*
+ * Header burger lives outside .kit-admin. Kit pages must not let UiKit .nowo-ui-btn
+ * / dark --nowo-ui-primary (#60a5fa) recolor .app-sidebar-toggle.
+ */
+button.app-sidebar-toggle.nowo-ui-burger,
+button.app-sidebar-toggle {
+  border: 1px solid var(--color-sand, var(--beacon-sand)) !important;
+  background: color-mix(in srgb, var(--color-surface, var(--beacon-surface)) 85%, transparent) !important;
+  color: var(--color-ink, var(--beacon-ink)) !important;
+  box-shadow: none !important;
+}
+
+button.app-sidebar-toggle.nowo-ui-burger:hover,
+button.app-sidebar-toggle:hover {
+  border-color: color-mix(in srgb, var(--color-moss, var(--beacon-moss)) 40%, var(--color-sand, var(--beacon-sand))) !important;
+  background: var(--color-surface, var(--beacon-surface)) !important;
+  color: var(--color-ink, var(--beacon-ink)) !important;
+}
+
+button.app-sidebar-toggle.nowo-ui-burger:focus-visible,
+button.app-sidebar-toggle:focus-visible {
+  outline: 2px solid var(--color-moss, var(--beacon-moss)) !important;
+  outline-offset: 2px;
+}
+
 p.kit-admin-page-header__intro {
   margin: 0.25rem 0 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 400;
   line-height: 1.25rem;
-  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 65%, transparent);
+  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 55%, transparent);
 }
 
 /* —— Kit admin (Menus / Breadcrumbs) — type + control scale ——
- * Tokens also on .nowo-ui-modal: kit-admin.ts portals modals to <body>,
+ * Tokens also on .nowo-ui-modal: kit-admin.ts portals <dialog> modals to <body>,
  * so they leave .kit-admin and would otherwise keep UiKit slate/blue :root defaults.
  */
 .kit-admin,
@@ -74,9 +99,20 @@ p.kit-admin-page-header__intro {
 }
 
 [data-theme="dark"] .kit-admin,
-[data-theme="dark"] .nowo-ui-modal {
+[data-theme="dark"] .nowo-ui-modal,
+html[data-theme="dark"] .kit-admin,
+html[data-theme="dark"] .nowo-ui-modal {
   --bs-primary-rgb: 74, 173, 127;
+  --nowo-ui-primary: var(--beacon-moss);
   --nowo-ui-primary-contrast: #0c1210;
+  --nowo-ui-surface: var(--beacon-surface);
+  --nowo-ui-surface-muted: var(--beacon-mist);
+  --nowo-ui-border: var(--beacon-sand);
+  --nowo-ui-border-strong: var(--beacon-sand);
+  --nowo-ui-text: var(--beacon-ink);
+  --nowo-ui-muted: color-mix(in srgb, var(--beacon-ink) 55%, transparent);
+  --nowo-ui-danger: var(--beacon-alert);
+  --nowo-ui-danger-text: var(--beacon-alert);
 }
 
 .kit-admin .h1,
@@ -140,12 +176,33 @@ p.kit-admin-page-header__intro {
 }
 
 /* Textual compact buttons: auto width when not icon-only */
-.kit-admin .btn-sm.btn-label {
+.kit-admin .btn-sm.btn-label,
+.modal .btn-sm.btn-label,
+.kit-admin .nowo-ui-row-actions--text .btn-sm,
+.kit-admin .nowo-ui-row-actions--text .btn-ghost,
+.kit-admin .nowo-ui-row-actions--text .btn-danger,
+.kit-admin .nowo-ui-row-actions--text .btn-primary,
+.kit-admin .nowo-ui-row-actions--text .nowo-ui-action.nowo-ui-btn--sm,
+.kit-admin .nowo-ui-row-actions--text .nowo-ui-btn--sm,
+.modal .nowo-ui-row-actions--text .btn-sm,
+.modal .nowo-ui-row-actions--text .nowo-ui-action.nowo-ui-btn--sm {
   width: auto;
   min-width: 0;
   height: auto;
   min-height: var(--kit-btn-sm, 2rem);
   padding: 0.35rem 0.65rem !important;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* Text row-action clusters: keep chips on one line; table panel may scroll horizontally */
+.kit-admin .nowo-ui-row-actions--text,
+.kit-admin td .nowo-ui-row-actions--text {
+  flex-wrap: nowrap;
+  row-gap: 0.35rem;
+  column-gap: 0.35rem;
+  max-width: none;
+  justify-content: flex-end;
 }
 
 .kit-admin .btn-primary,
@@ -528,24 +585,68 @@ p.kit-admin-page-header__intro {
 
 /*
  * Kit modals (css_framework: tailwind): UiKit opens via .nowo-ui-modal-open (not Bootstrap .show).
- * kit-admin.ts portals .nowo-ui-modal to <body> — match Beacon .confirm-dialog chrome.
- * Specificity must beat vendor .nowo-ui-modal.nowo-ui-modal-open .modal-* (nowo-ui.css).
+ * Host overrides use <dialog class="nowo-ui-modal confirm-dialog"> with Beacon panel chrome:
+ *   confirm-dialog__panel > header + (content|kit-modal__body) + actions
+ * kit-admin.ts bridges class ↔ showModal()/close() and portals to <body>.
+ * Center like .confirm-dialog (inset:0 + fit-content + margin:auto).
  */
-.nowo-ui-modal.nowo-ui-modal-open {
+dialog.nowo-ui-modal {
+  border: none;
+  padding: 0;
+  margin: auto;
+  width: var(--cd-width, min(32rem, calc(100vw - 2rem)));
+  max-width: var(--cd-width, min(32rem, calc(100vw - 2rem)));
+  max-height: var(--cd-max-height, min(85vh, 40rem));
+  height: fit-content;
+  background: transparent;
+  color: var(--color-ink, var(--beacon-ink));
+}
+
+dialog.nowo-ui-modal:not([open]) {
+  display: none !important;
+}
+
+dialog.nowo-ui-modal::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+html[data-theme='dark'] dialog.nowo-ui-modal::backdrop {
+  background: rgb(0 0 0 / 0.68);
+}
+
+/* Legacy div-based kit modals (vendor Breadcrumb shells, etc.). */
+.nowo-ui-modal.nowo-ui-modal-open:not(dialog) {
   z-index: 1080;
   background: rgb(0 0 0 / 0.45);
   padding: 1.25rem;
   align-items: flex-start;
 }
 
-html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
+html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open:not(dialog) {
   background: rgb(0 0 0 / 0.68);
 }
 
+dialog.nowo-ui-modal.nowo-ui-modal-open,
+dialog.nowo-ui-modal[open] {
+  display: block !important;
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  width: var(--cd-width, min(32rem, calc(100vw - 2rem)));
+  max-width: var(--cd-width, min(32rem, calc(100vw - 2rem)));
+  height: fit-content;
+  max-height: var(--cd-max-height, min(85vh, 40rem));
+  margin: auto !important;
+  padding: 0;
+  overflow: visible;
+  background: transparent !important;
+}
+
 .nowo-ui-modal.nowo-ui-modal-open .modal-dialog {
-  /* Match Beacon .confirm-dialog default width (vendor defaults to 560px) */
+  /* Legacy div shells (vendor). */
   max-width: min(32rem, calc(100vw - 2rem));
   margin: auto;
+  width: 100%;
 }
 
 .nowo-ui-modal.nowo-ui-modal-open .modal-dialog.modal-lg {
@@ -556,22 +657,42 @@ html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
   max-width: min(56rem, calc(100vw - 2rem));
 }
 
-.nowo-ui-modal.nowo-ui-modal-open .modal-content {
+/* Beacon panel chrome inside kit <dialog> (and legacy .modal-content). */
+.nowo-ui-modal .confirm-dialog__panel,
+.nowo-ui-modal.nowo-ui-modal-open .modal-content,
+.nowo-ui-modal.nowo-ui-modal-open .modal-content.kit-modal__shell {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--cd-max-height, min(85vh, 40rem));
   border-radius: 0.75rem;
-  border: 1px solid var(--beacon-sand);
-  background: var(--beacon-surface);
-  color: var(--beacon-ink);
+  border: 1px solid var(--color-sand, var(--beacon-sand)) !important;
+  background: var(--color-surface, var(--beacon-surface)) !important;
+  color: var(--color-ink, var(--beacon-ink)) !important;
   box-shadow: 0 12px 40px rgb(var(--beacon-shadow) / 22%);
   overflow: hidden;
   font-size: var(--kit-font-body, 0.875rem);
 }
 
+.nowo-ui-modal .confirm-dialog__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nowo-ui-modal .confirm-dialog__header .confirm-dialog__title {
+  flex: 1;
+  min-width: 0;
+}
+
 .nowo-ui-modal.nowo-ui-modal-open .modal-header {
+  flex-shrink: 0;
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1.15rem 1.25rem 0.9rem;
-  border-bottom: 1px solid var(--beacon-sand);
-  background: color-mix(in srgb, var(--beacon-mist) 35%, var(--beacon-surface));
+  border-bottom: 1px solid var(--color-sand, var(--beacon-sand)) !important;
+  background: color-mix(in srgb, var(--color-mist, var(--beacon-mist)) 35%, var(--color-surface, var(--beacon-surface))) !important;
 }
 
 .nowo-ui-modal.nowo-ui-modal-open .modal-title {
@@ -581,63 +702,132 @@ html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: -0.01em;
-  color: var(--beacon-ink);
+  color: var(--color-ink, var(--beacon-ink)) !important;
 }
 
+.nowo-ui-modal .btn-close,
 .nowo-ui-modal.nowo-ui-modal-open .btn-close {
   margin: 0.1rem -0.15rem 0 0;
   padding: 0.45rem;
   border-radius: 0.3rem;
-  color: var(--beacon-ink);
+  color: var(--color-ink, var(--beacon-ink)) !important;
   opacity: 0.55;
+  flex-shrink: 0;
 }
 
+.nowo-ui-modal .btn-close:hover,
+.nowo-ui-modal .btn-close:focus-visible,
 .nowo-ui-modal.nowo-ui-modal-open .btn-close:hover,
 .nowo-ui-modal.nowo-ui-modal-open .btn-close:focus-visible {
   opacity: 1;
-  background: color-mix(in srgb, var(--beacon-mist) 55%, var(--beacon-surface));
+  background: color-mix(in srgb, var(--color-mist, var(--beacon-mist)) 55%, var(--color-surface, var(--beacon-surface))) !important;
 }
 
+/*
+ * Body slot hosts AJAX / inline forms: no padding — confirm-dialog__content / actions
+ * own spacing so the footer strip matches Roles create dialog.
+ */
+.nowo-ui-modal .kit-modal__body,
 .nowo-ui-modal.nowo-ui-modal-open .modal-body {
-  padding: 1.15rem 1.25rem 1.25rem;
-  color: var(--beacon-ink);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--color-ink, var(--beacon-ink)) !important;
+  background: var(--color-surface, var(--beacon-surface)) !important;
+}
+
+.nowo-ui-modal.nowo-ui-modal-open .modal-body.kit-modal__body--message {
+  padding: 1.15rem 1.25rem !important;
+  overflow: auto;
+}
+
+.nowo-ui-modal .kit-modal__body > .kit-modal__lead,
+.nowo-ui-modal.nowo-ui-modal-open .modal-body > .kit-modal__lead {
+  padding: 1.15rem 1.25rem;
 }
 
 .nowo-ui-modal.nowo-ui-modal-open .modal-footer {
-  padding: 0.9rem 1.25rem 1.15rem;
-  border-top: 1px solid var(--beacon-sand);
-  background: color-mix(in srgb, var(--beacon-mist) 25%, var(--beacon-surface));
-}
-
-.nowo-ui-modal .kit-modal__lead {
-  margin: 0 0 1rem;
-  font-size: var(--kit-font-body, 0.875rem);
-  line-height: 1.45;
-  color: color-mix(in srgb, var(--beacon-ink) 72%, transparent);
-}
-
-.nowo-ui-modal .kit-modal__actions,
-.nowo-ui-modal .kit-modal__actions-form .kit-modal__actions {
+  flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 0.25rem;
+  margin: 0;
+  padding: 0.9rem 1.25rem 1.15rem;
+  border-top: 1px solid var(--color-sand, var(--beacon-sand)) !important;
+  background: color-mix(in srgb, var(--color-mist, var(--beacon-mist)) 25%, var(--color-surface, var(--beacon-surface))) !important;
 }
 
-.nowo-ui-modal .modal-body > form,
-.nowo-ui-modal .modal-body form:not(.kit-modal__actions-form) {
+.nowo-ui-modal .kit-modal__footer-form {
   display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
 }
 
-.nowo-ui-modal .modal-body form > button.nowo-ui-btn--primary:last-child,
-.nowo-ui-modal .modal-body form > button.btn-primary:last-child,
-.nowo-ui-modal .modal-body form > button[type="submit"].nowo-ui-btn:last-child,
-.nowo-ui-modal .modal-body form > button[type="submit"].btn:last-child {
-  align-self: flex-end;
-  margin-top: 1.15rem;
+.nowo-ui-modal .kit-modal__panel,
+.nowo-ui-modal .kit-modal__body > form.kit-modal__panel,
+.nowo-ui-modal .kit-modal__body > form.dm-dashboard-form,
+.nowo-ui-modal .modal-body > form.kit-modal__panel,
+.nowo-ui-modal .modal-body > form.dm-dashboard-form,
+.nowo-ui-modal #modal-import-container,
+.nowo-ui-modal #modal-item-form-container,
+.nowo-ui-modal #modal-item-form-container > form.kit-modal__panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  gap: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.nowo-ui-modal #modal-import-container > form.kit-modal__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.nowo-ui-modal .kit-modal__lead {
+  margin: 0 0 0.35rem;
+  font-size: var(--kit-font-body, 0.875rem);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 70%, transparent);
+}
+
+.nowo-ui-modal .kit-modal__section {
+  margin: 0;
+  font-size: var(--kit-font-label, 0.8125rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 78%, transparent);
+}
+
+/* Reuse Beacon confirm-dialog metrics inside kit modals. */
+.nowo-ui-modal .confirm-dialog__content {
+  gap: 1.15rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.nowo-ui-modal .confirm-dialog__content > .flex.flex-col {
+  gap: 1.15rem;
+}
+
+.nowo-ui-modal .confirm-dialog__actions {
+  --cd-pad-x: 1.25rem;
+}
+
+.nowo-ui-modal .confirm-dialog__actions .btn-primary,
+.nowo-ui-modal .confirm-dialog__actions .btn-danger,
+.nowo-ui-modal .confirm-dialog__actions .btn-ghost,
+.nowo-ui-modal .modal-footer .btn-primary,
+.nowo-ui-modal .modal-footer .btn-danger,
+.nowo-ui-modal .modal-footer .btn-ghost {
   min-width: 7.5rem;
 }
 
@@ -651,7 +841,7 @@ html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
   margin-bottom: 0.35rem;
   font-size: var(--kit-font-label, 0.8125rem);
   font-weight: 500;
-  color: color-mix(in srgb, var(--beacon-ink) 78%, transparent);
+  color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 78%, transparent);
 }
 
 .nowo-ui-modal .input,
@@ -662,15 +852,22 @@ html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
 .nowo-ui-modal textarea,
 .nowo-ui-modal input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]):not([type="submit"]):not([type="button"]) {
   border-radius: var(--kit-btn-radius, 0.375rem);
-  background-color: var(--beacon-surface);
-  border: 1px solid var(--beacon-sand);
-  color: var(--beacon-ink);
+  background-color: var(--color-surface, var(--beacon-surface)) !important;
+  border: 1px solid var(--color-sand, var(--beacon-sand)) !important;
+  color: var(--color-ink, var(--beacon-ink)) !important;
   padding: 0.5rem 0.75rem;
   font-size: var(--kit-font-body, 0.875rem);
   min-height: 2.25rem;
   width: 100%;
   max-width: none;
   box-sizing: border-box;
+  accent-color: var(--color-moss, var(--beacon-moss));
+}
+
+.nowo-ui-modal input[type="checkbox"],
+.nowo-ui-modal input[type="radio"],
+.nowo-ui-modal .checkbox {
+  accent-color: var(--color-moss, var(--beacon-moss));
 }
 
 .nowo-ui-modal .input:focus,
@@ -681,8 +878,8 @@ html[data-theme='dark'] .nowo-ui-modal.nowo-ui-modal-open {
 .nowo-ui-modal textarea:focus,
 .nowo-ui-modal input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]):focus {
   outline: 0;
-  border-color: var(--beacon-moss);
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--beacon-moss) 20%, transparent);
+  border-color: var(--color-moss, var(--beacon-moss)) !important;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--color-moss, var(--beacon-moss)) 20%, transparent) !important;
 }
 
 .nowo-ui-modal .form-text,
@@ -835,7 +1032,20 @@ html[data-theme='dark'] .modal-backdrop {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.35rem;
+}
+
+/* Shrink actions column to content; keep controls end-aligned (Menus / kit tables). */
+.kit-admin table th.w-0,
+.kit-admin table td.w-0 {
+  width: 1%;
+}
+
+.kit-admin table td.w-0 > .inline-flex,
+.kit-admin table td.w-0 > [class*="nowo-ui-row-actions"] {
+  justify-content: flex-end;
+  margin-inline-start: auto;
 }
 
 .kit-admin .nowo-ui-badge,
@@ -921,19 +1131,33 @@ html[data-theme='dark'] .modal-backdrop {
 
 /* Colours from --nowo-ui-* on .kit-admin / .nowo-ui-modal; keep Beacon control metrics.
  * UiKit tailwind macros also emit bg-blue-600 / border-slate-* — force Beacon colours.
+ * FormKit beacon profile uses class "input" (not nowo-ui-input).
  */
 .kit-admin .nowo-ui-input,
-.nowo-ui-modal .nowo-ui-input {
+.kit-admin input.input,
+.kit-admin select.input,
+.kit-admin textarea.input,
+.nowo-ui-modal .nowo-ui-input,
+.nowo-ui-modal input.input,
+.nowo-ui-modal select.input,
+.nowo-ui-modal textarea.input {
   font-size: var(--kit-font-body);
   min-height: 2.25rem;
   padding: 0.5rem 0.75rem;
   border-color: var(--beacon-sand) !important;
   background: var(--beacon-surface) !important;
   color: var(--beacon-ink) !important;
+  accent-color: var(--beacon-moss);
 }
 
 .kit-admin .nowo-ui-input:focus,
-.nowo-ui-modal .nowo-ui-input:focus {
+.kit-admin input.input:focus,
+.kit-admin select.input:focus,
+.kit-admin textarea.input:focus,
+.nowo-ui-modal .nowo-ui-input:focus,
+.nowo-ui-modal input.input:focus,
+.nowo-ui-modal select.input:focus,
+.nowo-ui-modal textarea.input:focus {
   border-color: var(--nowo-ui-primary) !important;
   outline: 0;
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--nowo-ui-primary) 20%, transparent);
@@ -1099,46 +1323,66 @@ html[data-theme='dark'] .modal-backdrop {
 }
 
 /*
- * Cookie-consent admin (bundle 1.5+): route-based .nowo-ui-tabs → Beacon tab chrome;
- * single vendor .nowo-ui-form-wrap card (no host tabify / double panel).
+ * Kit admin tabs (cookie consent + any vendor .nowo-ui-tabs): match product .beacon-tabs
+ * pills and beat vendor nowo-ui.css underline + Tailwind border-b / border-blue-* utilities.
  */
-.kit-admin .nowo-ui-tabs__list {
+.kit-admin .nowo-ui-tabs,
+.kit-admin .beacon-tabs .nowo-ui-tabs,
+.kit-admin .nowo-ui-tabs__list,
+.kit-admin .beacon-tabs .nowo-ui-tabs__list {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0 !important;
+  border-bottom: 0 !important;
 }
 
-.kit-admin .nowo-ui-tabs__item {
+.kit-admin .nowo-ui-tabs__item,
+.kit-admin .beacon-tabs .nowo-ui-tabs__item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
   border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: 0.01em;
-  text-decoration: none;
-  border: 1px solid var(--beacon-sand);
-  color: var(--beacon-ink);
-  background: color-mix(in srgb, var(--beacon-surface) 70%, transparent);
+  text-decoration: none !important;
+  border: 1px solid transparent !important;
+  border-bottom-width: 1px !important;
+  color: color-mix(in srgb, var(--beacon-ink) 70%, transparent) !important;
+  background: transparent !important;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.kit-admin .nowo-ui-tabs__item:hover {
-  border-color: color-mix(in srgb, var(--beacon-moss) 40%, var(--beacon-sand));
-  background: var(--beacon-surface);
-  color: var(--beacon-ink);
-  text-decoration: none;
+.kit-admin .nowo-ui-tabs__item:hover,
+.kit-admin .beacon-tabs .nowo-ui-tabs__item:hover {
+  border-color: transparent !important;
+  background: color-mix(in srgb, var(--beacon-sand) 35%, transparent) !important;
+  color: var(--beacon-ink) !important;
+  text-decoration: none !important;
 }
 
 .kit-admin .nowo-ui-tabs__item.is-active,
-.kit-admin .nowo-ui-tabs__item[aria-current="page"] {
-  border-color: color-mix(in srgb, var(--beacon-moss) 45%, var(--beacon-sand));
-  background: color-mix(in srgb, var(--beacon-moss) 12%, var(--beacon-surface));
-  color: var(--beacon-moss-deep);
+.kit-admin .nowo-ui-tabs__item.nowo-ui-tabs__item--active,
+.kit-admin .nowo-ui-tabs__item[aria-current="page"],
+.kit-admin .beacon-tabs .nowo-ui-tabs__item.is-active,
+.kit-admin .beacon-tabs .nowo-ui-tabs__item.nowo-ui-tabs__item--active,
+.kit-admin .beacon-tabs .nowo-ui-tabs__item[aria-current="page"] {
+  border-color: color-mix(in srgb, var(--beacon-moss) 45%, var(--beacon-sand)) !important;
+  background: color-mix(in srgb, var(--beacon-moss) 12%, var(--beacon-surface)) !important;
+  color: var(--beacon-moss-deep) !important;
   font-weight: 600;
+}
+
+.kit-admin .beacon-tabs--sections .nowo-ui-tabs__item {
+  font-size: 0.8125rem;
+  padding: 0.3rem 0.65rem;
 }
 
 .kit-admin .nowo-ui-tabs--area {
@@ -1150,7 +1394,9 @@ html[data-theme='dark'] .modal-backdrop {
 }
 
 .kit-admin .nowo-ui-form-wrap.card,
-.kit-admin .nowo-ui-table-wrap.card {
+.kit-admin .nowo-ui-table-wrap.card,
+.kit-admin .panel.nowo-ui-form-wrap,
+.kit-admin .panel.nowo-ui-table-wrap {
   border: 1px solid var(--beacon-sand);
   border-radius: 0.75rem;
   background: color-mix(in srgb, var(--beacon-surface) 85%, transparent);
@@ -1159,6 +1405,15 @@ html[data-theme='dark'] .modal-backdrop {
 
 .kit-admin .nowo-ui-form-wrap > .card-body {
   padding: 1.25rem;
+}
+
+.kit-admin .panel.nowo-ui-form-wrap,
+.kit-admin .panel.nowo-ui-table-wrap {
+  padding: 1.25rem;
+}
+
+.kit-admin .nowo-ui-toolbar {
+  justify-content: space-between;
 }
 
 .kit-admin .nowo-ui-form-actions {

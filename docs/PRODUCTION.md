@@ -113,7 +113,7 @@ docker compose up -d --scale messenger=2
 docker compose up -d --scale messenger-notify=2
 ```
 
-Monitor queue depth via `GET /health/ready` → `checks.messenger_async_pending` (Doctrine transport).
+Monitor queue depth via authenticated `GET /metrics` → `beacon_messenger_async_pending` (Doctrine transport). Do not rely on the public readiness probe for backlog; `/health/ready` checks the database only.
 
 **Failed transport:** messages that exhaust retries land in the Doctrine `failed` queue (`queue_name=failed`). Envelope payloads may contain application PII even after DSN scrubbing — treat the failed table as sensitive, restrict DB access, and purge periodically:
 
@@ -130,7 +130,7 @@ Do not leave failed envelopes indefinitely on shared production databases.
 | Path | Auth | Purpose |
 |------|------|---------|
 | `GET /health/live` | Public | Process is up |
-| `GET /health/ready` | Public | Database reachable + async queue depth |
+| `GET /health/ready` | Public | Database reachable |
 
 Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/Compose healthchecks.
 
@@ -181,7 +181,7 @@ Prefer `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` i
 
 ## Security headers (Caddy)
 
-The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and **HSTS** (skipped for `localhost` / `127.0.0.1` so local self-signed HTTPS is not sticky-pinned). **`Content-Security-Policy`** is set in PHP (`ContentSecurityPolicySubscriber`) with `object-src 'none'` and **`script-src 'self'`** (no `'unsafe-inline'`), so the Web Debug Toolbar can merge its script/style **nonces** into the same header. In **`kernel.debug`**, CSP also allows `'unsafe-eval'` because the toolbar `eval()`s scripts from the `/_wdt` AJAX fragment (prod stays without `'unsafe-eval'` except Swagger UI). Theme boot uses blocking IIFE from `assets/theme-boot.ts` (`public/build/theme-boot.js`); kit admin uses Vite `kit-admin` (self-hosted Bootstrap); confirm dialogs / password toggle / selects use Stimulus. Vendor kit page `window.*Config` scripts are rewritten to JSON islands (`KitInlineConfigScriptSubscriber`). `style-src` still allows `'unsafe-inline'` for operator appearance CSS overrides and small kit layout `<style>` blocks.
+The FrankenPHP `Caddyfile` sets baseline headers on the HTTPS site: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and **HSTS** (skipped for `localhost` / `127.0.0.1` so local self-signed HTTPS is not sticky-pinned). **`Content-Security-Policy`** is set in PHP (`ContentSecurityPolicySubscriber`) with `object-src 'none'` and **`script-src 'self'`** (no `'unsafe-inline'`), so the Web Debug Toolbar can merge its script/style **nonces** into the same header. In **`kernel.debug`**, CSP also allows `'unsafe-eval'` because the toolbar `eval()`s scripts from the `/_wdt` AJAX fragment (prod stays without `'unsafe-eval'` except Swagger UI). Theme boot uses blocking IIFE from `assets/theme-boot.ts` (`public/build/theme-boot.js`); kit admin uses Vite `kit-admin` (self-hosted Bootstrap); confirm dialogs / password toggle / selects use Stimulus. Vendor kit page `window.*Config` scripts are rewritten to JSON islands (`KitInlineConfigScriptSubscriber`). Production **`style-src-elem`** is `'self' 'nonce-…'` (host `<style>` blocks use `csp_nonce()`); **`style-src-attr 'unsafe-inline'`** allows CSSOM (`element.style`) used by SortableJS and shell motion. **`kernel.debug`** also allows `'unsafe-inline'` on `style-src-elem` for the Web Profiler. **`connect-src`** is `'self' ws: wss:` plus a cross-origin Mercure hub origin from `MERCURE_PUBLIC_URL` when needed; member realtime prefers same-origin `/.well-known/mercure` via Caddy.
 
 - **HSTS:** default `max-age=31536000; includeSubDomains` on non-loopback hosts. Override or extend via `CADDY_SERVER_EXTRA_DIRECTIVES` if you terminate TLS elsewhere (or need `preload`).
 - Do not ship analytics cookies without cookie-consent kit UX.
@@ -212,14 +212,14 @@ Use this list before exposing an instance beyond a trusted network. Details live
 |------|-------------------------|--------|
 | **SiteBackup / setup** | Unique `SITE_SETUP_TOKEN`, unique `SITE_BACKUP_PASSWORD_HASH` | Fail-closed outside `dev`/`test` if local defaults remain |
 | **App secrets** | `APP_SECRET`, DB credentials, Halite key volume or `APP_ENCRYPT_KEY` | Losing the encrypt key breaks ciphertext |
-| **Messenger** | Separate `messenger:consume`; watch `/health/ready` queue depth; purge `messenger:failed` periodically | Failed envelopes may hold PII; do not conflate with `FRANKENPHP_MODE=worker` |
+| **Messenger** | Separate `messenger:consume`; watch `/metrics` queue gauge; purge `messenger:failed` periodically | Failed envelopes may hold PII; do not conflate with `FRANKENPHP_MODE=worker` |
 | **Retention / quotas** | Ops defaults + optional per-project overrides; schedule `app:retention:purge` | `0` disables that rule |
 | **HTTP audit log** | Admin → HTTP log (`/admin/http-log`); schedule `nowo:http-log:purge` | Default retention 30 days; may store IPs / user ids |
 | **Ingest** | Prefer `X-Beacon-Auth`; keep reject-query-auth enabled in Ops defaults | Rotate project API key secrets if leaked |
 | **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
 | **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
 | **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production | Prefer private scrape network / Caddy `remote_ip` allowlist |
-| **Health** | `/health/live` + `/health/ready` for probes | Ready exposes queue depth (operational signal) |
+| **Health** | `/health/live` + `/health/ready` for probes | Ready checks DB only; queue depth is on `/metrics` |
 | **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` so client IP (login throttle, audit) is not spoofable | Default Compose terminates TLS in Caddy — only needed for an outer proxy |
 | **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit` | Controlled sources only; do not `|raw` user/event payload HTML |
 | **Mailer / Mercure** | Real DSN/hub in Admin; never ship Mailpit in prod Compose | Encrypted at rest via Halite |

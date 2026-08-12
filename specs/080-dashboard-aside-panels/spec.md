@@ -23,7 +23,7 @@ As a member, I open **Activity** and see my recent product actions (open/assign/
 
 As a member, I open **Mentions** and see comments where I was `@mentioned` in accessible projects; I can filter unread-only, mark one or all read, and page results.
 
-**Acceptance**: Route `/dashboard/mentions`; persisting `issue_mention` on comment create (migration `Version20260803140000`); CSRF-protected mark-read / mark-all-read; only project-accessible mentions; `PagePagination`.
+**Acceptance**: Route `/dashboard/mentions`; persisting `issue_mention` on comment create (migration `Version20260803140000`); CSRF-protected mark-read / mark-all-read via `MentionsMarkReadType` / `MentionsMarkAllReadType` (`090`); only project-accessible mentions; `PagePagination`.
 
 ### User Story 4 - Alerts / failed deliveries (Priority: P1)
 
@@ -78,6 +78,11 @@ As a member, sidebar Dashboard items and breadcrumbs exist for every new panel r
 - `040-issue-mentions-notify` — Email on mention/assign; this feature adds the in-app inbox.
 - `028-release-health` — Project-scoped new-in-release; this feature adds cross-project panel.
 - `035-ops-overview` — Admin fleet failed deliveries; Alerts is the member-scoped counterpart.
+
+## Amendment (Symfony Forms + title weight, 2026-08-11)
+
+- Mentions mark-read / mark-all-read POSTs use `MentionsMarkReadType` / `MentionsMarkAllReadType` (`090`).
+- Dashboard product page titles use lighter chrome: `h1` `text-2xl font-semibold` + quieter intro (`text-xs` / lower opacity); kit admin page-header title/intro aligned in `_kit_admin_styles`.
 
 ## Out of scope (v1)
 

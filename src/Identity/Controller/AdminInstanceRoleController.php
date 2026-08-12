@@ -8,9 +8,14 @@ use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\InstanceRole;
 use App\Identity\Entity\User;
 use App\Identity\Form\AdminInstanceRoleType;
+use App\Identity\Form\AdminRolePermissionsType;
+use App\Identity\Form\AdminRoleUserAddType;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Repository\UserRepository;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +47,8 @@ final class AdminInstanceRoleController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -113,7 +120,7 @@ final class AdminInstanceRoleController extends AbstractController
         $originalCode = $role->getCode();
         $form = $this->buildEditForm($role);
         $form->handleRequest($request);
-        $returnRoute = $this->resolveReturnRoute($request);
+        $returnRoute = $this->resolveReturnRoute((string) $form->get('_return')->getData());
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$role->isSystem()) {
@@ -167,7 +174,12 @@ final class AdminInstanceRoleController extends AbstractController
             return $this->redirectToRoute('admin_roles_show', ['id' => $role->getUuid()]);
         }
 
-        if (!$this->isCsrfTokenValid('admin_instance_role_delete_'.$role->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_roles_delete', ['id' => $role->getUuid()]),
+            'admin_instance_role_delete_'.$role->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -193,21 +205,43 @@ final class AdminInstanceRoleController extends AbstractController
         InstanceRole $role,
     ): Response {
         $this->roleRepository->hydrateDetail($role);
-
-        if ($request->isMethod(Request::METHOD_POST)) {
-            if (!$this->isCsrfTokenValid('admin_instance_role_permissions_'.$role->getId(), $request->request->getString('_token'))) {
-                throw $this->createAccessDeniedException('Invalid CSRF token.');
-            }
-
-            /** @var list<string|int> $rawIds */
-            $rawIds = $request->request->all('permission_ids');
-            $selectedIds = [];
-            foreach ($rawIds as $rawId) {
-                if (is_numeric($rawId)) {
-                    $selectedIds[] = (int) $rawId;
+        $permissionMap = $this->permissionsByCategory();
+        $permissionIds = [];
+        foreach ($permissionMap as $items) {
+            foreach ($items as $permission) {
+                $permissionId = $permission->getId();
+                if (null !== $permissionId) {
+                    $permissionIds[] = $permissionId;
                 }
             }
-            $selectedIds = array_values(array_unique($selectedIds));
+        }
+        $form = $this->createForm(AdminRolePermissionsType::class, $this->permissionsFormData($role, $permissionIds), [
+            'action' => $this->generateUrl('admin_roles_permissions', ['id' => $role->getUuid()]),
+            'method' => 'POST',
+            'csrf_token_id' => 'admin_instance_role_permissions_'.$role->getId(),
+            'permission_ids' => $permissionIds,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array<string, bool> $data */
+            $data = $form->getData();
+            $selectedIds = [];
+            foreach ($permissionIds as $permissionId) {
+                if (true === ($data['permission_'.$permissionId] ?? false)) {
+                    $selectedIds[] = $permissionId;
+                }
+            }
+            if ([] === $selectedIds) {
+                /** @var list<string|int> $legacyIds */
+                $legacyIds = $request->request->all('permission_ids');
+                foreach ($legacyIds as $legacyId) {
+                    if (is_numeric($legacyId)) {
+                        $selectedIds[] = (int) $legacyId;
+                    }
+                }
+                $selectedIds = array_values(array_unique($selectedIds));
+            }
 
             $role->clearPermissions();
             if ([] !== $selectedIds) {
@@ -237,7 +271,7 @@ final class AdminInstanceRoleController extends AbstractController
             return $this->redirectToRoute('admin_roles_permissions', ['id' => $role->getUuid()]);
         }
 
-        return $this->renderRoleDetail($request, $role, 'admin_roles_permissions');
+        return $this->renderRoleDetail($request, $role, 'admin_roles_permissions', permissionsForm: $form);
     }
 
     #[Route('/admin/roles/{id}/users', name: 'admin_roles_users', methods: ['GET'], requirements: ['id' => Requirement::UUID])]
@@ -255,11 +289,17 @@ final class AdminInstanceRoleController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         InstanceRole $role,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_instance_role_user_add_'.$role->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(AdminRoleUserAddType::class, null, [
+            'csrf_token_id' => 'admin_instance_role_user_add_'.$role->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
-        $email = strtolower(trim($request->request->getString('email')));
+        /** @var array{email?: string|null} $data */
+        $data = $form->getData();
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
         $user = $this->userRepository->findOneByEmail($email);
         if (!$user instanceof User) {
             $this->addFlash('error', 'flash.roles.user_not_found');
@@ -297,7 +337,15 @@ final class AdminInstanceRoleController extends AbstractController
         #[MapEntity(mapping: ['userId' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_instance_role_user_remove_'.$role->getId().'_'.$user->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_roles_users_remove', [
+                'id' => $role->getUuid(),
+                'userId' => $user->getUuid(),
+            ]),
+            'admin_instance_role_user_remove_'.$role->getId().'_'.$user->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -329,6 +377,11 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->render('admin/roles/index.html.twig', [
             'roles' => $roles,
             'q' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_roles'),
+            ])->createView(),
             'createForm' => $createForm,
             'open_create' => $openCreate || $request->query->getBoolean('new'),
         ]);
@@ -346,19 +399,19 @@ final class AdminInstanceRoleController extends AbstractController
         ]);
     }
 
-    private function buildEditForm(InstanceRole $role): FormInterface
+    private function buildEditForm(InstanceRole $role, string $returnRoute = 'admin_roles_show'): FormInterface
     {
         return $this->createForm(AdminInstanceRoleType::class, $role, [
             'action' => $this->generateUrl('admin_roles_edit', ['id' => $role->getUuid()]),
             'csrf_token_id' => 'admin_instance_role_edit_'.$role->getId(),
             'code_locked' => $role->isSystem(),
+            'with_return_route' => true,
+            'return_route' => $returnRoute,
         ]);
     }
 
-    private function resolveReturnRoute(Request $request): string
+    private function resolveReturnRoute(string $return): string
     {
-        $return = $request->request->getString('_return');
-
         return \in_array($return, self::DETAIL_ROUTES, true) ? $return : 'admin_roles_show';
     }
 
@@ -368,24 +421,77 @@ final class AdminInstanceRoleController extends AbstractController
         string $page,
         ?FormInterface $editForm = null,
         bool $openEdit = false,
+        ?FormInterface $permissionsForm = null,
     ): Response {
         $this->roleRepository->hydrateDetail($role);
-        $editForm ??= $this->buildEditForm($role);
+        $editForm ??= $this->buildEditForm($role, $page);
+        $permissionMap = $this->permissionsByCategory();
+        $permissionIds = [];
+        foreach ($permissionMap as $items) {
+            foreach ($items as $permission) {
+                $permissionId = $permission->getId();
+                if (null !== $permissionId) {
+                    $permissionIds[] = $permissionId;
+                }
+            }
+        }
+        $permissionsForm ??= $this->createForm(AdminRolePermissionsType::class, $this->permissionsFormData($role, $permissionIds), [
+            'action' => $this->generateUrl('admin_roles_permissions', ['id' => $role->getUuid()]),
+            'method' => 'POST',
+            'csrf_token_id' => 'admin_instance_role_permissions_'.$role->getId(),
+            'permission_ids' => $permissionIds,
+        ]);
         $vars = [
             'role' => $role,
             'editForm' => $editForm->createView(),
             'open_edit' => $openEdit || $request->query->getBoolean('edit'),
             'return_route' => $page,
+            'addUserForm' => $this->createForm(AdminRoleUserAddType::class, [
+                'email' => '',
+            ], [
+                'action' => $this->generateUrl('admin_roles_users_add', ['id' => $role->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_instance_role_user_add_'.$role->getId(),
+            ])->createView(),
+            'deleteForm' => $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_roles_delete', ['id' => $role->getUuid()]),
+                'admin_instance_role_delete_'.$role->getId(),
+            )->createView(),
         ];
 
         return match ($page) {
-            'admin_roles_users' => $this->render('admin/roles/users.html.twig', $vars),
+            'admin_roles_users' => $this->render('admin/roles/users.html.twig', [
+                ...$vars,
+                'removeUserForms' => $this->buildRoleUserRemoveForms($role),
+            ]),
             'admin_roles_permissions' => $this->render('admin/roles/permissions.html.twig', [
                 ...$vars,
-                'permissions_by_category' => $this->permissionsByCategory(),
+                'permissions_by_category' => $permissionMap,
+                'permissionsForm' => $permissionsForm->createView(),
             ]),
             default => $this->render('admin/roles/show.html.twig', $vars),
         };
+    }
+
+    /**
+     * @param list<int> $permissionIds
+     *
+     * @return array<string, bool>
+     */
+    private function permissionsFormData(InstanceRole $role, array $permissionIds): array
+    {
+        $data = [];
+        foreach ($permissionIds as $permissionId) {
+            $data['permission_'.$permissionId] = false;
+        }
+        foreach ($role->getPermissions() as $permission) {
+            $permissionId = $permission->getId();
+            if (null !== $permissionId) {
+                $data['permission_'.$permissionId] = true;
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -400,5 +506,29 @@ final class AdminInstanceRoleController extends AbstractController
         }
 
         return $permissionsByCategory;
+    }
+
+    /**
+     * @return array<int, FormView>
+     */
+    private function buildRoleUserRemoveForms(InstanceRole $role): array
+    {
+        $forms = [];
+        foreach ($role->getUsers() as $user) {
+            $userId = $user->getId();
+            if (null === $userId) {
+                continue;
+            }
+
+            $forms[$userId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_roles_users_remove', [
+                    'id' => $role->getUuid(),
+                    'userId' => $user->getUuid(),
+                ]),
+                'admin_instance_role_user_remove_'.$role->getId().'_'.$userId,
+            )->createView();
+        }
+
+        return $forms;
     }
 }

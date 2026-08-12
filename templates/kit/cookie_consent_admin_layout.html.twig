@@ -1,7 +1,7 @@
 {# Beacon host layout for cookie-consent admin Web UI (1.5+).
    Admin pages fill {% block body %}; wrap via body_before/after (same Twig body collision as menus).
-   Prefer this shell + kit/_kit_admin_styles over forking admin CRUD Twig.
-   Area/section tabs ship in CookieConsentBundle (route-based); restyle .nowo-ui-tabs here. #}
+   Tabs/forms: host forks under templates/bundles/NowoCookieConsentBundle/admin (beacon-tabs + FormKit).
+   Kit remaps also re-included from admin/base after vendor nowo-ui.css. #}
 {% extends 'kit/_kit_admin_layout.html.twig' %}
 
 {% set kit_admin_heading = 'nav.cookie_consent'|trans %}

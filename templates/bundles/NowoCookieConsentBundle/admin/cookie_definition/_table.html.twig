@@ -46,12 +46,12 @@
                             <button type="button" class="{{ ui.btn('secondary', null, _css_fw) }}" {{ ui.confirm_dismiss_attrs() }}>
                                 {{ 'nowo_cookie_consent.admin.cookie_definition.cancel'|trans({}, 'NowoCookieConsentBundle') }}
                             </button>
-                            <form method="post" action="{{ path('nowo_cookie_consent_cookie_definitions_delete', {configId: config.id, id: definition.id}) }}" class="d-inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete-cookie-definition-' ~ definition.id) }}">
+                            {% set deleteForm = csrf_action_form(path('nowo_cookie_consent_cookie_definitions_delete', {configId: config.id, id: definition.id}), 'delete-cookie-definition-' ~ definition.id, 'POST', false) %}
+                            {{ form_start(deleteForm, {attr: {class: 'd-inline'}}) }}
                                 <button type="submit" class="{{ ui.btn('danger', null, _css_fw) }}">
                                     {{ 'nowo_cookie_consent.admin.cookie_definition.delete'|trans({}, 'NowoCookieConsentBundle') }}
                                 </button>
-                            </form>
+                            {{ form_end(deleteForm) }}
                         {% endset %}
                         {% include '@NowoUiKitBundle/partials/_confirm.html.twig' with {
                             id: confirm_id,

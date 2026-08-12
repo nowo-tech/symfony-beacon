@@ -12,27 +12,26 @@
 {% block feed_header %}
 <div class="mb-6{% if feed_header_class is defined %} {{ feed_header_class }}{% endif %}">
     <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ title_key|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ intro_key|trans }}</p>
+        <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ title_key|trans }}</h1>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ intro_key|trans }}</p>
     </div>
     {% block feed_header_extra %}{% endblock %}
 </div>
 {% endblock %}
 
-<form
-    method="get"
-    action="{{ path(filter_route) }}"
-    class="issue-filters panel mb-6 grid gap-3 {{ filter_grid_class|default('sm:grid-cols-2 lg:grid-cols-3') }}"
-    data-testid="{{ filters_testid }}"
->
-    <input type="hidden" name="page" value="1">
-    {% block filter_hidden %}{% endblock %}
+{{ form_start(filterForm, {
+    attr: {
+        class: 'issue-filters panel mb-6 grid gap-3 ' ~ filter_grid_class|default('sm:grid-cols-2 lg:grid-cols-3'),
+        'data-testid': filters_testid
+    }
+}) }}
     {% block filter_fields %}{% endblock %}
     <div class="issue-filters__actions">
         <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
         <a class="btn-ghost issue-filters__clear no-underline" href="{{ path(filter_route) }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
-</form>
+    {{ form_rest(filterForm) }}
+{{ form_end(filterForm, {render_rest: false}) }}
 
 {% if pagination.total == 0 %}
     <div class="panel text-[var(--color-ink)]/70" data-testid="{{ empty_testid }}">{{ empty_key|trans }}</div>

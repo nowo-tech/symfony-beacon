@@ -28,7 +28,10 @@ As an operator, prod responses include baseline security headers.
 - **SC-001**: PRODUCTION.md checklist includes headers.
 - **SC-002**: Smoke curl assertions in docs or CI optional.
 
+## Amendment (Application CSP subscriber, as-built)
+
+Prod Caddy snippets remain the baseline for HSTS / frame / referrer. HTML **Content-Security-Policy** is owned by `ContentSecurityPolicySubscriber` (nonce for `script-src` / `style-src-elem`; `style-src-attr 'unsafe-inline'` for CSSOM; optional Mercure origin on `connect-src`). Kit admin host `<style>` blocks MUST use `csp_nonce()`. See `081` amendment “Kit Administration chrome sync” and `docs/PRODUCTION.md`.
+
 ## Out of scope
 
-- Application-level nonce CSP generator (optional later).
 - WAF.

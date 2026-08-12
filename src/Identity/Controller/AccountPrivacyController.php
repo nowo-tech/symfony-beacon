@@ -6,6 +6,7 @@ namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
 use App\Identity\Exception\AccountAnonymizeException;
+use App\Identity\Form\TypeToConfirmType;
 use App\Identity\Service\AccountAnonymizer;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\UserActionRecorder;
@@ -47,6 +48,13 @@ final class AccountPrivacyController extends AbstractController
             'can_anonymize' => !$user->isAnonymized()
                 && [] === $this->accountAnonymizer->soleOwnerProjects($user)
                 && !$this->accountAnonymizer->isLastAdmin($user),
+            'anonymizeForm' => $this->createForm(TypeToConfirmType::class, [
+                'confirmation' => '',
+            ], [
+                'action' => $this->generateUrl('account_privacy_anonymize'),
+                'method' => 'POST',
+                'csrf_token_id' => 'account_privacy_anonymize',
+            ])->createView(),
         ]);
     }
 
@@ -72,8 +80,12 @@ final class AccountPrivacyController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (!$this->isCsrfTokenValid('account_privacy_anonymize', $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(TypeToConfirmType::class, null, [
+            'csrf_token_id' => 'account_privacy_anonymize',
+        ]);
+        $form->submit($request->request->all(), false);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
         try {

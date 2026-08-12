@@ -1,0 +1,43 @@
+{# Sync-merge kit JSON islands into window.* before deferred dashboard.js runs.
+   Head modules/defer execute after body parse; this classic script runs during body parse
+   so __nowoDashboardMenuConfig / __breadcrumbKitDashboard exist when dashboard.js binds. #}
+<script{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
+(function () {
+  function parseJson(el) {
+    if (!el) return null;
+    try {
+      var data = JSON.parse(el.textContent || '{}');
+      return data && typeof data === 'object' ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  var boot = parseJson(document.getElementById('beacon-dashboard-menu-boot'));
+  if (boot) {
+    window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
+      cssFramework: boot.cssFramework || 'tailwind'
+    });
+    if (boot.i18n) window.dashboardMenuI18n = boot.i18n;
+    if (boot.iconSelectorScriptUrl) window.dashboardMenuIconSelectorScriptUrl = boot.iconSelectorScriptUrl;
+  }
+  var bkBoot = parseJson(document.getElementById('beacon-breadcrumb-kit-boot'));
+  if (bkBoot) {
+    window.__breadcrumbKitDashboard = Object.assign(window.__breadcrumbKitDashboard || {}, {
+      cssFramework: bkBoot.cssFramework || 'tailwind'
+    });
+    if (bkBoot.i18n) window.breadcrumbKitI18n = bkBoot.i18n;
+    if (bkBoot.importPartialUrl) window.__breadcrumbKitDashboard.importPartialUrl = bkBoot.importPartialUrl;
+    if (bkBoot.dashboardBase) window.__breadcrumbKitDashboard.dashboardBase = bkBoot.dashboardBase;
+  }
+  document.querySelectorAll('script.beacon-kit-page-config').forEach(function (el) {
+    var data = parseJson(el);
+    if (!data) return;
+    var kit = el.getAttribute('data-kit');
+    if (kit === 'dashboard-menu') {
+      window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, data);
+    } else if (kit === 'breadcrumb-kit') {
+      window.__breadcrumbKitDashboard = Object.assign(window.__breadcrumbKitDashboard || {}, data);
+    }
+  });
+})();
+</script>

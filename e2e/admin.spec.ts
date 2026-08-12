@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage } from './helpers';
+import { dismissProductTour, expectAuthenticatedPage, resolveDemoProjectUuid } from './helpers';
 
 test.describe('Administration', () => {
   test('admin hub loads', async ({ page }) => {
@@ -48,9 +48,9 @@ test.describe('Administration', () => {
       '/admin/http-log',
       '/admin/api/doc',
       '/admin/menus/',
-      '/admin/_routing/',
       '/breadcrumb-kit-admin/',
       '/admin/cookie-consent',
+      '/admin/_routing/',
     ];
     for (const path of paths) {
       await expectAuthenticatedPage(page, path);
@@ -76,4 +76,32 @@ test.describe('Administration', () => {
     await expect(page).toHaveURL(/\/admin\/users\/.+\/activity/);
     await expect(page).not.toHaveURL(/\/login/);
   });
+
+  test('admin projects list and first project show load', async ({ page }) => {
+    await expectAuthenticatedPage(page, '/admin/projects');
+    await expect(page.locator('[data-testid="admin-projects-config-portability"]')).toBeVisible();
+
+    const uuid = await resolveDemoProjectUuid(page);
+    await expectAuthenticatedPage(page, `/admin/projects/${uuid}`);
+    await expect(page.locator('[data-testid="admin-project-show"]')).toBeVisible();
+  });
+
+  test('admin group show when list has entries', async ({ page }) => {
+    await page.goto('/admin/groups');
+    await dismissProductTour(page);
+    const hrefs = await page.locator('a[href*="/admin/groups/"]').evaluateAll((anchors) =>
+      anchors
+        .map((a) => (a as HTMLAnchorElement).getAttribute('href') ?? '')
+        .filter((href) => /\/admin\/groups\/[0-9a-f-]{36}/i.test(href)),
+    );
+    if (hrefs.length === 0) {
+      return;
+    }
+    await page.goto(hrefs[0]);
+    await dismissProductTour(page);
+    await expect(page).toHaveURL(/\/admin\/groups\/[0-9a-f-]{36}/i);
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.getByRole('main')).toBeVisible();
+  });
 });
+

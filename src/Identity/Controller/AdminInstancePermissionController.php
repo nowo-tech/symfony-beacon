@@ -8,6 +8,9 @@ use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\User;
 use App\Identity\Form\AdminInstancePermissionType;
 use App\Identity\Repository\InstancePermissionRepository;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,6 +37,8 @@ final class AdminInstancePermissionController extends AbstractController
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
         private readonly FormFactoryInterface $formFactory,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -145,7 +150,12 @@ final class AdminInstancePermissionController extends AbstractController
             return $this->redirectToRoute('admin_permissions');
         }
 
-        if (!$this->isCsrfTokenValid('admin_instance_permission_delete_'.$permission->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
+            'admin_instance_permission_delete_'.$permission->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -186,6 +196,8 @@ final class AdminInstancePermissionController extends AbstractController
         $openCreate = $openCreate || $request->query->getBoolean('new');
         /** @var array<int, FormView> $editForms */
         $editForms = [];
+        /** @var array<int, FormView> $deleteForms */
+        $deleteForms = [];
         foreach ($permissions as $permission) {
             $permissionId = $permission->getId();
             if (null === $permissionId) {
@@ -197,9 +209,17 @@ final class AdminInstancePermissionController extends AbstractController
                 && $permission->getId() === $openPermission->getId()
             ) {
                 $editForms[$permissionId] = $invalidEditForm->createView();
+                $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->create(
+                    $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
+                    'admin_instance_permission_delete_'.$permissionId,
+                )->createView();
                 continue;
             }
             $editForms[$permissionId] = $this->buildEditForm($permission)->createView();
+            $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
+                'admin_instance_permission_delete_'.$permissionId,
+            )->createView();
         }
 
         $createForm = ($invalidCreateForm ?? $this->buildCreateForm())->createView();
@@ -208,7 +228,13 @@ final class AdminInstancePermissionController extends AbstractController
             'permissions' => $permissions,
             'permissions_by_category' => $byCategory,
             'q' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_permissions'),
+            ])->createView(),
             'editForms' => $editForms,
+            'deleteForms' => $deleteForms,
             'createForm' => $createForm,
             'open_edit_uuid' => '' !== $openEditUuid ? $openEditUuid : null,
             'open_create' => $openCreate,

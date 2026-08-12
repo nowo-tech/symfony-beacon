@@ -74,6 +74,49 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         self::assertFalse($this->extension->canOpenSettings($project));
     }
 
+    public function testRepeatedGrantsReuseResolvedAccessWithoutExtraMembershipLookups(): void
+    {
+        $user = new User();
+        $project = new Project();
+        $membership = new ProjectMembership();
+        $membership->setUser($user);
+        $membership->setRole(ProjectRole::Member);
+
+        $projectId = new \ReflectionProperty(Project::class, 'id');
+        $projectId->setValue($project, 7);
+        $userId = new \ReflectionProperty(User::class, 'id');
+        $userId->setValue($user, 3);
+
+        $this->security->method('getUser')->willReturn($user);
+        $this->membershipRepository->expects(self::once())
+            ->method('findOneByProjectAndUser')
+            ->with($project, $user)
+            ->willReturn($membership);
+
+        $request = new \Symfony\Component\HttpFoundation\Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $groupAccessRepository = $this->createMock(ProjectGroupAccessRepository::class);
+        $groupAccessRepository->expects(self::once())
+            ->method('findHighestGroupRoleForUser')
+            ->willReturn(null);
+        $shareLinkRepository = $this->createMock(ProjectShareLinkRepository::class);
+        $projectAccess = new ProjectAccessService(
+            $this->membershipRepository,
+            $groupAccessRepository,
+            $shareLinkRepository,
+            $this->authorizationChecker,
+            $requestStack,
+        );
+        $extension = new ProjectPermissionTwigExtension($projectAccess, $this->security);
+
+        self::assertTrue($extension->grants($project, ProjectPermission::ISSUES_TRIAGE));
+        self::assertTrue($extension->grants($project, ProjectPermission::ISSUES_TRIAGE));
+        self::assertTrue($extension->grants($project, ProjectPermission::VIEW));
+        self::assertFalse($extension->canOpenSettings($project));
+    }
+
     public function testAdminCanOpenSettings(): void
     {
         $user = new User();

@@ -5,8 +5,8 @@
 #}
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ title|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ intro|trans }}</p>
+        <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ title|trans }}</h1>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ intro|trans }}</p>
     </div>
     {% block header_actions %}
         {% if create_route is defined %}
@@ -15,19 +15,18 @@
     {% endblock %}
 </div>
 
-<form method="get" action="{{ path(search_route) }}" class="mb-4 flex flex-wrap gap-2">
-    <input
-        class="input min-w-56 flex-1"
-        type="search"
-        name="q"
-        value="{{ q }}"
-        placeholder="{{ search_placeholder|trans }}"
-        autocomplete="off"
-    >
+{{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap gap-2'}}) }}
+    {{ form_widget(searchForm.q, {
+        attr: {
+            class: 'input min-w-56 flex-1',
+            placeholder: search_placeholder|trans,
+            autocomplete: 'off'
+        }
+    }) }}
     {% block search_extras %}{% endblock %}
     <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
     <a class="btn-ghost no-underline" href="{{ path(search_route) }}">{{ 'common.clear_filters'|trans }}</a>
-</form>
+{{ form_end(searchForm, {render_rest: false}) }}
 
 <section class="panel overflow-x-auto">
     <table class="w-full text-left text-sm">

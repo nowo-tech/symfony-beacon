@@ -7,10 +7,12 @@ namespace App\Project\Controller;
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectReadToken;
+use App\Project\Form\ProjectReadTokenCreateType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectReadTokenManager;
+use App\Shared\Form\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -40,13 +42,19 @@ final class ProjectReadTokenController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_read_token_create', $request->request->getString('_token'))) {
+        $form = $this->createForm(ProjectReadTokenCreateType::class, null, [
+            'csrf_token_id' => 'project_read_token_create',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');
 
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
-        $created = $this->tokenManager->create($project, $user, $request->request->getString('label'));
+        /** @var array{label?: string|null} $data */
+        $data = $form->getData();
+        $created = $this->tokenManager->create($project, $user, (string) ($data['label'] ?? ''));
         $request->getSession()->set('_beacon_last_read_token', $created['rawToken']);
         $this->addFlash('success', 'projects.read_token.created');
 
@@ -64,7 +72,11 @@ final class ProjectReadTokenController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_read_token_revoke', $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'project_read_token_revoke',
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');
 
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);

@@ -23,7 +23,7 @@ use Throwable;
 /**
  * Delivers one notification attempt (Slack, Discord, Teams, Telegram, email, or HTTP).
  */
-#[AsMessageHandler]
+#[AsMessageHandler(sign: true)]
 final readonly class DeliverNotificationHandler
 {
     public function __construct(

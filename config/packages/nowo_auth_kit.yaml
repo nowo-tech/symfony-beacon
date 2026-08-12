@@ -102,6 +102,9 @@ nowo_auth_kit:
                 magic_login_check:
                     path: /login/magic/check
                     name: nowo_auth_kit_magic_login_check
+                magic_login_confirm:
+                    path: /login/magic/confirm
+                    name: nowo_auth_kit_magic_login_confirm
                 social_login_start:
                     path: /login/social/{provider}
                     name: nowo_auth_kit_social_login_start

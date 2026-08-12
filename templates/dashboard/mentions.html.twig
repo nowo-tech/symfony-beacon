@@ -8,6 +8,7 @@
     intro_key: 'mentions.intro',
     feed_header_class: 'flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between',
     filter_route: 'dashboard_mentions',
+    filterForm: filterForm,
     filters: filters,
     filters_testid: 'mentions-filters',
     empty_testid: 'mentions-empty',
@@ -23,29 +24,19 @@
     item_count: mentions|length,
 } %}
     {% block feed_header_extra %}
-        {% if unread_count > 0 %}
-            <form method="post" action="{{ path('dashboard_mentions_read_all') }}">
-                <input type="hidden" name="_token" value="{{ csrf_token('mention_read_all') }}">
+        {% if markAllReadForm %}
+            {{ form_start(markAllReadForm, {action: path('dashboard_mentions_read_all')}) }}
                 <button class="btn-ghost" type="submit">{{ 'mentions.mark_all_read'|trans }}</button>
-            </form>
+            {{ form_end(markAllReadForm) }}
         {% endif %}
     {% endblock %}
     {% block filter_fields %}
-        <select class="input" name="project" aria-label="{{ 'mentions.filter.project'|trans }}">
-            <option value="">{{ 'mentions.filter.any_project'|trans }}</option>
-            {% for project in projects %}
-                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-            {% endfor %}
-        </select>
+        {{ form_widget(filterForm.project) }}
         <label class="checkbox-label">
-            <input type="checkbox" class="checkbox" name="unread" value="1" {% if filters.unread %}checked{% endif %}>
+            {{ form_widget(filterForm.unread, {value: 1}) }}
             {{ 'mentions.filter.unread_only'|trans }}
         </label>
-        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-            {% for size in [10, 25, 50, 100] %}
-                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-            {% endfor %}
-        </select>
+        {{ form_widget(filterForm.per_page) }}
     {% endblock %}
     {% block results %}
         <ul class="divide-y divide-[var(--color-sand)]/70">
@@ -67,14 +58,14 @@
                         </p>
                         <time class="mt-1 block text-xs text-[var(--color-ink)]/55" datetime="{{ mention.createdAt|date('c') }}">{{ mention.createdAt|date('Y-m-d H:i') }}</time>
                     </div>
-                    {% if mention.unread %}
-                        <form method="post" action="{{ path('dashboard_mentions_read', {id: mention.id}) }}" class="shrink-0">
-                            <input type="hidden" name="_token" value="{{ csrf_token('mention_read_' ~ mention.id) }}">
-                            {% if filters.project %}<input type="hidden" name="project" value="{{ filters.project }}">{% endif %}
-                            {% if filters.unread %}<input type="hidden" name="unread" value="1">{% endif %}
-                            {% if filters.per_page %}<input type="hidden" name="per_page" value="{{ filters.per_page }}">{% endif %}
+                    {% if mention.unread and markReadForms[mention.id] is defined %}
+                        {{ form_start(markReadForms[mention.id], {
+                            action: path('dashboard_mentions_read', {id: mention.id}),
+                            attr: {class: 'shrink-0'},
+                        }) }}
+                            {% include 'form/_fields.html.twig' with {form: markReadForms[mention.id]} only %}
                             <button class="btn-ghost btn-sm btn-label" type="submit">{{ 'mentions.mark_read'|trans }}</button>
-                        </form>
+                        {{ form_end(markReadForms[mention.id]) }}
                     {% endif %}
                 </li>
             {% endfor %}

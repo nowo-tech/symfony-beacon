@@ -352,7 +352,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     serializer?: bool|array{ // Serializer configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         enable_attributes?: bool|Param, // Default: true
  *         name_converter?: scalar|Param|null,
  *         circular_reference_handler?: scalar|Param|null,
@@ -1421,7 +1421,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             max_uses?: int|Param, // How many times the signed login link can be used (Symfony login_link max_uses). // Default: 1
  *             request_rate_limit?: int|Param, // Max magic-login requests per client IP per window (0 = disabled). // Default: 5
  *             request_rate_window?: int|Param, // Seconds for request_rate_limit window. // Default: 900
- *             confirm_interstitial?: bool|Param, // When true, magic_login_check accepts GET+POST: GET renders a confirm form (for login_link.check_post_only); POST is handled by Symfony login_link. // Default: false
+ *             confirm_interstitial?: bool|Param, // When true, magic_login_check GET renders a CSRF confirm form; POST goes to magic_login_confirm (consume login link after Form CSRF). Pair with login_link.check_post_only. // Default: false
  *         },
  *         social_login?: array{
  *             mode?: "disabled"|"enabled"|Param, // disabled: hide social login. enabled: OAuth buttons when provider credentials exist in the database. // Default: "disabled"
@@ -1472,6 +1472,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             magic_login_check?: array{
  *                 path?: scalar|Param|null, // Default: "/magic-login/check"
  *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_magic_login_check"
+ *             },
+ *             magic_login_confirm?: array{
+ *                 path?: scalar|Param|null, // Default: "/magic-login/confirm"
+ *                 name?: scalar|Param|null, // Default: "nowo_auth_kit_magic_login_confirm"
  *             },
  *             social_login_start?: array{
  *                 path?: scalar|Param|null, // Default: "/login/social/{provider}"

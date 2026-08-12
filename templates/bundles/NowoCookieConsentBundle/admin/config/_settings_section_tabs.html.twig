@@ -1,0 +1,16 @@
+{# Host override: section tabs as beacon-tabs--sections (Appearance subtabs pattern). #}
+{% set active = section.value %}
+{% set items = [] %}
+{% for item in sections %}
+    {% set items = items|merge([{
+        label: ('nowo_cookie_consent.admin.config.settings.section.' ~ item.translationSuffix())|trans({}, 'NowoCookieConsentBundle'),
+        href: path('nowo_cookie_consent_config_settings_section', {configId: config.id, section: item.value}),
+        current: item.value == active,
+    }]) %}
+{% endfor %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'nowo_cookie_consent.admin.config.settings.section_tabs_label'|trans({}, 'NowoCookieConsentBundle'),
+    nav_class: 'mb-6 beacon-tabs--sections nowo-ui-tabs--sections',
+    attr: {'data-turbo': 'false', 'data-testid': 'cookie-consent-section-tabs'},
+    items: items,
+} only %}

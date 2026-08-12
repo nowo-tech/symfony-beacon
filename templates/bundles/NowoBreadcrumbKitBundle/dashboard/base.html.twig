@@ -1,0 +1,42 @@
+{# Host override: Beacon shell already loads kit styles before app CSS.
+   Do NOT append nowo-ui.css again — that reasserts UiKit blue/slate :root tokens. #}
+{% extends nowo_breadcrumb_kit_layout_template|default('kit/breadcrumb_dashboard_layout.html.twig') %}
+{% trans_default_domain 'NowoBreadcrumbKitBundle' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+
+{% set dashboard_routes = dashboard_routes|default({
+    collections_index: 'nowo_breadcrumb_kit_dashboard_collections_index',
+    collections_edit: 'nowo_breadcrumb_kit_dashboard_collections_edit',
+    import: 'nowo_breadcrumb_kit_dashboard_import',
+    export_all: 'nowo_breadcrumb_kit_dashboard_export_all',
+}) %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/dashboard.js', 'nowo_breadcrumb_kit') }}" defer></script>
+{% endblock %}
+
+{% block nowo_breadcrumb_kit_content %}
+    {% set modal_classes = modal_classes|default({}) %}
+    {% block nowo_ui_flashes %}
+        {% for msg in app.flashes('success') %}
+            <div class="{{ ui.flash('success') }}">{{ msg }}</div>
+        {% endfor %}
+        {% for msg in app.flashes('danger') %}
+            <div class="{{ ui.flash('danger') }}">{{ msg }}</div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="{{ ui.flash('error') }}">{{ msg }}</div>
+        {% endfor %}
+    {% endblock %}
+
+    {% block body %}{% endblock %}
+
+    {% block nowo_ui_modals %}
+        {% include '@NowoBreadcrumbKitBundle/dashboard/_dashboard_modals.html.twig' %}
+    {% endblock %}
+{% endblock %}

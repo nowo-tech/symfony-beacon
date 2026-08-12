@@ -123,16 +123,15 @@
                                 {% endembed %}
                             {% endif %}
                             {% if not permission.system %}
-                                <form
-                                    method="post"
-                                    action="{{ path('admin_permissions_delete', {id: permission.uuid}) }}"
-                                    data-controller="confirm-submit"
-                                    data-confirm-submit-message-value="{{ 'permissions.delete_confirm'|trans|e('html_attr') }}"
-                                    data-action="submit->confirm-submit#confirm"
-                                >
-                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_permission_delete_' ~ permission.id) }}">
+                                {{ form_start(deleteForms[permission.id], {
+                                    attr: {
+                                        'data-controller': 'confirm-submit',
+                                        'data-confirm-submit-message-value': 'permissions.delete_confirm'|trans|e('html_attr'),
+                                        'data-action': 'submit->confirm-submit#confirm',
+                                    }
+                                }) }}
                                     <button class="btn-danger btn-sm" type="submit">{{ 'permissions.delete'|trans }}</button>
-                                </form>
+                                {{ form_end(deleteForms[permission.id]) }}
                             {% endif %}
                         </div>
                     </td>

@@ -6,9 +6,11 @@ namespace App\Issues\Controller;
 
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
+use App\Issues\Form\DashboardNewInReleaseFilterType;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +27,7 @@ final class DashboardNewInReleaseController extends AbstractController
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly IssueSearchRepository $issueRepository,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -39,6 +42,7 @@ final class DashboardNewInReleaseController extends AbstractController
 
         $releaseRaw = trim($request->query->getString('release'));
         $release = '' !== $releaseRaw ? Issue::normalizeRelease($releaseRaw) : null;
+        $availableReleases = $this->issueRepository->findDistinctFirstReleasesAcrossProjects($projects);
 
         $total = $this->issueRepository->countNewInRelease($projects, $release);
         $pagination = PagePagination::fromRequest($request, $total);
@@ -49,15 +53,32 @@ final class DashboardNewInReleaseController extends AbstractController
             $pagination['offset'],
         );
 
+        $projectChoices = [];
+        foreach ($accessible as $project) {
+            $projectChoices[$project->getName()] = $project->getUuid();
+        }
+        $releaseChoices = array_combine($availableReleases, $availableReleases) ?: [];
+
         return $this->render('dashboard/new_in_release.html.twig', [
             'issues' => $issues,
             'projects' => $accessible,
-            'releases' => $this->issueRepository->findDistinctFirstReleasesAcrossProjects($projects),
+            'releases' => $availableReleases,
             'filters' => [
                 'project' => $projectFilter?->getUuid() ?? '',
                 'release' => $release ?? '',
+                'page' => 1,
                 'per_page' => $pagination['per_page'],
             ],
+            'filterForm' => $this->getFilterFormFactory->create(DashboardNewInReleaseFilterType::class, [
+                'project' => $projectFilter?->getUuid() ?? '',
+                'release' => $release ?? '',
+                'page' => 1,
+                'per_page' => $pagination['per_page'],
+            ], [
+                'action' => $this->generateUrl('dashboard_new_in_release'),
+                'project_choices' => $projectChoices,
+                'release_choices' => $releaseChoices,
+            ])->createView(),
             'pagination' => $pagination,
         ]);
     }

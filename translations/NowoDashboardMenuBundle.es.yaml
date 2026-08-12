@@ -1,0 +1,7 @@
+# Host overrides — table column labels for kit admin lists (aligned with Cookie Consent / Http Log).
+
+dashboard:
+  table_code: Código
+  table_name: Nombre
+  table_items: Ítems
+  table_context: Contexto

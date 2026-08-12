@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Shared\Http\JsonUploadReader;
+use App\Shared\Settings\Form\InstanceConfigImportType;
 use App\Shared\Settings\Service\InstanceConfigPortability;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +34,13 @@ final class InstanceConfigController extends AbstractController
     #[Route('/admin/instance-config', name: 'admin_instance_config', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('settings/instance_config.html.twig');
+        return $this->render('settings/instance_config.html.twig', [
+            'importForm' => $this->createForm(InstanceConfigImportType::class, null, [
+                'action' => $this->generateUrl('admin_instance_config_import'),
+                'method' => 'POST',
+                'csrf_token_id' => 'instance_config_import',
+            ])->createView(),
+        ]);
     }
 
     #[Route('/admin/instance-config/export', name: 'admin_instance_config_export', methods: ['GET'])]
@@ -63,13 +70,17 @@ final class InstanceConfigController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (!$this->isCsrfTokenValid('instance_config_import', $request->request->getString('_token'))) {
+        $form = $this->createForm(InstanceConfigImportType::class, null, [
+            'csrf_token_id' => 'instance_config_import',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'settings.instance_config.invalid_csrf');
 
             return $this->redirectToRoute('admin_instance_config');
         }
 
-        $file = $request->files->get('config');
+        $file = $form->get('config')->getData();
         try {
             $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $applied = $this->portability->import($payload);

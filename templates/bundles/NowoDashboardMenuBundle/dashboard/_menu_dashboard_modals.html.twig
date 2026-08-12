@@ -1,0 +1,94 @@
+{% trans_default_domain 'NowoDashboardMenuBundle' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{# Host: kit modal ids / fetch targets; Beacon <dialog> = panel + header + body slot (content/actions in partials). #}
+
+<dialog class="nowo-ui-modal confirm-dialog" id="modal-menu-form" aria-labelledby="modal-menu-form-label">
+    <div class="confirm-dialog__panel">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-menu-form-label">{{ 'dashboard.edit_menu'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div id="modal-menu-form-body" class="kit-modal__body">
+            <div class="confirm-dialog__content">
+                <p class="kit-modal__lead text-center">{{ 'dashboard.loading'|trans }}</p>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog class="nowo-ui-modal confirm-dialog" id="modal-menu-copy" aria-labelledby="modal-menu-copy-label">
+    <div class="confirm-dialog__panel">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-menu-copy-label">{{ 'dashboard.copy_menu'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div id="modal-menu-copy-body" class="kit-modal__body">
+            <div class="confirm-dialog__content">
+                <p class="kit-modal__lead text-center">{{ 'dashboard.loading'|trans }}</p>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog class="nowo-ui-modal confirm-dialog confirm-dialog--wide" id="modal-item-form" aria-labelledby="modal-item-form-label">
+    <div class="confirm-dialog__panel">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-item-form-label">{{ 'dashboard.item'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div id="modal-item-form-body" class="kit-modal__body">
+            <div class="confirm-dialog__content">
+                <p class="kit-modal__lead text-center">{{ 'dashboard.loading'|trans }}</p>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog class="nowo-ui-modal confirm-dialog" id="modal-import" aria-labelledby="modal-import-label">
+    <div class="confirm-dialog__panel">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-import-label">{{ 'dashboard.import'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div id="modal-import-body" class="kit-modal__body">
+            <div class="confirm-dialog__content">
+                <p class="kit-modal__lead text-center">{{ 'dashboard.loading'|trans }}</p>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog class="nowo-ui-modal confirm-dialog" id="modal-delete-confirm" aria-labelledby="modal-delete-label">
+    <form id="form-delete-confirm" method="post" action="" class="confirm-dialog__panel">
+        <input type="hidden" name="_token" value="">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-delete-label">{{ 'dashboard.confirm_delete'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div class="confirm-dialog__content">
+            <p class="confirm-dialog__body" id="modal-delete-message">{{ 'dashboard.delete_menu_message'|trans }}</p>
+        </div>
+        <div class="confirm-dialog__actions">
+            <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans }}</button>
+            <button type="submit" class="btn-danger">{{ 'dashboard.delete'|trans }}</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog class="nowo-ui-modal confirm-dialog" id="modal-delete-item-confirm" aria-labelledby="modal-delete-item-label">
+    <form id="form-delete-item-confirm" method="post" action="" class="confirm-dialog__panel">
+        <input type="hidden" name="_token" value="">
+        <div class="confirm-dialog__header">
+            <h2 class="confirm-dialog__title" id="modal-delete-item-label">{{ 'dashboard.confirm_delete'|trans }}</h2>
+            <button type="button" class="btn-close" {{ ui.modal_dismiss_attrs(_css_fw)|raw }} aria-label="{{ 'dashboard.close'|trans }}"></button>
+        </div>
+        <div class="confirm-dialog__content">
+            <p class="confirm-dialog__body" id="modal-delete-item-message">{{ 'dashboard.delete_item_message'|trans }}</p>
+        </div>
+        <div class="confirm-dialog__actions">
+            <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans }}</button>
+            <button type="submit" class="btn-danger">{{ 'dashboard.delete'|trans }}</button>
+        </div>
+    </form>
+</dialog>

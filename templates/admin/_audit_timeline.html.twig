@@ -23,31 +23,24 @@
     <a class="text-sm no-underline" href="{{ reset_path }}">{{ 'admin_projects.audit_reset'|trans }}</a>
 </div>
 
-<form method="get" action="{{ form_action }}" class="mb-4 grid gap-3 sm:grid-cols-4">
+{{ form_start(auditFilterForm, {attr: {class: 'mb-4 grid gap-3 sm:grid-cols-4'}}) }}
     <div class="sm:col-span-2">
         <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-action">{{ 'admin_projects.audit_filter_action'|trans }}</label>
-        <select id="{{ timeline_id }}-action" class="input w-full" name="action">
-            <option value="">{{ 'admin_projects.audit_filter_all_actions'|trans }}</option>
-            {% for action in audit_actions %}
-                <option value="{{ action.value }}" {% if audit_filter.action == action.value %}selected{% endif %}>
-                    {{ ('users.activity.action.' ~ action.value)|trans }}
-                </option>
-            {% endfor %}
-        </select>
+        {{ form_widget(auditFilterForm.action, {attr: {id: timeline_id ~ '-action', class: 'input w-full'}}) }}
     </div>
     <div>
         <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-from">{{ 'admin_projects.audit_filter_from'|trans }}</label>
-        <input id="{{ timeline_id }}-from" class="input w-full" type="date" name="from" value="{{ audit_filter.from }}">
+        {{ form_widget(auditFilterForm.from, {attr: {id: timeline_id ~ '-from', class: 'input w-full', type: 'date'}}) }}
     </div>
     <div>
         <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-to">{{ 'admin_projects.audit_filter_to'|trans }}</label>
-        <input id="{{ timeline_id }}-to" class="input w-full" type="date" name="to" value="{{ audit_filter.to }}">
+        {{ form_widget(auditFilterForm.to, {attr: {id: timeline_id ~ '-to', class: 'input w-full', type: 'date'}}) }}
     </div>
     <div class="flex flex-wrap items-end gap-2 sm:col-span-4">
         <button class="btn-primary" type="submit">{{ 'admin_projects.audit_apply'|trans }}</button>
         <a class="btn-ghost no-underline" href="{{ reset_path }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
-</form>
+{{ form_end(auditFilterForm, {render_rest: false}) }}
 
 {% if audit_entries is empty %}
     <p class="text-sm text-[var(--color-ink)]/55">{{ empty_key|trans }}</p>

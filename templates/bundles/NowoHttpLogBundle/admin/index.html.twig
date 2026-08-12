@@ -1,86 +1,92 @@
-{# Host override: UiKit table + icon row actions (nowo_ui_kit.row_actions_display). #}
+{# Host rewrite: Beacon Administration list chrome (Menus pattern).
+   Row actions: btn-ghost + _action_inner (nowo_ui_kit.row_actions_display). #}
 {% extends nowo_http_log_layout_template|default('@NowoHttpLogBundle/layout.html.twig') %}
-{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
 {% set _css_fw = nowo_http_log_css_framework|default('tailwind') %}
+{% set _td = 'NowoHttpLogBundle' %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
 
-{% block title %}{{ 'admin.index.title'|trans({}, 'NowoHttpLogBundle') }} — {{ parent() }}{% endblock %}
+{% block title %}{{ 'admin.index.title'|trans({}, _td) }} — {{ parent() }}{% endblock %}
+
+{% set kit_admin_header_actions %}
+    {% set exportCsvForm = csrf_action_form(path('nowo_http_log_admin_export'), 'http_log_export', 'POST', false) %}
+    {{ form_start(exportCsvForm, {attr: {class: 'inline'}}) }}
+        <input type="hidden" name="format" value="csv">
+        {% for key, value in criteria %}
+            <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
+        {% endfor %}
+        <button type="submit" class="btn-ghost">{{ 'admin.action.export_csv'|trans({}, _td) }}</button>
+    {{ form_end(exportCsvForm) }}
+    {% set exportJsonForm = csrf_action_form(path('nowo_http_log_admin_export'), 'http_log_export', 'POST', false) %}
+    {{ form_start(exportJsonForm, {attr: {class: 'inline'}}) }}
+        <input type="hidden" name="format" value="json">
+        {% for key, value in criteria %}
+            <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
+        {% endfor %}
+        <button type="submit" class="btn-ghost">{{ 'admin.action.export_json'|trans({}, _td) }}</button>
+    {{ form_end(exportJsonForm) }}
+    {% set purgeForm = csrf_action_form(path('nowo_http_log_admin_purge'), 'http_log_purge', 'POST', false) %}
+    {{ form_start(purgeForm, {
+        attr: {
+            class: 'inline',
+            onsubmit: "return confirm('" ~ 'admin.purge.confirm'|trans({}, _td)|e('js') ~ "');",
+        },
+    }) }}
+        <button type="submit" class="btn-danger">{{ 'admin.action.purge'|trans({}, _td) }}</button>
+    {{ form_end(purgeForm) }}
+{% endset %}
 
 {% block nowo_ui_content %}
     {% include '@NowoHttpLogBundle/admin/_filter.html.twig' %}
 
-    <div class="panel http-log-results" data-testid="http-log-results">
-        <div class="{{ ui.toolbar(_css_fw) }} http-log-results__toolbar">
-            <p class="http-log-results__summary nowo-ui-summary">{{ 'admin.index.total'|trans({'%count%': total}, 'NowoHttpLogBundle') }}</p>
-            <div class="{{ ui.row_actions(_css_fw) }} http-log-results__actions">
-                <form method="post" action="{{ path('nowo_http_log_admin_export') }}" class="http-log-results__action">
-                    <input type="hidden" name="_token" value="{{ csrf_token('http_log_export') }}">
-                    <input type="hidden" name="format" value="csv">
-                    {% for key, value in criteria %}
-                        <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
-                    {% endfor %}
-                    <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }} nowo-ui-btn-export">{{ 'admin.action.export_csv'|trans({}, 'NowoHttpLogBundle') }}</button>
-                </form>
-                <form method="post" action="{{ path('nowo_http_log_admin_export') }}" class="http-log-results__action">
-                    <input type="hidden" name="_token" value="{{ csrf_token('http_log_export') }}">
-                    <input type="hidden" name="format" value="json">
-                    {% for key, value in criteria %}
-                        <input type="hidden" name="{{ key }}" value="{{ value.timestamp is defined ? value|date('Y-m-d\\TH:i') : value }}">
-                    {% endfor %}
-                    <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }} nowo-ui-btn-export">{{ 'admin.action.export_json'|trans({}, 'NowoHttpLogBundle') }}</button>
-                </form>
-                <form method="post" action="{{ path('nowo_http_log_admin_purge') }}" class="http-log-results__action"
-                      onsubmit="return confirm('{{ 'admin.purge.confirm'|trans({}, 'NowoHttpLogBundle')|e('js') }}');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('http_log_purge') }}">
-                    <button type="submit" class="{{ ui.btn('danger', null, _css_fw) }} nowo-ui-btn-purge">{{ 'admin.action.purge'|trans({}, 'NowoHttpLogBundle') }}</button>
-                </form>
-            </div>
-        </div>
+    <section class="panel overflow-x-auto http-log-results" data-testid="http-log-results">
+        <p class="mb-3 text-sm text-[var(--color-ink)]/70">{{ 'admin.index.total'|trans({'%count%': total}, _td) }}</p>
 
-        <div class="{{ ui.table_wrap(_css_fw) }}">
-            <table class="{{ ui.table(_css_fw) }}">
-                <thead>
-                    <tr>
-                        <th>{{ 'admin.column.id'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.created_at'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.method'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.path'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.status'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.duration'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th>{{ 'admin.column.client_ip'|trans({}, 'NowoHttpLogBundle') }}</th>
-                        <th></th>
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.id'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.created_at'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.method'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.path'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.status'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.duration'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'admin.column.client_ip'|trans({}, _td) }}</th>
+                    <th class="w-0 px-2 py-2 text-end font-medium whitespace-nowrap"><span class="visually-hidden">{{ 'admin.action.view'|trans({}, _td) }}</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                    {% set _label_view = 'admin.action.view'|trans({}, _td) %}
+                    <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                        <td class="px-2 py-3">{{ entry.id }}</td>
+                        <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td class="px-2 py-3">
+                            <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">{{ entry.method }}</span>
+                        </td>
+                        <td class="max-w-xs truncate px-2 py-3" title="{{ entry.path }}">{{ entry.path }}</td>
+                        <td class="px-2 py-3">{{ entry.statusCode }}</td>
+                        <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ entry.durationMs|number_format(1) }} ms</td>
+                        <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ entry.clientIp }}</td>
+                        <td class="w-0 px-2 py-3 text-end whitespace-nowrap">
+                            <div class="inline-flex max-w-full items-center justify-end gap-1 {{ _display == 'icon' ? '' : 'flex-wrap' }} nowo-ui-row-actions nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}">
+                                <a
+                                    href="{{ path('nowo_http_log_admin_show', {id: entry.id}) }}"
+                                    class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} no-underline"
+                                    title="{{ _label_view }}"
+                                    aria-label="{{ _label_view }}"
+                                >
+                                    {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'view', label: _label_view} only %}
+                                </a>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for entry in entries %}
-                        <tr>
-                            <td>{{ entry.id }}</td>
-                            <td>{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
-                            <td><span class="{{ ui.badge(null, _css_fw) }}">{{ entry.method }}</span></td>
-                            <td class="text-truncate" title="{{ entry.path }}">{{ entry.path }}</td>
-                            <td>{{ entry.statusCode }}</td>
-                            <td>{{ entry.durationMs|number_format(1) }} ms</td>
-                            <td>{{ entry.clientIp }}</td>
-                            <td>
-                                {% include '@NowoUiKitBundle/partials/_row_actions.html.twig' with {
-                                    framework: _css_fw,
-                                    actions: [
-                                        {
-                                            kind: 'view',
-                                            href: path('nowo_http_log_admin_show', {id: entry.id}),
-                                            label: 'admin.action.view'|trans({}, 'NowoHttpLogBundle')
-                                        }
-                                    ]
-                                } %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="{{ ui.muted(_css_fw) }}">{{ 'admin.index.empty'|trans({}, 'NowoHttpLogBundle') }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% else %}
+                    <tr>
+                        <td class="px-2 py-4 text-[var(--color-ink)]/55" colspan="8">{{ 'admin.index.empty'|trans({}, _td) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         {% set totalPages = total > 0 ? (total / pageSize)|round(0, 'ceil') : 1 %}
         {% set httpLogQuery = {} %}
@@ -100,8 +106,8 @@
             query: httpLogQuery,
             nav_label: 'admin.index.title',
             trans_domain: 'messages',
-            nav_trans_domain: 'NowoHttpLogBundle',
+            nav_trans_domain: _td,
             framework: _css_fw,
         } %}
-    </div>
+    </section>
 {% endblock %}

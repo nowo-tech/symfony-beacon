@@ -27,11 +27,10 @@ final class AdminProjectIngestTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
         self::assertResponseIsSuccessful();
 
-        $token = $crawler->filter('form[action$="/ingest"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/ingest', [
-            '_token' => $token,
+        $form = $crawler->filter('form[action$="/ingest"]')->form([
             'enabled' => '0',
         ]);
+        $client->submit($form);
         self::assertResponseRedirects('/admin/projects/'.$project->getUuid());
 
         $em->clear();

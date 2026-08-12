@@ -98,7 +98,7 @@ As a maintainer, when I add a new settings/preferences form, I reuse the shared 
 - Danger zone / anonymize / delete confirms
 - Pure AuthKit vendor security pages unless already overridden as host settings UI
 - PWA install / uninstall links and install prompt
-- Migrating every hand-rolled admin CRUD create form to Form Types (separate from `077`)
+- Migrating every hand-rolled admin CRUD create form to Form Types (see `090-csrf-symfony-forms`)
 
 ## Success Criteria *(mandatory)*
 

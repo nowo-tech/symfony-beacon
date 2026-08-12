@@ -8,6 +8,8 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Form\ProjectClearHistoryType;
+use App\Project\Form\ProjectDeleteType;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
@@ -46,7 +48,11 @@ final class ProjectDangerZoneController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_clear_'.$project->getId(), (string) $request->request->get('_token'))) {
+        $form = $this->createForm(ProjectClearHistoryType::class, null, [
+            'csrf_token_id' => 'project_clear_'.$project->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -83,11 +89,16 @@ final class ProjectDangerZoneController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::DELETE);
 
-        if (!$this->isCsrfTokenValid('project_delete_'.$project->getId(), (string) $request->request->get('_token'))) {
+        $form = $this->createForm(ProjectDeleteType::class, null, [
+            'csrf_token_id' => 'project_delete_'.$project->getId(),
+            'project_id' => (int) $project->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $confirmation = (string) $request->request->get('confirmation');
+        $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
         if ($confirmation !== $project->getName()) {
             $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
 

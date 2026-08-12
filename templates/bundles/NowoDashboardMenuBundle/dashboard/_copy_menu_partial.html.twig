@@ -1,0 +1,18 @@
+{# Host: copy-menu modal body — Beacon confirm-dialog content + footer. #}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{% for msg in app.flashes('error') %}
+    <div class="{{ ui.flash('error', _css_fw) }}">{{ msg }}</div>
+{% endfor %}
+{{ form_start(form, { attr: { class: 'kit-modal__panel dm-dashboard-form' } }) }}
+    <div class="confirm-dialog__content">
+        <p class="kit-modal__lead">{{ 'dashboard.copy_menu_help'|trans({}, 'NowoDashboardMenuBundle') }}</p>
+        {% for field in form.children %}
+            {{ form_row(field) }}
+        {% endfor %}
+    </div>
+    <div class="confirm-dialog__actions">
+        <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans({}, 'NowoDashboardMenuBundle') }}</button>
+        <button type="submit" class="btn-primary">{{ 'dashboard.copy_menu'|trans({}, 'NowoDashboardMenuBundle') }}</button>
+    </div>
+{{ form_end(form) }}

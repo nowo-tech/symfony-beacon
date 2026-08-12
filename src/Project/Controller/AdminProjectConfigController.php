@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Form\AdminProjectImportType;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectConfigPortability;
 use App\Shared\Http\JsonUploadReader;
@@ -99,13 +100,17 @@ final class AdminProjectConfigController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (!$this->isCsrfTokenValid('admin_projects_import', $request->request->getString('_token'))) {
+        $form = $this->createForm(AdminProjectImportType::class, null, [
+            'csrf_token_id' => 'admin_projects_import',
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'flash.project.config_invalid_csrf');
 
             return $this->redirectToRoute('admin_projects');
         }
 
-        $file = $request->files->get('bundle');
+        $file = $form->get('bundle')->getData();
         try {
             $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $result = $this->portability->importAdmin($payload, $user);

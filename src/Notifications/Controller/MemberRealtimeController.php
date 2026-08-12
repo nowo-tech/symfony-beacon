@@ -42,7 +42,7 @@ final class MemberRealtimeController extends AbstractController
      * Live update + push bootstrap payload for the logged-in member.
      */
     #[Route('/account/realtime/config', name: 'account_realtime_config', methods: ['GET'])]
-    public function config(): JsonResponse
+    public function config(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -55,7 +55,7 @@ final class MemberRealtimeController extends AbstractController
                 $topics[] = IssueRealtimeTopics::forProject($project->getUuid());
             }
             $token = $this->mercure->createSubscriberToken($topics);
-            $hubUrl = $this->mercure->getPublicUrl();
+            $hubUrl = $this->browserMercureHubUrl($request, $this->mercure->getPublicUrl());
         }
 
         return $this->json([
@@ -173,5 +173,34 @@ final class MemberRealtimeController extends AbstractController
         }
 
         return $this->json(['ok' => true]);
+    }
+
+    /**
+     * Prefer same-origin EventSource when the hub is the Caddy-proxied
+     * {@code /.well-known/mercure} path so CSP {@code connect-src 'self'} matches
+     * even if {@code MERCURE_PUBLIC_URL} used a different host/port than the browser.
+     */
+    private function browserMercureHubUrl(Request $request, ?string $configuredPublicUrl): ?string
+    {
+        if (null === $configuredPublicUrl || '' === $configuredPublicUrl) {
+            return null;
+        }
+
+        $parts = parse_url($configuredPublicUrl);
+        if (!\is_array($parts)) {
+            return $configuredPublicUrl;
+        }
+
+        $path = $parts['path'] ?? '';
+        if (!str_starts_with($path, '/.well-known/mercure')) {
+            return $configuredPublicUrl;
+        }
+
+        $url = $request->getSchemeAndHttpHost().$path;
+        if (isset($parts['query']) && '' !== $parts['query']) {
+            $url .= '?'.$parts['query'];
+        }
+
+        return $url;
     }
 }

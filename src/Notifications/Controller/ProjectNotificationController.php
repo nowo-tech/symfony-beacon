@@ -12,6 +12,7 @@ use App\Project\Entity\Project;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
+use App\Shared\Form\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -111,7 +112,11 @@ final class ProjectNotificationController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
-        if (!$this->isCsrfTokenValid('notif_toggle_'.$destination->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'notif_toggle_'.$destination->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -130,7 +135,11 @@ final class ProjectNotificationController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
-        if (!$this->isCsrfTokenValid('notif_resume_'.$destination->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'notif_resume_'.$destination->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -149,7 +158,11 @@ final class ProjectNotificationController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
-        if (!$this->isCsrfTokenValid('notif_delete_'.$destination->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'notif_delete_'.$destination->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -168,7 +181,11 @@ final class ProjectNotificationController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedDestination($projectId, $destination);
-        if (!$this->isCsrfTokenValid('notif_test_'.$destination->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'notif_test_'.$destination->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 

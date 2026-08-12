@@ -79,6 +79,8 @@ class UserRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.createdBy', 'cb')->addSelect('cb')
             ->leftJoin('u.updatedBy', 'ub')->addSelect('ub')
+            // Eager-load instance roles so User::getRoles() does not N+1 the directory.
+            ->leftJoin('u.instanceRoles', 'ir')->addSelect('ir')
             ->orderBy('u.email', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {

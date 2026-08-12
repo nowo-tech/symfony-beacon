@@ -76,9 +76,8 @@ MD,
     )]
     #[OA\Response(response: 200, description: 'Accepted; async processing queued. Empty body.')]
     #[OA\Response(response: 400, description: 'Invalid JSON or empty mapped set after filters.')]
-    #[OA\Response(response: 401, description: 'Missing authorization.')]
-    #[OA\Response(response: 403, description: 'Forbidden / ingest disabled.')]
-    #[OA\Response(response: 404, description: 'Project not found.')]
+    #[OA\Response(response: 401, description: 'Unauthorized (missing/invalid credentials or unknown project).')]
+    #[OA\Response(response: 403, description: 'Ingest disabled for the project.')]
     #[OA\Response(response: 413, description: 'Body too large.')]
     #[OA\Response(response: 429, description: 'Rate limit or quota exceeded.')]
     public function __invoke(string $projectId, Request $request): Response

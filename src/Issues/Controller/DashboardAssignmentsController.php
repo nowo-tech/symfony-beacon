@@ -9,11 +9,13 @@ use App\Issues\AssignmentScope;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
+use App\Issues\Form\DashboardAssignmentsFilterType;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +33,7 @@ final class DashboardAssignmentsController extends AbstractController
         private readonly ProjectRepository $projectRepository,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly IssueSearchRepository $issueRepository,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -101,14 +104,33 @@ final class DashboardAssignmentsController extends AbstractController
             'assignee' => null !== $assigneeFilter?->getId() ? (string) $assigneeFilter->getId() : '',
             'sort' => $sort->field,
             'dir' => $sort->direction,
+            'page' => 1,
             'per_page' => $pagination['per_page'],
         ];
+        $projectChoices = [];
+        foreach ($accessible as $project) {
+            $projectChoices[$project->getName()] = $project->getUuid();
+        }
+        $teammateChoices = [];
+        foreach ($teammates as $teammate) {
+            $teammateId = $teammate->getId();
+            if (null === $teammateId) {
+                continue;
+            }
+
+            $teammateChoices[(string) $teammateId] = $teammate->getDisplayName() ?: $teammate->getEmail();
+        }
 
         return $this->render('dashboard/assignments.html.twig', [
             'issues' => $issues,
             'projects' => $accessible,
             'teammates' => $teammates,
             'filters' => $filters,
+            'filterForm' => $this->getFilterFormFactory->create(DashboardAssignmentsFilterType::class, $filters, [
+                'action' => $this->generateUrl('dashboard_assignments'),
+                'project_choices' => $projectChoices,
+                'teammate_choices' => $teammateChoices,
+            ])->createView(),
             'pagination' => $pagination,
             'scopes' => AssignmentScope::cases(),
         ]);

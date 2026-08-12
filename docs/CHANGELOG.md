@@ -7,9 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-08-12
+
+### Fixed
+
+- Kit admin row actions: `nowo_ui_kit.row_actions_display: text` with kit CSS so `.btn-sm` / `nowo-ui-btn--sm` square metrics do not crush label buttons (`btn-label` / `.nowo-ui-row-actions--text`); text clusters use `flex-wrap: nowrap` (panel may scroll horizontally).
+- Breadcrumb kit actions column: wider `min-w-*` (no `w-0`) so collection/item text actions stay on one line.
+- CSP console noise on kit admin: host `<style>` blocks use `csp_nonce()`; policy splits `style-src-elem` (nonce) vs `style-src-attr` (CSSOM); dashboard-menu skips CDN `stimulus-live.js` / esm.sh (Vite Stimulus + `window.Stimulus`); Mercure EventSource prefers same-origin `/.well-known/mercure` and `connect-src` allows a cross-origin hub from `MERCURE_PUBLIC_URL` when needed.
+- Kit admin modals (`<dialog>`): rebuild `kit-admin` with `showModal` bridge + host click handler for `data-nowo-modal-*`; sync JSON-island config boot before deferred `dashboard.js` (`script-src` nonce).
+- Breadcrumb kit admin hub intro: `admin.hub.breadcrumbs` translates via `messages` (was raw key under kit `trans_default_domain`).
+- Breadcrumbs for **Appearance** tab URLs (`admin_appearance_section`) and RoutingKit create/edit — seeded in `breadcrumbs.default.json` (re-run `make seed` / `app:seed-platform`). Site Backup panel stays on guest shell (password gate), so it has no admin crumbs by design.
+
 ### Changed
 
-- `nowo-tech/routing-kit-bundle` **1.4.0**: panel export/clear-cache/import/delete use Symfony forms; host override uses `export_form` / `clear_cache_form` / `import_form` / `delete_forms`.
+- Kit Administration chrome sync (`081`): host forks for **Dashboard Menu**, **Breadcrumb Kit**, **RoutingKit**, and **Http Log** use Administration list chrome — `panel` + sand/ink tables, `kit_admin_header_actions`, `btn-ghost` / `btn-primary` / `btn-danger` + `_action_inner` (text labels), kit JS/modal hooks kept; kit `base` overrides skip re-appending `nowo-ui.css`.
+- Http Log filters: Issues/admin widget+placeholder standard inside a `panel` card (`.input` + `btn-ghost`).
+- **CSRF via Symfony Forms (`090` / 6.39)**: host mutable POSTs use FormKit Types — `CsrfOnlyType` / `HiddenFieldsCsrfType` / `csrf_action_form()` for single-action buttons; named Types for Issues triage, danger zone, Settings create/import, admin helpers, mentions, tour replay; GET list filters via `AbstractGetFilterType` + `GetFilterFormFactory`. Intentional exceptions: AJAX header CSRF (theme / content-width / tour mark / Web Push), AuthKit logout `_csrf_token`, kit modal `data-token` deletes.
+- AuthKit **1.17.0**: magic-login confirm uses Form CSRF (`MagicLoginConfirmType` + POST `/login/magic/confirm`); host Twig fork updated; removed REQ-TWIG-005 plain-form exception.
+- Composer pins: `nowo-tech/password-toggle-bundle` **2.1.1** (CSP-safe eye icons), `password-strength-bundle` **2.2.0**, `routing-kit-bundle` **1.4.0** (Symfony forms for panel export/clear-cache/import/delete; host override uses `export_form` / `delete_forms`), `site-backup-bundle` **1.10.1**, `symfony/mercure-bundle` **0.5.0**, selected Symfony **8.1.4** components; dev: `phpstan-frankenphp` **1.1.0**, `rector` **2.6.2**. Host keeps Stimulus `_toggle_password_csp` (script-src); icon visibility aligns with bundle `is-password-visible`.
+- Demo breadcrumb ES labels for collection routes: `Migas de pan` (trail matches nav).
 
 ## [1.6.4] - 2026-08-11
 
@@ -907,7 +923,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.1...v1.6.2

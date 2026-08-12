@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
-use App\Identity\AdminAuditFilter;
 use App\Identity\Entity\User;
-use App\Identity\Entity\UserGroup;
-use App\Identity\Repository\UserActionRepository;
-use App\Identity\Repository\UserGroupMembershipRepository;
-use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
-use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectRole;
+use App\Project\Form\AdminProjectImportType;
+use App\Project\Form\ProjectDeleteType;
 use App\Project\Form\ProjectType;
-use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AdminProjectShowPageBuilder;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectFactory;
 use App\Project\Service\ProjectHistoryClearer;
-use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -41,22 +37,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminProjectController extends AbstractController
 {
-    private const int PROJECT_AUDIT_LIMIT = 100;
-
     public function __construct(
         private readonly UserActionRecorder $actionRecorder,
-        private readonly NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectHistoryClearer $historyClearer,
-        private readonly ProjectMembershipManager $membershipManager,
-        private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly MessengerQueueHealth $messengerQueueHealth,
         private readonly ProjectOpsStatsService $opsStats,
         private readonly ProjectRepository $projectRepository,
         private readonly ProjectFactory $projectFactory,
-        private readonly UserActionRepository $userActionRepository,
-        private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
-        private readonly UserGroupRepository $userGroupRepository,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
+        private readonly AdminProjectShowPageBuilder $showPageBuilder,
     ) {
     }
 
@@ -77,8 +67,18 @@ final class AdminProjectController extends AbstractController
         return $this->render('admin/projects/index.html.twig', [
             'projects' => $projects,
             'q' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_projects'),
+            ])->createView(),
             'opsStats' => $this->opsStats->forProjects($projects),
             'access_counts' => $this->projectRepository->countAccessByProjectIds($projectIds),
+            'importForm' => $this->createForm(AdminProjectImportType::class, null, [
+                'action' => $this->generateUrl('admin_projects_import'),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_projects_import',
+            ])->createView(),
         ]);
     }
 
@@ -125,35 +125,8 @@ final class AdminProjectController extends AbstractController
     ): Response {
         /** @var User $actor */
         $actor = $this->getUser();
-        $auditActions = $this->projectAuditActionTypes();
-        $audit = AdminAuditFilter::fromRequest($request, $auditActions);
 
-        $this->projectRepository->hydrateAccessGraph($project);
-        $availableGroups = $this->availableGroups($project);
-        $groupIds = ProjectRepository::collectGroupIds($project, $availableGroups);
-        $destinations = $project->getNotificationDestinations()->toArray();
-
-        return $this->render('admin/projects/show.html.twig', [
-            'project' => $project,
-            'assignableRoles' => $this->membershipManager->assignableRoles($actor, $project),
-            'assignableGroupRoles' => $this->membershipManager->assignableGroupRoles($actor, $project),
-            'availableGroups' => $availableGroups,
-            'group_member_counts' => $this->userGroupMembershipRepository->countByGroupIds($groupIds),
-            'delivery_attempts_by_destination' => $this->deliveryAttemptRepository->findRecentByDestinations($destinations),
-            'ownerCount' => $this->countOwners($project),
-            'opsStats' => $this->opsStats->forProject($project),
-            'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
-            'projectAuditActions' => $auditActions,
-            'projectAuditFilter' => $audit['filter'],
-            'projectAuditEntries' => $this->userActionRepository->findForProject(
-                $project,
-                $auditActions,
-                $audit['action'],
-                $audit['from'],
-                $audit['to'],
-                self::PROJECT_AUDIT_LIMIT,
-            ),
-        ]);
+        return $this->render('admin/projects/show.html.twig', $this->showPageBuilder->build($project, $actor, $request));
     }
 
     /** Suspend or resume Envelope ingest for a project. */
@@ -163,13 +136,21 @@ final class AdminProjectController extends AbstractController
         Project $project,
         Request $request,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_project_ingest_'.$project->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->createWithFields(
+            $this->generateUrl('admin_projects_ingest_toggle', ['id' => $project->getUuid()]),
+            'admin_project_ingest_'.$project->getId(),
+            ['enabled' => ''],
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         /** @var User $actor */
         $actor = $this->getUser();
-        $enable = '1' === $request->request->getString('enabled');
+        /** @var array{enabled?: string} $data */
+        $data = $form->getData();
+        $enable = '1' === ($data['enabled'] ?? '');
         $project->setIngestEnabled($enable);
         $this->actionRecorder->record(
             $enable ? UserActionType::ProjectResumed : UserActionType::ProjectSuspended,
@@ -190,15 +171,23 @@ final class AdminProjectController extends AbstractController
     #[Route('/admin/view-as-member/enable', name: 'admin_view_as_member_enable', methods: ['POST'])]
     public function enableViewAsMember(Request $request): RedirectResponse
     {
-        if (!$this->isCsrfTokenValid('admin_view_as_member_enable', $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->createWithFields(
+            $this->generateUrl('admin_view_as_member_enable'),
+            'admin_view_as_member_enable',
+            ['project_uuid' => '', 'redirect' => ''],
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         /** @var User $actor */
         $actor = $this->getUser();
+        /** @var array{project_uuid?: string, redirect?: string} $data */
+        $data = $form->getData();
         $request->getSession()->set(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY, true);
         $context = [];
-        $projectUuid = trim($request->request->getString('project_uuid'));
+        $projectUuid = trim((string) ($data['project_uuid'] ?? ''));
         if ('' !== $projectUuid) {
             $project = $this->projectRepository->findOneBy(['uuid' => $projectUuid]);
             if ($project instanceof Project) {
@@ -214,26 +203,34 @@ final class AdminProjectController extends AbstractController
 
         $fallback = $this->generateUrl('admin_projects');
 
-        return $this->redirect(SafeInternalRedirect::resolve($request, $request->request->getString('redirect'), $fallback));
+        return $this->redirect(SafeInternalRedirect::resolve($request, (string) ($data['redirect'] ?? ''), $fallback));
     }
 
     /** Exit view-as-member mode. */
     #[Route('/admin/view-as-member/disable', name: 'admin_view_as_member_disable', methods: ['POST'])]
     public function disableViewAsMember(Request $request): RedirectResponse
     {
-        if (!$this->isCsrfTokenValid('admin_view_as_member_disable', $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->createWithFields(
+            $this->generateUrl('admin_view_as_member_disable'),
+            'admin_view_as_member_disable',
+            ['redirect' => ''],
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         /** @var User $actor */
         $actor = $this->getUser();
+        /** @var array{redirect?: string} $data */
+        $data = $form->getData();
         $request->getSession()->remove(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY);
         $this->actionRecorder->recordAndFlush(UserActionType::ProjectViewAsEnded, $actor, $actor, []);
         $this->addFlash('success', 'flash.admin_projects.view_as_disabled');
 
         $fallback = $this->generateUrl('admin_projects');
 
-        return $this->redirect(SafeInternalRedirect::resolve($request, $request->request->getString('redirect'), $fallback));
+        return $this->redirect(SafeInternalRedirect::resolve($request, (string) ($data['redirect'] ?? ''), $fallback));
     }
 
     /** Update project name and description. */
@@ -277,11 +274,16 @@ final class AdminProjectController extends AbstractController
         Project $project,
         Request $request,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_project_delete_'.$project->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(ProjectDeleteType::class, null, [
+            'csrf_token_id' => 'admin_project_delete_'.$project->getId(),
+            'project_id' => (int) $project->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
-        $confirmation = $request->request->getString('confirmation');
+        $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
         if ($confirmation !== $project->getName()) {
             $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
 
@@ -340,68 +342,5 @@ final class AdminProjectController extends AbstractController
         $this->entityManager->flush();
 
         return $project;
-    }
-
-    /** @return list<UserGroup> */
-    private function availableGroups(Project $project): array
-    {
-        $linkedIds = [];
-        foreach ($project->getGroupAccesses() as $access) {
-            $id = $access->getUserGroup()?->getId();
-            if (null !== $id) {
-                $linkedIds[$id] = true;
-            }
-        }
-
-        $groups = [];
-        foreach ($this->userGroupRepository->findAllOrdered() as $group) {
-            $id = $group->getId();
-            if (null === $id || isset($linkedIds[$id])) {
-                continue;
-            }
-            $groups[] = $group;
-        }
-
-        return $groups;
-    }
-
-    private function countOwners(Project $project): int
-    {
-        return $this->membershipRepository->count([
-            'project' => $project,
-            'role' => ProjectRole::Owner,
-            'active' => true,
-        ]);
-    }
-
-    /**
-     * Administrative project actions shown on Admin -> Project audit timeline.
-     *
-     * @return list<UserActionType>
-     */
-    private function projectAuditActionTypes(): array
-    {
-        return [
-            UserActionType::ProjectCreated,
-            UserActionType::ProjectMemberAdded,
-            UserActionType::ProjectMemberRoleChanged,
-            UserActionType::ProjectMemberRemoved,
-            UserActionType::ProjectMemberActivated,
-            UserActionType::ProjectMemberDeactivated,
-            UserActionType::ProjectConfigExported,
-            UserActionType::ProjectConfigImported,
-            UserActionType::ProjectOwnershipTransferred,
-            UserActionType::ProjectGroupLinked,
-            UserActionType::ProjectGroupRoleChanged,
-            UserActionType::ProjectGroupUnlinked,
-            UserActionType::ProjectApiKeyCreated,
-            UserActionType::ProjectApiKeyRevoked,
-            UserActionType::ProjectApiKeyRotated,
-            UserActionType::ProjectSuspended,
-            UserActionType::ProjectResumed,
-            UserActionType::ProjectViewAsStarted,
-            UserActionType::ProjectHistoryCleared,
-            UserActionType::ProjectDeleted,
-        ];
     }
 }

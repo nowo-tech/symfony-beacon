@@ -1,6 +1,7 @@
 # nowo-tech/breadcrumb-kit-bundle
 # https://github.com/nowo-tech/BreadcrumbKitBundle
-# Host shell only: kit/breadcrumb_dashboard_layout.html.twig — do not fork dashboard/*.twig.
+# Host shell: kit/breadcrumb_dashboard_layout.html.twig
+# List chrome: templates/bundles/NowoBreadcrumbKitBundle/dashboard/ (Menus pattern).
 nowo_breadcrumb_kit:
     locales: '%fallback_locales%'
     default_locale: '%default_locale%'

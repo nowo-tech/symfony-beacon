@@ -10,8 +10,8 @@
 {% block body %}
 <div class="mx-auto space-y-6">
     <div>
-        <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'preferences.display.title'|trans }}</h1>
-        <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.tours_intro'|trans }}</p>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'preferences.display.title'|trans }}</h1>
+        <p class="mb-2 text-xs text-[var(--color-ink)]/55">{{ 'preferences.display.tours_intro'|trans }}</p>
     </div>
 
     {% include 'account/_area_nav.html.twig' %}
@@ -40,10 +40,9 @@
             <h2 id="display-tour-replay-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.product_tour_replay_title'|trans }}</h2>
             <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.product_tour_replay_intro'|trans }}</p>
         </div>
-        <form method="post" action="{{ path('account_product_tour_replay') }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('account_product_tour_replay') }}">
+        {{ form_start(replayForm, {action: path('account_product_tour_replay')}) }}
             <button type="submit" class="btn-ghost">{{ 'preferences.product_tour_replay'|trans }}</button>
-        </form>
+        {{ form_end(replayForm) }}
     </section>
 </div>
 {% endblock %}

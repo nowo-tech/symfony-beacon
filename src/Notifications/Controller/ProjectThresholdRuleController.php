@@ -11,6 +11,7 @@ use App\Project\Entity\Project;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
+use App\Shared\Form\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -102,7 +103,11 @@ final class ProjectThresholdRuleController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedRule($projectId, $rule);
-        if (!$this->isCsrfTokenValid('threshold_toggle_'.$rule->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'threshold_toggle_'.$rule->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -121,7 +126,11 @@ final class ProjectThresholdRuleController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $project = $this->requireManagedRule($projectId, $rule);
-        if (!$this->isCsrfTokenValid('threshold_delete_'.$rule->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'threshold_delete_'.$rule->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException();
         }
 

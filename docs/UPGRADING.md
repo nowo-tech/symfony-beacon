@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.6.4)](#unreleased-main-after-164)
+- [Unreleased (main after 1.7.0)](#unreleased-main-after-170)
+- [Upgrading from 1.6.4 to 1.7.0](#upgrading-from-164-to-170)
 - [Upgrading from 1.6.3 to 1.6.4](#upgrading-from-163-to-164)
 - [Upgrading from 1.6.2 to 1.6.3](#upgrading-from-162-to-163)
 - [Upgrading from 1.6.1 to 1.6.2](#upgrading-from-161-to-162)
@@ -57,9 +58,32 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.6.4)
+## Unreleased (main after 1.7.0)
 
-No further upgrade steps yet — follow [Upgrading from 1.6.3 to 1.6.4](#upgrading-from-163-to-164) when moving off **1.6.3**.
+No operator steps beyond `composer install` / `make migrate` until the next tagged release. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+
+## Upgrading from 1.6.4 to 1.7.0
+
+**CSRF via Symfony Forms (`090`), kit Administration chrome (`081`), AuthKit 1.17, CSP kit admin polish, Composer pins.** Pull, then:
+
+```bash
+git fetch --tags
+git checkout v1.7.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # no new Doctrine migrations required for 1.7.0
+make vite-build         # kit-admin modal bridge + Stimulus / theme assets
+php bin/console cache:clear
+```
+
+### Notes
+
+- **CSRF (`090`)**: host mutable POSTs use FormKit Types (`CsrfOnlyType` / named Types / `csrf_action_form()`). Custom Twig that still posts raw `csrf_token()` fields for product actions must migrate to those Types. Exceptions remain: AJAX header CSRF, AuthKit logout `_csrf_token`, kit modal `data-token` deletes.
+- **AuthKit 1.17**: magic-login confirm is POST `/login/magic/confirm` with `magic_login_confirm_form` — update any host Twig forks of that flow.
+- **Kit admin chrome**: Menu / Breadcrumb / Routing / Http Log host forks use Administration list pattern (`panel`, `kit_admin_header_actions`, `row_actions_display: text`). Rebuild frontend assets so `kit-admin` portals `<dialog>` under CSP.
+- **CSP**: host kit `<style>` blocks need `csp_nonce()`; Dashboard Menu must not load CDN Stimulus (`stimulus_script_url` empty). See [PRODUCTION.md](PRODUCTION.md) security headers.
+- **Breadcrumbs**: re-run `make seed-platform` (or Admin → Breadcrumbs) so Appearance / RoutingKit create-edit trails and ES “Migas de pan” labels apply.
+- **Composer**: RoutingKit **1.4.0** panel uses Symfony forms for export/clear-cache/import/delete (`export_form` / `delete_forms` in host Twig). Password-toggle **2.1.1** is CSP-safe; host still uses `_toggle_password_csp` + Stimulus.
 
 ## Upgrading from 1.6.3 to 1.6.4
 

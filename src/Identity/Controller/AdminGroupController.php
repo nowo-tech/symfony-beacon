@@ -9,6 +9,8 @@ use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
+use App\Identity\Form\AdminAuditTimelineFilterType;
+use App\Identity\Form\AdminGroupMemberAddType;
 use App\Identity\Form\AdminGroupType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
@@ -19,10 +21,12 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Repository\ProjectGroupAccessRepository;
+use App\Project\Exception\ProjectAccessException;
 use App\Project\Service\ProjectMembershipManager;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
-use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -48,6 +52,8 @@ final class AdminGroupController extends AbstractController
         private readonly UserActionRecorder $actionRecorder,
         private readonly UserActionRepository $userActionRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -68,6 +74,11 @@ final class AdminGroupController extends AbstractController
         return $this->render('admin/groups/index.html.twig', [
             'groups' => $groups,
             'q' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_groups'),
+            ])->createView(),
             'member_counts' => $this->groupMembershipRepository->countByGroupIds($groupIds),
         ]);
     }
@@ -116,12 +127,48 @@ final class AdminGroupController extends AbstractController
         $this->groupRepository->hydrateMembers($group);
         $auditActions = AdminIdentityAudit::groupTimelineActions();
         $audit = AdminAuditFilter::fromRequest($request, $auditActions);
+        $projectAccesses = $this->projectGroupAccessRepository->findByUserGroup($group);
+        $removeMemberForms = [];
+        foreach ($group->getMemberships() as $membership) {
+            $membershipId = $membership->getId();
+            $user = $membership->getUser();
+            if (null === $membershipId || null === $user?->getUuid()) {
+                continue;
+            }
+
+            $removeMemberForms[$membershipId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_groups_members_remove', [
+                    'groupId' => $group->getUuid(),
+                    'userId' => $user->getUuid(),
+                ]),
+                'admin_group_member_remove_'.$membershipId,
+            )->createView();
+        }
+        $removeProjectForms = [];
+        foreach ($projectAccesses as $access) {
+            $accessId = $access->getId();
+            if (null === $accessId) {
+                continue;
+            }
+
+            $removeProjectForms[$accessId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_groups_projects_remove', [
+                    'groupId' => $group->getUuid(),
+                    'accessId' => $access->getUuid(),
+                ]),
+                'admin_group_project_remove_'.$accessId,
+            )->createView();
+        }
 
         return $this->render('admin/groups/show.html.twig', [
             'group' => $group,
-            'projectAccesses' => $this->projectGroupAccessRepository->findByUserGroup($group),
+            'projectAccesses' => $projectAccesses,
             'groupAuditActions' => $auditActions,
             'groupAuditFilter' => $audit['filter'],
+            'auditFilterForm' => $this->getFilterFormFactory->create(AdminAuditTimelineFilterType::class, $audit['filter'], [
+                'action' => $this->generateUrl('admin_groups_show', ['id' => $group->getUuid()]),
+                'action_choices' => $this->auditActionChoices($auditActions),
+            ])->createView(),
             'groupAuditEntries' => $this->userActionRepository->findForGroup(
                 $group,
                 $auditActions,
@@ -130,6 +177,19 @@ final class AdminGroupController extends AbstractController
                 $audit['to'],
                 AdminIdentityAudit::TIMELINE_LIMIT,
             ),
+            'deleteForm' => $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_groups_delete', ['id' => $group->getUuid()]),
+                'admin_group_delete_'.$group->getId(),
+            )->createView(),
+            'addMemberForm' => $this->createForm(AdminGroupMemberAddType::class, [
+                'email' => '',
+            ], [
+                'action' => $this->generateUrl('admin_groups_members_add', ['id' => $group->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_group_member_add_'.$group->getId(),
+            ])->createView(),
+            'removeMemberForms' => $removeMemberForms,
+            'removeProjectForms' => $removeProjectForms,
         ]);
     }
 
@@ -179,7 +239,12 @@ final class AdminGroupController extends AbstractController
         UserGroup $group,
         Request $request,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_group_delete_'.$group->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_groups_delete', ['id' => $group->getUuid()]),
+            'admin_group_delete_'.$group->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -200,6 +265,21 @@ final class AdminGroupController extends AbstractController
         return $this->redirectToRoute('admin_groups');
     }
 
+    /**
+     * @param list<UserActionType> $actions
+     *
+     * @return array<string, string>
+     */
+    private function auditActionChoices(array $actions): array
+    {
+        $choices = [];
+        foreach ($actions as $action) {
+            $choices['users.activity.action.'.$action->value] = $action->value;
+        }
+
+        return $choices;
+    }
+
     /** Add an existing user to the group by email. */
     #[Route('/admin/groups/{id}/members', name: 'admin_groups_members_add', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
     public function addMember(
@@ -207,11 +287,17 @@ final class AdminGroupController extends AbstractController
         UserGroup $group,
         Request $request,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_group_member_add_'.$group->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(AdminGroupMemberAddType::class, null, [
+            'csrf_token_id' => 'admin_group_member_add_'.$group->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
-        $user = $this->userRepository->findOneByEmail($request->request->getString('email'));
+        /** @var array{email?: string|null} $data */
+        $data = $form->getData();
+        $user = $this->userRepository->findOneByEmail((string) ($data['email'] ?? ''));
         if (!$user instanceof User) {
             $this->addFlash('error', 'flash.groups.user_not_found');
 
@@ -258,7 +344,15 @@ final class AdminGroupController extends AbstractController
         if (!$membership instanceof UserGroupMembership) {
             throw $this->createNotFoundException();
         }
-        if (!$this->isCsrfTokenValid('admin_group_member_remove_'.$membership->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_groups_members_remove', [
+                'groupId' => $group->getUuid(),
+                'userId' => $user->getUuid(),
+            ]),
+            'admin_group_member_remove_'.$membership->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -295,7 +389,15 @@ final class AdminGroupController extends AbstractController
         if ($access->getUserGroup()?->getId() !== $group->getId()) {
             throw $this->createNotFoundException();
         }
-        if (!$this->isCsrfTokenValid('admin_group_project_remove_'.$access->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_groups_projects_remove', [
+                'groupId' => $group->getUuid(),
+                'accessId' => $access->getUuid(),
+            ]),
+            'admin_group_project_remove_'.$access->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -309,9 +411,9 @@ final class AdminGroupController extends AbstractController
         try {
             $this->projectMembershipManager->removeGroup($project, $actor, $access);
             $this->addFlash('success', 'flash.project.group_removed');
-        } catch (InvalidArgumentException|RuntimeException $e) {
-            $this->addFlash('error', match ($e->getMessage()) {
-                'forbidden' => 'flash.groups.project_unlink_forbidden',
+        } catch (ProjectAccessException $e) {
+            $this->addFlash('error', match ($e->reasonCode) {
+                ProjectAccessException::FORBIDDEN => 'flash.groups.project_unlink_forbidden',
                 default => 'flash.groups.project_unlink_error',
             });
         }

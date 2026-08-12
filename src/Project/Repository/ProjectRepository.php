@@ -153,6 +153,20 @@ class ProjectRepository extends ServiceEntityRepository
             ->setParameter('project', $project)
             ->getQuery()
             ->getResult();
+
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.apiKeys', 'ak')->addSelect('ak')
+            ->andWhere('p = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getResult();
+
+        $this->createQueryBuilder('p')
+            ->leftJoin('p.thresholdRules', 'tr')->addSelect('tr')
+            ->andWhere('p = :project')
+            ->setParameter('project', $project)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
+use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,7 @@ final class AccountLocaleController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
     ) {
     }
 
@@ -41,7 +43,13 @@ final class AccountLocaleController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if (!$this->isCsrfTokenValid('account_locale', (string) $request->request->get('_token'))) {
+        $form = $this->csrfOnlyFormFactory->createWithFields(
+            $this->generateUrl('account_locale_switch', ['locale' => $locale]),
+            'account_locale',
+            ['redirect' => ''],
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -52,7 +60,9 @@ final class AccountLocaleController extends AbstractController
         $request->setLocale($locale);
         $request->getSession()->set('_locale', $locale);
 
-        $target = $request->request->getString('redirect');
+        /** @var array{redirect?: string} $data */
+        $data = $form->getData();
+        $target = (string) ($data['redirect'] ?? '');
         if ('' === $target) {
             $target = $request->headers->get('Referer') ?? $this->generateUrl('dashboard_home');
         }

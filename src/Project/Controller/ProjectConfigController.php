@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Form\ProjectConfigImportType;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectConfigPortability;
@@ -77,13 +78,17 @@ final class ProjectConfigController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_config_import_'.$project->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(ProjectConfigImportType::class, null, [
+            'csrf_token_id' => 'project_config_import_'.$project->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'flash.project.config_invalid_csrf');
 
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
-        $file = $request->files->get('bundle');
+        $file = $form->get('bundle')->getData();
         try {
             $payload = JsonUploadReader::decodeObject($file instanceof UploadedFile ? $file : null);
             $result = $this->portability->importPanel($payload, $project, $user);

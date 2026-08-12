@@ -5,26 +5,19 @@
 {% block body %}
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <div>
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'admin.ops.title'|trans }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'admin.ops.intro'|trans }}</p>
+        <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'admin.ops.title'|trans }}</h1>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'admin.ops.intro'|trans }}</p>
     </div>
-    <form method="get" action="{{ path('admin_ops_overview') }}" class="flex flex-wrap items-end gap-2">
+    {{ form_start(filterForm, {attr: {class: 'flex flex-wrap items-end gap-2'}}) }}
         <label class="block text-sm">
             <span class="mb-1 block text-[var(--color-ink)]/65">{{ 'admin.ops.filter_project'|trans }}</span>
-            <select name="project" class="min-w-[12rem] rounded border border-[var(--color-ink)]/20 bg-transparent px-2 py-1.5">
-                <option value="">{{ 'admin.ops.filter_all'|trans }}</option>
-                {% for project in overview.projects %}
-                    <option value="{{ project.uuid }}" {% if overview.filter_project and overview.filter_project.id == project.id %}selected{% endif %}>
-                        {{ project.name }}
-                    </option>
-                {% endfor %}
-            </select>
+            {{ form_widget(filterForm.project) }}
         </label>
         <button type="submit" class="rounded bg-[var(--color-moss)] px-3 py-1.5 text-sm font-medium text-white">{{ 'common.filter'|trans }}</button>
         {% if overview.filter_project %}
             <a class="px-2 py-1.5 text-sm underline" href="{{ path('admin_ops_overview') }}">{{ 'common.clear_filters'|trans }}</a>
         {% endif %}
-    </form>
+    {{ form_end(filterForm, {render_rest: false}) }}
 </div>
 
 <div class="mb-6 grid gap-4 sm:grid-cols-3">

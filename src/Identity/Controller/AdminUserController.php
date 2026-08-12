@@ -8,6 +8,9 @@ use App\Identity\AdminAuditFilter;
 use App\Identity\AdminIdentityAudit;
 use App\Identity\Entity\User;
 use App\Identity\Exception\AccountAnonymizeException;
+use App\Identity\Form\AdminAuditTimelineFilterType;
+use App\Identity\Form\AdminUserRoleConfirmType;
+use App\Identity\Form\TypeToConfirmType;
 use App\Identity\Form\AdminUserType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
@@ -18,14 +21,18 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Exception\ProjectAccessException;
 use App\Project\Service\ProjectMembershipManager;
+use App\Shared\Form\CsrfOnlyFormFactory;
+use App\Shared\Form\AdminSearchType;
+use App\Shared\Form\GetFilterFormFactory;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +57,8 @@ final class AdminUserController extends AbstractController
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly AccountDataExporter $accountDataExporter,
         private readonly AccountAnonymizer $accountAnonymizer,
+        private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -57,29 +66,21 @@ final class AdminUserController extends AbstractController
     #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $query = $request->query->getString('q');
-
-        return $this->render('admin/users/index.html.twig', [
-            'users' => $this->userRepository->findAllForAdminDirectory('' !== $query ? $query : null),
-            'q' => $query,
-            'adminCount' => $this->countAdmins(),
-            'recentActions' => $this->userActionRepository->findLatest(25),
-        ]);
+        return $this->renderIndex($request);
     }
 
     /**
      * Create a Beacon account (email, display name, password, instance role).
+     * GET opens the create modal on the directory; POST processes the form.
      */
     #[Route('/admin/users/new', name: 'admin_users_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        $form = $this->createForm(AdminUserType::class, [
-            'email' => '',
-            'displayName' => '',
-            'password' => '',
-            'role' => 'user',
-            'enabled' => true,
-        ]);
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return $this->redirectToRoute('admin_users', ['new' => '1']);
+        }
+
+        $form = $this->buildCreateForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -94,7 +95,7 @@ final class AdminUserController extends AbstractController
             if ($this->userRepository->findOneByEmail($email) instanceof User) {
                 $this->addFlash('error', 'flash.users.email_taken');
 
-                return $this->redirectToRoute('admin_users_new');
+                return $this->redirectToRoute('admin_users', ['new' => '1']);
             }
 
             /** @var User $actor */
@@ -125,9 +126,7 @@ final class AdminUserController extends AbstractController
             return $this->redirectToRoute('admin_users');
         }
 
-        return $this->render('admin/users/form.html.twig', [
-            'form' => $form,
-        ]);
+        return $this->renderIndex($request, $form, openCreate: true);
     }
 
     /**
@@ -143,11 +142,32 @@ final class AdminUserController extends AbstractController
     ): Response {
         $auditActions = AdminIdentityAudit::userTimelineActions();
         $audit = AdminAuditFilter::fromRequest($request, $auditActions);
+        $memberships = $this->projectMembershipRepository->findByUser($user);
+        $removeProjectForms = [];
+        foreach ($memberships as $membership) {
+            $membershipId = $membership->getId();
+            $project = $membership->getProject();
+            if (null === $membershipId || null === $project?->getUuid()) {
+                continue;
+            }
+
+            $removeProjectForms[$membershipId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_users_projects_remove', [
+                    'userId' => $user->getUuid(),
+                    'projectId' => $project->getUuid(),
+                ]),
+                'admin_user_project_remove_'.$membershipId,
+            )->createView();
+        }
 
         return $this->render('admin/users/activity.html.twig', [
             'user' => $user,
             'userAuditActions' => $auditActions,
             'userAuditFilter' => $audit['filter'],
+            'auditFilterForm' => $this->getFilterFormFactory->create(AdminAuditTimelineFilterType::class, $audit['filter'], [
+                'action' => $this->generateUrl('admin_users_activity', ['id' => $user->getUuid()]),
+                'action_choices' => $this->auditActionChoices($auditActions),
+            ])->createView(),
             'actions' => $this->userActionRepository->findForUser(
                 $user,
                 $auditActions,
@@ -156,8 +176,24 @@ final class AdminUserController extends AbstractController
                 $audit['to'],
                 AdminIdentityAudit::TIMELINE_LIMIT,
             ),
-            'memberships' => $this->projectMembershipRepository->findByUser($user),
+            'memberships' => $memberships,
+            'removeProjectForms' => $removeProjectForms,
         ]);
+    }
+
+    /**
+     * @param list<UserActionType> $actions
+     *
+     * @return array<string, string>
+     */
+    private function auditActionChoices(array $actions): array
+    {
+        $choices = [];
+        foreach ($actions as $action) {
+            $choices['users.activity.action.'.$action->value] = $action->value;
+        }
+
+        return $choices;
     }
 
     /** Remove a direct project membership (instance admin). */
@@ -178,7 +214,15 @@ final class AdminUserController extends AbstractController
         if (!$membership instanceof ProjectMembership) {
             throw $this->createNotFoundException();
         }
-        if (!$this->isCsrfTokenValid('admin_user_project_remove_'.$membership->getId(), $request->request->getString('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_users_projects_remove', [
+                'userId' => $user->getUuid(),
+                'projectId' => $project->getUuid(),
+            ]),
+            'admin_user_project_remove_'.$membership->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -187,10 +231,10 @@ final class AdminUserController extends AbstractController
         try {
             $this->projectMembershipManager->remove($project, $actor, $membership);
             $this->addFlash('success', 'flash.project.member_removed');
-        } catch (InvalidArgumentException|RuntimeException $e) {
-            $this->addFlash('error', match ($e->getMessage()) {
-                'last_owner' => 'flash.project.member_last_owner',
-                'forbidden' => 'flash.users.project_unlink_forbidden',
+        } catch (ProjectAccessException $e) {
+            $this->addFlash('error', match ($e->reasonCode) {
+                ProjectAccessException::LAST_OWNER => 'flash.project.member_last_owner',
+                ProjectAccessException::FORBIDDEN => 'flash.users.project_unlink_forbidden',
                 default => 'flash.users.project_unlink_error',
             });
         }
@@ -207,8 +251,12 @@ final class AdminUserController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_user_role_'.$user->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(AdminUserRoleConfirmType::class, null, [
+            'csrf_token_id' => 'admin_user_role_'.$user->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
         /** @var User $current */
@@ -219,7 +267,9 @@ final class AdminUserController extends AbstractController
             return $this->redirectToRoute('admin_users');
         }
 
-        $role = $request->request->getString('role');
+        /** @var array{role?: string|null} $data */
+        $data = $form->getData();
+        $role = (string) ($data['role'] ?? '');
         if (!\in_array($role, ['user', 'admin'], true)) {
             $this->addFlash('error', 'flash.users.invalid_role');
 
@@ -260,7 +310,12 @@ final class AdminUserController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('toggle_user_'.$user->getId(), (string) $request->request->get('_token'))) {
+        $form = $this->csrfOnlyFormFactory->create(
+            $this->generateUrl('admin_users_toggle_enabled', ['id' => $user->getUuid()]),
+            'toggle_user_'.$user->getId(),
+        );
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -322,8 +377,12 @@ final class AdminUserController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        if (!$this->isCsrfTokenValid('admin_user_anonymize_'.$user->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(TypeToConfirmType::class, null, [
+            'csrf_token_id' => 'admin_user_anonymize_'.$user->getId(),
+        ]);
+        $form->submit($request->request->all(), false);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
         /** @var User $current */
@@ -362,5 +421,75 @@ final class AdminUserController extends AbstractController
     private function countAdmins(): int
     {
         return $this->userRepository->countAdmins();
+    }
+
+    private function renderIndex(
+        Request $request,
+        ?FormInterface $invalidCreateForm = null,
+        bool $openCreate = false,
+    ): Response {
+        $query = $request->query->getString('q');
+        $users = $this->userRepository->findAllForAdminDirectory('' !== $query ? $query : null);
+        $toggleEnabledForms = [];
+        $roleForms = [];
+        $anonymizeForms = [];
+        foreach ($users as $user) {
+            $userId = $user->getId();
+            if (null === $userId) {
+                continue;
+            }
+
+            $toggleEnabledForms[$userId] = $this->csrfOnlyFormFactory->create(
+                $this->generateUrl('admin_users_toggle_enabled', ['id' => $user->getUuid()]),
+                'toggle_user_'.$userId,
+            )->createView();
+            $roleForms[$userId] = $this->createForm(AdminUserRoleConfirmType::class, [
+                'role' => \in_array('ROLE_ADMIN', $user->getRoles(), true) ? 'admin' : 'user',
+            ], [
+                'action' => $this->generateUrl('admin_users_role', ['id' => $user->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_user_role_'.$userId,
+            ])->createView();
+            $anonymizeForms[$userId] = $this->createForm(TypeToConfirmType::class, [
+                'confirmation' => '',
+            ], [
+                'action' => $this->generateUrl('admin_users_anonymize', ['id' => $user->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_user_anonymize_'.$userId,
+            ])->createView();
+        }
+
+        $createForm = ($invalidCreateForm ?? $this->buildCreateForm())->createView();
+
+        return $this->render('admin/users/index.html.twig', [
+            'users' => $users,
+            'q' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_users'),
+            ])->createView(),
+            'adminCount' => $this->countAdmins(),
+            'recentActions' => $this->userActionRepository->findLatest(25),
+            'toggleEnabledForms' => $toggleEnabledForms,
+            'roleForms' => $roleForms,
+            'anonymizeForms' => $anonymizeForms,
+            'createForm' => $createForm,
+            'open_create' => $openCreate || $request->query->getBoolean('new'),
+        ]);
+    }
+
+    private function buildCreateForm(): FormInterface
+    {
+        return $this->createForm(AdminUserType::class, [
+            'email' => '',
+            'displayName' => '',
+            'password' => '',
+            'role' => 'user',
+            'enabled' => true,
+        ], [
+            'action' => $this->generateUrl('admin_users_new'),
+            'method' => 'POST',
+        ]);
     }
 }

@@ -9,11 +9,11 @@ use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Exception\ProjectAccessException;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -112,8 +112,8 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         try {
             $manager->addGroup($project, $admin, $group, ProjectRole::Member);
             self::fail('Expected group_link_forbidden');
-        } catch (RuntimeException $e) {
-            self::assertSame('group_link_forbidden', $e->getMessage());
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::GROUP_LINK_FORBIDDEN, $e->reasonCode);
         }
 
         $this->login($client, $admin);

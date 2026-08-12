@@ -1,0 +1,11 @@
+# Host overrides / additions for RoutingKit panel (i18n keys missing from vendor catalogue).
+
+panel.export: Exporter
+panel.import: Importer
+panel.import_title: Importer (JSON signé)
+panel.import_payload: Payload JSON
+panel.import_replace_all: Remplacer toutes les lignes existantes
+panel.yes: Oui
+panel.no: Non
+panel.delete_confirm: Supprimer cette définition de path ?
+panel.col.actions: Actions

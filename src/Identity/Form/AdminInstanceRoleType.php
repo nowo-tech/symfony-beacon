@@ -49,6 +49,13 @@ final class AdminInstanceRoleType extends FormKitAbstractType
                 'label' => 'roles.enabled_label',
                 'required' => false,
             ]);
+            if ($options['with_return_route']) {
+                $this->addNamedField('_return', 'hidden', [
+                    'mapped' => false,
+                    'required' => false,
+                    'data' => $options['return_route'],
+                ]);
+            }
         });
     }
 
@@ -59,8 +66,12 @@ final class AdminInstanceRoleType extends FormKitAbstractType
             'csrf_protection' => true,
             'translation_domain' => 'messages',
             'code_locked' => false,
+            'with_return_route' => false,
+            'return_route' => 'admin_roles_show',
         ]);
         $resolver->setAllowedTypes('code_locked', 'bool');
+        $resolver->setAllowedTypes('with_return_route', 'bool');
+        $resolver->setAllowedTypes('return_route', 'string');
     }
 
     #[Override]

@@ -8,6 +8,7 @@ use App\Identity\AccountSecurityActivity;
 use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
+use App\Identity\Form\AccountProductTourReplayType;
 use App\Identity\Form\AccountProfileType;
 use App\Identity\Form\AccountSecurityType;
 use App\Identity\Repository\UserActionRepository;
@@ -380,11 +381,16 @@ final class AccountPreferencesController extends AbstractController
             return $this->redirectToRoute($routeName);
         }
 
-        return $this->render($template, [
+        $vars = [
             'form' => $form,
             'issue_panel_ids' => IssuePanelIds::all(),
             'push_available' => $pushAvailable,
-        ]);
+        ];
+        if (AccountDisplayType::SECTION_TOURS === $section) {
+            $vars['replayForm'] = $this->createForm(AccountProductTourReplayType::class);
+        }
+
+        return $this->render($template, $vars);
     }
 
     /**

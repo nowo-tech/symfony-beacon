@@ -38,78 +38,61 @@
             {% endfor %}
         </select>
     </div>
-    {% if project_grants(project, 'project.issues.triage') %}
-    <form method="post" action="{{ path('issue_view_save', {id: project.uuid}) }}" class="flex flex-wrap items-end gap-2 grow">
-        <input type="hidden" name="_token" value="{{ csrf_token('issue_view_save') }}">
-        {% for key, value in filterQuery %}
-            {% if value is not same as('') and value is not null %}
-                <input type="hidden" name="{{ key }}" value="{{ value }}">
-            {% endif %}
-        {% endfor %}
+    {% if can_triage|default(false) %}
+    {{ form_start(saveViewForm, {attr: {class: 'flex flex-wrap items-end gap-2 grow'}}) }}
         <div>
-            <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="saved-view-name">{{ 'issues.views.save_name'|trans }}</label>
-            <input id="saved-view-name" class="input" type="text" name="name" maxlength="80" placeholder="{{ 'issues.views.save_placeholder'|trans }}" required>
+            <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="{{ saveViewForm.name.vars.id }}">{{ 'issues.views.save_name'|trans }}</label>
+            {{ form_widget(saveViewForm.name, {
+                attr: {
+                    class: 'input',
+                    placeholder: 'issues.views.save_placeholder'|trans
+                }
+            }) }}
         </div>
+        {{ form_rest(saveViewForm) }}
         <button class="btn-ghost issue-saved-views__save" type="submit">{{ 'issues.views.save'|trans }}</button>
-    </form>
+    {{ form_end(saveViewForm, {render_rest: false}) }}
     {% if savedViews|default([]) is not empty %}
         <div class="flex flex-wrap gap-2">
             {% for view in savedViews %}
-                <form method="post" action="{{ path('issue_view_delete', {id: project.uuid, viewUuid: view.uuid}) }}" class="inline">
-                    <input type="hidden" name="_token" value="{{ csrf_token('issue_view_delete') }}">
-                    <button type="submit" class="btn-ghost text-xs" title="{{ 'issues.views.delete'|trans }}">× {{ view.name }}</button>
-                </form>
+                {% include 'form/_csrf_action.html.twig' with {
+                    form: deleteViewForms[view.uuid],
+                    action: path('issue_view_delete', {id: project.uuid, viewUuid: view.uuid}),
+                    form_class: 'inline',
+                    submit_class: 'btn-ghost text-xs',
+                    submit_label: '× ' ~ view.name,
+                    button_attr: {title: 'issues.views.delete'|trans}
+                } only %}
             {% endfor %}
         </div>
     {% endif %}
     {% endif %}
 </div>
 
-<form method="get" action="{{ path('issue_index', {id: project.uuid}) }}" class="issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-tour="issue-filters">
-    <input type="hidden" name="sort" value="{{ filters.sort }}">
-    <input type="hidden" name="dir" value="{{ filters.dir }}">
-    <input type="hidden" name="page" value="1">
-    <input class="input issue-filters__search" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
-    <select class="input" name="level">
-        <option value="">{{ 'issues.filter.any_level'|trans }}</option>
-        {% for level in levels|default(['fatal', 'error', 'warning', 'info', 'debug']) %}
-            <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
-        {% endfor %}
-    </select>
-    <select class="input" name="status">
-        {% for status in ['unresolved', 'resolved', 'ignored', ''] %}
-            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status ? status : 'issues.filter.any_status'|trans }}</option>
-        {% endfor %}
-    </select>
-    <select class="input" name="priority">
-        <option value="">{{ 'issues.filter.any_priority'|trans }}</option>
-        {% for p in ['low', 'medium', 'high', 'critical'] %}
-            <option value="{{ p }}" {% if filters.priority|default('') == p %}selected{% endif %}>{{ ('issues.priority.' ~ p)|trans }}</option>
-        {% endfor %}
-    </select>
-    <select class="input" name="assignee">
-        <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
-        <option value="unassigned" {% if filters.assignee == 'unassigned' %}selected{% endif %}>{{ 'issues.assignee_unassigned'|trans }}</option>
-        {% for member in members %}
-            <option value="{{ member.id }}" {% if filters.assignee == (member.id ~ '') %}selected{% endif %}>{{ member.displayName ?: member.email }}</option>
-        {% endfor %}
-    </select>
-    <input class="input" name="environment" value="{{ filters.environment }}" placeholder="{{ 'issues.filter.environment'|trans }}">
-    <input class="input" name="compare" value="{{ filters.compare }}" placeholder="{{ 'issues.compare.environment_b'|trans }}" title="{{ 'issues.compare.hint'|trans }}">
-    <input class="input" name="release" value="{{ filters.release }}" placeholder="{{ 'issues.filter.release'|trans }}">
-    <input class="input" name="tag" value="{{ filters.tag|default('') }}" placeholder="{{ 'issues.filter.tag'|trans }}">
-    <input class="input" name="url" value="{{ filters.url|default('') }}" placeholder="{{ 'issues.filter.url'|trans }}">
-    <input class="input" name="user" value="{{ filters.user|default('') }}" placeholder="{{ 'issues.filter.user'|trans }}">
-    <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-        {% for size in [10, 25, 50, 100] %}
-            <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-        {% endfor %}
-    </select>
+{{ form_start(filterForm, {
+    attr: {
+        class: 'issue-filters panel mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+        'data-tour': 'issue-filters'
+    }
+}) }}
+    {{ form_widget(filterForm.q, {attr: {class: 'input issue-filters__search', placeholder: 'issues.search_placeholder'|trans}}) }}
+    {{ form_widget(filterForm.level) }}
+    {{ form_widget(filterForm.status) }}
+    {{ form_widget(filterForm.priority) }}
+    {{ form_widget(filterForm.assignee) }}
+    {{ form_widget(filterForm.environment, {attr: {class: 'input', placeholder: 'issues.filter.environment'|trans}}) }}
+    {{ form_widget(filterForm.compare, {attr: {class: 'input', placeholder: 'issues.compare.environment_b'|trans, title: 'issues.compare.hint'|trans}}) }}
+    {{ form_widget(filterForm.release, {attr: {class: 'input', placeholder: 'issues.filter.release'|trans}}) }}
+    {{ form_widget(filterForm.tag, {attr: {class: 'input', placeholder: 'issues.filter.tag'|trans}}) }}
+    {{ form_widget(filterForm.url, {attr: {class: 'input', placeholder: 'issues.filter.url'|trans}}) }}
+    {{ form_widget(filterForm.user, {attr: {class: 'input', placeholder: 'issues.filter.user'|trans}}) }}
+    {{ form_widget(filterForm.per_page) }}
     <div class="issue-filters__actions">
         <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
         <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('issue_index', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
-</form>
+    {{ form_rest(filterForm) }}
+{{ form_end(filterForm, {render_rest: false}) }}
 
 {% if compareResult is defined and compareResult %}
     <div class="panel mb-6 issue-compare" data-testid="issue-compare">
@@ -162,7 +145,6 @@
         <div class="issue-table-scroll">
         <table
             class="issue-table display w-full text-left text-sm"
-            style="width:100%"
             data-datatable-target="table"
         >
             <thead>

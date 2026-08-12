@@ -1,0 +1,24 @@
+{# Host: import modal body — Beacon confirm-dialog content + footer; keep data-import-form. #}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+<div id="modal-import-container">
+    {% for msg in app.flashes('error') %}
+        <div class="{{ ui.flash('error', _css_fw) }}">{{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('success') %}
+        <div class="{{ ui.flash('success', _css_fw) }}">{{ msg }}</div>
+    {% endfor %}
+    {{ form_start(form, { attr: { enctype: 'multipart/form-data', class: 'kit-modal__panel dm-dashboard-form import-form', 'data-import-form': '1' } }) }}
+        <input type="hidden" name="_modal" value="1">
+        <div class="confirm-dialog__content">
+            <p class="kit-modal__lead">{{ 'dashboard.import_help'|trans({}, 'NowoDashboardMenuBundle') }}</p>
+            {{ form_row(form.file) }}
+            {{ form_row(form.strategy) }}
+            {{ form_rest(form) }}
+        </div>
+        <div class="confirm-dialog__actions">
+            <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans({}, 'NowoDashboardMenuBundle') }}</button>
+            <button type="submit" class="btn-primary">{{ 'dashboard.import'|trans({}, 'NowoDashboardMenuBundle') }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>

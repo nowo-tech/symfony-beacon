@@ -24,6 +24,8 @@ when@test:
     parameters:
         # Keep catalog-empty → /setup redirect on in tests (DatabaseWebTestCase seeds catalogs by default).
         app.setup.check_platform_catalogs: true
+        # Functional ingest suites fire many requests from one IP.
+        beacon.ingest_ip_rate_limit: 100000
     services:
         # Allow EnvelopeIngestFunctionalTest to swap query-auth policy without putenv/$_ENV.
         App\Ingest\Service\IngestQueryAuthSettings:

@@ -1,15 +1,16 @@
 {# Beacon host layout for dashboard-menu CRUD.
    Bundle pages: @NowoDashboardMenuBundle/dashboard/*.html.twig → base → this shell.
-   Do NOT fork dashboard pages — only this layout + CSS so kit upgrades flow in. #}
+   Host forks index/show/reorder use Administration list chrome (panel, btn-*, tokens);
+   kit JS hooks (btn-*-menu/item, modal ids, __nowoDashboardMenuConfig) stay intact. #}
 {% extends 'kit/_kit_admin_layout.html.twig' %}
 
 {% set kit_admin_heading %}{% block dashboard_title %}{{ 'dashboard.title'|trans({}, 'NowoDashboardMenuBundle') }}{% endblock %}{% endset %}
 {% set kit_admin_intro = 'admin.hub.menus'|trans %}
 {% set kit_admin_css_framework = nowo_dashboard_menu_css_framework|default('tailwind') %}
-{% set kit_admin_split_filters = true %}
+{# Explicit panel.nowo-ui-table-wrap in dashboard pages (Cookie Consent pattern); no JS split. #}
 
 {% block kit_admin_extra_styles %}
-    <style>
+    <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
         body > .ts-dropdown { z-index: 1060; }
     </style>
 {% endblock %}
@@ -55,4 +56,5 @@
     {# Bundle base nests modals in nowo_dashboard_menu_content; that block is not rendered
        when the host wraps `{% block body %}` via body_before/after — include once here. #}
     {% include '@NowoDashboardMenuBundle/dashboard/_menu_dashboard_modals.html.twig' %}
+    {% include 'kit/_kit_config_boot.html.twig' %}
 {% endblock %}

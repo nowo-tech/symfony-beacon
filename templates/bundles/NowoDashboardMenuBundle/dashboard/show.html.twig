@@ -1,0 +1,307 @@
+{# Host rewrite: Beacon Administration detail chrome; kit item CRUD / modals / CSRF unchanged.
+   Row actions: btn-ghost/btn-danger + _action_inner (nowo_ui_kit.row_actions_display). #}
+{% extends '@NowoDashboardMenuBundle/dashboard/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _td = 'NowoDashboardMenuBundle' %}
+{% set _css_fw = nowo_dashboard_menu_css_framework|default('tailwind') %}
+{% set _display = nowo_ui_kit_row_actions_display|default('icon') %}
+{% set _show = dashboard_show_route|default(dashboard_routes.show|default('nowo_dashboard_menu_dashboard_show')) %}
+{% set _reorder = dashboard_routes.show_items_reorder|default('nowo_dashboard_menu_dashboard_show_items_reorder') %}
+
+{% block dashboard_title %}{{ 'dashboard.menu'|trans({}, _td) }}: {{ menu.code }}{% endblock %}
+
+{# Administration pattern: primary CTAs with the page header. #}
+{% set kit_admin_header_actions %}
+    {% if items|length > 0 %}
+        <a href="{{ path(_reorder, {id: menu.id}) }}" class="btn-ghost no-underline">{{ 'dashboard.open_sortable_reorder'|trans({}, _td) }}</a>
+    {% endif %}
+    <a
+        href="{{ path(dashboard_routes.export_menu|default('nowo_dashboard_menu_dashboard_export_menu'), {id: menu.id}) }}"
+        class="btn-ghost no-underline"
+        target="_blank"
+        rel="noopener noreferrer"
+    >{{ 'dashboard.export'|trans({}, _td) }}</a>
+    <button
+        type="button"
+        class="btn-ghost btn-copy-menu"
+        data-id="{{ menu.id }}"
+        data-copy-url="{{ path(dashboard_routes.menu_copy|default('nowo_dashboard_menu_dashboard_menu_copy'), {id: menu.id}) }}"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-menu-copy', _css_fw)|raw }}
+    >{{ 'dashboard.copy'|trans({}, _td) }}</button>
+    <button
+        type="button"
+        class="btn-ghost btn-edit-menu"
+        data-id="{{ menu.id }}"
+        data-section="basic"
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+        title="{{ 'dashboard.edit_identity'|trans({}, _td) }}"
+    >{{ 'dashboard.edit_menu'|trans({}, _td) }}</button>
+    {% if not menu.base %}
+        {% set _label_config = 'dashboard.edit_config'|trans({}, _td) %}
+        <button
+            type="button"
+            class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-menu btn-edit-menu-config"
+            data-id="{{ menu.id }}"
+            data-section="config"
+            {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+            {{ ui.modal_target_attr('modal-menu-form', _css_fw)|raw }}
+            title="{{ _label_config }}"
+            aria-label="{{ _label_config }}"
+        >
+            {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'config', label: _label_config} only %}
+        </button>
+    {% endif %}
+    {% if items|length > 0 %}
+        <form method="post" action="{{ path(dashboard_routes.items_reindex_positions|default('nowo_dashboard_menu_dashboard_items_reindex_positions'), {id: menu.id}) }}" class="inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('reindex_positions_' ~ menu.id) }}">
+            <button type="submit" class="btn-ghost" title="{{ 'dashboard.reindex_positions_title'|trans({'%step%': position_step}, _td) }}">
+                {{ 'dashboard.reindex_positions'|trans({'%step%': position_step}, _td) }}
+            </button>
+        </form>
+        <form method="post" action="{{ path(dashboard_routes.items_check_parent_cycles|default('nowo_dashboard_menu_dashboard_items_check_parent_cycles'), {id: menu.id}) }}" class="inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('check_parent_cycles_' ~ menu.id) }}">
+            <button type="submit" class="btn-ghost" title="{{ 'dashboard.check_parent_cycles_title'|trans({}, _td) }}">
+                {{ 'dashboard.check_parent_cycles'|trans({}, _td) }}
+            </button>
+        </form>
+    {% endif %}
+    <button
+        type="button"
+        class="btn-primary btn-add-item"
+        data-id="{{ menu.id }}"
+        data-parent=""
+        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+        {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+    >{{ 'dashboard.add_item'|trans({}, _td) }}</button>
+{% endset %}
+
+{% block body %}
+
+    {% if menu.permissionChecker or menu.depthLimit is not null or menu.collapsible is not null or menu.collapsibleExpanded is not null or menu.nestedCollapsible is not null or menu.nestedCollapsibleSections is not null %}
+        <section class="panel mb-4 text-sm text-[var(--color-ink)]/75">
+            {% if menu.permissionChecker %}<strong>{{ 'dashboard.permission_checker'|trans({}, _td) }}:</strong> <code>{{ menu.permissionChecker }}</code>{% endif %}
+            {% if menu.depthLimit is not null %} {% if menu.permissionChecker %}·{% endif %} <strong>{{ 'dashboard.depth_limit'|trans({}, _td) }}:</strong> {{ menu.depthLimit }}{% endif %}
+            {% if menu.collapsible is not null %} · <strong>{{ 'dashboard.collapsible'|trans({}, _td) }}:</strong> {{ menu.collapsible ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.collapsibleExpanded is not null %} · <strong>{{ 'dashboard.collapsible_expanded'|trans({}, _td) }}:</strong> {{ menu.collapsibleExpanded ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.nestedCollapsible is not null %} · <strong>{{ 'dashboard.nested_collapsible'|trans({}, _td) }}:</strong> {{ menu.nestedCollapsible ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+            {% if menu.nestedCollapsibleSections is not null %} · <strong>{{ 'form.menu_type.nested_collapsible_sections.label'|trans({}, _td) }}:</strong> {{ menu.nestedCollapsibleSections ? 'dashboard.yes'|trans({}, _td) : 'dashboard.no'|trans({}, _td) }}{% endif %}
+        </section>
+    {% endif %}
+
+    {% if menu.ulId or menu.classMenu or menu.classItem or menu.classLink or menu.classChildren or menu.classSectionChildren or menu.classSectionChildItem or menu.classSectionChildLink or menu.classSectionLabel or menu.classSection or menu.classDivider or menu.classCurrent or menu.classBranchExpanded or menu.classHasChildren or menu.classExpanded or menu.classCollapsed %}
+        <section class="panel mb-4 text-sm text-[var(--color-ink)]/75">
+            <strong>{{ 'dashboard.css_classes'|trans({}, _td) }}</strong>:
+            {% if menu.classMenu %}<code class="mr-1">menu: {{ menu.classMenu }}</code>{% endif %}
+            {% if menu.ulId %}<code class="mr-1">ul_id: {{ menu.ulId }}</code>{% endif %}
+            {% if menu.classItem %}<code class="mr-1">item: {{ menu.classItem }}</code>{% endif %}
+            {% if menu.classLink %}<code class="mr-1">link: {{ menu.classLink }}</code>{% endif %}
+            {% if menu.classChildren %}<code class="mr-1">children: {{ menu.classChildren }}</code>{% endif %}
+            {% if menu.classSectionChildren %}<code class="mr-1">section-children: {{ menu.classSectionChildren }}</code>{% endif %}
+            {% if menu.classSectionChildItem %}<code class="mr-1">section-child-item: {{ menu.classSectionChildItem }}</code>{% endif %}
+            {% if menu.classSectionChildLink %}<code class="mr-1">section-child-link: {{ menu.classSectionChildLink }}</code>{% endif %}
+            {% if menu.classSectionLabel %}<code class="mr-1">section-label: {{ menu.classSectionLabel }}</code>{% endif %}
+            {% if menu.classSection %}<code class="mr-1">section: {{ menu.classSection }}</code>{% endif %}
+            {% if menu.classDivider %}<code class="mr-1">divider: {{ menu.classDivider }}</code>{% endif %}
+            {% if menu.classCurrent %}<code class="mr-1">current: {{ menu.classCurrent }}</code>{% endif %}
+            {% if menu.classBranchExpanded %}<code class="mr-1">branch: {{ menu.classBranchExpanded }}</code>{% endif %}
+            {% if menu.classHasChildren %}<code class="mr-1">has-children: {{ menu.classHasChildren }}</code>{% endif %}
+            {% if menu.classExpanded %}<code class="mr-1">expanded: {{ menu.classExpanded }}</code>{% endif %}
+            {% if menu.classCollapsed %}<code class="mr-1">collapsed: {{ menu.classCollapsed }}</code>{% endif %}
+        </section>
+    {% endif %}
+
+    {% if items|length == 0 %}
+        <p class="text-sm text-[var(--color-ink)]/55">
+            {{ 'dashboard.no_items'|trans({}, _td) }}
+            <button
+                type="button"
+                class="btn-ghost btn-sm align-baseline btn-add-item"
+                data-id="{{ menu.id }}"
+                data-parent=""
+                {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+            >{{ 'dashboard.add_one'|trans({}, _td) }}</button>.
+        </p>
+    {% else %}
+        {% set currentLocale = app.request.locale|default('en') %}
+        <section class="panel overflow-x-auto" data-testid="dashboard-menu-items-table">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                        <th class="px-2 py-2 font-medium">{{ 'dashboard.parent'|trans({}, _td) }}</th>
+                        <th class="px-2 py-2 font-medium">Label ({{ currentLocale }})</th>
+                        <th class="px-2 py-2 font-medium">{{ 'dashboard.route_url'|trans({}, _td) }}</th>
+                        <th class="px-2 py-2 font-medium">{{ 'dashboard.item'|trans({}, _td) }}</th>
+                        <th class="w-0 px-2 py-2 text-end font-medium whitespace-nowrap">{{ 'dashboard.actions'|trans({}, _td) }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        {% set depth = item_depths[item.id] is defined ? item_depths[item.id] : 0 %}
+                        {% set can_have_children = item.itemType == 'link' or item.itemType == 'service' %}
+                        {% set _label_up = 'dashboard.move_up'|trans({}, _td) %}
+                        {% set _label_down = 'dashboard.move_down'|trans({}, _td) %}
+                        {% set _label_add = 'dashboard.add_child'|trans({}, _td) %}
+                        {% set _label_labels = 'dashboard.edit_labels'|trans({}, _td) %}
+                        {% set _label_type = 'dashboard.edit_type_position_icon'|trans({}, _td) %}
+                        {% set _label_config = 'dashboard.edit_config'|trans({}, _td) %}
+                        {% set _label_delete = 'dashboard.delete'|trans({}, _td) %}
+                        <tr id="item-{{ item.id }}" class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                            <td class="px-2 py-3 text-xs text-[var(--color-ink)]/55">
+                                <div>{{ item_parent_labels[item.id] is defined ? item_parent_labels[item.id] : '—' }}</div>
+                                <div>Pos: {{ item.position }}</div>
+                            </td>
+                            <td class="px-2 py-3">
+                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with { item: item } only %}
+                                {{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}
+                            </td>
+                            <td class="px-2 py-3 text-xs">
+                                {% if item.itemType == 'link' %}
+                                    {% if item.linkType == 'route' and item.routeName %}
+                                        <code class="block text-[var(--color-ink)]/65">{{ item.routeName }}{% if item.routeParams and item.routeParams|length > 0 %} {{ item.routeParams|json_encode }}{% endif %}</code>
+                                    {% elseif item.externalUrl %}
+                                        <a href="{{ item.externalUrl }}" target="_blank" rel="noopener noreferrer" class="break-all no-underline">{{ item.externalUrl }}</a>
+                                    {% else %}
+                                        <span class="text-[var(--color-ink)]/40">—</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-[var(--color-ink)]/40">—</span>
+                                {% endif %}
+                                {% set _permission_keys = item.permissionKeys ?? [] %}
+                                <div class="mt-1">
+                                    {% if _permission_keys is iterable and _permission_keys|length > 0 %}
+                                        {% for permission_key in _permission_keys %}
+                                            <code class="mr-1">{{ permission_key }}</code>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-[var(--color-ink)]/40">No permission keys</span>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-1">
+                                    {% if item.isUnanimous %}
+                                        <span class="badge bg-[var(--color-moss)]/15 text-[var(--color-moss)]">Unanimous</span>
+                                    {% else %}
+                                        <span class="badge bg-[var(--color-alert)]/15 text-[var(--color-alert)]">Non-unanimous</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-2 py-3" style="padding-left: {{ 0.5 + depth * 1.25 }}rem;">
+                                {% include '@NowoDashboardMenuBundle/dashboard/_dashboard_item_icon.html.twig' with { item: item } only %}
+                                <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/75">{{ item.itemType }}</span>
+                                {{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}
+                            </td>
+                            <td class="w-0 px-2 py-3 text-end whitespace-nowrap">
+                                <div class="inline-flex max-w-full items-center justify-end gap-1 {{ _display == 'icon' ? '' : 'flex-wrap' }} nowo-ui-row-actions nowo-ui-row-actions--{{ _display|replace({'_': '-'}) }}" aria-label="{{ 'dashboard.actions'|trans({}, _td) }}">
+                                    {% if prev_sibling[item.id] is defined and prev_sibling[item.id] is not null %}
+                                        <form method="post" action="{{ path(dashboard_routes.item_move_up|default('nowo_dashboard_menu_dashboard_item_move_up'), {id: menu.id, itemId: item.id}) }}" class="inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('item_move_up_' ~ item.id) }}">
+                                            <button type="submit" class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}" title="{{ _label_up }}" aria-label="{{ _label_up }}">
+                                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'prev', label: _label_up} only %}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} opacity-40" title="{{ 'dashboard.first'|trans({}, _td) }}" aria-hidden="true">
+                                            {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'prev', label: _label_up} only %}
+                                        </span>
+                                    {% endif %}
+                                    {% if next_sibling[item.id] is defined and next_sibling[item.id] is not null %}
+                                        <form method="post" action="{{ path(dashboard_routes.item_move_down|default('nowo_dashboard_menu_dashboard_item_move_down'), {id: menu.id, itemId: item.id}) }}" class="inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('item_move_down_' ~ item.id) }}">
+                                            <button type="submit" class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }}" title="{{ _label_down }}" aria-label="{{ _label_down }}">
+                                                {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'next', label: _label_down} only %}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} opacity-40" title="{{ 'dashboard.last'|trans({}, _td) }}" aria-hidden="true">
+                                            {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'next', label: _label_down} only %}
+                                        </span>
+                                    {% endif %}
+                                    <button
+                                        type="button"
+                                        class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-add-item{% if not can_have_children %} opacity-40{% endif %}"
+                                        title="{{ can_have_children ? _label_add : 'dashboard.add_child_disabled'|trans({}, _td) }}"
+                                        aria-label="{{ _label_add }}"
+                                        {% if can_have_children %}
+                                            data-id="{{ menu.id }}"
+                                            data-parent="{{ item.id }}"
+                                            {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                            {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+                                        {% else %}
+                                            disabled aria-disabled="true"
+                                        {% endif %}
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'create', label: _label_add} only %}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-item"
+                                        title="{{ _label_labels }}"
+                                        aria-label="{{ _label_labels }}"
+                                        data-id="{{ menu.id }}"
+                                        data-item-id="{{ item.id }}"
+                                        data-section="basic"
+                                        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                        {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'edit', label: _label_labels} only %}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-item"
+                                        title="{{ _label_type }}"
+                                        aria-label="{{ _label_type }}"
+                                        data-id="{{ menu.id }}"
+                                        data-item-id="{{ item.id }}"
+                                        data-section="icon"
+                                        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                        {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'bi:list', label: _label_type} only %}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-ghost {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-edit-item btn-edit-item-config"
+                                        title="{{ _label_config }}"
+                                        aria-label="{{ _label_config }}"
+                                        data-id="{{ menu.id }}"
+                                        data-item-id="{{ item.id }}"
+                                        data-section="config"
+                                        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                        {{ ui.modal_target_attr('modal-item-form', _css_fw)|raw }}
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'config', label: _label_config} only %}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-danger {{ _display == 'icon' ? 'btn-icon' : 'btn-sm btn-label' }} btn-delete-item"
+                                        title="{{ _label_delete }}"
+                                        aria-label="{{ _label_delete }}"
+                                        data-id="{{ menu.id }}"
+                                        data-item-id="{{ item.id }}"
+                                        data-name="{{ item.getLabelForLocale(currentLocale) ?: ('dashboard.no_label'|trans({}, _td)) }}"
+                                        data-url="{{ path(dashboard_routes.item_delete|default('nowo_dashboard_menu_dashboard_item_delete'), {id: menu.id, itemId: item.id}) }}"
+                                        data-token="{{ csrf_token('delete_item_' ~ item.id) }}"
+                                        {{ ui.modal_toggle_attrs(_css_fw)|raw }}
+                                        {{ ui.modal_target_attr('modal-delete-item-confirm', _css_fw)|raw }}
+                                    >
+                                        {% include '@NowoUiKitBundle/partials/_action_inner.html.twig' with {display: _display, icon_name: 'delete', label: _label_delete} only %}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+
+    <script>
+    window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
+        baseUrl: {{ path(_show, {id: menu.id})|json_encode|raw }},
+        menuId: {{ menu.id }},
+        debug: {{ app.debug ? 'true' : 'false' }}
+    });
+    </script>
+{% endblock %}

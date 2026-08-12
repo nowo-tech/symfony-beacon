@@ -1,0 +1,37 @@
+{# Host override: FormKit/beacon theme (drop vendor bootstrap_5_layout) + panel chrome. #}
+{% extends '@NowoCookieConsentBundle/admin/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+
+{% block title %}{{ isNew ? 'nowo_cookie_consent.admin.cookie_definition.new_title'|trans({}, 'NowoCookieConsentBundle') : 'nowo_cookie_consent.admin.cookie_definition.edit_title'|trans({'%name%': definition.name}, 'NowoCookieConsentBundle') }}{% endblock %}
+
+{% block body %}
+    {% include '@NowoCookieConsentBundle/admin/_admin_area_nav.html.twig' with {config: config} only %}
+
+    <div class="{{ ui.toolbar(_css_fw) }}">
+        <a class="{{ ui.btn('link', null, _css_fw) }}" href="{{ path('nowo_cookie_consent_cookie_definitions_index', {configId: config.id}) }}">
+            &larr; {{ 'nowo_cookie_consent.admin.area_nav.cookies'|trans({}, 'NowoCookieConsentBundle') }}
+        </a>
+    </div>
+
+    <section class="panel nowo-ui-form-wrapmx-auto" data-testid="cookie-consent-definition-form">
+        <h2 class="nowo-ui-section-title">
+            {{ isNew ? 'nowo_cookie_consent.admin.cookie_definition.new_title'|trans({}, 'NowoCookieConsentBundle') : 'nowo_cookie_consent.admin.cookie_definition.edit_title'|trans({'%name%': definition.name}, 'NowoCookieConsentBundle') }}
+        </h2>
+        <p class="{{ ui.muted(_css_fw) }} mb-4">
+            {{ 'nowo_cookie_consent.admin.cookie_definition.form_lead'|trans({'%profile%': config.displayName}, 'NowoCookieConsentBundle') }}
+        </p>
+
+        {{ form_start(form, {attr: {class: 'nowo-ui-form nowo-ui-form--stack space-y-4'}}) }}
+            {% include 'form/_fields.html.twig' with {form: form} only %}
+            <div class="nowo-ui-form-actions">
+                <button type="submit" class="btn-primary nowo-ui-action-save">
+                    {{ 'nowo_cookie_consent.admin.cookie_definition.save'|trans({}, 'NowoCookieConsentBundle') }}
+                </button>
+                <a class="btn-ghost nowo-ui-action-cancel no-underline" href="{{ path('nowo_cookie_consent_cookie_definitions_index', {configId: config.id}) }}">
+                    {{ 'nowo_cookie_consent.admin.cookie_definition.cancel'|trans({}, 'NowoCookieConsentBundle') }}
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

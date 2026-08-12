@@ -58,7 +58,7 @@ As a maintainer, when a form needs a special layout (color picker grid, quiet-ho
 - Hidden CSRF / `_token` children: must not be double-rendered; Symfony marks them rendered via `form_end` / rest as today.
 - Compound / embedded forms: loop top-level children; nested types keep their own themes.
 - Single-widget custom UIs (e.g. issue assignee): may use `form_widget` for a named child, then still run the unrendered loop for any additional Type fields.
-- Hand-rolled HTML `<form>` pages without a Symfony Form Type are out of scope for this feature (separate migration).
+- Hand-rolled HTML `<form>` pages without a Symfony Form Type were out of scope here; migration is `090-csrf-symfony-forms`.
 
 ## Requirements *(mandatory)*
 
@@ -96,10 +96,11 @@ As a maintainer, when a form needs a special layout (color picker grid, quiet-ho
 
 - `078-form-save-restore-actions` — standing convention for Save + Restore action chrome on settings forms (texts, colors, panel placement).
 - `081-formkit-uikit-kit-sync` — FormKit profile flags, AuthKit/UiKit/RoutingKit pins.
+- `090-csrf-symfony-forms` — migrate hand-rolled mutable POSTs to Form Types / `CsrfOnlyType`.
 
 ## Out of Scope
 
-- Migrating every non-Symfony `<form>` in admin CRUD to Form Types
+- Migrating every non-Symfony `<form>` in admin CRUD to Form Types — delivered under `090` (as-built); new host mutable POSTs MUST follow `090` / this field loop
 - Changing FormKit bundle internals
 - Redesigning appearance color-picker UX beyond complying with the catch-all loop rule
 - Standardizing Save / Restore labels and restore semantics (see `078`)

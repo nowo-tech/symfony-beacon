@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Ingest\Otlp\Service;
 
 use App\Ingest\Message\ProcessEnvelopeMessage;
+use App\Ingest\Service\IngestProjectAccessGate;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
@@ -38,7 +39,10 @@ final readonly class OtlpIngestPipeline
 
         $projectId = $accepted['project']->getId();
         if (null === $projectId) {
-            return $this->otlpIngestGateway->respond('project not found', Response::HTTP_NOT_FOUND);
+            return $this->otlpIngestGateway->respond(
+                IngestProjectAccessGate::UNAUTHORIZED_MESSAGE,
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
         try {

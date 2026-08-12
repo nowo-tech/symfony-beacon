@@ -123,6 +123,15 @@ Briefly allowed listing a copyable DSN under **active** keys for managers (recov
 
 Extends FR-003 / `062`: `SiteBackupSecurityDefaultsGuard` rejects documented / short `MERCURE_JWT_SECRET` outside `dev`/`test` when the env var is set. Covered by `SiteBackupSecurityDefaultsGuardTest`. Docs: PRODUCTION.md, MERCURE.md.
 
+## Amendment (session longevity + PWA cookie, 2026-08-11)
+
+Extends FR-007:
+
+- Session cookie name is `beacon.session_cookie_name` (`config/parameters.yaml`), default `SYMFONY_BEACON_SESSID` (not `PHPSESSID`). Cookie Consent inventory MUST reference the same parameter.
+- Without Remember me: `framework.session.cookie_lifetime` + `gc_maxlifetime` = **86400** (1 day).
+- Remember me cookie lifetime = **2592000** (30 days); keep AuthKit login `remember_me.lifetime` in sync with `security.firewalls.main.remember_me.lifetime`.
+- PWA bootstrap routes `/manifest.webmanifest` and `/sw.js` MUST NOT emit `Set-Cookie` (guest session must not overwrite an authenticated session cookie).
+
 ## Related
 
 - Predecessors: `018-project-governance`, `038-prometheus-metrics`, `044-instance-config-export`, `052-api-public-key-hardening`, `055-install-seed-layers`, `058-self-beacon-client`, `062-sitebackup-nondev-guard`, `068-slack-interactive-actions`

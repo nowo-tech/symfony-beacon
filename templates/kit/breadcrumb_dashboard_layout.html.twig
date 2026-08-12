@@ -1,16 +1,16 @@
 {# Beacon host layout for breadcrumb-kit CRUD.
    Bundle pages: @NowoBreadcrumbKitBundle/dashboard/*.html.twig → base → this shell.
-   Do NOT fork dashboard pages — only this layout + CSS so kit upgrades flow in. #}
+   Host forks: collection/item index (Menus chrome + text row actions). #}
 {% extends 'kit/_kit_admin_layout.html.twig' %}
 {% trans_default_domain 'NowoBreadcrumbKitBundle' %}
 
 {% set kit_admin_heading %}{% block dashboard_title %}{{ 'nav.breadcrumbs'|trans({}, 'messages') }}{% endblock %}{% endset %}
-{% set kit_admin_intro = 'admin.hub.breadcrumbs'|trans %}
+{% set kit_admin_intro = 'admin.hub.breadcrumbs'|trans({}, 'messages') %}
 {% set kit_admin_css_framework = nowo_breadcrumb_kit_css_framework|default('tailwind') %}
-{% set kit_admin_split_filters = true %}
+{# Explicit panel.nowo-ui-table-wrap in dashboard pages (Cookie Consent pattern); no JS split. #}
 
 {% block kit_admin_extra_styles %}
-    <style>
+    <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
         body > .ts-dropdown { z-index: 1060; }
     </style>
 {% endblock %}
@@ -38,4 +38,5 @@
 
 {% block kit_admin_modals %}
     {% include '@NowoBreadcrumbKitBundle/dashboard/_dashboard_modals.html.twig' %}
+    {% include 'kit/_kit_config_boot.html.twig' %}
 {% endblock %}

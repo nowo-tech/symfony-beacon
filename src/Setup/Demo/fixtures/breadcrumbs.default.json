@@ -757,6 +757,23 @@
       }
     },
     {
+      "route": "admin_appearance_section",
+      "label": "Appearance",
+      "parent": "admin_hub",
+      "dynamicParamKeys": [
+        "section"
+      ],
+      "translations": {
+        "en": "Appearance",
+        "es": "Apariencia",
+        "de": "Erscheinungsbild",
+        "nl": "Weergave",
+        "fr": "Apparence",
+        "it": "Aspetto",
+        "pt": "Aparência"
+      }
+    },
+    {
       "route": "admin_mailer",
       "label": "Mailer",
       "parent": "admin_hub",
@@ -908,6 +925,38 @@
         "fr": "Routes par locale",
         "it": "Route per locale",
         "pt": "Rotas por locale"
+      }
+    },
+    {
+      "route": "nowo_routing_kit_panel_create",
+      "label": "New",
+      "parent": "nowo_routing_kit_panel",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "New",
+        "es": "Nuevo",
+        "de": "Neu",
+        "nl": "Nieuw",
+        "fr": "Nouveau",
+        "it": "Nuovo",
+        "pt": "Novo"
+      }
+    },
+    {
+      "route": "nowo_routing_kit_panel_edit",
+      "label": "Edit",
+      "parent": "nowo_routing_kit_panel",
+      "dynamicParamKeys": [
+        "id"
+      ],
+      "translations": {
+        "en": "Edit",
+        "es": "Editar",
+        "de": "Bearbeiten",
+        "nl": "Bewerken",
+        "fr": "Modifier",
+        "it": "Modifica",
+        "pt": "Editar"
       }
     },
     {
@@ -1097,7 +1146,7 @@
       "dynamicParamKeys": [],
       "translations": {
         "en": "Breadcrumbs",
-        "es": "Migas",
+        "es": "Migas de pan",
         "de": "Brotkrumen",
         "nl": "Broodkruimels",
         "fr": "Fil d’Ariane",
@@ -1112,7 +1161,7 @@
       "dynamicParamKeys": [],
       "translations": {
         "en": "Breadcrumbs",
-        "es": "Migas",
+        "es": "Migas de pan",
         "de": "Brotkrumen",
         "nl": "Broodkruimels",
         "fr": "Fil d’Ariane",

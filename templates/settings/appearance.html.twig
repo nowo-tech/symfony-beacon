@@ -27,12 +27,18 @@
         class="group relative flex flex-col overflow-hidden rounded-lg border text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] {% if selected %}border-[var(--color-moss)] ring-2 ring-[var(--color-moss)]/35{% else %}border-[var(--color-sand)] hover:border-[var(--color-moss)]/50{% endif %}"
         aria-pressed="{{ selected ? 'true' : 'false' }}"
     >
-        <span class="block h-20 w-full p-3" style="background: {{ previewPaper }};">
-            <span class="flex h-full flex-col justify-between rounded-md p-2 shadow-sm" style="background: {{ previewSurface }}; color: {{ previewInk }};">
-                <span class="block h-1.5 w-10 rounded-sm" style="background: {{ previewAccent }};"></span>
+        <span
+            class="js-theme-preview block h-20 w-full p-3"
+            data-paper="{{ previewPaper }}"
+            data-surface="{{ previewSurface }}"
+            data-ink="{{ previewInk }}"
+            data-accent="{{ previewAccent }}"
+        >
+            <span class="js-theme-preview-surface flex h-full flex-col justify-between rounded-md p-2 shadow-sm">
+                <span class="js-theme-preview-accent block h-1.5 w-10 rounded-sm"></span>
                 <span class="flex items-center justify-between gap-2">
-                    <span class="block h-1 w-8 rounded-sm opacity-40" style="background: {{ previewInk }};"></span>
-                    <span class="block h-4 w-4 rounded-sm" style="background: {{ previewAccent }};"></span>
+                    <span class="js-theme-preview-ink block h-1 w-8 rounded-sm opacity-40"></span>
+                    <span class="js-theme-preview-accent block h-4 w-4 rounded-sm"></span>
                 </span>
             </span>
         </span>
@@ -48,8 +54,8 @@
 {% block body %}
 {% import _self as ui %}
 <div class="mx-auto">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'appearance.title'|trans }}</h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'appearance.intro'|trans }}</p>
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'appearance.title'|trans }}</h1>
+    <p class="mb-6 text-xs text-[var(--color-ink)]/55">{{ 'appearance.intro'|trans }}</p>
 
     {% set tab_items = [] %}
     {% for item in sections %}
@@ -108,8 +114,8 @@
                 {% endif %}
             </div>
 
-            <form method="post" class="space-y-5">
-                <input type="hidden" name="_token" value="{{ csrf_token('appearance_theme') }}">
+            {{ form_start(appearanceThemeForm, {attr: {class: 'space-y-5'}}) }}
+                {{ form_widget(appearanceThemeForm._token) }}
                 <div>
                     <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.light'|trans }}</h3>
                     <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -126,7 +132,7 @@
                         {% endfor %}
                     </div>
                 </div>
-            </form>
+            {{ form_end(appearanceThemeForm, {render_rest: false}) }}
         </section>
     {% else %}
         {{ form_start(form, {attr: {class: 'panel space-y-4', 'data-testid': 'appearance-form', 'data-appearance-section': section.value}}) }}

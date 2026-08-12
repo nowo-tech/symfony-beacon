@@ -6,6 +6,11 @@ test.describe('Settings deep checks', () => {
     await page.goto('/admin/appearance');
     await dismissProductTour(page);
 
+    // Index redirects to admin_appearance_section — breadcrumbs must still render.
+    const crumbs = page.locator('.beacon-breadcrumb-wrap');
+    await expect(crumbs).toBeVisible();
+    await expect(crumbs).toContainText(/appearance|apariencia|apparence|aspetto|aparência|erscheinungsbild|weergave/i);
+
     const tabs = page.locator('[data-testid="appearance-tabs"]');
     await expect(tabs).toBeVisible();
 
@@ -16,6 +21,7 @@ test.describe('Settings deep checks', () => {
       await waitForPageLoader(page);
       await expect(page).toHaveURL(new RegExp(`/admin/appearance/${section}`));
       await expect(page.getByRole('main').locator('form').first()).toBeVisible();
+      await expect(page.locator('.beacon-breadcrumb-wrap')).toBeVisible();
     }
   });
 
@@ -85,8 +91,8 @@ test.describe('Settings deep checks', () => {
     await dismissProductTour(page);
 
     const cards = [
-      { testid: 'admin-ops-defaults', url: /\/settings\/ops-defaults/ },
-      { testid: 'admin-instance-config', url: /\/settings\/instance-config/ },
+      { testid: 'admin-ops-defaults', url: /\/admin\/ops-defaults/ },
+      { testid: 'admin-instance-config', url: /\/admin\/instance-config/ },
       { testid: 'admin-http-log', url: /\/admin\/http-log/ },
       { testid: 'admin-cookie-consent', url: /\/admin\/cookie-consent|\/cookie-consent/ },
     ] as const;

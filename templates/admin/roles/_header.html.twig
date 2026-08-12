@@ -6,7 +6,7 @@
 <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
     <div>
         <a href="{{ path('admin_roles') }}" class="text-sm no-underline">{{ 'roles.back'|trans }}</a>
-        <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ role|rbac_role_name }}</h1>
+        <h1 class="mt-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ role|rbac_role_name }}</h1>
     </div>
     <div class="flex flex-wrap gap-2">
         {% if editForm is defined %}
@@ -26,7 +26,7 @@
                 {% endblock %}
                 {% block form %}
                     {{ form_start(editForm, {attr: {class: 'confirm-dialog__panel'}}) }}
-                        <input type="hidden" name="_return" value="{{ role_return_route }}">
+                        {{ form_widget(editForm._return) }}
                         <div class="confirm-dialog__header">
                             <h2 id="role-edit-dialog-title" class="confirm-dialog__title">{{ 'roles.edit_title'|trans }}</h2>
                             <p class="confirm-dialog__body">{{ 'roles.form_intro'|trans }}</p>
@@ -43,16 +43,15 @@
             {% endembed %}
         {% endif %}
         {% if not role.system and role.users|length == 0 %}
-            <form
-                method="post"
-                action="{{ path('admin_roles_delete', {id: role.uuid}) }}"
-                data-controller="confirm-submit"
-                data-confirm-submit-message-value="{{ 'roles.delete_confirm'|trans|e('html_attr') }}"
-                data-action="submit->confirm-submit#confirm"
-            >
-                <input type="hidden" name="_token" value="{{ csrf_token('admin_instance_role_delete_' ~ role.id) }}">
+            {{ form_start(deleteForm, {
+                attr: {
+                    'data-controller': 'confirm-submit',
+                    'data-confirm-submit-message-value': 'roles.delete_confirm'|trans|e('html_attr'),
+                    'data-action': 'submit->confirm-submit#confirm',
+                }
+            }) }}
                 <button class="btn-danger" type="submit">{{ 'roles.delete'|trans }}</button>
-            </form>
+            {{ form_end(deleteForm) }}
         {% endif %}
     </div>
 </div>

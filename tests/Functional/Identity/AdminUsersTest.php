@@ -99,10 +99,14 @@ final class AdminUsersTest extends DatabaseWebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $admin);
 
-        $crawler = $client->request(Request::METHOD_GET, '/admin/users/new');
+        $client->request(Request::METHOD_GET, '/admin/users/new');
+        self::assertResponseRedirects('/admin/users?new=1');
+        $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="admin-user-create"]');
+        self::assertCount(1, $crawler->filter('[data-confirm-dialog-open-on-connect-value="true"]'));
 
-        $form = $crawler->selectButton('Add user')->form([
+        $form = $crawler->filter('form[action$="/admin/users/new"]')->form([
             'admin_user[email]' => 'newbie@example.com',
             'admin_user[displayName]' => 'Newbie',
             'admin_user[password]' => 'secret123',

@@ -9,7 +9,10 @@ use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
+use App\Project\Form\ProjectReleaseEnvironmentCompareType;
+use App\Project\Form\ProjectReleaseFocusType;
 use App\Project\Service\ProjectAccessService;
+use App\Shared\Form\GetFilterFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +31,7 @@ final class ProjectReleaseHealthController extends AbstractController
         private readonly IssueSearchRepository $issueRepository,
         private readonly EventRepository $eventRepository,
         private readonly ProjectAccessService $projectAccess,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -76,10 +80,36 @@ final class ProjectReleaseHealthController extends AbstractController
             ];
         }
 
+        $releaseChoices = array_combine($releases, $releases) ?: [];
+        $compareChoices = [];
+        foreach ($releases as $release) {
+            if ($release === $selectedRelease) {
+                continue;
+            }
+
+            $compareChoices[$release] = $release;
+        }
+
         return $this->render('project/releases.html.twig', [
             'project' => $project,
             'releases' => $releases,
             'release_summaries' => $releaseSummaries,
+            'releaseFilterForm' => $this->getFilterFormFactory->create(ProjectReleaseFocusType::class, [
+                'release' => $selectedRelease,
+                'compare' => $compareRelease,
+            ], [
+                'action' => $this->generateUrl('project_releases', ['id' => $project->getUuid()]),
+                'release_choices' => $releaseChoices,
+                'compare_choices' => $compareChoices,
+            ])->createView(),
+            'environmentCompareForm' => $this->getFilterFormFactory->create(ProjectReleaseEnvironmentCompareType::class, [
+                'status' => '',
+                'release' => $selectedRelease ?? '',
+                'environment' => trim($request->query->getString('environment')),
+                'compare' => trim($request->query->getString('environment_compare')),
+            ], [
+                'action' => $this->generateUrl('issue_index', ['id' => $project->getUuid()]),
+            ])->createView(),
             'selected_release' => $selectedRelease,
             'selected_count' => $selectedCount,
             'selected_issues' => $selectedIssues,

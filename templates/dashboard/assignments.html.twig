@@ -7,6 +7,7 @@
     title_key: 'assignments.title',
     intro_key: 'assignments.intro',
     filter_route: 'dashboard_assignments',
+    filterForm: filterForm,
     filter_grid_class: 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
     filters: filters,
     filters_testid: 'assignments-filters',
@@ -29,58 +30,19 @@
     },
     item_count: issues|length,
 } %}
-    {% block filter_hidden %}
-        <input type="hidden" name="sort" value="{{ filters.sort }}">
-        <input type="hidden" name="dir" value="{{ filters.dir }}">
-    {% endblock %}
     {% block filter_fields %}
-        <select class="input" name="scope" aria-label="{{ 'assignments.filter.scope'|trans }}">
-            {% for scope in scopes %}
-                <option value="{{ scope.value }}" {% if filters.scope == scope.value %}selected{% endif %}>{{ ('assignments.scope.' ~ scope.value)|trans }}</option>
-            {% endfor %}
-        </select>
-
-        <select class="input" name="project" aria-label="{{ 'assignments.filter.project'|trans }}">
-            <option value="">{{ 'assignments.filter.any_project'|trans }}</option>
-            {% for project in projects %}
-                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-            {% endfor %}
-        </select>
-
-        <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="{{ 'issues.search_placeholder'|trans }}">
-
-        <select class="input" name="level" aria-label="{{ 'assignments.filter.level'|trans }}">
-            <option value="">{{ 'issues.filter.any_level'|trans }}</option>
-            {% for level in ['fatal', 'error', 'warning', 'info', 'debug'] %}
-                <option value="{{ level }}" {% if filters.level == level %}selected{% endif %}>{{ level }}</option>
-            {% endfor %}
-        </select>
-
-        <select class="input" name="status" aria-label="{{ 'assignments.filter.status'|trans }}">
-            {% for status in ['unresolved', 'resolved', 'ignored'] %}
-                <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status }}</option>
-            {% endfor %}
-        </select>
-
-        <select class="input" name="priority" aria-label="{{ 'assignments.filter.priority'|trans }}">
-            <option value="">{{ 'issues.filter.any_priority'|trans }}</option>
-            {% for p in ['low', 'medium', 'high', 'critical'] %}
-                <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ ('issues.priority.' ~ p)|trans }}</option>
-            {% endfor %}
-        </select>
-
-        <select class="input" name="assignee" aria-label="{{ 'assignments.filter.assignee'|trans }}" {% if filters.scope == 'mine' or filters.scope == 'unassigned' %}disabled{% endif %}>
-            <option value="">{{ 'issues.filter.any_assignee'|trans }}</option>
-            {% for mate in teammates %}
-                <option value="{{ mate.id }}" {% if filters.assignee == (mate.id ~ '') %}selected{% endif %}>{{ mate.displayName ?: mate.email }}</option>
-            {% endfor %}
-        </select>
-
-        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-            {% for size in [10, 25, 50, 100] %}
-                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-            {% endfor %}
-        </select>
+        {{ form_widget(filterForm.scope) }}
+        {{ form_widget(filterForm.project) }}
+        {{ form_widget(filterForm.q, {attr: {class: 'input', placeholder: 'issues.search_placeholder'|trans}}) }}
+        {{ form_widget(filterForm.level) }}
+        {{ form_widget(filterForm.status) }}
+        {{ form_widget(filterForm.priority) }}
+        {% set assigneeAttr = {class: 'input'} %}
+        {% if filters.scope == 'mine' or filters.scope == 'unassigned' %}
+            {% set assigneeAttr = assigneeAttr|merge({disabled: 'disabled'}) %}
+        {% endif %}
+        {{ form_widget(filterForm.assignee, {attr: assigneeAttr}) }}
+        {{ form_widget(filterForm.per_page) }}
     {% endblock %}
     {% block results %}
         <div class="overflow-x-auto">

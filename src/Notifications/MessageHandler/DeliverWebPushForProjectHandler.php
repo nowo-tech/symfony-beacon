@@ -20,7 +20,7 @@ use Throwable;
 /**
  * Sends Web Push notifications to opted-in members of a project.
  */
-#[AsMessageHandler]
+#[AsMessageHandler(sign: true)]
 final readonly class DeliverWebPushForProjectHandler
 {
     public function __construct(

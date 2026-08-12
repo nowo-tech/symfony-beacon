@@ -101,7 +101,7 @@ As ingest, similar events merge into one issue; resolved and ignored issues reop
 - **FR-006**: Issue detail MUST present structured panels including stack source context and Copy path.
 - **FR-007**: Panels MUST be collapsible with `localStorage` + optional account defaults (`IssuePanelIds`).
 - **FR-008**: Assignee MUST be an optional project member with list filter support.
-- **FR-009**: Status workflow MUST support unresolved / resolved / ignored via UI (`issue_status`) and ingest reopen of resolved **and** ignored → unresolved.
+- **FR-009**: Status workflow MUST support unresolved / resolved / ignored via UI (`issue_status`) and ingest reopen of resolved **and** ignored → unresolved. Status POST MUST use `IssueStatusType` (Symfony Form) per `090`.
 - **FR-010**: The system MUST persist an `issue_history` timeline for assignee changes and status changes (including ingest reopen), showing actor (or system), previous/next values, and timestamp on the issue detail sidebar.
 
 ### Non-Functional
@@ -115,3 +115,7 @@ As ingest, similar events merge into one issue; resolved and ignored issues reop
 - **SC-002**: Stack investigation shows source context and copyable paths when the client sends them (BeaconBundle ≥ 1.3.0).
 - **SC-003**: Similar exceptions collapse; resolved and ignored issues reopen on regression with visible history.
 - **SC-004**: Operators can mark an issue resolved from the UI and see assignment/status history next to the assignee control.
+
+## Amendment (Symfony Forms, 2026-08-11)
+
+Status POST uses `IssueStatusType`. Related triage Types live under `015` / `090-csrf-symfony-forms`.

@@ -42,4 +42,26 @@ test.describe('Project settings deep', () => {
     await expectAuthenticatedPage(page, `/projects/${uuid}/releases?from=&to=`);
     await expect(page.getByRole('main')).toBeVisible();
   });
+
+  test('config portability panel is present for managers', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await page.goto(`/projects/${uuid}/settings`);
+    await dismissProductTour(page);
+    await expect(page.locator('[data-testid="project-config-portability"]')).toBeVisible();
+    await expect(page.locator('[data-testid="project-config-download"]')).toBeVisible();
+  });
+
+  test('danger zone section is present for owners', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await page.goto(`/projects/${uuid}/settings`);
+    await dismissProductTour(page);
+    await expect(page.locator('.panel--danger, section.panel').filter({ hasText: /danger|peligro|delete|eliminar/i }).first()).toBeVisible();
+  });
+
+  test('notification destinations list shell loads', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await expectAuthenticatedPage(page, `/projects/${uuid}/settings`);
+    await expect(page.getByRole('main')).toContainText(/notification|notificaci/i);
+  });
 });
+

@@ -47,4 +47,39 @@ describe('toast-stack controller', () => {
     controller.dismiss(event);
     expect(toast.classList.contains('is-leaving')).toBe(true);
   });
+
+  it('pauses on hover and removes toast after leave fallback', async () => {
+    await Promise.resolve();
+    const toast = document.querySelector('[data-toast-stack-target="toast"]') as HTMLElement;
+    toast.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(2000);
+    expect(toast.classList.contains('is-leaving')).toBe(false);
+    toast.dispatchEvent(new Event('mouseleave'));
+    vi.advanceTimersByTime(1000);
+    expect(toast.classList.contains('is-leaving')).toBe(true);
+    vi.advanceTimersByTime(400);
+    expect(document.querySelector('[data-toast-stack-target="toast"]')).toBeNull();
+    expect(document.querySelector('[data-controller="toast-stack"]')).toBeNull();
+  });
+
+  it('ignores non-element dismiss targets and non-positive timeouts', async () => {
+    application.stop();
+    document.body.innerHTML = `
+      <div data-controller="toast-stack">
+        <div data-toast-stack-target="toast" data-timeout="0" class="toast">Stay</div>
+      </div>
+    `;
+    application = Application.start();
+    application.register('toast-stack', ToastStackController);
+    await Promise.resolve();
+    const controller = application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="toast-stack"]') as HTMLElement,
+      'toast-stack',
+    ) as ToastStackController;
+    const event = new Event('click');
+    Object.defineProperty(event, 'currentTarget', { value: null });
+    controller.dismiss(event);
+    vi.advanceTimersByTime(5000);
+    expect(document.querySelector('[data-toast-stack-target="toast"]')).toBeTruthy();
+  });
 });

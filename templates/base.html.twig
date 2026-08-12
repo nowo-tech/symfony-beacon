@@ -28,8 +28,8 @@
             <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
-        {# After app CSS so site palette / radius / border tokens win the cascade. #}
-        <style>{{ site_appearance.cssOverrides|raw }}</style>
+        {# After app CSS so site palette / radius / border tokens win the cascade. Nonce matches CSP style-src. #}
+        <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>{{ site_appearance.cssOverrides|raw }}</style>
         {% block javascripts %}
             {{ vite_entry_script_tags('app') }}
             <script src="{{ asset('js/nowo-ui-orb.js', 'nowo_ui_kit') }}" defer></script>
@@ -99,11 +99,10 @@
                             {% if is_granted('ROLE_ADMIN') and app.session.get('_beacon_view_as_member') %}
                                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm" role="status">
                                     <span>{{ 'admin_projects.view_as_banner'|trans }}</span>
-                                    <form method="post" action="{{ path('admin_view_as_member_disable') }}">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('admin_view_as_member_disable') }}">
-                                        <input type="hidden" name="redirect" value="{{ app.request.requestUri }}">
+                                    {% set form = csrf_action_form(path('admin_view_as_member_disable'), 'admin_view_as_member_disable', fields={redirect: app.request.requestUri}) %}
+                                    {{ form_start(form) }}
                                         <button class="btn-ghost btn-sm" type="submit">{{ 'admin_projects.view_as_exit'|trans }}</button>
-                                    </form>
+                                    {{ form_end(form) }}
                                 </div>
                             {% endif %}
                         {% endif %}

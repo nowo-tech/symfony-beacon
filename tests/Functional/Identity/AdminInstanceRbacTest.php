@@ -158,7 +158,7 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
             'admin_instance_role[name]' => 'Matrix helper renamed',
             'admin_instance_role[description]' => 'Updated via modal',
             'admin_instance_role[enabled]' => '1',
-            '_return' => 'admin_roles_users',
+            'admin_instance_role[_return]' => 'admin_roles_users',
         ]);
         $client->submit($editForm);
         self::assertResponseRedirects('/admin/roles/'.$role->getUuid().'/users');
@@ -208,7 +208,7 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         self::assertSelectorNotExists(sprintf('form[action="%s"]', '/admin/roles/'.$role->getUuid().'/delete'));
 
         $client->request(Request::METHOD_POST, '/admin/roles/'.$role->getUuid().'/delete', [
-            '_token' => 'x',
+            'csrf_only' => ['_token' => 'x'],
         ]);
         self::assertResponseRedirects('/admin/roles/'.$role->getUuid());
         $client->followRedirect();

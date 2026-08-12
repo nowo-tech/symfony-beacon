@@ -9,10 +9,12 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
+use App\Project\Form\ProjectApiKeyCreateType;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectApiKeyFactory;
+use App\Shared\Form\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,11 +49,17 @@ final class ProjectApiKeyController extends AbstractController
         $user = $this->getUser();
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
 
-        if (!$this->isCsrfTokenValid('project_key_create_'.$project->getId(), $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        $form = $this->createForm(ProjectApiKeyCreateType::class, null, [
+            'csrf_token_id' => 'project_key_create_'.$project->getId(),
+        ]);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            throw $this->createAccessDeniedException('Invalid form submission.');
         }
 
-        $label = trim($request->request->getString('label'));
+        /** @var array{label?: string|null} $data */
+        $data = $form->getData();
+        $label = trim((string) ($data['label'] ?? ''));
         if ('' === $label) {
             $label = $this->tokenGenerator->generateLabel();
         }
@@ -88,7 +96,11 @@ final class ProjectApiKeyController extends AbstractController
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
-        if (!$this->isCsrfTokenValid('project_key_revoke_'.$apiKey->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'project_key_revoke_'.$apiKey->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
@@ -123,7 +135,11 @@ final class ProjectApiKeyController extends AbstractController
         $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
-        if (!$this->isCsrfTokenValid('project_key_rotate_'.$apiKey->getId(), $request->request->getString('_token'))) {
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'project_key_rotate_'.$apiKey->getId(),
+        ]);
+        $form->submit($request->request->all());
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 

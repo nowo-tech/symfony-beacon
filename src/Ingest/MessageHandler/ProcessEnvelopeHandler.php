@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * N+1 / spans in {@see PerformanceEnvelopeWriter}, outbound alerts in Notifications.
  * OTLP adapters map into {@see ProcessEnvelopeMessage} under `App\Ingest\Otlp`.
  */
-#[AsMessageHandler]
+#[AsMessageHandler(sign: true)]
 final readonly class ProcessEnvelopeHandler
 {
     public function __construct(

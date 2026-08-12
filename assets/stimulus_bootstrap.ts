@@ -23,6 +23,16 @@ import ToastStackController from './controllers/toast_stack_controller';
 /** Starts Stimulus (UX controllers from controllers.json + local app controllers). */
 const app: Application = startStimulusApp();
 
+// Expose for kit dashboards (dashboard-menu Live modals) — avoid CDN stimulus-live.js / esm.sh.
+const stimulusGlobals = window as Window & {
+  Stimulus?: Application;
+  $$stimulusApp$$?: Application;
+  __stimulusApp__?: Application;
+};
+stimulusGlobals.Stimulus = app;
+stimulusGlobals.$$stimulusApp$$ = app;
+stimulusGlobals.__stimulusApp__ = app;
+
 app.register('clipboard-copy', ClipboardCopyController);
 app.register('collapse-panel', CollapsePanelController);
 app.register('combobox', ComboboxController);

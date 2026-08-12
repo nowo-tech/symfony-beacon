@@ -32,4 +32,16 @@ final class InboundEmailUnitTest extends TestCase
         $body = new InboundEmailQuoteStripper()->strip("Hello\n\nOn Mon, someone wrote:\n> prior");
         self::assertSame('Hello', $body);
     }
+
+    public function testQuoteStripperHandlesCommonMarkersAndWhitespace(): void
+    {
+        $stripper = new InboundEmailQuoteStripper();
+
+        self::assertSame('Top', $stripper->strip("Top\n\n---\nquoted"));
+        self::assertSame('Top', $stripper->strip("Top\r\n\r\n___\r\nquoted"));
+        self::assertSame('Top', $stripper->strip("Top\n\nFrom: someone@example.com\nBody"));
+        self::assertSame('Only me', $stripper->strip("Only me\n> quote line"));
+        self::assertSame('', $stripper->strip("   \n\t  "));
+        self::assertSame('No quotes here', $stripper->strip('No quotes here'));
+    }
 }

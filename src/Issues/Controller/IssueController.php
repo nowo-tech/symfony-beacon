@@ -11,6 +11,8 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueSavedView;
+use App\Issues\Form\IssueIndexFilterType;
+use App\Issues\Form\IssueSavedViewType;
 use App\Issues\IssueListSort;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
@@ -21,6 +23,8 @@ use App\Project\Service\ProjectAccessService;
 use App\Issues\Enum\IssueLevel;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
+use App\Shared\Form\CsrfOnlyType;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -38,12 +42,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class IssueController extends AbstractController
 {
-    /** @var list<string> */
-    private const array SAVED_VIEW_QUERY_KEYS = [
-        'q', 'level', 'status', 'environment', 'release', 'compare', 'assignee', 'priority',
-        'tag', 'url', 'user', 'sort', 'dir', 'per_page',
-    ];
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EventRepository $eventRepository,
@@ -53,6 +51,7 @@ final class IssueController extends AbstractController
         private readonly ProjectAccessService $projectAccess,
         private readonly IssueSavedViewRepository $savedViewRepository,
         private readonly UserActionRecorder $userActionRecorder,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -64,7 +63,7 @@ final class IssueController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requireMembership($project, $user);
+        $access = $this->projectAccess->requireMembership($project, $user);
 
         $this->userActionRecorder->recordAndFlush(UserActionType::ProjectOpened, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -148,12 +147,53 @@ final class IssueController extends AbstractController
         }
 
         $savedViews = $this->savedViewRepository->findForUserAndProject($user, $project);
+        $filters = [
+            'q' => $request->query->getString('q'),
+            'level' => $request->query->getString('level'),
+            'status' => $status->value,
+            'environment' => $request->query->getString('environment'),
+            'release' => $request->query->getString('release'),
+            'compare' => $request->query->getString('compare'),
+            'tag' => $request->query->getString('tag'),
+            'url' => $request->query->getString('url'),
+            'user' => $request->query->getString('user'),
+            'priority' => $priority instanceof IssuePriority ? $priority->value : '',
+            'assignee' => $assigneeFilter,
+            'sort' => $sort->field,
+            'dir' => $sort->direction,
+            'page' => $page,
+            'per_page' => $perPage,
+        ];
+        $saveViewForm = $this->createForm(IssueSavedViewType::class, $this->filterQueryFromArray($filters), [
+            'action' => $this->generateUrl('issue_view_save', ['id' => $project->getUuid()]),
+            'method' => 'POST',
+        ]);
+        $deleteViewForms = [];
+        foreach ($savedViews as $view) {
+            $deleteViewForms[$view->getUuid()] = $this->createForm(CsrfOnlyType::class, null, [
+                'action' => $this->generateUrl('issue_view_delete', [
+                    'id' => $project->getUuid(),
+                    'viewUuid' => $view->getUuid(),
+                ]),
+                'method' => 'POST',
+                'csrf_token_id' => 'issue_view_delete',
+            ])->createView();
+        }
 
         $tourVars = $this->productTourStepsBuilder->twigVars(
             $this->productTourStepsBuilder->contextForProjectIssues($project, $user),
             $user,
             $request,
         );
+        $memberChoices = [];
+        foreach ($members as $member) {
+            $memberId = $member->getId();
+            if (null === $memberId) {
+                continue;
+            }
+
+            $memberChoices[(string) $memberId] = $member->getDisplayName() ?: $member->getEmail();
+        }
 
         return $this->render('issue/index.html.twig', [
             'project' => $project,
@@ -163,25 +203,17 @@ final class IssueController extends AbstractController
             'sort' => $sort,
             'compareResult' => $compareResult,
             'savedViews' => $savedViews,
+            'saveViewForm' => $saveViewForm->createView(),
+            'deleteViewForms' => $deleteViewForms,
             'pagination' => $pagination,
             'levels' => IssueLevel::values(),
-            'filters' => [
-                'q' => $request->query->getString('q'),
-                'level' => $request->query->getString('level'),
-                'status' => $status->value,
-                'environment' => $request->query->getString('environment'),
-                'release' => $request->query->getString('release'),
-                'compare' => $request->query->getString('compare'),
-                'tag' => $request->query->getString('tag'),
-                'url' => $request->query->getString('url'),
-                'user' => $request->query->getString('user'),
-                'priority' => $priority instanceof IssuePriority ? $priority->value : '',
-                'assignee' => $assigneeFilter,
-                'sort' => $sort->field,
-                'dir' => $sort->direction,
-                'page' => $page,
-                'per_page' => $perPage,
-            ],
+            'filters' => $filters,
+            'can_triage' => $access->canTriageIssues(),
+            'filterForm' => $this->getFilterFormFactory->create(IssueIndexFilterType::class, $filters, [
+                'action' => $this->generateUrl('issue_index', ['id' => $project->getUuid()]),
+                'level_choices' => IssueLevel::values(),
+                'member_choices' => $memberChoices,
+            ])->createView(),
             ...$tourVars,
         ]);
     }
@@ -249,21 +281,20 @@ final class IssueController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $this->projectAccess->requireTriage($project, $user);
+        $form = $this->createForm(IssueSavedViewType::class);
+        $form->handleRequest($request);
+        $submitted = $request->request->all($form->getName());
+        $queryJson = \is_array($submitted) ? $this->filterQueryFromArray($submitted) : [];
 
-        if (!$this->isCsrfTokenValid('issue_view_save', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'issues.view_invalid');
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $name = \is_array($submitted) ? trim((string) ($submitted['name'] ?? '')) : '';
+            $this->addFlash('error', '' === $name ? 'issues.view_name_empty' : 'issues.view_invalid');
 
-            return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()] + $queryJson);
         }
 
-        $name = trim($request->request->getString('name'));
-        if ('' === $name) {
-            $this->addFlash('error', 'issues.view_name_empty');
-
-            return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()] + $this->filterQueryFromRequest($request));
-        }
-
-        $queryJson = $this->filterQueryFromRequest($request);
+        $data = $form->getData();
+        $name = trim((string) ((\is_array($data) ? $data['name'] : null) ?? ''));
         $view = new IssueSavedView();
         $view->setUser($user);
         $view->setProject($project);
@@ -293,7 +324,7 @@ final class IssueController extends AbstractController
 
         $query = [];
         foreach ($view->getQueryJson() as $key => $value) {
-            if (!\is_string($key) || !\in_array($key, self::SAVED_VIEW_QUERY_KEYS, true)) {
+            if (!\is_string($key) || !\in_array($key, IssueSavedViewType::QUERY_KEYS, true)) {
                 continue;
             }
             if (null === $value || '' === $value) {
@@ -318,8 +349,12 @@ final class IssueController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $this->projectAccess->requireTriage($project, $user);
+        $form = $this->createForm(CsrfOnlyType::class, null, [
+            'csrf_token_id' => 'issue_view_delete',
+        ]);
+        $form->submit($request->request->all());
 
-        if (!$this->isCsrfTokenValid('issue_view_delete', $request->request->getString('_token'))) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'issues.view_invalid');
 
             return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
@@ -335,18 +370,19 @@ final class IssueController extends AbstractController
         return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
     }
 
-    /** @return array<string, int|string> */
-    private function filterQueryFromRequest(Request $request): array
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, int|string>
+     */
+    private function filterQueryFromArray(array $data): array
     {
         $query = [];
-        foreach (self::SAVED_VIEW_QUERY_KEYS as $key) {
-            if ($request->request->has($key)) {
-                $value = $request->request->get($key);
-            } elseif ($request->query->has($key)) {
-                $value = $request->query->get($key);
-            } else {
+        foreach (IssueSavedViewType::QUERY_KEYS as $key) {
+            if (!\array_key_exists($key, $data)) {
                 continue;
             }
+            $value = $data[$key];
             if (null === $value || '' === $value) {
                 continue;
             }

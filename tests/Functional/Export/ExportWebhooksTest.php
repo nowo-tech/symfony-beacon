@@ -230,11 +230,10 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
         );
-        $dupToken = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/duplicate', [
-            '_token' => $dupToken,
-            'canonical_uuid' => $canonical->getUuid(),
+        $duplicateForm = $crawler->filter('[data-testid="mark-duplicate"] form.confirm-dialog__panel')->form([
+            'issue_duplicate[canonical_uuid]' => $canonical->getUuid(),
         ]);
+        $client->submit($duplicateForm);
         self::assertResponseRedirects();
         self::assertStringContainsString('issue.duplicated', (string) $requests[\count($requests) - 1]['body']);
         self::assertStringContainsString($canonical->getUuid(), (string) $requests[\count($requests) - 1]['body']);

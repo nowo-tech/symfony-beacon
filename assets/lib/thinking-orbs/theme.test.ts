@@ -48,4 +48,40 @@ describe('watchThemeAndMotion', () => {
     expect(onChange).toHaveBeenCalledWith(false, expect.any(Boolean));
     unsub();
   });
+
+  it('watches auto theme via matchMedia and MutationObserver', () => {
+    const listeners: Array<() => void> = [];
+    const matchMedia = window.matchMedia as unknown as ReturnType<typeof vi.fn>;
+    matchMedia.mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: (_: string, cb: () => void) => listeners.push(cb),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    const onChange = vi.fn();
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const unsub = watchThemeAndMotion('auto', host, onChange);
+    expect(onChange).toHaveBeenCalled();
+    document.documentElement.setAttribute('data-theme', 'dark');
+    listeners.forEach((cb) => cb());
+    unsub();
+    host.remove();
+  });
+
+  it('reads light ancestor class and system fallback', () => {
+    const host = document.createElement('div');
+    const parent = document.createElement('div');
+    parent.classList.add('light');
+    parent.appendChild(host);
+    document.body.appendChild(parent);
+    expect(resolveDark('auto', host)).toBe(false);
+    parent.remove();
+    expect(resolveDark('auto', null)).toEqual(expect.any(Boolean));
+  });
 });

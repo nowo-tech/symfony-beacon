@@ -20,6 +20,16 @@ class ProjectApiKeyRepository extends ServiceEntityRepository
 
     public function findActiveByPublicKey(string $publicKey): ?ProjectApiKey
     {
-        return $this->findOneBy(['publicKey' => $publicKey, 'active' => true]);
+        /** @var ProjectApiKey|null $key */
+        $key = $this->createQueryBuilder('k')
+            ->leftJoin('k.project', 'p')->addSelect('p')
+            ->andWhere('k.publicKey = :publicKey')
+            ->andWhere('k.active = true')
+            ->setParameter('publicKey', $publicKey)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $key;
     }
 }

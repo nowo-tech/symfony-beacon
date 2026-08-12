@@ -37,7 +37,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
             "{}\n".json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR)."\n{}",
         );
 
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function testIngestsEventAndCreatesIssue(): void
@@ -336,6 +336,29 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(429);
         self::assertSame('monthly event quota exceeded', $client->getResponse()->getContent());
         self::assertSame('3600', $client->getResponse()->headers->get('Retry-After'));
+    }
+
+    public function testIngestAcceptsProjectUuidPathWithoutSession(): void
+    {
+        [$client, , $project, $apiKey] = $this->bootWithDemoProject('uuid-ingest@example.com');
+
+        $client->request(
+            Request::METHOD_POST,
+            '/api/'.$project->getUuid().'/envelope/',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/x-beacon-envelope',
+                'HTTP_X_BEACON_AUTH' => \sprintf(
+                    'Beacon beacon_key=%s, beacon_secret=%s',
+                    $apiKey->getPublicKey(),
+                    (string) $apiKey->getSecretKey(),
+                ),
+            ],
+            $this->minimalEventEnvelope('uuid-path', 'UUID path ingest'),
+        );
+
+        self::assertResponseStatusCodeSame(200);
     }
 
     private function minimalEventEnvelope(string $eventIdSeed, string $message): string

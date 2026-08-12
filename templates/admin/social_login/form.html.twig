@@ -11,14 +11,14 @@
 
 {% block body %}
 <div class="mx-auto">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">
         {% if is_new %}
             {{ 'social_login_settings.create'|trans }}
         {% else %}
             {{ 'social_login_settings.edit_title'|trans({'%provider%': provider|capitalize}) }}
         {% endif %}
     </h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'social_login_settings.edit_intro'|trans }}</p>
+    <p class="mb-6 text-xs text-[var(--color-ink)]/55">{{ 'social_login_settings.edit_intro'|trans }}</p>
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
         {{ form_row(form.provider) }}

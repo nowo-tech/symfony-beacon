@@ -6,9 +6,11 @@ namespace App\Identity\Controller;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
+use App\Identity\Form\DashboardProjectSearchType;
 use App\Identity\Service\ProductTourStepsBuilder;
 use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +29,7 @@ final class DashboardController extends AbstractController
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly InstanceSettingsRepository $instanceSettingsRepository,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -53,6 +56,11 @@ final class DashboardController extends AbstractController
         return $this->render('dashboard/home.html.twig', [
             'projects' => $projects,
             'query' => $query,
+            'searchForm' => $this->getFilterFormFactory->create(DashboardProjectSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('dashboard_home'),
+            ])->createView(),
             'statsPreview' => $statsPreview,
             'newProjectForm' => $this->createForm(ProjectType::class),
             'openNewProject' => $request->query->getBoolean('new'),

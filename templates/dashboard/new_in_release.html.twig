@@ -7,6 +7,7 @@
     title_key: 'new_in_release.title',
     intro_key: 'new_in_release.intro',
     filter_route: 'dashboard_new_in_release',
+    filterForm: filterForm,
     filters: filters,
     filters_testid: 'new-in-release-filters',
     empty_testid: 'new-in-release-empty',
@@ -22,23 +23,9 @@
     item_count: issues|length,
 } %}
     {% block filter_fields %}
-        <select class="input" name="project" aria-label="{{ 'new_in_release.filter.project'|trans }}">
-            <option value="">{{ 'new_in_release.filter.any_project'|trans }}</option>
-            {% for project in projects %}
-                <option value="{{ project.uuid }}" {% if filters.project == project.uuid %}selected{% endif %}>{{ project.name }}</option>
-            {% endfor %}
-        </select>
-        <select class="input" name="release" aria-label="{{ 'new_in_release.filter.release'|trans }}">
-            <option value="">{{ 'new_in_release.filter.any_release'|trans }}</option>
-            {% for release in releases %}
-                <option value="{{ release }}" {% if filters.release == release %}selected{% endif %}>{{ release }}</option>
-            {% endfor %}
-        </select>
-        <select class="input" name="per_page" aria-label="{{ 'issues.filter.per_page'|trans }}">
-            {% for size in [10, 25, 50, 100] %}
-                <option value="{{ size }}" {% if filters.per_page == size %}selected{% endif %}>{{ 'issues.filter.per_page_option'|trans({'%count%': size}) }}</option>
-            {% endfor %}
-        </select>
+        {{ form_widget(filterForm.project) }}
+        {{ form_widget(filterForm.release) }}
+        {{ form_widget(filterForm.per_page) }}
     {% endblock %}
     {% block results %}
         <div class="overflow-x-auto">

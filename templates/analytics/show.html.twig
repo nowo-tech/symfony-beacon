@@ -8,7 +8,7 @@
 <p class="mb-4 text-[var(--color-ink)]/65">{{ 'analytics.intro'|trans }}</p>
 <p class="mb-6 text-sm text-[var(--color-ink)]/55">{{ 'analytics.timezone_help'|trans }}</p>
 
-<form method="get" action="{{ path('analytics_show', {id: project.uuid}) }}" class="analytics-filters panel mb-6">
+{{ form_start(filterForm, {attr: {class: 'analytics-filters panel mb-6'}}) }}
     <div class="analytics-filters__presets" role="group" aria-label="{{ 'analytics.period.label'|trans }}">
         {% for p in presets %}
             {% set preset_query = filter_query|merge({period: p}) %}
@@ -24,31 +24,31 @@
     <div class="analytics-filters__row">
         <label class="analytics-filters__field">
             <span>{{ 'analytics.period.from'|trans }}</span>
-            <input type="date" name="from" value="{{ from|date('Y-m-d') }}" class="input">
+            {{ form_widget(filterForm.from, {attr: {class: 'input', type: 'date'}}) }}
         </label>
         <label class="analytics-filters__field">
             <span>{{ 'analytics.period.to'|trans }}</span>
-            <input type="date" name="to" value="{{ to|date('Y-m-d') }}" class="input">
+            {{ form_widget(filterForm.to, {attr: {class: 'input', type: 'date'}}) }}
         </label>
-        <input type="hidden" name="period" value="custom">
         <label class="analytics-filters__field">
             <span>{{ 'analytics.filter.environment'|trans }}</span>
-            <input type="text" name="environment" value="{{ environment }}" class="input" placeholder="prod" autocomplete="off">
+            {{ form_widget(filterForm.environment) }}
         </label>
         <label class="analytics-filters__field">
             <span>{{ 'analytics.filter.release'|trans }}</span>
-            <input type="text" name="release" value="{{ release }}" class="input" placeholder="1.2.0" autocomplete="off">
+            {{ form_widget(filterForm.release) }}
         </label>
         <label class="analytics-filters__field">
             <span>{{ 'analytics.filter.level'|trans }}</span>
-            <input type="text" name="level" value="{{ level }}" class="input" placeholder="error" autocomplete="off">
+            {{ form_widget(filterForm.level) }}
         </label>
         <div class="analytics-filters__actions">
             <button type="submit" class="btn-primary">{{ 'analytics.filter.apply'|trans }}</button>
             <a class="btn-ghost no-underline" href="{{ path('analytics_show', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
         </div>
     </div>
-</form>
+    {{ form_rest(filterForm) }}
+{{ form_end(filterForm, {render_rest: false}) }}
 
 {% if filtered %}
     <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'analytics.filtered_note'|trans }}</p>

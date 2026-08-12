@@ -17,6 +17,9 @@ nowo_dashboard_menu:
         # Align with host nowo_ui_kit (tailwind + ux_icon); kit JS uses Nowo modals (non-Bootstrap).
         css_framework: tailwind
         icon_set: ux_icon
+        # Empty (not null): skip bundle stimulus-live.js which imports esm.sh (blocked by script-src 'self').
+        # Host Vite app already boots Stimulus + UX Live and exposes window.Stimulus.
+        stimulus_script_url: ''
         modals:
             menu_form: normal
             copy: normal

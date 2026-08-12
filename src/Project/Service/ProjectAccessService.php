@@ -61,8 +61,42 @@ final readonly class ProjectAccessService
      * Highest effective role from direct membership, linked groups, and active share grants.
      * Instance ROLE_ADMIN always resolves as owner (even without membership),
      * unless view-as-member is active (then Member).
+     *
+     * Results are memoized on the current request so Twig {@code project_grants} /
+     * {@code project_can_open_settings} do not re-query membership/group access in loops.
      */
     public function resolveAccess(Project $project, User $user): ?ProjectAccess
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $cacheKey = $this->accessCacheKey($project, $user);
+        if (null !== $cacheKey && $request instanceof Request && $request->attributes->has($cacheKey)) {
+            /** @var ProjectAccess|null $cached */
+            $cached = $request->attributes->get($cacheKey);
+
+            return $cached;
+        }
+
+        $access = $this->computeAccess($project, $user);
+
+        if (null !== $cacheKey && $request instanceof Request) {
+            $request->attributes->set($cacheKey, $access);
+        }
+
+        return $access;
+    }
+
+    private function accessCacheKey(Project $project, User $user): ?string
+    {
+        $projectId = $project->getId();
+        $userId = $user->getId();
+        if (null === $projectId || null === $userId) {
+            return null;
+        }
+
+        return '_beacon_project_access_'.$projectId.'_'.$userId;
+    }
+
+    private function computeAccess(Project $project, User $user): ?ProjectAccess
     {
         $direct = $this->getDirectMembership($project, $user);
         if ($direct instanceof ProjectMembership && !$direct->isActive()) {

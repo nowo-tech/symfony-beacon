@@ -3,11 +3,11 @@
 {% block title %}{{ project.name }} — {{ 'admin_projects.title'|trans }}{% endblock %}
 
 {% block body %}
-<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+<div class="mb-6 flex flex-wrap items-start justify-between gap-3" data-testid="admin-project-show">
     <div>
         <a href="{{ path('admin_projects') }}" class="text-sm no-underline">{{ 'admin_projects.back'|trans }}</a>
-        <h1 class="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ project.name }}</h1>
-        <p class="mt-1 text-sm text-[var(--color-ink)]/65">
+        <h1 class="mt-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ project.name }}</h1>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">
             {{ project.slug }}
             {% if project.description %}
                 · {{ project.description }}
@@ -18,14 +18,14 @@
         </p>
     </div>
     <div class="flex flex-wrap gap-2">
-        <a class="btn-ghost no-underline" href="{{ path('admin_project_export', {id: project.uuid}) }}">{{ 'admin_projects.config.export_one'|trans }}</a>
+        <a class="btn-ghost no-underline" href="{{ path('admin_project_export', {id: project.uuid}) }}" data-testid="admin-project-config-download">{{ 'admin_projects.config.export_one'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('issue_index', {id: project.uuid}) }}">{{ 'admin_projects.open_issues'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'admin_projects.open_settings'|trans }}</a>
         <a class="btn-ghost no-underline" href="{{ path('admin_projects_edit', {id: project.uuid}) }}">{{ 'admin_projects.edit'|trans }}</a>
     </div>
 </div>
 
-<section class="panel mb-6">
+<section class="panel mb-6" data-testid="admin-project-stats">
     <h2 class="mb-3 text-lg font-semibold">{{ 'admin_projects.stats_title'|trans }}</h2>
     <dl class="grid gap-3 text-sm sm:grid-cols-3">
         <div>
@@ -47,24 +47,21 @@
             </dd>
         </div>
     </dl>
-    <form method="post" action="{{ path('admin_projects_ingest_toggle', {id: project.uuid}) }}" class="mt-4 flex flex-wrap items-center gap-2">
-        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_ingest_' ~ project.id) }}">
+    {{ form_start(ingestToggleForm, {attr: {class: 'mt-4 flex flex-wrap items-center gap-2'}}) }}
+        {{ form_widget(ingestToggleForm.enabled) }}
         {% if project.ingestEnabled %}
-            <input type="hidden" name="enabled" value="0">
             <button class="btn-ghost" type="submit">{{ 'admin_projects.suspend_ingest'|trans }}</button>
             <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.suspend_ingest_help'|trans }}</span>
         {% else %}
-            <input type="hidden" name="enabled" value="1">
             <button class="btn-primary" type="submit">{{ 'admin_projects.resume_ingest'|trans }}</button>
             <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.resume_ingest_help'|trans }}</span>
         {% endif %}
-    </form>
-    <form method="post" action="{{ path('admin_view_as_member_enable') }}" class="mt-3">
-        <input type="hidden" name="_token" value="{{ csrf_token('admin_view_as_member_enable') }}">
-        <input type="hidden" name="project_uuid" value="{{ project.uuid }}">
-        <input type="hidden" name="redirect" value="{{ path('project_settings', {id: project.uuid}) }}">
+    {{ form_end(ingestToggleForm) }}
+    {{ form_start(viewAsMemberForm, {attr: {class: 'mt-3'}}) }}
+        {{ form_widget(viewAsMemberForm.project_uuid) }}
+        {{ form_widget(viewAsMemberForm.redirect) }}
         <button class="btn-ghost" type="submit">{{ 'admin_projects.view_as_member'|trans }}</button>
-    </form>
+    {{ form_end(viewAsMemberForm) }}
 </section>
 
 <section class="panel mb-6">
@@ -136,25 +133,19 @@
                 </div>
                 {% if not isOwnerMember %}
                 <div class="flex shrink-0 flex-wrap items-center gap-2">
-                    <form method="post" action="{{ path('admin_projects_members_role', {projectId: project.uuid, userId: memberUser.uuid}) }}" class="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_member_role_' ~ member.id) }}">
-                        <select class="input" name="role">
-                            {% for role in assignableRoles %}
-                                <option value="{{ role.value }}" {% if member.role == role %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
-                            {% endfor %}
-                        </select>
+                    {{ form_start(memberRoleForms[member.id], {attr: {class: 'flex flex-wrap items-center gap-2'}}) }}
+                        {{ form_widget(memberRoleForms[member.id].role, {attr: {class: 'input'}}) }}
                         <button class="btn-ghost" type="submit">{{ 'project.members.update_role'|trans }}</button>
-                    </form>
-                    <form
-                        method="post"
-                        action="{{ path('admin_projects_members_remove', {projectId: project.uuid, userId: memberUser.uuid}) }}"
-                        data-controller="confirm-submit"
-                        data-confirm-submit-message-value="{{ 'admin_projects.remove_member_confirm'|trans({'%email%': memberUser.email})|e('html_attr') }}"
-                        data-action="submit->confirm-submit#confirm"
-                    >
-                        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_member_remove_' ~ member.id) }}">
+                    {{ form_end(memberRoleForms[member.id]) }}
+                    {{ form_start(removeMemberForms[member.id], {
+                        attr: {
+                            'data-controller': 'confirm-submit',
+                            'data-confirm-submit-message-value': 'admin_projects.remove_member_confirm'|trans({'%email%': memberUser.email})|e('html_attr'),
+                            'data-action': 'submit->confirm-submit#confirm',
+                        }
+                    }) }}
                         <button class="btn-ghost" type="submit">{{ 'admin_projects.remove_member'|trans }}</button>
-                    </form>
+                    {{ form_end(removeMemberForms[member.id]) }}
                 </div>
                 {% endif %}
             </li>
@@ -163,16 +154,11 @@
         {% endfor %}
     </ul>
 
-    <form method="post" action="{{ path('admin_projects_members_add', {id: project.uuid}) }}" class="mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_member_add_' ~ project.id) }}">
-        <input class="input" type="email" name="email" required placeholder="{{ 'project.members.email_placeholder'|trans }}" autocomplete="off">
-        <select class="input" name="role">
-            {% for role in assignableRoles %}
-                <option value="{{ role.value }}" {% if role.value == 'member' %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
-            {% endfor %}
-        </select>
+    {{ form_start(addMemberForm, {attr: {class: 'mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]'}}) }}
+        {{ form_widget(addMemberForm.email, {attr: {class: 'input', placeholder: 'project.members.email_placeholder'|trans, autocomplete: 'off'}}) }}
+        {{ form_widget(addMemberForm.role, {attr: {class: 'input'}}) }}
         <button class="btn-primary" type="submit">{{ 'project.members.add'|trans }}</button>
-    </form>
+    {{ form_end(addMemberForm) }}
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.add_member_help'|trans }}</p>
 </section>
 
@@ -185,6 +171,7 @@
         empty_key: 'admin_projects.audit_empty',
         audit_actions: projectAuditActions,
         audit_filter: projectAuditFilter,
+        auditFilterForm: auditFilterForm,
         audit_entries: projectAuditEntries,
         timeline_id: 'project-audit-timeline',
         entry_testid: 'project-audit-entry'
@@ -206,25 +193,19 @@
                     </div>
                 </div>
                 <div class="flex shrink-0 flex-wrap items-center gap-2">
-                    <form method="post" action="{{ path('admin_projects_groups_role', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}" class="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_group_role_' ~ groupAccess.id) }}">
-                        <select class="input" name="role">
-                            {% for role in assignableGroupRoles %}
-                                <option value="{{ role.value }}" {% if groupAccess.role == role %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
-                            {% endfor %}
-                        </select>
+                    {{ form_start(groupRoleForms[groupAccess.id], {attr: {class: 'flex flex-wrap items-center gap-2'}}) }}
+                        {{ form_widget(groupRoleForms[groupAccess.id].role, {attr: {class: 'input'}}) }}
                         <button class="btn-ghost" type="submit">{{ 'project.members.update_role'|trans }}</button>
-                    </form>
-                    <form
-                        method="post"
-                        action="{{ path('admin_projects_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}) }}"
-                        data-controller="confirm-submit"
-                        data-confirm-submit-message-value="{{ 'admin_projects.unlink_group_confirm'|trans({'%name%': linkedGroup.name})|e('html_attr') }}"
-                        data-action="submit->confirm-submit#confirm"
-                    >
-                        <input type="hidden" name="_token" value="{{ csrf_token('admin_project_group_remove_' ~ groupAccess.id) }}">
+                    {{ form_end(groupRoleForms[groupAccess.id]) }}
+                    {{ form_start(removeGroupForms[groupAccess.id], {
+                        attr: {
+                            'data-controller': 'confirm-submit',
+                            'data-confirm-submit-message-value': 'admin_projects.unlink_group_confirm'|trans({'%name%': linkedGroup.name})|e('html_attr'),
+                            'data-action': 'submit->confirm-submit#confirm',
+                        }
+                    }) }}
                         <button class="btn-ghost" type="submit">{{ 'project.groups.remove'|trans }}</button>
-                    </form>
+                    {{ form_end(removeGroupForms[groupAccess.id]) }}
                 </div>
             </li>
         {% else %}
@@ -233,21 +214,11 @@
     </ul>
 
     {% if availableGroups is not empty %}
-        <form method="post" action="{{ path('admin_projects_groups_add', {id: project.uuid}) }}" class="mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-            <input type="hidden" name="_token" value="{{ csrf_token('admin_project_group_add_' ~ project.id) }}">
-            <select class="input" name="group" required>
-                <option value="">{{ 'project.groups.select'|trans }}</option>
-                {% for g in availableGroups %}
-                    <option value="{{ g.uuid }}">{{ g.name }} ({{ group_member_counts[g.id]|default(0) }})</option>
-                {% endfor %}
-            </select>
-            <select class="input" name="role">
-                {% for role in assignableGroupRoles %}
-                    <option value="{{ role.value }}" {% if role.value == 'member' %}selected{% endif %}>{{ ('project.members.role.' ~ role.value)|trans }}</option>
-                {% endfor %}
-            </select>
+        {{ form_start(addGroupForm, {attr: {class: 'mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]'}}) }}
+            {{ form_widget(addGroupForm.group, {attr: {class: 'input'}}) }}
+            {{ form_widget(addGroupForm.role, {attr: {class: 'input'}}) }}
             <button class="btn-primary" type="submit">{{ 'project.groups.add'|trans }}</button>
-        </form>
+        {{ form_end(addGroupForm) }}
     {% else %}
         <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.groups_none_available'|trans }}</p>
     {% endif %}
@@ -257,37 +228,38 @@
     <h2 class="mb-2 text-lg font-semibold text-[var(--color-alert)]">{{ 'admin_projects.danger_title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'admin_projects.danger_intro'|trans }}</p>
     {% embed 'shared/_confirm_dialog.html.twig' with {
+        custom_form: true,
         expected_value: project.name,
         trigger_class: 'btn-danger',
         trigger_label: 'admin_projects.delete_open'|trans,
-        form_action: path('admin_projects_delete', {id: project.uuid}),
-        title: 'project.danger.delete_title'|trans,
         title_id: 'admin-project-delete-title-' ~ project.id,
         aria_labelledby: 'admin-project-delete-title-' ~ project.id,
-        header_wrapper: true,
-        content_wrapper: true,
-        cancel_label: 'project.danger.cancel'|trans,
-        submit_label: 'project.danger.delete_confirm'|trans,
-        submit_class: 'btn-danger',
-        submit_disabled: true,
     } %}
-        {% block body %}
-            <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
-        {% endblock %}
-        {% block fields %}
-            <label class="confirm-dialog__label" for="admin-project-delete-confirm-{{ project.id }}">
-                {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
-            </label>
-            <input
-                id="admin-project-delete-confirm-{{ project.id }}"
-                class="input w-full"
-                name="confirmation"
-                autocomplete="off"
-                data-confirm-dialog-target="confirmInput"
-                data-action="input->confirm-dialog#syncSubmit"
-                required
-            >
-            <input type="hidden" name="_token" value="{{ csrf_token('admin_project_delete_' ~ project.id) }}">
+        {% block form %}
+            {{ form_start(deleteProjectForm, {attr: {class: 'confirm-dialog__panel'}}) }}
+                <div class="confirm-dialog__header">
+                    <h2 id="admin-project-delete-title-{{ project.id }}" class="confirm-dialog__title">{{ 'project.danger.delete_title'|trans }}</h2>
+                    <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
+                </div>
+                <div class="confirm-dialog__content">
+                    <label class="confirm-dialog__label" for="admin-project-delete-confirm-{{ project.id }}">
+                        {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
+                    </label>
+                    {{ form_widget(deleteProjectForm.confirmation, {
+                        attr: {
+                            id: 'admin-project-delete-confirm-' ~ project.id,
+                            class: 'input w-full',
+                            autocomplete: 'off',
+                            'data-confirm-dialog-target': 'confirmInput',
+                            'data-action': 'input->confirm-dialog#syncSubmit',
+                        }
+                    }) }}
+                </div>
+                <div class="confirm-dialog__actions">
+                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                    <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
+                </div>
+            {{ form_end(deleteProjectForm) }}
         {% endblock %}
     {% endembed %}
 </section>

@@ -15,11 +15,17 @@ use App\Project\Service\ProjectGovernanceResolver;
  *
  * Callers own body-size limits, auth parsing (query/DSN), parse-early, and HTTP response shaping.
  *
+ * Credential failures (unknown project, missing/invalid key or secret) always return the same
+ * {@code 401 unauthorized} response so path existence cannot be probed.
+ *
  * @phpstan-type Reject array{ok: false, status: int, message: string, headers: array<string, string>}
  * @phpstan-type Accept array{ok: true, project: Project, project_id: int}
  */
 final readonly class IngestProjectAccessGate
 {
+    /** Uniform body for all credential / path-auth failures (no existence oracle). */
+    public const string UNAUTHORIZED_MESSAGE = 'unauthorized';
+
     public function __construct(
         private ProjectRepository $projectRepository,
         private ProjectApiKeyRepository $apiKeyRepository,
@@ -37,17 +43,17 @@ final readonly class IngestProjectAccessGate
     {
         $pathProject = $this->projectRepository->findOneByIngestPath($projectRef);
         if (!$pathProject instanceof Project || null === $pathProject->getId()) {
-            return $this->reject(404, 'project not found');
+            return $this->unauthorized();
         }
         $projectId = $pathProject->getId();
 
         if (null === $publicKey || '' === $publicKey) {
-            return $this->reject(401, 'missing authorization information');
+            return $this->unauthorized();
         }
 
         $apiKey = $this->apiKeyRepository->findActiveByPublicKey($publicKey);
         if (!$apiKey instanceof ProjectApiKey || !$apiKey->getProject() instanceof Project || $apiKey->getProject()->getId() !== $projectId) {
-            return $this->reject(403, 'forbidden');
+            return $this->unauthorized();
         }
 
         $project = $apiKey->getProject();
@@ -55,7 +61,7 @@ final readonly class IngestProjectAccessGate
         if (null === $storedSecret || '' === $storedSecret
             || null === $secretKey || !hash_equals($storedSecret, $secretKey)
         ) {
-            return $this->reject(403, 'forbidden');
+            return $this->unauthorized();
         }
 
         return [
@@ -74,7 +80,7 @@ final readonly class IngestProjectAccessGate
     {
         $projectId = $project->getId();
         if (null === $projectId) {
-            return $this->reject(404, 'project not found');
+            return $this->unauthorized();
         }
 
         if (!$project->isIngestEnabled()) {
@@ -114,6 +120,12 @@ final readonly class IngestProjectAccessGate
         }
 
         return $this->assertIngestAllowed($credentials['project']);
+    }
+
+    /** @return Reject */
+    private function unauthorized(): array
+    {
+        return $this->reject(401, self::UNAUTHORIZED_MESSAGE);
     }
 
     /**

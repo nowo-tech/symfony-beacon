@@ -15,5 +15,7 @@ parameters:
     beacon.mercure.env_jwt_secret: '%env(string:MERCURE_JWT_SECRET)%'
     # Session cookie name (project-scoped; avoid colliding with other apps on localhost).
     beacon.session_cookie_name: SYMFONY_BEACON_SESSID
+    # Pre-auth Envelope/OTLP rate limit per client IP (requests/minute; 0 disables).
+    beacon.ingest_ip_rate_limit: '%env(int:BEACON_INGEST_IP_RATE_LIMIT)%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true

@@ -33,10 +33,8 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         self::assertSelectorExists('form[action$="/clear-history"]');
         self::assertSelectorExists('form[action$="/delete"]');
 
-        $token = $crawler->filter('form[action$="/clear-history"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/clear-history', [
-            '_token' => $token,
-        ]);
+        $form = $crawler->filter('form[action$="/clear-history"]')->form();
+        $client->submit($form);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project history cleared.');
@@ -54,12 +52,10 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->login($client, $user);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $token = $crawler->filter('form[action$="/delete"] input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/delete', [
-            '_token' => $token,
-            'confirmation' => 'Wrong Name',
+        $form = $crawler->filter('form[action$="/delete"]')->form([
+            'project_delete' => ['confirmation' => 'Wrong Name'],
         ]);
+        $client->submit($form);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project name did not match');
@@ -77,12 +73,10 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->login($client, $user);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/settings');
-        $token = $crawler->filter('form[action$="/delete"] input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$projectUuid.'/delete', [
-            '_token' => $token,
-            'confirmation' => 'Acme',
+        $form = $crawler->filter('form[action$="/delete"]')->form([
+            'project_delete' => ['confirmation' => 'Acme'],
         ]);
+        $client->submit($form);
         self::assertResponseRedirects('/dashboard');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project deleted.');
@@ -111,9 +105,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
 
         $this->login($client, $member);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        self::assertResponseIsSuccessful();
-        self::assertSelectorNotExists('form[action$="/clear-history"]');
-        self::assertSelectorNotExists('form[action$="/delete"]');
+        self::assertResponseStatusCodeSame(403);
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues');

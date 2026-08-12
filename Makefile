@@ -184,8 +184,9 @@ console: ensure-up
 	docker compose exec php bin/console $(ARGS)
 
 # Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
+# Harden key files to 0600 (world-writable keys would decrypt all #[Encrypted] columns).
 ensure-halite-secrets: ensure-up
-	docker compose exec -T php mkdir -p var/secrets
+	docker compose exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets && find var/secrets -maxdepth 1 -type f -name ".Halite*.key" -exec chmod 600 {} +'
 
 seed-platform: ensure-halite-secrets
 	docker compose exec -T php bin/console app:seed-platform

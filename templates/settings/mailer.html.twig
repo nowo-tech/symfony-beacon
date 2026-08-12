@@ -4,8 +4,8 @@
 
 {% block body %}
 <div class="mx-auto">
-    <h1 class="mb-2 font-[family-name:var(--font-display)] text-3xl font-bold">{{ 'mailer_settings.title'|trans }}</h1>
-    <p class="mb-6 text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.intro'|trans }}</p>
+    <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'mailer_settings.title'|trans }}</h1>
+    <p class="mb-6 text-xs text-[var(--color-ink)]/55">{{ 'mailer_settings.intro'|trans }}</p>
 
     <div class="panel mb-4 space-y-2 text-sm text-[var(--color-ink)]/75">
         {% if usingDatabaseDsn %}
@@ -32,21 +32,18 @@
         <h2 class="text-lg font-semibold">{{ 'mailer_settings.sample.title'|trans }}</h2>
         <p class="text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.sample.intro'|trans }}</p>
         {% if magicLoginAvailable %}
-            <form method="post" action="{{ path('admin_mailer_test') }}" class="space-y-3">
-                <input type="hidden" name="_token" value="{{ csrf_token('mailer_sample') }}">
+            {{ form_start(mailerTestForm, {attr: {class: 'space-y-3'}}) }}
                 <label class="block text-sm font-medium" for="mailer-sample-to">{{ 'mailer_settings.sample.to_label'|trans }}</label>
-                <input
-                    id="mailer-sample-to"
-                    class="input w-full"
-                    type="email"
-                    name="to"
-                    value="{{ defaultSampleTo }}"
-                    required
-                    autocomplete="email"
-                    placeholder="you@example.com"
-                >
+                {{ form_widget(mailerTestForm.to, {
+                    attr: {
+                        id: 'mailer-sample-to',
+                        class: 'input w-full',
+                        autocomplete: 'email',
+                        placeholder: 'you@example.com',
+                    }
+                }) }}
                 <button class="btn-primary" type="submit">{{ 'mailer_settings.sample.submit'|trans }}</button>
-            </form>
+            {{ form_end(mailerTestForm) }}
         {% else %}
             <p class="text-sm text-[var(--color-ink)]/55">{{ 'mailer_settings.sample.unavailable'|trans }}</p>
         {% endif %}

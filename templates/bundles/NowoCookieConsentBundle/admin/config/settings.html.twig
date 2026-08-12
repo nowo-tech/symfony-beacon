@@ -1,0 +1,34 @@
+{# Host override: FormKit/beacon theme (drop vendor bootstrap_5_layout) + panel chrome. #}
+{% extends '@NowoCookieConsentBundle/admin/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_cookie_consent_css_framework|default('tailwind') %}
+{% set section_suffix = section.translationSuffix() %}
+
+{% block title %}{{ 'nowo_cookie_consent.admin.config.settings.title'|trans({}, 'NowoCookieConsentBundle') }} — {{ config.displayName }}{% endblock %}
+
+{% block body %}
+    {% include '@NowoCookieConsentBundle/admin/_admin_area_nav.html.twig' with {config: config} only %}
+    {% include '@NowoCookieConsentBundle/admin/config/_settings_section_tabs.html.twig' with {
+        config: config,
+        section: section,
+        sections: sections,
+    } only %}
+
+    <section class="panel nowo-ui-form-wrapmx-auto" data-testid="cookie-consent-settings-form">
+        <h2 class="nowo-ui-section-title">
+            {{ ('nowo_cookie_consent.admin.config.settings.section.' ~ section_suffix)|trans({}, 'NowoCookieConsentBundle') }}
+        </h2>
+        <p class="{{ ui.muted(_css_fw) }} mb-4">
+            {{ ('nowo_cookie_consent.admin.config.settings.section.' ~ section_suffix ~ '_lead')|trans({}, 'NowoCookieConsentBundle') }}
+        </p>
+
+        {{ form_start(form, {attr: {class: 'nowo-ui-form nowo-ui-form--stack space-y-4'}}) }}
+            {% include 'form/_fields.html.twig' with {form: form} only %}
+            <div class="nowo-ui-form-actions">
+                <button type="submit" class="btn-primary nowo-ui-action-save">
+                    {{ 'nowo_cookie_consent.admin.config.settings.save'|trans({}, 'NowoCookieConsentBundle') }}
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

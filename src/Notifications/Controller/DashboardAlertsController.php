@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Notifications\Controller;
 
 use App\Identity\Entity\User;
+use App\Notifications\Form\DashboardAlertsFilterType;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +26,7 @@ final class DashboardAlertsController extends AbstractController
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly NotificationDestinationRepository $destinationRepository,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -44,13 +47,27 @@ final class DashboardAlertsController extends AbstractController
             $pagination['offset'],
         );
 
+        $projectChoices = [];
+        foreach ($accessible as $project) {
+            $projectChoices[$project->getName()] = $project->getUuid();
+        }
+
         return $this->render('dashboard/alerts.html.twig', [
             'destinations' => $destinations,
             'projects' => $accessible,
             'filters' => [
                 'project' => $projectFilter?->getUuid() ?? '',
                 'per_page' => $pagination['per_page'],
+                'page' => 1,
             ],
+            'filterForm' => $this->getFilterFormFactory->create(DashboardAlertsFilterType::class, [
+                'project' => $projectFilter?->getUuid() ?? '',
+                'per_page' => $pagination['per_page'],
+                'page' => 1,
+            ], [
+                'action' => $this->generateUrl('dashboard_alerts'),
+                'project_choices' => $projectChoices,
+            ])->createView(),
             'pagination' => $pagination,
         ]);
     }

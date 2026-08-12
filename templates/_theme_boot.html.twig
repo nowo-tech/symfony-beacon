@@ -1,7 +1,7 @@
 {# Blocking classic IIFE compiled from assets/theme-boot.ts (see vite themeBootIife plugin). #}
 <script src="{{ asset('build/theme-boot.js') }}"></script>
 {# Critical page substrate so a translucent loader never reveals the wrong theme. #}
-<style>
+<style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
     html[data-theme="light"],
     html[data-theme="light"] body {
         color-scheme: light;
