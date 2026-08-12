@@ -178,6 +178,10 @@ final class AdminInstancePermissionController extends AbstractController
         return $this->redirectToRoute('admin_permissions');
     }
 
+    /**
+     * @param FormInterface<mixed>|null $invalidEditForm
+     * @param FormInterface<mixed>|null $invalidCreateForm
+     */
     private function renderIndex(
         Request $request,
         ?InstancePermission $openPermission = null,
@@ -241,6 +245,7 @@ final class AdminInstancePermissionController extends AbstractController
         ]);
     }
 
+    /** @return FormInterface<mixed> */
     private function buildCreateForm(): FormInterface
     {
         $permission = new InstancePermission();
@@ -260,6 +265,7 @@ final class AdminInstancePermissionController extends AbstractController
         );
     }
 
+    /** @return FormInterface<mixed> */
     private function buildEditForm(InstancePermission $permission): FormInterface
     {
         return $this->formFactory->createNamed(

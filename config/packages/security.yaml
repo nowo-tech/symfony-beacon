@@ -20,8 +20,10 @@ security:
     main:
       lazy: true
       provider: app_user_provider
-      # UserKit AccountStatusUserChecker (≥1.1.6) covers checkPreAuth + checkPostAuth
-      # (AuthKit Security::login magic/social/QR and form login). Do not override user_checker.
+      # Wire UserKit AccountStatusUserChecker (≥1.1.6) so Security::login() (AuthKit magic/social/QR)
+      # and form login reject disabled accounts. Tag-only registration is not enough: Symfony's
+      # default firewall checker stays InMemoryUserChecker until user_checker is set explicitly.
+      user_checker: Nowo\UserKitBundle\Security\AccountStatusUserChecker
       form_login:
         login_path: nowo_auth_kit_login
         check_path: nowo_auth_kit_login

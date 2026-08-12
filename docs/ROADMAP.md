@@ -392,6 +392,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.7.0** | CSRF via Symfony Forms (`090` / 6.39); kit Administration chrome (Menu / Breadcrumb / Routing / Http Log); AuthKit 1.17; CSP kit-admin polish; RoutingKit 1.4 / password-toggle 2.1.1 |
 | **v1.8.0** | Member alert preferences (`091` / 6.40); Mercure `/users/{uuid}/member-alerts`; UserKit 1.1.6 disabled-account PreAuth; viewers edit own prefs from Account |
 | **v1.8.1** | CS / LiveComponent DI polish; restore `seedTestOpsDefaults` PHPUnit helper name |
+| **v1.8.2** | Firewall `user_checker` → UserKit AccountStatusUserChecker (disabled magic login); PHPStan / Rector / CS CI harden |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -403,4 +404,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-12 (**v1.8.1** cut; CS / LiveComponent DI polish after member alert preferences).
+Last updated: 2026-08-12 (**v1.8.2** cut; UserKit user_checker wiring + PHPStan/Rector/CS CI harden).

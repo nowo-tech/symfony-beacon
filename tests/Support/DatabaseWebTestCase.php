@@ -196,7 +196,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
     }
 
     /**
-     * Stable Ops defaults formerly supplied via when@test parameters (metrics, inbound, SSRF).
+     * Stable Ops defaults for PHPUnit (metrics, inbound, SSRF) formerly provided via test container parameters.
      */
     protected function seedTestOpsDefaults(): void
     {

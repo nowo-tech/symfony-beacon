@@ -21,6 +21,8 @@ final readonly class GetFilterFormFactory
      * @param class-string         $type
      * @param array<string, mixed> $data
      * @param array<string, mixed> $options
+     *
+     * @return FormInterface<mixed>
      */
     public function create(string $type, array $data = [], array $options = []): FormInterface
     {

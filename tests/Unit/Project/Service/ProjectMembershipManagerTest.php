@@ -41,7 +41,7 @@ final class ProjectMembershipManagerTest extends TestCase
         $this->groupAccessRepository = $this->createMock(ProjectGroupAccessRepository::class);
         $this->userGroupMembershipRepository = $this->createMock(UserGroupMembershipRepository::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->authorizationChecker->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
+        $this->authorizationChecker->expects(self::any())->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
 
         $projectAccess = new ProjectAccessService(
             $this->membershipRepository,

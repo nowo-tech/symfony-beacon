@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Rbac;
 
+use App\Identity\Entity\InstancePermission;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -43,19 +44,12 @@ final readonly class RbacPermissionTranslator
         return 'permissions.catalog.'.$slug.'.description';
     }
 
-    /**
-     * @param object{getKey(): string, getName(): string} $permission
-     */
-    public function name(object $permission): string
+    public function name(InstancePermission $permission): string
     {
         $locale = $this->translator->getLocale();
-        if (\is_callable([$permission, 'getNameForLocale'])) {
-            /** @var callable(string): ?string $getter */
-            $getter = [$permission, 'getNameForLocale'];
-            $localized = $getter($locale);
-            if (\is_string($localized) && '' !== trim($localized)) {
-                return trim($localized);
-            }
+        $localized = $permission->getNameForLocale($locale);
+        if (\is_string($localized) && '' !== trim($localized)) {
+            return trim($localized);
         }
 
         $machineKey = trim($permission->getKey());
@@ -72,19 +66,12 @@ final readonly class RbacPermissionTranslator
         return $translated;
     }
 
-    /**
-     * @param object{getKey(): string, getDescription(): ?string} $permission
-     */
-    public function description(object $permission): ?string
+    public function description(InstancePermission $permission): ?string
     {
         $locale = $this->translator->getLocale();
-        if (\is_callable([$permission, 'getDescriptionForLocale'])) {
-            /** @var callable(string): ?string $getter */
-            $getter = [$permission, 'getDescriptionForLocale'];
-            $localized = $getter($locale);
-            if (\is_string($localized) && '' !== trim($localized)) {
-                return trim($localized);
-            }
+        $localized = $permission->getDescriptionForLocale($locale);
+        if (\is_string($localized) && '' !== trim($localized)) {
+            return trim($localized);
         }
 
         $machineKey = trim($permission->getKey());

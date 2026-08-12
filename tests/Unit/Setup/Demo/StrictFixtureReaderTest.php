@@ -66,13 +66,21 @@ final class StrictFixtureReaderTest extends TestCase
 
             private const string FIXTURE_FILE = 'demo.json';
 
-            /** @param array<mixed> $source */
+            /**
+             * @param array<mixed> $source
+             *
+             * @return array<mixed>
+             */
             public function exposeRequireArray(array $source, string $key, string $context): array
             {
                 return $this->requireArray($source, $key, $context);
             }
 
-            /** @param array<mixed> $source */
+            /**
+             * @param array<mixed> $source
+             *
+             * @return array<mixed>
+             */
             public function exposeRequireList(array $source, string $key, string $context): array
             {
                 return $this->requireList($source, $key, $context);

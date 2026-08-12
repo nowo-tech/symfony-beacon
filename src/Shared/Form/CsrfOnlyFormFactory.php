@@ -21,6 +21,8 @@ final readonly class CsrfOnlyFormFactory
      * @param bool   $named         When true, form name is `csrf_only` (nested `csrf_only[_token]`).
      *                              When false, empty block prefix → flat `_token` / custom field name (kit controllers).
      * @param string $csrfFieldName Symfony CSRF field name (`_token` or kit `_csrf_token`)
+     *
+     * @return FormInterface<mixed>
      */
     public function create(
         string $action,
@@ -49,6 +51,8 @@ final readonly class CsrfOnlyFormFactory
      * @param array<string, scalar|null>          $fields       Field name => default value
      * @param array<string, string>               $fieldTypes   Field name => FormKit snake type (default hidden)
      * @param array<string, array<string, mixed>> $fieldOptions Per-field Form Type options
+     *
+     * @return FormInterface<mixed>
      */
     public function createWithFields(
         string $action,

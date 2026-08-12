@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.8.1)](#unreleased-main-after-181)
+- [Unreleased (main after 1.8.2)](#unreleased-main-after-182)
+- [Upgrading from 1.8.1 to 1.8.2](#upgrading-from-181-to-182)
 - [Upgrading from 1.8.0 to 1.8.1](#upgrading-from-180-to-181)
 - [Upgrading from 1.7.0 to 1.8.0](#upgrading-from-170-to-180)
 - [Upgrading from 1.6.4 to 1.7.0](#upgrading-from-164-to-170)
@@ -60,9 +61,22 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.8.1)
+## Unreleased (main after 1.8.2)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.8.1 to 1.8.2
+
+**Security / QA polish (no schema).** Wire firewall `user_checker` to UserKit `AccountStatusUserChecker` (disabled accounts blocked on AuthKit magic login via `Security::login`); PHPStan / Rector / CS Fixer CI hardening. See `[1.8.2]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.8.2   # or pull main at the release commit
+composer install
+php bin/console cache:clear
+```
+
+No `make migrate` / `make vite-build` required for this patch.
 
 ## Upgrading from 1.8.0 to 1.8.1
 

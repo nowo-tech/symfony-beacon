@@ -66,6 +66,7 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
     ) {
     }
 
+    /** @return FormInterface<mixed> */
     protected function instantiateForm(): FormInterface
     {
         return $this->formFactory->createNamed(
@@ -88,13 +89,7 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
     public function save(): RedirectResponse
     {
         $this->submitForm();
-        $project = null;
-        foreach ($this->projectRepository->findByUuids([$this->projectUuid]) as $candidate) {
-            if ($candidate->getUuid() === $this->projectUuid) {
-                $project = $candidate;
-                break;
-            }
-        }
+        $project = array_find($this->projectRepository->findByUuids([$this->projectUuid]), fn ($candidate): bool => $candidate->getUuid() === $this->projectUuid);
         if (!$project instanceof Project) {
             throw $this->createNotFoundException('Project not found.');
         }
@@ -120,6 +115,7 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
                 '_fragment' => 'member-alerts',
             ]);
         }
+
         return $this->redirectToRoute('account_display_notifications');
     }
 }

@@ -157,6 +157,8 @@ final class DashboardMentionsController extends AbstractController
     }
 
     /**
+     * @param FormInterface<mixed> $form
+     *
      * @return array<string, scalar>
      */
     private function redirectQuery(FormInterface $form): array

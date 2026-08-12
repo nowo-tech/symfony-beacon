@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Project\Service;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Service\ProjectApiKeyFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectApiKeyFactoryTest extends TestCase
@@ -40,7 +40,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
             ->willReturnOnConsecutiveCalls(new ProjectApiKey(), null);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getRepository')->with(ProjectApiKey::class)->willReturn($repo);
+        $em->expects(self::any())->method('getRepository')->with(ProjectApiKey::class)->willReturn($repo);
 
         $project = new Project();
         $project->setSlug('demo');
@@ -58,7 +58,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
         $repo->method('findOneBy')->willReturn(new ProjectApiKey());
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getRepository')->with(ProjectApiKey::class)->willReturn($repo);
+        $em->expects(self::any())->method('getRepository')->with(ProjectApiKey::class)->willReturn($repo);
 
         $project = new Project();
         $project->setSlug('demo');

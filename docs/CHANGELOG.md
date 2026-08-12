@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-08-12
+
+### Security
+
+- Wire firewall `user_checker` to UserKit `AccountStatusUserChecker` so AuthKit magic login (`Security::login`) rejects disabled accounts. Tag-only registration was a no-op against Symfony’s default `InMemoryUserChecker` (1.8.0 assumed the tag alone was enough).
+
+### Fixed
+
+- PHPStan level clean-up: FormInterface generics, FormView import on admin roles, Ingest gate `@return Accept|Reject`, Rbac translators typed to `InstancePermission` / `InstanceRole`, LiveComponent form generics, PHPUnit `expects()->method()->with()` chains.
+- Project danger-zone delete functional tests: form fields use empty block prefix (`confirmation`), not `project_delete[...]`.
+
+### Changed
+
+- Rector config: skip rules that fight PHPStan / Live conventions (`RemoveReturnTagIncompatibleWithNativeTypeRector`, `FlipTypeControlToUseExclusiveTypeRector`, `ControllerMethodInjectionToConstructorRector`); keep PHPUnit CQ sets disabled (avoids renaming helpers to `test*` from PHPDoc prose).
+- `make rector-fix` always runs CS Fixer afterward so Rector spacing diffs cannot fail GitHub CI `php-cs-fixer check`.
+
 ## [1.8.1] - 2026-08-12
 
 ### Fixed
@@ -950,7 +966,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...HEAD
+[1.8.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...v1.7.0

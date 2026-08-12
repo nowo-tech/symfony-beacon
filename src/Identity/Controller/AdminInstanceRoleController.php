@@ -22,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -365,6 +366,9 @@ final class AdminInstanceRoleController extends AbstractController
         return $this->redirectToRoute('admin_roles_users', ['id' => $role->getUuid()]);
     }
 
+    /**
+     * @param FormInterface<mixed>|null $invalidCreateForm
+     */
     private function renderIndex(
         Request $request,
         ?FormInterface $invalidCreateForm = null,
@@ -387,6 +391,7 @@ final class AdminInstanceRoleController extends AbstractController
         ]);
     }
 
+    /** @return FormInterface<mixed> */
     private function buildCreateForm(): FormInterface
     {
         $role = new InstanceRole();
@@ -399,6 +404,7 @@ final class AdminInstanceRoleController extends AbstractController
         ]);
     }
 
+    /** @return FormInterface<mixed> */
     private function buildEditForm(InstanceRole $role, string $returnRoute = 'admin_roles_show'): FormInterface
     {
         return $this->createForm(AdminInstanceRoleType::class, $role, [
@@ -415,6 +421,10 @@ final class AdminInstanceRoleController extends AbstractController
         return \in_array($return, self::DETAIL_ROUTES, true) ? $return : 'admin_roles_show';
     }
 
+    /**
+     * @param FormInterface<mixed>|null $editForm
+     * @param FormInterface<mixed>|null $permissionsForm
+     */
     private function renderRoleDetail(
         Request $request,
         InstanceRole $role,

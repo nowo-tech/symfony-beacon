@@ -59,8 +59,8 @@ final class InstancePermissionVoterTest extends TestCase
         $permission = new InstancePermission();
         $permission->setKey('project.settings.manage');
 
-        $this->permissions->method('findOneByKey')->with('project.settings.manage')->willReturn($permission);
-        $this->roles->method('findPermissionKeysForUserId')->with(7)->willReturn(['project.settings.manage']);
+        $this->permissions->expects(self::any())->method('findOneByKey')->with('project.settings.manage')->willReturn($permission);
+        $this->roles->expects(self::any())->method('findPermissionKeysForUserId')->with(7)->willReturn(['project.settings.manage']);
 
         $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
 

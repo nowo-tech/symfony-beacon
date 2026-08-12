@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Rbac;
 
+use App\Identity\Entity\InstanceRole;
 use App\Shared\Rbac\RbacRoleTranslator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +39,8 @@ final class RbacRoleTranslatorTest extends TestCase
     public function testNameReturnsTranslationWhenKeyExists(): void
     {
         $role = $this->role('ROLE_SUPPORT', 'DB Support', 'DB when to use');
-        $this->translator->method('trans')
+        $this->translator->expects(self::any())
+            ->method('trans')
             ->with('roles.catalog.role_support.name')
             ->willReturn('Support desk');
 
@@ -57,7 +59,8 @@ final class RbacRoleTranslatorTest extends TestCase
     public function testDescriptionReturnsTranslationWhenKeyExists(): void
     {
         $role = $this->role('ROLE_SUPPORT', 'Support', 'DB fallback');
-        $this->translator->method('trans')
+        $this->translator->expects(self::any())
+            ->method('trans')
             ->with('roles.catalog.role_support.description')
             ->willReturn('Use for L1 ticket triage.');
 
@@ -91,33 +94,13 @@ final class RbacRoleTranslatorTest extends TestCase
         self::assertNull($this->rbacRoleTranslator->description($role));
     }
 
-    /**
-     * @return object{getCode(): string, getName(): string, getDescription(): ?string}
-     */
-    private function role(string $code, string $name, ?string $description): object
+    private function role(string $code, string $name, ?string $description): InstanceRole
     {
-        return new readonly class($code, $name, $description) {
-            public function __construct(
-                private string $code,
-                private string $name,
-                private ?string $description,
-            ) {
-            }
+        $role = new InstanceRole();
+        $role->setCode($code);
+        $role->setName($name);
+        $role->setDescription($description);
 
-            public function getCode(): string
-            {
-                return $this->code;
-            }
-
-            public function getName(): string
-            {
-                return $this->name;
-            }
-
-            public function getDescription(): ?string
-            {
-                return $this->description;
-            }
-        };
+        return $role;
     }
 }

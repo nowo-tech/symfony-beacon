@@ -22,8 +22,6 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 /**
  * Account member-alert preferences with Live cascading visibility.
- *
- * @extends AbstractController
  */
 #[AsLiveComponent]
 #[IsGranted('ROLE_USER')]
@@ -58,6 +56,7 @@ final class MemberAlertPreferencesLive extends AbstractController
     ) {
     }
 
+    /** @return FormInterface<mixed> */
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(MemberAlertPreferencesType::class, $this->initialFormData, [
@@ -99,6 +98,7 @@ final class MemberAlertPreferencesLive extends AbstractController
         }
         $this->entityManager->flush();
         $this->addFlash('success', 'flash.preferences.display_saved');
+
         return $this->redirectToRoute('account_display_notifications');
     }
 }

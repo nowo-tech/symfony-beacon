@@ -96,11 +96,7 @@ final class ProjectMembershipUiHelperTest extends TestCase
     {
         $user = new User();
         $user->setEmail($email);
-        if (method_exists($user, 'setDisplayName')) {
-            $user->setDisplayName($displayName);
-        } elseif (method_exists($user, 'setName')) {
-            $user->setName($displayName);
-        }
+        $user->setDisplayName($displayName);
         $prop = new ReflectionProperty(User::class, 'id');
         $prop->setValue($user, $id);
 

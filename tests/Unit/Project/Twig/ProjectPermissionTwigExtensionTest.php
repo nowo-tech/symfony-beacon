@@ -36,7 +36,7 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         $groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
         $shareLinkRepository = $this->createMock(ProjectShareLinkRepository::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->authorizationChecker->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
+        $this->authorizationChecker->expects(self::any())->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
         $this->security = $this->createMock(Security::class);
 
         $projectAccess = new ProjectAccessService(
@@ -67,7 +67,8 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         $membership->setUser($user);
         $membership->setRole(ProjectRole::Member);
         $this->security->method('getUser')->willReturn($user);
-        $this->membershipRepository->method('findOneByProjectAndUser')
+        $this->membershipRepository->expects(self::any())
+            ->method('findOneByProjectAndUser')
             ->with($project, $user)
             ->willReturn($membership);
 

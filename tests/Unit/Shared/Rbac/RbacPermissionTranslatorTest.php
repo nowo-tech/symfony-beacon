@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Rbac;
 
+use App\Identity\Entity\InstancePermission;
 use App\Shared\Rbac\RbacPermissionTranslator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +59,8 @@ final class RbacPermissionTranslatorTest extends TestCase
     public function testNameReturnsYamlWhenDbLocaleMissing(): void
     {
         $permission = $this->permission('project.view', 'DB View', 'DB desc');
-        $this->translator->method('trans')
+        $this->translator->expects(self::any())
+            ->method('trans')
             ->with('permissions.catalog.project_view.name')
             ->willReturn('View project');
 
@@ -101,7 +103,8 @@ final class RbacPermissionTranslatorTest extends TestCase
     public function testDescriptionReturnsYamlWhenDbLocaleMissing(): void
     {
         $permission = $this->permission('project.issues.triage', 'Triage', 'DB fallback');
-        $this->translator->method('trans')
+        $this->translator->expects(self::any())
+            ->method('trans')
             ->with('permissions.catalog.project_issues_triage.description')
             ->willReturn('Mutate issues within a project.');
 
@@ -123,14 +126,6 @@ final class RbacPermissionTranslatorTest extends TestCase
     /**
      * @param array<string, string> $nameTranslations
      * @param array<string, string> $descriptionTranslations
-     *
-     * @return object{
-     *     getKey(): string,
-     *     getName(): string,
-     *     getDescription(): ?string,
-     *     getNameForLocale(string): ?string,
-     *     getDescriptionForLocale(string): ?string
-     * }
      */
     private function permission(
         string $key,
@@ -138,49 +133,14 @@ final class RbacPermissionTranslatorTest extends TestCase
         ?string $description,
         array $nameTranslations = [],
         array $descriptionTranslations = [],
-    ): object {
-        return new readonly class($key, $name, $description, $nameTranslations, $descriptionTranslations) {
-            /**
-             * @param array<string, string> $nameTranslations
-             * @param array<string, string> $descriptionTranslations
-             */
-            public function __construct(
-                private string $key,
-                private string $name,
-                private ?string $description,
-                private array $nameTranslations,
-                private array $descriptionTranslations,
-            ) {
-            }
+    ): InstancePermission {
+        $permission = new InstancePermission();
+        $permission->setKey($key);
+        $permission->setName($name);
+        $permission->setDescription($description);
+        $permission->setCategory('custom');
+        $permission->syncTranslations($nameTranslations, $descriptionTranslations);
 
-            public function getKey(): string
-            {
-                return $this->key;
-            }
-
-            public function getName(): string
-            {
-                return $this->name;
-            }
-
-            public function getDescription(): ?string
-            {
-                return $this->description;
-            }
-
-            public function getNameForLocale(string $locale): ?string
-            {
-                $value = $this->nameTranslations[$locale] ?? null;
-
-                return \is_string($value) && '' !== trim($value) ? trim($value) : null;
-            }
-
-            public function getDescriptionForLocale(string $locale): ?string
-            {
-                $value = $this->descriptionTranslations[$locale] ?? null;
-
-                return \is_string($value) && '' !== trim($value) ? trim($value) : null;
-            }
-        };
+        return $permission;
     }
 }

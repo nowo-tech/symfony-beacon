@@ -40,7 +40,7 @@ help:
 	@echo "  make twig-cs-fix     Twig-CS-Fixer (fix)"
 	@echo "  make phpstan         PHPStan analyse"
 	@echo "  make rector          Rector dry-run"
-	@echo "  make rector-fix      Rector apply"
+	@echo "  make rector-fix      Rector apply, then CS Fixer (Rector can leave spacing diffs)"
 	@echo "  make test            PHPUnit"
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
 	@echo "  make test-unit-js    Vitest unit tests for assets/"
@@ -249,8 +249,11 @@ phpstan: ensure-up
 rector: ensure-up
 	docker compose exec -T php vendor/bin/rector process --dry-run
 
+# Always re-run CS Fixer after Rector: rules like blank_line_before_statement leave diffs
+# that fail `php-cs-fixer check` in CI (qa-fix previously ran CS before Rector only).
 rector-fix: ensure-up
 	docker compose exec -T php vendor/bin/rector process
+	@$(MAKE) cs-fix
 
 test: ensure-up
 	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
@@ -310,6 +313,7 @@ secrets-scan:
 
 qa: cs twig-cs phpstan rector check-module-boundaries test
 
+# rector-fix re-applies CS Fixer so the tree matches CI `php-cs-fixer check`.
 qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
 
 # Update PHP (Composer) and frontend (pnpm) lockfiles within constraint ranges.

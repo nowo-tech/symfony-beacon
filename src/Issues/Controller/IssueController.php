@@ -282,11 +282,12 @@ final class IssueController extends AbstractController
         $this->projectAccess->requireTriage($project, $user);
         $form = $this->createForm(IssueSavedViewType::class);
         $form->handleRequest($request);
+        /** @var array<string, mixed> $submitted */
         $submitted = $request->request->all($form->getName());
-        $queryJson = \is_array($submitted) ? $this->filterQueryFromArray($submitted) : [];
+        $queryJson = $this->filterQueryFromArray($submitted);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            $name = \is_array($submitted) ? trim((string) ($submitted['name'] ?? '')) : '';
+            $name = trim((string) ($submitted['name'] ?? ''));
             $this->addFlash('error', '' === $name ? 'issues.view_name_empty' : 'issues.view_invalid');
 
             return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()] + $queryJson);

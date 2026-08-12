@@ -423,6 +423,9 @@ final class AdminUserController extends AbstractController
         return $this->userRepository->countAdmins();
     }
 
+    /**
+     * @param FormInterface<mixed>|null $invalidCreateForm
+     */
     private function renderIndex(
         Request $request,
         ?FormInterface $invalidCreateForm = null,
@@ -479,6 +482,7 @@ final class AdminUserController extends AbstractController
         ]);
     }
 
+    /** @return FormInterface<mixed> */
     private function buildCreateForm(): FormInterface
     {
         return $this->createForm(AdminUserType::class, [
