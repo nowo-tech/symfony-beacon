@@ -8,10 +8,10 @@ use App\Identity\Entity\User;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
 use App\Setup\Demo\BreadcrumbDemoSeeder;
 use App\Setup\Demo\CookieConsentDemoSeeder;
 use App\Setup\Demo\DashboardMenuDemoSeeder;
-use App\Project\Enum\ProjectRole;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -112,7 +112,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $candidates[] = $projectDir.'/var/test.db';
         $candidates[] = '/tmp/symfony-beacon-phpunit.db';
         $candidates[] = '/dev/shm/symfony-beacon-phpunit.db';
-        $candidates[] = sprintf('/dev/shm/symfony-beacon-phpunit-%d.db', getmypid());
+        $candidates[] = \sprintf('/dev/shm/symfony-beacon-phpunit-%d.db', getmypid());
 
         foreach (array_unique($candidates) as $file) {
             $dir = \dirname($file);

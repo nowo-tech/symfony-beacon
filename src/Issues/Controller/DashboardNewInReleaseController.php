@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
-use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Form\DashboardNewInReleaseFilterType;
 use App\Issues\Repository\IssueSearchRepository;
+use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Form\GetFilterFormFactory;

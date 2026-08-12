@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Project\Service;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Service\ProjectApiKeyFactory;
@@ -31,7 +33,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
 
     public function testCreateRegeneratesWhenCollisionThenSucceeds(): void
     {
-        /** @var EntityRepository<ProjectApiKey>&\PHPUnit\Framework\MockObject\MockObject $repo */
+        /** @var EntityRepository<ProjectApiKey>&MockObject $repo */
         $repo = $this->createMock(EntityRepository::class);
         $repo->expects(self::exactly(2))
             ->method('findOneBy')
@@ -51,7 +53,7 @@ final class ProjectApiKeyFactoryTest extends TestCase
 
     public function testCreateFallsBackAfterEightCollisions(): void
     {
-        /** @var EntityRepository<ProjectApiKey>&\PHPUnit\Framework\MockObject\Stub $repo */
+        /** @var EntityRepository<ProjectApiKey>&Stub $repo */
         $repo = $this->createStub(EntityRepository::class);
         $repo->method('findOneBy')->willReturn(new ProjectApiKey());
 

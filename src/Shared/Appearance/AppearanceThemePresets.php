@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance;
 
-use Deprecated;
 use App\Shared\Appearance\Entity\SiteAppearance;
+use Deprecated;
 
 /**
  * Named appearance palettes applied independently for light vs dark mode.

@@ -47,7 +47,7 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
 
         $keys = $this->createMock(ProjectApiKeyRepository::class);
         $keys->method('findActiveByPublicKey')->willReturnCallback(
-            static fn(string $publicKey): ?ProjectApiKey => match ($publicKey) {
+            static fn (string $publicKey): ?ProjectApiKey => match ($publicKey) {
                 $apiKey->getPublicKey() => $apiKey,
                 $wrongProjectKey->getPublicKey() => $wrongProjectKey,
                 default => null,

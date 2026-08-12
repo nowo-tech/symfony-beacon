@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\MessageHandler;
 
+use App\Identity\Entity\User;
 use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Message\DeliverWebPushForProjectMessage;
 use App\Notifications\Repository\PushSubscriptionRepository;
@@ -53,7 +54,7 @@ final readonly class DeliverWebPushForProjectHandler
             $allowed = array_fill_keys($message->eligibleUserIds, true);
             $users = array_values(array_filter(
                 $users,
-                static fn ($user): bool => null !== $user->getId() && isset($allowed[$user->getId()]),
+                static fn (User $user): bool => null !== $user->getId() && isset($allowed[$user->getId()]),
             ));
         }
         $subscriptions = $this->subscriptionRepository->findForPushEnabledUsers($users);

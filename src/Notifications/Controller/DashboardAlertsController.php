@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
-use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Notifications\Form\DashboardAlertsFilterType;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Form\GetFilterFormFactory;

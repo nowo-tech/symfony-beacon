@@ -19,6 +19,7 @@ use App\Notifications\Service\MemberAlertPreferenceEvaluator;
 use App\Project\Entity\Project;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 final class MemberAlertPreferenceEvaluatorTest extends TestCase
 {
@@ -124,7 +125,7 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
         $user->setPassword('x');
         $user->setMemberAlertsEnabled($memberAlertsEnabled);
         if (null !== $id) {
-            $ref = new \ReflectionProperty(User::class, 'id');
+            $ref = new ReflectionProperty(User::class, 'id');
             $ref->setValue($user, $id);
         }
 

@@ -204,7 +204,7 @@ final readonly class MemberAlertPreferenceManager
     }
 
     /**
-     * @param array<string, MemberAccountAlertEvent>  $account
+     * @param array<string, MemberAccountAlertEvent> $account
      * @param array<string, MemberProjectAlertEvent> $overrides
      *
      * @return array{0: bool, 1: MemberAlertScope}

@@ -183,7 +183,7 @@ final readonly class ProjectConfigPortability
         }
 
         $targetCode = '' !== $target->getCode() ? $target->getCode() : $target->getSlug();
-        $match = array_find($projects, fn($row): bool => $row['code'] === $targetCode || $row['uuid'] === $target->getUuid());
+        $match = array_find($projects, static fn ($row): bool => $row['code'] === $targetCode || $row['uuid'] === $target->getUuid());
         if (null === $match) {
             if (1 === \count($projects)) {
                 throw new InvalidArgumentException('code_mismatch');

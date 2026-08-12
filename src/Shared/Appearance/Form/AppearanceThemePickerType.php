@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Form;
 
-use Override;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;

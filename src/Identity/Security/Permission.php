@@ -27,6 +27,7 @@ final class Permission
         if (!str_contains($attribute, '.')) {
             return false;
         }
+
         return !str_starts_with($attribute, 'ROLE_') && !str_starts_with($attribute, 'IS_');
     }
 

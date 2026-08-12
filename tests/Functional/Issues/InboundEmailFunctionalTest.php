@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Identity\Entity\User;
-use App\Project\Entity\ProjectMembership;
-use App\Project\Enum\ProjectRole;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueComment;
 use App\Issues\Service\InboundEmailReplyToken;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class InboundEmailFunctionalTest extends DatabaseWebTestCase
 {

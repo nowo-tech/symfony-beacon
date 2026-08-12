@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-12
+
+### Fixed
+
+- PHPUnit base: keep `seedTestOpsDefaults()` helper name (avoid renaming test support methods to `test*`, which breaks schema bootstrap).
+- Member-alert LiveComponents: inject preference manager / repos via constructor (cleaner LiveAction signatures).
+
+### Changed
+
+- CS / Rector polish across Form Types, imports, and closure spacing (no behaviour change).
+
 ## [1.8.0] - 2026-08-12
 
 ### Added
@@ -939,7 +950,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.4...v1.7.0
 [1.6.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.6.3...v1.6.4

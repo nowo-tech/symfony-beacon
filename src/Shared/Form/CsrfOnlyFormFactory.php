@@ -46,9 +46,9 @@ final readonly class CsrfOnlyFormFactory
     /**
      * CSRF form with typed flat fields (empty block prefix).
      *
-     * @param array<string, scalar|null>              $fields         Field name => default value
-     * @param array<string, string>                   $fieldTypes     Field name => FormKit snake type (default hidden)
-     * @param array<string, array<string, mixed>>     $fieldOptions   Per-field Form Type options
+     * @param array<string, scalar|null>          $fields       Field name => default value
+     * @param array<string, string>               $fieldTypes   Field name => FormKit snake type (default hidden)
+     * @param array<string, array<string, mixed>> $fieldOptions Per-field Form Type options
      */
     public function createWithFields(
         string $action,

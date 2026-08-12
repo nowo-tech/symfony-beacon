@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Shared\Form\EncryptedSecretFormApplier;
 use App\Shared\Settings\Form\InstanceOpsDefaultsType;
 use App\Shared\Settings\OpsDefaultsSection;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

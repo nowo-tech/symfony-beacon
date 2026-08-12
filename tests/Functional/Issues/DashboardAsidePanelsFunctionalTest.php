@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
-use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueMention;
@@ -14,6 +13,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
+use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

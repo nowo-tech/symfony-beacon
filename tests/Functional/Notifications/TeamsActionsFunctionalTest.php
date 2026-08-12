@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Notifications;
 
-use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
@@ -13,6 +12,7 @@ use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\InteractionActionToken;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
+use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

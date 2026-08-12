@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Ingest\Otlp\Service;
 
-use App\Project\Entity\Project;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ops\Metrics\MetricsCollector;
+use App\Project\Entity\Project;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

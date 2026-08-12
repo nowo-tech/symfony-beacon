@@ -29,7 +29,7 @@ final readonly class ProjectAccess
 
     public function grantsAny(string ...$permissions): bool
     {
-        return array_any($permissions, fn(string $permission): bool => $this->grants($permission));
+        return array_any($permissions, fn (string $permission): bool => $this->grants($permission));
     }
 
     /** Whether the role may open project product surfaces. */

@@ -35,11 +35,11 @@ final class CsrfActionTwigExtension extends AbstractExtension
     }
 
     /**
-     * @param bool                                    $named          Nested `csrf_only[_token]` when true; flat token field when false (kits)
-     * @param string                                  $csrfFieldName  `_token` or kit `_csrf_token`
-     * @param array<string, scalar|null>              $fields         Optional typed fields (flat names; forces empty-prefix form)
-     * @param array<string, string>                   $fieldTypes     Field name => FormKit snake type (default hidden)
-     * @param array<string, array<string, mixed>>     $fieldOptions   Per-field Form Type options
+     * @param bool                                $named         Nested `csrf_only[_token]` when true; flat token field when false (kits)
+     * @param string                              $csrfFieldName `_token` or kit `_csrf_token`
+     * @param array<string, scalar|null>          $fields        Optional typed fields (flat names; forces empty-prefix form)
+     * @param array<string, string>               $fieldTypes    Field name => FormKit snake type (default hidden)
+     * @param array<string, array<string, mixed>> $fieldOptions  Per-field Form Type options
      */
     public function csrfActionForm(
         string $action,

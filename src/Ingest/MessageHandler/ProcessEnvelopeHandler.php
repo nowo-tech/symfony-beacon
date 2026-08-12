@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Ingest\MessageHandler;
 
-use App\Issues\Entity\Issue;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeParser;
+use App\Issues\Entity\Issue;
 use App\Issues\Service\IssueEnvelopeWriter;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\VolumeThresholdEvaluator;

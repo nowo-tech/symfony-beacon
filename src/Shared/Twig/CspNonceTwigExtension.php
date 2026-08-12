@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
 use App\Shared\Http\ContentSecurityPolicySubscriber;
 use Override;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

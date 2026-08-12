@@ -51,6 +51,13 @@ final class MemberAlertPreferencesLive extends AbstractController
     #[LiveProp]
     public array $projects = [];
 
+    public function __construct(
+        private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
+        private readonly PushSubscriptionRepository $pushSubscriptionRepository,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
+    }
+
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(MemberAlertPreferencesType::class, $this->initialFormData, [
@@ -67,13 +74,9 @@ final class MemberAlertPreferencesLive extends AbstractController
     }
 
     #[LiveAction]
-    public function save(
-        MemberAlertPreferenceManager $memberAlertPreferenceManager,
-        PushSubscriptionRepository $pushSubscriptionRepository,
-        EntityManagerInterface $entityManager,
-    ): RedirectResponse {
+    public function save(): RedirectResponse
+    {
         $this->submitForm();
-
         /** @var User $user */
         $user = $this->getUser();
         /** @var array<string, mixed> $data */
@@ -81,24 +84,21 @@ final class MemberAlertPreferencesLive extends AbstractController
         $masterEnabled = (bool) ($data['memberAlertsEnabled'] ?? true);
         /** @var array<string, mixed> $rawEvents */
         $rawEvents = \is_array($data['events'] ?? null) ? $data['events'] : [];
-        $memberAlertPreferenceManager->saveAccountEvents(
+        $this->memberAlertPreferenceManager->saveAccountEvents(
             $user,
             $masterEnabled,
             MemberAlertEvent::mapEventsFromFormKeys($rawEvents),
         );
-
         if ($this->getForm()->has('pushNotificationsEnabled')) {
             $user->setPushNotificationsEnabled((bool) ($data['pushNotificationsEnabled'] ?? false));
             if (!$user->isPushNotificationsEnabled()) {
-                foreach ($pushSubscriptionRepository->findByUser($user) as $subscription) {
-                    $entityManager->remove($subscription);
+                foreach ($this->pushSubscriptionRepository->findByUser($user) as $subscription) {
+                    $this->entityManager->remove($subscription);
                 }
             }
         }
-
-        $entityManager->flush();
+        $this->entityManager->flush();
         $this->addFlash('success', 'flash.preferences.display_saved');
-
         return $this->redirectToRoute('account_display_notifications');
     }
 }

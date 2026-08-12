@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Shared\Appearance\AppearanceSettingsSection;
 use App\Shared\Appearance\AppearanceSettingsSubtab;
 use App\Shared\Appearance\AppearanceThemePresets;
@@ -13,6 +12,7 @@ use App\Shared\Appearance\Form\SiteAppearanceType;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use App\Shared\Appearance\SiteAppearanceProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

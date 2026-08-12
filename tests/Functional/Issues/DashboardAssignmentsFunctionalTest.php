@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Issues;
 
-use App\Setup\Demo\DashboardMenuDemoSeeder;
-use App\Project\Entity\Project;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
+use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
+use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

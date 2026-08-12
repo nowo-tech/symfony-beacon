@@ -139,7 +139,7 @@ final class OtlpIngestPipelineTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->with(self::callback(static fn(object $message): bool => $message instanceof ProcessEnvelopeMessage
+            ->with(self::callback(static fn (object $message): bool => $message instanceof ProcessEnvelopeMessage
                 && 42 === $message->projectId
                 && $envelopeBody === $message->rawEnvelope
                 && '' !== $message->receivedAtIso))

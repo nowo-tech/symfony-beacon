@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
-use App\Project\Entity\Project;
 use App\Identity\Entity\User;
+use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Setup\Demo\DashboardMenuDemoSeeder;

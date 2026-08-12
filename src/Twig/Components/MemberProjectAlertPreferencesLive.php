@@ -59,6 +59,10 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
 
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
+        private readonly ProjectRepository $projectRepository,
+        private readonly ProjectAccessService $projectAccess,
+        private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -81,16 +85,11 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
     }
 
     #[LiveAction]
-    public function save(
-        ProjectRepository $projectRepository,
-        ProjectAccessService $projectAccess,
-        MemberAlertPreferenceManager $memberAlertPreferenceManager,
-        EntityManagerInterface $entityManager,
-    ): RedirectResponse {
+    public function save(): RedirectResponse
+    {
         $this->submitForm();
-
         $project = null;
-        foreach ($projectRepository->findByUuids([$this->projectUuid]) as $candidate) {
+        foreach ($this->projectRepository->findByUuids([$this->projectUuid]) as $candidate) {
             if ($candidate->getUuid() === $this->projectUuid) {
                 $project = $candidate;
                 break;
@@ -99,32 +98,28 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
         if (!$project instanceof Project) {
             throw $this->createNotFoundException('Project not found.');
         }
-
         /** @var User $user */
         $user = $this->getUser();
         // Own prefs for any accessible project (viewer+); not Settings admin surface.
-        $projectAccess->requireAccess($project, $user);
-
+        $this->projectAccess->requireAccess($project, $user);
         /** @var array<string, mixed> $data */
         $data = $this->getForm()->getData();
         /** @var array<string, mixed> $projectEvents */
         $projectEvents = \is_array($data['events'] ?? null) ? $data['events'] : [];
-        $memberAlertPreferenceManager->saveProjectPreferences($user, [[
+        $this->memberAlertPreferenceManager->saveProjectPreferences($user, [[
             'project' => $project,
             'enabled' => \array_key_exists('enabled', $data) ? (bool) $data['enabled'] : true,
             'resetOverrides' => (bool) ($data['resetOverrides'] ?? false),
             'events' => MemberAlertEvent::mapEventsFromFormKeys($projectEvents),
         ]]);
-        $entityManager->flush();
+        $this->entityManager->flush();
         $this->addFlash('success', 'flash.preferences.member_alerts_project_saved');
-
         if ('project' === $this->returnTo) {
             return $this->redirectToRoute('project_settings', [
                 'id' => $this->projectUuid,
                 '_fragment' => 'member-alerts',
             ]);
         }
-
         return $this->redirectToRoute('account_display_notifications');
     }
 }

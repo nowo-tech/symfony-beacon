@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Form;
 
-use Override;
 use App\Shared\Form\AbstractGetFilterType;
+use Override;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;

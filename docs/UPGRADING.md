@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.8.0)](#unreleased-main-after-180)
+- [Unreleased (main after 1.8.1)](#unreleased-main-after-181)
+- [Upgrading from 1.8.0 to 1.8.1](#upgrading-from-180-to-181)
 - [Upgrading from 1.7.0 to 1.8.0](#upgrading-from-170-to-180)
 - [Upgrading from 1.6.4 to 1.7.0](#upgrading-from-164-to-170)
 - [Upgrading from 1.6.3 to 1.6.4](#upgrading-from-163-to-164)
@@ -59,9 +60,22 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.8.0)
+## Unreleased (main after 1.8.1)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.8.0 to 1.8.1
+
+**CS / LiveComponent DI polish; PHPUnit bootstrap helper name.** No schema changes.
+
+```bash
+git fetch --tags
+git checkout v1.8.1   # or pull main at the release commit
+composer install
+php bin/console cache:clear
+```
+
+No `make migrate` / `make vite-build` required for this patch. See `[1.8.1]` in [CHANGELOG.md](CHANGELOG.md).
 
 ## Upgrading from 1.7.0 to 1.8.0
 

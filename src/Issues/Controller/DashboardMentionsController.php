@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Issues\Controller;
 
-use App\Project\Entity\Project;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Identity\Entity\User;
 use App\Issues\Entity\IssueMention;
 use App\Issues\Form\DashboardMentionsFilterType;
 use App\Issues\Form\MentionsMarkAllReadType;
 use App\Issues\Form\MentionsMarkReadType;
 use App\Issues\Repository\IssueMentionRepository;
+use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
 use App\Shared\Form\GetFilterFormFactory;
@@ -19,6 +18,7 @@ use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

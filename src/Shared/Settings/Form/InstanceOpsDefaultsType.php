@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
-use Symfony\Component\Validator\Constraint;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\OpsDefaultsSection;
 use Nowo\FormKitBundle\Form\FormKitAbstractType;
@@ -12,6 +11,7 @@ use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;

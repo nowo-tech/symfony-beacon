@@ -107,7 +107,7 @@ enum MemberAlertEvent: string
         $out = [];
         foreach ($eventsByFormKey as $formKey => $row) {
             $event = self::tryFromFormKey((string) $formKey);
-            $key = null !== $event ? $event->value : str_replace('_', '.', (string) $formKey);
+            $key = $event instanceof self ? $event->value : str_replace('_', '.', (string) $formKey);
             $out[$key] = self::fromFormEventRow(\is_array($row) ? $row : []);
         }
 

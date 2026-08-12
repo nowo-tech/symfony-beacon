@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
-use App\Project\Repository\ProjectShareLinkRepository;
 use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Entity\ProjectShareLink;
 use App\Project\Enum\ProjectRole;
+use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectShareLinkManager;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;

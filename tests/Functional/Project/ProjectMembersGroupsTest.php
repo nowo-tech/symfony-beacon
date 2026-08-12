@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Project;
 
-use App\Project\Entity\ProjectMembership;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Project\Entity\ProjectGroupAccess;
+use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;

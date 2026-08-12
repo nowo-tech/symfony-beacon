@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
-use App\Notifications\Service\HookDestinationContext;
 use App\Identity\Entity\User;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Service\ActionTokenConsumer;
 use App\Notifications\Service\ActionTokenConsumeResult;
+use App\Notifications\Service\HookDestinationContext;
 use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\InteractionActionToken;
 use App\Project\Service\ProjectAccessService;
