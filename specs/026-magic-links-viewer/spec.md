@@ -2,7 +2,7 @@
 
 **Feature Branch**: `026-magic-links-viewer`  
 **Created**: 2026-07-21  
-**Status**: Implemented  
+**Status**: Implemented (magic login + viewer + share links; disabled-account magic login enforced via UserKit firewall `user_checker` in **v1.8.2**)  
 
 **Input**: Add passwordless magic-link login for users; optional signed share links to open a project or a specific issue; introduce a read-only **viewer** project role.
 
@@ -73,7 +73,7 @@ As a project admin/owner, I create a time-limited signed link that opens a speci
 ### Functional Requirements
 
 - **FR-001**: System MUST support requesting and consuming a time-limited magic login link for enabled users.
-- **FR-002**: Magic login MUST respect account disable and login throttling policies.
+- **FR-002**: Magic login MUST respect account disable and login throttling policies. Disabled accounts MUST fail closed on AuthKit confirm (`Security::login` → UserKit `AccountStatusUserChecker` on firewall `main.user_checker`). Tag-only `security.user_checker` registration is insufficient — the firewall MUST reference the checker service explicitly (`config/packages/security.yaml`).
 - **FR-003**: Project membership MUST include a **viewer** role that is read-only for product surfaces (Issues, Performance, Analytics, read of Settings summary if shown).
 - **FR-004**: Viewer MUST NOT mutate issues, memberships, API keys, governance, notifications, or danger-zone actions.
 - **FR-005**: Owners/admins MUST be able to assign and revoke the viewer role like other membership roles.
@@ -107,3 +107,7 @@ As a project admin/owner, I create a time-limited signed link that opens a speci
 - Public anonymous issue boards without authentication.
 - Embedding Envelope ingest credentials in share links.
 - Native PagerDuty login.
+
+## Amendment (disabled magic login, 2026-08-12 / v1.8.2)
+
+AuthKit magic-login confirm consumes the signed link then calls `Security::login()` (pre-auth user checker only — not `CheckPassportEvent`). Host wiring: `security.firewalls.main.user_checker: Nowo\UserKitBundle\Security\AccountStatusUserChecker` (UserKit ≥ 1.1.6 `checkPreAuth`). `RejectDisabledMagicLoginSubscriber` remains defense-in-depth for authenticator passport paths. Functional: `MagicLoginTest::testDisabledUserDoesNotAuthenticateViaMagicLink`.

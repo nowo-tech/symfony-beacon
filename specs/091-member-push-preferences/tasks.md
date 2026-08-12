@@ -132,6 +132,16 @@
 
 ---
 
+## Phase 10: Release polish (post-ship)
+
+**Purpose**: Track follow-ups cut with **v1.8.1** / **v1.8.2** (no new product FR)
+
+- [X] T045 Constructor-inject preference manager / repos on `MemberAlertPreferencesLive` + `MemberProjectAlertPreferencesLive` (cleaner LiveAction signatures)
+- [X] T046 [P] PHPStan FormInterface / FormView / Rbac / Ingest `@return` alias clean-up; unit mock `with()` chains
+- [X] T047 [P] Rector: skip `RemoveReturnTagIncompatibleWithNativeTypeRector`, `FlipTypeControlToUseExclusiveTypeRector`, `ControllerMethodInjectionToConstructorRector`; `make rector-fix` runs CS Fixer after apply
+
+---
+
 ## Dependencies
 
 ```text
@@ -141,11 +151,12 @@ US4 (Phase 6) needs Phase 2 evaluator + preferably US1–US3 gates
 US5 (Phase 7) needs US2 + US3 UI/evaluator
 Phase 8 after US4–US5
 Phase 9 after Phase 8 (auth/client hardening)
+Phase 10 after ship (tooling / Live DI polish)
 ```
 
 **MVP**: Phase 1–5 (account + project enable + scope) with new-issue delivery still on project topics **or** early cut of user-topic publish for new issue only — prefer completing T027–T028 before calling MVP done so prefs actually filter Mercure.
 
-**Suggested MVP ship**: T001–T026 + minimal T027–T028 + T018 for new-issue path only; then US4/US5. Phase 9 is required before treating viewer Account overrides as done.
+**Suggested MVP ship**: T001–T026 + minimal T027–T028 + T018 for new-issue path only; then US4/US5. Phase 9 is required before treating viewer Account overrides as done. Phase 10 is post-release maintenance.
 
 ## Parallel examples
 
@@ -153,6 +164,7 @@ Phase 9 after Phase 8 (auth/client hardening)
 - After T011: T012 and T013 in parallel
 - US4: T030 payload work parallel to T032 Stimulus once topic contract stable
 - Phase 9: T042 docs parallel to T044 client work after T041 gate fix
+- Phase 10: T046 / T047 parallel after T045
 
 ## Task count
 
@@ -167,4 +179,5 @@ Phase 9 after Phase 8 (auth/client hardening)
 | US5 | T034–T036 (3) |
 | Polish | T037–T040 (4) |
 | Auth/client | T041–T044 (4) |
-| **Total** | **44** |
+| Release polish | T045–T047 (3) |
+| **Total** | **47** |

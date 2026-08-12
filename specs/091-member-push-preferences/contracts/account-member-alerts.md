@@ -14,8 +14,8 @@
 
 ### Implementation notes (host)
 
-- Account form: LiveComponent `MemberAlertPreferencesLive` (Symfony UX CSRF on Live endpoint; Symfony form `csrf_protection: false` for Live re-renders — see `config/packages/csrf.yaml`).
-- Per-project form: LiveComponent `MemberProjectAlertPreferencesLive` from Account modals and Project Settings.
+- Account form: LiveComponent `MemberAlertPreferencesLive` (Symfony UX CSRF on Live endpoint; Symfony form `csrf_protection: false` for Live re-renders — see `config/packages/csrf.yaml`). Preference manager / repos injected via **constructor** (not LiveAction method injection).
+- Per-project form: LiveComponent `MemberProjectAlertPreferencesLive` from Account modals and Project Settings (same constructor DI pattern).
 - Classic POST `project_member_alerts_save` remains for non-Live submissions; same `requireAccess` gate.
 
 ### Account fields (POST / Live submit)

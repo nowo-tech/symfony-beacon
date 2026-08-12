@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-20
 
-**Status**: Completed (shipped in v0.4.0; confirm-dialog UX hardened later; **transfer ownership** in v0.9.2)
+**Status**: Completed (shipped in v0.4.0; confirm-dialog UX hardened later; **transfer ownership** in v0.9.2; Symfony Forms **090** / empty block-prefix test fix **v1.8.2**)
 
 **Input**: User description: "Do I have options to delete a project and to empty its history? Both should open a warning modal; delete should require typing a confirmation text."
 
@@ -78,3 +78,7 @@ As a project owner, I can hand ownership to another direct member and become a *
 ## Amendment (Symfony Forms, 2026-08-11)
 
 Clear history and delete project POSTs use `ProjectClearHistoryType` / `ProjectDeleteType` instead of hand-rolled Twig `csrf_token()` forms. Transfer may retain confirm-dialog field collection until migrated under `090`. See `090-csrf-symfony-forms`.
+
+## Amendment (empty form prefix, 2026-08-12 / v1.8.2)
+
+`ProjectDeleteType` (and related danger-zone Types) use FormKit with **`getBlockPrefix(): ''`**, so DomCrawler / PHPUnit must set **`confirmation`** (and `_token`), not a nested `project_delete[confirmation]` bag. Functional coverage: `tests/Functional/Project/ProjectDangerZoneTest.php`.

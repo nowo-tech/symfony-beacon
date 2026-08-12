@@ -2,7 +2,7 @@
 
 **Feature Branch**: `090-csrf-symfony-forms`  
 **Created**: 2026-08-11  
-**Status**: Implemented (as-built — host mutable POSTs + GET filters on Form Types; release cut pending)  
+**Status**: Implemented (shipped in **v1.7.0**, 2026-08-12; danger-zone empty form prefix test fix **v1.8.2**)  
 **Roadmap**: Phase 6.39  
 
 **Input**: Product Twig MUST NOT hand-roll mutable HTML forms with raw `csrf_token()` hidden fields. Prefer Symfony Form Types (FormKit) and a shared CSRF-only form helper for single-action POSTs. Host GET filter UIs use shared `AbstractGetFilterType` / `GetFilterFormFactory` (no CSRF).
@@ -24,7 +24,7 @@ Controllers validate mutable posts with `$form->isSubmitted() && $form->isValid(
 | F1 | Shared CSRF-only | `App\Shared\Form\CsrfOnlyType` (FormKit), `HiddenFieldsCsrfType`, `CsrfOnlyFormFactory`, Twig `csrf_action_form`, partial `templates/form/_csrf_action.html.twig` |
 | F2 | Issues triage | `IssueStatusType`, `IssuePriorityType`, `IssueDuplicateType`, `IssueSavedViewType`, `IssueCommentType`; delete saved-view via `CsrfOnlyType` |
 | F3 | Mentions | `MentionsMarkReadType`, `MentionsMarkAllReadType` on dashboard Mentions |
-| F4 | Danger zone | `ProjectClearHistoryType`, `ProjectDeleteType` (typed name on delete) |
+| F4 | Danger zone | `ProjectClearHistoryType`, `ProjectDeleteType` (typed name on delete; **empty** `getBlockPrefix()` → top-level `confirmation` / `_token`, not `project_delete[...]`) |
 | F5 | Account tours | `AccountProductTourReplayType` on Display → Tours |
 | F6 | Single-action POSTs | Locale switch, view-as disable, API key revoke/rotate, member activate/deactivate/remove, share and read-token revoke, notification and threshold toggles/deletes/tests, admin permission delete, admin project ingest/access toggles — via `CsrfOnlyType` / factory / `HiddenFieldsCsrfType` |
 | F7 | Settings / admin fielded POSTs | Governance, API key / read-token / share / group / member add+role, config import (project + admin + instance), appearance theme picker, mailer test, group-member add, role permissions / role-user add, user role confirm, privacy anonymize (`TypeToConfirmType`), … |

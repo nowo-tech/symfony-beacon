@@ -128,3 +128,9 @@ tests/Functional/Notifications/MemberAlertPreferencesFunctionalTest.php
 ## Complexity Tracking
 
 None — justified complexity is product scope (prefs matrix), not stack violation.
+
+## Shipped
+
+- **v1.8.0** — feature + Phase 9 auth/client hardening.
+- **v1.8.1** — LiveComponent constructor DI (`Member*AlertPreferencesLive`); PHPUnit helper naming.
+- **v1.8.2** — PHPStan generics / array-shape docs; conservative Rector skips; CS after Rector in Make.

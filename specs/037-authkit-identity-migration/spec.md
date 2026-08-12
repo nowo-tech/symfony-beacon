@@ -82,6 +82,7 @@ As a guest completing password reset (link or OTP), pages use Beacon guest shell
 
 - Cursor / constitution rule: prefer `nowo-tech/auth-kit-bundle` + `user-kit-bundle`; AuthKit already integrated.
 - Partial Unreleased work counts toward this spec; tasks mark shipped items `[x]` and remaining `[ ]`.
+- Disabled-account enforcement for AuthKit `Security::login` (magic/social/QR) requires firewall `user_checker` → UserKit `AccountStatusUserChecker` (see `026` amendment / **v1.8.2**); do not rely on the `security.user_checker` tag alone.
 
 ## Out of Scope
 
