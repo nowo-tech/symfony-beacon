@@ -55,7 +55,10 @@ test.describe('Mutations — issue triage', () => {
     await dismissProductTour(page);
 
     const viewName = `e2e-view-${Date.now().toString(36)}`;
-    await page.locator('#saved-view-name').fill(viewName);
+    // Symfony FormKit field id is issue_saved_view_name (not the old #saved-view-name).
+    const nameInput = page.locator('input[name="issue_saved_view[name]"], #saved-view-name, #issue_saved_view_name');
+    await expect(nameInput).toBeVisible({ timeout: 15_000 });
+    await nameInput.fill(viewName);
     await page.locator('.issue-saved-views__save, form[action*="/issues/views"] button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
@@ -128,7 +131,20 @@ test.describe('Mutations — issue triage', () => {
       requireSampleOrSkip(false, 'Priority form not visible (collapsed panel or permissions)');
       return;
     }
-    await priorityForm.locator('select[name="priority"]').selectOption({ index: 1 });
+    // Expand triage panel when collapse-panel left it closed (localStorage / defaults).
+    const triageSection = page.locator(
+      '[data-controller~="collapse-panel"][data-collapse-panel-id-value="triage"]',
+    );
+    if ((await triageSection.count()) > 0) {
+      const toggle = triageSection.locator('[data-collapse-panel-target="button"]');
+      if ((await toggle.getAttribute('aria-expanded')) === 'false') {
+        await toggle.click();
+      }
+    }
+    // FormKit names the field issue_priority[priority] (not bare "priority").
+    await priorityForm
+      .locator('select[name="issue_priority[priority]"], select[name="priority"]')
+      .selectOption({ index: 1 });
     await priorityForm.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
     await expect(page).toHaveURL(new RegExp(`/issues/${issueUuid}`));

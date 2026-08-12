@@ -60,12 +60,18 @@ test.describe('Account area deep checks', () => {
       await expect(page.getByRole('main').locator('form').first()).toBeVisible();
     }
 
-    // Notifications: form only when VAPID is configured; otherwise the unavailable panel (no form).
+    // Notifications: Live member-alert form always; push toggle when VAPID is set, else unavailable panel.
     await expectAuthenticatedPage(page, '/account/display/notifications');
     const main = page.getByRole('main');
-    const pushForm = main.locator('[data-testid="display-push-form"], form').first();
-    const pushUnavailable = main.locator('[data-testid="display-push-unavailable"]');
-    await expect(pushForm.or(pushUnavailable)).toBeVisible();
+    await expect(main.locator('[data-testid="member-alert-preferences-form"]')).toBeVisible();
+    // Prefer explicit markers; do not match any <form> (strict-mode with pushUnavailable).
+    await expect(
+      main
+        .locator(
+          '[data-testid="display-push-unavailable"], [data-testid="member-alerts-push"] input[name*="pushNotificationsEnabled"], [data-testid="member-alerts-master-off-hint"]',
+        )
+        .first(),
+    ).toBeVisible();
   });
 
   test('authenticated locale switch posts without 500', async ({ page }) => {
