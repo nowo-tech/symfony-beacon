@@ -14,6 +14,7 @@ use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectApiKeyFactory;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -30,6 +31,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class ProjectApiKeyController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectAccessService $projectAccess,
@@ -53,9 +56,7 @@ final class ProjectApiKeyController extends AbstractController
             'csrf_token_id' => 'project_key_create_'.$project->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var array{label?: string|null} $data */
         $data = $form->getData();
@@ -100,9 +101,7 @@ final class ProjectApiKeyController extends AbstractController
             'csrf_token_id' => 'project_key_revoke_'.$apiKey->getId(),
         ]);
         $form->submit($request->request->all());
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $apiKey->setActive(false);
         $this->userActionRecorder->record(UserActionType::ProjectApiKeyRevoked, $user, $user, [
@@ -139,9 +138,7 @@ final class ProjectApiKeyController extends AbstractController
             'csrf_token_id' => 'project_key_rotate_'.$apiKey->getId(),
         ]);
         $form->submit($request->request->all());
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $label = $apiKey->getLabel();
         $apiKey->setActive(false);

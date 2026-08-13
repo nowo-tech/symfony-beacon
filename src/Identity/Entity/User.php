@@ -30,6 +30,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Application user (AuthKit / Security / UserKit).
  *
  * Display / tour / push preferences live in {@see UserUiPreferences} (embedded columns).
+ * Prefer {@see getUiPreferences()} in new service code; convenience getters/setters remain
+ * for Twig, PropertyAccess forms, and existing call sites.
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'app_user')]

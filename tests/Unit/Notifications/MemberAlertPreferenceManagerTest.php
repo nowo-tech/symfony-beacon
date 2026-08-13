@@ -22,24 +22,15 @@ use ReflectionProperty;
 
 final class MemberAlertPreferenceManagerTest extends TestCase
 {
-    private EntityManagerInterface&Stub $em;
     private MemberProjectAlertPreferenceRepository&Stub $projectPrefRepo;
     private MemberAccountAlertEventRepository&Stub $accountEventRepo;
     private MemberProjectAlertEventRepository&Stub $projectEventRepo;
-    private MemberAlertPreferenceManager $manager;
 
     protected function setUp(): void
     {
-        $this->em = $this->createStub(EntityManagerInterface::class);
         $this->projectPrefRepo = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $this->accountEventRepo = $this->createStub(MemberAccountAlertEventRepository::class);
         $this->projectEventRepo = $this->createStub(MemberProjectAlertEventRepository::class);
-        $this->manager = new MemberAlertPreferenceManager(
-            $this->projectPrefRepo,
-            $this->accountEventRepo,
-            $this->projectEventRepo,
-            $this->em,
-        );
     }
 
     public function testSaveAccountEventsRemovesDefaultRowsAndPersistsOverrides(): void

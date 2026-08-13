@@ -11,7 +11,7 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectRepository;
-use DateTimeImmutable;
+use App\Shared\Portability\ConfigPortabilityEnvelope;
 use InvalidArgumentException;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
@@ -54,9 +54,7 @@ final readonly class ProjectConfigPortability
         }
 
         return [
-            'schema' => self::SCHEMA,
-            'version' => self::VERSION,
-            'exported_at' => new DateTimeImmutable()->format(\DATE_ATOM),
+            ...ConfigPortabilityEnvelope::header(self::SCHEMA, self::VERSION),
             'projects' => $rows,
         ];
     }
@@ -223,16 +221,8 @@ final readonly class ProjectConfigPortability
      */
     private function normalizeProjects(array $payload): array
     {
-        if (($payload['schema'] ?? null) !== self::SCHEMA) {
-            throw new InvalidArgumentException('invalid_schema');
-        }
-        $version = $payload['version'] ?? null;
-        if (!\is_int($version) && (!\is_string($version) || !ctype_digit($version))) {
-            throw new InvalidArgumentException('invalid_version');
-        }
-        if (self::VERSION !== (int) $version) {
-            throw new InvalidArgumentException('unsupported_version');
-        }
+        ConfigPortabilityEnvelope::assertSchema($payload, self::SCHEMA);
+        ConfigPortabilityEnvelope::assertExactVersion($payload, self::VERSION);
         $list = $payload['projects'] ?? null;
         if (!\is_array($list)) {
             throw new InvalidArgumentException('invalid_projects');

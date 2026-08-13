@@ -2,7 +2,7 @@
 
 **Feature Branch**: `092-maintenance-mode`  
 **Created**: 2026-08-13  
-**Status**: Implemented (2026-08-13)
+**Status**: Implemented (v1.9.0)
 
 **Input**: Integrate `nowo-tech/maintenance-mode-bundle` so operators can enable, schedule, and preview site-wide HTTP **503** maintenance from Administration, with Beacon-branded public page art and kit admin chrome (same look and feel as other kit panels). Prefer the official kit over a hand-rolled maintenance stack.
 

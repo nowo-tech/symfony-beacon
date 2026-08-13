@@ -1,0 +1,82 @@
+<section class="panel mt-6" data-testid="project-config-portability">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'project.config.title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.config.help'|trans({'%code%': project.code != '' ? project.code : project.slug}) }}</p>
+
+    <div
+        data-controller="tabs"
+        data-tabs-active-tab-value="project-config-export"
+        class="grid gap-3"
+    >
+        <nav
+            role="tablist"
+            aria-label="{{ 'project.config.tabs_label'|trans|e('html_attr') }}"
+            class="flex h-auto w-full flex-wrap justify-start gap-1 border-b border-[var(--color-sand)]"
+        >
+            <button
+                type="button"
+                id="tab-project-config-export"
+                data-action="click->tabs#open"
+                data-tabs-target="trigger"
+                data-tab-id="project-config-export"
+                role="tab"
+                aria-controls="tab-project-config-export-panel"
+                aria-selected="true"
+                data-active
+                class="relative inline-flex min-w-10 items-center justify-center px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink)]/55 transition-colors hover:text-[var(--color-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] data-[active]:text-[var(--color-ink)] data-[active]:after:absolute data-[active]:after:inset-x-0 data-[active]:after:bottom-[-1px] data-[active]:after:h-0.5 data-[active]:after:bg-[var(--color-ink)]"
+            >{{ 'project.config.tab_export'|trans }}</button>
+            <button
+                type="button"
+                id="tab-project-config-import"
+                data-action="click->tabs#open"
+                data-tabs-target="trigger"
+                data-tab-id="project-config-import"
+                role="tab"
+                aria-controls="tab-project-config-import-panel"
+                aria-selected="false"
+                class="relative inline-flex min-w-10 items-center justify-center px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink)]/55 transition-colors hover:text-[var(--color-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-moss)] data-[active]:text-[var(--color-ink)] data-[active]:after:absolute data-[active]:after:inset-x-0 data-[active]:after:bottom-[-1px] data-[active]:after:h-0.5 data-[active]:after:bg-[var(--color-ink)]"
+            >{{ 'project.config.tab_import'|trans }}</button>
+        </nav>
+
+        <div
+            id="tab-project-config-export-panel"
+            data-tabs-target="tab"
+            data-tab-id="project-config-export"
+            role="tabpanel"
+            aria-labelledby="tab-project-config-export"
+            data-active
+            data-state="active"
+        >
+            <div class="grid gap-3 pt-1">
+                <p class="text-sm text-[var(--color-ink)]/60">{{ 'project.config.export_help'|trans }}</p>
+                <div>
+                    <a class="btn-primary no-underline" href="{{ path('project_config_export', {id: project.uuid}) }}" data-testid="project-config-download">{{ 'project.config.export'|trans }}</a>
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="tab-project-config-import-panel"
+            data-tabs-target="tab"
+            data-tab-id="project-config-import"
+            role="tabpanel"
+            aria-labelledby="tab-project-config-import"
+            data-state="inactive"
+            class="hidden"
+            hidden
+        >
+            <div class="grid gap-3 pt-1" data-testid="project-config-import">
+                <p class="text-sm text-[var(--color-ink)]/60">{{ 'project.config.import_help'|trans }}</p>
+                {{ form_start(configImportForm, {attr: {class: 'grid gap-3 sm:max-w-md', 'data-testid': 'project-config-import-form'}}) }}
+                    <label class="grid gap-1.5">
+                        <span class="text-sm font-medium text-[var(--color-ink)]">{{ 'project.config.file'|trans }}</span>
+                        {{ form_widget(configImportForm.bundle, {attr: {class: 'input', accept: 'application/json,.json', 'data-testid': 'project-config-file'}}) }}
+                    </label>
+                    <div>
+                        <button class="btn-primary" type="submit" data-testid="project-config-import-submit">{{ 'project.config.import'|trans }}</button>
+                    </div>
+                {{ form_end(configImportForm) }}
+                <p class="text-xs text-[var(--color-ink)]/55">{{ 'project.config.panel_note'|trans }}</p>
+            </div>
+        </div>
+    </div>
+</section>

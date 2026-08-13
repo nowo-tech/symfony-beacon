@@ -139,6 +139,7 @@ common:
     created_by: Erstellt von
     updated_by: Aktualisiert von
     by_system: System
+  'true': Ja
 pagination:
   showing: Zeigt %from%–%to% von %total%
   nav: Tabellenseiten
@@ -213,6 +214,11 @@ auth:
       %code%
 
       '
+  qr_login:
+    approved: Freigegeben — Anmeldung läuft…
+    denied: Anmeldung am Telefon abgelehnt.
+    expired: Dieser Code ist abgelaufen.
+    retry: Neuen QR-Code erzeugen
 flash:
   project:
     created: Projekt erstellt.
@@ -254,6 +260,16 @@ flash:
     group_not_found: Gruppe nicht gefunden.
     group_link_forbidden: Sie können nur Gruppen verknüpfen, denen Sie angehören (Projekteigentümer
       und Instanzadministratoren können jede Gruppe verknüpfen).
+    config_code_mismatch: Projektcode im Bundle stimmt nicht mit diesem Projekt überein.
+    config_file_too_large: Projekt-JSON ist zu groß (max. 2 MiB).
+    config_import_failed: Projekt-Bundle konnte nicht importiert werden (ungültiges JSON oder Schema).
+    config_imported_admin: Projekte importiert (Benutzer bei Bedarf angelegt).
+    config_imported_panel: Projekteinstellungen und Mitgliedschaften aus dem Bundle aktualisiert.
+    config_invalid_csrf: Ungültiges Sicherheitstoken. Bitte erneut versuchen.
+    config_missing_file: JSON-Projekt-Bundle zum Importieren wählen.
+    config_users_skipped: 'Einige Mitgliedschaften wurden übersprungen, weil diese E-Mails auf dieser Instanz nicht registriert sind.'
+    member_activated: Mitgliederzugriff wieder aktiviert.
+    member_deactivated: Mitgliederzugriff deaktiviert.
   appearance:
     saved: Darstellungseinstellungen gespeichert.
     theme_applied: Erscheinungsbild-Thema angewendet. Farbfelder wurden durch das
@@ -265,6 +281,8 @@ flash:
     password_saved: Passwort aktualisiert.
     display_saved: Anzeigeeinstellungen gespeichert.
     locale_saved: Sprache aktualisiert.
+    member_alerts_invalid: Alert-Einstellungen konnten nicht gespeichert werden. Formular prüfen und erneut versuchen.
+    member_alerts_project_saved: Projekt-Alert-Einstellungen gespeichert.
   users:
     enabled: Benutzerkonto aktiviert.
     disabled: Benutzerkonto deaktiviert.
@@ -417,6 +435,13 @@ project:
     revoke_confirm: Diesen API-Schlüssel widerrufen? Die Aufnahme mit diesem Geheimnis
       schlägt sofort fehl.
     rotate: Drehen
+    copy_dsn: DSN kopieren
+    dsn_copied: Kopiert
+    dsn_help: Diesen DSN für Clients kopieren (Pfad ist die Projekt-UUID). Rotieren erzeugt ein neues Geheimnis.
+    inactive_dsn_hidden: Widerrufene Schlüssel können Ingest nicht authentifizieren. DSN und Geheimnis werden nicht angezeigt.
+    secret_hidden: Vollständiger DSN und Geheimnis werden nur einmal nach Erstellen oder Rotieren gezeigt (nicht für Viewer).
+    secret_once_banner: Neuer DSN bereit — jetzt in den Client kopieren. Er bleibt nach dem Verlassen der Seite nicht gelistet.
+    secret_once_hint: 'Schlüssel erstellen oder rotieren, um den DSN einmalig anzuzeigen. Das Geheimnis wird auf dieser Seite nicht erneut gezeigt.'
   members:
     title: Mitglieder
     help: Direkte Mitglieder dieses Projekts. Eigentümer und Administratoren verwalten
@@ -442,6 +467,9 @@ project:
       admin: Admin
       member: Mitglied
       viewer: Viewer
+    activate: Zugriff aktivieren
+    deactivate: Zugriff deaktivieren
+    inactive: inaktiv
   groups:
     title: Gruppen
     help: Verknüpfen Sie eine Gruppe, sodass jedes Gruppenmitglied die ausgewählte
@@ -485,6 +513,18 @@ project:
     transfer_confirm: Eigentum übertragen
     transfer_no_candidates: Fügen Sie ein weiteres direktes Mitglied hinzu, bevor
       Sie den Besitz übertragen.
+  config:
+    title: Projekt exportieren / importieren
+    help: 'Portables JSON für dieses Projekt (Code: %code%). Enthält Mitgliedschaften per E-Mail; nie API-Geheimnisse.'
+    tabs_label: Exportieren oder importieren
+    tab_export: Exportieren
+    tab_import: Importieren
+    export_help: JSON-Bundle für dieses Projekt herunterladen. API-Geheimnisse werden nie enthalten.
+    export: JSON exportieren
+    import_help: 'beacon-project-bundle-JSON wählen. Nur dieses Projekt wird aktualisiert, wenn der Code übereinstimmt.'
+    file: JSON-Datei
+    import: JSON importieren
+    panel_note: Import aktualisiert dieses Projekt nur bei übereinstimmendem Bundle-Code. Unbekannte E-Mails werden übersprungen (hier werden keine Benutzer angelegt).
 projects:
   title: Projekte
   intro: Filtern und öffnen Sie Projekte, auf die Sie zugreifen können.
@@ -1295,6 +1335,23 @@ preferences:
       'issue.reopened': Reopened
       'issue.assigned': Assigned
       'issue.commented': Comment
+    account_defaults_link: Konto-Alert-Standards bearbeiten
+    master_off_hint: 'Mitglieder-Alerts sind aus. Schalter einschalten, um Konto-Standards, Projekt-Overrides und Browser-Push zu konfigurieren.'
+    modal_close: Schließen
+    project_off_hint: 'Alerts für dieses Projekt sind aus. Schalter einschalten für Event-Overrides, oder aus lassen, um dieses Projekt stummzuschalten und Konto-Standards beizubehalten.'
+    project_page_intro: 'Diese Einstellungen gelten nur für Sie in diesem Projekt. Sie kombinieren sich mit Ihren Konto-Standards und den Team-Zielen — Mitglieder-Toasts/Push feuern, wenn Prefs und Event passen; Ziele benachrichtigen externe Kanäle unabhängig.'
+    project_page_title: Meine Alerts für dieses Projekt
+    project_save: Meine Projekt-Alerts speichern
+    projects_account_hint: 'Öffnen Sie ein Projekt, um Alerts nur für dieses Projekt feinabzustimmen (Modal). Die Zustellung erfordert weiterhin den Konto-Hauptschalter oben.'
+    scope_switch_help: Aus = alle Issues im Projekt; an = nur wenn Sie beteiligt sind
+    event_help:
+      issue:
+        assigned: Wenn ein Issue zugewiesen (oder neu zugewiesen) wird.
+        commented: Wenn jemand ein Issue kommentiert.
+        new: Wenn ein neues Issue in einem zugänglichen Projekt aufgenommen wird.
+        regression: Wenn ein zuvor gelöstes Issue erneut auftritt.
+        reopened: Wenn ein gelöstes Issue wieder geöffnet wird.
+        resolved: Wenn ein Issue als gelöst markiert wird.
   push_notifications: Push-Benachrichtigungen für neue Issues
   push_notifications_help: Optional. Wenn aktiviert, fragt Beacon den Browser um Erlaubnis
     und kann Sie über neue Issues in Ihren Projekten informieren — auch im Hintergrund
@@ -1362,6 +1419,7 @@ user_preferences:
     label: Aktuelles Passwort
     help: Nur erforderlich, wenn ein neues Passwort festgelegt wird.
     help_required: Bestätigen Sie Ihr aktuelles Passwort, um ein neues festzulegen.
+    help_email_change: Erforderlich bei Änderung Ihrer E-Mail-Adresse (Login und Passwort-Reset-Ziel).
   plain_password:
     first:
       label: Neues Passwort
@@ -1481,6 +1539,19 @@ admin_projects:
   audit_apply: Filter anwenden
   audit_clear: Löschen
   audit_empty: Keine erfassten Projektaktionen entsprechen den aktuellen Filtern.
+  config:
+    title: Projekte exportieren / importieren
+    help: Alle Projekte als JSON herunterladen oder ein Bundle importieren. Fehlende Benutzer werden deaktiviert angelegt (per E-Mail).
+    note: Idempotent anhand des Projektcodes. API-Geheimnisse werden nie enthalten.
+    tabs_label: Exportieren oder importieren
+    tab_export: Exportieren
+    tab_import: Importieren
+    export_help: Alle Projekte als beacon-project-bundle-JSON herunterladen.
+    export_all: Alles als JSON exportieren
+    export_one: JSON exportieren
+    import_help: 'Bundle hochladen, um Projekte per Code zu upserten. Fehlende Benutzer werden deaktiviert angelegt.'
+    file: JSON-Datei
+    import: JSON importieren
 admin:
   hub:
     title: Verwaltung
@@ -1503,8 +1574,6 @@ admin:
     routing: Duale Locale-Pfade (JSON) für Routable-Controller verwalten.
     http_log: Erfasste HTTP-Anfragen (Header, Status, Dauer) mit Aufbewahrung und
       Export einsehen.
-    maintenance: Standortweite Wartung aktivieren oder planen (HTTP 503).
-    maintenance_preview: Öffentliche Wartungsseite in der Vorschau anzeigen, ohne Downtime zu aktivieren.
     maintenance: Standortweite Wartung aktivieren oder planen (HTTP 503).
     maintenance_preview: Öffentliche Wartungsseite in der Vorschau anzeigen, ohne Downtime zu aktivieren.
     mailer: Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.
@@ -1543,6 +1612,13 @@ admin:
     failed_empty: Keine Ziele mit fehlgeschlagener letzter Zustellung.
     open_by_project_title: Offene Issues nach Projekt
     open_by_project_empty: Keine offenen Issues im Umfang.
+    posture:
+      title: Warnung zur Sicherheitslage
+      intro: Ein oder mehrere Ops-Standards lassen Fail-Closed-Schutzmaßnahmen aus. Prüfen und nach Möglichkeit verschärfen.
+      link_ops_defaults: Ops-Standards öffnen
+      allow_private_urls: Private / Loopback-Webhook-URLs sind erlaubt (SSRF-Risiko).
+      allow_anonymous_resolve: Anonymes interaktives Resolve ist an Hooks erlaubt.
+      metrics_require_token_off: Metriken-Scrape-Token ist nicht erforderlich (require-token aktivieren und Bearer setzen).
 tour:
   controls:
     next: Weiter
@@ -1850,6 +1926,7 @@ settings:
       Datei keine geheimen Schlüssel enthält.
     missing_file: Wählen Sie eine JSON-Datei zum Importieren.
     invalid_csrf: Ungültiges Sicherheitstoken.
+    file_too_large: Instanz-JSON ist zu groß (max. 2 MiB).
 mercure_settings:
   title: Mercure
   intro: Optionale Live-Benachrichtigungen fur angemeldete Mitglieder, wenn ein neues
@@ -1874,6 +1951,89 @@ mercure_settings:
   push_note: Hintergrund-PWA-Push wird pro Benutzer unter Konto -> Anzeige konfiguriert
     (benotigt VAPID_*-Schlussel). Es hangt nicht von Mercure ab.
   submit: Mercure-Einstellungen speichern
+  guide:
+    title: Mercure Schritt für Schritt konfigurieren
+    intro: Live-Toasts für neue Issues nutzen einen Mercure-Hub (Server-Sent Events). Mercure ist optional und unabhängig von Web Push (Konto → Anzeige).
+    open: So konfigurieren
+    close: Schließen
+    docs_hint: 'Vollständige Referenz zu Topics, Datenschutz und Produktion — docs/ops/MERCURE.md.'
+    env:
+      step1_example: |
+        MERCURE_URL=http://mercure/.well-known/mercure
+        MERCURE_PUBLIC_URL=${DEFAULT_URI}/.well-known/mercure
+        MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
+      step2_example: openssl rand -base64 48
+      title: 2. Umgebungsvariablen
+      lead: 'Hub lieber in .env konfigurieren und Formularfelder leer lassen, damit die Administration nur die Funktion ein-/ausschaltet.'
+      step1: Diese Variablen in .env kopieren oder bestätigen (aus .env.dist).
+      step2: Platzhalter-JWT-Geheimnis durch einen starken Wert ersetzen (mindestens 32 Zeichen).
+      step2_note: Dieselbe Zeichenkette muss PHP (MERCURE_JWT_SECRET) und der Hub verwenden (compose.yaml mappt sie auf MERCURE_PUBLISHER_JWT_KEY und MERCURE_SUBSCRIBER_JWT_KEY).
+      step3: 'Wissen, wofür jede Variable steht.'
+      table_var: Variable
+      table_meaning: Bedeutung
+      row_url: Interne Publish-URL aus PHP (Compose-Beispiel links).
+      row_public: 'Browser-EventSource-URL. Bevorzugen Sie ${DEFAULT_URI}/.well-known/mercure, damit der Browser same-origin über Caddy bleibt.'
+      row_jwt: Gemeinsames HMAC-Geheimnis für Publisher- und Subscriber-JWTs.
+    external:
+      example: |
+        MERCURE_URL=https://mercure.example.com/.well-known/mercure
+        MERCURE_PUBLIC_URL=https://mercure.example.com/.well-known/mercure
+        MERCURE_JWT_SECRET="your-shared-secret-at-least-32-chars"
+      title: 6. Externer Hub (optional)
+      lead: Sie können Beacon auf jeden Mercure-kompatiblen Hub statt des Compose-Dienstes zeigen.
+      step1: 'MERCURE_URL (oder Publish URL) auf einen Endpunkt setzen, den der PHP-Container erreichen kann.'
+      step2: 'MERCURE_PUBLIC_URL (oder Public URL) auf eine HTTPS-URL setzen, die Browser öffnen können.'
+      step3: Dasselbe JWT-Geheimnis für Hub-Publisher/Subscriber-Schlüssel und in Beacon verwenden.
+      step4: Bei Cross-Origin-Hub CORS (cors_origins) für Ihren Beacon-Origin konfigurieren.
+    start:
+      step1_example: |
+        docker compose up -d mercure php
+        # or a full stack:
+        make up
+      step2_example: 'docker compose exec mercure curl -fsS http://127.0.0.1/healthz'
+      step3_example: |
+        handle /.well-known/mercure* {
+            reverse_proxy mercure:80
+        }
+      title: 3. Hub starten
+      step1: Mercure mit dem App-Stack starten oder neu erstellen.
+      step2: Health-Endpoint des Hubs prüfen (im Compose-Netzwerk).
+      step3: 'Bestätigen, dass Caddy den Hub proxied (bereits in .docker/frankenphp/Caddyfile).'
+    troubleshoot:
+      recreate: |
+        # After changing hub env vars
+        docker compose up -d --force-recreate mercure
+      title: 7. Fehlerbehebung
+      inactive: 'Status inaktiv — Schalter aus, oder URL/Geheimnis fehlen (DB und Env leer).'
+      unauthorized: EventSource 401 — Subscriber-JWT-Geheimnis ≠ Hub MERCURE_SUBSCRIBER_JWT_KEY.
+      cors: CORS-Fehler — Public URL ist cross-origin und Hub cors_origins schließt Beacon aus.
+      publish: 'Publish-Fehler in Logs — PHP erreicht MERCURE_URL nicht, oder JWT ≠ Hub-Schlüssel.'
+      ciphertext: Browser fordert Unsinnspfad wie /MUIFA…== — Overrides konnten nicht entschlüsselt werden; Publish/Public/JWT hier leeren und Env-Werte nutzen.
+      push: 'Toasts nur bei offenem Tab sind erwartet; für Hintergrund Web Push (VAPID_*) nutzen.'
+    verify:
+      curl_example: |
+        # From the host (replace with your DEFAULT_URI)
+        curl -sI "${DEFAULT_URI}/.well-known/mercure"
+      title: 5. Im Browser prüfen
+      step1: DevTools → Network öffnen und nach mercure oder EventSource filtern.
+      step2: Verbindung zu /.well-known/mercure (oder Ihrer Public URL) mit Autorisierungs-JWT bestätigen.
+      step3: 'Neues Issue in einem Projekt erzeugen, dem Sie angehören, und SSE-Event / Toast beobachten.'
+      step4: 'GET /account/realtime/config sollte hubUrl + token nur enthalten, wenn Mercure aktiv und konfiguriert ist.'
+    overview:
+      title: 1. Was Sie brauchen
+      body: 'Beacon veröffentlicht private Updates; angemeldete Mitglieder abonnieren, solange ein Tab offen ist. Diese Teile müssen übereinstimmen.'
+      item_hub: Ein Mercure-Hub (Compose-Dienst mercure oder ein kompatibler Hub).
+      item_jwt: Ein gemeinsames JWT-HMAC-Geheimnis (≥ 32 Zeichen) für PHP und den Hub.
+      item_proxy: Same-Origin-Browserzugriff über Caddy unter /.well-known/mercure (Compose-Standard).
+      item_admin: Der Hauptschalter auf diesem Bildschirm plus optionale URL-/Geheimnis-Overrides.
+    admin:
+      title: 4. Live-Alerts hier aktivieren
+      step1: „Mercure-Live-Alerts aktivieren“ einschalten.
+      step2: 'Publish URL, Public URL und JWT leer lassen, um MERCURE_* aus der Umgebung zu nutzen.'
+      step3: 'Oder Felder ausfüllen, um die Umgebung zu überschreiben (Werte werden in der DB verschlüsselt).'
+      step4: Speichern. Das Statuspanel oben sollte Live-Alerts als aktiv anzeigen.
+      step5: 'Als Projektmitglied anmelden, Tab offen lassen, neues Issue erzeugen und auf den In-App-Toast achten.'
+      current_url: 'Aktuell aufgelöste Browser-Hub-URL: %url%'
 instance_mercure:
   enabled:
     label: Mercure-Live-Benachrichtigungen aktivieren
@@ -2234,6 +2394,9 @@ notifications:
       payload: Kanonische JSON-Payload als Request-Body (User-Agent symfony-beacon-notifications/1.0).
       tip: Bevorzugen Sie HTTPS und authentifizieren Sie Ihren Empfanger. Vermeiden
         Sie interne oder Cloud-Metadaten-Adressen.
+  project_layer_help: 'Diese Ziele gehören zum Projekt (Teamkanäle), unabhängig von den persönlichen Alert-Einstellungen der Mitglieder oben. Ausgehende Zustellung nutzt Zielkategorien; Mitglieder-Toasts/Push nutzen die Mitglieder-Präferenzmatrix.'
+  teams:
+    token_used: 'Dieser Teams-Aktionslink wurde bereits verwendet. Öffnen Sie das Issue in Beacon, falls Sie es noch ändern müssen.'
 thresholds:
   title: Schwellenwert-Benachrichtigungen
   intro: Erstellen Sie gleitende Volumen-Benachrichtigungen, wenn Error- oder Fatal-Events

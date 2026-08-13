@@ -25,6 +25,7 @@ nowo_cookie_consent:
     functionality:
         description: 'Optionele cookies die uitgebreide functies mogelijk maken naast de kernwerking van de dienst.'
     analytics:
+        title: 'Analyse'
         description: 'Optionele cookies om het gebruik te meten en de dienst te verbeteren. Ze worden alleen geplaatst als u toestemt en de beheerder analysetools heeft ingeschakeld.'
     marketing:
         description: 'Optionele cookies voor reclame of remarketing. Ze worden alleen met uw voorafgaande toestemming geplaatst.'

@@ -1,0 +1,50 @@
+<section class="panel mt-6" data-testid="share-links">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'projects.share.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'projects.share.help'|trans }}</p>
+    {% if lastShareUrl %}
+        <p class="mb-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all" data-testid="share-url">{{ lastShareUrl }}</p>
+    {% endif %}
+    {{ form_start(shareCreateForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-3'}}) }}
+        <label class="text-sm">
+            <span class="mb-1 block">{{ 'projects.share.days'|trans }}</span>
+            {{ form_widget(shareCreateForm.days, {attr: {class: 'input'}}) }}
+        </label>
+        <label class="text-sm">
+            <span class="mb-1 block">{{ 'projects.share.max_uses'|trans }}</span>
+            {{ form_widget(shareCreateForm.max_uses, {attr: {class: 'input', placeholder: 'projects.share.max_uses_unlimited'|trans}}) }}
+        </label>
+        <label class="text-sm grow">
+            <span class="mb-1 block">{{ 'projects.share.issue_uuid'|trans }}</span>
+            {{ form_widget(shareCreateForm.issue_uuid, {
+                attr: {
+                    class: 'input w-full',
+                    placeholder: 'projects.share.issue_optional'|trans,
+                    autocomplete: 'off',
+                }
+            }) }}
+        </label>
+        <button type="submit" class="btn-primary">{{ 'projects.share.create'|trans }}</button>
+    {{ form_end(shareCreateForm) }}
+    <p class="mb-4 text-xs text-[var(--color-ink)]/50">{{ 'projects.share.max_uses_help'|trans }}</p>
+    <ul class="space-y-2 text-sm">
+        {% for link in shareLinks|default([]) %}
+            <li class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--color-sand)] p-3">
+                <div>
+                    <div class="font-mono text-xs">{{ link.uuid|slice(0, 8) }}…</div>
+                    <div class="text-xs text-[var(--color-ink)]/55">
+                        {{ 'projects.share.expires'|trans }} {{ link.expiresAt|date('Y-m-d H:i') }}
+                        · {{ 'projects.share.uses'|trans({'%used%': link.useCount, '%max%': link.maxUses ?? ('projects.share.max_uses_unlimited'|trans)}) }}
+                        {% if link.issue %} · {{ 'projects.share.scoped_issue'|trans }}{% endif %}
+                    </div>
+                </div>
+                {{ form_start(shareRevokeForms[link.id], {
+                    action: path('project_share_revoke', {id: project.uuid, shareId: link.uuid}),
+                }) }}
+                    <button type="submit" class="btn-ghost">{{ 'projects.share.revoke'|trans }}</button>
+                {{ form_end(shareRevokeForms[link.id]) }}
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'projects.share.empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+</section>

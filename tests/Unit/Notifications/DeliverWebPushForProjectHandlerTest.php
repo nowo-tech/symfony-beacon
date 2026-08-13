@@ -147,7 +147,7 @@ final class DeliverWebPushForProjectHandlerTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
 
         $this->handler(factory: $factory, projects: $projects, memberships: $memberships, subscriptions: $subs, em: $em)(
-            new DeliverWebPushForProjectMessage(1, ['event' => 'issue.new'], null)
+            new DeliverWebPushForProjectMessage(1, ['event' => 'issue.new'])
         );
     }
 

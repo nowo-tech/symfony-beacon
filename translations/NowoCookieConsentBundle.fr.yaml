@@ -25,6 +25,7 @@ nowo_cookie_consent:
     functionality:
         description: 'Cookies facultatifs qui activent des fonctionnalités avancées au-delà du fonctionnement essentiel du service.'
     analytics:
+        title: 'Analytique'
         description: 'Cookies facultatifs utilisés pour mesurer l’utilisation et améliorer le service. Ils ne sont déposés que si vous y consentez et que l’opérateur a activé des outils d’analytique.'
     marketing:
         description: 'Cookies facultatifs utilisés à des fins publicitaires ou de remarketing. Ils ne sont déposés qu’avec votre consentement préalable.'

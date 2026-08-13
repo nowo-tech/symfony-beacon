@@ -13,6 +13,7 @@ use App\Issues\Repository\IssueMentionRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,6 +31,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class DashboardMentionsController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly IssueMentionRepository $mentionRepository,
@@ -85,10 +88,7 @@ final class DashboardMentionsController extends AbstractController
             ])->createView();
         }
 
-        $projectChoices = [];
-        foreach ($accessible as $project) {
-            $projectChoices[$project->getName()] = $project->getUuid();
-        }
+        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
 
         return $this->render('dashboard/mentions.html.twig', [
             'mentions' => $mentions,
@@ -120,9 +120,7 @@ final class DashboardMentionsController extends AbstractController
 
         $form = $this->createForm(MentionsMarkAllReadType::class);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $accessible = $this->projectRepository->findAccessibleByUser($user);
         $this->mentionRepository->markAllReadForUser($user, $accessible);
@@ -141,9 +139,7 @@ final class DashboardMentionsController extends AbstractController
             'csrf_token_id' => 'mention_read_'.$id,
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $mention = $this->mentionRepository->findOneForUser($user, $id);
         if (!$mention instanceof IssueMention) {

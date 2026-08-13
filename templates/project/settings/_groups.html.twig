@@ -1,0 +1,108 @@
+<section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'project.groups.title'|trans }}</h2>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.groups.help'|trans }}</p>
+    <ul class="space-y-3 text-sm">
+        {% for groupAccess in project.groupAccesses %}
+            {% set linkedGroup = groupAccess.userGroup %}
+            <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-medium">{{ linkedGroup.name }}</div>
+                        <div class="text-xs text-[var(--color-ink)]/60">{{ 'project.groups.member_count'|trans({'%count%': group_member_counts[linkedGroup.id]|default(0)}) }}</div>
+                        <div class="mt-1">
+                            <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ groupAccess.role.value)|trans }}</span>
+                        </div>
+                    </div>
+                    {% if assignableGroupRoles is not empty %}
+                        <div class="flex shrink-0 items-center gap-1">
+                            {% embed 'shared/_confirm_dialog.html.twig' with {
+                                custom_form: true,
+                                aria_labelledby: 'project-group-role-title-' ~ groupAccess.id,
+                            } %}
+                                {% block trigger %}
+                                    <button
+                                        type="button"
+                                        class="btn-ghost btn-sm btn-icon"
+                                        data-action="confirm-dialog#open"
+                                        title="{{ 'project.groups.edit_role'|trans }}"
+                                        aria-label="{{ 'project.groups.edit_role'|trans }}"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.83H5v-.92l9.06-9.06.92.92L5.92 20.08zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                        </svg>
+                                    </button>
+                                {% endblock %}
+                                {% block form %}
+                                    {{ form_start(groupRoleForms[groupAccess.id], {attr: {class: 'confirm-dialog__panel'}}) }}
+                                        <div class="confirm-dialog__header">
+                                            <h2 id="project-group-role-title-{{ groupAccess.id }}" class="confirm-dialog__title">{{ 'project.groups.edit_role_title'|trans }}</h2>
+                                            <p class="confirm-dialog__body">{{ 'project.groups.edit_role_body'|trans({'%name%': linkedGroup.name}) }}</p>
+                                        </div>
+                                        <div class="confirm-dialog__content">
+                                            <label class="confirm-dialog__label" for="group-role-{{ groupAccess.id }}">{{ 'project.members.role_label'|trans }}</label>
+                                            {{ form_widget(groupRoleForms[groupAccess.id].role, {attr: {id: 'group-role-' ~ groupAccess.id, class: 'input w-full'}}) }}
+                                        </div>
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                            <button type="submit" class="btn-primary">{{ 'project.members.update_role'|trans }}</button>
+                                        </div>
+                                    {{ form_end(groupRoleForms[groupAccess.id]) }}
+                                {% endblock %}
+                            {% endembed %}
+
+                            {% embed 'shared/_confirm_dialog.html.twig' with {
+                                custom_form: true,
+                                form_action: path('project_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}),
+                                aria_labelledby: 'project-group-remove-title-' ~ groupAccess.id,
+                            } %}
+                                {% block form %}
+                                    {{ form_start(groupRemoveForms[groupAccess.id], {
+                                        action: path('project_groups_remove', {projectId: project.uuid, groupAccessId: groupAccess.uuid}),
+                                        attr: {class: 'confirm-dialog__panel'},
+                                    }) }}
+                                        <div class="confirm-dialog__header">
+                                            <h2 id="project-group-remove-title-{{ groupAccess.id }}" class="confirm-dialog__title">{{ 'project.groups.remove_title'|trans }}</h2>
+                                            <p class="confirm-dialog__body">{{ 'project.groups.remove_confirm'|trans({'%name%': linkedGroup.name}) }}</p>
+                                        </div>
+                                        <div class="confirm-dialog__content"></div>
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                            <button type="submit" class="btn-danger">{{ 'project.groups.remove'|trans }}</button>
+                                        </div>
+                                    {{ form_end(groupRemoveForms[groupAccess.id]) }}
+                                {% endblock %}
+                                {% block trigger %}
+                                    <button
+                                        type="button"
+                                        class="btn-ghost btn-sm btn-icon"
+                                        data-action="confirm-dialog#open"
+                                        title="{{ 'project.groups.remove'|trans }}"
+                                        aria-label="{{ 'project.groups.remove'|trans }}"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </button>
+                                {% endblock %}
+                            {% endembed %}
+                        </div>
+                    {% endif %}
+                </div>
+            </li>
+        {% else %}
+            <li class="text-[var(--color-ink)]/55">{{ 'project.groups.empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if assignableGroupRoles is not empty %}
+        {% if availableGroups is not empty %}
+            {{ form_start(groupAddForm, {attr: {class: 'mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]'}}) }}
+                {{ form_widget(groupAddForm.group, {attr: {class: 'input'}}) }}
+                {{ form_widget(groupAddForm.role, {attr: {class: 'input'}}) }}
+                <button class="btn-primary" type="submit">{{ 'project.groups.add'|trans }}</button>
+            {{ form_end(groupAddForm) }}
+        {% else %}
+            <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.groups.none_available'|trans }}</p>
+        {% endif %}
+    {% endif %}
+</section>

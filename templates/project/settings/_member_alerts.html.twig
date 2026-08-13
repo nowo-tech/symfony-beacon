@@ -1,0 +1,19 @@
+<section class="panel mt-6" id="member-alerts" data-testid="project-member-alerts">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-semibold">{{ 'preferences.member_alerts.project_page_title'|trans }}</h2>
+        {% if memberAlertsHasOverrides %}
+            <span class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.member_alerts.has_overrides'|trans }}</span>
+        {% endif %}
+    </div>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'preferences.member_alerts.project_page_intro'|trans }}</p>
+    <p class="mb-4 text-xs text-[var(--color-ink)]/55">
+        <a class="underline" href="{{ path('account_display_notifications') }}">{{ 'preferences.member_alerts.account_defaults_link'|trans }}</a>
+    </p>
+    {{ component('MemberProjectAlertPreferencesLive', {
+        projectUuid: project.uuid,
+        projectName: project.name,
+        initialFormData: memberAlertsInitial,
+        returnTo: 'project',
+        showModalActions: false,
+    }) }}
+</section>

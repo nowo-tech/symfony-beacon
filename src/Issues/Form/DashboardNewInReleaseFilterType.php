@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
+use App\Shared\Form\DashboardProjectFilterFields;
 use Override;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -28,46 +28,26 @@ final class DashboardNewInReleaseFilterType extends AbstractGetFilterType
         $projectChoices = $options['project_choices'];
         /** @var array<string, string> $releaseChoices */
         $releaseChoices = $options['release_choices'];
-        $perPageChoices = [];
-        foreach ([10, 25, 50, 100] as $size) {
-            $perPageChoices[$this->translator->trans('issues.filter.per_page_option', ['%count%' => (string) $size])] = $size;
-        }
 
-        $builder
-            ->add('page', HiddenType::class)
-            ->add('project', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
-                'choices' => $projectChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('new_in_release.filter.any_project'),
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'new_in_release.filter.project',
-                ],
-            ])
-            ->add('release', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
-                'choices' => $releaseChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('new_in_release.filter.any_release'),
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'new_in_release.filter.release',
-                ],
-            ])
-            ->add('per_page', ChoiceType::class, [
-                'label' => false,
-                'required' => true,
-                'choices' => $perPageChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'issues.filter.per_page',
-                ],
-            ]);
+        DashboardProjectFilterFields::addPageAndProject(
+            $builder,
+            $this->translator,
+            $projectChoices,
+            'new_in_release.filter.any_project',
+            'new_in_release.filter.project',
+        );
+        $builder->add('release', ChoiceType::class, [
+            'label' => false,
+            'required' => false,
+            'choices' => $releaseChoices,
+            'choice_translation_domain' => false,
+            'placeholder' => $this->translator->trans('new_in_release.filter.any_release'),
+            'attr' => [
+                'class' => 'input',
+                'aria-label' => 'new_in_release.filter.release',
+            ],
+        ]);
+        DashboardProjectFilterFields::addPerPage($builder, $this->translator);
     }
 
     #[Override]

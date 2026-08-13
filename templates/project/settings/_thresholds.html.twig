@@ -1,0 +1,76 @@
+<section class="panel mt-6">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+            <h2 class="text-lg font-semibold">{{ 'thresholds.title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'thresholds.intro'|trans }}</p>
+            {% if not project.ingestEnabled %}
+                <p class="mt-2 text-xs text-[var(--color-alert)]">{{ 'thresholds.ingest_disabled'|trans }}</p>
+            {% endif %}
+        </div>
+        <a class="btn-primary" href="{{ path('project_threshold_rule_new', {id: project.uuid}) }}">{{ 'thresholds.add'|trans }}</a>
+    </div>
+    {% set thresholdRules = project.thresholdRules %}
+    {% if thresholdRules is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'thresholds.empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-3">
+            {% for rule in thresholdRules %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <div class="font-medium">
+                                {{ rule.label ?: 'thresholds.unnamed'|trans }}
+                                {% if not rule.enabled %}
+                                    <span class="badge badge-error">{{ 'thresholds.disabled'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                                {{ 'thresholds.summary'|trans({
+                                    '%count%': rule.errorCount,
+                                    '%window%': rule.windowMinutes,
+                                    '%cooldown%': rule.cooldownMinutes
+                                }) }}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% if rule.environment %}
+                                    <span>{{ 'thresholds.filter.environment'|trans({'%value%': rule.environment}) }}</span>
+                                {% endif %}
+                                {% if rule.releaseVersion %}
+                                    <span{% if rule.environment %} class="ml-2"{% endif %}>{{ 'thresholds.filter.release'|trans({'%value%': rule.releaseVersion}) }}</span>
+                                {% endif %}
+                                {% if not rule.environment and not rule.releaseVersion %}
+                                    <span>{{ 'thresholds.filter.all_events'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% if rule.lastFiredAt %}
+                                    {{ 'thresholds.last_fired'|trans }} {{ rule.lastFiredAt|date('Y-m-d H:i') }}
+                                {% else %}
+                                    {{ 'thresholds.never_fired'|trans }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <a class="btn-ghost" href="{{ path('project_threshold_rule_edit', {projectId: project.uuid, id: rule.uuid}) }}">{{ 'thresholds.edit'|trans }}</a>
+                            {{ form_start(thresholdToggleForms[rule.id], {
+                                action: path('project_threshold_rule_toggle', {projectId: project.uuid, id: rule.uuid}),
+                            }) }}
+                                <button class="btn-ghost" type="submit">{{ rule.enabled ? 'thresholds.disable'|trans : 'thresholds.enable'|trans }}</button>
+                            {{ form_end(thresholdToggleForms[rule.id]) }}
+                            {{ form_start(thresholdDeleteForms[rule.id], {
+                                action: path('project_threshold_rule_delete', {projectId: project.uuid, id: rule.uuid}),
+                                attr: {
+                                    'data-controller': 'confirm-submit',
+                                    'data-confirm-submit-message-value': 'thresholds.delete_confirm'|trans,
+                                    'data-action': 'submit->confirm-submit#confirm',
+                                },
+                            }) }}
+                                <button class="btn-danger" type="submit">{{ 'thresholds.delete'|trans }}</button>
+                            {{ form_end(thresholdDeleteForms[rule.id]) }}
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>

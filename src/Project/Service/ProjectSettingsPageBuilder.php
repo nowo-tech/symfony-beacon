@@ -54,6 +54,7 @@ final readonly class ProjectSettingsPageBuilder
         private ProjectShareLinkRepository $shareLinkRepository,
         private HumanFriendlyTokenGenerator $tokenGenerator,
         private ProjectMembershipManager $membershipManager,
+        private ProjectMembershipFormSupport $membershipFormSupport,
         private UserGroupMembershipRepository $userGroupMembershipRepository,
         private UserGroupRepository $userGroupRepository,
         private NotificationDeliveryAttemptRepository $deliveryAttemptRepository,
@@ -196,7 +197,7 @@ final readonly class ProjectSettingsPageBuilder
             $thresholdDeleteForms[$ruleId] = $this->createCsrfOnlyView('threshold_delete_'.$ruleId);
         }
 
-        $transferOwnershipChoices = ProjectMembershipUiHelper::transferOwnershipChoices($project, $user);
+        $transferOwnershipChoices = $this->membershipFormSupport->transferOwnershipChoices($project, $user);
 
         $memberAlertRows = $this->memberAlertPreferenceManager->projectRowsForUi($user, [$project]);
         $memberAlertRow = $memberAlertRows[0] ?? null;
@@ -310,10 +311,10 @@ final readonly class ProjectSettingsPageBuilder
                     'action' => $this->urlGenerator->generate('project_groups_add', ['id' => $project->getUuid()]),
                     'method' => 'POST',
                     'csrf_token_id' => 'project_group_add_'.$project->getId(),
-                    'group_choices' => ProjectMembershipUiHelper::groupChoicesForLinking(
+                    'group_choices' => $this->membershipFormSupport->groupChoicesForLinking(
                         $project,
-                        $availableGroups,
                         $groupMemberCounts,
+                        $availableGroups,
                     ),
                     'role_choices' => $projectGroupRoleChoices,
                 ])->createView()

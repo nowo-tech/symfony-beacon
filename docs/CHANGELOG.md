@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-13
+
 ### Security
 
 - **Security residual hardening (`093` / 6.42)**: Envelope query-string auth hard-removed (always 401); Ops Overview security posture warning; pre-auth IP rate limit on public Slack/Teams/email hooks (`BEACON_HOOK_IP_RATE_LIMIT`); ingest notifications dispatched via `DispatchIngestNotificationsMessage` on `async` (thin Ingest→Notifications decoupling). Docs: SECURITY / PRODUCTION / UPGRADING.
@@ -16,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Site-wide maintenance mode (`092` / 6.41)**: `nowo-tech/maintenance-mode-bundle` — Administration panel (`/admin/maintenance`, `ROLE_ADMIN`, no ops password), `/_maintenance_preview`, kit admin chrome (tabs/panels), seeded sidebar + breadcrumbs. Public page uses `public/illustrations/error-503.png` (shared with branded `error503`). Re-run `make seed-platform` after upgrade. Spec: `specs/092-maintenance-mode/`.
 - **Branded 503** (`063` follow-up): `error503.html.twig` + `error.503.*` locale catalogue; illustration `error-503.png`.
 - Expanded Playwright coverage (admin RBAC, kit admin deep, member alerts) plus additional unit tests for member-alert / Web Push paths.
+
+### Changed
+
+- **PHPStan FrankenPHP 1.1.0 (`094` / 6.43)**: pin `nowo-tech/phpstan-frankenphp` **1.1.0**; `phpstan.neon.dist` uses production gate `rules.neon` (classic + worker + hardening, including 1.1.0 process-state / `pcntl_signal` rules). Path-scoped ignore for PHPUnit Flex `umask` in `tests/bootstrap.php` only. Spec: `specs/094-phpstan-frankenphp-110/`.
+- Maintainability: project Settings Twig split into section partials; `IssueSearchRepository` query traits; shared dashboard filter fields / CSRF form helpers; portability envelope helper; member-alert form builder extraction.
 
 ### Removed
 
@@ -81,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Http Log filters: Issues/admin widget+placeholder standard inside a `panel` card (`.input` + `btn-ghost`).
 - **CSRF via Symfony Forms (`090` / 6.39)**: host mutable POSTs use FormKit Types — `CsrfOnlyType` / `HiddenFieldsCsrfType` / `csrf_action_form()` for single-action buttons; named Types for Issues triage, danger zone, Settings create/import, admin helpers, mentions, tour replay; GET list filters via `AbstractGetFilterType` + `GetFilterFormFactory`. Intentional exceptions: AJAX header CSRF (theme / content-width / tour mark / Web Push), AuthKit logout `_csrf_token`, kit modal `data-token` deletes.
 - AuthKit **1.17.0**: magic-login confirm uses Form CSRF (`MagicLoginConfirmType` + POST `/login/magic/confirm`); host Twig fork updated; removed REQ-TWIG-005 plain-form exception.
-- Composer pins: `nowo-tech/password-toggle-bundle` **2.1.1** (CSP-safe eye icons), `password-strength-bundle` **2.2.0**, `routing-kit-bundle` **1.4.0** (Symfony forms for panel export/clear-cache/import/delete; host override uses `export_form` / `delete_forms`), `site-backup-bundle` **1.10.1**, `symfony/mercure-bundle` **0.5.0**, selected Symfony **8.1.4** components; dev: `phpstan-frankenphp` **1.1.0**, `rector` **2.6.2**. Host keeps Stimulus `_toggle_password_csp` (script-src); icon visibility aligns with bundle `is-password-visible`.
+- Composer pins: `nowo-tech/password-toggle-bundle` **2.1.1** (CSP-safe eye icons), `password-strength-bundle` **2.2.0**, `routing-kit-bundle` **1.4.0** (Symfony forms for panel export/clear-cache/import/delete; host override uses `export_form` / `delete_forms`), `site-backup-bundle` **1.10.1**, `symfony/mercure-bundle` **0.5.0**, selected Symfony **8.1.4** components; dev: `phpstan-frankenphp` **1.0.3**, `rector` **2.6.2**. Host keeps Stimulus `_toggle_password_csp` (script-src); icon visibility aligns with bundle `is-password-visible`.
 - Demo breadcrumb ES labels for collection routes: `Migas de pan` (trail matches nav).
 
 ## [1.6.4] - 2026-08-11
@@ -980,7 +987,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...v1.9.0
 [1.8.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.7.0...v1.8.0

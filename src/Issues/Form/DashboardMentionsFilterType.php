@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
+use App\Shared\Form\DashboardProjectFilterFields;
 use Override;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -27,42 +26,22 @@ final class DashboardMentionsFilterType extends AbstractGetFilterType
     {
         /** @var array<string, string> $projectChoices */
         $projectChoices = $options['project_choices'];
-        $perPageChoices = [];
-        foreach ([10, 25, 50, 100] as $size) {
-            $perPageChoices[$this->translator->trans('issues.filter.per_page_option', ['%count%' => (string) $size])] = $size;
-        }
 
-        $builder
-            ->add('page', HiddenType::class)
-            ->add('project', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
-                'choices' => $projectChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('mentions.filter.any_project'),
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'mentions.filter.project',
-                ],
-            ])
-            ->add('unread', CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'checkbox',
-                ],
-            ])
-            ->add('per_page', ChoiceType::class, [
-                'label' => false,
-                'required' => true,
-                'choices' => $perPageChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'issues.filter.per_page',
-                ],
-            ]);
+        DashboardProjectFilterFields::addPageAndProject(
+            $builder,
+            $this->translator,
+            $projectChoices,
+            'mentions.filter.any_project',
+            'mentions.filter.project',
+        );
+        $builder->add('unread', CheckboxType::class, [
+            'label' => false,
+            'required' => false,
+            'attr' => [
+                'class' => 'checkbox',
+            ],
+        ]);
+        DashboardProjectFilterFields::addPerPage($builder, $this->translator);
     }
 
     #[Override]

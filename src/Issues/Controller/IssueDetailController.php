@@ -22,10 +22,8 @@ use App\Issues\Repository\IssueHistoryEntryRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueCommentCreator;
-use App\Issues\Service\IssueHistoryRecorder;
-use App\Issues\Service\IssueMergeService;
+use App\Issues\Service\IssueDuplicateMarker;
 use App\Issues\Service\IssueStatusChanger;
-use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,13 +48,11 @@ final class IssueDetailController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly EventRepository $eventRepository,
         private readonly IssueHistoryEntryRepository $historyEntryRepository,
-        private readonly IssueHistoryRecorder $historyRecorder,
         private readonly IssueAssigneeChanger $issueAssigneeChanger,
         private readonly IssueCommentCreator $issueCommentCreator,
-        private readonly IssueMergeService $issueMergeService,
+        private readonly IssueDuplicateMarker $issueDuplicateMarker,
         private readonly IssueRepository $issueRepository,
         private readonly IssueStatusChanger $issueStatusChanger,
-        private readonly NotificationDispatcher $notificationDispatcher,
         private readonly ProjectAccessService $projectAccess,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
@@ -393,93 +389,17 @@ final class IssueDetailController extends AbstractController
 
         $data = $form->getData();
         $canonicalUuid = trim((string) ((\is_array($data) ? $data['canonical_uuid'] : null) ?? ''));
-        if ('' === $canonicalUuid) {
-            $this->addFlash('error', 'issues.duplicate_invalid');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        if ($canonicalUuid === $issue->getUuid()) {
-            $this->addFlash('error', 'issues.duplicate_self');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        $canonical = $this->issueRepository->findOneByProjectAndUuid($project, $canonicalUuid);
-        if (!$canonical instanceof Issue) {
-            $this->addFlash('error', 'issues.duplicate_not_found');
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
-        try {
-            $this->issueMergeService->assertCanMarkAsDuplicate($issue, $canonical);
-        } catch (InvalidArgumentException $e) {
-            $flash = match ($e->getMessage()) {
-                'circular' => 'issues.duplicate_circular',
-                'wrong_project' => 'issues.duplicate_not_found',
-                default => 'issues.duplicate_invalid',
-            };
-            $this->addFlash('error', $flash);
-
-            return $this->redirectToRoute('issue_show', $showParams);
-        }
-
         $mergeEvents = (bool) ((\is_array($data) ? $data['merge_events'] : null) ?? false);
-        if ($mergeEvents) {
-            try {
-                $moved = $this->issueMergeService->mergeIntoCanonical($issue, $canonical, $user);
-            } catch (InvalidArgumentException) {
-                $this->addFlash('error', 'issues.merge_failed');
+        $result = $this->issueDuplicateMarker->mark($project, $issue, $user, $canonicalUuid, $mergeEvents);
 
-                return $this->redirectToRoute('issue_show', $showParams);
-            }
-            $this->userActionRecorder->record(
-                UserActionType::IssueMerged,
-                $user,
-                $user,
-                [
-                    'project_uuid' => $project->getUuid(),
-                    'project_name' => $project->getName(),
-                    'issue_uuid' => $issue->getUuid(),
-                    'issue_title' => $issue->getTitle(),
-                    'canonical_uuid' => $canonical->getUuid(),
-                    'canonical_title' => $canonical->getTitle(),
-                    'events_moved' => $moved,
-                ],
-            );
-            $this->notificationDispatcher->dispatchIssueDuplicated($project, $issue, $canonical);
-            $this->addFlash('success', 'issues.merge_saved');
+        $this->addFlash($result['ok'] ? 'success' : 'error', $result['flash']);
 
+        if ($result['ok'] && null !== $result['redirect_issue_uuid']) {
             return $this->redirectToRoute('issue_show', [
                 'projectId' => $project->getUuid(),
-                'id' => $canonical->getUuid(),
+                'id' => $result['redirect_issue_uuid'],
             ]);
         }
-
-        $previousStatus = $issue->getStatus();
-        $issue->setDuplicateOf($canonical);
-        $issue->setStatus(IssueStatus::Ignored);
-        if (IssueStatus::Ignored !== $previousStatus) {
-            $this->historyRecorder->recordStatusChange($issue, $previousStatus, IssueStatus::Ignored, $user);
-        }
-
-        $this->userActionRecorder->record(
-            UserActionType::IssueMarkedDuplicate,
-            $user,
-            $user,
-            [
-                'project_uuid' => $project->getUuid(),
-                'project_name' => $project->getName(),
-                'issue_uuid' => $issue->getUuid(),
-                'issue_title' => $issue->getTitle(),
-                'canonical_uuid' => $canonical->getUuid(),
-                'canonical_title' => $canonical->getTitle(),
-            ],
-        );
-        $this->notificationDispatcher->dispatchIssueDuplicated($project, $issue, $canonical);
-        $this->entityManager->flush();
-        $this->addFlash('success', 'issues.duplicate_saved');
 
         return $this->redirectToRoute('issue_show', $showParams);
     }

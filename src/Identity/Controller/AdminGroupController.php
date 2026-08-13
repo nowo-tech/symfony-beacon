@@ -23,6 +23,7 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Exception\ProjectAccessException;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Service\ProjectMembershipManager;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
@@ -43,6 +44,8 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminGroupController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly UserGroupRepository $groupRepository,
         private readonly UserGroupMembershipRepository $groupMembershipRepository,
@@ -244,9 +247,7 @@ final class AdminGroupController extends AbstractController
             'admin_group_delete_'.$group->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $name = $group->getName();
         $uuid = $group->getUuid();
@@ -291,9 +292,7 @@ final class AdminGroupController extends AbstractController
             'csrf_token_id' => 'admin_group_member_add_'.$group->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var array{email?: string|null} $data */
         $data = $form->getData();
@@ -352,9 +351,7 @@ final class AdminGroupController extends AbstractController
             'admin_group_member_remove_'.$membership->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $group->removeMembership($membership);
         $this->entityManager->remove($membership);
@@ -397,9 +394,7 @@ final class AdminGroupController extends AbstractController
             'admin_group_project_remove_'.$access->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $project = $access->getProject();
         if (!$project instanceof Project) {

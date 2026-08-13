@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Controller;
 
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,8 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 final class GuestLocaleController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         #[Autowire('%kernel.default_locale%')]
         private readonly string $defaultLocale,
@@ -55,9 +58,7 @@ final class GuestLocaleController extends AbstractController
             ['redirect' => ''],
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $request->getSession()->set('_locale', $locale);
 

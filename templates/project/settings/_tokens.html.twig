@@ -1,0 +1,49 @@
+<section class="panel mt-6" data-testid="read-api-tokens">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'projects.read_token.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'projects.read_token.help'|trans }}</p>
+    {% if lastReadToken %}
+        <p class="mb-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all font-mono" data-testid="read-token-secret">{{ lastReadToken }}</p>
+        <p class="mb-4 text-xs text-[var(--color-ink)]/55">{{ 'projects.read_token.copy_once'|trans }}</p>
+    {% endif %}
+    {{ form_start(readTokenCreateForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-3'}}) }}
+        <label class="text-sm grow">
+            <span class="mb-1 block">{{ 'projects.read_token.label'|trans }}</span>
+            {{ form_widget(readTokenCreateForm.label, {
+                attr: {
+                    class: 'input w-full',
+                    maxlength: 120,
+                    placeholder: 'projects.read_token.label_placeholder'|trans,
+                    autocomplete: 'off',
+                }
+            }) }}
+        </label>
+        <button type="submit" class="btn-primary">{{ 'projects.read_token.create'|trans }}</button>
+    {{ form_end(readTokenCreateForm) }}
+    <ul class="space-y-2 text-sm">
+        {% for token in readTokens|default([]) %}
+            <li class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--color-sand)] p-3" data-testid="read-token-row">
+                <div>
+                    <div class="font-medium">{{ token.label }}</div>
+                    <div class="font-mono text-xs text-[var(--color-ink)]/55">{{ token.prefix }}…</div>
+                    <div class="text-xs text-[var(--color-ink)]/55">
+                        {% if token.active %}
+                            {{ 'projects.read_token.active'|trans }}
+                            {% if token.lastUsedAt %} · {{ 'projects.read_token.last_used'|trans }} {{ token.lastUsedAt|date('Y-m-d H:i') }}{% endif %}
+                        {% else %}
+                            {{ 'projects.read_token.revoked_at'|trans }} {{ token.revokedAt ? token.revokedAt|date('Y-m-d H:i') : '—' }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if token.active %}
+                    {{ form_start(readTokenRevokeForms[token.id], {
+                        action: path('project_read_token_revoke', {id: project.uuid, tokenId: token.uuid}),
+                    }) }}
+                        <button type="submit" class="btn-ghost text-sm text-[var(--color-clay)]">{{ 'projects.read_token.revoke'|trans }}</button>
+                    {{ form_end(readTokenRevokeForms[token.id]) }}
+                {% endif %}
+            </li>
+        {% else %}
+            <li class="text-sm text-[var(--color-ink)]/55">{{ 'projects.read_token.empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+</section>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +21,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class AccountLocaleController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
@@ -49,11 +52,9 @@ final class AccountLocaleController extends AbstractController
             ['redirect' => ''],
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
-        $user->setPreferredLocale($locale);
+        $user->getUiPreferences()->setPreferredLocale($locale);
         $this->entityManager->flush();
         $this->addFlash('success', 'flash.preferences.locale_saved');
 

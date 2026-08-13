@@ -1,0 +1,45 @@
+<section class="panel mb-6">
+    <h2 class="mb-2 text-lg font-semibold">{{ 'project.governance.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'project.governance.help'|trans }}</p>
+    {% if effectiveQuota > 0 %}
+        <p class="mb-2 text-xs text-[var(--color-ink)]/55">
+            {{ 'project.governance.quota_usage'|trans({'%count%': eventsToday, '%quota%': effectiveQuota}) }}
+        </p>
+    {% endif %}
+    {% if effectiveMonthlyQuota > 0 %}
+        <p class="mb-4 text-xs text-[var(--color-ink)]/55">
+            {{ 'project.governance.quota_usage_monthly'|trans({'%count%': eventsThisMonth, '%quota%': effectiveMonthlyQuota}) }}
+            <span class="text-[var(--color-ink)]/40">({{ 'project.governance.month_utc_hint'|trans }})</span>
+        </p>
+    {% endif %}
+    {{ form_start(governanceForm, {attr: {class: 'grid gap-4 sm:grid-cols-2'}}) }}
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="retention_days">{{ 'project.governance.retention_days'|trans }}</label>
+            {{ form_widget(governanceForm.retention_days, {attr: {class: 'input w-full', id: 'retention_days', placeholder: governanceDefaults.retention_days}}) }}
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.retention_days}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="retention_max_events">{{ 'project.governance.retention_max_events'|trans }}</label>
+            {{ form_widget(governanceForm.retention_max_events, {attr: {class: 'input w-full', id: 'retention_max_events', placeholder: governanceDefaults.retention_max_events}}) }}
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.retention_max_events}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="ingest_rate_limit_per_minute">{{ 'project.governance.ingest_rate_limit'|trans }}</label>
+            {{ form_widget(governanceForm.ingest_rate_limit_per_minute, {attr: {class: 'input w-full', id: 'ingest_rate_limit_per_minute', placeholder: governanceDefaults.ingest_rate_limit}}) }}
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.ingest_rate_limit}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="event_quota_daily">{{ 'project.governance.event_quota_daily'|trans }}</label>
+            {{ form_widget(governanceForm.event_quota_daily, {attr: {class: 'input w-full', id: 'event_quota_daily', placeholder: governanceDefaults.event_quota_daily}}) }}
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.event_quota_daily}) }}</p>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="event_quota_monthly">{{ 'project.governance.event_quota_monthly'|trans }}</label>
+            {{ form_widget(governanceForm.event_quota_monthly, {attr: {class: 'input w-full', id: 'event_quota_monthly', placeholder: governanceDefaults.event_quota_monthly}}) }}
+            <p class="mt-1 text-xs text-[var(--color-ink)]/50">{{ 'project.governance.inherit_hint'|trans({'%default%': governanceDefaults.event_quota_monthly}) }}</p>
+        </div>
+        <div class="sm:col-span-2">
+            <button class="btn-primary" type="submit">{{ 'project.governance.save'|trans }}</button>
+        </div>
+    {{ form_end(governanceForm) }}
+</section>

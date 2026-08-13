@@ -6,9 +6,12 @@ namespace App\Tests\Functional\Notifications;
 
 use App\Notifications\Realtime\IssueRealtimeTopics;
 use App\Notifications\Repository\PushSubscriptionRepository;
+use App\Notifications\Service\WebPushClientFactory;
 use App\Shared\Mercure\ConfiguredMercure;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Tests\Support\DatabaseWebTestCase;
+use Doctrine\ORM\EntityManagerInterface;
+use Minishlink\WebPush\VAPID;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
@@ -96,17 +99,17 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
     public function testPushSubscribeHappyPathAndValidationErrorsWhenConfigured(): void
     {
         [$client, $user, $project] = $this->bootWithDemoProject('realtime-push-ok@example.com');
-        $keys = \Minishlink\WebPush\VAPID::createVapidKeys();
+        $keys = VAPID::createVapidKeys();
         self::getContainer()->set(
-            \App\Notifications\Service\WebPushClientFactory::class,
-            new \App\Notifications\Service\WebPushClientFactory(
+            WebPushClientFactory::class,
+            new WebPushClientFactory(
                 $keys['publicKey'],
                 $keys['privateKey'],
                 'mailto:ops@example.com',
             ),
         );
 
-        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $user->setPushNotificationsEnabled(true);
         $em->flush();
 
@@ -158,8 +161,11 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/account/realtime/config');
         self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent() ?: '', true);
-        self::assertTrue($payload['push']['preferenceEnabled']);
+        $realtimeConfig = json_decode($client->getResponse()->getContent() ?: 'null', true);
+        self::assertIsArray($realtimeConfig);
+        self::assertArrayHasKey('push', $realtimeConfig);
+        self::assertIsArray($realtimeConfig['push']);
+        self::assertTrue($realtimeConfig['push']['preferenceEnabled']);
 
         $client->request(
             Request::METHOD_POST,
@@ -197,7 +203,7 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
         self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
         self::getContainer()->get(ConfiguredMercure::class)->reset();
 
-        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         $user->setMemberAlertsEnabled(false);
         $em->flush();
 

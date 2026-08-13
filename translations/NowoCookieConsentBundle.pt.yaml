@@ -25,6 +25,7 @@ nowo_cookie_consent:
     functionality:
         description: 'Cookies opcionais que ativam funcionalidades avançadas para além do funcionamento essencial do serviço.'
     analytics:
+        title: 'Analítica'
         description: 'Cookies opcionais utilizados para medir a utilização e melhorar o serviço. Só são definidos se consentir e o operador tiver ativado ferramentas de analítica.'
     marketing:
         description: 'Cookies opcionais utilizados para publicidade ou remarketing. Só são definidos com o seu consentimento prévio.'

@@ -14,6 +14,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectHistoryClearer;
+use App\Shared\Controller\RequiresValidFormTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class ProjectDangerZoneController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectHistoryClearer $historyClearer,
@@ -52,9 +55,7 @@ final class ProjectDangerZoneController extends AbstractController
             'csrf_token_id' => 'project_clear_'.$project->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $projectUuid = $project->getUuid();
         $projectName = $project->getName();
@@ -94,9 +95,7 @@ final class ProjectDangerZoneController extends AbstractController
             'project_id' => (int) $project->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
         if ($confirmation !== $project->getName()) {

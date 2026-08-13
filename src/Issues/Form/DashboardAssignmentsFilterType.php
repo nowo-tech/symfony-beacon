@@ -6,6 +6,7 @@ namespace App\Issues\Form;
 
 use App\Issues\AssignmentScope;
 use App\Shared\Form\AbstractGetFilterType;
+use App\Shared\Form\DashboardProjectFilterFields;
 use Override;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -45,10 +46,6 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
         ];
         foreach ($teammateChoices as $id => $label) {
             $assigneeChoices[$label] = $id;
-        }
-        $perPageChoices = [];
-        foreach ([10, 25, 50, 100] as $size) {
-            $perPageChoices[$this->translator->trans('issues.filter.per_page_option', ['%count%' => (string) $size])] = $size;
         }
 
         $builder
@@ -133,18 +130,8 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
                     'class' => 'input',
                     'aria-label' => 'assignments.filter.assignee',
                 ],
-            ])
-            ->add('per_page', ChoiceType::class, [
-                'label' => false,
-                'required' => true,
-                'choices' => $perPageChoices,
-                'choice_translation_domain' => false,
-                'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'issues.filter.per_page',
-                ],
             ]);
+        DashboardProjectFilterFields::addPerPage($builder, $this->translator);
     }
 
     #[Override]

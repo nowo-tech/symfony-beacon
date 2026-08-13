@@ -2,7 +2,7 @@
 
 **Feature Branch**: `093-security-residual-hardening`  
 **Created**: 2026-08-13  
-**Status**: Implemented (unreleased)  
+**Status**: Implemented (v1.9.0)  
 **Roadmap**: Phase 6.42  
 
 **Input**: Full-tree security + architecture residual audit (2026-08-13): remediate open High/Medium items **H1–M5** left after `087-security-audit-hardening` — hard-delete Envelope query-auth, Ops fail-closed posture warnings, pre-auth hook rate limits, Teams Assign / Setup token query hygiene docs (+ prefer header), metrics require-token upgrade banner, and thin Ingest→Notifications decoupling. Low items (CSP attr, Live CSRF trade-off, share max-uses post-claim) stay non-goals.

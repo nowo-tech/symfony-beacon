@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.8.2)](#unreleased-main-after-182)
+- [Unreleased (main after 1.9.0)](#unreleased-main-after-190)
+- [Upgrading from 1.8.2 to 1.9.0](#upgrading-from-182-to-190)
 - [Upgrading from 1.8.1 to 1.8.2](#upgrading-from-181-to-182)
 - [Upgrading from 1.8.0 to 1.8.1](#upgrading-from-180-to-181)
 - [Upgrading from 1.7.0 to 1.8.0](#upgrading-from-170-to-180)
@@ -61,27 +62,42 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.8.2)
+## Unreleased (main after 1.9.0)
 
-### Security residual hardening (`093` / 6.42)
+_No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.8.2 to 1.9.0
+
+**Maintenance mode (`092` / 6.41), security residual hardening (`093` / 6.42), PHPStan FrankenPHP 1.1.0 (`094` / 6.43), Settings/search maintainability.** See `[1.9.0]` in [CHANGELOG.md](CHANGELOG.md).
 
 **Breaking (ingest):** Envelope query-string auth (`?beacon_key=&beacon_secret=`) is **removed**. Update clients to `X-Beacon-Auth` or envelope `dsn` before upgrading.
 
 ```bash
-git pull   # or checkout the release tag when cut
+git fetch --tags
+git checkout v1.9.0   # or pull main at the release commit
 composer install
 # Add to .env if missing (see .env.dist):
 # BEACON_HOOK_IP_RATE_LIMIT=120
-make migrate
+make ensure-up          # or make up on a fresh clone
+make migrate            # Version20260813100000 drops ingest_reject_query_auth
+make seed-platform      # Maintenance admin menu + breadcrumbs
 php bin/console cache:clear
 ```
 
-Operator checklist:
+### Operator checklist
 
-1. Confirm no SDK still sends query credentials.
+1. Confirm no SDK still sends Envelope query credentials.
 2. Open **Administration → Ops overview** — if a security posture warning appears (private URLs, anonymous Resolve, or metrics require-token off), tighten under **Ops defaults**.
 3. Optional: tune `BEACON_HOOK_IP_RATE_LIMIT` (public Slack/Teams/email hooks; `0` disables).
 4. Prefer `X-Setup-Token` for setup; rotate `SITE_SETUP_TOKEN` after first setup.
+5. **Maintenance**: Administration → Maintenance (`/admin/maintenance`); preview `/_maintenance_preview` without enabling downtime. Public 503 uses `error-503.png`.
+6. **Dev / CI**: `nowo-tech/phpstan-frankenphp` **1.1.0** with `rules.neon` production gate — re-run `make phpstan` after pull.
+
+### Notes
+
+- **Migration**: `Version20260813100000` removes `instance_settings.ingest_reject_query_auth` (reject is always on).
+- **Messenger**: ingest notifications go through `DispatchIngestNotificationsMessage` on `async` — keep `messenger:consume` / Compose `messenger` + `messenger-notify` running.
+- **Maintainability (no operator action)**: project Settings Twig section partials; issue search query traits; shared form helpers — behaviour unchanged.
 
 ## Upgrading from 1.8.1 to 1.8.2
 

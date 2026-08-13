@@ -23,6 +23,7 @@ use App\Project\Entity\ProjectMembership;
 use App\Project\Exception\ProjectAccessException;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Service\ProjectMembershipManager;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
@@ -47,6 +48,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminUserController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserActionRepository $userActionRepository,
@@ -222,9 +225,7 @@ final class AdminUserController extends AbstractController
             'admin_user_project_remove_'.$membership->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
@@ -255,9 +256,7 @@ final class AdminUserController extends AbstractController
             'csrf_token_id' => 'admin_user_role_'.$user->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var User $current */
         $current = $this->getUser();
@@ -315,9 +314,7 @@ final class AdminUserController extends AbstractController
             'toggle_user_'.$user->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $current */
         $current = $this->getUser();
@@ -381,9 +378,7 @@ final class AdminUserController extends AbstractController
             'csrf_token_id' => 'admin_user_anonymize_'.$user->getId(),
         ]);
         $form->submit($request->request->all(), false);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var User $current */
         $current = $this->getUser();

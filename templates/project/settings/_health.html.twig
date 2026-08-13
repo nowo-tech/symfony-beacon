@@ -1,0 +1,99 @@
+<section class="panel mt-6">
+    <h2 class="mb-3 text-lg font-semibold">{{ 'project.health.title'|trans }}</h2>
+    <p class="mb-4 text-sm text-[var(--color-ink)]/65">{{ 'project.health.intro'|trans }}</p>
+    <dl class="mb-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.messenger_pending'|trans }}</dt>
+            <dd class="mt-1 font-medium">
+                {% if messengerQueue.available %}
+                    {{ messengerQueue.pending }}
+                    <span class="text-xs font-normal text-[var(--color-ink)]/55">({{ 'project.health.instance_wide'|trans }})</span>
+                {% else %}
+                    {{ 'project.health.messenger_unavailable'|trans }}
+                    — <a href="{{ path('health_ready') }}">{{ 'project.health.ready_link'|trans }}</a>
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt class="text-[var(--color-ink)]/55">{{ 'project.health.ready_probe'|trans }}</dt>
+            <dd class="mt-1"><a href="{{ path('health_ready') }}">/health/ready</a></dd>
+        </div>
+    </dl>
+    <h3 class="mb-2 text-sm font-semibold">{{ 'project.health.destinations_title'|trans }}</h3>
+    {% set destinations = project.notificationDestinations %}
+    {% if destinations is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'project.health.destinations_empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-2 text-sm">
+            {% for destination in destinations %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                    <div class="font-medium">
+                        {{ destination.label }}
+                        {% if beacon_notification_circuit_open(destination) %}
+                            <span class="badge badge-error">{{ 'notifications.circuit_paused'|trans }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                        {% if beacon_notification_circuit_open(destination) %}
+                            <p class="text-[var(--color-alert)]">{{ 'notifications.circuit_paused_help'|trans({'%count%': destination.consecutiveFailures}) }}</p>
+                        {% endif %}
+                        {% if destination.lastDeliveryAt %}
+                            {{ 'project.health.last_delivery'|trans }}
+                            {{ destination.lastDeliveryAt|date('Y-m-d H:i') }}
+                            —
+                            {% if destination.lastDeliverySuccess %}
+                                <span class="text-emerald-700">{{ 'project.health.delivery_ok'|trans }}</span>
+                            {% else %}
+                                <span class="text-[var(--color-alert)]">{{ 'project.health.delivery_fail'|trans }}</span>
+                                {% if destination.lastDeliveryError %}
+                                    · {{ destination.lastDeliveryError }}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {{ 'project.health.never_delivered'|trans }}
+                        {% endif %}
+                    </div>
+                    {% if beacon_notification_circuit_open(destination) and membership.canManageNotifications %}
+                        {{ form_start(notificationResumeForms[destination.id], {
+                            action: path('project_notification_resume', {projectId: project.uuid, id: destination.uuid}),
+                            attr: {class: 'mt-2'},
+                        }) }}
+                            <button class="btn-ghost" type="submit">{{ 'notifications.resume'|trans }}</button>
+                        {{ form_end(notificationResumeForms[destination.id]) }}
+                    {% endif %}
+                    {% set attempts = delivery_attempts_by_destination[destination.id]|default([]) %}
+                    <div class="mt-3">
+                        {% if attempts is empty %}
+                            <p class="text-xs text-[var(--color-ink)]/55">{{ 'project.health.history_empty'|trans }}</p>
+                        {% else %}
+                            <details class="group rounded-md border border-[var(--color-sand)]/70 bg-[var(--color-sand)]/20 p-2">
+                                <summary class="cursor-pointer list-none text-xs font-medium text-[var(--color-ink)]">
+                                    <span class="group-open:hidden">{{ 'project.health.history_show'|trans({'%count%': attempts|length}) }}</span>
+                                    <span class="hidden group-open:inline">{{ 'project.health.history_hide'|trans({'%count%': attempts|length}) }}</span>
+                                </summary>
+                                <ul class="mt-2 space-y-2 text-xs">
+                                    {% for attempt in attempts %}
+                                        <li class="rounded border border-[var(--color-sand)] bg-[var(--color-paper)] p-2">
+                                            <div class="font-medium">
+                                                {{ attempt.attemptedAt|date('Y-m-d H:i') }}
+                                                —
+                                                {% if attempt.successful %}
+                                                    <span class="text-emerald-700">{{ 'project.health.delivery_ok'|trans }}</span>
+                                                {% else %}
+                                                    <span class="text-[var(--color-alert)]">{{ 'project.health.delivery_fail'|trans }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if attempt.errorSnippet %}
+                                                <div class="mt-1 text-[var(--color-ink)]/65">{{ attempt.errorSnippet }}</div>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>

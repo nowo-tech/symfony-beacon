@@ -136,6 +136,7 @@ common:
     created_by: Aangemaakt door
     updated_by: Bijgewerkt door
     by_system: Systeem
+  'true': ja
 pagination:
   showing: Toont %from%–%to% van %total%
   nav: Tabelpagina's
@@ -210,6 +211,11 @@ auth:
       %code%
 
       '
+  qr_login:
+    approved: Goedgekeurd — je wordt aangemeld…
+    denied: Aanmelding geweigerd op de telefoon.
+    expired: Deze code is verlopen.
+    retry: Nieuwe QR-code genereren
 flash:
   project:
     created: Project gemaakt.
@@ -248,6 +254,16 @@ flash:
     group_not_found: Groep niet gevonden.
     group_link_forbidden: U kunt alleen groepen koppelen waartoe u behoort (projecteigenaren
       en instantiebeheerders kunnen elke groep koppelen).
+    config_code_mismatch: Projectcode in de bundle komt niet overeen met dit project.
+    config_file_too_large: Projectconfig-JSON is te groot (max. 2 MiB).
+    config_import_failed: Projectbundle kon niet worden geïmporteerd (ongeldige JSON of schema).
+    config_imported_admin: Projecten geïmporteerd (gebruikers aangemaakt indien ontbrekend).
+    config_imported_panel: Projectinstellingen en lidmaatschappen bijgewerkt vanuit de bundle.
+    config_invalid_csrf: Ongeldig beveiligingstoken. Probeer opnieuw.
+    config_missing_file: Kies een JSON-projectbundle om te importeren.
+    config_users_skipped: Sommige lidmaatschappen zijn overgeslagen omdat die e-mails niet op deze instantie geregistreerd zijn.
+    member_activated: Lidtoegang opnieuw ingeschakeld.
+    member_deactivated: Lidtoegang gedeactiveerd.
   appearance:
     saved: Weergave-instellingen opgeslagen.
     theme_applied: Weergavethema toegepast. Kleuren zijn vervangen door de voorinstelling.
@@ -258,6 +274,8 @@ flash:
     password_saved: Wachtwoord bijgewerkt.
     display_saved: Weergavevoorkeuren opgeslagen.
     locale_saved: Taal bijgewerkt.
+    member_alerts_invalid: Waarschuwingsvoorkeuren konden niet worden opgeslagen. Controleer het formulier en probeer opnieuw.
+    member_alerts_project_saved: Projectwaarschuwingsvoorkeuren opgeslagen.
   users:
     enabled: Gebruikersaccount ingeschakeld.
     disabled: Gebruikersaccount uitgeschakeld.
@@ -406,6 +424,13 @@ project:
     revoke_confirm: Deze API-sleutel intrekken? Inslikken met dit geheim zal onmiddellijk
       mislukken.
     rotate: Draaien
+    copy_dsn: DSN kopiëren
+    dsn_copied: Gekopieerd
+    dsn_help: Kopieer deze DSN voor clients (pad is de project-UUID). Roteren maakt een nieuw geheim.
+    inactive_dsn_hidden: Ingetrokken sleutels kunnen ingest niet authenticeren. DSN en geheim worden niet getoond.
+    secret_hidden: Volledige DSN en geheim worden slechts één keer getoond na aanmaken of rotatie (niet voor viewers).
+    secret_once_banner: Nieuwe DSN klaar — kopieer hem nu naar je client. Hij blijft niet in de lijst nadat je deze pagina verlaat.
+    secret_once_hint: Maak of roteer deze sleutel om de DSN één keer te tonen. Het geheim wordt op deze pagina niet opnieuw getoond.
   members:
     title: Leden
     help: Directe leden van dit project. Eigenaren en beheerders beheren het lidmaatschap.
@@ -431,6 +456,9 @@ project:
       admin: Beheerder
       member: Lid
       viewer: Viewer
+    activate: Toegang inschakelen
+    deactivate: Toegang uitschakelen
+    inactive: inactief
   groups:
     title: Groepen
     help: Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt.
@@ -472,6 +500,18 @@ project:
     transfer_type_label: 'Typ %name% om te bevestigen:'
     transfer_confirm: Eigendom overdragen
     transfer_no_candidates: Voeg nog een direct lid toe voordat u het eigendom overdraagt.
+  config:
+    title: Project exporteren / importeren
+    help: 'Draagbare JSON voor dit project (code: %code%). Bevat lidmaatschappen op e-mail; nooit API-geheimen.'
+    tabs_label: Exporteren of importeren
+    tab_export: Exporteren
+    tab_import: Importeren
+    export_help: Download een JSON-bundle voor dit project. API-geheimen worden nooit meegenomen.
+    export: JSON exporteren
+    import_help: Kies een beacon-project-bundle-JSON. Alleen dit project wordt bijgewerkt als de code overeenkomt.
+    file: JSON-bestand
+    import: JSON importeren
+    panel_note: Import werkt dit project alleen bij als de bundlecode overeenkomt. Onbekende e-mails worden overgeslagen (hier worden geen gebruikers aangemaakt).
 projects:
   title: Projecten
   intro: Filter en open projecten waartoe u toegang heeft.
@@ -1279,6 +1319,23 @@ preferences:
       'issue.reopened': Reopened
       'issue.assigned': Assigned
       'issue.commented': Comment
+    account_defaults_link: Accountwaarschuwingsstandaarden bewerken
+    master_off_hint: 'Lidwaarschuwingen staan uit. Zet de schakelaar aan om accountstandaarden, projectoverrides en browser-push te configureren.'
+    modal_close: Sluiten
+    project_off_hint: 'Waarschuwingen voor dit project staan uit. Zet aan voor event-overrides, of laat uit om dit project te dempen met behoud van accountstandaarden.'
+    project_page_intro: Deze voorkeuren gelden alleen voor jou in dit project. Ze combineren met je accountstandaarden en teambestemmingen — lid-toasts/push vuren wanneer je prefs en het event matchen; bestemmingen melden externe kanalen onafhankelijk.
+    project_page_title: Mijn waarschuwingen voor dit project
+    project_save: Mijn projectwaarschuwingen opslaan
+    projects_account_hint: Open een project om waarschuwingen alleen voor dat project bij te stellen (modal). Levering vereist nog steeds de account-hoofdschakelaar hierboven.
+    scope_switch_help: Uit = alle issues in het project; aan = alleen wanneer je betrokken bent
+    event_help:
+      issue:
+        assigned: Wanneer een issue wordt toegewezen (of opnieuw toegewezen).
+        commented: Wanneer iemand een issue becommentarieert.
+        new: Wanneer een nieuw issue wordt ingenomen in een project waartoe je toegang hebt.
+        regression: Wanneer een eerder opgelost issue opnieuw optreedt.
+        reopened: Wanneer een opgelost issue opnieuw wordt geopend.
+        resolved: Wanneer een issue als opgelost wordt gemarkeerd.
   push_notifications: Pushmeldingen voor nieuwe issues
   push_notifications_help: Optioneel. Wanneer ingeschakeld, vraagt Beacon de browser
     om toestemming en kan u waarschuwen over nieuwe issues in projecten waartoe u
@@ -1346,6 +1403,7 @@ user_preferences:
     help: Alleen vereist bij het instellen van een nieuw wachtwoord.
     help_required: Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te
       stellen.
+    help_email_change: Vereist bij het wijzigen van je e-mailadres (login en wachtwoordreset-bestemming).
   plain_password:
     first:
       label: Nieuw wachtwoord
@@ -1463,6 +1521,19 @@ admin_projects:
   audit_apply: Filters toepassen
   audit_clear: Wissen
   audit_empty: Geen geregistreerde projectacties komen overeen met de huidige filters.
+  config:
+    title: Projecten exporteren / importeren
+    help: Download alle projecten als JSON of importeer een bundle. Ontbrekende gebruikers worden uitgeschakeld aangemaakt (op e-mail).
+    note: Idempotent op projectcode. API-geheimen worden nooit meegenomen.
+    tabs_label: Exporteren of importeren
+    tab_export: Exporteren
+    tab_import: Importeren
+    export_help: Download alle projecten als beacon-project-bundle-JSON.
+    export_all: Alles als JSON exporteren
+    export_one: JSON exporteren
+    import_help: Upload een bundle om projecten per code te upserten. Ontbrekende gebruikers worden uitgeschakeld aangemaakt.
+    file: JSON-bestand
+    import: JSON importeren
 admin:
   hub:
     title: Administratie
@@ -1485,8 +1556,6 @@ admin:
     routing: Beheer duale publieke locale-paden (JSON) voor Routable-controllers.
     http_log: Bekijk vastgelegde HTTP-requests (headers, status, duur) met retentie
       en export.
-    maintenance: Sitebrede onderhoudsmodus inschakelen of plannen (HTTP 503).
-    maintenance_preview: Bekijk de openbare onderhoudspagina zonder downtime in te schakelen.
     maintenance: Sitebrede onderhoudsmodus inschakelen of plannen (HTTP 503).
     maintenance_preview: Bekijk de openbare onderhoudspagina zonder downtime in te schakelen.
     mailer: Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.
@@ -1524,6 +1593,13 @@ admin:
     failed_empty: Geen bestemmingen met een mislukte laatste levering.
     open_by_project_title: Open issues per project
     open_by_project_empty: Geen open issues in bereik.
+    posture:
+      title: Waarschuwing beveiligingspostuur
+      intro: Een of meer Ops-standaarden laten fail-closed-bescherming uit. Bekijk en versterk ze waar mogelijk.
+      link_ops_defaults: Ops-standaarden openen
+      allow_private_urls: 'Privé-/loopback-webhook-URL''s zijn toegestaan (SSRF-risico).'
+      allow_anonymous_resolve: Anonieme interactieve Resolve is toegestaan op hooks.
+      metrics_require_token_off: Metrics-scrape-token is niet verplicht (zet require-token aan en stel een Bearer in).
 tour:
   controls:
     next: Volgende
@@ -1827,6 +1903,7 @@ settings:
       geheime sleutels bevat.
     missing_file: Kies een JSON-bestand om te importeren.
     invalid_csrf: Ongeldig beveiligingstoken.
+    file_too_large: Instantieconfig-JSON is te groot (max. 2 MiB).
 mercure_settings:
   title: Mercure
   intro: Optionele livemeldingen voor aangemelde leden wanneer een nieuwe issue wordt
@@ -1851,6 +1928,89 @@ mercure_settings:
   push_note: PWA-push op de achtergrond wordt per gebruiker ingesteld onder Account
     -> Weergave (vereist VAPID_*-sleutels). Het hangt niet af van Mercure.
   submit: Mercure-instellingen opslaan
+  guide:
+    title: Mercure stap voor stap configureren
+    intro: Live-toasts voor nieuwe issues gebruiken een Mercure-hub (Server-Sent Events). Mercure is optioneel en onafhankelijk van Web Push (Account → Weergave).
+    open: Hoe te configureren
+    close: Sluiten
+    docs_hint: 'Volledige referentie met topics, privacy en productie — docs/ops/MERCURE.md.'
+    env:
+      step1_example: |
+        MERCURE_URL=http://mercure/.well-known/mercure
+        MERCURE_PUBLIC_URL=${DEFAULT_URI}/.well-known/mercure
+        MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
+      step2_example: openssl rand -base64 48
+      title: 2. Omgevingsvariabelen
+      lead: Configureer de hub liever in .env en laat de formuliervelden leeg zodat Beheer alleen de functie aan/uit zet.
+      step1: Kopieer of bevestig deze variabelen in .env (uit .env.dist).
+      step2: Vervang de placeholder-JWT-geheim door een sterke waarde (minimaal 32 tekens).
+      step2_note: Dezelfde string moet door PHP (MERCURE_JWT_SECRET) en de hub worden gebruikt (compose.yaml mapt die naar MERCURE_PUBLISHER_JWT_KEY en MERCURE_SUBSCRIBER_JWT_KEY).
+      step3: Weten wat elke variabele doet.
+      table_var: Variabele
+      table_meaning: Betekenis
+      row_url: Interne publish-URL vanuit PHP (Compose-voorbeeld links).
+      row_public: 'Browser-EventSource-URL. Gebruik bij voorkeur ${DEFAULT_URI}/.well-known/mercure zodat de browser same-origin via Caddy blijft.'
+      row_jwt: Gedeeld HMAC-geheim voor publisher- en subscriber-JWTs.
+    external:
+      example: |
+        MERCURE_URL=https://mercure.example.com/.well-known/mercure
+        MERCURE_PUBLIC_URL=https://mercure.example.com/.well-known/mercure
+        MERCURE_JWT_SECRET="your-shared-secret-at-least-32-chars"
+      title: 6. Externe hub (optioneel)
+      lead: Je kunt Beacon naar elke Mercure-compatibele hub laten wijzen in plaats van de Compose-service.
+      step1: Zet MERCURE_URL (of Publish URL) op een endpoint dat de PHP-container kan bereiken.
+      step2: Zet MERCURE_PUBLIC_URL (of Public URL) op een HTTPS-URL die browsers kunnen openen.
+      step3: Gebruik hetzelfde JWT-geheim op de hub publisher/subscriber-sleutels en in Beacon.
+      step4: 'Als de hub cross-origin is, configureer hub-CORS (cors_origins) voor je Beacon-origin.'
+    start:
+      step1_example: |
+        docker compose up -d mercure php
+        # or a full stack:
+        make up
+      step2_example: 'docker compose exec mercure curl -fsS http://127.0.0.1/healthz'
+      step3_example: |
+        handle /.well-known/mercure* {
+            reverse_proxy mercure:80
+        }
+      title: 3. Hub starten
+      step1: Start of herschep Mercure met de app-stack.
+      step2: Bevestig het health-endpoint van de hub (binnen het Compose-netwerk).
+      step3: Bevestig dat Caddy de hub proxyt (al in .docker/frankenphp/Caddyfile).
+    troubleshoot:
+      recreate: |
+        # After changing hub env vars
+        docker compose up -d --force-recreate mercure
+      title: 7. Probleemoplossing
+      inactive: 'Status inactief — schakelaar uit, of URL/geheim ontbreekt (DB en env leeg).'
+      unauthorized: EventSource 401 — subscriber-JWT-geheim ≠ hub MERCURE_SUBSCRIBER_JWT_KEY.
+      cors: CORS-fouten — public URL is cross-origin en hub cors_origins sluit Beacon uit.
+      publish: 'Publish-fouten in logs — PHP kan MERCURE_URL niet bereiken, of JWT ≠ hub-sleutels.'
+      ciphertext: Browser vraagt een onzinpad zoals /MUIFA…== — decryptie van overrides mislukt; maak Publish/Public/JWT hier leeg en gebruik env-waarden.
+      push: 'Toasts alleen met open tab is verwacht; gebruik Web Push (VAPID_*) voor achtergrond.'
+    verify:
+      curl_example: |
+        # From the host (replace with your DEFAULT_URI)
+        curl -sI "${DEFAULT_URI}/.well-known/mercure"
+      title: 5. Verifiëren in de browser
+      step1: Open DevTools → Network en filter op mercure of EventSource.
+      step2: Bevestig een verbinding met /.well-known/mercure (of je public URL) met een authorisatie-JWT.
+      step3: Trigger een nieuw issue op een project waar je bij hoort en let op het SSE-event / toast.
+      step4: GET /account/realtime/config moet hubUrl + token alleen bevatten wanneer Mercure is ingeschakeld en geconfigureerd.
+    overview:
+      title: 1. Wat je nodig hebt
+      body: Beacon publiceert privé-updates; ingelogde leden abonneren zolang een tab open is. Deze onderdelen moeten overeenkomen.
+      item_hub: 'Een Mercure-hub (Compose-service mercure, of elke Mercure-compatibele hub).'
+      item_jwt: Eén gedeeld JWT-HMAC-geheim (≥ 32 tekens) voor PHP en de hub.
+      item_proxy: Same-origin-browsertoegang via Caddy op /.well-known/mercure (Compose-standaard).
+      item_admin: 'De hoofdschakelaar op dit scherm, plus optionele URL-/geheim-overrides.'
+    admin:
+      title: 4. Live-waarschuwingen hier inschakelen
+      step1: Zet “Mercure-livewaarschuwingen inschakelen” aan.
+      step2: 'Laat Publish URL, Public URL en JWT leeg om MERCURE_* uit de omgeving te gebruiken.'
+      step3: Of vul die velden in om de env te overschrijven (waarden versleuteld in de database).
+      step4: Opslaan. Het statuspaneel hierboven moet live-waarschuwingen als actief tonen.
+      step5: 'Meld je aan als projectlid, houd een tab open, maak een nieuw issue en let op de in-app-toast.'
+      current_url: 'Nu opgeloste browser-hub-URL: %url%'
 instance_mercure:
   enabled:
     label: Mercure-livemeldingen inschakelen
@@ -2195,6 +2355,9 @@ notifications:
       payload: Canonieke JSON-payload als requestbody (User-Agent symfony-beacon-notifications/1.0).
       tip: Gebruik bij voorkeur HTTPS en autenticeer je ontvanger. Vermijd interne
         of cloudmetadata-adressen.
+  project_layer_help: 'Deze bestemmingen horen bij het project (teamkanalen), los van de persoonlijke waarschuwingsvoorkeuren hierboven. Uitgaande levering gebruikt bestemmingscategorieën; lid-toasts/push gebruiken de voorkeursmatrix van het lid.'
+  teams:
+    token_used: Die Teams-actielink is al gebruikt. Open het issue in Beacon als je het nog wilt wijzigen.
 thresholds:
   title: Drempelmeldingen
   intro: Maak rollende volumemeldingen wanneer error- of fatal-events een geconfigureerd

@@ -10,6 +10,7 @@ use App\Identity\Form\AdminInstancePermissionType;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
@@ -32,6 +33,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminInstancePermissionController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly InstancePermissionRepository $permissionRepository,
         private readonly UserActionRecorder $actionRecorder,
@@ -155,9 +158,7 @@ final class AdminInstancePermissionController extends AbstractController
             'admin_instance_permission_delete_'.$permission->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();

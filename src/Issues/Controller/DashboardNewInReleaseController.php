@@ -54,10 +54,7 @@ final class DashboardNewInReleaseController extends AbstractController
             $pagination['offset'],
         );
 
-        $projectChoices = [];
-        foreach ($accessible as $project) {
-            $projectChoices[$project->getName()] = $project->getUuid();
-        }
+        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
         $releaseChoices = array_combine($availableReleases, $availableReleases);
 
         return $this->render('dashboard/new_in_release.html.twig', [

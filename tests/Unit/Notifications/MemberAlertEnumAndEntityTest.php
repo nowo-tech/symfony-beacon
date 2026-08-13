@@ -9,10 +9,12 @@ use App\Identity\Form\MemberProjectAlertPreferencesType;
 use App\Notifications\Entity\MemberAccountAlertEvent;
 use App\Notifications\Entity\MemberProjectAlertEvent;
 use App\Notifications\Entity\MemberProjectAlertPreference;
+use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Enum\MemberAlertScope;
 use App\Notifications\Message\DeliverWebPushForProjectMessage;
 use App\Project\Entity\Project;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class MemberAlertEnumAndEntityTest extends TestCase
@@ -78,8 +80,8 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertSame($user, $pref->getUser());
         self::assertSame($project, $pref->getProject());
         self::assertFalse($pref->isEnabled());
-        self::assertNotNull($pref->getCreatedAt());
-        self::assertNotNull($pref->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $pref->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $pref->getUpdatedAt());
 
         $account = new MemberAccountAlertEvent();
         self::assertNull($account->getId());
@@ -124,7 +126,7 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         $user = new User();
         $user->setEmail('push-entity@example.com');
         $user->setPassword('x');
-        $sub = new \App\Notifications\Entity\PushSubscription($user);
+        $sub = new PushSubscription($user);
         self::assertNull($sub->getId());
         self::assertSame($user, $sub->getUser());
         $sub->setSubscription('https://fcm.googleapis.com/fcm/send/x', 'p', 'a', 'aesgcm', 'UA');
@@ -134,14 +136,13 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertSame('a', $sub->getAuthToken());
         self::assertSame('aesgcm', $sub->getContentEncoding());
         self::assertSame('UA', $sub->getUserAgent());
-        self::assertNotNull($sub->getCreatedAt());
-        self::assertNotNull($sub->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $sub->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $sub->getUpdatedAt());
         $sub->setEndpoint('cipher')->setP256dh('c1')->setAuthToken('c2');
         self::assertSame('cipher', $sub->getEndpoint());
         self::assertSame('c1', $sub->getP256dh());
         self::assertSame('c2', $sub->getAuthToken());
         $before = $sub->getUpdatedAt();
-        usleep(1000);
         $sub->touch();
         self::assertGreaterThanOrEqual($before, $sub->getUpdatedAt());
     }

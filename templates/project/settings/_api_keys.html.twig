@@ -1,0 +1,84 @@
+    <section class="panel">
+        <h2 class="mb-3 text-lg font-semibold">{{ 'project.api_keys.title'|trans }}</h2>
+        <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans }}</p>
+        <ul class="space-y-3">
+            {% for key in project.apiKeys %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm"{% if not key.active %} data-testid="api-key-inactive"{% endif %}>
+                    <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
+                    {% if membership.canManageApiKeys %}
+                        <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
+                        {% if key.active %}
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_once_hint'|trans }}</p>
+                        {% else %}
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.inactive_dsn_hidden'|trans }}</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_hidden'|trans }}</p>
+                    {% endif %}
+                    {% if membership.canManageApiKeys and key.active %}
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            {{ form_start(apiKeyRotateForms[key.id], {
+                                action: path('project_keys_rotate', {projectId: project.uuid, keyId: key.id}),
+                            }) }}
+                                <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.rotate'|trans }}</button>
+                            {{ form_end(apiKeyRotateForms[key.id]) }}
+                            {{ form_start(apiKeyRevokeForms[key.id], {
+                                action: path('project_keys_revoke', {projectId: project.uuid, keyId: key.id}),
+                                attr: {
+                                    'data-controller': 'confirm-submit',
+                                    'data-confirm-submit-message-value': 'project.api_keys.revoke_confirm'|trans,
+                                    'data-action': 'submit->confirm-submit#confirm',
+                                },
+                            }) }}
+                                <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.revoke'|trans }}</button>
+                            {{ form_end(apiKeyRevokeForms[key.id]) }}
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if membership.canManageApiKeys and lastApiKeyDsn|default(null) %}
+            <div class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3" data-testid="api-key-dsn-flash">
+                <div class="flex flex-wrap items-start gap-2">
+                    <code class="block min-w-0 flex-1 break-all text-sm font-mono">{{ lastApiKeyDsn }}</code>
+                    <button
+                        type="button"
+                        class="btn-ghost btn-sm shrink-0"
+                        data-controller="clipboard-copy"
+                        data-clipboard-copy-text-value="{{ lastApiKeyDsn|e('html_attr') }}"
+                        data-clipboard-copy-label-value="{{ 'project.api_keys.copy_dsn'|trans|e('html_attr') }}"
+                        data-clipboard-copy-done-label-value="{{ 'project.api_keys.dsn_copied'|trans|e('html_attr') }}"
+                        data-action="click->clipboard-copy#copy"
+                        aria-label="{{ 'project.api_keys.copy_dsn'|trans }}"
+                    >{{ 'project.api_keys.copy_dsn'|trans }}</button>
+                </div>
+                <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.secret_once_banner'|trans }}</p>
+            </div>
+        {% endif %}
+        {% if membership.canManageApiKeys %}
+            {{ form_start(apiKeyCreateForm, {
+                attr: {
+                    class: 'mt-4 flex flex-wrap gap-2',
+                    'data-controller': 'human-key-label',
+                    'data-human-key-label-adjectives-value': labelAdjectives|json_encode|e('html_attr'),
+                    'data-human-key-label-nouns-value': labelNouns|json_encode|e('html_attr'),
+                }
+            }) }}
+                {{ form_widget(apiKeyCreateForm.label, {
+                    attr: {
+                        class: 'input min-w-40 flex-1',
+                        placeholder: 'project.api_keys.label_placeholder'|trans,
+                        'data-human-key-label-target': 'label',
+                        autocomplete: 'off',
+                    }
+                }) }}
+                <button
+                    type="button"
+                    class="btn-ghost"
+                    data-action="human-key-label#generate"
+                    title="{{ 'project.api_keys.generate_hint'|trans }}"
+                >{{ 'project.api_keys.generate'|trans }}</button>
+                <button class="btn-primary" type="submit">{{ 'project.api_keys.add'|trans }}</button>
+            {{ form_end(apiKeyCreateForm) }}
+        {% endif %}
+    </section>

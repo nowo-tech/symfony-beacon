@@ -48,10 +48,7 @@ final class DashboardAlertsController extends AbstractController
             $pagination['offset'],
         );
 
-        $projectChoices = [];
-        foreach ($accessible as $project) {
-            $projectChoices[$project->getName()] = $project->getUuid();
-        }
+        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
 
         return $this->render('dashboard/alerts.html.twig', [
             'destinations' => $destinations,

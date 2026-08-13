@@ -17,6 +17,7 @@ use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectFactory;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Project\Service\ProjectOpsStatsService;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
@@ -37,6 +38,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminProjectController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
@@ -142,9 +145,7 @@ final class AdminProjectController extends AbstractController
             ['enabled' => ''],
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
@@ -177,9 +178,7 @@ final class AdminProjectController extends AbstractController
             ['project_uuid' => '', 'redirect' => ''],
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
@@ -216,9 +215,7 @@ final class AdminProjectController extends AbstractController
             ['redirect' => ''],
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
@@ -279,9 +276,7 @@ final class AdminProjectController extends AbstractController
             'project_id' => (int) $project->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
         if ($confirmation !== $project->getName()) {

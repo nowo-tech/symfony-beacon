@@ -138,6 +138,7 @@ common:
     created_by: Creado por
     updated_by: Actualizado por
     by_system: Sistema
+  'true': sí
 pagination:
   showing: Mostrando %from%–%to% de %total%
   nav: Páginas de la tabla
@@ -1661,6 +1662,7 @@ user_preferences:
     label: Contraseña actual
     help: Solo necesaria al establecer una nueva contraseña.
     help_required: Confirma tu contraseña actual para establecer una nueva.
+    help_email_change: Obligatoria al cambiar tu dirección de correo (inicio de sesión y destino del restablecimiento).
   plain_password:
     first:
       label: Nueva contraseña
@@ -1825,8 +1827,6 @@ admin:
       retención y exportación.
     maintenance: Activar o programar mantenimiento del sitio (HTTP 503).
     maintenance_preview: Ver la página pública de mantenimiento sin activar el downtime.
-    maintenance: Activar o programar mantenimiento del sitio (HTTP 503).
-    maintenance_preview: Ver la página pública de mantenimiento sin activar el downtime.
     api_docs: Explorar el ingest Envelope y la documentación OpenAPI HTTP relacionada.
     roles: Crear roles de instancia, editar matrices de permisos y asignar usuarios.
     permissions: Consultar claves de capacidad y editar etiquetas del catálogo.
@@ -1855,6 +1855,13 @@ admin:
     failed_empty: No hay destinos con una última entrega fallida.
     open_by_project_title: Incidencias abiertas por proyecto
     open_by_project_empty: No hay incidencias abiertas en el ámbito.
+    posture:
+      title: Aviso de postura de seguridad
+      intro: Uno o más valores ops dejan desactivadas protecciones fail-closed. Revísalos y ajústalos cuando puedas.
+      link_ops_defaults: Abrir valores ops
+      allow_private_urls: Se permiten URLs de webhook privadas / loopback (riesgo SSRF).
+      allow_anonymous_resolve: Resolve interactivo anónimo permitido en hooks.
+      metrics_require_token_off: No se exige token de scrape de métricas (activa require-token y configura un Bearer).
 setup:
   eyebrow: Primer arranque
   title: Configuración de la instancia
@@ -2366,6 +2373,8 @@ notifications:
       payload: Payload JSON canónico como cuerpo de la petición (User-Agent symfony-beacon-notifications/1.0).
       tip: Prefiere HTTPS y autentica tu receptor. Evita apuntar a direcciones internas
         o de metadatos cloud.
+  teams:
+    token_used: Ese enlace de acción de Teams ya se usó. Abre la incidencia en Beacon si aún necesitas cambiarla.
 thresholds:
   title: Alertas por umbral
   intro: Crea alertas de volumen cuando los eventos error o fatal superen una cantidad

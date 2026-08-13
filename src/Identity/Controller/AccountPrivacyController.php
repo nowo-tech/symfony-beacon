@@ -11,6 +11,7 @@ use App\Identity\Service\AccountAnonymizer;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Controller\RequiresValidFormTrait;
 use JsonException;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class AccountPrivacyController extends AbstractController
 {
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly AccountDataExporter $accountDataExporter,
         private readonly AccountAnonymizer $accountAnonymizer,
@@ -84,9 +87,7 @@ final class AccountPrivacyController extends AbstractController
             'csrf_token_id' => 'account_privacy_anonymize',
         ]);
         $form->submit($request->request->all(), false);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         try {
             $this->accountAnonymizer->anonymize($user, $user);

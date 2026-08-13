@@ -1,0 +1,167 @@
+    <section class="panel">
+        <div class="mb-3 flex flex-wrap items-start justify-between gap-2">
+            <div>
+                <h2 class="text-lg font-semibold">{{ 'project.members.title'|trans }}</h2>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'project.members.help'|trans }}</p>
+            </div>
+            {% if assignableRoles is not empty %}
+                {% embed 'shared/_confirm_dialog.html.twig' with {
+                    custom_form: true,
+                    aria_labelledby: 'project-member-add-title-' ~ project.id,
+                } %}
+                    {% block trigger %}
+                        <button
+                            type="button"
+                            class="btn-primary btn-sm btn-icon"
+                            data-action="confirm-dialog#open"
+                            title="{{ 'project.members.add'|trans }}"
+                            aria-label="{{ 'project.members.add'|trans }}"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                        </button>
+                    {% endblock %}
+                    {% block form %}
+                        {{ form_start(memberAddForm, {attr: {class: 'confirm-dialog__panel'}}) }}
+                            <div class="confirm-dialog__header">
+                                <h2 id="project-member-add-title-{{ project.id }}" class="confirm-dialog__title">{{ 'project.members.add_title'|trans }}</h2>
+                                <p class="confirm-dialog__body">{{ 'project.members.add_help'|trans }}</p>
+                            </div>
+                            <div class="confirm-dialog__content">
+                                <label class="confirm-dialog__label" for="member-email">{{ 'project.members.email_label'|trans }}</label>
+                                {{ form_widget(memberAddForm.email, {
+                                    attr: {
+                                        id: 'member-email',
+                                        class: 'input w-full',
+                                        autocomplete: 'off',
+                                        placeholder: 'project.members.email_placeholder'|trans,
+                                    }
+                                }) }}
+                                <label class="confirm-dialog__label" for="member-add-role">{{ 'project.members.role_label'|trans }}</label>
+                                {{ form_widget(memberAddForm.role, {attr: {id: 'member-add-role', class: 'input w-full'}}) }}
+                            </div>
+                            <div class="confirm-dialog__actions">
+                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                <button type="submit" class="btn-primary">{{ 'project.members.add'|trans }}</button>
+                            </div>
+                        {{ form_end(memberAddForm) }}
+                    {% endblock %}
+                {% endembed %}
+            {% endif %}
+        </div>
+        <ul class="space-y-3 text-sm">
+            {% for member in project.memberships %}
+                {% set memberUser = member.user %}
+                {% set isProtectedFull = member.role.value == 'full' %}
+                {% set actorIsOwner = membership.role.value == 'owner' %}
+                {# Owners are not edited/removed here — use Transfer ownership. #}
+                {% set canManageThis = assignableRoles is not empty
+                    and member.role.value != 'owner'
+                    and (actorIsOwner or member.role.value != 'full') %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="font-medium">{{ memberUser.displayName }}</div>
+                            <div class="text-xs text-[var(--color-ink)]/60">{{ memberUser.email }}</div>
+                            <div class="mt-1">
+                                <span class="badge bg-[var(--color-sand)]">{{ ('project.members.role.' ~ member.role.value)|trans }}</span>
+                                {% if not member.active %}
+                                    <span class="badge badge-error">{{ 'project.members.inactive'|trans }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if canManageThis %}
+                            <div class="flex shrink-0 items-center gap-1">
+                                {% embed 'shared/_confirm_dialog.html.twig' with {
+                                    custom_form: true,
+                                    aria_labelledby: 'project-member-role-title-' ~ member.id,
+                                } %}
+                                    {% block trigger %}
+                                        <button
+                                            type="button"
+                                            class="btn-ghost btn-sm btn-icon"
+                                            data-action="confirm-dialog#open"
+                                            title="{{ 'project.members.edit_role'|trans }}"
+                                            aria-label="{{ 'project.members.edit_role'|trans }}"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.83H5v-.92l9.06-9.06.92.92L5.92 20.08zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                            </svg>
+                                        </button>
+                                    {% endblock %}
+                                    {% block form %}
+                                        {{ form_start(memberRoleForms[member.id], {attr: {class: 'confirm-dialog__panel'}}) }}
+                                            <div class="confirm-dialog__header">
+                                                <h2 id="project-member-role-title-{{ member.id }}" class="confirm-dialog__title">{{ 'project.members.edit_role_title'|trans }}</h2>
+                                                <p class="confirm-dialog__body">{{ 'project.members.edit_role_body'|trans({'%name%': memberUser.displayName, '%email%': memberUser.email}) }}</p>
+                                            </div>
+                                            <div class="confirm-dialog__content">
+                                                <label class="confirm-dialog__label" for="member-role-{{ member.id }}">{{ 'project.members.role_label'|trans }}</label>
+                                                {{ form_widget(memberRoleForms[member.id].role, {attr: {id: 'member-role-' ~ member.id, class: 'input w-full'}}) }}
+                                            </div>
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                                <button type="submit" class="btn-primary">{{ 'project.members.update_role'|trans }}</button>
+                                            </div>
+                                        {{ form_end(memberRoleForms[member.id]) }}
+                                    {% endblock %}
+                                {% endembed %}
+
+                                {% embed 'shared/_confirm_dialog.html.twig' with {
+                                    custom_form: true,
+                                    form_action: path('project_members_remove', {projectId: project.uuid, userId: memberUser.uuid}),
+                                    aria_labelledby: 'project-member-remove-title-' ~ member.id,
+                                } %}
+                                    {% block form %}
+                                        {{ form_start(memberRemoveForms[member.id], {
+                                            action: path('project_members_remove', {projectId: project.uuid, userId: memberUser.uuid}),
+                                            attr: {class: 'confirm-dialog__panel'},
+                                        }) }}
+                                            <div class="confirm-dialog__header">
+                                                <h2 id="project-member-remove-title-{{ member.id }}" class="confirm-dialog__title">{{ 'project.members.remove_title'|trans }}</h2>
+                                                {% if isProtectedFull %}
+                                                    <p class="confirm-dialog__body">{{ 'flash.project.member_cannot_remove_full'|trans }}</p>
+                                                {% else %}
+                                                    <p class="confirm-dialog__body">{{ 'project.members.remove_confirm'|trans({'%email%': memberUser.email}) }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="confirm-dialog__content"></div>
+                                            <div class="confirm-dialog__actions">
+                                                <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
+                                                <button type="submit" class="btn-danger" {% if isProtectedFull %}disabled{% endif %}>{{ 'project.members.remove'|trans }}</button>
+                                            </div>
+                                        {{ form_end(memberRemoveForms[member.id]) }}
+                                    {% endblock %}
+                                    {% block trigger %}
+                                        <button
+                                            type="button"
+                                            class="btn-ghost btn-sm btn-icon"
+                                            data-action="confirm-dialog#open"
+                                            title="{{ 'project.members.remove'|trans }}"
+                                            aria-label="{{ 'project.members.remove'|trans }}"
+                                            {% if isProtectedFull %}disabled{% endif %}
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                            </svg>
+                                        </button>
+                                    {% endblock %}
+                                {% endembed %}
+
+                                {{ form_start(memberSetActiveForms[member.id], {
+                                    action: path('project_members_set_active', {projectId: project.uuid, userId: memberUser.uuid}),
+                                }) }}
+                                    {{ form_widget(memberSetActiveForms[member.id].active) }}
+                                    <button class="btn-ghost btn-sm" type="submit" title="{{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}">
+                                        {{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}
+                                    </button>
+                                {{ form_end(memberSetActiveForms[member.id]) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'project.members.your_role'|trans }} {{ ('project.members.role.' ~ membership.role.value)|trans }}</p>
+    </section>

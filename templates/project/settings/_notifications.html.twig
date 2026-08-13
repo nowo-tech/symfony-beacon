@@ -1,0 +1,78 @@
+<section class="panel mt-6" id="project-notification-destinations">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-semibold">{{ 'notifications.title'|trans }}</h2>
+        <div class="flex flex-wrap gap-2">
+            <a class="btn-ghost" href="{{ path('project_notification_help', {id: project.uuid}) }}">{{ 'notifications.help.link'|trans }}</a>
+            {% if membership.canManageNotifications %}
+                <a class="btn-primary" href="{{ path('project_notification_new', {id: project.uuid}) }}">{{ 'notifications.add'|trans }}</a>
+            {% endif %}
+        </div>
+    </div>
+    <p class="mb-2 text-sm text-[var(--color-ink)]/65">{{ 'notifications.intro'|trans }}</p>
+    <p class="mb-4 text-xs text-[var(--color-ink)]/55">{{ 'notifications.project_layer_help'|trans }}</p>
+    {% set destinations = project.notificationDestinations %}
+    {% if destinations is empty %}
+        <p class="text-sm text-[var(--color-ink)]/55">{{ 'notifications.empty'|trans }}</p>
+    {% else %}
+        <ul class="space-y-3">
+            {% for destination in destinations %}
+                <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <div class="font-medium">
+                                {{ destination.label }}
+                                {% if not destination.enabled %}
+                                    <span class="badge badge-error">{{ 'notifications.disabled'|trans }}</span>
+                                {% endif %}
+                                {% if beacon_notification_circuit_open(destination) %}
+                                    <span class="badge badge-error">{{ 'notifications.circuit_paused'|trans }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/60">
+                                {{ ('notifications.type.' ~ destination.type.value)|trans }}
+                                · {{ destination.maskedEndpointUrl }}
+                            </div>
+                            <div class="mt-1 text-xs text-[var(--color-ink)]/55">
+                                {% for category in destination.categories %}
+                                    <span class="mr-1">{{ ('notifications.category.' ~ category)|trans }}</span>{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if membership.canManageNotifications %}
+                            <div class="flex flex-wrap gap-2">
+                                <a class="btn-ghost" href="{{ path('project_notification_edit', {projectId: project.uuid, id: destination.uuid}) }}">{{ 'notifications.edit'|trans }}</a>
+                                {% if beacon_notification_circuit_open(destination) %}
+                                    {{ form_start(notificationResumeForms[destination.id], {
+                                        action: path('project_notification_resume', {projectId: project.uuid, id: destination.uuid}),
+                                    }) }}
+                                        <button class="btn-ghost" type="submit">{{ 'notifications.resume'|trans }}</button>
+                                    {{ form_end(notificationResumeForms[destination.id]) }}
+                                {% endif %}
+                                {{ form_start(notificationToggleForms[destination.id], {
+                                    action: path('project_notification_toggle', {projectId: project.uuid, id: destination.uuid}),
+                                }) }}
+                                    <button class="btn-ghost" type="submit">{{ destination.enabled ? 'notifications.disable'|trans : 'notifications.enable'|trans }}</button>
+                                {{ form_end(notificationToggleForms[destination.id]) }}
+                                {{ form_start(notificationTestForms[destination.id], {
+                                    action: path('project_notification_test', {projectId: project.uuid, id: destination.uuid}),
+                                }) }}
+                                    <button class="btn-ghost" type="submit" title="{{ 'notifications.test_hint'|trans({'%type%': ('notifications.type.' ~ destination.type.value)|trans}) }}">{{ 'notifications.test'|trans }}</button>
+                                {{ form_end(notificationTestForms[destination.id]) }}
+                                {{ form_start(notificationDeleteForms[destination.id], {
+                                    action: path('project_notification_delete', {projectId: project.uuid, id: destination.uuid}),
+                                    attr: {
+                                        'data-controller': 'confirm-submit',
+                                        'data-confirm-submit-message-value': 'notifications.delete_confirm'|trans,
+                                        'data-action': 'submit->confirm-submit#confirm',
+                                    },
+                                }) }}
+                                    <button class="btn-danger" type="submit">{{ 'notifications.delete'|trans }}</button>
+                                {{ form_end(notificationDeleteForms[destination.id]) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>

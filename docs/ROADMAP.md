@@ -304,8 +304,9 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.38 | **Project config export/import**: `beacon-project-bundle` v1; unique `project.code`; membership `active`; Admin creates users; Settings skips unknown emails | Beacon | `089-project-config-export` | **Done** (v1.6.0) |
 | 6.39 | **CSRF via Symfony Forms**: `CsrfOnlyType` + named Types (triage / danger / Settings / admin) + GET `AbstractGetFilterType`; migrate off hand-rolled Twig `csrf_token()` POSTs | Beacon | `090-csrf-symfony-forms` | **Done** (v1.7.0) |
 | 6.40 | **Member alert preferences**: Account matrix (master / events / scope / per-project); Mercure `/users/{uuid}/member-alerts`; Web Push filtered; viewers edit own prefs from Account | Beacon | `091-member-push-preferences` | **Done** (v1.8.0) |
-| 6.41 | **Site-wide maintenance mode**: `nowo-tech/maintenance-mode-bundle`; Administration panel + preview; branded `error-503.png` public page; kit chrome | Beacon | `092-maintenance-mode` | **Done** (unreleased) |
-| 6.42 | **Security residual hardening**: hard-delete Envelope query-auth; Ops security posture warning; hook IP rate limits; metrics require-token upgrade banner; Setup/Teams query hygiene docs; thin Ingest→Notifications Messenger decoupling | Beacon | `093-security-residual-hardening` | **Implemented** (unreleased) |
+| 6.41 | **Site-wide maintenance mode**: `nowo-tech/maintenance-mode-bundle`; Administration panel + preview; branded `error-503.png` public page; kit chrome | Beacon | `092-maintenance-mode` | **Done** (v1.9.0) |
+| 6.42 | **Security residual hardening**: hard-delete Envelope query-auth; Ops security posture warning; hook IP rate limits; metrics require-token upgrade banner; Setup/Teams query hygiene docs; thin Ingest→Notifications Messenger decoupling | Beacon | `093-security-residual-hardening` | **Done** (v1.9.0) |
+| 6.43 | **PHPStan FrankenPHP 1.1.0**: production gate `rules.neon`; new worker process-state + `pcntl_signal` hardening identifiers; path-scoped PHPUnit `umask` ignore | Beacon | `094-phpstan-frankenphp-110` | **Done** (v1.9.0) |
 
 ### Next (immediate queue)
 
@@ -395,7 +396,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.8.0** | Member alert preferences (`091` / 6.40); Mercure `/users/{uuid}/member-alerts`; UserKit 1.1.6 disabled-account PreAuth; viewers edit own prefs from Account |
 | **v1.8.1** | CS / LiveComponent DI polish; restore `seedTestOpsDefaults` PHPUnit helper name |
 | **v1.8.2** | Firewall `user_checker` → UserKit AccountStatusUserChecker (disabled magic login); PHPStan / Rector / CS CI harden |
-| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, OTLP gRPC, …) when specified |
+| **v1.9.0** | Maintenance mode (`092` / 6.41); security residual (`093` / 6.42 — breaking query-auth removal); PHPStan FrankenPHP 1.1.0 (`094` / 6.43); Settings/search maintainability |
+| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 
@@ -406,4 +408,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-12 (**v1.8.2** cut; UserKit user_checker wiring + PHPStan/Rector/CS CI harden).
+Last updated: 2026-08-13 (**v1.9.0** cut — maintenance, security residual, PHPStan FrankenPHP 1.1.0).

@@ -15,6 +15,7 @@ use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
@@ -36,6 +37,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminInstanceRoleController extends AbstractController
 {
+    use RequiresValidFormTrait;
     private const array DETAIL_ROUTES = [
         'admin_roles_show',
         'admin_roles_users',
@@ -180,9 +182,7 @@ final class AdminInstanceRoleController extends AbstractController
             'admin_instance_role_delete_'.$role->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
@@ -294,9 +294,7 @@ final class AdminInstanceRoleController extends AbstractController
             'csrf_token_id' => 'admin_instance_role_user_add_'.$role->getId(),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var array{email?: string|null} $data */
         $data = $form->getData();
@@ -346,9 +344,7 @@ final class AdminInstanceRoleController extends AbstractController
             'admin_instance_role_user_remove_'.$role->getId().'_'.$user->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         $user->removeInstanceRole($role);
 

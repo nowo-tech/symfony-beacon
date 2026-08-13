@@ -137,6 +137,7 @@ common:
     created_by: Created by
     updated_by: Updated by
     by_system: System
+  'yes': 'yes'
 pagination:
   showing: Showing %from%–%to% of %total%
   nav: Table pages
@@ -1005,6 +1006,9 @@ ops_defaults:
     help: Minutes before an automatically paused destination may retry. Use 0 to require
       manual resume.
   submit: Save ops defaults
+  ingest_reject_query_auth:
+    label: Reject query-string ingest auth (deprecated)
+    help: 'When enabled, beacon_key/beacon_secret query parameters are rejected (401). Disable only while migrating clients to X-Beacon-Auth or Envelope DSN.'
 settings:
   instance_config:
     title: Instance config

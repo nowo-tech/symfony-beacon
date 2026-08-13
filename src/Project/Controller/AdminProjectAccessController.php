@@ -11,14 +11,13 @@ use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
-use App\Project\Exception\ProjectAccessException;
 use App\Project\Form\ProjectGroupAddType;
 use App\Project\Form\ProjectMemberAddType;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\ProjectAccessFlashKeys;
+use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipUiHelper;
+use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -35,10 +34,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class AdminProjectAccessController extends AbstractController
 {
+    use HandlesProjectAccessMutationsTrait;
+    use RequiresValidFormTrait;
+
     public function __construct(
         private readonly ProjectMembershipManager $membershipManager,
         private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly ProjectRepository $projectRepository,
+        private readonly ProjectMembershipFormSupport $membershipFormSupport,
         private readonly UserGroupRepository $userGroupRepository,
         private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
     ) {
@@ -58,20 +60,17 @@ final class AdminProjectAccessController extends AbstractController
             'role_choices' => ProjectMembershipUiHelper::roleChoices($this->membershipManager->assignableRoles($actor, $project)),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var array{email?: string|null, role?: string|null} $data */
         $data = $form->getData();
         $role = ProjectRole::tryFrom((string) ($data['role'] ?? '')) ?? ProjectRole::Member;
 
-        try {
-            $this->membershipManager->addByEmail($project, $actor, (string) ($data['email'] ?? ''), $role);
-            $this->addFlash('success', 'flash.project.member_added');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn (): ProjectMembership => $this->membershipManager->addByEmail($project, $actor, (string) ($data['email'] ?? ''), $role),
+            'flash.project.member_added',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -95,9 +94,7 @@ final class AdminProjectAccessController extends AbstractController
             'csrf_token_id' => 'admin_project_member_role_'.$target->getId(),
         ]);
         $form->submit($request->request->all());
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         $role = ProjectRole::tryFrom($request->request->getString('role'));
         if (!$role instanceof ProjectRole) {
@@ -108,12 +105,11 @@ final class AdminProjectAccessController extends AbstractController
 
         /** @var User $actor */
         $actor = $this->getUser();
-        try {
-            $this->membershipManager->changeRole($project, $actor, $target, $role);
-            $this->addFlash('success', 'flash.project.member_role_updated');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn () => $this->membershipManager->changeRole($project, $actor, $target, $role),
+            'flash.project.member_role_updated',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -141,18 +137,15 @@ final class AdminProjectAccessController extends AbstractController
             'admin_project_member_remove_'.$target->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
-        try {
-            $this->membershipManager->remove($project, $actor, $target);
-            $this->addFlash('success', 'flash.project.member_removed');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn () => $this->membershipManager->remove($project, $actor, $target),
+            'flash.project.member_removed',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -168,13 +161,11 @@ final class AdminProjectAccessController extends AbstractController
         $actor = $this->getUser();
         $form = $this->createForm(ProjectGroupAddType::class, null, [
             'csrf_token_id' => 'admin_project_group_add_'.$project->getId(),
-            'group_choices' => $this->groupChoicesForForm($project),
+            'group_choices' => $this->membershipFormSupport->groupChoicesForLinking($project),
             'role_choices' => ProjectMembershipUiHelper::roleChoices($this->membershipManager->assignableGroupRoles($actor, $project)),
         ]);
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         /** @var array{group?: string|null, role?: string|null} $data */
         $data = $form->getData();
@@ -186,12 +177,11 @@ final class AdminProjectAccessController extends AbstractController
         }
 
         $role = ProjectRole::tryFrom((string) ($data['role'] ?? '')) ?? ProjectRole::Member;
-        try {
-            $this->membershipManager->addGroup($project, $actor, $group, $role);
-            $this->addFlash('success', 'flash.project.group_added');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn (): ProjectGroupAccess => $this->membershipManager->addGroup($project, $actor, $group, $role),
+            'flash.project.group_added',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -217,9 +207,7 @@ final class AdminProjectAccessController extends AbstractController
             'csrf_token_id' => 'admin_project_group_role_'.$groupAccess->getId(),
         ]);
         $form->submit($request->request->all());
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid form submission.');
-        }
+        $this->requireValidForm($form);
 
         $role = ProjectRole::tryFrom($request->request->getString('role'));
         if (!$role instanceof ProjectRole) {
@@ -230,12 +218,11 @@ final class AdminProjectAccessController extends AbstractController
 
         /** @var User $actor */
         $actor = $this->getUser();
-        try {
-            $this->membershipManager->changeGroupRole($project, $actor, $groupAccess, $role);
-            $this->addFlash('success', 'flash.project.group_role_updated');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn () => $this->membershipManager->changeGroupRole($project, $actor, $groupAccess, $role),
+            'flash.project.group_role_updated',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -265,18 +252,15 @@ final class AdminProjectAccessController extends AbstractController
             'admin_project_group_remove_'.$groupAccess->getId(),
         );
         $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
+        $this->requireValidCsrfForm($form);
 
         /** @var User $actor */
         $actor = $this->getUser();
-        try {
-            $this->membershipManager->removeGroup($project, $actor, $groupAccess);
-            $this->addFlash('success', 'flash.project.group_removed');
-        } catch (ProjectAccessException $e) {
-            $this->addFlash('error', ProjectAccessFlashKeys::forException($e));
-        }
+        $this->attemptProjectAccessMutation(
+            fn () => $this->membershipManager->removeGroup($project, $actor, $groupAccess),
+            'flash.project.group_removed',
+            denyOnForbidden: false,
+        );
 
         return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
     }
@@ -289,16 +273,5 @@ final class AdminProjectAccessController extends AbstractController
         }
 
         return $membership;
-    }
-
-    /** @return array<string, string> */
-    private function groupChoicesForForm(Project $project): array
-    {
-        $this->projectRepository->hydrateAccessGraph($project);
-
-        return ProjectMembershipUiHelper::groupChoicesForLinking(
-            $project,
-            $this->userGroupRepository->findAllOrdered(),
-        );
     }
 }

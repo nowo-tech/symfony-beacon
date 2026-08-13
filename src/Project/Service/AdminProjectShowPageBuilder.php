@@ -42,6 +42,7 @@ final readonly class AdminProjectShowPageBuilder
         private GetFilterFormFactory $getFilterFormFactory,
         private ProjectRepository $projectRepository,
         private ProjectMembershipManager $membershipManager,
+        private ProjectMembershipFormSupport $membershipFormSupport,
         private ProjectMembershipRepository $membershipRepository,
         private UserGroupMembershipRepository $userGroupMembershipRepository,
         private UserGroupRepository $userGroupRepository,
@@ -185,9 +186,8 @@ final readonly class AdminProjectShowPageBuilder
                 'action' => $this->urlGenerator->generate('admin_projects_groups_add', ['id' => $project->getUuid()]),
                 'method' => 'POST',
                 'csrf_token_id' => 'admin_project_group_add_'.$project->getId(),
-                'group_choices' => ProjectMembershipUiHelper::groupChoicesForLinking(
+                'group_choices' => $this->membershipFormSupport->groupChoicesForLinking(
                     $project,
-                    $availableGroups,
                     $groupMemberCounts,
                 ),
                 'role_choices' => $groupRoleChoices,

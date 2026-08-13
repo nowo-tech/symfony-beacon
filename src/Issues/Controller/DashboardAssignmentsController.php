@@ -107,10 +107,8 @@ final class DashboardAssignmentsController extends AbstractController
             'page' => 1,
             'per_page' => $pagination['per_page'],
         ];
-        $projectChoices = [];
-        foreach ($accessible as $project) {
-            $projectChoices[$project->getName()] = $project->getUuid();
-        }
+
+        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
         $teammateChoices = [];
         foreach ($teammates as $teammate) {
             $teammateId = $teammate->getId();

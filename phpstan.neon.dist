@@ -12,17 +12,19 @@ parameters:
         -
             identifier: doctrine.associationType
             path: src/*/Entity/*
+        # PHPUnit CLI bootstrap (Symfony Flex debug umask); not a FrankenPHP worker request path
+        -
+            identifier: frankenphp.worker.noUmask
+            path: tests/bootstrap.php
 
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-symfony/rules.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon
-    # nowo-tech/phpstan-frankenphp — classic → worker → hardening
+    # nowo-tech/phpstan-frankenphp — production gate (classic + worker + hardening)
     # https://github.com/nowo-tech/PhpStanFrankenPhp/blob/main/docs/CONFIGURATION.md
     - vendor/nowo-tech/phpstan-frankenphp/extension.neon
-    - vendor/nowo-tech/phpstan-frankenphp/ruleset-classic.neon
-    - vendor/nowo-tech/phpstan-frankenphp/ruleset-worker.neon
-    - vendor/nowo-tech/phpstan-frankenphp/ruleset-hardening.neon
+    - vendor/nowo-tech/phpstan-frankenphp/rules.neon
     # Optional: also flag $_GET/$_POST/… (framework often touches these legitimately)
     # - vendor/nowo-tech/phpstan-frankenphp/ruleset-worker-strict.neon

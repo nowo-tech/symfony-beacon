@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Notifications;
 
 use App\Identity\Entity\User;
+use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Repository\MemberAccountAlertEventRepository;
 use App\Notifications\Repository\MemberProjectAlertPreferenceRepository;
+use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
@@ -16,6 +18,7 @@ use App\Twig\Components\MemberProjectAlertPreferencesLive;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
@@ -437,7 +440,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
 
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $user->setPushNotificationsEnabled(true);
-        $sub = new \App\Notifications\Entity\PushSubscription($user);
+        $sub = new PushSubscription($user);
         $sub->setSubscription('https://fcm.googleapis.com/fcm/send/test-endpoint', 'p256', 'auth', 'aesgcm');
         $em->persist($sub);
         $em->flush();
@@ -476,7 +479,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
         }
         $component->submitForm($formValues, 'save');
         self::assertResponseRedirects('/account/display/notifications');
-        self::assertSame([], self::getContainer()->get(\App\Notifications\Repository\PushSubscriptionRepository::class)->findByUser($user));
+        self::assertSame([], self::getContainer()->get(PushSubscriptionRepository::class)->findByUser($user));
 
         $missing = $this->createLiveComponent(
             name: MemberProjectAlertPreferencesLive::class,
@@ -510,7 +513,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
         try {
             $missing->submitForm($values, 'save');
             self::fail('Expected NotFoundHttpException for unknown project');
-        } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+        } catch (NotFoundHttpException $e) {
             self::assertSame('Project not found.', $e->getMessage());
         }
     }

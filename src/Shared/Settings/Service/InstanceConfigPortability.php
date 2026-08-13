@@ -9,8 +9,8 @@ use App\Shared\Appearance\AppearanceCornerStyles;
 use App\Shared\Appearance\AppearanceThemePresets;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use App\Shared\Appearance\SiteAppearanceProvider;
+use App\Shared\Portability\ConfigPortabilityEnvelope;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
-use DateTimeImmutable;
 use InvalidArgumentException;
 
 /**
@@ -64,9 +64,7 @@ final readonly class InstanceConfigPortability
         $settings = $this->instanceSettingsRepository->getOrCreate();
 
         return [
-            'schema' => self::SCHEMA,
-            'version' => self::VERSION,
-            'exported_at' => new DateTimeImmutable()->format(\DATE_ATOM),
+            ...ConfigPortabilityEnvelope::header(self::SCHEMA, self::VERSION),
             'appearance' => [
                 'brand_name' => $appearance->getBrandName(),
                 'brand_eyebrow' => $appearance->getBrandEyebrow(),
@@ -127,13 +125,8 @@ final readonly class InstanceConfigPortability
     {
         $this->assertNoForbiddenKeys($payload);
 
-        if (($payload['schema'] ?? null) !== self::SCHEMA) {
-            throw new InvalidArgumentException('invalid_schema');
-        }
-        $version = (int) ($payload['version'] ?? 0);
-        if ($version < 1 || $version > self::VERSION) {
-            throw new InvalidArgumentException('unsupported_version');
-        }
+        ConfigPortabilityEnvelope::assertSchema($payload, self::SCHEMA);
+        ConfigPortabilityEnvelope::assertCompatibleVersion($payload, self::VERSION);
 
         $applied = [];
 

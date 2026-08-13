@@ -24,6 +24,7 @@ use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionProperty;
+use RuntimeException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Messenger\Envelope;
@@ -89,7 +90,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
         $memberships->method('findUsersByProject')->willReturn([$user]);
 
         $http = new MockHttpClient(static function (): never {
-            throw new class('hub down') extends \RuntimeException implements TransportExceptionInterface {};
+            throw new class('hub down') extends RuntimeException implements TransportExceptionInterface {};
         });
         $mercure = $this->enabledMercure($http);
 
