@@ -2,9 +2,13 @@
 
 **Feature Branch**: `008-ux-native`  
 **Created**: 2026-07-20  
-**Status**: **Superseded / Removed** (Hotwire Native dropped; PWA remains)
+**Updated**: 2026-08-13  
+**Status**: **Deferred / Future** (not in current scope — tracked on the product roadmap)
 
-> **Historical spec.** The server contract (`/config/ios_v1.json`, `/config/android_v1.json`, `ux-native` / `ux-turbo`) was removed. Operators should use the **PWA** (`nowo-tech/pwa-bundle`). See [docs/dev/NATIVE-MOBILE.md](../../docs/dev/NATIVE-MOBILE.md) and constitution v1.2.0+.
+> **Deferred.** Beacon does **not** ship `symfony/ux-native` or `symfony/ux-turbo` today.
+> Operators should use the **PWA** (`nowo-tech/pwa-bundle`) for installable mobile access.
+> When prioritized, re-open this spec (or a successor), amend the constitution, and implement via Spec Kit.
+> See [docs/dev/NATIVE-MOBILE.md](../../docs/dev/NATIVE-MOBILE.md) and [docs/ROADMAP.md](../../docs/ROADMAP.md).
 
 **Input**: User description: "Pass the project to Symfony UX Native so we can have a mobile application."
 
@@ -95,9 +99,9 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 
 ### Key Entities
 
-- **Native configuration document**: Versioned settings + ordered path rules consumed by Hotwire Native clients (built by `App\Native\AppNativeConfiguration`).
-- **Native request**: An HTTP request identified as coming from a Hotwire Native shell (`ux_is_native()`).
-- **Theme bridge**: Stimulus `beacon-theme-bridge` keeps native chrome in sync with app theme after Turbo navigations.
+- **Native configuration document**: Versioned settings + ordered path rules consumed by Hotwire Native clients.
+- **Native request**: An HTTP request identified as coming from a Hotwire Native shell.
+- **Theme bridge**: Optional Stimulus bridge to keep native chrome in sync with app theme after Turbo navigations.
 
 ## Success Criteria *(mandatory)*
 
@@ -112,7 +116,7 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 
 - Symfony UX Native remains the integration point for Hotwire Native detection/config (component may evolve; behaviour above is the contract).
 - Shipping App Store / Play Store binaries is **out of scope** for this repo; only server support + docs are in scope.
-- PWA (`nowo-tech/pwa-bundle`) continues to serve browser “install to home screen”; native store apps replace that path for mobile users who use the shell.
+- PWA (`nowo-tech/pwa-bundle`) continues to serve browser “install to home screen” until/unless a native shell is prioritized.
 - Legal pages and cookie consent may be required before public store distribution but are tracked as operator obligations, not blockers for server-side native support.
 
 ## Out of Scope
@@ -120,3 +124,4 @@ As an operator or contributor, I can follow project documentation to point iOS/A
 - Separate JSON REST API + token auth for a fully native UI rewrite (React Native / Flutter).
 - Maintaining first-party Xcode / Android Studio projects inside this repository (may be added later).
 - Push notifications, NFC, camera bridges beyond a minimal theme bridge hook.
+- **Implementing this feature in the current release train** — deferred until explicitly scheduled on the roadmap.

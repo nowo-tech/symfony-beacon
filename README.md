@@ -200,7 +200,7 @@ Index: **[docs/README.md](docs/README.md)** (canonical manuals + categorized gui
 - [Security policy](SECURITY.md)
 - [DSN / SDK](docs/DSN.md)
 - [Event context (timestamps, versions, user)](docs/product/EVENT-CONTEXT.md)
-- [Mobile / PWA (Hotwire Native removed)](docs/dev/NATIVE-MOBILE.md)
+- [Mobile / PWA](docs/dev/NATIVE-MOBILE.md)
 - [Legal pages & cookie consent](docs/product/LEGAL-AND-COOKIES.md)
 - [Adding a UI language](docs/dev/ADDING-LOCALES.md)
 - [Production](docs/PRODUCTION.md)

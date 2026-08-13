@@ -33,7 +33,7 @@ Related: [ARCHITECTURE.md](ARCHITECTURE.md), [CHANGELOG.md](CHANGELOG.md), featu
 | Daily analytics | Beacon | `005-analytics` |
 | AuthKit, projects, Settings, danger zone | Beacon | `002`, `011` |
 | Rich event context + stack source context | Beacon + Bundle | `010`, Bundle ≥ 1.3.0 |
-| PWA (browser installability) | Beacon | `nowo-tech/pwa-bundle` (Hotwire Native `008` removed — see `docs/dev/NATIVE-MOBILE.md`) |
+| PWA (browser installability) | Beacon | `nowo-tech/pwa-bundle` (see `docs/dev/NATIVE-MOBILE.md`) |
 | Architecture rationale + Mermaid flows | Beacon | `docs/ARCHITECTURE.md` |
 
 ---
@@ -138,7 +138,7 @@ Do **not** reinvent: native PagerDuty, session replay, multi-org SaaS control pl
 
 ## Phase 6 — Operator platform & triage depth (Next)
 
-Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`); **v1.5.1** polishes owner-row membership UI and kit admin modal chrome. **v1.6.0** adds project config export/import **6.38** (`089`), DSN UUID path, and AuthKit 1.16. **v1.6.1** hardens ingest gate / config import + Mercure JWT guard; **v1.6.2** tabs the export/import Settings card; **v1.6.3** restores show-once DSN, caps JSON imports at 2 MiB, and public-only Cookie Consent; **v1.6.4** fixes PWA session overwrite / Mercure 0.8 and extends session + Remember me lifetimes. **v1.7.0** ships CSRF via Symfony Forms **6.39** (`090`), kit Administration chrome sync (`081`), AuthKit **1.17**, and CSP kit-admin polish. **v1.8.0** ships member alert preferences **6.40** (`091`), UserKit **1.1.6**, and per-user Mercure topics. **v1.9.0** ships maintenance mode **6.41**, security residual **6.42**, and PHPStan FrankenPHP 1.1.0 **6.43**. **v1.10.0** ships product FormKit `filter` / `beacon` + Twig `form_row` consolidation **6.44**. **v1.11.0** ships audit residual hardening **6.45** (`095`). **v1.12.0** ships audit follow-up **6.46** (`096`) — Read API rate limit, hash-at-rest ingest secrets, Project-subject voter abstain, membership write DRY, filter DTOs, QR disabled, Slack user-id hygiene. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP) when prioritized.
+Focus: **v1.1.0** ships Phase **6.29**–**6.34** (dashboard Assignments/aside panels, FormKit/UiKit sync, appearance presets, module boundaries, architecture convergence) plus Playwright E2E and PHPUnit suite layout. **v1.2.0** adds Vitest + Compose `env_file` / local port hygiene. **v1.3.0** adds DRY maintainability **6.35** (`086`); **v1.3.1** closes FormKit host-form parity + demo `ProjectFactory` + unit tests for pipeline/hooks/factories. **v1.4.0** ships project `project.*` permissions + Administration Roles/Permissions UI + security audit hardening **6.36** (`087`). **v1.5.0** adds project membership role **`full`** + InstanceRole delete-in-use guards **6.37** (`088`); **v1.5.1** polishes owner-row membership UI and kit admin modal chrome. **v1.6.0** adds project config export/import **6.38** (`089`), DSN UUID path, and AuthKit 1.16. **v1.6.1** hardens ingest gate / config import + Mercure JWT guard; **v1.6.2** tabs the export/import Settings card; **v1.6.3** restores show-once DSN, caps JSON imports at 2 MiB, and public-only Cookie Consent; **v1.6.4** fixes PWA session overwrite / Mercure 0.8 and extends session + Remember me lifetimes. **v1.7.0** ships CSRF via Symfony Forms **6.39** (`090`), kit Administration chrome sync (`081`), AuthKit **1.17**, and CSP kit-admin polish. **v1.8.0** ships member alert preferences **6.40** (`091`), UserKit **1.1.6**, and per-user Mercure topics. **v1.9.0** ships maintenance mode **6.41**, security residual **6.42**, and PHPStan FrankenPHP 1.1.0 **6.43**. **v1.10.0** ships product FormKit `filter` / `beacon` + Twig `form_row` consolidation **6.44**. **v1.11.0** ships audit residual hardening **6.45** (`095`). **v1.12.0** ships audit follow-up **6.46** (`096`) — Read API rate limit, hash-at-rest ingest secrets, Project-subject voter abstain, membership write DRY, filter DTOs, QR disabled, Slack user-id hygiene. **v1.0.0** was the first stable major (Phases 0–6 through **6.28**). **Next**: Later Phase 6+ (SAML / WebAuthn / QR SMS OTP / Hotwire Native `008`) when prioritized.
 
 ### Security hardening (priority track — platform review 2026-07-21)
 
@@ -315,7 +315,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| — | Pull from Later (SSO / QR SMS OTP / WebAuthn) when prioritized | Beacon | — | **Next** |
+| — | Pull from Later (SSO / QR SMS OTP / WebAuthn / Hotwire Native) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)
 
@@ -329,6 +329,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | — | **SSO/SAML/OIDC** via AuthKit (SAML still Later; OIDC enterprise flag shipped in 1.12 / `072`) | Beacon | — | **Later** (OIDC ready) |
 | — | **QR SMS OTP** verify (`phone_otp` / notifiers; image shipped in `075` / 6.27) | Beacon | extends `072`/`075` | **Later** |
 | — | **WebAuthn / passkeys** when AuthKit runtime ships | Beacon | — | **Later** |
+| — | **Hotwire Native / Symfony UX Native** server contract (`ux-native` + Turbo, native-aware Twig, `/config/*_v1.json`) — **not started**; PWA remains the mobile path | Beacon | `008-ux-native` | **Later** |
 | — | OTLP gRPC / protobuf / Bundle exporter / Performance TSDB (HTTP JSON metrics shipped in `074` / 6.26) | Beacon (+ optional Bundle) | extends `074` | **Later** |
 | — | Teams→member mapping / Adaptive Cards (OpenUri Assign shipped in `073` / 6.25) | Beacon | extends `073` | **Later** |
 | — | IMAP / attachments / provider-native adapters (webhook inbound shipped in `076` / 6.28) | Beacon | extends `076` | **Later** |
@@ -341,7 +342,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 - **SSO/SAML/OIDC** until an enterprise dedicated spec (AuthKit); not the same as magic links (`026`) or social OAuth (`060`)
 - Source maps / session replay / profiling
 - Uptime monitors / cron check-ins as first-class products
-- Native store apps inside this repo (server contract only)
+- Native store apps / Hotwire Native shells **inside this repo** until `008-ux-native` is prioritized (**Later** on this roadmap; PWA is the current mobile path)
 - **PagerDuty-native** (generic HTTP webhook / digests may still target it)
 - Public anonymous issue boards (share links in `026` still require constrained auth / viewer semantics)
 - Enforcing **100%** code coverage
@@ -403,7 +404,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.10.0** | Product FormKit `filter` / `beacon` + `form` catalogues + Twig `form_row` consolidation (`081` / `077` / `090` / 6.44); prefixed HTML form field names |
 | **v1.11.0** | Audit residual hardening (`095` / 6.45): phone QR verify hygiene; maintenance ingest-only exclusions; Mercure hub guard; `#[IsGranted]` / Port / Metrics→Ops; batch prefs; admin pagination |
 | **v1.12.0** | Audit follow-up (`096` / 6.46): Read API rate limit; hash-at-rest ingest secrets; Project voter abstain; membership write DRY; filter DTOs; QR disabled; Slack user-id hygiene; beacon-bundle 1.7.0 |
-| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, …) when specified |
+| **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
 

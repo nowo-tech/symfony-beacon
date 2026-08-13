@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.1 → 1.4.2 (PATCH: Principle II module list includes Ops; Shared/Ops ownership)
-- Modified principles: II (Canonical stack — modular layout)
+- Version change: 1.4.2 → 1.4.3 (PATCH: Principle II — Hotwire Native deferred to ROADMAP Later; PWA remains current mobile path)
+- Modified principles: II (Canonical stack — Hotwire Native ban clarified as roadmap-deferred)
 - Added sections: none
 - Removed sections: none
 - Templates: unchanged
-- Follow-up: keep docs/ARCHITECTURE.md in sync with `085-architecture-convergence`
+- Follow-up: do not implement `008-ux-native` until prioritized
 -->
 
 # symfony-beacon Constitution
@@ -35,7 +35,7 @@ Artifacts under `specs/` are the source of truth; code must align with them.
 Do not introduce alternate stacks (Nginx+FPM, Apache) without amending this constitution.
 Do not introduce full DDD/hexagonal layers; keep Symfony modular conventions.
 Do not replace the Twig app with a separate mobile-only UI stack without a new spec amending this principle.
-Do not reintroduce Hotwire Native / `symfony/ux-native` without amending this constitution (removed; see `docs/dev/NATIVE-MOBILE.md`).
+Do not reintroduce Hotwire Native / `symfony/ux-native` without amending this constitution (deferred to the product roadmap as **Later** — see `docs/ROADMAP.md` and `specs/008-ux-native/`; current mobile path is PWA — `docs/dev/NATIVE-MOBILE.md`).
 
 ### III. Product mission
 
@@ -98,7 +98,7 @@ Rationale: contribution history and review attribution belong to the people who 
 - Ingest auth: Envelope-compatible (`X-Beacon-Auth` header and/or envelope `dsn`) mapped to project API keys. Query-string auth (`beacon_key` / `beacon_secret`) is **deprecated** but still accepted with deprecation headers.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository**; this server may install it for **dogfooding** (self-reporting via `BEACON_DSN`). External apps configure their own DSN against this host.
-- Mobile: PWA only in this repository (`docs/dev/NATIVE-MOBILE.md`).
+- Mobile: PWA only in this repository until Hotwire Native (`008`) is prioritized (`docs/dev/NATIVE-MOBILE.md`, `docs/ROADMAP.md`).
 - Configuration: see **Principle IX** — no `env(…):` default map entries in `config/parameters.yaml`.
 
 ## Development workflow (SDD)
@@ -120,4 +120,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Commits, issues, and PRs/MRs MUST comply with **Principle X** (no Cursor / agent attribution).
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.4.2 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-08-06
+**Version**: 1.4.3 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-08-13

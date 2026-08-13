@@ -54,7 +54,7 @@ Ingest is the hot path. The constitution requires Envelope endpoints to **authen
 | Server-rendered Twig | Auth, CSRF, flash messages, and permission checks stay in one stack; good fit for an operator console. |
 | Stimulus | Progressive enhancement for interactive widgets (DataTables, clipboard, collapse panels). |
 | Vite + TypeScript + Tailwind 4 | Modern asset pipeline without splitting the product into “API repo + frontend repo”. |
-| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md) — Hotwire Native removed). |
+| PWA | Same Twig app is installable via `nowo-tech/pwa-bundle` (see [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md); Hotwire Native is Later on the roadmap). |
 | Montserrat | Brand wordmarks and app chrome share one geometric sans (self-hosted). |
 
 A dedicated SPA would force a second auth model, duplicated validation, and larger ops surface for little benefit on CRUD-heavy admin screens.

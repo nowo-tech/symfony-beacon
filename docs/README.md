@@ -42,7 +42,7 @@ English operator and developer manuals for **symfony-beacon**.
 |-----|--------|
 | [DATABASE.md](dev/DATABASE.md) | Schema / Mermaid ER |
 | [ADDING-LOCALES.md](dev/ADDING-LOCALES.md) | Enable a UI language |
-| [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md) | PWA note (Hotwire Native removed) |
+| [NATIVE-MOBILE.md](dev/NATIVE-MOBILE.md) | PWA now; Hotwire Native deferred to roadmap |
 | [FUNDING.md](dev/FUNDING.md) | Sponsors / support |
 
 ## Also

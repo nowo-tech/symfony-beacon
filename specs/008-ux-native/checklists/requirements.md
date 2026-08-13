@@ -2,6 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning  
 **Created**: 2026-07-20  
+**Updated**: 2026-08-13  
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -26,10 +27,10 @@
 
 - [x] Functional requirements map to acceptance scenarios
 - [x] User scenarios cover config, UI, navigation, docs
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] Implementation already landed; plan/tasks record completion
+- [ ] Feature is **not** ready for `/speckit-implement` — **Deferred / Future** on the roadmap
+- [x] Plan/tasks remain unchecked until prioritized
 
 ## Notes
 
-- Spec authored after implementation to restore Spec Kit alignment (constitution principle I).
-- Store binaries remain out of scope by design.
+- Spec retained as the contract for a future Phase 6+ item.
+- Do not install `symfony/ux-native` / `symfony/ux-turbo` until constitution amendment + prioritized tasks.

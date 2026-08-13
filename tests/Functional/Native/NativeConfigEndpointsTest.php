@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Native;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\Support\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Hotwire Native bridge endpoints and layout were removed from Beacon.
- * Keep a smoke check so accidental reintroduction of /config/* routes is noticed,
- * and that a former Native UA still gets a normal login page.
+ * Hotwire Native is deferred (roadmap Later / specs/008-ux-native).
+ * Smoke checks: /config/* must stay gone, and a former Native UA keeps a normal login page.
  */
-final class NativeConfigEndpointsTest extends WebTestCase
+final class NativeConfigEndpointsTest extends DatabaseWebTestCase
 {
     public function testIosConfigRouteIsGone(): void
     {
