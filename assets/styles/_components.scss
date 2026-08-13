@@ -1275,6 +1275,14 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
   align-items: center;
 }
 
+/* Form help — same size/tone as page descriptions under titles. */
+.help-text {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
 /* Native fields only — Tom Select adds `.input` on `.ts-wrapper`; do not style that. */
 input.input,
 select.input,

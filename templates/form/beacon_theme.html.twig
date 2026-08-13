@@ -161,9 +161,9 @@
     {%- endfor -%}
 {%- endblock attributes -%}
 
+{#- Help size/tone: FormKit profile help_attr + global .help-text (page-intro). -#}
 {%- block form_help -%}
     {%- if help is not empty -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' text-xs text-[var(--color-ink)]/55')|trim}) -%}
         {{- parent() -}}
     {%- endif -%}
 {%- endblock form_help -%}
