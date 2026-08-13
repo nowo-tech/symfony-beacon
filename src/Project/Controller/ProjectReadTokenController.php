@@ -6,6 +6,7 @@ namespace App\Project\Controller;
 
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Entity\ProjectReadToken;
 use App\Project\Form\ProjectReadTokenCreateType;
 use App\Project\Repository\ProjectReadTokenRepository;
@@ -49,7 +50,7 @@ final class ProjectReadTokenController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         /** @var array{label?: string|null} $data */
@@ -58,7 +59,7 @@ final class ProjectReadTokenController extends AbstractController
         $request->getSession()->set('_beacon_last_read_token', $created['rawToken']);
         $this->addFlash('success', 'projects.read_token.created');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     #[Route('/projects/{id}/settings/read-tokens/{tokenId}/revoke', name: 'project_read_token_revoke', requirements: ['id' => Requirement::UUID, 'tokenId' => Requirement::UUID], methods: ['POST'])]
@@ -79,7 +80,7 @@ final class ProjectReadTokenController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.read_token.invalid_csrf');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $token = $this->tokenRepository->findOneBy(['uuid' => $tokenId, 'project' => $project]);
@@ -89,6 +90,6 @@ final class ProjectReadTokenController extends AbstractController
         $this->tokenManager->revoke($token, $user);
         $this->addFlash('success', 'projects.read_token.revoked');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 }

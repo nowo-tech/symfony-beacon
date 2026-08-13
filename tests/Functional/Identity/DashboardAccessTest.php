@@ -60,7 +60,7 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Issues');
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'API keys');
     }

@@ -168,6 +168,24 @@
       }
     },
     {
+      "route": "project_settings_section",
+      "label": "Settings",
+      "parent": "project_show",
+      "dynamicParamKeys": [
+        "id",
+        "section"
+      ],
+      "translations": {
+        "en": "Settings",
+        "es": "Configuración",
+        "de": "Einstellungen",
+        "nl": "Instellingen",
+        "fr": "Paramètres",
+        "it": "Impostazioni",
+        "pt": "Definições"
+      }
+    },
+    {
       "route": "project_notification_help",
       "label": "Notification guides",
       "parent": "project_settings",

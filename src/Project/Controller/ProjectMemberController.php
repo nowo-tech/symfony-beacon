@@ -9,6 +9,7 @@ use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
@@ -79,7 +80,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.member_added',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Change a direct member's project role. */
@@ -112,7 +113,7 @@ final class ProjectMemberController extends AbstractController
         if (!$role instanceof ProjectRole) {
             $this->addFlash('error', 'flash.project.member_invalid_role');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $this->attemptProjectAccessMutation(
@@ -120,7 +121,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.member_role_updated',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Remove a direct project membership. */
@@ -154,7 +155,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.member_removed',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Activate or deactivate a direct membership without deleting it (089). */
@@ -193,7 +194,7 @@ final class ProjectMemberController extends AbstractController
             $active ? 'flash.project.member_activated' : 'flash.project.member_deactivated',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /**
@@ -228,7 +229,7 @@ final class ProjectMemberController extends AbstractController
         if ($confirmation !== $project->getName()) {
             $this->addFlash('error', 'flash.project.transfer_confirmation_mismatch');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
         }
 
         $memberUuid = (string) ($data['user'] ?? '');
@@ -236,7 +237,7 @@ final class ProjectMemberController extends AbstractController
         if (!$memberUser instanceof User) {
             $this->addFlash('error', 'flash.project.member_user_not_found');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
         }
 
         $target = $this->requireTargetMembership($project, $memberUser);
@@ -246,7 +247,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.ownership_transferred',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
     }
 
     /** Link a user group to the project with admin or member role. */
@@ -277,7 +278,7 @@ final class ProjectMemberController extends AbstractController
         if (!$group instanceof UserGroup) {
             $this->addFlash('error', 'flash.project.group_not_found');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $this->attemptProjectAccessMutation(
@@ -285,7 +286,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.group_added',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Change the role of a linked group. */
@@ -316,7 +317,7 @@ final class ProjectMemberController extends AbstractController
         if (!$role instanceof ProjectRole) {
             $this->addFlash('error', 'flash.project.member_invalid_role');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $this->attemptProjectAccessMutation(
@@ -324,7 +325,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.group_role_updated',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Unlink a group from the project. */
@@ -356,7 +357,7 @@ final class ProjectMemberController extends AbstractController
             'flash.project.group_removed',
         );
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     /** Resolve the direct membership row for a project member or 404. */

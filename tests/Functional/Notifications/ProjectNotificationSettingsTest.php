@@ -89,7 +89,7 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('https://exa', $client->getResponse()->getContent() ?: '');
         self::assertStringNotContainsString('very-secret-token-abcdef', $client->getResponse()->getContent() ?: '');

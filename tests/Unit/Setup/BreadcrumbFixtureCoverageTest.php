@@ -50,6 +50,8 @@ final class BreadcrumbFixtureCoverageTest extends TestCase
             'account_profile',
             'dashboard_home',
             'project_settings',
+            // Index redirects here — without this row, /projects/{id}/settings/{section} has no trail.
+            'project_settings_section',
             'issue_index',
         ];
     }

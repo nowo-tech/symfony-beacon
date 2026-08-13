@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectClearHistoryType;
 use App\Project\Form\ProjectDeleteType;
 use App\Project\Repository\ProjectRepository;
@@ -77,7 +78,7 @@ final class ProjectDangerZoneController extends AbstractController
 
         $this->addFlash('success', 'flash.project.history_cleared');
 
-        return $this->redirectToRoute('project_settings', ['id' => $projectUuid]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $projectUuid, 'section' => ProjectSettingsSection::Danger->value]);
     }
 
     #[Route('/projects/{id}/delete', name: 'project_delete', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
@@ -101,7 +102,7 @@ final class ProjectDangerZoneController extends AbstractController
         if ($confirmation !== $project->getName()) {
             $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
         }
 
         // Clear telemetry first so SQLite (and ORM) stay consistent without relying on DB cascades alone.

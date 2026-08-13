@@ -32,7 +32,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
 
         $roleForm = $crawler->filter('form[action$="/groups/'.$access->getUuid().'/role"]');
@@ -42,20 +42,20 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
             '_token' => $token,
             'role' => 'admin',
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         $reloaded = $em->getRepository(ProjectGroupAccess::class)->find($access->getId());
         self::assertInstanceOf(ProjectGroupAccess::class, $reloaded);
         self::assertSame(ProjectRole::Admin, $reloaded->getRole());
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $removeForm = $crawler->filter('form[action$="/groups/'.$access->getUuid().'/remove"]');
         $token = $removeForm->filter('input[name="_token"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/groups/'.$access->getUuid().'/remove', [
             '_token' => $token,
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         self::assertNull($em->getRepository(ProjectGroupAccess::class)->find($access->getId()));
@@ -66,7 +66,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-unknown-member@example.com');
         $this->login($client, $owner);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
             'project_member_add' => [
@@ -75,7 +75,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
                 'role' => 'member',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'No user exists with that email');
     }
@@ -95,7 +95,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $roleForm = $crawler->filter('form[action$="/members/'.$member->getUuid().'/role"]');
         $token = $roleForm->filter('input[name="_token"]')->attr('value');
 
@@ -103,7 +103,7 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
             '_token' => $token,
             'role' => 'not-a-role',
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Invalid membership role');
     }

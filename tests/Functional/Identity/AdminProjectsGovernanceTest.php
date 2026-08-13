@@ -77,20 +77,20 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
 
         $revokeToken = $crawler->filter('form[action$="/revoke"] input[name="_token"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/keys/'.$apiKey->getId().'/revoke', [
             '_token' => $revokeToken,
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         $revoked = $em->getRepository(ProjectApiKey::class)->find($apiKey->getId());
         self::assertFalse($revoked?->isActive());
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         // Create a fresh active key via rotate on a newly created key
         $createForm = $crawler->filter('form[action$="/keys"]')->form();
         $client->submit($createForm, [
@@ -106,7 +106,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         ]);
         self::assertInstanceOf(ProjectApiKey::class, $active);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $rotateForm = $crawler->filter('form[action$="/keys/'.$active->getId().'/rotate"]');
         self::assertGreaterThan(0, $rotateForm->count());
         $rotateToken = $rotateForm->filter('input[name="_token"]')->attr('value');
@@ -156,7 +156,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Governance');
         self::assertSelectorTextContains('.flash', 'approaching its daily event quota');
@@ -172,7 +172,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
                 'event_quota_monthly' => '500',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/general');
 
         $em->clear();
         $project = $em->getRepository(Project::class)->find($project->getId());
@@ -213,7 +213,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
 
         $this->login($client, $admin);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.flash', 'approaching its monthly event quota');
         self::assertSelectorExists('input[name="project_governance[event_quota_monthly]"]');
@@ -230,9 +230,9 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         $this->login($client, $admin);
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
         $client->submit($crawler->filter('form[action$="/view-as-member/enable"]')->form([
-            'redirect' => '/projects/'.$project->getUuid().'/settings',
+            'redirect' => '/projects/'.$project->getUuid().'/settings/access',
         ]));
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'viewing projects as a member');
         self::assertSelectorNotExists('form[action$="/governance"]');

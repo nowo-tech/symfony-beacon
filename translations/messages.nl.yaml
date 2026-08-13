@@ -362,7 +362,14 @@ project:
   settings:
     title: Instellingen
     nav: Instellingen
-    intro: API-sleutels, leden, bestuur en destructieve projectacties.
+    intro: Beheer governance, toegang, meldingen, portabiliteit en destructieve acties voor dit project.
+    tabs_label: Instellingsecties
+    tab:
+      general: Algemeen
+      access: Toegang
+      alerts: Meldingen
+      data: Gegevens
+      danger: Gevarenzone
   governance:
     title: Bestuur
     quota_usage_monthly: '%count% / %quota% gebeurtenissen deze maand (UTC)'

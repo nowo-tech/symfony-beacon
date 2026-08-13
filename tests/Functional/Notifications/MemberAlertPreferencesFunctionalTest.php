@@ -105,7 +105,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
         [$client, $user, $project] = $this->bootWithDemoProject('member-alerts-project-ui@example.com');
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="project-member-alerts"]');
         self::assertSelectorExists('[data-testid="member-project-alert-preferences-live"]');
@@ -245,7 +245,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
 
         $this->login($client, $viewer);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
 
         $client->request(Request::METHOD_GET, '/account/display/notifications');
@@ -430,7 +430,7 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
             ];
         }
         $projectComponent->submitForm($projectValues, 'save');
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings#member-alerts');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/alerts#member-alerts');
     }
 
     public function testSaveRemovesPushSubscriptionsAndUnknownProjectReturns404(): void

@@ -26,7 +26,7 @@ async function gotoDownload(page: import('@playwright/test').Page, url: string) 
 test.describe('Project config portability (089)', () => {
   test('settings shows export/import panels and tabs switch', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/data`);
     await dismissProductTour(page);
 
     const panel = page.locator('[data-testid="project-config-portability"]');
@@ -70,7 +70,7 @@ test.describe('Project config portability (089)', () => {
     await download!.saveAs(jsonPath);
     expect(fs.statSync(jsonPath).size).toBeGreaterThan(20);
 
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/data`);
     await dismissProductTour(page);
 
     const panel = page.locator('[data-testid="project-config-portability"]');
@@ -81,7 +81,7 @@ test.describe('Project config portability (089)', () => {
     await panel.locator('[data-testid="project-config-import-submit"]').click();
     await waitForPageLoader(page);
 
-    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings`));
+    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/data`));
     await expect(page).not.toHaveURL(/\/login/);
     // Success or validation flash — page must stay on settings with the portability panel.
     await expect(panel).toBeVisible();

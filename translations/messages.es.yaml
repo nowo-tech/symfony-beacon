@@ -368,7 +368,14 @@ project:
   settings:
     title: Configuración
     nav: Configuración
-    intro: Claves API, miembros, gobernanza y acciones destructivas del proyecto.
+    intro: Gestiona gobernanza, acceso, alertas, portabilidad y acciones destructivas de este proyecto.
+    tabs_label: Secciones de configuración
+    tab:
+      general: General
+      access: Acceso
+      alerts: Alertas
+      data: Datos
+      danger: Zona de peligro
   governance:
     title: Gobernanza
     quota_usage_monthly: '%count% / %quota% eventos este mes (UTC)'

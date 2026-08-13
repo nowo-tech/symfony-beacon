@@ -373,7 +373,14 @@ project:
   settings:
     title: Einstellungen
     nav: Einstellungen
-    intro: API-Schlüssel, Mitglieder, Governance und destruktive Projektaktionen.
+    intro: Verwalten Sie Governance, Zugriff, Benachrichtigungen, Portabilität und destruktive Aktionen für dieses Projekt.
+    tabs_label: Einstellungsabschnitte
+    tab:
+      general: Allgemein
+      access: Zugriff
+      alerts: Benachrichtigungen
+      data: Daten
+      danger: Gefahrenzone
   governance:
     title: Regierungsführung
     quota_usage_monthly: '%count% / %quota% Ereignisse in diesem Monat (UTC)'

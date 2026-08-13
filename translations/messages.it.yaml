@@ -366,7 +366,14 @@ project:
   settings:
     title: Impostazioni
     nav: Impostazioni
-    intro: Chiavi API, membri, governance e azioni di progetto distruttive.
+    intro: Gestisci governance, accesso, avvisi, portabilità e azioni distruttive per questo progetto.
+    tabs_label: Sezioni delle impostazioni
+    tab:
+      general: Generale
+      access: Accesso
+      alerts: Avvisi
+      data: Dati
+      danger: Zona pericolosa
   governance:
     title: Governo
     quota_usage_monthly: '%count% / %quota% eventi questo mese (UTC)'

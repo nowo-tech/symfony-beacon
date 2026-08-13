@@ -4,10 +4,12 @@ import { dismissProductTour, expectAuthenticatedPage, resolveDemoProjectUuid, wa
 test.describe('Project settings deep', () => {
   test('settings shows governance, members, tokens, and share panels', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/general`);
     await dismissProductTour(page);
-
     await expect(page.locator('#project_governance_retention_days')).toBeVisible();
+
+    await page.goto(`/projects/${uuid}/settings/access`);
+    await dismissProductTour(page);
     await expect(page.locator('[data-testid="read-api-tokens"]')).toBeVisible();
     await expect(page.locator('[data-testid="share-links"]')).toBeVisible();
     // Members list is always present for owners/admins of the demo project.
@@ -16,7 +18,7 @@ test.describe('Project settings deep', () => {
 
   test('API key DSN is visible or redacted for seeded project', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/access`);
     await dismissProductTour(page);
 
     const dsn = page.locator('[data-testid="api-key-dsn"], [data-testid="api-key-dsn-redacted"]');
@@ -45,7 +47,7 @@ test.describe('Project settings deep', () => {
 
   test('config portability panel is present for managers', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/data`);
     await dismissProductTour(page);
     await expect(page.locator('[data-testid="project-config-portability"]')).toBeVisible();
     await expect(page.locator('[data-testid="project-config-download"]')).toBeVisible();
@@ -53,14 +55,14 @@ test.describe('Project settings deep', () => {
 
   test('danger zone section is present for owners', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/danger`);
     await dismissProductTour(page);
     await expect(page.locator('.panel--danger, section.panel').filter({ hasText: /danger|peligro|delete|eliminar/i }).first()).toBeVisible();
   });
 
   test('notification destinations list shell loads', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await expectAuthenticatedPage(page, `/projects/${uuid}/settings`);
+    await expectAuthenticatedPage(page, `/projects/${uuid}/settings/alerts`);
     await expect(page.getByRole('main')).toContainText(/notification|notificaci/i);
   });
 });

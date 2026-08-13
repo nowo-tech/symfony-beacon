@@ -164,7 +164,7 @@ final class ProjectShareLinkTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
         self::assertResponseStatusCodeSame(403);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseStatusCodeSame(403);
     }
 

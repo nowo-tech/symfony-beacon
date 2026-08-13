@@ -9,6 +9,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Form\NotificationDestinationFormType;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
@@ -59,7 +60,7 @@ final class ProjectNotificationController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'notifications.flash.created');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
         }
 
         return $this->render('notifications/form.html.twig', [
@@ -93,7 +94,7 @@ final class ProjectNotificationController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'notifications.flash.updated');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
         }
 
         return $this->render('notifications/form.html.twig', [
@@ -124,7 +125,7 @@ final class ProjectNotificationController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', $destination->isEnabled() ? 'notifications.flash.enabled' : 'notifications.flash.disabled');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     #[Route('/projects/{projectId}/notifications/{id}/resume', name: 'project_notification_resume', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
@@ -147,7 +148,7 @@ final class ProjectNotificationController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', 'notifications.flash.circuit_resumed');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     #[Route('/projects/{projectId}/notifications/{id}/delete', name: 'project_notification_delete', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
@@ -170,7 +171,7 @@ final class ProjectNotificationController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', 'notifications.flash.deleted');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     #[Route('/projects/{projectId}/notifications/{id}/test', name: 'project_notification_test', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
@@ -197,7 +198,7 @@ final class ProjectNotificationController extends AbstractController
         $this->notificationDispatcher->dispatchTest($project, $destination);
         $this->addFlash('success', 'notifications.flash.test_queued');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     #[Route('/projects/{id}/notifications/help', name: 'project_notification_help', requirements: ['id' => Requirement::UUID], methods: ['GET'])]

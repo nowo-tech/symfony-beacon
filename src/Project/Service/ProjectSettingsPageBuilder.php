@@ -14,6 +14,7 @@ use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectRole;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectApiKeyCreateType;
 use App\Project\Form\ProjectClearHistoryType;
 use App\Project\Form\ProjectConfigImportType;
@@ -68,8 +69,13 @@ final readonly class ProjectSettingsPageBuilder
     /**
      * @return array<string, mixed>
      */
-    public function build(Project $project, User $user, ProjectAccess $access, Request $request): array
-    {
+    public function build(
+        Project $project,
+        User $user,
+        ProjectAccess $access,
+        Request $request,
+        ProjectSettingsSection $section,
+    ): array {
         $baseUrl = $request->getSchemeAndHttpHost();
 
         $this->projectRepository->hydrateAccessGraph($project);
@@ -211,6 +217,8 @@ final readonly class ProjectSettingsPageBuilder
             'project' => $project,
             'access' => $access,
             'membership' => $access, // BC alias for templates expecting .role
+            'settingsSection' => $section,
+            'settingsSections' => ProjectSettingsSection::visibleFor($access),
             'baseUrl' => $baseUrl,
             'labelAdjectives' => $this->tokenGenerator->adjectiveWordList(),
             'labelNouns' => $this->tokenGenerator->nounWordList(),

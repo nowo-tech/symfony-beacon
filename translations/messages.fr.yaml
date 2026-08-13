@@ -370,7 +370,14 @@ project:
   settings:
     title: Paramètres
     nav: Paramètres
-    intro: Clés API, membres, gouvernance et actions destructrices du projet.
+    intro: Gérez la gouvernance, l’accès, les alertes, la portabilité et les actions destructives de ce projet.
+    tabs_label: Sections des paramètres
+    tab:
+      general: Général
+      access: Accès
+      alerts: Alertes
+      data: Données
+      danger: Zone de danger
   governance:
     title: Gouvernance
     quota_usage_monthly: '%count% / %quota% événements ce mois-ci (UTC)'

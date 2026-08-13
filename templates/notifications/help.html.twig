@@ -10,7 +10,7 @@
         <h1 class="notification-help__title text-2xl font-semibold">{{ 'notifications.help.title'|trans }}</h1>
         <p class="mt-2 max-w-3xl text-xs text-[var(--color-ink)]/55">{{ 'notifications.help.intro'|trans }}</p>
     </div>
-    <a class="btn-ghost" href="{{ path('project_settings', {id: project.uuid}) }}">{{ 'notifications.help.back'|trans }}</a>
+    <a class="btn-ghost" href="{{ path('project_settings_section', {id: project.uuid, section: 'alerts'}) }}">{{ 'notifications.help.back'|trans }}</a>
 </div>
 
 <nav class="mb-8 flex flex-wrap gap-2 text-sm" aria-label="{{ 'notifications.help.toc'|trans }}">

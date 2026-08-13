@@ -38,7 +38,7 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/governance"]');
 
@@ -53,7 +53,7 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
                 'event_quota_monthly' => '',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/general');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'governance settings saved');
 
@@ -78,7 +78,7 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $owner);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         $token = $crawler->filter('form[action$="/governance"] input[name="project_governance[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/governance', [
             'project_governance' => [
@@ -90,7 +90,7 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
                 'event_quota_monthly' => '',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/general');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'non-negative integers');
     }

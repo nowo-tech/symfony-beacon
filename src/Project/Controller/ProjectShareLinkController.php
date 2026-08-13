@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Entity\ProjectShareLink;
 use App\Project\Form\ProjectShareCreateType;
 use App\Project\Repository\ProjectShareLinkRepository;
@@ -100,7 +101,7 @@ final class ProjectShareLinkController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.share.invalid_csrf');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         /** @var array{days?: int|null, max_uses?: int|null, issue_uuid?: string|null} $data */
@@ -118,7 +119,7 @@ final class ProjectShareLinkController extends AbstractController
             if (!$issue instanceof Issue) {
                 $this->addFlash('error', 'projects.share.issue_not_found');
 
-                return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+                return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
             }
         }
 
@@ -127,14 +128,14 @@ final class ProjectShareLinkController extends AbstractController
         } catch (InvalidArgumentException $e) {
             $this->addFlash('error', 'projects.share.'.$e->getMessage());
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $url = $this->generateUrl('project_share_open', ['token' => $created['rawToken']], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->addFlash('success', 'projects.share.created');
         $request->getSession()->set('_beacon_last_share_url', $url);
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     #[IsGranted('ROLE_USER')]
@@ -156,7 +157,7 @@ final class ProjectShareLinkController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'projects.share.invalid_csrf');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
         }
 
         $link = $this->shareLinkRepository->findOneBy(['uuid' => $shareId, 'project' => $project]);
@@ -166,6 +167,6 @@ final class ProjectShareLinkController extends AbstractController
         $this->shareLinkManager->revoke($link, $user);
         $this->addFlash('success', 'projects.share.revoked');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 }

@@ -22,7 +22,7 @@ final class ProjectApiKeyRotateTest extends DatabaseWebTestCase
         self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
 
         $keyId = $apiKey->getId();

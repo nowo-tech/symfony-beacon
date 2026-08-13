@@ -40,7 +40,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertNotSame('', $secret);
 
         $this->login($client, $viewer);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
 
@@ -63,7 +63,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertTrue($apiKey->isActive());
 
         $this->login($client, $owner);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
         self::assertSelectorExists('[data-testid="api-key-dsn-redacted"]');
@@ -72,7 +72,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $apiKey->setActive(false);
         $em->flush();
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="api-key-inactive"]');
         self::assertSelectorNotExists('[data-testid="api-key-dsn"]');
@@ -90,7 +90,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $oldSecret = (string) $apiKey->getSecretKey();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         $rotateAction = '/projects/'.$project->getUuid().'/keys/'.$apiKey->getId().'/rotate';
         $token = $crawler->filter('form[action$="'.$rotateAction.'"] input[name="_token"]')->attr('value');
@@ -116,7 +116,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertNotSame($oldSecret, $newSecret);
         self::assertStringContainsString($newSecret, $html);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('[data-testid="api-key-dsn-flash"]');
         self::assertStringNotContainsString($newSecret, (string) $client->getResponse()->getContent());

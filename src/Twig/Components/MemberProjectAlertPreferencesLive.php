@@ -9,6 +9,7 @@ use App\Identity\Form\MemberProjectAlertPreferencesType;
 use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectAccessService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -110,8 +111,9 @@ final class MemberProjectAlertPreferencesLive extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', 'flash.preferences.member_alerts_project_saved');
         if ('project' === $this->returnTo) {
-            return $this->redirectToRoute('project_settings', [
+            return $this->redirectToRoute('project_settings_section', [
                 'id' => $this->projectUuid,
+                'section' => ProjectSettingsSection::Alerts->value,
                 '_fragment' => 'member-alerts',
             ]);
         }

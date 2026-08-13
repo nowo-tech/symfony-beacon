@@ -68,7 +68,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/groups"]');
 
@@ -80,7 +80,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
                 'role' => 'admin',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         $linked = $em->getRepository(ProjectGroupAccess::class)->findOneBy(['project' => $project->getId()]);
@@ -119,7 +119,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         }
 
         $this->login($client, $admin);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('option[value="'.$group->getUuid().'"]');
         self::assertNull($em->getRepository(ProjectGroupAccess::class)->findOneBy(['project' => $project->getId()]));

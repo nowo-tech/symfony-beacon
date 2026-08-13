@@ -28,7 +28,7 @@ test.describe('Share link access — authenticated', () => {
 
   test('creates a share link and opens it while authenticated', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings`);
+    await page.goto(`/projects/${uuid}/settings/access`);
     await dismissProductTour(page);
 
     const share = page.locator('[data-testid="share-links"]');
@@ -38,7 +38,7 @@ test.describe('Share link access — authenticated', () => {
     await createForm.locator('input[name="project_share_create[max_uses]"]').fill('5');
     await createForm.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
-    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings`));
+    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/access`));
 
     const shareUrlEl = page.locator('[data-testid="share-url"]');
     await expect(shareUrlEl).toBeVisible({ timeout: 15_000 });

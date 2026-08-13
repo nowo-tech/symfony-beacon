@@ -117,7 +117,7 @@ final class ProjectReadApiFunctionalTest extends DatabaseWebTestCase
         [$client, $owner, $project] = $this->bootWithDemoProject('read-api-settings@example.com');
         $this->login($client, $owner);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="read-api-tokens"]');
 
@@ -130,7 +130,7 @@ final class ProjectReadApiFunctionalTest extends DatabaseWebTestCase
         $secret = $client->getCrawler()->filter('[data-testid="read-token-secret"]')->text();
         self::assertStringStartsWith('brt_', $secret);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertSelectorNotExists('[data-testid="read-token-secret"]');
         self::assertSelectorExists('[data-testid="read-token-row"]');
     }

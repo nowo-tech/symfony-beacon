@@ -34,7 +34,7 @@ final class ProjectHealthUiTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $user);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Health');
         self::assertSelectorTextContains('body', 'Ops Hook');

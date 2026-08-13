@@ -45,7 +45,7 @@ final class NotificationCircuitBreakerTest extends DatabaseWebTestCase
         self::assertFalse($breaker->shouldSkipDelivery($destination, isSample: true));
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Auto-paused');
 

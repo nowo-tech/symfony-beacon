@@ -13,6 +13,7 @@ use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectGovernanceType;
 use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
@@ -126,14 +127,50 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/projects/{id}/settings', name: 'project_settings', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    public function settingsIndex(
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Project $project,
+    ): RedirectResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $access = $this->projectAccess->requireSettingsSurface($project, $user);
+
+        return $this->redirectToRoute('project_settings_section', [
+            'id' => $project->getUuid(),
+            'section' => ProjectSettingsSection::defaultFor($access)->value,
+        ]);
+    }
+
+    #[Route(
+        '/projects/{id}/settings/{section}',
+        name: 'project_settings_section',
+        requirements: [
+            'id' => Requirement::UUID,
+            'section' => 'general|access|alerts|data|danger',
+        ],
+        methods: ['GET'],
+    )]
     public function settings(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
         Request $request,
+        string $section,
     ): Response {
+        $sectionEnum = ProjectSettingsSection::tryFrom($section);
+        if (null === $sectionEnum) {
+            throw $this->createNotFoundException();
+        }
+
         /** @var User $user */
         $user = $this->getUser();
         $access = $this->projectAccess->requireSettingsSurface($project, $user);
+
+        if (!$sectionEnum->isVisibleFor($access)) {
+            return $this->redirectToRoute('project_settings_section', [
+                'id' => $project->getUuid(),
+                'section' => ProjectSettingsSection::defaultFor($access)->value,
+            ]);
+        }
 
         $this->userActionRecorder->recordAndFlush(UserActionType::ProjectSettingsViewed, $user, $user, [
             'project_uuid' => $project->getUuid(),
@@ -144,7 +181,7 @@ final class ProjectController extends AbstractController
 
         return $this->render(
             'project/settings.html.twig',
-            $this->settingsPageBuilder->build($project, $user, $access, $request),
+            $this->settingsPageBuilder->build($project, $user, $access, $request, $sectionEnum),
         );
     }
 
@@ -209,7 +246,11 @@ final class ProjectController extends AbstractController
             return $this->redirectToRoute('account_display_notifications');
         }
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid(), '_fragment' => 'member-alerts']);
+        return $this->redirectToRoute('project_settings_section', [
+            'id' => $project->getUuid(),
+            'section' => ProjectSettingsSection::Alerts->value,
+            '_fragment' => 'member-alerts',
+        ]);
     }
 
     #[Route('/projects/{id}/governance', name: 'project_governance_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
@@ -230,7 +271,10 @@ final class ProjectController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'flash.project.governance_invalid');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', [
+                'id' => $project->getUuid(),
+                'section' => ProjectSettingsSection::General->value,
+            ]);
         }
 
         /** @var array<string, int|null> $data */
@@ -246,7 +290,10 @@ final class ProjectController extends AbstractController
 
         $this->addFlash('success', 'flash.project.governance_saved');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', [
+            'id' => $project->getUuid(),
+            'section' => ProjectSettingsSection::General->value,
+        ]);
     }
 
     private function maybeFlashApproachingQuota(Request $request, Project $project, ProjectAccess $access): void

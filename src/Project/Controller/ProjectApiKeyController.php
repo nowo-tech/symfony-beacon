@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Form\ProjectApiKeyCreateType;
 use App\Project\Security\ProjectPermission;
@@ -76,7 +77,7 @@ final class ProjectApiKeyController extends AbstractController
         $this->addFlash('success', 'flash.project.api_key_created');
         $request->getSession()->set('_beacon_last_api_key_dsn', $key->buildDsn($this->settingsBaseUrl($request)));
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     #[Route(
@@ -113,7 +114,7 @@ final class ProjectApiKeyController extends AbstractController
 
         $this->addFlash('success', 'flash.project.api_key_revoked');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     #[Route(
@@ -154,7 +155,7 @@ final class ProjectApiKeyController extends AbstractController
         $this->addFlash('success', 'flash.project.api_key_rotated');
         $request->getSession()->set('_beacon_last_api_key_dsn', $newKey->buildDsn($this->settingsBaseUrl($request)));
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
     }
 
     private function assertKeyBelongsToProject(ProjectApiKey $apiKey, Project $project): void

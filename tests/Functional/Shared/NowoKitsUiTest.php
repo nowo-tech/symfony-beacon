@@ -59,7 +59,7 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.beacon-breadcrumb-wrap');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Projects');

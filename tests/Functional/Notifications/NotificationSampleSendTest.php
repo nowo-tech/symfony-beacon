@@ -72,7 +72,7 @@ final class NotificationSampleSendTest extends DatabaseWebTestCase
         self::assertStringContainsString('embeds', (string) $requests[0]['body']);
 
         $this->login($client, $owner);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/alerts');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/test"]');
     }

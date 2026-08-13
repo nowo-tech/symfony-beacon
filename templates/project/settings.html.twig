@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'project.settings.title'|trans }} — {{ project.name }}{% endblock %}
+{% block title %}{{ settingsSection.tabLabelKey()|trans }} — {{ 'project.settings.title'|trans }} — {{ project.name }}{% endblock %}
 
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
@@ -13,40 +13,60 @@
     </div>
 {% endif %}
 
-{% if membership.canManageSettings %}
-{% include 'project/settings/_governance.html.twig' %}
+{% set tab_items = [] %}
+{% for item in settingsSections %}
+    {% set tab_items = tab_items|merge([{
+        label: item.tabLabelKey()|trans,
+        href: path('project_settings_section', {id: project.uuid, section: item.value}),
+        current: item == settingsSection,
+        attr: {'data-testid': 'project-settings-tab-' ~ item.value},
+    }]) %}
+{% endfor %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'project.settings.tabs_label'|trans,
+    nav_class: 'mb-6 beacon-tabs--sections',
+    attr: {'data-testid': 'project-settings-tabs'},
+    items: tab_items,
+} only %}
+
+{% if settingsSection.value == 'general' and membership.canManageSettings %}
+    {% include 'project/settings/_governance.html.twig' %}
 {% endif %}
 
-<div class="grid gap-6 lg:grid-cols-2">
-    {% include 'project/settings/_api_keys.html.twig' %}
-    {% include 'project/settings/_members.html.twig' %}
-</div>
+{% if settingsSection.value == 'access' %}
+    <div class="grid gap-6 lg:grid-cols-2">
+        {% include 'project/settings/_api_keys.html.twig' %}
+        {% include 'project/settings/_members.html.twig' %}
+    </div>
 
-{% if membership.canManageSettings %}
-{% include 'project/settings/_tokens.html.twig' %}
+    {% if membership.canManageSettings %}
+        {% include 'project/settings/_tokens.html.twig' %}
+    {% endif %}
+
+    {% if membership.canManageShareLinks %}
+        {% include 'project/settings/_shares.html.twig' %}
+    {% endif %}
+
+    {% include 'project/settings/_groups.html.twig' %}
 {% endif %}
 
-{% if membership.canManageShareLinks %}
-{% include 'project/settings/_shares.html.twig' %}
+{% if settingsSection.value == 'alerts' %}
+    {% include 'project/settings/_health.html.twig' %}
+
+    {% if membership.canManageNotifications %}
+        {% include 'project/settings/_thresholds.html.twig' %}
+    {% endif %}
+
+    {% include 'project/settings/_member_alerts.html.twig' %}
+
+    {% include 'project/settings/_notifications.html.twig' %}
 {% endif %}
 
-{% include 'project/settings/_groups.html.twig' %}
-
-{% include 'project/settings/_health.html.twig' %}
-
-{% if membership.canManageNotifications %}
-{% include 'project/settings/_thresholds.html.twig' %}
+{% if settingsSection.value == 'data' and membership.canManageSettings %}
+    {% include 'project/settings/_portability.html.twig' %}
 {% endif %}
 
-{% include 'project/settings/_member_alerts.html.twig' %}
-
-{% include 'project/settings/_notifications.html.twig' %}
-
-{% if membership.canManageSettings %}
-{% include 'project/settings/_portability.html.twig' %}
-{% endif %}
-
-{% if membership.canManageSettings or membership.canDeleteProject %}
-{% include 'project/settings/_danger_zone.html.twig' %}
+{% if settingsSection.value == 'danger' and (membership.canManageSettings or membership.canDeleteProject) %}
+    {% include 'project/settings/_danger_zone.html.twig' %}
 {% endif %}
 {% endblock %}

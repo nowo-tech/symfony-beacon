@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectChildEntityGuard;
@@ -57,7 +58,7 @@ final class ProjectThresholdRuleController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'thresholds.flash.created');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
         }
 
         return $this->render('notifications/threshold_rule_form.html.twig', [
@@ -84,7 +85,7 @@ final class ProjectThresholdRuleController extends AbstractController
             $this->entityManager->flush();
             $this->addFlash('success', 'thresholds.flash.updated');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
         }
 
         return $this->render('notifications/threshold_rule_form.html.twig', [
@@ -115,7 +116,7 @@ final class ProjectThresholdRuleController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', $rule->isEnabled() ? 'thresholds.flash.enabled' : 'thresholds.flash.disabled');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     #[Route('/projects/{projectId}/threshold-rules/{id}/delete', name: 'project_threshold_rule_delete', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
@@ -138,7 +139,7 @@ final class ProjectThresholdRuleController extends AbstractController
         $this->entityManager->flush();
         $this->addFlash('success', 'thresholds.flash.deleted');
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
     private function requireManagedRule(string $projectId, ProjectThresholdRule $rule): Project

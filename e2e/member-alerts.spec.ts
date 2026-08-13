@@ -107,7 +107,7 @@ test.describe('Member alert preferences (091)', () => {
     await expect(panel.locator('[data-testid="member-alerts-project-overrides"]')).toBeVisible({ timeout: 15_000 });
     await panel.locator('[data-testid="project-member-alerts-save"]').click();
     await waitForPageLoader(page);
-    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings`));
+    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/alerts`));
     await expect(page.locator('[data-testid="project-member-alerts"]')).toBeVisible();
     await expect(page.locator('[data-testid="member-alerts-project-overrides"]')).toBeVisible();
   });

@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectConfigImportType;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
@@ -85,7 +86,7 @@ final class ProjectConfigController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'flash.project.config_invalid_csrf');
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Data->value]);
         }
 
         $file = $form->get('bundle')->getData();
@@ -101,7 +102,7 @@ final class ProjectConfigController extends AbstractController
             };
             $this->addFlash('error', $key);
 
-            return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Data->value]);
         }
 
         $this->userActionRecorder->recordAndFlush(
@@ -128,6 +129,6 @@ final class ProjectConfigController extends AbstractController
             $this->addFlash('warning', $warning);
         }
 
-        return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
+        return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Data->value]);
     }
 }

@@ -27,7 +27,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->seedHistory($project);
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Danger zone');
         self::assertSelectorExists('form[action$="/clear-history"]');
@@ -35,7 +35,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
 
         $form = $crawler->filter('form[action$="/clear-history"]')->form();
         $client->submit($form);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project history cleared.');
 
@@ -51,13 +51,13 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         [$client, $user, $project] = $this->bootWithDemoProject('owner-del@example.com');
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         // ProjectDeleteType posts under project_delete[…].
         $form = $crawler->filter('form[action$="/delete"]')->form([
             'project_delete[confirmation]' => 'Wrong Name',
         ]);
         $client->submit($form);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project name did not match');
 
@@ -73,7 +73,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->seedHistory($project);
         $this->login($client, $user);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/settings/danger');
         $form = $crawler->filter('form[action$="/delete"]')->form([
             'project_delete[confirmation]' => 'Acme',
         ]);
@@ -105,7 +105,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $member);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         self::assertResponseStatusCodeSame(403);
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid());

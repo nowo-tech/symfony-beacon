@@ -36,6 +36,7 @@ final class DashboardMenuCurrentMatcherTest extends TestCase
         yield 'home' => ['dashboard_home'];
         yield 'show' => ['project_show'];
         yield 'settings' => ['project_settings'];
+        yield 'settings section' => ['project_settings_section'];
         yield 'issues' => ['issue_index'];
         yield 'issue show' => ['issue_show'];
         yield 'performance' => ['performance_index'];

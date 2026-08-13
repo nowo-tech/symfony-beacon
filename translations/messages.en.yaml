@@ -363,7 +363,14 @@ project:
   settings:
     title: Settings
     nav: Settings
-    intro: API keys, members, governance, and destructive project actions.
+    intro: Manage governance, access, alerts, portability, and destructive actions for this project.
+    tabs_label: Settings sections
+    tab:
+      general: General
+      access: Access
+      alerts: Alerts
+      data: Data
+      danger: Danger zone
   governance:
     title: Governance
     quota_usage_monthly: '%count% / %quota% events this month (UTC)'

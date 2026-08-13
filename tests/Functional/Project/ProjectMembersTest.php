@@ -28,7 +28,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/members"]');
 
@@ -40,7 +40,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
                 'role' => 'admin',
             ],
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Member added');
 
@@ -71,7 +71,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $member);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseStatusCodeSame(403);
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
@@ -97,7 +97,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
             'project_member_add' => [
@@ -142,7 +142,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $roleForm = $crawler->filter('form[action$="/members/'.$member->getUuid().'/role"]');
         self::assertGreaterThan(0, $roleForm->count());
         $token = $roleForm->filter('input[name="_token"]')->attr('value');
@@ -151,7 +151,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
             '_token' => $token,
             'role' => 'admin',
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         $reloaded = $em->getRepository(ProjectMembership::class)->findOneBy([
@@ -160,13 +160,13 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         ]);
         self::assertSame(ProjectRole::Admin, $reloaded?->getRole());
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $removeForm = $crawler->filter('form[action$="/members/'.$member->getUuid().'/remove"]');
         $token = $removeForm->filter('input[name="_token"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members/'.$member->getUuid().'/remove', [
             '_token' => $token,
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
 
         $em->clear();
         self::assertNull($em->getRepository(ProjectMembership::class)->findOneBy([
@@ -180,7 +180,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-last@example.com');
         $this->login($client, $owner);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('form[action$="/members/'.$owner->getUuid().'/role"]');
         self::assertSelectorNotExists('form[action$="/members/'.$owner->getUuid().'/remove"]');
@@ -204,7 +204,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         self::assertResponseIsSuccessful();
 
         $transferForm = $crawler->filter('form[action$="/transfer-ownership"]');
@@ -213,7 +213,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
             'project_transfer_ownership[user]' => $member->getUuid(),
             'project_transfer_ownership[confirmation]' => $project->getName(),
         ]));
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'ownership transferred');
 
@@ -248,12 +248,12 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         $client->submit($crawler->filter('form[action$="/transfer-ownership"]')->form([
             'project_transfer_ownership[user]' => $member->getUuid(),
             'project_transfer_ownership[confirmation]' => 'wrong-name',
         ]));
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'did not match');
 
@@ -294,7 +294,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('form[action$="/transfer-ownership"]');
 
@@ -325,7 +325,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         $removeForm = $crawler->filter('form[action$="/members/'.$full->getUuid().'/remove"]');
         self::assertGreaterThan(0, $removeForm->count());
         $token = $removeForm->filter('input[name="_token"]')->attr('value');
@@ -333,7 +333,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members/'.$full->getUuid().'/remove', [
             '_token' => $token,
         ]);
-        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/access');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'full role');
 
@@ -374,7 +374,7 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $full);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('form[action$="/transfer-ownership"]');
 

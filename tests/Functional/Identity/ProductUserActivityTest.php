@@ -28,7 +28,7 @@ final class ProductUserActivityTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
         self::assertResponseIsSuccessful();
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
 
         $actions = $em->getRepository(UserAction::class)->findBy(
