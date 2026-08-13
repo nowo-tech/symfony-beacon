@@ -2,7 +2,7 @@
 
 **Feature Branch**: `090-csrf-symfony-forms`  
 **Created**: 2026-08-11  
-**Status**: Implemented (shipped in **v1.7.0**, 2026-08-12; danger-zone empty form prefix test fix **v1.8.2**)  
+**Status**: Implemented (shipped in **v1.7.0**, 2026-08-12; danger-zone empty form prefix test fix **v1.8.2**; Maintenance panel FormViews + danger/import constraints **v1.11.0** / `095`)
 **Roadmap**: Phase 6.39  
 
 **Input**: Product Twig MUST NOT hand-roll mutable HTML forms with raw `csrf_token()` hidden fields. Prefer Symfony Form Types (FormKit) and a shared CSRF-only form helper for single-action POSTs. Host GET filter UIs use shared `AbstractGetFilterType` / `GetFilterFormFactory` (no CSRF).

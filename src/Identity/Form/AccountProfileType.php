@@ -40,12 +40,6 @@ final class AccountProfileType extends FormKitAbstractType
                     'attr' => ['autocomplete' => 'current-password'],
                 ]),
             );
-            $this->addTextField('slackUserId', [
-                'required' => false,
-                'label' => 'preferences.profile.slack_user_id',
-                'help' => 'preferences.profile.slack_user_id_help',
-                'constraints' => [new Length(max: 64)],
-            ]);
             $this->addTextField('phone', [
                 'required' => false,
                 'label' => 'preferences.profile.phone',

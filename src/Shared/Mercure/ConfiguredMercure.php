@@ -33,6 +33,7 @@ final class ConfiguredMercure implements ResetInterface
         private readonly string $envPublicUrl,
         #[Autowire('%beacon.mercure.env_jwt_secret%')]
         private readonly string $envJwtSecret,
+        private readonly MercureHubUrlGuard $hubUrlGuard,
         private readonly ?HttpClientInterface $httpClient = null,
     ) {
     }
@@ -182,12 +183,8 @@ final class ConfiguredMercure implements ResetInterface
         if ('' === $trimmed || $this->looksLikeUndecryptedCiphertext($trimmed)) {
             return null;
         }
-        if (false === filter_var($trimmed, \FILTER_VALIDATE_URL)) {
-            return null;
-        }
-        $scheme = strtolower((string) parse_url($trimmed, \PHP_URL_SCHEME));
 
-        return \in_array($scheme, ['http', 'https'], true) ? $trimmed : null;
+        return $this->hubUrlGuard->isSafeHttpUrl($trimmed) ? $trimmed : null;
     }
 
     private function usableSecret(?string $value): ?string

@@ -19,6 +19,7 @@ use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Mercure\ConfiguredMercure;
+use App\Shared\Mercure\MercureHubUrlGuard;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\TestCase;
@@ -127,7 +128,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
         $settings->setMercureEnabled(false);
         $repo = $this->createStub(InstanceSettingsRepository::class);
         $repo->method('getOrCreate')->willReturn($settings);
-        $mercure = new ConfiguredMercure($repo, '', '', '');
+        $mercure = new ConfiguredMercure($repo, '', '', '', new MercureHubUrlGuard());
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects(self::never())->method('dispatch');
@@ -155,6 +156,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
             'http://mercure.test/.well-known/mercure',
             'https://localhost/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
+            new MercureHubUrlGuard(),
             $http,
         );
     }
@@ -163,12 +165,16 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
     {
         $projectPrefRepo = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $projectPrefRepo->method('findOneByUserAndProject')->willReturn(null);
+        $projectPrefRepo->method('findIndexedByUserIdsForProject')->willReturn([]);
         $accountRepo = $this->createStub(MemberAccountAlertEventRepository::class);
         $accountRepo->method('findOneByUserAndEvent')->willReturn(null);
+        $accountRepo->method('findIndexedByUserIds')->willReturn([]);
         $projectEventRepo = $this->createStub(MemberProjectAlertEventRepository::class);
         $projectEventRepo->method('findOneByUserProjectAndEvent')->willReturn(null);
+        $projectEventRepo->method('findIndexedByUserIdsForProject')->willReturn([]);
         $mentionRepo = $this->createStub(IssueMentionRepository::class);
         $mentionRepo->method('isUserMentionedOnIssue')->willReturn(false);
+        $mentionRepo->method('findUserIdsMentionedOnIssue')->willReturn([]);
 
         return new MemberAlertPreferenceEvaluator(
             $projectPrefRepo,

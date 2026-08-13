@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
-use App\Identity\Entity\User;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
 use App\Project\Form\ProjectReleaseEnvironmentCompareType;
 use App\Project\Form\ProjectReleaseFocusType;
-use App\Project\Service\ProjectAccessService;
+use App\Project\Security\ProjectPermission;
 use App\Shared\Form\GetFilterFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,21 +29,17 @@ final class ProjectReleaseHealthController extends AbstractController
     public function __construct(
         private readonly IssueSearchRepository $issueRepository,
         private readonly EventRepository $eventRepository,
-        private readonly ProjectAccessService $projectAccess,
         private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
     #[Route('/projects/{id}/releases', name: 'project_releases', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function index(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
         Request $request,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireMembership($project, $user);
-
         $issueReleases = $this->issueRepository->findDistinctReleases($project);
         $eventReleases = $this->eventRepository->findDistinctReleaseVersions($project);
         $releases = array_values(array_unique([...$issueReleases, ...$eventReleases]));

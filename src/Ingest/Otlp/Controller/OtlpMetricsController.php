@@ -44,7 +44,7 @@ MD,
     )]
     #[OA\Parameter(
         name: 'projectId',
-        description: 'Project public UUID from the Beacon DSN path (legacy numeric id still accepted).',
+        description: 'Project public UUID from the Beacon DSN path.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: '019fea2d-507b-7890-8b33-ca488db6f696'),

@@ -121,6 +121,31 @@ class IssueMentionRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param list<int> $userIds
+     *
+     * @return list<int>
+     */
+    public function findUserIdsMentionedOnIssue(Issue $issue, array $userIds): array
+    {
+        if ([] === $userIds) {
+            return [];
+        }
+
+        /** @var list<int|string> $rows */
+        $rows = $this->createQueryBuilder('m')
+            ->select('IDENTITY(m.mentionedUser)')
+            ->innerJoin('m.comment', 'c')
+            ->andWhere('c.issue = :issue')
+            ->andWhere('IDENTITY(m.mentionedUser) IN (:userIds)')
+            ->setParameter('issue', $issue)
+            ->setParameter('userIds', array_values(array_unique($userIds)))
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_values(array_map(static fn (int|string $id): int => (int) $id, $rows));
+    }
+
+    /**
      * @param list<Project> $projects
      */
     public function markAllReadForUser(User $user, array $projects): int

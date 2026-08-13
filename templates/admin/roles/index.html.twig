@@ -60,6 +60,7 @@
     {% block table_body %}
         <tbody>
             {% for role in roles %}
+                {% set counts = role_counts[role.id] ?? {permissions: 0, users: 0} %}
                 <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0" data-testid="admin-role-row">
                     <td class="px-2 py-3">
                         <a class="font-medium no-underline" href="{{ path('admin_roles_show', {id: role.uuid}) }}">{{ role|rbac_role_name }}</a>
@@ -81,8 +82,8 @@
                             <span class="badge bg-[var(--color-sand)] text-[var(--color-ink)]/65">{{ 'roles.status.system'|trans }}</span>
                         {% endif %}
                     </td>
-                    <td class="px-2 py-3">{{ role.permissions|length }}</td>
-                    <td class="px-2 py-3">{{ role.users|length }}</td>
+                    <td class="px-2 py-3">{{ counts.permissions }}</td>
+                    <td class="px-2 py-3">{{ counts.users }}</td>
                     <td class="px-2 py-3">
                         <a class="btn-ghost btn-sm no-underline" href="{{ path('admin_roles_show', {id: role.uuid}) }}">{{ 'roles.open'|trans }}</a>
                     </td>

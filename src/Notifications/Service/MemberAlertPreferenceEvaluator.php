@@ -53,6 +53,67 @@ final readonly class MemberAlertPreferenceEvaluator
         return $this->isInvolved($user, $issue);
     }
 
+    /**
+     * @param list<User> $users
+     *
+     * @return list<User>
+     */
+    public function filterEligibleUsers(array $users, Project $project, Issue $issue, MemberAlertEvent $event): array
+    {
+        if ([] === $users) {
+            return [];
+        }
+
+        $enabledUsers = [];
+        $userIds = [];
+        foreach ($users as $user) {
+            if (!$user->isMemberAlertsEnabled()) {
+                continue;
+            }
+
+            $userId = $user->getId();
+            if (null === $userId) {
+                continue;
+            }
+
+            $enabledUsers[$userId] = $user;
+            $userIds[] = $userId;
+        }
+
+        if ([] === $enabledUsers) {
+            return [];
+        }
+
+        $projectPrefs = $this->projectPreferenceRepository->findIndexedByUserIdsForProject($project, $userIds);
+        $accountRows = $this->accountEventRepository->findIndexedByUserIds($userIds);
+        $projectRows = $this->projectEventRepository->findIndexedByUserIdsForProject($project, $userIds);
+        $mentionedUserIds = array_flip($this->mentionRepository->findUserIdsMentionedOnIssue($issue, $userIds));
+
+        $eligible = [];
+        $assigneeId = $issue->getAssignee()?->getId();
+        foreach ($enabledUsers as $userId => $user) {
+            $projectPref = $projectPrefs[$userId] ?? null;
+            if ($projectPref instanceof MemberProjectAlertPreference && !$projectPref->isEnabled()) {
+                continue;
+            }
+
+            [$enabled, $scope] = $this->resolveEventSettingsFromRows(
+                $accountRows[$userId] ?? [],
+                $projectRows[$userId] ?? [],
+                $event,
+            );
+            if (!$enabled) {
+                continue;
+            }
+
+            if (MemberAlertScope::All === $scope || $assigneeId === $userId || isset($mentionedUserIds[$userId])) {
+                $eligible[] = $user;
+            }
+        }
+
+        return $eligible;
+    }
+
     public function isInvolved(User $user, Issue $issue): bool
     {
         $assignee = $issue->getAssignee();
@@ -77,6 +138,27 @@ final readonly class MemberAlertPreferenceEvaluator
         $accountRow = $this->accountEventRepository->findOneByUserAndEvent($user, $event);
         if ($accountRow instanceof MemberAccountAlertEvent) {
             return [$accountRow->isEnabled(), $accountRow->getScope()];
+        }
+
+        return [true, MemberAlertScope::All];
+    }
+
+    /**
+     * @param array<string, MemberAccountAlertEvent> $accountRows
+     * @param array<string, MemberProjectAlertEvent> $projectRows
+     *
+     * @return array{0: bool, 1: MemberAlertScope}
+     */
+    private function resolveEventSettingsFromRows(array $accountRows, array $projectRows, MemberAlertEvent $event): array
+    {
+        $key = $event->value;
+
+        if (isset($projectRows[$key]) && $projectRows[$key] instanceof MemberProjectAlertEvent) {
+            return [$projectRows[$key]->isEnabled(), $projectRows[$key]->getScope()];
+        }
+
+        if (isset($accountRows[$key]) && $accountRows[$key] instanceof MemberAccountAlertEvent) {
+            return [$accountRows[$key]->isEnabled(), $accountRows[$key]->getScope()];
         }
 
         return [true, MemberAlertScope::All];

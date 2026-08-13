@@ -13,7 +13,6 @@ use App\Project\Entity\ProjectShareLink;
 use App\Project\Form\ProjectShareCreateType;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectShareLinkManager;
 use App\Shared\Form\CsrfOnlyType;
 use DateTimeImmutable;
@@ -36,7 +35,6 @@ final class ProjectShareLinkController extends AbstractController
     public function __construct(
         private readonly ProjectShareLinkManager $shareLinkManager,
         private readonly ProjectShareLinkRepository $shareLinkRepository,
-        private readonly ProjectAccessService $projectAccess,
         private readonly IssueRepository $issueRepository,
     ) {
     }
@@ -85,6 +83,7 @@ final class ProjectShareLinkController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/projects/{id}/settings/share-links', name: 'project_share_create', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SHARE_LINKS_MANAGE, 'project')]
     public function create(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -92,7 +91,6 @@ final class ProjectShareLinkController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
         $form = $this->createForm(ProjectShareCreateType::class, null, [
             'csrf_token_id' => 'project_share_create',
@@ -140,6 +138,7 @@ final class ProjectShareLinkController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/projects/{id}/settings/share-links/{shareId}/revoke', name: 'project_share_revoke', requirements: ['id' => Requirement::UUID, 'shareId' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SHARE_LINKS_MANAGE, 'project')]
     public function revoke(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -148,7 +147,6 @@ final class ProjectShareLinkController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SHARE_LINKS_MANAGE);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'project_share_revoke',

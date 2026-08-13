@@ -109,7 +109,8 @@ final class MemberAlertPreferenceManagerTest extends TestCase
         $projectEventRepo = $this->createMock(MemberProjectAlertEventRepository::class);
         $projectEventRepo->expects(self::once())->method('deleteAllForUserAndProject')
             ->with($user, $project);
-        $this->projectPrefRepo->method('findOneByUserAndProject')->willReturn($pref);
+        $projectEventRepo->method('findIndexedByProjectIdForUser')->willReturn([]);
+        $this->projectPrefRepo->method('findIndexedByProjectIdForUser')->willReturn([1 => $pref]);
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($pref);
 
@@ -134,8 +135,8 @@ final class MemberAlertPreferenceManagerTest extends TestCase
         $project = $this->project(2);
 
         $this->accountEventRepo->method('findIndexedByEventForUser')->willReturn([]);
-        $this->projectEventRepo->method('findIndexedByEventForUserAndProject')->willReturn([]);
-        $this->projectPrefRepo->method('findOneByUserAndProject')->willReturn(null);
+        $this->projectEventRepo->method('findIndexedByProjectIdForUser')->willReturn([]);
+        $this->projectPrefRepo->method('findIndexedByProjectIdForUser')->willReturn([]);
 
         $persisted = [];
         $em = $this->createMock(EntityManagerInterface::class);
@@ -197,10 +198,10 @@ final class MemberAlertPreferenceManagerTest extends TestCase
         $this->accountEventRepo->method('findIndexedByEventForUser')->willReturn([
             MemberAlertEvent::IssueNew->value => $account,
         ]);
-        $this->projectEventRepo->method('findIndexedByEventForUserAndProject')->willReturn([
-            MemberAlertEvent::IssueNew->value => $override,
+        $this->projectEventRepo->method('findIndexedByProjectIdForUser')->willReturn([
+            3 => [MemberAlertEvent::IssueNew->value => $override],
         ]);
-        $this->projectPrefRepo->method('findOneByUserAndProject')->willReturn(null);
+        $this->projectPrefRepo->method('findIndexedByProjectIdForUser')->willReturn([]);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($override);
@@ -247,8 +248,8 @@ final class MemberAlertPreferenceManagerTest extends TestCase
         $this->accountEventRepo->method('findIndexedByEventForUser')->willReturn([
             MemberAlertEvent::IssueAssigned->value => $account,
         ]);
-        $this->projectEventRepo->method('findIndexedByEventForUserAndProject')->willReturn([
-            MemberAlertEvent::IssueAssigned->value => $override,
+        $this->projectEventRepo->method('findIndexedByProjectIdForUser')->willReturn([
+            9 => [MemberAlertEvent::IssueAssigned->value => $override],
         ]);
 
         $manager = new MemberAlertPreferenceManager(

@@ -8,9 +8,7 @@ use App\Identity\DashboardProductActivity;
 use App\Identity\Entity\User;
 use App\Identity\Form\DashboardActivityFilterType;
 use App\Identity\Repository\UserActionRepository;
-use App\Project\Entity\Project;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\AccessibleProjectFilter;
+use App\Identity\Service\DashboardActivityFilterResolver;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,8 +24,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class DashboardActivityController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
         private readonly UserActionRepository $userActionRepository,
+        private readonly DashboardActivityFilterResolver $filterResolver,
         private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
@@ -37,46 +35,27 @@ final class DashboardActivityController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-
-        $uuids = [];
-        if ($projectFilter instanceof Project) {
-            $uuids = [$projectFilter->getUuid()];
-        } else {
-            foreach ($accessible as $project) {
-                $uuids[] = $project->getUuid();
-            }
-        }
+        $filters = $this->filterResolver->resolve($user, $request);
 
         $types = DashboardProductActivity::types();
-        $total = $this->userActionRepository->countActorProductActivity($user, $types, $uuids);
+        $total = $this->userActionRepository->countActorProductActivity($user, $types, $filters->projectUuids);
         $pagination = PagePagination::fromRequest($request, $total);
         $actions = $this->userActionRepository->findActorProductActivity(
             $user,
             $types,
-            $uuids,
+            $filters->projectUuids,
             $pagination['per_page'],
             $pagination['offset'],
         );
-
-        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
+        $formData = $filters->formData($pagination['per_page']);
 
         return $this->render('dashboard/activity.html.twig', [
             'actions' => $actions,
-            'projects' => $accessible,
-            'filters' => [
-                'project' => $projectFilter?->getUuid() ?? '',
-                'per_page' => $pagination['per_page'],
-                'page' => 1,
-            ],
-            'filterForm' => $this->getFilterFormFactory->create(DashboardActivityFilterType::class, [
-                'project' => $projectFilter?->getUuid() ?? '',
-                'per_page' => $pagination['per_page'],
-                'page' => 1,
-            ], [
+            'projects' => $filters->accessibleProjects,
+            'filters' => $formData,
+            'filterForm' => $this->getFilterFormFactory->create(DashboardActivityFilterType::class, $formData, [
                 'action' => $this->generateUrl('dashboard_activity'),
-                'project_choices' => $projectChoices,
+                'project_choices' => $filters->projectChoices(),
             ])->createView(),
             'pagination' => $pagination,
         ]);

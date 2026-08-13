@@ -4,42 +4,29 @@ declare(strict_types=1);
 
 namespace App\Project\Form;
 
-use App\Shared\Form\FormKitAbstractType;
+use App\Shared\Form\AbstractJsonImportType;
 use Override;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Uploads a project config bundle JSON file (FormKit {@code beacon}).
  *
  * Catalogue: {@code translations/form.*.yaml} → {@code project_config_import.*}.
  */
-final class ProjectConfigImportType extends FormKitAbstractType
+final class ProjectConfigImportType extends AbstractJsonImportType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    protected function fileFieldName(): string
     {
-        $this->withBuilder($builder, function (): void {
-            $this->addNamedField('bundle', 'file', [
-                'placeholder' => false,
-                'help' => false,
-                'required' => true,
-                'mapped' => false,
-                'attr' => [
-                    'accept' => 'application/json,.json',
-                    'data-testid' => 'project-config-file',
-                ],
-            ]);
-        });
+        return 'bundle';
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    protected function fileInputTestId(): string
     {
-        parent::configureOptions($resolver);
-        $resolver->setDefaults([
-            'data_class' => null,
-            'csrf_protection' => true,
-            'csrf_token_id' => 'project_config_import',
-        ]);
+        return 'project-config-file';
+    }
+
+    protected function csrfTokenId(): string
+    {
+        return 'project_config_import';
     }
 
     #[Override]

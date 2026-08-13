@@ -19,6 +19,7 @@ use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
+use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -371,12 +372,27 @@ final class AdminInstanceRoleController extends AbstractController
         bool $openCreate = false,
     ): Response {
         $query = $request->query->getString('q');
-        $roles = $this->roleRepository->findAllOrdered('' !== $query ? $query : null);
+        $total = $this->roleRepository->countAllOrdered('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $roles = $this->roleRepository->findAllOrdered(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
+        $roleIds = [];
+        foreach ($roles as $role) {
+            $roleId = $role->getId();
+            if (null !== $roleId) {
+                $roleIds[] = $roleId;
+            }
+        }
         $createForm = ($invalidCreateForm ?? $this->buildCreateForm())->createView();
 
         return $this->render('admin/roles/index.html.twig', [
             'roles' => $roles,
             'q' => $query,
+            'pagination' => $pagination,
+            'role_counts' => $this->roleRepository->countByRoleIds($roleIds),
             'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
                 'q' => $query,
             ], [

@@ -73,8 +73,14 @@ final readonly class MemberAlertPreferenceManager
      */
     public function saveProjectPreferences(User $user, array $projectRows): void
     {
+        $projects = array_values(array_map(static fn (array $row): Project => $row['project'], $projectRows));
+        $account = $this->accountEventRepository->findIndexedByEventForUser($user);
+        $preferences = $this->projectPreferenceRepository->findIndexedByProjectIdForUser($user, $projects);
+        $overrides = $this->projectEventRepository->findIndexedByProjectIdForUser($user, $projects);
+
         foreach ($projectRows as $row) {
             $project = $row['project'];
+            $projectId = $project->getId();
             $enabled = $row['enabled'];
             $reset = (bool) ($row['resetOverrides'] ?? false);
             $events = \is_array($row['events'] ?? null) ? $row['events'] : [];
@@ -83,10 +89,16 @@ final readonly class MemberAlertPreferenceManager
             if ($reset) {
                 $this->projectEventRepository->deleteAllForUserAndProject($user, $project);
             } else {
-                $hasEventOverrides = $this->syncProjectEventRows($user, $project, $events);
+                $hasEventOverrides = $this->syncProjectEventRows(
+                    $user,
+                    $project,
+                    $events,
+                    $account,
+                    null !== $projectId ? ($overrides[$projectId] ?? []) : [],
+                );
             }
 
-            $pref = $this->projectPreferenceRepository->findOneByUserAndProject($user, $project);
+            $pref = null !== $projectId ? ($preferences[$projectId] ?? null) : null;
 
             if ($enabled && !$hasEventOverrides) {
                 if ($pref instanceof MemberProjectAlertPreference) {
@@ -118,13 +130,14 @@ final readonly class MemberAlertPreferenceManager
     public function projectRowsForUi(User $user, array $projects): array
     {
         $indexed = $this->projectPreferenceRepository->findIndexedByProjectIdForUser($user, $projects);
+        $account = $this->accountEventRepository->findIndexedByEventForUser($user);
+        $projectOverrides = $this->projectEventRepository->findIndexedByProjectIdForUser($user, $projects);
         $rows = [];
         foreach ($projects as $project) {
             $id = $project->getId();
             $pref = null !== $id ? ($indexed[$id] ?? null) : null;
             $enabled = !$pref instanceof MemberProjectAlertPreference || $pref->isEnabled();
-            $overrides = $this->projectEventRepository->findIndexedByEventForUserAndProject($user, $project);
-            $account = $this->accountEventRepository->findIndexedByEventForUser($user);
+            $overrides = null !== $id ? ($projectOverrides[$id] ?? []) : [];
             $events = [];
             foreach (MemberAlertEvent::casesInUiOrder() as $event) {
                 [$evEnabled, $scope] = $this->mergeEvent($account, $overrides, $event);
@@ -164,11 +177,17 @@ final readonly class MemberAlertPreferenceManager
 
     /**
      * @param array<string, mixed> $rawEvents
+     * @param array<string, MemberAccountAlertEvent> $account
+     * @param array<string, MemberProjectAlertEvent> $existing
      */
-    private function syncProjectEventRows(User $user, Project $project, array $rawEvents): bool
+    private function syncProjectEventRows(
+        User $user,
+        Project $project,
+        array $rawEvents,
+        array $account,
+        array $existing,
+    ): bool
     {
-        $account = $this->accountEventRepository->findIndexedByEventForUser($user);
-        $existing = $this->projectEventRepository->findIndexedByEventForUserAndProject($user, $project);
         $hasOverrides = false;
 
         foreach (MemberAlertEvent::casesInUiOrder() as $event) {

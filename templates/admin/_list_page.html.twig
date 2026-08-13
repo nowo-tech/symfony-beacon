@@ -43,4 +43,14 @@
     </table>
 </section>
 
+{% if pagination is defined and pagination.total > 0 %}
+    {% include 'shared/_table_pagination.html.twig' with {
+        pagination: pagination,
+        item_count: pagination.total > pagination.offset ? min(pagination.per_page, pagination.total - pagination.offset) : 0,
+        route: search_route,
+        query: q is defined and q is not empty ? {q: q} : {},
+        nav_label: 'pagination.nav'
+    } only %}
+{% endif %}
+
 {% block after_table %}{% endblock %}

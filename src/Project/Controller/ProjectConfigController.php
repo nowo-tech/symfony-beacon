@@ -11,7 +11,6 @@ use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectConfigImportType;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectConfigPortability;
 use App\Shared\Http\JsonUploadReader;
 use InvalidArgumentException;
@@ -32,20 +31,19 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectConfigController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectAccessService $projectAccess,
         private readonly ProjectConfigPortability $portability,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
     }
 
     #[Route('/projects/{id}/config/export', name: 'project_config_export', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function export(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $payload = $this->portability->export([$project]);
         $this->userActionRecorder->recordAndFlush(
@@ -70,6 +68,7 @@ final class ProjectConfigController extends AbstractController
     }
 
     #[Route('/projects/{id}/config/import', name: 'project_config_import', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function import(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -77,7 +76,6 @@ final class ProjectConfigController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $form = $this->createForm(ProjectConfigImportType::class, null, [
             'csrf_token_id' => 'project_config_import_'.$project->getId(),

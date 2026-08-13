@@ -9,6 +9,7 @@ use App\Identity\Entity\UserGroup;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -27,7 +28,7 @@ class ProjectRepository extends ServiceEntityRepository
      *
      * @return list<Project>
      */
-    public function findAllOrdered(?string $query = null): array
+    public function findAllOrdered(?string $query = null, ?int $limit = null, int $offset = 0): array
     {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.createdBy', 'cb')->addSelect('cb')
@@ -35,14 +36,33 @@ class ProjectRepository extends ServiceEntityRepository
             ->orderBy('p.name', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('p.name LIKE :q OR p.slug LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $like = '%'.SqlLikeEscaper::escape(trim($query)).'%';
+            $qb->andWhere("p.name LIKE :q ESCAPE '\\' OR p.slug LIKE :q ESCAPE '\\'")
+                ->setParameter('q', $like);
+        }
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit)->setFirstResult(max(0, $offset));
         }
 
         /** @var list<Project> $result */
         $result = $qb->getQuery()->getResult();
 
         return $result;
+    }
+
+    public function countAllOrdered(?string $query = null): int
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)');
+
+        if (null !== $query && '' !== trim($query)) {
+            $like = '%'.SqlLikeEscaper::escape(trim($query)).'%';
+            $qb->andWhere("p.name LIKE :q ESCAPE '\\' OR p.slug LIKE :q ESCAPE '\\'")
+                ->setParameter('q', $like);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -63,8 +83,8 @@ class ProjectRepository extends ServiceEntityRepository
             ->orderBy('p.name', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('p.name LIKE :q OR p.slug LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $qb->andWhere("p.name LIKE :q ESCAPE '\\' OR p.slug LIKE :q ESCAPE '\\'")
+                ->setParameter('q', '%'.SqlLikeEscaper::escape(trim($query)).'%');
         }
 
         /** @var list<Project> $result */

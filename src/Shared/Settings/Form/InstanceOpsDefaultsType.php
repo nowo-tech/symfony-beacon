@@ -7,26 +7,43 @@ namespace App\Shared\Settings\Form;
 use App\Shared\Form\FormKitAbstractType;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\OpsDefaultsSection;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Instance operational defaults — one field group per {@see OpsDefaultsSection} tab.
  */
 final class InstanceOpsDefaultsType extends FormKitAbstractType
 {
+    public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
+        private readonly TranslatorInterface $translator,
+    ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
+    }
+
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var OpsDefaultsSection $section */
         $section = $options['section'];
+        $settings = $builder->getData();
+        $allowPrivateUrlsWasEnabled = $settings instanceof InstanceSettings && $settings->isAllowPrivateUrls();
+        $allowAnonymousResolveWasEnabled = $settings instanceof InstanceSettings && $settings->isAllowAnonymousResolve();
         $nonNegative = [
             new NotNull(),
             new GreaterThanOrEqual(0),
@@ -47,6 +64,34 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
                 OpsDefaultsSection::Notifications => $this->addNotificationFields($nonNegative, $positive),
             };
         });
+
+        if (OpsDefaultsSection::Notifications === $section) {
+            $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($allowPrivateUrlsWasEnabled, $allowAnonymousResolveWasEnabled): void {
+                $form = $event->getForm();
+                $data = $event->getData();
+                if (!$data instanceof InstanceSettings) {
+                    return;
+                }
+
+                if (!$allowPrivateUrlsWasEnabled && $data->isAllowPrivateUrls()) {
+                    $confirmation = trim((string) $form->get('confirmAllowPrivateUrls')->getData());
+                    if ('ALLOW_PRIVATE_URLS' !== $confirmation) {
+                        $form->get('confirmAllowPrivateUrls')->addError(new FormError(
+                            $this->translator->trans('ops_defaults.confirm_allow_private_urls.invalid', [], 'form'),
+                        ));
+                    }
+                }
+
+                if (!$allowAnonymousResolveWasEnabled && $data->isAllowAnonymousResolve()) {
+                    $confirmation = trim((string) $form->get('confirmAllowAnonymousResolve')->getData());
+                    if ('ALLOW_ANONYMOUS_RESOLVE' !== $confirmation) {
+                        $form->get('confirmAllowAnonymousResolve')->addError(new FormError(
+                            $this->translator->trans('ops_defaults.confirm_allow_anonymous_resolve.invalid', [], 'form'),
+                        ));
+                    }
+                }
+            });
+        }
     }
 
     #[Override]
@@ -190,11 +235,23 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
             'label' => 'ops_defaults.allow_private_urls.label',
             'help' => 'ops_defaults.allow_private_urls.help',
         ]);
+        $this->addTextField('confirmAllowPrivateUrls', [
+            'mapped' => false,
+            'required' => false,
+            'label' => 'ops_defaults.confirm_allow_private_urls.label',
+            'help' => 'ops_defaults.confirm_allow_private_urls.help',
+        ]);
         $this->addCheckboxField('allowAnonymousResolve', [
             'placeholder' => false,
             'required' => false,
             'label' => 'ops_defaults.allow_anonymous_resolve.label',
             'help' => 'ops_defaults.allow_anonymous_resolve.help',
+        ]);
+        $this->addTextField('confirmAllowAnonymousResolve', [
+            'mapped' => false,
+            'required' => false,
+            'label' => 'ops_defaults.confirm_allow_anonymous_resolve.label',
+            'help' => 'ops_defaults.confirm_allow_anonymous_resolve.help',
         ]);
         $this->addIntegerField('notificationDeliveryHistoryLimit', [
             'placeholder' => false,

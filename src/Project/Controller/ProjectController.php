@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
-use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Identity\Form\MemberProjectAlertPreferencesType;
 use App\Identity\Service\UserActionRecorder;
@@ -15,10 +14,10 @@ use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectGovernanceType;
-use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectCreationFormFactory;
 use App\Project\Service\ProjectFactory;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Project\Service\ProjectSettingsPageBuilder;
@@ -26,7 +25,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,17 +39,25 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectController extends AbstractController
 {
     public function __construct(
-        private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectGovernanceResolver $governanceResolver,
         private readonly ProjectAccessService $projectAccess,
         private readonly ProjectRepository $projectRepository,
         private readonly ProjectFactory $projectFactory,
+        private readonly ProjectCreationFormFactory $projectCreationFormFactory,
         private readonly ProjectSettingsPageBuilder $settingsPageBuilder,
         private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
         private readonly FormFactoryInterface $formFactory,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
+    }
+
+    #[Route('/projects/_new_form', name: 'project_new_form_fragment', methods: ['GET'])]
+    public function newFormFragment(): Response
+    {
+        return $this->render('project/_new_form_dialog.html.twig', [
+            'newProjectForm' => $this->projectCreationFormFactory->create()->createView(),
+        ]);
     }
 
     #[Route('/projects/new', name: 'project_new', methods: ['GET', 'POST'])]
@@ -64,7 +70,7 @@ final class ProjectController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $form = $this->createForm(ProjectType::class);
+        $form = $this->projectCreationFormFactory->create();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -87,42 +93,17 @@ final class ProjectController extends AbstractController
             return $this->redirectToRoute('project_settings', ['id' => $project->getUuid()]);
         }
 
-        return $this->renderDashboardHome($user, $request, $form, openNewProject: true);
-    }
-
-    /**
-     * @param FormInterface<mixed> $newProjectForm
-     */
-    private function renderDashboardHome(
-        User $user,
-        Request $request,
-        FormInterface $newProjectForm,
-        bool $openNewProject,
-    ): Response {
-        $query = $request->query->getString('q');
-        $projects = $this->projectRepository->findAccessibleByUser($user, '' !== $query ? $query : null);
-
-        $previewProjects = \array_slice($projects, 0, 5);
-        $statsPreview = $this->dailyProjectStatRepository->findLastDaysForProjects($previewProjects, 7);
-
-        return $this->render('dashboard/home.html.twig', [
-            'projects' => $projects,
-            'query' => $query,
-            'statsPreview' => $statsPreview,
-            'newProjectForm' => $newProjectForm,
-            'openNewProject' => $openNewProject,
+        return $this->render('project/new.html.twig', [
+            'newProjectForm' => $form,
         ]);
     }
 
     #[Route('/projects/{id}', name: 'project_show', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function show(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
     ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requireMembership($project, $user);
-
         return $this->redirectToRoute('issue_index', ['id' => $project->getUuid()]);
     }
 
@@ -150,6 +131,7 @@ final class ProjectController extends AbstractController
         ],
         methods: ['GET'],
     )]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function settings(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -254,15 +236,12 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/projects/{id}/governance', name: 'project_governance_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function saveGovernance(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
         Request $request,
     ): RedirectResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
-
         $form = $this->createForm(ProjectGovernanceType::class, null, [
             'csrf_token_id' => 'project_governance_'.$project->getId(),
             'env_defaults' => $this->governanceResolver->envDefaults(),

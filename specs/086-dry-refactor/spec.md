@@ -2,7 +2,7 @@
 
 **Feature Branch**: `086-dry-refactor`  
 **Created**: 2026-08-07  
-**Status**: Implemented (shipped in **v1.3.0**, 2026-08-07; confirm-dialog structured chrome **2026-08-09**; open-on-connect + dark scrim **2026-08-10**)  
+**Status**: Implemented (shipped in **v1.3.0**, 2026-08-07; confirm-dialog structured chrome **2026-08-09**; open-on-connect + dark scrim **2026-08-10**; `AbstractJsonImportType` + Settings field traits **v1.11.0** / `095`)
 
 **Input**: Internal maintainability pass after `083` / `085`: collapse duplicated PHP write-path helpers and Twig chrome shells; align native checkbox styling with Beacon form tokens; auto-start Compose via `make ensure-up` for exec-based Make targets. No new end-user product surface.
 

@@ -55,4 +55,37 @@ class MemberProjectAlertPreferenceRepository extends ServiceEntityRepository
 
         return $indexed;
     }
+
+    /**
+     * @param list<int> $userIds
+     *
+     * @return array<int, MemberProjectAlertPreference>
+     */
+    public function findIndexedByUserIdsForProject(Project $project, array $userIds): array
+    {
+        if ([] === $userIds) {
+            return [];
+        }
+
+        /** @var list<MemberProjectAlertPreference> $rows */
+        $rows = $this->createQueryBuilder('p')
+            ->innerJoin('p.user', 'u')
+            ->addSelect('u')
+            ->andWhere('p.project = :project')
+            ->andWhere('u.id IN (:userIds)')
+            ->setParameter('project', $project)
+            ->setParameter('userIds', array_values(array_unique($userIds)))
+            ->getQuery()
+            ->getResult();
+
+        $indexed = [];
+        foreach ($rows as $row) {
+            $userId = $row->getUser()?->getId();
+            if (null !== $userId) {
+                $indexed[$userId] = $row;
+            }
+        }
+
+        return $indexed;
+    }
 }

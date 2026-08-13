@@ -345,6 +345,7 @@ final readonly class ProjectSettingsPageBuilder
                     'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
                     'user_choices' => $transferOwnershipChoices,
                     'project_id' => (int) $project->getId(),
+                    'confirmation_value' => $project->getName(),
                 ])->createView()
                 : null,
             'clearHistoryForm' => $access->canManageSettings()
@@ -356,6 +357,7 @@ final readonly class ProjectSettingsPageBuilder
                 ? $this->formFactory->create(ProjectDeleteType::class, null, [
                     'csrf_token_id' => 'project_delete_'.$project->getId(),
                     'project_id' => (int) $project->getId(),
+                    'confirmation_value' => $project->getName(),
                 ])->createView()
                 : null,
         ];

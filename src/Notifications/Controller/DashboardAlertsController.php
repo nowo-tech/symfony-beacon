@@ -7,9 +7,7 @@ namespace App\Notifications\Controller;
 use App\Identity\Entity\User;
 use App\Notifications\Form\DashboardAlertsFilterType;
 use App\Notifications\Repository\NotificationDestinationRepository;
-use App\Project\Entity\Project;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\AccessibleProjectFilter;
+use App\Notifications\Service\DashboardAlertsFilterResolver;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,8 +23,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class DashboardAlertsController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
         private readonly NotificationDestinationRepository $destinationRepository,
+        private readonly DashboardAlertsFilterResolver $filterResolver,
         private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
@@ -36,35 +34,24 @@ final class DashboardAlertsController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
+        $filters = $this->filterResolver->resolve($user, $request);
 
-        $total = $this->destinationRepository->countWithFailedLastDeliveryInProjects($projects);
+        $total = $this->destinationRepository->countWithFailedLastDeliveryInProjects($filters->selectedProjects);
         $pagination = PagePagination::fromRequest($request, $total);
         $destinations = $this->destinationRepository->findWithFailedLastDeliveryInProjects(
-            $projects,
+            $filters->selectedProjects,
             $pagination['per_page'],
             $pagination['offset'],
         );
-
-        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
+        $formData = $filters->formData($pagination['per_page']);
 
         return $this->render('dashboard/alerts.html.twig', [
             'destinations' => $destinations,
-            'projects' => $accessible,
-            'filters' => [
-                'project' => $projectFilter?->getUuid() ?? '',
-                'per_page' => $pagination['per_page'],
-                'page' => 1,
-            ],
-            'filterForm' => $this->getFilterFormFactory->create(DashboardAlertsFilterType::class, [
-                'project' => $projectFilter?->getUuid() ?? '',
-                'per_page' => $pagination['per_page'],
-                'page' => 1,
-            ], [
+            'projects' => $filters->accessibleProjects,
+            'filters' => $formData,
+            'filterForm' => $this->getFilterFormFactory->create(DashboardAlertsFilterType::class, $formData, [
                 'action' => $this->generateUrl('dashboard_alerts'),
-                'project_choices' => $projectChoices,
+                'project_choices' => $filters->projectChoices(),
             ])->createView(),
             'pagination' => $pagination,
         ]);

@@ -62,6 +62,10 @@ final class DashboardAccessTest extends DatabaseWebTestCase
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/general');
         self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Governance');
+
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
+        self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'API keys');
     }
 
@@ -101,8 +105,12 @@ final class DashboardAccessTest extends DatabaseWebTestCase
         $client->submit($form);
         self::assertResponseRedirects();
         $client->followRedirect();
+        if ($client->getResponse()->isRedirection()) {
+            $client->followRedirect();
+        }
+        self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Billing API');
-        self::assertSelectorTextContains('body', 'API keys');
+        self::assertSelectorTextContains('body', 'Governance');
         self::assertSelectorTextContains('body', 'Settings');
     }
 }

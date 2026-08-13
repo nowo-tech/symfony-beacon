@@ -106,7 +106,7 @@ class NotificationDestination implements AuditableInterface
     private ?string $lastDeliveryError = null;
 
     /** @var Collection<int, NotificationDeliveryAttempt> */
-    #[ORM\OneToMany(targetEntity: NotificationDeliveryAttempt::class, mappedBy: 'destination', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: NotificationDeliveryAttempt::class, mappedBy: 'destination', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['attemptedAt' => 'DESC', 'id' => 'DESC'])]
     private Collection $deliveryAttempts;
 

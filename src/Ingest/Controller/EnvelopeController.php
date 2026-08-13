@@ -53,15 +53,15 @@ Accepts an Envelope body (newline-separated JSON header, item header, and payloa
 - `X-Beacon-Auth` header with `beacon_key` + **required** `beacon_secret`
 - Envelope first-line JSON `"dsn": "https://public:secret@host/projectUuid"`
 
-Query-string `beacon_key` / `beacon_secret` are **removed** (always **401**). Prefer header or envelope DSN.
+Query-string `beacon_key` / `beacon_secret` are **rejected** (always **401**). Prefer header or envelope DSN.
 
-The public key is an opaque identifier and MUST belong to `{projectId}` (project UUID; legacy numeric id still accepted). Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
+The public key is an opaque identifier and MUST belong to `{projectId}` (project UUID). Secret is always required. On success the body is empty and processing is queued asynchronously (`ProcessEnvelopeMessage`).
 MD, summary: 'Ingest a Beacon Envelope', security: [
         ['BeaconAuth' => []],
     ], tags: ['Ingest'])]
     #[OA\Parameter(
         name: 'projectId',
-        description: 'Project public UUID from the Beacon DSN path (legacy numeric primary key still accepted).',
+        description: 'Project public UUID from the Beacon DSN path.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: '019fea2d-507b-7890-8b33-ca488db6f696'),

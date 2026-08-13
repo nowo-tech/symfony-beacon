@@ -16,13 +16,10 @@ use App\Issues\Form\IssueCommentType;
 use App\Issues\Form\IssueDuplicateType;
 use App\Issues\Form\IssuePriorityType;
 use App\Issues\Form\IssueStatusType;
-use App\Issues\Repository\EventRepository;
-use App\Issues\Repository\IssueCommentRepository;
-use App\Issues\Repository\IssueHistoryEntryRepository;
-use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueAssigneeChanger;
 use App\Issues\Service\IssueCommentCreator;
 use App\Issues\Service\IssueDuplicateMarker;
+use App\Issues\Service\IssueShowPageBuilder;
 use App\Issues\Service\IssueStatusChanger;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectAccessService;
@@ -44,14 +41,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class IssueDetailController extends AbstractController
 {
     public function __construct(
-        private readonly IssueCommentRepository $commentRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly EventRepository $eventRepository,
-        private readonly IssueHistoryEntryRepository $historyEntryRepository,
         private readonly IssueAssigneeChanger $issueAssigneeChanger,
         private readonly IssueCommentCreator $issueCommentCreator,
         private readonly IssueDuplicateMarker $issueDuplicateMarker,
-        private readonly IssueRepository $issueRepository,
+        private readonly IssueShowPageBuilder $issueShowPageBuilder,
         private readonly IssueStatusChanger $issueStatusChanger,
         private readonly ProjectAccessService $projectAccess,
         private readonly UserActionRecorder $userActionRecorder,
@@ -59,17 +53,15 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
-    public function show(string $projectId, string $id): Response
-    {
-        $issue = $this->issueRepository->findOneByUuidHydrated($id);
-        if (!$issue instanceof Issue) {
-            throw $this->createNotFoundException();
-        }
-
+    public function show(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        #[MapEntity(mapping: ['id' => 'uuid'])]
+        Issue $issue,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $access = $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());
@@ -81,79 +73,7 @@ final class IssueDetailController extends AbstractController
             'issue_title' => $issue->getTitle(),
         ]);
 
-        $events = $this->eventRepository->findLatestForIssue($issue);
-        $latestEvent = $events[0] ?? null;
-        $occurrence = $this->eventRepository->occurrenceStatsForIssue($issue);
-        $assigneeForm = $this->createForm(IssueAssigneeType::class, $issue, [
-            'project_id' => $project->getId(),
-            'action' => $this->generateUrl('issue_assign', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-            'method' => 'POST',
-        ]);
-        $history = $this->historyEntryRepository->findLatestForIssue($issue);
-        $comments = $this->commentRepository->findLatestForIssue($issue);
-        $duplicateCandidates = $this->issueRepository->findDuplicateCandidates($project, $issue);
-        $similarIssues = $this->issueRepository->findSimilarIssues($issue);
-        $statusForms = [];
-        foreach (IssueStatus::cases() as $status) {
-            if ($issue->getStatus() === $status) {
-                continue;
-            }
-
-            $statusForms[$status->value] = $this->createForm(IssueStatusType::class, [
-                'status' => $status->value,
-            ], [
-                'action' => $this->generateUrl('issue_status', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-                'method' => 'POST',
-                'csrf_token_id' => 'issue_status',
-            ])->createView();
-        }
-        $priorityForm = $this->createForm(IssuePriorityType::class, [
-            'priority' => $issue->getPriority()->value,
-        ], [
-            'action' => $this->generateUrl('issue_priority', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-            'method' => 'POST',
-            'csrf_token_id' => 'issue_priority',
-        ]);
-        $quickDuplicateForms = [];
-        foreach ($similarIssues as $similarIssue) {
-            $quickDuplicateForms[$similarIssue->getId()] = $this->createForm(IssueDuplicateType::class, [
-                'canonical_uuid' => $similarIssue->getUuid(),
-            ], [
-                'action' => $this->generateUrl('issue_mark_duplicate', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-                'method' => 'POST',
-                'csrf_token_id' => 'issue_duplicate',
-            ])->createView();
-        }
-        $duplicateDialogForm = $this->createForm(IssueDuplicateType::class, null, [
-            'action' => $this->generateUrl('issue_mark_duplicate', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-            'method' => 'POST',
-            'csrf_token_id' => 'issue_duplicate',
-        ]);
-
-        return $this->render('issue/show.html.twig', [
-            'project' => $project,
-            'issue' => $issue,
-            'events' => $events,
-            'latestEvent' => $latestEvent,
-            'occurrence' => $occurrence,
-            'assigneeForm' => $assigneeForm->createView(),
-            'issueHistory' => $history,
-            'comments' => $comments,
-            'duplicateCandidates' => $duplicateCandidates,
-            'similarIssues' => $similarIssues,
-            'statusForms' => $statusForms,
-            'priorityForm' => $priorityForm->createView(),
-            'quickDuplicateForms' => $quickDuplicateForms,
-            'duplicateDialogForm' => $duplicateDialogForm->createView(),
-            'commentForm' => $this->createForm(IssueCommentType::class, [
-                'body' => '',
-            ], [
-                'action' => $this->generateUrl('issue_comment_add', ['projectId' => $project->getUuid(), 'id' => $issue->getUuid()]),
-                'method' => 'POST',
-                'csrf_token_id' => 'issue_comment',
-            ])->createView(),
-            'can_triage' => $access->canTriageIssues(),
-        ]);
+        return $this->render('issue/show.html.twig', $this->issueShowPageBuilder->build($project, $issue, $user, $access));
     }
 
     #[Route('/projects/{projectId}/issues/{id}/assign', name: 'issue_assign', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
@@ -405,17 +325,16 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/events/{eventId}', name: 'event_show', requirements: ['projectId' => Requirement::UUID], methods: ['GET'])]
-    public function eventShow(string $projectId, string $eventId): Response
-    {
+    public function eventShow(
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
+        #[MapEntity(mapping: ['eventId' => 'eventId'])]
+        Event $event,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $event = $this->eventRepository->findOneByEventId($eventId);
-        $project = $event?->getIssue()?->getProject();
-        if (!$event instanceof Event || !$project instanceof Project || $project->getUuid() !== $projectId) {
-            throw $this->createNotFoundException();
-        }
         $issue = $event->getIssue();
-        if (!$issue instanceof Issue) {
+        if (!$issue instanceof Issue || $issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireIssueRead($project, $user, $issue->getUuid());

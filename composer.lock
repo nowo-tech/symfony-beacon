@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7dccaa6767e040fbefb759552fb0d3a2",
+    "content-hash": "e6f610af8749e2307f818875752d1f04",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2885,16 +2885,16 @@
         },
         {
             "name": "nowo-tech/maintenance-mode-bundle",
-            "version": "v1.4.1",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/MaintenanceModeBundle.git",
-                "reference": "d5db668e8a0585049570f379f1585e48ec3e205d"
+                "reference": "1fc6f1a737c2617da742dc593357877a060fe312"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/MaintenanceModeBundle/zipball/d5db668e8a0585049570f379f1585e48ec3e205d",
-                "reference": "d5db668e8a0585049570f379f1585e48ec3e205d",
+                "url": "https://api.github.com/repos/nowo-tech/MaintenanceModeBundle/zipball/1fc6f1a737c2617da742dc593357877a060fe312",
+                "reference": "1fc6f1a737c2617da742dc593357877a060fe312",
                 "shasum": ""
             },
             "require": {
@@ -2904,6 +2904,7 @@
                 "symfony/console": "^7.4 || ^8.0",
                 "symfony/dependency-injection": "^7.4 || ^8.0",
                 "symfony/event-dispatcher": "^7.4 || ^8.0",
+                "symfony/form": "^7.4 || ^8.0",
                 "symfony/http-foundation": "^7.4 || ^8.0",
                 "symfony/http-kernel": "^7.4 || ^8.0",
                 "symfony/routing": "^7.4 || ^8.0",
@@ -2971,7 +2972,7 @@
                 "issues": "https://github.com/nowo-tech/MaintenanceModeBundle/issues",
                 "source": "https://github.com/nowo-tech/MaintenanceModeBundle"
             },
-            "time": "2026-08-13T06:30:17+00:00"
+            "time": "2026-08-13T15:12:13+00:00"
         },
         {
             "name": "nowo-tech/migrations-kit-bundle",

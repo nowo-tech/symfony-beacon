@@ -2,7 +2,7 @@
 
 **Feature Branch**: `083-module-boundaries`  
 **Created**: 2026-08-06  
-**Status**: Implemented (2026-08-06)  
+**Status**: Implemented (2026-08-06; Port + Metrics→Ops + creation fragment in **v1.11.0** / `095`)
 
 **Input**: Architecture audit (2026-08-05): keep the deliberate modular Symfony shape (no DDD/hexagonal/SPA rewrite); harden eroded module boundaries — Shared catch-all growth, Identity↔Project cycle, Issues hotspots, Ingest orchestration/OTLP weight, shared async queue contention, docs/spec catalog drift (module map missing `Api`/`Setup`, duplicate `079-*` feature numbers), and thin Analytics/Performance automated coverage.
 
@@ -19,6 +19,8 @@ There is no new end-user product surface. Success is measurable as: docs ↔ cod
 | Module map | Constitution **1.4.1** + `docs/ARCHITECTURE.md` list `Api` / `Setup`; Shared growth rules in CONTRIBUTING |
 | Domain enums | `App\Issues\Enum\{IssueStatus,IssuePriority,IssueLevel}`; `App\Project\Enum\ProjectRole` (left `Shared`) |
 | Admin projects | `App\Project\Controller\AdminProjectController` — same `/admin/projects*` route names |
+| Identity ↔ Project | `ProjectMembershipAdminPort` for admin unlink; dashboard new-project form via Project fragment (`095`) |
+| Metrics scrape | `App\Ops\Metrics` (not Shared) — guarded by `.scripts/check-module-boundaries.sh` (`095`) |
 | Issues queries | `IssueSearchRepository` (list/filter/search); `IssueRepository` (fingerprint/uuid/similarity lookups) |
 | Issues HTTP | `IssueController` (index + saved views); `IssueDetailController` (show / triage / event); AI export → `IssueAiExportController` (`085`) |
 | OTLP | `App\Ingest\Otlp\{Controller,Service}` (`OtlpIngestPipeline` + mappers in `086`); route import `controllers_ingest_otlp` |

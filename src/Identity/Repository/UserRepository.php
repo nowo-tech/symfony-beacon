@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Repository;
 
 use App\Identity\Entity\User;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -74,7 +75,7 @@ class UserRepository extends ServiceEntityRepository
      *
      * @return list<User>
      */
-    public function findAllForAdminDirectory(?string $query = null): array
+    public function findAllForAdminDirectory(?string $query = null, ?int $limit = null, ?int $offset = null): array
     {
         $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.createdBy', 'cb')->addSelect('cb')
@@ -84,14 +85,34 @@ class UserRepository extends ServiceEntityRepository
             ->orderBy('u.email', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('u.email LIKE :q OR u.displayName LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $qb->andWhere("u.email LIKE :q ESCAPE '\\' OR u.displayName LIKE :q ESCAPE '\\'")
+                ->setParameter('q', '%'.SqlLikeEscaper::escape(trim($query)).'%');
+        }
+
+        if (null !== $limit) {
+            $qb->setMaxResults(max(1, $limit));
+        }
+        if (null !== $offset && $offset > 0) {
+            $qb->setFirstResult($offset);
         }
 
         /** @var list<User> $users */
         $users = $qb->getQuery()->getResult();
 
         return $users;
+    }
+
+    public function countForAdminDirectory(?string $query = null): int
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)');
+
+        if (null !== $query && '' !== trim($query)) {
+            $qb->andWhere("u.email LIKE :q ESCAPE '\\' OR u.displayName LIKE :q ESCAPE '\\'")
+                ->setParameter('q', '%'.SqlLikeEscaper::escape(trim($query)).'%');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**

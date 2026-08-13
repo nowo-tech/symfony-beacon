@@ -83,7 +83,7 @@ Symfony’s default role hierarchy is **not** customized in this repo. In practi
 ## Project membership roles (not `ROLE_*`)
 
 Enum: `App\Project\Enum\ProjectRole` (`owner` | `full` | `admin` | `member` | `viewer`).
-Logical keys: `App\Project\Security\ProjectPermission` (checked via `ProjectAccess` / `ProjectAccessService::requirePermission()`). Seed metadata: `ProjectPermissionCatalog` → shared `permission` table for catalog UI; runtime access is still **per-project membership**, not `InstancePermissionVoter`.
+Logical keys: `App\Project\Security\ProjectPermission` (checked via `ProjectAccess`, `ProjectPermissionVoter`, and focused `ProjectAccessService` helpers). Seed metadata: `ProjectPermissionCatalog` → shared `permission` table for catalog UI; runtime access is still **per-project membership**, not `InstancePermissionVoter`.
 
 | Permission key | viewer | member | admin | full | owner |
 |----------------|:------:|:------:|:-----:|:----:|:-----:|
@@ -108,24 +108,24 @@ Admin UI labels “Admin” / “User” on `/admin/users` map to **`ROLE_ADMIN`
 
 ## Enforcing `project.*` in controllers (403)
 
-Product HTTP actions must call `ProjectAccessService` **before** reading sensitive data or mutating state. Prefer permission keys over raw role ranks:
+Product HTTP actions must enforce project access **before** reading sensitive data or mutating state. Prefer `#[IsGranted(ProjectPermission::..., 'project')]` on project-scoped routes, and keep `ProjectAccessService` helpers for share-link nuance or non-controller flows:
 
 | Surface | Prefer |
 |---------|--------|
-| Open Issues / Performance / Analytics / Releases | `requireAccess()` / `requireMembership()` (`project.view`) |
-| Triage / comments / saved-view mutations | `requireTriage()` or `requirePermission(…, ProjectPermission::ISSUES_TRIAGE)` |
-| Settings page GET | `requireSettingsSurface()` (any manage/delete grant) |
-| Governance, read tokens, clear history, export issues/events, **project config export/import** | `requirePermission(…, ProjectPermission::SETTINGS_MANAGE)` |
-| Members / group links / **activate·deactivate membership** | `requirePermission(…, ProjectPermission::MEMBERS_MANAGE)` |
+| Open Issues / Performance / Analytics / Releases | `#[IsGranted(ProjectPermission::VIEW, 'project')]` or `requireAccess()` / `requireMembership()` / `requireIssueRead()` when share-scoped |
+| Triage / comments / saved-view mutations | `requireTriage()` or `#[IsGranted(…, ISSUES_TRIAGE)]` |
+| Settings page GET | `requireSettingsSurface()` (any manage/delete grant) + section visibility |
+| Governance, read tokens, clear history, export issues/events, **project config export/import** | `#[IsGranted(…, SETTINGS_MANAGE)]` |
+| Members / group links / **activate·deactivate membership** | `#[IsGranted(…, MEMBERS_MANAGE)]` |
 | Transfer ownership | `requirePrimaryOwner()` (exact `Owner`; not `full`) |
-| API keys create/rotate/revoke | `requirePermission(…, ProjectPermission::API_KEYS_MANAGE)` |
-| Notification destinations / thresholds | `requirePermission(…, ProjectPermission::NOTIFICATIONS_MANAGE)` |
-| Share links | `requirePermission(…, ProjectPermission::SHARE_LINKS_MANAGE)` |
-| Delete project | `requirePermission(…, ProjectPermission::DELETE)` |
+| API keys create/rotate/revoke | `#[IsGranted(…, API_KEYS_MANAGE)]` |
+| Notification destinations / thresholds | `#[IsGranted(…, NOTIFICATIONS_MANAGE)]` |
+| Share links | `#[IsGranted(…, SHARE_LINKS_MANAGE)]` |
+| Delete project | `#[IsGranted(…, DELETE)]` |
 
 Insufficient access raises `AccessDeniedHttpException` → **HTTP 403**. Do **not** rely on Twig alone for security.
 
-`ProjectChildEntityGuard::requireManagedChild()` enforces `project.notifications.manage` for notification/threshold child routes.
+Notification and threshold child routes now map the parent `Project` and enforce `project.notifications.manage` with `#[IsGranted(ProjectPermission::NOTIFICATIONS_MANAGE, 'project')]`, while still rejecting mismatched child entities with 404.
 
 ## Twig UI gating (`ProjectPermissionTwigExtension`)
 
@@ -154,8 +154,8 @@ On Settings templates that already receive `membership` (`ProjectAccess`), prefe
 **Rules of thumb**
 
 1. Hide UI with Twig (`project_grants` / `canManage*` / Settings tab via `project_can_open_settings`) so users never see forbidden tabs, cards, or forms.
-2. Enforce the same key again in the controller/manager with `requirePermission` (or `requireSettingsSurface` for the Settings GET, `requirePrimaryOwner` for transfer) so forged URLs/POSTs return **403**.
-3. Never call `is_granted('project.…')` for product access — that hits instance `InstancePermissionVoter`, which is the wrong layer.
+2. Prefer `#[IsGranted(ProjectPermission::…, 'project')]` on the controller action (or `requirePermission` / `requireSettingsSurface` / `requirePrimaryOwner` when the flow is share-scoped or non-HTTP) so forged URLs/POSTs return **403**.
+3. Never call `is_granted('project.…')` for product access against the wrong subject — that hits instance `InstancePermissionVoter` when the attribute is treated as an instance catalog key. Use `ProjectPermissionVoter` with a `Project` subject (or `ProjectAccessService`).
 
 ## Quick reference for contributors
 
@@ -164,7 +164,7 @@ On Settings templates that already receive `membership` (`ProjectAccess`), prefe
 | “Must be logged in” | `#[IsGranted('ROLE_USER')]` or firewall `access_control` |
 | “Full instance operator” | `#[IsGranted('ROLE_ADMIN')]` |
 | “Partial Administration capability” | Not used — Administration stays `ROLE_ADMIN` only |
-| “May triage / Settings / API keys on this project” | `ProjectAccessService::requirePermission(…, ProjectPermission::…)` + Twig `project_grants` |
+| “May triage / Settings / API keys on this project” | `#[IsGranted(ProjectPermission::…, 'project')]` and/or `ProjectAccessService` + Twig `project_grants` |
 | “Open Settings surface” | `requireSettingsSurface()` + `project_can_open_settings(project)` |
 | New project capability | Add a `project.*` key on `ProjectPermission` + matrix row + Twig/controller gates; catalog seed via `ProjectPermissionCatalog` |
 

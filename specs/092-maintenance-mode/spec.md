@@ -2,7 +2,7 @@
 
 **Feature Branch**: `092-maintenance-mode`  
 **Created**: 2026-08-13  
-**Status**: Implemented (v1.9.0)
+**Status**: Implemented (v1.9.0; exclusions narrowed in **v1.11.0** / `095`)
 
 **Input**: Integrate `nowo-tech/maintenance-mode-bundle` so operators can enable, schedule, and preview site-wide HTTP **503** maintenance from Administration, with Beacon-branded public page art and kit admin chrome (same look and feel as other kit panels). Prefer the official kit over a hand-rolled maintenance stack.
 
@@ -80,6 +80,7 @@ As an admin, Maintenance appears in the **Administration** sidebar (Instance) an
 ### Edge Cases
 
 - AuthKit login/register/reset and health endpoints remain reachable during maintenance (configured exclusions).
+- **Ingest exclusions (v1.11.0 / `095`)**: only Envelope + OTLP path patterns skip the 503. A blanket `/api/` prefix is **not** used — Read API `/api/projects/…` stays under maintenance.
 - Panel routes under `/admin/maintenance` are always excluded from the 503 gate.
 - Empty message falls back to translated bundle default.
 - History empty state shows a calm empty row, not a raw exception.

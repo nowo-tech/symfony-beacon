@@ -15,7 +15,7 @@ final class OtlpMetricsIngestFunctionalTest extends DatabaseWebTestCase
     {
         [$client, , $project] = $this->bootWithDemoProject();
 
-        $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/otlp/v1/metrics', [], [], [
+        $client->request(Request::METHOD_POST, '/api/'.$project->getUuid().'/otlp/v1/metrics', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], '{}');
 
@@ -28,7 +28,7 @@ final class OtlpMetricsIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/otlp/v1/metrics?beacon_key='.$apiKey->getPublicKey().'&beacon_secret='.$apiKey->getSecretKey(),
+            '/api/'.$project->getUuid().'/otlp/v1/metrics?beacon_key='.$apiKey->getPublicKey().'&beacon_secret='.$apiKey->getSecretKey(),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -70,7 +70,7 @@ final class OtlpMetricsIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/otlp/v1/metrics',
+            '/api/'.$project->getUuid().'/otlp/v1/metrics',
             [],
             [],
             $this->beaconAuthHeaders($apiKey) + ['CONTENT_TYPE' => 'application/json'],
@@ -114,7 +114,7 @@ final class OtlpMetricsIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/otlp/v1/metrics',
+            '/api/'.$project->getUuid().'/otlp/v1/metrics',
             [],
             [],
             $this->beaconAuthHeaders($apiKey) + ['CONTENT_TYPE' => 'application/json'],

@@ -87,16 +87,16 @@ class Issue
     private ?string $lastEnvironment = null;
 
     /** @var Collection<int, Event> */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $events;
 
     /** @var Collection<int, IssueHistoryEntry> */
-    #[ORM\OneToMany(targetEntity: IssueHistoryEntry::class, mappedBy: 'issue', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: IssueHistoryEntry::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdAt' => 'DESC', 'id' => 'DESC'])]
     private Collection $historyEntries;
 
     /** @var Collection<int, IssueComment> */
-    #[ORM\OneToMany(targetEntity: IssueComment::class, mappedBy: 'issue', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: IssueComment::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $comments;
 

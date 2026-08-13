@@ -10,9 +10,7 @@ use App\Issues\Form\DashboardMentionsFilterType;
 use App\Issues\Form\MentionsMarkAllReadType;
 use App\Issues\Form\MentionsMarkReadType;
 use App\Issues\Repository\IssueMentionRepository;
-use App\Project\Entity\Project;
-use App\Project\Repository\ProjectRepository;
-use App\Project\Service\AccessibleProjectFilter;
+use App\Issues\Service\DashboardMentionsFilterResolver;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
@@ -34,9 +32,9 @@ final class DashboardMentionsController extends AbstractController
     use RequiresValidFormTrait;
 
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
         private readonly IssueMentionRepository $mentionRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly DashboardMentionsFilterResolver $filterResolver,
         private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
@@ -46,36 +44,21 @@ final class DashboardMentionsController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $projectFilter = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = $projectFilter instanceof Project ? [$projectFilter] : $accessible;
-        $unreadOnly = $request->query->getBoolean('unread');
+        $filters = $this->filterResolver->resolve($user, $request);
 
-        $total = $this->mentionRepository->countInboxForUser($user, $projects, $unreadOnly);
+        $total = $this->mentionRepository->countInboxForUser($user, $filters->selectedProjects, $filters->unreadOnly);
         $pagination = PagePagination::fromRequest($request, $total);
         $mentions = $this->mentionRepository->findInboxForUser(
             $user,
-            $projects,
-            $unreadOnly,
+            $filters->selectedProjects,
+            $filters->unreadOnly,
             $pagination['per_page'],
             $pagination['offset'],
         );
 
-        $unreadCount = $this->mentionRepository->countInboxForUser($user, $accessible, true);
-        $filters = [
-            'project' => $projectFilter?->getUuid() ?? '',
-            'unread' => $unreadOnly ? '1' : '',
-            'page' => 1,
-            'per_page' => $pagination['per_page'],
-        ];
-        $redirectQuery = array_filter(
-            [
-                'project' => $filters['project'],
-                'unread' => $filters['unread'],
-                'per_page' => (string) $filters['per_page'],
-            ],
-            static fn (string $value): bool => '' !== $value,
-        );
+        $unreadCount = $this->mentionRepository->countInboxForUser($user, $filters->accessibleProjects, true);
+        $formData = $filters->formData($pagination['per_page']);
+        $redirectQuery = $filters->redirectQuery($pagination['per_page']);
 
         $markReadForms = [];
         foreach ($mentions as $mention) {
@@ -88,20 +71,13 @@ final class DashboardMentionsController extends AbstractController
             ])->createView();
         }
 
-        $projectChoices = AccessibleProjectFilter::choiceMap($accessible);
-
         return $this->render('dashboard/mentions.html.twig', [
             'mentions' => $mentions,
-            'projects' => $accessible,
-            'filters' => $filters,
-            'filterForm' => $this->getFilterFormFactory->create(DashboardMentionsFilterType::class, [
-                'project' => $filters['project'],
-                'unread' => '1' === $filters['unread'],
-                'page' => 1,
-                'per_page' => $pagination['per_page'],
-            ], [
+            'projects' => $filters->accessibleProjects,
+            'filters' => $formData,
+            'filterForm' => $this->getFilterFormFactory->create(DashboardMentionsFilterType::class, $formData, [
                 'action' => $this->generateUrl('dashboard_mentions'),
-                'project_choices' => $projectChoices,
+                'project_choices' => $filters->projectChoices(),
             ])->createView(),
             'pagination' => $pagination,
             'unread_count' => $unreadCount,
@@ -122,8 +98,8 @@ final class DashboardMentionsController extends AbstractController
         $form->handleRequest($request);
         $this->requireValidCsrfForm($form);
 
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
-        $this->mentionRepository->markAllReadForUser($user, $accessible);
+        $filters = $this->filterResolver->resolve($user, $request);
+        $this->mentionRepository->markAllReadForUser($user, $filters->accessibleProjects);
         $this->entityManager->flush();
 
         return $this->redirectToRoute('dashboard_mentions');

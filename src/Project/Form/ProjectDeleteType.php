@@ -8,6 +8,7 @@ use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\EqualTo;
 
 /**
  * Danger-zone delete project form (type-to-confirm + CSRF).
@@ -21,11 +22,14 @@ final class ProjectDeleteType extends FormKitAbstractType
         $projectId = (int) $options['project_id'];
         $idPrefix = (string) $options['input_id_prefix'];
 
-        $this->withBuilder($builder, function () use ($projectId, $idPrefix): void {
+        $this->withBuilder($builder, function () use ($options, $projectId, $idPrefix): void {
             $this->addTextField('confirmation', [
                 'help' => false,
                 'placeholder' => false,
                 'required' => true,
+                'constraints' => [
+                    new EqualTo((string) $options['confirmation_value']),
+                ],
                 'attr' => [
                     'id' => $idPrefix.$projectId,
                     'class' => 'input w-full',
@@ -45,9 +49,11 @@ final class ProjectDeleteType extends FormKitAbstractType
             'csrf_protection' => true,
             'csrf_token_id' => 'project_delete',
             'project_id' => 0,
+            'confirmation_value' => '',
             'input_id_prefix' => 'project-delete-confirm-',
         ]);
         $resolver->setAllowedTypes('project_id', 'int');
+        $resolver->setAllowedTypes('confirmation_value', 'string');
         $resolver->setAllowedTypes('input_id_prefix', 'string');
     }
 

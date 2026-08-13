@@ -57,6 +57,8 @@ nowo_maintenance_mode:
             - /register
             - /logout
             - /reset-password
-            - /api/
+            # Ingest only — Read API (/api/projects/…) stays under maintenance 503.
         patterns:
             - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|setup)(/|$|\?)#'
+            - '#^/api/[^/]+/envelope(/|$|\?)#'
+            - '#^/api/[^/]+/otlp(/|$|\?)#'

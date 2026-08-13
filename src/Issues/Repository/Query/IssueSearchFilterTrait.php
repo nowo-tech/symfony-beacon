@@ -27,8 +27,9 @@ trait IssueSearchFilterTrait
         if ($platform instanceof AbstractMySQLPlatform) {
             $boolean = $this->toBooleanFulltextQuery($query);
             if ('' === $boolean) {
-                $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
-                    ->setParameter('q', '%'.$query.'%');
+                $like = '%'.SqlLikeEscaper::escape($query).'%';
+                $qb->andWhere("i.title LIKE :q ESCAPE '\\' OR i.culprit LIKE :q ESCAPE '\\'")
+                    ->setParameter('q', $like);
 
                 return;
             }
@@ -44,8 +45,9 @@ trait IssueSearchFilterTrait
             return;
         }
 
-        $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q')
-            ->setParameter('q', '%'.$query.'%');
+        $like = '%'.SqlLikeEscaper::escape($query).'%';
+        $qb->andWhere("i.title LIKE :q ESCAPE '\\' OR i.culprit LIKE :q ESCAPE '\\'")
+            ->setParameter('q', $like);
     }
 
     private function toBooleanFulltextQuery(string $query): string
@@ -93,8 +95,8 @@ trait IssueSearchFilterTrait
         }
 
         $qb->andWhere(
-            'EXISTS (SELECT 1 FROM '.Event::class.' ue WHERE ue.issue = i AND ue.userIdentifier LIKE :userLike)',
-        )->setParameter('userLike', '%'.trim($user).'%');
+            "EXISTS (SELECT 1 FROM ".Event::class." ue WHERE ue.issue = i AND ue.userIdentifier LIKE :userLike ESCAPE '\\')",
+        )->setParameter('userLike', '%'.SqlLikeEscaper::escape(trim($user)).'%');
     }
 
     /** @return list<int> */

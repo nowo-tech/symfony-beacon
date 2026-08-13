@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Shared\Settings\Form;
 
 use App\Shared\Form\FormKitAbstractType;
+use App\Shared\Mercure\MercureHubUrlGuard;
 use App\Shared\Settings\Entity\InstanceSettings;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,6 +22,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 final class InstanceMercureSettingsType extends FormKitAbstractType
 {
+    public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
+        private readonly MercureHubUrlGuard $hubUrlGuard,
+    ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
+    }
+
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -38,6 +49,14 @@ final class InstanceMercureSettingsType extends FormKitAbstractType
                 ],
                 'constraints' => [
                     new Length(max: 2048),
+                    new Callback(function (mixed $value, ExecutionContextInterface $context): void {
+                        $this->validateHubUrl(
+                            $value,
+                            $context,
+                            invalidKey: 'instance_mercure.url.invalid',
+                            unsafeKey: 'instance_mercure.url.unsafe',
+                        );
+                    }),
                 ],
             ]);
             $this->addTextField('mercurePublicUrl', [
@@ -49,6 +68,14 @@ final class InstanceMercureSettingsType extends FormKitAbstractType
                 ],
                 'constraints' => [
                     new Length(max: 2048),
+                    new Callback(function (mixed $value, ExecutionContextInterface $context): void {
+                        $this->validateHubUrl(
+                            $value,
+                            $context,
+                            invalidKey: 'instance_mercure.public_url.invalid',
+                            unsafeKey: 'instance_mercure.public_url.unsafe',
+                        );
+                    }),
                 ],
             ]);
             $this->boundBuilder()->add(
@@ -104,5 +131,25 @@ final class InstanceMercureSettingsType extends FormKitAbstractType
                 ->setTranslationDomain('form')
                 ->addViolation();
         }
+    }
+
+    private function validateHubUrl(
+        mixed $value,
+        ExecutionContextInterface $context,
+        string $invalidKey,
+        string $unsafeKey,
+    ): void {
+        if (null === $value || '' === $value) {
+            return;
+        }
+
+        $result = $this->hubUrlGuard->classifyHttpUrl(\is_string($value) ? $value : null);
+        if (MercureHubUrlGuard::RESULT_VALID === $result) {
+            return;
+        }
+
+        $context->buildViolation(MercureHubUrlGuard::RESULT_UNSAFE === $result ? $unsafeKey : $invalidKey)
+            ->setTranslationDomain('form')
+            ->addViolation();
     }
 }

@@ -72,27 +72,27 @@ class Project implements AuditableInterface
     private bool $ingestEnabled = true;
 
     /** @var Collection<int, ProjectApiKey> */
-    #[ORM\OneToMany(targetEntity: ProjectApiKey::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ProjectApiKey::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $apiKeys;
 
     /** @var Collection<int, ProjectMembership> */
-    #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ProjectMembership::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $memberships;
 
     /** @var Collection<int, ProjectGroupAccess> */
-    #[ORM\OneToMany(targetEntity: ProjectGroupAccess::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ProjectGroupAccess::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $groupAccesses;
 
     /** @var Collection<int, Issue> */
-    #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'project')]
+    #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'project', fetch: 'EXTRA_LAZY')]
     private Collection $issues;
 
     /** @var Collection<int, NotificationDestination> */
-    #[ORM\OneToMany(targetEntity: NotificationDestination::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: NotificationDestination::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $notificationDestinations;
 
     /** @var Collection<int, ProjectThresholdRule> */
-    #[ORM\OneToMany(targetEntity: ProjectThresholdRule::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ProjectThresholdRule::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $thresholdRules;
 
     #[ORM\ManyToOne(targetEntity: User::class)]

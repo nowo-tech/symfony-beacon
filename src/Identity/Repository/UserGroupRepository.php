@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Repository;
 
 use App\Identity\Entity\UserGroup;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,7 +26,7 @@ class UserGroupRepository extends ServiceEntityRepository
      *
      * @return list<UserGroup>
      */
-    public function findAllOrdered(?string $query = null): array
+    public function findAllOrdered(?string $query = null, ?int $limit = null, int $offset = 0): array
     {
         $qb = $this->createQueryBuilder('g')
             ->leftJoin('g.createdBy', 'cb')->addSelect('cb')
@@ -33,14 +34,33 @@ class UserGroupRepository extends ServiceEntityRepository
             ->orderBy('g.name', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('g.name LIKE :q OR g.slug LIKE :q OR g.description LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $like = '%'.SqlLikeEscaper::escape(trim($query)).'%';
+            $qb->andWhere("g.name LIKE :q ESCAPE '\\' OR g.slug LIKE :q ESCAPE '\\' OR g.description LIKE :q ESCAPE '\\'")
+                ->setParameter('q', $like);
+        }
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit)->setFirstResult(max(0, $offset));
         }
 
         /** @var list<UserGroup> $groups */
         $groups = $qb->getQuery()->getResult();
 
         return $groups;
+    }
+
+    public function countAllOrdered(?string $query = null): int
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->select('COUNT(g.id)');
+
+        if (null !== $query && '' !== trim($query)) {
+            $like = '%'.SqlLikeEscaper::escape(trim($query)).'%';
+            $qb->andWhere("g.name LIKE :q ESCAPE '\\' OR g.slug LIKE :q ESCAPE '\\' OR g.description LIKE :q ESCAPE '\\'")
+                ->setParameter('q', $like);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /** Lookup by unique slug (normalized to lowercase). */

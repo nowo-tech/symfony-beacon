@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Metrics;
+namespace App\Ops\Metrics;
 
 /**
  * Renders Prometheus text exposition format 0.0.4.

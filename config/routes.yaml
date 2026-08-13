@@ -98,8 +98,8 @@ controllers_health:
 
 controllers_metrics:
     resource:
-        path: ../src/Shared/Metrics/
-        namespace: App\Shared\Metrics
+        path: ../src/Ops/Metrics/
+        namespace: App\Ops\Metrics
     type: attribute
 
 # RoutingKit DB/JSON locale routes — MUST be last so {name}.{locale} overlays app routes.

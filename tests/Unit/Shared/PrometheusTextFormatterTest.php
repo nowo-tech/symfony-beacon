@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared;
 
-use App\Shared\Metrics\PrometheusTextFormatter;
+use App\Ops\Metrics\PrometheusTextFormatter;
 use PHPUnit\Framework\TestCase;
 
 final class PrometheusTextFormatterTest extends TestCase

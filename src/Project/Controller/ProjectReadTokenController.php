@@ -11,7 +11,6 @@ use App\Project\Entity\ProjectReadToken;
 use App\Project\Form\ProjectReadTokenCreateType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectReadTokenManager;
 use App\Shared\Form\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -29,11 +28,11 @@ final class ProjectReadTokenController extends AbstractController
     public function __construct(
         private readonly ProjectReadTokenManager $tokenManager,
         private readonly ProjectReadTokenRepository $tokenRepository,
-        private readonly ProjectAccessService $projectAccess,
     ) {
     }
 
     #[Route('/projects/{id}/settings/read-tokens', name: 'project_read_token_create', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function create(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -41,7 +40,6 @@ final class ProjectReadTokenController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $form = $this->createForm(ProjectReadTokenCreateType::class, null, [
             'csrf_token_id' => 'project_read_token_create',
@@ -63,6 +61,7 @@ final class ProjectReadTokenController extends AbstractController
     }
 
     #[Route('/projects/{id}/settings/read-tokens/{tokenId}/revoke', name: 'project_read_token_revoke', requirements: ['id' => Requirement::UUID, 'tokenId' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function revoke(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -71,7 +70,6 @@ final class ProjectReadTokenController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'project_read_token_revoke',

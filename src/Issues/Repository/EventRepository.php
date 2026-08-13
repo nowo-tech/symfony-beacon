@@ -9,6 +9,7 @@ use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
 use App\Project\Entity\Project;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -322,8 +323,9 @@ class EventRepository extends ServiceEntityRepository
             ->setMaxResults(max(1, $limit));
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('i.title LIKE :q OR i.culprit LIKE :q OR e.eventId LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $like = '%'.SqlLikeEscaper::escape(trim($query)).'%';
+            $qb->andWhere("i.title LIKE :q ESCAPE '\\' OR i.culprit LIKE :q ESCAPE '\\' OR e.eventId LIKE :q ESCAPE '\\'")
+                ->setParameter('q', $like);
         }
         if (null !== $level && '' !== $level) {
             $qb->andWhere('i.level = :level')->setParameter('level', $level);

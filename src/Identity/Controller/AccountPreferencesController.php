@@ -77,6 +77,8 @@ final class AccountPreferencesController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $previousEmail = $user->getEmail();
+        $previousPhone = $user->getPhone();
+        $previousPhoneVerifiedAt = $user->getPhoneVerifiedAt();
 
         $form = $this->createForm(AccountProfileType::class, $user);
         $form->handleRequest($request);
@@ -102,11 +104,10 @@ final class AccountPreferencesController extends AbstractController
             }
 
             $phone = $user->getPhone();
-            if (null === $phone || '' === $phone) {
+            if (null === $phone || '' === $phone || $phone !== $previousPhone) {
                 $user->setPhoneVerifiedAt(null);
-            } else {
-                // Interim: treat self-saved phone as verified until SMS OTP ships.
-                $user->setPhoneVerifiedAt(new DateTimeImmutable());
+            } elseif ($previousPhoneVerifiedAt instanceof DateTimeImmutable) {
+                $user->setPhoneVerifiedAt($previousPhoneVerifiedAt);
             }
 
             $this->entityManager->flush();

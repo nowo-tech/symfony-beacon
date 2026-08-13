@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
-use App\Identity\Entity\User;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
-use App\Project\Service\ProjectChildEntityGuard;
 use App\Shared\Form\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -30,22 +27,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectThresholdRuleController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectAccessService $projectAccess,
-        private readonly ProjectChildEntityGuard $childEntityGuard,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     #[Route('/projects/{id}/threshold-rules/new', name: 'project_threshold_rule_new', requirements: ['id' => Requirement::UUID], methods: ['GET', 'POST'])]
+    #[IsGranted(ProjectPermission::NOTIFICATIONS_MANAGE, 'project')]
     public function new(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
         Request $request,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::NOTIFICATIONS_MANAGE);
-
         $rule = new ProjectThresholdRule();
         $rule->setProject($project);
 
@@ -70,13 +62,15 @@ final class ProjectThresholdRuleController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/threshold-rules/{id}/edit', name: 'project_threshold_rule_edit', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET', 'POST'])]
+    #[IsGranted(ProjectPermission::NOTIFICATIONS_MANAGE, 'project')]
     public function edit(
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         ProjectThresholdRule $rule,
         Request $request,
     ): Response {
-        $project = $this->requireManagedRule($projectId, $rule);
+        $this->assertRuleBelongsToProject($project, $rule);
 
         $form = $this->createForm(ProjectThresholdRuleType::class, $rule);
         $form->handleRequest($request);
@@ -97,13 +91,15 @@ final class ProjectThresholdRuleController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/threshold-rules/{id}/toggle', name: 'project_threshold_rule_toggle', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::NOTIFICATIONS_MANAGE, 'project')]
     public function toggle(
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         ProjectThresholdRule $rule,
         Request $request,
     ): RedirectResponse {
-        $project = $this->requireManagedRule($projectId, $rule);
+        $this->assertRuleBelongsToProject($project, $rule);
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'threshold_toggle_'.$rule->getId(),
         ]);
@@ -120,13 +116,15 @@ final class ProjectThresholdRuleController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/threshold-rules/{id}/delete', name: 'project_threshold_rule_delete', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::NOTIFICATIONS_MANAGE, 'project')]
     public function delete(
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         ProjectThresholdRule $rule,
         Request $request,
     ): RedirectResponse {
-        $project = $this->requireManagedRule($projectId, $rule);
+        $this->assertRuleBelongsToProject($project, $rule);
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'threshold_delete_'.$rule->getId(),
         ]);
@@ -142,15 +140,10 @@ final class ProjectThresholdRuleController extends AbstractController
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
     }
 
-    private function requireManagedRule(string $projectId, ProjectThresholdRule $rule): Project
+    private function assertRuleBelongsToProject(Project $project, ProjectThresholdRule $rule): void
     {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        return $this->childEntityGuard->requireManagedChild(
-            $projectId,
-            $rule->getProject(),
-            $user,
-        );
+        if ($rule->getProject()?->getId() !== $project->getId()) {
+            throw $this->createNotFoundException();
+        }
     }
 }

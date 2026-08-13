@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Identity\Entity\User;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use App\Shared\Form\FormKitAbstractType;
 use Closure;
 use Doctrine\ORM\EntityRepository;
@@ -68,8 +69,8 @@ final class ProjectMemberAutocompleteField extends FormKitAbstractType
                         return;
                     }
 
-                    $qb->andWhere('entity.email LIKE :term OR entity.displayName LIKE :term')
-                        ->setParameter('term', '%'.$term.'%');
+                    $qb->andWhere("entity.email LIKE :term ESCAPE '\\' OR entity.displayName LIKE :term ESCAPE '\\'")
+                        ->setParameter('term', '%'.SqlLikeEscaper::escape($term).'%');
                 };
             },
         ]);

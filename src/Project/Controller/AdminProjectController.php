@@ -22,6 +22,7 @@ use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
+use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,7 +59,13 @@ final class AdminProjectController extends AbstractController
     public function index(Request $request): Response
     {
         $query = $request->query->getString('q');
-        $projects = $this->projectRepository->findAllOrdered('' !== $query ? $query : null);
+        $total = $this->projectRepository->countAllOrdered('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $projects = $this->projectRepository->findAllOrdered(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
         $projectIds = [];
         foreach ($projects as $project) {
             $id = $project->getId();
@@ -70,6 +77,7 @@ final class AdminProjectController extends AbstractController
         return $this->render('admin/projects/index.html.twig', [
             'projects' => $projects,
             'q' => $query,
+            'pagination' => $pagination,
             'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
                 'q' => $query,
             ], [

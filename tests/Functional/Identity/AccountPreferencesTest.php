@@ -186,7 +186,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('[data-testid="profile-overview"]', 'prefs-email-new@example.com');
     }
 
-    public function testUserCanSavePhoneForQrLogin(): void
+    public function testSavingPhoneDoesNotAutoVerifyIt(): void
     {
         [$client, $user] = $this->bootWithDemoProject('qr-phone@example.com');
         $user->setDisplayName('QR User');
@@ -211,7 +211,61 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $reloaded = $em->getRepository(User::class)->find($user->getId());
         self::assertInstanceOf(User::class, $reloaded);
         self::assertSame('+34600111222', $reloaded->getPhone());
-        self::assertNotNull($reloaded->getPhoneVerifiedAt());
+        self::assertNull($reloaded->getPhoneVerifiedAt());
+    }
+
+    public function testSavingUnchangedPhoneKeepsExistingVerification(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('qr-phone-keep@example.com');
+        $verifiedAt = new \DateTimeImmutable('-1 day');
+        $user->setDisplayName('QR Keep');
+        $user->setPhone('+34600111222');
+        $user->setPhoneVerifiedAt($verifiedAt);
+        self::getContainer()->get('doctrine')->getManager()->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/profile');
+        $form = $crawler->selectButton('Save profile')->form([
+            'user_preferences[displayName]' => 'QR Keep',
+            'user_preferences[email]' => 'qr-phone-keep@example.com',
+            'user_preferences[phone]' => '+34600111222',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/account/profile');
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertInstanceOf(User::class, $reloaded);
+        self::assertSame($verifiedAt->format('Y-m-d H:i:s'), $reloaded->getPhoneVerifiedAt()?->format('Y-m-d H:i:s'));
+    }
+
+    public function testChangingPhoneClearsExistingVerification(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('qr-phone-clear@example.com');
+        $user->setDisplayName('QR Clear');
+        $user->setPhone('+34600111222');
+        $user->setPhoneVerifiedAt(new \DateTimeImmutable('-1 day'));
+        self::getContainer()->get('doctrine')->getManager()->flush();
+
+        $this->login($client, $user);
+
+        $crawler = $client->request(Request::METHOD_GET, '/account/profile');
+        $form = $crawler->selectButton('Save profile')->form([
+            'user_preferences[displayName]' => 'QR Clear',
+            'user_preferences[email]' => 'qr-phone-clear@example.com',
+            'user_preferences[phone]' => '+34600999999',
+        ]);
+        $client->submit($form);
+        self::assertResponseRedirects('/account/profile');
+
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->find($user->getId());
+        self::assertInstanceOf(User::class, $reloaded);
+        self::assertSame('+34600999999', $reloaded->getPhone());
+        self::assertNull($reloaded->getPhoneVerifiedAt());
     }
 
     public function testUserCanUpdateDisplayPreferences(): void

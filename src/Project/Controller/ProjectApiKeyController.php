@@ -13,7 +13,6 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Form\ProjectApiKeyCreateType;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectApiKeyFactory;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyType;
@@ -36,7 +35,6 @@ final class ProjectApiKeyController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly ProjectAccessService $projectAccess,
         private readonly ProjectApiKeyFactory $projectApiKeyFactory,
         private readonly HumanFriendlyTokenGenerator $tokenGenerator,
         private readonly UserActionRecorder $userActionRecorder,
@@ -44,6 +42,7 @@ final class ProjectApiKeyController extends AbstractController
     }
 
     #[Route('/projects/{id}/keys', name: 'project_keys_create', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::API_KEYS_MANAGE, 'project')]
     public function createKey(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -51,7 +50,6 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
 
         $form = $this->createForm(ProjectApiKeyCreateType::class, null, [
             'csrf_token_id' => 'project_key_create_'.$project->getId(),
@@ -86,6 +84,7 @@ final class ProjectApiKeyController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::API_KEYS_MANAGE, 'project')]
     public function revokeKey(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -95,7 +94,6 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [
@@ -123,6 +121,7 @@ final class ProjectApiKeyController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'keyId' => '\d+'],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::API_KEYS_MANAGE, 'project')]
     public function rotateKey(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -132,7 +131,6 @@ final class ProjectApiKeyController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::API_KEYS_MANAGE);
         $this->assertKeyBelongsToProject($apiKey, $project);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [

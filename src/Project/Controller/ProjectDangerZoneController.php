@@ -13,7 +13,6 @@ use App\Project\Form\ProjectClearHistoryType;
 use App\Project\Form\ProjectDeleteType;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
 use App\Project\Service\ProjectHistoryClearer;
 use App\Shared\Controller\RequiresValidFormTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,13 +35,13 @@ final class ProjectDangerZoneController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectHistoryClearer $historyClearer,
-        private readonly ProjectAccessService $projectAccess,
         private readonly ProjectRepository $projectRepository,
         private readonly UserActionRecorder $userActionRecorder,
     ) {
     }
 
     #[Route('/projects/{id}/clear-history', name: 'project_clear_history', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function clearHistory(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -50,7 +49,6 @@ final class ProjectDangerZoneController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
 
         $form = $this->createForm(ProjectClearHistoryType::class, null, [
             'csrf_token_id' => 'project_clear_'.$project->getId(),
@@ -82,6 +80,7 @@ final class ProjectDangerZoneController extends AbstractController
     }
 
     #[Route('/projects/{id}/delete', name: 'project_delete', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::DELETE, 'project')]
     public function delete(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -89,20 +88,24 @@ final class ProjectDangerZoneController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::DELETE);
 
         $form = $this->createForm(ProjectDeleteType::class, null, [
             'csrf_token_id' => 'project_delete_'.$project->getId(),
             'project_id' => (int) $project->getId(),
+            'confirmation_value' => $project->getName(),
         ]);
         $form->handleRequest($request);
-        $this->requireValidCsrfForm($form);
+        if (!$form->isSubmitted()) {
+            $this->requireValidCsrfForm($form);
+        }
+        if (!$form->isValid()) {
+            if (!$form->get('confirmation')->isValid()) {
+                $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
 
-        $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
-        if ($confirmation !== $project->getName()) {
-            $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
+                return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
+            }
 
-            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
+            $this->requireValidCsrfForm($form);
         }
 
         // Clear telemetry first so SQLite (and ORM) stay consistent without relying on DB cascades alone.

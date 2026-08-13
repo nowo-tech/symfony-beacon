@@ -8,7 +8,6 @@ use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Identity\Form\DashboardProjectSearchType;
 use App\Identity\Service\ProductTourStepsBuilder;
-use App\Project\Form\ProjectType;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -62,7 +61,6 @@ final class DashboardController extends AbstractController
                 'action' => $this->generateUrl('dashboard_home'),
             ])->createView(),
             'statsPreview' => $statsPreview,
-            'newProjectForm' => $this->createForm(ProjectType::class),
             'openNewProject' => $request->query->getBoolean('new'),
             'showSetupBanner' => $showSetupBanner,
             ...$tourVars,

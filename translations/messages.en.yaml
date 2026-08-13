@@ -1540,8 +1540,9 @@ preferences:
       to me on Slack issue alerts. Find it in your Slack profile → … → Copy member
       ID.
     phone: Phone number
-    phone_help: Optional. Required for Sign in with phone (QR). Saving a number marks
-      it verified for QR approval until SMS OTP is available.
+    phone_help: Optional. Used for Sign in with phone (QR) only after the number is verified. Saving or changing a number clears verification until SMS OTP ships.
+    phone_unverified: This number is not verified yet, so QR phone login will not work for it.
+    phone_verified: Phone verified for QR login.
     projects_title: Your projects
     projects_intro: Projects you can open through a direct membership.
     projects_empty: You are not a direct member of any project yet.

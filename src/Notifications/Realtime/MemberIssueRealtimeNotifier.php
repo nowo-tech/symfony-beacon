@@ -35,14 +35,16 @@ final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeN
     public function notify(MemberAlertEvent $event, Project $project, Issue $issue, array $payload): void
     {
         $payload['event'] = $event->value;
-        $users = $this->membershipRepository->findUsersByProject($project);
+        $users = $this->preferenceEvaluator->filterEligibleUsers(
+            $this->membershipRepository->findUsersByProject($project),
+            $project,
+            $issue,
+            $event,
+        );
         $eligibleIds = [];
         $mercureTopics = [];
 
         foreach ($users as $user) {
-            if (!$this->preferenceEvaluator->shouldNotify($user, $project, $issue, $event)) {
-                continue;
-            }
             $id = $user->getId();
             if (null !== $id) {
                 $eligibleIds[] = $id;

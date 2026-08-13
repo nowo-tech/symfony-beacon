@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'project.new.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-lg">
+    <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'project.new.title'|trans }}</h1>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'project.name.help'|trans }}</p>
+    <div class="panel mt-6">
+        {{ form_start(newProjectForm, {attr: {class: 'space-y-4'}}) }}
+            {% include 'form/_fields.html.twig' with {form: newProjectForm} only %}
+            <div class="flex justify-end gap-2">
+                <a class="btn-ghost no-underline" href="{{ path('dashboard_home') }}">{{ 'common.cancel'|trans }}</a>
+                <button class="btn-primary" type="submit">{{ 'project.new.submit'|trans }}</button>
+            </div>
+        {{ form_end(newProjectForm) }}
+    </div>
+</div>
+{% endblock %}

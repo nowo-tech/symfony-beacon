@@ -126,7 +126,7 @@ final class EnvelopeGoldenContractTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $this->beaconAuthHeaders($apiKey),

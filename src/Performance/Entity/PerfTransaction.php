@@ -53,7 +53,7 @@ class PerfTransaction
     private array $payload = [];
 
     /** @var Collection<int, PerfSpan> */
-    #[ORM\OneToMany(targetEntity: PerfSpan::class, mappedBy: 'transaction', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: PerfSpan::class, mappedBy: 'transaction', cascade: ['persist'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $spans;
 
     #[ORM\Column]

@@ -49,7 +49,9 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         ]);
         $this->submitSection($client, 'notifications', [
             'instance_ops_defaults[allowPrivateUrls]' => '1',
+            'instance_ops_defaults[confirmAllowPrivateUrls]' => 'ALLOW_PRIVATE_URLS',
             'instance_ops_defaults[allowAnonymousResolve]' => '1',
+            'instance_ops_defaults[confirmAllowAnonymousResolve]' => 'ALLOW_ANONYMOUS_RESOLVE',
             'instance_ops_defaults[notificationDeliveryHistoryLimit]' => '25',
             'instance_ops_defaults[notificationCircuitBreakerThreshold]' => '4',
             'instance_ops_defaults[notificationCircuitBreakerCooldownMinutes]' => '15',
@@ -81,6 +83,30 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         $this->login($client, $user);
         $client->request(Request::METHOD_GET, '/admin/ops-defaults/governance');
         self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testNotificationsSectionRequiresExplicitConfirmationWhenEnablingRiskyFlags(): void
+    {
+        [$client, $admin] = $this->bootAdmin('ops-defaults-confirm@example.com');
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings->setAllowPrivateUrls(false);
+        $settings->setAllowAnonymousResolve(false);
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
+        $this->login($client, $admin);
+
+        $crawler = $client->request(Request::METHOD_GET, '/admin/ops-defaults/notifications');
+        $form = $crawler->filter('[data-testid="ops-defaults-form"]')->form([
+            'instance_ops_defaults[allowPrivateUrls]' => '1',
+            'instance_ops_defaults[allowAnonymousResolve]' => '1',
+            'instance_ops_defaults[notificationDeliveryHistoryLimit]' => '25',
+            'instance_ops_defaults[notificationCircuitBreakerThreshold]' => '4',
+            'instance_ops_defaults[notificationCircuitBreakerCooldownMinutes]' => '15',
+        ]);
+        $client->submit($form);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSelectorTextContains('body', 'Type ALLOW_PRIVATE_URLS to enable private notification URLs.');
+        self::assertSelectorTextContains('body', 'Type ALLOW_ANONYMOUS_RESOLVE to enable anonymous Resolve.');
     }
 
     /**

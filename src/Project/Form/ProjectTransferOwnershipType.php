@@ -8,6 +8,7 @@ use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -39,7 +40,10 @@ final class ProjectTransferOwnershipType extends FormKitAbstractType
                 'help' => false,
                 'placeholder' => false,
                 'required' => true,
-                'constraints' => [new NotBlank()],
+                'constraints' => [
+                    new NotBlank(),
+                    new EqualTo((string) $options['confirmation_value']),
+                ],
                 'attr' => [
                     'id' => 'project-transfer-confirm-'.$projectId,
                     'class' => 'input w-full',
@@ -60,9 +64,11 @@ final class ProjectTransferOwnershipType extends FormKitAbstractType
             'csrf_token_id' => 'project_transfer_ownership',
             'user_choices' => [],
             'project_id' => 0,
+            'confirmation_value' => '',
         ]);
         $resolver->setAllowedTypes('user_choices', 'array');
         $resolver->setAllowedTypes('project_id', 'int');
+        $resolver->setAllowedTypes('confirmation_value', 'string');
     }
 
     #[Override]

@@ -8,6 +8,7 @@ use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\EqualTo;
 
 /**
  * Generic typed confirmation field for confirm dialogs that still need CSRF protection.
@@ -22,12 +23,15 @@ final class TypeToConfirmType extends FormKitAbstractType
         /** @var array<string, mixed> $fieldAttr */
         $fieldAttr = $options['confirmation_attr'];
 
-        $this->withBuilder($builder, function () use ($fieldAttr): void {
+        $this->withBuilder($builder, function () use ($fieldAttr, $options): void {
             $this->addTextField('confirmation', [
                 'required' => false,
                 'label' => false,
                 'help' => false,
                 'placeholder' => false,
+                'constraints' => [
+                    new EqualTo((string) $options['confirmation_value']),
+                ],
                 'attr' => $fieldAttr,
                 'label_attr' => ['class' => 'confirm-dialog__label'],
             ]);
@@ -41,12 +45,14 @@ final class TypeToConfirmType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'type_to_confirm',
+            'confirmation_value' => 'ANONYMIZE',
             'confirmation_attr' => [
                 'class' => 'input w-full',
                 'autocomplete' => 'off',
                 'data-confirm-dialog-target' => 'confirmInput',
             ],
         ]);
+        $resolver->setAllowedTypes('confirmation_value', 'string');
         $resolver->setAllowedTypes('confirmation_attr', 'array');
     }
 

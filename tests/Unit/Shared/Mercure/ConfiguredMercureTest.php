@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Shared\Mercure;
 
 use App\Shared\Mercure\ConfiguredMercure;
+use App\Shared\Mercure\MercureHubUrlGuard;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +25,7 @@ final class ConfiguredMercureTest extends TestCase
             'http://mercure/.well-known/mercure',
             'https://localhost/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
+            new MercureHubUrlGuard(),
         );
 
         self::assertFalse($mercure->isEnabled());
@@ -44,6 +46,7 @@ final class ConfiguredMercureTest extends TestCase
             'http://mercure/.well-known/mercure',
             'https://localhost/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
+            new MercureHubUrlGuard(),
         );
 
         self::assertTrue($mercure->isEnabled());
@@ -68,6 +71,7 @@ final class ConfiguredMercureTest extends TestCase
             'http://mercure/.well-known/mercure',
             'https://localhost/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
+            new MercureHubUrlGuard(),
         );
 
         self::assertTrue($mercure->isEnabled());

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Repository;
 
 use App\Identity\Entity\InstancePermission;
+use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,8 +31,8 @@ class InstancePermissionRepository extends ServiceEntityRepository
             ->addOrderBy('p.name', 'ASC');
 
         if (null !== $query && '' !== trim($query)) {
-            $qb->andWhere('p.key LIKE :q OR p.name LIKE :q OR p.description LIKE :q OR p.category LIKE :q')
-                ->setParameter('q', '%'.trim($query).'%');
+            $qb->andWhere("p.key LIKE :q ESCAPE '\\' OR p.name LIKE :q ESCAPE '\\' OR p.description LIKE :q ESCAPE '\\' OR p.category LIKE :q ESCAPE '\\'")
+                ->setParameter('q', '%'.SqlLikeEscaper::escape(trim($query)).'%');
         }
 
         /** @var list<InstancePermission> $rows */

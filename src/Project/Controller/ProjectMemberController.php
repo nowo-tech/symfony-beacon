@@ -54,6 +54,7 @@ final class ProjectMemberController extends AbstractController
 
     /** Add a direct member by email (owner/admin/member as allowed for the actor). */
     #[Route('/projects/{id}/members', name: 'project_members_add', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function add(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -61,7 +62,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::MEMBERS_MANAGE);
 
         $form = $this->createForm(ProjectMemberAddType::class, null, [
             'csrf_token_id' => 'project_member_add_'.$project->getId(),
@@ -90,6 +90,7 @@ final class ProjectMemberController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'userId' => Requirement::UUID],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function changeRole(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -99,7 +100,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $target = $this->requireTargetMembership($project, $memberUser);
 
@@ -131,6 +131,7 @@ final class ProjectMemberController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'userId' => Requirement::UUID],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function remove(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -140,7 +141,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $target = $this->requireTargetMembership($project, $memberUser);
 
@@ -165,6 +165,7 @@ final class ProjectMemberController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'userId' => Requirement::UUID],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function setActive(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -174,7 +175,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $target = $this->requireTargetMembership($project, $memberUser);
 
@@ -219,18 +219,24 @@ final class ProjectMemberController extends AbstractController
             'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
             'user_choices' => $this->membershipFormSupport->transferOwnershipChoices($project, $actor),
             'project_id' => (int) $project->getId(),
+            'confirmation_value' => $project->getName(),
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$form->isSubmitted()) {
+            $this->requireValidForm($form);
+        }
+        if (!$form->isValid()) {
+            if (!$form->get('confirmation')->isValid()) {
+                $this->addFlash('error', 'flash.project.transfer_confirmation_mismatch');
+
+                return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
+            }
+
+            $this->requireValidForm($form);
+        }
 
         /** @var array{confirmation?: string|null, user?: string|null} $data */
         $data = $form->getData();
-        $confirmation = (string) ($data['confirmation'] ?? '');
-        if ($confirmation !== $project->getName()) {
-            $this->addFlash('error', 'flash.project.transfer_confirmation_mismatch');
-
-            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Danger->value]);
-        }
 
         $memberUuid = (string) ($data['user'] ?? '');
         $memberUser = $this->userRepository->findOneBy(['uuid' => $memberUuid]);
@@ -252,6 +258,7 @@ final class ProjectMemberController extends AbstractController
 
     /** Link a user group to the project with admin or member role. */
     #[Route('/projects/{id}/groups', name: 'project_groups_add', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function addGroup(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -259,7 +266,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $form = $this->createForm(ProjectGroupAddType::class, null, [
             'csrf_token_id' => 'project_group_add_'.$project->getId(),
@@ -296,6 +302,7 @@ final class ProjectMemberController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'groupAccessId' => Requirement::UUID],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function changeGroupRole(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -305,7 +312,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'project_group_role_'.$groupAccess->getId(),
@@ -335,6 +341,7 @@ final class ProjectMemberController extends AbstractController
         requirements: ['projectId' => Requirement::UUID, 'groupAccessId' => Requirement::UUID],
         methods: ['POST'],
     )]
+    #[IsGranted(ProjectPermission::MEMBERS_MANAGE, 'project')]
     public function removeGroup(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
@@ -344,7 +351,6 @@ final class ProjectMemberController extends AbstractController
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $this->getUser();
-        $this->projectAccess->requirePermission($project, $actor, ProjectPermission::MEMBERS_MANAGE);
 
         $form = $this->createForm(CsrfOnlyType::class, null, [
             'csrf_token_id' => 'project_group_remove_'.$groupAccess->getId(),

@@ -56,6 +56,19 @@ if [ ! -f src/Project/Controller/AdminProjectController.php ]; then
   bad=1
 fi
 
+# --- Identity admin unlink flows must use ProjectMembershipAdminPort ---
+if [ ! -f src/Project/Port/ProjectMembershipAdminPort.php ]; then
+  echo "error: missing src/Project/Port/ProjectMembershipAdminPort.php" >&2
+  bad=1
+fi
+
+identity_project_manager_hits=$(php_files_matching 'use App\\Project\\Service\\ProjectMembershipManager;' src/Identity/Controller)
+if [ -n "$identity_project_manager_hits" ]; then
+  echo "error: Identity controllers must depend on App\\Project\\Port\\ProjectMembershipAdminPort, not ProjectMembershipManager:" >&2
+  printf '%s\n' "$identity_project_manager_hits" >&2
+  bad=1
+fi
+
 # --- OTLP controllers must live under Ingest/Otlp ---
 otlp_hits=$(php_files_matching 'Otlp.*Controller|Controller.*Otlp' src)
 otlp_outside=$(printf '%s\n' "$otlp_hits" | grep -v '^src/Ingest/Otlp/' | grep -v '^$' || true)
@@ -106,8 +119,34 @@ if [ -f src/Ingest/MessageHandler/ProcessEnvelopeHandler.php ]; then
   fi
 fi
 
+# --- Metrics scrape HTTP must live under Ops (not Shared) ---
+if [ -e src/Shared/Metrics/MetricsController.php ] || [ -d src/Shared/Metrics ]; then
+  echo "error: Metrics scrape belongs in App\\Ops\\Metrics (remove src/Shared/Metrics)." >&2
+  bad=1
+fi
+
+metrics_shared_ns=$(php_files_matching 'namespace App\\Shared\\Metrics;' src)
+if [ -n "$metrics_shared_ns" ]; then
+  echo "error: namespace App\\Shared\\Metrics is forbidden; use App\\Ops\\Metrics:" >&2
+  printf '%s\n' "$metrics_shared_ns" >&2
+  bad=1
+fi
+
+if [ ! -f src/Ops/Metrics/MetricsController.php ]; then
+  echo "error: missing src/Ops/Metrics/MetricsController.php" >&2
+  bad=1
+fi
+
+# --- Dashboard must not own project creation forms ---
+identity_creation_hits=$(php_files_matching 'use App\\Project\\Service\\ProjectCreationFormFactory;' src/Identity)
+if [ -n "$identity_creation_hits" ]; then
+  echo "error: Identity must not depend on ProjectCreationFormFactory (use Project fragment / project_new):" >&2
+  printf '%s\n' "$identity_creation_hits" >&2
+  bad=1
+fi
+
 if [ "$bad" -ne 0 ]; then
   exit 1
 fi
 
-echo "OK: module boundaries (AdminProject, OTLP, Shared write-path, Ops, Envelope writers)."
+echo "OK: module boundaries (AdminProject, OTLP, Shared write-path, Ops, Envelope writers, Metrics, Port)."

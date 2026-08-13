@@ -267,10 +267,19 @@ ops_defaults:
   allow_private_urls:
     label: Allow private notification URLs
     help: When enabled, outbound webhooks may target private/link-local hosts. Keep disabled in production.
+      Type ALLOW_PRIVATE_URLS to confirm when turning this on.
   allow_anonymous_resolve:
     label: Allow anonymous Slack/Teams Resolve
     help: Legacy. When enabled, Resolve may mutate issues without a mapped Beacon actor. Prefer mapped
-      users + triage.
+      users + triage. Type ALLOW_ANONYMOUS_RESOLVE to confirm when turning this on.
+  confirm_allow_private_urls:
+    label: Confirm private URLs
+    help: Type ALLOW_PRIVATE_URLS when enabling private notification URLs.
+    invalid: Type ALLOW_PRIVATE_URLS to enable private notification URLs.
+  confirm_allow_anonymous_resolve:
+    label: Confirm anonymous Resolve
+    help: Type ALLOW_ANONYMOUS_RESOLVE when enabling anonymous Resolve.
+    invalid: Type ALLOW_ANONYMOUS_RESOLVE to enable anonymous Resolve.
   delivery_history_limit:
     label: Delivery history limit
     help: Number of recent delivery attempts retained for each notification destination.
@@ -313,10 +322,14 @@ instance_mercure:
     label: Publish URL (server)
     help: Leave blank to use MERCURE_URL (e.g. http://mercure/.well-known/mercure inside Compose).
     placeholder: http://mercure/.well-known/mercure
+    invalid: Enter a valid HTTP or HTTPS Mercure URL.
+    unsafe: That Mercure URL targets a blocked metadata or link-local address.
   public_url:
     label: Public URL (browser)
     help: Leave blank to use MERCURE_PUBLIC_URL (usually same-origin /.well-known/mercure via Caddy).
     placeholder: https://localhost:9447/.well-known/mercure
+    invalid: Enter a valid HTTP or HTTPS public Mercure URL.
+    unsafe: That public Mercure URL targets a blocked metadata or link-local address.
   jwt_secret:
     label: JWT secret
     help: Leave blank to keep the current encrypted value or fall back to MERCURE_JWT_SECRET. Minimum
@@ -487,8 +500,8 @@ preferences:
   product_tour_select_all: Select all tours
   profile:
     phone: Phone number
-    phone_help: Optional. Required for Sign in with phone (QR). Saving a number marks it verified for
-      QR approval until SMS OTP is available.
+    phone_help: Optional. Reserved for future SMS OTP / phone sign-in flows. Changing or clearing the
+      number removes any previous phone verification.
     slack_user_id: Slack user ID
     slack_user_id_help: Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack
       issue alerts. Find it in your Slack profile → … → Copy member ID.

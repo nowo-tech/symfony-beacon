@@ -97,6 +97,15 @@
 
     {{ form_start(form, {attr: {class: 'panel space-y-4'}}) }}
         <h2 class="text-lg font-semibold">{{ 'preferences.profile.edit_title'|trans }}</h2>
+        {% if profile_user.phone %}
+            <p class="text-sm {% if profile_user.phoneVerifiedAt %}text-[var(--color-moss)]{% else %}text-[var(--color-alert)]{% endif %}" data-testid="phone-verification-status">
+                {% if profile_user.phoneVerifiedAt %}
+                    {{ 'preferences.profile.phone_verified'|trans }}
+                {% else %}
+                    {{ 'preferences.profile.phone_unverified'|trans }}
+                {% endif %}
+            </p>
+        {% endif %}
         {% include 'form/_fields.html.twig' with {form: form} only %}
         <div class="border-t border-[var(--color-sand)] pt-4">
             <button class="btn-primary" type="submit">{{ 'preferences.profile.submit'|trans }}</button>

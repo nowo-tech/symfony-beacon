@@ -1,5 +1,6 @@
 {# Host rewrite: Beacon Administration chrome (panels, tabs, form stack).
-   Extends bundle base → kit/maintenance_mode_panel_layout (page title/intro live there). #}
+   Extends bundle base → kit/maintenance_mode_panel_layout (page title/intro live there).
+   Forms come from MaintenancePanelController FormViews (bundle ≥ 1.5.0). #}
 {% extends '@NowoMaintenanceModeBundle/panel/base.html.twig' %}
 {% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
 {% set _css_fw = nowo_maintenance_mode_css_framework|default('tailwind') %}
@@ -65,12 +66,8 @@
     </section>
 
     <section class="panel mb-6" data-testid="maintenance-manual">
-        <form method="post" action="{{ path_prefix }}/enable" class="nowo-ui-form--stack">
-            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_enable') }}">
-            <div class="nowo-ui-field">
-                <label for="message">{{ 'panel.message'|trans({}, _td) }}</label>
-                <textarea id="message" name="message" class="nowo-ui-input nowo-ui-input--block" rows="3">{{ state.message }}</textarea>
-            </div>
+        {{ form_start(enable_form, {attr: {class: 'nowo-ui-form--stack'}}) }}
+            {% include '@NowoMaintenanceModeBundle/panel/_form_fields.html.twig' with {form: enable_form} only %}
             <div class="nowo-ui-form-actions">
                 <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }}">{{ 'panel.enable'|trans({}, _td) }}</button>
                 <button
@@ -79,40 +76,16 @@
                     form="maintenance-disable-form"
                 >{{ 'panel.disable'|trans({}, _td) }}</button>
             </div>
-        </form>
-        <form id="maintenance-disable-form" method="post" action="{{ path_prefix }}/disable" class="sr-only" aria-hidden="true">
-            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_disable') }}">
-        </form>
+        {{ form_end(enable_form) }}
+        {{ form_start(disable_form, {attr: {id: 'maintenance-disable-form', class: 'sr-only', 'aria-hidden': 'true'}}) }}
+            {% include '@NowoMaintenanceModeBundle/panel/_form_fields.html.twig' with {form: disable_form} only %}
+        {{ form_end(disable_form) }}
     </section>
 
     <section class="panel mb-6" data-testid="maintenance-schedule">
         <h2 class="nowo-ui-section-title">{{ 'panel.schedule'|trans({}, _td) }}</h2>
-        <form method="post" action="{{ path_prefix }}/schedule" class="nowo-ui-form--stack">
-            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_schedule') }}">
-            <div class="nowo-ui-field">
-                <label for="scheduled_enable_at">{{ 'panel.scheduled_enable'|trans({}, _td) }}</label>
-                <input
-                    type="datetime-local"
-                    id="scheduled_enable_at"
-                    name="scheduled_enable_at"
-                    class="nowo-ui-input nowo-ui-input--block"
-                    value="{{ state.scheduledEnableAt ? state.scheduledEnableAt|date('Y-m-d\\TH:i') : '' }}"
-                >
-            </div>
-            <div class="nowo-ui-field">
-                <label for="scheduled_disable_at">{{ 'panel.scheduled_disable'|trans({}, _td) }}</label>
-                <input
-                    type="datetime-local"
-                    id="scheduled_disable_at"
-                    name="scheduled_disable_at"
-                    class="nowo-ui-input nowo-ui-input--block"
-                    value="{{ state.scheduledDisableAt ? state.scheduledDisableAt|date('Y-m-d\\TH:i') : '' }}"
-                >
-            </div>
-            <div class="nowo-ui-field">
-                <label for="schedule_message">{{ 'panel.message'|trans({}, _td) }}</label>
-                <textarea id="schedule_message" name="message" class="nowo-ui-input nowo-ui-input--block" rows="2">{{ state.message }}</textarea>
-            </div>
+        {{ form_start(schedule_form, {attr: {class: 'nowo-ui-form--stack'}}) }}
+            {% include '@NowoMaintenanceModeBundle/panel/_form_fields.html.twig' with {form: schedule_form} only %}
             <div class="nowo-ui-form-actions">
                 <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.save_schedule'|trans({}, _td) }}</button>
                 <button
@@ -121,16 +94,16 @@
                     form="maintenance-clear-schedule-form"
                 >{{ 'panel.clear_schedule'|trans({}, _td) }}</button>
             </div>
-        </form>
-        <form id="maintenance-clear-schedule-form" method="post" action="{{ path_prefix }}/clear-schedule" class="sr-only" aria-hidden="true">
-            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_clear_schedule') }}">
-        </form>
+        {{ form_end(schedule_form) }}
+        {{ form_start(clear_schedule_form, {attr: {id: 'maintenance-clear-schedule-form', class: 'sr-only', 'aria-hidden': 'true'}}) }}
+            {% include '@NowoMaintenanceModeBundle/panel/_form_fields.html.twig' with {form: clear_schedule_form} only %}
+        {{ form_end(clear_schedule_form) }}
     </section>
 
     {% if password_required|default(false) %}
-        <form method="post" action="{{ path_prefix }}/logout" class="mt-2">
-            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_logout') }}">
+        {{ form_start(logout_form, {attr: {class: 'mt-2'}}) }}
+            {% include '@NowoMaintenanceModeBundle/panel/_form_fields.html.twig' with {form: logout_form} only %}
             <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.logout'|trans({}, _td) }}</button>
-        </form>
+        {{ form_end(logout_form) }}
     {% endif %}
 {% endblock %}

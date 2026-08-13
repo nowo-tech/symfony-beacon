@@ -112,7 +112,7 @@ class IssueRepository extends ServiceEntityRepository
         $ors = [];
         foreach ($tokens as $i => $token) {
             $param = 'sim'.$i;
-            $ors[] = 'LOWER(i.title) LIKE :'.$param;
+            $ors[] = "LOWER(i.title) LIKE :{$param} ESCAPE '\\'";
             $qb->setParameter($param, '%'.SqlLikeEscaper::escape(mb_strtolower($token)).'%');
         }
         $qb->andWhere('('.implode(' OR ', $ors).')');

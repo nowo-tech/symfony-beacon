@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-08-13
+
+### Security
+
+- **Audit residual hardening (`095` / 6.45)**: profile save no longer auto-verifies phone for AuthKit QR login (changing/clearing the number clears `phoneVerifiedAt`); maintenance 503 exclusions narrowed to Envelope + OTLP ingest only (Read API stays locked); Mercure hub URLs validated with `MercureHubUrlGuard` (blocks private/metadata targets). Spec: `specs/095-audit-residual-hardening/`.
+
+### Added
+
+- `ProjectPermissionVoter` for declarative `#[IsGranted(ProjectPermission::…, 'project')]` on project-scoped HTTP.
+- `ProjectMembershipAdminPort` (+ adapter) so Identity admin unlink flows do not depend on `ProjectMembershipManager`.
+- `IssueShowPageBuilder` and dashboard GET filter resolvers/DTOs (Assignments, Mentions, New-in-release, Alerts, Activity).
+- Project-owned new-project dialog fragment (`/projects/_new_form`) embedded from the dashboard.
+- `AbstractJsonImportType` shared by project/instance JSON import forms.
+- Admin list pagination helpers (`countAllOrdered` / `countByRoleIds`) for users, groups, roles, and projects.
+
+### Changed
+
+- Project Settings UI split into section subtabs (`general` / `access` / `alerts` / `data` / `danger`) with section-aware navigation.
+- Project HTTP mutators (keys, members, shares, tokens, export, danger, notifications, thresholds, release health) prefer `#[IsGranted]` over imperative `requirePermission`.
+- Member alert realtime fan-out and preference manager batch-load prefs/events/mentions (no per-member N+1).
+- Prometheus scrape controller / text formatter live under `App\Ops\Metrics` (not Shared).
+- `InstanceSettings` split into Mailer / Mercure / Ops field traits (same table; no migration).
+- Large Doctrine collections use `EXTRA_LAZY`; user LIKE searches use `SqlLikeEscaper` with SQLite-safe `ESCAPE '\'`.
+- Maintenance Administration panel host fork uses Symfony FormViews + `form/_fields` (no hand-rolled `csrf_token()` fields).
+- Danger-zone / type-to-confirm / JSON import forms gain EqualTo / File constraints.
+- Module-boundary CI also guards Metrics ownership and bans Identity → `ProjectCreationFormFactory`.
+
+### Notes for integrators
+
+- Custom scripts that assumed maintenance left **all** of `/api/` open must treat Read API as 503 during maintenance; ingest Envelope/OTLP remain excluded.
+- Operators relying on “save phone → QR works” must verify phones (SMS OTP still Later / ROADMAP); unverified numbers show status on Account → Profile.
+
 ## [1.10.0] - 2026-08-13
 
 ### Added
@@ -1004,7 +1036,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...v1.9.0
 [1.8.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...v1.8.2

@@ -36,6 +36,74 @@ class MemberProjectAlertEventRepository extends ServiceEntityRepository
         return $indexed;
     }
 
+    /**
+     * @param list<Project> $projects
+     *
+     * @return array<int, array<string, MemberProjectAlertEvent>>
+     */
+    public function findIndexedByProjectIdForUser(User $user, array $projects): array
+    {
+        if ([] === $projects) {
+            return [];
+        }
+
+        /** @var list<MemberProjectAlertEvent> $rows */
+        $rows = $this->createQueryBuilder('e')
+            ->andWhere('e.user = :user')
+            ->andWhere('e.project IN (:projects)')
+            ->setParameter('user', $user)
+            ->setParameter('projects', $projects)
+            ->getQuery()
+            ->getResult();
+
+        $indexed = [];
+        foreach ($rows as $row) {
+            $projectId = $row->getProject()?->getId();
+            if (null === $projectId) {
+                continue;
+            }
+
+            $indexed[$projectId][$row->getEvent()->value] = $row;
+        }
+
+        return $indexed;
+    }
+
+    /**
+     * @param list<int> $userIds
+     *
+     * @return array<int, array<string, MemberProjectAlertEvent>>
+     */
+    public function findIndexedByUserIdsForProject(Project $project, array $userIds): array
+    {
+        if ([] === $userIds) {
+            return [];
+        }
+
+        /** @var list<MemberProjectAlertEvent> $rows */
+        $rows = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u')
+            ->addSelect('u')
+            ->andWhere('e.project = :project')
+            ->andWhere('u.id IN (:userIds)')
+            ->setParameter('project', $project)
+            ->setParameter('userIds', array_values(array_unique($userIds)))
+            ->getQuery()
+            ->getResult();
+
+        $indexed = [];
+        foreach ($rows as $row) {
+            $userId = $row->getUser()?->getId();
+            if (null === $userId) {
+                continue;
+            }
+
+            $indexed[$userId][$row->getEvent()->value] = $row;
+        }
+
+        return $indexed;
+    }
+
     public function findOneByUserProjectAndEvent(
         User $user,
         Project $project,

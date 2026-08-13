@@ -17,7 +17,7 @@ use Throwable;
  * Liveness and readiness probes for orchestrators (no auth).
  *
  * Readiness checks database only. Messenger backlog is exposed via authenticated
- * {@code /metrics} ({@see \App\Shared\Metrics\MetricsController}), not the public probe.
+ * {@code /metrics} ({@see \App\Ops\Metrics\MetricsController}), not the public probe.
  */
 #[AsController]
 final readonly class HealthController

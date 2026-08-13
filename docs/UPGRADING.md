@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.10.0)](#unreleased-main-after-1100)
+- [Unreleased (main after 1.11.0)](#unreleased-main-after-1110)
+- [Upgrading from 1.10.0 to 1.11.0](#upgrading-from-1100-to-1110)
 - [Upgrading from 1.9.0 to 1.10.0](#upgrading-from-190-to-1100)
 - [Upgrading from 1.8.2 to 1.9.0](#upgrading-from-182-to-190)
 - [Upgrading from 1.8.1 to 1.8.2](#upgrading-from-181-to-182)
@@ -63,9 +64,38 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.10.0)
+## Unreleased (main after 1.11.0)
 
 _No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.10.0 to 1.11.0
+
+**Audit residual hardening (`095` / 6.45)** — phone QR verification hygiene, maintenance ingest-only exclusions, Mercure hub URL guard, architecture/perf cleanup. See `[1.11.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.11.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+php bin/console cache:clear
+# Optional: rebuild assets if you customize project Settings / dashboard chrome
+# make vite-build
+```
+
+No Doctrine migrations in this release.
+
+### Operator checklist
+
+1. **QR phone login**: numbers saved before this release that were auto-marked verified stay verified until changed. Saving or changing a phone clears verification — QR approval will not work until SMS OTP ships (or an admin sets `phoneVerifiedAt` deliberately). Review Account → Profile status copy.
+2. **Maintenance mode**: Envelope (`/api/{id}/envelope/`) and OTLP (`/api/{id}/otlp/…`) remain reachable during maintenance; **Read API** `/api/projects/…` is **not** excluded (returns 503). Confirm any automation that assumed a blanket `/api/` exclusion.
+3. **Mercure**: invalid/private hub URLs are rejected when saving Administration → Mercure (and when publishing). Use a public HTTPS hub URL.
+4. **Project Settings URLs**: deep-links should use `/projects/{uuid}/settings/{section}` (`general` / `access` / `alerts` / `data` / `danger`). Bare `/settings` still redirects to the default visible section.
+5. **Developers**: prefer `#[IsGranted(ProjectPermission::…, 'project')]` on project-scoped controllers; Identity admin unlink must use `ProjectMembershipAdminPort`; Metrics scrape lives in `App\Ops\Metrics`.
+
+### Notes
+
+- Member-alert preference evaluation is batched on the realtime path (no operator action).
+- Admin Users / Groups / Roles / Projects lists are paginated (same query `q` + page params as other admin indexes).
 
 ## Upgrading from 1.9.0 to 1.10.0
 

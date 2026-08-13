@@ -134,6 +134,21 @@ Do not leave failed envelopes indefinitely on shared production databases.
 
 Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/Compose healthchecks.
 
+## Maintenance mode
+
+Administration → **Maintenance** (`nowo-tech/maintenance-mode-bundle`) can return **503** for the public site during upgrades.
+
+Configured exclusions keep AuthKit, health, setup, and **ingest** reachable:
+
+| Path pattern | During maintenance |
+|--------------|--------------------|
+| `/api/{project}/envelope/` | Reachable (ingest continues) |
+| `/api/{project}/otlp/…` | Reachable (OTLP ingest continues) |
+| `/api/projects/…` (Read API) | **503** (not excluded) |
+| `/admin/maintenance` | Always reachable for `ROLE_ADMIN` |
+
+Do not assume a blanket `/api/` exclusion — that was removed in **v1.11.0** (`095`).
+
 ## Prometheus metrics (`/metrics`)
 
 `GET /metrics` exposes Prometheus text exposition (`beacon_messenger_async_pending`, `beacon_notification_destinations_failed`, `beacon_ingest_ack_total`, `beacon_ingest_reject_total`).

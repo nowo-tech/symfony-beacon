@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Project\Controller;
 
-use App\Identity\Entity\User;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssuePriority;
@@ -15,7 +14,6 @@ use App\Issues\Service\IssueJsonNormalizer;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Security\ProjectPermission;
-use App\Project\Service\ProjectAccessService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,7 +36,6 @@ final class ProjectExportController extends AbstractController
         private readonly IssueSearchRepository $issueRepository,
         private readonly EventRepository $eventRepository,
         private readonly ProjectMembershipRepository $membershipRepository,
-        private readonly ProjectAccessService $projectAccess,
         private readonly IssueJsonNormalizer $issueJsonNormalizer,
     ) {
     }
@@ -49,16 +46,13 @@ final class ProjectExportController extends AbstractController
         requirements: ['uuid' => Requirement::UUID, '_format' => 'csv|json'],
         methods: ['GET'],
     )]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function exportIssues(
         #[MapEntity(mapping: ['uuid' => 'uuid'])]
         Project $project,
         Request $request,
         string $_format,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
-
         $issues = $this->resolveIssues($project, $request);
 
         if ('json' === $_format) {
@@ -120,16 +114,13 @@ final class ProjectExportController extends AbstractController
         requirements: ['uuid' => Requirement::UUID, '_format' => 'csv|json'],
         methods: ['GET'],
     )]
+    #[IsGranted(ProjectPermission::SETTINGS_MANAGE, 'project')]
     public function exportEvents(
         #[MapEntity(mapping: ['uuid' => 'uuid'])]
         Project $project,
         Request $request,
         string $_format,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-        $this->projectAccess->requirePermission($project, $user, ProjectPermission::SETTINGS_MANAGE);
-
         $statusParam = $request->query->getString('status');
         $status = '' !== $statusParam ? IssueStatus::tryFrom($statusParam) : null;
 

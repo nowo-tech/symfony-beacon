@@ -17,7 +17,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
     {
         [$client, , $project] = $this->bootWithDemoProject();
 
-        $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], [], '{}');
+        $client->request(Request::METHOD_POST, '/api/'.$project->getUuid().'/envelope/', [], [], [], '{}');
 
         self::assertResponseStatusCodeSame(401);
     }
@@ -28,7 +28,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             ['HTTP_X_BEACON_AUTH' => 'Beacon beacon_key='.$apiKey->getPublicKey()],
@@ -76,7 +76,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $this->beaconAuthHeaders($apiKey),
@@ -137,7 +137,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
                 ], \JSON_THROW_ON_ERROR),
             ]);
 
-            $client->request(Request::METHOD_POST, '/api/'.$project->getId().'/envelope/', [], [], $headers, $body);
+            $client->request(Request::METHOD_POST, '/api/'.$project->getUuid().'/envelope/', [], [], $headers, $body);
             self::assertResponseIsSuccessful();
         }
 
@@ -187,7 +187,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $this->beaconAuthHeaders($apiKey),
@@ -222,7 +222,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/?beacon_key='.rawurlencode($apiKey->getPublicKey())
+            '/api/'.$project->getUuid().'/envelope/?beacon_key='.rawurlencode($apiKey->getPublicKey())
                 .'&beacon_secret='.rawurlencode((string) $apiKey->getSecretKey()),
             [],
             [],
@@ -249,7 +249,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $headers,
@@ -259,7 +259,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $headers,
@@ -282,7 +282,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $headers,
@@ -292,7 +292,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/',
+            '/api/'.$project->getUuid().'/envelope/',
             [],
             [],
             $headers,

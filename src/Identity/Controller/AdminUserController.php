@@ -21,12 +21,13 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Exception\ProjectAccessException;
+use App\Project\Port\ProjectMembershipAdminPort;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Service\ProjectMembershipManager;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
+use App\Shared\Pagination\PagePagination;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
@@ -54,7 +55,7 @@ final class AdminUserController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipRepository $projectMembershipRepository,
-        private readonly ProjectMembershipManager $projectMembershipManager,
+        private readonly ProjectMembershipAdminPort $projectMembershipAdminPort,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -230,7 +231,7 @@ final class AdminUserController extends AbstractController
         /** @var User $actor */
         $actor = $this->getUser();
         try {
-            $this->projectMembershipManager->remove($project, $actor, $membership);
+            $this->projectMembershipAdminPort->unlinkMembership($project, $actor, $membership);
             $this->addFlash('success', 'flash.project.member_removed');
         } catch (ProjectAccessException $e) {
             $this->addFlash('error', match ($e->reasonCode) {
@@ -376,6 +377,7 @@ final class AdminUserController extends AbstractController
     ): RedirectResponse {
         $form = $this->createForm(TypeToConfirmType::class, null, [
             'csrf_token_id' => 'admin_user_anonymize_'.$user->getId(),
+            'confirmation_value' => 'ANONYMIZE',
         ]);
         $form->submit($request->request->all(), false);
         $this->requireValidForm($form);
@@ -427,7 +429,13 @@ final class AdminUserController extends AbstractController
         bool $openCreate = false,
     ): Response {
         $query = $request->query->getString('q');
-        $users = $this->userRepository->findAllForAdminDirectory('' !== $query ? $query : null);
+        $total = $this->userRepository->countForAdminDirectory('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $users = $this->userRepository->findAllForAdminDirectory(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
         $toggleEnabledForms = [];
         $roleForms = [];
         $anonymizeForms = [];
@@ -454,6 +462,7 @@ final class AdminUserController extends AbstractController
                 'action' => $this->generateUrl('admin_users_anonymize', ['id' => $user->getUuid()]),
                 'method' => 'POST',
                 'csrf_token_id' => 'admin_user_anonymize_'.$userId,
+                'confirmation_value' => 'ANONYMIZE',
             ])->createView();
         }
 
@@ -462,6 +471,7 @@ final class AdminUserController extends AbstractController
         return $this->render('admin/users/index.html.twig', [
             'users' => $users,
             'q' => $query,
+            'pagination' => $pagination,
             'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
                 'q' => $query,
             ], [

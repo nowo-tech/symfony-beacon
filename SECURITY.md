@@ -49,7 +49,7 @@ Operators should keep the **Mailer DSN** (Administration → Mailer, encrypted a
 
 Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the documented `.env.dist` `APP_SECRET` (`ChangeMePleaseUseARealSecret`). `app:seed-demo` is blocked outside local environments unless `--allow-non-local` (random keys only).
 
-## Ingest and public hooks (`093`)
+## Ingest and public hooks (`093` / `095`)
 
 | Surface | Guidance |
 | --- | --- |
@@ -58,6 +58,9 @@ Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the d
 | Teams Assign OpenUri | HMAC and params travel in the **query string** (Microsoft OpenUri constraint) — treat access logs / Referer as sensitive. |
 | Setup token | Prefer header `X-Setup-Token`. Query `?token=` remains for the SiteBackup wizard; rotate `SITE_SETUP_TOKEN` after first setup. |
 | Ops posture | Administration → Ops overview warns when private webhook URLs, anonymous Resolve, or optional metrics scrape are enabled. |
+| Maintenance exclusions (`095`) | Only Envelope + OTLP ingest paths skip the public 503. Read API `/api/projects/…` stays under maintenance. |
+| Mercure hub URL (`095`) | Administration → Mercure rejects private/metadata hub URLs (`MercureHubUrlGuard`). |
+| AuthKit QR phone (`095`) | Saving a phone does **not** set `phoneVerifiedAt`. Unverified numbers cannot approve QR login until SMS OTP ships. |
 
 ## Safe harbour
 

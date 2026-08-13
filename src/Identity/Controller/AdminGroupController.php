@@ -21,12 +21,13 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Exception\ProjectAccessException;
+use App\Project\Port\ProjectMembershipAdminPort;
 use App\Project\Repository\ProjectGroupAccessRepository;
-use App\Project\Service\ProjectMembershipManager;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
+use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,7 +52,7 @@ final class AdminGroupController extends AbstractController
         private readonly UserGroupMembershipRepository $groupMembershipRepository,
         private readonly UserRepository $userRepository,
         private readonly ProjectGroupAccessRepository $projectGroupAccessRepository,
-        private readonly ProjectMembershipManager $projectMembershipManager,
+        private readonly ProjectMembershipAdminPort $projectMembershipAdminPort,
         private readonly UserActionRecorder $actionRecorder,
         private readonly UserActionRepository $userActionRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -65,7 +66,13 @@ final class AdminGroupController extends AbstractController
     public function index(Request $request): Response
     {
         $query = $request->query->getString('q');
-        $groups = $this->groupRepository->findAllOrdered('' !== $query ? $query : null);
+        $total = $this->groupRepository->countAllOrdered('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $groups = $this->groupRepository->findAllOrdered(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
         $groupIds = [];
         foreach ($groups as $group) {
             $id = $group->getId();
@@ -77,6 +84,7 @@ final class AdminGroupController extends AbstractController
         return $this->render('admin/groups/index.html.twig', [
             'groups' => $groups,
             'q' => $query,
+            'pagination' => $pagination,
             'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
                 'q' => $query,
             ], [
@@ -404,7 +412,7 @@ final class AdminGroupController extends AbstractController
         /** @var User $actor */
         $actor = $this->getUser();
         try {
-            $this->projectMembershipManager->removeGroup($project, $actor, $access);
+            $this->projectMembershipAdminPort->unlinkGroupAccess($project, $actor, $access);
             $this->addFlash('success', 'flash.project.group_removed');
         } catch (ProjectAccessException $e) {
             $this->addFlash('error', match ($e->reasonCode) {
