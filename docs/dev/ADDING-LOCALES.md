@@ -115,12 +115,13 @@ The switcher renders `('locale.' ~ locale)|trans`.
 In `config/packages/security.yaml`, extend the public AuthKit regexes so the new code is allowed:
 
 ```yaml
-- path: ^/(en|es|de|nl|fr|it|pt|pl)/(login|register|logout)
-- path: ^/(login|register|logout)
+- path: ^/(?:(en|es|de|nl|fr|it|pt|pl)/)?(login|register|logout|reset-password)(/|$)
+- path: ^/(?:(en|es|de|nl|fr|it|pt|pl)/)?legal/
+- path: ^/(?:(en|es|de|nl|fr|it|pt|pl)/)?setup
 - path: ^/locale/
 ```
 
-(Replace `pl` with your locale; keep the full pipe-separated list. Include both bare and prefixed AuthKit paths.)
+(Replace `pl` with your locale in every locale alternation in `access_control`. Bare and locale-prefixed public AuthKit/legal/setup paths share one optional-prefix pattern each.)
 
 Also extend requirements on `GuestLocaleController` (`guest_locale_switch`), setup/legal route locale requirements, and `account_locale_switch`.
 

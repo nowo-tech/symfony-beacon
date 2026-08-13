@@ -1,0 +1,3 @@
+# Panel (/_maintenance) + preview (/_maintenance_preview)
+nowo_maintenance_mode:
+    resource: '@NowoMaintenanceModeBundle/Resources/config/routes.yaml'

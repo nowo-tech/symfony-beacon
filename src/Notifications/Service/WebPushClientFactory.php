@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Builds a configured {@see WebPush} client when VAPID keys are present.
  */
-final readonly class WebPushClientFactory
+readonly class WebPushClientFactory
 {
     public function __construct(
         #[Autowire('%beacon.vapid.public_key%')]

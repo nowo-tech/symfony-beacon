@@ -24,6 +24,13 @@ final class AdministrationMenuCurrentMatcherTest extends TestCase
         $request->attributes->set('_route', 'nowo_http_log_admin_show');
 
         self::assertTrue($matcher->isCurrent($item, $request, '/admin/http-log'));
+
+        $maintenance = new MenuItem();
+        $maintenance->setRouteName('nowo_maintenance_mode_panel_index');
+        $maintenance->setItemType(MenuItem::ITEM_TYPE_LINK);
+        $maintenanceRequest = Request::create('/admin/maintenance/history');
+        $maintenanceRequest->attributes->set('_route', 'nowo_maintenance_mode_panel_history');
+        self::assertTrue($matcher->isCurrent($maintenance, $maintenanceRequest, '/admin/maintenance'));
     }
 
     #[Test]

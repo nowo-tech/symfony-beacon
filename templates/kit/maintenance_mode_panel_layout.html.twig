@@ -1,0 +1,57 @@
+{# Beacon host layout for MaintenanceMode admin panel (ROLE_ADMIN, no ops password).
+   Bundle pages fill {% block body %}; kit wrap uses body_before/after like other admin kits.
+   Host forks: templates/bundles/NowoMaintenanceModeBundle/panel/ #}
+{% extends 'kit/_kit_admin_layout.html.twig' %}
+
+{% set kit_admin_heading %}{% block page_title %}{{ 'nav.maintenance'|trans }}{% endblock %}{% endset %}
+{% set kit_admin_intro = 'admin.hub.maintenance'|trans %}
+{% set kit_admin_wrapper_class = ' nowo-maintenance-panel' %}
+{% set kit_admin_css_framework = nowo_maintenance_mode_css_framework|default('tailwind') %}
+{% set kit_admin_data_testid = 'admin-maintenance' %}
+
+{% block title %}{{ kit_admin_heading|striptags|trim }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block kit_admin_extra_styles %}
+    <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
+        .kit-admin.nowo-maintenance-panel .maintenance-status {
+            display: grid;
+            grid-template-columns: minmax(8rem, 14rem) 1fr;
+            gap: 0.55rem 1rem;
+            margin: 0.75rem 0 0;
+        }
+        .kit-admin.nowo-maintenance-panel .maintenance-status dt {
+            margin: 0;
+            font-size: var(--kit-font-meta, 0.75rem);
+            font-weight: 500;
+            color: color-mix(in srgb, var(--color-ink, var(--beacon-ink)) 55%, transparent);
+        }
+        .kit-admin.nowo-maintenance-panel .maintenance-status dd {
+            margin: 0;
+            min-width: 0;
+            word-break: break-word;
+            font-size: var(--kit-font-body, 0.875rem);
+            color: var(--color-ink, var(--beacon-ink));
+        }
+        .kit-admin.nowo-maintenance-panel .nowo-ui-status--on {
+            color: var(--color-alert, var(--beacon-alert));
+            font-weight: 600;
+        }
+        .kit-admin.nowo-maintenance-panel .nowo-ui-status--off {
+            color: var(--color-moss, var(--beacon-moss));
+            font-weight: 600;
+        }
+        .kit-admin.nowo-maintenance-panel .nowo-ui-section-title {
+            margin-top: 0;
+        }
+        .kit-admin.nowo-maintenance-panel .nowo-ui-form--stack textarea.nowo-ui-input {
+            min-height: 5.5rem;
+            font-family: inherit;
+            font-size: var(--kit-font-body, 0.875rem);
+        }
+        .kit-admin.nowo-maintenance-panel .nowo-ui-form-actions {
+            border-top: 0;
+            margin-top: 0.35rem;
+            padding-top: 0;
+        }
+    </style>
+{% endblock %}

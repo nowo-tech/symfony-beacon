@@ -22,6 +22,7 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
         yield '404' => ['@Twig/Exception/error404.html.twig', 404, 'illustrations/error-404.png'];
         yield '403' => ['@Twig/Exception/error403.html.twig', 403, 'illustrations/error-403.png'];
         yield '500' => ['@Twig/Exception/error500.html.twig', 500, 'illustrations/error-500.png'];
+        yield '503' => ['@Twig/Exception/error503.html.twig', 503, 'illustrations/error-503.png'];
     }
 
     #[DataProvider('errorTemplateProvider')]
@@ -46,5 +47,6 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
         self::assertFileExists($root.'/public/illustrations/error-404.png');
         self::assertFileExists($root.'/public/illustrations/error-403.png');
         self::assertFileExists($root.'/public/illustrations/error-500.png');
+        self::assertFileExists($root.'/public/illustrations/error-503.png');
     }
 }

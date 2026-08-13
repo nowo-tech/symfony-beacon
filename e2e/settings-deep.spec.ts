@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, waitForPageLoader } from './helpers';
+import { dismissProductTour, expectAuthenticatedPage, gotoStable, waitForPageLoader } from './helpers';
 
 test.describe('Settings deep checks', () => {
   test('appearance tabs switch between sections', async ({ page }) => {
@@ -87,7 +87,7 @@ test.describe('Settings deep checks', () => {
   });
 
   test('admin hub deep cards navigate', async ({ page }) => {
-    await page.goto('/admin');
+    await gotoStable(page, '/admin');
     await dismissProductTour(page);
 
     const cards = [
@@ -95,16 +95,32 @@ test.describe('Settings deep checks', () => {
       { testid: 'admin-instance-config', url: /\/admin\/instance-config/ },
       { testid: 'admin-http-log', url: /\/admin\/http-log/ },
       { testid: 'admin-cookie-consent', url: /\/admin\/cookie-consent|\/cookie-consent/ },
+      { testid: 'admin-roles', url: /\/admin\/roles/ },
+      { testid: 'admin-permissions', url: /\/admin\/permissions/ },
     ] as const;
 
     for (const card of cards) {
-      await page.goto('/admin');
+      await gotoStable(page, '/admin');
       await dismissProductTour(page);
       const link = page.locator(`[data-testid="${card.testid}"]`);
       await expect(link).toBeVisible();
       await link.click();
       await expect(page).toHaveURL(card.url);
       await expect(page).not.toHaveURL(/\/login/);
+    }
+  });
+
+  test('legacy /settings/* paths redirect into admin settings', async ({ page }) => {
+    for (const [from, to] of [
+      ['/settings/appearance', /\/admin\/appearance/],
+      ['/settings/ops-defaults', /\/admin\/ops-defaults/],
+      ['/settings/instance-config', /\/admin\/instance-config/],
+    ] as const) {
+      await gotoStable(page, from);
+      await dismissProductTour(page);
+      await expect(page).toHaveURL(to);
+      await expect(page).not.toHaveURL(/\/login/);
+      await expect(page.getByRole('main')).toBeVisible();
     }
   });
 });

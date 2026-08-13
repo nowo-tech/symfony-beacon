@@ -81,14 +81,38 @@ class PushSubscription
         return $this->endpoint;
     }
 
+    /**
+     * Used by doctrine-encrypt-bundle when writing ciphertext (hash stays from plaintext setSubscription).
+     */
+    public function setEndpoint(string $endpoint): self
+    {
+        $this->endpoint = $endpoint;
+
+        return $this;
+    }
+
     public function getP256dh(): string
     {
         return $this->p256dh;
     }
 
+    public function setP256dh(string $p256dh): self
+    {
+        $this->p256dh = $p256dh;
+
+        return $this;
+    }
+
     public function getAuthToken(): string
     {
         return $this->authToken;
+    }
+
+    public function setAuthToken(string $authToken): self
+    {
+        $this->authToken = $authToken;
+
+        return $this;
     }
 
     public function getContentEncoding(): string

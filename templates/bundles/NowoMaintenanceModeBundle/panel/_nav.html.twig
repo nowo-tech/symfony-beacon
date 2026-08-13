@@ -1,0 +1,21 @@
+{# Panel / History area tabs — Beacon pills (Appearance / Cookie consent pattern). #}
+{% set _route = app.request.attributes.get('_route')|default('') %}
+{% set _on_history = _route == 'nowo_maintenance_mode_panel_history' or active|default('') == 'history' %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'panel.nav.panel'|trans({}, 'NowoMaintenanceModeBundle'),
+    nav_class: 'mb-6 nowo-ui-tabs--area',
+    attr: {'data-testid': 'maintenance-panel-tabs'},
+    framework: nowo_maintenance_mode_css_framework|default('tailwind'),
+    items: [
+        {
+            label: 'panel.nav.panel'|trans({}, 'NowoMaintenanceModeBundle'),
+            href: path_prefix,
+            current: not _on_history,
+        },
+        {
+            label: 'panel.nav.history'|trans({}, 'NowoMaintenanceModeBundle'),
+            href: path_prefix ~ '/history',
+            current: _on_history,
+        },
+    ],
+} only %}

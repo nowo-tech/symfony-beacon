@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "52ffc15c522fa10477bdb04acb78fd2f",
+    "content-hash": "68fa6ea607196271af2855ad82553447",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2884,6 +2884,96 @@
             "time": "2026-08-04T22:02:51+00:00"
         },
         {
+            "name": "nowo-tech/maintenance-mode-bundle",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/MaintenanceModeBundle.git",
+                "reference": "d5db668e8a0585049570f379f1585e48ec3e205d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/MaintenanceModeBundle/zipball/d5db668e8a0585049570f379f1585e48ec3e205d",
+                "reference": "d5db668e8a0585049570f379f1585e48ec3e205d",
+                "shasum": ""
+            },
+            "require": {
+                "nowo-tech/ui-kit-bundle": "^1.4",
+                "php": ">=8.2 <8.6",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/console": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/event-dispatcher": "^7.4 || ^8.0",
+                "symfony/http-foundation": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/routing": "^7.4 || ^8.0",
+                "symfony/security-core": "^7.4 || ^8.0",
+                "symfony/security-csrf": "^7.4 || ^8.0",
+                "symfony/yaml": "^7.4 || ^8.0",
+                "twig/extra-bundle": "^3.12",
+                "twig/string-extra": "^3.12"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/framework-bundle": "^7.4 || ^8.0",
+                "symfony/twig-bundle": "^7.4 || ^8.0",
+                "twig/twig": "^3.12",
+                "vincentlanglet/twig-cs-fixer": "^4.0"
+            },
+            "suggest": {
+                "symfony/flex": "For automatic recipe installation",
+                "symfony/security-bundle": "Required for the private panel when security.allow_unauthenticated is false (default); also for custom MaintenanceAccessGateInterface / access_checker",
+                "symfony/translation": "Required for |trans in panel and public maintenance templates",
+                "symfony/twig-bundle": "Required to render maintenance and panel templates"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\MaintenanceModeBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle to put a site into maintenance mode with configurable exclusions, panel CRUD, and pluggable storage.",
+            "homepage": "https://github.com/nowo-tech/MaintenanceModeBundle",
+            "keywords": [
+                "503",
+                "downtime",
+                "maintenance",
+                "maintenance-mode",
+                "symfony",
+                "symfony-bundle"
+            ],
+            "support": {
+                "changelog": "https://github.com/nowo-tech/MaintenanceModeBundle/blob/main/docs/CHANGELOG.md",
+                "docs": "https://github.com/nowo-tech/MaintenanceModeBundle/tree/main/docs",
+                "issues": "https://github.com/nowo-tech/MaintenanceModeBundle/issues",
+                "source": "https://github.com/nowo-tech/MaintenanceModeBundle"
+            },
+            "time": "2026-08-13T06:30:17+00:00"
+        },
+        {
             "name": "nowo-tech/migrations-kit-bundle",
             "version": "v2.0.18",
             "source": {
@@ -3506,16 +3596,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.10.0",
+            "version": "v1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "55e81981d5a6b75ab9d6f850117aac7c54b8a516"
+                "reference": "d228bf0d53936e1211a66bb58012103d78321491"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/55e81981d5a6b75ab9d6f850117aac7c54b8a516",
-                "reference": "55e81981d5a6b75ab9d6f850117aac7c54b8a516",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/d228bf0d53936e1211a66bb58012103d78321491",
+                "reference": "d228bf0d53936e1211a66bb58012103d78321491",
                 "shasum": ""
             },
             "require": {
@@ -3596,7 +3686,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-08-04T22:10:46+00:00"
+            "time": "2026-08-07T21:37:15+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",

@@ -25,6 +25,8 @@ nav:
   cookie_consent: Consentimento de cookies
   routing: Rotas por locale
   http_log: Log HTTP
+  maintenance: Manutenção
+  maintenance_preview: Pré-visualização da manutenção
   api_docs: Docs da API
   social_login: Login social
   ops_defaults: Limites ops
@@ -1477,6 +1479,10 @@ admin:
     routing: Gerir caminhos públicos duals por locale (JSON) para controladores Routable.
     http_log: Consultar pedidos HTTP capturados (cabeçalhos, estado, duração) com
       retenção e exportação.
+    maintenance: Ativar ou agendar manutenção do site (HTTP 503).
+    maintenance_preview: Pré-visualizar a página pública sem ativar o downtime.
+    maintenance: Ativar ou agendar manutenção do site (HTTP 503).
+    maintenance_preview: Pré-visualizar a página pública sem ativar o downtime.
     mailer: DSN Mailer encriptado e endereço From para e-mails transacionais.
     api_docs: Explorar o ingest Envelope e a documentação OpenAPI HTTP relacionada.
     social_login: Credenciais OAuth (Google / GitHub / Microsoft) na base de dados.
@@ -2299,6 +2305,13 @@ error:
       Provavelmente.
     image_alt: Mascote Beacon a reconectar um cabo luminoso entre servidores junto
       a um 502 grande
+  503:
+    title: Em manutenção
+    lead: Estamos a fazer algumas melhorias suaves. Tudo o que importa está
+      seguro — volta daqui a pouco.
+    hint: A nossa mascote trouxe uma chave inglesa e um cartaz. O chá é opcional.
+    image_alt: Mascote Beacon com chave inglesa junto a servidores e um grande
+      503 com cartaz de manutenção
 ops_defaults:
   allow_anonymous_resolve:
     help: Legado. Se ativo, o Resolve pode alterar issues sem um ator Beacon mapeado.

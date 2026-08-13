@@ -203,3 +203,70 @@ test.describe('Mutations — admin', () => {
     await expect(page.getByRole('main')).toContainText(name, { timeout: 15_000 });
   });
 });
+
+test.describe('Mutations — issue assignee & read API', () => {
+  test('assignee panel exposes autocomplete and can clear assignment', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    const issueUuid = await openFirstIssue(page, uuid);
+    if (!issueUuid) {
+      requireSampleOrSkip(false, 'No issues available — run make seed-sample');
+      return;
+    }
+
+    const assigneeSection = page.locator(
+      '[data-controller~="collapse-panel"][data-collapse-panel-id-value="assignee"]',
+    );
+    if ((await assigneeSection.count()) > 0) {
+      const toggle = assigneeSection.locator('[data-collapse-panel-target="button"]');
+      if ((await toggle.getAttribute('aria-expanded')) === 'false') {
+        await toggle.click();
+      }
+    }
+
+    const assigneeForm = page.locator('form.issue-assignee-form');
+    await expect(assigneeForm).toBeVisible({ timeout: 15_000 });
+    // Symfony UX Autocomplete / Tom Select wrapper.
+    await expect(
+      assigneeForm.locator('.ts-wrapper, select[name*="assignee"], [data-controller*="symfony--ux-autocomplete"]').first(),
+    ).toBeVisible();
+
+    // Clearing (empty) is always safe and exercises the POST path.
+    const clearBtn = assigneeForm.locator('.clear-button, .ts-clear-button, [data-ts-clear], button.clear-button').first();
+    if (await clearBtn.isVisible().catch(() => false)) {
+      await clearBtn.click();
+    }
+    await assigneeForm.locator('button[type="submit"]').click();
+    await waitForPageLoader(page);
+    await expect(page).toHaveURL(new RegExp(`/issues/${issueUuid}`));
+    await expect(page).not.toHaveURL(/\/login/);
+  });
+
+  test('creates a read token and lists issues via Bearer API', async ({ page, request }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await page.goto(`/projects/${uuid}/settings`);
+    await dismissProductTour(page);
+
+    const tokens = page.locator('[data-testid="read-api-tokens"]');
+    await expect(tokens).toBeVisible();
+    const label = `e2e-read-${Date.now().toString(36)}`;
+    await tokens.locator('input[name*="[label]"], input[name="label"]').fill(label);
+    await tokens.locator('button[type="submit"]').first().click();
+    await waitForPageLoader(page);
+
+    const secret = page.locator('[data-testid="read-token-secret"]');
+    await expect(secret).toBeVisible({ timeout: 15_000 });
+    const bearer = (await secret.innerText()).trim();
+    expect(bearer.length).toBeGreaterThan(10);
+
+    const list = await request.get(`/api/projects/${uuid}/issues`, {
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(list.status(), await list.text()).toBe(200);
+    const body = await list.json();
+    expect(body).toBeTruthy();
+
+    // Unauthorized without token.
+    const denied = await request.get(`/api/projects/${uuid}/issues`);
+    expect(denied.status()).toBe(401);
+  });
+});

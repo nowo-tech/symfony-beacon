@@ -1,0 +1,136 @@
+{# Host rewrite: Beacon Administration chrome (panels, tabs, form stack).
+   Extends bundle base → kit/maintenance_mode_panel_layout (page title/intro live there). #}
+{% extends '@NowoMaintenanceModeBundle/panel/base.html.twig' %}
+{% import '@NowoUiKitBundle/macros/ui.html.twig' as ui %}
+{% set _css_fw = nowo_maintenance_mode_css_framework|default('tailwind') %}
+{% set _td = 'NowoMaintenanceModeBundle' %}
+
+{% set kit_admin_header_actions %}
+    <a
+        class="btn-ghost no-underline"
+        href="{{ path('nowo_maintenance_mode_preview') }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-testid="maintenance-preview-link"
+    >{{ 'nav.maintenance_preview'|trans }}</a>
+{% endset %}
+
+{% block body %}
+    {% include '@NowoMaintenanceModeBundle/panel/_nav.html.twig' with {active: 'panel'} %}
+
+    {% for type, messages in flashes|default({}) %}
+        {% for message in messages %}
+            <div class="{{ ui.flash(type, _css_fw) }} mb-4" role="alert">{{ message|trans({}, _td) }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <section class="panel mb-6" data-testid="maintenance-status">
+        <dl class="maintenance-status">
+            <dt>{{ 'panel.status.manual'|trans({}, _td) }}</dt>
+            <dd>
+                {% if state.enabled %}
+                    <span class="nowo-ui-status nowo-ui-status--on">{{ 'panel.status.enabled'|trans({}, _td) }}</span>
+                {% else %}
+                    <span class="nowo-ui-status nowo-ui-status--off">{{ 'panel.status.disabled'|trans({}, _td) }}</span>
+                {% endif %}
+            </dd>
+
+            <dt>{{ 'panel.status.effective'|trans({}, _td) }}</dt>
+            <dd>
+                {% if state.effectivelyEnabled %}
+                    <span class="nowo-ui-status nowo-ui-status--on">{{ 'panel.status.on'|trans({}, _td) }}</span>
+                {% else %}
+                    <span class="nowo-ui-status nowo-ui-status--off">{{ 'panel.status.off'|trans({}, _td) }}</span>
+                {% endif %}
+            </dd>
+
+            <dt>{{ 'panel.message'|trans({}, _td) }}</dt>
+            <dd>{{ state.message ?? '—' }}</dd>
+
+            <dt>{{ 'panel.activated'|trans({}, _td) }}</dt>
+            <dd>{{ state.activatedAt ? state.activatedAt|date('Y-m-d H:i:s') : '—' }}</dd>
+
+            <dt>{{ 'panel.deactivated'|trans({}, _td) }}</dt>
+            <dd>{{ state.deactivatedAt ? state.deactivatedAt|date('Y-m-d H:i:s') : '—' }}</dd>
+
+            <dt>{{ 'panel.scheduled_enable'|trans({}, _td) }}</dt>
+            <dd>{{ state.scheduledEnableAt ? state.scheduledEnableAt|date('Y-m-d H:i:s') : '—' }}</dd>
+
+            <dt>{{ 'panel.scheduled_disable'|trans({}, _td) }}</dt>
+            <dd>{{ state.scheduledDisableAt ? state.scheduledDisableAt|date('Y-m-d H:i:s') : '—' }}</dd>
+
+            <dt>{{ 'panel.updated_by'|trans({}, _td) }}</dt>
+            <dd>{{ state.updatedBy ?? '—' }}</dd>
+        </dl>
+    </section>
+
+    <section class="panel mb-6" data-testid="maintenance-manual">
+        <form method="post" action="{{ path_prefix }}/enable" class="nowo-ui-form--stack">
+            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_enable') }}">
+            <div class="nowo-ui-field">
+                <label for="message">{{ 'panel.message'|trans({}, _td) }}</label>
+                <textarea id="message" name="message" class="nowo-ui-input nowo-ui-input--block" rows="3">{{ state.message }}</textarea>
+            </div>
+            <div class="nowo-ui-form-actions">
+                <button type="submit" class="{{ ui.btn('primary', null, _css_fw) }}">{{ 'panel.enable'|trans({}, _td) }}</button>
+                <button
+                    type="submit"
+                    class="{{ ui.btn('danger', null, _css_fw) }}"
+                    form="maintenance-disable-form"
+                >{{ 'panel.disable'|trans({}, _td) }}</button>
+            </div>
+        </form>
+        <form id="maintenance-disable-form" method="post" action="{{ path_prefix }}/disable" class="sr-only" aria-hidden="true">
+            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_disable') }}">
+        </form>
+    </section>
+
+    <section class="panel mb-6" data-testid="maintenance-schedule">
+        <h2 class="nowo-ui-section-title">{{ 'panel.schedule'|trans({}, _td) }}</h2>
+        <form method="post" action="{{ path_prefix }}/schedule" class="nowo-ui-form--stack">
+            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_schedule') }}">
+            <div class="nowo-ui-field">
+                <label for="scheduled_enable_at">{{ 'panel.scheduled_enable'|trans({}, _td) }}</label>
+                <input
+                    type="datetime-local"
+                    id="scheduled_enable_at"
+                    name="scheduled_enable_at"
+                    class="nowo-ui-input nowo-ui-input--block"
+                    value="{{ state.scheduledEnableAt ? state.scheduledEnableAt|date('Y-m-d\\TH:i') : '' }}"
+                >
+            </div>
+            <div class="nowo-ui-field">
+                <label for="scheduled_disable_at">{{ 'panel.scheduled_disable'|trans({}, _td) }}</label>
+                <input
+                    type="datetime-local"
+                    id="scheduled_disable_at"
+                    name="scheduled_disable_at"
+                    class="nowo-ui-input nowo-ui-input--block"
+                    value="{{ state.scheduledDisableAt ? state.scheduledDisableAt|date('Y-m-d\\TH:i') : '' }}"
+                >
+            </div>
+            <div class="nowo-ui-field">
+                <label for="schedule_message">{{ 'panel.message'|trans({}, _td) }}</label>
+                <textarea id="schedule_message" name="message" class="nowo-ui-input nowo-ui-input--block" rows="2">{{ state.message }}</textarea>
+            </div>
+            <div class="nowo-ui-form-actions">
+                <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.save_schedule'|trans({}, _td) }}</button>
+                <button
+                    type="submit"
+                    class="{{ ui.btn('secondary', null, _css_fw) }}"
+                    form="maintenance-clear-schedule-form"
+                >{{ 'panel.clear_schedule'|trans({}, _td) }}</button>
+            </div>
+        </form>
+        <form id="maintenance-clear-schedule-form" method="post" action="{{ path_prefix }}/clear-schedule" class="sr-only" aria-hidden="true">
+            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_clear_schedule') }}">
+        </form>
+    </section>
+
+    {% if password_required|default(false) %}
+        <form method="post" action="{{ path_prefix }}/logout" class="mt-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('nowo_maintenance_logout') }}">
+            <button type="submit" class="{{ ui.btn('secondary', null, _css_fw) }}">{{ 'panel.logout'|trans({}, _td) }}</button>
+        </form>
+    {% endif %}
+{% endblock %}

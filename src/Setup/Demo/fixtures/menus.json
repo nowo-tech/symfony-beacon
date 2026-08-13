@@ -424,6 +424,21 @@
                 "it": "Setup iniziale",
                 "pt": "Setup inicial"
               }
+            },
+            {
+              "position": 80,
+              "label": "Maintenance",
+              "route": "nowo_maintenance_mode_panel_index",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Maintenance",
+                "es": "Mantenimiento",
+                "de": "Wartung",
+                "nl": "Onderhoud",
+                "fr": "Maintenance",
+                "it": "Manutenzione",
+                "pt": "Manutenção"
+              }
             }
           ]
         },
@@ -528,6 +543,21 @@
                 "fr": "Journal HTTP",
                 "it": "Log HTTP",
                 "pt": "Log HTTP"
+              }
+            },
+            {
+              "position": 15,
+              "label": "Maintenance preview",
+              "route": "nowo_maintenance_mode_preview",
+              "permission": "ROLE_ADMIN",
+              "translations": {
+                "en": "Maintenance preview",
+                "es": "Vista previa de mantenimiento",
+                "de": "Wartungsseite-Vorschau",
+                "nl": "Voorbeeld onderhoudspagina",
+                "fr": "Aperçu page maintenance",
+                "it": "Anteprima pagina manutenzione",
+                "pt": "Pré-visualização da manutenção"
               }
             },
             {

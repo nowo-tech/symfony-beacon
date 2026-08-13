@@ -28,6 +28,8 @@ nav:
   cookie_consent: Cookie consent
   routing: Locale routes
   http_log: HTTP log
+  maintenance: Maintenance
+  maintenance_preview: Maintenance page preview
   api_docs: API docs
   toggle_sidebar: Toggle navigation
   preferences: Preferences
@@ -1949,6 +1951,8 @@ admin:
     routing: Manage dual locale public paths (JSON) for Routable controllers.
     http_log: Browse captured HTTP requests (headers, status, duration) with retention
       and export.
+    maintenance: Enable or schedule site-wide maintenance (HTTP 503).
+    maintenance_preview: Preview the public maintenance page without enabling downtime.
     api_docs: Explore Envelope ingest and related HTTP OpenAPI documentation.
     roles: Create instance roles, edit permission matrices, and assign users.
     permissions: Browse capability keys and edit catalog labels.
@@ -2603,6 +2607,13 @@ error:
     hint: Our mascot is reconnecting the glow cable. Sparks are intentional. Probably.
     image_alt: Beacon mascot reconnecting a glowing cable between servers next to
       a large 502
+  503:
+    title: Under maintenance
+    lead: We are making a few gentle improvements. Everything you care about is
+      safe — check back in a moment.
+    hint: Our mascot brought a wrench and a sandwich board. Tea is optional.
+    image_alt: Beacon mascot with a wrench beside servers and a large 503 under
+      maintenance sign
 roles:
   title: Roles
   intro: Instance capability roles. Assign permissions on the role detail Permissions

@@ -155,6 +155,8 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.beacon-nav', 'Cookie consent');
         self::assertSelectorTextContains('.beacon-nav', 'Locale routes');
         self::assertSelectorTextContains('.beacon-nav', 'HTTP log');
+        self::assertSelectorTextContains('.beacon-nav', 'Maintenance');
+        self::assertSelectorTextContains('.beacon-nav', 'Maintenance preview');
         self::assertSelectorTextContains('.user-menu', 'Administration');
         self::assertSelectorTextContains('.user-avatar', 'DA');
     }
@@ -182,6 +184,33 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorExists('.page-loader[data-controller~="page-loader"]');
         self::assertSelectorExists('[data-nowo-ui-orb]');
         self::assertSelectorTextContains('[data-testid="http-log-filters"]', 'Clear filters');
+    }
+
+    public function testMaintenancePanelUsesBeaconAdminChrome(): void
+    {
+        [$client, $user] = $this->bootWithDemoProject('maintenance-shell@example.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        self::getContainer()->get('doctrine')->getManager()->flush();
+        self::getContainer()->get(DashboardMenuDemoSeeder::class)->seedIfEmpty();
+        self::getContainer()->get(BreadcrumbDemoSeeder::class)->seedIfEmpty();
+        $this->login($client, $user);
+
+        $client->request(Request::METHOD_GET, '/admin/maintenance/');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="admin-maintenance"]');
+        self::assertSelectorExists('#administration-menu-navigation');
+        self::assertSelectorExists('[data-testid="maintenance-panel-tabs"]');
+        self::assertSelectorExists('[data-testid="maintenance-status"].panel');
+        self::assertSelectorExists('[data-testid="maintenance-manual"].panel');
+        self::assertSelectorExists('[data-testid="maintenance-schedule"].panel');
+        self::assertSelectorExists('[data-testid="maintenance-preview-link"]');
+        self::assertSelectorNotExists('form[action$="/logout"]');
+        self::assertSelectorTextContains('.kit-admin-page-header__title', 'Maintenance');
+
+        $client->request(Request::METHOD_GET, '/admin/maintenance/history');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="maintenance-history"].panel');
+        self::assertSelectorExists('[data-testid="maintenance-panel-tabs"]');
     }
 
     public function testKitAdminDashboardsRequireAuth(): void

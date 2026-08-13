@@ -43,6 +43,8 @@ final class BreadcrumbFixtureCoverageTest extends TestCase
             'nowo_site_backup_setup',
             'nowo_http_log_admin_index',
             'nowo_http_log_admin_show',
+            'nowo_maintenance_mode_panel_index',
+            'nowo_maintenance_mode_preview',
             'nowo_dashboard_menu_dashboard_index',
             'nowo_breadcrumb_kit_dashboard_collections_index',
             'account_profile',

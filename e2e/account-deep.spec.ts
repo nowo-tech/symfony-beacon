@@ -93,4 +93,11 @@ test.describe('Account area deep checks', () => {
       await waitForPageLoader(page);
     }
   });
+
+  test('product tour replay form is present on display/tours', async ({ page }) => {
+    await expectAuthenticatedPage(page, '/account/display/tours');
+    const replay = page.locator('form[action*="/account/product-tour/replay"]');
+    await expect(replay).toBeVisible();
+    await expect(replay.locator('button[type="submit"]')).toBeVisible();
+  });
 });

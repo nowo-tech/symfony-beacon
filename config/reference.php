@@ -2293,8 +2293,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
@@ -2557,6 +2557,59 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     seo_kit_bridge?: bool|Param, // When true and SeoKitBundle is installed, decorate SeoPathBuilderInterface with RoutingKit paths. // Default: true
  *     ...<string, mixed>
  * }
+ * @psalm-type NowoMaintenanceModeConfig = array{ // Nowo Maintenance Mode Bundle configuration.
+ *     enabled?: bool|Param, // Master switch: when false the subscriber never returns 503. // Default: true
+ *     default_message?: scalar|Param|null, // Default message shown on the public maintenance page. null = rely on Twig translation (maintenance.page.message). // Default: "We're making a few gentle improvements. Everything you care about is safe."
+ *     status_code?: int|Param, // HTTP status code for the maintenance response. // Default: 503
+ *     retry_after?: int|Param, // Retry-After header value in seconds. // Default: 3600
+ *     subscriber_priority?: int|Param, // kernel.request listener priority (default 31: after router so route/controller exclusions work). // Default: 31
+ *     preview?: array{ // Dev preview of the configured public maintenance page (like /_error/503).
+ *         enabled?: mixed, // null = enable when kernel.debug is true. Set false to disable even in debug. // Default: null
+ *         path?: scalar|Param|null, // URL path for the preview (auto-excluded from 503). // Default: "/_maintenance_preview"
+ *     },
+ *     panel?: array{ // Admin CRUD panel settings.
+ *         enabled?: bool|Param, // Expose the Twig CRUD panel controllers. // Default: true
+ *         path_prefix?: scalar|Param|null, // URL prefix for the panel routes (also auto-excluded from 503). // Default: "/_maintenance"
+ *     },
+ *     web_ui?: array{ // REQ-UI-001 look-and-feel for the admin panel (layout, CSS stack, icons).
+ *         enabled?: bool|Param, // When false, panel Twig globals still resolve but hosts may hide chrome; panel routes follow panel.enabled. // Default: true
+ *         layout_template?: scalar|Param|null, // Twig layout that panel pages extend (host apps SHOULD set their project layout). Syncs templates.panel_layout. // Default: "@NowoMaintenanceModeBundle/panel/layout.html.twig"
+ *         css_framework?: "bootstrap"|"bootstrap4"|"bootstrap5"|"tailwind"|"foundation"|"custom"|"tabler"|"none"|Param, // Host-chosen CSS stack for semantic nowo-ui-* markup. // Default: "custom"
+ *         icon_set?: "bootstrap-icons"|"tabler-icons"|"ux_icon"|"svg_inline"|"none"|Param, // Icon strategy for panel actions (panel uses text buttons by default). // Default: "none"
+ *     },
+ *     exclusions?: array{ // Requests matching any rule bypass the maintenance page.
+ *         paths?: list<scalar|Param|null>,
+ *         path_prefixes?: list<scalar|Param|null>,
+ *         routes?: list<scalar|Param|null>,
+ *         patterns?: list<scalar|Param|null>,
+ *         ips?: list<scalar|Param|null>,
+ *     },
+ *     security?: array{ // REQ-UI-002 roles + optional ops password gate / soft bypass. Password gate is additional to access_roles.
+ *         access_roles?: list<scalar|Param|null>,
+ *         access_checker?: scalar|Param|null, // Optional service id implementing MaintenanceModeAccessCheckerInterface. null = role-based default (or AllowAll when allow_unauthenticated). // Default: null
+ *         allow_unauthenticated?: bool|Param, // DEV/DEMO only: skip Symfony Security role check (password gate may still apply). Never true in production. // Default: false
+ *         password_protection?: bool|Param, // When false, the panel login section is disabled even if a hash is set (trusted networks only). // Default: true
+ *         password_hash?: scalar|Param|null, // password_hash() output (bcrypt / argon2id / sodium). Prefer env: MAINTENANCE_PASSWORD_HASH. // Default: null
+ *         access_gate?: scalar|Param|null, // FQCN or service id implementing MaintenanceAccessGateInterface. null = default password gate. // Default: null
+ *         bypass_token?: scalar|Param|null, // Optional shared secret: ?maintenance_bypass=TOKEN (or cookie) skips the 503 for QA without opening the panel. // Default: null
+ *         bypass_query_parameter?: scalar|Param|null, // Query parameter name for the soft bypass token. // Default: "maintenance_bypass"
+ *         bypass_cookie_name?: scalar|Param|null, // Cookie name set after a successful query bypass. // Default: "nowo_maintenance_bypass"
+ *         bypass_set_cookie?: bool|Param, // When true, a successful query bypass also sets a cookie for subsequent requests. // Default: true
+ *     },
+ *     storage?: array{ // Pluggable state / history backends (default: filesystem under var/).
+ *         state_file?: scalar|Param|null, // JSON or YAML file for MaintenanceState. // Default: "%kernel.project_dir%/var/maintenance/state.json"
+ *         history_file?: scalar|Param|null, // Append-only JSONL history file. // Default: "%kernel.project_dir%/var/maintenance/history.jsonl"
+ *         state_storage?: scalar|Param|null, // Override service id / FQCN for MaintenanceStateStorageInterface. // Default: null
+ *         history_storage?: scalar|Param|null, // Override service id / FQCN for MaintenanceHistoryStorageInterface. // Default: null
+ *     },
+ *     templates?: array{ // Overrideable Twig templates (REQ-TWIG).
+ *         page?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/maintenance/page.html.twig"
+ *         panel_layout?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/panel/layout.html.twig"
+ *         panel_index?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/panel/index.html.twig"
+ *         panel_login?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/panel/login.html.twig"
+ *         panel_history?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/panel/history.html.twig"
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2595,6 +2648,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_beacon?: NowoBeaconConfig,
  *     nowo_site_backup?: NowoSiteBackupConfig,
  *     nowo_routing_kit?: NowoRoutingKitConfig,
+ *     nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2635,6 +2689,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2674,6 +2729,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2715,6 +2771,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_beacon?: NowoBeaconConfig,
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
+ *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

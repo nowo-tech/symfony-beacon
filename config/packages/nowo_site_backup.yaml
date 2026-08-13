@@ -50,6 +50,8 @@ nowo_site_backup:
             - /api/
             - /_wdt
             - /_profiler
+            - /_maintenance
+            - /admin/maintenance
             - /build/
             - /assets/
             - /login
@@ -65,6 +67,8 @@ nowo_site_backup:
         patterns:
             - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$|\?)#'
             - '#^/(manifest\.webmanifest|sw\.js|offline)$#'
+            - '#^/_maintenance(_preview)?(/|$|\?)#'
+            - '#^/admin/maintenance(/|$|\?)#'
     setup:
         enabled: true
         path_prefix: '/setup'

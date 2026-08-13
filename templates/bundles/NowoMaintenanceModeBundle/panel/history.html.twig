@@ -1,0 +1,44 @@
+{# Host rewrite: Beacon Administration history table (Menus / RoutingKit chrome). #}
+{% extends '@NowoMaintenanceModeBundle/panel/base.html.twig' %}
+{% set _td = 'NowoMaintenanceModeBundle' %}
+
+{% set kit_admin_header_actions %}
+    <a
+        class="btn-ghost no-underline"
+        href="{{ path('nowo_maintenance_mode_preview') }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-testid="maintenance-preview-link"
+    >{{ 'nav.maintenance_preview'|trans }}</a>
+{% endset %}
+
+{% block body %}
+    {% include '@NowoMaintenanceModeBundle/panel/_nav.html.twig' with {active: 'history'} %}
+
+    <section class="panel overflow-x-auto" data-testid="maintenance-history">
+        <table class="w-full text-left text-sm nowo-ui-table">
+            <thead>
+                <tr class="border-b border-[var(--color-sand)] text-[var(--color-ink)]/55">
+                    <th class="px-2 py-2 font-medium">{{ 'panel.history.when'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.history.action'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.history.actor'|trans({}, _td) }}</th>
+                    <th class="px-2 py-2 font-medium">{{ 'panel.history.message'|trans({}, _td) }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for entry in entries %}
+                <tr class="row-hover border-b border-[var(--color-sand)]/70 last:border-0">
+                    <td class="px-2 py-3">{{ entry.occurredAt|date('Y-m-d H:i:s') }}</td>
+                    <td class="px-2 py-3">{{ entry.action }}</td>
+                    <td class="px-2 py-3">{{ entry.actor ?? '—' }}</td>
+                    <td class="px-2 py-3 text-[var(--color-ink)]/75">{{ entry.message ?? '—' }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="nowo-ui-empty px-2 py-3" colspan="4">{{ 'panel.history.empty'|trans({}, _td) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

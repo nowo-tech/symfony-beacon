@@ -28,6 +28,8 @@ nav:
   cookie_consent: Consentimiento de cookies
   routing: Rutas por idioma
   http_log: Log HTTP
+  maintenance: Mantenimiento
+  maintenance_preview: Vista previa de mantenimiento
   api_docs: Docs API
   toggle_sidebar: Alternar navegación
   preferences: Preferencias
@@ -1821,6 +1823,10 @@ admin:
       Routable.
     http_log: Consultar peticiones HTTP capturadas (cabeceras, estado, duración) con
       retención y exportación.
+    maintenance: Activar o programar mantenimiento del sitio (HTTP 503).
+    maintenance_preview: Ver la página pública de mantenimiento sin activar el downtime.
+    maintenance: Activar o programar mantenimiento del sitio (HTTP 503).
+    maintenance_preview: Ver la página pública de mantenimiento sin activar el downtime.
     api_docs: Explorar el ingest Envelope y la documentación OpenAPI HTTP relacionada.
     roles: Crear roles de instancia, editar matrices de permisos y asignar usuarios.
     permissions: Consultar claves de capacidad y editar etiquetas del catálogo.
@@ -2479,6 +2485,13 @@ error:
       Probablemente.
     image_alt: Mascota Beacon reconectando un cable luminoso entre servidores junto
       a un 502
+  503:
+    title: En mantenimiento
+    lead: Estamos haciendo unas mejoras suaves. Todo lo importante está a salvo
+      — vuelve en un momento.
+    hint: Nuestra mascota trajo una llave inglesa y un cartel. El té es opcional.
+    image_alt: Mascota Beacon con llave inglesa junto a servidores y un gran 503
+      con cartel de mantenimiento
 ops_defaults:
   allow_anonymous_resolve:
     help: Legado. Si está activo, Resolve puede mutar incidencias sin un actor Beacon

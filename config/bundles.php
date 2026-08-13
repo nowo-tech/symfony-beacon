@@ -19,7 +19,6 @@ return [
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
     Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
-    # Feature kits that prepend FormKit / UiKit defaults must register before those kits.
     Nowo\DashboardMenuBundle\NowoDashboardMenuBundle::class => ['all' => true],
     Nowo\CookieConsentBundle\NowoCookieConsentBundle::class => ['all' => true],
     Nowo\HttpLogBundle\NowoHttpLogBundle::class => ['all' => true],
@@ -39,4 +38,5 @@ return [
     Nowo\BeaconBundle\NowoBeaconBundle::class => ['all' => true],
     Nowo\SiteBackupBundle\NowoSiteBackupBundle::class => ['all' => true],
     Nowo\RoutingKitBundle\NowoRoutingKitBundle::class => ['all' => true],
+    Nowo\MaintenanceModeBundle\NowoMaintenanceModeBundle::class => ['all' => true],
 ];

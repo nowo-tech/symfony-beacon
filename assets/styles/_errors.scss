@@ -1,4 +1,4 @@
-/* Branded HTTP error pages (400 / 401 / 403 / 404 / 408 / 429 / 500 / 502). */
+/* Branded HTTP error pages (400 / 401 / 403 / 404 / 408 / 429 / 500 / 502 / 503). */
 
 .error-page {
   min-height: 100vh;
@@ -73,4 +73,45 @@
   flex-wrap: wrap;
   gap: 0.65rem;
   justify-content: center;
+}
+
+/* —— Public maintenance (503 / /_maintenance_preview) —— */
+
+.maintenance-page__eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-moss);
+}
+
+.maintenance-page__brand {
+  margin-bottom: 1.25rem;
+}
+
+.maintenance-page__brand .brand-mark {
+  pointer-events: none;
+}
+
+.maintenance-page__figure {
+  margin: 0 0 1.25rem;
+}
+
+.maintenance-page__eta {
+  margin: 0 auto 1rem;
+  max-width: 20rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-moss-deep, var(--color-moss));
+}
+
+.maintenance-page__thanks {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-moss);
 }

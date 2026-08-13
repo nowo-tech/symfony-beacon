@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Security residual hardening (`093` / 6.42)**: Envelope query-string auth hard-removed (always 401); Ops Overview security posture warning; pre-auth IP rate limit on public Slack/Teams/email hooks (`BEACON_HOOK_IP_RATE_LIMIT`); ingest notifications dispatched via `DispatchIngestNotificationsMessage` on `async` (thin Ingest→Notifications decoupling). Docs: SECURITY / PRODUCTION / UPGRADING.
 
+### Added
+
+- **Site-wide maintenance mode (`092` / 6.41)**: `nowo-tech/maintenance-mode-bundle` — Administration panel (`/admin/maintenance`, `ROLE_ADMIN`, no ops password), `/_maintenance_preview`, kit admin chrome (tabs/panels), seeded sidebar + breadcrumbs. Public page uses `public/illustrations/error-503.png` (shared with branded `error503`). Re-run `make seed-platform` after upgrade. Spec: `specs/092-maintenance-mode/`.
+- **Branded 503** (`063` follow-up): `error503.html.twig` + `error.503.*` locale catalogue; illustration `error-503.png`.
+- Expanded Playwright coverage (admin RBAC, kit admin deep, member alerts) plus additional unit tests for member-alert / Web Push paths.
+
 ### Removed
 
 - Ops defaults toggle **Reject query-string ingest auth** and `instance_settings.ingest_reject_query_auth` (migration `Version20260813100000`).

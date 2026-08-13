@@ -47,7 +47,8 @@ nowo_pwa:
             - '/logout'
             - '/reset-password'
             - '/setup'
-            - '/_site_backup'
+            - /_site_backup
+            - /admin/maintenance
             - '/.well-known/mercure'
             - '/_profiler'
             - '/_wdt'

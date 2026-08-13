@@ -25,6 +25,7 @@ final class AdministrationMenuCurrentMatcher extends AbstractRoutePrefixMenuCurr
         'nowo_routing_kit_panel' => ['nowo_routing_kit_'],
         'nowo_http_log_admin_index' => ['nowo_http_log_'],
         'nowo_site_backup_setup' => ['nowo_site_backup_'],
+        'nowo_maintenance_mode_panel_index' => ['nowo_maintenance_mode_'],
     ];
 
     /** @return array<string, list<string>> */

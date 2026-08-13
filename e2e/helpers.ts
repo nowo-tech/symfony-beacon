@@ -14,6 +14,21 @@ export function requireSampleOrSkip(ready: boolean, reason: string): void {
   test.skip(true, reason);
 }
 
+/** Navigate with retries for transient WSL/Docker net::ERR_NETWORK_CHANGED. */
+export async function gotoStable(page: Page, path: string, attempts = 3): Promise<void> {
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      await page.goto(path);
+      return;
+    } catch (err) {
+      if (attempt === attempts - 1 || !/ERR_NETWORK_CHANGED|net::ERR_/i.test(String(err))) {
+        throw err;
+      }
+      await page.waitForTimeout(500);
+    }
+  }
+}
+
 /** Wait for the Beacon page-loader overlay to release pointer events. */
 export async function waitForPageLoader(page: Page): Promise<void> {
   const loader = page.locator('.page-loader.is-active, [data-controller="page-loader"].is-active');

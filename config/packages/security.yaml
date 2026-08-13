@@ -58,43 +58,23 @@ security:
         target: nowo_auth_kit_login
         invalidate_session: true
         enable_csrf: true
+  # Locale alternation must stay in sync with kernel.enabled_locales / docs/dev/ADDING-LOCALES.md.
+  # Ingest + read API use dedicated firewalls with security: false (no access_control needed).
   access_control:
     - path: ^/$
       roles: PUBLIC_ACCESS
-    - path: ^/(login|register|logout)$
+    # AuthKit: bare + locale-prefixed (login/* covers magic/social/qr)
+    - path: ^/(?:(en|es|de|nl|fr|it|pt)/)?(login|register|logout|reset-password)(/|$)
       roles: PUBLIC_ACCESS
-    - path: ^/login/magic
+    - path: ^/(?:(en|es|de|nl|fr|it|pt)/)?legal/
       roles: PUBLIC_ACCESS
-    - path: ^/login/social
-      roles: PUBLIC_ACCESS
-    - path: ^/login/qr
-      roles: PUBLIC_ACCESS
-    - path: ^/reset-password
+    - path: ^/(?:(en|es|de|nl|fr|it|pt)/)?setup
       roles: PUBLIC_ACCESS
     - path: ^/share/
       roles: PUBLIC_ACCESS
-    # Locale-prefixed public surfaces (AuthKit, legal)
-    - path: ^/(en|es|de|nl|fr|it|pt)/(login|register|logout)(/|$)
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/login/magic
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/login/social
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/login/qr
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/reset-password
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/legal/
-      roles: PUBLIC_ACCESS
     - path: ^/locale/
       roles: PUBLIC_ACCESS
-    - path: ^/api/(\d+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/(envelope|otlp)
-      roles: PUBLIC_ACCESS
-    - path: ^/api/projects/
-      roles: PUBLIC_ACCESS
     - path: ^/(manifest\.webmanifest|sw\.js|offline)$
-      roles: PUBLIC_ACCESS
-    - path: ^/legal/
       roles: PUBLIC_ACCESS
     - path: '^/cookie_consent(_alt)?$'
       roles: PUBLIC_ACCESS
@@ -104,32 +84,19 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/metrics$
       roles: PUBLIC_ACCESS
-    - path: ^/hooks/slack
-      roles: PUBLIC_ACCESS
-    # Assign OpenUri needs a Beacon session (login redirect); other Teams hooks stay public.
+    # Assign OpenUri needs a Beacon session; must stay before the public hooks rule.
     - path: ^/hooks/teams/assign-me
       roles: ROLE_USER
-    - path: ^/hooks/teams
+    - path: ^/hooks/(slack|teams|email)
       roles: PUBLIC_ACCESS
-    - path: ^/hooks/email
-      roles: PUBLIC_ACCESS
-    - path: ^/admin/api/doc
-      roles: ROLE_ADMIN
-    # SiteBackupBundle: cold-start setup + panel (panel uses its own password gate)
-    - path: ^/setup
-      roles: PUBLIC_ACCESS
-    - path: ^/(en|es|de|nl|fr|it|pt)/setup
-      roles: PUBLIC_ACCESS
+    # SiteBackup panel uses its own password gate
     - path: ^/_site_backup
       roles: PUBLIC_ACCESS
-    # Framework error page previews (/_error/{code}) in dev/test
-    - path: ^/_error
+    # MaintenanceMode 503 preview + framework error previews (dev/test)
+    - path: ^/_(maintenance_preview|error)
       roles: PUBLIC_ACCESS
-    # RoutingKitBundle admin panel (in-bundle ROLE_ADMIN + firewall)
-    - path: ^/admin/_routing
-      roles: ROLE_ADMIN
-    # HttpLogBundle admin UI (in-bundle ROLE_ADMIN gate)
-    - path: ^/admin/http-log
+    # Bundle admin UIs (in-bundle ROLE_ADMIN / access_checker as well)
+    - path: ^/admin/(api/doc|_routing|http-log|maintenance)
       roles: ROLE_ADMIN
     - path: ^/
       roles: ROLE_USER

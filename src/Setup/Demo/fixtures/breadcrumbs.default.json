@@ -975,6 +975,36 @@
       }
     },
     {
+      "route": "nowo_maintenance_mode_panel_index",
+      "label": "Maintenance",
+      "parent": "admin_hub",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "Maintenance",
+        "es": "Mantenimiento",
+        "de": "Wartung",
+        "nl": "Onderhoud",
+        "fr": "Maintenance",
+        "it": "Manutenzione",
+        "pt": "Manutenção"
+      }
+    },
+    {
+      "route": "nowo_maintenance_mode_preview",
+      "label": "Maintenance preview",
+      "parent": "admin_hub",
+      "dynamicParamKeys": [],
+      "translations": {
+        "en": "Maintenance preview",
+        "es": "Vista previa de mantenimiento",
+        "de": "Wartungsseite-Vorschau",
+        "nl": "Voorbeeld onderhoudspagina",
+        "fr": "Aperçu page maintenance",
+        "it": "Anteprima pagina manutenzione",
+        "pt": "Pré-visualização da manutenção"
+      }
+    },
+    {
       "route": "nowo_http_log_admin_show",
       "label": "Request",
       "parent": "nowo_http_log_admin_index",

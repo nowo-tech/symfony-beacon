@@ -1,0 +1,88 @@
+{# Beacon-branded public maintenance page (503 + /_maintenance_preview).
+   Mirrors error/layout chrome; hero art: public/illustrations/error-503.png. #}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex">
+    {% include '_theme_boot.html.twig' %}
+    <title>{{ 'maintenance.page.title'|trans({}, 'NowoMaintenanceModeBundle') }} — {{ site_appearance.brandName|default('Beacon') }}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
+    {{ vite_entry_link_tags('app') }}
+    <style>{{ site_appearance.cssOverrides|default('')|raw }}</style>
+    {{ vite_entry_script_tags('app') }}
+</head>
+<body class="page-shell error-page maintenance-page" data-error-status="503">
+    <div class="top-controls">
+        {% include '_theme_toggle.html.twig' %}
+    </div>
+
+    <main class="error-page__main">
+        <div class="error-page__card maintenance-page__card">
+            <p class="maintenance-page__eyebrow">{{ 'nav.maintenance'|trans }}</p>
+
+            <div class="maintenance-page__brand fade-up">
+                {% include '_brand_mark.html.twig' with {tag: 'h1', size: 'hero'} %}
+            </div>
+
+            <figure class="error-page__figure maintenance-page__figure fade-up-delay">
+                <img
+                    class="error-page__img"
+                    src="{{ asset('illustrations/error-503.png') }}"
+                    width="1536"
+                    height="1024"
+                    alt="{{ 'error.503.image_alt'|trans }}"
+                    decoding="async"
+                >
+            </figure>
+
+            <p class="error-page__code" aria-hidden="true">503</p>
+            <h2 class="error-page__title">{{ 'maintenance.page.heading'|trans({}, 'NowoMaintenanceModeBundle') }}</h2>
+            <p class="error-page__lead">
+                {{ message|default('maintenance.page.message'|trans({}, 'NowoMaintenanceModeBundle')) }}
+            </p>
+            <p class="error-page__hint">{{ 'maintenance.page.reassure'|trans({}, 'NowoMaintenanceModeBundle') }}</p>
+
+            {% set until = state is defined and state.scheduledDisableAt ? state.scheduledDisableAt : null %}
+            {% if until %}
+                <p
+                    class="maintenance-page__eta"
+                    id="mm-countdown"
+                    data-until="{{ until|date('c') }}"
+                    data-fallback="{{ 'maintenance.page.thanks'|trans({}, 'NowoMaintenanceModeBundle') }}"
+                >
+                    {{ until|date('Y-m-d H:i T') }}
+                </p>
+            {% endif %}
+
+            <p class="maintenance-page__thanks">{{ 'maintenance.page.thanks'|trans({}, 'NowoMaintenanceModeBundle') }}</p>
+        </div>
+    </main>
+
+    {% if until %}
+    <script>
+    (function () {
+        var el = document.getElementById('mm-countdown');
+        if (!el) return;
+        var until = el.getAttribute('data-until');
+        var fallback = el.getAttribute('data-fallback') || '';
+        if (!until) { el.textContent = fallback; return; }
+        var target = Date.parse(until);
+        function pad(n) { return String(n).padStart(2, '0'); }
+        function tick() {
+            var diff = Math.max(0, Math.floor((target - Date.now()) / 1000));
+            if (diff <= 0) { el.textContent = '00:00:00'; return; }
+            var h = Math.floor(diff / 3600);
+            var m = Math.floor((diff % 3600) / 60);
+            var s = diff % 60;
+            el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+            window.setTimeout(tick, 1000);
+        }
+        tick();
+    })();
+    </script>
+    {% endif %}
+</body>
+</html>

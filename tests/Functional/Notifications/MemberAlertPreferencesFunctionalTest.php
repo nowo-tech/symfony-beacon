@@ -347,4 +347,171 @@ final class MemberAlertPreferencesFunctionalTest extends DatabaseWebTestCase
         self::assertNotNull($row);
         self::assertFalse($row->isEnabled());
     }
+
+    public function testSaveDisablesPushAndRedirectsProjectSettingsReturnTo(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('member-alerts-push-off@example.com');
+        $this->login($client, $user);
+
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $user->setPushNotificationsEnabled(true);
+        $em->flush();
+
+        $events = [];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $events[$event->value] = ['enabled' => true, 'scope' => 'all'];
+        }
+
+        $component = $this->createLiveComponent(
+            name: MemberAlertPreferencesLive::class,
+            data: [
+                'initialFormData' => [
+                    'memberAlertsEnabled' => true,
+                    'events' => MemberAlertEvent::mapEventsToFormKeys($events),
+                    'pushNotificationsEnabled' => true,
+                ],
+                'pushAvailable' => true,
+                'projects' => [],
+            ],
+            client: $client,
+        )->actingAs($user);
+
+        $formValues = [
+            'member_alert_preferences' => [
+                'memberAlertsEnabled' => true,
+                'pushNotificationsEnabled' => false,
+                'events' => [],
+            ],
+        ];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $formValues['member_alert_preferences']['events'][$event->formKey()] = [
+                'enabled' => true,
+                'involved' => false,
+            ];
+        }
+        $component->submitForm($formValues, 'save');
+        self::assertResponseRedirects('/account/display/notifications');
+
+        $em->clear();
+        $reloaded = $em->find($user::class, $user->getId());
+        self::assertNotNull($reloaded);
+        self::assertFalse($reloaded->isPushNotificationsEnabled());
+
+        $projectComponent = $this->createLiveComponent(
+            name: MemberProjectAlertPreferencesLive::class,
+            data: [
+                'projectUuid' => $project->getUuid(),
+                'projectName' => $project->getName(),
+                'initialFormData' => [
+                    'enabled' => true,
+                    'resetOverrides' => false,
+                    'events' => MemberAlertEvent::mapEventsToFormKeys($events),
+                ],
+                'returnTo' => 'project',
+            ],
+            client: $client,
+        )->actingAs($user);
+
+        $projectFormName = 'project_alerts_'.str_replace('-', '', $project->getUuid());
+        $projectValues = [
+            $projectFormName => [
+                'enabled' => true,
+                'resetOverrides' => false,
+                'events' => [],
+            ],
+        ];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $projectValues[$projectFormName]['events'][$event->formKey()] = [
+                'enabled' => true,
+                'involved' => MemberAlertEvent::IssueCommented === $event,
+            ];
+        }
+        $projectComponent->submitForm($projectValues, 'save');
+        self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings#member-alerts');
+    }
+
+    public function testSaveRemovesPushSubscriptionsAndUnknownProjectReturns404(): void
+    {
+        [$client, $user, $project] = $this->bootWithDemoProject('member-alerts-push-sub@example.com');
+        $this->login($client, $user);
+
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $user->setPushNotificationsEnabled(true);
+        $sub = new \App\Notifications\Entity\PushSubscription($user);
+        $sub->setSubscription('https://fcm.googleapis.com/fcm/send/test-endpoint', 'p256', 'auth', 'aesgcm');
+        $em->persist($sub);
+        $em->flush();
+
+        $events = [];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $events[$event->value] = ['enabled' => true, 'scope' => 'all'];
+        }
+
+        $component = $this->createLiveComponent(
+            name: MemberAlertPreferencesLive::class,
+            data: [
+                'initialFormData' => [
+                    'memberAlertsEnabled' => true,
+                    'events' => MemberAlertEvent::mapEventsToFormKeys($events),
+                    'pushNotificationsEnabled' => true,
+                ],
+                'pushAvailable' => true,
+                'projects' => [],
+            ],
+            client: $client,
+        )->actingAs($user);
+
+        $formValues = [
+            'member_alert_preferences' => [
+                'memberAlertsEnabled' => true,
+                'pushNotificationsEnabled' => false,
+                'events' => [],
+            ],
+        ];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $formValues['member_alert_preferences']['events'][$event->formKey()] = [
+                'enabled' => true,
+                'involved' => false,
+            ];
+        }
+        $component->submitForm($formValues, 'save');
+        self::assertResponseRedirects('/account/display/notifications');
+        self::assertSame([], self::getContainer()->get(\App\Notifications\Repository\PushSubscriptionRepository::class)->findByUser($user));
+
+        $missing = $this->createLiveComponent(
+            name: MemberProjectAlertPreferencesLive::class,
+            data: [
+                'projectUuid' => '00000000-0000-4000-8000-000000000099',
+                'projectName' => 'Gone',
+                'initialFormData' => [
+                    'enabled' => true,
+                    'resetOverrides' => false,
+                    'events' => MemberAlertEvent::mapEventsToFormKeys($events),
+                ],
+                'returnTo' => 'account',
+            ],
+            client: $client,
+        )->actingAs($user);
+
+        $formName = 'project_alerts_'.str_replace('-', '', '00000000-0000-4000-8000-000000000099');
+        $values = [
+            $formName => [
+                'enabled' => true,
+                'resetOverrides' => false,
+                'events' => [],
+            ],
+        ];
+        foreach (MemberAlertEvent::casesInUiOrder() as $event) {
+            $values[$formName]['events'][$event->formKey()] = [
+                'enabled' => true,
+                'involved' => false,
+            ];
+        }
+        try {
+            $missing->submitForm($values, 'save');
+            self::fail('Expected NotFoundHttpException for unknown project');
+        } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+            self::assertSame('Project not found.', $e->getMessage());
+        }
+    }
 }

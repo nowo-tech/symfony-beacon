@@ -25,6 +25,8 @@ nav:
   cookie_consent: Cookie-toestemming
   routing: Locale-routes
   http_log: HTTP-log
+  maintenance: Onderhoud
+  maintenance_preview: Voorbeeld onderhoudspagina
   api_docs: API-docs
   social_login: Sociale login
   ops_defaults: Ops-standaarden
@@ -1483,6 +1485,10 @@ admin:
     routing: Beheer duale publieke locale-paden (JSON) voor Routable-controllers.
     http_log: Bekijk vastgelegde HTTP-requests (headers, status, duur) met retentie
       en export.
+    maintenance: Sitebrede onderhoudsmodus inschakelen of plannen (HTTP 503).
+    maintenance_preview: Bekijk de openbare onderhoudspagina zonder downtime in te schakelen.
+    maintenance: Sitebrede onderhoudsmodus inschakelen of plannen (HTTP 503).
+    maintenance_preview: Bekijk de openbare onderhoudspagina zonder downtime in te schakelen.
     mailer: Versleutelde Mailer-DSN en From-adres voor transactionele e-mail.
     api_docs: Verken Envelope-ingest en gerelateerde HTTP-OpenAPI-documentatie.
     social_login: OAuth-gegevens (Google / GitHub / Microsoft) in de database.
@@ -2309,6 +2315,13 @@ error:
     hint: Onze mascotte verbindt de gloedkabel opnieuw. Vonken zijn opzettelijk. Waarschijnlijk.
     image_alt: Beacon-mascotte die een gloeiende kabel tussen servers herverbindt
       naast een grote 502
+  503:
+    title: Onderhoud
+    lead: We voeren een paar zachte verbeteringen door. Alles wat ertoe doet is
+      veilig — kom zo terug.
+    hint: Ons mascotte bracht een sleutel en een bord mee. Thee is optioneel.
+    image_alt: Beacon-mascotte met sleutel naast servers en een grote 503
+      met onderhoudsbord
 ops_defaults:
   allow_anonymous_resolve:
     help: Verouderd. Indien ingeschakeld mag Resolve issues wijzigen zonder gemapte

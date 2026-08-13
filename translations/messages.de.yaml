@@ -25,6 +25,8 @@ nav:
   cookie_consent: Cookie-Einwilligung
   routing: Locale-Routen
   http_log: HTTP-Protokoll
+  maintenance: Wartung
+  maintenance_preview: Wartungsseite-Vorschau
   api_docs: API-Dokumente
   social_login: Social Login
   ops_defaults: Ops-Standards
@@ -1501,6 +1503,10 @@ admin:
     routing: Duale Locale-Pfade (JSON) für Routable-Controller verwalten.
     http_log: Erfasste HTTP-Anfragen (Header, Status, Dauer) mit Aufbewahrung und
       Export einsehen.
+    maintenance: Standortweite Wartung aktivieren oder planen (HTTP 503).
+    maintenance_preview: Öffentliche Wartungsseite in der Vorschau anzeigen, ohne Downtime zu aktivieren.
+    maintenance: Standortweite Wartung aktivieren oder planen (HTTP 503).
+    maintenance_preview: Öffentliche Wartungsseite in der Vorschau anzeigen, ohne Downtime zu aktivieren.
     mailer: Verschlüsselter Mailer-DSN und From-Adresse für Transaktions-E-Mails.
     api_docs: Envelope-Ingest und zugehörige HTTP-OpenAPI-Dokumentation erkunden.
     social_login: OAuth-Anmeldeinformationen (Google / GitHub / Microsoft) in der
@@ -2351,6 +2357,13 @@ error:
     hint: Unser Maskottchen verbindet das Leuchtkabel neu. Funken sind Absicht. Wahrscheinlich.
     image_alt: Beacon-Maskottchen verbindet ein leuchtendes Kabel zwischen Servern
       neben einer großen 502
+  503:
+    title: Wartungsmodus
+    lead: Wir nehmen sanfte Verbesserungen vor. Alles Wichtige ist sicher —
+      schauen Sie gleich noch einmal vorbei.
+    hint: Unser Maskottchen brachte einen Schraubenschlüssel und ein Schild. Tee ist optional.
+    image_alt: Beacon-Maskottchen mit Schraubenschlüssel neben Servern und einer großen 503
+      mit Wartungsschild
 ops_defaults:
   allow_anonymous_resolve:
     help: Veraltet. Wenn aktiviert, kann Resolve Issues ohne zugeordneten Beacon-Akteur

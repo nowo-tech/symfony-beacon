@@ -20,6 +20,7 @@ final readonly class AppSectionResolver
         'nowo_cookie_consent_',
         'nowo_routing_kit_',
         'nowo_http_log_',
+        'nowo_maintenance_mode_',
     ];
 
     /** @var list<string> */

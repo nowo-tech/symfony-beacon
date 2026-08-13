@@ -1,0 +1,62 @@
+# nowo-tech/maintenance-mode-bundle — public 503 page + admin panel + preview
+# Panel (ROLE_ADMIN): /admin/maintenance · Preview: /_maintenance_preview
+# Same access pattern as HttpLog / DashboardMenu (login + access_roles checker; no ops password gate).
+nowo_maintenance_mode:
+    enabled: true
+    default_message: "We're making a few gentle improvements. Everything you care about is safe."
+    status_code: 503
+    retry_after: 3600
+
+    preview:
+        # null = on when kernel.debug (like /_error/503)
+        enabled: ~
+        path: '/_maintenance_preview'
+
+    panel:
+        enabled: true
+        path_prefix: '/admin/maintenance'
+
+    # Host Twig override: templates/bundles/NowoMaintenanceModeBundle/maintenance/page.html.twig
+    templates:
+        page: '@NowoMaintenanceModeBundle/maintenance/page.html.twig'
+
+    web_ui:
+        layout_template: 'kit/maintenance_mode_panel_layout.html.twig'
+        css_framework: tailwind
+        icon_set: ux_icon
+
+    security:
+        # HttpLog-style: Symfony session + ROLE_ADMIN via ConfigurableMaintenanceModeAccessChecker.
+        allow_unauthenticated: false
+        access_roles: [ROLE_ADMIN]
+        access_checker: null
+        # No second password gate — AuthKit login is enough (bundle still supports password_protection if needed).
+        password_protection: false
+
+    exclusions:
+        # Keep AuthKit reachable so operators can sign in while the site is in maintenance,
+        # then open /admin/maintenance (panel prefix is always auto-excluded from 503) and disable.
+        paths:
+            - /health/live
+            - /health/ready
+            - /favicon.ico
+            - /manifest.webmanifest
+            - /sw.js
+            - /offline
+        path_prefixes:
+            - /build/
+            - /assets/
+            - /bundles/
+            - /icons/
+            - /_wdt
+            - /_profiler
+            - /_error
+            - /_site_backup
+            - /setup
+            - /login
+            - /register
+            - /logout
+            - /reset-password
+            - /api/
+        patterns:
+            - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|setup)(/|$|\?)#'

@@ -48,6 +48,23 @@ final class PushServiceWorkerListenerTest extends TestCase
         self::assertSame($already, $response->getContent());
     }
 
+    public function testSkipsWhenResponseContentIsNotAString(): void
+    {
+        $kernel = $this->createStub(KernelInterface::class);
+        $request = Request::create('/sw.js');
+        $request->attributes->set('_route', 'nowo_pwa_service_worker');
+        $response = new class extends Response {
+            public function getContent(): string|false
+            {
+                return false;
+            }
+        };
+        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        (new PushServiceWorkerListener())($event);
+
+        self::assertFalse($response->getContent());
+    }
+
     private function dispatch(string $route, string $content, int $requestType): Response
     {
         $kernel = $this->createStub(KernelInterface::class);
