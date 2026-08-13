@@ -78,4 +78,43 @@ final class IssueJsonNormalizerTest extends TestCase
         self::assertSame('dev@example.com', $payload['assignee_email']);
         self::assertSame($canonical->getUuid(), $payload['duplicate_of_uuid']);
     }
+
+    public function testToDtoMirrorsNormalizeShape(): void
+    {
+        $assignee = (new User())->setEmail('dev@example.com');
+        $canonical = (new Issue())->setFingerprint('fp-c')->setTitle('Canonical');
+        $issue = (new Issue())
+            ->setFingerprint('fp')
+            ->setTitle('Dup')
+            ->setLevel(IssueLevel::Error)
+            ->setStatus(IssueStatus::Ignored)
+            ->setPriority(IssuePriority::Low)
+            ->setCulprit('App\\X')
+            ->setEventCount(2)
+            ->setFirstSeen(new DateTimeImmutable('2026-02-01T00:00:00+00:00'))
+            ->setLastSeen(new DateTimeImmutable('2026-02-02T00:00:00+00:00'))
+            ->setFirstRelease('2.0.0')
+            ->setLastRelease('2.0.1')
+            ->setLastEnvironment('staging')
+            ->setAssignee($assignee)
+            ->setDuplicateOf($canonical);
+
+        $dto = new IssueJsonNormalizer()->toDto($issue);
+        $payload = new IssueJsonNormalizer()->normalize($issue);
+
+        self::assertSame($payload['uuid'], $dto->uuid);
+        self::assertSame($payload['title'], $dto->title);
+        self::assertSame($payload['level'], $dto->level);
+        self::assertSame($payload['status'], $dto->status);
+        self::assertSame($payload['priority'], $dto->priority);
+        self::assertSame($payload['culprit'], $dto->culprit);
+        self::assertSame($payload['event_count'], $dto->eventCount);
+        self::assertSame($payload['first_seen'], $dto->firstSeen);
+        self::assertSame($payload['last_seen'], $dto->lastSeen);
+        self::assertSame($payload['first_release'], $dto->firstRelease);
+        self::assertSame($payload['last_release'], $dto->lastRelease);
+        self::assertSame($payload['last_environment'], $dto->lastEnvironment);
+        self::assertSame($payload['assignee_email'], $dto->assigneeEmail);
+        self::assertSame($payload['duplicate_of_uuid'], $dto->duplicateOfUuid);
+    }
 }

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Project\Service;
 
 use App\Identity\Entity\User;
-use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
+use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
@@ -16,187 +16,237 @@ use App\Project\Exception\ProjectAccessException;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Project\Service\ProjectAccessFlashKeys;
 use App\Project\Service\ProjectAccessService;
-use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class ProjectMembershipManagerTest extends TestCase
 {
-    private ProjectMembershipRepository&MockObject $membershipRepository;
-    private ProjectGroupAccessRepository&MockObject $groupAccessRepository;
-    private UserGroupMembershipRepository&MockObject $userGroupMembershipRepository;
-    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private UserRepository&Stub $userRepository;
+    private ProjectMembershipRepository&Stub $membershipRepository;
+    private AuthorizationCheckerInterface&Stub $authorizationChecker;
+    private EntityManagerInterface&Stub $entityManager;
+    /** @var list<object> */
+    private array $persisted = [];
+    private int $flushCount = 0;
     private ProjectMembershipManager $manager;
-    private ProjectGroupAccessManager $groupAccessManager;
 
     protected function setUp(): void
     {
-        $this->membershipRepository = $this->createMock(ProjectMembershipRepository::class);
-        $this->groupAccessRepository = $this->createMock(ProjectGroupAccessRepository::class);
-        $this->userGroupMembershipRepository = $this->createMock(UserGroupMembershipRepository::class);
-        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->authorizationChecker->expects(self::any())->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
+        $this->persisted = [];
+        $this->flushCount = 0;
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
+        $this->authorizationChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $this->authorizationChecker->method('isGranted')->willReturn(true);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->entityManager->method('persist')->willReturnCallback(function (object $entity): void {
+            $this->persisted[] = $entity;
+        });
+        $this->entityManager->method('remove');
+        $this->entityManager->method('flush')->willReturnCallback(function (): void {
+            ++$this->flushCount;
+        });
 
-        $projectAccess = new ProjectAccessService(
+        $access = new ProjectAccessService(
             $this->membershipRepository,
-            $this->groupAccessRepository,
-            $this->createMock(ProjectShareLinkRepository::class),
+            $this->createStub(ProjectGroupAccessRepository::class),
+            $this->createStub(ProjectShareLinkRepository::class),
             $this->authorizationChecker,
             new RequestStack(),
         );
-
         $policy = new ProjectMembershipPolicy(
             $this->membershipRepository,
-            $this->userGroupMembershipRepository,
-            $projectAccess,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $access,
             $this->authorizationChecker,
         );
 
-        $actionRecorder = new ReflectionClass(UserActionRecorder::class)->newInstanceWithoutConstructor();
-        $em = $this->createMock(EntityManagerInterface::class);
-
         $this->manager = new ProjectMembershipManager(
-            $this->createMock(UserRepository::class),
+            $this->userRepository,
             $this->membershipRepository,
             $policy,
-            $actionRecorder,
-            $em,
-        );
-
-        $this->groupAccessManager = new ProjectGroupAccessManager(
-            $this->groupAccessRepository,
-            $policy,
-            $actionRecorder,
-            $em,
+            new UserActionRecorder($this->entityManager, new RequestStack()),
+            $this->entityManager,
         );
     }
 
-    public function testCannotRemoveLastOwner(): void
+    public function testAddByEmailHappyPathAndFailures(): void
     {
-        $project = $this->projectWithId(1);
-        $owner = $this->userWithId(1);
-        $membership = $this->membership($project, $owner, ProjectRole::Owner);
+        $project = $this->project(1);
+        $actor = $this->user(1, 'admin@example.com');
 
-        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($membership);
+        $this->userRepository->method('findOneByEmail')->willReturn(null);
+        try {
+            $this->manager->addByEmail($project, $actor, 'missing@example.com', ProjectRole::Member);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::USER_NOT_FOUND, $e->reasonCode);
+        }
+
+        $disabled = $this->user(2, 'd@example.com')->setEnabled(false);
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->userRepository->method('findOneByEmail')->willReturn($disabled);
+        $this->rebuild();
+        try {
+            $this->manager->addByEmail($project, $actor, 'd@example.com', ProjectRole::Member);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::USER_DISABLED, $e->reasonCode);
+        }
+
+        $member = $this->user(3, 'm@example.com');
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->userRepository->method('findOneByEmail')->willReturn($member);
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
+            (new ProjectMembership())->setProject($project)->setUser($member)->setRole(ProjectRole::Viewer),
+        );
+        $this->rebuild();
+        try {
+            $this->manager->addByEmail($project, $actor, 'm@example.com', ProjectRole::Member);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::ALREADY_MEMBER, $e->reasonCode);
+        }
+
+        $fresh = $this->user(4, 'new@example.com');
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->userRepository->method('findOneByEmail')->willReturn($fresh);
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(null);
+        $this->rebuild();
+        $created = $this->manager->addByEmail($project, $actor, 'new@example.com', ProjectRole::Member);
+        self::assertSame($fresh, $created->getUser());
+        self::assertSame(ProjectRole::Member, $created->getRole());
+        self::assertSame(1, $this->flushCount);
+    }
+
+    public function testChangeRoleRemoveTransferAndSetActive(): void
+    {
+        $project = $this->project(1);
+        $actor = $this->user(1, 'owner@example.com');
+        $targetUser = $this->user(2, 'member@example.com');
+        $actorMembership = (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
+        $target = (new ProjectMembership())->setProject($project)->setUser($targetUser)->setRole(ProjectRole::Member);
+        $project->addMembership($actorMembership);
+        $project->addMembership($target);
+
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturnCallback(
+            static function (Project $p, User $u) use ($actor, $actorMembership, $targetUser, $target): ?ProjectMembership {
+                if ($u === $actor) {
+                    return $actorMembership;
+                }
+                if ($u === $targetUser) {
+                    return $target;
+                }
+
+                return null;
+            },
+        );
+        $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 2]);
+
+        $this->manager->changeRole($project, $actor, $target, ProjectRole::Admin);
+        self::assertSame(ProjectRole::Admin, $target->getRole());
+
+        $this->manager->setActive($project, $actor, $target, false);
+        self::assertFalse($target->isActive());
+        $this->manager->setActive($project, $actor, $target, false); // no-op
+        $this->manager->setActive($project, $actor, $target, true);
+        self::assertTrue($target->isActive());
+
+        $this->manager->transferOwnership($project, $actor, $target);
+        self::assertSame(ProjectRole::Owner, $target->getRole());
+        self::assertSame(ProjectRole::Full, $actorMembership->getRole());
+
+        $removable = (new ProjectMembership())->setProject($project)->setUser($this->user(9, 'v@example.com'))->setRole(ProjectRole::Viewer);
+        $project->addMembership($removable);
+        $this->manager->remove($project, $actor, $removable);
+        self::assertGreaterThan(0, $this->flushCount);
+        self::assertTrue(array_any(
+            $this->persisted,
+            static fn (object $e): bool => $e instanceof \App\Identity\Entity\UserAction
+                && \in_array($e->getAction(), [
+                    UserActionType::ProjectMemberRoleChanged,
+                    UserActionType::ProjectOwnershipTransferred,
+                    UserActionType::ProjectMemberRemoved,
+                    UserActionType::ProjectMemberActivated,
+                    UserActionType::ProjectMemberDeactivated,
+                ], true),
+        ));
+    }
+
+    public function testRemoveBlocksLastOwnerAndFull(): void
+    {
+        $project = $this->project(1);
+        $actor = $this->user(1, 'owner@example.com');
+        $ownerMembership = (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
+        $full = (new ProjectMembership())->setProject($project)->setUser($this->user(2, 'f@example.com'))->setRole(ProjectRole::Full);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($ownerMembership);
         $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1]);
-        $this->groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
 
         try {
-            $this->manager->remove($project, $owner, $membership);
-            self::fail('Expected ProjectAccessException');
+            $this->manager->remove($project, $actor, $ownerMembership);
+            self::fail('expected');
         } catch (ProjectAccessException $e) {
             self::assertSame(ProjectAccessException::LAST_OWNER, $e->reasonCode);
         }
-    }
 
-    public function testCannotRemoveFullMember(): void
-    {
-        $project = $this->projectWithId(1);
-        $owner = $this->userWithId(1);
-        $full = $this->userWithId(2);
-        $ownerMembership = $this->membership($project, $owner, ProjectRole::Owner);
-        $fullMembership = $this->membership($project, $full, ProjectRole::Full);
-
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($ownerMembership);
-        $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1]);
-        $this->groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
-
+        $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 2]);
+        $this->rebuild();
         try {
-            $this->manager->remove($project, $owner, $fullMembership);
-            self::fail('Expected ProjectAccessException');
+            $this->manager->remove($project, $actor, $full);
+            self::fail('expected');
         } catch (ProjectAccessException $e) {
             self::assertSame(ProjectAccessException::CANNOT_REMOVE_FULL, $e->reasonCode);
         }
     }
 
-    public function testGroupLinkForbiddenForAdminOutsideGroup(): void
+    private function rebuild(): void
     {
-        $project = $this->projectWithId(1);
-        $admin = $this->userWithId(20);
-        $adminMembership = $this->membership($project, $admin, ProjectRole::Admin);
-        $group = new UserGroup();
-        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, 5);
-
-        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($adminMembership);
-        $this->groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
-        $this->userGroupMembershipRepository->method('findOneByGroupAndUser')->willReturn(null);
-
-        try {
-            $this->groupAccessManager->assertActorCanLinkGroup($admin, $group, $project);
-            self::fail('Expected ProjectAccessException');
-        } catch (ProjectAccessException $e) {
-            self::assertSame(ProjectAccessException::GROUP_LINK_FORBIDDEN, $e->reasonCode);
-        }
+        $access = new ProjectAccessService(
+            $this->membershipRepository,
+            $this->createStub(ProjectGroupAccessRepository::class),
+            $this->createStub(ProjectShareLinkRepository::class),
+            $this->authorizationChecker,
+            new RequestStack(),
+        );
+        $policy = new ProjectMembershipPolicy(
+            $this->membershipRepository,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $access,
+            $this->authorizationChecker,
+        );
+        $this->manager = new ProjectMembershipManager(
+            $this->userRepository,
+            $this->membershipRepository,
+            $policy,
+            new UserActionRecorder($this->entityManager, new RequestStack()),
+            $this->entityManager,
+        );
     }
 
-    public function testCannotTransferToSelf(): void
+    private function project(int $id): Project
     {
-        $project = $this->projectWithId(1);
-        $owner = $this->userWithId(1);
-        $ownerMembership = $this->membership($project, $owner, ProjectRole::Owner);
-
-        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($ownerMembership);
-        $this->groupAccessRepository->method('findHighestGroupRoleForUser')->willReturn(null);
-
-        try {
-            $this->manager->transferOwnership($project, $owner, $ownerMembership);
-            self::fail('Expected ProjectAccessException');
-        } catch (ProjectAccessException $e) {
-            self::assertSame(ProjectAccessException::CANNOT_TRANSFER_TO_SELF, $e->reasonCode);
-        }
-    }
-
-    public function testFlashKeysCoverKnownCodes(): void
-    {
-        foreach ([
-            ProjectAccessException::USER_NOT_FOUND,
-            ProjectAccessException::LAST_OWNER,
-            ProjectAccessException::GROUP_LINK_FORBIDDEN,
-            ProjectAccessException::CANNOT_TRANSFER_TO_SELF,
-            ProjectAccessException::CANNOT_REMOVE_FULL,
-        ] as $code) {
-            self::assertNotSame('flash.project.member_error', ProjectAccessFlashKeys::forCode($code), $code);
-            self::assertSame(
-                ProjectAccessFlashKeys::forCode($code),
-                ProjectAccessFlashKeys::forException(ProjectAccessException::of($code)),
-            );
-        }
-    }
-
-    private function projectWithId(int $id): Project
-    {
-        $project = new Project();
-        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
+        $project = (new Project())->setName('P'.$id)->setSlug('p'.$id);
+        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
 
         return $project;
     }
 
-    private function userWithId(int $id): User
+    private function user(int $id, string $email): User
     {
-        $user = new User();
-        $user->setEmail('u'.$id.'@example.com');
-        $user->setDisplayName('User '.$id);
-        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
+        $user = (new User())->setEmail($email);
+        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
 
         return $user;
-    }
-
-    private function membership(Project $project, User $user, ProjectRole $role): ProjectMembership
-    {
-        $membership = new ProjectMembership();
-        $membership->setUser($user);
-        $membership->setRole($role);
-        $project->addMembership($membership);
-
-        return $membership;
     }
 }

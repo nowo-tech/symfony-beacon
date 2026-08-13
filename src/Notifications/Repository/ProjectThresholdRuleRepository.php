@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<ProjectThresholdRule>
  */
-final class ProjectThresholdRuleRepository extends ServiceEntityRepository
+class ProjectThresholdRuleRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

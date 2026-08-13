@@ -40,4 +40,27 @@ final class AccessibleProjectFilterTest extends TestCase
         self::assertNull(AccessibleProjectFilter::resolve([$project], '00000000-0000-4000-8000-000000000000'));
         self::assertNull(AccessibleProjectFilter::resolve([], $project->getUuid()));
     }
+
+    public function testChoiceMapIsEmptyForNoProjects(): void
+    {
+        self::assertSame([], AccessibleProjectFilter::choiceMap([]));
+    }
+
+    public function testChoiceMapMapsNameToUuid(): void
+    {
+        $a = new Project();
+        $a->setSlug('alpha');
+        $a->setName('Alpha');
+        $b = new Project();
+        $b->setSlug('beta');
+        $b->setName('Beta');
+
+        self::assertSame(
+            [
+                'Alpha' => $a->getUuid(),
+                'Beta' => $b->getUuid(),
+            ],
+            AccessibleProjectFilter::choiceMap([$a, $b]),
+        );
+    }
 }

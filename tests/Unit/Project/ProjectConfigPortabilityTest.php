@@ -17,6 +17,7 @@ use App\Project\Service\ProjectFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class ProjectConfigPortabilityTest extends TestCase
@@ -131,7 +132,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $membership->setRole(ProjectRole::Full);
         $project->addMembership($membership);
 
-        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo = $this->createStub(UserRepository::class);
         $userRepo->method('findIndexedByEmails')->willReturn(['full@example.com' => $actor]);
 
         $projectRepo = $this->createMock(ProjectRepository::class);
@@ -180,7 +181,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $membership->setActive(true);
         $project->addMembership($membership);
 
-        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo = $this->createStub(UserRepository::class);
         $userRepo->method('findIndexedByEmails')->willReturn(['owner@example.com' => $actor]);
 
         $projectRepo = $this->createMock(ProjectRepository::class);
@@ -238,6 +239,77 @@ final class ProjectConfigPortabilityTest extends TestCase
                 'memberships' => [],
             ]],
         ], $project, $actor);
+    }
+
+    public function testImportAdminCreatesMissingProjectAndUsers(): void
+    {
+        $actor = $this->user('admin@example.com', 'Admin');
+        (new ReflectionProperty(User::class, 'id'))->setValue($actor, 1);
+
+        $createdUsers = [];
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('findIndexedByEmails')->willReturnCallback(
+            static function (array $emails) use ($actor, &$createdUsers): array {
+                $map = ['admin@example.com' => $actor];
+                foreach ($emails as $email) {
+                    if (isset($createdUsers[$email])) {
+                        $map[$email] = $createdUsers[$email];
+                    }
+                }
+
+                return $map;
+            },
+        );
+        $userRepo->method('save')->willReturnCallback(static function (User $user) use (&$createdUsers): void {
+            $createdUsers[strtolower($user->getEmail())] = $user;
+            if (null === $user->getId()) {
+                (new ReflectionProperty(User::class, 'id'))->setValue($user, 10 + \count($createdUsers));
+            }
+        });
+
+        $saved = [];
+        $projectRepo = $this->createStub(ProjectRepository::class);
+        $projectRepo->method('findOneBy')->willReturn(null);
+        $projectRepo->method('hydrateMembershipsForProjects');
+        $projectRepo->method('save')->willReturnCallback(static function (Project $project) use (&$saved): void {
+            if (null === $project->getId()) {
+                (new ReflectionProperty(Project::class, 'id'))->setValue($project, 42);
+            }
+            $saved[] = $project;
+        });
+
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
+        $hasher->method('hashPassword')->willReturn('hash');
+        $service = new ProjectConfigPortability(
+            $projectRepo,
+            $userRepo,
+            new PortableUserProvisioner($userRepo, $hasher),
+            new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
+        );
+
+        $result = $service->importAdmin([
+            'schema' => ProjectConfigPortability::SCHEMA,
+            'version' => 1,
+            'projects' => [[
+                'code' => 'new-proj',
+                'slug' => 'new-proj',
+                'name' => 'New Project',
+                'description' => 'Demo',
+                'ingest_enabled' => true,
+                'retention_days' => 14,
+                'memberships' => [
+                    ['email' => 'admin@example.com', 'display_name' => 'Admin', 'role' => 'owner', 'active' => true],
+                    ['email' => 'newbie@example.com', 'display_name' => 'Newbie', 'role' => 'member', 'active' => true],
+                ],
+            ]],
+        ], $actor);
+
+        self::assertSame(1, $result['projects_upserted']);
+        self::assertSame(1, $result['users_created']);
+        self::assertGreaterThanOrEqual(2, $result['memberships_applied']);
+        self::assertNotEmpty($saved);
+        self::assertSame('new-proj', $saved[0]->getCode());
+        self::assertSame(14, $saved[0]->getRetentionDays());
     }
 
     private function service(): ProjectConfigPortability

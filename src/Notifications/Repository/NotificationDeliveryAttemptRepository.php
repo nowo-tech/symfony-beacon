@@ -13,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<NotificationDeliveryAttempt>
  */
-final class NotificationDeliveryAttemptRepository extends ServiceEntityRepository
+class NotificationDeliveryAttemptRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
