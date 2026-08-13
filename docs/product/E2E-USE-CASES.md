@@ -48,7 +48,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-11 | `/register` redirects to login when users exist | Covered | `use-cases-auth.spec.ts` |
 | UC-AUTH-12 | Logout returns to login | Covered | `dashboard-project.spec.ts` |
 | UC-AUTH-13 | Guest locale switch | Covered | `navigation-ui.spec.ts` |
-| UC-AUTH-14 | Social login buttons when providers configured | Partial | Admin social forms Covered; guest IdP redirect needs live providers |
+| UC-AUTH-14 | Social login buttons when providers configured | Covered | `use-cases-partials-closing.spec.ts` (enabled provider → guest Continue; live IdP redirect Out of scope) |
 | UC-AUTH-15 | Password policy / strength / toggle UI | Covered | `use-cases-auth-chrome.spec.ts` (login reveal + account security) |
 | UC-AUTH-16 | Protected routes redirect guests to login | Covered | `navigation-ui.spec.ts` |
 
@@ -117,7 +117,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-DASH-08 | Alerts feed + filters | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-09 | New-in-release feed + filters | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-10 | Area switch Preferences / Dashboard / Administration | Covered | `use-cases-account-chrome.spec.ts` |
-| UC-DASH-11 | Product tour on first dashboard visit | Partial | dismiss helpers; replay Covered |
+| UC-DASH-11 | Product tour on first dashboard visit | Covered | `use-cases-partials-closing.spec.ts` (`?tour=1`); replay Covered in `account-deep.spec.ts` |
 
 ---
 
@@ -128,10 +128,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-01 | Create project from dashboard | Covered | `mutations.spec.ts` |
 | UC-PROJ-02 | Project show overview | Covered | `dashboard-project.spec.ts` |
 | UC-PROJ-03 | Project nav tabs (issues / analytics / performance / releases / settings) | Covered | `navigation-ui.spec.ts` |
-| UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | Partial | `project-settings-deep.spec.ts`, `use-cases-project.spec.ts` |
+| UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | Covered | `use-cases-project.spec.ts`, `use-cases-partials-closing.spec.ts` (general/access/alerts/data/danger) |
 | UC-PROJ-05 | Create / rotate / revoke API key + DSN flash | Covered | `project-settings-deep.spec.ts`, `use-cases-notifications-keys.spec.ts` |
-| UC-PROJ-06 | Add / change role / deactivate / remove member | Covered | `use-cases-members-viewer.spec.ts` (add viewer + remove); role/deactivate Partial |
-| UC-PROJ-07 | Add / role / remove group access | Partial | Admin group create Covered; project group ACL deep Gap |
+| UC-PROJ-06 | Add / change role / deactivate / remove member | Covered | `use-cases-members-viewer.spec.ts`, `use-cases-partials-closing.spec.ts` |
+| UC-PROJ-07 | Add / role / remove group access | Covered | `use-cases-partials-closing.spec.ts` |
 | UC-PROJ-08 | Save governance (retention / rate / quota) | Covered | `mutations.spec.ts` |
 | UC-PROJ-09 | Create share link (project-wide) | Covered | `mutations.spec.ts`, `share-access.spec.ts` |
 | UC-PROJ-10 | Create share link (issue-scoped + max uses) | Covered | `use-cases-share.spec.ts` |
@@ -155,7 +155,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 |----|----------|--------|-------------|
 | UC-ISS-01 | Issue list table after sample seed | Covered | `issues-deep.spec.ts` |
 | UC-ISS-02 | Filter by level + status | Covered | `mutations.spec.ts` |
-| UC-ISS-03 | Filter by environment / release / priority (query string) | Covered | `use-cases-issues.spec.ts` (tag/url/user/q still Gap — some combos 500) |
+| UC-ISS-03 | Filter by environment / release / priority (query string) | Covered | `use-cases-issues.spec.ts`, `use-cases-partials-closing.spec.ts` (tag/url/user/q; MySQL url LIKE ESCAPE fixed) |
 | UC-ISS-04 | FULLTEXT search query param | Covered | `dashboard-project.spec.ts` |
 | UC-ISS-05 | Sort + pagination + per_page | Covered | `issues-deep.spec.ts` |
 | UC-ISS-06 | Environment compare panel | Covered | `issues-deep.spec.ts` |
@@ -170,7 +170,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-15 | Ignore status | Covered | `use-cases-issues.spec.ts` |
 | UC-ISS-16 | Change priority | Covered | `mutations.spec.ts` |
 | UC-ISS-17 | Assign / clear assignee | Covered | `mutations.spec.ts` |
-| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `use-cases-thresholds-health.spec.ts` (open dialog); merge submit Partial |
+| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `use-cases-partials-closing.spec.ts` (submit without merge_events); merge_events optional Partial |
 | UC-ISS-19 | Similar issues panel | Covered | `use-cases-thresholds-health.spec.ts` (attached when present) |
 | UC-ISS-20 | Copy for AI (md/json export) | Covered | `issues-deep.spec.ts` |
 | UC-ISS-21 | Open event detail from issue | Covered | `use-cases-issues.spec.ts` |
@@ -250,9 +250,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 |----|----------|--------|-------------|
 | UC-ADM-01 | Admin hub + deep cards | Covered | `admin.spec.ts`, `settings-deep.spec.ts` |
 | UC-ADM-02 | Users list / new form / activity | Covered | `admin.spec.ts` |
-| UC-ADM-03 | Create user / toggle enabled / change role | Covered | `use-cases-analytics-admin.spec.ts` + `use-cases-admin-remaining.spec.ts` (toggle); role change Partial |
-| UC-ADM-04 | Admin user GDPR export / anonymize | Partial | export Covered (`use-cases-admin.spec.ts`); anonymize Out of scope |
-| UC-ADM-05 | Groups CRUD + members / projects | Covered | `use-cases-admin-remaining.spec.ts` (create+show); member attach Partial |
+| UC-ADM-03 | Create user / toggle enabled / change role | Covered | `use-cases-analytics-admin.spec.ts`, `use-cases-admin-remaining.spec.ts`, `use-cases-partials-closing.spec.ts` |
+| UC-ADM-04 | Admin user GDPR export / anonymize | Partial | export Covered (`use-cases-admin.spec.ts`); anonymize execute Out of scope |
+| UC-ADM-05 | Groups CRUD + members / projects | Covered | `use-cases-admin-remaining.spec.ts`, `use-cases-partials-closing.spec.ts` (add/remove member) |
 | UC-ADM-06 | Admin projects list / show / edit / ops | Covered | `admin.spec.ts`, `admin-project-deep.spec.ts` |
 | UC-ADM-07 | Suspend ingest from admin | Covered | `use-cases-analytics-admin.spec.ts` |
 | UC-ADM-08 | View-as-member enable / disable | Covered | `use-cases-admin.spec.ts` |
@@ -283,17 +283,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 ## 14. Suggested next E2E batches (priority)
 
-**Automable Gaps closed** via `use-cases-auth-chrome`, `use-cases-account-chrome`, `use-cases-members-viewer`, `use-cases-thresholds-health`, `use-cases-admin-remaining` (+ earlier `use-cases-*` wave).
+**Automable Partials closed** in `use-cases-partials-closing.spec.ts` (+ prior `use-cases-*` waves). Catalog has **no Gaps**.
 
-**Remaining honest Partial / Out of scope (not Gaps):**
+**Remaining honest Partial / Out of scope only:**
 
-1. Guest IdP redirect with live OAuth providers (UC-AUTH-14).
-2. Remember-me cookie round-trip across browser restart (UC-AUTH-08 deep).
-3. Tag/URL/user issue filter combos if any still 500 (UC-ISS-03 remainder).
-4. Mark-duplicate merge submit (UC-ISS-18 deep).
-5. Project group ACL attach/detach (UC-PROJ-07).
-6. Admin role change + anonymize execute (UC-ADM-03/04 deep).
-7. Anything marked **Out of scope** above (throttle, push, signed hooks, danger-zone executes, cold setup).
+1. Live OAuth IdP redirect after clicking Continue (UC-AUTH-14 deep).
+2. Remember-me cookie across browser restart (UC-AUTH-08 deep).
+3. Mark-duplicate with `merge_events` checked (UC-ISS-18 deep).
+4. Danger-zone / anonymize / throttle / push / signed hooks / cold setup executes (Out of scope rows above).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file in the table.
 

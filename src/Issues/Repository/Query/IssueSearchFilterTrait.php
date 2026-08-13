@@ -120,13 +120,16 @@ trait IssueSearchFilterTrait
         } else {
             $like = '%'.SqlLikeEscaper::escape($needle).'%';
             if ($isSqlite) {
+                // SQLite: ESCAPE '\' — one backslash as the escape character.
                 $sql = 'SELECT DISTINCT e.issue_id FROM event e'
                     .' INNER JOIN issue i ON i.id = e.issue_id'
-                    .' WHERE i.project_id = ? AND CAST(e.payload AS TEXT) LIKE ? ESCAPE \'\\\'';
+                    ." WHERE i.project_id = ? AND CAST(e.payload AS TEXT) LIKE ? ESCAPE '\\'";
             } else {
+                // MySQL: string literal '\\' is one backslash (NO_BACKSLASH_ESCAPES off).
+                // A single-quoted ESCAPE '\' is a syntax error (see SQLSTATE 1064 near ''\'').
                 $sql = 'SELECT DISTINCT e.issue_id FROM event e'
                     .' INNER JOIN issue i ON i.id = e.issue_id'
-                    .' WHERE i.project_id = ? AND CAST(e.payload AS CHAR) LIKE ? ESCAPE \'\\\'';
+                    ." WHERE i.project_id = ? AND CAST(e.payload AS CHAR) LIKE ? ESCAPE '\\\\'";
             }
             $params = [$projectId, $like];
         }
