@@ -56,23 +56,12 @@
                 </thead>
                 <tbody>
                     {% for issue in issues %}
-                        {% set assigneeLabel = issue.assignee ? (issue.assignee.displayName ?: issue.assignee.email) : ('issues.assignee_unassigned'|trans) %}
-                        <tr class="border-t border-[var(--color-sand)]/70">
-                            <td class="px-3 py-2 align-top">
-                                <a class="no-underline text-[var(--color-moss)] hover:underline" href="{{ path('project_show', {id: issue.project.uuid}) }}">{{ issue.project.name }}</a>
-                            </td>
-                            <td class="px-3 py-2 align-top">
-                                <a class="font-medium no-underline hover:underline" href="{{ path('issue_show', {projectId: issue.project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a>
-                                <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
-                                <span class="badge ml-0 mt-1 issue-badge--priority-{{ issue.priority.value }}">{{ ('issues.priority.' ~ issue.priority.value)|trans }}</span>
-                            </td>
-                            <td class="px-3 py-2 align-top">
-                                <span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span>
-                            </td>
-                            <td class="px-3 py-2 align-top">{{ issue.status.value }}</td>
-                            <td class="px-3 py-2 align-top {% if not issue.assignee %}text-[var(--color-ink)]/45{% endif %}">{{ assigneeLabel }}</td>
-                            <td class="px-3 py-2 align-top whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
-                        </tr>
+                        {% include 'dashboard/_issue_row.html.twig' with {
+                            issue: issue,
+                            show_priority: true,
+                            show_status: true,
+                            show_assignee: true,
+                        } only %}
                     {% endfor %}
                 </tbody>
             </table>

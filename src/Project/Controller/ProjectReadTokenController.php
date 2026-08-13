@@ -6,8 +6,8 @@ namespace App\Project\Controller;
 
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
-use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Entity\ProjectReadToken;
+use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectReadTokenCreateType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Security\ProjectPermission;

@@ -52,9 +52,10 @@ nowo_auth_kit:
             social_login:
                 mode: enabled
                 create_user_if_missing: false
-            # QR phone login (AuthKit 1.12). Requires User.phone + phoneVerifiedAt.
+            # QR phone login (AuthKit 1.12). Disabled until a real phone OTP / verification
+            # path sets User.phoneVerifiedAt (profile save only clears or restores it).
             qr_login:
-                mode: enabled
+                mode: disabled
                 challenge_ttl: 90
                 approve_requires: session
                 desktop_binding: strict

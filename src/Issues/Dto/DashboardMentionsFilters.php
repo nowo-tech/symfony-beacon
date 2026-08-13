@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Dto;
 
+use App\Project\Dto\AccessibleProjectFilterTrait;
 use App\Project\Entity\Project;
 
 /**
@@ -11,6 +12,8 @@ use App\Project\Entity\Project;
  */
 final readonly class DashboardMentionsFilters
 {
+    use AccessibleProjectFilterTrait;
+
     /**
      * @param list<Project> $accessibleProjects
      * @param list<Project> $selectedProjects
@@ -21,19 +24,6 @@ final readonly class DashboardMentionsFilters
         public ?Project $project,
         public bool $unreadOnly,
     ) {
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function projectChoices(): array
-    {
-        $choices = [];
-        foreach ($this->accessibleProjects as $project) {
-            $choices[$project->getName()] = $project->getUuid();
-        }
-
-        return $choices;
     }
 
     /**

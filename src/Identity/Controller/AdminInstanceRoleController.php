@@ -13,6 +13,7 @@ use App\Identity\Form\AdminRoleUserAddType;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Repository\UserRepository;
+use App\Identity\Service\InstancePermissionMatrixBuilder;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Shared\Controller\RequiresValidFormTrait;
@@ -48,6 +49,7 @@ final class AdminInstanceRoleController extends AbstractController
     public function __construct(
         private readonly InstanceRoleRepository $roleRepository,
         private readonly InstancePermissionRepository $permissionRepository,
+        private readonly InstancePermissionMatrixBuilder $permissionMatrixBuilder,
         private readonly UserRepository $userRepository,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
@@ -207,7 +209,7 @@ final class AdminInstanceRoleController extends AbstractController
         InstanceRole $role,
     ): Response {
         $this->roleRepository->hydrateDetail($role);
-        $permissionMap = $this->permissionsByCategory();
+        $permissionMap = $this->permissionMatrixBuilder->permissionsByCategory();
         $permissionIds = [];
         foreach ($permissionMap as $items) {
             foreach ($items as $permission) {
@@ -447,7 +449,7 @@ final class AdminInstanceRoleController extends AbstractController
     ): Response {
         $this->roleRepository->hydrateDetail($role);
         $editForm ??= $this->buildEditForm($role, $page);
-        $permissionMap = $this->permissionsByCategory();
+        $permissionMap = $this->permissionMatrixBuilder->permissionsByCategory();
         $permissionIds = [];
         foreach ($permissionMap as $items) {
             foreach ($items as $permission) {
@@ -519,17 +521,6 @@ final class AdminInstanceRoleController extends AbstractController
     /**
      * @return array<string, list<InstancePermission>>
      */
-    private function permissionsByCategory(): array
-    {
-        $permissions = $this->permissionRepository->findAllOrdered();
-        $permissionsByCategory = [];
-        foreach ($permissions as $permission) {
-            $permissionsByCategory[$permission->getCategory()][] = $permission;
-        }
-
-        return $permissionsByCategory;
-    }
-
     /**
      * @return array<int, FormView>
      */

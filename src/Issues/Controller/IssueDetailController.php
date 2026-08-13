@@ -22,6 +22,7 @@ use App\Issues\Service\IssueDuplicateMarker;
 use App\Issues\Service\IssueShowPageBuilder;
 use App\Issues\Service\IssueStatusChanger;
 use App\Project\Entity\Project;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -77,16 +78,17 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}/assign', name: 'issue_assign', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function assign(
         Request $request,
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);
@@ -130,16 +132,17 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}/status', name: 'issue_status', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function status(
         Request $request,
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);
@@ -168,8 +171,12 @@ final class IssueDetailController extends AbstractController
             ]);
         }
 
-        if ($this->issueStatusChanger->change($issue, $next, $user)) {
-            $this->addFlash('success', 'issues.status_saved');
+        try {
+            if ($this->issueStatusChanger->change($issue, $next, $user)) {
+                $this->addFlash('success', 'issues.status_saved');
+            }
+        } catch (InvalidArgumentException) {
+            $this->addFlash('error', 'issues.status_invalid');
         }
 
         return $this->redirectToRoute('issue_show', [
@@ -179,16 +186,17 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}/priority', name: 'issue_priority', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function priority(
         Request $request,
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);
@@ -237,16 +245,17 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}/comments', name: 'issue_comment_add', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function addComment(
         Request $request,
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);
@@ -281,16 +290,17 @@ final class IssueDetailController extends AbstractController
     }
 
     #[Route('/projects/{projectId}/issues/{id}/duplicate', name: 'issue_mark_duplicate', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function markDuplicate(
         Request $request,
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
     ): RedirectResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $issue->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($issue->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireTriage($project, $user);

@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
  * Enables declarative project permission checks with {@see ProjectPermission} constants.
+ *
+ * @extends Voter<string, Project>
  */
 final class ProjectPermissionVoter extends Voter
 {

@@ -25,7 +25,6 @@ final class ProjectGroupAddType extends FormKitAbstractType
                 'required' => true,
                 'choices' => $options['group_choices'],
                 'choice_translation_domain' => false,
-                'placeholder' => 'project_group_add.group.placeholder',
                 'constraints' => [new NotBlank()],
             ]);
             $this->addChoiceField('role', [

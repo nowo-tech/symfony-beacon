@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Instance Mailer settings (DSN and From stored encrypted; blank DSN keeps current value).
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code instance_mailer.*}.
  */
 final class InstanceMailerSettingsType extends FormKitAbstractType
 {
@@ -41,11 +43,8 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
                 $this->mergeFieldOptions('plainMailerDsn', 'password', [
                     'mapped' => false,
                     'required' => false,
-                    'label' => 'instance_mailer.mailer_dsn.label',
-                    'help' => 'instance_mailer.mailer_dsn.help',
                     'attr' => [
                         'autocomplete' => 'new-password',
-                        'placeholder' => 'instance_mailer.mailer_dsn.placeholder',
                     ],
                     'constraints' => [
                         new Length(max: 2048),
@@ -57,16 +56,9 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
                 'placeholder' => false,
                 'mapped' => false,
                 'required' => false,
-                'label' => 'instance_mailer.clear_dsn.label',
-                'help' => 'instance_mailer.clear_dsn.help',
             ]);
             $this->addEmailField('mailerFrom', [
                 'required' => false,
-                'label' => 'instance_mailer.mailer_from.label',
-                'help' => 'instance_mailer.mailer_from.help',
-                'attr' => [
-                    'placeholder' => 'instance_mailer.mailer_from.placeholder',
-                ],
                 'constraints' => [
                     new Email(),
                     new Length(max: 180),
@@ -83,10 +75,16 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
         ]);
     }
 
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'instance_mailer';
+    }
+
     public function validatePlainDsn(mixed $value, ExecutionContextInterface $context): void
     {
         if (!\is_string($value) && null !== $value) {
-            $context->buildViolation('instance_mailer.mailer_dsn.invalid')
+            $context->buildViolation('instance_mailer.plain_mailer_dsn.invalid')
                 ->setTranslationDomain('form')
                 ->addViolation();
 

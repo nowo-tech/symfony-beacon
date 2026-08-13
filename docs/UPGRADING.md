@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.11.0)](#unreleased-main-after-1110)
+- [Unreleased (main after 1.12.0)](#unreleased-main-after-1120)
+- [Upgrading from 1.11.0 to 1.12.0](#upgrading-from-1110-to-1120)
 - [Upgrading from 1.10.0 to 1.11.0](#upgrading-from-1100-to-1110)
 - [Upgrading from 1.9.0 to 1.10.0](#upgrading-from-190-to-1100)
 - [Upgrading from 1.8.2 to 1.9.0](#upgrading-from-182-to-190)
@@ -64,9 +65,38 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.11.0)
+## Unreleased (main after 1.12.0)
 
 _No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.11.0 to 1.12.0
+
+**Audit follow-up hardening (`096` / 6.46)** — Read API rate limit, hash-at-rest ingest secrets, Project-subject voter abstain, membership write DRY, filter DTOs, QR disabled, Slack user-id hygiene, 24h interaction tokens. See `[1.12.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.12.0   # or pull main at the release commit
+# Add to .env if missing (see .env.dist):
+# BEACON_READ_API_RATE_LIMIT=120
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # Version20260813180000 indexes + Version20260813190000 secret_hash
+php bin/console cache:clear
+```
+
+### Operator checklist
+
+1. **Env**: set `BEACON_READ_API_RATE_LIMIT` (default `120`; `0` disables Read API IP throttle).
+2. **Migrations**: confirm `secret_hash` column exists; existing keys keep working via legacy encrypted column until the next successful ingest upgrades them (or rotate keys).
+3. **QR login**: AuthKit `qr_login` is **disabled** — phone fields remain for future OTP; do not expect QR approval until SMS OTP ships.
+4. **Slack Assign mapping**: changing Account → Profile Slack user ID requires the current password and must be unique across users.
+5. **Teams/Slack cards**: Assign/Resolve HMAC tokens expire in **24 hours** (was 7 days) — refresh notification cards if operators see expired-action errors.
+6. **RBAC**: instance catalog `ROLE_PROJECT_*` never substitutes for project membership on product `#[IsGranted(ProjectPermission::…, 'project')]` (see [ROLES.md](product/ROLES.md)).
+
+### Notes
+
+- One-shot DSN flash after create/rotate is unchanged; Settings still shows public key only.
+- Filter / membership FormKit field names are unchanged for UI operators.
 
 ## Upgrading from 1.10.0 to 1.11.0
 

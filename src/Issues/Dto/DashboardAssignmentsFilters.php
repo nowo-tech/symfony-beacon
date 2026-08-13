@@ -9,6 +9,7 @@ use App\Issues\AssignmentScope;
 use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
+use App\Project\Dto\AccessibleProjectFilterTrait;
 use App\Project\Entity\Project;
 
 /**
@@ -16,6 +17,8 @@ use App\Project\Entity\Project;
  */
 final readonly class DashboardAssignmentsFilters
 {
+    use AccessibleProjectFilterTrait;
+
     /**
      * @param list<Project> $accessibleProjects
      * @param list<Project> $selectedProjects
@@ -37,20 +40,9 @@ final readonly class DashboardAssignmentsFilters
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function projectChoices(): array
-    {
-        $choices = [];
-        foreach ($this->accessibleProjects as $project) {
-            $choices[$project->getName()] = $project->getUuid();
-        }
-
-        return $choices;
-    }
-
-    /**
-     * @return array<string, string>
+     * Map of teammate id => display label (PHP coerces numeric string keys to int).
+     *
+     * @return array<int|string, string>
      */
     public function teammateChoices(): array
     {
@@ -78,7 +70,7 @@ final readonly class DashboardAssignmentsFilters
             'q' => $this->query ?? '',
             'level' => $this->level ?? '',
             'status' => $this->status->value,
-            'priority' => $this->priority?->value ?? '',
+            'priority' => $this->priority instanceof IssuePriority ? $this->priority->value : '',
             'assignee' => null !== $this->assignee?->getId() ? (string) $this->assignee->getId() : '',
             'sort' => $this->sort->field,
             'dir' => $this->sort->direction,

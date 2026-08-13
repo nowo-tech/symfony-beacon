@@ -37,58 +37,38 @@ final class OtlpMetricsMapper implements OtlpSignalMapperInterface
 
         /** @var list<array<string, mixed>> $events */
         $events = [];
-        $resourceMetrics = $decoded['resourceMetrics'] ?? $decoded['resource_metrics'] ?? [];
-        if (!\is_array($resourceMetrics)) {
-            return [];
-        }
 
-        foreach ($resourceMetrics as $resourceMetric) {
-            if (!\is_array($resourceMetric) || \count($events) >= self::MAX_DATA_POINTS) {
-                break;
-            }
-
-            $resourceAttrs = $this->attributesMap(
-                \is_array($resourceMetric['resource']['attributes'] ?? null)
-                    ? $resourceMetric['resource']['attributes']
-                    : [],
-            );
-
-            $scopeMetrics = $resourceMetric['scopeMetrics'] ?? $resourceMetric['scope_metrics'] ?? [];
-            if (!\is_array($scopeMetrics)) {
-                continue;
-            }
-
-            foreach ($scopeMetrics as $scopeMetric) {
-                if (!\is_array($scopeMetric) || \count($events) >= self::MAX_DATA_POINTS) {
-                    break 2;
+        OtlpResourceIterator::walk(
+            $decoded,
+            'resourceMetrics',
+            'resource_metrics',
+            'scopeMetrics',
+            'scope_metrics',
+            'metrics',
+            'metrics',
+            $this->attributesMap(...),
+            function (array $resourceAttrs, array $metric) use (&$events): bool {
+                if (\count($events) >= self::MAX_DATA_POINTS) {
+                    return false;
                 }
 
-                $metrics = $scopeMetric['metrics'] ?? [];
-                if (!\is_array($metrics)) {
-                    continue;
-                }
-
-                foreach ($metrics as $metric) {
-                    if (!\is_array($metric) || \count($events) >= self::MAX_DATA_POINTS) {
-                        break 3;
+                $name = isset($metric['name']) && \is_string($metric['name']) ? $metric['name'] : '';
+                foreach ($this->dataPoints($metric) as $point) {
+                    if (\count($events) >= self::MAX_DATA_POINTS) {
+                        return false;
                     }
-
-                    $name = isset($metric['name']) && \is_string($metric['name']) ? $metric['name'] : '';
-                    foreach ($this->dataPoints($metric) as $point) {
-                        if (\count($events) >= self::MAX_DATA_POINTS) {
-                            break 4;
-                        }
-                        if (!\is_array($point)) {
-                            continue;
-                        }
-                        $payload = $this->mapDataPoint($point, $name, $resourceAttrs);
-                        if (null !== $payload) {
-                            $events[] = $payload;
-                        }
+                    if (!\is_array($point)) {
+                        continue;
+                    }
+                    $payload = $this->mapDataPoint($point, $name, $resourceAttrs);
+                    if (null !== $payload) {
+                        $events[] = $payload;
                     }
                 }
-            }
-        }
+
+                return \count($events) < self::MAX_DATA_POINTS;
+            },
+        );
 
         return $events;
     }

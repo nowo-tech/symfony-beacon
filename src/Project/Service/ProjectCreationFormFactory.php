@@ -19,6 +19,9 @@ final readonly class ProjectCreationFormFactory
     }
 
     /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $options
+     *
      * @return FormInterface<mixed>
      */
     public function create(array $data = [], array $options = []): FormInterface

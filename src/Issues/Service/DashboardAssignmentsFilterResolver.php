@@ -12,8 +12,8 @@ use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Project\Service\AccessibleProjectsProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,14 +22,14 @@ use Symfony\Component\HttpFoundation\Request;
 final readonly class DashboardAssignmentsFilterResolver
 {
     public function __construct(
-        private ProjectRepository $projectRepository,
+        private AccessibleProjectsProvider $accessibleProjects,
         private ProjectMembershipRepository $membershipRepository,
     ) {
     }
 
     public function resolve(User $user, Request $request): DashboardAssignmentsFilters
     {
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
+        $accessible = $this->accessibleProjects->forUser($user);
         $scope = AssignmentScope::tryFromQuery($request->query->getString('scope') ?: null);
         $project = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = $project instanceof Project ? [$project] : $accessible;

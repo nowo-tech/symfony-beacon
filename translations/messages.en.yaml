@@ -358,8 +358,6 @@ flash:
 project:
   label: Project
   no_description: No description
-  nav:
-    label: Project sections
   settings:
     title: Settings
     nav: Settings
@@ -377,12 +375,10 @@ project:
     month_utc_hint: Month boundary is UTC
     save: Save governance
     quota_usage: 'Events today: %count% / %quota%'
-    ingest_disabled_banner: Envelope ingest is suspended for this project. Existing
-      data remains readable.
+    ingest_disabled_banner: Envelope ingest is suspended for this project. Existing data remains readable.
   health:
     title: Health
-    intro: Instance Messenger queue depth and recent notification delivery status
-      for this project’s destinations.
+    intro: Instance Messenger queue depth and recent notification delivery status for this project’s destinations.
     messenger_pending: Messenger async pending
     messenger_unavailable: Queue depth unavailable
     instance_wide: instance-wide
@@ -401,27 +397,20 @@ project:
     title: New project
     submit: Create project
   name:
-    label: Name
-    placeholder: e.g. Billing API
-    help: Shown in the dashboard and used to derive the project slug.
     required: Project name is required.
-  description:
-    label: Description
-    placeholder: Optional short summary
-    help: Helps your team recognize this project.
   api_keys:
     title: API keys / DSN
-    help: Use a DSN in BEACON_DSN so your app can send errors to this project.
     inactive: inactive
     inactive_dsn_hidden: Revoked keys cannot authenticate ingest. DSN and secret are not shown.
     public: 'public:'
     secret_hidden: Full DSN and secret are shown only once after create or rotate (not to viewers).
-    secret_once_hint: Create or rotate this key to reveal the DSN once. The secret is not shown again on this page.
-    secret_once_banner: New DSN ready — copy it into your client now. It will not stay listed after you leave this page.
+    secret_once_hint: Create or rotate this key to reveal the DSN once. The secret is not shown again
+      on this page.
+    secret_once_banner: New DSN ready — copy it into your client now. It will not stay listed after you
+      leave this page.
     dsn_help: Copy this DSN for clients (path is the project UUID). Rotate to mint a new secret.
     copy_dsn: Copy DSN
     dsn_copied: Copied
-    label_placeholder: e.g. calm-otter
     generate: Suggest name
     generate_hint: Fill the label with a human-friendly adjective-noun name
     add: Add key
@@ -430,20 +419,19 @@ project:
     rotate: Rotate
   config:
     title: Export / import project
-    help: 'Portable JSON for this project (code: %code%). Includes memberships by email; never includes API secrets.'
     tabs_label: Export or import
     tab_export: Export
     tab_import: Import
     export_help: Download a JSON bundle for this project. API secrets are never included.
-    import_help: Choose a beacon-project-bundle JSON file. Only this project is updated when the code matches.
+    import_help: Choose a beacon-project-bundle JSON file. Only this project is updated when the code
+      matches.
     export: Export JSON
     import: Import JSON
     file: JSON file
-    panel_note: Import updates this project only when the bundle code matches. Unknown emails are skipped (users are not created here).
+    panel_note: Import updates this project only when the bundle code matches. Unknown emails are skipped
+      (users are not created here).
   members:
     title: Members
-    help: Direct members of this project. Owners and admins manage membership. Access
-      can also come from linked groups below.
     your_role: 'Your role:'
     inactive: inactive
     activate: Enable access
@@ -470,8 +458,6 @@ project:
       viewer: Viewer
   groups:
     title: Groups
-    help: Link a group so every group member gets the chosen role on this project.
-      Owner and full roles must be assigned to individual users.
     empty: No groups linked yet.
     select: Select a group…
     add: Link group
@@ -481,8 +467,7 @@ project:
     edit_role: Edit group role
     edit_role_title: Change group role
     edit_role_body: Choose a new role for the group “%name%”.
-    none_available: All groups are already linked, or create groups under Administration
-      → Groups.
+    none_available: All groups are already linked, or create groups under Administration → Groups.
     member_count: '%count% users in group'
   danger:
     title: Danger zone
@@ -490,19 +475,19 @@ project:
     cancel: Cancel
     clear_open: Clear history…
     clear_title: Clear project history?
-    clear_body: This permanently deletes issues, events, performance data, and analytics
-      for this project. API keys and members are kept.
+    clear_body: This permanently deletes issues, events, performance data, and analytics for this project.
+      API keys and members are kept.
     clear_confirm: Yes, clear history
     delete_open: Delete project…
     delete_title: Delete this project permanently?
-    delete_body: This permanently deletes “%name%” and all of its data (issues, events,
-      performance, analytics, keys, and members). This cannot be undone.
+    delete_body: This permanently deletes “%name%” and all of its data (issues, events, performance, analytics,
+      keys, and members). This cannot be undone.
     delete_type_label: 'Type %name% to confirm:'
     delete_confirm: Delete project
     transfer_open: Transfer ownership…
     transfer_title: Transfer project ownership?
-    transfer_body: The selected member becomes the owner. You become an admin and
-      lose the ability to delete the project.
+    transfer_body: The selected member becomes the owner. You become an admin and lose the ability to
+      delete the project.
     transfer_member_label: New owner
     transfer_member_placeholder: Select a member…
     transfer_type_label: 'Type %name% to confirm:'
@@ -517,12 +502,11 @@ projects:
   errors_last_7_days: '%count% errors in last 7 days'
   share:
     title: Share links
-    help: Create a time-limited link that grants read-only viewer access to this project
-      (or one issue). Recipients must sign in. New links default to one use.
+    help: Create a time-limited link that grants read-only viewer access to this project (or one issue).
+      Recipients must sign in. New links default to one use.
     days: Lifetime (days)
     max_uses: Max uses
-    max_uses_help: Leave Max uses empty for unlimited opens until expiry. Default
-      is 1 (single use).
+    max_uses_help: Leave Max uses empty for unlimited opens until expiry. Default is 1 (single use).
     max_uses_unlimited: Unlimited
     max_uses_invalid: Max uses must be a positive integer (or empty for unlimited).
     uses: Uses %used% / %max%
@@ -542,11 +526,9 @@ projects:
     expires_too_far: Share links cannot last more than 30 days.
     issue_wrong_project: That issue does not belong to this project.
   read_token:
+    help: 'Create Bearer tokens (prefix brt_) for automation. Tokens are hashed at rest and distinct from
+      ingest keys. Use Authorization: Bearer on /api/projects/{uuid}/issues.'
     title: Read API tokens
-    help: 'Create Bearer tokens (prefix brt_) for automation. Tokens are hashed at
-      rest and distinct from ingest keys. Use Authorization: Bearer on /api/projects/{uuid}/issues.'
-    label: Label
-    label_placeholder: CI bot, export script…
     create: Create token
     revoke: Revoke
     empty: No read API tokens yet.
@@ -805,11 +787,10 @@ analytics:
     nplus1_groups: N+1 groups
 releases:
   title: Release health
-  intro: Pick a release to see how many issues were first seen there, compare two
-    releases, or jump into the existing issue-list compare.
+  intro: Pick a release to see how many issues were first seen there, compare two releases, or jump into
+    the existing issue-list compare.
   empty: No release data is available for this project yet.
   focus:
-    label: Release
     submit: Update release health
   new_in_release:
     title: New in %release%
@@ -817,9 +798,7 @@ releases:
     open_issue_list: Open filtered issue list
     empty: No issues were first seen in this release.
   compare:
-    label: Compare with release
-    help: Optionally compare the selected release with another release using the current
-      issue set.
+    help: Optionally compare the selected release with another release using the current issue set.
     summary_title: Compare %a% vs %b%
     only_a: Only in %release%
     only_b: Only in %release%
@@ -832,8 +811,8 @@ releases:
     environment_a: Environment A
     environment_b: Environment B
     open_issue_list: Open compare on issue list
-    help: This reuses the existing `014` issue-list compare. When a release is selected,
-      the link keeps that release filter.
+    help: This reuses the existing `014` issue-list compare. When a release is selected, the link keeps
+      that release filter.
 appearance:
   title: Appearance
   intro: Customize brand name, accents, status colors, and page surfaces for this
@@ -921,91 +900,30 @@ mailer_settings:
       '
 ops_defaults:
   title: Ops defaults
-  intro: Configure instance-wide defaults for ingest, metrics, inbound email, hooks,
-    project governance, and notification delivery.
+  intro: Configure instance-wide defaults for ingest, metrics, inbound email, hooks, project governance,
+    and notification delivery.
   tabs_label: Ops defaults sections
   section:
     governance: Project governance
-    governance_help: Projects inherit these retention, ingest rate, and quota values
-      unless they define an override.
+    governance_help: Projects inherit these retention, ingest rate, and quota values unless they define
+      an override.
     ingest: Ingest & auth
-    ingest_help: Envelope/OTLP body size limits. Query-string ingest auth is removed — use X-Beacon-Auth or envelope DSN.
+    ingest_help: Envelope/OTLP body size limits. Query-string ingest auth is removed — use X-Beacon-Auth
+      or envelope DSN.
     metrics: Prometheus metrics
-    metrics_help: Scrape token for GET /metrics (Authorization Bearer only). Leave
-      the token blank when saving to keep the current secret.
+    metrics_help: Scrape token for GET /metrics (Authorization Bearer only). Leave the token blank when
+      saving to keep the current secret.
     inbound: Inbound email
-    inbound_help: Reply-To tokens and provider webhooks for issue comments. Leave
-      the webhook secret blank when saving to keep the current value.
+    inbound_help: Reply-To tokens and provider webhooks for issue comments. Leave the webhook secret blank
+      when saving to keep the current value.
     notifications: Notification delivery
-    notifications_help: SSRF policy, interactive Resolve policy, delivery history,
-      and circuit breaking across the instance.
-  retention_days:
-    label: Retention days
-    help: Delete telemetry older than this many days. Use 0 to disable age-based retention.
-  retention_max_events:
-    label: Maximum stored events per project
-    help: Keep at most this many events per project. Use 0 for no event-count cap.
-  ingest_rate_limit:
-    label: Ingest rate limit per minute
-    help: Maximum Envelope requests per project each minute. Use 0 for unlimited.
-  event_quota_daily:
-    label: Daily event quota
-    help: Maximum accepted events per project each day. Use 0 for unlimited.
-  event_quota_monthly:
-    label: Monthly event quota
-    help: Maximum accepted events per project per UTC calendar month. Use 0 for unlimited.
-  envelope_max_bytes:
-    label: Max Envelope / OTLP body size (bytes)
-    help: HTTP 413 when a raw ingest body exceeds this size. Default 2097152 (2 MiB).
-  metrics_require_token:
-    label: Require metrics scrape token
-    help: When enabled, /metrics returns 503 until a metrics token is stored. Recommended
-      in production.
+    notifications_help: SSRF policy, interactive Resolve policy, delivery history, and circuit breaking
+      across the instance.
   metrics_token:
-    label: Metrics scrape token
-    help: Bearer token for scrapers. Blank on save keeps the current token.
     configured: A metrics scrape token is currently stored.
-  clear_metrics_token:
-    label: Clear metrics scrape token
-    help: Remove the stored scrape token.
-  inbound_email_enabled:
-    label: Enable inbound email comments
-    help: When enabled, mention/assign mail can include Reply-To tokens and POST /hooks/email/inbound
-      accepts provider webhooks.
-  inbound_mail_domain:
-    label: Inbound mail domain
-    help: Domain used in Reply-To addresses (reply+{token}@domain).
   inbound_webhook_secret:
-    label: Inbound webhook secret
-    help: Shared secret for X-Beacon-Inbound-Secret and Reply-To HMAC signing. Blank
-      on save keeps the current secret.
     configured: An inbound webhook secret is currently stored.
-  clear_inbound_webhook_secret:
-    label: Clear inbound webhook secret
-    help: Remove the stored inbound webhook secret.
-  allow_private_urls:
-    label: Allow private notification URLs
-    help: When enabled, outbound webhooks may target private/link-local hosts. Keep
-      disabled in production.
-  allow_anonymous_resolve:
-    label: Allow anonymous Slack/Teams Resolve
-    help: Legacy. When enabled, Resolve may mutate issues without a mapped Beacon
-      actor. Prefer mapped users + triage.
-  delivery_history_limit:
-    label: Delivery history limit
-    help: Number of recent delivery attempts retained for each notification destination.
-  circuit_breaker_threshold:
-    label: Circuit breaker failure threshold
-    help: Consecutive delivery failures before a notification destination is automatically
-      paused.
-  circuit_breaker_cooldown:
-    label: Circuit breaker cooldown in minutes
-    help: Minutes before an automatically paused destination may retry. Use 0 to require
-      manual resume.
   submit: Save ops defaults
-  ingest_reject_query_auth:
-    label: Reject query-string ingest auth (deprecated)
-    help: 'When enabled, beacon_key/beacon_secret query parameters are rejected (401). Disable only while migrating clients to X-Beacon-Auth or Envelope DSN.'
 settings:
   instance_config:
     title: Instance config
@@ -1063,37 +981,7 @@ social_login_settings:
     actions: Actions
 social_login_credential:
   provider:
-    label: Provider key
-    help: Lowercase slug (google, github, microsoft, or custom).
     invalid: Use a lowercase slug starting with a letter (a-z, digits, _ or -).
-  label:
-    label: Button label
-    help: Shown on the login page Continue-with button.
-  client_id:
-    label: Client ID
-  client_secret:
-    label: Client secret
-    help_new: OAuth client secret from the IdP app registration.
-    help_edit: Leave blank to keep the current secret.
-  enabled:
-    label: Enabled
-    help: Disabled providers stay in the database but do not show on login.
-  enterprise_sso:
-    label: Enterprise SSO
-    help: Show under “Sign in with your organization” instead of consumer social buttons
-      (OIDC IdPs).
-  authorize_url:
-    label: Authorize URL
-    help: Optional for built-in providers; required for custom IdPs.
-  token_url:
-    label: Token URL
-    help: Optional for built-in providers; required for custom IdPs.
-  userinfo_url:
-    label: Userinfo URL
-    help: Optional for built-in providers; required for custom IdPs.
-  scopes:
-    label: Scopes
-    help: Optional space- or comma-separated OAuth scopes.
 mercure_settings:
   title: Mercure
   intro: Optional live alerts for signed-in members when a new issue is created. Disabled
@@ -1205,139 +1093,6 @@ mercure_settings:
         # After changing hub env vars
         docker compose up -d --force-recreate mercure
     docs_hint: Full reference with topics, privacy, and production notes — docs/ops/MERCURE.md.
-instance_mercure:
-  enabled:
-    label: Enable Mercure live alerts
-    help: When on, signed-in members subscribe to private project topics for new-issue
-      toasts while the app is open.
-  url:
-    label: Publish URL (server)
-    help: Leave blank to use MERCURE_URL (e.g. http://mercure/.well-known/mercure
-      inside Compose).
-    placeholder: http://mercure/.well-known/mercure
-  public_url:
-    label: Public URL (browser)
-    help: Leave blank to use MERCURE_PUBLIC_URL (usually same-origin /.well-known/mercure
-      via Caddy).
-    placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
-    label: JWT secret
-    help: Leave blank to keep the current encrypted value or fall back to MERCURE_JWT_SECRET.
-      Minimum 32 characters when set.
-    placeholder: ••••••••••••••••••••••••••••••••
-    too_short: JWT secret must be at least 32 characters.
-    invalid: Enter a valid JWT secret string.
-  clear_secret:
-    label: Clear stored JWT secret
-    help: Removes the database secret and falls back to MERCURE_JWT_SECRET until you
-      save a new one.
-instance_mailer:
-  mailer_dsn:
-    label: Mailer DSN
-    help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587
-      — null:// is rejected (use Clear stored DSN instead).
-    placeholder: smtp://user:pass@mail.example:587
-    invalid: Enter a valid Symfony Mailer DSN (for example smtp://user:pass@host:587).
-    null_transport: null:// cannot deliver mail. Paste a real SMTP (or other) DSN,
-      or use Clear stored DSN to fall back to the environment.
-    scheme_not_allowed: That Mailer DSN scheme is not allowed. Use smtp, smtps, or
-      a supported provider scheme (Mailgun, Postmark, SES, …). Sendmail/native DSNs
-      are blocked because they can execute host commands.
-  clear_dsn:
-    label: Clear stored DSN
-    help: Removes the database DSN and falls back to MAILER_DSN from the environment
-      until you save a new one.
-  mailer_from:
-    label: From address
-    help: Envelope From for magic-login and notification emails. Defaults to beacon@localhost
-      when empty.
-    placeholder: beacon@example.com
-site_appearance:
-  brand_name:
-    label: Brand name
-    placeholder: symfony-beacon
-    help: Shown in the header and on the login page.
-  brand_eyebrow:
-    label: Brand eyebrow
-    placeholder: Error tracking
-    help: Short label above the brand on the login screen.
-  accent_color:
-    label: Accent
-    placeholder: '#1f6f54'
-    help: Primary accent (buttons, links) in light mode.
-  accent_deep_color:
-    label: Accent (hover)
-    placeholder: '#134736'
-    help: Darker accent for hover states in light mode.
-  accent_color_dark:
-    label: Accent (dark)
-    placeholder: '#4aad7f'
-    help: Primary accent in dark mode.
-  accent_deep_color_dark:
-    label: Accent hover (dark)
-    placeholder: '#6bc49a'
-    help: Lighter accent for hover states in dark mode.
-  danger_color:
-    label: Danger
-    placeholder: '#b42318'
-    help: Error / destructive accent in light mode.
-  danger_color_dark:
-    label: Danger (dark)
-    placeholder: '#f97066'
-    help: Error / destructive accent in dark mode.
-  warn_color:
-    label: Warning
-    placeholder: '#b54708'
-    help: Warning / caution accent in light mode.
-  warn_color_dark:
-    label: Warning (dark)
-    placeholder: '#fdb022'
-    help: Warning / caution accent in dark mode.
-  paper_color:
-    label: Paper
-    placeholder: '#f3f6f4'
-    help: Page background in light mode.
-  paper_color_dark:
-    label: Paper (dark)
-    placeholder: '#0c1210'
-    help: Page background in dark mode.
-  ink_color:
-    label: Ink
-    placeholder: '#0f1c18'
-    help: Primary text color in light mode.
-  ink_color_dark:
-    label: Ink (dark)
-    placeholder: '#e6eee9'
-    help: Primary text color in dark mode.
-  surface_color:
-    label: Surface
-    placeholder: '#ffffff'
-    help: Panels and cards in light mode.
-  surface_color_dark:
-    label: Surface (dark)
-    placeholder: '#151c19'
-    help: Panels and cards in dark mode.
-  footer_fixed:
-    label: Fixed footer
-    help: Keep the legal footer pinned to the bottom of the viewport while page content
-      scrolls.
-  corner_style:
-    label: Corner style
-    help: Cards use a larger radius; inputs and buttons stay subtler.
-    choice:
-      sharp: Sharp
-      soft: Soft (default)
-      rounded: Rounded
-  border_strength:
-    label: Border strength
-    help: How defined element borders look in light and dark mode (panels, inputs,
-      chrome).
-    choice:
-      subtle: Subtle
-      medium: Medium (default)
-      strong: Strong
-  color:
-    invalid: 'Use a hex color like #1f6f54.'
 users:
   title: Users
   intro: Create accounts, assign instance roles, and enable or disable login (UserKit).
@@ -1758,62 +1513,7 @@ preferences:
     email_in_use: This email is already in use.
     password_required: Enter a new password.
 user_preferences:
-  display_name:
-    label: Display name
-    placeholder: Your name
-    help: Shown in the avatar menu and member lists.
-  email:
-    label: Email
-    placeholder: you@example.com
-    help: Used to sign in.
-  slack_user_id:
-    placeholder: U012ABCDEF
-  phone:
-    placeholder: '+34600111222'
-  preferred_locale:
-    label: Language
-    placeholder: Auto
-    help: Preferred UI language for this account.
-  preferred_theme:
-    label: Theme
-    placeholder: Auto
-    help: Preferred day or night appearance.
-  preferred_content_width:
-    label: Content width
-    placeholder: Content
-    help: Centered content column, or stretch the main area full width.
-  preferred_ui_density:
-    label: UI density
-    placeholder: Comfortable
-    help: Comfortable spacing, or a more compact operator layout.
-  preferred_font_scale:
-    label: Text size
-    placeholder: Medium
-    help: Scale the interface text smaller or larger.
-  preferred_contrast:
-    label: Contrast
-    placeholder: System
-    help: Follow the device contrast preference, or force stronger text and borders.
-  preferred_sidebar:
-    label: Sidebar
-    placeholder: Expanded
-    help: Default desktop sidebar state when this browser has no saved preference
-      yet.
-  preferred_motion:
-    label: Motion
-    placeholder: System
-    help: Follow the device preference, reduce animations, or keep full motion.
-  current_password:
-    label: Current password
-    help: Required only when setting a new password.
-    help_required: Confirm your current password to set a new one.
-    help_email_change: Required when changing your email address (login and password-reset
-      destination).
   plain_password:
-    first:
-      label: New password
-    second:
-      label: Confirm new password
     mismatch: The password fields must match.
     strength_invalid: The password does not meet the strength requirements (%missing%).
 groups:
@@ -2324,11 +2024,11 @@ legal:
       interface; operators should confirm the applicable rules in their jurisdiction.
 notifications:
   title: Notifications
-  intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP
-    endpoint when new issues, regressions, threshold spikes, or N+1 groups appear.
-  project_layer_help: These destinations belong to the project (team channels), independent
-    of each member’s personal alert prefs above. Outbound delivery uses destination
-    categories; member toasts/push use the member preference matrix.
+  intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP endpoint when new issues,
+    regressions, threshold spikes, or N+1 groups appear.
+  project_layer_help: These destinations belong to the project (team channels), independent of each member’s
+    personal alert prefs above. Outbound delivery uses destination categories; member toasts/push use
+    the member preference matrix.
   empty: No destinations yet. Add a channel to notify your team.
   add: Add destination
   edit: Edit
@@ -2337,54 +2037,25 @@ notifications:
   disabled: Disabled
   resume: Resume
   circuit_paused: Auto-paused
-  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound
-    alerts are skipped until you resume (Send test still works).
+  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound alerts are skipped
+    until you resume (Send test still works).
   test: Send test
-  test_hint: Send a %type%-formatted sample notification (works even if the destination
-    is disabled)
+  test_hint: Send a %type%-formatted sample notification (works even if the destination is disabled)
   delete: Delete
   delete_confirm: Delete this notification destination?
   save: Save destination
   cancel: Cancel
   new_title: New notification destination
   edit_title: Edit notification destination
-  form_help: Choose a channel type and paste the matching endpoint. Secrets are masked
-    in the settings list.
+  form_help: Choose a channel type and paste the matching endpoint. Secrets are masked in the settings
+    list.
   teams:
-    token_used: That Teams action link was already used. Open the issue in Beacon
-      if you still need to change it.
+    token_used: That Teams action link was already used. Open the issue in Beacon if you still need to
+      change it.
   form:
-    label: Label
-    type: Type
-    endpoint: Endpoint
-    endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS webhook URL. Email: recipient
-      address. Telegram: bot_token@chat_id'
-    endpoint_invalid: Endpoint does not match the selected type.
-    endpoint_ssrf: Endpoint must not target private, link-local, or cloud metadata
-      addresses.
-    signing_secret: Interaction signing secret
-    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing
-      Secret, or a shared secret for Teams HttpPOST). Leave blank to keep the current
-      value.
-    clear_signing_secret: Clear interaction signing secret
-    enabled: Enabled
-    categories: Alert categories
+    pagerduty_note: Native PagerDuty is not supported; use a generic HTTP webhook if you need an incident
+      bridge.
     quiet_hours_legend: Quiet hours & digest
-    quiet_hours_enabled: Enable quiet hours
-    quiet_hours_help: During the window, alerts are buffered instead of sent immediately.
-      Run app:notifications:flush-digests on a schedule (or after the window).
-    quiet_hours_timezone: Timezone
-    quiet_hours_start: Quiet hours start (HH:MM)
-    quiet_hours_end: Quiet hours end (HH:MM)
-    quiet_hours_timezone_invalid: Invalid timezone identifier.
-    quiet_hours_time_invalid: Use 24-hour HH:MM format (e.g. 22:00).
-    quiet_hours_required: Start and end times are required when quiet hours are enabled.
-    quiet_hours_range_invalid: Start and end times must differ.
-    digest_enabled: Send digest summary on flush
-    digest_help: When enabled, flush sends one summary per destination. When disabled,
-      each held alert is sent individually after quiet hours.
-    pagerduty_note: Native PagerDuty is not supported; use a generic HTTP webhook
-      if you need an incident bridge.
   type:
     slack: Slack Incoming Webhook
     discord: Discord webhook
@@ -2418,95 +2089,81 @@ notifications:
     link: Setup guides
     back: Back to settings
     toc: Jump to channel
-    intro: Step-by-step instructions to connect Slack, Discord, Microsoft Teams, Telegram,
-      email, or a generic HTTP webhook to this project.
+    intro: Step-by-step instructions to connect Slack, Discord, Microsoft Teams, Telegram, email, or a
+      generic HTTP webhook to this project.
     payload_label: 'Beacon sends:'
-    docs_hint: 'Full reference (payloads, delivery, permissions): docs/product/NOTIFICATIONS.md
-      in the repository.'
+    docs_hint: 'Full reference (payloads, delivery, permissions): docs/product/NOTIFICATIONS.md in the
+      repository.'
     slack:
       title: Slack (Incoming Webhook)
       lead: Create a Slack app Incoming Webhook and paste the HTTPS URL into Beacon.
       step1: Open api.slack.com/apps and create an app From scratch for your workspace.
-      step2: Enable Incoming Webhooks, then Add New Webhook to Workspace and pick
-        a channel.
+      step2: Enable Incoming Webhooks, then Add New Webhook to Workspace and pick a channel.
       step3: Copy the webhook URL (https://hooks.slack.com/services/…).
-      step4: In Beacon choose Slack Incoming Webhook, paste the URL as the endpoint,
-        select categories, and save.
+      step4: In Beacon choose Slack Incoming Webhook, paste the URL as the endpoint, select categories,
+        and save.
       step5: Click Send test and confirm the message appears in Slack.
-      payload: JSON with text (summary) and a beacon object containing the full event
-        payload.
-      tip: Prefer a dedicated ops channel. Rotate the webhook in Slack if it ever
-        leaks; update the destination in Beacon.
+      payload: JSON with text (summary) and a beacon object containing the full event payload.
+      tip: Prefer a dedicated ops channel. Rotate the webhook in Slack if it ever leaks; update the destination
+        in Beacon.
     discord:
       title: Discord (webhook)
       lead: Create a channel webhook in Discord and paste its URL into Beacon.
-      step1: Open Server settings → Integrations → Webhooks (or the channel Integrations
-        tab).
-      step2: Create a New Webhook, name it (for example Beacon), and choose the target
-        channel.
+      step1: Open Server settings → Integrations → Webhooks (or the channel Integrations tab).
+      step2: Create a New Webhook, name it (for example Beacon), and choose the target channel.
       step3: Copy Webhook URL (https://discord.com/api/webhooks/…).
-      step4: In Beacon choose Discord webhook, paste the URL, select categories, save,
-        then Send test.
-      payload: JSON with content (summary) and an embeds array (title, description,
-        optional issue URL).
+      step4: In Beacon choose Discord webhook, paste the URL, select categories, save, then Send test.
+      payload: JSON with content (summary) and an embeds array (title, description, optional issue URL).
       tip: Discord rate-limits webhooks; Beacon delivers asynchronously via Messenger.
     teams:
       title: Microsoft Teams (Incoming Webhook)
-      lead: Add an Incoming Webhook connector to a Teams channel and paste the URL
-        into Beacon.
+      lead: Add an Incoming Webhook connector to a Teams channel and paste the URL into Beacon.
       step1: In the Teams channel menu open Connectors (or Manage channel → Connectors).
       step2: Configure Incoming Webhook, give it a name, and create it.
       step3: Copy the webhook URL Teams provides.
-      step4: In Beacon choose Microsoft Teams webhook, paste the URL, select categories,
-        save, then Send test.
-      payload: Office 365 MessageCard JSON with summary, title, text, and an Open
-        in Beacon action when a URL exists.
-      tip: If your tenant only allows Workflows instead of classic Incoming Webhooks,
-        point a Generic HTTP destination at a workflow that accepts POST JSON.
+      step4: In Beacon choose Microsoft Teams webhook, paste the URL, select categories, save, then Send
+        test.
+      payload: Office 365 MessageCard JSON with summary, title, text, and an Open in Beacon action when
+        a URL exists.
+      tip: If your tenant only allows Workflows instead of classic Incoming Webhooks, point a Generic
+        HTTP destination at a workflow that accepts POST JSON.
     telegram:
       title: Telegram (bot)
-      lead: Create a bot with BotFather and store bot_token@chat_id as the Beacon
-        endpoint.
+      lead: Create a bot with BotFather and store bot_token@chat_id as the Beacon endpoint.
       step1: Open @BotFather in Telegram, run /newbot, and copy the bot token.
       step2: Start a private chat with the bot, or add it to a group and send a message.
-      step3: Call getUpdates on the Bot API and read message.chat.id (group ids are
-        often negative).
-      step4: In Beacon choose Telegram bot and set the endpoint to bot_token@chat_id
-        (example — 123:AA…@-1001234567890).
+      step3: Call getUpdates on the Bot API and read message.chat.id (group ids are often negative).
+      step4: In Beacon choose Telegram bot and set the endpoint to bot_token@chat_id (example — 123:AA…@-1001234567890).
       step5: Save and Send test.
-      payload: Bot API sendMessage with chat_id and text (summary only; not the full
-        JSON payload).
-      tip: The last @ in the endpoint splits token and chat id. Tokens are encrypted
-        at rest like other endpoints.
+      payload: Bot API sendMessage with chat_id and text (summary only; not the full JSON payload).
+      tip: The last @ in the endpoint splits token and chat id. Tokens are encrypted at rest like other
+        endpoints.
     email:
       title: Email
-      lead: Deliver alerts to a mailbox via Symfony Mailer. Configure the Mailer DSN
-        under Administration → Mailer first.
-      step1: Open Administration → Mailer and save an encrypted DSN (smtp://…). Environment
-        MAILER_DSN is only a bootstrap fallback; null://null does not deliver.
+      lead: Deliver alerts to a mailbox via Symfony Mailer. Configure the Mailer DSN under Administration
+        → Mailer first.
+      step1: Open Administration → Mailer and save an encrypted DSN (smtp://…). Environment MAILER_DSN
+        is only a bootstrap fallback; null://null does not deliver.
       step2: In Beacon choose Email and set the endpoint to the recipient address.
       step3: Select categories, save, Send test, and check inbox/spam.
-      payload: Email subject equals the summary; body is the summary plus the issue
-        or performance URL when present.
-      tip: Use a shared ops alias. For richer digests, prefer Slack/Discord/Teams
-        or an HTTP bridge.
+      payload: Email subject equals the summary; body is the summary plus the issue or performance URL
+        when present.
+      tip: Use a shared ops alias. For richer digests, prefer Slack/Discord/Teams or an HTTP bridge.
     http:
       title: Generic HTTP webhook
       lead: POST the canonical Beacon JSON payload to any HTTPS automation endpoint.
       step1: Expose an HTTPS URL that accepts POST with Content-Type application/json.
-      step2: In Beacon choose Generic HTTP webhook, paste the URL, select categories,
-        save, then Send test.
-      step3: Confirm your service receives the canonical JSON body (event, summary,
-        project, issue, url, category).
+      step2: In Beacon choose Generic HTTP webhook, paste the URL, select categories, save, then Send
+        test.
+      step3: Confirm your service receives the canonical JSON body (event, summary, project, issue, url,
+        category).
       payload: Canonical JSON payload as the request body (User-Agent symfony-beacon-notifications/1.0).
-      tip: Prefer HTTPS and authenticate your receiver. Avoid pointing at internal
-        or cloud metadata addresses.
+      tip: Prefer HTTPS and authenticate your receiver. Avoid pointing at internal or cloud metadata addresses.
 thresholds:
   title: Threshold alerts
-  intro: Create rolling volume alerts when error or fatal events exceed a configured
-    count inside a time window.
-  ingest_disabled: Ingest is suspended for this project, so threshold rules are not
-    evaluated.
+  intro: Create rolling volume alerts when error or fatal events exceed a configured count inside a time
+    window.
+  ingest_disabled: Ingest is suspended for this project, so threshold rules are not evaluated.
   empty: No threshold rules yet. Add one to catch sudden spikes.
   add: Add rule
   edit: Edit
@@ -2519,9 +2176,8 @@ thresholds:
   cancel: Cancel
   new_title: New threshold rule
   edit_title: Edit threshold rule
-  form_help: Configure a rolling error/fatal volume alert. Optional environment and
-    release filters scope the count before notification routing, quiet hours, and
-    digests apply.
+  form_help: Configure a rolling error/fatal volume alert. Optional environment and release filters scope
+    the count before notification routing, quiet hours, and digests apply.
   unnamed: Unnamed rule
   summary: '%count% events in %window% min · %cooldown% min cooldown'
   last_fired: Last fired
@@ -2530,22 +2186,6 @@ thresholds:
     environment: 'Environment: %value%'
     release: 'Release: %value%'
     all_events: All environments and releases
-  form:
-    label: Label
-    label_help: Optional internal name shown in Settings and payloads.
-    enabled: Enabled
-    error_count: Error count
-    error_count_help: Alert when at least this many error/fatal events are received
-      in the rolling window.
-    window_minutes: Window (minutes)
-    window_minutes_help: Rolling lookback window from 1 to 1440 minutes.
-    cooldown_minutes: Cooldown (minutes)
-    cooldown_minutes_help: Suppress duplicate alerts for this rule during the cooldown
-      window.
-    environment: Environment filter
-    environment_help: Leave blank to count all environments.
-    release: Release filter
-    release_help: Leave blank to count all releases.
   flash:
     created: Threshold rule created.
     updated: Threshold rule updated.
@@ -2794,8 +2434,3 @@ permissions:
   name_locale_help: Optional for %locale%. Overrides the catalog name when set.
   description_locale_help: Optional for %locale%. Overrides the catalog description when set.
 
-admin_instance_permission:
-  key:
-    placeholder: 'e.g. project.custom.manage'
-  category:
-    placeholder: Choose a category…

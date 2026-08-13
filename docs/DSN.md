@@ -16,7 +16,7 @@ https://9cb5e28adc3ed7a40052e2a17e327220:abcdef0123456789@localhost:9447/019fea2
 
 Ingest **always requires** `beacon_secret` (or the secret segment of the DSN). Keys created by Beacon always include a secret; public-key-only auth is rejected with HTTP 403.
 
-The **public key** is an opaque credential identifier (safe to show in Settings). The **secret** appears only in the one-shot create/rotate banner (not on ordinary Settings GET). The DSN path is the project **UUID**. Legacy numeric project ids in the path are still accepted for older clients.
+The **public key** is an opaque credential identifier (safe to show in Settings). The **secret** appears only in the one-shot create/rotate banner (not on ordinary Settings GET). At rest Beacon stores a **SHA-256 hash** of the secret (`secret_hash`); legacy encrypted plaintext rows are upgraded on the next successful ingest. The DSN path is the project **UUID**. Legacy numeric project ids in the path are still accepted for older clients.
 
 Docker clients (BeaconBundle FrankenPHP demo) on the **local** stack (`compose.yaml`) may use **HTTP ingest** on port `9084` via `host.docker.internal` — the development Caddyfile serves `/api/*` on HTTP for those hosts; browsers keep using HTTPS `:9447`. **Production** (`compose.prod.yaml` / `Caddyfile.prod`) does **not** accept cleartext ingest: use an `https://…` DSN only.
 

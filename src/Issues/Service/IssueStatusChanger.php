@@ -41,6 +41,8 @@ final readonly class IssueStatusChanger
             return false;
         }
 
+        IssueStatusTransition::assertCanTransition($previous, $next);
+
         $issue->setStatus($next);
         $this->historyRecorder->recordStatusChange($issue, $previous, $next, $actor);
         $this->userActionRecorder->record(

@@ -2,7 +2,7 @@
         <div class="mb-3 flex flex-wrap items-start justify-between gap-2">
             <div>
                 <h2 class="text-lg font-semibold">{{ 'project.members.title'|trans }}</h2>
-                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'project.members.help'|trans }}</p>
+                <p class="mt-1 text-sm text-[var(--color-ink)]/60">{{ 'project.members.help'|trans({}, 'form') }}</p>
             </div>
             {% if assignableRoles is not empty %}
                 {% embed 'shared/_confirm_dialog.html.twig' with {
@@ -93,7 +93,7 @@
                                             </div>
                                             <div class="confirm-dialog__content">
                                                 {{ form_row(memberRoleForms[member.id].role, {
-                                                    label: 'project.members.role_label'|trans,
+                                                    label: 'project.members.role_label'|trans({}, 'form'),
                                                     translation_domain: false,
                                                     label_attr: {class: 'confirm-dialog__label'},
                                                     attr: {id: 'member-role-' ~ member.id, class: 'input w-full'},

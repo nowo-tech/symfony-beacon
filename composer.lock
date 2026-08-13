@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6f610af8749e2307f818875752d1f04",
+    "content-hash": "002e534b4e30a6ec0b69b5d9a3d3e75d",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2123,16 +2123,16 @@
         },
         {
             "name": "nowo-tech/beacon-bundle",
-            "version": "v1.6.11",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BeaconBundle.git",
-                "reference": "777406a55d34145443a1c3d5cca4fe26a80cadba"
+                "reference": "044f53e0e68180d73c90d7323ca92d74970a7651"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/777406a55d34145443a1c3d5cca4fe26a80cadba",
-                "reference": "777406a55d34145443a1c3d5cca4fe26a80cadba",
+                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/044f53e0e68180d73c90d7323ca92d74970a7651",
+                "reference": "044f53e0e68180d73c90d7323ca92d74970a7651",
                 "shasum": ""
             },
             "require": {
@@ -2174,7 +2174,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.6.x-dev"
+                    "dev-main": "1.7.x-dev"
                 }
             },
             "autoload": {
@@ -2215,7 +2215,7 @@
                 "issues": "https://github.com/nowo-tech/BeaconBundle/issues",
                 "source": "https://github.com/nowo-tech/BeaconBundle"
             },
-            "time": "2026-07-31T14:35:19+00:00"
+            "time": "2026-08-12T08:17:49+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",
@@ -2885,16 +2885,16 @@
         },
         {
             "name": "nowo-tech/maintenance-mode-bundle",
-            "version": "v1.5.1",
+            "version": "v1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/MaintenanceModeBundle.git",
-                "reference": "1fc6f1a737c2617da742dc593357877a060fe312"
+                "reference": "e956b33718240b4567fb75e27ae92f63bf3f5ec7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/MaintenanceModeBundle/zipball/1fc6f1a737c2617da742dc593357877a060fe312",
-                "reference": "1fc6f1a737c2617da742dc593357877a060fe312",
+                "url": "https://api.github.com/repos/nowo-tech/MaintenanceModeBundle/zipball/e956b33718240b4567fb75e27ae92f63bf3f5ec7",
+                "reference": "e956b33718240b4567fb75e27ae92f63bf3f5ec7",
                 "shasum": ""
             },
             "require": {
@@ -2972,7 +2972,7 @@
                 "issues": "https://github.com/nowo-tech/MaintenanceModeBundle/issues",
                 "source": "https://github.com/nowo-tech/MaintenanceModeBundle"
             },
-            "time": "2026-08-13T15:12:13+00:00"
+            "time": "2026-08-13T15:19:41+00:00"
         },
         {
             "name": "nowo-tech/migrations-kit-bundle",

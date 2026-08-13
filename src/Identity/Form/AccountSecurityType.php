@@ -12,7 +12,6 @@ use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -32,7 +31,6 @@ final class AccountSecurityType extends FormKitAbstractType
                 $this->mergeFieldOptions('currentPassword', 'password', [
                     'mapped' => false,
                     'required' => true,
-                    'label' => 'user_preferences.current_password.label',
                     'help' => 'user_preferences.current_password.help_required',
                     'attr' => ['autocomplete' => 'current-password'],
                     'constraints' => [
@@ -46,13 +44,10 @@ final class AccountSecurityType extends FormKitAbstractType
                 $this->mergeFieldOptions('plainPassword', 'password', [
                     'mapped' => true,
                     'required' => true,
-                    // Field meta stays on form; kit UI (requirements/generator) stays on NowoPasswordStrengthBundle.
-                    'label' => new TranslatableMessage('user_preferences.plain_password.label', [], 'form'),
-                    'help' => new TranslatableMessage('user_preferences.plain_password.help', [], 'form'),
-                    'translation_domain' => 'NowoPasswordStrengthBundle',
+                    // FormKit beacon auto chrome (form catalogue). Kit requirement/generator
+                    // copy stays on NowoPasswordStrengthBundle via form/password_strength_beacon_theme.
                     'attr' => [
                         'autocomplete' => 'new-password',
-                        'placeholder' => new TranslatableMessage('user_preferences.plain_password.placeholder', [], 'form'),
                     ],
                     'level' => 'strong',
                     'policy_mode' => 'level',
@@ -72,7 +67,6 @@ final class AccountSecurityType extends FormKitAbstractType
                 $this->mergeFieldOptions('plainPassword_confirm', 'password', [
                     'mapped' => false,
                     'required' => true,
-                    'label' => 'user_preferences.plain_password.second.label',
                     'attr' => ['autocomplete' => 'new-password'],
                     'constraints' => [
                         new NotBlank(message: 'preferences.error.password_required'),

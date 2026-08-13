@@ -42,8 +42,8 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', 'falls back to MAILER_DSN');
 
         $form = $crawler->selectButton('Save mailer settings')->form([
-            'instance_mailer_settings[plainMailerDsn]' => 'smtp://user:s3cret@mail.example:587',
-            'instance_mailer_settings[mailerFrom]' => 'alerts@example.com',
+            'instance_mailer[plainMailerDsn]' => 'smtp://user:s3cret@mail.example:587',
+            'instance_mailer[mailerFrom]' => 'alerts@example.com',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/mailer');
@@ -108,7 +108,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
-            'instance_mailer_settings[clearMailerDsn]' => '1',
+            'instance_mailer[clearMailerDsn]' => '1',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/mailer');
@@ -144,7 +144,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
-            'instance_mailer_settings[plainMailerDsn]' => 'not-a-valid-dsn',
+            'instance_mailer[plainMailerDsn]' => 'not-a-valid-dsn',
         ]);
         $client->submit($form);
         self::assertResponseStatusCodeSame(422);
@@ -152,7 +152,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
-            'instance_mailer_settings[plainMailerDsn]' => 'file:///tmp/mail.sock',
+            'instance_mailer[plainMailerDsn]' => 'file:///tmp/mail.sock',
         ]);
         $client->submit($form);
         self::assertResponseStatusCodeSame(422);
@@ -160,7 +160,7 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/mailer');
         $form = $crawler->selectButton('Save mailer settings')->form([
-            'instance_mailer_settings[plainMailerDsn]' => 'null://null',
+            'instance_mailer[plainMailerDsn]' => 'null://null',
         ]);
         $client->submit($form);
         self::assertResponseStatusCodeSame(422);

@@ -132,19 +132,25 @@ final class AccountDisplayType extends FormKitAbstractType
     {
         $panelIds = IssuePanelIds::all();
 
-        $builder->add('preferredCollapsedIssuePanels', TagType::class, [
-            'value_format' => ValueFormat::ARRAY,
-            'whitelist' => $panelIds,
-            'max_tags' => \count($panelIds),
-            'duplicates' => false,
-            'dropdown_enabled' => true,
-            'required' => false,
-            'label' => 'preferences.issue_panels_collapsed',
-            'help' => 'preferences.issue_panels_help',
-            'placeholder' => 'preferences.issue_panels_placeholder',
-            'container_class' => 'nowo-tag-input issue-panel-prefs',
-            'input_class' => 'input nowo-tag-input__field',
-        ]);
+        $this->withBuilder($builder, function () use ($panelIds): void {
+            $merged = $this->mergeFieldOptions('preferredCollapsedIssuePanels', 'text', [
+                'value_format' => ValueFormat::ARRAY,
+                'whitelist' => $panelIds,
+                'max_tags' => \count($panelIds),
+                'duplicates' => false,
+                'dropdown_enabled' => true,
+                'required' => false,
+                'container_class' => 'nowo-tag-input issue-panel-prefs',
+                'input_class' => 'input nowo-tag-input__field',
+            ]);
+            // TagType requires a root placeholder string; FormKit stores the key on attr.
+            $attrPlaceholder = $merged['attr']['placeholder'] ?? null;
+            if (\is_string($attrPlaceholder) && '' !== $attrPlaceholder) {
+                $merged['placeholder'] = $attrPlaceholder;
+            }
+
+            $this->boundBuilder()->add('preferredCollapsedIssuePanels', TagType::class, $merged);
+        });
     }
 
     /**

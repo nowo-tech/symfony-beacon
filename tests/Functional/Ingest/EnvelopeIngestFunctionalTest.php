@@ -223,7 +223,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         $client->request(
             Request::METHOD_POST,
             '/api/'.$project->getUuid().'/envelope/?beacon_key='.rawurlencode($apiKey->getPublicKey())
-                .'&beacon_secret='.rawurlencode((string) $apiKey->getSecretKey()),
+                .'&beacon_secret='.rawurlencode(self::TEST_API_SECRET),
             [],
             [],
             ['CONTENT_TYPE' => 'application/x-beacon-envelope'],
@@ -317,7 +317,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
                 'HTTP_X_BEACON_AUTH' => \sprintf(
                     'Beacon beacon_key=%s, beacon_secret=%s',
                     $apiKey->getPublicKey(),
-                    (string) $apiKey->getSecretKey(),
+                    self::TEST_API_SECRET,
                 ),
             ],
             $this->minimalEventEnvelope('uuid-path', 'UUID path ingest'),

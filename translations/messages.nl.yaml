@@ -357,8 +357,6 @@ flash:
 project:
   label: Project
   no_description: Geen beschrijving
-  nav:
-    label: Projectsecties
   settings:
     title: Instellingen
     nav: Instellingen
@@ -376,12 +374,11 @@ project:
     month_utc_hint: Maandgrens is UTC
     save: Bewaar het bestuur
     quota_usage: 'Evenementen vandaag: %count% / %quota%'
-    ingest_disabled_banner: De envelopopname is opgeschort voor dit project. Bestaande
-      gegevens blijven leesbaar.
+    ingest_disabled_banner: De envelopopname is opgeschort voor dit project. Bestaande gegevens blijven
+      leesbaar.
   health:
     title: Gezondheid
-    intro: Instance Messenger-wachtrijdiepte en laatste meldingsstatus voor de bestemmingen
-      van dit project.
+    intro: Instance Messenger-wachtrijdiepte en laatste meldingsstatus voor de bestemmingen van dit project.
     messenger_pending: Messenger-asynchronisatie in behandeling
     messenger_unavailable: Wachtrijdiepte niet beschikbaar
     instance_wide: exemplaar-breed
@@ -400,39 +397,30 @@ project:
     title: Nieuw project
     submit: Project aanmaken
   name:
-    label: Naam
-    placeholder: bijv. Facturerings-API
-    help: Wordt weergegeven in het dashboard en gebruikt om de projectslug af te leiden.
     required: Projectnaam is vereist.
-  description:
-    label: Beschrijving
-    placeholder: Optionele korte samenvatting
-    help: Helpt uw ​​team dit project te herkennen.
   api_keys:
     title: API-sleutels / DSN
-    help: Gebruik een DSN in BEACON_DSN zodat uw app fouten naar dit project kan verzenden.
     inactive: inactief
     public: 'publiek:'
-    label_placeholder: bijv. kalme otter
     generate: Naam voorstellen
-    generate_hint: Vul het etiket met een mensvriendelijke naam voor het bijvoeglijk
-      naamwoord
+    generate_hint: Vul het etiket met een mensvriendelijke naam voor het bijvoeglijk naamwoord
     add: Sleutel toevoegen
     revoke: Herroepen
-    revoke_confirm: Deze API-sleutel intrekken? Inslikken met dit geheim zal onmiddellijk
-      mislukken.
+    revoke_confirm: Deze API-sleutel intrekken? Inslikken met dit geheim zal onmiddellijk mislukken.
     rotate: Draaien
     copy_dsn: DSN kopiëren
     dsn_copied: Gekopieerd
     dsn_help: Kopieer deze DSN voor clients (pad is de project-UUID). Roteren maakt een nieuw geheim.
-    inactive_dsn_hidden: Ingetrokken sleutels kunnen ingest niet authenticeren. DSN en geheim worden niet getoond.
-    secret_hidden: Volledige DSN en geheim worden slechts één keer getoond na aanmaken of rotatie (niet voor viewers).
-    secret_once_banner: Nieuwe DSN klaar — kopieer hem nu naar je client. Hij blijft niet in de lijst nadat je deze pagina verlaat.
-    secret_once_hint: Maak of roteer deze sleutel om de DSN één keer te tonen. Het geheim wordt op deze pagina niet opnieuw getoond.
+    inactive_dsn_hidden: Ingetrokken sleutels kunnen ingest niet authenticeren. DSN en geheim worden niet
+      getoond.
+    secret_hidden: Volledige DSN en geheim worden slechts één keer getoond na aanmaken of rotatie (niet
+      voor viewers).
+    secret_once_banner: Nieuwe DSN klaar — kopieer hem nu naar je client. Hij blijft niet in de lijst
+      nadat je deze pagina verlaat.
+    secret_once_hint: Maak of roteer deze sleutel om de DSN één keer te tonen. Het geheim wordt op deze
+      pagina niet opnieuw getoond.
   members:
     title: Leden
-    help: Directe leden van dit project. Eigenaren en beheerders beheren het lidmaatschap.
-      Toegang kan ook afkomstig zijn van gekoppelde groepen hieronder.
     your_role: 'Jouw rol:'
     email_label: E-mailadres van lid
     email_placeholder: gebruiker@voorbeeld.com
@@ -459,8 +447,6 @@ project:
     inactive: inactief
   groups:
     title: Groepen
-    help: Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt.
-      Eigenaren moeten worden toegevoegd als individuele gebruikers.
     empty: Er zijn nog geen groepen gekoppeld.
     select: Selecteer een groep…
     add: Link groep
@@ -470,8 +456,7 @@ project:
     edit_role: Groepsrol bewerken
     edit_role_title: Groepsrol wijzigen
     edit_role_body: Kies een nieuwe rol voor de groep “%name%”.
-    none_available: Alle groepen zijn al gekoppeld, of maak groepen aan onder Beheer
-      → Groepen.
+    none_available: Alle groepen zijn al gekoppeld, of maak groepen aan onder Beheer → Groepen.
     member_count: '%count% gebruikers in groep'
   danger:
     title: Gevarenzone
@@ -479,20 +464,19 @@ project:
     cancel: Annuleren
     clear_open: Geschiedenis wissen…
     clear_title: Projectgeschiedenis wissen?
-    clear_body: Hiermee worden problemen, gebeurtenissen, prestatiegegevens en analyses
-      voor dit project permanent verwijderd. API-sleutels en leden worden bewaard.
+    clear_body: Hiermee worden problemen, gebeurtenissen, prestatiegegevens en analyses voor dit project
+      permanent verwijderd. API-sleutels en leden worden bewaard.
     clear_confirm: Ja, duidelijke geschiedenis
     delete_open: Project verwijderen…
     delete_title: Dit project definitief verwijderen?
-    delete_body: Hierdoor worden “%name%” en alle bijbehorende gegevens (problemen,
-      gebeurtenissen, prestaties, analyses, sleutels en leden) permanent verwijderd.
-      Dit kan niet ongedaan worden gemaakt.
+    delete_body: Hierdoor worden “%name%” en alle bijbehorende gegevens (problemen, gebeurtenissen, prestaties,
+      analyses, sleutels en leden) permanent verwijderd. Dit kan niet ongedaan worden gemaakt.
     delete_type_label: 'Typ %name% om te bevestigen:'
     delete_confirm: Project verwijderen
     transfer_open: Eigendom overdragen…
     transfer_title: Projecteigendom overdragen?
-    transfer_body: Het geselecteerde lid wordt de eigenaar. U wordt beheerder en verliest
-      de mogelijkheid om het project te verwijderen.
+    transfer_body: Het geselecteerde lid wordt de eigenaar. U wordt beheerder en verliest de mogelijkheid
+      om het project te verwijderen.
     transfer_member_label: Nieuwe eigenaar
     transfer_member_placeholder: Selecteer een lid…
     transfer_type_label: 'Typ %name% om te bevestigen:'
@@ -500,16 +484,17 @@ project:
     transfer_no_candidates: Voeg nog een direct lid toe voordat u het eigendom overdraagt.
   config:
     title: Project exporteren / importeren
-    help: 'Draagbare JSON voor dit project (code: %code%). Bevat lidmaatschappen op e-mail; nooit API-geheimen.'
     tabs_label: Exporteren of importeren
     tab_export: Exporteren
     tab_import: Importeren
     export_help: Download een JSON-bundle voor dit project. API-geheimen worden nooit meegenomen.
     export: JSON exporteren
-    import_help: Kies een beacon-project-bundle-JSON. Alleen dit project wordt bijgewerkt als de code overeenkomt.
+    import_help: Kies een beacon-project-bundle-JSON. Alleen dit project wordt bijgewerkt als de code
+      overeenkomt.
     file: JSON-bestand
     import: JSON importeren
-    panel_note: Import werkt dit project alleen bij als de bundlecode overeenkomt. Onbekende e-mails worden overgeslagen (hier worden geen gebruikers aangemaakt).
+    panel_note: Import werkt dit project alleen bij als de bundlecode overeenkomt. Onbekende e-mails worden
+      overgeslagen (hier worden geen gebruikers aangemaakt).
 projects:
   title: Projecten
   intro: Filter en open projecten waartoe u toegang heeft.
@@ -519,15 +504,13 @@ projects:
   errors_last_7_days: '%count% fouten in de afgelopen 7 dagen'
   share:
     title: Deellinks
-    help: Maak een tijdelijke link met alleen-lezen toegang tot dit project (of één
-      issue). Ontvangers moeten inloggen. Nieuwe links zijn standaard eenmalig.
+    help: Maak een tijdelijke link met alleen-lezen toegang tot dit project (of één issue). Ontvangers
+      moeten inloggen. Nieuwe links zijn standaard eenmalig.
     days: Geldigheid (dagen)
     max_uses: Max. gebruik
-    max_uses_help: Laat Max. gebruik leeg voor onbeperkte openingen tot verval. Standaard
-      is 1 (eenmalig).
+    max_uses_help: Laat Max. gebruik leeg voor onbeperkte openingen tot verval. Standaard is 1 (eenmalig).
     max_uses_unlimited: Onbeperkt
-    max_uses_invalid: Max. gebruik moet een positief geheel getal zijn (of leeg voor
-      onbeperkt).
+    max_uses_invalid: Max. gebruik moet een positief geheel getal zijn (of leeg voor onbeperkt).
     uses: Gebruik %used% / %max%
     issue_uuid: Issue-UUID (optioneel)
     issue_optional: Leeg laten voor het hele project
@@ -545,17 +528,14 @@ projects:
     expires_too_far: Deellinks mogen maximaal 30 dagen geldig zijn.
     issue_wrong_project: Dat issue hoort niet bij dit project.
   read_token:
+    help: 'Maak Bearer-tokens (voorvoegsel brt_) voor automatisering. Tokens worden gehashed opgeslagen
+      en verschillen van ingest-sleutels. Gebruik Authorization: Bearer op /api/projects/{uuid}/issues.'
     active: Actief
     copy_once: Kopieer dit token nu. Het wordt niet opnieuw getoond.
     create: Token maken
     created: Leestoken gemaakt — kopieer het nu; het wordt niet opnieuw getoond.
     empty: Nog geen lees-API-tokens.
-    help: 'Maak Bearer-tokens (voorvoegsel brt_) voor automatisering. Tokens worden
-      gehashed opgeslagen en verschillen van ingest-sleutels. Gebruik Authorization:
-      Bearer op /api/projects/{uuid}/issues.'
     invalid_csrf: Ongeldig beveiligingstoken.
-    label: Label
-    label_placeholder: CI-bot, exportscript…
     last_used: Laatst gebruikt
     revoke: Intrekken
     revoked: Leestoken ingetrokken.
@@ -863,91 +843,6 @@ appearance:
     surfaces: Oppervlakken (papier, inkt, panelen)
   submit: Bewaar uiterlijk
   reset: Resetten naar standaardwaarden
-site_appearance:
-  brand_name:
-    label: Merknaam
-    placeholder: symfonie-baken
-    help: Getoond in de koptekst en op de inlogpagina.
-  brand_eyebrow:
-    label: Merk wenkbrauw
-    placeholder: Foutopsporing
-    help: Kort label boven het merk op het inlogscherm.
-  accent_color:
-    label: Accent
-    placeholder: '#1f6f54'
-    help: Primair accent (knoppen, links) in lichtmodus.
-  accent_deep_color:
-    label: Accent (zweven)
-    placeholder: '#134736'
-    help: Donkerder accent voor zweeftoestanden in de lichte modus.
-  accent_color_dark:
-    label: Accent (donker)
-    placeholder: '#4aad7f'
-    help: Primair accent in donkere modus.
-  accent_deep_color_dark:
-    label: Accentzweven (donker)
-    placeholder: '#6bc49a'
-    help: Lichter accent voor zweeftoestanden in de donkere modus.
-  danger_color:
-    label: Gevaar
-    placeholder: '#b42318'
-    help: Fout / destructief accent in lichtmodus.
-  danger_color_dark:
-    label: Gevaar (donker)
-    placeholder: '#f97066'
-    help: Fout / destructief accent in donkere modus.
-  warn_color:
-    label: Waarschuwing
-    placeholder: '#b54708'
-    help: Waarschuwingsaccent in lichtmodus.
-  warn_color_dark:
-    label: Waarschuwing (donker)
-    placeholder: '#fdb022'
-    help: Waarschuwingsaccent in donkere modus.
-  paper_color:
-    label: Papier
-    placeholder: '#f3f6f4'
-    help: Pagina-achtergrond in lichtmodus.
-  paper_color_dark:
-    label: Papier (donker)
-    placeholder: '#0c1210'
-    help: Pagina-achtergrond in donkere modus.
-  ink_color:
-    label: Inkt
-    placeholder: '#0f1c18'
-    help: Primaire tekstkleur in lichtmodus.
-  ink_color_dark:
-    label: Inkt (donker)
-    placeholder: '#e6eee9'
-    help: Primaire tekstkleur in donkere modus.
-  surface_color:
-    label: Oppervlak
-    placeholder: '#ffffff'
-    help: Panelen en kaarten in lichtmodus.
-  surface_color_dark:
-    label: Oppervlak (donker)
-    placeholder: '#151c19'
-    help: Panelen en kaarten in donkere modus.
-  footer_fixed:
-    label: Vaste footer
-    help: Houdt de juridische footer vast onderaan de viewport terwijl de inhoud scrollt.
-  corner_style:
-    label: Hoekstijl
-    help: Kaarten gebruiken een grotere radius; invoervelden en knoppen blijven subtieler.
-    choice:
-      sharp: Scherp
-      soft: Zacht (standaard)
-      rounded: Afgerond
-  border_strength:
-    label: Randsterkte
-    help: Hoe duidelijk elementranden ogen in lichte en donkere modus (panelen, invoer,
-      chrome).
-    choice:
-      subtle: Subtiel
-      medium: Gemiddeld (standaard)
-      strong: Sterk
-  color:
-    invalid: 'Gebruik een hexadecimale kleur zoals #1f6f54.'
 users:
   title: Gebruikers
   intro: Maak accounts aan, wijs instantierollen toe en schakel inloggen in of uit
@@ -1364,62 +1259,7 @@ preferences:
     / VAPID_PRIVATE_KEY). Vraag een administrator, of gebruik Mercure live-toasts
     wanneer ingeschakeld onder Administratie → Mercure.
 user_preferences:
-  display_name:
-    label: Weergavenaam
-    placeholder: Jouw naam
-    help: Getoond in het avatarmenu en de ledenlijsten.
-  email:
-    label: E-mail
-    placeholder: jij@voorbeeld.com
-    help: Gebruikt om in te loggen.
-  slack_user_id:
-    placeholder: U012ABCDEF
-  phone:
-    placeholder: '+34600111222'
-  preferred_locale:
-    label: Taal
-    placeholder: Auto
-    help: Voorkeurstaal van de gebruikersinterface voor dit account.
-  preferred_theme:
-    label: Thema
-    placeholder: Auto
-    help: Gewenste verschijning overdag of 's nachts.
-  preferred_content_width:
-    label: Breedte inhoud
-    placeholder: Inhoud
-    help: Gecentreerde inhoudskolom, of rek het hoofdgebied over de volledige breedte
-      uit.
-  preferred_ui_density:
-    label: UI-dichtheid
-    placeholder: Comfortabel
-    help: Comfortabele tussenruimte of een compactere bestuurdersindeling.
-  preferred_font_scale:
-    label: Tekstgrootte
-    placeholder: Medium
-    help: Schaald de interfacetekst kleiner of groter.
-  preferred_contrast:
-    label: Contrast
-    placeholder: Systeem
-    help: Volg het apparaatcontrast of forceer sterkere tekst en randen.
-  preferred_sidebar:
-    label: Zijbalk
-    placeholder: Uitgevouwen
-    help: Standaard op desktop als deze browser nog geen opgeslagen voorkeur heeft.
-  preferred_motion:
-    label: Beweging
-    placeholder: Systeem
-    help: Volg de apparaatvoorkeur, verminder animaties of houd volledige beweging.
-  current_password:
-    label: Huidig ​​wachtwoord
-    help: Alleen vereist bij het instellen van een nieuw wachtwoord.
-    help_required: Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te
-      stellen.
-    help_email_change: Vereist bij het wijzigen van je e-mailadres (login en wachtwoordreset-bestemming).
   plain_password:
-    first:
-      label: Nieuw wachtwoord
-    second:
-      label: Bevestig nieuw wachtwoord
     mismatch: De wachtwoordvelden moeten overeenkomen.
     strength_invalid: Het wachtwoord voldoet niet aan de sterkte-eisen (%missing%).
 groups:
@@ -1828,12 +1668,10 @@ legal:
       regels in hun rechtsgebied bevestigen.
 releases:
   title: Release-gezondheid
-  intro: Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien,
-    twee releases te vergelijken of direct naar de bestaande compare van de issuelijst
-    te gaan.
+  intro: Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien, twee releases te
+    vergelijken of direct naar de bestaande compare van de issuelijst te gaan.
   empty: Er zijn nog geen releasegegevens beschikbaar voor dit project.
   focus:
-    label: Release
     submit: Release-gezondheid bijwerken
   new_in_release:
     title: Nieuw in %release%
@@ -1841,9 +1679,8 @@ releases:
     open_issue_list: Gefilterde issuelijst openen
     empty: Er zijn geen issues voor het eerst in deze release gezien.
   compare:
-    label: Vergelijk met release
-    help: Vergelijk de geselecteerde release optioneel met een andere release met
-      behulp van de huidige set issues.
+    help: Vergelijk de geselecteerde release optioneel met een andere release met behulp van de huidige
+      set issues.
     summary_title: Vergelijk %a% vs %b%
     only_a: Alleen in %release%
     only_b: Alleen in %release%
@@ -1856,8 +1693,8 @@ releases:
     environment_a: Omgeving A
     environment_b: Omgeving B
     open_issue_list: Vergelijking openen in de issuelijst
-    help: Dit hergebruikt de bestaande `014` compare van de issuelijst. Wanneer een
-      release is geselecteerd, behoudt de link dat releasefilter.
+    help: Dit hergebruikt de bestaande `014` compare van de issuelijst. Wanneer een release is geselecteerd,
+      behoudt de link dat releasefilter.
 mailer_settings:
   title: Mailer
   intro: Sla de Symfony Mailer-DSN versleuteld op in de database (niet in .env). Inloggen
@@ -2021,52 +1858,6 @@ mercure_settings:
       step4: Opslaan. Het statuspaneel hierboven moet live-waarschuwingen als actief tonen.
       step5: 'Meld je aan als projectlid, houd een tab open, maak een nieuw issue en let op de in-app-toast.'
       current_url: 'Nu opgeloste browser-hub-URL: %url%'
-instance_mercure:
-  enabled:
-    label: Mercure-livemeldingen inschakelen
-    help: Wanneer ingeschakeld abonneren aangemelde leden zich op prive-projecttopics
-      voor nieuwe-issue-toasts zolang de app open is.
-  url:
-    label: Publish-URL (server)
-    help: Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure
-      binnen Compose).
-    placeholder: http://mercure/.well-known/mercure
-  public_url:
-    label: Publieke URL (browser)
-    help: Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure
-      via Caddy).
-    placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
-    label: JWT-secret
-    help: Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen
-      op MERCURE_JWT_SECRET. Minimaal 32 tekens indien ingesteld.
-    placeholder: ••••••••••••••••••••••••••••••••
-    too_short: JWT-secret moet minimaal 32 tekens bevatten.
-    invalid: Voer een geldige JWT-secretstring in.
-  clear_secret:
-    label: Opgeslagen JWT-secret wissen
-    help: Verwijdert het secret uit de database en valt terug op MERCURE_JWT_SECRET
-      totdat je een nieuwe opslaat.
-instance_mailer:
-  mailer_dsn:
-    label: Mailer-DSN
-    help: Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587
-      - null:// wordt afgewezen (gebruik in plaats daarvan Opgeslagen DSN wissen).
-    placeholder: smtp://user:pass@mail.example:587
-    invalid: Voer een geldige Symfony Mailer-DSN in (bijvoorbeeld smtp://user:pass@host:587).
-    null_transport: null:// kan geen e-mail afleveren. Plak een echte SMTP-DSN (of
-      andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.
-    scheme_not_allowed: Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps
-      of een ondersteund providerschema (Mailgun, Postmark, SES, …).
-  clear_dsn:
-    label: Opgeslagen DSN wissen
-    help: Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving
-      totdat je een nieuwe opslaat.
-  mailer_from:
-    label: From-adres
-    help: Envelope From voor magic login en notificatiemails. Standaard beacon@localhost
-      wanneer leeg.
-    placeholder: beacon@example.com
 setup:
   eyebrow: Eerste keer
   title: Instantie-setup
@@ -2188,9 +1979,8 @@ setup:
     failed: Setup-actie mislukt.
 notifications:
   title: Meldingen
-  intro: Stuur meldingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek
-    HTTP-endpoint wanneer nieuwe issues, regressies, drempelpieken of N+1-groepen
-    verschijnen.
+  intro: Stuur meldingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek HTTP-endpoint wanneer
+    nieuwe issues, regressies, drempelpieken of N+1-groepen verschijnen.
   empty: Nog geen bestemmingen. Voeg een kanaal toe om je team te waarschuwen.
   add: Bestemming toevoegen
   edit: Bewerken
@@ -2199,53 +1989,22 @@ notifications:
   disabled: Uitgeschakeld
   resume: Resume
   circuit_paused: Auto-paused
-  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound
-    alerts are skipped until you resume (Send test still works).
+  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound alerts are skipped
+    until you resume (Send test still works).
   test: Test verzenden
-  test_hint: Verzend een voorbeeldmelding in %type%-indeling (werkt ook als de bestemming
-    is uitgeschakeld)
+  test_hint: Verzend een voorbeeldmelding in %type%-indeling (werkt ook als de bestemming is uitgeschakeld)
   delete: Verwijderen
   delete_confirm: Deze meldingsbestemming verwijderen?
   save: Bestemming opslaan
   cancel: Annuleren
   new_title: Nieuwe meldingsbestemming
   edit_title: Meldingsbestemming bewerken
-  form_help: Kies een kanaaltype en plak het bijbehorende endpoint. Geheimen worden
-    in de instellingenlijst gemaskeerd.
+  form_help: Kies een kanaaltype en plak het bijbehorende endpoint. Geheimen worden in de instellingenlijst
+    gemaskeerd.
   form:
-    label: Label
-    type: Type
-    endpoint: Endpoint
-    endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-webhook-URL. E-mail: ontvangeradres.
-      Telegram: bot_token@chat_id'
-    endpoint_invalid: Endpoint komt niet overeen met het geselecteerde type.
-    endpoint_ssrf: Endpoint mag niet verwijzen naar private, link-local- of cloudmetadata-adressen.
-    signing_secret: Interaction signing secret
-    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing
-      Secret, or a shared secret for Teams HttpPOST). Leave blank to keep the current
-      value.
-    clear_signing_secret: Clear interaction signing secret
-    enabled: Ingeschakeld
-    categories: Meldingscategorieen
+    pagerduty_note: Native PagerDuty wordt niet ondersteund; gebruik een generieke HTTP-webhook als je
+      een incidentbrug nodig hebt.
     quiet_hours_legend: Stille uren en digest
-    quiet_hours_enabled: Stille uren inschakelen
-    quiet_hours_help: Tijdens dit venster worden meldingen gebufferd in plaats van
-      direct verzonden. Voer app:notifications:flush-digests volgens schema uit (of
-      na het venster).
-    quiet_hours_timezone: Tijdzone
-    quiet_hours_start: Begin stille uren (HH:MM)
-    quiet_hours_end: Einde stille uren (HH:MM)
-    quiet_hours_timezone_invalid: Ongeldige tijdzone-id.
-    quiet_hours_time_invalid: Gebruik 24-uursindeling HH:MM (bijv. 22:00).
-    quiet_hours_required: Start- en eindtijd zijn verplicht wanneer stille uren zijn
-      ingeschakeld.
-    quiet_hours_range_invalid: Start- en eindtijd moeten verschillen.
-    digest_enabled: Digestsamenvatting verzenden bij flush
-    digest_help: Wanneer ingeschakeld verzendt flush een samenvatting per bestemming.
-      Wanneer uitgeschakeld wordt elke vastgehouden melding afzonderlijk verzonden
-      na de stille uren.
-    pagerduty_note: Native PagerDuty wordt niet ondersteund; gebruik een generieke
-      HTTP-webhook als je een incidentbrug nodig hebt.
   type:
     slack: Slack Incoming Webhook
     discord: Discord-webhook
@@ -2279,101 +2038,88 @@ notifications:
     link: Setup-handleidingen
     back: Terug naar instellingen
     toc: Ga naar kanaal
-    intro: Stapsgewijze instructies om Slack, Discord, Microsoft Teams, Telegram,
-      e-mail of een generieke HTTP-webhook met dit project te verbinden.
+    intro: Stapsgewijze instructies om Slack, Discord, Microsoft Teams, Telegram, e-mail of een generieke
+      HTTP-webhook met dit project te verbinden.
     payload_label: 'Beacon verzendt:'
-    docs_hint: 'Volledige referentie (payloads, levering, rechten): docs/product/NOTIFICATIONS.md
-      in de repository.'
+    docs_hint: 'Volledige referentie (payloads, levering, rechten): docs/product/NOTIFICATIONS.md in de
+      repository.'
     slack:
       title: Slack (Incoming Webhook)
-      lead: Maak een Incoming Webhook voor een Slack-app aan en plak de HTTPS-URL
-        in Beacon.
+      lead: Maak een Incoming Webhook voor een Slack-app aan en plak de HTTPS-URL in Beacon.
       step1: Open api.slack.com/apps en maak een app From scratch voor je workspace.
-      step2: Schakel Incoming Webhooks in, kies daarna Add New Webhook to Workspace
-        en selecteer een kanaal.
+      step2: Schakel Incoming Webhooks in, kies daarna Add New Webhook to Workspace en selecteer een kanaal.
       step3: Kopieer de webhook-URL (https://hooks.slack.com/services/...).
-      step4: Kies in Beacon Slack Incoming Webhook, plak de URL als endpoint, selecteer
-        categorieen en sla op.
+      step4: Kies in Beacon Slack Incoming Webhook, plak de URL als endpoint, selecteer categorieen en
+        sla op.
       step5: Klik op Test verzenden en controleer of het bericht in Slack verschijnt.
-      payload: JSON met text (samenvatting) en een beacon-object met de volledige
-        eventpayload.
-      tip: Gebruik bij voorkeur een apart ops-kanaal. Roteer de webhook in Slack als
-        die ooit uitlekt en werk de bestemming in Beacon bij.
+      payload: JSON met text (samenvatting) en een beacon-object met de volledige eventpayload.
+      tip: Gebruik bij voorkeur een apart ops-kanaal. Roteer de webhook in Slack als die ooit uitlekt
+        en werk de bestemming in Beacon bij.
     discord:
       title: Discord (webhook)
       lead: Maak een kanaalwebhook in Discord aan en plak de URL in Beacon.
-      step1: Open Serverinstellingen -> Integraties -> Webhooks (of het tabblad Integraties
-        van het kanaal).
-      step2: Maak een nieuwe webhook, geef die een naam (bijvoorbeeld Beacon) en kies
-        het doelkanaal.
+      step1: Open Serverinstellingen -> Integraties -> Webhooks (of het tabblad Integraties van het kanaal).
+      step2: Maak een nieuwe webhook, geef die een naam (bijvoorbeeld Beacon) en kies het doelkanaal.
       step3: Kopieer de webhook-URL (https://discord.com/api/webhooks/...).
-      step4: Kies in Beacon Discord-webhook, plak de URL, selecteer categorieen, sla
-        op en verzend daarna een test.
-      payload: JSON met content (samenvatting) en een embeds-array (title, description,
-        optionele issue-URL).
+      step4: Kies in Beacon Discord-webhook, plak de URL, selecteer categorieen, sla op en verzend daarna
+        een test.
+      payload: JSON met content (samenvatting) en een embeds-array (title, description, optionele issue-URL).
       tip: Discord beperkt webhooks; Beacon levert asynchroon via Messenger.
     teams:
       title: Microsoft Teams (Incoming Webhook)
-      lead: Voeg een Incoming Webhook-connector toe aan een Teams-kanaal en plak de
-        URL in Beacon.
+      lead: Voeg een Incoming Webhook-connector toe aan een Teams-kanaal en plak de URL in Beacon.
       step1: Open in het Teams-kanaalmenu Connectors (of Kanaal beheren -> Connectors).
       step2: Configureer Incoming Webhook, geef deze een naam en maak deze aan.
       step3: Kopieer de webhook-URL die Teams verstrekt.
-      step4: Kies in Beacon Microsoft Teams-webhook, plak de URL, selecteer categorieen,
-        sla op en verzend daarna een test.
-      payload: Office 365 MessageCard-JSON met summary, title, text en een Open in
-        Beacon-actie wanneer een URL bestaat.
-      tip: Als je tenant alleen Workflows toestaat in plaats van klassieke Incoming
-        Webhooks, laat dan een generieke HTTP-bestemming wijzen naar een workflow
-        die POST-JSON accepteert.
+      step4: Kies in Beacon Microsoft Teams-webhook, plak de URL, selecteer categorieen, sla op en verzend
+        daarna een test.
+      payload: Office 365 MessageCard-JSON met summary, title, text en een Open in Beacon-actie wanneer
+        een URL bestaat.
+      tip: Als je tenant alleen Workflows toestaat in plaats van klassieke Incoming Webhooks, laat dan
+        een generieke HTTP-bestemming wijzen naar een workflow die POST-JSON accepteert.
     telegram:
       title: Telegram (bot)
       lead: Maak een bot met BotFather en sla bot_token@chat_id op als Beacon-endpoint.
       step1: Open @BotFather in Telegram, voer /newbot uit en kopieer het bottoken.
-      step2: Start een privechat met de bot, of voeg hem toe aan een groep en stuur
-        een bericht.
-      step3: Roep getUpdates aan op de Bot API en lees message.chat.id uit (groeps-id's
-        zijn vaak negatief).
-      step4: Kies in Beacon Telegram-bot en stel het endpoint in op bot_token@chat_id
-        (voorbeeld - 123:AA...@-1001234567890).
+      step2: Start een privechat met de bot, of voeg hem toe aan een groep en stuur een bericht.
+      step3: Roep getUpdates aan op de Bot API en lees message.chat.id uit (groeps-id's zijn vaak negatief).
+      step4: Kies in Beacon Telegram-bot en stel het endpoint in op bot_token@chat_id (voorbeeld - 123:AA...@-1001234567890).
       step5: Opslaan en Test verzenden.
-      payload: Bot API sendMessage met chat_id en text (alleen de samenvatting; niet
-        de volledige JSON-payload).
-      tip: De laatste @ in het endpoint splitst token en chat-id. Tokens worden net
-        als andere endpoints versleuteld in rust opgeslagen.
+      payload: Bot API sendMessage met chat_id en text (alleen de samenvatting; niet de volledige JSON-payload).
+      tip: De laatste @ in het endpoint splitst token en chat-id. Tokens worden net als andere endpoints
+        versleuteld in rust opgeslagen.
     email:
       title: E-mail
-      lead: Lever meldingen af in een mailbox via Symfony Mailer. Configureer eerst
-        de Mailer-DSN onder Beheer -> Mailer.
-      step1: Open Beheer -> Mailer en sla een versleutelde DSN op (smtp://...). MAILER_DSN
-        uit de omgeving is alleen een bootstrapfallback; null://null levert niets
-        af.
+      lead: Lever meldingen af in een mailbox via Symfony Mailer. Configureer eerst de Mailer-DSN onder
+        Beheer -> Mailer.
+      step1: Open Beheer -> Mailer en sla een versleutelde DSN op (smtp://...). MAILER_DSN uit de omgeving
+        is alleen een bootstrapfallback; null://null levert niets af.
       step2: Kies in Beacon E-mail en stel het endpoint in op het ontvangeradres.
       step3: Selecteer categorieen, sla op, verzend een test en controleer inbox/spam.
-      payload: Het e-mailonderwerp is gelijk aan de samenvatting; de berichttekst
-        is de samenvatting plus de issue- of performance-URL wanneer aanwezig.
-      tip: Gebruik een gedeelde ops-alias. Voor rijkere digests zijn Slack/Discord/Teams
-        of een HTTP-bridge beter.
+      payload: Het e-mailonderwerp is gelijk aan de samenvatting; de berichttekst is de samenvatting plus
+        de issue- of performance-URL wanneer aanwezig.
+      tip: Gebruik een gedeelde ops-alias. Voor rijkere digests zijn Slack/Discord/Teams of een HTTP-bridge
+        beter.
     http:
       title: Generieke HTTP-webhook
       lead: POST de canonieke Beacon-JSON-payload naar elk HTTPS-automatiseringsendpoint.
       step1: Bied een HTTPS-URL aan die POST met Content-Type application/json accepteert.
-      step2: Kies in Beacon Generieke HTTP-webhook, plak de URL, selecteer categorieen,
-        sla op en verzend daarna een test.
-      step3: Controleer of je service de canonieke JSON-body ontvangt (event, summary,
-        project, issue, url, category).
+      step2: Kies in Beacon Generieke HTTP-webhook, plak de URL, selecteer categorieen, sla op en verzend
+        daarna een test.
+      step3: Controleer of je service de canonieke JSON-body ontvangt (event, summary, project, issue,
+        url, category).
       payload: Canonieke JSON-payload als requestbody (User-Agent symfony-beacon-notifications/1.0).
-      tip: Gebruik bij voorkeur HTTPS en autenticeer je ontvanger. Vermijd interne
-        of cloudmetadata-adressen.
-  project_layer_help: 'Deze bestemmingen horen bij het project (teamkanalen), los van de persoonlijke waarschuwingsvoorkeuren hierboven. Uitgaande levering gebruikt bestemmingscategorieën; lid-toasts/push gebruiken de voorkeursmatrix van het lid.'
+      tip: Gebruik bij voorkeur HTTPS en autenticeer je ontvanger. Vermijd interne of cloudmetadata-adressen.
+  project_layer_help: Deze bestemmingen horen bij het project (teamkanalen), los van de persoonlijke waarschuwingsvoorkeuren
+    hierboven. Uitgaande levering gebruikt bestemmingscategorieën; lid-toasts/push gebruiken de voorkeursmatrix
+    van het lid.
   teams:
     token_used: Die Teams-actielink is al gebruikt. Open het issue in Beacon als je het nog wilt wijzigen.
 thresholds:
   title: Drempelmeldingen
-  intro: Maak rollende volumemeldingen wanneer error- of fatal-events een geconfigureerd
-    aantal overschrijden binnen een tijdvenster.
-  ingest_disabled: Ingest is opgeschort voor dit project, dus drempelregels worden
-    niet geevalueerd.
+  intro: Maak rollende volumemeldingen wanneer error- of fatal-events een geconfigureerd aantal overschrijden
+    binnen een tijdvenster.
+  ingest_disabled: Ingest is opgeschort voor dit project, dus drempelregels worden niet geevalueerd.
   empty: Nog geen drempelregels. Voeg er een toe om plotselinge pieken op te vangen.
   add: Regel toevoegen
   edit: Bewerken
@@ -2386,9 +2132,8 @@ thresholds:
   cancel: Annuleren
   new_title: Nieuwe drempelregel
   edit_title: Drempelregel bewerken
-  form_help: Configureer een rollende error/fatal-volumemelding. Optionele filters
-    voor omgeving en release beperken de telling voordat routering, stille uren en
-    digests worden toegepast.
+  form_help: Configureer een rollende error/fatal-volumemelding. Optionele filters voor omgeving en release
+    beperken de telling voordat routering, stille uren en digests worden toegepast.
   unnamed: Naamloze regel
   summary: '%count% gebeurtenissen in %window% min · %cooldown% min cooldown'
   last_fired: Laatst geactiveerd
@@ -2397,22 +2142,6 @@ thresholds:
     environment: 'Omgeving: %value%'
     release: 'Release: %value%'
     all_events: Alle omgevingen en releases
-  form:
-    label: Label
-    label_help: Optionele interne naam die wordt getoond in Settings en payloads.
-    enabled: Ingeschakeld
-    error_count: Aantal fouten
-    error_count_help: Waarschuw wanneer minstens zoveel error/fatal-events binnen
-      het rollende venster worden ontvangen.
-    window_minutes: Venster (minuten)
-    window_minutes_help: Rollend terugkijkvenster van 1 tot 1440 minuten.
-    cooldown_minutes: Cooldown (minuten)
-    cooldown_minutes_help: Onderdrukt dubbele meldingen voor deze regel tijdens het
-      cooldownvenster.
-    environment: Omgevingsfilter
-    environment_help: Leeg laten om alle omgevingen te tellen.
-    release: Releasefilter
-    release_help: Leeg laten om alle releases te tellen.
   flash:
     created: Drempelregel aangemaakt.
     updated: Drempelregel bijgewerkt.
@@ -2496,132 +2225,33 @@ error:
     image_alt: Beacon-mascotte met sleutel naast servers en een grote 503
       met onderhoudsbord
 ops_defaults:
-  allow_anonymous_resolve:
-    help: Verouderd. Indien ingeschakeld mag Resolve issues wijzigen zonder gemapte
-      Beacon-actor. Geef voorkeur aan gemapte gebruikers + triage.
-    label: Anonieme Slack/Teams-Resolve toestaan
-  allow_private_urls:
-    help: Indien ingeschakeld mogen uitgaande webhooks privé-/link-local-hosts bereiken.
-      Laat uitgeschakeld in productie.
-    label: Privé-notificatie-URL’s toestaan
-  circuit_breaker_cooldown:
-    help: Minuten voordat een automatisch gepauzeerde bestemming opnieuw mag proberen.
-      Gebruik 0 voor handmatige hervatting.
-    label: Circuit breaker-afkoeling in minuten
-  circuit_breaker_threshold:
-    help: Opeenvolgende afleverfouten voordat een notificatiebestemming automatisch
-      wordt gepauzeerd.
-    label: Circuit breaker-foutdrempel
-  clear_inbound_webhook_secret:
-    help: Verwijder het opgeslagen inbound-webhookgeheim.
-    label: Inbound-webhookgeheim wissen
-  clear_metrics_token:
-    help: Verwijder het opgeslagen scrape-token.
-    label: Metrics-scrape-token wissen
-  delivery_history_limit:
-    help: Aantal recente afleverpogingen dat per notificatiebestemming wordt bewaard.
-    label: Limiet aflevergeschiedenis
-  envelope_max_bytes:
-    help: HTTP 413 wanneer een ruwe ingest-body deze grootte overschrijdt. Standaard
-      2097152 (2 MiB).
-    label: Max. Envelope-/OTLP-bodygrootte (bytes)
-  event_quota_daily:
-    help: Maximum geaccepteerde events per project per dag. Gebruik 0 voor onbeperkt.
-    label: Dagelijkse eventquota
-  event_quota_monthly:
-    help: Maximum geaccepteerde events per project per UTC-kalendermaand. Gebruik
-      0 voor onbeperkt.
-    label: Maandelijkse eventquota
-  inbound_email_enabled:
-    help: Indien ingeschakeld kunnen mention/assign-mails Reply-To-tokens bevatten
-      en accepteert POST /hooks/email/inbound providerwebhooks.
-    label: Inbound e-mailreacties inschakelen
-  inbound_mail_domain:
-    help: Domein gebruikt in Reply-To-adressen (reply+{token}@domein).
-    label: Inbound maildomein
   inbound_webhook_secret:
     configured: Er is momenteel een inbound-webhookgeheim opgeslagen.
-    help: Gedeeld geheim voor X-Beacon-Inbound-Secret en Reply-To-HMAC-ondertekening.
-      Leeg laten behoudt het huidige geheim.
-    label: Inbound-webhookgeheim
-  ingest_rate_limit:
-    help: Maximum Envelope-verzoeken per project per minuut. Gebruik 0 voor onbeperkt.
-    label: Ingest-snelheidslimiet per minuut
-  ingest_reject_query_auth:
-    help: Indien ingeschakeld worden beacon_key/beacon_secret-queryparameters geweigerd
-      (401). Alleen uitschakelen tijdens migratie naar X-Beacon-Auth of Envelope-DSN.
-    label: Verouderde querystring-ingest-auth weigeren
-  intro: Configureer instance-brede standaarden voor ingest, metrics, inbound e-mail,
-    hooks, projectgovernance en notificatiebezorging.
-  metrics_require_token:
-    help: Indien ingeschakeld geeft /metrics 503 totdat er een metrics-token is opgeslagen.
-      Aanbevolen in productie.
-    label: Metrics-scrape-token vereisen
+  intro: Configureer instance-brede standaarden voor ingest, metrics, inbound e-mail, hooks, projectgovernance
+    en notificatiebezorging.
   metrics_token:
     configured: Er is momenteel een metrics-scrape-token opgeslagen.
-    help: Bearer-token voor scrapers. Leeg laten behoudt het huidige token.
-    label: Metrics-scrape-token
-  retention_days:
-    help: Verwijder telemetrie ouder dan dit aantal dagen. Gebruik 0 om leeftijdsgebaseerde
-      retentie uit te schakelen.
-    label: Retentiedagen
-  retention_max_events:
-    help: Bewaar hoogstens dit aantal events per project. Gebruik 0 voor geen maximum
-      op aantal.
-    label: Maximum opgeslagen events per project
   section:
     governance: Projectgovernance
-    governance_help: Projecten erven deze retentie-, ingest-snelheids- en quotawaarden
-      tenzij ze een override definiëren.
+    governance_help: Projecten erven deze retentie-, ingest-snelheids- en quotawaarden tenzij ze een override
+      definiëren.
     inbound: Inbound e-mail
-    inbound_help: Reply-To-tokens en providerwebhooks voor issue-reacties. Laat het
-      webhookgeheim leeg bij opslaan om de huidige waarde te behouden.
+    inbound_help: Reply-To-tokens en providerwebhooks voor issue-reacties. Laat het webhookgeheim leeg
+      bij opslaan om de huidige waarde te behouden.
     ingest: Ingest & auth
     ingest_help: Envelope/OTLP-bodygrootte en beleid voor verouderde querystring-ingest-auth.
     metrics: Prometheus-metrics
-    metrics_help: Scrape-token voor GET /metrics (alleen Authorization Bearer). Laat
-      het token leeg bij opslaan om het huidige geheim te behouden.
+    metrics_help: Scrape-token voor GET /metrics (alleen Authorization Bearer). Laat het token leeg bij
+      opslaan om het huidige geheim te behouden.
     notifications: Notificatiebezorging
-    notifications_help: SSRF-beleid, interactief Resolve-beleid, aflevergeschiedenis
-      en circuit breaking over de instance.
+    notifications_help: SSRF-beleid, interactief Resolve-beleid, aflevergeschiedenis en circuit breaking
+      over de instance.
   submit: Ops-standaarden opslaan
   tabs_label: Ops-standaarden secties
   title: Ops-standaarden
 social_login_credential:
-  authorize_url:
-    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
-    label: Authorize-URL
-  client_id:
-    label: Client-ID
-  client_secret:
-    help_edit: Laat leeg om het huidige geheim te behouden.
-    help_new: OAuth-clientgeheim uit de IdP-appregistratie.
-    label: Clientgeheim
-  enabled:
-    help: Uitgeschakelde providers blijven in de database maar verschijnen niet bij
-      login.
-    label: Ingeschakeld
-  enterprise_sso:
-    help: Tonen onder „Inloggen met je organisatie” in plaats van consumenten-socialknoppen
-      (OIDC-IdP’s).
-    label: Enterprise-SSO
-  label:
-    help: Getoond op de Doorgaan-met-knop op de loginpagina.
-    label: Knoplabel
   provider:
-    help: Kleine-letter-slug (google, github, microsoft of aangepast).
-    invalid: Gebruik een kleine-letter-slug die met een letter begint (a-z, cijfers,
-      _ of -).
-    label: Providersleutel
-  scopes:
-    help: Optionele OAuth-scopes, gescheiden door spaties of komma’s.
-    label: Scopes
-  token_url:
-    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
-    label: Token-URL
-  userinfo_url:
-    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
-    label: Userinfo-URL
+    invalid: Gebruik een kleine-letter-slug die met een letter begint (a-z, cijfers, _ of -).
 social_login_settings:
   add_intro: Er bestaan ingebouwde endpointcatalogi voor Google, GitHub en Microsoft.
   add_provider: '%provider% toevoegen'
@@ -2822,8 +2452,3 @@ permissions:
   name_locale_help: Optional for %locale%. Overrides the catalog name when set.
   description_locale_help: Optional for %locale%. Overrides the catalog description when set.
 
-admin_instance_permission:
-  key:
-    placeholder: 'bijv. project.custom.manage'
-  category:
-    placeholder: Kies een categorie…

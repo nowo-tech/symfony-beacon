@@ -28,10 +28,10 @@ Operators get safer defaults (no unverified phone QR, tighter maintenance exclus
 
 ## Non-goals
 
-- Shipping SMS OTP / disabling QR entirely (QR remains `enabled`; verified field stays required for approval)
-- Api Platform / Serializer groups / `MapQueryString` on Read API
+- Shipping SMS OTP (QR left `enabled` in this cut; **v1.12.0 / `096`** disables `qr_login` until OTP exists)
+- Api Platform / Serializer groups / Read API rate limit / hash-at-rest ingest secrets (shipped in **`096`** / v1.12.0)
 - Splitting `SiteAppearance` or full Identity admin controller rewrite
-- Binding Slack user IDs via OAuth (still free-text; documented residual)
+- Binding Slack user IDs via OAuth (password + uniqueness hygiene in **`096`**; OAuth still Later)
 
 ## User Scenarios & Testing
 

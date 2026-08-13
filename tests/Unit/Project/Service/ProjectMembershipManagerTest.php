@@ -18,7 +18,9 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessFlashKeys;
 use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipManager;
+use App\Project\Service\ProjectMembershipPolicy;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +36,7 @@ final class ProjectMembershipManagerTest extends TestCase
     private UserGroupMembershipRepository&MockObject $userGroupMembershipRepository;
     private AuthorizationCheckerInterface&MockObject $authorizationChecker;
     private ProjectMembershipManager $manager;
+    private ProjectGroupAccessManager $groupAccessManager;
 
     protected function setUp(): void
     {
@@ -51,17 +54,29 @@ final class ProjectMembershipManagerTest extends TestCase
             new RequestStack(),
         );
 
+        $policy = new ProjectMembershipPolicy(
+            $this->membershipRepository,
+            $this->userGroupMembershipRepository,
+            $projectAccess,
+            $this->authorizationChecker,
+        );
+
         $actionRecorder = new ReflectionClass(UserActionRecorder::class)->newInstanceWithoutConstructor();
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->manager = new ProjectMembershipManager(
             $this->createMock(UserRepository::class),
             $this->membershipRepository,
-            $this->groupAccessRepository,
-            $this->userGroupMembershipRepository,
-            $projectAccess,
+            $policy,
             $actionRecorder,
-            $this->authorizationChecker,
-            $this->createMock(EntityManagerInterface::class),
+            $em,
+        );
+
+        $this->groupAccessManager = new ProjectGroupAccessManager(
+            $this->groupAccessRepository,
+            $policy,
+            $actionRecorder,
+            $em,
         );
     }
 
@@ -116,7 +131,7 @@ final class ProjectMembershipManagerTest extends TestCase
         $this->userGroupMembershipRepository->method('findOneByGroupAndUser')->willReturn(null);
 
         try {
-            $this->manager->assertActorCanLinkGroup($admin, $group, $project);
+            $this->groupAccessManager->assertActorCanLinkGroup($admin, $group, $project);
             self::fail('Expected ProjectAccessException');
         } catch (ProjectAccessException $e) {
             self::assertSame(ProjectAccessException::GROUP_LINK_FORBIDDEN, $e->reasonCode);

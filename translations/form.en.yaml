@@ -170,9 +170,13 @@ user_preferences:
     placeholder: you@example.com
     help: Used to sign in.
   slack_user_id:
+    label: Slack user ID
     placeholder: U012ABCDEF
+    help: 'Optional. Your Slack member ID enables Assign/Resolve on Slack alerts. Changing it requires your current password. Find it in Slack → profile → … → Copy member ID.'
   phone:
+    label: Phone number
     placeholder: '+34600111222'
+    help: Optional. Reserved for future SMS OTP / phone sign-in. Changing or clearing the number removes any previous phone verification.
   preferred_locale:
     label: Language
     placeholder: Auto
@@ -205,21 +209,30 @@ user_preferences:
     label: Motion
     placeholder: System
     help: Follow the device preference, reduce animations, or keep full motion.
+  preferred_collapsed_issue_panels:
+    label: Issue panels collapsed by default
+    placeholder: Select panels…
+    help: Checked panels start collapsed on issue and event detail pages. Your browser remembers
+      manual open/close overrides.
   current_password:
     label: Current password
     placeholder: Current password
     help: Required only when setting a new password.
     help_email_change: Required when changing your email address (login and password-reset destination).
+    help_sensitive_change: Required when changing your email or Slack user ID.
     help_required: Confirm your current password to set a new one.
   plain_password:
     label: New password
     placeholder: New password
     help: Choose a strong password that meets the requirements below.
+    mismatch: The password fields must match.
+    strength_invalid: The password does not meet the strength requirements (%missing%).
     second:
       label: Confirm new password
     first:
       label: New password
   plain_password_confirm:
+    label: Confirm new password
     placeholder: Confirm new password
     help: Re-enter your new password.
 ops_defaults:
@@ -294,7 +307,7 @@ ops_defaults:
     help: When enabled, beacon_key/beacon_secret query parameters are rejected (401). Disable only while
       migrating clients to X-Beacon-Auth or Envelope DSN.
 instance_mailer:
-  mailer_dsn:
+  plain_mailer_dsn:
     label: Mailer DSN
     help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587 —
       null:// is rejected (use Clear stored DSN instead).
@@ -305,7 +318,7 @@ instance_mailer:
     scheme_not_allowed: That Mailer DSN scheme is not allowed. Use smtp, smtps, or
       a supported provider scheme (Mailgun, Postmark, SES, …). Sendmail/native DSNs
       are blocked because they can execute host commands.
-  clear_dsn:
+  clear_mailer_dsn:
     label: Clear stored DSN
     help: Removes the database DSN and falls back to MAILER_DSN from the environment until you save a
       new one.
@@ -314,30 +327,30 @@ instance_mailer:
     help: Envelope From for magic-login and notification emails. Defaults to beacon@localhost when empty.
     placeholder: beacon@example.com
 instance_mercure:
-  enabled:
+  mercure_enabled:
     label: Enable Mercure live alerts
     help: When on, signed-in members subscribe to private project topics for new-issue toasts while the
       app is open.
-  url:
+  mercure_url:
     label: Publish URL (server)
     help: Leave blank to use MERCURE_URL (e.g. http://mercure/.well-known/mercure inside Compose).
     placeholder: http://mercure/.well-known/mercure
     invalid: Enter a valid HTTP or HTTPS Mercure URL.
     unsafe: That Mercure URL targets a blocked metadata or link-local address.
-  public_url:
+  mercure_public_url:
     label: Public URL (browser)
     help: Leave blank to use MERCURE_PUBLIC_URL (usually same-origin /.well-known/mercure via Caddy).
     placeholder: https://localhost:9447/.well-known/mercure
     invalid: Enter a valid HTTP or HTTPS public Mercure URL.
     unsafe: That public Mercure URL targets a blocked metadata or link-local address.
-  jwt_secret:
+  plain_mercure_jwt_secret:
     label: JWT secret
     help: Leave blank to keep the current encrypted value or fall back to MERCURE_JWT_SECRET. Minimum
       32 characters when set.
     placeholder: ••••••••••••••••••••••••••••••••
     invalid: Enter a valid JWT secret string.
     too_short: JWT secret must be at least 32 characters.
-  clear_secret:
+  clear_mercure_jwt_secret:
     label: Clear stored JWT secret
     help: Removes the database secret and falls back to MERCURE_JWT_SECRET until you save a new one.
 social_login_credential:
@@ -481,9 +494,7 @@ notifications:
     teams: Microsoft Teams webhook
     telegram: Telegram bot
 preferences:
-  issue_panels_collapsed: Issue panels collapsed by default
-  issue_panels_help: Checked panels start collapsed on issue and event detail pages. Your browser remembers
-    manual open/close overrides.
+
   member_alerts:
     enabled: Notify for this event
     master: Enable member alerts
@@ -498,19 +509,12 @@ preferences:
   product_tour_enabled_help: Checked tours can auto-start once per area. Uncheck a tour to hide it; uncheck
     all to disable every tour.
   product_tour_select_all: Select all tours
-  profile:
-    phone: Phone number
-    phone_help: Optional. Reserved for future SMS OTP / phone sign-in flows. Changing or clearing the
-      number removes any previous phone verification.
-    slack_user_id: Slack user ID
-    slack_user_id_help: Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack
-      issue alerts. Find it in your Slack profile → … → Copy member ID.
   push_notifications: Browser push (device)
   push_notifications_help: Optional device opt-in. When enabled, Beacon asks the browser for permission
     and can deliver alerts matching your member-alert preferences — even when the app is in the background
     (installed PWA or supported browser). Live in-app toasts require Administration → Mercure separately,
     and the member-alerts master switch above.
-  issue_panels_placeholder: Select panels…
+
   contrast_more: More contrast
   contrast_system: System (follow device)
   density_comfortable: Comfortable

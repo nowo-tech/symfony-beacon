@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Api\Read\Controller;
 
+use App\Api\Read\Dto\ProjectIssuesListQuery;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueRepository;
@@ -18,11 +19,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 /**
  * Bearer-authenticated JSON read API for project issues (automation; not public boards).
+ *
+ * Auth is application-level (firewall {@code read_api} uses {@code security: false}).
+ * IP rate limiting is applied by {@see \App\Api\Read\EventSubscriber\ReadApiRateLimitSubscriber}.
  */
 #[AsController]
 final readonly class ProjectReadApiController
@@ -38,30 +43,34 @@ final readonly class ProjectReadApiController
 
     #[Route('/api/projects/{projectUuid}/issues', name: 'api_project_issues_list', requirements: ['projectUuid' => Requirement::UUID], methods: ['GET'])]
     #[OA\Get(path: '/api/projects/{projectUuid}/issues', operationId: 'readProjectIssues', summary: 'List project issues (read token)', security: [['BeaconReadToken' => []]], tags: ['Read API'])]
-    public function listIssues(Request $request, string $projectUuid): JsonResponse
-    {
+    public function listIssues(
+        Request $request,
+        string $projectUuid,
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_BAD_REQUEST)]
+        ProjectIssuesListQuery $query = new ProjectIssuesListQuery(),
+    ): JsonResponse {
         $auth = $this->authorize($request, $projectUuid);
         if ($auth instanceof JsonResponse) {
             return $auth;
         }
         [$project] = $auth;
 
-        $limit = max(1, min(1000, $request->query->getInt('limit', 100)));
-        $statusRaw = $request->query->getString('status');
-        $status = '' !== $statusRaw ? IssueStatus::tryFrom($statusRaw) : null;
+        $status = null !== $query->status && '' !== $query->status
+            ? IssueStatus::tryFrom($query->status)
+            : null;
         $issues = $this->issueSearchRepository->search(
             project: $project,
-            query: $request->query->getString('q') ?: null,
-            level: $request->query->getString('level') ?: null,
+            query: $query->q ?: null,
+            level: $query->level ?: null,
             status: $status,
-            environment: $request->query->getString('environment') ?: null,
-            release: $request->query->getString('release') ?: null,
-            limit: $limit,
+            environment: $query->environment ?: null,
+            release: $query->release ?: null,
+            limit: $query->limit,
         );
 
         return new JsonResponse([
             'project' => ['uuid' => $project->getUuid(), 'name' => $project->getName()],
-            'limit' => $limit,
+            'limit' => $query->limit,
             'count' => \count($issues),
             'issues' => array_map($this->issueJsonNormalizer->normalize(...), $issues),
         ]);

@@ -12,14 +12,16 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Form\ProjectGroupAddType;
+use App\Project\Form\ProjectGroupRoleType;
 use App\Project\Form\ProjectMemberAddType;
+use App\Project\Form\ProjectMemberRoleType;
 use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipUiHelper;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,6 +41,7 @@ final class AdminProjectAccessController extends AbstractController
 
     public function __construct(
         private readonly ProjectMembershipManager $membershipManager,
+        private readonly ProjectGroupAccessManager $groupAccessManager,
         private readonly ProjectMembershipRepository $membershipRepository,
         private readonly ProjectMembershipFormSupport $membershipFormSupport,
         private readonly UserGroupRepository $userGroupRepository,
@@ -90,21 +93,26 @@ final class AdminProjectAccessController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $target = $this->requireDirectMembership($project, $memberUser);
-        $form = $this->createForm(CsrfOnlyType::class, null, [
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $form = $this->createForm(ProjectMemberRoleType::class, null, [
             'csrf_token_id' => 'admin_project_member_role_'.$target->getId(),
+            'role_choices' => ProjectMembershipUiHelper::roleChoices(
+                $this->membershipManager->assignableRoles($actor, $project),
+            ),
         ]);
-        $form->submit($request->request->all());
+        $form->handleRequest($request);
         $this->requireValidForm($form);
 
-        $role = ProjectRole::tryFrom($request->request->getString('role'));
+        /** @var array{role?: string|null} $data */
+        $data = $form->getData() ?? [];
+        $role = ProjectRole::tryFrom((string) ($data['role'] ?? ''));
         if (!$role instanceof ProjectRole) {
             $this->addFlash('error', 'flash.project.member_invalid_role');
 
             return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
         }
 
-        /** @var User $actor */
-        $actor = $this->getUser();
         $this->attemptProjectAccessMutation(
             fn () => $this->membershipManager->changeRole($project, $actor, $target, $role),
             'flash.project.member_role_updated',
@@ -162,7 +170,7 @@ final class AdminProjectAccessController extends AbstractController
         $form = $this->createForm(ProjectGroupAddType::class, null, [
             'csrf_token_id' => 'admin_project_group_add_'.$project->getId(),
             'group_choices' => $this->membershipFormSupport->groupChoicesForLinking($project),
-            'role_choices' => ProjectMembershipUiHelper::roleChoices($this->membershipManager->assignableGroupRoles($actor, $project)),
+            'role_choices' => ProjectMembershipUiHelper::roleChoices($this->groupAccessManager->assignableGroupRoles($actor, $project)),
         ]);
         $form->handleRequest($request);
         $this->requireValidForm($form);
@@ -178,7 +186,7 @@ final class AdminProjectAccessController extends AbstractController
 
         $role = ProjectRole::tryFrom((string) ($data['role'] ?? '')) ?? ProjectRole::Member;
         $this->attemptProjectAccessMutation(
-            fn (): ProjectGroupAccess => $this->membershipManager->addGroup($project, $actor, $group, $role),
+            fn (): ProjectGroupAccess => $this->groupAccessManager->addGroup($project, $actor, $group, $role),
             'flash.project.group_added',
             denyOnForbidden: false,
         );
@@ -203,23 +211,28 @@ final class AdminProjectAccessController extends AbstractController
         if ($groupAccess->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
-        $form = $this->createForm(CsrfOnlyType::class, null, [
+        /** @var User $actor */
+        $actor = $this->getUser();
+        $form = $this->createForm(ProjectGroupRoleType::class, null, [
             'csrf_token_id' => 'admin_project_group_role_'.$groupAccess->getId(),
+            'role_choices' => ProjectMembershipUiHelper::roleChoices(
+                $this->groupAccessManager->assignableGroupRoles($actor, $project),
+            ),
         ]);
-        $form->submit($request->request->all());
+        $form->handleRequest($request);
         $this->requireValidForm($form);
 
-        $role = ProjectRole::tryFrom($request->request->getString('role'));
+        /** @var array{role?: string|null} $data */
+        $data = $form->getData() ?? [];
+        $role = ProjectRole::tryFrom((string) ($data['role'] ?? ''));
         if (!$role instanceof ProjectRole) {
             $this->addFlash('error', 'flash.project.member_invalid_role');
 
             return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
         }
 
-        /** @var User $actor */
-        $actor = $this->getUser();
         $this->attemptProjectAccessMutation(
-            fn () => $this->membershipManager->changeGroupRole($project, $actor, $groupAccess, $role),
+            fn () => $this->groupAccessManager->changeGroupRole($project, $actor, $groupAccess, $role),
             'flash.project.group_role_updated',
             denyOnForbidden: false,
         );
@@ -257,7 +270,7 @@ final class AdminProjectAccessController extends AbstractController
         /** @var User $actor */
         $actor = $this->getUser();
         $this->attemptProjectAccessMutation(
-            fn () => $this->membershipManager->removeGroup($project, $actor, $groupAccess),
+            fn () => $this->groupAccessManager->removeGroup($project, $actor, $groupAccess),
             'flash.project.group_removed',
             denyOnForbidden: false,
         );

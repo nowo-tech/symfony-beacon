@@ -176,7 +176,7 @@ final readonly class MemberAlertPreferenceManager
     }
 
     /**
-     * @param array<string, mixed> $rawEvents
+     * @param array<string, mixed>                   $rawEvents
      * @param array<string, MemberAccountAlertEvent> $account
      * @param array<string, MemberProjectAlertEvent> $existing
      */
@@ -186,8 +186,7 @@ final readonly class MemberAlertPreferenceManager
         array $rawEvents,
         array $account,
         array $existing,
-    ): bool
-    {
+    ): bool {
         $hasOverrides = false;
 
         foreach (MemberAlertEvent::casesInUiOrder() as $event) {

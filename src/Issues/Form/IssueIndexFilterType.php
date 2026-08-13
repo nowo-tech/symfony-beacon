@@ -33,22 +33,11 @@ final class IssueIndexFilterType extends AbstractGetFilterType
     {
         /** @var list<string> $levelChoices */
         $levelChoices = $options['level_choices'];
-        /** @var array<string, string> $memberChoices */
+        /** @var array<int|string, string> $memberChoices */
         $memberChoices = $options['member_choices'];
 
-        $priorityChoices = [
-            'issue_index_filter.priority.any' => '',
-            'issue_index_filter.priority.low' => 'low',
-            'issue_index_filter.priority.medium' => 'medium',
-            'issue_index_filter.priority.high' => 'high',
-            'issue_index_filter.priority.critical' => 'critical',
-        ];
-        $statusChoices = [
-            'issue_index_filter.status.any' => '',
-            'issue_index_filter.status.unresolved' => 'unresolved',
-            'issue_index_filter.status.resolved' => 'resolved',
-            'issue_index_filter.status.ignored' => 'ignored',
-        ];
+        $priorityChoices = IssueListFilterFields::priorityChoicesWithAny('issue_index_filter');
+        $statusChoices = IssueListFilterFields::statusChoicesWithAny('issue_index_filter');
         // Member display names stay literal; static options are translated once here.
         $assigneeChoices = [
             $this->translator->trans('issue_index_filter.assignee.any', [], 'form') => '',

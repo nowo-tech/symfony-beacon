@@ -37,10 +37,10 @@ final class MercureSettingsTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', 'Mercure is off');
 
         $form = $crawler->selectButton('Save Mercure settings')->form([
-            'instance_mercure_settings[mercureEnabled]' => '1',
-            'instance_mercure_settings[mercureUrl]' => 'http://mercure/.well-known/mercure',
-            'instance_mercure_settings[mercurePublicUrl]' => 'https://beacon.test/.well-known/mercure',
-            'instance_mercure_settings[plainMercureJwtSecret]' => '!ChangeThisMercureHubJWTSecretKey!',
+            'instance_mercure[mercureEnabled]' => '1',
+            'instance_mercure[mercureUrl]' => 'http://mercure/.well-known/mercure',
+            'instance_mercure[mercurePublicUrl]' => 'https://beacon.test/.well-known/mercure',
+            'instance_mercure[plainMercureJwtSecret]' => '!ChangeThisMercureHubJWTSecretKey!',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/mercure');
@@ -71,7 +71,7 @@ final class MercureSettingsTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/mercure');
         $form = $crawler->selectButton('Save Mercure settings')->form([
-            'instance_mercure_settings[clearMercureJwtSecret]' => '1',
+            'instance_mercure[clearMercureJwtSecret]' => '1',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/mercure');

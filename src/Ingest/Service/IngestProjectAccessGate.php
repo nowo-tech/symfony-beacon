@@ -9,6 +9,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Shared Envelope/OTLP credential + governance checks (path project, API key, secret, quotas, rate).
@@ -31,6 +32,7 @@ final readonly class IngestProjectAccessGate
         private ProjectApiKeyRepository $apiKeyRepository,
         private ProjectGovernanceResolver $governanceResolver,
         private IngestRateLimiter $ingestRateLimiter,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -57,11 +59,12 @@ final readonly class IngestProjectAccessGate
         }
 
         $project = $apiKey->getProject();
-        $storedSecret = $apiKey->getSecretKey();
-        if (null === $storedSecret || '' === $storedSecret
-            || null === $secretKey || !hash_equals($storedSecret, $secretKey)
-        ) {
+        if (null === $secretKey || !$apiKey->matchesSecret($secretKey)) {
             return $this->unauthorized();
+        }
+
+        if ($apiKey->upgradeLegacySecretToHash($secretKey)) {
+            $this->entityManager->flush();
         }
 
         return [

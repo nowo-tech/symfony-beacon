@@ -40,49 +40,29 @@ final class OtlpTracesMapper implements OtlpSignalMapperInterface
 
         /** @var list<array<string, mixed>> $events */
         $events = [];
-        $resourceSpans = $decoded['resourceSpans'] ?? $decoded['resource_spans'] ?? [];
-        if (!\is_array($resourceSpans)) {
-            return [];
-        }
 
-        foreach ($resourceSpans as $resourceSpan) {
-            if (!\is_array($resourceSpan) || \count($events) >= self::MAX_SPANS) {
-                break;
-            }
-
-            $resourceAttrs = $this->attributesMap(
-                \is_array($resourceSpan['resource']['attributes'] ?? null)
-                    ? $resourceSpan['resource']['attributes']
-                    : [],
-            );
-
-            $scopeSpans = $resourceSpan['scopeSpans'] ?? $resourceSpan['scope_spans'] ?? [];
-            if (!\is_array($scopeSpans)) {
-                continue;
-            }
-
-            foreach ($scopeSpans as $scopeSpan) {
-                if (!\is_array($scopeSpan) || \count($events) >= self::MAX_SPANS) {
-                    break 2;
+        OtlpResourceIterator::walk(
+            $decoded,
+            'resourceSpans',
+            'resource_spans',
+            'scopeSpans',
+            'scope_spans',
+            'spans',
+            'spans',
+            $this->attributesMap(...),
+            function (array $resourceAttrs, array $span) use (&$events): bool {
+                if (\count($events) >= self::MAX_SPANS) {
+                    return false;
                 }
 
-                $spans = $scopeSpan['spans'] ?? [];
-                if (!\is_array($spans)) {
-                    continue;
+                $payload = $this->mapSpan($span, $resourceAttrs);
+                if (null !== $payload) {
+                    $events[] = $payload;
                 }
 
-                foreach ($spans as $span) {
-                    if (!\is_array($span) || \count($events) >= self::MAX_SPANS) {
-                        break 3;
-                    }
-
-                    $payload = $this->mapSpan($span, $resourceAttrs);
-                    if (null !== $payload) {
-                        $events[] = $payload;
-                    }
-                }
-            }
-        }
+                return \count($events) < self::MAX_SPANS;
+            },
+        );
 
         return $events;
     }

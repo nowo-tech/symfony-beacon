@@ -216,6 +216,11 @@ user_preferences:
     label: Beweging
     placeholder: Systeem
     help: Volg de apparaatvoorkeur, verminder animaties of houd volledige beweging.
+  preferred_collapsed_issue_panels:
+    label: Probleempanelen zijn standaard samengevouwen
+    placeholder: Selecteer panelen…
+    help: Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's.
+      Uw browser onthoudt handmatige open-/sluitoverschrijvingen.
   current_password:
     label: Huidig ​​wachtwoord
     placeholder: Huidig wachtwoord
@@ -226,11 +231,14 @@ user_preferences:
     label: Nieuw wachtwoord
     placeholder: Nieuw wachtwoord
     help: Kies een sterk wachtwoord dat aan de onderstaande eisen voldoet.
+    mismatch: De wachtwoordvelden moeten overeenkomen.
+    strength_invalid: Het wachtwoord voldoet niet aan de sterkte-eisen (%missing%).
     second:
       label: Bevestig nieuw wachtwoord
     first:
       label: Nieuw wachtwoord
   plain_password_confirm:
+    label: Bevestig nieuw wachtwoord
     placeholder: Bevestig nieuw wachtwoord
     help: Voer je nieuwe wachtwoord opnieuw in.
 ops_defaults:
@@ -300,7 +308,7 @@ ops_defaults:
     help: Bewaar hoogstens dit aantal events per project. Gebruik 0 voor geen maximum op aantal.
     label: Maximum opgeslagen events per project
 instance_mailer:
-  mailer_dsn:
+  plain_mailer_dsn:
     label: Mailer-DSN
     help: Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587
       - null:// wordt afgewezen (gebruik in plaats daarvan Opgeslagen DSN wissen).
@@ -310,7 +318,7 @@ instance_mailer:
       andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.
     scheme_not_allowed: Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps
       of een ondersteund providerschema (Mailgun, Postmark, SES, …).
-  clear_dsn:
+  clear_mailer_dsn:
     label: Opgeslagen DSN wissen
     help: Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving totdat je een
       nieuwe opslaat.
@@ -319,27 +327,27 @@ instance_mailer:
     help: Envelope From voor magic login en notificatiemails. Standaard beacon@localhost wanneer leeg.
     placeholder: beacon@example.com
 instance_mercure:
-  enabled:
+  mercure_enabled:
     label: Mercure-livemeldingen inschakelen
     help: Wanneer ingeschakeld abonneren aangemelde leden zich op prive-projecttopics voor nieuwe-issue-toasts
       zolang de app open is.
-  url:
+  mercure_url:
     label: Publish-URL (server)
     help: Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure binnen Compose).
     placeholder: http://mercure/.well-known/mercure
-  public_url:
+  mercure_public_url:
     label: Publieke URL (browser)
     help: Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure via
       Caddy).
     placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
+  plain_mercure_jwt_secret:
     label: JWT-secret
     help: Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET.
       Minimaal 32 tekens indien ingesteld.
     placeholder: ••••••••••••••••••••••••••••••••
     invalid: Voer een geldige JWT-secretstring in.
     too_short: JWT-secret moet minimaal 32 tekens bevatten.
-  clear_secret:
+  clear_mercure_jwt_secret:
     label: Opgeslagen JWT-secret wissen
     help: Verwijdert het secret uit de database en valt terug op MERCURE_JWT_SECRET totdat je een nieuwe
       opslaat.
@@ -485,9 +493,7 @@ notifications:
     teams: Microsoft Teams-webhook
     telegram: Telegram-bot
 preferences:
-  issue_panels_collapsed: Probleempanelen zijn standaard samengevouwen
-  issue_panels_help: Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's.
-    Uw browser onthoudt handmatige open-/sluitoverschrijvingen.
+
   member_alerts:
     enabled: Notify for this event
     master: Enable member alerts
@@ -512,7 +518,7 @@ preferences:
   push_notifications_help: Optioneel. Wanneer ingeschakeld, vraagt Beacon de browser om toestemming en
     kan u waarschuwen over nieuwe issues in projecten waartoe u behoort — ook op de achtergrond (geïnstalleerde
     PWA of ondersteunde browser). Live in-app toasts vereisen apart Administratie → Mercure.
-  issue_panels_placeholder: Selecteer panelen…
+
   contrast_more: Meer contrast
   contrast_system: Systeem (volg apparaat)
   density_comfortable: Comfortabel

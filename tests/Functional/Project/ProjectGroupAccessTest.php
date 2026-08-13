@@ -11,7 +11,7 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Exception\ProjectAccessException;
-use App\Project\Service\ProjectMembershipManager;
+use App\Project\Service\ProjectGroupAccessManager;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,7 +110,7 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         $em->persist($group);
         $em->flush();
 
-        $manager = self::getContainer()->get(ProjectMembershipManager::class);
+        $manager = self::getContainer()->get(ProjectGroupAccessManager::class);
         try {
             $manager->addGroup($project, $admin, $group, ProjectRole::Member);
             self::fail('Expected group_link_forbidden');

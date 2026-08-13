@@ -17,29 +17,29 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final class DoctrineEncryptTest extends DatabaseWebTestCase
 {
-    public function testApiKeySecretIsEncryptedInDatabase(): void
+    public function testApiKeySecretIsHashedInDatabase(): void
     {
         [, , $project] = $this->bootWithDemoProject('encrypt-key@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
 
-        $apiKey = ProjectApiKey::generate($project, 'Encrypt test');
-        $plainSecret = $apiKey->getSecretKey();
-        self::assertNotNull($plainSecret);
+        $plainSecret = 'plain-secret-for-hash-test';
+        $apiKey = ProjectApiKey::generate($project, 'Hash test', null, $plainSecret);
         $em->persist($apiKey);
         $em->flush();
         $id = $apiKey->getId();
         self::assertNotNull($id);
 
         $conn = $em->getConnection();
-        $raw = $conn->fetchOne('SELECT secret_key FROM project_api_key WHERE id = ?', [$id]);
-        self::assertIsString($raw);
-        self::assertNotSame($plainSecret, $raw);
-        self::assertStringEndsWith('<ENC>', $raw);
+        $hash = $conn->fetchOne('SELECT secret_hash FROM project_api_key WHERE id = ?', [$id]);
+        self::assertSame(ProjectApiKey::hashSecret($plainSecret), $hash);
+        $legacy = $conn->fetchOne('SELECT secret_key FROM project_api_key WHERE id = ?', [$id]);
+        self::assertTrue(null === $legacy || '' === $legacy);
 
         $em->clear();
         $reloaded = $em->find(ProjectApiKey::class, $id);
         self::assertNotNull($reloaded);
-        self::assertSame($plainSecret, $reloaded->getSecretKey());
+        self::assertTrue($reloaded->matchesSecret($plainSecret));
+        self::assertFalse($reloaded->matchesSecret('wrong'));
     }
 
     public function testNotificationEndpointUrlIsEncryptedInDatabase(): void

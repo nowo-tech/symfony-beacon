@@ -43,24 +43,28 @@ You should receive an acknowledgement within a few business days. We will work w
 | --- | --- | --- |
 | Magic login (`login_link`) | Lifetime **600s**, **max_uses: 1**, used-link cache `cache.app` | Request rate limit 5 / 15 minutes per IP; disabled accounts rejected. **Requires** an encrypted non-null Mailer DSN under Administration → Mailer; otherwise `/login/magic` redirects to password login and the link is hidden. |
 | Share links | Max **30 days**; SHA-256 hashed token; **max uses** (UI default **1**; empty = unlimited until expiry) | Grants session viewer access only; never embeds Envelope API secrets |
-| Project API keys / DSN | Secret shown **once** after create/rotate (session flash `_beacon_last_api_key_dsn`, cleared on render) | Settings list shows **public key only**; rotate/create to mint a new DSN. Revoked keys never expose secret/DSN. |
+| Project API keys / DSN | Secret shown **once** after create/rotate (session flash `_beacon_last_api_key_dsn`, cleared on render). At rest: SHA-256 `secret_hash` (`096`) | Settings list shows **public key only**; rotate/create to mint a new DSN. Revoked keys never expose secret/DSN. |
 
 Operators should keep the **Mailer DSN** (Administration → Mailer, encrypted at rest) and `kernel.secret` production-grade; rotating the secret invalidates outstanding magic links. Env `MAILER_DSN` is only a fallback for other outbound mail when no database DSN is configured — it does **not** enable magic-link sign-in.
 
 Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the documented `.env.dist` `APP_SECRET` (`ChangeMePleaseUseARealSecret`). `app:seed-demo` is blocked outside local environments unless `--allow-non-local` (random keys only).
 
-## Ingest and public hooks (`093` / `095`)
+## Ingest and public hooks (`093` / `095` / `096`)
 
 | Surface | Guidance |
 | --- | --- |
 | Envelope auth | Use `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` is **removed** (always 401). |
 | Public hooks | Slack / Teams actions / inbound email are IP rate-limited (`BEACON_HOOK_IP_RATE_LIMIT`, default 120/min). Teams Assign-me stays session-gated. |
-| Teams Assign OpenUri | HMAC and params travel in the **query string** (Microsoft OpenUri constraint) — treat access logs / Referer as sensitive. |
+| Read API | Bearer `brt_…` tokens (SHA-256 at rest). Firewall `read_api` is `security: false` — auth is in `ProjectReadApiController`. IP rate-limited via `BEACON_READ_API_RATE_LIMIT` (default 120/min). |
+| Project API key secrets | SHA-256 hash at rest (`secret_hash`). Plaintext only in the one-shot DSN flash after create/rotate. Legacy encrypted `secret_key` rows are upgraded on next successful ingest. |
+| Teams Assign OpenUri | HMAC and params travel in the **query string** (Microsoft OpenUri constraint) — treat access logs / Referer as sensitive. Assign/Resolve tokens TTL **24h** (`InteractionActionToken::DEFAULT_TTL_SECONDS`). |
 | Setup token | Prefer header `X-Setup-Token`. Query `?token=` remains for the SiteBackup wizard; rotate `SITE_SETUP_TOKEN` after first setup. |
 | Ops posture | Administration → Ops overview warns when private webhook URLs, anonymous Resolve, or optional metrics scrape are enabled. |
 | Maintenance exclusions (`095`) | Only Envelope + OTLP ingest paths skip the public 503. Read API `/api/projects/…` stays under maintenance. |
 | Mercure hub URL (`095`) | Administration → Mercure rejects private/metadata hub URLs (`MercureHubUrlGuard`). |
-| AuthKit QR phone (`095`) | Saving a phone does **not** set `phoneVerifiedAt`. Unverified numbers cannot approve QR login until SMS OTP ships. |
+| AuthKit QR phone | **Disabled** until a real phone OTP sets `User.phoneVerifiedAt` (profile save only clears/restores verification). |
+| Slack user ID | Set under Account → Profile; changing it requires the current password and must be unique (anti-hijack until Slack OAuth linking ships). |
+| Instance `ROLE_PROJECT_*` | Catalog / Admin UI only. Product `#[IsGranted(ProjectPermission::…, 'project')]` requires membership (`InstancePermissionVoter` abstains when the subject is a `Project`). |
 
 ## Safe harbour
 

@@ -39,6 +39,9 @@ abstract class DatabaseWebTestCase extends WebTestCase
      */
     protected bool $autoSeedPlatformCatalogs = true;
 
+    /** Stable plaintext for {@see ProjectApiKey} created in {@see bootWithDemoProject()}. */
+    protected const string TEST_API_SECRET = 'phpunit-beacon-api-secret-01';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -175,7 +178,7 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $membership->setRole(ProjectRole::Owner);
         $project->addMembership($membership);
 
-        $apiKey = ProjectApiKey::generate($project, 'Test');
+        $apiKey = ProjectApiKey::generate($project, 'Test', null, self::TEST_API_SECRET);
         $project->addApiKey($apiKey);
 
         $em->persist($user);
@@ -225,8 +228,8 @@ abstract class DatabaseWebTestCase extends WebTestCase
     protected function beaconAuthHeaders(ProjectApiKey $apiKey): array
     {
         $header = 'Beacon beacon_key='.$apiKey->getPublicKey();
-        $secret = $apiKey->getSecretKey();
-        if (null !== $secret && '' !== $secret) {
+        $secret = $apiKey->peekIssuedPlainSecret() ?? self::TEST_API_SECRET;
+        if ('' !== $secret) {
             $header .= ', beacon_secret='.$secret;
         }
 

@@ -59,7 +59,10 @@ security:
         invalidate_session: true
         enable_csrf: true
   # Locale alternation must stay in sync with kernel.enabled_locales / docs/dev/ADDING-LOCALES.md.
-  # Ingest + read API use dedicated firewalls with security: false (no access_control needed).
+  # Ingest + read API use dedicated firewalls with security: false (auth + rate limits are application-level).
+  # Read API: Bearer tokens in ProjectReadApiController + ReadApiRateLimitSubscriber (BEACON_READ_API_RATE_LIMIT).
+  role_hierarchy:
+    ROLE_ADMIN: ROLE_USER
   access_control:
     - path: ^/$
       roles: PUBLIC_ACCESS

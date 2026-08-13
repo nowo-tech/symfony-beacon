@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-08-13
+
+### Security
+
+- **Audit follow-up hardening (`096` / 6.46)**: Bearer Read API IP rate limit (`BEACON_READ_API_RATE_LIMIT`, default 120/min); ingest API key secrets stored as SHA-256 `secret_hash` (plaintext only in one-shot DSN flash; legacy Halite `secret_key` dual-read + upgrade on successful ingest); `InstancePermissionVoter` abstains on `Project` subjects so instance `ROLE_PROJECT_*` cannot bypass membership; AuthKit `qr_login` **disabled** until phone OTP; Slack user ID changes require current password and must be unique; Slack/Teams interaction tokens TTL **24h** (was 7d). Spec: `specs/096-audit-follow-up-hardening/`.
+
+### Added
+
+- `ReadApiRateLimitSubscriber` / `ReadApiRateLimiter`; Read API list query DTO `ProjectIssuesListQuery` (`MapQueryString`).
+- `ProjectMembershipPolicy` + `ProjectGroupAccessManager` shared by panel and Admin membership/group mutations.
+- Filter DTOs / resolvers: `IssueIndexFilters`, `AnalyticsFilters`, `PerformanceFilters` (+ dashboard filter trait reuse).
+- `AccessibleProjectsProvider` (request-scoped cache for accessible project lists).
+- `OtlpResourceIterator`; `IssueStatusTransition`; `IssueJsonView`.
+- Doctrine indexes `idx_issue_project_first_release`, `idx_event_issue_user_identifier` (`Version20260813180000`); `project_api_key.secret_hash` (`Version20260813190000`).
+
+### Changed
+
+- Membership / group role POSTs bind `ProjectMemberRoleType` / `ProjectGroupRoleType` (Choice + CSRF) instead of CsrfOnly + raw `role`.
+- Account profile: Slack user ID field with password gate; FormKit chrome cleanup on security/password fields.
+- Pin `nowo-tech/beacon-bundle` **1.7.0**.
+
+### Notes for integrators
+
+- Add `BEACON_READ_API_RATE_LIMIT=120` (or `0` to disable) to operator `.env` from `.env.dist`.
+- Run migrations after upgrade (`make migrate`).
+- QR phone login UI/routes stay present but kit mode is **disabled** until SMS OTP ships.
+- Automations that assumed 7-day Assign/Resolve OpenUri tokens must refresh cards within 24h.
+
 ## [1.11.0] - 2026-08-13
 
 ### Security
@@ -1036,7 +1064,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...v1.9.0

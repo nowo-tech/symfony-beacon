@@ -28,7 +28,7 @@ final class OtlpTracesIngestFunctionalTest extends DatabaseWebTestCase
 
         $client->request(
             Request::METHOD_POST,
-            '/api/'.$project->getUuid().'/otlp/v1/traces?beacon_key='.$apiKey->getPublicKey().'&beacon_secret='.$apiKey->getSecretKey(),
+            '/api/'.$project->getUuid().'/otlp/v1/traces?beacon_key='.$apiKey->getPublicKey().'&beacon_secret='.rawurlencode(self::TEST_API_SECRET),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],

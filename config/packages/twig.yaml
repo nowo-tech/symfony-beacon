@@ -3,6 +3,9 @@ twig:
     form_themes:
         - '@NowoFormKit/form/static_blocks.html.twig'
         - 'form/beacon_theme.html.twig'
+        # Kit requirement/generator copy stays on NowoPasswordStrengthBundle even when
+        # FormKit sets field translation_domain to form (AccountSecurity / AuthKit).
+        - 'form/password_strength_beacon_theme.html.twig'
     globals:
         enabled_locales: '%kernel.enabled_locales%'
         default_locale: '%kernel.default_locale%'

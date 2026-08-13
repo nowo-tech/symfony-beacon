@@ -27,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_issue_project_status', columns: ['project_id', 'status'])]
 #[ORM\Index(name: 'idx_issue_project_assignee', columns: ['project_id', 'assignee_id'])]
 #[ORM\Index(name: 'idx_issue_project_last_release', columns: ['project_id', 'last_release'])]
+#[ORM\Index(name: 'idx_issue_project_first_release', columns: ['project_id', 'first_release'])]
 #[ORM\Index(name: 'idx_issue_project_priority', columns: ['project_id', 'priority'])]
 #[ORM\Index(name: 'idx_issue_title_culprit_ft', columns: ['title', 'culprit'], flags: ['fulltext'])]
 class Issue
@@ -87,16 +88,16 @@ class Issue
     private ?string $lastEnvironment = null;
 
     /** @var Collection<int, Event> */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'issue', fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private Collection $events;
 
     /** @var Collection<int, IssueHistoryEntry> */
-    #[ORM\OneToMany(targetEntity: IssueHistoryEntry::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: IssueHistoryEntry::class, mappedBy: 'issue', fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'DESC', 'id' => 'DESC'])]
     private Collection $historyEntries;
 
     /** @var Collection<int, IssueComment> */
-    #[ORM\OneToMany(targetEntity: IssueComment::class, mappedBy: 'issue', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: IssueComment::class, mappedBy: 'issue', fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $comments;
 

@@ -5,25 +5,21 @@ declare(strict_types=1);
 namespace App\Project\Service;
 
 use App\Identity\Entity\User;
-use App\Identity\Entity\UserGroup;
-use App\Identity\Entity\UserGroupMembership;
-use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
-use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
-use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Exception\ProjectAccessException;
-use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Adds, updates, and removes direct project memberships and group access links.
+ * Adds, updates, and removes direct project memberships.
+ *
+ * Group links live in {@see ProjectGroupAccessManager}. Shared authz rules are in
+ * {@see ProjectMembershipPolicy}.
  *
  * Every mutating method records a {@see UserActionType} via {@see UserActionRecorder}
  * and flushes the entity manager. Domain failures raise {@see ProjectAccessException}
@@ -34,13 +30,18 @@ final readonly class ProjectMembershipManager
     public function __construct(
         private UserRepository $userRepository,
         private ProjectMembershipRepository $membershipRepository,
-        private ProjectGroupAccessRepository $groupAccessRepository,
-        private UserGroupMembershipRepository $userGroupMembershipRepository,
-        private ProjectAccessService $projectAccess,
+        private ProjectMembershipPolicy $policy,
         private UserActionRecorder $actionRecorder,
-        private AuthorizationCheckerInterface $authorizationChecker,
         private EntityManagerInterface $entityManager,
     ) {
+    }
+
+    /**
+     * @return list<ProjectRole>
+     */
+    public function assignableRoles(User $actor, Project $project): array
+    {
+        return $this->policy->assignableRoles($actor, $project);
     }
 
     /**
@@ -50,8 +51,8 @@ final readonly class ProjectMembershipManager
      */
     public function addByEmail(Project $project, User $actor, string $email, ProjectRole $role): ProjectMembership
     {
-        $this->assertActorCanManage($project, $actor);
-        $this->assertAssignableRole($actor, $project, $role);
+        $this->policy->assertActorCanManage($project, $actor);
+        $this->policy->assertAssignableRole($actor, $project, $role);
 
         $user = $this->userRepository->findOneByEmail($email);
         if (!$user instanceof User) {
@@ -90,12 +91,12 @@ final readonly class ProjectMembershipManager
      */
     public function changeRole(Project $project, User $actor, ProjectMembership $target, ProjectRole $role): void
     {
-        $this->assertActorCanManage($project, $actor);
-        $this->assertSameProject($project, $target);
-        $this->assertCanMutateTarget($actor, $project, $target);
-        $this->assertAssignableRole($actor, $project, $role);
+        $this->policy->assertActorCanManage($project, $actor);
+        $this->policy->assertSameProject($project, $target);
+        $this->policy->assertCanMutateTarget($actor, $project, $target);
+        $this->policy->assertAssignableRole($actor, $project, $role);
 
-        if (ProjectRole::Owner === $target->getRole() && ProjectRole::Owner !== $role && $this->countDirectOwners($project) <= 1) {
+        if (ProjectRole::Owner === $target->getRole() && ProjectRole::Owner !== $role && $this->policy->countDirectOwners($project) <= 1) {
             throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
 
@@ -122,11 +123,11 @@ final readonly class ProjectMembershipManager
      */
     public function remove(Project $project, User $actor, ProjectMembership $target): void
     {
-        $this->assertActorCanManage($project, $actor);
-        $this->assertSameProject($project, $target);
-        $this->assertCanMutateTarget($actor, $project, $target);
+        $this->policy->assertActorCanManage($project, $actor);
+        $this->policy->assertSameProject($project, $target);
+        $this->policy->assertCanMutateTarget($actor, $project, $target);
 
-        if (ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
+        if (ProjectRole::Owner === $target->getRole() && $this->policy->countDirectOwners($project) <= 1) {
             throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
         if (ProjectRole::Full === $target->getRole()) {
@@ -161,8 +162,8 @@ final readonly class ProjectMembershipManager
      */
     public function transferOwnership(Project $project, User $actor, ProjectMembership $target): void
     {
-        $this->assertActorCanTransferOwnership($project, $actor);
-        $this->assertSameProject($project, $target);
+        $this->policy->assertActorCanTransferOwnership($project, $actor);
+        $this->policy->assertSameProject($project, $target);
 
         $newOwner = $target->getUser();
         if ($newOwner->getId() === $actor->getId()) {
@@ -206,267 +207,20 @@ final readonly class ProjectMembershipManager
     }
 
     /**
-     * Link a user group to the project (admin/member only).
-     *
-     * @throws ProjectAccessException
-     */
-    public function addGroup(Project $project, User $actor, UserGroup $group, ProjectRole $role): ProjectGroupAccess
-    {
-        $this->assertActorCanManage($project, $actor);
-        $this->assertActorCanLinkGroup($actor, $group, $project);
-        if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
-        }
-        $this->assertAssignableGroupRole($actor, $project, $role);
-
-        if ($this->groupAccessRepository->findOneByProjectAndGroup($project, $group) instanceof ProjectGroupAccess) {
-            throw ProjectAccessException::of(ProjectAccessException::GROUP_ALREADY_LINKED);
-        }
-
-        $access = new ProjectGroupAccess();
-        $access->setUserGroup($group);
-        $access->setRole($role);
-        $project->addGroupAccess($access);
-        $this->actionRecorder->record(
-            UserActionType::ProjectGroupLinked,
-            $actor,
-            null,
-            [
-                'project' => $project->getName(),
-                'project_uuid' => $project->getUuid(),
-                'group' => $group->getName(),
-                'group_uuid' => $group->getUuid(),
-                'role' => $role->value,
-            ],
-        );
-        $this->entityManager->flush();
-
-        return $access;
-    }
-
-    /**
-     * Instance ROLE_ADMIN or project owner may link any group.
-     * Project admins may only link groups they belong to.
-     *
-     * @throws ProjectAccessException
-     */
-    public function assertActorCanLinkGroup(User $actor, UserGroup $group, Project $project): void
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $access = $this->projectAccess->resolveAccess($project, $actor);
-        if ($access instanceof ProjectAccess && ProjectRole::Owner === $access->role) {
-            return;
-        }
-
-        if ($this->userGroupMembershipRepository->findOneByGroupAndUser($group, $actor) instanceof UserGroupMembership) {
-            return;
-        }
-
-        throw ProjectAccessException::of(ProjectAccessException::GROUP_LINK_FORBIDDEN);
-    }
-
-    /**
-     * Change the role of a linked group (admin/member only).
-     *
-     * @throws ProjectAccessException
-     */
-    public function changeGroupRole(Project $project, User $actor, ProjectGroupAccess $target, ProjectRole $role): void
-    {
-        $this->assertActorCanManage($project, $actor);
-        if ($target->getProject()?->getId() !== $project->getId()) {
-            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
-        }
-        if (\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
-        }
-        $this->assertAssignableGroupRole($actor, $project, $role);
-
-        $from = $target->getRole()->value;
-        $target->setRole($role);
-        $group = $target->getUserGroup();
-        $this->actionRecorder->record(
-            UserActionType::ProjectGroupRoleChanged,
-            $actor,
-            null,
-            [
-                'project' => $project->getName(),
-                'project_uuid' => $project->getUuid(),
-                'group' => $group?->getName(),
-                'group_uuid' => $group?->getUuid(),
-                'from' => $from,
-                'to' => $role->value,
-            ],
-        );
-        $this->entityManager->flush();
-    }
-
-    /**
-     * Unlink a group from the project.
-     *
-     * @throws ProjectAccessException
-     */
-    public function removeGroup(Project $project, User $actor, ProjectGroupAccess $target): void
-    {
-        $this->assertActorCanManage($project, $actor);
-        if ($target->getProject()?->getId() !== $project->getId()) {
-            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
-        }
-
-        $group = $target->getUserGroup();
-        $removedRole = $target->getRole()->value;
-        $project->removeGroupAccess($target);
-        $this->entityManager->remove($target);
-        $this->actionRecorder->record(
-            UserActionType::ProjectGroupUnlinked,
-            $actor,
-            null,
-            [
-                'project' => $project->getName(),
-                'project_uuid' => $project->getUuid(),
-                'group' => $group?->getName(),
-                'group_uuid' => $group?->getUuid(),
-                'role' => $removedRole,
-            ],
-        );
-        $this->entityManager->flush();
-    }
-
-    /**
-     * Roles the actor may assign to direct members.
-     *
-     * @return list<ProjectRole>
-     */
-    public function assignableRoles(User $actor, Project $project): array
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return [ProjectRole::Owner, ProjectRole::Full, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
-        }
-
-        $access = $this->projectAccess->resolveAccess($project, $actor);
-        if (!$access instanceof ProjectAccess || !$access->canManageMembers()) {
-            return [];
-        }
-
-        if (ProjectRole::Owner === $access->role) {
-            return [ProjectRole::Owner, ProjectRole::Full, ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
-        }
-
-        return [ProjectRole::Admin, ProjectRole::Member, ProjectRole::Viewer];
-    }
-
-    /**
-     * Roles the actor may assign to linked groups (never owner or full).
-     *
-     * @return list<ProjectRole>
-     */
-    public function assignableGroupRoles(User $actor, Project $project): array
-    {
-        return array_values(array_filter(
-            $this->assignableRoles($actor, $project),
-            static fn (ProjectRole $role): bool => !\in_array($role, [ProjectRole::Owner, ProjectRole::Full], true),
-        ));
-    }
-
-    /** @throws ProjectAccessException */
-    private function assertActorCanManage(Project $project, User $actor): void
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $access = $this->projectAccess->resolveAccess($project, $actor);
-        if (!$access instanceof ProjectAccess || !$access->canManageMembers()) {
-            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
-        }
-    }
-
-    /** @throws ProjectAccessException */
-    private function assertActorCanTransferOwnership(Project $project, User $actor): void
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $access = $this->projectAccess->resolveAccess($project, $actor);
-        if (!$access instanceof ProjectAccess || ProjectRole::Owner !== $access->role) {
-            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
-        }
-    }
-
-    /** @throws ProjectAccessException */
-    private function assertAssignableRole(User $actor, Project $project, ProjectRole $role): void
-    {
-        if (!\in_array($role, $this->assignableRoles($actor, $project), true)) {
-            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
-        }
-    }
-
-    /** @throws ProjectAccessException */
-    private function assertAssignableGroupRole(User $actor, Project $project, ProjectRole $role): void
-    {
-        if (!\in_array($role, $this->assignableGroupRoles($actor, $project), true)) {
-            throw ProjectAccessException::of(ProjectAccessException::INVALID_ROLE);
-        }
-    }
-
-    /** @throws ProjectAccessException */
-    private function assertSameProject(Project $project, ProjectMembership $target): void
-    {
-        if ($target->getProject()?->getId() !== $project->getId()) {
-            throw ProjectAccessException::of(ProjectAccessException::WRONG_PROJECT);
-        }
-    }
-
-    /**
-     * Admins cannot mutate owner or full memberships (instance ROLE_ADMIN may).
-     *
-     * @throws ProjectAccessException
-     */
-    private function assertCanMutateTarget(User $actor, Project $project, ProjectMembership $target): void
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $access = $this->projectAccess->resolveAccess($project, $actor);
-        if (!$access instanceof ProjectAccess) {
-            throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
-        }
-
-        if (ProjectRole::Admin === $access->role && \in_array($target->getRole(), [ProjectRole::Owner, ProjectRole::Full], true)) {
-            throw ProjectAccessException::of(ProjectAccessException::CANNOT_MANAGE_OWNER);
-        }
-    }
-
-    /** Count direct (not group-derived) **active** owner memberships on the project. */
-    private function countDirectOwners(Project $project): int
-    {
-        $projectId = $project->getId();
-        if (null === $projectId) {
-            return 0;
-        }
-
-        return $this->membershipRepository->countOwnersByProjectIds([$projectId])[$projectId] ?? 0;
-    }
-
-    /**
      * Activate or deactivate a direct membership (does not delete the row).
      *
      * @throws ProjectAccessException
      */
     public function setActive(Project $project, User $actor, ProjectMembership $target, bool $active): void
     {
-        $this->assertActorCanManage($project, $actor);
-        $this->assertCanMutateTarget($actor, $project, $target);
+        $this->policy->assertActorCanManage($project, $actor);
+        $this->policy->assertCanMutateTarget($actor, $project, $target);
 
         if ($target->getProject()?->getId() !== $project->getId()) {
             throw ProjectAccessException::of(ProjectAccessException::FORBIDDEN);
         }
 
-        if (!$active && ProjectRole::Owner === $target->getRole() && $this->countDirectOwners($project) <= 1) {
+        if (!$active && ProjectRole::Owner === $target->getRole() && $this->policy->countDirectOwners($project) <= 1) {
             throw ProjectAccessException::of(ProjectAccessException::LAST_OWNER);
         }
 

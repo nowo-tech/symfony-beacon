@@ -57,18 +57,18 @@ final class MailerDsnValidator
         }
 
         if ($this->isNullTransport($dsn)) {
-            return 'instance_mailer.mailer_dsn.null_transport';
+            return 'instance_mailer.plain_mailer_dsn.null_transport';
         }
 
         $scheme = strtolower((string) (parse_url($dsn, \PHP_URL_SCHEME) ?? ''));
         if ('' === $scheme || !\in_array($scheme, self::ALLOWED_SCHEMES, true)) {
-            return 'instance_mailer.mailer_dsn.scheme_not_allowed';
+            return 'instance_mailer.plain_mailer_dsn.scheme_not_allowed';
         }
 
         try {
             Transport::fromDsn($dsn);
         } catch (Throwable) {
-            return 'instance_mailer.mailer_dsn.invalid';
+            return 'instance_mailer.plain_mailer_dsn.invalid';
         }
 
         return null;

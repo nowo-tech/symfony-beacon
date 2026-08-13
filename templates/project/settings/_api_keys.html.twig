@@ -1,6 +1,6 @@
     <section class="panel">
         <h2 class="mb-3 text-lg font-semibold">{{ 'project.api_keys.title'|trans }}</h2>
-        <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans }}</p>
+        <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans({}, 'form') }}</p>
         <ul class="space-y-3">
             {% for key in project.apiKeys %}
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm"{% if not key.active %} data-testid="api-key-inactive"{% endif %}>

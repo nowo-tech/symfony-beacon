@@ -9,6 +9,8 @@ use App\Identity\Entity\User;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Security\InstancePermissionVoter;
+use App\Project\Entity\Project;
+use App\Project\Security\ProjectPermission;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -79,6 +81,37 @@ final class InstancePermissionVoterTest extends TestCase
         self::assertSame(
             VoterInterface::ACCESS_DENIED,
             $this->voter->vote($token, null, ['admin.unknown.thing']),
+        );
+    }
+
+    public function testAbstainsWhenSubjectIsProject(): void
+    {
+        $user = new User();
+        $user->setRoles(['ROLE_USER']);
+        $ref = new ReflectionProperty(User::class, 'id');
+        $ref->setValue($user, 7);
+
+        $this->permissions->expects(self::never())->method('findOneByKey');
+        $this->roles->expects(self::never())->method('findPermissionKeysForUserId');
+
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $project = new Project();
+
+        self::assertSame(
+            VoterInterface::ACCESS_ABSTAIN,
+            $this->voter->vote($token, $project, [ProjectPermission::DELETE]),
+        );
+    }
+
+    public function testAdminStillGrantedWithoutProjectSubject(): void
+    {
+        $user = new User();
+        $user->setRoles(['ROLE_ADMIN']);
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+
+        self::assertSame(
+            VoterInterface::ACCESS_GRANTED,
+            $this->voter->vote($token, null, [ProjectPermission::DELETE]),
         );
     }
 }

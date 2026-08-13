@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Service;
 
+use App\Issues\Dto\IssueJsonView;
 use App\Issues\Entity\Issue;
 
 /**
@@ -32,5 +33,28 @@ final class IssueJsonNormalizer
             'assignee_email' => $issue->getAssignee()?->getEmail(),
             'duplicate_of_uuid' => $issue->getDuplicateOf()?->getUuid(),
         ];
+    }
+
+    /**
+     * DTO mirror of {@see normalize()} for Serializer-based consumers.
+     */
+    public function toDto(Issue $issue): IssueJsonView
+    {
+        return new IssueJsonView(
+            uuid: $issue->getUuid(),
+            title: $issue->getTitle(),
+            level: $issue->getLevel(),
+            status: $issue->getStatus()->value,
+            priority: $issue->getPriority()->value,
+            culprit: $issue->getCulprit(),
+            eventCount: $issue->getEventCount(),
+            firstSeen: $issue->getFirstSeen()->format(\DATE_ATOM),
+            lastSeen: $issue->getLastSeen()->format(\DATE_ATOM),
+            firstRelease: $issue->getFirstRelease(),
+            lastRelease: $issue->getLastRelease(),
+            lastEnvironment: $issue->getLastEnvironment(),
+            assigneeEmail: $issue->getAssignee()?->getEmail(),
+            duplicateOfUuid: $issue->getDuplicateOf()?->getUuid(),
+        );
     }
 }

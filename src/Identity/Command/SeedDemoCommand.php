@@ -173,9 +173,10 @@ final class SeedDemoCommand extends Command
 
         $apiKey = $result['api_key'];
         $owner = $result['user'];
-        $uiDsn = $apiKey->buildDsn($baseUrl);
-        $clientDsn = $apiKey->buildDsn($ingestBaseUrl);
-        $selfDsn = $apiKey->buildDsn(self::SELF_INGEST_BASE_URL);
+        $demoSecret = self::DEMO_SECRET_KEY;
+        $uiDsn = $apiKey->buildDsn($baseUrl, $demoSecret);
+        $clientDsn = $apiKey->buildDsn($ingestBaseUrl, $demoSecret);
+        $selfDsn = $apiKey->buildDsn(self::SELF_INGEST_BASE_URL, $demoSecret);
         $io->writeln('UI DSN: '.$uiDsn);
         $io->writeln('Client DSN (Docker / BeaconBundle demo): '.$clientDsn);
         $io->writeln('Self DSN (server dogfood / 127.0.0.1): '.$selfDsn);

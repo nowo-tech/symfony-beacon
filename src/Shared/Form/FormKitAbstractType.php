@@ -43,18 +43,24 @@ abstract class FormKitAbstractType extends NowoFormKitAbstractType
      * Choice empty-option from the {@code form} catalogue (FormKit moves root
      * {@code placeholder} to {@code attr}; restore ChoiceType empty option after merge).
      *
+     * Pass {@code placeholder} for a custom empty-option key, omit it to use
+     * {@code {blockPrefix}.{field}.placeholder}, or {@code false} for no empty option.
+     * Pass {@code label}/{@code help} {@code false} when Twig owns the chrome (e.g. confirm dialogs).
+     *
      * @param array<string, mixed> $options
      */
     protected function addChoiceWithFormPlaceholder(string $name, array $options): void
     {
-        $emptyOption = $options['placeholder'] ?? false;
+        $emptyOption = $options['placeholder'] ?? null;
         unset($options['placeholder']);
         $options['placeholder'] = false;
-        $options['label'] ??= false;
-        $options['help'] ??= false;
 
         $merged = $this->mergeFieldOptions($name, 'choice', $options);
         if (false !== $emptyOption) {
+            if (null === $emptyOption) {
+                $fieldSnake = strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($name)));
+                $emptyOption = $this->getBlockPrefix().'.'.$fieldSnake.'.placeholder';
+            }
             $merged['placeholder'] = $emptyOption;
             // Profile merger already set field domain to form; keep it for the empty option key.
             $merged['translation_domain'] = $options['translation_domain'] ?? 'form';

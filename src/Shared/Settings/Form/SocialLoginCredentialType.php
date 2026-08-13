@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * Admin form for AuthKit {@see \Nowo\AuthKitBundle\Entity\SocialLoginCredential} rows.
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code social_login_credential.*}.
  */
 final class SocialLoginCredentialType extends FormKitAbstractType
 {
@@ -27,8 +29,6 @@ final class SocialLoginCredentialType extends FormKitAbstractType
         $this->withBuilder($builder, function () use ($isNew, $providerLocked): void {
             $this->addTextField('provider', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.provider.label',
-                'help' => 'social_login_credential.provider.help',
                 'disabled' => $providerLocked,
                 'constraints' => $providerLocked ? [] : [
                     new NotBlank(),
@@ -38,8 +38,6 @@ final class SocialLoginCredentialType extends FormKitAbstractType
             ]);
             $this->addTextField('label', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.label.label',
-                'help' => 'social_login_credential.label.help',
                 'constraints' => [
                     new NotBlank(),
                     new Length(max: 128),
@@ -47,7 +45,6 @@ final class SocialLoginCredentialType extends FormKitAbstractType
             ]);
             $this->addTextField('client_id', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.client_id.label',
                 'constraints' => [
                     new NotBlank(),
                     new Length(max: 255),
@@ -58,7 +55,6 @@ final class SocialLoginCredentialType extends FormKitAbstractType
                 PasswordType::class,
                 $this->mergeFieldOptions('client_secret', 'password', [
                     'placeholder' => false,
-                    'label' => 'social_login_credential.client_secret.label',
                     'help' => $isNew
                         ? 'social_login_credential.client_secret.help_new'
                         : 'social_login_credential.client_secret.help_edit',
@@ -74,44 +70,32 @@ final class SocialLoginCredentialType extends FormKitAbstractType
             );
             $this->addCheckboxField('enabled', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.enabled.label',
-                'help' => 'social_login_credential.enabled.help',
                 'required' => false,
             ]);
             $this->addCheckboxField('enterprise_sso', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.enterprise_sso.label',
-                'help' => 'social_login_credential.enterprise_sso.help',
                 'required' => false,
             ]);
             $this->addUrlField('authorize_url', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.authorize_url.label',
-                'help' => 'social_login_credential.authorize_url.help',
                 'required' => false,
                 'default_protocol' => 'https',
                 'constraints' => [new Length(max: 512)],
             ]);
             $this->addUrlField('token_url', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.token_url.label',
-                'help' => 'social_login_credential.token_url.help',
                 'required' => false,
                 'default_protocol' => 'https',
                 'constraints' => [new Length(max: 512)],
             ]);
             $this->addUrlField('userinfo_url', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.userinfo_url.label',
-                'help' => 'social_login_credential.userinfo_url.help',
                 'required' => false,
                 'default_protocol' => 'https',
                 'constraints' => [new Length(max: 512)],
             ]);
             $this->addTextField('scopes', [
                 'placeholder' => false,
-                'label' => 'social_login_credential.scopes.label',
-                'help' => 'social_login_credential.scopes.help',
                 'required' => false,
                 'constraints' => [new Length(max: 512)],
             ]);
@@ -127,5 +111,11 @@ final class SocialLoginCredentialType extends FormKitAbstractType
         ]);
         $resolver->setAllowedTypes('is_new', 'bool');
         $resolver->setAllowedTypes('provider_locked', 'bool');
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'social_login_credential';
     }
 }

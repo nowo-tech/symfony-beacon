@@ -33,11 +33,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $em->persist($viewer);
         $em->flush();
 
-        /** @var ProjectApiKey $apiKey */
-        $apiKey = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project]);
-        self::assertInstanceOf(ProjectApiKey::class, $apiKey);
-        $secret = (string) $apiKey->getSecretKey();
-        self::assertNotSame('', $secret);
+        $secret = self::TEST_API_SECRET;
 
         $this->login($client, $viewer);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
@@ -58,9 +54,10 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         /** @var ProjectApiKey $apiKey */
         $apiKey = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project]);
         self::assertInstanceOf(ProjectApiKey::class, $apiKey);
-        $secret = (string) $apiKey->getSecretKey();
-        self::assertNotSame('', $secret);
+        self::assertTrue($apiKey->matchesSecret(self::TEST_API_SECRET));
+        self::assertNotNull($apiKey->getSecretHash());
         self::assertTrue($apiKey->isActive());
+        $secret = self::TEST_API_SECRET;
 
         $this->login($client, $owner);
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
@@ -87,7 +84,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         /** @var ProjectApiKey $apiKey */
         $apiKey = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project, 'active' => true]);
         self::assertInstanceOf(ProjectApiKey::class, $apiKey);
-        $oldSecret = (string) $apiKey->getSecretKey();
+        $oldSecret = self::TEST_API_SECRET;
 
         $this->login($client, $owner);
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
@@ -111,9 +108,11 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         /** @var ProjectApiKey $rotated */
         $rotated = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project, 'active' => true]);
         self::assertInstanceOf(ProjectApiKey::class, $rotated);
-        $newSecret = (string) $rotated->getSecretKey();
-        self::assertNotSame('', $newSecret);
+        self::assertNotNull($rotated->getSecretHash());
+        self::assertSame(1, preg_match('#://[^/]+:([a-f0-9]{32})@#', $html, $matches));
+        $newSecret = $matches[1];
         self::assertNotSame($oldSecret, $newSecret);
+        self::assertTrue($rotated->matchesSecret($newSecret));
         self::assertStringContainsString($newSecret, $html);
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');

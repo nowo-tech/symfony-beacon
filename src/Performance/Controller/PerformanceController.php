@@ -7,9 +7,11 @@ namespace App\Performance\Controller;
 use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Performance\Dto\PerformanceFilters;
 use App\Performance\Entity\PerfTransaction;
 use App\Performance\Repository\PerfTransactionRepository;
 use App\Project\Entity\Project;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -34,6 +36,7 @@ final class PerformanceController extends AbstractController
     }
 
     #[Route('/projects/{id}/performance', name: 'performance_index', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function index(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -48,12 +51,12 @@ final class PerformanceController extends AbstractController
             'project_name' => $project->getName(),
         ]);
 
-        $nPlusOneOnly = $request->query->getBoolean('nplus1');
-        $total = $this->transactionRepository->countForProject($project, $nPlusOneOnly);
+        $filters = PerformanceFilters::fromRequestQuery($request->query->getBoolean('nplus1'));
+        $total = $this->transactionRepository->countForProject($project, $filters->nPlusOneOnly);
         $pagination = PagePagination::fromRequest($request, $total);
         $transactions = $this->transactionRepository->findPageForProject(
             $project,
-            $nPlusOneOnly,
+            $filters->nPlusOneOnly,
             $pagination['per_page'],
             $pagination['offset'],
         );
@@ -61,21 +64,22 @@ final class PerformanceController extends AbstractController
         return $this->render('performance/index.html.twig', [
             'project' => $project,
             'transactions' => $transactions,
-            'nPlusOneOnly' => $nPlusOneOnly,
+            'nPlusOneOnly' => $filters->nPlusOneOnly,
             'pagination' => $pagination,
         ]);
     }
 
     #[Route('/projects/{projectId}/performance/{id}', name: 'performance_show', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function show(
-        string $projectId,
+        #[MapEntity(mapping: ['projectId' => 'uuid'])]
+        Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         PerfTransaction $transaction,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $project = $transaction->getProject();
-        if (!$project instanceof Project || $project->getUuid() !== $projectId) {
+        if ($transaction->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
         $this->projectAccess->requireMembership($project, $user);

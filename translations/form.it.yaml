@@ -217,6 +217,11 @@ user_preferences:
     label: Movimento
     placeholder: Sistema
     help: Segui le preferenze del dispositivo, riduci le animazioni o mantieni il movimento completo.
+  preferred_collapsed_issue_panels:
+    label: I pannelli dei problemi sono compressi per impostazione predefinita
+    placeholder: Seleziona pannelli…
+    help: I pannelli selezionati iniziano a essere compressi nelle pagine dei dettagli dei
+      problemi e degli eventi. Il tuo browser ricorda le operazioni manuali di apertura/chiusura.
   current_password:
     label: Password attuale
     placeholder: Password attuale
@@ -227,11 +232,14 @@ user_preferences:
     label: Nuova password
     placeholder: Nuova password
     help: Scegli una password robusta che soddisfi i requisiti seguenti.
+    mismatch: I campi della password devono corrispondere.
+    strength_invalid: La password non soddisfa i requisiti di robustezza (%missing%).
     second:
       label: Conferma la nuova password
     first:
       label: Nuova password
   plain_password_confirm:
+    label: Conferma la nuova password
     placeholder: Conferma la nuova password
     help: Reinserisci la nuova password.
 ops_defaults:
@@ -301,7 +309,7 @@ ops_defaults:
     help: Conserva al massimo questo numero di eventi per progetto. Usa 0 per nessun tetto per conteggio.
     label: Massimo di eventi memorizzati per progetto
 instance_mailer:
-  mailer_dsn:
+  plain_mailer_dsn:
     label: DSN Mailer
     help: Lascia vuoto per mantenere il valore cifrato corrente. Esempio smtp://user:pass@mail.example:587
       - null:// viene rifiutato (usa invece Cancella DSN memorizzato).
@@ -311,7 +319,7 @@ instance_mailer:
       altro), oppure usa Cancella DSN memorizzato per ricadere sull'ambiente.
     scheme_not_allowed: Questo schema DSN Mailer non e consentito. Usa smtp, smtps
       o uno schema provider supportato (Mailgun, Postmark, SES, …).
-  clear_dsn:
+  clear_mailer_dsn:
     label: Cancella DSN memorizzato
     help: Rimuove il DSN dal database e ricade su MAILER_DSN dall'ambiente finche non ne salvi uno nuovo.
   mailer_from:
@@ -319,27 +327,27 @@ instance_mailer:
     help: Envelope From per magic login ed email di notifica. Valore predefinito beacon@localhost se vuoto.
     placeholder: beacon@example.com
 instance_mercure:
-  enabled:
+  mercure_enabled:
     label: Abilita avvisi live Mercure
     help: Quando attivo, i membri autenticati si iscrivono a topic privati del progetto per i toast di
       nuove issue mentre l'app e aperta.
-  url:
+  mercure_url:
     label: URL di publish (server)
     help: Lascia vuoto per usare MERCURE_URL (ad es. http://mercure/.well-known/mercure dentro Compose).
     placeholder: http://mercure/.well-known/mercure
-  public_url:
+  mercure_public_url:
     label: URL pubblica (browser)
     help: Lascia vuoto per usare MERCURE_PUBLIC_URL (di solito same-origin /.well-known/mercure tramite
       Caddy).
     placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
+  plain_mercure_jwt_secret:
     label: Segreto JWT
     help: Lascia vuoto per mantenere il valore cifrato corrente o ricadere su MERCURE_JWT_SECRET. Minimo
       32 caratteri se impostato.
     placeholder: ••••••••••••••••••••••••••••••••
     invalid: Inserisci una stringa di segreto JWT valida.
     too_short: Il segreto JWT deve contenere almeno 32 caratteri.
-  clear_secret:
+  clear_mercure_jwt_secret:
     label: Cancella il segreto JWT memorizzato
     help: Rimuove il segreto dal database e ricade su MERCURE_JWT_SECRET finche non ne salvi uno nuovo.
 social_login_credential:
@@ -484,9 +492,7 @@ notifications:
     teams: Webhook Microsoft Teams
     telegram: Bot Telegram
 preferences:
-  issue_panels_collapsed: I pannelli dei problemi sono compressi per impostazione predefinita
-  issue_panels_help: I pannelli selezionati iniziano a essere compressi nelle pagine dei dettagli dei
-    problemi e degli eventi. Il tuo browser ricorda le operazioni manuali di apertura/chiusura.
+
   member_alerts:
     enabled: Notify for this event
     master: Enable member alerts
@@ -511,7 +517,7 @@ preferences:
   push_notifications_help: Opzionale. Se abilitato, Beacon chiede al browser l'autorizzazione e può avvisarti
     sulle nuove issue nei progetti a cui appartieni — anche in background (PWA installata o browser supportato).
     I toast live in-app richiedono separatamente Amministrazione → Mercure.
-  issue_panels_placeholder: Seleziona pannelli…
+
   contrast_more: Più contrasto
   contrast_system: Sistema (segui dispositivo)
   density_comfortable: Comodo

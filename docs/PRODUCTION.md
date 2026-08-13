@@ -65,7 +65,7 @@ See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager i
 
 ## Field encryption key (Halite)
 
-Beacon encrypts API key secrets, notification webhook URLs, push subscription endpoints, **AuthKit OAuth client secrets + linked-account tokens** (AuthKit **≥ 1.15**), and **instance Mailer + Mercure settings** (DSN, From, hub URLs, JWT secret) with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite).
+Beacon encrypts notification webhook URLs, push subscription endpoints, **AuthKit OAuth client secrets + linked-account tokens** (AuthKit **≥ 1.15**), and **instance Mailer + Mercure settings** (DSN, From, hub URLs, JWT secret) with [`nowo-tech/doctrine-encrypt-bundle`](https://packagist.org/packages/nowo-tech/doctrine-encrypt-bundle) (Halite). **Project ingest API key secrets** are stored as **SHA-256 hashes** (`secret_hash`) from **v1.12.0** — not recoverable Halite ciphertext (legacy encrypted `secret_key` rows upgrade on successful ingest).
 
 After upgrading AuthKit to **1.15+**, encrypt any existing plaintext social rows:
 
@@ -188,6 +188,14 @@ Set the maximum Envelope POSTs per project per minute under **Administration →
 
 Daily and monthly event quotas are configured on the same page (`0` = unlimited) and also return `429` (`daily event quota exceeded` / `monthly event quota exceeded`).
 
+Pre-auth **IP** sliding windows (env, default 120/min; `0` disables):
+
+| Env | Surface |
+|-----|---------|
+| `BEACON_INGEST_IP_RATE_LIMIT` | Envelope / OTLP before credential lookup |
+| `BEACON_HOOK_IP_RATE_LIMIT` | Public Slack / Teams actions / inbound-email hooks |
+| `BEACON_READ_API_RATE_LIMIT` | Bearer Read API `/api/projects/…` |
+
 ### Query-string ingest auth
 
 Query `beacon_key` / `beacon_secret` is **removed**. Clients must use `X-Beacon-Auth` or envelope `dsn`. Requests that still send query credentials receive **401**.
@@ -228,8 +236,9 @@ Use this list before exposing an instance beyond a trusted network. Details live
 | **Messenger** | Separate `messenger:consume`; watch `/metrics` queue gauge; purge `messenger:failed` periodically | Failed envelopes may hold PII; do not conflate with `FRANKENPHP_MODE=worker` |
 | **Retention / quotas** | Ops defaults + optional per-project overrides; schedule `app:retention:purge` | `0` disables that rule |
 | **HTTP audit log** | Admin → HTTP log (`/admin/http-log`); schedule `nowo:http-log:purge` | Default retention 30 days; may store IPs / user ids |
-| **Ingest** | `X-Beacon-Auth` or envelope DSN only (query auth removed) | Rotate project API key secrets if leaked |
-| **Public hooks** | `BEACON_HOOK_IP_RATE_LIMIT` (default 120/min); Teams Assign query HMAC may appear in logs/Referer | Assign-me is session-gated and excluded from the IP throttle |
+| **Ingest** | `X-Beacon-Auth` or envelope DSN only (query auth removed); secrets are SHA-256 at rest | Rotate project API key secrets if leaked |
+| **Read API** | `BEACON_READ_API_RATE_LIMIT` (default 120/min); Bearer `brt_…` only | Returns 503 under maintenance (`095`) |
+| **Public hooks** | `BEACON_HOOK_IP_RATE_LIMIT` (default 120/min); Teams Assign query HMAC may appear in logs/Referer; action tokens TTL **24h** | Assign-me is session-gated and excluded from the IP throttle |
 | **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
 | **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
 | **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production (Ops Overview warns when off) | Prefer private scrape network / Caddy `remote_ip` allowlist |

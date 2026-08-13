@@ -361,8 +361,6 @@ flash:
 project:
   label: Progetto
   no_description: Nessuna descrizione
-  nav:
-    label: Sezioni del progetto
   settings:
     title: Impostazioni
     nav: Impostazioni
@@ -380,12 +378,12 @@ project:
     month_utc_hint: Il confine del mese è UTC
     save: Salvare la governance
     quota_usage: 'Eventi oggi: %count% / %quota%'
-    ingest_disabled_banner: L'acquisizione della busta è sospesa per questo progetto.
-      I dati esistenti rimangono leggibili.
+    ingest_disabled_banner: L'acquisizione della busta è sospesa per questo progetto. I dati esistenti
+      rimangono leggibili.
   health:
     title: Salute
-    intro: Profondità della coda di Instance Messenger e stato di consegna dell'ultima
-      notifica per le destinazioni di questo progetto.
+    intro: Profondità della coda di Instance Messenger e stato di consegna dell'ultima notifica per le
+      destinazioni di questo progetto.
     messenger_pending: Asincronizzazione di Messenger in sospeso
     messenger_unavailable: Profondità coda non disponibile
     instance_wide: a livello di istanza
@@ -404,39 +402,31 @@ project:
     title: Nuovo progetto
     submit: Crea progetto
   name:
-    label: Nome
-    placeholder: per esempio. API di fatturazione
-    help: Visualizzato nella dashboard e utilizzato per derivare lo slug del progetto.
     required: Il nome del progetto è obbligatorio.
-  description:
-    label: Descrizione
-    placeholder: Breve riepilogo facoltativo
-    help: Aiuta il tuo team a riconoscere questo progetto.
   api_keys:
     title: Chiavi API/DSN
-    help: Utilizza un DSN in BEACON_DSN in modo che la tua app possa inviare errori
-      a questo progetto.
     inactive: inattivo
     public: 'pubblico:'
-    label_placeholder: per esempio. lontra calma
     generate: Suggerisci nome
     generate_hint: Compila l'etichetta con un nome aggettivo-sostantivo adatto all'uomo
     add: Aggiungi chiave
     revoke: Revocare
-    revoke_confirm: Revocare questa chiave API? L'acquisizione con questo segreto
-      avrà esito negativo immediato.
+    revoke_confirm: Revocare questa chiave API? L'acquisizione con questo segreto avrà esito negativo
+      immediato.
     rotate: Ruotare
     copy_dsn: Copia DSN
     dsn_copied: Copiato
-    dsn_help: Copia questo DSN per i client (il path è l’UUID del progetto). Ruota per generare un nuovo secret.
+    dsn_help: Copia questo DSN per i client (il path è l’UUID del progetto). Ruota per generare un nuovo
+      secret.
     inactive_dsn_hidden: Le chiavi revocate non possono autenticare l’ingest. DSN e secret non sono mostrati.
-    secret_hidden: DSN completo e secret sono mostrati solo una volta dopo creazione o rotazione (non ai viewer).
-    secret_once_banner: Nuovo DSN pronto — copialo ora nel client. Non resterà elencato dopo aver lasciato questa pagina.
-    secret_once_hint: Crea o ruota questa chiave per rivelare il DSN una sola volta. Il secret non viene più mostrato in questa pagina.
+    secret_hidden: DSN completo e secret sono mostrati solo una volta dopo creazione o rotazione (non
+      ai viewer).
+    secret_once_banner: Nuovo DSN pronto — copialo ora nel client. Non resterà elencato dopo aver lasciato
+      questa pagina.
+    secret_once_hint: Crea o ruota questa chiave per rivelare il DSN una sola volta. Il secret non viene
+      più mostrato in questa pagina.
   members:
     title: Membri
-    help: Membri diretti di questo progetto. I proprietari e gli amministratori gestiscono
-      l'appartenenza. L'accesso può provenire anche dai gruppi collegati di seguito.
     your_role: 'Il tuo ruolo:'
     email_label: E-mail del membro
     email_placeholder: utente@esempio.com
@@ -463,8 +453,6 @@ project:
     inactive: inattivo
   groups:
     title: Gruppi
-    help: Collega un gruppo in modo che ogni membro del gruppo ottenga il ruolo scelto
-      in questo progetto. I proprietari devono essere aggiunti come singoli utenti.
     empty: Nessun gruppo ancora collegato.
     select: Seleziona un gruppo...
     add: Gruppo di collegamento
@@ -474,8 +462,7 @@ project:
     edit_role: Modifica ruolo del gruppo
     edit_role_title: Cambia ruolo nel gruppo
     edit_role_body: Scegli un nuovo ruolo per il gruppo “%name%”.
-    none_available: Tutti i gruppi sono già collegati oppure crea gruppi in Amministrazione
-      → Gruppi.
+    none_available: Tutti i gruppi sono già collegati oppure crea gruppi in Amministrazione → Gruppi.
     member_count: '%count% utenti nel gruppo'
   danger:
     title: Zona pericolosa
@@ -483,39 +470,37 @@ project:
     cancel: Cancellare
     clear_open: Cancella cronologia...
     clear_title: Cancellare la cronologia del progetto?
-    clear_body: Questa operazione eliminerà definitivamente problemi, eventi, dati
-      sulle prestazioni e analisi per questo progetto. Le chiavi e i membri API vengono
-      conservati.
+    clear_body: Questa operazione eliminerà definitivamente problemi, eventi, dati sulle prestazioni e
+      analisi per questo progetto. Le chiavi e i membri API vengono conservati.
     clear_confirm: Sì, cancella la cronologia
     delete_open: Elimina progetto...
     delete_title: Eliminare questo progetto in modo permanente?
-    delete_body: Ciò elimina permanentemente "%name%" e tutti i suoi dati (problemi,
-      eventi, prestazioni, analisi, chiavi e membri). Questa operazione non può essere
-      annullata.
+    delete_body: Ciò elimina permanentemente "%name%" e tutti i suoi dati (problemi, eventi, prestazioni,
+      analisi, chiavi e membri). Questa operazione non può essere annullata.
     delete_type_label: 'Digita %name% per confermare:'
     delete_confirm: Elimina progetto
     transfer_open: Trasferisci proprietà...
     transfer_title: Trasferire la proprietà del progetto?
-    transfer_body: Il membro selezionato diventa il proprietario. Diventi un amministratore
-      e perdi la possibilità di eliminare il progetto.
+    transfer_body: Il membro selezionato diventa il proprietario. Diventi un amministratore e perdi la
+      possibilità di eliminare il progetto.
     transfer_member_label: Nuovo proprietario
     transfer_member_placeholder: Seleziona un membro...
     transfer_type_label: 'Digita %name% per confermare:'
     transfer_confirm: Trasferisci la proprietà
-    transfer_no_candidates: Aggiungi un altro membro diretto prima di trasferire la
-      proprietà.
+    transfer_no_candidates: Aggiungi un altro membro diretto prima di trasferire la proprietà.
   config:
     title: Esporta / importa progetto
-    help: 'JSON portabile per questo progetto (codice: %code%). Include membership per email; mai i segreti API.'
     tabs_label: Esporta o importa
     tab_export: Esporta
     tab_import: Importa
     export_help: Scarica un bundle JSON per questo progetto. I segreti API non sono mai inclusi.
     export: Esporta JSON
-    import_help: Scegli un file JSON beacon-project-bundle. Solo questo progetto viene aggiornato se il codice corrisponde.
+    import_help: Scegli un file JSON beacon-project-bundle. Solo questo progetto viene aggiornato se il
+      codice corrisponde.
     file: File JSON
     import: Importa JSON
-    panel_note: L’import aggiorna questo progetto solo se il codice del bundle corrisponde. Le email sconosciute vengono saltate (qui non si creano utenti).
+    panel_note: L’import aggiorna questo progetto solo se il codice del bundle corrisponde. Le email sconosciute
+      vengono saltate (qui non si creano utenti).
 projects:
   title: Progetti
   intro: Filtra e apri i progetti a cui puoi accedere.
@@ -525,13 +510,12 @@ projects:
   errors_last_7_days: '%count% errori negli ultimi 7 giorni'
   share:
     title: Link di condivisione
-    help: Crea un link a tempo limitato in sola lettura per questo progetto (o una
-      issue). I destinatari devono accedere. I nuovi link hanno 1 uso per impostazione
-      predefinita.
+    help: Crea un link a tempo limitato in sola lettura per questo progetto (o una issue). I destinatari
+      devono accedere. I nuovi link hanno 1 uso per impostazione predefinita.
     days: Durata (giorni)
     max_uses: Usi massimi
-    max_uses_help: Lascia Usi massimi vuoto per aperture illimitate fino alla scadenza.
-      Il valore predefinito è 1.
+    max_uses_help: Lascia Usi massimi vuoto per aperture illimitate fino alla scadenza. Il valore predefinito
+      è 1.
     max_uses_unlimited: Illimitato
     max_uses_invalid: Usi massimi deve essere un intero positivo (o vuoto per illimitato).
     uses: Usi %used% / %max%
@@ -551,16 +535,14 @@ projects:
     expires_too_far: I link di condivisione non possono durare più di 30 giorni.
     issue_wrong_project: Quella issue non appartiene a questo progetto.
   read_token:
+    help: 'Crea token Bearer (prefisso brt_) per l’automazione. Sono hashati a riposo e distinti dalle
+      chiavi di ingest. Usa Authorization: Bearer su /api/projects/{uuid}/issues.'
     active: Attivo
     copy_once: Copia questo token ora. Non verrà più mostrato.
     create: Crea token
     created: Token di lettura creato — copialo ora; non verrà più mostrato.
     empty: Nessun token API di lettura ancora.
-    help: 'Crea token Bearer (prefisso brt_) per l’automazione. Sono hashati a riposo
-      e distinti dalle chiavi di ingest. Usa Authorization: Bearer su /api/projects/{uuid}/issues.'
     invalid_csrf: Token di sicurezza non valido.
-    label: Etichetta
-    label_placeholder: Bot CI, script di export…
     last_used: Ultimo utilizzo
     revoke: Revoca
     revoked: Token di lettura revocato.
@@ -868,92 +850,6 @@ appearance:
     surfaces: Superfici (carta, inchiostro, pannelli)
   submit: Salva l'aspetto
   reset: Ripristina le impostazioni predefinite
-site_appearance:
-  brand_name:
-    label: Marchio
-    placeholder: symfony-beacon
-    help: Mostrato nell'intestazione e nella pagina di accesso.
-  brand_eyebrow:
-    label: Sopracciglio di marca
-    placeholder: Tracciamento degli errori
-    help: Breve etichetta sopra il marchio nella schermata di accesso.
-  accent_color:
-    label: Accento
-    placeholder: '#1f6f54'
-    help: Accento primario (pulsanti, collegamenti) in modalità luce.
-  accent_deep_color:
-    label: Accento (al passaggio del mouse)
-    placeholder: '#134736'
-    help: Accento più scuro per gli stati al passaggio del mouse in modalità luce.
-  accent_color_dark:
-    label: Accento (scuro)
-    placeholder: '#4aad7f'
-    help: Accento primario in modalità oscura.
-  accent_deep_color_dark:
-    label: Accento al passaggio del mouse (scuro)
-    placeholder: '#6bc49a'
-    help: Accento più chiaro per gli stati al passaggio del mouse in modalità oscura.
-  danger_color:
-    label: Pericolo
-    placeholder: '#b42318'
-    help: Errore/accento distruttivo in modalità luce.
-  danger_color_dark:
-    label: Pericolo (scuro)
-    placeholder: '#f97066'
-    help: Errore/accento distruttivo in modalità oscura.
-  warn_color:
-    label: Avviso
-    placeholder: '#b54708'
-    help: Accento di avviso in modalità chiara.
-  warn_color_dark:
-    label: Avviso (scuro)
-    placeholder: '#fdb022'
-    help: Accento di avviso in modalità scura.
-  paper_color:
-    label: Carta
-    placeholder: '#f3f6f4'
-    help: Sfondo della pagina in modalità chiara.
-  paper_color_dark:
-    label: Carta (scuro)
-    placeholder: '#0c1210'
-    help: Sfondo della pagina in modalità scura.
-  ink_color:
-    label: Inchiostro
-    placeholder: '#0f1c18'
-    help: Colore del testo principale in modalità chiara.
-  ink_color_dark:
-    label: Inchiostro (scuro)
-    placeholder: '#e6eee9'
-    help: Colore del testo principale in modalità scura.
-  surface_color:
-    label: Superficie
-    placeholder: '#ffffff'
-    help: Pannelli e schede in modalità chiara.
-  surface_color_dark:
-    label: Superficie (scuro)
-    placeholder: '#151c19'
-    help: Pannelli e schede in modalità scura.
-  footer_fixed:
-    label: Footer fisso
-    help: Mantiene il footer legale fissato in basso nella viewport mentre il contenuto
-      scorre.
-  corner_style:
-    label: Stile angoli
-    help: Le card usano un raggio maggiore; input e pulsanti restano più sobri.
-    choice:
-      sharp: Netto
-      soft: Morbido (predefinito)
-      rounded: Arrotondato
-  border_strength:
-    label: Definizione bordi
-    help: Quanto sono definiti i bordi degli elementi in modalità chiara e scura (pannelli,
-      input, chrome).
-    choice:
-      subtle: Sottile
-      medium: Media (predefinito)
-      strong: Forte
-  color:
-    invalid: 'Utilizza un colore esadecimale come #1f6f54.'
 users:
   title: Utenti
   intro: Crea account, assegna ruoli all'istanza e abilita o disabilita l'accesso
@@ -1371,62 +1267,7 @@ preferences:
     / VAPID_PRIVATE_KEY). Chiedi a un amministratore, oppure usa i toast Mercure live
     se abilitati in Amministrazione → Mercure.
 user_preferences:
-  display_name:
-    label: Nome da visualizzare
-    placeholder: Il tuo nome
-    help: Mostrato nel menu avatar e negli elenchi dei membri.
-  email:
-    label: E-mail
-    placeholder: tu@esempio.com
-    help: Utilizzato per accedere.
-  slack_user_id:
-    placeholder: U012ABCDEF
-  phone:
-    placeholder: '+34600111222'
-  preferred_locale:
-    label: Lingua
-    placeholder: Auto
-    help: Lingua dell'interfaccia utente preferita per questo account.
-  preferred_theme:
-    label: Tema
-    placeholder: Auto
-    help: Aspetto preferito diurno o notturno.
-  preferred_content_width:
-    label: Larghezza del contenuto
-    placeholder: Contenuto
-    help: Colonna del contenuto centrata o allunga l'area principale a tutta larghezza.
-  preferred_ui_density:
-    label: Densità dell'interfaccia utente
-    placeholder: Comodo
-    help: Spaziatura confortevole o disposizione dell'operatore più compatta.
-  preferred_font_scale:
-    label: Dimensione del testo
-    placeholder: Medio
-    help: Riduci o ingrandisci il testo dell'interfaccia.
-  preferred_contrast:
-    label: Contrasto
-    placeholder: Sistema
-    help: Segui il contrasto del dispositivo oppure forza testo e bordi più marcati.
-  preferred_sidebar:
-    label: Barra laterale
-    placeholder: Espansa
-    help: Stato predefinito su desktop se questo browser non ha ancora una preferenza
-      salvata.
-  preferred_motion:
-    label: Movimento
-    placeholder: Sistema
-    help: Segui le preferenze del dispositivo, riduci le animazioni o mantieni il
-      movimento completo.
-  current_password:
-    label: Password attuale
-    help: Richiesto solo quando si imposta una nuova password.
-    help_required: Conferma la tua password attuale per impostarne una nuova.
-    help_email_change: Obbligatoria quando cambi l’indirizzo email (login e destinazione reset password).
   plain_password:
-    first:
-      label: Nuova password
-    second:
-      label: Conferma la nuova password
     mismatch: I campi della password devono corrispondere.
     strength_invalid: La password non soddisfa i requisiti di robustezza (%missing%).
 groups:
@@ -1836,12 +1677,10 @@ legal:
       le norme applicabili nella propria giurisdizione.
 releases:
   title: Salute delle release
-  intro: Scegli una release per vedere quante issue sono state viste per la prima
-    volta li, confrontare due release oppure aprire il compare esistente della lista
-    issue.
+  intro: Scegli una release per vedere quante issue sono state viste per la prima volta li, confrontare
+    due release oppure aprire il compare esistente della lista issue.
   empty: Non ci sono ancora dati sulle release per questo progetto.
   focus:
-    label: Release
     submit: Aggiorna salute delle release
   new_in_release:
     title: Nuove in %release%
@@ -1849,9 +1688,8 @@ releases:
     open_issue_list: Apri lista issue filtrata
     empty: Nessuna issue e stata vista per la prima volta in questa release.
   compare:
-    label: Confronta con release
-    help: Facoltativamente confronta la release selezionata con un'altra release usando
-      l'insieme corrente di issue.
+    help: Facoltativamente confronta la release selezionata con un'altra release usando l'insieme corrente
+      di issue.
     summary_title: Confronta %a% vs %b%
     only_a: Solo in %release%
     only_b: Solo in %release%
@@ -1864,8 +1702,8 @@ releases:
     environment_a: Ambiente A
     environment_b: Ambiente B
     open_issue_list: Apri confronto nella lista issue
-    help: Riutilizza il compare esistente della issue list `014`. Quando una release
-      e selezionata, il link mantiene quel filtro release.
+    help: Riutilizza il compare esistente della issue list `014`. Quando una release e selezionata, il
+      link mantiene quel filtro release.
 mailer_settings:
   title: Mailer
   intro: Memorizza il DSN di Symfony Mailer cifrato nel database (non in .env). Il
@@ -2029,52 +1867,6 @@ mercure_settings:
       step4: Salva. Il pannello di stato sopra dovrebbe mostrare gli avvisi come attivi.
       step5: 'Accedi come membro del progetto, tieni una scheda aperta, crea una nuova issue e osserva il toast.'
       current_url: 'URL hub del browser risolta ora: %url%'
-instance_mercure:
-  enabled:
-    label: Abilita avvisi live Mercure
-    help: Quando attivo, i membri autenticati si iscrivono a topic privati del progetto
-      per i toast di nuove issue mentre l'app e aperta.
-  url:
-    label: URL di publish (server)
-    help: Lascia vuoto per usare MERCURE_URL (ad es. http://mercure/.well-known/mercure
-      dentro Compose).
-    placeholder: http://mercure/.well-known/mercure
-  public_url:
-    label: URL pubblica (browser)
-    help: Lascia vuoto per usare MERCURE_PUBLIC_URL (di solito same-origin /.well-known/mercure
-      tramite Caddy).
-    placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
-    label: Segreto JWT
-    help: Lascia vuoto per mantenere il valore cifrato corrente o ricadere su MERCURE_JWT_SECRET.
-      Minimo 32 caratteri se impostato.
-    placeholder: ••••••••••••••••••••••••••••••••
-    too_short: Il segreto JWT deve contenere almeno 32 caratteri.
-    invalid: Inserisci una stringa di segreto JWT valida.
-  clear_secret:
-    label: Cancella il segreto JWT memorizzato
-    help: Rimuove il segreto dal database e ricade su MERCURE_JWT_SECRET finche non
-      ne salvi uno nuovo.
-instance_mailer:
-  mailer_dsn:
-    label: DSN Mailer
-    help: Lascia vuoto per mantenere il valore cifrato corrente. Esempio smtp://user:pass@mail.example:587
-      - null:// viene rifiutato (usa invece Cancella DSN memorizzato).
-    placeholder: smtp://user:pass@mail.example:587
-    invalid: Inserisci un DSN Symfony Mailer valido (ad esempio smtp://user:pass@host:587).
-    null_transport: null:// non puo consegnare email. Incolla un DSN SMTP reale (o
-      altro), oppure usa Cancella DSN memorizzato per ricadere sull'ambiente.
-    scheme_not_allowed: Questo schema DSN Mailer non e consentito. Usa smtp, smtps
-      o uno schema provider supportato (Mailgun, Postmark, SES, …).
-  clear_dsn:
-    label: Cancella DSN memorizzato
-    help: Rimuove il DSN dal database e ricade su MAILER_DSN dall'ambiente finche
-      non ne salvi uno nuovo.
-  mailer_from:
-    label: Indirizzo From
-    help: Envelope From per magic login ed email di notifica. Valore predefinito beacon@localhost
-      se vuoto.
-    placeholder: beacon@example.com
 setup:
   eyebrow: Primo avvio
   title: Setup dell'istanza
@@ -2199,9 +1991,8 @@ setup:
     failed: Azione di setup non riuscita.
 notifications:
   title: Notifiche
-  intro: Invia avvisi a Slack, Discord, Teams, Telegram, email oppure a un endpoint
-    HTTP generico quando compaiono nuove issue, regressioni, picchi di soglia o gruppi
-    N+1.
+  intro: Invia avvisi a Slack, Discord, Teams, Telegram, email oppure a un endpoint HTTP generico quando
+    compaiono nuove issue, regressioni, picchi di soglia o gruppi N+1.
   empty: Nessuna destinazione ancora. Aggiungi un canale per avvisare il tuo team.
   add: Aggiungi destinazione
   edit: Modifica
@@ -2210,54 +2001,22 @@ notifications:
   disabled: Disabilitata
   resume: Resume
   circuit_paused: Auto-paused
-  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound
-    alerts are skipped until you resume (Send test still works).
+  circuit_paused_help: Paused after %count% consecutive delivery failures. Outbound alerts are skipped
+    until you resume (Send test still works).
   test: Invia test
-  test_hint: Invia una notifica di esempio nel formato %type% (funziona anche se la
-    destinazione e disabilitata)
+  test_hint: Invia una notifica di esempio nel formato %type% (funziona anche se la destinazione e disabilitata)
   delete: Elimina
   delete_confirm: Eliminare questa destinazione di notifica?
   save: Salva destinazione
   cancel: Annulla
   new_title: Nuova destinazione di notifica
   edit_title: Modifica destinazione di notifica
-  form_help: Scegli un tipo di canale e incolla l'endpoint corrispondente. I segreti
-    sono mascherati nell'elenco delle impostazioni.
+  form_help: Scegli un tipo di canale e incolla l'endpoint corrispondente. I segreti sono mascherati nell'elenco
+    delle impostazioni.
   form:
-    label: Etichetta
-    type: Tipo
-    endpoint: Endpoint
-    endpoint_help: 'Slack / Discord / Teams / HTTP: URL HTTPS del webhook. Email:
-      indirizzo del destinatario. Telegram: bot_token@chat_id'
-    endpoint_invalid: L'endpoint non corrisponde al tipo selezionato.
-    endpoint_ssrf: L'endpoint non deve puntare a indirizzi privati, link-local o metadati
-      cloud.
-    signing_secret: Interaction signing secret
-    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing
-      Secret, or a shared secret for Teams HttpPOST). Leave blank to keep the current
-      value.
-    clear_signing_secret: Clear interaction signing secret
-    enabled: Abilitata
-    categories: Categorie di avviso
+    pagerduty_note: PagerDuty nativo non e supportato; usa un webhook HTTP generico se ti serve un bridge
+      per incident.
     quiet_hours_legend: Ore di silenzio e digest
-    quiet_hours_enabled: Abilita ore di silenzio
-    quiet_hours_help: Durante la finestra gli avvisi vengono accumulati invece di
-      essere inviati subito. Esegui app:notifications:flush-digests secondo pianificazione
-      (o dopo la finestra).
-    quiet_hours_timezone: Fuso orario
-    quiet_hours_start: Inizio ore di silenzio (HH:MM)
-    quiet_hours_end: Fine ore di silenzio (HH:MM)
-    quiet_hours_timezone_invalid: Identificatore di fuso orario non valido.
-    quiet_hours_time_invalid: Usa il formato a 24 ore HH:MM (ad es. 22:00).
-    quiet_hours_required: Ora di inizio e fine sono richieste quando le ore di silenzio
-      sono abilitate.
-    quiet_hours_range_invalid: Ora di inizio e fine devono essere diverse.
-    digest_enabled: Invia riepilogo digest al flush
-    digest_help: Quando attivo, il flush invia un riepilogo per destinazione. Quando
-      disattivo, ogni avviso trattenuto viene inviato singolarmente dopo le ore di
-      silenzio.
-    pagerduty_note: PagerDuty nativo non e supportato; usa un webhook HTTP generico
-      se ti serve un bridge per incident.
   type:
     slack: Slack Incoming Webhook
     discord: Webhook Discord
@@ -2291,101 +2050,89 @@ notifications:
     link: Guide di configurazione
     back: Torna alle impostazioni
     toc: Vai al canale
-    intro: Istruzioni passo passo per collegare Slack, Discord, Microsoft Teams, Telegram,
-      email oppure un webhook HTTP generico a questo progetto.
+    intro: Istruzioni passo passo per collegare Slack, Discord, Microsoft Teams, Telegram, email oppure
+      un webhook HTTP generico a questo progetto.
     payload_label: 'Beacon invia:'
-    docs_hint: 'Riferimento completo (payload, consegna, permessi): docs/product/NOTIFICATIONS.md
-      nel repository.'
+    docs_hint: 'Riferimento completo (payload, consegna, permessi): docs/product/NOTIFICATIONS.md nel
+      repository.'
     slack:
       title: Slack (Incoming Webhook)
       lead: Crea un Incoming Webhook per un'app Slack e incolla l'URL HTTPS in Beacon.
       step1: Apri api.slack.com/apps e crea un'app From scratch per il tuo workspace.
-      step2: Abilita Incoming Webhooks, poi Add New Webhook to Workspace e scegli
-        un canale.
+      step2: Abilita Incoming Webhooks, poi Add New Webhook to Workspace e scegli un canale.
       step3: Copia l'URL del webhook (https://hooks.slack.com/services/...).
-      step4: In Beacon scegli Slack Incoming Webhook, incolla l'URL come endpoint,
-        seleziona le categorie e salva.
+      step4: In Beacon scegli Slack Incoming Webhook, incolla l'URL come endpoint, seleziona le categorie
+        e salva.
       step5: Fai clic su Invia test e conferma che il messaggio compaia in Slack.
-      payload: JSON con text (riepilogo) e un oggetto beacon che contiene il payload
-        completo dell'evento.
-      tip: Preferisci un canale ops dedicato. Ruota il webhook in Slack se dovesse
-        trapelare e aggiorna la destinazione in Beacon.
+      payload: JSON con text (riepilogo) e un oggetto beacon che contiene il payload completo dell'evento.
+      tip: Preferisci un canale ops dedicato. Ruota il webhook in Slack se dovesse trapelare e aggiorna
+        la destinazione in Beacon.
     discord:
       title: Discord (webhook)
       lead: Crea un webhook di canale in Discord e incolla il suo URL in Beacon.
-      step1: Apri Impostazioni server -> Integrazioni -> Webhook (oppure la scheda
-        Integrazioni del canale).
-      step2: Crea un nuovo webhook, assegnagli un nome (ad esempio Beacon) e scegli
-        il canale di destinazione.
+      step1: Apri Impostazioni server -> Integrazioni -> Webhook (oppure la scheda Integrazioni del canale).
+      step2: Crea un nuovo webhook, assegnagli un nome (ad esempio Beacon) e scegli il canale di destinazione.
       step3: Copia l'URL del webhook (https://discord.com/api/webhooks/...).
-      step4: In Beacon scegli Webhook Discord, incolla l'URL, seleziona le categorie,
-        salva e poi Invia test.
-      payload: JSON con content (riepilogo) e un array embeds (title, description,
-        URL issue opzionale).
-      tip: Discord applica rate limit ai webhook; Beacon consegna in modo asincrono
-        tramite Messenger.
+      step4: In Beacon scegli Webhook Discord, incolla l'URL, seleziona le categorie, salva e poi Invia
+        test.
+      payload: JSON con content (riepilogo) e un array embeds (title, description, URL issue opzionale).
+      tip: Discord applica rate limit ai webhook; Beacon consegna in modo asincrono tramite Messenger.
     teams:
       title: Microsoft Teams (Incoming Webhook)
-      lead: Aggiungi un connettore Incoming Webhook a un canale Teams e incolla l'URL
-        in Beacon.
+      lead: Aggiungi un connettore Incoming Webhook a un canale Teams e incolla l'URL in Beacon.
       step1: Nel menu del canale Teams apri Connectors (o Gestisci canale -> Connectors).
       step2: Configura Incoming Webhook, assegnagli un nome e crealo.
       step3: Copia l'URL del webhook fornito da Teams.
-      step4: In Beacon scegli Webhook Microsoft Teams, incolla l'URL, seleziona le
-        categorie, salva e poi Invia test.
-      payload: JSON Office 365 MessageCard con summary, title, text e un'azione Open
-        in Beacon quando esiste un URL.
-      tip: Se il tuo tenant consente solo Workflows invece dei classici Incoming Webhooks,
-        punta una destinazione HTTP generica a un workflow che accetta POST JSON.
+      step4: In Beacon scegli Webhook Microsoft Teams, incolla l'URL, seleziona le categorie, salva e
+        poi Invia test.
+      payload: JSON Office 365 MessageCard con summary, title, text e un'azione Open in Beacon quando
+        esiste un URL.
+      tip: Se il tuo tenant consente solo Workflows invece dei classici Incoming Webhooks, punta una destinazione
+        HTTP generica a un workflow che accetta POST JSON.
     telegram:
       title: Telegram (bot)
-      lead: Crea un bot con BotFather e memorizza bot_token@chat_id come endpoint
-        Beacon.
+      lead: Crea un bot con BotFather e memorizza bot_token@chat_id come endpoint Beacon.
       step1: Apri @BotFather in Telegram, esegui /newbot e copia il token del bot.
-      step2: Avvia una chat privata con il bot oppure aggiungilo a un gruppo e invia
-        un messaggio.
-      step3: Chiama getUpdates sulla Bot API e leggi message.chat.id (gli id dei gruppi
-        sono spesso negativi).
-      step4: In Beacon scegli Bot Telegram e imposta l'endpoint su bot_token@chat_id
-        (esempio - 123:AA...@-1001234567890).
+      step2: Avvia una chat privata con il bot oppure aggiungilo a un gruppo e invia un messaggio.
+      step3: Chiama getUpdates sulla Bot API e leggi message.chat.id (gli id dei gruppi sono spesso negativi).
+      step4: In Beacon scegli Bot Telegram e imposta l'endpoint su bot_token@chat_id (esempio - 123:AA...@-1001234567890).
       step5: Salva e Invia test.
-      payload: sendMessage della Bot API con chat_id e text (solo riepilogo; non il
-        payload JSON completo).
-      tip: L'ultimo @ nell'endpoint separa token e chat id. I token sono cifrati a
-        riposo come gli altri endpoint.
+      payload: sendMessage della Bot API con chat_id e text (solo riepilogo; non il payload JSON completo).
+      tip: L'ultimo @ nell'endpoint separa token e chat id. I token sono cifrati a riposo come gli altri
+        endpoint.
     email:
       title: Email
-      lead: Recapita gli avvisi a una casella email tramite Symfony Mailer. Configura
-        prima il DSN Mailer in Amministrazione -> Mailer.
-      step1: Apri Amministrazione -> Mailer e salva un DSN cifrato (smtp://...). MAILER_DSN
-        nell'ambiente e solo un fallback di bootstrap; null://null non recapita nulla.
+      lead: Recapita gli avvisi a una casella email tramite Symfony Mailer. Configura prima il DSN Mailer
+        in Amministrazione -> Mailer.
+      step1: Apri Amministrazione -> Mailer e salva un DSN cifrato (smtp://...). MAILER_DSN nell'ambiente
+        e solo un fallback di bootstrap; null://null non recapita nulla.
       step2: In Beacon scegli Email e imposta l'endpoint sull'indirizzo del destinatario.
       step3: Seleziona le categorie, salva, Invia test e controlla posta in arrivo/spam.
-      payload: L'oggetto dell'email coincide con il riepilogo; il corpo contiene il
-        riepilogo piu l'URL della issue o della performance quando presente.
-      tip: Usa un alias ops condiviso. Per digest piu ricchi, preferisci Slack/Discord/Teams
-        o un bridge HTTP.
+      payload: L'oggetto dell'email coincide con il riepilogo; il corpo contiene il riepilogo piu l'URL
+        della issue o della performance quando presente.
+      tip: Usa un alias ops condiviso. Per digest piu ricchi, preferisci Slack/Discord/Teams o un bridge
+        HTTP.
     http:
       title: Webhook HTTP generico
-      lead: Invia tramite POST il payload JSON canonico di Beacon a qualsiasi endpoint
-        HTTPS di automazione.
+      lead: Invia tramite POST il payload JSON canonico di Beacon a qualsiasi endpoint HTTPS di automazione.
       step1: Esponi un URL HTTPS che accetti POST con Content-Type application/json.
-      step2: In Beacon scegli Webhook HTTP generico, incolla l'URL, seleziona le categorie,
-        salva e poi Invia test.
-      step3: Conferma che il tuo servizio riceva il body JSON canonico (event, summary,
-        project, issue, url, category).
+      step2: In Beacon scegli Webhook HTTP generico, incolla l'URL, seleziona le categorie, salva e poi
+        Invia test.
+      step3: Conferma che il tuo servizio riceva il body JSON canonico (event, summary, project, issue,
+        url, category).
       payload: Payload JSON canonico come body della richiesta (User-Agent symfony-beacon-notifications/1.0).
-      tip: Preferisci HTTPS e autentica il destinatario. Evita di puntare a indirizzi
-        interni o di metadati cloud.
-  project_layer_help: 'Queste destinazioni appartengono al progetto (canali del team), indipendenti dalle preferenze personali di avviso sopra. La consegna in uscita usa le categorie della destinazione; toast/push membro usano la matrice di preferenze del membro.'
+      tip: Preferisci HTTPS e autentica il destinatario. Evita di puntare a indirizzi interni o di metadati
+        cloud.
+  project_layer_help: Queste destinazioni appartengono al progetto (canali del team), indipendenti dalle
+    preferenze personali di avviso sopra. La consegna in uscita usa le categorie della destinazione; toast/push
+    membro usano la matrice di preferenze del membro.
   teams:
     token_used: Questo link di azione Teams è già stato usato. Apri l’issue in Beacon se devi ancora modificarla.
 thresholds:
   title: Avvisi di soglia
-  intro: Crea avvisi di volume su finestra mobile quando eventi error o fatal superano
-    un conteggio configurato all'interno di una finestra temporale.
-  ingest_disabled: L'ingest e sospeso per questo progetto, quindi le regole di soglia
-    non vengono valutate.
+  intro: Crea avvisi di volume su finestra mobile quando eventi error o fatal superano un conteggio configurato
+    all'interno di una finestra temporale.
+  ingest_disabled: L'ingest e sospeso per questo progetto, quindi le regole di soglia non vengono valutate.
   empty: Nessuna regola di soglia ancora. Aggiungine una per intercettare picchi improvvisi.
   add: Aggiungi regola
   edit: Modifica
@@ -2398,9 +2145,8 @@ thresholds:
   cancel: Annulla
   new_title: Nuova regola di soglia
   edit_title: Modifica regola di soglia
-  form_help: Configura un avviso di volume error/fatal su finestra mobile. I filtri
-    facoltativi di ambiente e release limitano il conteggio prima che vengano applicati
-    routing notifiche, ore di silenzio e digest.
+  form_help: Configura un avviso di volume error/fatal su finestra mobile. I filtri facoltativi di ambiente
+    e release limitano il conteggio prima che vengano applicati routing notifiche, ore di silenzio e digest.
   unnamed: Regola senza nome
   summary: '%count% eventi in %window% min · %cooldown% min di cooldown'
   last_fired: Ultimo trigger
@@ -2409,22 +2155,6 @@ thresholds:
     environment: 'Ambiente: %value%'
     release: 'Release: %value%'
     all_events: Tutti gli ambienti e le release
-  form:
-    label: Etichetta
-    label_help: Nome interno facoltativo mostrato in Settings e nei payload.
-    enabled: Abilitata
-    error_count: Conteggio errori
-    error_count_help: Avvisa quando almeno questo numero di eventi error/fatal viene
-      ricevuto nella finestra mobile.
-    window_minutes: Finestra (minuti)
-    window_minutes_help: Finestra mobile di osservazione da 1 a 1440 minuti.
-    cooldown_minutes: Cooldown (minuti)
-    cooldown_minutes_help: Sopprime avvisi duplicati per questa regola durante la
-      finestra di cooldown.
-    environment: Filtro ambiente
-    environment_help: Lascia vuoto per contare tutti gli ambienti.
-    release: Filtro release
-    release_help: Lascia vuoto per contare tutte le release.
   flash:
     created: Regola di soglia creata.
     updated: Regola di soglia aggiornata.
@@ -2514,133 +2244,32 @@ error:
     image_alt: Mascotte Beacon con chiave inglese accanto a server e un grande 503
       con cartello di manutenzione
 ops_defaults:
-  allow_anonymous_resolve:
-    help: Legacy. Se attivo, Resolve può modificare le issue senza un attore Beacon
-      mappato. Preferisci utenti mappati + triage.
-    label: Consenti Resolve anonimo Slack/Teams
-  allow_private_urls:
-    help: Se attivo, i webhook in uscita possono puntare a host privati/link-local.
-      Mantienilo disattivato in produzione.
-    label: Consenti URL di notifica private
-  circuit_breaker_cooldown:
-    help: Minuti prima che una destinazione messa in pausa automaticamente possa ritentare.
-      Usa 0 per richiedere la ripresa manuale.
-    label: Cooldownoldown del circuit breaker in minuti
-  circuit_breaker_threshold:
-    help: Errori di consegna consecutivi prima che una destinazione di notifica venga
-      messa in pausa automaticamente.
-    label: Soglia di errori del circuit breaker
-  clear_inbound_webhook_secret:
-    help: Rimuovi il secret del webhook in ingresso memorizzato.
-    label: Cancella secret del webhook in ingresso
-  clear_metrics_token:
-    help: Rimuovi il token di scrape memorizzato.
-    label: Cancella token di scrape delle metriche
-  delivery_history_limit:
-    help: Numero di tentativi di consegna recenti conservati per ogni destinazione
-      di notifica.
-    label: Limite cronologia consegne
-  envelope_max_bytes:
-    help: HTTP 413 quando un body di ingest grezzo supera questa dimensione. Predefinito
-      2097152 (2 MiB).
-    label: Dimensione max body Envelope / OTLP (byte)
-  event_quota_daily:
-    help: Massimo di eventi accettati per progetto ogni giorno. Usa 0 per illimitato.
-    label: Quota giornaliera eventi
-  event_quota_monthly:
-    help: Massimo di eventi accettati per progetto per mese calendario UTC. Usa 0
-      per illimitato.
-    label: Quota mensile eventi
-  inbound_email_enabled:
-    help: Se attivo, le email di menzione/assegnazione possono includere token Reply-To
-      e POST /hooks/email/inbound accetta webhook del provider.
-    label: Abilita commenti via email in ingresso
-  inbound_mail_domain:
-    help: Dominio usato negli indirizzi Reply-To (reply+{token}@dominio).
-    label: Dominio mail in ingresso
   inbound_webhook_secret:
     configured: È attualmente memorizzato un secret di webhook in ingresso.
-    help: Secret condiviso per X-Beacon-Inbound-Secret e firma HMAC Reply-To. Lasciare
-      vuoto conserva il secret attuale.
-    label: Secret webhook in ingresso
-  ingest_rate_limit:
-    help: Massimo di richieste Envelope per progetto ogni minuto. Usa 0 per illimitato.
-    label: Limite di frequenza ingest al minuto
-  ingest_reject_query_auth:
-    help: Se attivo, i parametri beacon_key/beacon_secret in query vengono rifiutati
-      (401). Disattiva solo durante la migrazione a X-Beacon-Auth o DSN Envelope.
-    label: Rifiuta auth ingest via query string (obsoleta)
-  intro: Configura i valori predefiniti dell’istanza per ingest, metriche, email in
-    ingresso, hook, governance dei progetti e consegna delle notifiche.
-  metrics_require_token:
-    help: Se attivo, /metrics restituisce 503 finché non è memorizzato un token delle
-      metriche. Consigliato in produzione.
-    label: Richiedi token di scrape delle metriche
+  intro: Configura i valori predefiniti dell’istanza per ingest, metriche, email in ingresso, hook, governance
+    dei progetti e consegna delle notifiche.
   metrics_token:
     configured: È attualmente memorizzato un token di scrape delle metriche.
-    help: Token Bearer per gli scraper. Lasciare vuoto conserva il token attuale.
-    label: Token di scrape delle metriche
-  retention_days:
-    help: Elimina la telemetria più vecchia di questo numero di giorni. Usa 0 per
-      disattivare la retention per età.
-    label: Giorni di retention
-  retention_max_events:
-    help: Conserva al massimo questo numero di eventi per progetto. Usa 0 per nessun
-      tetto per conteggio.
-    label: Massimo di eventi memorizzati per progetto
   section:
     governance: Governance dei progetti
-    governance_help: I progetti ereditano questi valori di retention, frequenza ingest
-      e quote salvo override.
+    governance_help: I progetti ereditano questi valori di retention, frequenza ingest e quote salvo override.
     inbound: Email in ingresso
-    inbound_help: Token Reply-To e webhook del provider per i commenti alle issue.
-      Lascia vuoto il secret webhook al salvataggio per mantenere il valore attuale.
+    inbound_help: Token Reply-To e webhook del provider per i commenti alle issue. Lascia vuoto il secret
+      webhook al salvataggio per mantenere il valore attuale.
     ingest: Ingest e autenticazione
-    ingest_help: Dimensione body Envelope/OTLP e policy di auth ingest via query string
-      obsoleta.
+    ingest_help: Dimensione body Envelope/OTLP e policy di auth ingest via query string obsoleta.
     metrics: Metriche Prometheus
-    metrics_help: Token di scrape per GET /metrics (solo Authorization Bearer). Lascia
-      vuoto il token al salvataggio per mantenere il secret attuale.
+    metrics_help: Token di scrape per GET /metrics (solo Authorization Bearer). Lascia vuoto il token
+      al salvataggio per mantenere il secret attuale.
     notifications: Consegna notifiche
-    notifications_help: Policy SSRF, policy Resolve interattiva, cronologia consegne
-      e circuit breaking sull’istanza.
+    notifications_help: Policy SSRF, policy Resolve interattiva, cronologia consegne e circuit breaking
+      sull’istanza.
   submit: Salva valori ops
   tabs_label: Sezioni valori ops
   title: Valori ops
 social_login_credential:
-  authorize_url:
-    help: Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.
-    label: URL di autorizzazione
-  client_id:
-    label: Client ID
-  client_secret:
-    help_edit: Lascia vuoto per mantenere il secret attuale.
-    help_new: Secret client OAuth dalla registrazione dell’app IdP.
-    label: Client secret
-  enabled:
-    help: I provider disabilitati restano nel database ma non compaiono nel login.
-    label: Abilitato
-  enterprise_sso:
-    help: Mostra sotto «Accedi con la tua organizzazione» invece dei pulsanti social
-      consumer (IdP OIDC).
-    label: SSO aziendale
-  label:
-    help: Mostrato sul pulsante Continua con della pagina di login.
-    label: Etichetta del pulsante
   provider:
-    help: Slug in minuscolo (google, github, microsoft o personalizzato).
-    invalid: Usa uno slug in minuscolo che inizia con una lettera (a-z, cifre, _ o
-      -).
-    label: Chiave provider
-  scopes:
-    help: Scope OAuth facoltativi separati da spazi o virgole.
-    label: Scope
-  token_url:
-    help: Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.
-    label: URL token
-  userinfo_url:
-    help: Facoltativo per i provider integrati; obbligatorio per IdP personalizzati.
-    label: URL userinfo
+    invalid: Usa uno slug in minuscolo che inizia con una lettera (a-z, cifre, _ o -).
 social_login_settings:
   add_intro: Esistono cataloghi di endpoint integrati per Google, GitHub e Microsoft.
   add_provider: Aggiungi %provider%
@@ -2842,8 +2471,3 @@ permissions:
   name_locale_help: Optional for %locale%. Overrides the catalog name when set.
   description_locale_help: Optional for %locale%. Overrides the catalog description when set.
 
-admin_instance_permission:
-  key:
-    placeholder: 'es. project.custom.manage'
-  category:
-    placeholder: Scegli una categoria…

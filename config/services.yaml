@@ -27,6 +27,7 @@ when@test:
         # Functional ingest suites fire many requests from one IP.
         beacon.ingest_ip_rate_limit: 100000
         beacon.hook_ip_rate_limit: 100000
+        beacon.read_api_rate_limit: 100000
     services:
         App\Issues\Service\IssueUserMailNotifier:
             public: true

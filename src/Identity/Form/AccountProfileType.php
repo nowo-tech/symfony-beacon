@@ -35,16 +35,17 @@ final class AccountProfileType extends FormKitAbstractType
                 $this->mergeFieldOptions('currentPassword', 'password', [
                     'mapped' => false,
                     'required' => false,
-                    'label' => 'user_preferences.current_password.label',
-                    'help' => 'user_preferences.current_password.help_email_change',
+                    'help' => 'user_preferences.current_password.help_sensitive_change',
                     'attr' => ['autocomplete' => 'current-password'],
                 ]),
             );
             $this->addTextField('phone', [
                 'required' => false,
-                'label' => 'preferences.profile.phone',
-                'help' => 'preferences.profile.phone_help',
                 'constraints' => [new Length(max: 32)],
+            ]);
+            $this->addTextField('slackUserId', [
+                'required' => false,
+                'constraints' => [new Length(max: 64)],
             ]);
         });
     }

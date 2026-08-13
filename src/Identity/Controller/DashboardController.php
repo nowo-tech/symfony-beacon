@@ -8,7 +8,7 @@ use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Identity\Entity\User;
 use App\Identity\Form\DashboardProjectSearchType;
 use App\Identity\Service\ProductTourStepsBuilder;
-use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectsProvider;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class DashboardController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
+        private readonly AccessibleProjectsProvider $accessibleProjects,
         private readonly DailyProjectStatRepository $dailyProjectStatRepository,
         private readonly InstanceSettingsRepository $instanceSettingsRepository,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
@@ -38,7 +38,7 @@ final class DashboardController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $query = $request->query->getString('q');
-        $projects = $this->projectRepository->findAccessibleByUser($user, '' !== $query ? $query : null);
+        $projects = $this->accessibleProjects->forUser($user, '' !== $query ? $query : null);
 
         $previewProjects = \array_slice($projects, 0, 5);
         $statsPreview = $this->dailyProjectStatRepository->findLastDaysForProjects($previewProjects, 7);

@@ -18,10 +18,10 @@ use Nowo\AuditKitBundle\Model\TimestampableTrait;
 #[ORM\Table(name: 'instance_settings')]
 class InstanceSettings implements AuditableInterface
 {
-    use TimestampableTrait;
     use InstanceSettingsMailerFields;
     use InstanceSettingsMercureFields;
     use InstanceSettingsOpsFields;
+    use TimestampableTrait;
 
     public const DEFAULT_MAILER_FROM = 'beacon@localhost';
     public const DEFAULT_RETENTION_DAYS = 0;

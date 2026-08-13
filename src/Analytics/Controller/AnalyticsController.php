@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Analytics\Controller;
 
 use App\Analytics\Dto\AnalyticsDayPoint;
+use App\Analytics\Dto\AnalyticsFilters;
 use App\Analytics\Form\AnalyticsFilterType;
 use App\Analytics\Service\AnalyticsPeriodResolver;
 use App\Analytics\Service\AnalyticsSeriesService;
@@ -12,6 +13,7 @@ use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
@@ -39,6 +41,7 @@ final class AnalyticsController extends AbstractController
     }
 
     #[Route('/projects/{id}/analytics', name: 'analytics_show', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function show(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -58,18 +61,20 @@ final class AnalyticsController extends AbstractController
             $this->addFlash('warning', $resolved['error']);
         }
 
-        $environment = $request->query->getString('environment') ?: null;
-        $release = $request->query->getString('release') ?: null;
-        $level = $request->query->getString('level') ?: null;
-        $filtered = $this->seriesService->hasFilters($environment, $release, $level);
+        $filters = AnalyticsFilters::fromRequestQuery(
+            $request->query->getString('environment'),
+            $request->query->getString('release'),
+            $request->query->getString('level'),
+        );
+        $filtered = $this->seriesService->hasFilters($filters->environment, $filters->release, $filters->level);
 
         $seriesAsc = $this->seriesService->build(
             $project,
             $resolved['from'],
             $resolved['to'],
-            $environment,
-            $release,
-            $level,
+            $filters->environment,
+            $filters->release,
+            $filters->level,
         );
         $hasVolume = array_any($seriesAsc, static fn (AnalyticsDayPoint $point): bool => $point->errorCount > 0
             || ($point->transactionCount ?? 0) > 0
@@ -80,9 +85,20 @@ final class AnalyticsController extends AbstractController
         $pagination = PagePagination::fromRequest($request, $total);
         $pageRows = \array_slice($seriesDesc, $pagination['offset'], $pagination['per_page']);
 
-        $filterQuery = $this->periodResolver->queryParams($resolved, $environment, $release, $level);
+        $filterQuery = $this->periodResolver->queryParams(
+            $resolved,
+            $filters->environment,
+            $filters->release,
+            $filters->level,
+        );
 
         $chartPoints = array_map(static fn (AnalyticsDayPoint $p): array => $p->toChartArray(), $seriesAsc);
+        $filterFormData = [
+            'from' => $resolved['from']->format('Y-m-d'),
+            'to' => $resolved['to']->format('Y-m-d'),
+            'period' => 'custom',
+            ...$filters->formData(),
+        ];
 
         return $this->render('analytics/show.html.twig', [
             'project' => $project,
@@ -91,19 +107,12 @@ final class AnalyticsController extends AbstractController
             'period' => $resolved['period'],
             'from' => $resolved['from'],
             'to' => $resolved['to'],
-            'filterForm' => $this->getFilterFormFactory->create(AnalyticsFilterType::class, [
-                'from' => $resolved['from']->format('Y-m-d'),
-                'to' => $resolved['to']->format('Y-m-d'),
-                'period' => 'custom',
-                'environment' => $environment ?? '',
-                'release' => $release ?? '',
-                'level' => $level ?? '',
-            ], [
+            'filterForm' => $this->getFilterFormFactory->create(AnalyticsFilterType::class, $filterFormData, [
                 'action' => $this->generateUrl('analytics_show', ['id' => $project->getUuid()]),
             ])->createView(),
-            'environment' => $environment ?? '',
-            'release' => $release ?? '',
-            'level' => $level ?? '',
+            'environment' => $filters->environment ?? '',
+            'release' => $filters->release ?? '',
+            'level' => $filters->level ?? '',
             'filtered' => $filtered,
             'has_volume' => $hasVolume,
             'filter_query' => $filterQuery,

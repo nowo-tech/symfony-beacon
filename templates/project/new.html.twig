@@ -5,7 +5,7 @@
 {% block body %}
 <div class="mx-auto max-w-lg">
     <h1 class="font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'project.new.title'|trans }}</h1>
-    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'project.name.help'|trans }}</p>
+    <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'project.name.help'|trans({}, 'form') }}</p>
     <div class="panel mt-6">
         {{ form_start(newProjectForm, {attr: {class: 'space-y-4'}}) }}
             {% include 'form/_fields.html.twig' with {form: newProjectForm} only %}

@@ -1,6 +1,6 @@
 <section class="panel mt-6" data-testid="project-config-portability">
     <h2 class="mb-2 text-lg font-semibold">{{ 'project.config.title'|trans }}</h2>
-    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.config.help'|trans({'%code%': project.code != '' ? project.code : project.slug}) }}</p>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.config.help'|trans({'%code%': project.code != '' ? project.code : project.slug}, 'form') }}</p>
 
     <div
         data-controller="tabs"

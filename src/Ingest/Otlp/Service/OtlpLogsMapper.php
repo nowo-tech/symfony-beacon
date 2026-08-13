@@ -37,49 +37,29 @@ final class OtlpLogsMapper implements OtlpSignalMapperInterface
 
         /** @var list<array<string, mixed>> $events */
         $events = [];
-        $resourceLogs = $decoded['resourceLogs'] ?? $decoded['resource_logs'] ?? [];
-        if (!\is_array($resourceLogs)) {
-            return [];
-        }
 
-        foreach ($resourceLogs as $resourceLog) {
-            if (!\is_array($resourceLog) || \count($events) >= self::MAX_RECORDS) {
-                break;
-            }
-
-            $resourceAttrs = $this->attributesMap(
-                \is_array($resourceLog['resource']['attributes'] ?? null)
-                    ? $resourceLog['resource']['attributes']
-                    : [],
-            );
-
-            $scopeLogs = $resourceLog['scopeLogs'] ?? $resourceLog['scope_logs'] ?? [];
-            if (!\is_array($scopeLogs)) {
-                continue;
-            }
-
-            foreach ($scopeLogs as $scopeLog) {
-                if (!\is_array($scopeLog) || \count($events) >= self::MAX_RECORDS) {
-                    break 2;
+        OtlpResourceIterator::walk(
+            $decoded,
+            'resourceLogs',
+            'resource_logs',
+            'scopeLogs',
+            'scope_logs',
+            'logRecords',
+            'log_records',
+            $this->attributesMap(...),
+            function (array $resourceAttrs, array $record) use (&$events): bool {
+                if (\count($events) >= self::MAX_RECORDS) {
+                    return false;
                 }
 
-                $logRecords = $scopeLog['logRecords'] ?? $scopeLog['log_records'] ?? [];
-                if (!\is_array($logRecords)) {
-                    continue;
+                $payload = $this->mapRecord($record, $resourceAttrs);
+                if (null !== $payload) {
+                    $events[] = $payload;
                 }
 
-                foreach ($logRecords as $record) {
-                    if (!\is_array($record) || \count($events) >= self::MAX_RECORDS) {
-                        break 3;
-                    }
-
-                    $payload = $this->mapRecord($record, $resourceAttrs);
-                    if (null !== $payload) {
-                        $events[] = $payload;
-                    }
-                }
-            }
-        }
+                return \count($events) < self::MAX_RECORDS;
+            },
+        );
 
         return $events;
     }

@@ -11,6 +11,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -31,11 +32,11 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
         new ReflectionProperty(Project::class, 'id')->setValue($other, 99);
 
         $apiKey = ProjectApiKey::generate($known, 'Test');
-        // Bind secret for hash_equals path.
-        $secret = $apiKey->getSecretKey();
+        $secret = $apiKey->peekIssuedPlainSecret();
         self::assertNotNull($secret);
 
         $wrongProjectKey = ProjectApiKey::generate($other, 'Other');
+        $wrongSecret = (string) $wrongProjectKey->peekIssuedPlainSecret();
 
         $projects = $this->createMock(ProjectRepository::class);
         $projects->method('findOneByIngestPath')->willReturnCallback(
@@ -59,13 +60,14 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
             $keys,
             $this->unusedGovernance(),
             new IngestRateLimiter(new ArrayAdapter()),
+            $this->createStub(EntityManagerInterface::class),
         );
 
         $cases = [
             $gate->authorizeCredentials('missing', 'pk', 'sk'),
             $gate->authorizeCredentials('42', null, null),
             $gate->authorizeCredentials('42', 'unknown', 'sk'),
-            $gate->authorizeCredentials('42', $wrongProjectKey->getPublicKey(), (string) $wrongProjectKey->getSecretKey()),
+            $gate->authorizeCredentials('42', $wrongProjectKey->getPublicKey(), $wrongSecret),
             $gate->authorizeCredentials('42', $apiKey->getPublicKey(), 'wrong-secret'),
         ];
 
@@ -87,10 +89,11 @@ final class IngestProjectAccessGateUnauthorizedTest extends TestCase
         $project->setIngestEnabled(false);
 
         $gate = new IngestProjectAccessGate(
-            $this->createMock(ProjectRepository::class),
-            $this->createMock(ProjectApiKeyRepository::class),
+            $this->createStub(ProjectRepository::class),
+            $this->createStub(ProjectApiKeyRepository::class),
             $this->unusedGovernance(),
             new IngestRateLimiter(new ArrayAdapter()),
+            $this->createStub(EntityManagerInterface::class),
         );
 
         $reject = $gate->assertIngestAllowed($project);

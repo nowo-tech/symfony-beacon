@@ -30,20 +30,15 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
     {
         /** @var array<string, string> $projectChoices */
         $projectChoices = $options['project_choices'];
-        /** @var array<string, string> $teammateChoices */
+        /** @var array<int|string, string> $teammateChoices */
         $teammateChoices = $options['teammate_choices'];
 
         $scopeChoices = [];
         foreach (AssignmentScope::cases() as $scope) {
             $scopeChoices['dashboard_assignments_filter.scope.'.$scope->value] = $scope->value;
         }
-        $priorityChoices = [
-            'dashboard_assignments_filter.priority.any' => '',
-            'dashboard_assignments_filter.priority.low' => 'low',
-            'dashboard_assignments_filter.priority.medium' => 'medium',
-            'dashboard_assignments_filter.priority.high' => 'high',
-            'dashboard_assignments_filter.priority.critical' => 'critical',
-        ];
+        $priorityChoices = IssueListFilterFields::priorityChoicesWithAny('dashboard_assignments_filter');
+
         $assigneeChoices = [
             $this->translator->trans('dashboard_assignments_filter.assignee.any', [], 'form') => '',
         ];
@@ -101,13 +96,7 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
             ]);
 
             $this->addFilterSelect('level', [
-                'choices' => [
-                    'fatal' => 'fatal',
-                    'error' => 'error',
-                    'warning' => 'warning',
-                    'info' => 'info',
-                    'debug' => 'debug',
-                ],
+                'choices' => IssueListFilterFields::levelIdentityChoices(),
                 'choice_translation_domain' => false,
                 'attr' => [
                     'class' => 'input',
@@ -120,11 +109,7 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
                 'row_attr' => ['class' => 'dashboard-filters__field'],
             ]);
             $this->addFilterSelect('status', [
-                'choices' => [
-                    'unresolved' => 'unresolved',
-                    'resolved' => 'resolved',
-                    'ignored' => 'ignored',
-                ],
+                'choices' => IssueListFilterFields::statusIdentityChoices(),
                 'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [

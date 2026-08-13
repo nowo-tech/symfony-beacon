@@ -22,7 +22,7 @@ use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectsProvider;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,7 +52,7 @@ final class AccountPreferencesController extends AbstractController
         private readonly UserActionRepository $userActionRepository,
         private readonly ProjectMembershipRepository $projectMembershipRepository,
         private readonly UserGroupMembershipRepository $userGroupMembershipRepository,
-        private readonly ProjectRepository $projectRepository,
+        private readonly AccessibleProjectsProvider $accessibleProjects,
         private readonly MemberAlertPreferenceManager $memberAlertPreferenceManager,
         private readonly PushSubscriptionRepository $pushSubscriptionRepository,
         private readonly WebPushClientFactory $webPushFactory,
@@ -79,6 +79,7 @@ final class AccountPreferencesController extends AbstractController
         $previousEmail = $user->getEmail();
         $previousPhone = $user->getPhone();
         $previousPhoneVerifiedAt = $user->getPhoneVerifiedAt();
+        $previousSlackUserId = $user->getSlackUserId();
 
         $form = $this->createForm(AccountProfileType::class, $user);
         $form->handleRequest($request);
@@ -100,6 +101,28 @@ final class AccountPreferencesController extends AbstractController
                     $form->get('email')->addError(new FormError($this->translator->trans('preferences.error.email_in_use')));
 
                     return $this->renderProfile($form, $user);
+                }
+            }
+
+            $newSlack = $user->getSlackUserId();
+            $slackChanged = ($newSlack ?? '') !== ($previousSlackUserId ?? '');
+            if ($slackChanged) {
+                $currentPassword = (string) $form->get('currentPassword')->getData();
+                if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+                    $user->setSlackUserId($previousSlackUserId);
+                    $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
+
+                    return $this->renderProfile($form, $user);
+                }
+
+                if (null !== $newSlack && '' !== $newSlack) {
+                    $slackConflict = $this->userRepository->findOneBySlackUserId($newSlack);
+                    if ($slackConflict instanceof User && $slackConflict->getId() !== $user->getId()) {
+                        $user->setSlackUserId($previousSlackUserId);
+                        $form->get('slackUserId')->addError(new FormError($this->translator->trans('preferences.error.slack_user_id_in_use')));
+
+                        return $this->renderProfile($form, $user);
+                    }
                 }
             }
 
@@ -330,7 +353,7 @@ final class AccountPreferencesController extends AbstractController
         $this->healDisplayPreferencesIfNeeded($user);
 
         $pushAvailable = $this->webPushFactory->isConfigured();
-        $accessibleProjects = $this->projectRepository->findAccessibleByUser($user);
+        $accessibleProjects = $this->accessibleProjects->forUser($user);
         $projectRows = $this->memberAlertPreferenceManager->projectRowsForUi($user, $accessibleProjects);
 
         /** @var list<array{uuid: string, name: string, hasOverrides: bool, formData: array<string, mixed>}> $projects */

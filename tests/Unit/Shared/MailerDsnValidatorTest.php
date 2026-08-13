@@ -17,16 +17,16 @@ final class MailerDsnValidatorTest extends TestCase
         self::assertNull($validator->validatePlainDsn('smtp://user:pass@mail.example:587'));
         self::assertTrue($validator->isDeliverable('smtp://user:pass@mail.example:587'));
 
-        self::assertSame('instance_mailer.mailer_dsn.null_transport', $validator->validatePlainDsn('null://null'));
+        self::assertSame('instance_mailer.plain_mailer_dsn.null_transport', $validator->validatePlainDsn('null://null'));
         self::assertFalse($validator->isDeliverable('null://null'));
 
-        self::assertSame('instance_mailer.mailer_dsn.scheme_not_allowed', $validator->validatePlainDsn('smtp://'));
+        self::assertSame('instance_mailer.plain_mailer_dsn.scheme_not_allowed', $validator->validatePlainDsn('smtp://'));
         self::assertFalse($validator->isDeliverable('smtp://'));
 
-        self::assertSame('instance_mailer.mailer_dsn.invalid', $validator->validatePlainDsn('smtp://exa mple.com'));
+        self::assertSame('instance_mailer.plain_mailer_dsn.invalid', $validator->validatePlainDsn('smtp://exa mple.com'));
         self::assertFalse($validator->isDeliverable('smtp://exa mple.com'));
 
-        self::assertSame('instance_mailer.mailer_dsn.scheme_not_allowed', $validator->validatePlainDsn('not-a-dsn'));
+        self::assertSame('instance_mailer.plain_mailer_dsn.scheme_not_allowed', $validator->validatePlainDsn('not-a-dsn'));
         self::assertFalse($validator->isDeliverable('not-a-dsn'));
     }
 
@@ -35,7 +35,7 @@ final class MailerDsnValidatorTest extends TestCase
         $validator = new MailerDsnValidator();
 
         self::assertSame(
-            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            'instance_mailer.plain_mailer_dsn.scheme_not_allowed',
             $validator->validatePlainDsn('file:///tmp/mail.sock'),
         );
         self::assertFalse($validator->isDeliverable('file:///tmp/mail.sock'));
@@ -46,15 +46,15 @@ final class MailerDsnValidatorTest extends TestCase
         $validator = new MailerDsnValidator();
 
         self::assertSame(
-            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            'instance_mailer.plain_mailer_dsn.scheme_not_allowed',
             $validator->validatePlainDsn('sendmail://default'),
         );
         self::assertSame(
-            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            'instance_mailer.plain_mailer_dsn.scheme_not_allowed',
             $validator->validatePlainDsn('sendmail://default?command=/usr/bin/env%20id%20-t'),
         );
         self::assertSame(
-            'instance_mailer.mailer_dsn.scheme_not_allowed',
+            'instance_mailer.plain_mailer_dsn.scheme_not_allowed',
             $validator->validatePlainDsn('native://default'),
         );
         self::assertFalse($validator->isDeliverable('sendmail://default'));

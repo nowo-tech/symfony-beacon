@@ -21,7 +21,7 @@ As an integrator, I list/get issues with a project read token.
 
 - **FR-001**: Project-scoped read tokens (create/revoke in Settings; hashed at rest). Create/revoke MUST require `project.settings.manage`; Settings UI section gated with `canManageSettings`.
 - **FR-002**: Endpoints for issues list/detail; export may reuse `017` auth model.
-- **FR-003**: No public unauthenticated boards; rate-limit documented (reverse proxy; OpenAPI tag).
+- **FR-003**: No public unauthenticated boards; app-level IP rate limit via `BEACON_READ_API_RATE_LIMIT` (default 120/min; `0` disables) on `/api/projects/…` (`096` / v1.12.0). OpenAPI tag `Read API` remains.
 - **FR-004**: Tokens must not equal ingest public/secret key material.
 
 ## Success Criteria
@@ -37,3 +37,7 @@ As an integrator, I list/get issues with a project read token.
 ## Amendment (FormKit create token, 2026-08-13)
 
 `ProjectReadTokenCreateType` extends `FormKitAbstractType` (profile `beacon`, prefix `project_read_token_create`). Labels/placeholders/help under `project_read_token_create.*` in `translations/form.*.yaml`. Twig: `form_row` + `_fields` (`077`). Canonical: `081` FR-003c. E2E / DomCrawler: `project_read_token_create[label]` (not bare `name="label"`).
+
+## Amendment (Read API rate limit + MapQueryString, 2026-08-13 / `096`)
+
+`ReadApiRateLimitSubscriber` enforces `BEACON_READ_API_RATE_LIMIT` before controller auth. List endpoint binds `ProjectIssuesListQuery` with `#[MapQueryString]`. See `specs/096-audit-follow-up-hardening/`.

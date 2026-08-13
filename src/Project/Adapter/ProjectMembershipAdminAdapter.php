@@ -10,6 +10,7 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Exception\ProjectAccessException;
 use App\Project\Port\ProjectMembershipAdminPort;
+use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipManager;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
@@ -21,6 +22,7 @@ final readonly class ProjectMembershipAdminAdapter implements ProjectMembershipA
 {
     public function __construct(
         private ProjectMembershipManager $membershipManager,
+        private ProjectGroupAccessManager $groupAccessManager,
     ) {
     }
 
@@ -37,6 +39,6 @@ final readonly class ProjectMembershipAdminAdapter implements ProjectMembershipA
      */
     public function unlinkGroupAccess(Project $project, User $actor, ProjectGroupAccess $groupAccess): void
     {
-        $this->membershipManager->removeGroup($project, $actor, $groupAccess);
+        $this->groupAccessManager->removeGroup($project, $actor, $groupAccess);
     }
 }

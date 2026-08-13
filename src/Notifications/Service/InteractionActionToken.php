@@ -15,7 +15,7 @@ use InvalidArgumentException;
  */
 final class InteractionActionToken
 {
-    public const int DEFAULT_TTL_SECONDS = 604_800; // 7 days
+    public const int DEFAULT_TTL_SECONDS = 86_400; // 24 hours (Assign is OpenUri/query — keep short)
 
     public const string ACTION_RESOLVE = 'resolve';
 

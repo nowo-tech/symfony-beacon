@@ -28,6 +28,8 @@ final class ProjectTransferOwnershipType extends FormKitAbstractType
                 'required' => true,
                 'choices' => $options['user_choices'],
                 'choice_translation_domain' => false,
+                'label' => false,
+                'help' => false,
                 'placeholder' => 'project.danger.transfer_member_placeholder',
                 'constraints' => [new NotBlank()],
                 'attr' => [

@@ -8,6 +8,7 @@ use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\User;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
+use App\Project\Entity\Project;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -15,7 +16,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 /**
  * Grants dotted permission keys (e.g. project.view) from assigned instance roles.
  *
- * ROLE_ADMIN always passes for catalogued (or custom) permission attributes.
+ * ROLE_ADMIN always passes for catalogued (or custom) permission attributes when
+ * there is no {@see Project} subject.
+ *
+ * When the subject is a {@see Project}, this voter abstains so product access is
+ * decided only by {@see \App\Project\Security\ProjectPermissionVoter} (membership /
+ * group role / ROLE_ADMIN via {@see \App\Project\Service\ProjectAccessService}).
+ * Otherwise instance ROLE_PROJECT_* would GRANT under the default affirmative
+ * strategy and bypass membership.
  *
  * @extends Voter<string, mixed|null>
  */
@@ -29,6 +37,10 @@ final class InstancePermissionVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
+        if ($subject instanceof Project) {
+            return false;
+        }
+
         return Permission::isDottedCapability($attribute);
     }
 

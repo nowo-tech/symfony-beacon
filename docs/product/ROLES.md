@@ -65,7 +65,7 @@ Day-to-day product access for `ROLE_USER` is **`ProjectRole` + `ProjectPermissio
   System roles cannot be deleted; custom roles with assigned users also cannot be deleted until unassigned.
 - **Legacy cleanup:** `app:seed-platform` **removes** formerly seeded operator codes (`ROLE_SUPPORT`, `ROLE_OPS_VIEWER`, `ROLE_PLATFORM`, `ROLE_NAV_EDITOR`, `ROLE_PROJECT_OPS`) if present, and purges leftover `admin.*` permission rows.
 - **Admin UI:** Administration → **Roles** / **Permissions** (project catalog + optional custom keys). Closed permission dialogs must not auto-open (`086` FR-003c).
-- **Voter:** `InstancePermissionVoter` grants catalogued dotted keys for `ROLE_ADMIN` or an assigned InstanceRole that includes the key.
+- **Voter:** `InstancePermissionVoter` grants catalogued dotted keys for `ROLE_ADMIN` or an assigned InstanceRole that includes the key **only when there is no `Project` subject**. With a `Project` subject it abstains so `ProjectPermissionVoter` + membership decide (avoids affirmative-strategy bypass by `ROLE_PROJECT_*`).
 - **Translatable labels (REQ-RBAC-008):** Roles → `roles.catalog.*`. Permissions → `permission_translation` rows (create/edit modal **locale tabs**, `DEFAULT_LOCALE` first; **not** JSON), then `permissions.catalog.*`, then entity columns. Categories → YAML `permissions.category.<slug>.name|description` with create/edit **selector** of `InstancePermissionCategoryCatalog` slugs (not free text). Machine `key` / category slug are never translated.
 
 Do not invent new Symfony `ROLE_*` values without storing them on the user JSON (`ROLE_ADMIN`) or creating an `InstanceRole`.
@@ -155,7 +155,7 @@ On Settings templates that already receive `membership` (`ProjectAccess`), prefe
 
 1. Hide UI with Twig (`project_grants` / `canManage*` / Settings tab via `project_can_open_settings`) so users never see forbidden tabs, cards, or forms.
 2. Prefer `#[IsGranted(ProjectPermission::…, 'project')]` on the controller action (or `requirePermission` / `requireSettingsSurface` / `requirePrimaryOwner` when the flow is share-scoped or non-HTTP) so forged URLs/POSTs return **403**.
-3. Never call `is_granted('project.…')` for product access against the wrong subject — that hits instance `InstancePermissionVoter` when the attribute is treated as an instance catalog key. Use `ProjectPermissionVoter` with a `Project` subject (or `ProjectAccessService`).
+3. Never call `is_granted('project.…')` for product access against the wrong subject — that hits instance `InstancePermissionVoter` when the attribute is treated as an instance catalog key. Use `ProjectPermissionVoter` with a `Project` subject (or `ProjectAccessService`). Instance `ROLE_PROJECT_*` never substitutes for membership on `#[IsGranted(ProjectPermission::…, 'project')]`.
 
 ## Quick reference for contributors
 

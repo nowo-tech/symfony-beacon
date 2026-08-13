@@ -1,6 +1,6 @@
 <section class="panel mt-6">
     <h2 class="mb-3 text-lg font-semibold">{{ 'project.groups.title'|trans }}</h2>
-    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.groups.help'|trans }}</p>
+    <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.groups.help'|trans({}, 'form') }}</p>
     <ul class="space-y-3 text-sm">
         {% for groupAccess in project.groupAccesses %}
             {% set linkedGroup = groupAccess.userGroup %}
@@ -40,7 +40,7 @@
                                         </div>
                                         <div class="confirm-dialog__content">
                                             {{ form_row(groupRoleForms[groupAccess.id].role, {
-                                                label: 'project.members.role_label'|trans,
+                                                label: 'project.members.role_label'|trans({}, 'form'),
                                                 translation_domain: false,
                                                 label_attr: {class: 'confirm-dialog__label'},
                                                 attr: {id: 'group-role-' ~ groupAccess.id, class: 'input w-full'},

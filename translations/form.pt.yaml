@@ -217,6 +217,11 @@ user_preferences:
     label: Movimento
     placeholder: Sistema
     help: Siga a preferência do dispositivo, reduza as animações ou mantenha o movimento total.
+  preferred_collapsed_issue_panels:
+    label: Painéis de problemas recolhidos por padrão
+    placeholder: Selecionar painéis…
+    help: Os painéis verificados começam recolhidos nas páginas de detalhes do problema e do
+      evento. Seu navegador lembra substituições manuais de abertura/fechamento.
   current_password:
     label: Senha atual
     placeholder: Senha atual
@@ -227,11 +232,14 @@ user_preferences:
     label: Nova senha
     placeholder: Nova senha
     help: Escolha uma senha forte que cumpra os requisitos abaixo.
+    mismatch: Os campos de senha devem corresponder.
+    strength_invalid: A senha não atende aos requisitos de segurança (%missing%).
     second:
       label: Confirme a nova senha
     first:
       label: Nova senha
   plain_password_confirm:
+    label: Confirme a nova senha
     placeholder: Confirme a nova senha
     help: Introduza novamente a nova senha.
 ops_defaults:
@@ -301,7 +309,7 @@ ops_defaults:
     help: Manter no máximo este número de eventos por projeto. Use 0 para sem teto por contagem.
     label: Máximo de eventos armazenados por projeto
 instance_mailer:
-  mailer_dsn:
+  plain_mailer_dsn:
     label: DSN do Mailer
     help: Deixe em branco para manter o valor cifrado atual. Exemplo smtp://user:pass@mail.example:587
       - null:// e rejeitado (use antes Limpar DSN guardado).
@@ -311,7 +319,7 @@ instance_mailer:
       outro), ou use Limpar DSN guardado para recorrer ao ambiente.
     scheme_not_allowed: Esse esquema de DSN Mailer nao e permitido. Use smtp, smtps
       ou um esquema de fornecedor suportado (Mailgun, Postmark, SES, …).
-  clear_dsn:
+  clear_mailer_dsn:
     label: Limpar DSN guardado
     help: Remove o DSN da base de dados e recorre a MAILER_DSN do ambiente ate guardar um novo.
   mailer_from:
@@ -320,28 +328,28 @@ instance_mailer:
       vazio.
     placeholder: beacon@example.com
 instance_mercure:
-  enabled:
+  mercure_enabled:
     label: Ativar alertas live Mercure
     help: Quando ativo, os membros autenticados subscrevem topicos privados do projeto para toasts de
       novas issues enquanto a app esta aberta.
-  url:
+  mercure_url:
     label: URL de publicacao (servidor)
     help: Deixe em branco para usar MERCURE_URL (por ex. http://mercure/.well-known/mercure dentro do
       Compose).
     placeholder: http://mercure/.well-known/mercure
-  public_url:
+  mercure_public_url:
     label: URL publico (navegador)
     help: Deixe em branco para usar MERCURE_PUBLIC_URL (normalmente same-origin /.well-known/mercure via
       Caddy).
     placeholder: https://localhost:9447/.well-known/mercure
-  jwt_secret:
+  plain_mercure_jwt_secret:
     label: Segredo JWT
     help: Deixe em branco para manter o valor cifrado atual ou recorrer a MERCURE_JWT_SECRET. Minimo de
       32 caracteres quando definido.
     placeholder: ••••••••••••••••••••••••••••••••
     invalid: Introduza uma string de segredo JWT valida.
     too_short: O segredo JWT tem de ter pelo menos 32 caracteres.
-  clear_secret:
+  clear_mercure_jwt_secret:
     label: Limpar segredo JWT guardado
     help: Remove o segredo da base de dados e recorre a MERCURE_JWT_SECRET ate guardar um novo.
 social_login_credential:
@@ -488,9 +496,7 @@ notifications:
     teams: Webhook do Microsoft Teams
     telegram: Bot do Telegram
 preferences:
-  issue_panels_collapsed: Painéis de problemas recolhidos por padrão
-  issue_panels_help: Os painéis verificados começam recolhidos nas páginas de detalhes do problema e do
-    evento. Seu navegador lembra substituições manuais de abertura/fechamento.
+
   member_alerts:
     enabled: Notify for this event
     master: Enable member alerts
@@ -515,7 +521,7 @@ preferences:
   push_notifications_help: Opcional. Quando ativado, o Beacon pede autorização ao browser e pode alertá-lo
     sobre novas issues nos projetos a que pertence — mesmo em segundo plano (PWA instalada ou browser
     suportado). Toasts em direto na app requerem separadamente Administração → Mercure.
-  issue_panels_placeholder: Selecionar painéis…
+
   contrast_more: Mais contraste
   contrast_system: Sistema (seguir dispositivo)
   density_comfortable: Confortável

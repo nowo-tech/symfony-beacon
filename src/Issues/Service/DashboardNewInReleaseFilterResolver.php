@@ -9,8 +9,8 @@ use App\Issues\Dto\DashboardNewInReleaseFilters;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Entity\Project;
-use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectFilter;
+use App\Project\Service\AccessibleProjectsProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,14 +19,14 @@ use Symfony\Component\HttpFoundation\Request;
 final readonly class DashboardNewInReleaseFilterResolver
 {
     public function __construct(
-        private ProjectRepository $projectRepository,
+        private AccessibleProjectsProvider $accessibleProjects,
         private IssueSearchRepository $issueRepository,
     ) {
     }
 
     public function resolve(User $user, Request $request): DashboardNewInReleaseFilters
     {
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
+        $accessible = $this->accessibleProjects->forUser($user);
         $project = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
         $projects = $project instanceof Project ? [$project] : $accessible;
 

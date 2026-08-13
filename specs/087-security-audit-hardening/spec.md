@@ -15,7 +15,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 | ID | Area | Delivered |
 |----|------|-----------|
-| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); ordinary GET shows public key only (show-once restored 2026-08-11); revoked keys never expose secret/DSN |
+| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); ordinary GET shows public key only (show-once restored 2026-08-11); revoked keys never expose secret/DSN. **Follow-up `096` / v1.12.0:** secret stored as SHA-256 `secret_hash` (not recoverable Halite ciphertext) |
 | S2 | Demo seed | `app:seed-demo` blocked outside `dev`/`test` unless `--allow-non-local` (never stable DEMO_* keys outside local) |
 | S3 | Bootstrap guard | `SiteBackupSecurityDefaultsGuard` also rejects empty / documented / short `APP_SECRET` |
 | S4 | Metrics | `InstanceSettings::DEFAULT_METRICS_REQUIRE_TOKEN = true`; migration sets column default true (existing rows unchanged) |

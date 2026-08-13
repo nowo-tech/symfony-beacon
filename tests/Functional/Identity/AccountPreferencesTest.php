@@ -9,6 +9,7 @@ use App\Identity\Entity\UserAction;
 use App\Identity\UserActionType;
 use App\Setup\Demo\DashboardMenuDemoSeeder;
 use App\Tests\Support\DatabaseWebTestCase;
+use DateTimeImmutable;
 use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
 use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Symfony\Component\HttpFoundation\Request;
@@ -217,7 +218,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
     public function testSavingUnchangedPhoneKeepsExistingVerification(): void
     {
         [$client, $user] = $this->bootWithDemoProject('qr-phone-keep@example.com');
-        $verifiedAt = new \DateTimeImmutable('-1 day');
+        $verifiedAt = new DateTimeImmutable('-1 day');
         $user->setDisplayName('QR Keep');
         $user->setPhone('+34600111222');
         $user->setPhoneVerifiedAt($verifiedAt);
@@ -246,7 +247,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         [$client, $user] = $this->bootWithDemoProject('qr-phone-clear@example.com');
         $user->setDisplayName('QR Clear');
         $user->setPhone('+34600111222');
-        $user->setPhoneVerifiedAt(new \DateTimeImmutable('-1 day'));
+        $user->setPhoneVerifiedAt(new DateTimeImmutable('-1 day'));
         self::getContainer()->get('doctrine')->getManager()->flush();
 
         $this->login($client, $user);

@@ -13,7 +13,9 @@ use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
  * Project ingest credential (public/secret key pair) used in Envelope DSN auth.
  *
  * The public key is an opaque, non-secret identifier (shown in Settings / DSN).
- * The secret is required for every ingest request and is encrypted at rest.
+ * The secret is shown once after create/rotate; at rest only a SHA-256 hash is kept
+ * ({@see $secretHash}). Legacy rows may still hold an encrypted {@see $secretKey}
+ * until the next successful ingest or rotate upgrades them.
  */
 #[ORM\Entity(repositoryClass: ProjectApiKeyRepository::class)]
 #[ORM\Table(name: 'project_api_key')]
@@ -32,10 +34,21 @@ class ProjectApiKey
     #[ORM\Column(length: 64)]
     private string $publicKey = '';
 
-    /** Envelope secret (encrypted at rest via doctrine-encrypt-bundle). */
+    /** SHA-256 hex of the Envelope secret (preferred at-rest form). */
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $secretHash = null;
+
+    /**
+     * Legacy encrypted plaintext secret (Halite). Cleared once {@see $secretHash} is set.
+     *
+     * @deprecated prefer {@see $secretHash}; retained for dual-read migration
+     */
     #[ORM\Column(type: 'text', nullable: true)]
     #[Encrypted]
     private ?string $secretKey = null;
+
+    /** In-memory plaintext after generate/rotate only — never persisted. */
+    private ?string $issuedPlainSecret = null;
 
     #[ORM\Column(length: 80)]
     private string $label = 'Default';
@@ -61,9 +74,77 @@ class ProjectApiKey
         $key->setProject($project);
         $key->setLabel($label);
         $key->setPublicKey($publicKey ?? bin2hex(random_bytes(16)));
-        $key->setSecretKey($secretKey ?? bin2hex(random_bytes(16)));
+        $key->assignPlainSecret($secretKey ?? bin2hex(random_bytes(16)));
 
         return $key;
+    }
+
+    public static function hashSecret(string $plainSecret): string
+    {
+        return hash('sha256', $plainSecret);
+    }
+
+    /**
+     * Store SHA-256 at rest and keep plaintext only in memory for one-shot DSN display.
+     */
+    public function assignPlainSecret(string $plainSecret): self
+    {
+        $this->issuedPlainSecret = $plainSecret;
+        $this->secretHash = self::hashSecret($plainSecret);
+        $this->secretKey = null;
+
+        return $this;
+    }
+
+    public function matchesSecret(string $plainSecret): bool
+    {
+        if (null !== $this->secretHash && '' !== $this->secretHash) {
+            return hash_equals($this->secretHash, self::hashSecret($plainSecret));
+        }
+
+        // Legacy encrypted plaintext column.
+        if (null !== $this->secretKey && '' !== $this->secretKey) {
+            return hash_equals($this->secretKey, $plainSecret);
+        }
+
+        return false;
+    }
+
+    /**
+     * When auth succeeds against a legacy encrypted secret, upgrade to hash-at-rest.
+     */
+    public function upgradeLegacySecretToHash(string $plainSecret): bool
+    {
+        if (null !== $this->secretHash && '' !== $this->secretHash) {
+            return false;
+        }
+        if (null === $this->secretKey || '' === $this->secretKey) {
+            return false;
+        }
+        if (!hash_equals($this->secretKey, $plainSecret)) {
+            return false;
+        }
+
+        $this->secretHash = self::hashSecret($plainSecret);
+        $this->secretKey = null;
+
+        return true;
+    }
+
+    /**
+     * One-shot plaintext for DSN flash after create/rotate (clears after read).
+     */
+    public function consumeIssuedPlainSecret(): ?string
+    {
+        $plain = $this->issuedPlainSecret;
+        $this->issuedPlainSecret = null;
+
+        return $plain;
+    }
+
+    public function peekIssuedPlainSecret(): ?string
+    {
+        return $this->issuedPlainSecret;
     }
 
     public function getId(): ?int
@@ -95,11 +176,25 @@ class ProjectApiKey
         return $this;
     }
 
+    public function getSecretHash(): ?string
+    {
+        return $this->secretHash;
+    }
+
+    /**
+     * Legacy encrypted column only — used by doctrine-encrypt-bundle via PropertyAccess.
+     * Do not use for DSN/auth; prefer {@see matchesSecret()} / {@see consumeIssuedPlainSecret()}.
+     */
     public function getSecretKey(): ?string
     {
         return $this->secretKey;
     }
 
+    /**
+     * Legacy encrypted column only — must not hash or touch {@see $secretHash}/{@see $issuedPlainSecret}.
+     * Encrypt subscriber get/set goes through these accessors; routing plaintext here into
+     * {@see assignPlainSecret()} would hash ciphertext and break auth.
+     */
     public function setSecretKey(?string $secretKey): self
     {
         $this->secretKey = $secretKey;
@@ -139,19 +234,20 @@ class ProjectApiKey
     /**
      * Envelope-compatible DSN: https://{public}:{secret}@{host}/{projectUuid}.
      *
-     * The secret is included whenever present so clients can satisfy ingest auth.
+     * Pass the plaintext secret (from {@see consumeIssuedPlainSecret()} or a known demo secret).
      * Path uses the public project UUID (numeric id remains accepted on ingest for back-compat).
      */
-    public function buildDsn(string $baseUrl): string
+    public function buildDsn(string $baseUrl, ?string $plainSecret = null): string
     {
+        $secret = $plainSecret ?? $this->issuedPlainSecret;
         $projectUuid = $this->project?->getUuid() ?? '';
         $host = parse_url(rtrim($baseUrl, '/'), \PHP_URL_HOST) ?: 'localhost';
         $scheme = parse_url(rtrim($baseUrl, '/'), \PHP_URL_SCHEME) ?: 'https';
         $port = parse_url(rtrim($baseUrl, '/'), \PHP_URL_PORT);
         $authority = $host.($port ? ':'.$port : '');
         $userinfo = $this->publicKey;
-        if (null !== $this->secretKey && '' !== $this->secretKey) {
-            $userinfo .= ':'.$this->secretKey;
+        if (null !== $secret && '' !== $secret) {
+            $userinfo .= ':'.$secret;
         }
 
         return \sprintf('%s://%s@%s/%s', $scheme, $userinfo, $authority, $projectUuid);

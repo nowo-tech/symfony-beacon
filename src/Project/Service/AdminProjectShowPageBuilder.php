@@ -42,6 +42,7 @@ final readonly class AdminProjectShowPageBuilder
         private GetFilterFormFactory $getFilterFormFactory,
         private ProjectRepository $projectRepository,
         private ProjectMembershipManager $membershipManager,
+        private ProjectGroupAccessManager $groupAccessManager,
         private ProjectMembershipFormSupport $membershipFormSupport,
         private ProjectMembershipRepository $membershipRepository,
         private UserGroupMembershipRepository $userGroupMembershipRepository,
@@ -70,7 +71,7 @@ final readonly class AdminProjectShowPageBuilder
         $groupMemberCounts = $this->userGroupMembershipRepository->countByGroupIds($groupIds);
         $destinations = $project->getNotificationDestinations()->toArray();
         $assignableRoles = $this->membershipManager->assignableRoles($actor, $project);
-        $assignableGroupRoles = $this->membershipManager->assignableGroupRoles($actor, $project);
+        $assignableGroupRoles = $this->groupAccessManager->assignableGroupRoles($actor, $project);
         $memberRoleChoices = ProjectMembershipUiHelper::roleChoices($assignableRoles);
         $groupRoleChoices = ProjectMembershipUiHelper::roleChoices($assignableGroupRoles);
 

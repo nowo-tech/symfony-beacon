@@ -54,7 +54,8 @@ final class ProjectFactoryTest extends TestCase
         $key = $project->getApiKeys()->first();
         self::assertInstanceOf(ProjectApiKey::class, $key);
         self::assertSame('fixed-public', $key->getPublicKey());
-        self::assertSame('fixed-secret', $key->getSecretKey());
+        self::assertTrue($key->matchesSecret('fixed-secret'));
+        self::assertSame(ProjectApiKey::hashSecret('fixed-secret'), $key->getSecretHash());
         self::assertSame('Symfony Beacon key', $key->getLabel());
     }
 

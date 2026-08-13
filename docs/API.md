@@ -67,8 +67,18 @@ Bind these carefully in production ([PRODUCTION.md](PRODUCTION.md)).
 - UI: `/admin/api/doc` (Swagger / OpenAPI in the Administration shell; specs `013-api-docs-panel`, `054-api-doc-admin-only`)
 - Requires **`ROLE_ADMIN`**
 
-There is **no** public read API for issues yet (Planned: `042-read-api-tokens`). Automation today: CSV/JSON export from the Issues UI, notification webhooks, and Envelope ingest.
+## Read API (Bearer tokens)
+
+Project Settings can mint **read tokens** (`brt_…`, SHA-256 at rest). Endpoints under `/api/projects/{uuid}/…` (list/get issues) authenticate in-controller (`security: false` firewall). Spec: `042-read-api-tokens`.
+
+| Mechanism | Notes |
+|-----------|--------|
+| `Authorization: Bearer brt_…` | Required |
+| IP rate limit | `BEACON_READ_API_RATE_LIMIT` (default 120/min; `0` disables) → HTTP **429** + `Retry-After: 60` (`096`) |
+| Maintenance | Read API is **not** excluded — returns **503** when maintenance is on (`095`) |
+
+Not a public board: no anonymous access; write/mutate API is out of scope.
 
 ## Auth for Twig UI
 
-Session auth via AuthKit (`/login`). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped).
+Session auth via AuthKit (`/login`). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped). AuthKit **QR phone login is disabled** until SMS OTP can set `phoneVerifiedAt` (`096`).

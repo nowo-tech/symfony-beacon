@@ -36,20 +36,10 @@
                 </thead>
                 <tbody>
                     {% for issue in issues %}
-                        <tr class="border-t border-[var(--color-sand)]/70">
-                            <td class="px-3 py-2 align-top">
-                                <a class="no-underline text-[var(--color-moss)] hover:underline" href="{{ path('project_show', {id: issue.project.uuid}) }}">{{ issue.project.name }}</a>
-                            </td>
-                            <td class="px-3 py-2 align-top">
-                                <a class="font-medium no-underline hover:underline" href="{{ path('issue_show', {projectId: issue.project.uuid, id: issue.uuid}) }}">{{ issue.title }}</a>
-                                <div class="text-xs text-[var(--color-ink)]/55">{{ issue.culprit }}</div>
-                            </td>
-                            <td class="px-3 py-2 align-top whitespace-nowrap">{{ issue.firstRelease }}</td>
-                            <td class="px-3 py-2 align-top">
-                                <span class="badge {% if issue.level == 'error' or issue.level == 'fatal' %}badge-error{% else %}badge-warn{% endif %}">{{ issue.level }}</span>
-                            </td>
-                            <td class="px-3 py-2 align-top whitespace-nowrap">{{ issue.lastSeen|date('Y-m-d H:i') }}</td>
-                        </tr>
+                        {% include 'dashboard/_issue_row.html.twig' with {
+                            issue: issue,
+                            show_release: true,
+                        } only %}
                     {% endfor %}
                 </tbody>
             </table>

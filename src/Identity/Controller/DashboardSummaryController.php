@@ -11,7 +11,7 @@ use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\IssueMentionRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Notifications\Repository\NotificationDestinationRepository;
-use App\Project\Repository\ProjectRepository;
+use App\Project\Service\AccessibleProjectsProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class DashboardSummaryController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRepository $projectRepository,
+        private readonly AccessibleProjectsProvider $accessibleProjects,
         private readonly IssueSearchRepository $issueRepository,
         private readonly IssueMentionRepository $mentionRepository,
         private readonly NotificationDestinationRepository $destinationRepository,
@@ -37,7 +37,7 @@ final class DashboardSummaryController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $accessible = $this->projectRepository->findAccessibleByUser($user);
+        $accessible = $this->accessibleProjects->forUser($user);
 
         $mineOpen = $this->issueRepository->countAssignments(
             $accessible,

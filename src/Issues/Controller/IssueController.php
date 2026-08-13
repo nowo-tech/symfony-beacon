@@ -11,16 +11,14 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
 use App\Issues\Entity\IssueSavedView;
 use App\Issues\Enum\IssueLevel;
-use App\Issues\Enum\IssuePriority;
-use App\Issues\Enum\IssueStatus;
 use App\Issues\Form\IssueIndexFilterType;
 use App\Issues\Form\IssueSavedViewType;
-use App\Issues\IssueListSort;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSavedViewRepository;
 use App\Issues\Repository\IssueSearchRepository;
+use App\Issues\Service\IssueIndexFilterResolver;
 use App\Project\Entity\Project;
-use App\Project\Repository\ProjectMembershipRepository;
+use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
 use App\Shared\Form\CsrfOnlyType;
 use App\Shared\Form\GetFilterFormFactory;
@@ -45,7 +43,7 @@ final class IssueController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly EventRepository $eventRepository,
         private readonly IssueSearchRepository $issueSearchRepository,
-        private readonly ProjectMembershipRepository $membershipRepository,
+        private readonly IssueIndexFilterResolver $issueIndexFilterResolver,
         private readonly ProductTourStepsBuilder $productTourStepsBuilder,
         private readonly ProjectAccessService $projectAccess,
         private readonly IssueSavedViewRepository $savedViewRepository,
@@ -55,6 +53,7 @@ final class IssueController extends AbstractController
     }
 
     #[Route('/projects/{id}/issues', name: 'issue_index', requirements: ['id' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function index(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -69,53 +68,21 @@ final class IssueController extends AbstractController
             'project_name' => $project->getName(),
         ]);
 
-        $statusParam = $request->query->getString('status');
-        $status = '' !== $statusParam
-            ? (IssueStatus::tryFrom($statusParam) ?? IssueStatus::Unresolved)
-            : IssueStatus::Unresolved;
-
-        $members = $this->membershipRepository->findUsersByProject($project);
-        $assigneeFilter = $request->query->getString('assignee');
-        $assignee = null;
-        $unassignedOnly = 'unassigned' === $assigneeFilter;
-        if (!$unassignedOnly && '' !== $assigneeFilter && ctype_digit($assigneeFilter)) {
-            foreach ($members as $member) {
-                if ($member->getId() === (int) $assigneeFilter) {
-                    $assignee = $member;
-                    break;
-                }
-            }
-        }
-
-        $sort = IssueListSort::fromQuery(
-            $request->query->getString('sort') ?: null,
-            $request->query->getString('dir') ?: null,
-        );
-
-        $q = $request->query->getString('q') ?: null;
-        $level = $request->query->getString('level') ?: null;
-        $environment = $request->query->getString('environment') ?: null;
-        $release = $request->query->getString('release') ?: null;
-        $compare = $request->query->getString('compare') ?: null;
-        $tag = $request->query->getString('tag') ?: null;
-        $url = $request->query->getString('url') ?: null;
-        $userFilter = $request->query->getString('user') ?: null;
-        $priorityParam = $request->query->getString('priority');
-        $priority = '' !== $priorityParam ? IssuePriority::tryFrom($priorityParam) : null;
+        $resolved = $this->issueIndexFilterResolver->resolve($project, $request);
 
         $total = $this->issueSearchRepository->countSearch(
             $project,
-            $q,
-            $level,
-            $status,
-            $environment,
-            $release,
-            $priority,
-            $assignee,
-            $unassignedOnly,
-            tag: $tag,
-            url: $url,
-            user: $userFilter,
+            $resolved->query,
+            $resolved->level,
+            $resolved->status,
+            $resolved->environment,
+            $resolved->release,
+            $resolved->priority,
+            $resolved->assignee,
+            $resolved->unassignedOnly,
+            tag: $resolved->tag,
+            url: $resolved->url,
+            user: $resolved->user,
         );
         $pagination = PagePagination::fromRequest($request, $total);
         $page = $pagination['page'];
@@ -123,46 +90,30 @@ final class IssueController extends AbstractController
 
         $issues = $this->issueSearchRepository->search(
             $project,
-            $q,
-            $level,
-            $status,
-            $environment,
-            $release,
-            $priority,
-            $assignee,
-            $unassignedOnly,
-            $sort,
+            $resolved->query,
+            $resolved->level,
+            $resolved->status,
+            $resolved->environment,
+            $resolved->release,
+            $resolved->priority,
+            $resolved->assignee,
+            $resolved->unassignedOnly,
+            $resolved->sort,
             $perPage,
             $pagination['offset'],
-            tag: $tag,
-            url: $url,
-            user: $userFilter,
+            tag: $resolved->tag,
+            url: $resolved->url,
+            user: $resolved->user,
         );
         $occurrenceByIssue = $this->eventRepository->occurrenceStatsForIssues($issues);
 
         $compareResult = null;
-        if (null !== $compare && null !== $environment) {
-            $compareResult = $this->buildEnvironmentCompare($project, $environment, $compare);
+        if (null !== $resolved->compare && null !== $resolved->environment) {
+            $compareResult = $this->buildEnvironmentCompare($project, $resolved->environment, $resolved->compare);
         }
 
         $savedViews = $this->savedViewRepository->findForUserAndProject($user, $project);
-        $filters = [
-            'q' => $request->query->getString('q'),
-            'level' => $request->query->getString('level'),
-            'status' => $status->value,
-            'environment' => $request->query->getString('environment'),
-            'release' => $request->query->getString('release'),
-            'compare' => $request->query->getString('compare'),
-            'tag' => $request->query->getString('tag'),
-            'url' => $request->query->getString('url'),
-            'user' => $request->query->getString('user'),
-            'priority' => $priority instanceof IssuePriority ? $priority->value : '',
-            'assignee' => $assigneeFilter,
-            'sort' => $sort->field,
-            'dir' => $sort->direction,
-            'page' => $page,
-            'per_page' => $perPage,
-        ];
+        $filters = $resolved->formData($page, $perPage);
         $saveViewForm = $this->createForm(IssueSavedViewType::class, $this->filterQueryFromArray($filters), [
             'action' => $this->generateUrl('issue_view_save', ['id' => $project->getUuid()]),
             'method' => 'POST',
@@ -184,22 +135,13 @@ final class IssueController extends AbstractController
             $user,
             $request,
         );
-        $memberChoices = [];
-        foreach ($members as $member) {
-            $memberId = $member->getId();
-            if (null === $memberId) {
-                continue;
-            }
-
-            $memberChoices[(string) $memberId] = $member->getDisplayName() ?: $member->getEmail();
-        }
 
         return $this->render('issue/index.html.twig', [
             'project' => $project,
             'issues' => $issues,
             'occurrenceByIssue' => $occurrenceByIssue,
-            'members' => $members,
-            'sort' => $sort,
+            'members' => $resolved->members,
+            'sort' => $resolved->sort,
             'compareResult' => $compareResult,
             'savedViews' => $savedViews,
             'saveViewForm' => $saveViewForm->createView(),
@@ -211,7 +153,7 @@ final class IssueController extends AbstractController
             'filterForm' => $this->getFilterFormFactory->create(IssueIndexFilterType::class, $filters, [
                 'action' => $this->generateUrl('issue_index', ['id' => $project->getUuid()]),
                 'level_choices' => IssueLevel::values(),
-                'member_choices' => $memberChoices,
+                'member_choices' => $resolved->memberChoices(),
             ])->createView(),
             ...$tourVars,
         ]);
@@ -272,6 +214,7 @@ final class IssueController extends AbstractController
     }
 
     #[Route('/projects/{id}/issues/views', name: 'issue_view_save', requirements: ['id' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function saveView(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
@@ -308,6 +251,7 @@ final class IssueController extends AbstractController
     }
 
     #[Route('/projects/{id}/issues/views/{viewUuid}', name: 'issue_view_apply', requirements: ['id' => Requirement::UUID, 'viewUuid' => Requirement::UUID], methods: ['GET'])]
+    #[IsGranted(ProjectPermission::VIEW, 'project')]
     public function applyView(
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Project $project,
@@ -340,6 +284,7 @@ final class IssueController extends AbstractController
     }
 
     #[Route('/projects/{id}/issues/views/{viewUuid}/delete', name: 'issue_view_delete', requirements: ['id' => Requirement::UUID, 'viewUuid' => Requirement::UUID], methods: ['POST'])]
+    #[IsGranted(ProjectPermission::ISSUES_TRIAGE, 'project')]
     public function deleteView(
         Request $request,
         #[MapEntity(mapping: ['id' => 'uuid'])]
