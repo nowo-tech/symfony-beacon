@@ -24,10 +24,19 @@ Filters / overrides:
 ```bash
 make test-e2e ARGS='e2e/public.spec.ts'
 make test-e2e ARGS='e2e/mutations.spec.ts'
+make test-e2e ARGS='e2e/use-cases-*.spec.ts'
 PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 ```
 
 When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `helpers.ts`).
+
+## Product use-case catalog
+
+**All product use cases** (with Covered / Partial / Gap status and suggested next batches) live in:
+
+[`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
+
+Add a `UC-*` row there whenever you introduce a new scenario, then implement it under `e2e/use-cases-*.spec.ts` (or extend an existing group).
 
 Spec groups:
 
@@ -44,6 +53,8 @@ Spec groups:
 - `cookie-consent` — guest modal + config endpoints
 - `share-access` — invalid token + create/consume share link
 - `project-settings-deep` — governance/members/DSN/notifications smoke
+- `project-config` — project/admin config export/import
+- **`use-cases-*`** — catalog-driven expansions (auth/errors, OTLP ingest, issue workflow, project tabs, admin ops, hooks, dashboard mentions, **share guest**, **notifications/keys**, **analytics/admin lifecycle**)
 
 Auth storage is written to `e2e/.auth/` (gitignored).
 HTML report: `pnpm run test:e2e:report`

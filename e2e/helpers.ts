@@ -1,7 +1,98 @@
 import { expect, test, type Page } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export const DEMO_EMAIL = process.env.PLAYWRIGHT_DEMO_EMAIL ?? 'admin@symfony-beacon.local';
 export const DEMO_PASSWORD = process.env.PLAYWRIGHT_DEMO_PASSWORD ?? 'admin123';
+
+const helpersDir = path.dirname(fileURLToPath(import.meta.url));
+
+/** Demo ingest credentials from `make seed` (`.demo-client.env`). */
+export type DemoIngestCredentials = {
+  projectId: string;
+  publicKey: string;
+  secretKey: string;
+  projectUuid?: string;
+};
+
+/**
+ * Parse `.demo-client.env` written by `app:seed-demo`.
+ * Returns null when missing (callers should `requireSampleOrSkip`).
+ */
+export function loadDemoIngestCredentials(): DemoIngestCredentials | null {
+  const envCandidates = [
+    path.join(helpersDir, '..', '.demo-client.env'),
+    path.join(helpersDir, '.demo-client.env.cache'),
+  ];
+  let envText = '';
+  for (const envPath of envCandidates) {
+    try {
+      if (fs.existsSync(envPath)) {
+        envText = fs.readFileSync(envPath, 'utf8');
+        break;
+      }
+    } catch {
+      // continue
+    }
+  }
+  if (!envText) {
+    return null;
+  }
+
+  const dsnMatch = envText.match(/^BEACON_DSN=(.+)$/m) ?? envText.match(/^BEACON_UI_DSN=(.+)$/m);
+  const publicKeyMatch = envText.match(/^BEACON_PUBLIC_KEY=(.+)$/m);
+  const projectIdMatch = envText.match(/^BEACON_PROJECT_ID=(\d+)$/m);
+  const projectUuidMatch = envText.match(/^BEACON_PROJECT_UUID=([0-9a-f-]{36})$/im);
+
+  let projectId = projectIdMatch?.[1];
+  let publicKey = publicKeyMatch?.[1]?.trim();
+  let secretKey: string | undefined;
+  let projectUuid = projectUuidMatch?.[1];
+
+  if (dsnMatch?.[1]) {
+    const raw = dsnMatch[1].trim().replace(/^["']|["']$/g, '');
+    try {
+      const url = new URL(raw.replace(/^beacon:/i, 'http:'));
+      publicKey = publicKey ?? decodeURIComponent(url.username);
+      secretKey = decodeURIComponent(url.password);
+      const id = url.pathname.replace(/^\//, '').split('/')[0];
+      if (/^\d+$/.test(id)) {
+        projectId = projectId ?? id;
+      } else if (/^[0-9a-f-]{36}$/i.test(id)) {
+        projectUuid = projectUuid ?? id;
+      }
+    } catch {
+      const parsed = raw.match(/^(?:beacon|http|https):\/\/([^:]+):([^@]+)@[^/]+\/([^/\s]+)/i);
+      if (parsed) {
+        publicKey = publicKey ?? parsed[1];
+        secretKey = parsed[2];
+        if (/^\d+$/.test(parsed[3])) {
+          projectId = projectId ?? parsed[3];
+        } else if (/^[0-9a-f-]{36}$/i.test(parsed[3])) {
+          projectUuid = projectUuid ?? parsed[3];
+        }
+      }
+    }
+  }
+
+  // Envelope/OTLP accept numeric project id or UUID; prefer numeric when present.
+  const ref = projectId ?? projectUuid;
+  if (!ref || !publicKey || !secretKey) {
+    return null;
+  }
+
+  return { projectId: ref, publicKey, secretKey, projectUuid };
+}
+
+/** Preferred HTTP ingest base (Docker clients use :9084). */
+export function ingestHttpBase(): string {
+  return process.env.PLAYWRIGHT_INGEST_BASE_URL ?? 'http://localhost:9084';
+}
+
+export function beaconAuthHeader(publicKey: string, secretKey: string): string {
+  return `Beacon beacon_key=${publicKey}, beacon_secret=${secretKey}`;
+}
 
 /** CI / PLAYWRIGHT_REQUIRE_SAMPLE=1: missing demo sample data fails instead of skip. */
 export function requireSampleOrSkip(ready: boolean, reason: string): void {
@@ -45,10 +136,14 @@ export async function dismissCookieConsent(page: Page): Promise<void> {
     return;
   }
 
-  const acceptAll = openModal.locator('#cookie_consent_use_all_cookies');
-  const functionalOnly = openModal.locator('#cookie_consent_use_only_functional_cookies');
+  const acceptAll = openModal.locator(
+    '#cookie_consent_use_all_cookies, button:has-text("Accept all"), button:has-text("Aceptar todas")',
+  );
+  const functionalOnly = openModal.locator(
+    '#cookie_consent_use_only_functional_cookies, button:has-text("necessary"), button:has-text("necesarias"), button:has-text("Solo cookies")',
+  );
 
-  const target = (await acceptAll.isVisible().catch(() => false)) ? acceptAll : functionalOnly;
+  const target = (await acceptAll.first().isVisible().catch(() => false)) ? acceptAll.first() : functionalOnly.first();
   await target.waitFor({ state: 'visible', timeout: 5_000 });
   await expect(target).toBeEnabled();
   await target.evaluate((el: HTMLElement) => el.click());

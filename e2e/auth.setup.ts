@@ -20,6 +20,7 @@ function loadDemoCredentials(): { email: string; password: string } {
       const text = fs.readFileSync(envPath, 'utf8');
       const email = text.match(/^BEACON_LOGIN_EMAIL=(.+)$/m)?.[1]?.trim();
       const password = text.match(/^BEACON_LOGIN_PASSWORD=(.+)$/m)?.[1]?.trim();
+      // Ignore incomplete pairs (e.g. operator email with empty password from dogfood).
       if (email && password) {
         return { email, password };
       }
