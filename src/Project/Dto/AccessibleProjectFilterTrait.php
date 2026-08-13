@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Project\Dto;
 
+use App\Project\Entity\Project;
 use App\Project\Service\AccessibleProjectFilter;
 
 /**
  * Shared {@code projectChoices()} for dashboard filter DTOs that expose accessible projects.
  *
- * @property list<\App\Project\Entity\Project> $accessibleProjects
+ * @property list<Project> $accessibleProjects
  */
 trait AccessibleProjectFilterTrait
 {
