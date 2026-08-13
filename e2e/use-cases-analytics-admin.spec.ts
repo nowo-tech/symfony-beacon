@@ -91,24 +91,20 @@ test.describe('Admin user lifecycle — use cases', () => {
   });
 
   test('admin can suspend then resume project ingest (UC-ADM-07)', async ({ page }) => {
-    await page.goto('/admin/projects');
-    await dismissProductTour(page);
-    const show = page
-      .locator('a[href*="/admin/projects/"]')
-      .filter({ hasNot: page.locator('[href*="/new"]') })
-      .first();
-    await expect(show).toBeVisible();
-    await show.click();
+    const uuid = await resolveDemoProjectUuid(page);
+    await page.goto(`/admin/projects/${uuid}`);
     await expect(page).toHaveURL(/\/admin\/projects\/.+/);
     await dismissProductTour(page);
+    await expect(page.locator('[data-testid="admin-project-show"]')).toBeVisible();
 
-    const ingestForm = page.locator('form').filter({ hasText: /ingest|ingesta/i }).first();
-    const btn = ingestForm.locator('button[type="submit"]').first();
+    const suspendBtn = page.getByRole('button', { name: /suspend|suspender|unterbrechen|opschorten|suspendre|sospendere/i });
+    const resumeBtn = page.getByRole('button', { name: /resume|reanudar|wieder|hervat|reprendre|riprendi|retomar/i });
+    const btn = (await suspendBtn.isVisible().catch(() => false)) ? suspendBtn : resumeBtn;
     if (await btn.isVisible().catch(() => false)) {
       await btn.click();
       await waitForPageLoader(page);
       await expect(page).not.toHaveURL(/\/login/);
-      const btn2 = page.locator('form').filter({ hasText: /ingest|ingesta/i }).locator('button[type="submit"]').first();
+      const btn2 = (await suspendBtn.isVisible().catch(() => false)) ? suspendBtn : resumeBtn;
       if (await btn2.isVisible().catch(() => false)) {
         await btn2.click();
         await waitForPageLoader(page);

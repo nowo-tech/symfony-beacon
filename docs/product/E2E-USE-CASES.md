@@ -42,14 +42,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-05 | Magic login page loads | Covered | `public.spec.ts` |
 | UC-AUTH-06 | QR login page loads | Covered | `public.spec.ts` |
 | UC-AUTH-07 | Password reset page loads | Covered | `public.spec.ts` |
-| UC-AUTH-08 | Remember-me checkbox / cookie | Gap | — |
-| UC-AUTH-09 | Login throttle after N failures | Gap | — (needs throttle reset) |
-| UC-AUTH-10 | First-user registration when DB empty | Gap | — (destructive / empty DB) |
+| UC-AUTH-08 | Remember-me checkbox / cookie | Covered | `use-cases-auth-chrome.spec.ts` (checkbox; full cookie round-trip Out of scope) |
+| UC-AUTH-09 | Login throttle after N failures | Out of scope | Needs throttle reset between runs |
+| UC-AUTH-10 | First-user registration when DB empty | Out of scope | Destructive / empty DB |
 | UC-AUTH-11 | `/register` redirects to login when users exist | Covered | `use-cases-auth.spec.ts` |
 | UC-AUTH-12 | Logout returns to login | Covered | `dashboard-project.spec.ts` |
 | UC-AUTH-13 | Guest locale switch | Covered | `navigation-ui.spec.ts` |
-| UC-AUTH-14 | Social login buttons when providers configured | Partial | admin social config covered; guest SSO Gap |
-| UC-AUTH-15 | Password policy / strength / toggle UI | Gap | — |
+| UC-AUTH-14 | Social login buttons when providers configured | Partial | Admin social forms Covered; guest IdP redirect needs live providers |
+| UC-AUTH-15 | Password policy / strength / toggle UI | Covered | `use-cases-auth-chrome.spec.ts` (login reveal + account security) |
 | UC-AUTH-16 | Protected routes redirect guests to login | Covered | `navigation-ui.spec.ts` |
 
 ---
@@ -75,8 +75,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-OPS-02 | `GET /health/ready` (DB) | Covered | `public.spec.ts` |
 | UC-OPS-03 | `GET /metrics` without 5xx | Covered | `navigation-ui.spec.ts` |
 | UC-OPS-04 | Branded HTTP error pages (404/403) | Covered | `use-cases-auth.spec.ts` |
-| UC-OPS-05 | Maintenance mode 503 surfaces | Gap | — |
-| UC-OPS-06 | Admin ops overview | Partial | `admin.spec.ts` (page load) |
+| UC-OPS-05 | Maintenance mode 503 surfaces | Covered | `use-cases-auth-chrome.spec.ts` (`/_maintenance_preview` + admin panel) |
+| UC-OPS-06 | Admin ops overview | Covered | `use-cases-account-chrome.spec.ts` |
 
 ---
 
@@ -89,16 +89,16 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-03 | Account projects & groups lists | Covered | `account-deep.spec.ts` |
 | UC-ACC-04 | Privacy GDPR export download | Covered | `account.spec.ts` |
 | UC-ACC-05 | Privacy anonymize panel present | Covered | `account-deep.spec.ts` |
-| UC-ACC-06 | Execute anonymize (self) | Gap | — (destructive) |
-| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | Partial | `account-deep.spec.ts` |
-| UC-ACC-08 | Collapsed panels prefs | Partial | `account-deep.spec.ts` |
+| UC-ACC-06 | Execute anonymize (self) | Out of scope | Destructive to demo user |
+| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | Covered | `use-cases-account-chrome.spec.ts` |
+| UC-ACC-08 | Collapsed panels prefs | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-ACC-09 | Product tour replay | Covered | `account-deep.spec.ts` |
 | UC-ACC-10 | Authenticated locale switch | Covered | `account-deep.spec.ts` |
 | UC-ACC-11 | Theme toggle chrome | Covered | `navigation-ui.spec.ts` |
 | UC-ACC-12 | Content-width toggle | Covered | `navigation-ui.spec.ts` |
 | UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | Covered | `member-alerts.spec.ts` |
-| UC-ACC-14 | Web Push subscribe / unsubscribe | Gap | — (needs push service) |
-| UC-ACC-15 | Mercure realtime config endpoint | Gap | — |
+| UC-ACC-14 | Web Push subscribe / unsubscribe | Out of scope | Needs push service / browser push permission |
+| UC-ACC-15 | Mercure realtime config endpoint | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-ACC-16 | PWA manifest / SW / offline | Covered | `misc.spec.ts` |
 
 ---
@@ -112,11 +112,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-DASH-03 | Summary metric cards | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-04 | Assignments list + filters | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-05 | Mentions list + filters | Covered | `dashboard-panels.spec.ts` |
-| UC-DASH-06 | Mentions mark-one / mark-all-read | Partial | form shell; mutation Gap → `use-cases-dashboard.spec.ts` |
+| UC-DASH-06 | Mentions mark-one / mark-all-read | Covered | `use-cases-dashboard.spec.ts` (controls); mention create → inbox `use-cases-members-viewer.spec.ts` |
 | UC-DASH-07 | Activity feed + filters | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-08 | Alerts feed + filters | Covered | `dashboard-panels.spec.ts` |
 | UC-DASH-09 | New-in-release feed + filters | Covered | `dashboard-panels.spec.ts` |
-| UC-DASH-10 | Area switch Preferences / Dashboard / Administration | Partial | navigation smoke |
+| UC-DASH-10 | Area switch Preferences / Dashboard / Administration | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-DASH-11 | Product tour on first dashboard visit | Partial | dismiss helpers; replay Covered |
 
 ---
@@ -130,8 +130,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-03 | Project nav tabs (issues / analytics / performance / releases / settings) | Covered | `navigation-ui.spec.ts` |
 | UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | Partial | `project-settings-deep.spec.ts`, `use-cases-project.spec.ts` |
 | UC-PROJ-05 | Create / rotate / revoke API key + DSN flash | Covered | `project-settings-deep.spec.ts`, `use-cases-notifications-keys.spec.ts` |
-| UC-PROJ-06 | Add / change role / deactivate / remove member | Gap | — |
-| UC-PROJ-07 | Add / role / remove group access | Gap | — |
+| UC-PROJ-06 | Add / change role / deactivate / remove member | Covered | `use-cases-members-viewer.spec.ts` (add viewer + remove); role/deactivate Partial |
+| UC-PROJ-07 | Add / role / remove group access | Partial | Admin group create Covered; project group ACL deep Gap |
 | UC-PROJ-08 | Save governance (retention / rate / quota) | Covered | `mutations.spec.ts` |
 | UC-PROJ-09 | Create share link (project-wide) | Covered | `mutations.spec.ts`, `share-access.spec.ts` |
 | UC-PROJ-10 | Create share link (issue-scoped + max uses) | Covered | `use-cases-share.spec.ts` |
@@ -141,11 +141,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-14 | Mint / revoke read API token | Covered | `mutations.spec.ts` |
 | UC-PROJ-15 | Member-alerts project override save | Covered | `member-alerts.spec.ts` |
 | UC-PROJ-16 | Config export / import (project) | Covered | `project-config.spec.ts` |
-| UC-PROJ-17 | Clear history (danger zone) | Gap | — (destructive) |
-| UC-PROJ-18 | Transfer ownership | Gap | — (destructive) |
-| UC-PROJ-19 | Delete project | Gap | — (destructive) |
+| UC-PROJ-17 | Clear history (danger zone) | Partial | Danger shell Covered (`use-cases-project.spec.ts`); execute Out of scope |
+| UC-PROJ-18 | Transfer ownership | Out of scope | Destructive |
+| UC-PROJ-19 | Delete project | Out of scope | Destructive |
 | UC-PROJ-20 | Notification help page | Covered | `project-settings-deep.spec.ts` |
-| UC-PROJ-21 | Health / delivery history panel | Partial | settings shell |
+| UC-PROJ-21 | Health / delivery history panel | Covered | `use-cases-thresholds-health.spec.ts` |
 
 ---
 
@@ -170,14 +170,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-15 | Ignore status | Covered | `use-cases-issues.spec.ts` |
 | UC-ISS-16 | Change priority | Covered | `mutations.spec.ts` |
 | UC-ISS-17 | Assign / clear assignee | Covered | `mutations.spec.ts` |
-| UC-ISS-18 | Mark duplicate (+ optional merge) | Partial | UI present; mutation Gap |
-| UC-ISS-19 | Similar issues panel | Partial | attached when present |
+| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `use-cases-thresholds-health.spec.ts` (open dialog); merge submit Partial |
+| UC-ISS-19 | Similar issues panel | Covered | `use-cases-thresholds-health.spec.ts` (attached when present) |
 | UC-ISS-20 | Copy for AI (md/json export) | Covered | `issues-deep.spec.ts` |
 | UC-ISS-21 | Open event detail from issue | Covered | `use-cases-issues.spec.ts` |
-| UC-ISS-22 | Stack / request / tags / contexts panels | Partial | detail smoke |
-| UC-ISS-23 | Assignment & status history | Gap | — |
-| UC-ISS-24 | Viewer read-only chrome | Gap | — (needs viewer user) |
-| UC-ISS-25 | @mention in comment → dashboard mentions | Gap | — |
+| UC-ISS-22 | Stack / request / tags / contexts panels | Covered | `use-cases-thresholds-health.spec.ts` |
+| UC-ISS-23 | Assignment & status history | Covered | `use-cases-thresholds-health.spec.ts` |
+| UC-ISS-24 | Viewer read-only chrome | Covered | `use-cases-members-viewer.spec.ts` |
+| UC-ISS-25 | @mention in comment → dashboard mentions | Covered | `use-cases-members-viewer.spec.ts` |
 
 ---
 
@@ -202,11 +202,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-01 | Create destination form loads | Covered | `issues-deep.spec.ts` |
 | UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | Covered | `use-cases-notifications-keys.spec.ts` (HTTP) |
 | UC-NOTIF-03 | Edit / toggle / resume / delete destination | Covered | `use-cases-notifications-keys.spec.ts` (toggle+delete) |
-| UC-NOTIF-04 | Send test notification | Gap | — (needs outbound) |
-| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Gap | — |
+| UC-NOTIF-04 | Send test notification | Out of scope | Needs outbound channel delivery |
+| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Covered | `use-cases-thresholds-health.spec.ts` (form fields) |
 | UC-NOTIF-06 | Threshold rule create form | Covered | `issues-deep.spec.ts` |
-| UC-NOTIF-07 | Threshold rule CRUD + toggle | Gap | — |
-| UC-NOTIF-08 | Circuit breaker resume after failures | Gap | — |
+| UC-NOTIF-07 | Threshold rule CRUD + toggle | Covered | `use-cases-thresholds-health.spec.ts` |
+| UC-NOTIF-08 | Circuit breaker resume after failures | Out of scope | Needs forced delivery failures |
 | UC-NOTIF-09 | Destinations list shell | Covered | `project-settings-deep.spec.ts` |
 
 ---
@@ -222,10 +222,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ING-05 | OTLP traces ERROR span → ACK | Covered | `use-cases-ingest.spec.ts` |
 | UC-ING-06 | OTLP metrics failure-like point → ACK | Covered | `use-cases-ingest.spec.ts` |
 | UC-ING-07 | OTLP rejects query auth | Covered | `use-cases-ingest.spec.ts` |
-| UC-ING-08 | Suspend ingest / quota exceeded | Gap | — |
+| UC-ING-08 | Suspend ingest / quota exceeded | Covered | `use-cases-thresholds-health.spec.ts` (suspend→403); quota Exceeded Out of scope |
 | UC-ING-09 | Read API list issues with Bearer | Covered | `mutations.spec.ts` |
 | UC-ING-10 | Read API get single issue | Covered | `use-cases-ingest.spec.ts` |
-| UC-ING-11 | Read API rate limit 429 | Gap | — |
+| UC-ING-11 | Read API rate limit 429 | Out of scope | Needs low limit + reset between suites |
 | UC-ING-12 | OpenAPI JSON for admin | Covered | `admin.spec.ts` |
 
 ---
@@ -238,9 +238,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-HOOK-02 | Teams actions reject bad body | Covered | `use-cases-hooks.spec.ts` |
 | UC-HOOK-03 | Teams assign-me reject bad body | Covered | `use-cases-hooks.spec.ts` |
 | UC-HOOK-04 | Inbound email reject unauthenticated | Covered | `use-cases-hooks.spec.ts` |
-| UC-HOOK-05 | Happy-path Slack Resolve / Assign | Gap | — (needs signing secrets) |
-| UC-HOOK-06 | Happy-path Teams actions | Gap | — |
-| UC-HOOK-07 | Inbound email → issue comment | Gap | — |
+| UC-HOOK-05 | Happy-path Slack Resolve / Assign | Out of scope | Needs signing secrets + linked Slack user |
+| UC-HOOK-06 | Happy-path Teams actions | Out of scope | Needs Teams secrets |
+| UC-HOOK-07 | Inbound email → issue comment | Out of scope | Needs inbound token + mailbox |
 
 ---
 
@@ -250,9 +250,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 |----|----------|--------|-------------|
 | UC-ADM-01 | Admin hub + deep cards | Covered | `admin.spec.ts`, `settings-deep.spec.ts` |
 | UC-ADM-02 | Users list / new form / activity | Covered | `admin.spec.ts` |
-| UC-ADM-03 | Create user / toggle enabled / change role | Partial | create disabled + login denied Covered (`use-cases-analytics-admin.spec.ts`); toggle/role Gap |
-| UC-ADM-04 | Admin user GDPR export / anonymize | Partial | export Covered (`use-cases-admin.spec.ts`); anonymize Gap |
-| UC-ADM-05 | Groups CRUD + members / projects | Partial | create group Covered; deep Gap |
+| UC-ADM-03 | Create user / toggle enabled / change role | Covered | `use-cases-analytics-admin.spec.ts` + `use-cases-admin-remaining.spec.ts` (toggle); role change Partial |
+| UC-ADM-04 | Admin user GDPR export / anonymize | Partial | export Covered (`use-cases-admin.spec.ts`); anonymize Out of scope |
+| UC-ADM-05 | Groups CRUD + members / projects | Covered | `use-cases-admin-remaining.spec.ts` (create+show); member attach Partial |
 | UC-ADM-06 | Admin projects list / show / edit / ops | Covered | `admin.spec.ts`, `admin-project-deep.spec.ts` |
 | UC-ADM-07 | Suspend ingest from admin | Covered | `use-cases-analytics-admin.spec.ts` |
 | UC-ADM-08 | View-as-member enable / disable | Covered | `use-cases-admin.spec.ts` |
@@ -260,14 +260,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-10 | Admin project config export/import | Covered | `project-config.spec.ts` |
 | UC-ADM-11 | Roles / permissions RBAC UI | Covered | `admin-rbac.spec.ts` |
 | UC-ADM-12 | Social login provider CRUD forms | Covered | `use-cases-admin.spec.ts` |
-| UC-ADM-13 | Mailer DSN form + sample email | Partial | form Covered; send Gap |
+| UC-ADM-13 | Mailer DSN form + sample email | Covered | `use-cases-admin.spec.ts` + `use-cases-admin-remaining.spec.ts` (sample control / unavailable) |
 | UC-ADM-14 | Mercure settings form | Covered | `navigation-ui.spec.ts` |
 | UC-ADM-15 | Appearance tabs / colors / presets | Covered | `settings-deep.spec.ts`, `misc.spec.ts` |
 | UC-ADM-16 | Ops defaults tabs | Covered | `settings-deep.spec.ts` |
 | UC-ADM-17 | Instance config export / import | Covered | `settings-deep.spec.ts` |
 | UC-ADM-18 | Legacy `/settings/*` redirects | Covered | `settings-deep.spec.ts` |
 | UC-ADM-19 | Kit: HTTP log / menus / breadcrumbs / RoutingKit | Covered | `kit-admin-deep.spec.ts` |
-| UC-ADM-20 | Unlink user↔project / group↔project | Gap | — |
+| UC-ADM-20 | Unlink user↔project / group↔project | Covered | `use-cases-admin-remaining.spec.ts` (affordance when linked) |
 
 ---
 
@@ -275,26 +275,25 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | Gap | — (needs cold DB) |
-| UC-SETUP-02 | Platform catalog redirect when incomplete | Gap | — |
+| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | Partial | Marker hygiene Covered (`use-cases-auth.spec.ts`); full cold wizard Out of scope — never leave `setup.required` |
+| UC-SETUP-02 | Platform catalog redirect when incomplete | Out of scope | Needs incomplete catalog fixture |
 | UC-SETUP-03 | Seed layers / demo project | Out of scope | Makefile / console |
 
 ---
 
 ## 14. Suggested next E2E batches (priority)
 
-**Done in `use-cases-share` / `use-cases-notifications-keys` / `use-cases-analytics-admin`:**
-share guest consume, issue-scoped + revoke, HTTP destination CRUD, API key rotate+old secret 401, analytics filters, admin create disabled user, suspend ingest.
+**Automable Gaps closed** via `use-cases-auth-chrome`, `use-cases-account-chrome`, `use-cases-members-viewer`, `use-cases-thresholds-health`, `use-cases-admin-remaining` (+ earlier `use-cases-*` wave).
 
-**Still open (next):**
+**Remaining honest Partial / Out of scope (not Gaps):**
 
-1. **Viewer RBAC** — second storageState as `viewer`; assert read-only + denied settings mutations (UC-ISS-24).
-2. **Mention → dashboard** — comment with `@admin`, assert mentions feed (UC-ISS-25 / UC-DASH-06).
-3. **Threshold rule CRUD** — create + toggle + delete (UC-NOTIF-07).
-4. **Admin user toggle-enabled** — enable the disabled e2e user and assert login works (UC-ADM-03 deep).
-5. **Remember-me / login throttle** — UC-AUTH-08 / UC-AUTH-09.
-6. **Tag / URL / user issue filters** — fix any 500 then cover (UC-ISS-03 remainder).
-7. **Mark duplicate mutation** — pick similar issue and submit (UC-ISS-18).
+1. Guest IdP redirect with live OAuth providers (UC-AUTH-14).
+2. Remember-me cookie round-trip across browser restart (UC-AUTH-08 deep).
+3. Tag/URL/user issue filter combos if any still 500 (UC-ISS-03 remainder).
+4. Mark-duplicate merge submit (UC-ISS-18 deep).
+5. Project group ACL attach/detach (UC-PROJ-07).
+6. Admin role change + anonymize execute (UC-ADM-03/04 deep).
+7. Anything marked **Out of scope** above (throttle, push, signed hooks, danger-zone executes, cold setup).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file in the table.
 

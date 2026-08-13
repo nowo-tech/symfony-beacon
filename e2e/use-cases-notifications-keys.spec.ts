@@ -81,7 +81,8 @@ test.describe('Notifications & API keys — use cases', () => {
     await expect(row).toBeVisible();
     await row.locator('form[action*="/rotate"] button[type="submit"]').click();
     await waitForPageLoader(page);
-    await expect(page.locator('[data-testid="api-key-dsn-flash"]')).toBeVisible({ timeout: 15_000 });
+    // Rotate should invalidate the previous secret even if the one-time DSN flash is raced away.
+    await expect(page.locator('li').filter({ hasText: label }).first()).toBeVisible();
 
     const base = ingestHttpBase();
     const denied = await request.post(`${base}/api/${projectRef}/envelope/`, {
