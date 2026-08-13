@@ -28,9 +28,16 @@
 {$CADDY_EXTRA_CONFIG}
 
 # HTTP for local + Docker clients (BeaconBundle demo → host.docker.internal:9084).
-# Serve Envelope ingest on HTTP; redirect other browser traffic to HTTPS UI.
+# Serve Envelope ingest on HTTP; proxy Mercure to the HTTPS-site built-in hub;
+# redirect other browser traffic to HTTPS UI.
 http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	@ingest path /api/*
+	@mercure path /.well-known/mercure*
+	# Messenger publishes to http://php/.well-known/mercure — must not HTTPS-redirect.
+	@browserOnly {
+		not path /api/*
+		not path /.well-known/mercure*
+	}
 
 	handle @ingest {
 		root * /app/public
@@ -39,7 +46,17 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 		php_server
 	}
 
-	handle {
+	# Single built-in hub lives on the HTTPS site (hot_reload + browsers). Proxy here
+	# so Messenger can publish over cleartext HTTP on the Compose network.
+	handle @mercure {
+		reverse_proxy https://localhost {
+			transport http {
+				tls_insecure_skip_verify
+			}
+		}
+	}
+
+	handle @browserOnly {
 		redir {$DEFAULT_URI:https://localhost:9447}{uri} permanent
 	}
 }
@@ -80,9 +97,17 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 
-	# Mercure hub (Compose service `mercure`) — same-origin SSE for the PWA UI.
-	handle /.well-known/mercure* {
-		reverse_proxy mercure:80
+	# Built-in Mercure (dev): live member alerts + FrankenPHP hot_reload.
+	# Production uses Caddyfile.prod → reverse_proxy to the Compose `mercure` service.
+	# One hub only (do not also import mercure on the HTTP site — bolt lock / timeout).
+	mercure {
+		transport bolt {
+			path /data/caddy/mercure.db
+		}
+		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
+		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+		anonymous
+		{$MERCURE_EXTRA_DIRECTIVES}
 	}
 
 	# Vite assets: prefer files already written under public/build/ (vite-build).
@@ -113,5 +138,17 @@ http://{$SERVER_NAME:localhost}, http://host.docker.internal, http://127.0.0.1 {
 	# classic: run PHP per request.
 	# worker:  if a worker is registered for ./public/index.php, requests to that
 	#          script are handled by the worker (no re-bootstrap).
-	php_server
+	# hot_reload: FrankenPHP → built-in Mercure → browser (dev Caddyfile only).
+	# Narrow watches avoid vendor/node_modules/var/public/build noise.
+	php_server {
+		hot_reload {
+			watch src/**/*.{php}
+			watch config/**/*.{php,yaml,yml}
+			watch templates/**/*.twig
+			watch translations/**/*.{yaml,yml,xlf}
+			watch assets/**/*.{ts,js,scss,css,json}
+			watch .env
+			watch composer.json
+		}
+	}
 }

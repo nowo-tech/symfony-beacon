@@ -124,7 +124,7 @@ make worker   # FRANKENPHP_MODE=worker
 make classic  # per-request boot
 ```
 
-Application code is written for worker safety (`ResetInterface` when needed). See [docs/ops/FRANKENPHP-CODING.md](docs/ops/FRANKENPHP-CODING.md).
+Application code is written for worker safety (`ResetInterface` when needed). See [docs/ops/FRANKENPHP-CODING.md](docs/ops/FRANKENPHP-CODING.md). Local **hot reload** (Twig/PHP → browser): [docs/ops/FRANKENPHP-HOT-RELOAD.md](docs/ops/FRANKENPHP-HOT-RELOAD.md).
 
 ## Architecture
 

@@ -5,10 +5,11 @@ set -e
 # FrankenPHP mode switch (classic ↔ worker)
 # =============================================================================
 # Inputs (compose / .env):
-#   FRANKENPHP_MODE          classic | worker   (default: classic)
-#   FRANKENPHP_WORKER_NUM    worker process count (optional; default = 2×CPU)
-#   FRANKENPHP_LOOP_MAX      requests per worker before restart (Symfony Runtime)
-#   FRANKENPHP_RESET_KERNEL  true|false — clone Kernel between requests
+#   FRANKENPHP_MODE            classic | worker   (default: classic)
+#   FRANKENPHP_WORKER_NUM      worker process count (optional; default = 2×CPU)
+#   FRANKENPHP_LOOP_MAX        requests per worker before restart (Symfony Runtime)
+#   FRANKENPHP_RESET_KERNEL    true|false — clone Kernel between requests
+#   FRANKENPHP_WORKER_CONFIG   optional Caddy worker subdirectives (dev: "watch")
 #
 # Output:
 #   FRANKENPHP_CONFIG  → injected into the `frankenphp { }` Caddyfile block.
@@ -17,6 +18,7 @@ set -e
 #   1) FrankenPHP boots public/index.php as a worker and sets FRANKENPHP_WORKER=1
 #   2) Symfony\Component\Runtime\SymfonyRuntime detects FRANKENPHP_WORKER
 #   3) Uses FrankenPhpWorkerRunner → frankenphp_handle_request() loop
+# Hot reload (dev): pair worker "watch" with php_server hot_reload — docs/ops/FRANKENPHP-HOT-RELOAD.md
 # =============================================================================
 configure_frankenphp_mode() {
 	mode="$(printf '%s' "${FRANKENPHP_MODE:-classic}" | tr '[:upper:]' '[:lower:]')"
@@ -24,18 +26,24 @@ configure_frankenphp_mode() {
 	# Front controller relative to WORKDIR (/app). Must match php_server.
 	worker_file="./public/index.php"
 
+	# Optional worker.watch lines (dev hot_reload). Compose sets FRANKENPHP_WORKER_CONFIG=watch.
+	# Prod must leave FRANKENPHP_WORKER_CONFIG empty — watching the filesystem is a DX-only cost.
+	worker_extra="$(printf '%s' "${FRANKENPHP_WORKER_CONFIG:-}" | tr -d '\r')"
+
 	case "$mode" in
 		worker)
-			# Full Caddy worker block: path + optional num.
+			# Full Caddy worker block: path + optional num + optional watch.
 			workers="${FRANKENPHP_WORKER_NUM:-}"
 			if [ -n "$workers" ]; then
 				export FRANKENPHP_CONFIG="worker {
 	file ${worker_file}
 	num ${workers}
+	${worker_extra}
 }"
 			else
 				export FRANKENPHP_CONFIG="worker {
 	file ${worker_file}
+	${worker_extra}
 }"
 			fi
 			;;

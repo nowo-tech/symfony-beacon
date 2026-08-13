@@ -60,6 +60,12 @@ importers:
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
+      frankenphp-hot-reload:
+        specifier: 1.0.1
+        version: 1.0.1(@hotwired/stimulus@3.2.2)(idiomorph@0.7.4)
+      idiomorph:
+        specifier: 0.7.4
+        version: 0.7.4
       jsdom:
         specifier: ^30.0.1
         version: 30.0.1
@@ -1316,6 +1322,20 @@ packages:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
 
+  frankenphp-hot-reload@1.0.1:
+    resolution: {integrity: sha512-hfv6XSwo4Dh0mwAviVSXUxcrdbaL3P30AKQWL+VBI0TOkNo9MjSKGOU5jHdpx1o3So3tXjyf9kn5msZIKPjB7g==}
+    peerDependencies:
+      '@hotwired/stimulus': ^3.2.2
+      '@hotwired/turbo': ^8.0.20
+      idiomorph: ^0.7.4
+    peerDependenciesMeta:
+      '@hotwired/stimulus':
+        optional: true
+      '@hotwired/turbo':
+        optional: true
+      idiomorph:
+        optional: true
+
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -1351,6 +1371,9 @@ packages:
   iconv-lite@0.7.3:
     resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
     engines: {node: '>=0.10.0'}
+
+  idiomorph@0.7.4:
+    resolution: {integrity: sha512-uCdSpLo3uMfqOmrwXTpR1k/sq4sSmKC7l4o/LdJOEU+MMMq+wkevRqOQYn3lP7vfz9Mv+USBEqPvi0XhdL9ENw==}
 
   immutable@5.1.9:
     resolution: {integrity: sha512-m8nVez3rwrgmWxtLMt1ZYXB2Lv7OKYn/disyxAlSDYAlKSlFoPPfIAmAM/M5xqL4m4C/wAPw7S2/CNaUii1Hxg==}
@@ -3071,6 +3094,11 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
+  frankenphp-hot-reload@1.0.1(@hotwired/stimulus@3.2.2)(idiomorph@0.7.4):
+    optionalDependencies:
+      '@hotwired/stimulus': 3.2.2
+      idiomorph: 0.7.4
+
   fsevents@2.3.2:
     optional: true
 
@@ -3100,6 +3128,8 @@ snapshots:
   iconv-lite@0.7.3:
     dependencies:
       safer-buffer: 2.1.2
+
+  idiomorph@0.7.4: {}
 
   immutable@5.1.9: {}
 

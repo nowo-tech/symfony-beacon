@@ -32,6 +32,8 @@ services:
       # Prod queue: do not auto-create tables at runtime.
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
       FRANKENPHP_MODE: ${FRANKENPHP_MODE:-worker}
+      # Never enable filesystem watch / hot_reload in production.
+      FRANKENPHP_WORKER_CONFIG: ""
     volumes:
       - caddy_data:/data
       - caddy_config:/config

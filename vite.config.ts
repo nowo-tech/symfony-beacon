@@ -89,6 +89,8 @@ export default defineConfig({
                 'kit-admin': './assets/kit-admin.ts',
                 // Nelmio Swagger UI init (CSP: no inline script on /admin/api/doc).
                 'swagger-ui-boot': './assets/swagger-ui-boot.ts',
+                // FrankenPHP hot reload (Twig loads only when FRANKENPHP_HOT_RELOAD is set).
+                'frankenphp-hot-reload': './assets/frankenphp-hot-reload.ts',
             },
         },
     },

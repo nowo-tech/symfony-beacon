@@ -1,0 +1,6 @@
+{# FrankenPHP hot reload client — only when the Caddy php_server hot_reload directive is active. #}
+{% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+{% if frankenphp_hot_reload %}
+    <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload|e('html_attr') }}">
+    {{ vite_entry_script_tags('frankenphp-hot-reload') }}
+{% endif %}

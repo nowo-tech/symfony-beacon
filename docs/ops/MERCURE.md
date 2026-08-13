@@ -9,7 +9,7 @@ Background / locked-screen alerts use **Web Push** (VAPID) instead — see [NOTI
 | Mercure **hub** | Accepts publish requests from PHP; fans out SSE to browsers |
 | `MERCURE_JWT_SECRET` | Shared HMAC secret used to sign **publisher** and **subscriber** JWTs |
 | **Administration → Mercure** | Master switch + optional URL/secret overrides stored in the database |
-| Caddy `/.well-known/mercure` | Same-origin reverse proxy so the browser talks to the hub without CORS pain |
+| Caddy `/.well-known/mercure` | Same-origin hub endpoint. **Local/dev:** FrankenPHP built-in Mercure (also powers [hot reload](FRANKENPHP-HOT-RELOAD.md)). **Production:** reverse proxy to the Compose `mercure` service |
 
 Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/mercure.html#configuration). Hub image: [`dunglas/mercure`](https://hub.docker.com/r/dunglas/mercure).
 
@@ -20,10 +20,12 @@ Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/
 1. Ensure `.env` has Mercure variables (copied from `.env.dist`):
 
    ```env
-   MERCURE_URL=http://mercure/.well-known/mercure
+   MERCURE_URL=http://php/.well-known/mercure
    MERCURE_PUBLIC_URL=${DEFAULT_URI}/.well-known/mercure
    MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
    ```
+
+   Local/dev publishes to FrankenPHP’s built-in hub (`http://php/…`). For `compose.prod.yaml`, set `MERCURE_URL=http://mercure/.well-known/mercure` instead.
 
 2. Replace the default JWT secret with a strong value (**≥ 32 characters**). The same string must reach:
 
@@ -43,9 +45,11 @@ Official Symfony notes: [Mercure configuration](https://symfony.com/doc/current/
    # or a full stack: make up
    ```
 
-4. Confirm Caddy proxies the hub (already in [`.docker/frankenphp/Caddyfile`](../../.docker/frankenphp/Caddyfile)):
+4. Confirm the hub endpoint (already in [`.docker/frankenphp/Caddyfile`](../../.docker/frankenphp/Caddyfile) for local — built-in Mercure; production uses reverse proxy in `Caddyfile.prod`):
 
    ```caddy
+   # Dev: mercure { … } snippet (import mercure_dev)
+   # Prod:
    handle /.well-known/mercure* {
        reverse_proxy mercure:80
    }
@@ -69,7 +73,7 @@ Mercure does **not** need to be a hard dependency of `php` / `messenger` for Env
 
 | Variable | Used by | Meaning |
 |----------|---------|---------|
-| `MERCURE_URL` | PHP (publish) | Internal hub endpoint. In Compose: `http://mercure/.well-known/mercure` |
+| `MERCURE_URL` | PHP (publish) | Internal hub endpoint. Local/dev: `http://php/.well-known/mercure` (built-in). Production: `http://mercure/.well-known/mercure` |
 | `MERCURE_PUBLIC_URL` | Browser (subscribe) | URL the EventSource client opens. Prefer same-origin via Caddy: `${DEFAULT_URI}/.well-known/mercure` |
 | `MERCURE_JWT_SECRET` | PHP + hub | Shared HMAC secret for JWTs (min **32** characters when set in the admin form) |
 
