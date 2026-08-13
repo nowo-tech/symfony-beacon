@@ -175,9 +175,7 @@ Daily and monthly event quotas are configured on the same page (`0` = unlimited)
 
 ### Query-string ingest auth
 
-Prefer `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` is deprecated.
-
-**Reject deprecated query-string ingest auth** is enabled by default under **Administration → Ops defaults**. Disable it only while migrating clients (any environment).
+Query `beacon_key` / `beacon_secret` is **removed**. Clients must use `X-Beacon-Auth` or envelope `dsn`. Requests that still send query credentials receive **401**.
 
 ## Security headers (Caddy)
 
@@ -210,15 +208,16 @@ Use this list before exposing an instance beyond a trusted network. Details live
 
 | Area | Must configure / verify | Notes |
 |------|-------------------------|--------|
-| **SiteBackup / setup** | Unique `SITE_SETUP_TOKEN`, unique `SITE_BACKUP_PASSWORD_HASH` | Fail-closed outside `dev`/`test` if local defaults remain |
+| **SiteBackup / setup** | Unique `SITE_SETUP_TOKEN`, unique `SITE_BACKUP_PASSWORD_HASH`; prefer `X-Setup-Token` header | Query `?token=` works for the wizard — rotate after first setup; fail-closed outside `dev`/`test` if local defaults remain |
 | **App secrets** | `APP_SECRET`, DB credentials, Halite key volume or `APP_ENCRYPT_KEY` | Losing the encrypt key breaks ciphertext |
 | **Messenger** | Separate `messenger:consume`; watch `/metrics` queue gauge; purge `messenger:failed` periodically | Failed envelopes may hold PII; do not conflate with `FRANKENPHP_MODE=worker` |
 | **Retention / quotas** | Ops defaults + optional per-project overrides; schedule `app:retention:purge` | `0` disables that rule |
 | **HTTP audit log** | Admin → HTTP log (`/admin/http-log`); schedule `nowo:http-log:purge` | Default retention 30 days; may store IPs / user ids |
-| **Ingest** | Prefer `X-Beacon-Auth`; keep reject-query-auth enabled in Ops defaults | Rotate project API key secrets if leaked |
+| **Ingest** | `X-Beacon-Auth` or envelope DSN only (query auth removed) | Rotate project API key secrets if leaked |
+| **Public hooks** | `BEACON_HOOK_IP_RATE_LIMIT` (default 120/min); Teams Assign query HMAC may appear in logs/Referer | Assign-me is session-gated and excluded from the IP throttle |
 | **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
 | **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
-| **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production | Prefer private scrape network / Caddy `remote_ip` allowlist |
+| **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production (Ops Overview warns when off) | Prefer private scrape network / Caddy `remote_ip` allowlist |
 | **Health** | `/health/live` + `/health/ready` for probes | Ready checks DB only; queue depth is on `/metrics` |
 | **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` so client IP (login throttle, audit) is not spoofable | Default Compose terminates TLS in Caddy — only needed for an outer proxy |
 | **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit` | Controlled sources only; do not `|raw` user/event payload HTML |

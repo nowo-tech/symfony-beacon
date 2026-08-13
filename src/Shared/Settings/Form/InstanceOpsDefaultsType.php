@@ -108,12 +108,6 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
             'help' => 'ops_defaults.envelope_max_bytes.help',
             'constraints' => $positive,
         ]);
-        $this->addCheckboxField('ingestRejectQueryAuth', [
-            'placeholder' => false,
-            'required' => false,
-            'label' => 'ops_defaults.ingest_reject_query_auth.label',
-            'help' => 'ops_defaults.ingest_reject_query_auth.help',
-        ]);
     }
 
     private function addMetricsFields(): void

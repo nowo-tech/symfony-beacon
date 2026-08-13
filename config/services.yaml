@@ -26,12 +26,8 @@ when@test:
         app.setup.check_platform_catalogs: true
         # Functional ingest suites fire many requests from one IP.
         beacon.ingest_ip_rate_limit: 100000
+        beacon.hook_ip_rate_limit: 100000
     services:
-        # Allow EnvelopeIngestFunctionalTest to swap query-auth policy without putenv/$_ENV.
-        App\Ingest\Service\IngestQueryAuthSettings:
-            public: true
-            autowire: true
-            autoconfigure: true
         App\Issues\Service\IssueUserMailNotifier:
             public: true
             autowire: true

@@ -31,7 +31,6 @@ class InstanceSettings implements AuditableInterface
     public const DEFAULT_CIRCUIT_BREAKER_THRESHOLD = 5;
     public const DEFAULT_CIRCUIT_BREAKER_COOLDOWN_MINUTES = 0;
     public const DEFAULT_ENVELOPE_MAX_BYTES = 2_097_152;
-    public const DEFAULT_INGEST_REJECT_QUERY_AUTH = true;
     public const DEFAULT_METRICS_REQUIRE_TOKEN = true;
     public const DEFAULT_INBOUND_EMAIL_ENABLED = false;
     public const DEFAULT_ALLOW_PRIVATE_URLS = false;
@@ -100,9 +99,6 @@ class InstanceSettings implements AuditableInterface
 
     #[ORM\Column(options: ['default' => self::DEFAULT_ENVELOPE_MAX_BYTES])]
     private int $envelopeMaxBytes = self::DEFAULT_ENVELOPE_MAX_BYTES;
-
-    #[ORM\Column(options: ['default' => self::DEFAULT_INGEST_REJECT_QUERY_AUTH])]
-    private bool $ingestRejectQueryAuth = self::DEFAULT_INGEST_REJECT_QUERY_AUTH;
 
     /** Prometheus scrape Bearer token (encrypted at rest). */
     #[ORM\Column(type: 'text', nullable: true)]
@@ -424,18 +420,6 @@ class InstanceSettings implements AuditableInterface
     public function setEnvelopeMaxBytes(int $envelopeMaxBytes): self
     {
         $this->envelopeMaxBytes = max(1, $envelopeMaxBytes);
-
-        return $this;
-    }
-
-    public function isIngestRejectQueryAuth(): bool
-    {
-        return $this->ingestRejectQueryAuth;
-    }
-
-    public function setIngestRejectQueryAuth(bool $ingestRejectQueryAuth): self
-    {
-        $this->ingestRejectQueryAuth = $ingestRejectQueryAuth;
 
         return $this;
     }

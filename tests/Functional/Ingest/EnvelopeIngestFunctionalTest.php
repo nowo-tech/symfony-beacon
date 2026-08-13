@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Ingest;
 
-use App\Ingest\Service\IngestQueryAuthSettings;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventRepository;
 use App\Performance\Entity\PerfTransaction;
-use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\DatabaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -206,7 +204,7 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         self::assertSame(6, $txs[0]->getSpanCount());
     }
 
-    public function testQueryAuthIsRejectedByDefault(): void
+    public function testQueryAuthIsAlwaysRejected(): void
     {
         [$client, , $project, $apiKey] = $this->bootWithDemoProject('query-auth-reject@example.com');
 
@@ -233,43 +231,10 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         );
 
         self::assertResponseStatusCodeSame(401);
-        self::assertSame('true', $client->getResponse()->headers->get('Deprecation'));
-        self::assertStringContainsString('deprecated', (string) $client->getResponse()->headers->get('Warning'));
-    }
-
-    public function testQueryAuthStillWorksWithDeprecationHeadersWhenAllowed(): void
-    {
-        [$client, , $project, $apiKey] = $this->bootWithDemoProject('query-auth@example.com');
-        self::getContainer()->set(
-            IngestQueryAuthSettings::class,
-            new IngestQueryAuthSettings(self::getContainer()->get(InstanceOpsDefaults::class), false),
+        self::assertStringContainsString(
+            'query string authorization is not supported',
+            (string) $client->getResponse()->getContent(),
         );
-
-        $eventId = bin2hex(random_bytes(16));
-        $body = implode("\n", [
-            json_encode(['event_id' => $eventId], \JSON_THROW_ON_ERROR),
-            json_encode(['type' => 'event'], \JSON_THROW_ON_ERROR),
-            json_encode([
-                'event_id' => $eventId,
-                'message' => 'Query auth event',
-                'level' => 'error',
-                'platform' => 'php',
-            ], \JSON_THROW_ON_ERROR),
-        ]);
-
-        $client->request(
-            Request::METHOD_POST,
-            '/api/'.$project->getId().'/envelope/?beacon_key='.rawurlencode($apiKey->getPublicKey())
-                .'&beacon_secret='.rawurlencode((string) $apiKey->getSecretKey()),
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/x-beacon-envelope'],
-            $body,
-        );
-
-        self::assertResponseIsSuccessful();
-        self::assertSame('true', $client->getResponse()->headers->get('Deprecation'));
-        self::assertStringContainsString('deprecated', (string) $client->getResponse()->headers->get('Warning'));
     }
 
     public function testDailyQuotaReturnsHttp429(): void

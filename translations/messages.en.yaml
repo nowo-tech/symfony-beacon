@@ -929,7 +929,7 @@ ops_defaults:
     governance_help: Projects inherit these retention, ingest rate, and quota values
       unless they define an override.
     ingest: Ingest & auth
-    ingest_help: Envelope/OTLP body size and deprecated query-string ingest auth policy.
+    ingest_help: Envelope/OTLP body size limits. Query-string ingest auth is removed — use X-Beacon-Auth or envelope DSN.
     metrics: Prometheus metrics
     metrics_help: Scrape token for GET /metrics (Authorization Bearer only). Leave
       the token blank when saving to keep the current secret.
@@ -957,10 +957,6 @@ ops_defaults:
   envelope_max_bytes:
     label: Max Envelope / OTLP body size (bytes)
     help: HTTP 413 when a raw ingest body exceeds this size. Default 2097152 (2 MiB).
-  ingest_reject_query_auth:
-    label: Reject deprecated query-string ingest auth
-    help: When enabled, beacon_key/beacon_secret query parameters are refused (401).
-      Disable only while migrating clients to X-Beacon-Auth or envelope DSN.
   metrics_require_token:
     label: Require metrics scrape token
     help: When enabled, /metrics returns 503 until a metrics token is stored. Recommended
@@ -1980,6 +1976,13 @@ admin:
     failed_empty: No destinations with a failed last delivery.
     open_by_project_title: Open issues by project
     open_by_project_empty: No open issues in scope.
+    posture:
+      title: Security posture warning
+      intro: One or more Ops defaults leave fail-closed protections off. Review and tighten them when possible.
+      link_ops_defaults: Open Ops defaults
+      allow_private_urls: Private / loopback webhook URLs are allowed (SSRF risk).
+      allow_anonymous_resolve: Anonymous interactive Resolve is allowed on hooks.
+      metrics_require_token_off: Metrics scrape token is not required (enable require-token and set a Bearer token).
 setup:
   eyebrow: First run
   title: Instance setup

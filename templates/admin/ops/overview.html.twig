@@ -20,6 +20,21 @@
     {{ form_end(filterForm, {render_rest: false}) }}
 </div>
 
+{% if securityPostureItems is not empty %}
+    <div class="panel mb-6 border border-[var(--color-warn)]/40 bg-[var(--color-warn)]/10" data-testid="ops-security-posture" role="status">
+        <h2 class="text-sm font-semibold text-[var(--color-warn)]">{{ 'admin.ops.posture.title'|trans }}</h2>
+        <p class="mt-1 text-sm text-[var(--color-ink)]/75">{{ 'admin.ops.posture.intro'|trans }}</p>
+        <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-[var(--color-ink)]/80">
+            {% for item in securityPostureItems %}
+                <li data-posture-id="{{ item.id }}">{{ item.label_key|trans }}</li>
+            {% endfor %}
+        </ul>
+        <p class="mt-3 text-sm">
+            <a class="underline" href="{{ path('admin_ops_defaults') }}">{{ 'admin.ops.posture.link_ops_defaults'|trans }}</a>
+        </p>
+    </div>
+{% endif %}
+
 <div class="mb-6 grid gap-4 sm:grid-cols-3">
     <div class="panel">
         <h2 class="text-sm font-semibold text-[var(--color-ink)]/70">{{ 'admin.ops.queue_title'|trans }}</h2>

@@ -63,7 +63,25 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.8.2)
 
-No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+### Security residual hardening (`093` / 6.42)
+
+**Breaking (ingest):** Envelope query-string auth (`?beacon_key=&beacon_secret=`) is **removed**. Update clients to `X-Beacon-Auth` or envelope `dsn` before upgrading.
+
+```bash
+git pull   # or checkout the release tag when cut
+composer install
+# Add to .env if missing (see .env.dist):
+# BEACON_HOOK_IP_RATE_LIMIT=120
+make migrate
+php bin/console cache:clear
+```
+
+Operator checklist:
+
+1. Confirm no SDK still sends query credentials.
+2. Open **Administration → Ops overview** — if a security posture warning appears (private URLs, anonymous Resolve, or metrics require-token off), tighten under **Ops defaults**.
+3. Optional: tune `BEACON_HOOK_IP_RATE_LIMIT` (public Slack/Teams/email hooks; `0` disables).
+4. Prefer `X-Setup-Token` for setup; rotate `SITE_SETUP_TOKEN` after first setup.
 
 ## Upgrading from 1.8.1 to 1.8.2
 
@@ -604,8 +622,15 @@ Rebuild front-end assets after upgrade (CSP Stimulus controllers, cookie-consent
 
 ### Branded HTTP errors (`063-branded-http-errors`)
 
-- Twig overrides under `templates/bundles/TwigBundle/Exception/`; illustrations in `public/illustrations/`.
-- Preview `/_error/{404|403|500}` is registered **only** when `APP_ENV=dev`.
+- Twig overrides under `templates/bundles/TwigBundle/Exception/`; illustrations in `public/illustrations/error-{400,401,403,404,408,429,500,502,503}.png`.
+- Preview `/_error/{code}` is registered **only** when `APP_ENV=dev`.
+- **503**: use `error-503.png` for both Symfony error503 and the MaintenanceMode public page (`092`).
+
+### Site-wide maintenance mode (`092-maintenance-mode`)
+
+- Composer: `nowo-tech/maintenance-mode-bundle`; config `config/packages/nowo_maintenance_mode.yaml` (panel `/admin/maintenance`, preview `/_maintenance_preview`).
+- Host Twig: `templates/bundles/NowoMaintenanceModeBundle/` + `kit/maintenance_mode_panel_layout.html.twig`.
+- Re-run **`make seed-platform`** so Administration menus/breadcrumbs include Maintenance and Maintenance preview.
 
 ### CSP delivery (post-0.15.0 hardening)
 

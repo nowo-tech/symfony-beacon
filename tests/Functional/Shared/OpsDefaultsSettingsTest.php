@@ -37,7 +37,6 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         ]);
         $this->submitSection($client, 'ingest', [
             'instance_ops_defaults[envelopeMaxBytes]' => '1048576',
-            'instance_ops_defaults[ingestRejectQueryAuth]' => '1',
         ]);
         $this->submitSection($client, 'metrics', [
             'instance_ops_defaults[metricsRequireToken]' => '1',
@@ -63,7 +62,6 @@ final class OpsDefaultsSettingsTest extends DatabaseWebTestCase
         self::assertSame(5000, $settings->getEventQuotaDaily());
         self::assertSame(100000, $settings->getEventQuotaMonthly());
         self::assertSame(1048576, $settings->getEnvelopeMaxBytes());
-        self::assertTrue($settings->isIngestRejectQueryAuth());
         self::assertTrue($settings->isMetricsRequireToken());
         self::assertSame('ops-metrics-token', $settings->getMetricsToken());
         self::assertTrue($settings->isInboundEmailEnabled());

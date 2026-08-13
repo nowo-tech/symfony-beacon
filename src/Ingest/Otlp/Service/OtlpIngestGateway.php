@@ -52,7 +52,6 @@ final readonly class OtlpIngestGateway implements OtlpIngestGatewayInterface
 
         $auth = $this->authParser->parseFromRequest(
             $request->headers->get('X-Beacon-Auth'),
-            '',
         );
 
         $access = $this->projectAccessGate->authorize($projectRef, $auth['public_key'], $auth['secret_key']);

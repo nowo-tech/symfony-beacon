@@ -70,11 +70,6 @@ final readonly class InstanceOpsDefaults
         return max(1, $this->settings()->getEnvelopeMaxBytes());
     }
 
-    public function ingestRejectQueryAuth(): bool
-    {
-        return $this->settings()->isIngestRejectQueryAuth();
-    }
-
     public function metricsToken(): string
     {
         return $this->settings()->getMetricsToken() ?? '';

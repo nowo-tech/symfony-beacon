@@ -28,12 +28,16 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 ## Non-goals (deferred)
 
-- Revalidate share-link `isUsable()` on every authenticated request after claim (`061` follow-up)
-- MAC / signature on `ProcessEnvelopeMessage` after HTTP ACK (`051` adjacent)
-- Domain-event decoupling Ingest → Notifications (`085` residual)
-- Hard-delete Envelope query-auth code path (`049` residual)
-- Stricter CSP `style-src` without `unsafe-inline` (`053` residual)
-- Authenticated `/health/ready` counters (`050` residual)
+Items below were deferred from the 2026-08-10 pass. Status as of **2026-08-13**:
+
+- Revalidate share-link `isUsable()` on every authenticated request after claim (`061` follow-up) — **still deferred** (revoke/expiry already revalidated; max-uses post-claim intentional)
+- MAC / signature on `ProcessEnvelopeMessage` after HTTP ACK (`051` adjacent) — **largely closed** in code (`AsMessageHandler(sign: true)`); keep listed until `087` text fully amended
+- Domain-event decoupling Ingest → Notifications (`085` residual) — **planned** in `093` US6 (thin Messenger trigger)
+- Hard-delete Envelope query-auth code path (`049` residual) — **planned** in `093` US1
+- Stricter CSP `style-src` without `unsafe-inline` (`053` residual) — **still deferred**
+- Authenticated `/health/ready` counters (`050` residual) — **still deferred**
+
+See also: `093-security-residual-hardening` (Ops posture, hook rate limits, metrics upgrade banner, docs hygiene).
 
 ## User Scenarios & Testing *(mandatory)*
 

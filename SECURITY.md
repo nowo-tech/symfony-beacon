@@ -49,6 +49,16 @@ Operators should keep the **Mailer DSN** (Administration → Mailer, encrypted a
 
 Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the documented `.env.dist` `APP_SECRET` (`ChangeMePleaseUseARealSecret`). `app:seed-demo` is blocked outside local environments unless `--allow-non-local` (random keys only).
 
+## Ingest and public hooks (`093`)
+
+| Surface | Guidance |
+| --- | --- |
+| Envelope auth | Use `X-Beacon-Auth` or envelope `dsn`. Query `beacon_key` / `beacon_secret` is **removed** (always 401). |
+| Public hooks | Slack / Teams actions / inbound email are IP rate-limited (`BEACON_HOOK_IP_RATE_LIMIT`, default 120/min). Teams Assign-me stays session-gated. |
+| Teams Assign OpenUri | HMAC and params travel in the **query string** (Microsoft OpenUri constraint) — treat access logs / Referer as sensitive. |
+| Setup token | Prefer header `X-Setup-Token`. Query `?token=` remains for the SiteBackup wizard; rotate `SITE_SETUP_TOKEN` after first setup. |
+| Ops posture | Administration → Ops overview warns when private webhook URLs, anonymous Resolve, or optional metrics scrape are enabled. |
+
 ## Safe harbour
 
 We appreciate good-faith research. Avoid destructive testing against installations you do not operate, and do not exfiltrate personal data beyond what is needed to demonstrate the issue.

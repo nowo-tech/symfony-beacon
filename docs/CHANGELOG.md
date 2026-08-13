@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Security residual hardening (`093` / 6.42)**: Envelope query-string auth hard-removed (always 401); Ops Overview security posture warning; pre-auth IP rate limit on public Slack/Teams/email hooks (`BEACON_HOOK_IP_RATE_LIMIT`); ingest notifications dispatched via `DispatchIngestNotificationsMessage` on `async` (thin Ingest→Notifications decoupling). Docs: SECURITY / PRODUCTION / UPGRADING.
+
+### Removed
+
+- Ops defaults toggle **Reject query-string ingest auth** and `instance_settings.ingest_reject_query_auth` (migration `Version20260813100000`).
+
 ## [1.8.2] - 2026-08-12
 
 ### Security

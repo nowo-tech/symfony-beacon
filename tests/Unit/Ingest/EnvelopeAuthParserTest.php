@@ -9,38 +9,49 @@ use PHPUnit\Framework\TestCase;
 
 final class EnvelopeAuthParserTest extends TestCase
 {
-    public function testParsesHeader(): void
+    private EnvelopeAuthParser $parser;
+
+    protected function setUp(): void
     {
-        $parser = new EnvelopeAuthParser();
-        $result = $parser->parseFromRequest(
-            'Beacon beacon_key=publickey, beacon_secret=secret, beacon_client=php/1.5',
-            '',
+        $this->parser = new EnvelopeAuthParser();
+    }
+
+    public function testQueryContainsCredentialsDetectsKeyOrSecret(): void
+    {
+        self::assertTrue($this->parser->queryContainsCredentials('beacon_key=abc'));
+        self::assertTrue($this->parser->queryContainsCredentials('beacon_secret=xyz'));
+        self::assertTrue($this->parser->queryContainsCredentials('beacon_key=a&beacon_secret=b'));
+        self::assertFalse($this->parser->queryContainsCredentials(''));
+        self::assertFalse($this->parser->queryContainsCredentials('foo=bar'));
+        self::assertFalse($this->parser->queryContainsCredentials('beacon_key='));
+    }
+
+    public function testParseFromRequestIgnoresQueryEvenIfPassedHistorically(): void
+    {
+        $auth = $this->parser->parseFromRequest(
+            'Beacon beacon_key=from-header, beacon_secret=hdr-secret',
         );
 
-        self::assertSame('publickey', $result['public_key']);
-        self::assertSame('secret', $result['secret_key']);
+        self::assertSame('from-header', $auth['public_key']);
+        self::assertSame('hdr-secret', $auth['secret_key']);
     }
 
-    public function testParsesQueryAndDsn(): void
+    public function testParseFromRequestUsesEnvelopeDsnWhenHeaderMissing(): void
     {
-        $parser = new EnvelopeAuthParser();
-        $fromQuery = $parser->parseFromRequest(null, 'beacon_key=qkey&beacon_secret=sec');
-        self::assertSame('qkey', $fromQuery['public_key']);
-        self::assertSame('sec', $fromQuery['secret_key']);
+        $auth = $this->parser->parseFromRequest(
+            null,
+            'https://pub:sec@beacon.example/019fea2d-507b-7890-8b33-ca488db6f696',
+        );
 
-        $fromDsn = $parser->parseFromRequest(null, '', 'https://dsnkey:dsnsecret@localhost/1');
-        self::assertSame('dsnkey', $fromDsn['public_key']);
-        self::assertSame('dsnsecret', $fromDsn['secret_key']);
+        self::assertSame('pub', $auth['public_key']);
+        self::assertSame('sec', $auth['secret_key']);
     }
 
-    public function testQueryContainsCredentials(): void
+    public function testParseFromRequestWithoutCredentialsReturnsNulls(): void
     {
-        $parser = new EnvelopeAuthParser();
+        $auth = $this->parser->parseFromRequest(null);
 
-        self::assertFalse($parser->queryContainsCredentials(''));
-        self::assertFalse($parser->queryContainsCredentials('foo=bar'));
-        self::assertTrue($parser->queryContainsCredentials('beacon_key=qkey'));
-        self::assertTrue($parser->queryContainsCredentials('beacon_secret=sec'));
-        self::assertTrue($parser->queryContainsCredentials('beacon_key=qkey&beacon_secret=sec'));
+        self::assertNull($auth['public_key']);
+        self::assertNull($auth['secret_key']);
     }
 }

@@ -15,7 +15,7 @@ Content-Type: application/x-beacon-envelope
 |-----------|--------|
 | `X-Beacon-Auth: beacon_key=…; beacon_secret=…` | **Preferred** |
 | Envelope header `"dsn": "https://public:secret@host/project"` | Supported |
-| Query `?beacon_key=&beacon_secret=` | **Deprecated** — rejected by default (Ops defaults → reject query auth); disable only while migrating |
+| Query `?beacon_key=&beacon_secret=` | **Removed** — always HTTP 401; use `X-Beacon-Auth` or envelope DSN |
 
 Ingest **always requires** a non-empty secret. The public key must belong to `{project_id}`. Successful requests return a fast **200 ACK**; processing continues on Messenger.
 

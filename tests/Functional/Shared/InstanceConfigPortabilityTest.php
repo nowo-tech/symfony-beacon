@@ -49,7 +49,7 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         self::assertSame(240, $payload['instance']['ingest_rate_limit']);
         self::assertSame(7, $payload['instance']['notification_circuit_breaker_threshold']);
         self::assertArrayHasKey('envelope_max_bytes', $payload['instance']);
-        self::assertArrayHasKey('ingest_reject_query_auth', $payload['instance']);
+        self::assertArrayNotHasKey('ingest_reject_query_auth', $payload['instance']);
         self::assertArrayHasKey('metrics_token_configured', $payload['instance']);
         self::assertArrayNotHasKey('metrics_token', $payload['instance']);
         self::assertStringNotContainsString('super-secret', $json);

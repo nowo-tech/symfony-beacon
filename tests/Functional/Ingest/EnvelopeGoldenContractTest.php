@@ -51,7 +51,6 @@ final class EnvelopeGoldenContractTest extends DatabaseWebTestCase
     {
         $parsed = new EnvelopeAuthParser()->parseFromRequest(
             'Beacon beacon_key=pubkey, beacon_secret=secret',
-            '',
         );
 
         self::assertSame('pubkey', $parsed['public_key']);

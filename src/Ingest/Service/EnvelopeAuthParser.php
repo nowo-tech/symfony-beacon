@@ -28,12 +28,14 @@ final class EnvelopeAuthParser
     }
 
     /**
+     * Extract credentials from the Beacon auth header and/or envelope DSN only.
+     * Query-string {@code beacon_key}/{@code beacon_secret} are never accepted (see {@see queryContainsCredentials()}).
+     *
      * @return array{public_key: ?string, secret_key: ?string}
      */
     public function parseFromRequest(
         #[SensitiveParameter]
         ?string $authHeader,
-        string $queryString,
         ?string $envelopeDsn = null,
     ): array {
         $key = null;
@@ -43,16 +45,6 @@ final class EnvelopeAuthParser
             $parts = $this->parseAuthPairs(substr($authHeader, 7));
             $key = $parts['beacon_key'] ?? null;
             $secret = $parts['beacon_secret'] ?? null;
-        }
-
-        if (null === $key && '' !== $queryString) {
-            parse_str($queryString, $query);
-            if (isset($query['beacon_key']) && \is_string($query['beacon_key'])) {
-                $key = $query['beacon_key'];
-            }
-            if (isset($query['beacon_secret']) && \is_string($query['beacon_secret'])) {
-                $secret = $query['beacon_secret'];
-            }
         }
 
         if (null === $key && null !== $envelopeDsn && '' !== $envelopeDsn) {

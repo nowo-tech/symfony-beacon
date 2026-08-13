@@ -8,8 +8,8 @@ use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Service\EnvelopeParser;
 use App\Issues\Entity\Issue;
 use App\Issues\Service\IssueEnvelopeWriter;
-use App\Notifications\Service\NotificationDispatcher;
-use App\Notifications\Service\VolumeThresholdEvaluator;
+use App\Notifications\Message\DispatchIngestNotificationsMessage;
+use App\Performance\Entity\PerfTransaction;
 use App\Performance\Service\PerformanceEnvelopeWriter;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectRepository;
@@ -18,9 +18,10 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
- * Orchestrates Envelope persistence: parse → domain writers → one flush → notify.
+ * Orchestrates Envelope persistence: parse → domain writers → one flush → notify message.
  *
  * Keep this handler thin: fingerprinting/grouping lives in {@see IssueEnvelopeWriter},
  * N+1 / spans in {@see PerformanceEnvelopeWriter}, outbound alerts in Notifications.
@@ -34,8 +35,7 @@ final readonly class ProcessEnvelopeHandler
         private ProjectRepository $projectRepository,
         private IssueEnvelopeWriter $issueEnvelopeWriter,
         private PerformanceEnvelopeWriter $performanceEnvelopeWriter,
-        private NotificationDispatcher $notificationDispatcher,
-        private VolumeThresholdEvaluator $volumeThresholdEvaluator,
+        private MessageBusInterface $bus,
         private EntityManagerInterface $entityManager,
         private ProjectGovernanceResolver $governanceResolver,
         private LoggerInterface $logger,
@@ -85,8 +85,8 @@ final readonly class ProcessEnvelopeHandler
         $parsed = $this->envelopeParser->parse($message->rawEnvelope);
         $receivedAt = new DateTimeImmutable($message->receivedAtIso);
 
-        /** @var list<callable(): void> $afterFlush */
-        $afterFlush = [];
+        /** @var list<array{kind: 'new'|'regression', issue: Issue}|array{kind: 'nplus1', transaction: PerfTransaction}> $pendingAlerts */
+        $pendingAlerts = [];
         /** @var array<string, array{0: ?string, 1: ?string}> $volumeThresholdKeys */
         $volumeThresholdKeys = [];
 
@@ -104,15 +104,11 @@ final readonly class ProcessEnvelopeHandler
                 }
 
                 $issue = $result->issue;
-                $isNew = $result->isNew;
-                $isRegression = $result->isRegression;
-                $afterFlush[] = function () use ($project, $issue, $isNew, $isRegression): void {
-                    if ($isNew) {
-                        $this->notificationDispatcher->dispatchNewIssue($project, $issue);
-                    } elseif ($isRegression) {
-                        $this->notificationDispatcher->dispatchIssueRegression($project, $issue);
-                    }
-                };
+                if ($result->isNew) {
+                    $pendingAlerts[] = ['kind' => 'new', 'issue' => $issue];
+                } elseif ($result->isRegression) {
+                    $pendingAlerts[] = ['kind' => 'regression', 'issue' => $issue];
+                }
 
                 if ($result->countsTowardVolumeThreshold) {
                     $key = ($result->environment ?? '')."\0".($result->release ?? '');
@@ -121,10 +117,7 @@ final readonly class ProcessEnvelopeHandler
             } elseif ('transaction' === $type) {
                 $result = $this->performanceEnvelopeWriter->write($project, $payload, $receivedAt);
                 if ($result->nPlusOneCount > 0) {
-                    $tx = $result->transaction;
-                    $afterFlush[] = function () use ($project, $tx): void {
-                        $this->notificationDispatcher->dispatchNPlusOne($project, $tx);
-                    };
+                    $pendingAlerts[] = ['kind' => 'nplus1', 'transaction' => $result->transaction];
                 }
             }
             // Other item types are accepted at the HTTP layer and ignored here.
@@ -132,16 +125,30 @@ final readonly class ProcessEnvelopeHandler
 
         $this->entityManager->flush();
 
-        foreach ($afterFlush as $callback) {
-            $callback();
+        /** @var list<array{kind: 'new'|'regression'|'nplus1', issue_id?: int, transaction_id?: int}> $alerts */
+        $alerts = [];
+        foreach ($pendingAlerts as $pending) {
+            if ('nplus1' === $pending['kind']) {
+                $txId = $pending['transaction']->getId();
+                if (null !== $txId) {
+                    $alerts[] = ['kind' => 'nplus1', 'transaction_id' => $txId];
+                }
+                continue;
+            }
+
+            $issueId = $pending['issue']->getId();
+            if (null !== $issueId) {
+                $alerts[] = ['kind' => $pending['kind'], 'issue_id' => $issueId];
+            }
         }
 
-        if ([] !== $volumeThresholdKeys) {
-            $this->volumeThresholdEvaluator->evaluateContexts(
-                $project,
+        if ([] !== $alerts || [] !== $volumeThresholdKeys) {
+            $this->bus->dispatch(new DispatchIngestNotificationsMessage(
+                $message->projectId,
+                $alerts,
                 array_values($volumeThresholdKeys),
-                $receivedAt,
-            );
+                $message->receivedAtIso,
+            ));
         }
     }
 }

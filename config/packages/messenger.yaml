@@ -39,6 +39,7 @@ framework:
 
         routing:
             App\Ingest\Message\ProcessEnvelopeMessage: async_ingest
+            App\Notifications\Message\DispatchIngestNotificationsMessage: async
             App\Notifications\Message\DeliverNotificationMessage: async
             App\Notifications\Message\DeliverWebPushForProjectMessage: async
             Nowo\HttpLogBundle\Message\PersistHttpLogMessage: async

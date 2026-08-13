@@ -24,7 +24,6 @@ final class InstanceOpsDefaultsTest extends TestCase
             $settings->setNotificationCircuitBreakerThreshold(0);
             $settings->setNotificationCircuitBreakerCooldownMinutes(-1);
             $settings->setEnvelopeMaxBytes(0);
-            $settings->setIngestRejectQueryAuth(false);
             $settings->setMetricsToken(' tok ');
             $settings->setMetricsRequireToken(true);
             $settings->setInboundEmailEnabled(true);
@@ -44,7 +43,6 @@ final class InstanceOpsDefaultsTest extends TestCase
         self::assertSame(1, $ops->circuitBreakerThreshold());
         self::assertSame(0, $ops->circuitBreakerCooldownMinutes());
         self::assertSame(1, $ops->envelopeMaxBytes());
-        self::assertFalse($ops->ingestRejectQueryAuth());
         self::assertSame('tok', $ops->metricsToken());
         self::assertTrue($ops->metricsRequireToken());
         self::assertTrue($ops->inboundEmailEnabled());

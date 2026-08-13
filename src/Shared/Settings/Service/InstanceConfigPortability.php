@@ -107,7 +107,6 @@ final readonly class InstanceConfigPortability
                 'notification_circuit_breaker_threshold' => $settings->getNotificationCircuitBreakerThreshold(),
                 'notification_circuit_breaker_cooldown_minutes' => $settings->getNotificationCircuitBreakerCooldownMinutes(),
                 'envelope_max_bytes' => $settings->getEnvelopeMaxBytes(),
-                'ingest_reject_query_auth' => $settings->isIngestRejectQueryAuth(),
                 'metrics_require_token' => $settings->isMetricsRequireToken(),
                 'metrics_token_configured' => $settings->hasMetricsToken(),
                 'inbound_email_enabled' => $settings->isInboundEmailEnabled(),
@@ -254,7 +253,6 @@ final readonly class InstanceConfigPortability
         }
 
         $booleanSetters = [
-            'ingest_reject_query_auth' => 'setIngestRejectQueryAuth',
             'metrics_require_token' => 'setMetricsRequireToken',
             'inbound_email_enabled' => 'setInboundEmailEnabled',
             'notifications_allow_private_urls' => 'setAllowPrivateUrls',
@@ -266,9 +264,6 @@ final readonly class InstanceConfigPortability
             }
             $incoming = (bool) $data[$key];
             // Fail-closed: never weaken security-sensitive flags via silent JSON import.
-            if ('ingest_reject_query_auth' === $key && !$incoming && $settings->isIngestRejectQueryAuth()) {
-                continue;
-            }
             if ('metrics_require_token' === $key && !$incoming && $settings->isMetricsRequireToken()) {
                 continue;
             }

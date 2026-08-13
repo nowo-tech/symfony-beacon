@@ -304,6 +304,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.38 | **Project config export/import**: `beacon-project-bundle` v1; unique `project.code`; membership `active`; Admin creates users; Settings skips unknown emails | Beacon | `089-project-config-export` | **Done** (v1.6.0) |
 | 6.39 | **CSRF via Symfony Forms**: `CsrfOnlyType` + named Types (triage / danger / Settings / admin) + GET `AbstractGetFilterType`; migrate off hand-rolled Twig `csrf_token()` POSTs | Beacon | `090-csrf-symfony-forms` | **Done** (v1.7.0) |
 | 6.40 | **Member alert preferences**: Account matrix (master / events / scope / per-project); Mercure `/users/{uuid}/member-alerts`; Web Push filtered; viewers edit own prefs from Account | Beacon | `091-member-push-preferences` | **Done** (v1.8.0) |
+| 6.42 | **Security residual hardening**: hard-delete Envelope query-auth; Ops security posture warning; hook IP rate limits; metrics require-token upgrade banner; Setup/Teams query hygiene docs; thin Ingest→Notifications Messenger decoupling | Beacon | `093-security-residual-hardening` | **Implemented** (unreleased) |
 
 ### Next (immediate queue)
 

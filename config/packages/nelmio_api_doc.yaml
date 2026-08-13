@@ -59,7 +59,7 @@ nelmio_api_doc:
                     description: |
                         Beacon auth header. Example:
                         `Beacon beacon_key=PUBLIC, beacon_secret=SECRET`
-                        The secret is always required. Prefer this over query auth.
+                        The secret is always required. Query-string auth is not supported.
                 BeaconReadToken:
                     type: http
                     scheme: bearer
@@ -67,16 +67,6 @@ nelmio_api_doc:
                     description: |
                         Project read API token (`brt_` + hex). Create/revoke in Project Settings.
                         Does not accept ingest public/secret keys.
-                BeaconKeyQuery:
-                    type: apiKey
-                    in: query
-                    name: beacon_key
-                    description: 'Deprecated: public key query parameter (prefer X-Beacon-Auth).'
-                BeaconSecretQuery:
-                    type: apiKey
-                    in: query
-                    name: beacon_secret
-                    description: 'Deprecated: secret in the query string leaks into logs; prefer X-Beacon-Auth. Always required.'
     areas:
         path_patterns:
             - ^/api

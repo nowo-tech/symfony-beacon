@@ -6,6 +6,7 @@ namespace App\Ops\Controller;
 
 use App\Ops\Form\AdminOpsOverviewFilterType;
 use App\Ops\Service\OpsOverviewService;
+use App\Ops\Service\SecurityPosture;
 use App\Project\Repository\ProjectRepository;
 use App\Shared\Form\GetFilterFormFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +23,7 @@ final class AdminOpsOverviewController extends AbstractController
         private readonly OpsOverviewService $opsOverviewService,
         private readonly ProjectRepository $projectRepository,
         private readonly GetFilterFormFactory $getFilterFormFactory,
+        private readonly SecurityPosture $securityPosture,
     ) {
     }
 
@@ -42,6 +44,7 @@ final class AdminOpsOverviewController extends AbstractController
 
         return $this->render('admin/ops/overview.html.twig', [
             'overview' => $overview,
+            'securityPostureItems' => $this->securityPosture->weakenedItems(),
             'filterForm' => $this->getFilterFormFactory->create(AdminOpsOverviewFilterType::class, [
                 'project' => $projectFilter,
             ], [

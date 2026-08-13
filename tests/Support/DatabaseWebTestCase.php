@@ -209,7 +209,6 @@ abstract class DatabaseWebTestCase extends WebTestCase
         $settings->setInboundWebhookSecret('phpunit-inbound-secret');
         $settings->setAllowPrivateUrls(true);
         $settings->setAllowAnonymousResolve(false);
-        $settings->setIngestRejectQueryAuth(true);
         $repository->save($settings);
     }
 
