@@ -1,4 +1,4 @@
-.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls
 
@@ -29,6 +29,7 @@ help:
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
 	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + BEACON_DSN (no new user)"
 	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"
+	@echo "  make migrate         doctrine:migrations:migrate -n (no seed)"
 	@echo "  make ready           bootstrap + seed (recommended first local run / dogfooding)"
 	@echo "  make restart         Restart php + messenger"
 	@echo "  make specify-check   Verify Specify CLI"
@@ -206,8 +207,10 @@ dogfood: ensure-halite-secrets
 	docker compose exec -T php bin/console app:seed-demo --skip-demo-user
 	@echo "Dogfood: BEACON_DSN is written only when empty. If it changed, run: make restart"
 
-bootstrap: ensure-halite-secrets
+migrate: ensure-halite-secrets
 	docker compose exec -T php bin/console doctrine:migrations:migrate -n
+
+bootstrap: migrate
 	@$(MAKE) seed-platform
 	@docker compose exec -T php sh -c 'mkdir -p var/site-backup && touch var/site-backup/setup.done'
 	@echo "Next: make seed (or make ready) for demo user + dogfood DSN — or open /setup / register"
