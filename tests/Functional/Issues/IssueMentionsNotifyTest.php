@@ -179,10 +179,12 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
         self::assertResponseIsSuccessful();
-        $token = $crawler->filter('form.issue-comments__form input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form.issue-comments__form input[name="issue_comment[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/comments', [
-            '_token' => $token,
-            'body' => 'Hello @AliceHttp',
+            'issue_comment' => [
+                '_token' => $token,
+                'body' => 'Hello @AliceHttp',
+            ],
         ]);
         self::assertResponseRedirects();
         $client->followRedirect();
@@ -241,10 +243,12 @@ final class IssueMentionsNotifyTest extends DatabaseWebTestCase
 
         $this->login($client, $owner);
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
-        $token = $crawler->filter('form.issue-comments__form input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form.issue-comments__form input[name="issue_comment[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/comments', [
-            '_token' => $token,
-            'body' => 'Hello @AliceSend',
+            'issue_comment' => [
+                '_token' => $token,
+                'body' => 'Hello @AliceSend',
+            ],
         ]);
         self::assertResponseRedirects();
         self::assertSame(1, $transport->sent);

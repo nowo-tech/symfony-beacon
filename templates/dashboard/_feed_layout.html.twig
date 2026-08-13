@@ -6,6 +6,9 @@
                    filter_query, item_count.
 
     Blocks: feed_header, filter_fields, filter_hidden, results.
+
+    Default filter_fields paints visible Type children via form_row (077). Override only
+    for custom chrome (e.g. mentions unread checkbox). Hiddens land after actions.
 #}
 {% set filterQuery = filter_query %}
 
@@ -25,12 +28,18 @@
         'data-testid': filters_testid
     }
 }) }}
-    {% block filter_fields %}{% endblock %}
+    {% block filter_fields %}
+        {% for field in filterForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
+    {% endblock %}
     <div class="issue-filters__actions">
         <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
         <a class="btn-ghost issue-filters__clear no-underline" href="{{ path(filter_route) }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
-    {{ form_rest(filterForm) }}
+    {% include 'form/_fields.html.twig' with {form: filterForm} only %}
 {{ form_end(filterForm, {render_rest: false}) }}
 
 {% if pagination.total == 0 %}

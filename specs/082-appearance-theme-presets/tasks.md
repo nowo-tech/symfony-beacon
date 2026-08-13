@@ -10,3 +10,4 @@
 - [x] Instance config export/import keys for themes + layout
 - [x] Tests: AppearanceSettings, AppearanceThemePresets, corner/border helpers
 - [x] Docs: ROADMAP 6.32, CHANGELOG Unreleased, UPGRADING migration note, this spec
+- [x] Appearance Colors → theme `color_row` + `_fields`; Themes CSRF-only paint (`077` / `081` Twig consolidation)

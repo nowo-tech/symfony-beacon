@@ -23,11 +23,13 @@ final class AnalyticsAccessTest extends DatabaseWebTestCase
         [$client, $user, $project] = $this->bootWithDemoProject();
         $this->login($client, $user);
 
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/analytics');
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/analytics');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-controller="analytics-chart"]');
         self::assertSelectorExists('canvas[data-analytics-chart-target="canvas"]');
         self::assertSelectorExists('.analytics-filters');
+        self::assertSelectorCount(5, '.analytics-filters__row > .analytics-filters__field');
+        self::assertGreaterThan(0, $crawler->filter('.analytics-filters__field .help-text, .analytics-filters__field [id$="_help"]')->count());
     }
 
     public function testStrangerIsForbidden(): void

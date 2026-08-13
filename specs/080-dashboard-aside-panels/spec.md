@@ -84,6 +84,14 @@ As a member, sidebar Dashboard items and breadcrumbs exist for every new panel r
 - Mentions mark-read / mark-all-read POSTs use `MentionsMarkReadType` / `MentionsMarkAllReadType` (`090`).
 - Dashboard product page titles use lighter chrome: `h1` `text-2xl font-semibold` + quieter intro (`text-xs` / lower opacity); kit admin page-header title/intro aligned in `_kit_admin_styles`.
 
+## Amendment (FormKit GET filters, 2026-08-13)
+
+Aside list filters (Mentions / New-in-release / Alerts / Activity as applicable) extend `AbstractGetFilterType` (profile `filter`). Shared `addDashboardPerPage` keeps **`per_page` required**; other fields optional. Twig: `form_row` + `_fields` / loop (`077`). Canonical contract + CSRF/authz non-regression: `081` FR-003a / `090` FR-007.
+
+## Amendment (Mentions unread via `form_row`, 2026-08-13)
+
+Mentions filter checkbox `unread` uses `form_row` with a Twig/`messages` caption (`mentions.filter.unread_only`). The Type keeps FormKit `label: false` (filter profile). No hand-rolled `form_widget` + sibling label. See `077` / `081` Twig consolidation amendments.
+
 ## Out of scope (v1)
 
 - Watching / favorites (projects or issues) — needs a new follow model.

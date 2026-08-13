@@ -6,23 +6,24 @@ namespace App\Issues\Form;
 
 use App\Issues\AssignmentScope;
 use App\Shared\Form\AbstractGetFilterType;
-use App\Shared\Form\DashboardProjectFilterFields;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Override;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Dashboard cross-project assignments filters.
+ * Dashboard cross-project assignments filters (FormKit {@code filter}).
  */
 final class DashboardAssignmentsFilterType extends AbstractGetFilterType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly TranslatorInterface $translator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -31,59 +32,75 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
         $projectChoices = $options['project_choices'];
         /** @var array<string, string> $teammateChoices */
         $teammateChoices = $options['teammate_choices'];
+
         $scopeChoices = [];
         foreach (AssignmentScope::cases() as $scope) {
-            $scopeChoices[$this->translator->trans('assignments.scope.'.$scope->value)] = $scope->value;
+            $scopeChoices['dashboard_assignments_filter.scope.'.$scope->value] = $scope->value;
         }
         $priorityChoices = [
-            $this->translator->trans('issues.filter.any_priority') => '',
+            'dashboard_assignments_filter.priority.any' => '',
+            'dashboard_assignments_filter.priority.low' => 'low',
+            'dashboard_assignments_filter.priority.medium' => 'medium',
+            'dashboard_assignments_filter.priority.high' => 'high',
+            'dashboard_assignments_filter.priority.critical' => 'critical',
         ];
-        foreach (['low', 'medium', 'high', 'critical'] as $priority) {
-            $priorityChoices[$this->translator->trans('issues.priority.'.$priority)] = $priority;
-        }
         $assigneeChoices = [
-            $this->translator->trans('issues.filter.any_assignee') => '',
+            $this->translator->trans('dashboard_assignments_filter.assignee.any', [], 'form') => '',
         ];
         foreach ($teammateChoices as $id => $label) {
             $assigneeChoices[$label] = $id;
         }
 
-        $builder
-            ->add('sort', HiddenType::class)
-            ->add('dir', HiddenType::class)
-            ->add('page', HiddenType::class)
-            ->add('scope', ChoiceType::class, [
-                'label' => false,
-                'required' => true,
+        $this->withBuilder($builder, function () use (
+            $projectChoices,
+            $scopeChoices,
+            $priorityChoices,
+            $assigneeChoices,
+        ): void {
+            $this->addHiddenFilterField('sort');
+            $this->addHiddenFilterField('dir');
+            $this->addHiddenFilterField('page');
+
+            $this->addFilterSelect('scope', [
                 'choices' => $scopeChoices,
-                'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.scope',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.scope.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('project', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+            $this->addFilterSelect('project', [
                 'choices' => $projectChoices,
                 'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('assignments.filter.any_project'),
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.project',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.project.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('q', SearchType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+
+            $this->addNamedField('q', 'search', [
                 'attr' => [
                     'class' => 'input',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.q.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('level', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+
+            $this->addFilterSelect('level', [
                 'choices' => [
                     'fatal' => 'fatal',
                     'error' => 'error',
@@ -92,46 +109,63 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
                     'debug' => 'debug',
                 ],
                 'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('issues.filter.any_level'),
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.level',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.level.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('status', ChoiceType::class, [
-                'label' => false,
-                'required' => true,
-                'choices' => ['unresolved', 'resolved', 'ignored'],
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+            $this->addFilterSelect('status', [
+                'choices' => [
+                    'unresolved' => 'unresolved',
+                    'resolved' => 'resolved',
+                    'ignored' => 'ignored',
+                ],
                 'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.status',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.status.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('priority', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+            $this->addFilterSelect('priority', [
                 'choices' => $priorityChoices,
-                'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.priority',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.priority.aria',
+                        [],
+                        'form',
+                    ),
                 ],
-            ])
-            ->add('assignee', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+            $this->addFilterSelect('assignee', [
                 'choices' => $assigneeChoices,
                 'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [
                     'class' => 'input',
-                    'aria-label' => 'assignments.filter.assignee',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_assignments_filter.assignee.aria',
+                        [],
+                        'form',
+                    ),
                 ],
+                'row_attr' => ['class' => 'dashboard-filters__field'],
             ]);
-        DashboardProjectFilterFields::addPerPage($builder, $this->translator);
+            $this->addDashboardPerPage($this->translator);
+        });
     }
 
     #[Override]
@@ -145,5 +179,11 @@ final class DashboardAssignmentsFilterType extends AbstractGetFilterType
         ]);
         $resolver->setAllowedTypes('project_choices', 'array');
         $resolver->setAllowedTypes('teammate_choices', 'array');
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'dashboard_assignments_filter';
     }
 }

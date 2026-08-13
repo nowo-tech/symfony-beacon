@@ -119,3 +119,7 @@ As ingest, similar events merge into one issue; resolved and ignored issues reop
 ## Amendment (Symfony Forms, 2026-08-11)
 
 Status POST uses `IssueStatusType`. Related triage Types live under `015` / `090-csrf-symfony-forms`.
+
+## Amendment (Issues index FormKit filter, 2026-08-13)
+
+Issues list filters use `IssueIndexFilterType` → `AbstractGetFilterType` (FormKit profile `filter`). Placeholders/help under `issue_index_filter.*` in `translations/form.*.yaml`. Fields optional except **`per_page`** (`required: true`). CSRF disabled on GET (intentional). Chrome: `form_row` + `_fields` / loop (no FormKit labels; theme omits label). Canonical contract: `081` FR-003a; Twig loop: `077`; CSRF boundary: `090` FR-007.

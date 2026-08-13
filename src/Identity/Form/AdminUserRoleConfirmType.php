@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,12 +19,11 @@ final class AdminUserRoleConfirmType extends FormKitAbstractType
         $this->withBuilder($builder, function (): void {
             $this->addChoiceField('role', [
                 'required' => true,
-                'label' => false,
+                'label' => false, 'help' => false,
                 'choices' => [
                     'users.role.user' => 'user',
                     'users.role.admin' => 'admin',
                 ],
-                'choice_translation_domain' => 'messages',
                 'placeholder' => false,
             ]);
         });
@@ -36,7 +35,6 @@ final class AdminUserRoleConfirmType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'admin_user_role',
-            'translation_domain' => 'messages',
         ]);
     }
 

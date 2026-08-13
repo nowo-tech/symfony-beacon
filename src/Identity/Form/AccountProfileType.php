@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Identity\Entity\User;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -37,7 +37,6 @@ final class AccountProfileType extends FormKitAbstractType
                     'required' => false,
                     'label' => 'user_preferences.current_password.label',
                     'help' => 'user_preferences.current_password.help_email_change',
-                    'translation_domain' => 'messages',
                     'attr' => ['autocomplete' => 'current-password'],
                 ]),
             );

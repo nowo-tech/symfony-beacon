@@ -43,5 +43,10 @@ As a member, I filter by level (type), status, priority, text search, and page s
 ## Related
 
 - `080-dashboard-aside-panels` — Summary, Activity, Mentions, Alerts, New in release (same Dashboard aside; shared pagination convention FR-011).
-- `081-formkit-uikit-kit-sync` — pagination chrome via UiKit 1.7+.
+- `081-formkit-uikit-kit-sync` — pagination chrome via UiKit 1.7+; product FormKit profile `filter`.
+- `090-csrf-symfony-forms` — GET filter Types / CSRF boundary.
 - Breadcrumbs for Assignments nest under `dashboard_home` (Projects) so trails render with `hide_when_single_root`.
+
+## Amendment (FormKit GET filter, 2026-08-13)
+
+`DashboardAssignmentsFilterType` extends `AbstractGetFilterType` (profile `filter`). Contract: `081` FR-003a (`required` false except `per_page`; CSRF off on GET intentional; access still via `findAccessibleByUser`). Twig paints via `form_row` + `_fields` / loop (`077`).

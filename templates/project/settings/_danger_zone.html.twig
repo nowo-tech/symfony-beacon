@@ -50,19 +50,22 @@
                         </div>
                         <div class="confirm-dialog__content">
                             {% if transferCandidates is not empty %}
-                                <label class="confirm-dialog__label" for="project-transfer-user-{{ project.id }}">{{ 'project.danger.transfer_member_label'|trans }}</label>
-                                {{ form_widget(transferOwnershipForm.user, {attr: {id: 'project-transfer-user-' ~ project.id, class: 'input w-full'}}) }}
-                                <label class="confirm-dialog__label" for="project-transfer-confirm-{{ project.id }}">
-                                    {{ 'project.danger.transfer_type_label'|trans({'%name%': project.name}) }}
-                                </label>
-                                {{ form_widget(transferOwnershipForm.confirmation, {
-                                    attr: {
-                                        id: 'project-transfer-confirm-' ~ project.id,
-                                        class: 'input w-full',
-                                        autocomplete: 'off',
-                                        'data-confirm-dialog-target': 'confirmInput',
-                                    }
-                                }) }}
+                                {% for field in transferOwnershipForm %}
+                                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                        {% if field.vars.name == 'confirmation' %}
+                                            {{ form_row(field, {
+                                                label: 'project.danger.transfer_type_label'|trans({'%name%': project.name}),
+                                                translation_domain: false,
+                                            }) }}
+                                        {% else %}
+                                            {{ form_row(field, {
+                                                label: 'project.danger.transfer_member_label'|trans,
+                                                translation_domain: false,
+                                            }) }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% include 'form/_fields.html.twig' with {form: transferOwnershipForm} only %}
                             {% endif %}
                         </div>
                         <div class="confirm-dialog__actions">
@@ -71,7 +74,7 @@
                                 <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.transfer_confirm'|trans }}</button>
                             {% endif %}
                         </div>
-                    {{ form_end(transferOwnershipForm) }}
+                    {{ form_end(transferOwnershipForm, {render_rest: false}) }}
                 {% endblock %}
             {% endembed %}
         {% endif %}
@@ -94,17 +97,17 @@
                             <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
                         </div>
                         <div class="confirm-dialog__content">
-                            <label class="confirm-dialog__label" for="project-delete-confirm-{{ project.id }}">
-                                {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
-                            </label>
-                            {{ form_widget(deleteProjectForm.confirmation) }}
+                            {{ form_row(deleteProjectForm.confirmation, {
+                                label: 'project.danger.delete_type_label'|trans({'%name%': project.name}),
+                                translation_domain: false,
+                            }) }}
                             {% include 'form/_fields.html.twig' with {form: deleteProjectForm} only %}
                         </div>
                         <div class="confirm-dialog__actions">
                             <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                             <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
                         </div>
-                    {{ form_end(deleteProjectForm) }}
+                    {{ form_end(deleteProjectForm, {render_rest: false}) }}
                 {% endblock %}
             {% endembed %}
         {% endif %}

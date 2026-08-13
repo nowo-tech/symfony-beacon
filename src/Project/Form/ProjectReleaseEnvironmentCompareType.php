@@ -5,37 +5,41 @@ declare(strict_types=1);
 namespace App\Project\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Builds the issue-list deep-link form for release environment comparison.
+ * Issue-list deep-link form for release environment comparison (FormKit {@code filter}: no labels).
+ *
+ * Placeholders / help: {@code translations/form.*.yaml} → {@code project_release_environment_compare.*}.
+ * Visible captions are Twig chrome ({@code releases.environment_compare.*}).
  */
 final class ProjectReleaseEnvironmentCompareType extends AbstractGetFilterType
 {
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('status', HiddenType::class)
-            ->add('release', HiddenType::class, [
-                'required' => false,
-            ])
-            ->add('environment', TextType::class, [
-                'label' => false,
-                'required' => false,
+        $this->withBuilder($builder, function (): void {
+            $this->addHiddenFilterField('status');
+            $this->addHiddenFilterField('release');
+            $this->addTextField('environment', [
                 'attr' => [
+                    'id' => 'env-a',
                     'class' => 'input w-full',
-                    'placeholder' => 'production',
-                ],
-            ])
-            ->add('compare', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input w-full',
-                    'placeholder' => 'staging',
                 ],
             ]);
+            $this->addTextField('compare', [
+                'attr' => [
+                    'id' => 'env-b',
+                    'class' => 'input w-full',
+                ],
+            ]);
+        });
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'project_release_environment_compare';
     }
 }

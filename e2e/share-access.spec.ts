@@ -34,8 +34,8 @@ test.describe('Share link access — authenticated', () => {
     const share = page.locator('[data-testid="share-links"]');
     await expect(share).toBeVisible();
 
-    const createForm = share.locator('form').filter({ has: page.locator('input[name="days"]') });
-    await createForm.locator('input[name="max_uses"]').fill('5');
+    const createForm = share.locator('form').filter({ has: page.locator('input[name="project_share_create[days]"]') });
+    await createForm.locator('input[name="project_share_create[max_uses]"]').fill('5');
     await createForm.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
     await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings`));

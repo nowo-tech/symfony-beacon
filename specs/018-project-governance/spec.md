@@ -109,3 +109,7 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 
 - Revoked / inactive API keys MUST NOT show a copyable DSN or secret in Settings (FR-003). Covered by `ProjectApiKeyVisibilityTest`.
 - Active keys also MUST NOT re-list DSN on ordinary GET; create/rotate one-shot banner only (`002` FR-003 / `087` show-once restore).
+
+## Amendment (FormKit `beacon` governance form, 2026-08-13)
+
+`ProjectGovernanceType` extends `FormKitAbstractType` (profile `beacon`, block prefix `project_governance`). Labels / placeholders / help live under `project_governance.*` in `translations/form.*.yaml` (auto); numeric placeholders may be literal defaults; help may use `help_translation_parameters` (`%default%`). Twig: `form_row` + `_fields` (`077`). Canonical: `081` FR-003c. Automated tests / E2E MUST use prefixed ids such as `#project_governance_retention_days` (not `#retention_days`).

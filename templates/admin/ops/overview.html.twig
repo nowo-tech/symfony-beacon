@@ -9,10 +9,7 @@
         <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'admin.ops.intro'|trans }}</p>
     </div>
     {{ form_start(filterForm, {attr: {class: 'flex flex-wrap items-end gap-2'}}) }}
-        <label class="block text-sm">
-            <span class="mb-1 block text-[var(--color-ink)]/65">{{ 'admin.ops.filter_project'|trans }}</span>
-            {{ form_widget(filterForm.project) }}
-        </label>
+        {% include 'form/_fields.html.twig' with {form: filterForm} only %}
         <button type="submit" class="rounded bg-[var(--color-moss)] px-3 py-1.5 text-sm font-medium text-white">{{ 'common.filter'|trans }}</button>
         {% if overview.filter_project %}
             <a class="px-2 py-1.5 text-sm underline" href="{{ path('admin_ops_overview') }}">{{ 'common.clear_filters'|trans }}</a>

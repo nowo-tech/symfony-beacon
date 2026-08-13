@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Admin create-user form (no data_class — maps to {@see User} in the controller).
+ *
+ * Field label / placeholder / help use FormKit convention keys in the {@code form}
+ * domain ({@code admin_user.<field>.label|placeholder|help} → translations/form.*.yaml).
  */
 final class AdminUserType extends FormKitAbstractType
 {
@@ -21,20 +24,15 @@ final class AdminUserType extends FormKitAbstractType
     {
         $this->withBuilder($builder, function (): void {
             $this->addEmailField('email', [
-                'label' => 'users.form.email',
                 'constraints' => [new NotBlank(), new Email(), new Length(max: 180)],
             ]);
             $this->addTextField('displayName', [
-                'label' => 'users.form.display_name',
                 'constraints' => [new NotBlank(), new Length(max: 120)],
             ]);
             $this->addPasswordField('password', [
-                'label' => 'users.form.password',
-                'help' => 'users.form.password_help',
                 'constraints' => [new NotBlank(), new Length(min: 8, max: 4096)],
             ]);
             $this->addChoiceField('role', [
-                'label' => 'users.role_label',
                 'choices' => [
                     'users.role.user' => 'user',
                     'users.role.admin' => 'admin',
@@ -42,8 +40,8 @@ final class AdminUserType extends FormKitAbstractType
                 'constraints' => [new NotBlank()],
             ]);
             $this->addCheckboxField('enabled', [
-                'label' => 'users.form.enabled',
                 'required' => false,
+                'placeholder' => false,
             ]);
         });
     }
@@ -53,7 +51,6 @@ final class AdminUserType extends FormKitAbstractType
         $resolver->setDefaults([
             'csrf_protection' => true,
             'csrf_token_id' => 'admin_user_new',
-            'translation_domain' => 'messages',
         ]);
     }
 

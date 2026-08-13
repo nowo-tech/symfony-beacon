@@ -31,18 +31,15 @@
     item_count: issues|length,
 } %}
     {% block filter_fields %}
-        {{ form_widget(filterForm.scope) }}
-        {{ form_widget(filterForm.project) }}
-        {{ form_widget(filterForm.q, {attr: {class: 'input', placeholder: 'issues.search_placeholder'|trans}}) }}
-        {{ form_widget(filterForm.level) }}
-        {{ form_widget(filterForm.status) }}
-        {{ form_widget(filterForm.priority) }}
-        {% set assigneeAttr = {class: 'input'} %}
-        {% if filters.scope == 'mine' or filters.scope == 'unassigned' %}
-            {% set assigneeAttr = assigneeAttr|merge({disabled: 'disabled'}) %}
-        {% endif %}
-        {{ form_widget(filterForm.assignee, {attr: assigneeAttr}) }}
-        {{ form_widget(filterForm.per_page) }}
+        {% for field in filterForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {% if field.vars.name == 'assignee' and (filters.scope == 'mine' or filters.scope == 'unassigned') %}
+                    {{ form_row(field, {attr: field.vars.attr|merge({disabled: 'disabled'})}) }}
+                {% else %}
+                    {{ form_row(field) }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
     {% endblock %}
     {% block results %}
         <div class="overflow-x-auto">

@@ -97,3 +97,7 @@ As a maintainer, Analytics and Performance functional tests run on every pull re
 ## Out of scope (deferred)
 
 - PHPUnit code-coverage report / soft threshold in CI → `033-coverage-ci`.
+
+## Amendment (Analytics filter FormKit, 2026-08-13)
+
+Product analytics filters use `AnalyticsFilterType` → `AbstractGetFilterType` (FormKit profile `filter`). Placeholders and help live in `translations/form.*.yaml` under `analytics_filter.*`; Twig keeps period/filter captions from `messages` and paints fields with `form_row` + `_fields` / loop (`077`). Fields are optional (`required: false` via filter base). CSRF off on GET is intentional; access still gated by project membership (`AnalyticsAccess*`). See `081` FR-003a / product `filter` amendment and `090` FR-007.

@@ -369,17 +369,8 @@ project:
     intro: Chiavi API, membri, governance e azioni di progetto distruttive.
   governance:
     title: Governo
-    help: Conservazione per progetto, limiti di velocità e quote giornaliere. Lascia
-      un campo vuoto per ereditare l'impostazione predefinita del server.
-    retention_days: Giorni di conservazione
-    retention_max_events: Numero massimo di eventi memorizzati
-    ingest_rate_limit: Limite di velocità di acquisizione (al minuto)
-    event_quota_daily: Quota eventi giornaliera
-    event_quota_monthly: Quota mensile di eventi
     quota_usage_monthly: '%count% / %quota% eventi questo mese (UTC)'
     month_utc_hint: Il confine del mese è UTC
-    inherit_hint: Vuoto = eredita l'impostazione predefinita del server (%default%).
-      Utilizzare 0 per disabilitare quando il valore predefinito è diverso da zero.
     save: Salvare la governance
     quota_usage: 'Eventi oggi: %count% / %quota%'
     ingest_disabled_banner: L'acquisizione della busta è sospesa per questo progetto.
@@ -1038,9 +1029,20 @@ users:
       group.deleted: Gruppo eliminato
       group.member_added: Membro aggiunto al gruppo
       group.member_removed: Membro rimosso dal gruppo
+      instance_role.created: Ruolo di istanza creato
+      instance_role.updated: Ruolo di istanza aggiornato
+      instance_role.deleted: Ruolo di istanza eliminato
+      instance_role.permissions_updated: Permessi del ruolo di istanza aggiornati
+      instance_role.user_added: Utente aggiunto al ruolo di istanza
+      instance_role.user_removed: Utente rimosso dal ruolo di istanza
+      instance_permission.created: Permesso di istanza creato
+      instance_permission.updated: Permesso di istanza aggiornato
+      instance_permission.deleted: Permesso di istanza eliminato
       project.member_added: Membro aggiunto al progetto
       project.member_role_changed: Ruolo del membro del progetto modificato
       project.member_removed: Membro rimosso dal progetto
+      project.member_activated: Membro del progetto attivato
+      project.member_deactivated: Membro del progetto disattivato
       project.ownership_transferred: Proprieta del progetto trasferita
       project.group_linked: Gruppo del progetto collegato
       project.group_role_changed: Ruolo del gruppo del progetto modificato
@@ -1075,6 +1077,8 @@ users:
       project.share_link_opened: Link di condivisione aperto
       instance.config_exported: Configurazione dell'istanza esportata
       instance.config_imported: Configurazione dell'istanza importata
+      project.config_exported: Configurazione del progetto esportata
+      project.config_imported: Configurazione del progetto importata
       instance.mailer_updated: Impostazioni mailer dell'istanza aggiornate
     context:
       email: E-mail
@@ -1839,7 +1843,6 @@ releases:
     empty: Nessuna issue e stata vista per la prima volta in questa release.
   compare:
     label: Confronta con release
-    none: Non confrontare
     help: Facoltativamente confronta la release selezionata con un'altra release usando
       l'insieme corrente di issue.
     summary_title: Confronta %a% vs %b%

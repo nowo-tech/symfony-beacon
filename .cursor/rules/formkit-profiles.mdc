@@ -1,0 +1,78 @@
+---
+description: FormKit profiles — beacon vs filter for Symfony forms
+globs: src/**/Form/**/*.php
+alwaysApply: false
+---
+# FormKit profiles (Beacon)
+
+## Profiles (`config/packages/nowo_form_kit.yaml`)
+
+| Form kind | Base class | Profile |
+|---|---|---|
+| Product / POST / settings | `App\Shared\Form\FormKitAbstractType` | `beacon` (default) |
+| GET / list / dashboard filters | `App\Shared\Form\AbstractGetFilterType` | `filter` via `#[FormKitConfig('filter')]` |
+
+Do **not** build GET filters on `FormKitAbstractType` alone — extend `AbstractGetFilterType`.
+
+Canonical specs: `081` FR-003a / FR-003c, `077` field loop, `.cursor/rules/formkit-profiles.mdc` (this file).
+
+## Beacon profile contract
+
+| Concern | Rule |
+|---|---|
+| **block prefix** | Non-empty `getBlockPrefix()` |
+| **label / placeholder / help** | Auto → `{prefix}.{field}.{label\|placeholder\|help}` in `translations/form.*.yaml` |
+| **opt out** | `help: false` and/or `placeholder: false` (checkboxes SHOULD pass `placeholder: false`) |
+| **domain** | Profile `form` via merger — do **not** set `translation_domain: messages` on field chrome |
+| **forbidden** | i18n strings in `attr.placeholder` / hard-coded labels; `|trans` into options that still have a domain |
+
+Twig: `form_row` via `{% include 'form/_fields.html.twig' %}` or `not field.rendered` loop (`077`).
+
+## Filter profile contract
+
+| Concern | Rule |
+|---|---|
+| **label** | Never (`field_types.*.label: false`) — Types MUST NOT pass `label` |
+| **placeholder** | Always (`auto_placeholder: true` → `{prefix}.{field}.placeholder` in `form`) |
+| **help** | Always (`auto_help: true` → `{prefix}.{field}.help`), unless the field sets `help: false` |
+| **required** | Always `false`, except **`per_page`** (`required: true`). Default forced in `AbstractGetFilterType::mergeFieldOptions()`; pass explicit `required` to override (FormKit YAML `field_types` cannot set `required`) |
+
+CSRF: GET filters use `csrf_protection: false` (intentional). Optional fields do not change authz — controllers still gate access.
+
+Exceptions:
+
+- **hidden** — `addHiddenFilterField()` (`placeholder` + `help: false` in options so the merger unsets them; `HiddenType` rejects bool `help`)
+- **choice** — empty option via `addFilterSelect()` (auto `{prefix}.{field}.placeholder`); pass `placeholder: false` when the select has no empty option
+- **Twig-owned placeholder** (admin/dashboard compact search) — `placeholder: false`; usually also `help: false`
+- **Twig-owned checkbox caption** (e.g. Mentions `unread`) — Type keeps `label: false` / usually `help: false`; Twig passes the caption into `form_row({label: '…'|trans})` (theme `checkbox_row`)
+
+Twig filter UIs MUST paint fields with `form_row` (widget + help + errors; theme skips label when false) via
+`{% include 'form/_fields.html.twig' %}` or an equivalent `not field.rendered` loop
+(077). Put `attr` / `row_attr` / aria on the Form Type. Override the loop only for
+**interactive custom chrome** (member-alert Live `pref-switch`, issue duplicate combobox —
+see `077` amendment). Prefer that over hand-rolled
+`form_widget` + `form_help` pairs. Hiddens use `hidden_row` (no grid cell).
+Optional captions stay in Twig/`messages` outside FormKit labels.
+
+## `translation_domain`
+
+Do **not** set `translation_domain` on FormKit-merged fields. `FormOptionsMerger` applies the active profile’s domain (`form` for `beacon` / `filter`).
+
+Only set it when intentionally overriding:
+
+- `false` — Twig (or caller) already translated the string (avoid double-`trans`)
+- another catalogue — e.g. kit bundle domain, or rare shared UI choice keys
+- raw `$builder->create()` / `$builder->add()` **outside** FormKit helpers
+
+Same for `choice_translation_domain`: omit when choice labels should use the field domain; use `false` for literal labels; use `messages` only when choice keys live there.
+
+## Conventions
+
+- Catalogue: `translations/form.*.yaml`
+- Prefer FormKit helpers (`withBuilder`, `addTextField`, …) over raw `$builder->add()`
+- Snake-case `search` → Symfony `SearchType` via host `nowo_form_kit.type_map` (not built into FormKit)
+- Twig that sets `placeholder: 'key'|trans` (messages) MUST pair with `twigOwnedChromeOptions()` / `translation_domain: false` — Symfony re-translates `attr.placeholder` in the field domain
+- Empty `getBlockPrefix()` + auto_placeholder → keys like `.bundle.placeholder`; disable with `placeholder: false` (or use `twigOwnedChromeOptions()`)
+- Choice empty options with `form` keys: `addChoiceWithFormPlaceholder()` (not raw `placeholder` on `addChoiceField`); filters: `addFilterSelect()`
+- Checkboxes: pass `placeholder: false` (auto_placeholder otherwise invents `*.placeholder`)
+- Do **not** set `translation_domain: messages` on host fields. Put labels/placeholders/help/choice keys in `form.*.yaml`. Rare `choice_translation_domain: messages` only for shared UI catalogues that stay in `messages` (e.g. `users.activity.action.*`, `permissions.category.*`)

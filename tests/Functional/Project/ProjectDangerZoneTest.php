@@ -52,9 +52,9 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $this->login($client, $user);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        // ProjectDeleteType uses an empty block prefix → top-level "confirmation" / "_token".
+        // ProjectDeleteType posts under project_delete[…].
         $form = $crawler->filter('form[action$="/delete"]')->form([
-            'confirmation' => 'Wrong Name',
+            'project_delete[confirmation]' => 'Wrong Name',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
@@ -75,7 +75,7 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$projectUuid.'/settings');
         $form = $crawler->filter('form[action$="/delete"]')->form([
-            'confirmation' => 'Acme',
+            'project_delete[confirmation]' => 'Acme',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/dashboard');

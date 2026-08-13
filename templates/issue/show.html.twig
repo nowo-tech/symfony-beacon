@@ -61,18 +61,14 @@
             {% endif %}
             {% if can_triage|default(false) %}
             {{ form_start(commentForm, {attr: {class: 'issue-comments__form'}}) }}
-                <label class="sr-only" for="issue-comment-body">{{ 'issues.comment_body'|trans }}</label>
-                {{ form_widget(commentForm.body, {
-                    attr: {
-                        id: 'issue-comment-body',
-                        class: 'input w-full mb-2',
-                        rows: 3,
-                        maxlength: 5000,
-                        placeholder: 'issues.comment_placeholder'|trans,
-                    }
-                }) }}
+                {% for field in commentForm %}
+                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                        {{ form_row(field) }}
+                    {% endif %}
+                {% endfor %}
                 <button type="submit" class="btn-primary">{{ 'issues.comment_submit'|trans }}</button>
-            {{ form_end(commentForm) }}
+                {% include 'form/_fields.html.twig' with {form: commentForm} only %}
+            {{ form_end(commentForm, {render_rest: false}) }}
             {% else %}
                 <p class="text-sm text-[var(--color-ink)]/55">{{ 'issues.viewer_readonly'|trans }}</p>
             {% endif %}
@@ -153,21 +149,21 @@
                         <div class="issue-status-actions__buttons">
                             {% if statusForms['resolved'] is defined %}
                                 {{ form_start(statusForms['resolved'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {{ form_widget(statusForms['resolved'].status) }}
+                                    {% include 'form/_fields.html.twig' with {form: statusForms['resolved']} only %}
                                     <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
-                                {{ form_end(statusForms['resolved']) }}
+                                {{ form_end(statusForms['resolved'], {render_rest: false}) }}
                             {% endif %}
                             {% if statusForms['unresolved'] is defined %}
                                 {{ form_start(statusForms['unresolved'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {{ form_widget(statusForms['unresolved'].status) }}
+                                    {% include 'form/_fields.html.twig' with {form: statusForms['unresolved']} only %}
                                     <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
-                                {{ form_end(statusForms['unresolved']) }}
+                                {{ form_end(statusForms['unresolved'], {render_rest: false}) }}
                             {% endif %}
                             {% if statusForms['ignored'] is defined %}
                                 {{ form_start(statusForms['ignored'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {{ form_widget(statusForms['ignored'].status) }}
+                                    {% include 'form/_fields.html.twig' with {form: statusForms['ignored']} only %}
                                     <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
-                                {{ form_end(statusForms['ignored']) }}
+                                {{ form_end(statusForms['ignored'], {render_rest: false}) }}
                             {% endif %}
                         </div>
                     </div>
@@ -175,9 +171,17 @@
                     <div class="issue-priority-actions">
                         <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
                         {{ form_start(priorityForm, {attr: {class: 'issue-priority-form'}}) }}
-                            {{ form_widget(priorityForm.priority, {attr: {class: 'input', 'aria-label': 'issues.priority_label'|trans}}) }}
+                            {% for field in priorityForm %}
+                                {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                    {{ form_row(field, {
+                                        label: false,
+                                        attr: field.vars.attr|merge({'aria-label': 'issues.priority_label'|trans}),
+                                    }) }}
+                                {% endif %}
+                            {% endfor %}
                             <button type="submit" class="btn-primary">{{ 'issues.priority_save'|trans }}</button>
-                        {{ form_end(priorityForm) }}
+                            {% include 'form/_fields.html.twig' with {form: priorityForm} only %}
+                        {{ form_end(priorityForm, {render_rest: false}) }}
                     </div>
                 </div>
             {% endblock %}
@@ -187,11 +191,14 @@
             {% block body %}
                 <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
                 {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
-                    {{ form_widget(assigneeForm.assignee) }}
-                    {{ form_errors(assigneeForm.assignee) }}
+                    {% for field in assigneeForm %}
+                        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                            {{ form_row(field, {label: false}) }}
+                        {% endif %}
+                    {% endfor %}
                     {% include 'form/_fields.html.twig' with {form: assigneeForm} only %}
                     <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
-                {{ form_end(assigneeForm) }}
+                {{ form_end(assigneeForm, {render_rest: false}) }}
             {% endblock %}
         {% endembed %}
 
@@ -210,8 +217,7 @@
                                     </a>
                                     {% if can_triage|default(false) and quickDuplicateForms[similar.id] is defined %}
                                         {{ form_start(quickDuplicateForms[similar.id], {attr: {class: 'shrink-0'}}) }}
-                                            {{ form_widget(quickDuplicateForms[similar.id].canonical_uuid) }}
-                                            {{ form_widget(quickDuplicateForms[similar.id]._token) }}
+                                            {% include 'form/_fields.html.twig' with {form: quickDuplicateForms[similar.id]} only %}
                                             <button type="submit" class="btn-ghost btn-sm" title="{{ 'issues.similar_mark_duplicate'|trans }}">{{ 'issues.similar_mark_duplicate'|trans }}</button>
                                         {{ form_end(quickDuplicateForms[similar.id], {render_rest: false}) }}
                                     {% endif %}
@@ -260,13 +266,13 @@
                                 </div>
 
                                 <div class="confirm-dialog__content">
-                                    {{ form_widget(duplicateDialogForm.canonical_uuid) }}
+                                    {{ form_row(duplicateDialogForm.canonical_uuid) }}
 
                                     {{ form_label(duplicateDialogForm.query) }}
                                     <div class="combobox combobox--stacked">
                                         {{ form_widget(duplicateDialogForm.query, {
                                             attr: {
-                                                placeholder: 'issues.duplicate_search_placeholder'|trans,
+                                                placeholder: 'issues.duplicate_search_placeholder',
                                                 'data-required-message': 'issues.duplicate_choose'|trans,
                                             }
                                         }) }}
@@ -301,8 +307,10 @@
                                             >{{ 'issues.duplicate_search_empty'|trans }}</li>
                                         </ul>
                                     </div>
+                                    {{ form_errors(duplicateDialogForm.query) }}
 
                                     {{ form_row(duplicateDialogForm.merge_events) }}
+                                    {% include 'form/_fields.html.twig' with {form: duplicateDialogForm} only %}
                                 </div>
 
                                 <div class="confirm-dialog__actions">

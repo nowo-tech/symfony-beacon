@@ -373,17 +373,8 @@ project:
     intro: Clés API, membres, gouvernance et actions destructrices du projet.
   governance:
     title: Gouvernance
-    help: Rétention par projet, limites de débit et quotas quotidiens. Laissez un
-      champ vide pour hériter de la valeur par défaut du serveur.
-    retention_days: Jours de rétention
-    retention_max_events: Nombre maximum d'événements stockés
-    ingest_rate_limit: Limite de taux d'ingestion (par minute)
-    event_quota_daily: Quota d'événements quotidiens
-    event_quota_monthly: Quota mensuel d’événements
     quota_usage_monthly: '%count% / %quota% événements ce mois-ci (UTC)'
     month_utc_hint: La limite du mois est en UTC
-    inherit_hint: Vide = hérite des valeurs par défaut du serveur (%default%). Utilisez
-      0 pour désactiver lorsque la valeur par défaut est différente de zéro.
     save: Sauver la gouvernance
     quota_usage: 'Événements aujourd''hui : %count% / %quota%'
     ingest_disabled_banner: L’ingestion d’enveloppes est suspendue pour ce projet.
@@ -1047,9 +1038,20 @@ users:
       group.deleted: Groupe supprime
       group.member_added: Membre ajoute au groupe
       group.member_removed: Membre retire du groupe
+      instance_role.created: Rôle d'instance créé
+      instance_role.updated: Rôle d'instance mis à jour
+      instance_role.deleted: Rôle d'instance supprimé
+      instance_role.permissions_updated: Permissions du rôle d'instance mises à jour
+      instance_role.user_added: Utilisateur ajouté au rôle d'instance
+      instance_role.user_removed: Utilisateur retiré du rôle d'instance
+      instance_permission.created: Permission d'instance créée
+      instance_permission.updated: Permission d'instance mise à jour
+      instance_permission.deleted: Permission d'instance supprimée
       project.member_added: Membre ajoute au projet
       project.member_role_changed: Role du membre du projet modifie
       project.member_removed: Membre retire du projet
+      project.member_activated: Membre du projet activé
+      project.member_deactivated: Membre du projet désactivé
       project.ownership_transferred: Propriete du projet transferee
       project.group_linked: Groupe du projet lie
       project.group_role_changed: Role du groupe du projet modifie
@@ -1084,6 +1086,8 @@ users:
       project.share_link_opened: Lien de partage ouvert
       instance.config_exported: Configuration d'instance exportée
       instance.config_imported: Configuration d'instance importée
+      project.config_exported: Configuration du projet exportée
+      project.config_imported: Configuration du projet importée
       instance.mailer_updated: Paramètres mailer d'instance mis à jour
     context:
       email: E-mail
@@ -1859,7 +1863,6 @@ releases:
     empty: Aucune issue n''a ete vue pour la premiere fois dans cette release.
   compare:
     label: Comparer avec la release
-    none: Ne pas comparer
     help: Comparez facultativement la release selectionnee avec une autre release
       en utilisant l''ensemble actuel d''issues.
     summary_title: Comparer %a% vs %b%

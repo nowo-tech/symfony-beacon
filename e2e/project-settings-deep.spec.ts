@@ -7,7 +7,7 @@ test.describe('Project settings deep', () => {
     await page.goto(`/projects/${uuid}/settings`);
     await dismissProductTour(page);
 
-    await expect(page.locator('#retention_days')).toBeVisible();
+    await expect(page.locator('#project_governance_retention_days')).toBeVisible();
     await expect(page.locator('[data-testid="read-api-tokens"]')).toBeVisible();
     await expect(page.locator('[data-testid="share-links"]')).toBeVisible();
     // Members list is always present for owners/admins of the demo project.

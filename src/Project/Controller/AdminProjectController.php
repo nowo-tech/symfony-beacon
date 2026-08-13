@@ -274,6 +274,7 @@ final class AdminProjectController extends AbstractController
         $form = $this->createForm(ProjectDeleteType::class, null, [
             'csrf_token_id' => 'admin_project_delete_'.$project->getId(),
             'project_id' => (int) $project->getId(),
+            'input_id_prefix' => 'admin-project-delete-confirm-',
         ]);
         $form->handleRequest($request);
         $this->requireValidForm($form);

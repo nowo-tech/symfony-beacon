@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

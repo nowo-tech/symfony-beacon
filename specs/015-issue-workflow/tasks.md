@@ -32,6 +32,7 @@
 - [x] T015 `tests/Functional/Issues/IssueWorkflowTest.php` (priority, comment, duplicate, saved view)
 - [x] T016 Changelog Unreleased bullets (English)
 - [x] T017 Mark plan/tasks complete
+- [x] T018 Document duplicate combobox `form_widget` exception + comment/priority/assignee `form_row` prefixes (`077` / `081`)
 
 ## Deferred (completed follow-up)
 

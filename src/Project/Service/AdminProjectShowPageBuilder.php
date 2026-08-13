@@ -199,6 +199,7 @@ final readonly class AdminProjectShowPageBuilder
                 'method' => 'POST',
                 'csrf_token_id' => 'admin_project_delete_'.$project->getId(),
                 'project_id' => (int) $project->getId(),
+                'input_id_prefix' => 'admin-project-delete-confirm-',
             ])->createView(),
         ];
     }

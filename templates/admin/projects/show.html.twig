@@ -48,7 +48,7 @@
         </div>
     </dl>
     {{ form_start(ingestToggleForm, {attr: {class: 'mt-4 flex flex-wrap items-center gap-2'}}) }}
-        {{ form_widget(ingestToggleForm.enabled) }}
+        {% include 'form/_fields.html.twig' with {form: ingestToggleForm} only %}
         {% if project.ingestEnabled %}
             <button class="btn-ghost" type="submit">{{ 'admin_projects.suspend_ingest'|trans }}</button>
             <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.suspend_ingest_help'|trans }}</span>
@@ -56,12 +56,11 @@
             <button class="btn-primary" type="submit">{{ 'admin_projects.resume_ingest'|trans }}</button>
             <span class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.resume_ingest_help'|trans }}</span>
         {% endif %}
-    {{ form_end(ingestToggleForm) }}
+    {{ form_end(ingestToggleForm, {render_rest: false}) }}
     {{ form_start(viewAsMemberForm, {attr: {class: 'mt-3'}}) }}
-        {{ form_widget(viewAsMemberForm.project_uuid) }}
-        {{ form_widget(viewAsMemberForm.redirect) }}
+        {% include 'form/_fields.html.twig' with {form: viewAsMemberForm} only %}
         <button class="btn-ghost" type="submit">{{ 'admin_projects.view_as_member'|trans }}</button>
-    {{ form_end(viewAsMemberForm) }}
+    {{ form_end(viewAsMemberForm, {render_rest: false}) }}
 </section>
 
 <section class="panel mb-6">
@@ -134,9 +133,14 @@
                 {% if not isOwnerMember %}
                 <div class="flex shrink-0 flex-wrap items-center gap-2">
                     {{ form_start(memberRoleForms[member.id], {attr: {class: 'flex flex-wrap items-center gap-2'}}) }}
-                        {{ form_widget(memberRoleForms[member.id].role, {attr: {class: 'input'}}) }}
+                        {% for field in memberRoleForms[member.id] %}
+                            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                {{ form_row(field, {label: false, attr: {class: 'input'}}) }}
+                            {% endif %}
+                        {% endfor %}
                         <button class="btn-ghost" type="submit">{{ 'project.members.update_role'|trans }}</button>
-                    {{ form_end(memberRoleForms[member.id]) }}
+                        {% include 'form/_fields.html.twig' with {form: memberRoleForms[member.id]} only %}
+                    {{ form_end(memberRoleForms[member.id], {render_rest: false}) }}
                     {{ form_start(removeMemberForms[member.id], {
                         attr: {
                             'data-controller': 'confirm-submit',
@@ -155,10 +159,14 @@
     </ul>
 
     {{ form_start(addMemberForm, {attr: {class: 'mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]'}}) }}
-        {{ form_widget(addMemberForm.email, {attr: {class: 'input', placeholder: 'project.members.email_placeholder'|trans, autocomplete: 'off'}}) }}
-        {{ form_widget(addMemberForm.role, {attr: {class: 'input'}}) }}
+        {% for field in addMemberForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button class="btn-primary" type="submit">{{ 'project.members.add'|trans }}</button>
-    {{ form_end(addMemberForm) }}
+        {% include 'form/_fields.html.twig' with {form: addMemberForm} only %}
+    {{ form_end(addMemberForm, {render_rest: false}) }}
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.add_member_help'|trans }}</p>
 </section>
 
@@ -194,9 +202,14 @@
                 </div>
                 <div class="flex shrink-0 flex-wrap items-center gap-2">
                     {{ form_start(groupRoleForms[groupAccess.id], {attr: {class: 'flex flex-wrap items-center gap-2'}}) }}
-                        {{ form_widget(groupRoleForms[groupAccess.id].role, {attr: {class: 'input'}}) }}
+                        {% for field in groupRoleForms[groupAccess.id] %}
+                            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                {{ form_row(field, {label: false, attr: {class: 'input'}}) }}
+                            {% endif %}
+                        {% endfor %}
                         <button class="btn-ghost" type="submit">{{ 'project.members.update_role'|trans }}</button>
-                    {{ form_end(groupRoleForms[groupAccess.id]) }}
+                        {% include 'form/_fields.html.twig' with {form: groupRoleForms[groupAccess.id]} only %}
+                    {{ form_end(groupRoleForms[groupAccess.id], {render_rest: false}) }}
                     {{ form_start(removeGroupForms[groupAccess.id], {
                         attr: {
                             'data-controller': 'confirm-submit',
@@ -215,10 +228,14 @@
 
     {% if availableGroups is not empty %}
         {{ form_start(addGroupForm, {attr: {class: 'mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto]'}}) }}
-            {{ form_widget(addGroupForm.group, {attr: {class: 'input'}}) }}
-            {{ form_widget(addGroupForm.role, {attr: {class: 'input'}}) }}
+            {% for field in addGroupForm %}
+                {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                    {{ form_row(field) }}
+                {% endif %}
+            {% endfor %}
             <button class="btn-primary" type="submit">{{ 'project.groups.add'|trans }}</button>
-        {{ form_end(addGroupForm) }}
+            {% include 'form/_fields.html.twig' with {form: addGroupForm} only %}
+        {{ form_end(addGroupForm, {render_rest: false}) }}
     {% else %}
         <p class="mt-3 text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.groups_none_available'|trans }}</p>
     {% endif %}
@@ -242,24 +259,17 @@
                     <p class="confirm-dialog__body">{{ 'project.danger.delete_body'|trans({'%name%': project.name}) }}</p>
                 </div>
                 <div class="confirm-dialog__content">
-                    <label class="confirm-dialog__label" for="admin-project-delete-confirm-{{ project.id }}">
-                        {{ 'project.danger.delete_type_label'|trans({'%name%': project.name}) }}
-                    </label>
-                    {{ form_widget(deleteProjectForm.confirmation, {
-                        attr: {
-                            id: 'admin-project-delete-confirm-' ~ project.id,
-                            class: 'input w-full',
-                            autocomplete: 'off',
-                            'data-confirm-dialog-target': 'confirmInput',
-                            'data-action': 'input->confirm-dialog#syncSubmit',
-                        }
+                    {{ form_row(deleteProjectForm.confirmation, {
+                        label: 'project.danger.delete_type_label'|trans({'%name%': project.name}),
+                        translation_domain: false,
                     }) }}
+                    {% include 'form/_fields.html.twig' with {form: deleteProjectForm} only %}
                 </div>
                 <div class="confirm-dialog__actions">
                     <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                     <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'project.danger.delete_confirm'|trans }}</button>
                 </div>
-            {{ form_end(deleteProjectForm) }}
+            {{ form_end(deleteProjectForm, {render_rest: false}) }}
         {% endblock %}
     {% endembed %}
 </section>

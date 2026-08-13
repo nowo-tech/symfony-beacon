@@ -85,11 +85,13 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         self::assertInstanceOf(Project::class, $project);
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
-        $token = $crawler->filter('form[action$="/members"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/members', [
-            '_token' => $token,
-            'email' => 'admin-project-invitee@example.com',
-            'role' => 'admin',
+            'project_member_add' => [
+                '_token' => $token,
+                'email' => 'admin-project-invitee@example.com',
+                'role' => 'admin',
+            ],
         ]);
         self::assertResponseRedirects('/admin/projects/'.$project->getUuid());
         $client->followRedirect();
@@ -118,11 +120,13 @@ final class AdminProjectsTest extends DatabaseWebTestCase
 
         $this->login($client, $admin);
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
-        $token = $crawler->filter('form[action$="/groups"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/groups"] input[name="project_group_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/groups', [
-            '_token' => $token,
-            'group' => $group->getUuid(),
-            'role' => 'member',
+            'project_group_add' => [
+                '_token' => $token,
+                'group' => $group->getUuid(),
+                'role' => 'member',
+            ],
         ]);
         self::assertResponseRedirects('/admin/projects/'.$project->getUuid());
         $client->followRedirect();
@@ -138,11 +142,9 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid());
         $deleteForm = $crawler->filter('form[action$="/delete"]');
         self::assertGreaterThan(0, $deleteForm->count());
-        $token = $deleteForm->filter('input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/admin/projects/'.$project->getUuid().'/delete', [
-            '_token' => $token,
-            'confirmation' => $project->getName(),
-        ]);
+        $client->submit($deleteForm->form([
+            'project_delete[confirmation]' => $project->getName(),
+        ]));
         self::assertResponseRedirects('/admin/projects');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'Project deleted');

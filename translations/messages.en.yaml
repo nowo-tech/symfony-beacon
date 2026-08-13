@@ -366,17 +366,8 @@ project:
     intro: API keys, members, governance, and destructive project actions.
   governance:
     title: Governance
-    help: Per-project retention, rate limits, and daily/monthly event quotas. Leave
-      a field empty to inherit the server default.
-    retention_days: Retention days
-    retention_max_events: Max stored events
-    ingest_rate_limit: Ingest rate limit (per minute)
-    event_quota_daily: Daily event quota
-    event_quota_monthly: Monthly event quota
     quota_usage_monthly: '%count% / %quota% events this month (UTC)'
     month_utc_hint: Month boundary is UTC
-    inherit_hint: Empty = inherit server default (%default%). Use 0 to disable when
-      the default is non-zero.
     save: Save governance
     quota_usage: 'Events today: %count% / %quota%'
     ingest_disabled_banner: Envelope ingest is suspended for this project. Existing
@@ -820,7 +811,6 @@ releases:
     empty: No issues were first seen in this release.
   compare:
     label: Compare with release
-    none: Do not compare
     help: Optionally compare the selected release with another release using the current
       issue set.
     summary_title: Compare %a% vs %b%
@@ -1423,9 +1413,20 @@ users:
       group.deleted: Group deleted
       group.member_added: Group member added
       group.member_removed: Group member removed
+      instance_role.created: Instance role created
+      instance_role.updated: Instance role updated
+      instance_role.deleted: Instance role deleted
+      instance_role.permissions_updated: Instance role permissions updated
+      instance_role.user_added: User added to instance role
+      instance_role.user_removed: User removed from instance role
+      instance_permission.created: Instance permission created
+      instance_permission.updated: Instance permission updated
+      instance_permission.deleted: Instance permission deleted
       project.member_added: Project member added
       project.member_role_changed: Project member role changed
       project.member_removed: Project member removed
+      project.member_activated: Project member activated
+      project.member_deactivated: Project member deactivated
       project.ownership_transferred: Project ownership transferred
       project.group_linked: Project group linked
       project.group_role_changed: Project group role changed
@@ -1460,6 +1461,8 @@ users:
       project.share_link_opened: Share link opened
       instance.config_exported: Instance config exported
       instance.config_imported: Instance config imported
+      project.config_exported: Project config exported
+      project.config_imported: Project config imported
       instance.mailer_updated: Instance mailer settings updated
     context:
       email: Email

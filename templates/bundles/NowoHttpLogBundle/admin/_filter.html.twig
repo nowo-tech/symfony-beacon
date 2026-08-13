@@ -1,4 +1,4 @@
-{# Host override: Issues/admin filter standard — widgets + placeholders, Beacon input/btn. #}
+{# Host override: Issues/admin filter chrome — form_row loop (077 / 081). #}
 {% trans_default_domain 'NowoHttpLogBundle' %}
 {% set _td = 'NowoHttpLogBundle' %}
 {% set _input = 'input w-full min-w-0' %}
@@ -10,74 +10,35 @@
         role: 'search',
     },
 }) }}
-    {{ form_widget(filterForm.q, {
-        attr: {
-            class: _input ~ ' sm:col-span-2',
-            placeholder: 'filter.q'|trans({}, _td),
-            'aria-label': 'filter.q'|trans({}, _td),
-            autocomplete: 'off',
-        },
-    }) }}
-    {{ form_widget(filterForm.method, {
-        attr: {
-            class: _input,
-            'aria-label': 'filter.method'|trans({}, _td),
-            title: 'filter.method'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.routeName, {
-        attr: {
-            class: _input,
-            placeholder: 'filter.route_name'|trans({}, _td),
-            'aria-label': 'filter.route_name'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.statusCode, {
-        attr: {
-            class: _input,
-            placeholder: 'filter.status_code'|trans({}, _td),
-            'aria-label': 'filter.status_code'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.clientIp, {
-        attr: {
-            class: _input,
-            placeholder: 'filter.client_ip'|trans({}, _td),
-            'aria-label': 'filter.client_ip'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.path, {
-        attr: {
-            class: _input,
-            placeholder: 'filter.path'|trans({}, _td),
-            'aria-label': 'filter.path'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.bodyContentType, {
-        attr: {
-            class: _input,
-            'aria-label': 'filter.body_content_type'|trans({}, _td),
-            title: 'filter.body_content_type'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.createdFrom, {
-        attr: {
-            class: _input,
-            'aria-label': 'filter.created_from'|trans({}, _td),
-            title: 'filter.created_from'|trans({}, _td),
-        },
-    }) }}
-    {{ form_widget(filterForm.createdTo, {
-        attr: {
-            class: _input,
-            'aria-label': 'filter.created_to'|trans({}, _td),
-            title: 'filter.created_to'|trans({}, _td),
-        },
-    }) }}
+    {% for field in filterForm %}
+        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+            {% set _label = field.vars.label is not same as(false) and field.vars.label
+                ? field.vars.label|trans({}, _td)
+                : field.vars.name %}
+            {% set _is_choice = 'choice' in field.vars.block_prefixes %}
+            {% set _attr = {
+                class: _input,
+                'aria-label': _label,
+                title: _label,
+            } %}
+            {% if not _is_choice %}
+                {% set _attr = _attr|merge({placeholder: _label}) %}
+            {% endif %}
+            {% if field.vars.name == 'q' %}
+                {% set _attr = _attr|merge({autocomplete: 'off'}) %}
+            {% endif %}
+            {{ form_row(field, {
+                label: false,
+                help: false,
+                attr: _attr,
+                row_attr: {class: (field.vars.name == 'q' ? 'sm:col-span-2 ' : '') ~ 'flex flex-col gap-2'},
+            }) }}
+        {% endif %}
+    {% endfor %}
 
     <div class="col-span-full flex flex-wrap items-center gap-2">
         <button type="submit" class="btn-ghost">{{ 'common.filter'|trans({}, 'messages') }}</button>
         <a class="btn-ghost no-underline" href="{{ path('nowo_http_log_admin_index') }}">{{ 'common.clear_filters'|trans({}, 'messages') }}</a>
     </div>
-    {{ form_rest(filterForm) }}
+    {% include 'form/_fields.html.twig' with {form: filterForm} only %}
 {{ form_end(filterForm, {render_rest: false}) }}

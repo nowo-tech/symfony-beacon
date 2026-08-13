@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
+use App\Shared\Form\FormKitAbstractType;
 use App\Shared\Settings\Entity\InstanceSettings;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -84,7 +84,6 @@ final class InstanceMercureSettingsType extends FormKitAbstractType
     {
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
-            'translation_domain' => 'messages',
         ]);
     }
 
@@ -95,14 +94,14 @@ final class InstanceMercureSettingsType extends FormKitAbstractType
         }
         if (!\is_string($value)) {
             $context->buildViolation('instance_mercure.jwt_secret.invalid')
-                ->setTranslationDomain('messages')
+                ->setTranslationDomain('form')
                 ->addViolation();
 
             return;
         }
         if (\strlen(trim($value)) < 32) {
             $context->buildViolation('instance_mercure.jwt_secret.too_short')
-                ->setTranslationDomain('messages')
+                ->setTranslationDomain('form')
                 ->addViolation();
         }
     }

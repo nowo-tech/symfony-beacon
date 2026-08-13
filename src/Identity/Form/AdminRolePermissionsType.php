@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,7 +35,6 @@ final class AdminRolePermissionsType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'admin_instance_role_permissions',
-            'translation_domain' => 'messages',
             'allow_extra_fields' => true,
             'permission_ids' => [],
         ]);

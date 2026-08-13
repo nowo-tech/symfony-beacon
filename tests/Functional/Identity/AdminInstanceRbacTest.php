@@ -167,7 +167,7 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('h1', 'Matrix helper renamed');
 
         $userForm = $crawler->filter('[data-testid="admin-role-users"] form')->last()->form([
-            'email' => $admin->getEmail(),
+            'admin_role_user_add[email]' => $admin->getEmail(),
         ]);
         $client->submit($userForm);
         self::assertResponseRedirects('/admin/roles/'.$role->getUuid().'/users');

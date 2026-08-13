@@ -368,17 +368,8 @@ project:
     intro: Chaves de API, membros, governança e ações destrutivas do projeto.
   governance:
     title: Governança
-    help: Retenção por projeto, limites de taxas e cotas diárias. Deixe um campo vazio
-      para herdar o padrão do servidor.
-    retention_days: Dias de retenção
-    retention_max_events: Máximo de eventos armazenados
-    ingest_rate_limit: Limite de taxa de ingestão (por minuto)
-    event_quota_daily: Cota diária de eventos
-    event_quota_monthly: Cota mensal de eventos
     quota_usage_monthly: '%count% / %quota% eventos este mês (UTC)'
     month_utc_hint: O limite do mês é UTC
-    inherit_hint: Vazio = herda o padrão do servidor (%default%). Use 0 para desabilitar
-      quando o padrão for diferente de zero.
     save: Salve a governança
     quota_usage: 'Eventos hoje: %count% / %quota%'
     ingest_disabled_banner: A ingestão de envelopes está suspensa para este projeto.
@@ -1028,9 +1019,20 @@ users:
       group.deleted: Grupo eliminado
       group.member_added: Membro adicionado ao grupo
       group.member_removed: Membro removido do grupo
+      instance_role.created: Função de instância criada
+      instance_role.updated: Função de instância atualizada
+      instance_role.deleted: Função de instância eliminada
+      instance_role.permissions_updated: Permissões da função de instância atualizadas
+      instance_role.user_added: Utilizador adicionado à função de instância
+      instance_role.user_removed: Utilizador removido da função de instância
+      instance_permission.created: Permissão de instância criada
+      instance_permission.updated: Permissão de instância atualizada
+      instance_permission.deleted: Permissão de instância eliminada
       project.member_added: Membro adicionado ao projeto
       project.member_role_changed: Funcao do membro do projeto alterada
       project.member_removed: Membro removido do projeto
+      project.member_activated: Membro do projeto ativado
+      project.member_deactivated: Membro do projeto desativado
       project.ownership_transferred: Propriedade do projeto transferida
       project.group_linked: Grupo do projeto associado
       project.group_role_changed: Funcao do grupo do projeto alterada
@@ -1065,6 +1067,8 @@ users:
       project.share_link_opened: Ligação de partilha aberta
       instance.config_exported: Configuração da instância exportada
       instance.config_imported: Configuração da instância importada
+      project.config_exported: Configuração do projeto exportada
+      project.config_imported: Configuração do projeto importada
       instance.mailer_updated: Definições de mailer da instância atualizadas
     context:
       email: E-mail
@@ -1824,7 +1828,6 @@ releases:
     empty: Nenhuma issue foi vista pela primeira vez nesta release.
   compare:
     label: Comparar com release
-    none: Nao comparar
     help: Compare opcionalmente a release selecionada com outra release usando o conjunto
       atual de issues.
     summary_title: Comparar %a% vs %b%

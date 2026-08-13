@@ -40,17 +40,13 @@
     </div>
     {% if can_triage|default(false) %}
     {{ form_start(saveViewForm, {attr: {class: 'flex flex-wrap items-end gap-2 grow'}}) }}
-        <div>
-            <label class="block text-xs text-[var(--color-ink)]/60 mb-1" for="{{ saveViewForm.name.vars.id }}">{{ 'issues.views.save_name'|trans }}</label>
-            {{ form_widget(saveViewForm.name, {
-                attr: {
-                    class: 'input',
-                    placeholder: 'issues.views.save_placeholder'|trans
-                }
-            }) }}
-        </div>
-        {{ form_rest(saveViewForm) }}
+        {% for field in saveViewForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button class="btn-ghost issue-saved-views__save" type="submit">{{ 'issues.views.save'|trans }}</button>
+        {% include 'form/_fields.html.twig' with {form: saveViewForm} only %}
     {{ form_end(saveViewForm, {render_rest: false}) }}
     {% if savedViews|default([]) is not empty %}
         <div class="flex flex-wrap gap-2">
@@ -75,23 +71,16 @@
         'data-tour': 'issue-filters'
     }
 }) }}
-    {{ form_widget(filterForm.q, {attr: {class: 'input issue-filters__search', placeholder: 'issues.search_placeholder'|trans}}) }}
-    {{ form_widget(filterForm.level) }}
-    {{ form_widget(filterForm.status) }}
-    {{ form_widget(filterForm.priority) }}
-    {{ form_widget(filterForm.assignee) }}
-    {{ form_widget(filterForm.environment, {attr: {class: 'input', placeholder: 'issues.filter.environment'|trans}}) }}
-    {{ form_widget(filterForm.compare, {attr: {class: 'input', placeholder: 'issues.compare.environment_b'|trans, title: 'issues.compare.hint'|trans}}) }}
-    {{ form_widget(filterForm.release, {attr: {class: 'input', placeholder: 'issues.filter.release'|trans}}) }}
-    {{ form_widget(filterForm.tag, {attr: {class: 'input', placeholder: 'issues.filter.tag'|trans}}) }}
-    {{ form_widget(filterForm.url, {attr: {class: 'input', placeholder: 'issues.filter.url'|trans}}) }}
-    {{ form_widget(filterForm.user, {attr: {class: 'input', placeholder: 'issues.filter.user'|trans}}) }}
-    {{ form_widget(filterForm.per_page) }}
+    {% for field in filterForm %}
+        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+            {{ form_row(field) }}
+        {% endif %}
+    {% endfor %}
     <div class="issue-filters__actions">
         <button class="btn-primary issue-filters__submit" type="submit">{{ 'common.filter'|trans }}</button>
         <a class="btn-ghost issue-filters__clear no-underline" href="{{ path('issue_index', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
-    {{ form_rest(filterForm) }}
+    {% include 'form/_fields.html.twig' with {form: filterForm} only %}
 {{ form_end(filterForm, {render_rest: false}) }}
 
 {% if compareResult is defined and compareResult %}

@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Issues\Enum\IssuePriority;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
+use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * CSRF-protected issue priority update form.
+ * CSRF-protected issue priority update form (FormKit {@code beacon}).
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code issue_priority.*}.
+ * Choice labels stay in {@code messages} ({@code issues.priority.*}).
  */
 final class IssuePriorityType extends FormKitAbstractType
 {
@@ -26,7 +30,7 @@ final class IssuePriorityType extends FormKitAbstractType
 
         $this->withBuilder($builder, function () use ($choices, $priorityValues): void {
             $this->addChoiceField('priority', [
-                'label' => false,
+                'help' => false,
                 'choices' => $choices,
                 'choice_translation_domain' => 'messages',
                 'required' => true,
@@ -35,19 +39,22 @@ final class IssuePriorityType extends FormKitAbstractType
                     new NotBlank(),
                     new Choice(choices: $priorityValues),
                 ],
-                'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'issues.priority_label',
-                ],
             ]);
         });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        parent::configureOptions($resolver);
         $resolver->setDefaults([
             'csrf_protection' => true,
             'csrf_token_id' => 'issue_priority',
         ]);
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'issue_priority';
     }
 }

@@ -129,7 +129,7 @@ final class InstanceConfigPortabilityTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/admin/instance-config');
         self::assertResponseIsSuccessful();
         $form = $crawler->selectButton('Import JSON')->form();
-        $configField = $form->get('config');
+        $configField = $form->get('instance_config_import[config]');
         self::assertInstanceOf(FileFormField::class, $configField);
         $configField->upload($tmp);
         $client->submit($form);

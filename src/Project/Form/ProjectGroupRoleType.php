@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Project\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,9 +19,8 @@ final class ProjectGroupRoleType extends FormKitAbstractType
         $this->withBuilder($builder, function () use ($options): void {
             $this->addChoiceField('role', [
                 'required' => true,
-                'label' => false,
+                'label' => false, 'help' => false,
                 'choices' => $options['role_choices'],
-                'choice_translation_domain' => 'messages',
                 'placeholder' => false,
             ]);
         });
@@ -33,7 +32,6 @@ final class ProjectGroupRoleType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'project_group_role',
-            'translation_domain' => 'messages',
             'role_choices' => [],
         ]);
         $resolver->setAllowedTypes('role_choices', 'array');

@@ -58,20 +58,17 @@
         {% if membership.canManageApiKeys %}
             {{ form_start(apiKeyCreateForm, {
                 attr: {
-                    class: 'mt-4 flex flex-wrap gap-2',
+                    class: 'mt-4 flex flex-wrap items-end gap-2',
                     'data-controller': 'human-key-label',
                     'data-human-key-label-adjectives-value': labelAdjectives|json_encode|e('html_attr'),
                     'data-human-key-label-nouns-value': labelNouns|json_encode|e('html_attr'),
                 }
             }) }}
-                {{ form_widget(apiKeyCreateForm.label, {
-                    attr: {
-                        class: 'input min-w-40 flex-1',
-                        placeholder: 'project.api_keys.label_placeholder'|trans,
-                        'data-human-key-label-target': 'label',
-                        autocomplete: 'off',
-                    }
-                }) }}
+                {% for field in apiKeyCreateForm %}
+                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                        {{ form_row(field) }}
+                    {% endif %}
+                {% endfor %}
                 <button
                     type="button"
                     class="btn-ghost"
@@ -79,6 +76,7 @@
                     title="{{ 'project.api_keys.generate_hint'|trans }}"
                 >{{ 'project.api_keys.generate'|trans }}</button>
                 <button class="btn-primary" type="submit">{{ 'project.api_keys.add'|trans }}</button>
-            {{ form_end(apiKeyCreateForm) }}
+                {% include 'form/_fields.html.twig' with {form: apiKeyCreateForm} only %}
+            {{ form_end(apiKeyCreateForm, {render_rest: false}) }}
         {% endif %}
     </section>

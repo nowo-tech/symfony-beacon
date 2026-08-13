@@ -67,11 +67,13 @@ final class ProjectMembersGroupsTest extends DatabaseWebTestCase
         $this->login($client, $owner);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $token = $crawler->filter('form[action$="/members"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
-            '_token' => $token,
-            'email' => 'nobody@example.com',
-            'role' => 'member',
+            'project_member_add' => [
+                '_token' => $token,
+                'email' => 'nobody@example.com',
+                'role' => 'member',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();

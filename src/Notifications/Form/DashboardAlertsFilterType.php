@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace App\Notifications\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
-use App\Shared\Form\DashboardProjectFilterFields;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Dashboard alerts filters.
+ * Dashboard alerts filters (FormKit {@code filter}).
  */
 final class DashboardAlertsFilterType extends AbstractGetFilterType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly TranslatorInterface $translator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,13 +30,13 @@ final class DashboardAlertsFilterType extends AbstractGetFilterType
         /** @var array<string, string> $projectChoices */
         $projectChoices = $options['project_choices'];
 
-        DashboardProjectFilterFields::addPageProjectAndPerPage(
-            $builder,
-            $this->translator,
-            $projectChoices,
-            'alerts.filter.any_project',
-            'alerts.filter.project',
-        );
+        $this->withBuilder($builder, function () use ($projectChoices): void {
+            $this->addDashboardPageProjectAndPerPage(
+                $this->translator,
+                $projectChoices,
+                'dashboard_alerts_filter.project.aria',
+            );
+        });
     }
 
     #[Override]
@@ -44,5 +48,11 @@ final class DashboardAlertsFilterType extends AbstractGetFilterType
             'project_choices' => [],
         ]);
         $resolver->setAllowedTypes('project_choices', 'array');
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'dashboard_alerts_filter';
     }
 }

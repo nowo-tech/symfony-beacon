@@ -21,10 +21,6 @@
     },
     item_count: destinations|length,
 } %}
-    {% block filter_fields %}
-        {{ form_widget(filterForm.project) }}
-        {{ form_widget(filterForm.per_page) }}
-    {% endblock %}
     {% block results %}
         <ul class="divide-y divide-[var(--color-sand)]/70">
             {% for destination in destinations %}

@@ -32,11 +32,13 @@ final class ProjectMembersTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/members"]');
 
-        $token = $crawler->filter('form[action$="/members"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
-            '_token' => $token,
-            'email' => 'invitee@example.com',
-            'role' => 'admin',
+            'project_member_add' => [
+                '_token' => $token,
+                'email' => 'invitee@example.com',
+                'role' => 'admin',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
@@ -96,11 +98,13 @@ final class ProjectMembersTest extends DatabaseWebTestCase
 
         $this->login($client, $owner);
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $token = $crawler->filter('form[action$="/members"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/members"] input[name="project_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/members', [
-            '_token' => $token,
-            'email' => 'new-member@example.com',
-            'role' => 'member',
+            'project_member_add' => [
+                '_token' => $token,
+                'email' => 'new-member@example.com',
+                'role' => 'member',
+            ],
         ]);
         self::assertResponseRedirects();
 
@@ -205,13 +209,10 @@ final class ProjectMembersTest extends DatabaseWebTestCase
 
         $transferForm = $crawler->filter('form[action$="/transfer-ownership"]');
         self::assertGreaterThan(0, $transferForm->count());
-        $token = $transferForm->filter('input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/transfer-ownership', [
-            '_token' => $token,
-            'user' => $member->getUuid(),
-            'confirmation' => $project->getName(),
-        ]);
+        $client->submit($transferForm->form([
+            'project_transfer_ownership[user]' => $member->getUuid(),
+            'project_transfer_ownership[confirmation]' => $project->getName(),
+        ]));
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'ownership transferred');
@@ -248,13 +249,10 @@ final class ProjectMembersTest extends DatabaseWebTestCase
 
         $this->login($client, $owner);
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $token = $crawler->filter('form[action$="/transfer-ownership"] input[name="_token"]')->attr('value');
-
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/transfer-ownership', [
-            '_token' => $token,
-            'user' => $member->getUuid(),
-            'confirmation' => 'wrong-name',
-        ]);
+        $client->submit($crawler->filter('form[action$="/transfer-ownership"]')->form([
+            'project_transfer_ownership[user]' => $member->getUuid(),
+            'project_transfer_ownership[confirmation]' => 'wrong-name',
+        ]));
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
         self::assertSelectorTextContains('.flash', 'did not match');

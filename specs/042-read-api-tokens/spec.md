@@ -33,3 +33,7 @@ As an integrator, I list/get issues with a project read token.
 
 - Write/mutate API.
 - Public status pages.
+
+## Amendment (FormKit create token, 2026-08-13)
+
+`ProjectReadTokenCreateType` extends `FormKitAbstractType` (profile `beacon`, prefix `project_read_token_create`). Labels/placeholders/help under `project_read_token_create.*` in `translations/form.*.yaml`. Twig: `form_row` + `_fields` (`077`). Canonical: `081` FR-003c. E2E / DomCrawler: `project_read_token_create[label]` (not bare `name="label"`).

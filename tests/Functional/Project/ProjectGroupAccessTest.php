@@ -72,11 +72,13 @@ final class ProjectGroupAccessTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/groups"]');
 
-        $token = $crawler->filter('form[action$="/groups"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/groups"] input[name="project_group_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/groups', [
-            '_token' => $token,
-            'group' => $group->getUuid(),
-            'role' => 'admin',
+            'project_group_add' => [
+                '_token' => $token,
+                'group' => $group->getUuid(),
+                'role' => 'admin',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
 

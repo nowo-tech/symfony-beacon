@@ -33,17 +33,14 @@
         <p class="text-sm text-[var(--color-ink)]/65">{{ 'mailer_settings.sample.intro'|trans }}</p>
         {% if magicLoginAvailable %}
             {{ form_start(mailerTestForm, {attr: {class: 'space-y-3'}}) }}
-                <label class="block text-sm font-medium" for="mailer-sample-to">{{ 'mailer_settings.sample.to_label'|trans }}</label>
-                {{ form_widget(mailerTestForm.to, {
-                    attr: {
-                        id: 'mailer-sample-to',
-                        class: 'input w-full',
-                        autocomplete: 'email',
-                        placeholder: 'you@example.com',
-                    }
-                }) }}
+                {% for field in mailerTestForm %}
+                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                        {{ form_row(field) }}
+                    {% endif %}
+                {% endfor %}
                 <button class="btn-primary" type="submit">{{ 'mailer_settings.sample.submit'|trans }}</button>
-            {{ form_end(mailerTestForm) }}
+                {% include 'form/_fields.html.twig' with {form: mailerTestForm} only %}
+            {{ form_end(mailerTestForm, {render_rest: false}) }}
         {% else %}
             <p class="text-sm text-[var(--color-ink)]/55">{{ 'mailer_settings.sample.unavailable'|trans }}</p>
         {% endif %}

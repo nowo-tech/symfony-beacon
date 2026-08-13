@@ -171,3 +171,11 @@ As a member, on a project I can override account event toggles and involvement s
 | **v1.8.0** | Feature cut: Account matrix, Mercure `/users/{uuid}/member-alerts`, Web Push filter, viewer `requireAccess`, migrations |
 | **v1.8.1** | Constructor-injected LiveComponents; restore `seedTestOpsDefaults` helper name |
 | **v1.8.2** | PHPStan typing clean-up; Rector skips that preserve PHPStan aliases / Live method injection; `make rector-fix` → CS Fixer |
+
+## Amendment (FormKit preference forms, 2026-08-13)
+
+`MemberAlertPreferencesType` / `MemberProjectAlertPreferencesType` extend host `FormKitAbstractType` (profile `beacon`). Labels/help stay under `preferences.*` in the `form` catalogue (shared with Twig). Nested event matrix is built outside FormKit merge; the `events` compound sets `translation_domain: form` once so children inherit. Twig: `form_row` / `_fields` for residual fields (`077`). Canonical: `081` FR-003c.
+
+## Amendment (Live `pref-switch` chrome, 2026-08-13)
+
+Account / project member-alert LiveComponent Twigs intentionally use `form_widget` for master / push / event / scope toggles so `pref-switch` + Live `data-model` / `role="switch"` stay intact. Default theme `checkbox_row` MUST NOT replace that chrome until a dedicated switch theme block exists. Listed as a standing exception in `077` / `081` Twig consolidation amendments.

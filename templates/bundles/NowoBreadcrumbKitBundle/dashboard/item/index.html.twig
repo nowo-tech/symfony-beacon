@@ -50,17 +50,24 @@
         <p class="mb-3 text-sm text-[var(--color-ink)]/55"><code>{{ collection.code }}</code> — {{ collection.name }}</p>
     {% endif %}
 
-    {{ form_start(search_form, {attr: {class: 'mb-4 flex flex-wrap gap-2', role: 'search'}}) }}
-        {{ form_widget(search_form.q, {
-            attr: {
-                class: 'input min-w-56 flex-1',
-                placeholder: 'dashboard.search_placeholder'|trans,
-                'aria-label': 'dashboard.search'|trans,
-                autocomplete: 'off',
-            },
-        }) }}
+    {{ form_start(search_form, {attr: {class: 'mb-4 flex flex-wrap items-end gap-2', role: 'search'}}) }}
+        {% for field in search_form %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field, {
+                    label: false,
+                    attr: {
+                        class: 'input min-w-56 flex-1',
+                        placeholder: 'dashboard.search_placeholder'|trans,
+                        'aria-label': 'dashboard.search'|trans,
+                        autocomplete: 'off',
+                    },
+                    row_attr: {class: 'grow min-w-56'},
+                }) }}
+            {% endif %}
+        {% endfor %}
         <button type="submit" class="btn-ghost">{{ 'dashboard.filter'|trans }}</button>
         <a href="{{ path(_items_index, {collectionId: collection.id}) }}" class="btn-ghost no-underline">{{ 'dashboard.clear_filters'|trans }}</a>
+        {% include 'form/_fields.html.twig' with {form: search_form} only %}
     {{ form_end(search_form, {render_rest: false}) }}
 
     {% if search_query != '' %}

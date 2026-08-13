@@ -59,23 +59,17 @@
                             <p class="confirm-dialog__body">{{ 'preferences.privacy.anonymize_confirm_body'|trans }}</p>
                         </div>
                         <div class="confirm-dialog__content">
-                            <label class="confirm-dialog__label" for="privacy-anonymize-confirm-input">
-                                {{ 'preferences.privacy.anonymize_type_label'|trans }}
-                            </label>
-                            {{ form_widget(anonymizeForm.confirmation, {
-                                attr: {
-                                    id: 'privacy-anonymize-confirm-input',
-                                    class: 'input w-full',
-                                    autocomplete: 'off',
-                                    'data-confirm-dialog-target': 'confirmInput',
-                                }
+                            {{ form_row(anonymizeForm.confirmation, {
+                                label: 'preferences.privacy.anonymize_type_label'|trans,
+                                translation_domain: false,
                             }) }}
+                            {% include 'form/_fields.html.twig' with {form: anonymizeForm} only %}
                         </div>
                         <div class="confirm-dialog__actions">
                             <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'common.cancel'|trans }}</button>
                             <button type="submit" class="btn-danger" data-testid="account-privacy-anonymize-submit" data-confirm-dialog-target="submit" disabled>{{ 'preferences.privacy.anonymize_confirm'|trans }}</button>
                         </div>
-                    {{ form_end(anonymizeForm) }}
+                    {{ form_end(anonymizeForm, {render_rest: false}) }}
                 {% endblock %}
             {% endembed %}
         {% endif %}

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-13
+
+### Added
+
+- **Product FormKit form profiles (`081` / `077` / `090` follow-up / 6.44)**: host catalogues `translations/form.*.yaml` (de/en/es/fr/it/nl/pt); Cursor rule `.cursor/rules/formkit-profiles.mdc`; Beacon form theme **`color_row`** (Appearance color swatch + hex readout). Specs: `077`, `081`, `090` (+ related amendments).
+
+### Changed
+
+- **Profile `filter`** (`AbstractGetFilterType`): label never; auto placeholder/help; `required` false except `per_page`; helpers `addHiddenFilterField` / `addFilterSelect` / `addDashboardPerPage`; host `type_map.search` → `SearchType`.
+- **Profile `beacon`** (`FormKitAbstractType`): non-empty `getBlockPrefix()`; auto label/placeholder/help from `form` catalogue — Settings (governance, shares, tokens, members/groups, API keys, …), Issues triage, admin helpers, account/preferences.
+- Host Twig paints with **`form_row` + `form/_fields.html.twig`** (Appearance, Mentions unread caption, role permissions/edit, magic-login confirm, Dashboard Menu flags/reorder/import, filters/settings). Standing `form_widget` exceptions: member-alert Live `pref-switch`, issue duplicate combobox, form theme internals.
+- PHPUnit / Playwright selectors use prefixed field names/ids (`project_governance_*`, `project_share_create[*]`, `project_read_token_create[*]`, `admin_group_member_add[email]`, …).
+
+### Notes for integrators
+
+- HTML form POST field names now include the Type block prefix (e.g. `project_governance[retention_days]`). UI operators need no action; update any custom scripts that posted unprefixed names.
+
 ## [1.9.0] - 2026-08-13
 
 ### Security
@@ -987,7 +1004,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.2...v1.9.0
 [1.8.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.8.0...v1.8.1

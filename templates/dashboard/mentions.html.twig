@@ -31,12 +31,15 @@
         {% endif %}
     {% endblock %}
     {% block filter_fields %}
-        {{ form_widget(filterForm.project) }}
-        <label class="checkbox-label">
-            {{ form_widget(filterForm.unread, {value: 1}) }}
-            {{ 'mentions.filter.unread_only'|trans }}
-        </label>
-        {{ form_widget(filterForm.per_page) }}
+        {% for field in filterForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {% if field.vars.name == 'unread' %}
+                    {{ form_row(field, {label: 'mentions.filter.unread_only'|trans}) }}
+                {% else %}
+                    {{ form_row(field) }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
     {% endblock %}
     {% block results %}
         <ul class="divide-y divide-[var(--color-sand)]/70">

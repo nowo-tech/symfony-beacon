@@ -188,12 +188,9 @@ final class InstanceMailerSettingsTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', 'Magic-link email credentials are ready');
         self::assertSelectorExists('form[action$="/admin/mailer/test"]');
 
-        $token = $crawler->filter('form[action$="/admin/mailer/test"] input[name="_token"]')->attr('value');
-        self::assertNotEmpty($token);
-
-        $client->request(Request::METHOD_POST, '/admin/mailer/test', [
-            '_token' => $token,
-            'to' => 'mailer-sample@example.com',
+        $form = $crawler->filter('form[action$="/admin/mailer/test"]')->form();
+        $client->submit($form, [
+            'mailer_test[to]' => 'mailer-sample@example.com',
         ]);
         self::assertResponseRedirects('/admin/mailer');
         $client->followRedirect();

@@ -24,22 +24,21 @@
 </div>
 
 {{ form_start(auditFilterForm, {attr: {class: 'mb-4 grid gap-3 sm:grid-cols-4'}}) }}
-    <div class="sm:col-span-2">
-        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-action">{{ 'admin_projects.audit_filter_action'|trans }}</label>
-        {{ form_widget(auditFilterForm.action, {attr: {id: timeline_id ~ '-action', class: 'input w-full'}}) }}
-    </div>
-    <div>
-        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-from">{{ 'admin_projects.audit_filter_from'|trans }}</label>
-        {{ form_widget(auditFilterForm.from, {attr: {id: timeline_id ~ '-from', class: 'input w-full', type: 'date'}}) }}
-    </div>
-    <div>
-        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60" for="{{ timeline_id }}-to">{{ 'admin_projects.audit_filter_to'|trans }}</label>
-        {{ form_widget(auditFilterForm.to, {attr: {id: timeline_id ~ '-to', class: 'input w-full', type: 'date'}}) }}
-    </div>
+    {# Captions are Twig chrome (messages); FormKit filter profile keeps label: false. #}
+    {% for field in auditFilterForm %}
+        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+            {{ form_row(field, {
+                label: ('admin_projects.audit_filter_' ~ field.vars.name)|trans,
+                translation_domain: false,
+                label_attr: {class: 'mb-1 block text-xs font-medium uppercase tracking-wide text-[var(--color-ink)]/60'},
+            }) }}
+        {% endif %}
+    {% endfor %}
     <div class="flex flex-wrap items-end gap-2 sm:col-span-4">
         <button class="btn-primary" type="submit">{{ 'admin_projects.audit_apply'|trans }}</button>
         <a class="btn-ghost no-underline" href="{{ reset_path }}">{{ 'common.clear_filters'|trans }}</a>
     </div>
+    {% include 'form/_fields.html.twig' with {form: auditFilterForm} only %}
 {{ form_end(auditFilterForm, {render_rest: false}) }}
 
 {% if audit_entries is empty %}

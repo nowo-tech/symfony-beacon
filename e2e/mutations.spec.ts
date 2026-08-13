@@ -166,7 +166,7 @@ test.describe('Mutations — project settings', () => {
 
     const tokens = page.locator('[data-testid="read-api-tokens"]');
     await expect(tokens).toBeVisible();
-    await tokens.locator('input[name="label"]').fill(`e2e-token-${Date.now().toString(36)}`);
+    await tokens.locator('input[name="project_read_token_create[label]"]').fill(`e2e-token-${Date.now().toString(36)}`);
     await tokens.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page.locator('[data-testid="read-token-secret"], [data-testid="read-token-row"]').first()).toBeVisible({
@@ -179,13 +179,13 @@ test.describe('Mutations — project settings', () => {
     await page.goto(`/projects/${uuid}/settings`);
     await dismissProductTour(page);
 
-    const retention = page.locator('#retention_days');
+    const retention = page.locator('#project_governance_retention_days');
     await expect(retention).toBeVisible();
     await retention.fill('30');
     await page.locator('form').filter({ has: retention }).locator('button[type="submit"]').click();
     await waitForPageLoader(page);
     await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings`));
-    await expect(page.locator('#retention_days')).toHaveValue('30');
+    await expect(page.locator('#project_governance_retention_days')).toHaveValue('30');
   });
 });
 
@@ -249,7 +249,7 @@ test.describe('Mutations — issue assignee & read API', () => {
     const tokens = page.locator('[data-testid="read-api-tokens"]');
     await expect(tokens).toBeVisible();
     const label = `e2e-read-${Date.now().toString(36)}`;
-    await tokens.locator('input[name*="[label]"], input[name="label"]').fill(label);
+    await tokens.locator('input[name="project_read_token_create[label]"]').fill(label);
     await tokens.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
 

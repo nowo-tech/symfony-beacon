@@ -224,6 +224,7 @@ final class ProjectController extends AbstractController
 
         $form = $this->createForm(ProjectGovernanceType::class, null, [
             'csrf_token_id' => 'project_governance_'.$project->getId(),
+            'env_defaults' => $this->governanceResolver->envDefaults(),
         ]);
         $form->handleRequest($request);
         if (!$form->isSubmitted() || !$form->isValid()) {

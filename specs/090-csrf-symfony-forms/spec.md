@@ -83,8 +83,8 @@ As a member, list filters submit via GET Form Types sharing `AbstractGetFilterTy
 
 **Acceptance Scenarios**:
 
-1. **Given** a list with filters, **When** the page renders, **Then** the filter is built with `GetFilterFormFactory` / a Type extending `AbstractGetFilterType`.
-2. **Given** Issues/admin multi-field filters, **When** chrome is painted, **Then** widgets use placeholder / `aria-label` (no visible labels) unless the surface is intentionally labeled (analytics / audit).
+1. **Given** a list with filters, **When** the page renders, **Then** the filter is built with `GetFilterFormFactory` / a Type extending `AbstractGetFilterType` (FormKit profile `filter`).
+2. **Given** Issues/admin/dashboard multi-field filters, **When** chrome is painted, **Then** FormKit emits no field labels; placeholders/help come from `translations/form.*.yaml`; Twig paints via `form_row` + `_fields` / unrendered loop (`077`); optional Twig captions in `messages` only where the surface opts in (e.g. analytics); fields are not required except page-size `per_page` when present.
 
 ## Requirements *(mandatory)*
 
@@ -94,7 +94,7 @@ As a member, list filters submit via GET Form Types sharing `AbstractGetFilterTy
 - **FR-004**: Named Types for issue triage / danger / mentions / tour replay / Settings / admin MUST live under the owning module (`Issues`, `Project`, `Identity`, `Shared`, …) and follow `077` field-loop rules when the template renders multiple fields.
 - **FR-005**: Functional tests that previously posted `_token` + raw fields MUST submit Symfony form fields (including CSRF) after migration.
 - **FR-006**: Host Settings create/import and admin fielded POSTs listed in Scope F7 MUST be on Form Types before Status Done (as-built: done). Kit vendor modal delete tokens MAY lag (`081`).
-- **FR-007**: Host GET multi-field / search filters MUST extend `AbstractGetFilterType` (or reuse `AdminSearchType` / `SearchQueryType`) and be created via `GetFilterFormFactory` where controllers build the view.
+- **FR-007**: Host GET multi-field / search filters MUST extend `AbstractGetFilterType` (or reuse `AdminSearchType` / `SearchQueryType` / `DashboardProjectSearchType`) with FormKit profile `filter`, and be created via `GetFilterFormFactory` where controllers build the view. Contract: never FormKit label; always placeholder (except hidden / Twig-owned search); always help unless `help: false`; **required false** except **`per_page`** (`required: true`); Twig `form_row` + `_fields` / loop (`077`). See `081` FR-003a / filter amendment.
 - **FR-008**: AJAX preference / push endpoints MAY keep header CSRF (`X-CSRF-TOKEN`); they are not required to use HTML Form Types.
 
 ## Success Criteria
@@ -106,9 +106,23 @@ As a member, list filters submit via GET Form Types sharing `AbstractGetFilterTy
 
 ## Assumptions
 
-- FormKit (`nowo-tech/form-kit-bundle`) remains the host Form Type base (`081`, `086` FormKit parity).
+- FormKit (`nowo-tech/form-kit-bundle`) remains the host Form Type base (`081`, `086` FormKit parity). Product GET filters use profile `filter` (`081` amendment 2026-08-13); product settings/POST use `beacon` (`081` FR-003c).
 - Token id strings stay stable across migration so bookmarks/docs that mention ids remain valid where possible.
-- Http Log kit filters follow Issues/admin widget chrome under `081` (host fork); product analytics/audit may keep visible labels.
+- Http Log kit filters follow Issues/admin filter chrome under `081` (host fork); analytics Twig captions are optional chrome on top of label-less FormKit fields painted with `form_row`.
+
+## Amendment (GET filter `required` / search type_map, 2026-08-13)
+
+Aligns with `081` FR-003a: `AbstractGetFilterType::mergeFieldOptions()` defaults every filter field to `required: false`; **`per_page`** MUST pass `required: true` (`addDashboardPerPage` / Issues index). Host registers `nowo_form_kit.type_map.search` → `SearchType` for snake-case `addNamedField(..., 'search', …)`.
+
+**Security posture (non-regression)**:
+
+- GET filters KEEP `csrf_protection: false` + `method: GET` — intentional for idempotent list UIs (`F8` / US4). Mutable host POSTs remain on Symfony Form CSRF (`FR-001`…`FR-006`).
+- Making filter fields optional (`required: false`) is **not** an authorization change: it only drops HTML/Symfony “field required” constraints. Controllers MUST continue to enforce membership / roles before applying query filters; empty params MUST fall back to existing safe defaults (no cross-project leakage via missing `required`).
+- Registering `SearchType` in `type_map` does not alter CSRF or access control.
+
+## Amendment (Prefixed Form field selectors, 2026-08-13)
+
+Product `beacon` Types use non-empty `getBlockPrefix()`. Automated browsers (Playwright DomCrawler / PHPUnit) MUST submit and assert against prefixed names and Symfony ids, e.g. `project_governance[retention_days]` / `#project_governance_retention_days`, `project_share_create[days]`, `project_read_token_create[label]`, `admin_group_member_add[email]`. Unprefixed `name="days"` / `#retention_days` selectors are obsolete after the FormKit migration.
 
 ## Related
 

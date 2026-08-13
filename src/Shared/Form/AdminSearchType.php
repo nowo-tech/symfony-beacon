@@ -5,28 +5,30 @@ declare(strict_types=1);
 namespace App\Shared\Form;
 
 use Override;
-use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reusable admin directory search field (`q`).
+ * Reusable admin directory search field ({@code q}) — FormKit {@code filter}.
+ *
+ * Twig should pass {@code attr.placeholder} already translated (e.g. {@code key|trans}).
+ * {@code placeholder: false} skips FormKit auto-placeholder so Twig wins.
  */
 final class AdminSearchType extends AbstractGetFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $placeholder = $options['search_placeholder'];
-
-        $builder->add('q', SearchType::class, [
-            'label' => false,
-            'required' => false,
-            'attr' => [
-                'class' => 'input min-w-56 flex-1',
-                'placeholder' => \is_string($placeholder) ? $placeholder : null,
-                'autocomplete' => 'off',
-            ],
-        ]);
+        $this->withBuilder($builder, function (): void {
+            $this->addNamedField('q', 'search', [
+                'placeholder' => false,
+                'help' => false,
+                'translation_domain' => false,
+                'attr' => [
+                    'class' => 'input min-w-56 flex-1',
+                    'autocomplete' => 'off',
+                ],
+            ]);
+        });
     }
 
     #[Override]
@@ -38,5 +40,11 @@ final class AdminSearchType extends AbstractGetFilterType
             'search_placeholder' => null,
         ]);
         $resolver->setAllowedTypes('search_placeholder', ['null', 'string']);
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'admin_search';
     }
 }

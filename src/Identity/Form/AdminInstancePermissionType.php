@@ -7,8 +7,8 @@ namespace App\Identity\Form;
 use App\Identity\Entity\InstancePermission;
 use App\Identity\Security\Permission;
 use App\Identity\Service\InstancePermissionCategoryCatalog;
+use App\Shared\Form\FormKitAbstractType;
 use App\Shared\Rbac\RbacPermissionTranslator;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
 use Override;
@@ -26,6 +26,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Admin create/edit form for a custom (or catalog) instance permission.
+ *
+ * Labels / placeholders / default help come from FormKit ({@code form} domain,
+ * {@code admin_instance_permission.*}). Help is overridden only when it depends
+ * on whether the locale is the instance default.
  */
 final class AdminInstancePermissionType extends FormKitAbstractType
 {
@@ -46,9 +50,6 @@ final class AdminInstancePermissionType extends FormKitAbstractType
 
         $this->withBuilder($builder, function () use ($options, $locales, $defaultLocale): void {
             $this->addTextField('key', [
-                'label' => 'permissions.key_label',
-                'help' => 'permissions.key_help',
-                'placeholder' => 'admin_instance_permission.key.placeholder',
                 'disabled' => (bool) $options['key_locked'],
                 'constraints' => $options['key_locked'] ? [] : [
                     new NotBlank(),
@@ -60,9 +61,8 @@ final class AdminInstancePermissionType extends FormKitAbstractType
                 ],
             ]);
             $this->addChoiceField('category', [
-                'label' => 'permissions.category_label',
-                'help' => 'permissions.category_help',
                 'choices' => InstancePermissionCategoryCatalog::formChoices(),
+                'choice_translation_domain' => 'messages',
                 'constraints' => [
                     new NotBlank(),
                     new Choice(choices: InstancePermissionCategoryCatalog::slugs()),
@@ -75,21 +75,20 @@ final class AdminInstancePermissionType extends FormKitAbstractType
                     $nameConstraints[] = new NotBlank();
                 }
                 $localeParam = ['%locale%' => strtoupper($locale)];
+                // Label from FormKit (name_<locale>.label). Help depends on default locale.
                 $this->addTextField('name_'.$locale, [
                     'mapped' => false,
                     'required' => $locale === $defaultLocale,
-                    'label' => 'permissions.name_label',
                     'help' => $locale === $defaultLocale
-                        ? 'permissions.name_help'
-                        : 'permissions.name_locale_help',
+                        ? 'admin_instance_permission.name.help_default'
+                        : 'admin_instance_permission.name.help_locale',
                     'help_translation_parameters' => $localeParam,
                     'constraints' => $nameConstraints,
                 ]);
                 $this->addTextareaField('description_'.$locale, [
                     'mapped' => false,
                     'required' => false,
-                    'label' => 'permissions.description_label',
-                    'help' => 'permissions.description_locale_help',
+                    'help' => 'admin_instance_permission.description.help_locale',
                     'help_translation_parameters' => $localeParam,
                     'constraints' => [new Length(max: 2000)],
                 ]);
@@ -167,7 +166,6 @@ final class AdminInstancePermissionType extends FormKitAbstractType
         $resolver->setDefaults([
             'data_class' => InstancePermission::class,
             'csrf_protection' => true,
-            'translation_domain' => 'messages',
             'key_locked' => false,
             // Controllers must pass `%default_locale%` (`DEFAULT_LOCALE`) + enabled locales.
             'enabled_locales' => [],

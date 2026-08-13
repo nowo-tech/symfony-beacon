@@ -124,3 +124,7 @@ As a project member, I queue two issues for a future merge without merging event
 ## Amendment (Symfony Forms, 2026-08-11)
 
 Issue show/index triage mutations (priority, duplicate, saved views) and status (`004`) use named Form Types / `CsrfOnlyType`. See `090-csrf-symfony-forms`.
+
+## Amendment (Duplicate combobox chrome, 2026-08-13)
+
+Issue show duplicate dialog keeps Stimulus combobox markup around `IssueDuplicateType.query` via `form_widget` for that child; residual fields use `_fields` (`077`). Standing interactive-chrome exception until a theme combobox row exists (`077` / `081` Twig consolidation amendments). Comment / priority / assignee panels use `form_row` + catalogue prefixes (`issue_comment`, `issue_priority`, `issue_assignee`).

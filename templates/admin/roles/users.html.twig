@@ -24,16 +24,15 @@
         {% endfor %}
     </ul>
 
-    {{ form_start(addUserForm, {attr: {class: 'mt-4 flex flex-wrap gap-2'}}) }}
-        {{ form_widget(addUserForm.email, {
-            attr: {
-                class: 'input min-w-56 flex-1',
-                placeholder: 'roles.user_email_placeholder'|trans,
-                autocomplete: 'off',
-            }
-        }) }}
+    {{ form_start(addUserForm, {attr: {class: 'mt-4 flex flex-wrap items-end gap-2'}}) }}
+        {% for field in addUserForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button class="btn-primary" type="submit">{{ 'roles.add_user'|trans }}</button>
-    {{ form_end(addUserForm) }}
+        {% include 'form/_fields.html.twig' with {form: addUserForm} only %}
+    {{ form_end(addUserForm, {render_rest: false}) }}
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'roles.add_user_help'|trans }}</p>
 </section>
 {% endblock %}

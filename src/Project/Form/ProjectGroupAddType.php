@@ -4,45 +4,46 @@ declare(strict_types=1);
 
 namespace App\Project\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Links a user group to a project with a selected access role.
+ * Links a user group to a project (FormKit {@code beacon}).
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code project_group_add.*}.
+ * Role choice labels use {@code form} ({@code project.members.role.*}).
  */
 final class ProjectGroupAddType extends FormKitAbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->withBuilder($builder, function () use ($options): void {
-            $this->addChoiceField('group', [
+            $this->addChoiceWithFormPlaceholder('group', [
                 'required' => true,
-                'label' => false,
                 'choices' => $options['group_choices'],
                 'choice_translation_domain' => false,
-                'placeholder' => 'project.groups.select',
+                'placeholder' => 'project_group_add.group.placeholder',
                 'constraints' => [new NotBlank()],
             ]);
             $this->addChoiceField('role', [
-                'required' => true,
-                'label' => false,
-                'choices' => $options['role_choices'],
-                'choice_translation_domain' => 'messages',
+                'help' => false,
                 'placeholder' => false,
+                'required' => true,
+                'choices' => $options['role_choices'],
             ]);
         });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        parent::configureOptions($resolver);
         $resolver->setDefaults([
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'project_group_add',
-            'translation_domain' => 'messages',
             'group_choices' => [],
             'role_choices' => [],
         ]);
@@ -53,6 +54,6 @@ final class ProjectGroupAddType extends FormKitAbstractType
     #[Override]
     public function getBlockPrefix(): string
     {
-        return '';
+        return 'project_group_add';
     }
 }

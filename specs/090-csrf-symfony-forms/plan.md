@@ -35,7 +35,7 @@ Replace host hand-rolled `<form method="post">` + Twig `csrf_token()` with FormK
 | Hidden payload POST | `HiddenFieldsCsrfType` (e.g. member set-active) via factory / page builder |
 | Fielded POST | Named module Types extending `FormKitAbstractType`; Twig `077` field loop |
 | Settings page | `ProjectSettingsPageBuilder` builds per-row CSRF views for revoke/toggle/delete |
-| GET filters | `AbstractGetFilterType` (CSRF off) + `GetFilterFormFactory` |
+| GET filters | `AbstractGetFilterType` (CSRF off, GET) + `GetFilterFormFactory`; profile `filter` (`081`); `required` false except `per_page`; host `type_map.search` |
 | AJAX | Leave `X-CSRF-TOKEN` + `isCsrfTokenValid` on preference / push controllers |
 | Kits | Do not block Done on Menu/Breadcrumb modal `data-token`; document under `081` |
 
@@ -68,7 +68,7 @@ src/{Issues,Project,Identity,Notifications,Analytics,Ops,Shared}/Form/*Type.php
 ## Testing
 
 - `IssueWorkflowTest`, `ProjectDangerZoneTest`, admin/group/project mutation functionals submit Symfony fields
-- Smoke: POST without CSRF rejected; GET filters still filter
+- Smoke: POST without CSRF rejected; GET filters still filter; optional filter fields do not bypass membership checks
 - No new DB migrations
 
 ## Complexity Tracking

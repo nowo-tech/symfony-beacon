@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Identity\Entity\User;
+use App\Shared\Form\FormKitAbstractType;
 use Closure;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,9 +29,10 @@ final class ProjectMemberAutocompleteField extends FormKitAbstractType
         $resolver->setDefaults([
             'class' => User::class,
             'placeholder' => 'issues.assignee_unassigned',
-            'translation_domain' => 'messages',
             'required' => false,
             'label' => false,
+            // Display names / emails from DB — never translate as catalogue keys.
+            'choice_translation_domain' => false,
             'choice_label' => static function (User $user): string {
                 $name = trim($user->getDisplayName());
 

@@ -217,6 +217,7 @@ final class ProjectMemberController extends AbstractController
         $form = $this->createForm(ProjectTransferOwnershipType::class, null, [
             'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
             'user_choices' => $this->membershipFormSupport->transferOwnershipChoices($project, $actor),
+            'project_id' => (int) $project->getId(),
         ]);
         $form->handleRequest($request);
         $this->requireValidForm($form);

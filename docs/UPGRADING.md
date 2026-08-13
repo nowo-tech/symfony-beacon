@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.9.0)](#unreleased-main-after-190)
+- [Unreleased (main after 1.10.0)](#unreleased-main-after-1100)
+- [Upgrading from 1.9.0 to 1.10.0](#upgrading-from-190-to-1100)
 - [Upgrading from 1.8.2 to 1.9.0](#upgrading-from-182-to-190)
 - [Upgrading from 1.8.1 to 1.8.2](#upgrading-from-181-to-182)
 - [Upgrading from 1.8.0 to 1.8.1](#upgrading-from-180-to-181)
@@ -62,9 +63,37 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.9.0)
+## Unreleased (main after 1.10.0)
 
 _No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.9.0 to 1.10.0
+
+**Product FormKit form profiles + Twig `form_row` consolidation (`081` / `077` / `090` follow-up / 6.44).** See `[1.10.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.10.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+php bin/console cache:clear
+# Optional: rebuild assets if you customize Appearance color JS / SCSS
+# make vite-build
+```
+
+No Doctrine migrations in this release.
+
+### Operator checklist
+
+1. **UI operators**: no action — Settings / Issues / admin forms keep working in the browser.
+2. **Custom scripts / scrapers** that POST host HTML forms MUST use Symfony block-prefixed field names (e.g. `project_governance[retention_days]`, `project_share_create[days]`, `project_read_token_create[label]`, `admin_group_member_add[email]`). Unprefixed `retention_days` / `days` / `label` / `email` payloads no longer bind.
+3. **Developers**: Form chrome lives in `translations/form.*.yaml` (profiles `beacon` / `filter`). Prefer `form_row` + `form/_fields.html.twig` over hand-rolled `form_widget` + `form_help`. See `.cursor/rules/formkit-profiles.mdc` and `docs/CONTRIBUTING.md` (Symfony forms).
+4. **E2E / PHPUnit**: update selectors to prefixed ids/names (Playwright suite already aligned in this cut).
+
+### Notes
+
+- Standing Twig exceptions (intentional): member-alert Live `pref-switch` rows, issue duplicate combobox query widget, form theme internals (`077`).
+- Appearance Colors use theme `color_row` (swatch + hex); Themes apply still CSRF-only (theme cards submit `apply_theme`).
 
 ## Upgrading from 1.8.2 to 1.9.0
 

@@ -1,0 +1,868 @@
+# FormKit field catalogue (label / placeholder / help). Domain: form
+admin_user:
+  email:
+    label: Email
+    placeholder: nome@exemplo.com
+    help: Email de acesso desta conta.
+  display_name:
+    label: Nome visível
+    placeholder: Ana Silva
+    help: Mostrado no diretório de admin e na linha de atividade.
+  password:
+    label: Palavra-passe
+    placeholder: Pelo menos 8 caracteres
+    help: Pelo menos 8 caracteres.
+  role:
+    label: Função
+    placeholder: Selecionar uma função
+    help: Função de instância (utilizador ou admin).
+  enabled:
+    label: Conta ativa (pode iniciar sessão)
+    placeholder: ''
+    help: Se estiver desativada, o utilizador não pode iniciar sessão.
+admin_instance_role:
+  name:
+    label: Nome
+    placeholder: Suporte
+    help: Reserva na base de dados para o nome visível. A UI prefere roles.catalog.<slug>.name se essa
+      chave estiver traduzida (slug = código em minúsculas).
+  code:
+    label: Código
+    placeholder: ROLE_SUPPORT
+    help: Código estilo Symfony (ex. ROLE_SUPPORT). Id de máquina — não traduzido.
+  description:
+    label: Quando usar
+    placeholder: Orientação breve opcional…
+    help: Orientação breve sobre quando atribuir este papel. Prefira roles.catalog.<slug>.description;
+      este campo é a reserva na BD.
+  enabled:
+    label: Ativo
+    help: Se estiver desativado, este papel não pode ser atribuído de novo.
+project:
+  nav:
+    label: Seções do projeto
+  governance:
+    help: Retenção por projeto, limites de taxas e cotas diárias. Deixe um campo vazio para herdar o padrão
+      do servidor.
+    inherit_hint: Vazio = herda o padrão do servidor (%default%). Use 0 para desabilitar quando o padrão
+      for diferente de zero.
+    retention_days:
+      label: Dias de retenção
+    retention_max_events:
+      label: Máximo de eventos armazenados
+    ingest_rate_limit:
+      label: Limite de taxa de ingestão (por minuto)
+    event_quota_daily:
+      label: Cota diária de eventos
+    event_quota_monthly:
+      label: Cota mensal de eventos
+  name:
+    label: Nome
+    placeholder: por exemplo API de faturamento
+    help: Mostrado no painel e usado para derivar o slug do projeto.
+    required: O nome do projeto é obrigatório.
+  description:
+    label: Descrição
+    placeholder: Breve resumo opcional
+    help: Ajuda sua equipe a reconhecer este projeto.
+  api_keys:
+    help: Use um DSN em BEACON_DSN para que seu aplicativo possa enviar erros para este projeto.
+  members:
+    help: Membros diretos deste projeto. Proprietários e administradores gerenciam a associação. O acesso
+      também pode vir dos grupos vinculados abaixo.
+    email_label: E-mail do membro
+    email_placeholder: usuário@exemplo.com
+    role:
+      admin: Administrador
+      full: Full
+      member: Membro
+      owner: Proprietário
+      viewer: Viewer
+    role_label: Papel
+  groups:
+    help: Vincule um grupo para que cada membro do grupo receba a função escolhida neste projeto. Os proprietários
+      devem ser adicionados como usuários individuais.
+    select: Selecione um grupo…
+  config:
+    help: 'JSON portátil deste projeto (código: %code%). Inclui memberships por email; nunca segredos
+      de API.'
+  danger:
+    transfer_member_placeholder: Selecione um membro…
+site_appearance:
+  brand_name:
+    label: Marca
+    placeholder: symfony-beacon
+    help: Mostrado no cabeçalho e na página de login.
+  brand_eyebrow:
+    label: Sobrancelha de marca
+    placeholder: Rastreamento de erros
+    help: Etiqueta curta acima da marca na tela de login.
+  accent_color:
+    label: Sotaque
+    placeholder: '#1f6f54'
+    help: Acento primário (botões, links) no modo claro.
+  accent_deep_color:
+    label: Acento (passar o mouse)
+    placeholder: '#134736'
+    help: Acento mais escuro para estados de foco no modo claro.
+  accent_color_dark:
+    label: Sotaque (escuro)
+    placeholder: '#4aad7f'
+    help: Acento primário no modo escuro.
+  accent_deep_color_dark:
+    label: Foco acentuado (escuro)
+    placeholder: '#6bc49a'
+    help: Acento mais claro para estados de foco no modo escuro.
+  danger_color:
+    label: Perigo
+    placeholder: '#b42318'
+    help: Erro/acento destrutivo no modo claro.
+  danger_color_dark:
+    label: Perigo (escuro)
+    placeholder: '#f97066'
+    help: Erro/acento destrutivo no modo escuro.
+  warn_color:
+    label: Aviso
+    placeholder: '#b54708'
+    help: Acento de aviso no modo claro.
+  warn_color_dark:
+    label: Aviso (escuro)
+    placeholder: '#fdb022'
+    help: Acento de aviso no modo escuro.
+  paper_color:
+    label: Papel
+    placeholder: '#f3f6f4'
+    help: Fundo da página no modo claro.
+  paper_color_dark:
+    label: Papel (escuro)
+    placeholder: '#0c1210'
+    help: Fundo da página no modo escuro.
+  ink_color:
+    label: Tinta
+    placeholder: '#0f1c18'
+    help: Cor do texto principal no modo claro.
+  ink_color_dark:
+    label: Tinta (escuro)
+    placeholder: '#e6eee9'
+    help: Cor do texto principal no modo escuro.
+  surface_color:
+    label: Superfície
+    placeholder: '#ffffff'
+    help: Painéis e cartões no modo claro.
+  surface_color_dark:
+    label: Superfície (escuro)
+    placeholder: '#151c19'
+    help: Painéis e cartões no modo escuro.
+  footer_fixed:
+    label: Rodapé fixo
+    help: Mantém o rodapé legal afixado na parte inferior da viewport enquanto o conteúdo faz scroll.
+  corner_style:
+    label: Estilo dos cantos
+    help: Os cartões usam um raio maior; inputs e botões ficam mais subtis.
+    choice:
+      sharp: Afiado
+      soft: Suave (predefinição)
+      rounded: Arredondado
+  border_strength:
+    label: Definição das bordas
+    help: Quão definidas ficam as bordas dos elementos em modo claro e escuro (painéis, inputs, chrome).
+    choice:
+      subtle: Subtil
+      medium: Média (predefinição)
+      strong: Forte
+  color:
+    invalid: 'Use uma cor hexadecimal como #1f6f54.'
+user_preferences:
+  display_name:
+    label: Nome de exibição
+    placeholder: Seu nome
+    help: Exibido no menu de avatar e nas listas de membros.
+  email:
+    label: E-mail
+    placeholder: você@exemplo.com
+    help: Usado para fazer login.
+  slack_user_id:
+    placeholder: U012ABCDEF
+  phone:
+    placeholder: '+34600111222'
+  preferred_locale:
+    label: Linguagem
+    placeholder: Auto
+    help: Idioma de IU preferido para esta conta.
+  preferred_theme:
+    label: Tema
+    placeholder: Auto
+    help: Aparência preferida de dia ou de noite.
+  preferred_content_width:
+    label: Largura do conteúdo
+    placeholder: Contente
+    help: Coluna de conteúdo centralizada ou esticar a largura total da área principal.
+  preferred_ui_density:
+    label: Densidade da IU
+    placeholder: Confortável
+    help: Espaçamento confortável ou layout do operador mais compacto.
+  preferred_font_scale:
+    label: Tamanho do texto
+    placeholder: Médio
+    help: Reduza ou aumente o texto da interface.
+  preferred_contrast:
+    label: Contraste
+    placeholder: Sistema
+    help: Siga o contraste do dispositivo ou force texto e bordas mais marcados.
+  preferred_sidebar:
+    label: Barra lateral
+    placeholder: Expandida
+    help: Estado padrão no ambiente de trabalho se este browser ainda não tiver preferência guardada.
+  preferred_motion:
+    label: Movimento
+    placeholder: Sistema
+    help: Siga a preferência do dispositivo, reduza as animações ou mantenha o movimento total.
+  current_password:
+    label: Senha atual
+    placeholder: Senha atual
+    help: Necessário apenas ao definir uma nova senha.
+    help_email_change: Obrigatória ao alterar o endereço de email (login e destino de redefinição de palavra-passe).
+    help_required: Confirme sua senha atual para definir uma nova.
+  plain_password:
+    label: Nova senha
+    placeholder: Nova senha
+    help: Escolha uma senha forte que cumpra os requisitos abaixo.
+    second:
+      label: Confirme a nova senha
+    first:
+      label: Nova senha
+  plain_password_confirm:
+    placeholder: Confirme a nova senha
+    help: Introduza novamente a nova senha.
+ops_defaults:
+  allow_anonymous_resolve:
+    help: Legado. Se ativo, o Resolve pode alterar issues sem um ator Beacon mapeado. Prefira utilizadores
+      mapeados + triage.
+    label: Permitir Resolve anónimo do Slack/Teams
+  allow_private_urls:
+    help: Se ativo, os webhooks de saída podem apontar para hosts privados/link-local. Mantenha desativado
+      em produção.
+    label: Permitir URL privadas de notificação
+  circuit_breaker_cooldown:
+    help: Minutos antes de um destino automaticamente em pausa poder tentar de novo. Use 0 para exigir
+      retoma manual.
+    label: Arrefecimento do circuit breaker em minutos
+  circuit_breaker_threshold:
+    help: Falhas de entrega consecutivas antes de um destino de notificação ser automaticamente colocado
+      em pausa.
+    label: Limiar de falhas do circuit breaker
+  clear_inbound_webhook_secret:
+    help: Remover o segredo de webhook de entrada armazenado.
+    label: Limpar segredo de webhook de entrada
+  clear_metrics_token:
+    help: Remover o token de scrape armazenado.
+    label: Limpar token de scrape de métricas
+  delivery_history_limit:
+    help: Número de tentativas de entrega recentes retidas por cada destino de notificação.
+    label: Limite do histórico de entregas
+  envelope_max_bytes:
+    help: HTTP 413 quando um corpo de ingest em bruto excede este tamanho. Predefinição 2097152 (2 MiB).
+    label: Tamanho máximo do corpo Envelope / OTLP (bytes)
+  event_quota_daily:
+    help: Máximo de eventos aceites por projeto por dia. Use 0 para ilimitado.
+    label: Quota diária de eventos
+  event_quota_monthly:
+    help: Máximo de eventos aceites por projeto por mês civil UTC. Use 0 para ilimitado.
+    label: Quota mensal de eventos
+  inbound_email_enabled:
+    help: Se ativo, o correio de menção/atribuição pode incluir tokens Reply-To e POST /hooks/email/inbound
+      aceita webhooks do fornecedor.
+    label: Ativar comentários por e-mail de entrada
+  inbound_mail_domain:
+    help: Domínio usado nos endereços Reply-To (reply+{token}@domínio).
+    label: Domínio de correio de entrada
+  inbound_webhook_secret:
+    help: Segredo partilhado para X-Beacon-Inbound-Secret e assinatura HMAC Reply-To. Em branco ao guardar
+      mantém o segredo atual.
+    label: Segredo de webhook de entrada
+  ingest_rate_limit:
+    help: Máximo de pedidos Envelope por projeto por minuto. Use 0 para ilimitado.
+    label: Limite de ritmo de ingest por minuto
+  ingest_reject_query_auth:
+    help: Se ativo, os parâmetros beacon_key/beacon_secret na query são recusados (401). Desative apenas
+      ao migrar clientes para X-Beacon-Auth ou DSN Envelope.
+    label: Rejeitar autenticação de ingest por query string (obsoleta)
+  metrics_require_token:
+    help: Se ativo, /metrics devolve 503 até existir um token de métricas armazenado. Recomendado em produção.
+    label: Exigir token de scrape de métricas
+  metrics_token:
+    help: Token Bearer para scrapers. Em branco ao guardar mantém o token atual.
+    label: Token de scrape de métricas
+  retention_days:
+    help: Eliminar telemetria mais antiga do que este número de dias. Use 0 para desativar a retenção
+      por idade.
+    label: Dias de retenção
+  retention_max_events:
+    help: Manter no máximo este número de eventos por projeto. Use 0 para sem teto por contagem.
+    label: Máximo de eventos armazenados por projeto
+instance_mailer:
+  mailer_dsn:
+    label: DSN do Mailer
+    help: Deixe em branco para manter o valor cifrado atual. Exemplo smtp://user:pass@mail.example:587
+      - null:// e rejeitado (use antes Limpar DSN guardado).
+    placeholder: smtp://user:pass@mail.example:587
+    invalid: Introduza um DSN Symfony Mailer valido (por exemplo smtp://user:pass@host:587).
+    null_transport: null:// nao consegue entregar email. Cole um DSN SMTP real (ou
+      outro), ou use Limpar DSN guardado para recorrer ao ambiente.
+    scheme_not_allowed: Esse esquema de DSN Mailer nao e permitido. Use smtp, smtps
+      ou um esquema de fornecedor suportado (Mailgun, Postmark, SES, …).
+  clear_dsn:
+    label: Limpar DSN guardado
+    help: Remove o DSN da base de dados e recorre a MAILER_DSN do ambiente ate guardar um novo.
+  mailer_from:
+    label: Endereco From
+    help: Envelope From para magic login e emails de notificacao. Por defeito usa beacon@localhost quando
+      vazio.
+    placeholder: beacon@example.com
+instance_mercure:
+  enabled:
+    label: Ativar alertas live Mercure
+    help: Quando ativo, os membros autenticados subscrevem topicos privados do projeto para toasts de
+      novas issues enquanto a app esta aberta.
+  url:
+    label: URL de publicacao (servidor)
+    help: Deixe em branco para usar MERCURE_URL (por ex. http://mercure/.well-known/mercure dentro do
+      Compose).
+    placeholder: http://mercure/.well-known/mercure
+  public_url:
+    label: URL publico (navegador)
+    help: Deixe em branco para usar MERCURE_PUBLIC_URL (normalmente same-origin /.well-known/mercure via
+      Caddy).
+    placeholder: https://localhost:9447/.well-known/mercure
+  jwt_secret:
+    label: Segredo JWT
+    help: Deixe em branco para manter o valor cifrado atual ou recorrer a MERCURE_JWT_SECRET. Minimo de
+      32 caracteres quando definido.
+    placeholder: ••••••••••••••••••••••••••••••••
+    invalid: Introduza uma string de segredo JWT valida.
+    too_short: O segredo JWT tem de ter pelo menos 32 caracteres.
+  clear_secret:
+    label: Limpar segredo JWT guardado
+    help: Remove o segredo da base de dados e recorre a MERCURE_JWT_SECRET ate guardar um novo.
+social_login_credential:
+  authorize_url:
+    help: Opcional para fornecedores integrados; obrigatório para IdP personalizados.
+    label: URL de autorização
+  client_id:
+    label: Client ID
+  client_secret:
+    label: Client secret
+    help_new: Segredo de cliente OAuth do registo da app no IdP.
+    help_edit: Deixe em branco para manter o segredo atual.
+  enabled:
+    help: Os fornecedores desativados permanecem na base de dados mas não aparecem no login.
+    label: Ativado
+  enterprise_sso:
+    help: Mostrar em «Iniciar sessão com a sua organização» em vez dos botões sociais de consumidor (IdP
+      OIDC).
+    label: SSO empresarial
+  label:
+    help: Mostrado no botão Continuar com da página de login.
+    label: Etiqueta do botão
+  provider:
+    help: Slug em minúsculas (google, github, microsoft ou personalizado).
+    label: Chave do fornecedor
+  scopes:
+    help: Scopes OAuth opcionais separados por espaços ou vírgulas.
+    label: Scopes
+  token_url:
+    help: Opcional para fornecedores integrados; obrigatório para IdP personalizados.
+    label: URL de token
+  userinfo_url:
+    help: Opcional para fornecedores integrados; obrigatório para IdP personalizados.
+    label: URL de userinfo
+admin_instance_permission:
+  key:
+    label: Permission key
+    help: Lowercase dotted machine name used in isGranted('project.view'). Not translated.
+    placeholder: p. ex. project.custom.manage
+  category:
+    label: Category
+    help: Choose a category. Option labels follow the current UI language; the stored value is the machine
+      slug.
+    placeholder: Escolha uma categoria…
+  name:
+    help_default: Required for the default language (%locale%). Saved per language; the UI uses the active
+      locale, then the catalog, then this value.
+    help_locale: Optional for %locale%. Overrides the catalog name when set.
+  description:
+    help_locale: Optional for %locale%. Overrides the catalog description when set.
+  name_en:
+    label: Display name
+  description_en:
+    label: Description
+  name_es:
+    label: Display name
+  description_es:
+    label: Description
+  name_de:
+    label: Display name
+  description_de:
+    label: Description
+  name_fr:
+    label: Display name
+  description_fr:
+    label: Description
+  name_it:
+    label: Display name
+  description_it:
+    label: Description
+  name_nl:
+    label: Display name
+  description_nl:
+    label: Description
+  name_pt:
+    label: Display name
+  description_pt:
+    label: Description
+groups:
+  description_label: Descrição
+  name_label: Nome
+issues:
+  assignee_unassigned: Não atribuído
+  duplicate_canonical: Problema canônico
+  duplicate_search_placeholder: Pesquise por título ou UUID…
+  merge_events_help: Move todos os eventos para o problema selecionado, recalcula as contagens e depois
+    ignora este problema.
+  merge_events_label: Mescle também eventos na questão canônica
+  priority:
+    critical: Crítico
+    high: Alto
+    low: Baixo
+    medium: Médio
+  priority_label: Prioridade
+notifications:
+  form:
+    categories: Categorias de alerta
+    clear_signing_secret: Clear interaction signing secret
+    digest_enabled: Enviar resumo digest no flush
+    digest_help: Quando ativado, o flush envia um resumo por destino. Quando desativado, cada alerta retido
+      e enviado individualmente apos as horas silenciosas.
+    enabled: Ativado
+    endpoint: Endpoint
+    endpoint_help: 'Slack / Discord / Teams / HTTP: URL HTTPS do webhook. Email: endereco do destinatario.
+      Telegram: bot_token@chat_id'
+    label: Etiqueta
+    quiet_hours_enabled: Ativar horas silenciosas
+    quiet_hours_end: Fim das horas silenciosas (HH:MM)
+    quiet_hours_help: Durante esta janela, os alertas ficam em buffer em vez de serem enviados de imediato.
+      Execute app:notifications:flush-digests num agendamento (ou depois da janela).
+    quiet_hours_start: Inicio das horas silenciosas (HH:MM)
+    quiet_hours_timezone: Fuso horario
+    signing_secret: Interaction signing secret
+    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing Secret, or a shared
+      secret for Teams HttpPOST). Leave blank to keep the current value.
+    type: Tipo
+    endpoint_invalid: O endpoint nao corresponde ao tipo selecionado.
+    endpoint_ssrf: O endpoint nao deve apontar para enderecos privados, link-local ou de metadados cloud.
+    quiet_hours_range_invalid: As horas de inicio e fim devem ser diferentes.
+    quiet_hours_required: As horas de inicio e fim sao obrigatorias quando as horas silenciosas estao
+      ativadas.
+    quiet_hours_time_invalid: Use o formato de 24 horas HH:MM (por ex. 22:00).
+    quiet_hours_timezone_invalid: Identificador de fuso horario invalido.
+  category:
+    debug: Debug
+    error: Erro
+    fatal: Fatal
+    info: Info
+    issue:
+      assigned: Issue atribuida
+      commented: Issue comentada
+      duplicated: Issue marcada como duplicada
+      reopened: Issue reaberta
+      resolved: Issue resolvida
+    n_plus_one: Detecoes N+1
+    volume:
+      threshold: Limiares de volume
+    warning: Aviso
+  type:
+    discord: Webhook do Discord
+    email: Email
+    http: Webhook HTTP generico
+    slack: Slack Incoming Webhook
+    teams: Webhook do Microsoft Teams
+    telegram: Bot do Telegram
+preferences:
+  issue_panels_collapsed: Painéis de problemas recolhidos por padrão
+  issue_panels_help: Os painéis verificados começam recolhidos nas páginas de detalhes do problema e do
+    evento. Seu navegador lembra substituições manuais de abertura/fechamento.
+  member_alerts:
+    enabled: Notify for this event
+    master: Enable member alerts
+    master_help: When off, you receive no live toasts or Web Push for member issue events. Your event
+      and project choices are kept.
+    project_enabled: Alerts for this project
+    reset_overrides: Reset overrides (inherit account defaults)
+    reset_overrides_help: Clears saved per-event overrides for this project on save.
+    scope:
+      involved: Only when I am involved
+  product_tour_enabled: Tours ativos
+  product_tour_enabled_help: Os tours selecionados podem iniciar automaticamente uma vez por área. Desmarque
+    um tour para o ocultar; desmarque todos para desativar cada tour.
+  product_tour_select_all: Selecionar todos os tours
+  profile:
+    phone: Número de telefone
+    phone_help: Opcional. Necessário para login QR. Guardar marca como verificado até OTP SMS.
+    slack_user_id: Slack user ID
+    slack_user_id_help: Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack
+      issue alerts. Find it in your Slack profile → … → Copy member ID.
+  push_notifications: Notificações push para novas issues
+  push_notifications_help: Opcional. Quando ativado, o Beacon pede autorização ao browser e pode alertá-lo
+    sobre novas issues nos projetos a que pertence — mesmo em segundo plano (PWA instalada ou browser
+    suportado). Toasts em direto na app requerem separadamente Administração → Mercure.
+  issue_panels_placeholder: Selecionar painéis…
+  contrast_more: Mais contraste
+  contrast_system: Sistema (seguir dispositivo)
+  density_comfortable: Confortável
+  density_compact: Compactar
+  font_scale_lg: Grande
+  font_scale_md: Médio
+  font_scale_sm: Pequeno
+  motion_full: Movimento total
+  motion_reduce: Reduzir o movimento
+  motion_system: Sistema (seguir dispositivo)
+  product_tour_page:
+    admin: Administração
+    dashboard: Dashboard
+    project_issues: Issues do projeto
+  sidebar_collapsed: Recolhida
+  sidebar_expanded: Expandida
+  theme_dark: Noite
+  theme_light: Dia
+  width_content: Conteúdo (centralizado)
+  width_full: Largura total
+projects:
+  search_placeholder: Pesquisar projetos…
+  read_token:
+    label: Etiqueta
+    label_placeholder: Bot de CI, script de exportação…
+  share:
+    days: Validade (dias)
+    issue_optional: Deixe vazio para o projeto inteiro
+    issue_uuid: UUID da issue (opcional)
+    max_uses: Utilizações máx.
+    max_uses_help: Deixe Utilizações máx. vazio para aberturas ilimitadas até expirar. O valor predefinido
+      é 1.
+    max_uses_unlimited: Ilimitado
+thresholds:
+  form:
+    cooldown_minutes: Cooldown (minutos)
+    cooldown_minutes_help: Suprime alertas duplicados desta regra durante a janela de cooldown.
+    enabled: Ativada
+    environment: Filtro de ambiente
+    environment_help: Deixe em branco para contar todos os ambientes.
+    error_count: Contagem de erros
+    error_count_help: Alertar quando pelo menos este numero de eventos error/fatal for recebido na janela
+      deslizante.
+    label: Etiqueta
+    label_help: Nome interno opcional mostrado em Settings e nos payloads.
+    release: Filtro de release
+    release_help: Deixe em branco para contar todas as releases.
+    window_minutes: Janela (minutos)
+    window_minutes_help: Janela deslizante retrospetiva de 1 a 1440 minutos.
+analytics_filter:
+  from:
+    placeholder: De
+    help: Data de início do intervalo personalizado (dia civil UTC).
+  to:
+    placeholder: Até
+    help: Data de fim do intervalo personalizado (dia civil UTC).
+  environment:
+    placeholder: prod
+    help: Limita o volume de erros a este ambiente (vazio = todos).
+  release:
+    placeholder: 1.2.0
+    help: Limita o volume de erros a esta versão de release (vazio = todas).
+  level:
+    placeholder: error
+    help: Limita o volume de erros a este nível (ex. error). Vazio = todos.
+issue_index_filter:
+  q:
+    placeholder: Search title…
+    help: Search issues by title.
+  level:
+    placeholder: Any level
+    help: Filter by event level.
+  environment:
+    placeholder: Environment
+    help: Only issues seen in this environment.
+  compare:
+    placeholder: Compare with environment…
+    help: Set Environment and Compare to see issues only in A, only in B, or in both.
+  release:
+    placeholder: Release
+    help: Only issues first seen in this release.
+  tag:
+    placeholder: Tag
+    help: Filter by tag.
+  url:
+    placeholder: Request URL
+    help: Filter by request URL fragment.
+  user:
+    placeholder: Event user
+    help: Filter by event user.
+  status:
+    any: any status
+    unresolved: Unresolved
+    resolved: Resolved
+    ignored: Ignored
+    help: Filter by issue status.
+  priority:
+    any: Any priority
+    low: Low
+    medium: Medium
+    high: High
+    critical: Critical
+    help: Filter by priority.
+  assignee:
+    any: Any assignee
+    unassigned: Unassigned
+    help: Filter by assignee.
+  per_page:
+    aria: Results per page
+    option: '%count% per page'
+    help: How many issues to show per page.
+project_release_environment_compare:
+  environment:
+    placeholder: production
+    help: Environment A for the compare deep-link.
+  compare:
+    placeholder: staging
+    help: Environment B for the compare deep-link.
+project_release_focus:
+  release:
+    placeholder: Escolha uma release
+    help: Foque a página de releases nesta versão.
+  compare:
+    placeholder: Nao comparar
+    help: Optionally compare with another release.
+dashboard_filter:
+  per_page:
+    aria: Resultados por página
+    option: '%count% por página'
+    help: How many rows to show per page.
+dashboard_activity_filter:
+  per_page:
+    help: Quantas linhas de atividade por página.
+  project:
+    placeholder: Qualquer projeto
+    aria: Projeto
+    help: Limit activity to one project.
+dashboard_alerts_filter:
+  per_page:
+    help: Quantas linhas de alertas por página.
+  project:
+    placeholder: Qualquer projeto
+    aria: Projeto
+    help: Limit failed deliveries to one project.
+dashboard_mentions_filter:
+  per_page:
+    help: Quantas linhas de menções por página.
+  project:
+    placeholder: Qualquer projeto
+    aria: Projeto
+    help: Limit mentions to one project.
+dashboard_new_in_release_filter:
+  per_page:
+    help: Quantas linhas por página.
+  project:
+    placeholder: Qualquer projeto
+    aria: Projeto
+    help: Limit results to one project.
+  release:
+    placeholder: Qualquer release
+    aria: Release
+    help: Only issues first seen in this release.
+dashboard_assignments_filter:
+  per_page:
+    help: Quantas linhas de atribuições por página.
+  q:
+    placeholder: Pesquisar por título…
+    aria: Pesquisar
+    help: Filtrar atribuições pelo título da issue.
+  project:
+    placeholder: Qualquer projeto
+    aria: Projeto
+    help: Limit assignments to one project.
+  level:
+    placeholder: Qualquer nível
+    aria: Nível
+    help: Filter by event level.
+  status:
+    aria: Estado
+    help: Filter by issue status.
+  priority:
+    aria: Prioridade
+    any: Qualquer prioridade
+    low: Baixo
+    medium: Médio
+    high: Alto
+    critical: Crítico
+    help: Filter by priority.
+  assignee:
+    aria: Colega
+    any: Qualquer cessionário
+    help: Filter by teammate (when scope allows).
+  scope:
+    aria: Âmbito
+    mine: Atribuídas a mim
+    teammates: Colegas
+    unassigned: Sem atribuição
+    all: Todas nos meus projetos
+    help: Whose assignments to list.
+admin_audit_timeline_filter:
+  action:
+    placeholder: Todas as ações
+    help: Filter the timeline by action type.
+  from:
+    placeholder: De
+    help: Include actions on or after this date.
+  to:
+    placeholder: Até
+    help: Include actions on or before this date.
+admin_ops_overview_filter:
+  project:
+    placeholder: Todos os projetos
+    help: Limit the ops overview to one project.
+notification_destination:
+  quiet_hours_start:
+    placeholder: '22:00'
+    help: Início das horas silenciosas (HH:MM).
+  quiet_hours_end:
+    placeholder: 07:00
+    help: Fim das horas silenciosas (HH:MM).
+admin:
+  ops:
+    filter_project: Filtro de projeto
+analytics:
+  filter:
+    environment: Ambiente
+    level: Nível
+    release: Release
+  period:
+    from: De
+    to: Até
+permissions:
+  key_invalid: Use lowercase dotted segments (at least two), e.g. project.custom.manage.
+releases:
+  compare:
+    label: Comparar com release
+  focus:
+    label: Release
+users:
+  role:
+    admin: Administrador
+    user: Usuário
+
+project_share_create:
+  days:
+    label: Validade (dias)
+  max_uses:
+    label: Usos maximos
+    placeholder: Ilimitado
+    help: Deixe Usos maximos vazio para aberturas ilimitadas ate expirar. Padrao e 1 (uso unico).
+  issue_uuid:
+    label: UUID do issue (opcional)
+    placeholder: Deixe vazio para o projeto inteiro
+
+project_read_token_create:
+  label:
+    label: Rotulo
+    placeholder: Bot de CI, script de exportacao…
+
+project_member_add:
+  email:
+    label: E-mail do membro
+    placeholder: user@example.com
+  role:
+    label: Funcao
+
+project_governance:
+  retention_days:
+    label: Dias de retencao
+    help: Vazio = herdar o padrao do servidor (%default%). Use 0 para desativar quando o padrao nao for zero.
+  retention_max_events:
+    label: Max. de eventos armazenados
+    help: Vazio = herdar o padrao do servidor (%default%). Use 0 para desativar quando o padrao nao for zero.
+  ingest_rate_limit_per_minute:
+    label: Limite de ingestao (por minuto)
+    help: Vazio = herdar o padrao do servidor (%default%). Use 0 para desativar quando o padrao nao for zero.
+  event_quota_daily:
+    label: Cota diaria de eventos
+    help: Vazio = herdar o padrao do servidor (%default%). Use 0 para desativar quando o padrao nao for zero.
+  event_quota_monthly:
+    label: Cota mensal de eventos
+    help: Vazio = herdar o padrao do servidor (%default%). Use 0 para desativar quando o padrao nao for zero.
+
+project_api_key_create:
+  label:
+    label: Rótulo
+    placeholder: ex. calm-otter
+
+project_config_import:
+  bundle:
+    label: Arquivo JSON
+
+admin_project_import:
+  bundle:
+    label: Arquivo JSON
+
+instance_config_import:
+  config:
+    label: Arquivo de configuração
+
+mailer_test:
+  to:
+    label: Destinatário
+    placeholder: voce@exemplo.com
+
+project_group_add:
+  group:
+    label: Grupo
+    placeholder: Selecione um grupo…
+  role:
+    label: Função
+
+project_transfer_ownership:
+  user:
+    label: Novo proprietário
+  confirmation:
+    label: Digite o nome do projeto para confirmar
+
+project_delete:
+  confirmation:
+    label: Digite o nome do projeto para confirmar
+
+admin_group_member_add:
+  email:
+    label: E-mail do membro
+    placeholder: usuario@exemplo.com
+
+admin_role_user_add:
+  email:
+    label: E-mail do usuário
+    placeholder: usuario@exemplo.com
+
+issue_saved_view:
+  name:
+    label: Nome da visão
+    placeholder: Meu conjunto de filtros
+
+issue_comment:
+  body:
+    label: Comentário
+    placeholder: Escreva um comentário…
+
+issue_priority:
+  priority:
+    label: Prioridade
+
+issue_assignee:
+  assignee:
+    label: Responsável
+

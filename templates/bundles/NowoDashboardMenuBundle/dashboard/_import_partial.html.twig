@@ -10,16 +10,16 @@
     {% endfor %}
     {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'kit-modal__panel dm-dashboard-form import-form', 'data-import-form': '1'}}) }}
         {% set modalFlagForm = flat_hidden_fields({_modal: '1'}) %}
-        {{ form_widget(modalFlagForm._modal) }}
+        {{ form_row(modalFlagForm._modal) }}
         <div class="confirm-dialog__content">
             <p class="kit-modal__lead">{{ 'dashboard.import_help'|trans({}, 'NowoDashboardMenuBundle') }}</p>
             {{ form_row(form.file) }}
             {{ form_row(form.strategy) }}
-            {{ form_rest(form) }}
+            {% include 'form/_fields.html.twig' with {form: form} only %}
         </div>
         <div class="confirm-dialog__actions">
             <button type="button" class="btn-ghost" {{ ui.modal_dismiss_attrs(_css_fw)|raw }}>{{ 'dashboard.cancel'|trans({}, 'NowoDashboardMenuBundle') }}</button>
             <button type="submit" class="btn-primary">{{ 'dashboard.import'|trans({}, 'NowoDashboardMenuBundle') }}</button>
         </div>
-    {{ form_end(form) }}
+    {{ form_end(form, {render_rest: false}) }}
 </div>

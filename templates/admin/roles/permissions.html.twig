@@ -26,12 +26,16 @@
                         {% endif %}
                         <ul class="space-y-2 text-sm">
                             {% for permission in permissions %}
+                                {% set permField = attribute(permissionsForm, 'permission_' ~ permission.id) %}
                                 <li class="flex items-start gap-3 border-b border-[var(--color-sand)]/70 py-2 last:border-0">
-                                    {{ form_widget(attribute(permissionsForm, 'permission_' ~ permission.id), {
+                                    {# Rich RBAC caption stays outside FormKit label; contents keeps flex siblings. #}
+                                    {{ form_row(permField, {
+                                        label: false,
                                         attr: {
                                             class: 'mt-1',
                                             id: 'perm-' ~ permission.id,
-                                        }
+                                        },
+                                        row_attr: {class: 'contents'},
                                     }) }}
                                     <label class="min-w-0 flex-1 cursor-pointer" for="perm-{{ permission.id }}">
                                         <span class="font-medium">{{ permission|rbac_permission_name }}</span>
@@ -51,6 +55,7 @@
                 <button class="btn-primary" type="submit">{{ 'roles.save_permissions'|trans }}</button>
             </div>
         {% endif %}
-    {{ form_end(permissionsForm) }}
+        {% include 'form/_fields.html.twig' with {form: permissionsForm} only %}
+    {{ form_end(permissionsForm, {render_rest: false}) }}
 </section>
 {% endblock %}

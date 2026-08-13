@@ -22,32 +22,18 @@
     </div>
 
     <div class="analytics-filters__row">
-        <label class="analytics-filters__field">
-            <span>{{ 'analytics.period.from'|trans }}</span>
-            {{ form_widget(filterForm.from, {attr: {class: 'input', type: 'date'}}) }}
-        </label>
-        <label class="analytics-filters__field">
-            <span>{{ 'analytics.period.to'|trans }}</span>
-            {{ form_widget(filterForm.to, {attr: {class: 'input', type: 'date'}}) }}
-        </label>
-        <label class="analytics-filters__field">
-            <span>{{ 'analytics.filter.environment'|trans }}</span>
-            {{ form_widget(filterForm.environment) }}
-        </label>
-        <label class="analytics-filters__field">
-            <span>{{ 'analytics.filter.release'|trans }}</span>
-            {{ form_widget(filterForm.release) }}
-        </label>
-        <label class="analytics-filters__field">
-            <span>{{ 'analytics.filter.level'|trans }}</span>
-            {{ form_widget(filterForm.level) }}
-        </label>
+        {# Visible fields first (hidden period stays out of the CSS grid). #}
+        {% for field in filterForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <div class="analytics-filters__actions">
             <button type="submit" class="btn-primary">{{ 'analytics.filter.apply'|trans }}</button>
             <a class="btn-ghost no-underline" href="{{ path('analytics_show', {id: project.uuid}) }}">{{ 'common.clear_filters'|trans }}</a>
         </div>
     </div>
-    {{ form_rest(filterForm) }}
+    {% include 'form/_fields.html.twig' with {form: filterForm} only %}
 {{ form_end(filterForm, {render_rest: false}) }}
 
 {% if filtered %}

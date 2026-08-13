@@ -75,8 +75,12 @@ Automated tests cover redirect, apply light+dark on one Themes page, form sectio
 
 - `044-instance-config-export` — Portability allowlist extended here.
 - `078-form-save-restore-actions` — Save / Restore label convention on appearance forms.
-- `077-form-type-field-loop` — Color field loop on Colors sections.
+- `077-form-type-field-loop` — Color field loop on Colors sections; theme `color_row` (swatch + hex).
 - Phase **6.6b** (v0.15.0) — Base warn/paper/ink/surface palette this feature builds on.
+
+## Amendment (Appearance Colors `color_row`, 2026-08-13)
+
+Colors section paints color inputs via Beacon form theme block **`color_row`** (label + swatch + `data-color-hex-for` hex readout + errors/help), then `_fields` for CSRF. Themes apply form paints CSRF only (`form_row(_token)`); theme cards submit `apply_theme` and MUST NOT render that Type field. Canonical loop: `077`.
 
 ## Out of scope (v1)
 

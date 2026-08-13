@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Form;
 
 use App\Notifications\Entity\ProjectThresholdRule;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -61,7 +61,6 @@ final class ProjectThresholdRuleType extends FormKitAbstractType
     {
         $resolver->setDefaults([
             'data_class' => ProjectThresholdRule::class,
-            'translation_domain' => 'messages',
         ]);
     }
 

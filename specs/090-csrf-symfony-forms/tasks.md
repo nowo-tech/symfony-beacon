@@ -37,9 +37,11 @@
 - [x] T018 Issues index + dashboard aside filter Types
 - [x] T019 Admin search / audit timeline / analytics / ops overview / release compare filter Types
 - [x] T020 Controllers build filters via `GetFilterFormFactory`
+- [x] T021 FormKit profile `filter` contract (081): placeholders/`form` catalogue; analytics help; no `help: false` on HiddenType; `required` false except `per_page`; host `type_map.search`; document CSRF/authz non-regression
 
 ## Phase 6: Docs / cross-specs
 
 - [x] T021 Spec + plan + tasks + checklist; amend `077` / related (`004`, `011`, `015`, `057`, `080`, `087`)
 - [x] T022 ROADMAP 6.39 + CHANGELOG Unreleased note for host Form CSRF migration
 - [x] T023 Confirm intentional exceptions: AJAX header CSRF, AuthKit logout, kit modal `data-token`
+- [x] T024 E2E / DomCrawler selectors for prefixed `beacon` fields (`project_governance_*`, share/token create, `admin_group_member_add`); amend this spec + `077`/`081`

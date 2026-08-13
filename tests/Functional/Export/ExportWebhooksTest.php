@@ -218,10 +218,12 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
         );
-        $commentToken = $crawler->filter('form.issue-comments__form input[name="_token"]')->attr('value');
+        $commentToken = $crawler->filter('form.issue-comments__form input[name="issue_comment[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/comments', [
-            '_token' => $commentToken,
-            'body' => 'Webhook comment body',
+            'issue_comment' => [
+                '_token' => $commentToken,
+                'body' => 'Webhook comment body',
+            ],
         ]);
         self::assertResponseRedirects();
         self::assertStringContainsString('issue.commented', (string) $requests[\count($requests) - 1]['body']);

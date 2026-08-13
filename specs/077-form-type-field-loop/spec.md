@@ -87,15 +87,44 @@ As a maintainer, when a form needs a special layout (color picker grid, quiet-ho
 
 ## Assumptions
 
-- FormKit (`nowo-tech/form-kit-bundle` **≥ 2.2**) remains the preferred way to set field options and defaults. Host kit profiles set `auto_help` / `auto_placeholder: false` where kits only supply labels (`081-formkit-uikit-kit-sync`).
+- FormKit (`nowo-tech/form-kit-bundle` **≥ 2.2**) remains the preferred way to set field options and defaults. Host kit profiles set `auto_help` / `auto_placeholder: false` where kits only supply labels (`081-formkit-uikit-kit-sync`). Product profiles `beacon` / `filter` use auto label/placeholder/help per `081` FR-003a / FR-003c.
+- Shared loop partial: `templates/form/_fields.html.twig` (`form_row` per unrendered child). Prefer `form_row` over hand-rolled `form_widget` + `form_help` for both settings and GET filters (theme skips labels when FormKit `label` is false).
 - Global form theme (`templates/form/beacon_theme.html.twig`) continues to supply baseline widget/row markup; Types supply field-specific attrs.
 - Kit-owned AuthKit security pages are only in scope where this repo already overrides them under `templates/bundles/` (AuthKit **≥ 1.14** disables convention help/placeholder on login/register/reset forms).
 - Admin user/group/project create-edit forms use Form Types + this loop (F2A done). F2B layout (Issue controller split / AdminProject in Project) delivered under `083` / `085`.
 
+## Amendment (Filter + settings `form_row`, 2026-08-13)
+
+Product GET filters (`081` FR-003a) and product `beacon` settings forms (`081` FR-003c) MUST paint fields with `form_row` via `_fields.html.twig` or an equivalent `not field.rendered` loop. Do not default to separate `form_widget` + `form_help` pairs. Override the loop only for **interactive custom chrome** (see amendment below). Hiddens use theme `hidden_row` (no grid cell). See `.cursor/rules/formkit-profiles.mdc`.
+
+## Amendment (Twig `form_row` consolidation wave, 2026-08-13)
+
+Further host surfaces migrated to `form_row` / `_fields` (still before actions; `form_end` with `render_rest: false` when the loop owns rest):
+
+| Surface | Notes |
+|---|---|
+| Appearance Colors | Theme block `color_row` (swatch + `data-color-hex-for` hex readout); grid paints non-hidden rows then `_fields` for CSRF |
+| Appearance Themes | CSRF via `form_row(_token)` only — do **not** paint `apply_theme` (theme cards submit that name) |
+| Mentions filter `unread` | `form_row` + Twig/`messages` caption (`mentions.filter.unread_only`); Type keeps FormKit `label: false` |
+| Admin role permissions | `form_row` with `label: false` + rich RBAC caption beside; `row_attr.class: contents` for flex layout |
+| Admin role edit `_return` | `form_row` (hidden) |
+| AuthKit magic-login confirm (host override) | `_fields` instead of `form_widget(form)` |
+| Dashboard Menu section/modal flags + reorder `tree` + import | `form_row` / `_fields` |
+
+**Intentional `form_widget` exceptions** (custom chrome — do not “fix” by forcing default `checkbox_row` / text row):
+
+1. **Member alert LiveComponents** (`MemberAlertPreferencesLive`, `MemberProjectAlertPreferencesLive`, `account/_member_alert_event_row`) — `pref-switch` + Live `data-model` / `role="switch"`.
+2. **Issue duplicate dialog query** — Stimulus combobox chrome around one named child; still run `_fields` for the rest.
+3. **Form theme internals** (`beacon_theme` / `auth_kit_theme`) — `form_row` delegates to `form_widget` by design.
+
+Unifying (1)–(2) later requires theme blocks (e.g. switch row / combobox row), then `form_row`.
+
+Playwright / DomCrawler MUST target prefixed names/ids (`project_governance_retention_days`, `project_share_create[days]`, `project_read_token_create[label]`, `admin_group_member_add[email]`, …).
+
 ## Related
 
 - `078-form-save-restore-actions` — standing convention for Save + Restore action chrome on settings forms (texts, colors, panel placement).
-- `081-formkit-uikit-kit-sync` — FormKit profile flags, AuthKit/UiKit/RoutingKit pins.
+- `081-formkit-uikit-kit-sync` — FormKit profile flags, AuthKit/UiKit/RoutingKit pins; product `beacon` / `filter` contracts (FR-003a / FR-003c).
 - `090-csrf-symfony-forms` — migrate hand-rolled mutable POSTs to Form Types / `CsrfOnlyType`.
 
 ## Out of Scope

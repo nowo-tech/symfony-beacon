@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -122,7 +122,6 @@ final class SocialLoginCredentialType extends FormKitAbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'translation_domain' => 'messages',
             'is_new' => true,
             'provider_locked' => false,
         ]);

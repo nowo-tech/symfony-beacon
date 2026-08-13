@@ -240,6 +240,7 @@ final readonly class ProjectSettingsPageBuilder
                     'action' => $this->urlGenerator->generate('project_governance_save', ['id' => $project->getUuid()]),
                     'method' => 'POST',
                     'csrf_token_id' => 'project_governance_'.$project->getId(),
+                    'env_defaults' => $this->governanceResolver->envDefaults(),
                 ])->createView()
                 : null,
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
@@ -335,6 +336,7 @@ final readonly class ProjectSettingsPageBuilder
                     'method' => 'POST',
                     'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
                     'user_choices' => $transferOwnershipChoices,
+                    'project_id' => (int) $project->getId(),
                 ])->createView()
                 : null,
             'clearHistoryForm' => $access->canManageSettings()

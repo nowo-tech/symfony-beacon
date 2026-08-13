@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Identity\Entity\UserGroup;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,7 +37,6 @@ final class AdminGroupType extends FormKitAbstractType
         $resolver->setDefaults([
             'data_class' => UserGroup::class,
             'csrf_protection' => true,
-            'translation_domain' => 'messages',
         ]);
     }
 

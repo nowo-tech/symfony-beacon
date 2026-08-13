@@ -29,23 +29,18 @@
                                 <p class="confirm-dialog__body">{{ 'project.members.add_help'|trans }}</p>
                             </div>
                             <div class="confirm-dialog__content">
-                                <label class="confirm-dialog__label" for="member-email">{{ 'project.members.email_label'|trans }}</label>
-                                {{ form_widget(memberAddForm.email, {
-                                    attr: {
-                                        id: 'member-email',
-                                        class: 'input w-full',
-                                        autocomplete: 'off',
-                                        placeholder: 'project.members.email_placeholder'|trans,
-                                    }
-                                }) }}
-                                <label class="confirm-dialog__label" for="member-add-role">{{ 'project.members.role_label'|trans }}</label>
-                                {{ form_widget(memberAddForm.role, {attr: {id: 'member-add-role', class: 'input w-full'}}) }}
+                                {% for field in memberAddForm %}
+                                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                        {{ form_row(field) }}
+                                    {% endif %}
+                                {% endfor %}
+                                {% include 'form/_fields.html.twig' with {form: memberAddForm} only %}
                             </div>
                             <div class="confirm-dialog__actions">
                                 <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                 <button type="submit" class="btn-primary">{{ 'project.members.add'|trans }}</button>
                             </div>
-                        {{ form_end(memberAddForm) }}
+                        {{ form_end(memberAddForm, {render_rest: false}) }}
                     {% endblock %}
                 {% endembed %}
             {% endif %}
@@ -97,14 +92,19 @@
                                                 <p class="confirm-dialog__body">{{ 'project.members.edit_role_body'|trans({'%name%': memberUser.displayName, '%email%': memberUser.email}) }}</p>
                                             </div>
                                             <div class="confirm-dialog__content">
-                                                <label class="confirm-dialog__label" for="member-role-{{ member.id }}">{{ 'project.members.role_label'|trans }}</label>
-                                                {{ form_widget(memberRoleForms[member.id].role, {attr: {id: 'member-role-' ~ member.id, class: 'input w-full'}}) }}
+                                                {{ form_row(memberRoleForms[member.id].role, {
+                                                    label: 'project.members.role_label'|trans,
+                                                    translation_domain: false,
+                                                    label_attr: {class: 'confirm-dialog__label'},
+                                                    attr: {id: 'member-role-' ~ member.id, class: 'input w-full'},
+                                                }) }}
+                                                {% include 'form/_fields.html.twig' with {form: memberRoleForms[member.id]} only %}
                                             </div>
                                             <div class="confirm-dialog__actions">
                                                 <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
                                                 <button type="submit" class="btn-primary">{{ 'project.members.update_role'|trans }}</button>
                                             </div>
-                                        {{ form_end(memberRoleForms[member.id]) }}
+                                        {{ form_end(memberRoleForms[member.id], {render_rest: false}) }}
                                     {% endblock %}
                                 {% endembed %}
 
@@ -152,11 +152,11 @@
                                 {{ form_start(memberSetActiveForms[member.id], {
                                     action: path('project_members_set_active', {projectId: project.uuid, userId: memberUser.uuid}),
                                 }) }}
-                                    {{ form_widget(memberSetActiveForms[member.id].active) }}
+                                    {% include 'form/_fields.html.twig' with {form: memberSetActiveForms[member.id]} only %}
                                     <button class="btn-ghost btn-sm" type="submit" title="{{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}">
                                         {{ (member.active ? 'project.members.deactivate' : 'project.members.activate')|trans }}
                                     </button>
-                                {{ form_end(memberSetActiveForms[member.id]) }}
+                                {{ form_end(memberSetActiveForms[member.id], {render_rest: false}) }}
                             </div>
                         {% endif %}
                     </div>

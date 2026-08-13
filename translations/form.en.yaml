@@ -1,0 +1,848 @@
+# FormKit field catalogue (label / placeholder / help). Domain: form
+admin_user:
+  email:
+    label: Email
+    placeholder: name@example.com
+    help: Sign-in email for this account.
+  display_name:
+    label: Display name
+    placeholder: Jane Doe
+    help: Shown in the admin directory and activity timeline.
+  password:
+    label: Password
+    placeholder: At least 8 characters
+    help: At least 8 characters.
+  role:
+    label: Role
+    placeholder: Select a role
+    help: Instance role (user or admin).
+  enabled:
+    label: Account enabled (can sign in)
+    placeholder: ''
+    help: When disabled, the user cannot sign in.
+admin_instance_role:
+  name:
+    label: Name
+    placeholder: Support
+    help: Database fallback for the display name. UI prefers roles.catalog.<slug>.name when that key is
+      translated (slug = lowercase code).
+  code:
+    label: Code
+    placeholder: ROLE_SUPPORT
+    help: Symfony-style code (e.g. ROLE_SUPPORT). Stored as the machine id — not translated.
+  description:
+    label: When to use
+    placeholder: Optional short guidance…
+    help: Short guidance on when to assign this role. Prefer roles.catalog.<slug>.description; this field
+      is the database fallback.
+  enabled:
+    label: Enabled
+    help: When disabled, this role cannot be newly assigned.
+project:
+  nav:
+    label: Project sections
+  governance:
+    help: Per-project retention, rate limits, and daily/monthly event quotas. Leave a field empty to inherit
+      the server default.
+  name:
+    label: Name
+    placeholder: e.g. Billing API
+    help: Shown in the dashboard and used to derive the project slug.
+    required: Project name is required.
+  description:
+    label: Description
+    placeholder: Optional short summary
+    help: Helps your team recognize this project.
+  api_keys:
+    help: Use a DSN in BEACON_DSN so your app can send errors to this project.
+  config:
+    help: 'Portable JSON for this project (code: %code%). Includes memberships by email; never includes
+      API secrets.'
+  members:
+    help: Direct members of this project. Owners and admins manage membership. Access can also come from
+      linked groups below.
+    email_label: Member email
+    email_placeholder: user@example.com
+    role:
+      admin: Admin
+      full: Full
+      member: Member
+      owner: Owner
+      viewer: Viewer
+    role_label: Role
+  groups:
+    help: Link a group so every group member gets the chosen role on this project. Owner and full roles
+      must be assigned to individual users.
+    select: Select a group…
+  danger:
+    transfer_member_placeholder: Select a member…
+site_appearance:
+  brand_name:
+    label: Brand name
+    placeholder: symfony-beacon
+    help: Shown in the header and on the login page.
+  brand_eyebrow:
+    label: Brand eyebrow
+    placeholder: Error tracking
+    help: Short label above the brand on the login screen.
+  accent_color:
+    label: Accent
+    placeholder: '#1f6f54'
+    help: Primary accent (buttons, links) in light mode.
+  accent_deep_color:
+    label: Accent (hover)
+    placeholder: '#134736'
+    help: Darker accent for hover states in light mode.
+  accent_color_dark:
+    label: Accent (dark)
+    placeholder: '#4aad7f'
+    help: Primary accent in dark mode.
+  accent_deep_color_dark:
+    label: Accent hover (dark)
+    placeholder: '#6bc49a'
+    help: Lighter accent for hover states in dark mode.
+  danger_color:
+    label: Danger
+    placeholder: '#b42318'
+    help: Error / destructive accent in light mode.
+  danger_color_dark:
+    label: Danger (dark)
+    placeholder: '#f97066'
+    help: Error / destructive accent in dark mode.
+  warn_color:
+    label: Warning
+    placeholder: '#b54708'
+    help: Warning / caution accent in light mode.
+  warn_color_dark:
+    label: Warning (dark)
+    placeholder: '#fdb022'
+    help: Warning / caution accent in dark mode.
+  paper_color:
+    label: Paper
+    placeholder: '#f3f6f4'
+    help: Page background in light mode.
+  paper_color_dark:
+    label: Paper (dark)
+    placeholder: '#0c1210'
+    help: Page background in dark mode.
+  ink_color:
+    label: Ink
+    placeholder: '#0f1c18'
+    help: Primary text color in light mode.
+  ink_color_dark:
+    label: Ink (dark)
+    placeholder: '#e6eee9'
+    help: Primary text color in dark mode.
+  surface_color:
+    label: Surface
+    placeholder: '#ffffff'
+    help: Panels and cards in light mode.
+  surface_color_dark:
+    label: Surface (dark)
+    placeholder: '#151c19'
+    help: Panels and cards in dark mode.
+  footer_fixed:
+    label: Fixed footer
+    help: Keep the legal footer pinned to the bottom of the viewport while page content scrolls.
+  corner_style:
+    label: Corner style
+    help: Cards use a larger radius; inputs and buttons stay subtler.
+    choice:
+      sharp: Sharp
+      soft: Soft (default)
+      rounded: Rounded
+  border_strength:
+    label: Border strength
+    help: How defined element borders look in light and dark mode (panels, inputs, chrome).
+    choice:
+      subtle: Subtle
+      medium: Medium (default)
+      strong: Strong
+  color:
+    invalid: 'Use a hex color like #1f6f54.'
+user_preferences:
+  display_name:
+    label: Display name
+    placeholder: Your name
+    help: Shown in the avatar menu and member lists.
+  email:
+    label: Email
+    placeholder: you@example.com
+    help: Used to sign in.
+  slack_user_id:
+    placeholder: U012ABCDEF
+  phone:
+    placeholder: '+34600111222'
+  preferred_locale:
+    label: Language
+    placeholder: Auto
+    help: Preferred UI language for this account.
+  preferred_theme:
+    label: Theme
+    placeholder: Auto
+    help: Preferred day or night appearance.
+  preferred_content_width:
+    label: Content width
+    placeholder: Content
+    help: Centered content column, or stretch the main area full width.
+  preferred_ui_density:
+    label: UI density
+    placeholder: Comfortable
+    help: Comfortable spacing, or a more compact operator layout.
+  preferred_font_scale:
+    label: Text size
+    placeholder: Medium
+    help: Scale the interface text smaller or larger.
+  preferred_contrast:
+    label: Contrast
+    placeholder: System
+    help: Follow the device contrast preference, or force stronger text and borders.
+  preferred_sidebar:
+    label: Sidebar
+    placeholder: Expanded
+    help: Default desktop sidebar state when this browser has no saved preference yet.
+  preferred_motion:
+    label: Motion
+    placeholder: System
+    help: Follow the device preference, reduce animations, or keep full motion.
+  current_password:
+    label: Current password
+    placeholder: Current password
+    help: Required only when setting a new password.
+    help_email_change: Required when changing your email address (login and password-reset destination).
+    help_required: Confirm your current password to set a new one.
+  plain_password:
+    label: New password
+    placeholder: New password
+    help: Choose a strong password that meets the requirements below.
+    second:
+      label: Confirm new password
+    first:
+      label: New password
+  plain_password_confirm:
+    placeholder: Confirm new password
+    help: Re-enter your new password.
+ops_defaults:
+  retention_days:
+    label: Retention days
+    help: Delete telemetry older than this many days. Use 0 to disable age-based retention.
+  retention_max_events:
+    label: Maximum stored events per project
+    help: Keep at most this many events per project. Use 0 for no event-count cap.
+  ingest_rate_limit:
+    label: Ingest rate limit per minute
+    help: Maximum Envelope requests per project each minute. Use 0 for unlimited.
+  event_quota_daily:
+    label: Daily event quota
+    help: Maximum accepted events per project each day. Use 0 for unlimited.
+  event_quota_monthly:
+    label: Monthly event quota
+    help: Maximum accepted events per project per UTC calendar month. Use 0 for unlimited.
+  envelope_max_bytes:
+    label: Max Envelope / OTLP body size (bytes)
+    help: HTTP 413 when a raw ingest body exceeds this size. Default 2097152 (2 MiB).
+  metrics_require_token:
+    label: Require metrics scrape token
+    help: When enabled, /metrics returns 503 until a metrics token is stored. Recommended in production.
+  metrics_token:
+    label: Metrics scrape token
+    help: Bearer token for scrapers. Blank on save keeps the current token.
+  clear_metrics_token:
+    label: Clear metrics scrape token
+    help: Remove the stored scrape token.
+  inbound_email_enabled:
+    label: Enable inbound email comments
+    help: When enabled, mention/assign mail can include Reply-To tokens and POST /hooks/email/inbound
+      accepts provider webhooks.
+  inbound_mail_domain:
+    label: Inbound mail domain
+    help: Domain used in Reply-To addresses (reply+{token}@domain).
+  inbound_webhook_secret:
+    label: Inbound webhook secret
+    help: Shared secret for X-Beacon-Inbound-Secret and Reply-To HMAC signing. Blank on save keeps the
+      current secret.
+  clear_inbound_webhook_secret:
+    label: Clear inbound webhook secret
+    help: Remove the stored inbound webhook secret.
+  allow_private_urls:
+    label: Allow private notification URLs
+    help: When enabled, outbound webhooks may target private/link-local hosts. Keep disabled in production.
+  allow_anonymous_resolve:
+    label: Allow anonymous Slack/Teams Resolve
+    help: Legacy. When enabled, Resolve may mutate issues without a mapped Beacon actor. Prefer mapped
+      users + triage.
+  delivery_history_limit:
+    label: Delivery history limit
+    help: Number of recent delivery attempts retained for each notification destination.
+  circuit_breaker_threshold:
+    label: Circuit breaker failure threshold
+    help: Consecutive delivery failures before a notification destination is automatically paused.
+  circuit_breaker_cooldown:
+    label: Circuit breaker cooldown in minutes
+    help: Minutes before an automatically paused destination may retry. Use 0 to require manual resume.
+  ingest_reject_query_auth:
+    label: Reject query-string ingest auth (deprecated)
+    help: When enabled, beacon_key/beacon_secret query parameters are rejected (401). Disable only while
+      migrating clients to X-Beacon-Auth or Envelope DSN.
+instance_mailer:
+  mailer_dsn:
+    label: Mailer DSN
+    help: Leave blank to keep the current encrypted value. Example smtp://user:pass@mail.example:587 —
+      null:// is rejected (use Clear stored DSN instead).
+    placeholder: smtp://user:pass@mail.example:587
+    invalid: Enter a valid Symfony Mailer DSN (for example smtp://user:pass@host:587).
+    null_transport: null:// cannot deliver mail. Paste a real SMTP (or other) DSN,
+      or use Clear stored DSN to fall back to the environment.
+    scheme_not_allowed: That Mailer DSN scheme is not allowed. Use smtp, smtps, or
+      a supported provider scheme (Mailgun, Postmark, SES, …). Sendmail/native DSNs
+      are blocked because they can execute host commands.
+  clear_dsn:
+    label: Clear stored DSN
+    help: Removes the database DSN and falls back to MAILER_DSN from the environment until you save a
+      new one.
+  mailer_from:
+    label: From address
+    help: Envelope From for magic-login and notification emails. Defaults to beacon@localhost when empty.
+    placeholder: beacon@example.com
+instance_mercure:
+  enabled:
+    label: Enable Mercure live alerts
+    help: When on, signed-in members subscribe to private project topics for new-issue toasts while the
+      app is open.
+  url:
+    label: Publish URL (server)
+    help: Leave blank to use MERCURE_URL (e.g. http://mercure/.well-known/mercure inside Compose).
+    placeholder: http://mercure/.well-known/mercure
+  public_url:
+    label: Public URL (browser)
+    help: Leave blank to use MERCURE_PUBLIC_URL (usually same-origin /.well-known/mercure via Caddy).
+    placeholder: https://localhost:9447/.well-known/mercure
+  jwt_secret:
+    label: JWT secret
+    help: Leave blank to keep the current encrypted value or fall back to MERCURE_JWT_SECRET. Minimum
+      32 characters when set.
+    placeholder: ••••••••••••••••••••••••••••••••
+    invalid: Enter a valid JWT secret string.
+    too_short: JWT secret must be at least 32 characters.
+  clear_secret:
+    label: Clear stored JWT secret
+    help: Removes the database secret and falls back to MERCURE_JWT_SECRET until you save a new one.
+social_login_credential:
+  provider:
+    label: Provider key
+    help: Lowercase slug (google, github, microsoft, or custom).
+  label:
+    label: Button label
+    help: Shown on the login page Continue-with button.
+  client_id:
+    label: Client ID
+  client_secret:
+    label: Client secret
+    help_new: OAuth client secret from the IdP app registration.
+    help_edit: Leave blank to keep the current secret.
+  enabled:
+    label: Enabled
+    help: Disabled providers stay in the database but do not show on login.
+  enterprise_sso:
+    label: Enterprise SSO
+    help: Show under “Sign in with your organization” instead of consumer social buttons (OIDC IdPs).
+  authorize_url:
+    label: Authorize URL
+    help: Optional for built-in providers; required for custom IdPs.
+  token_url:
+    label: Token URL
+    help: Optional for built-in providers; required for custom IdPs.
+  userinfo_url:
+    label: Userinfo URL
+    help: Optional for built-in providers; required for custom IdPs.
+  scopes:
+    label: Scopes
+    help: Optional space- or comma-separated OAuth scopes.
+admin_instance_permission:
+  key:
+    label: Permission key
+    help: Lowercase dotted machine name used in isGranted('project.view'). Not translated.
+    placeholder: e.g. project.custom.manage
+  category:
+    label: Category
+    help: Choose a category. Option labels follow the current UI language; the stored value is the machine
+      slug.
+    placeholder: Choose a category…
+  name:
+    help_default: Required for the default language (%locale%). Saved per language; the UI uses the active
+      locale, then the catalog, then this value.
+    help_locale: Optional for %locale%. Overrides the catalog name when set.
+  description:
+    help_locale: Optional for %locale%. Overrides the catalog description when set.
+  name_en:
+    label: Display name
+  description_en:
+    label: Description
+  name_es:
+    label: Display name
+  description_es:
+    label: Description
+  name_de:
+    label: Display name
+  description_de:
+    label: Description
+  name_fr:
+    label: Display name
+  description_fr:
+    label: Description
+  name_it:
+    label: Display name
+  description_it:
+    label: Description
+  name_nl:
+    label: Display name
+  description_nl:
+    label: Description
+  name_pt:
+    label: Display name
+  description_pt:
+    label: Description
+groups:
+  description_label: Description
+  name_label: Name
+issues:
+  assignee_unassigned: Unassigned
+  duplicate_canonical: Canonical issue
+  duplicate_search_placeholder: Search by title or UUID…
+  merge_events_help: Moves all events to the selected issue, recalculates counts, then ignores this issue.
+  merge_events_label: Also merge events into the canonical issue
+  priority:
+    critical: Critical
+    high: High
+    low: Low
+    medium: Medium
+  priority_label: Priority
+notifications:
+  form:
+    categories: Alert categories
+    clear_signing_secret: Clear interaction signing secret
+    digest_enabled: Send digest summary on flush
+    digest_help: When enabled, flush sends one summary per destination. When disabled, each held alert
+      is sent individually after quiet hours.
+    enabled: Enabled
+    endpoint: Endpoint
+    endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS webhook URL. Email: recipient address. Telegram:
+      bot_token@chat_id'
+    label: Label
+    quiet_hours_enabled: Enable quiet hours
+    quiet_hours_end: Quiet hours end (HH:MM)
+    quiet_hours_help: During the window, alerts are buffered instead of sent immediately. Run app:notifications:flush-digests
+      on a schedule (or after the window).
+    quiet_hours_start: Quiet hours start (HH:MM)
+    quiet_hours_timezone: Timezone
+    signing_secret: Interaction signing secret
+    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing Secret, or a shared
+      secret for Teams HttpPOST). Leave blank to keep the current value.
+    type: Type
+    endpoint_invalid: Endpoint does not match the selected type.
+    endpoint_ssrf: Endpoint must not target private, link-local, or cloud metadata addresses.
+    quiet_hours_range_invalid: Start and end times must differ.
+    quiet_hours_required: Start and end times are required when quiet hours are enabled.
+    quiet_hours_time_invalid: Use 24-hour HH:MM format (e.g. 22:00).
+    quiet_hours_timezone_invalid: Invalid timezone identifier.
+  category:
+    debug: Debug
+    error: Error
+    fatal: Fatal
+    info: Info
+    issue:
+      assigned: Issue assigned
+      commented: Issue commented
+      duplicated: Issue marked duplicate
+      reopened: Issue reopened
+      resolved: Issue resolved
+    n_plus_one: N+1 detections
+    volume:
+      threshold: Volume thresholds
+    warning: Warning
+  type:
+    discord: Discord webhook
+    email: Email
+    http: Generic HTTP webhook
+    slack: Slack Incoming Webhook
+    teams: Microsoft Teams webhook
+    telegram: Telegram bot
+preferences:
+  issue_panels_collapsed: Issue panels collapsed by default
+  issue_panels_help: Checked panels start collapsed on issue and event detail pages. Your browser remembers
+    manual open/close overrides.
+  member_alerts:
+    enabled: Notify for this event
+    master: Enable member alerts
+    master_help: When off, you receive no live toasts or Web Push for member issue events. Your event
+      and project choices are kept.
+    project_enabled: Alerts for this project
+    reset_overrides: Reset overrides (inherit account defaults)
+    reset_overrides_help: Clears saved per-event overrides for this project on save.
+    scope:
+      involved: Involved only
+  product_tour_enabled: Active tours
+  product_tour_enabled_help: Checked tours can auto-start once per area. Uncheck a tour to hide it; uncheck
+    all to disable every tour.
+  product_tour_select_all: Select all tours
+  profile:
+    phone: Phone number
+    phone_help: Optional. Required for Sign in with phone (QR). Saving a number marks it verified for
+      QR approval until SMS OTP is available.
+    slack_user_id: Slack user ID
+    slack_user_id_help: Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack
+      issue alerts. Find it in your Slack profile → … → Copy member ID.
+  push_notifications: Browser push (device)
+  push_notifications_help: Optional device opt-in. When enabled, Beacon asks the browser for permission
+    and can deliver alerts matching your member-alert preferences — even when the app is in the background
+    (installed PWA or supported browser). Live in-app toasts require Administration → Mercure separately,
+    and the member-alerts master switch above.
+  issue_panels_placeholder: Select panels…
+  contrast_more: More contrast
+  contrast_system: System (follow device)
+  density_comfortable: Comfortable
+  density_compact: Compact
+  font_scale_lg: Large
+  font_scale_md: Medium
+  font_scale_sm: Small
+  motion_full: Full motion
+  motion_reduce: Reduce motion
+  motion_system: System (follow device)
+  product_tour_page:
+    admin: Administration
+    dashboard: Dashboard
+    project_issues: Project issues
+  sidebar_collapsed: Collapsed
+  sidebar_expanded: Expanded
+  theme_dark: Night
+  theme_light: Day
+  width_content: Content (centered)
+  width_full: Full width
+projects:
+  search_placeholder: Search projects…
+  read_token:
+    label: Label
+    label_placeholder: CI bot, export script…
+  share:
+    days: Lifetime (days)
+    issue_optional: Leave empty for whole project
+    issue_uuid: Issue UUID (optional)
+    max_uses: Max uses
+    max_uses_help: Leave Max uses empty for unlimited opens until expiry. Default is 1 (single use).
+    max_uses_unlimited: Unlimited
+thresholds:
+  form:
+    cooldown_minutes: Cooldown (minutes)
+    cooldown_minutes_help: Suppress duplicate alerts for this rule during the cooldown window.
+    enabled: Enabled
+    environment: Environment filter
+    environment_help: Leave blank to count all environments.
+    error_count: Error count
+    error_count_help: Alert when at least this many error/fatal events are received in the rolling window.
+    label: Label
+    label_help: Optional internal name shown in Settings and payloads.
+    release: Release filter
+    release_help: Leave blank to count all releases.
+    window_minutes: Window (minutes)
+    window_minutes_help: Rolling lookback window from 1 to 1440 minutes.
+analytics_filter:
+  from:
+    placeholder: From
+    help: Start date for a custom range (UTC calendar day).
+  to:
+    placeholder: To
+    help: End date for a custom range (UTC calendar day).
+  environment:
+    placeholder: prod
+    help: Limit error volume to this environment (leave blank for all).
+  release:
+    placeholder: 1.2.0
+    help: Limit error volume to this release version (leave blank for all).
+  level:
+    placeholder: error
+    help: Limit error volume to this log level (e.g. error). Leave blank for all.
+issue_index_filter:
+  q:
+    placeholder: Search title…
+    help: Search issues by title.
+  level:
+    placeholder: Any level
+    help: Filter by event level.
+  environment:
+    placeholder: Environment
+    help: Only issues seen in this environment.
+  compare:
+    placeholder: Compare with environment…
+    help: Set Environment and Compare to see issues only in A, only in B, or in both.
+  release:
+    placeholder: Release
+    help: Only issues first seen in this release.
+  tag:
+    placeholder: Tag
+    help: Filter by tag.
+  url:
+    placeholder: Request URL
+    help: Filter by request URL fragment.
+  user:
+    placeholder: Event user
+    help: Filter by event user.
+  status:
+    any: any status
+    unresolved: Unresolved
+    resolved: Resolved
+    ignored: Ignored
+    help: Filter by issue status.
+  priority:
+    any: Any priority
+    low: Low
+    medium: Medium
+    high: High
+    critical: Critical
+    help: Filter by priority.
+  assignee:
+    any: Any assignee
+    unassigned: Unassigned
+    help: Filter by assignee.
+  per_page:
+    aria: Results per page
+    option: '%count% per page'
+    help: How many issues to show per page.
+project_release_environment_compare:
+  environment:
+    placeholder: production
+    help: Environment A for the compare deep-link.
+  compare:
+    placeholder: staging
+    help: Environment B for the compare deep-link.
+project_release_focus:
+  release:
+    placeholder: Select a release
+    help: Focus the releases page on this version.
+  compare:
+    placeholder: Do not compare
+    help: Optionally compare with another release.
+dashboard_filter:
+  per_page:
+    aria: Results per page
+    option: '%count% per page'
+    help: How many rows to show per page.
+dashboard_activity_filter:
+  per_page:
+    help: How many activity rows to show per page.
+  project:
+    placeholder: Any project
+    aria: Project
+    help: Limit activity to one project.
+dashboard_alerts_filter:
+  per_page:
+    help: How many alert rows to show per page.
+  project:
+    placeholder: Any project
+    aria: Project
+    help: Limit failed deliveries to one project.
+dashboard_mentions_filter:
+  per_page:
+    help: How many mention rows to show per page.
+  project:
+    placeholder: Any project
+    aria: Project
+    help: Limit mentions to one project.
+dashboard_new_in_release_filter:
+  per_page:
+    help: How many rows to show per page.
+  project:
+    placeholder: Any project
+    aria: Project
+    help: Limit results to one project.
+  release:
+    placeholder: Any release
+    aria: Release
+    help: Only issues first seen in this release.
+dashboard_assignments_filter:
+  per_page:
+    help: How many assignment rows to show per page.
+  q:
+    placeholder: Search by title…
+    aria: Search
+    help: Filter assignments by issue title.
+  project:
+    placeholder: Any project
+    aria: Project
+    help: Limit assignments to one project.
+  level:
+    placeholder: Any level
+    aria: Level
+    help: Filter by event level.
+  status:
+    aria: Status
+    help: Filter by issue status.
+  priority:
+    aria: Priority
+    any: Any priority
+    low: Low
+    medium: Medium
+    high: High
+    critical: Critical
+    help: Filter by priority.
+  assignee:
+    aria: Teammate
+    any: Any assignee
+    help: Filter by teammate (when scope allows).
+  scope:
+    aria: Assignment scope
+    mine: Assigned to me
+    teammates: Teammates
+    unassigned: Unassigned
+    all: All in my projects
+    help: Whose assignments to list.
+admin_audit_timeline_filter:
+  action:
+    placeholder: All actions
+    help: Filter the timeline by action type.
+  from:
+    placeholder: From
+    help: Include actions on or after this date.
+  to:
+    placeholder: To
+    help: Include actions on or before this date.
+admin_ops_overview_filter:
+  project:
+    placeholder: All projects
+    help: Limit the ops overview to one project.
+notification_destination:
+  quiet_hours_start:
+    placeholder: '22:00'
+    help: Start of quiet hours (HH:MM).
+  quiet_hours_end:
+    placeholder: 07:00
+    help: End of quiet hours (HH:MM).
+admin:
+  ops:
+    filter_project: Project filter
+analytics:
+  filter:
+    environment: Environment
+    level: Level
+    release: Release
+  period:
+    from: From
+    to: To
+permissions:
+  key_invalid: Use lowercase dotted segments (at least two), e.g. project.custom.manage.
+releases:
+  compare:
+    label: Compare with release
+  focus:
+    label: Release
+users:
+  role:
+    admin: Admin
+    user: User
+
+project_share_create:
+  days:
+    label: Lifetime (days)
+  max_uses:
+    label: Max uses
+    placeholder: Unlimited
+    help: Leave Max uses empty for unlimited opens until expiry. Default is 1 (single use).
+  issue_uuid:
+    label: Issue UUID (optional)
+    placeholder: Leave empty for whole project
+
+project_read_token_create:
+  label:
+    label: Label
+    placeholder: CI bot, export script…
+
+project_member_add:
+  email:
+    label: Member email
+    placeholder: user@example.com
+  role:
+    label: Role
+
+project_governance:
+  retention_days:
+    label: Retention days
+    help: Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.
+  retention_max_events:
+    label: Max stored events
+    help: Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.
+  ingest_rate_limit_per_minute:
+    label: Ingest rate limit (per minute)
+    help: Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.
+  event_quota_daily:
+    label: Daily event quota
+    help: Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.
+  event_quota_monthly:
+    label: Monthly event quota
+    help: Empty = inherit server default (%default%). Use 0 to disable when the default is non-zero.
+
+project_api_key_create:
+  label:
+    label: Label
+    placeholder: e.g. calm-otter
+
+project_config_import:
+  bundle:
+    label: JSON file
+
+admin_project_import:
+  bundle:
+    label: JSON file
+
+instance_config_import:
+  config:
+    label: Config file
+
+mailer_test:
+  to:
+    label: Recipient
+    placeholder: you@example.com
+
+project_group_add:
+  group:
+    label: Group
+    placeholder: Select a group…
+  role:
+    label: Role
+
+project_transfer_ownership:
+  user:
+    label: New owner
+  confirmation:
+    label: Type the project name to confirm
+
+project_delete:
+  confirmation:
+    label: Type the project name to confirm
+
+admin_group_member_add:
+  email:
+    label: Member email
+    placeholder: user@example.com
+
+admin_role_user_add:
+  email:
+    label: User email
+    placeholder: user@example.com
+
+issue_saved_view:
+  name:
+    label: View name
+    placeholder: My filter set
+
+issue_comment:
+  body:
+    label: Comment
+    placeholder: Write a comment…
+
+issue_priority:
+  priority:
+    label: Priority
+
+issue_assignee:
+  assignee:
+    label: Assignee
+

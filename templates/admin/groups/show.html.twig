@@ -64,16 +64,15 @@
         {% endfor %}
     </ul>
 
-    {{ form_start(addMemberForm, {attr: {class: 'mt-4 flex flex-wrap gap-2'}}) }}
-        {{ form_widget(addMemberForm.email, {
-            attr: {
-                class: 'input min-w-56 flex-1',
-                placeholder: 'groups.member_email_placeholder'|trans,
-                autocomplete: 'off',
-            }
-        }) }}
+    {{ form_start(addMemberForm, {attr: {class: 'mt-4 flex flex-wrap items-end gap-2'}}) }}
+        {% for field in addMemberForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button class="btn-primary" type="submit">{{ 'groups.add_member'|trans }}</button>
-    {{ form_end(addMemberForm) }}
+        {% include 'form/_fields.html.twig' with {form: addMemberForm} only %}
+    {{ form_end(addMemberForm, {render_rest: false}) }}
     <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'groups.add_member_help'|trans }}</p>
 </section>
 

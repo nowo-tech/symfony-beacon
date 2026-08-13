@@ -70,7 +70,7 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
         self::assertSelectorExists('[data-testid="audit-meta"]');
         $form = $crawler->selectButton('Add member')->form([
-            'email' => 'group-user@example.com',
+            'admin_group_member_add[email]' => 'group-user@example.com',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/admin/groups/'.$group->getUuid());

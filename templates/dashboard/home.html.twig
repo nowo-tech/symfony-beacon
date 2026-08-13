@@ -26,20 +26,27 @@
         <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto lg:max-w-2xl lg:flex-1 lg:justify-end">
             {{ form_start(searchForm, {
                 attr: {
-                    class: 'flex min-w-0 flex-1 items-center gap-2',
+                    class: 'flex min-w-0 flex-1 items-end gap-2',
                     role: 'search'
                 }
             }) }}
-                {{ form_widget(searchForm.q, {
-                    attr: {
-                        class: 'input min-w-0 flex-1',
-                        placeholder: 'projects.search_placeholder'|trans,
-                        autocomplete: 'off',
-                        'aria-label': 'projects.search_placeholder'|trans
-                    }
-                }) }}
+                {% for field in searchForm %}
+                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                        {{ form_row(field, {
+                            label: false,
+                            attr: {
+                                class: 'input min-w-0 flex-1',
+                                placeholder: 'projects.search_placeholder'|trans,
+                                autocomplete: 'off',
+                                'aria-label': 'projects.search_placeholder'|trans,
+                            },
+                            row_attr: {class: 'min-w-0 flex-1'},
+                        }) }}
+                    {% endif %}
+                {% endfor %}
                 <button class="btn-ghost shrink-0" type="submit">{{ 'common.filter'|trans }}</button>
                 <a class="btn-ghost shrink-0 no-underline" href="{{ path('dashboard_home') }}">{{ 'common.clear_filters'|trans }}</a>
+                {% include 'form/_fields.html.twig' with {form: searchForm} only %}
             {{ form_end(searchForm, {render_rest: false}) }}
             <button type="button" class="btn-primary shrink-0 sm:self-auto" data-tour="new-project" data-action="confirm-dialog#open">
                 {{ 'nav.new_project'|trans }}

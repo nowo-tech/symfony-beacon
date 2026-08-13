@@ -119,20 +119,23 @@
                                             {% endif %}
                                         </div>
                                         <div class="confirm-dialog__content">
-                                            <label class="confirm-dialog__label" for="user-role-{{ user.id }}">{{ 'users.role_label'|trans }}</label>
-                                            {{ form_widget(roleForms[user.id].role, {
+                                            {{ form_row(roleForms[user.id].role, {
+                                                label: 'users.role_label'|trans,
+                                                translation_domain: false,
+                                                label_attr: {class: 'confirm-dialog__label'},
                                                 attr: {
                                                     id: 'user-role-' ~ user.id,
                                                     class: 'input w-full',
                                                     disabled: isLastAdmin,
-                                                }
+                                                },
                                             }) }}
+                                            {% include 'form/_fields.html.twig' with {form: roleForms[user.id]} only %}
                                         </div>
                                         <div class="confirm-dialog__actions">
                                             <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
                                             <button type="submit" class="btn-primary" {% if isLastAdmin %}disabled{% endif %}>{{ 'users.actions.update_role'|trans }}</button>
                                         </div>
-                                    {{ form_end(roleForms[user.id]) }}
+                                    {{ form_end(roleForms[user.id], {render_rest: false}) }}
                                 {% endblock %}
                             {% endembed %}
                         {% endif %}
@@ -172,23 +175,23 @@
                                                 <p class="confirm-dialog__body">{{ 'users.anonymize_confirm_body'|trans({'%email%': user.email}) }}</p>
                                             </div>
                                             <div class="confirm-dialog__content">
-                                                <label class="confirm-dialog__label" for="admin-user-anonymize-input-{{ user.id }}">
-                                                    {{ 'preferences.privacy.anonymize_type_label'|trans }}
-                                                </label>
-                                                {{ form_widget(anonymizeForms[user.id].confirmation, {
+                                                {{ form_row(anonymizeForms[user.id].confirmation, {
+                                                    label: 'preferences.privacy.anonymize_type_label'|trans,
+                                                    translation_domain: false,
                                                     attr: {
                                                         id: 'admin-user-anonymize-input-' ~ user.id,
                                                         class: 'input w-full',
                                                         autocomplete: 'off',
                                                         'data-confirm-dialog-target': 'confirmInput',
-                                                    }
+                                                    },
                                                 }) }}
+                                                {% include 'form/_fields.html.twig' with {form: anonymizeForms[user.id]} only %}
                                             </div>
                                             <div class="confirm-dialog__actions">
                                                 <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'users.cancel'|trans }}</button>
                                                 <button type="submit" class="btn-danger" data-confirm-dialog-target="submit" disabled>{{ 'users.actions.anonymize'|trans }}</button>
                                             </div>
-                                        {{ form_end(anonymizeForms[user.id]) }}
+                                        {{ form_end(anonymizeForms[user.id], {render_rest: false}) }}
                                     {% endblock %}
                                 {% endembed %}
                             {% endif %}

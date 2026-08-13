@@ -8,6 +8,7 @@
 ## Content Quality
 
 - [x] Spec captures CSRF-only helper + named Types + GET filter migration
+- [x] GET filter contract notes: `required` false except `per_page`; CSRF off intentional; optional fields ≠ authz weaken
 - [x] Cross-links `077` deferred hand-rolled forms
 - [x] Non-goals list AJAX header CSRF + kit vendor modal tokens
 - [x] Dashboard title weight polish noted under Scope UX

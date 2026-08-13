@@ -130,17 +130,21 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
         );
-        $commentToken = $crawler->filter('form.issue-comments__form input[name="_token"]')->attr('value');
+        $commentToken = $crawler->filter('form.issue-comments__form input[name="issue_comment[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/comments', [
-            '_token' => $commentToken,
-            'body' => '',
+            'issue_comment' => [
+                '_token' => $commentToken,
+                'body' => '',
+            ],
         ]);
         self::assertResponseRedirects();
         self::assertSame(0, $em->getRepository(IssueComment::class)->count(['issue' => $duplicate]));
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/comments', [
-            '_token' => $commentToken,
-            'body' => 'Needs triage from the team.',
+            'issue_comment' => [
+                '_token' => $commentToken,
+                'body' => 'Needs triage from the team.',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());
         $client->followRedirect();

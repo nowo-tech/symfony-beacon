@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Issues\Enum\IssueStatus;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,6 +21,7 @@ final class IssueStatusType extends FormKitAbstractType
 
         $this->withBuilder($builder, function () use ($statusValues): void {
             $this->addNamedField('status', 'hidden', [
+                'placeholder' => false,
                 'constraints' => [
                     new NotBlank(),
                     new Choice(choices: $statusValues),

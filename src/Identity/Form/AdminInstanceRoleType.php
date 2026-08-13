@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Identity\Entity\InstanceRole;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * Admin create/edit form for an instance RBAC role.
+ *
+ * Field label / placeholder / help use FormKit convention keys in the {@code form}
+ * domain ({@code admin_instance_role.<field>.*} → translations/form.*.yaml).
  */
 final class AdminInstanceRoleType extends FormKitAbstractType
 {
@@ -22,13 +25,9 @@ final class AdminInstanceRoleType extends FormKitAbstractType
     {
         $this->withBuilder($builder, function () use ($options): void {
             $this->addTextField('name', [
-                'label' => 'roles.name_label',
-                'help' => 'roles.name_help',
                 'constraints' => [new NotBlank(), new Length(max: 120)],
             ]);
             $this->addTextField('code', [
-                'label' => 'roles.code_label',
-                'help' => 'roles.code_help',
                 'disabled' => (bool) $options['code_locked'],
                 'constraints' => $options['code_locked'] ? [] : [
                     new NotBlank(),
@@ -40,19 +39,20 @@ final class AdminInstanceRoleType extends FormKitAbstractType
                 ],
             ]);
             $this->addTextareaField('description', [
-                'label' => 'roles.description_label',
-                'help' => 'roles.description_help',
                 'required' => false,
                 'constraints' => [new Length(max: 2000)],
             ]);
             $this->addCheckboxField('enabled', [
-                'label' => 'roles.enabled_label',
                 'required' => false,
+                'placeholder' => false,
             ]);
             if ($options['with_return_route']) {
                 $this->addNamedField('_return', 'hidden', [
                     'mapped' => false,
                     'required' => false,
+                    'label' => false,
+                    'help' => false,
+                    'placeholder' => false,
                     'data' => $options['return_route'],
                 ]);
             }
@@ -64,7 +64,6 @@ final class AdminInstanceRoleType extends FormKitAbstractType
         $resolver->setDefaults([
             'data_class' => InstanceRole::class,
             'csrf_protection' => true,
-            'translation_domain' => 'messages',
             'code_locked' => false,
             'with_return_route' => false,
             'return_route' => 'admin_roles_show',

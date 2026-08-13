@@ -5,23 +5,28 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
+use App\Shared\Form\DashboardProjectFilterFields;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Override;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SearchType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * GET filters for the per-project issue index.
+ * GET filters for the per-project issue index (FormKit {@code filter} profile).
+ *
+ * Placeholders live in {@code translations/form.*.yaml} under {@code issue_index_filter.*}.
+ * Choice empty-option copy is applied after FormKit merge (ChoiceType root {@code placeholder}).
  */
 final class IssueIndexFilterType extends AbstractGetFilterType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly TranslatorInterface $translator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -30,134 +35,105 @@ final class IssueIndexFilterType extends AbstractGetFilterType
         $levelChoices = $options['level_choices'];
         /** @var array<string, string> $memberChoices */
         $memberChoices = $options['member_choices'];
-        $statusChoices = [
-            'unresolved' => 'unresolved',
-            'resolved' => 'resolved',
-            'ignored' => 'ignored',
-            $this->translator->trans('issues.filter.any_status') => '',
-        ];
+
         $priorityChoices = [
-            $this->translator->trans('issues.filter.any_priority') => '',
+            'issue_index_filter.priority.any' => '',
+            'issue_index_filter.priority.low' => 'low',
+            'issue_index_filter.priority.medium' => 'medium',
+            'issue_index_filter.priority.high' => 'high',
+            'issue_index_filter.priority.critical' => 'critical',
         ];
-        foreach (['low', 'medium', 'high', 'critical'] as $priority) {
-            $priorityChoices[$this->translator->trans('issues.priority.'.$priority)] = $priority;
-        }
+        $statusChoices = [
+            'issue_index_filter.status.any' => '',
+            'issue_index_filter.status.unresolved' => 'unresolved',
+            'issue_index_filter.status.resolved' => 'resolved',
+            'issue_index_filter.status.ignored' => 'ignored',
+        ];
+        // Member display names stay literal; static options are translated once here.
         $assigneeChoices = [
-            $this->translator->trans('issues.filter.any_assignee') => '',
-            $this->translator->trans('issues.assignee_unassigned') => 'unassigned',
+            $this->translator->trans('issue_index_filter.assignee.any', [], 'form') => '',
+            $this->translator->trans('issue_index_filter.assignee.unassigned', [], 'form') => 'unassigned',
         ];
         foreach ($memberChoices as $id => $label) {
             $assigneeChoices[$label] = $id;
         }
         $perPageChoices = [];
-        foreach ([10, 25, 50, 100] as $size) {
-            $perPageChoices[$this->translator->trans('issues.filter.per_page_option', ['%count%' => (string) $size])] = $size;
+        foreach (DashboardProjectFilterFields::PER_PAGE_SIZES as $size) {
+            $perPageChoices[$this->translator->trans(
+                'issue_index_filter.per_page.option',
+                ['%count%' => (string) $size],
+                'form',
+            )] = $size;
         }
 
-        $builder
-            ->add('sort', HiddenType::class)
-            ->add('dir', HiddenType::class)
-            ->add('page', HiddenType::class)
-            ->add('q', SearchType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input issue-filters__search',
-                ],
-            ])
-            ->add('level', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+        $this->withBuilder($builder, function () use (
+            $levelChoices,
+            $statusChoices,
+            $priorityChoices,
+            $assigneeChoices,
+            $perPageChoices,
+        ): void {
+            $this->addHiddenFilterField('sort');
+            $this->addHiddenFilterField('dir');
+            $this->addHiddenFilterField('page');
+
+            $this->addNamedField('q', 'search', [
+                'attr' => ['class' => 'input issue-filters__search'],
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+
+            $this->addFilterSelect('level', [
                 'choices' => array_combine($levelChoices, $levelChoices),
                 'choice_translation_domain' => false,
-                'placeholder' => $this->translator->trans('issues.filter.any_level'),
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('status', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addFilterSelect('status', [
                 'choices' => $statusChoices,
-                'choice_translation_domain' => false,
                 'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('priority', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addFilterSelect('priority', [
                 'choices' => $priorityChoices,
-                'choice_translation_domain' => false,
                 'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('assignee', ChoiceType::class, [
-                'label' => false,
-                'required' => false,
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addFilterSelect('assignee', [
                 'choices' => $assigneeChoices,
                 'choice_translation_domain' => false,
                 'placeholder' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('environment', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('compare', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('release', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('tag', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('url', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('user', TextType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'input',
-                ],
-            ])
-            ->add('per_page', ChoiceType::class, [
-                'label' => false,
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+
+            $this->addTextField('environment', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addTextField('compare', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addTextField('release', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addTextField('tag', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addTextField('url', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+            $this->addTextField('user', [
+                'row_attr' => ['class' => 'issue-filters__field'],
+            ]);
+
+            $this->addFilterSelect('per_page', [
                 'required' => true,
                 'choices' => $perPageChoices,
                 'choice_translation_domain' => false,
                 'placeholder' => false,
                 'attr' => [
-                    'class' => 'input',
-                    'aria-label' => 'issues.filter.per_page',
+                    'aria-label' => $this->translator->trans('issue_index_filter.per_page.aria', [], 'form'),
                 ],
+                'row_attr' => ['class' => 'issue-filters__field'],
             ]);
+        });
     }
 
     #[Override]
@@ -171,5 +147,11 @@ final class IssueIndexFilterType extends AbstractGetFilterType
         ]);
         $resolver->setAllowedTypes('level_choices', 'array');
         $resolver->setAllowedTypes('member_choices', 'array');
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'issue_index_filter';
     }
 }

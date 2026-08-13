@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
+use App\Shared\Form\FormKitAbstractType;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\OpsDefaultsSection;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -54,7 +54,6 @@ final class InstanceOpsDefaultsType extends FormKitAbstractType
     {
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
-            'translation_domain' => 'messages',
             'section' => OpsDefaultsSection::Governance,
         ]);
         $resolver->setAllowedTypes('section', OpsDefaultsSection::class);

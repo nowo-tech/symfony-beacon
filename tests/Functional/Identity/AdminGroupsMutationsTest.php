@@ -76,10 +76,12 @@ final class AdminGroupsMutationsTest extends DatabaseWebTestCase
         $this->login($client, $admin);
         $crawler = $client->request(Request::METHOD_GET, '/admin/groups/'.$group->getUuid());
 
-        $addToken = $crawler->filter('form[action$="/members"] input[name="_token"]')->attr('value');
+        $addToken = $crawler->filter('form[action$="/members"] input[name="admin_group_member_add[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/admin/groups/'.$group->getUuid().'/members', [
-            '_token' => $addToken,
-            'email' => 'missing-user@example.com',
+            'admin_group_member_add' => [
+                '_token' => $addToken,
+                'email' => 'missing-user@example.com',
+            ],
         ]);
         self::assertResponseRedirects('/admin/groups/'.$group->getUuid());
         $client->followRedirect();

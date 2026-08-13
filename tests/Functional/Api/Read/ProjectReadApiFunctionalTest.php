@@ -122,7 +122,7 @@ final class ProjectReadApiFunctionalTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-testid="read-api-tokens"]');
 
         $client->submitForm('Create token', [
-            'label' => 'Nightly export',
+            'project_read_token_create[label]' => 'Nightly export',
         ]);
         self::assertResponseRedirects();
         $client->followRedirect();

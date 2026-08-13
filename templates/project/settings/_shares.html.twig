@@ -5,27 +5,14 @@
         <p class="mb-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3 text-sm break-all" data-testid="share-url">{{ lastShareUrl }}</p>
     {% endif %}
     {{ form_start(shareCreateForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-3'}}) }}
-        <label class="text-sm">
-            <span class="mb-1 block">{{ 'projects.share.days'|trans }}</span>
-            {{ form_widget(shareCreateForm.days, {attr: {class: 'input'}}) }}
-        </label>
-        <label class="text-sm">
-            <span class="mb-1 block">{{ 'projects.share.max_uses'|trans }}</span>
-            {{ form_widget(shareCreateForm.max_uses, {attr: {class: 'input', placeholder: 'projects.share.max_uses_unlimited'|trans}}) }}
-        </label>
-        <label class="text-sm grow">
-            <span class="mb-1 block">{{ 'projects.share.issue_uuid'|trans }}</span>
-            {{ form_widget(shareCreateForm.issue_uuid, {
-                attr: {
-                    class: 'input w-full',
-                    placeholder: 'projects.share.issue_optional'|trans,
-                    autocomplete: 'off',
-                }
-            }) }}
-        </label>
+        {% for field in shareCreateForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button type="submit" class="btn-primary">{{ 'projects.share.create'|trans }}</button>
-    {{ form_end(shareCreateForm) }}
-    <p class="mb-4 text-xs text-[var(--color-ink)]/50">{{ 'projects.share.max_uses_help'|trans }}</p>
+        {% include 'form/_fields.html.twig' with {form: shareCreateForm} only %}
+    {{ form_end(shareCreateForm, {render_rest: false}) }}
     <ul class="space-y-2 text-sm">
         {% for link in shareLinks|default([]) %}
             <li class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--color-sand)] p-3">

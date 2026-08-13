@@ -92,10 +92,9 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         // Create a fresh active key via rotate on a newly created key
-        $createToken = $crawler->filter('form[action$="/keys"] input[name="_token"]')->attr('value');
-        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/keys', [
-            '_token' => $createToken,
-            'label' => 'rotate-me',
+        $createForm = $crawler->filter('form[action$="/keys"]')->form();
+        $client->submit($createForm, [
+            'project_api_key_create[label]' => 'rotate-me',
         ]);
         self::assertResponseRedirects();
 
@@ -162,14 +161,16 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', 'Governance');
         self::assertSelectorTextContains('.flash', 'approaching its daily event quota');
 
-        $token = $crawler->filter('form[action$="/governance"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/governance"] input[name="project_governance[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/governance', [
-            '_token' => $token,
-            'retention_days' => '14',
-            'retention_max_events' => '',
-            'ingest_rate_limit_per_minute' => '30',
-            'event_quota_daily' => '100',
-            'event_quota_monthly' => '500',
+            'project_governance' => [
+                '_token' => $token,
+                'retention_days' => '14',
+                'retention_max_events' => '',
+                'ingest_rate_limit_per_minute' => '30',
+                'event_quota_daily' => '100',
+                'event_quota_monthly' => '500',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
 
@@ -215,7 +216,7 @@ final class AdminProjectsGovernanceTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.flash', 'approaching its monthly event quota');
-        self::assertSelectorExists('#event_quota_monthly');
+        self::assertSelectorExists('input[name="project_governance[event_quota_monthly]"]');
     }
 
     public function testViewAsMemberForcesMemberRole(): void

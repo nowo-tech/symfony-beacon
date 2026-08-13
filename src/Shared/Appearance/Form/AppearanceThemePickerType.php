@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Appearance\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,7 +20,7 @@ final class AppearanceThemePickerType extends FormKitAbstractType
         $this->withBuilder($builder, function (): void {
             $this->addTextField('apply_theme', [
                 'required' => true,
-                'label' => false,
+                'label' => false, 'help' => false, 'placeholder' => false,
                 'constraints' => [new NotBlank()],
             ]);
         });
@@ -32,7 +32,6 @@ final class AppearanceThemePickerType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'appearance_theme',
-            'translation_domain' => 'messages',
         ]);
     }
 

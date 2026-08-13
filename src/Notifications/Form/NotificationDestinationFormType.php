@@ -9,10 +9,10 @@ use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\NotificationCategories;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use App\Notifications\Service\OutboundUrlGuard;
+use App\Shared\Form\FormKitAbstractType;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
@@ -64,7 +64,6 @@ final class NotificationDestinationFormType extends FormKitAbstractType
                     'class' => NotificationDestinationType::class,
                     'label' => 'notifications.form.type',
                     'choice_label' => static fn (NotificationDestinationType $type): string => 'notifications.type.'.$type->value,
-                    'choice_translation_domain' => 'messages',
                 ]),
             );
             $this->addTextField('endpointUrl', [
@@ -104,7 +103,6 @@ final class NotificationDestinationFormType extends FormKitAbstractType
                 'multiple' => true,
                 'expanded' => false,
                 'autocomplete' => true,
-                'choice_translation_domain' => 'messages',
                 'attr' => [
                     'data-notification-categories' => '1',
                 ],
@@ -139,16 +137,15 @@ final class NotificationDestinationFormType extends FormKitAbstractType
             $this->addTextField('quietHoursStart', [
                 'label' => 'notifications.form.quiet_hours_start',
                 'required' => false,
-                'attr' => ['placeholder' => '22:00'],
             ]);
             $this->addTextField('quietHoursEnd', [
                 'label' => 'notifications.form.quiet_hours_end',
                 'required' => false,
-                'attr' => ['placeholder' => '07:00'],
             ]);
             $this->addCheckboxField('digestEnabled', [
                 'label' => 'notifications.form.digest_enabled',
                 'required' => false,
+                'placeholder' => false,
                 'help' => 'notifications.form.digest_help',
             ]);
         });
@@ -171,7 +168,7 @@ final class NotificationDestinationFormType extends FormKitAbstractType
                 new DateTimeZone($data->getQuietHoursTimezone());
             } catch (Exception) {
                 $form->get('quietHoursTimezone')->addError(new FormError(
-                    $this->translator->trans('notifications.form.quiet_hours_timezone_invalid'),
+                    $this->translator->trans('notifications.form.quiet_hours_timezone_invalid', [], 'form'),
                 ));
             }
 
@@ -181,23 +178,23 @@ final class NotificationDestinationFormType extends FormKitAbstractType
 
             if (null !== $start && 1 !== preg_match($timePattern, $start)) {
                 $form->get('quietHoursStart')->addError(new FormError(
-                    $this->translator->trans('notifications.form.quiet_hours_time_invalid'),
+                    $this->translator->trans('notifications.form.quiet_hours_time_invalid', [], 'form'),
                 ));
             }
             if (null !== $end && 1 !== preg_match($timePattern, $end)) {
                 $form->get('quietHoursEnd')->addError(new FormError(
-                    $this->translator->trans('notifications.form.quiet_hours_time_invalid'),
+                    $this->translator->trans('notifications.form.quiet_hours_time_invalid', [], 'form'),
                 ));
             }
 
             if ($data->isQuietHoursEnabled()) {
                 if (null === $start || null === $end) {
                     $form->get('quietHoursStart')->addError(new FormError(
-                        $this->translator->trans('notifications.form.quiet_hours_required'),
+                        $this->translator->trans('notifications.form.quiet_hours_required', [], 'form'),
                     ));
                 } elseif ($start === $end) {
                     $form->get('quietHoursEnd')->addError(new FormError(
-                        $this->translator->trans('notifications.form.quiet_hours_range_invalid'),
+                        $this->translator->trans('notifications.form.quiet_hours_range_invalid', [], 'form'),
                     ));
                 }
             }
@@ -217,7 +214,7 @@ final class NotificationDestinationFormType extends FormKitAbstractType
 
             if (!$valid) {
                 $form->get('endpointUrl')->addError(new FormError(
-                    $this->translator->trans('notifications.form.endpoint_invalid'),
+                    $this->translator->trans('notifications.form.endpoint_invalid', [], 'form'),
                 ));
 
                 return;
@@ -233,7 +230,7 @@ final class NotificationDestinationFormType extends FormKitAbstractType
                     $this->outboundUrlGuard->assertSafeHttpUrl($endpoint);
                 } catch (InvalidArgumentException) {
                     $form->get('endpointUrl')->addError(new FormError(
-                        $this->translator->trans('notifications.form.endpoint_ssrf'),
+                        $this->translator->trans('notifications.form.endpoint_ssrf', [], 'form'),
                     ));
                 }
             }

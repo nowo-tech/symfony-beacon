@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Settings\Form;
 
+use App\Shared\Form\FormKitAbstractType;
 use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
@@ -80,7 +80,6 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
     {
         $resolver->setDefaults([
             'data_class' => InstanceSettings::class,
-            'translation_domain' => 'messages',
         ]);
     }
 
@@ -88,7 +87,7 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
     {
         if (!\is_string($value) && null !== $value) {
             $context->buildViolation('instance_mailer.mailer_dsn.invalid')
-                ->setTranslationDomain('messages')
+                ->setTranslationDomain('form')
                 ->addViolation();
 
             return;
@@ -97,7 +96,7 @@ final class InstanceMailerSettingsType extends FormKitAbstractType
         $error = $this->dsnValidator->validatePlainDsn($value ?? '');
         if (null !== $error) {
             $context->buildViolation($error)
-                ->setTranslationDomain('messages')
+                ->setTranslationDomain('form')
                 ->addViolation();
         }
     }

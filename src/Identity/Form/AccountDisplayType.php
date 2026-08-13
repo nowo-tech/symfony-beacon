@@ -7,8 +7,8 @@ namespace App\Identity\Form;
 use App\Identity\Entity\User;
 use App\Identity\Tour\ProductTourPage;
 use App\Issues\IssuePanelIds;
+use App\Shared\Form\FormKitAbstractType;
 use InvalidArgumentException;
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Nowo\TagInputBundle\Form\TagType;
 use Nowo\TagInputBundle\Form\ValueFormat;
 use Override;
@@ -59,6 +59,8 @@ final class AccountDisplayType extends FormKitAbstractType
             // No empty ChoiceType placeholder — every account has concrete defaults.
             $this->addChoiceField('preferredLocale', [
                 'choices' => $localeChoices,
+                // Literal locale codes (EN, ES, …) — do not translate as catalogue keys.
+                'choice_translation_domain' => false,
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -67,7 +69,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.theme_light' => 'light',
                     'preferences.theme_dark' => 'dark',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -76,7 +77,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.width_content' => 'content',
                     'preferences.width_full' => 'full',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -85,7 +85,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.density_comfortable' => 'comfortable',
                     'preferences.density_compact' => 'compact',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -95,7 +94,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.font_scale_md' => 'md',
                     'preferences.font_scale_lg' => 'lg',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -104,7 +102,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.contrast_system' => 'system',
                     'preferences.contrast_more' => 'more',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -113,7 +110,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.sidebar_expanded' => 'expanded',
                     'preferences.sidebar_collapsed' => 'collapsed',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -123,7 +119,6 @@ final class AccountDisplayType extends FormKitAbstractType
                     'preferences.motion_reduce' => 'reduce',
                     'preferences.motion_full' => 'full',
                 ],
-                'choice_translation_domain' => 'messages',
                 'required' => true,
                 'placeholder' => false,
             ]);
@@ -147,7 +142,6 @@ final class AccountDisplayType extends FormKitAbstractType
             'label' => 'preferences.issue_panels_collapsed',
             'help' => 'preferences.issue_panels_help',
             'placeholder' => 'preferences.issue_panels_placeholder',
-            'translation_domain' => 'messages',
             'container_class' => 'nowo-tag-input issue-panel-prefs',
             'input_class' => 'input nowo-tag-input__field',
         ]);
@@ -170,12 +164,11 @@ final class AccountDisplayType extends FormKitAbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'choices' => $tourChoices,
-                'choice_translation_domain' => 'messages',
                 'label' => 'preferences.product_tour_enabled',
                 'help' => 'preferences.product_tour_enabled_help',
                 'select_all' => true,
                 'select_all_label' => 'preferences.product_tour_select_all',
-                'select_all_translation_domain' => 'messages',
+                'select_all_translation_domain' => 'form',
                 'select_all_css_class' => 'size-4 shrink-0 rounded border-[var(--color-sand)] text-[var(--color-moss)] focus:ring-[var(--color-moss)]/30',
                 'select_all_wrapper_css_class' => 'flex items-center gap-2.5 pb-2 mb-1 border-b border-[var(--color-sand)]/60',
                 'select_all_label_css_class' => 'text-sm font-medium text-[var(--color-ink)]',
@@ -197,7 +190,6 @@ final class AccountDisplayType extends FormKitAbstractType
             'required' => false,
             'label' => 'preferences.push_notifications',
             'help' => 'preferences.push_notifications_help',
-            'translation_domain' => 'messages',
         ]);
     }
 

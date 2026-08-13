@@ -371,17 +371,8 @@ project:
     intro: Claves API, miembros, gobernanza y acciones destructivas del proyecto.
   governance:
     title: Gobernanza
-    help: Retención, límites de tasa y cuotas diarias por proyecto. Deja un campo
-      vacío para heredar el valor del servidor.
-    retention_days: Días de retención
-    retention_max_events: Máximo de eventos almacenados
-    ingest_rate_limit: Límite de ingest (por minuto)
-    event_quota_daily: Cuota diaria de eventos
-    event_quota_monthly: Cuota mensual de eventos
     quota_usage_monthly: '%count% / %quota% eventos este mes (UTC)'
     month_utc_hint: El límite del mes es UTC
-    inherit_hint: Vacío = heredar valor del servidor (%default%). Usa 0 para desactivar
-      si el valor por defecto no es cero.
     save: Guardar gobernanza
     quota_usage: 'Eventos hoy: %count% / %quota%'
     ingest_disabled_banner: El ingest de Envelope está suspendido para este proyecto.
@@ -828,7 +819,6 @@ releases:
     empty: Ninguna incidencia apareció por primera vez en esta release.
   compare:
     label: Comparar con release
-    none: No comparar
     help: Opcionalmente compara la release seleccionada con otra release usando el
       conjunto actual de incidencias.
     summary_title: Comparar %a% vs %b%
@@ -1278,9 +1268,20 @@ users:
       group.deleted: Grupo eliminado
       group.member_added: Miembro añadido al grupo
       group.member_removed: Miembro eliminado del grupo
+      instance_role.created: Rol de instancia creado
+      instance_role.updated: Rol de instancia actualizado
+      instance_role.deleted: Rol de instancia eliminado
+      instance_role.permissions_updated: Permisos del rol de instancia actualizados
+      instance_role.user_added: Usuario añadido al rol de instancia
+      instance_role.user_removed: Usuario eliminado del rol de instancia
+      instance_permission.created: Permiso de instancia creado
+      instance_permission.updated: Permiso de instancia actualizado
+      instance_permission.deleted: Permiso de instancia eliminado
       project.member_added: Miembro añadido al proyecto
       project.member_role_changed: Rol de miembro del proyecto cambiado
       project.member_removed: Miembro eliminado del proyecto
+      project.member_activated: Miembro del proyecto activado
+      project.member_deactivated: Miembro del proyecto desactivado
       project.ownership_transferred: Propiedad del proyecto cedida
       project.group_linked: Grupo vinculado al proyecto
       project.group_role_changed: Rol del grupo en el proyecto cambiado
@@ -1315,6 +1316,8 @@ users:
       project.share_link_opened: Enlace para compartir abierto
       instance.config_exported: Configuración de instancia exportada
       instance.config_imported: Configuración de instancia importada
+      project.config_exported: Configuración de proyecto exportada
+      project.config_imported: Configuración de proyecto importada
       instance.mailer_updated: Ajustes de mailer de instancia actualizados
     context:
       email: Email

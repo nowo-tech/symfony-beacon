@@ -130,5 +130,6 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - Session without Remember me: **1 day**; Remember me: **30 days** (AuthKit + firewall lifetimes aligned).
 - Cookie Consent modal: public-only `render_routes` whitelist (`081` Cookie Consent amendment); not on authenticated product shells.
 - Locale switch / guest locale POSTs: Symfony `csrf_action_form()` (`090`).
+- Settings member/group add Forms (`ProjectMemberAddType` / `ProjectGroupAddType`) use FormKit profile `beacon` + `form` catalogue prefixes; Twig `form_row` + `_fields` (`081` FR-003c / `077`).
 
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

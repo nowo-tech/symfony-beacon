@@ -57,6 +57,12 @@ final class AccountPrivacyController extends AbstractController
                 'action' => $this->generateUrl('account_privacy_anonymize'),
                 'method' => 'POST',
                 'csrf_token_id' => 'account_privacy_anonymize',
+                'confirmation_attr' => [
+                    'id' => 'privacy-anonymize-confirm-input',
+                    'class' => 'input w-full',
+                    'autocomplete' => 'off',
+                    'data-confirm-dialog-target' => 'confirmInput',
+                ],
             ])->createView(),
         ]);
     }

@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace App\Identity\Form;
 
 use App\Project\Entity\Project;
+use App\Shared\Form\FormKitAbstractType;
 use Override;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Current user's member-alert preferences for a single project (opt-out matrix).
  *
- * @extends AbstractType<array<string, mixed>>
+ * Labels stay under {@code preferences.*} in the {@code form} catalogue (shared with Twig).
  */
-final class MemberProjectAlertPreferencesType extends AbstractType
+final class MemberProjectAlertPreferencesType extends FormKitAbstractType
 {
     public static function formNameForProject(Project $project): string
     {
@@ -30,24 +28,25 @@ final class MemberProjectAlertPreferencesType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('enabled', CheckboxType::class, [
-            'required' => false,
-            'label' => 'preferences.member_alerts.project_enabled',
-            'translation_domain' => 'messages',
-        ]);
-        $builder->add('resetOverrides', CheckboxType::class, [
-            'required' => false,
-            'label' => 'preferences.member_alerts.reset_overrides',
-            'help' => 'preferences.member_alerts.reset_overrides_help',
-            'translation_domain' => 'messages',
-        ]);
+        $this->withBuilder($builder, function (): void {
+            $this->addCheckboxField('enabled', [
+                'required' => false,
+                'placeholder' => false,
+                'label' => 'preferences.member_alerts.project_enabled',
+                'help' => false,
+            ]);
+            $this->addCheckboxField('resetOverrides', [
+                'required' => false,
+                'placeholder' => false,
+                'label' => 'preferences.member_alerts.reset_overrides',
+                'help' => 'preferences.member_alerts.reset_overrides_help',
+            ]);
 
-        MemberAlertEventsFormBuilder::addEventsMatrix($builder, 'preferences.member_alerts.project_overrides');
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([]);
+            MemberAlertEventsFormBuilder::addEventsMatrix(
+                $this->boundBuilder(),
+                'preferences.member_alerts.project_overrides',
+            );
+        });
     }
 
     #[Override]

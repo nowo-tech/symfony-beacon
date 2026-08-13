@@ -42,14 +42,16 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[action$="/governance"]');
 
-        $token = $crawler->filter('form[action$="/governance"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/governance"] input[name="project_governance[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/governance', [
-            '_token' => $token,
-            'retention_days' => '21',
-            'retention_max_events' => '5000',
-            'ingest_rate_limit_per_minute' => '',
-            'event_quota_daily' => '250',
-            'event_quota_monthly' => '',
+            'project_governance' => [
+                '_token' => $token,
+                'retention_days' => '21',
+                'retention_max_events' => '5000',
+                'ingest_rate_limit_per_minute' => '',
+                'event_quota_daily' => '250',
+                'event_quota_monthly' => '',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();
@@ -77,14 +79,16 @@ final class ProjectControllerFunctionalTest extends DatabaseWebTestCase
         $this->login($client, $owner);
 
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings');
-        $token = $crawler->filter('form[action$="/governance"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/governance"] input[name="project_governance[_token]"]')->attr('value');
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/governance', [
-            '_token' => $token,
-            'retention_days' => '-1',
-            'retention_max_events' => '',
-            'ingest_rate_limit_per_minute' => '',
-            'event_quota_daily' => '',
-            'event_quota_monthly' => '',
+            'project_governance' => [
+                '_token' => $token,
+                'retention_days' => '-1',
+                'retention_max_events' => '',
+                'ingest_rate_limit_per_minute' => '',
+                'event_quota_daily' => '',
+                'event_quota_monthly' => '',
+            ],
         ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings');
         $client->followRedirect();

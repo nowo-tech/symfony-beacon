@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace App\Issues\Form;
 
 use App\Shared\Form\AbstractGetFilterType;
-use App\Shared\Form\DashboardProjectFilterFields;
+use Nowo\FormKitBundle\Form\FormOptionsMerger;
+use Nowo\FormKitBundle\Form\FormTypeMap;
 use Override;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Dashboard "new in release" filters.
+ * Dashboard "new in release" filters (FormKit {@code filter}).
  */
 final class DashboardNewInReleaseFilterType extends AbstractGetFilterType
 {
     public function __construct(
+        FormOptionsMerger $formOptionsMerger,
+        FormTypeMap $formTypeMap,
         private readonly TranslatorInterface $translator,
     ) {
+        parent::__construct($formOptionsMerger, $formTypeMap);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -29,25 +32,27 @@ final class DashboardNewInReleaseFilterType extends AbstractGetFilterType
         /** @var array<string, string> $releaseChoices */
         $releaseChoices = $options['release_choices'];
 
-        DashboardProjectFilterFields::addPageAndProject(
-            $builder,
-            $this->translator,
-            $projectChoices,
-            'new_in_release.filter.any_project',
-            'new_in_release.filter.project',
-        );
-        $builder->add('release', ChoiceType::class, [
-            'label' => false,
-            'required' => false,
-            'choices' => $releaseChoices,
-            'choice_translation_domain' => false,
-            'placeholder' => $this->translator->trans('new_in_release.filter.any_release'),
-            'attr' => [
-                'class' => 'input',
-                'aria-label' => 'new_in_release.filter.release',
-            ],
-        ]);
-        DashboardProjectFilterFields::addPerPage($builder, $this->translator);
+        $this->withBuilder($builder, function () use ($projectChoices, $releaseChoices): void {
+            $this->addDashboardPageAndProject(
+                $this->translator,
+                $projectChoices,
+                'dashboard_new_in_release_filter.project.aria',
+            );
+            $this->addFilterSelect('release', [
+                'choices' => $releaseChoices,
+                'choice_translation_domain' => false,
+                'attr' => [
+                    'class' => 'input',
+                    'aria-label' => $this->translator->trans(
+                        'dashboard_new_in_release_filter.release.aria',
+                        [],
+                        'form',
+                    ),
+                ],
+                'row_attr' => ['class' => 'dashboard-filters__field'],
+            ]);
+            $this->addDashboardPerPage($this->translator);
+        });
     }
 
     #[Override]
@@ -61,5 +66,11 @@ final class DashboardNewInReleaseFilterType extends AbstractGetFilterType
         ]);
         $resolver->setAllowedTypes('project_choices', 'array');
         $resolver->setAllowedTypes('release_choices', 'array');
+    }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return 'dashboard_new_in_release_filter';
     }
 }

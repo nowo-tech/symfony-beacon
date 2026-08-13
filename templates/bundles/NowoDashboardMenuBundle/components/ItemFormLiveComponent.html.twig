@@ -42,7 +42,7 @@
     }) }}
         {% if _section_focus != '' %}
             {% set sectionFlagForm = flat_hidden_fields({_section: _section_focus}) %}
-            {{ form_widget(sectionFlagForm._section) }}
+            {{ form_row(sectionFlagForm._section) }}
         {% endif %}
         <div class="confirm-dialog__content">
         {% if _show_basic %}

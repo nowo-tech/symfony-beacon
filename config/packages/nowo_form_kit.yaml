@@ -7,10 +7,17 @@
 nowo_form_kit:
     default_profile: beacon
     css_framework: tailwind
+    # SearchType is not in FormKit's built-in map (text/email/… only).
+    type_map:
+        search: Symfony\Component\Form\Extension\Core\Type\SearchType
     profiles:
         beacon: &beacon_profile
             alias: beacon
-            translation_domain: messages
+            # Host FormKit catalogues live in translations/form.*.yaml
+            # ({form}.{field}.label|placeholder|help). Kit profiles below override.
+            translation_domain: form
+            auto_placeholder: true
+            auto_help: true
             required_label_suffix: null
             defaults:
                 attr:
@@ -100,3 +107,55 @@ nowo_form_kit:
             translation_domain: NowoRoutingKitBundle
             auto_placeholder: false
             auto_help: false
+
+        # GET / dashboard / index filters — own FormKit profile (not beacon).
+        # Wire via AbstractGetFilterType (#[FormKitConfig('filter')]), never beacon alone.
+        #
+        # Contract:
+        #   - label: never (field_types.*.label: false)
+        #   - placeholder: always (auto_placeholder: true → {prefix}.{field}.placeholder)
+        #   - help: always (auto_help: true → {prefix}.{field}.help), unless field sets help: false
+        #   - required: always false except per_page (required: true via field options;
+        #     AbstractGetFilterType::mergeFieldOptions defaults false; FormKit YAML cannot set required)
+        # Exceptions: hidden (addHiddenFilterField: placeholder+help false);
+        # choice empty-option via addFilterSelect; Twig-owned search → placeholder: false
+        # (still gets help unless help: false).
+        filter:
+            <<: *beacon_profile
+            alias: filter
+            translation_domain: form
+            auto_placeholder: true
+            auto_help: true
+            defaults:
+                attr:
+                    class: 'input'
+                row_attr:
+                    class: ''
+            field_types:
+                text:
+                    label: false
+                search:
+                    label: false
+                textarea:
+                    label: false
+                integer:
+                    label: false
+                number:
+                    label: false
+                email:
+                    label: false
+                password:
+                    label: false
+                checkbox:
+                    label: false
+                choice:
+                    label: false
+                    # Select empty-option uses ChoiceType "placeholder", not attr.placeholder.
+                    # addFilterSelect() restores an empty-option key when the field needs one.
+                    placeholder: false
+                hidden:
+                    label: false
+                    # Pass placeholder/help: false in field options (addHiddenFilterField) so
+                    # FormOptionsMerger unsets them — profile alone leaves attr.placeholder,
+                    # and HiddenType rejects bool help if left as false.
+                    placeholder: false

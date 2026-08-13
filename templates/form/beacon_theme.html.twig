@@ -10,9 +10,29 @@
     </div>
 {%- endblock form_row -%}
 
+{#- Hidden fields: no row chrome (keeps CSS grids / filter layouts clean). -#}
+{%- block hidden_row -%}
+    {{- form_widget(form) -}}
+{%- endblock hidden_row -%}
+
+{#- Color inputs: swatch + live hex readout (settings appearance). -#}
+{%- block color_row -%}
+    <div class="{{ row_attr.class|default('flex flex-col gap-2') }}">
+        {{- form_label(form) -}}
+        <div class="flex items-center gap-3">
+            {{- form_widget(form) -}}
+            <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ id }}">{{ value }}</span>
+        </div>
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock color_row -%}
+
 {%- block form_label -%}
     {% if label is not same as(false) -%}
-        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' block text-sm font-medium text-[var(--color-ink)]/85')|trim}) %}
+        {% if label_attr.class is not defined or label_attr.class is empty %}
+            {% set label_attr = label_attr|merge({class: 'block text-sm font-medium text-[var(--color-ink)]/85'}) %}
+        {% endif %}
         {{- parent() -}}
     {%- endif -%}
 {%- endblock form_label -%}
@@ -42,7 +62,32 @@
 
 {%- block choice_widget_collapsed -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) %}
-    {{- parent() -}}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+        {% set required = false %}
+    {%- endif -%}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {%- if placeholder is not none -%}
+            {#- Kits may pre-|trans empty-option copy; only translate catalogue-looking keys. -#}
+            {%- set _ph_is_key = placeholder is not same as('') and placeholder is not same as(false) and placeholder matches '/^[a-zA-Z_][a-zA-Z0-9_.]*$/' -%}
+            {%- set _ph_skip = translation_domain is same as(false) or not _ph_is_key -%}
+            <option value=""{% if placeholder_attr|default({}) %}{% with {attr: placeholder_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (_ph_skip ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+        {%- endif -%}
+        {%- if preferred_choices|length > 0 -%}
+            {% set options = preferred_choices %}
+            {% set render_preferred_choices = true %}
+            {{- block('choice_widget_options') -}}
+            {%- if choices|length > 0 and separator is not none -%}
+                {%- if separator_html is not defined or separator_html is same as(false) -%}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% else %}
+                    {{ separator|raw }}
+                {% endif %}
+            {%- endif -%}
+        {%- endif -%}
+        {%- set options = choices -%}
+        {%- set render_preferred_choices = false -%}
+        {{- block('choice_widget_options') -}}
+    </select>
 {%- endblock choice_widget_collapsed -%}
 
 {#- Expanded multi/single choice: keep checkbox and label on one row (form_div_layout emits naked siblings). -#}
@@ -61,7 +106,8 @@
                 }) -}}
                 {%- if choice_label is not same as(false) -%}
                     <span class="leading-snug">
-                        {{- choice_label|trans({}, choice_translation_domain) -}}
+                        {#- Match Symfony form_div_layout: skip |trans when domain is false (literal labels). -#}
+                        {{- choice_translation_domain is same as(false) ? choice_label : choice_label|trans({}, choice_translation_domain) -}}
                     </span>
                 {%- endif -%}
             </label>
@@ -80,7 +126,7 @@
             <span class="min-w-0">
                 {%- if label is not same as(false) -%}
                     <span class="block font-medium text-[var(--color-ink)]/85">
-                        {{- label|trans({}, translation_domain) -}}
+                        {{- translation_domain is same as(false) ? label : label|trans({}, translation_domain) -}}
                     </span>
                 {%- endif -%}
                 {{- form_help(form) -}}
@@ -99,6 +145,29 @@
     {{- parent() -}}
 {%- endblock checkbox_widget -%}
 
+{%- block attributes -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- ' ' -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {#- Keys look like form.field.placeholder; kits often pre-|trans literals into attr. -#}
+            {%- set _is_key = attrvalue is not null and attrvalue is not same as(false) and attrvalue matches '/^[a-zA-Z_][a-zA-Z0-9_.]*$/' -%}
+            {%- set _skip_trans = translation_domain is same as(false) or attrvalue is null or attrvalue is same as(false) or not _is_key -%}
+            {{- attrname }}="{{ _skip_trans ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
+        {%- elseif attrvalue is same as(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not same as(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock attributes -%}
+
+{%- block form_help -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' text-xs text-[var(--color-ink)]/55')|trim}) -%}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_help -%}
+
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
         <ul class="list-none space-y-1 text-sm text-[var(--color-alert)]">
@@ -108,10 +177,3 @@
         </ul>
     {%- endif -%}
 {%- endblock form_errors -%}
-
-{%- block form_help -%}
-    {%- if help is not empty -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' text-xs text-[var(--color-ink)]/55')|trim}) -%}
-        {{- parent() -}}
-    {%- endif -%}
-{%- endblock form_help -%}

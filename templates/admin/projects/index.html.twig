@@ -151,14 +151,16 @@
             <div class="grid gap-3 pt-1" data-testid="admin-projects-config-import">
                 <p class="text-sm text-[var(--color-ink)]/60">{{ 'admin_projects.config.import_help'|trans }}</p>
                 {{ form_start(importForm, {attr: {class: 'grid gap-3 sm:max-w-md', 'data-testid': 'admin-projects-config-import-form'}}) }}
-                    <label class="grid gap-1.5">
-                        <span class="text-sm font-medium text-[var(--color-ink)]">{{ 'admin_projects.config.file'|trans }}</span>
-                        {{ form_widget(importForm.bundle, {attr: {class: 'input', accept: 'application/json,.json', 'data-testid': 'admin-projects-config-file'}}) }}
-                    </label>
+                    {% for field in importForm %}
+                        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                            {{ form_row(field) }}
+                        {% endif %}
+                    {% endfor %}
                     <div>
                         <button class="btn-primary" type="submit" data-testid="admin-projects-config-import-submit">{{ 'admin_projects.config.import'|trans }}</button>
                     </div>
-                {{ form_end(importForm) }}
+                    {% include 'form/_fields.html.twig' with {form: importForm} only %}
+                {{ form_end(importForm, {render_rest: false}) }}
                 <p class="text-xs text-[var(--color-ink)]/55">{{ 'admin_projects.config.note'|trans }}</p>
             </div>
         </div>

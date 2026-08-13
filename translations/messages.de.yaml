@@ -376,17 +376,8 @@ project:
     intro: API-Schlüssel, Mitglieder, Governance und destruktive Projektaktionen.
   governance:
     title: Regierungsführung
-    help: Aufbewahrung pro Projekt, Ratenlimits und Tageskontingente. Lassen Sie ein
-      Feld leer, um den Serverstandard zu übernehmen.
-    retention_days: Aufbewahrungstage
-    retention_max_events: Max. gespeicherte Ereignisse
-    ingest_rate_limit: Begrenzung der Aufnahmerate (pro Minute)
-    event_quota_daily: Tägliches Event-Kontingent
-    event_quota_monthly: Monatliches Ereigniskontingent
     quota_usage_monthly: '%count% / %quota% Ereignisse in diesem Monat (UTC)'
     month_utc_hint: Monatsgrenze ist UTC
-    inherit_hint: Leer = Serverstandard übernehmen (%default%). Verwenden Sie 0 zum
-      Deaktivieren, wenn der Standardwert ungleich Null ist.
     save: Governance retten
     quota_usage: 'Veranstaltungen heute: %count% / %quota%'
     ingest_disabled_banner: Die Umschlagaufnahme ist für dieses Projekt ausgesetzt.
@@ -1048,9 +1039,20 @@ users:
       group.deleted: Gruppe geloscht
       group.member_added: Gruppenmitglied hinzugefugt
       group.member_removed: Gruppenmitglied entfernt
+      instance_role.created: Instanzrolle erstellt
+      instance_role.updated: Instanzrolle aktualisiert
+      instance_role.deleted: Instanzrolle gelöscht
+      instance_role.permissions_updated: Berechtigungen der Instanzrolle aktualisiert
+      instance_role.user_added: Benutzer zur Instanzrolle hinzugefügt
+      instance_role.user_removed: Benutzer von Instanzrolle entfernt
+      instance_permission.created: Instanzberechtigung erstellt
+      instance_permission.updated: Instanzberechtigung aktualisiert
+      instance_permission.deleted: Instanzberechtigung gelöscht
       project.member_added: Projektmitglied hinzugefugt
       project.member_role_changed: Rolle des Projektmitglieds geandert
       project.member_removed: Projektmitglied entfernt
+      project.member_activated: Projektmitglied aktiviert
+      project.member_deactivated: Projektmitglied deaktiviert
       project.ownership_transferred: Projektinhaberschaft ubertragen
       project.group_linked: Projektgruppe verknupft
       project.group_role_changed: Rolle der Projektgruppe geandert
@@ -1085,6 +1087,8 @@ users:
       project.share_link_opened: Freigabelink geöffnet
       instance.config_exported: Instanzkonfiguration exportiert
       instance.config_imported: Instanzkonfiguration importiert
+      project.config_exported: Projektkonfiguration exportiert
+      project.config_imported: Projektkonfiguration importiert
       instance.mailer_updated: Instanz-Mailer-Einstellungen aktualisiert
     context:
       email: E-Mail
@@ -1852,7 +1856,6 @@ releases:
     empty: In dieser Release wurden keine Issues erstmals gesehen.
   compare:
     label: Mit Release vergleichen
-    none: Nicht vergleichen
     help: Vergleichen Sie die ausgewahlte Release optional mit einer anderen Release
       anhand der aktuellen Issue-Menge.
     summary_title: Vergleich %a% vs %b%

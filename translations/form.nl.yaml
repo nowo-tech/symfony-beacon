@@ -1,0 +1,864 @@
+# FormKit field catalogue (label / placeholder / help). Domain: form
+admin_user:
+  email:
+    label: E-mail
+    placeholder: naam@voorbeeld.nl
+    help: Inlog-e-mail voor dit account.
+  display_name:
+    label: Weergavenaam
+    placeholder: Jan Jansen
+    help: Getoond in de admin-directory en activiteitstijdlijn.
+  password:
+    label: Wachtwoord
+    placeholder: Minimaal 8 tekens
+    help: Minimaal 8 tekens.
+  role:
+    label: Rol
+    placeholder: Selecteer een rol
+    help: Instantierol (gebruiker of admin).
+  enabled:
+    label: Account ingeschakeld (kan inloggen)
+    placeholder: ''
+    help: Indien uitgeschakeld kan de gebruiker niet inloggen.
+admin_instance_role:
+  name:
+    label: Naam
+    placeholder: Support
+    help: Database-fallback voor de weergavenaam. De UI geeft de voorkeur aan roles.catalog.<slug>.name
+      als die sleutel is vertaald (slug = code in kleine letters).
+  code:
+    label: Code
+    placeholder: ROLE_SUPPORT
+    help: Symfony-achtige code (bijv. ROLE_SUPPORT). Machine-id — niet vertaald.
+  description:
+    label: Wanneer gebruiken
+    placeholder: Optionele korte toelichting…
+    help: Korte toelichting wanneer deze rol toe te wijzen. Geef de voorkeur aan roles.catalog.<slug>.description;
+      dit veld is de DB-fallback.
+  enabled:
+    label: Ingeschakeld
+    help: Indien uitgeschakeld kan deze rol niet opnieuw worden toegewezen.
+project:
+  nav:
+    label: Projectsecties
+  governance:
+    help: Retentie per project, tarieflimieten en dagelijkse quota. Laat een veld leeg om de serverstandaard
+      over te nemen.
+    inherit_hint: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaardwaarde
+      niet nul is.
+    retention_days:
+      label: Retentie dagen
+    retention_max_events:
+      label: Max. opgeslagen gebeurtenissen
+    ingest_rate_limit:
+      label: Limiet voor opnamesnelheid (per minuut)
+    event_quota_daily:
+      label: Dagelijks evenementenquotum
+    event_quota_monthly:
+      label: Maandelijks evenementenquotum
+  name:
+    label: Naam
+    placeholder: bijv. Facturerings-API
+    help: Wordt weergegeven in het dashboard en gebruikt om de projectslug af te leiden.
+    required: Projectnaam is vereist.
+  description:
+    label: Beschrijving
+    placeholder: Optionele korte samenvatting
+    help: Helpt uw ​​team dit project te herkennen.
+  api_keys:
+    help: Gebruik een DSN in BEACON_DSN zodat uw app fouten naar dit project kan verzenden.
+  members:
+    help: Directe leden van dit project. Eigenaren en beheerders beheren het lidmaatschap. Toegang kan
+      ook afkomstig zijn van gekoppelde groepen hieronder.
+    email_label: E-mailadres van lid
+    email_placeholder: gebruiker@voorbeeld.com
+    role:
+      admin: Beheerder
+      full: Full
+      member: Lid
+      owner: Eigenaar
+      viewer: Viewer
+    role_label: Rol
+  groups:
+    help: Koppel een groep zodat elk groepslid de gekozen rol in dit project krijgt. Eigenaren moeten
+      worden toegevoegd als individuele gebruikers.
+    select: Selecteer een groep…
+  config:
+    help: 'Draagbare JSON voor dit project (code: %code%). Bevat lidmaatschappen op e-mail; nooit API-geheimen.'
+  danger:
+    transfer_member_placeholder: Selecteer een lid…
+site_appearance:
+  brand_name:
+    label: Merknaam
+    placeholder: symfonie-baken
+    help: Getoond in de koptekst en op de inlogpagina.
+  brand_eyebrow:
+    label: Merk wenkbrauw
+    placeholder: Foutopsporing
+    help: Kort label boven het merk op het inlogscherm.
+  accent_color:
+    label: Accent
+    placeholder: '#1f6f54'
+    help: Primair accent (knoppen, links) in lichtmodus.
+  accent_deep_color:
+    label: Accent (zweven)
+    placeholder: '#134736'
+    help: Donkerder accent voor zweeftoestanden in de lichte modus.
+  accent_color_dark:
+    label: Accent (donker)
+    placeholder: '#4aad7f'
+    help: Primair accent in donkere modus.
+  accent_deep_color_dark:
+    label: Accentzweven (donker)
+    placeholder: '#6bc49a'
+    help: Lichter accent voor zweeftoestanden in de donkere modus.
+  danger_color:
+    label: Gevaar
+    placeholder: '#b42318'
+    help: Fout / destructief accent in lichtmodus.
+  danger_color_dark:
+    label: Gevaar (donker)
+    placeholder: '#f97066'
+    help: Fout / destructief accent in donkere modus.
+  warn_color:
+    label: Waarschuwing
+    placeholder: '#b54708'
+    help: Waarschuwingsaccent in lichtmodus.
+  warn_color_dark:
+    label: Waarschuwing (donker)
+    placeholder: '#fdb022'
+    help: Waarschuwingsaccent in donkere modus.
+  paper_color:
+    label: Papier
+    placeholder: '#f3f6f4'
+    help: Pagina-achtergrond in lichtmodus.
+  paper_color_dark:
+    label: Papier (donker)
+    placeholder: '#0c1210'
+    help: Pagina-achtergrond in donkere modus.
+  ink_color:
+    label: Inkt
+    placeholder: '#0f1c18'
+    help: Primaire tekstkleur in lichtmodus.
+  ink_color_dark:
+    label: Inkt (donker)
+    placeholder: '#e6eee9'
+    help: Primaire tekstkleur in donkere modus.
+  surface_color:
+    label: Oppervlak
+    placeholder: '#ffffff'
+    help: Panelen en kaarten in lichtmodus.
+  surface_color_dark:
+    label: Oppervlak (donker)
+    placeholder: '#151c19'
+    help: Panelen en kaarten in donkere modus.
+  footer_fixed:
+    label: Vaste footer
+    help: Houdt de juridische footer vast onderaan de viewport terwijl de inhoud scrollt.
+  corner_style:
+    label: Hoekstijl
+    help: Kaarten gebruiken een grotere radius; invoervelden en knoppen blijven subtieler.
+    choice:
+      sharp: Scherp
+      soft: Zacht (standaard)
+      rounded: Afgerond
+  border_strength:
+    label: Randsterkte
+    help: Hoe duidelijk elementranden ogen in lichte en donkere modus (panelen, invoer, chrome).
+    choice:
+      subtle: Subtiel
+      medium: Gemiddeld (standaard)
+      strong: Sterk
+  color:
+    invalid: 'Gebruik een hexadecimale kleur zoals #1f6f54.'
+user_preferences:
+  display_name:
+    label: Weergavenaam
+    placeholder: Jouw naam
+    help: Getoond in het avatarmenu en de ledenlijsten.
+  email:
+    label: E-mail
+    placeholder: jij@voorbeeld.com
+    help: Gebruikt om in te loggen.
+  slack_user_id:
+    placeholder: U012ABCDEF
+  phone:
+    placeholder: '+34600111222'
+  preferred_locale:
+    label: Taal
+    placeholder: Auto
+    help: Voorkeurstaal van de gebruikersinterface voor dit account.
+  preferred_theme:
+    label: Thema
+    placeholder: Auto
+    help: Gewenste verschijning overdag of 's nachts.
+  preferred_content_width:
+    label: Breedte inhoud
+    placeholder: Inhoud
+    help: Gecentreerde inhoudskolom, of rek het hoofdgebied over de volledige breedte uit.
+  preferred_ui_density:
+    label: UI-dichtheid
+    placeholder: Comfortabel
+    help: Comfortabele tussenruimte of een compactere bestuurdersindeling.
+  preferred_font_scale:
+    label: Tekstgrootte
+    placeholder: Medium
+    help: Schaald de interfacetekst kleiner of groter.
+  preferred_contrast:
+    label: Contrast
+    placeholder: Systeem
+    help: Volg het apparaatcontrast of forceer sterkere tekst en randen.
+  preferred_sidebar:
+    label: Zijbalk
+    placeholder: Uitgevouwen
+    help: Standaard op desktop als deze browser nog geen opgeslagen voorkeur heeft.
+  preferred_motion:
+    label: Beweging
+    placeholder: Systeem
+    help: Volg de apparaatvoorkeur, verminder animaties of houd volledige beweging.
+  current_password:
+    label: Huidig ​​wachtwoord
+    placeholder: Huidig wachtwoord
+    help: Alleen vereist bij het instellen van een nieuw wachtwoord.
+    help_email_change: Vereist bij het wijzigen van je e-mailadres (login en wachtwoordreset-bestemming).
+    help_required: Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te stellen.
+  plain_password:
+    label: Nieuw wachtwoord
+    placeholder: Nieuw wachtwoord
+    help: Kies een sterk wachtwoord dat aan de onderstaande eisen voldoet.
+    second:
+      label: Bevestig nieuw wachtwoord
+    first:
+      label: Nieuw wachtwoord
+  plain_password_confirm:
+    placeholder: Bevestig nieuw wachtwoord
+    help: Voer je nieuwe wachtwoord opnieuw in.
+ops_defaults:
+  allow_anonymous_resolve:
+    help: Verouderd. Indien ingeschakeld mag Resolve issues wijzigen zonder gemapte Beacon-actor. Geef
+      voorkeur aan gemapte gebruikers + triage.
+    label: Anonieme Slack/Teams-Resolve toestaan
+  allow_private_urls:
+    help: Indien ingeschakeld mogen uitgaande webhooks privé-/link-local-hosts bereiken. Laat uitgeschakeld
+      in productie.
+    label: Privé-notificatie-URL’s toestaan
+  circuit_breaker_cooldown:
+    help: Minuten voordat een automatisch gepauzeerde bestemming opnieuw mag proberen. Gebruik 0 voor
+      handmatige hervatting.
+    label: Circuit breaker-afkoeling in minuten
+  circuit_breaker_threshold:
+    help: Opeenvolgende afleverfouten voordat een notificatiebestemming automatisch wordt gepauzeerd.
+    label: Circuit breaker-foutdrempel
+  clear_inbound_webhook_secret:
+    help: Verwijder het opgeslagen inbound-webhookgeheim.
+    label: Inbound-webhookgeheim wissen
+  clear_metrics_token:
+    help: Verwijder het opgeslagen scrape-token.
+    label: Metrics-scrape-token wissen
+  delivery_history_limit:
+    help: Aantal recente afleverpogingen dat per notificatiebestemming wordt bewaard.
+    label: Limiet aflevergeschiedenis
+  envelope_max_bytes:
+    help: HTTP 413 wanneer een ruwe ingest-body deze grootte overschrijdt. Standaard 2097152 (2 MiB).
+    label: Max. Envelope-/OTLP-bodygrootte (bytes)
+  event_quota_daily:
+    help: Maximum geaccepteerde events per project per dag. Gebruik 0 voor onbeperkt.
+    label: Dagelijkse eventquota
+  event_quota_monthly:
+    help: Maximum geaccepteerde events per project per UTC-kalendermaand. Gebruik 0 voor onbeperkt.
+    label: Maandelijkse eventquota
+  inbound_email_enabled:
+    help: Indien ingeschakeld kunnen mention/assign-mails Reply-To-tokens bevatten en accepteert POST
+      /hooks/email/inbound providerwebhooks.
+    label: Inbound e-mailreacties inschakelen
+  inbound_mail_domain:
+    help: Domein gebruikt in Reply-To-adressen (reply+{token}@domein).
+    label: Inbound maildomein
+  inbound_webhook_secret:
+    help: Gedeeld geheim voor X-Beacon-Inbound-Secret en Reply-To-HMAC-ondertekening. Leeg laten behoudt
+      het huidige geheim.
+    label: Inbound-webhookgeheim
+  ingest_rate_limit:
+    help: Maximum Envelope-verzoeken per project per minuut. Gebruik 0 voor onbeperkt.
+    label: Ingest-snelheidslimiet per minuut
+  ingest_reject_query_auth:
+    help: Indien ingeschakeld worden beacon_key/beacon_secret-queryparameters geweigerd (401). Alleen
+      uitschakelen tijdens migratie naar X-Beacon-Auth of Envelope-DSN.
+    label: Verouderde querystring-ingest-auth weigeren
+  metrics_require_token:
+    help: Indien ingeschakeld geeft /metrics 503 totdat er een metrics-token is opgeslagen. Aanbevolen
+      in productie.
+    label: Metrics-scrape-token vereisen
+  metrics_token:
+    help: Bearer-token voor scrapers. Leeg laten behoudt het huidige token.
+    label: Metrics-scrape-token
+  retention_days:
+    help: Verwijder telemetrie ouder dan dit aantal dagen. Gebruik 0 om leeftijdsgebaseerde retentie uit
+      te schakelen.
+    label: Retentiedagen
+  retention_max_events:
+    help: Bewaar hoogstens dit aantal events per project. Gebruik 0 voor geen maximum op aantal.
+    label: Maximum opgeslagen events per project
+instance_mailer:
+  mailer_dsn:
+    label: Mailer-DSN
+    help: Leeg laten om de huidige versleutelde waarde te behouden. Voorbeeld smtp://user:pass@mail.example:587
+      - null:// wordt afgewezen (gebruik in plaats daarvan Opgeslagen DSN wissen).
+    placeholder: smtp://user:pass@mail.example:587
+    invalid: Voer een geldige Symfony Mailer-DSN in (bijvoorbeeld smtp://user:pass@host:587).
+    null_transport: null:// kan geen e-mail afleveren. Plak een echte SMTP-DSN (of
+      andere), of gebruik Opgeslagen DSN wissen om terug te vallen op de omgeving.
+    scheme_not_allowed: Dat Mailer-DSN-schema is niet toegestaan. Gebruik smtp, smtps
+      of een ondersteund providerschema (Mailgun, Postmark, SES, …).
+  clear_dsn:
+    label: Opgeslagen DSN wissen
+    help: Verwijdert de DSN uit de database en valt terug op MAILER_DSN uit de omgeving totdat je een
+      nieuwe opslaat.
+  mailer_from:
+    label: From-adres
+    help: Envelope From voor magic login en notificatiemails. Standaard beacon@localhost wanneer leeg.
+    placeholder: beacon@example.com
+instance_mercure:
+  enabled:
+    label: Mercure-livemeldingen inschakelen
+    help: Wanneer ingeschakeld abonneren aangemelde leden zich op prive-projecttopics voor nieuwe-issue-toasts
+      zolang de app open is.
+  url:
+    label: Publish-URL (server)
+    help: Leeg laten om MERCURE_URL te gebruiken (bijv. http://mercure/.well-known/mercure binnen Compose).
+    placeholder: http://mercure/.well-known/mercure
+  public_url:
+    label: Publieke URL (browser)
+    help: Leeg laten om MERCURE_PUBLIC_URL te gebruiken (meestal same-origin /.well-known/mercure via
+      Caddy).
+    placeholder: https://localhost:9447/.well-known/mercure
+  jwt_secret:
+    label: JWT-secret
+    help: Leeg laten om de huidige versleutelde waarde te behouden of terug te vallen op MERCURE_JWT_SECRET.
+      Minimaal 32 tekens indien ingesteld.
+    placeholder: ••••••••••••••••••••••••••••••••
+    invalid: Voer een geldige JWT-secretstring in.
+    too_short: JWT-secret moet minimaal 32 tekens bevatten.
+  clear_secret:
+    label: Opgeslagen JWT-secret wissen
+    help: Verwijdert het secret uit de database en valt terug op MERCURE_JWT_SECRET totdat je een nieuwe
+      opslaat.
+social_login_credential:
+  authorize_url:
+    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
+    label: Authorize-URL
+  client_id:
+    label: Client-ID
+  client_secret:
+    label: Clientgeheim
+    help_new: OAuth-clientgeheim uit de IdP-appregistratie.
+    help_edit: Laat leeg om het huidige geheim te behouden.
+  enabled:
+    help: Uitgeschakelde providers blijven in de database maar verschijnen niet bij login.
+    label: Ingeschakeld
+  enterprise_sso:
+    help: Tonen onder „Inloggen met je organisatie” in plaats van consumenten-socialknoppen (OIDC-IdP’s).
+    label: Enterprise-SSO
+  label:
+    help: Getoond op de Doorgaan-met-knop op de loginpagina.
+    label: Knoplabel
+  provider:
+    help: Kleine-letter-slug (google, github, microsoft of aangepast).
+    label: Providersleutel
+  scopes:
+    help: Optionele OAuth-scopes, gescheiden door spaties of komma’s.
+    label: Scopes
+  token_url:
+    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
+    label: Token-URL
+  userinfo_url:
+    help: Optioneel voor ingebouwde providers; verplicht voor aangepaste IdP’s.
+    label: Userinfo-URL
+admin_instance_permission:
+  key:
+    label: Permission key
+    help: Lowercase dotted machine name used in isGranted('project.view'). Not translated.
+    placeholder: bijv. project.custom.manage
+  category:
+    label: Category
+    help: Choose a category. Option labels follow the current UI language; the stored value is the machine
+      slug.
+    placeholder: Kies een categorie…
+  name:
+    help_default: Required for the default language (%locale%). Saved per language; the UI uses the active
+      locale, then the catalog, then this value.
+    help_locale: Optional for %locale%. Overrides the catalog name when set.
+  description:
+    help_locale: Optional for %locale%. Overrides the catalog description when set.
+  name_en:
+    label: Display name
+  description_en:
+    label: Description
+  name_es:
+    label: Display name
+  description_es:
+    label: Description
+  name_de:
+    label: Display name
+  description_de:
+    label: Description
+  name_fr:
+    label: Display name
+  description_fr:
+    label: Description
+  name_it:
+    label: Display name
+  description_it:
+    label: Description
+  name_nl:
+    label: Display name
+  description_nl:
+    label: Description
+  name_pt:
+    label: Display name
+  description_pt:
+    label: Description
+groups:
+  description_label: Beschrijving
+  name_label: Naam
+issues:
+  assignee_unassigned: Niet toegewezen
+  duplicate_canonical: Canonieke kwestie
+  duplicate_search_placeholder: Zoeken op titel of UUID…
+  merge_events_help: Verplaatst alle gebeurtenissen naar het geselecteerde probleem, berekent de aantallen
+    opnieuw en negeert dit probleem vervolgens.
+  merge_events_label: Voeg ook gebeurtenissen samen in de canonieke kwestie
+  priority:
+    critical: Kritisch
+    high: Hoog
+    low: Laag
+    medium: Medium
+  priority_label: Prioriteit
+notifications:
+  form:
+    categories: Meldingscategorieen
+    clear_signing_secret: Clear interaction signing secret
+    digest_enabled: Digestsamenvatting verzenden bij flush
+    digest_help: Wanneer ingeschakeld verzendt flush een samenvatting per bestemming. Wanneer uitgeschakeld
+      wordt elke vastgehouden melding afzonderlijk verzonden na de stille uren.
+    enabled: Ingeschakeld
+    endpoint: Endpoint
+    endpoint_help: 'Slack / Discord / Teams / HTTP: HTTPS-webhook-URL. E-mail: ontvangeradres. Telegram:
+      bot_token@chat_id'
+    label: Label
+    quiet_hours_enabled: Stille uren inschakelen
+    quiet_hours_end: Einde stille uren (HH:MM)
+    quiet_hours_help: Tijdens dit venster worden meldingen gebufferd in plaats van direct verzonden. Voer
+      app:notifications:flush-digests volgens schema uit (of na het venster).
+    quiet_hours_start: Begin stille uren (HH:MM)
+    quiet_hours_timezone: Tijdzone
+    signing_secret: Interaction signing secret
+    signing_secret_help: Optional. Enables interactive Resolve (Slack app Signing Secret, or a shared
+      secret for Teams HttpPOST). Leave blank to keep the current value.
+    type: Type
+    endpoint_invalid: Endpoint komt niet overeen met het geselecteerde type.
+    endpoint_ssrf: Endpoint mag niet verwijzen naar private, link-local- of cloudmetadata-adressen.
+    quiet_hours_range_invalid: Start- en eindtijd moeten verschillen.
+    quiet_hours_required: Start- en eindtijd zijn verplicht wanneer stille uren zijn ingeschakeld.
+    quiet_hours_time_invalid: Gebruik 24-uursindeling HH:MM (bijv. 22:00).
+    quiet_hours_timezone_invalid: Ongeldige tijdzone-id.
+  category:
+    debug: Debug
+    error: Fout
+    fatal: Fatal
+    info: Info
+    issue:
+      assigned: Issue toegewezen
+      commented: Issue becommentarieerd
+      duplicated: Issue als duplicaat gemarkeerd
+      reopened: Issue heropend
+      resolved: Issue opgelost
+    n_plus_one: N+1-detecties
+    volume:
+      threshold: Volumedrempels
+    warning: Waarschuwing
+  type:
+    discord: Discord-webhook
+    email: E-mail
+    http: Generieke HTTP-webhook
+    slack: Slack Incoming Webhook
+    teams: Microsoft Teams-webhook
+    telegram: Telegram-bot
+preferences:
+  issue_panels_collapsed: Probleempanelen zijn standaard samengevouwen
+  issue_panels_help: Aangevinkte panelen worden samengevouwen weergegeven op de probleem- en gebeurtenisdetailpagina's.
+    Uw browser onthoudt handmatige open-/sluitoverschrijvingen.
+  member_alerts:
+    enabled: Notify for this event
+    master: Enable member alerts
+    master_help: When off, you receive no live toasts or Web Push for member issue events. Your event
+      and project choices are kept.
+    project_enabled: Alerts for this project
+    reset_overrides: Reset overrides (inherit account defaults)
+    reset_overrides_help: Clears saved per-event overrides for this project on save.
+    scope:
+      involved: Only when I am involved
+  product_tour_enabled: Actieve rondleidingen
+  product_tour_enabled_help: Aangevinkte rondleidingen kunnen één keer per gebied automatisch starten.
+    Vink uit om een rondleiding te verbergen; vink alles uit om elke rondleiding uit te schakelen.
+  product_tour_select_all: Alle rondleidingen selecteren
+  profile:
+    phone: Telefoonnummer
+    phone_help: Optioneel. Vereist voor QR-login. Opslaan markeert als geverifieerd tot SMS-OTP.
+    slack_user_id: Slack user ID
+    slack_user_id_help: Optional. Your Slack member ID (e.g. U012ABCDEF) enables Assign to me on Slack
+      issue alerts. Find it in your Slack profile → … → Copy member ID.
+  push_notifications: Pushmeldingen voor nieuwe issues
+  push_notifications_help: Optioneel. Wanneer ingeschakeld, vraagt Beacon de browser om toestemming en
+    kan u waarschuwen over nieuwe issues in projecten waartoe u behoort — ook op de achtergrond (geïnstalleerde
+    PWA of ondersteunde browser). Live in-app toasts vereisen apart Administratie → Mercure.
+  issue_panels_placeholder: Selecteer panelen…
+  contrast_more: Meer contrast
+  contrast_system: Systeem (volg apparaat)
+  density_comfortable: Comfortabel
+  density_compact: Compact
+  font_scale_lg: Groot
+  font_scale_md: Medium
+  font_scale_sm: Klein
+  motion_full: Volledige beweging
+  motion_reduce: Verminder beweging
+  motion_system: Systeem (volg apparaat)
+  product_tour_page:
+    admin: Administratie
+    dashboard: Dashboard
+    project_issues: Projectissues
+  sidebar_collapsed: Ingevouwen
+  sidebar_expanded: Uitgevouwen
+  theme_dark: Nacht
+  theme_light: Dag
+  width_content: Inhoud (gecentreerd)
+  width_full: Volledige breedte
+projects:
+  search_placeholder: Zoek projecten…
+  read_token:
+    label: Label
+    label_placeholder: CI-bot, exportscript…
+  share:
+    days: Geldigheid (dagen)
+    issue_optional: Leeg laten voor het hele project
+    issue_uuid: Issue-UUID (optioneel)
+    max_uses: Max. gebruik
+    max_uses_help: Laat Max. gebruik leeg voor onbeperkte openingen tot verval. Standaard is 1 (eenmalig).
+    max_uses_unlimited: Onbeperkt
+thresholds:
+  form:
+    cooldown_minutes: Cooldown (minuten)
+    cooldown_minutes_help: Onderdrukt dubbele meldingen voor deze regel tijdens het cooldownvenster.
+    enabled: Ingeschakeld
+    environment: Omgevingsfilter
+    environment_help: Leeg laten om alle omgevingen te tellen.
+    error_count: Aantal fouten
+    error_count_help: Waarschuw wanneer minstens zoveel error/fatal-events binnen het rollende venster
+      worden ontvangen.
+    label: Label
+    label_help: Optionele interne naam die wordt getoond in Settings en payloads.
+    release: Releasefilter
+    release_help: Leeg laten om alle releases te tellen.
+    window_minutes: Venster (minuten)
+    window_minutes_help: Rollend terugkijkvenster van 1 tot 1440 minuten.
+analytics_filter:
+  from:
+    placeholder: Van
+    help: Startdatum voor een aangepast bereik (UTC-kalenderdag).
+  to:
+    placeholder: Tot
+    help: Einddatum voor een aangepast bereik (UTC-kalenderdag).
+  environment:
+    placeholder: prod
+    help: Beperk errorvolume tot deze omgeving (leeg = alle).
+  release:
+    placeholder: 1.2.0
+    help: Beperk errorvolume tot deze releaseversie (leeg = alle).
+  level:
+    placeholder: error
+    help: Beperk errorvolume tot dit logniveau (bijv. error). Leeg = alle.
+issue_index_filter:
+  q:
+    placeholder: Search title…
+    help: Search issues by title.
+  level:
+    placeholder: Any level
+    help: Filter by event level.
+  environment:
+    placeholder: Environment
+    help: Only issues seen in this environment.
+  compare:
+    placeholder: Compare with environment…
+    help: Set Environment and Compare to see issues only in A, only in B, or in both.
+  release:
+    placeholder: Release
+    help: Only issues first seen in this release.
+  tag:
+    placeholder: Tag
+    help: Filter by tag.
+  url:
+    placeholder: Request URL
+    help: Filter by request URL fragment.
+  user:
+    placeholder: Event user
+    help: Filter by event user.
+  status:
+    any: any status
+    unresolved: Unresolved
+    resolved: Resolved
+    ignored: Ignored
+    help: Filter by issue status.
+  priority:
+    any: Any priority
+    low: Low
+    medium: Medium
+    high: High
+    critical: Critical
+    help: Filter by priority.
+  assignee:
+    any: Any assignee
+    unassigned: Unassigned
+    help: Filter by assignee.
+  per_page:
+    aria: Results per page
+    option: '%count% per page'
+    help: How many issues to show per page.
+project_release_environment_compare:
+  environment:
+    placeholder: production
+    help: Environment A for the compare deep-link.
+  compare:
+    placeholder: staging
+    help: Environment B for the compare deep-link.
+project_release_focus:
+  release:
+    placeholder: Kies een release
+    help: Focus de releases-pagina op deze versie.
+  compare:
+    placeholder: Niet vergelijken
+    help: Optionally compare with another release.
+dashboard_filter:
+  per_page:
+    aria: Resultaten per pagina
+    option: '%count% per pagina'
+    help: How many rows to show per page.
+dashboard_activity_filter:
+  per_page:
+    help: Hoeveel activiteitsrijen per pagina.
+  project:
+    placeholder: Elk project
+    aria: Project
+    help: Limit activity to one project.
+dashboard_alerts_filter:
+  per_page:
+    help: Hoeveel alert-rijen per pagina.
+  project:
+    placeholder: Elk project
+    aria: Project
+    help: Limit failed deliveries to one project.
+dashboard_mentions_filter:
+  per_page:
+    help: Hoeveel mention-rijen per pagina.
+  project:
+    placeholder: Elk project
+    aria: Project
+    help: Limit mentions to one project.
+dashboard_new_in_release_filter:
+  per_page:
+    help: Hoeveel rijen per pagina.
+  project:
+    placeholder: Elk project
+    aria: Project
+    help: Limit results to one project.
+  release:
+    placeholder: Elke release
+    aria: Release
+    help: Only issues first seen in this release.
+dashboard_assignments_filter:
+  per_page:
+    help: Hoeveel toewijzingsrijen per pagina.
+  q:
+    placeholder: Zoeken op titel…
+    aria: Zoeken
+    help: Filter toewijzingen op issue-titel.
+  project:
+    placeholder: Elk project
+    aria: Project
+    help: Limit assignments to one project.
+  level:
+    placeholder: Elk niveau
+    aria: Niveau
+    help: Filter by event level.
+  status:
+    aria: Status
+    help: Filter by issue status.
+  priority:
+    aria: Prioriteit
+    any: Enige prioriteit
+    low: Laag
+    medium: Medium
+    high: Hoog
+    critical: Kritisch
+    help: Filter by priority.
+  assignee:
+    aria: Teamgenoot
+    any: Elke rechtverkrijgende
+    help: Filter by teammate (when scope allows).
+  scope:
+    aria: Bereik
+    mine: Aan mij toegewezen
+    teammates: Teamgenoten
+    unassigned: Niet toegewezen
+    all: Alles in mijn projecten
+    help: Whose assignments to list.
+admin_audit_timeline_filter:
+  action:
+    placeholder: Alle acties
+    help: Filter the timeline by action type.
+  from:
+    placeholder: Van
+    help: Include actions on or after this date.
+  to:
+    placeholder: Tot
+    help: Include actions on or before this date.
+admin_ops_overview_filter:
+  project:
+    placeholder: Alle projecten
+    help: Limit the ops overview to one project.
+notification_destination:
+  quiet_hours_start:
+    placeholder: '22:00'
+    help: Start stille uren (HH:MM).
+  quiet_hours_end:
+    placeholder: 07:00
+    help: Einde stille uren (HH:MM).
+admin:
+  ops:
+    filter_project: Projectfilter
+analytics:
+  filter:
+    environment: Omgeving
+    level: Niveau
+    release: Release
+  period:
+    from: Van
+    to: Tot
+permissions:
+  key_invalid: Use lowercase dotted segments (at least two), e.g. project.custom.manage.
+releases:
+  compare:
+    label: Vergelijk met release
+  focus:
+    label: Release
+users:
+  role:
+    admin: Beheerder
+    user: Gebruiker
+
+project_share_create:
+  days:
+    label: Levensduur (dagen)
+  max_uses:
+    label: Max. gebruiken
+    placeholder: Onbeperkt
+    help: Laat Max. gebruiken leeg voor onbeperkte opens tot verval. Standaard is 1 (eenmalig).
+  issue_uuid:
+    label: Issue-UUID (optioneel)
+    placeholder: Leeg laten voor het hele project
+
+project_read_token_create:
+  label:
+    label: Label
+    placeholder: CI-bot, exportscript…
+
+project_member_add:
+  email:
+    label: Lid-e-mail
+    placeholder: user@example.com
+  role:
+    label: Rol
+
+project_governance:
+  retention_days:
+    label: Retentiedagen
+    help: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaard niet nul is.
+  retention_max_events:
+    label: Max. opgeslagen events
+    help: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaard niet nul is.
+  ingest_rate_limit_per_minute:
+    label: Ingest-limiet (per minuut)
+    help: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaard niet nul is.
+  event_quota_daily:
+    label: Dagelijks eventquotum
+    help: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaard niet nul is.
+  event_quota_monthly:
+    label: Maandelijks eventquotum
+    help: Leeg = serverstandaard overnemen (%default%). Gebruik 0 om uit te schakelen als de standaard niet nul is.
+
+project_api_key_create:
+  label:
+    label: Label
+    placeholder: bijv. calm-otter
+
+project_config_import:
+  bundle:
+    label: JSON-bestand
+
+admin_project_import:
+  bundle:
+    label: JSON-bestand
+
+instance_config_import:
+  config:
+    label: Configuratiebestand
+
+mailer_test:
+  to:
+    label: Ontvanger
+    placeholder: jij@voorbeeld.com
+
+project_group_add:
+  group:
+    label: Groep
+    placeholder: Selecteer een groep…
+  role:
+    label: Rol
+
+project_transfer_ownership:
+  user:
+    label: Nieuwe eigenaar
+  confirmation:
+    label: Typ de projectnaam ter bevestiging
+
+project_delete:
+  confirmation:
+    label: Typ de projectnaam ter bevestiging
+
+admin_group_member_add:
+  email:
+    label: Lid-e-mail
+    placeholder: gebruiker@voorbeeld.com
+
+admin_role_user_add:
+  email:
+    label: Gebruikers-e-mail
+    placeholder: gebruiker@voorbeeld.com
+
+issue_saved_view:
+  name:
+    label: Weergavenaam
+    placeholder: Mijn filterset
+
+issue_comment:
+  body:
+    label: Reactie
+    placeholder: Schrijf een reactie…
+
+issue_priority:
+  priority:
+    label: Prioriteit
+
+issue_assignee:
+  assignee:
+    label: Toegewezen
+

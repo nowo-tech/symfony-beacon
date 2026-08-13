@@ -15,17 +15,25 @@
     {% endblock %}
 </div>
 
-{{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap gap-2'}}) }}
-    {{ form_widget(searchForm.q, {
-        attr: {
-            class: 'input min-w-56 flex-1',
-            placeholder: search_placeholder|trans,
-            autocomplete: 'off'
-        }
-    }) }}
+{{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-2'}}) }}
+    {# Translate once here — AdminSearchType sets translation_domain: false on q. #}
+    {% for field in searchForm %}
+        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+            {{ form_row(field, {
+                label: false,
+                attr: {
+                    class: 'input min-w-56 flex-1',
+                    placeholder: search_placeholder|trans,
+                    autocomplete: 'off',
+                },
+                row_attr: {class: 'grow min-w-56'},
+            }) }}
+        {% endif %}
+    {% endfor %}
     {% block search_extras %}{% endblock %}
     <button class="btn-ghost" type="submit">{{ 'common.filter'|trans }}</button>
     <a class="btn-ghost no-underline" href="{{ path(search_route) }}">{{ 'common.clear_filters'|trans }}</a>
+    {% include 'form/_fields.html.twig' with {form: searchForm} only %}
 {{ form_end(searchForm, {render_rest: false}) }}
 
 <section class="panel overflow-x-auto">

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Issues\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
+use App\Shared\Form\FormKitAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,6 +23,7 @@ final class MentionsMarkReadType extends FormKitAbstractType
                 $this->addNamedField($key, 'hidden', [
                     'required' => false,
                     'empty_data' => '',
+                    'placeholder' => false,
                     'data' => (string) ($query[$key] ?? ''),
                 ]);
             }

@@ -21,3 +21,7 @@ Optional **max uses** per share link, aligned with magic-login `max_uses`, witho
 
 - SiteBackup `/setup` hardening (`062`)
 - Changing magic-login defaults
+
+## Amendment (FormKit share create, 2026-08-13)
+
+`ProjectShareCreateType` extends `FormKitAbstractType` (profile `beacon`, prefix `project_share_create`). Labels/placeholders/help under `project_share_create.*` in `translations/form.*.yaml` (incl. max-uses). Twig: `form_row` + `_fields` (`077`). Canonical: `081` FR-003c. E2E / DomCrawler: `project_share_create[days]` / `project_share_create[max_uses]` (not bare `name="days"`).

@@ -6,19 +6,14 @@
         <p class="mb-4 text-xs text-[var(--color-ink)]/55">{{ 'projects.read_token.copy_once'|trans }}</p>
     {% endif %}
     {{ form_start(readTokenCreateForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-3'}}) }}
-        <label class="text-sm grow">
-            <span class="mb-1 block">{{ 'projects.read_token.label'|trans }}</span>
-            {{ form_widget(readTokenCreateForm.label, {
-                attr: {
-                    class: 'input w-full',
-                    maxlength: 120,
-                    placeholder: 'projects.read_token.label_placeholder'|trans,
-                    autocomplete: 'off',
-                }
-            }) }}
-        </label>
+        {% for field in readTokenCreateForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button type="submit" class="btn-primary">{{ 'projects.read_token.create'|trans }}</button>
-    {{ form_end(readTokenCreateForm) }}
+        {% include 'form/_fields.html.twig' with {form: readTokenCreateForm} only %}
+    {{ form_end(readTokenCreateForm, {render_rest: false}) }}
     <ul class="space-y-2 text-sm">
         {% for token in readTokens|default([]) %}
             <li class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--color-sand)] p-3" data-testid="read-token-row">

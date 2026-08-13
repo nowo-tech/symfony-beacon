@@ -2,18 +2,6 @@
 
 {% block title %}{{ section.tabLabelKey()|trans }} — {{ 'appearance.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
-{% macro color_field(field) %}
-    <div class="flex flex-col gap-2">
-        {{ form_label(field) }}
-        <div class="flex items-center gap-3">
-            {{ form_widget(field) }}
-            <span class="font-mono text-xs text-[var(--color-ink)]/55" data-color-hex-for="{{ field.vars.id }}">{{ field.vars.value }}</span>
-        </div>
-        {{ form_errors(field) }}
-        {{ form_help(field) }}
-    </div>
-{% endmacro %}
-
 {% macro theme_card(theme, activeThemeId) %}
     {% set selected = activeThemeId == theme.id %}
     {% set previewPaper = theme.mode == 'dark' ? theme.paperDark : theme.paper %}
@@ -115,7 +103,8 @@
             </div>
 
             {{ form_start(appearanceThemeForm, {attr: {class: 'space-y-5'}}) }}
-                {{ form_widget(appearanceThemeForm._token) }}
+                {# apply_theme is submitted by theme_card buttons — do not paint the Type text field. #}
+                {{ form_row(appearanceThemeForm._token) }}
                 <div>
                     <h3 class="mb-3 text-sm font-semibold">{{ 'appearance.themes.light'|trans }}</h3>
                     <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -142,12 +131,13 @@
 
                 {% if section.value == 'colors' %}
                     <div class="grid gap-4 sm:grid-cols-2">
-                        {% for child in form %}
-                            {% if not child.rendered %}
-                                {{ ui.color_field(child) }}
+                        {% for field in form %}
+                            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                {{ form_row(field) }}
                             {% endif %}
                         {% endfor %}
                     </div>
+                    {% include 'form/_fields.html.twig' with {form: form} only %}
                 {% else %}
                     {% include 'form/_fields.html.twig' with {form: form} only %}
                 {% endif %}
@@ -157,7 +147,7 @@
                 <button class="btn-primary" type="submit">{{ 'appearance.submit'|trans }}</button>
                 <button class="btn-ghost" type="submit" name="reset" value="1">{{ 'appearance.reset'|trans }}</button>
             </div>
-        {{ form_end(form) }}
+        {{ form_end(form, {render_rest: false}) }}
     {% endif %}
 </div>
 {% endblock %}

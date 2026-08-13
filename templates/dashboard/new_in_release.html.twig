@@ -22,11 +22,6 @@
     },
     item_count: issues|length,
 } %}
-    {% block filter_fields %}
-        {{ form_widget(filterForm.project) }}
-        {{ form_widget(filterForm.release) }}
-        {{ form_widget(filterForm.per_page) }}
-    {% endblock %}
     {% block results %}
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

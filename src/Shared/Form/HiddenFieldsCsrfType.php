@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Form;
 
-use Nowo\FormKitBundle\Form\FormKitAbstractType;
 use Override;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,6 +33,10 @@ final class HiddenFieldsCsrfType extends FormKitAbstractType
                 $defaults = [
                     'required' => false,
                     'empty_data' => '',
+                    'label' => false,
+                    'help' => false,
+                    'placeholder' => false,
+                    'translation_domain' => false,
                 ];
                 /** @var array<string, mixed> $extra */
                 $extra = $fieldOptions[$name] ?? [];
@@ -48,6 +51,7 @@ final class HiddenFieldsCsrfType extends FormKitAbstractType
             'data_class' => null,
             'csrf_protection' => true,
             'csrf_token_id' => 'csrf_only',
+            'translation_domain' => false,
             'fields' => [],
             'field_types' => [],
             'field_options' => [],

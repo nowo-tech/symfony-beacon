@@ -98,9 +98,10 @@
             </div>
             {% set reorder_form = reorder_form|default(csrf_action_form(path(dashboard_routes.items_reorder_tree|default('nowo_dashboard_menu_dashboard_items_reorder_tree'), {id: menu.id}), 'reorder_tree_' ~ menu.id, 'POST', false, '_token', {tree: ''})) %}
             {{ form_start(reorder_form, {attr: {id: 'nowo-menu-sortable-form', class: 'mt-4'}}) }}
-                {{ form_widget(reorder_form.tree, {attr: {id: 'nowo-menu-sortable-payload'}}) }}
+                {{ form_row(reorder_form.tree, {attr: {id: 'nowo-menu-sortable-payload'}}) }}
+                {% include 'form/_fields.html.twig' with {form: reorder_form} only %}
                 <button type="submit" class="btn-primary">{{ 'dashboard.sortable_apply'|trans({}, _td) }}</button>
-            {{ form_end(reorder_form) }}
+            {{ form_end(reorder_form, {render_rest: false}) }}
         </section>
     {% endif %}
 

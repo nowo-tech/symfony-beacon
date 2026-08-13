@@ -19,17 +19,13 @@
     <h2 class="mb-2 text-lg font-semibold">{{ 'settings.instance_config.import_title'|trans }}</h2>
     <p class="mb-4 text-sm text-[var(--color-ink)]/60">{{ 'settings.instance_config.import_help'|trans }}</p>
     {{ form_start(importForm, {attr: {class: 'flex flex-wrap items-end gap-3'}}) }}
-        <label class="text-sm">
-            <span class="mb-1 block">{{ 'settings.instance_config.file'|trans }}</span>
-            {{ form_widget(importForm.config, {
-                attr: {
-                    class: 'input',
-                    accept: 'application/json,.json',
-                    'data-testid': 'instance-config-file',
-                }
-            }) }}
-        </label>
+        {% for field in importForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
         <button type="submit" class="btn-primary" data-testid="instance-config-import-submit">{{ 'settings.instance_config.import'|trans }}</button>
-    {{ form_end(importForm) }}
+        {% include 'form/_fields.html.twig' with {form: importForm} only %}
+    {{ form_end(importForm, {render_rest: false}) }}
 </section>
 {% endblock %}

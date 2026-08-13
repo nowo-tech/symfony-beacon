@@ -42,11 +42,16 @@
         'aria-label': 'dashboard.search'|trans,
         autocomplete: 'off',
     }) %}
-    {{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap gap-2', role: 'search'}}) }}
-        {{ form_widget(searchForm.q) }}
+    {{ form_start(searchForm, {attr: {class: 'mb-4 flex flex-wrap items-end gap-2', role: 'search'}}) }}
+        {% for field in searchForm %}
+            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                {{ form_row(field, {label: false, row_attr: {class: 'grow min-w-56'}}) }}
+            {% endif %}
+        {% endfor %}
         <button type="submit" class="btn-ghost">{{ 'dashboard.filter'|trans }}</button>
         <a href="{{ path(_index) }}" class="btn-ghost no-underline">{{ 'dashboard.clear_filters'|trans }}</a>
-    {{ form_end(searchForm) }}
+        {% include 'form/_fields.html.twig' with {form: searchForm} only %}
+    {{ form_end(searchForm, {render_rest: false}) }}
 
     <section class="panel overflow-x-auto" data-testid="breadcrumb-kit-collections-table">
         <table class="w-full text-left text-sm">
