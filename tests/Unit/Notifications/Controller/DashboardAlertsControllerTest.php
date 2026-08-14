@@ -28,8 +28,8 @@ final class DashboardAlertsControllerTest extends TestCase
 {
     public function testIndexRendersEmptyFailedDeliveries(): void
     {
-        $user = (new User())->setEmail('ops@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 3);
+        $user = new User()->setEmail('ops@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 3);
 
         $destinations = $this->createStub(NotificationDestinationRepository::class);
         $destinations->method('countWithFailedLastDeliveryInProjects')->willReturn(0);

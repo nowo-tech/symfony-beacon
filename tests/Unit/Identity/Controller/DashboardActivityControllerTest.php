@@ -28,8 +28,8 @@ final class DashboardActivityControllerTest extends TestCase
 {
     public function testIndexRendersEmptyActivity(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 8);
+        $user = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 8);
 
         $actions = $this->createStub(UserActionRepository::class);
         $actions->method('countActorProductActivity')->willReturn(0);

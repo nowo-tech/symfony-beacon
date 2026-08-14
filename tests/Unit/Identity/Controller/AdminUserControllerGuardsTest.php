@@ -30,15 +30,15 @@ final class AdminUserControllerGuardsTest extends TestCase
 {
     public function testAnonymizeBlocksSelf(): void
     {
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        (new ReflectionProperty(User::class, 'id'))->setValue($admin, 1);
-        (new ReflectionProperty(User::class, 'uuid'))->setValue($admin, '11111111-1111-7111-8111-111111111111');
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        new ReflectionProperty(User::class, 'id')->setValue($admin, 1);
+        new ReflectionProperty(User::class, 'uuid')->setValue($admin, '11111111-1111-7111-8111-111111111111');
 
         $form = $this->validForm();
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
         $session = $this->boot($controller, $admin, $form, flash: true);
 
-        $response = $controller->anonymize(Request::create('/x', 'POST'), $admin);
+        $response = $controller->anonymize(Request::create('/x', Request::METHOD_POST), $admin);
         self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame('/admin/users', $response->getTargetUrl());
         self::assertSame(['flash.users.cannot_anonymize_self'], $session->getFlashBag()->peek('error'));
@@ -46,72 +46,72 @@ final class AdminUserControllerGuardsTest extends TestCase
 
     public function testAnonymizeMapsAlreadyAnonymizedFlash(): void
     {
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        (new ReflectionProperty(User::class, 'id'))->setValue($admin, 1);
-        $target = (new User())->setEmail('gone@example.com')->setAnonymizedAt(new DateTimeImmutable('-1 day'));
-        (new ReflectionProperty(User::class, 'id'))->setValue($target, 2);
-        (new ReflectionProperty(User::class, 'uuid'))->setValue($target, '22222222-2222-7222-8222-222222222222');
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        new ReflectionProperty(User::class, 'id')->setValue($admin, 1);
+        $target = new User()->setEmail('gone@example.com')->setAnonymizedAt(new DateTimeImmutable('-1 day'));
+        new ReflectionProperty(User::class, 'id')->setValue($target, 2);
+        new ReflectionProperty(User::class, 'uuid')->setValue($target, '22222222-2222-7222-8222-222222222222');
 
         $form = $this->validForm();
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminUserController::class, 'accountAnonymizer'))->setValue(
+        new ReflectionProperty(AdminUserController::class, 'accountAnonymizer')->setValue(
             $controller,
             new ReflectionClass(AccountAnonymizer::class)->newInstanceWithoutConstructor(),
         );
         $session = $this->boot($controller, $admin, $form, flash: true);
 
-        $response = $controller->anonymize(Request::create('/x', 'POST'), $target);
+        $response = $controller->anonymize(Request::create('/x', Request::METHOD_POST), $target);
         self::assertSame('/admin/users', $response->getTargetUrl());
         self::assertSame(['flash.privacy.already_anonymized'], $session->getFlashBag()->peek('error'));
     }
 
     public function testChangeRoleBlocksSelf(): void
     {
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        (new ReflectionProperty(User::class, 'id'))->setValue($admin, 1);
-        (new ReflectionProperty(User::class, 'uuid'))->setValue($admin, '11111111-1111-7111-8111-111111111111');
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        new ReflectionProperty(User::class, 'id')->setValue($admin, 1);
+        new ReflectionProperty(User::class, 'uuid')->setValue($admin, '11111111-1111-7111-8111-111111111111');
 
         $form = $this->validForm(['role' => 'user']);
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
         $session = $this->boot($controller, $admin, $form, flash: true);
 
-        $response = $controller->changeRole(Request::create('/x', 'POST'), $admin);
+        $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $admin);
         self::assertSame('/admin/users', $response->getTargetUrl());
         self::assertSame(['flash.users.cannot_change_own_role'], $session->getFlashBag()->peek('error'));
     }
 
     public function testChangeRoleRejectsInvalidRole(): void
     {
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        (new ReflectionProperty(User::class, 'id'))->setValue($admin, 1);
-        $target = (new User())->setEmail('member@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($target, 2);
-        (new ReflectionProperty(User::class, 'uuid'))->setValue($target, '22222222-2222-7222-8222-222222222222');
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        new ReflectionProperty(User::class, 'id')->setValue($admin, 1);
+        $target = new User()->setEmail('member@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($target, 2);
+        new ReflectionProperty(User::class, 'uuid')->setValue($target, '22222222-2222-7222-8222-222222222222');
 
         $form = $this->validForm(['role' => 'superuser']);
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
         $session = $this->boot($controller, $admin, $form, flash: true);
 
-        $response = $controller->changeRole(Request::create('/x', 'POST'), $target);
+        $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $target);
         self::assertSame('/admin/users', $response->getTargetUrl());
         self::assertSame(['flash.users.invalid_role'], $session->getFlashBag()->peek('error'));
     }
 
     public function testRemoveProject404WhenMembershipMissing(): void
     {
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        $target = (new User())->setEmail('member@example.com');
-        $project = (new Project())->setName('Acme')->setSlug('acme');
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        $target = new User()->setEmail('member@example.com');
+        $project = new Project()->setName('Acme')->setSlug('acme');
 
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findOneByProjectAndUser')->willReturn(null);
 
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminUserController::class, 'projectMembershipRepository'))->setValue($controller, $memberships);
+        new ReflectionProperty(AdminUserController::class, 'projectMembershipRepository')->setValue($controller, $memberships);
         $this->boot($controller, $admin, $this->createStub(FormInterface::class));
 
         $this->expectException(NotFoundHttpException::class);
-        $controller->removeProject($target, $project, Request::create('/x', 'POST'));
+        $controller->removeProject($target, $project, Request::create('/x', Request::METHOD_POST));
     }
 
     /**

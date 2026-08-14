@@ -31,8 +31,8 @@ final class DashboardIssueInboxesControllerTest extends TestCase
 {
     public function testAssignmentsIndexRendersEmptyInbox(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 4);
+        $user = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 4);
 
         $issues = $this->createStub(IssueSearchRepository::class);
         $issues->method('countAssignments')->willReturn(0);
@@ -69,8 +69,8 @@ final class DashboardIssueInboxesControllerTest extends TestCase
 
     public function testNewInReleaseIndexRendersEmptyList(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 4);
+        $user = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 4);
 
         $issues = $this->createStub(IssueSearchRepository::class);
         $issues->method('countNewInRelease')->willReturn(0);

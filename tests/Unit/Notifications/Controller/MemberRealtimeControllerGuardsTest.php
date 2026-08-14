@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Notifications\Controller;
 
 use App\Identity\Entity\User;
 use App\Notifications\Controller\MemberRealtimeController;
+use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Notifications\Service\WebPushClientFactory;
 use App\Notifications\Service\WebPushEndpointGuard;
@@ -166,7 +167,7 @@ final class MemberRealtimeControllerGuardsTest extends TestCase
 
     public function testUnsubscribeRejectsInvalidCsrfAndInvalidJson(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
+        $user = new User()->setEmail('dev@example.com');
 
         $controller = new MemberRealtimeController(
             $this->disabledMercure(),
@@ -177,14 +178,14 @@ final class MemberRealtimeControllerGuardsTest extends TestCase
         );
 
         $this->boot($controller, $user, csrfValid: false);
-        $forbidden = $controller->unsubscribe(Request::create('/account/push/unsubscribe', 'POST'));
+        $forbidden = $controller->unsubscribe(Request::create('/account/push/unsubscribe', Request::METHOD_POST));
         self::assertSame(Response::HTTP_FORBIDDEN, $forbidden->getStatusCode());
         self::assertSame(['ok' => false, 'error' => 'invalid_csrf'], json_decode($forbidden->getContent(), true));
 
         $this->boot($controller, $user, csrfValid: true);
         $badJson = $controller->unsubscribe(Request::create(
             '/account/push/unsubscribe',
-            'POST',
+            Request::METHOD_POST,
             server: ['CONTENT_TYPE' => 'application/json'],
             content: '{bad',
         ));
@@ -194,8 +195,8 @@ final class MemberRealtimeControllerGuardsTest extends TestCase
 
     public function testUnsubscribeClearsAllSubscriptionsWithoutEndpoint(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
-        $row = new ReflectionClass(\App\Notifications\Entity\PushSubscription::class)->newInstanceWithoutConstructor();
+        $user = new User()->setEmail('dev@example.com');
+        $row = new ReflectionClass(PushSubscription::class)->newInstanceWithoutConstructor();
 
         $subscriptions = $this->createStub(PushSubscriptionRepository::class);
         $subscriptions->method('findByUser')->willReturn([$row]);
@@ -215,7 +216,7 @@ final class MemberRealtimeControllerGuardsTest extends TestCase
 
         $response = $controller->unsubscribe(Request::create(
             '/account/push/unsubscribe',
-            'POST',
+            Request::METHOD_POST,
             server: ['CONTENT_TYPE' => 'application/json'],
             content: '{}',
         ));

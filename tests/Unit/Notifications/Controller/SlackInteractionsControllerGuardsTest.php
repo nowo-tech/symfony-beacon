@@ -24,7 +24,7 @@ final class SlackInteractionsControllerGuardsTest extends TestCase
 {
     public function testMissingPayloadReturnsBadRequest(): void
     {
-        $response = $this->controller()->__invoke(Request::create('/hooks/slack/interactions', 'POST'));
+        $response = $this->controller()->__invoke(Request::create('/hooks/slack/interactions', Request::METHOD_POST));
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertSame('Missing payload', $response->getContent());
     }
@@ -33,7 +33,7 @@ final class SlackInteractionsControllerGuardsTest extends TestCase
     {
         $response = $this->controller()->__invoke(Request::create(
             '/hooks/slack/interactions',
-            'POST',
+            Request::METHOD_POST,
             ['payload' => '{not-json'],
         ));
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
@@ -44,7 +44,7 @@ final class SlackInteractionsControllerGuardsTest extends TestCase
     {
         $response = $this->controller()->__invoke(Request::create(
             '/hooks/slack/interactions',
-            'POST',
+            Request::METHOD_POST,
             ['payload' => json_encode(['type' => 'url_verification', 'challenge' => 'abc'], \JSON_THROW_ON_ERROR)],
         ));
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());

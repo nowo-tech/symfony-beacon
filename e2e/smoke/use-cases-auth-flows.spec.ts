@@ -5,7 +5,6 @@ import {
   dismissCookieConsent,
   dismissProductTour,
   loginAsDemo,
-  logout,
   waitForPageLoader,
 } from '../support/helpers';
 

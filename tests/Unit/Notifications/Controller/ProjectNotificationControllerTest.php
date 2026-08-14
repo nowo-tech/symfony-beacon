@@ -175,9 +175,9 @@ final class ProjectNotificationControllerTest extends TestCase
 
     public function testResumeClearsCircuitAndTestRequiresPersistedId(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 5);
-        (new ReflectionProperty(Project::class, 'uuid'))->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
+        new ReflectionProperty(Project::class, 'uuid')->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
 
         $destination = new NotificationDestination();
         $destination->setProject($project);
@@ -186,7 +186,7 @@ final class ProjectNotificationControllerTest extends TestCase
         $destination->setLabel('Hook');
         $destination->setCategories(['error']);
         $destination->openCircuit();
-        (new ReflectionProperty(NotificationDestination::class, 'id'))->setValue($destination, 9);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($destination, 9);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('flush');

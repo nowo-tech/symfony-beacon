@@ -69,7 +69,15 @@ test.describe('Admin kit mutations & deeper shells', () => {
     await expect(dialog).toBeVisible({ timeout: 15_000 });
     await dialog.locator('input[name="admin_instance_permission_new[key]"]').fill(`e2e.perm.x${suffix}`);
     await dialog.locator('select[name="admin_instance_permission_new[category]"]').selectOption({ index: 1 });
-    await dialog.locator('input[name="admin_instance_permission_new[name_en]"]').fill(`E2E perm ${suffix}`);
+    // Locale tabs hide non-active name_* inputs — fill the visible one (default locale may be es).
+    const visibleName = dialog.locator('input[name*="admin_instance_permission_new[name_"]:visible').first();
+    if ((await visibleName.count()) > 0) {
+      await visibleName.fill(`E2E perm ${suffix}`);
+    } else {
+      await dialog.locator('input[name="admin_instance_permission_new[name_en]"]').fill(`E2E perm ${suffix}`, {
+        force: true,
+      });
+    }
     await dialog.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);

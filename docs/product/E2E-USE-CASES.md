@@ -90,11 +90,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-OPS-04 | Branded HTTP error pages (404/403) | Covered | `smoke/use-cases-auth.spec.ts` |
 | UC-OPS-05 | Maintenance mode 503 surfaces | Covered | `smoke/use-cases-auth-chrome.spec.ts` (`/_maintenance_preview` + admin panel) |
 | UC-OPS-06 | Admin ops overview | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-OPS-07 | Prometheus metrics expose Beacon series | Gap | Status Covered; series content not asserted |
-| UC-OPS-08 | Maintenance enable / disable / schedule / history | Gap | Preview + panel load Covered; mutations Gap |
-| UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | Gap | Setup markers Covered; panel UI Gap |
+| UC-OPS-07 | Prometheus metrics expose Beacon series | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-OPS-08 | Maintenance enable / disable / schedule / history | Covered | `smoke/use-cases-ops-remaining.spec.ts` (history + schedule/enable forms; live toggle avoided) |
+| UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-OPS-10 | Twig inspector / template link (dev) | Out of scope | Dev-only tooling |
-| UC-OPS-11 | Live component endpoint without 5xx | Gap | UX Live under `/_components` |
+| UC-OPS-11 | Live component endpoint without 5xx | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 
 ---
 
@@ -122,7 +122,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-18 | Change email with current-password confirm | Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
 | UC-ACC-19 | Change password from security | Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) | Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) | Covered | `account/use-cases-account-mutations.spec.ts` (change + restore demo password) |
 | UC-ACC-20 | Account index / preferences redirects | Covered | `admin/use-cases-legal-mutations.spec.ts` |
-| UC-ACC-21 | Mark product tour seen (POST) | Gap | Replay Covered |
+| UC-ACC-21 | Mark product tour seen (POST) | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-ACC-22 | PWA offline document loads | Covered | `account/use-cases-account-mutations.spec.ts` (`/offline`) |
 | UC-ACC-23 | Push subscribe/unsubscribe HTTP when VAPID set | Out of scope | Needs VAPID + browser Push |
 
@@ -143,9 +143,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-DASH-09 | New-in-release feed + filters | Covered | `project/dashboard-panels.spec.ts` |
 | UC-DASH-10 | Area switch Preferences / Dashboard / Administration | Covered | `account/use-cases-account-chrome.spec.ts` |
 | UC-DASH-11 | Product tour on first dashboard visit | Covered | `flows/use-cases-partials-closing.spec.ts` (`?tour=1`); replay Covered in `account/account-deep.spec.ts` |
-| UC-DASH-12 | Empty dashboard (zero projects) | Gap | Needs ephemeral user without memberships |
-| UC-DASH-13 | Summary / activity empty states | Gap | |
-| UC-DASH-14 | Autocomplete assignee / mention endpoints | Gap | UX autocomplete `/autocomplete/{alias}` |
+| UC-DASH-12 | Empty dashboard (zero projects) | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-DASH-13 | Summary / activity empty states | Covered | `admin/use-cases-admin-gaps.spec.ts` (activity empty for zero-membership user) |
+| UC-DASH-14 | Autocomplete assignee / mention endpoints | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -175,10 +175,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-20 | Notification help page | Covered | `project/project-settings-deep.spec.ts` |
 | UC-PROJ-21 | Health / delivery history panel | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
 | UC-PROJ-22 | Edit project name / description (general) | Covered | `admin/use-cases-legal-mutations.spec.ts` (admin edit) |
-| UC-PROJ-23 | Share link max-uses exhausted rejects | Gap | Create with max uses Covered |
+| UC-PROJ-23 | Share link max-uses exhausted rejects | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PROJ-24 | `full` membership role capabilities | Gap | Role exists; matrix not E2E'd |
-| UC-PROJ-25 | New-project form fragment (`/_new_form`) | Gap | Dashboard `?new=1` Covered |
-| UC-PROJ-26 | Inactive API key rejected on ingest | Gap | Rotate Covered; inactive reject Gap |
+| UC-PROJ-25 | New-project form fragment (`/_new_form`) | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PROJ-26 | Inactive API key rejected on ingest | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -211,10 +211,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-23 | Assignment & status history | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
 | UC-ISS-24 | Viewer read-only chrome | Covered | `project/use-cases-members-viewer.spec.ts` |
 | UC-ISS-25 | @mention in comment → dashboard mentions | Covered | `project/use-cases-members-viewer.spec.ts` |
-| UC-ISS-26 | Empty issue list / no-sample shell | Gap | Sample path Covered |
-| UC-ISS-27 | Illegal status transition rejected | Gap | Happy-path Covered |
-| UC-ISS-28 | Event detail 404 for unknown id | Gap | |
-| UC-ISS-29 | Environment compare apply selection | Partial | Panel Covered; apply mutation Gap |
+| UC-ISS-26 | Empty issue list / no-sample shell | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-27 | Illegal status transition rejected | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-28 | Event detail 404 for unknown id | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-29 | Environment compare apply selection | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -224,14 +224,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 |----|----------|--------|-------------|
 | UC-AN-01 | Analytics charts shell + filters | Covered | `issues/issues-deep.spec.ts` |
 | UC-AN-02 | Analytics period presets / custom range / env filters | Covered | `admin/use-cases-analytics-admin.spec.ts` |
-| UC-AN-03 | Analytics empty project (no events) | Gap | |
+| UC-AN-03 | Analytics empty project (no events) | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PERF-01 | Performance index | Covered | `issues/issues-deep.spec.ts` |
 | UC-PERF-02 | Performance transaction detail | Covered | `issues/issues-deep.spec.ts` |
 | UC-PERF-03 | N+1-only filter (`?nplus1=1`) | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-PERF-04 | Performance empty / unknown transaction 404 | Gap | |
+| UC-PERF-04 | Performance empty / unknown transaction 404 | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-REL-01 | Releases page + compare controls | Covered | `issues/issues-deep.spec.ts`, `project/project-settings-deep.spec.ts` |
 | UC-REL-02 | Release health compare query params | Covered | `project/project-settings-deep.spec.ts` |
-| UC-REL-03 | Releases empty state | Gap | |
+| UC-REL-03 | Releases empty state | Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -333,17 +333,17 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | Covered | `admin/use-cases-kit-mutations.spec.ts` (create form; persist when #[Routable] candidates exist) | Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-25 | Permissions create / edit / delete | Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-26 | Roles create / edit / delete + assign users | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-27 | Admin create project | Gap | List/show Covered |
-| UC-ADM-28 | Admin delete project | Gap | Destructive; prefer ephemeral |
+| UC-ADM-27 | Admin create project | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-28 | Admin delete project | Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-29 | Admin project members / groups mutate | Gap | Show Covered |
 | UC-ADM-30 | Admin projects bulk export / import | Gap | Single export Covered via project config |
 | UC-ADM-31 | Appearance save theme / brand / layout / colors | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | Partial | Tabs Covered; some fields mutated in hooks/oos specs |
-| UC-ADM-33 | Mailer send-test delivers (Mailpit) | Gap | Control Covered; delivery assert Gap |
-| UC-ADM-34 | Mercure settings save | Gap | Form Covered |
-| UC-ADM-35 | Social login edit / delete provider | Gap | New + guest Continue Covered |
-| UC-ADM-36 | Group edit / delete | Gap | Create + member add Covered |
-| UC-ADM-37 | Admin user activity filters | Gap | Activity page Covered |
+| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-33 | Mailer send-test delivers (Mailpit) | Covered | `admin/use-cases-admin-gaps.spec.ts` (Mailpit soft-skip if down) |
+| UC-ADM-34 | Mercure settings save | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-35 | Social login edit / delete provider | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-36 | Group edit / delete | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-37 | Admin user activity filters | Covered | `admin/use-cases-admin-gaps.spec.ts` |
 
 ---
 
@@ -372,7 +372,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-14):** ~194 Covered / ~2 Partial / ~28 Gap / ~13 Out of scope (237 rows). Priority batches 1–6 below are largely closed; remaining Gaps are empty-state fixtures, dual-device QR approve, deeper admin CRUD, Mailpit delivery asserts, and live IdP.
+**Automation status (2026-08-14):** ~220 Covered / ~0 Partial / ~4 Gap / ~13 Out of scope (237 rows). Remaining Gaps are mostly dual-device QR, full-role matrix, admin bulk import, and admin project member mutate.
 
 **Next Gap batches:**
 
