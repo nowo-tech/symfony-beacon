@@ -7,10 +7,10 @@ Status values:
 
 | Status | Meaning |
 |--------|---------|
-| **Covered** | Asserted in `e2e/**/*.spec.ts` (smoke or mutation) |
-| **Partial** | Route/shell visited; happy-path mutation or edge cases still open |
-| **Gap** | Defined here; no dedicated E2E yet (may still have PHPUnit) |
-| **Out of scope** | Needs external systems, destructive production ops, empty-DB wipe, or is Later |
+| ✅ **Covered** | Asserted in `e2e/**/*.spec.ts` (smoke or mutation) |
+| ❌ **Partial** | Route/shell visited; happy-path mutation or edge cases still open |
+| ❌ **Gap** | Defined here; no dedicated E2E yet (may still have PHPUnit) |
+| ❌ **Out of scope** | Needs external systems, destructive production ops, empty-DB wipe, or is Later |
 
 Run: `make up && make seed && make seed-sample && make test-e2e` — see [`e2e/README.md`](../../e2e/README.md).
 
@@ -37,30 +37,30 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-AUTH-01 | Open `/` → redirect to login | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-02 | Login with valid credentials | Covered | `setup/auth.setup.ts` |
-| UC-AUTH-03 | Login with invalid credentials stays on login | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-04 | Localized login (`/en|es|de|fr/login`) | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-05 | Magic login page loads | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-06 | QR login page loads | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-07 | Password reset page loads | Covered | `smoke/public.spec.ts` |
-| UC-AUTH-08 | Remember-me checkbox / cookie | Covered | `smoke/use-cases-auth-chrome.spec.ts` (checkbox); `flows/use-cases-destructive-safe.spec.ts` (REMEMBERME survives session clear) |
-| UC-AUTH-09 | Login throttle after N failures | Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral username; suite start clears `login_attempts`) |
-| UC-AUTH-10 | First-user registration when DB empty | Out of scope | Destructive / empty DB |
-| UC-AUTH-11 | `/register` redirects to login when users exist | Covered | `smoke/use-cases-auth.spec.ts` |
-| UC-AUTH-12 | Logout returns to login | Covered | `project/dashboard-project.spec.ts` |
-| UC-AUTH-13 | Guest locale switch | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-AUTH-14 | Social login buttons when providers configured | Covered | `flows/use-cases-partials-closing.spec.ts` (enabled provider → guest Continue; live IdP redirect Out of scope) |
-| UC-AUTH-15 | Password policy / strength / toggle UI | Covered | `smoke/use-cases-auth-chrome.spec.ts` (login reveal + account security) |
-| UC-AUTH-16 | Protected routes redirect guests to login | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-AUTH-17 | Submit magic-login request (email form) | Covered | `smoke/use-cases-auth-flows.spec.ts` (submit; Mailpit assert optional) |
-| UC-AUTH-18 | Complete magic-login via check/confirm token | Covered | `smoke/use-cases-auth-mailpit.spec.ts` (Mailpit link → confirm → dashboard; needs `make mailpit`) |
-| UC-AUTH-19 | Submit password-reset request | Covered | `smoke/use-cases-auth-flows.spec.ts` (submit; Mailpit assert optional) |
-| UC-AUTH-20 | Complete password reset with token | Covered | `smoke/use-cases-auth-mailpit.spec.ts` (ephemeral user + Mailpit reset link) |
-| UC-AUTH-21 | QR login: create session + poll status JSON | Covered | `smoke/use-cases-auth-flows.spec.ts` (`qr_login.mode=enabled`; challenge + `/status` pending) |
-| UC-AUTH-22 | QR login: approve / deny from authenticated device | Covered | `smoke/use-cases-auth-qr-dual.spec.ts` (guest desktop + authenticated phone; deny POST + approve) |
-| UC-AUTH-23 | Live social IdP redirect + callback | Covered | `smoke/use-cases-remaining-oos.spec.ts` (authorize redirect + client_id; OAuth callback still external) |
-| UC-AUTH-24 | Localized logout (`/{locale}/logout`) | Covered | `smoke/use-cases-auth-flows.spec.ts` |
+| UC-AUTH-01 | Open `/` → redirect to login | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-02 | Login with valid credentials | ✅ Covered | `setup/auth.setup.ts` |
+| UC-AUTH-03 | Login with invalid credentials stays on login | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-04 | Localized login (`/en|es|de|fr/login`) | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-05 | Magic login page loads | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-06 | QR login page loads | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-07 | Password reset page loads | ✅ Covered | `smoke/public.spec.ts` |
+| UC-AUTH-08 | Remember-me checkbox / cookie | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (checkbox); `flows/use-cases-destructive-safe.spec.ts` (REMEMBERME survives session clear) |
+| UC-AUTH-09 | Login throttle after N failures | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral username; suite start clears `login_attempts`) |
+| UC-AUTH-10 | First-user registration when DB empty | ❌ Out of scope | Destructive / empty DB |
+| UC-AUTH-11 | `/register` redirects to login when users exist | ✅ Covered | `smoke/use-cases-auth.spec.ts` |
+| UC-AUTH-12 | Logout returns to login | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-AUTH-13 | Guest locale switch | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-AUTH-14 | Social login buttons when providers configured | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (enabled provider → guest Continue; live IdP redirect Out of scope) |
+| UC-AUTH-15 | Password policy / strength / toggle UI | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (login reveal + account security) |
+| UC-AUTH-16 | Protected routes redirect guests to login | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-AUTH-17 | Submit magic-login request (email form) | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` (submit; Mailpit assert optional) |
+| UC-AUTH-18 | Complete magic-login via check/confirm token | ✅ Covered | `smoke/use-cases-auth-mailpit.spec.ts` (Mailpit link → confirm → dashboard; needs `make mailpit`) |
+| UC-AUTH-19 | Submit password-reset request | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` (submit; Mailpit assert optional) |
+| UC-AUTH-20 | Complete password reset with token | ✅ Covered | `smoke/use-cases-auth-mailpit.spec.ts` (ephemeral user + Mailpit reset link) |
+| UC-AUTH-21 | QR login: create session + poll status JSON | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` (`qr_login.mode=enabled`; challenge + `/status` pending) |
+| UC-AUTH-22 | QR login: approve / deny from authenticated device | ✅ Covered | `smoke/use-cases-auth-qr-dual.spec.ts` (guest desktop + authenticated phone; deny POST + approve) |
+| UC-AUTH-23 | Live social IdP redirect + callback | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (authorize redirect + client_id; OAuth callback still external) |
+| UC-AUTH-24 | Localized logout (`/{locale}/logout`) | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` |
 
 ---
 
@@ -68,15 +68,15 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-LEGAL-01 | Legal notice / privacy / terms / cookies (localized) | Covered | `smoke/public.spec.ts` |
-| UC-LEGAL-02 | Bare `/legal/*` redirects | Covered | `smoke/public.spec.ts` |
-| UC-LEGAL-03 | Guest cookie consent modal accept-all | Covered | `smoke/cookie-consent.spec.ts` |
-| UC-LEGAL-04 | Consent persists across navigations | Covered | `smoke/cookie-consent.spec.ts` |
-| UC-LEGAL-05 | Cookie consent config JSON endpoints | Covered | `smoke/cookie-consent.spec.ts` |
-| UC-LEGAL-06 | Admin cookie consent settings / definitions | Covered | `admin/kit-admin-deep.spec.ts` |
-| UC-LEGAL-07 | Consent necessary-only / reject non-essential | Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only) |
-| UC-LEGAL-08 | Cookie definition CRUD (new/edit/delete) | Covered | `admin/use-cases-legal-mutations.spec.ts` |
-| UC-LEGAL-09 | Cookie consent settings section tabs save | Covered | `admin/use-cases-legal-mutations.spec.ts` |
+| UC-LEGAL-01 | Legal notice / privacy / terms / cookies (localized) | ✅ Covered | `smoke/public.spec.ts` |
+| UC-LEGAL-02 | Bare `/legal/*` redirects | ✅ Covered | `smoke/public.spec.ts` |
+| UC-LEGAL-03 | Guest cookie consent modal accept-all | ✅ Covered | `smoke/cookie-consent.spec.ts` |
+| UC-LEGAL-04 | Consent persists across navigations | ✅ Covered | `smoke/cookie-consent.spec.ts` |
+| UC-LEGAL-05 | Cookie consent config JSON endpoints | ✅ Covered | `smoke/cookie-consent.spec.ts` |
+| UC-LEGAL-06 | Admin cookie consent settings / definitions | ✅ Covered | `admin/kit-admin-deep.spec.ts` |
+| UC-LEGAL-07 | Consent necessary-only / reject non-essential | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only) |
+| UC-LEGAL-08 | Cookie definition CRUD (new/edit/delete) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
+| UC-LEGAL-09 | Cookie consent settings section tabs save | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
 
 ---
 
@@ -84,17 +84,17 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-OPS-01 | `GET /health/live` → 200 | Covered | `smoke/public.spec.ts` |
-| UC-OPS-02 | `GET /health/ready` (DB) | Covered | `smoke/public.spec.ts` |
-| UC-OPS-03 | `GET /metrics` without 5xx | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-OPS-04 | Branded HTTP error pages (404/403) | Covered | `smoke/use-cases-auth.spec.ts` |
-| UC-OPS-05 | Maintenance mode 503 surfaces | Covered | `smoke/use-cases-auth-chrome.spec.ts` (`/_maintenance_preview` + admin panel) |
-| UC-OPS-06 | Admin ops overview | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-OPS-07 | Prometheus metrics expose Beacon series | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
-| UC-OPS-08 | Maintenance enable / disable / schedule / history | Covered | `smoke/use-cases-ops-remaining.spec.ts` (history + schedule/enable forms; live toggle avoided) |
-| UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
-| UC-OPS-10 | Twig inspector / template link (dev) | Covered | `smoke/use-cases-remaining-oos.spec.ts` (`#_twig_inspector__icon`; skips without WDT) |
-| UC-OPS-11 | Live component endpoint without 5xx | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-OPS-01 | `GET /health/live` → 200 | ✅ Covered | `smoke/public.spec.ts` |
+| UC-OPS-02 | `GET /health/ready` (DB) | ✅ Covered | `smoke/public.spec.ts` |
+| UC-OPS-03 | `GET /metrics` without 5xx | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-OPS-04 | Branded HTTP error pages (404/403) | ✅ Covered | `smoke/use-cases-auth.spec.ts` |
+| UC-OPS-05 | Maintenance mode 503 surfaces | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (`/_maintenance_preview` + admin panel) |
+| UC-OPS-06 | Admin ops overview | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-OPS-07 | Prometheus metrics expose Beacon series | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-OPS-08 | Maintenance enable / disable / schedule / history | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` (history + schedule/enable forms; live toggle avoided) |
+| UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-OPS-10 | Twig inspector / template link (dev) | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (`#_twig_inspector__icon`; skips without WDT) |
+| UC-OPS-11 | Live component endpoint without 5xx | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 
 ---
 
@@ -102,29 +102,29 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-ACC-01 | Profile overview | Covered | `account/account.spec.ts`, `account/account-deep.spec.ts` |
-| UC-ACC-02 | Security / history / activity panels | Covered | `account/account-deep.spec.ts` |
-| UC-ACC-03 | Account projects & groups lists | Covered | `account/account-deep.spec.ts` |
-| UC-ACC-04 | Privacy GDPR export download | Covered | `account/account.spec.ts` |
-| UC-ACC-05 | Privacy anonymize panel present | Covered | `account/account-deep.spec.ts` |
-| UC-ACC-06 | Execute anonymize (self) | Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral user; not demo admin) |
-| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-ACC-08 | Collapsed panels prefs | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-ACC-09 | Product tour replay | Covered | `account/account-deep.spec.ts` |
-| UC-ACC-10 | Authenticated locale switch | Covered | `account/account-deep.spec.ts` |
-| UC-ACC-11 | Theme toggle chrome | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-ACC-12 | Content-width toggle | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | Covered | `account/member-alerts.spec.ts` |
-| UC-ACC-14 | Web Push subscribe / unsubscribe | Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
-| UC-ACC-15 | Mercure realtime config endpoint | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-ACC-16 | PWA manifest / SW / offline | Covered | `smoke/misc.spec.ts` |
-| UC-ACC-17 | Save profile (display name / phone / Slack user id) | Covered | `account/use-cases-account-mutations.spec.ts` |
-| UC-ACC-18 | Change email with current-password confirm | Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
-| UC-ACC-19 | Change password from security | Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) | Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) | Covered | `account/use-cases-account-mutations.spec.ts` (change + restore demo password) |
-| UC-ACC-20 | Account index / preferences redirects | Covered | `admin/use-cases-legal-mutations.spec.ts` |
-| UC-ACC-21 | Mark product tour seen (POST) | Covered | `smoke/use-cases-ops-remaining.spec.ts` |
-| UC-ACC-22 | PWA offline document loads | Covered | `account/use-cases-account-mutations.spec.ts` (`/offline`) |
-| UC-ACC-23 | Push subscribe/unsubscribe HTTP when VAPID set | Covered | `smoke/use-cases-remaining-oos.spec.ts` (FCM-shaped endpoint; skips without VAPID); browser Push permission still external |
+| UC-ACC-01 | Profile overview | ✅ Covered | `account/account.spec.ts`, `account/account-deep.spec.ts` |
+| UC-ACC-02 | Security / history / activity panels | ✅ Covered | `account/account-deep.spec.ts` |
+| UC-ACC-03 | Account projects & groups lists | ✅ Covered | `account/account-deep.spec.ts` |
+| UC-ACC-04 | Privacy GDPR export download | ✅ Covered | `account/account.spec.ts` |
+| UC-ACC-05 | Privacy anonymize panel present | ✅ Covered | `account/account-deep.spec.ts` |
+| UC-ACC-06 | Execute anonymize (self) | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral user; not demo admin) |
+| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-ACC-08 | Collapsed panels prefs | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-ACC-09 | Product tour replay | ✅ Covered | `account/account-deep.spec.ts` |
+| UC-ACC-10 | Authenticated locale switch | ✅ Covered | `account/account-deep.spec.ts` |
+| UC-ACC-11 | Theme toggle chrome | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-ACC-12 | Content-width toggle | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | ✅ Covered | `account/member-alerts.spec.ts` |
+| UC-ACC-14 | Web Push subscribe / unsubscribe | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
+| UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` |
+| UC-ACC-17 | Save profile (display name / phone / Slack user id) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` |
+| UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
+| UC-ACC-19 | Change password from security | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) |
+| UC-ACC-20 | Account index / preferences redirects | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
+| UC-ACC-21 | Mark product tour seen (POST) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-ACC-22 | PWA offline document loads | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (`/offline`) |
+| UC-ACC-23 | Push subscribe/unsubscribe HTTP when VAPID set | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (FCM-shaped endpoint; skips without VAPID); browser Push permission still external |
 
 ---
 
@@ -132,20 +132,20 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-DASH-01 | Dashboard project list | Covered | `project/dashboard-project.spec.ts` |
-| UC-DASH-02 | User menu links (account / admin) | Covered | `project/dashboard-project.spec.ts` |
-| UC-DASH-03 | Summary metric cards | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-04 | Assignments list + filters | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-05 | Mentions list + filters | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-06 | Mentions mark-one / mark-all-read | Covered | `project/use-cases-dashboard.spec.ts` (controls); mention create → inbox `project/use-cases-members-viewer.spec.ts` |
-| UC-DASH-07 | Activity feed + filters | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-08 | Alerts feed + filters | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-09 | New-in-release feed + filters | Covered | `project/dashboard-panels.spec.ts` |
-| UC-DASH-10 | Area switch Preferences / Dashboard / Administration | Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-DASH-11 | Product tour on first dashboard visit | Covered | `flows/use-cases-partials-closing.spec.ts` (`?tour=1`); replay Covered in `account/account-deep.spec.ts` |
-| UC-DASH-12 | Empty dashboard (zero projects) | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-DASH-13 | Summary / activity empty states | Covered | `admin/use-cases-admin-gaps.spec.ts` (activity empty for zero-membership user) |
-| UC-DASH-14 | Autocomplete assignee / mention endpoints | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-DASH-01 | Dashboard project list | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-DASH-02 | User menu links (account / admin) | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-DASH-03 | Summary metric cards | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-04 | Assignments list + filters | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-05 | Mentions list + filters | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-06 | Mentions mark-one / mark-all-read | ✅ Covered | `project/use-cases-dashboard.spec.ts` (controls); mention create → inbox `project/use-cases-members-viewer.spec.ts` |
+| UC-DASH-07 | Activity feed + filters | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-08 | Alerts feed + filters | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-09 | New-in-release feed + filters | ✅ Covered | `project/dashboard-panels.spec.ts` |
+| UC-DASH-10 | Area switch Preferences / Dashboard / Administration | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-DASH-11 | Product tour on first dashboard visit | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (`?tour=1`); replay Covered in `account/account-deep.spec.ts` |
+| UC-DASH-12 | Empty dashboard (zero projects) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-DASH-13 | Summary / activity empty states | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` (activity empty for zero-membership user) |
+| UC-DASH-14 | Autocomplete assignee / mention endpoints | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -153,32 +153,32 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-PROJ-01 | Create project from dashboard | Covered | `flows/mutations.spec.ts` |
-| UC-PROJ-02 | Project show overview | Covered | `project/dashboard-project.spec.ts` |
-| UC-PROJ-03 | Project nav tabs (issues / analytics / performance / releases / settings) | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | Covered | `project/use-cases-project.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (general/access/alerts/data/danger) |
-| UC-PROJ-05 | Create / rotate / revoke API key + DSN flash | Covered | `project/project-settings-deep.spec.ts`, `notifications/use-cases-notifications-keys.spec.ts` |
-| UC-PROJ-06 | Add / change role / deactivate / remove member | Covered | `project/use-cases-members-viewer.spec.ts`, `flows/use-cases-partials-closing.spec.ts` |
-| UC-PROJ-07 | Add / role / remove group access | Covered | `flows/use-cases-partials-closing.spec.ts` |
-| UC-PROJ-08 | Save governance (retention / rate / quota) | Covered | `flows/mutations.spec.ts` |
-| UC-PROJ-09 | Create share link (project-wide) | Covered | `flows/mutations.spec.ts`, `project/share-access.spec.ts` |
-| UC-PROJ-10 | Create share link (issue-scoped + max uses) | Covered | `project/use-cases-share.spec.ts` |
-| UC-PROJ-11 | Revoke share link | Covered | `project/use-cases-share.spec.ts` |
-| UC-PROJ-12 | Guest opens valid share token (viewer) | Covered | `project/use-cases-share.spec.ts` (login then consume) |
-| UC-PROJ-13 | Invalid share token | Covered | `project/share-access.spec.ts` |
-| UC-PROJ-14 | Mint / revoke read API token | Covered | `flows/mutations.spec.ts` |
-| UC-PROJ-15 | Member-alerts project override save | Covered | `account/member-alerts.spec.ts` |
-| UC-PROJ-16 | Config export / import (project) | Covered | `project/project-config.spec.ts` |
-| UC-PROJ-17 | Clear history (danger zone) | Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project) |
-| UC-PROJ-18 | Transfer ownership | Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project + second member) |
-| UC-PROJ-19 | Delete project | Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
-| UC-PROJ-20 | Notification help page | Covered | `project/project-settings-deep.spec.ts` |
-| UC-PROJ-21 | Health / delivery history panel | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-PROJ-22 | Edit project name / description (general) | Covered | `admin/use-cases-legal-mutations.spec.ts` (admin edit) |
-| UC-PROJ-23 | Share link max-uses exhausted rejects | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-PROJ-24 | `full` membership role capabilities | Covered | `admin/use-cases-final-gaps.spec.ts` (settings/danger delete; no transfer) |
-| UC-PROJ-25 | New-project form fragment (`/_new_form`) | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-PROJ-26 | Inactive API key rejected on ingest | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PROJ-01 | Create project from dashboard | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-PROJ-02 | Project show overview | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-PROJ-03 | Project nav tabs (issues / analytics / performance / releases / settings) | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | ✅ Covered | `project/use-cases-project.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (general/access/alerts/data/danger) |
+| UC-PROJ-05 | Create / rotate / revoke API key + DSN flash | ✅ Covered | `project/project-settings-deep.spec.ts`, `notifications/use-cases-notifications-keys.spec.ts` |
+| UC-PROJ-06 | Add / change role / deactivate / remove member | ✅ Covered | `project/use-cases-members-viewer.spec.ts`, `flows/use-cases-partials-closing.spec.ts` |
+| UC-PROJ-07 | Add / role / remove group access | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` |
+| UC-PROJ-08 | Save governance (retention / rate / quota) | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-PROJ-09 | Create share link (project-wide) | ✅ Covered | `flows/mutations.spec.ts`, `project/share-access.spec.ts` |
+| UC-PROJ-10 | Create share link (issue-scoped + max uses) | ✅ Covered | `project/use-cases-share.spec.ts` |
+| UC-PROJ-11 | Revoke share link | ✅ Covered | `project/use-cases-share.spec.ts` |
+| UC-PROJ-12 | Guest opens valid share token (viewer) | ✅ Covered | `project/use-cases-share.spec.ts` (login then consume) |
+| UC-PROJ-13 | Invalid share token | ✅ Covered | `project/share-access.spec.ts` |
+| UC-PROJ-14 | Mint / revoke read API token | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-PROJ-15 | Member-alerts project override save | ✅ Covered | `account/member-alerts.spec.ts` |
+| UC-PROJ-16 | Config export / import (project) | ✅ Covered | `project/project-config.spec.ts` |
+| UC-PROJ-17 | Clear history (danger zone) | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project) |
+| UC-PROJ-18 | Transfer ownership | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project + second member) |
+| UC-PROJ-19 | Delete project | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
+| UC-PROJ-20 | Notification help page | ✅ Covered | `project/project-settings-deep.spec.ts` |
+| UC-PROJ-21 | Health / delivery history panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
+| UC-PROJ-22 | Edit project name / description (general) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (admin edit) |
+| UC-PROJ-23 | Share link max-uses exhausted rejects | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PROJ-24 | `full` membership role capabilities | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (settings/danger delete; no transfer) |
+| UC-PROJ-25 | New-project form fragment (`/_new_form`) | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PROJ-26 | Inactive API key rejected on ingest | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -186,35 +186,35 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-ISS-01 | Issue list table after sample seed | Covered | `issues/issues-deep.spec.ts` |
-| UC-ISS-02 | Filter by level + status | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-03 | Filter by environment / release / priority (query string) | Covered | `issues/use-cases-issues.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (tag/url/user/q; MySQL url LIKE ESCAPE fixed) |
-| UC-ISS-04 | FULLTEXT search query param | Covered | `project/dashboard-project.spec.ts` |
-| UC-ISS-05 | Sort + pagination + per_page | Covered | `issues/issues-deep.spec.ts` |
-| UC-ISS-06 | Environment compare panel | Covered | `issues/issues-deep.spec.ts` |
-| UC-ISS-07 | Save named view | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-08 | Apply saved view | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-ISS-09 | Delete saved view | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-ISS-10 | Export issues CSV/JSON | Covered | `project/dashboard-project.spec.ts` |
-| UC-ISS-11 | Export events CSV/JSON | Covered | `project/dashboard-project.spec.ts` |
-| UC-ISS-12 | Open issue detail | Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` |
-| UC-ISS-13 | Add comment | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-14 | Resolve / reopen status | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-15 | Ignore status | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-ISS-16 | Change priority | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-17 | Assign / clear assignee | Covered | `flows/mutations.spec.ts` |
-| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `flows/use-cases-partials-closing.spec.ts` (without merge); `flows/use-cases-destructive-safe.spec.ts` (with merge_events) |
-| UC-ISS-19 | Similar issues panel | Covered | `notifications/use-cases-thresholds-health.spec.ts` (attached when present) |
-| UC-ISS-20 | Copy for AI (md/json export) | Covered | `issues/issues-deep.spec.ts` |
-| UC-ISS-21 | Open event detail from issue | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-ISS-22 | Stack / request / tags / contexts panels | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-ISS-23 | Assignment & status history | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-ISS-24 | Viewer read-only chrome | Covered | `project/use-cases-members-viewer.spec.ts` |
-| UC-ISS-25 | @mention in comment → dashboard mentions | Covered | `project/use-cases-members-viewer.spec.ts` |
-| UC-ISS-26 | Empty issue list / no-sample shell | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-ISS-27 | Illegal status transition rejected | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-ISS-28 | Event detail 404 for unknown id | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-ISS-29 | Environment compare apply selection | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-01 | Issue list table after sample seed | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-ISS-02 | Filter by level + status | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-03 | Filter by environment / release / priority (query string) | ✅ Covered | `issues/use-cases-issues.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (tag/url/user/q; MySQL url LIKE ESCAPE fixed) |
+| UC-ISS-04 | FULLTEXT search query param | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-ISS-05 | Sort + pagination + per_page | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-ISS-06 | Environment compare panel | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-ISS-07 | Save named view | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-08 | Apply saved view | ✅ Covered | `issues/use-cases-issues.spec.ts` |
+| UC-ISS-09 | Delete saved view | ✅ Covered | `issues/use-cases-issues.spec.ts` |
+| UC-ISS-10 | Export issues CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-ISS-11 | Export events CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-ISS-12 | Open issue detail | ✅ Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` |
+| UC-ISS-13 | Add comment | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-14 | Resolve / reopen status | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-15 | Ignore status | ✅ Covered | `issues/use-cases-issues.spec.ts` |
+| UC-ISS-16 | Change priority | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-17 | Assign / clear assignee | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-18 | Mark duplicate (+ optional merge) | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (without merge); `flows/use-cases-destructive-safe.spec.ts` (with merge_events) |
+| UC-ISS-19 | Similar issues panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (attached when present) |
+| UC-ISS-20 | Copy for AI (md/json export) | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-ISS-21 | Open event detail from issue | ✅ Covered | `issues/use-cases-issues.spec.ts` |
+| UC-ISS-22 | Stack / request / tags / contexts panels | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
+| UC-ISS-23 | Assignment & status history | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
+| UC-ISS-24 | Viewer read-only chrome | ✅ Covered | `project/use-cases-members-viewer.spec.ts` |
+| UC-ISS-25 | @mention in comment → dashboard mentions | ✅ Covered | `project/use-cases-members-viewer.spec.ts` |
+| UC-ISS-26 | Empty issue list / no-sample shell | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-27 | Illegal status transition rejected | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-28 | Event detail 404 for unknown id | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-29 | Environment compare apply selection | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -222,16 +222,16 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-AN-01 | Analytics charts shell + filters | Covered | `issues/issues-deep.spec.ts` |
-| UC-AN-02 | Analytics period presets / custom range / env filters | Covered | `admin/use-cases-analytics-admin.spec.ts` |
-| UC-AN-03 | Analytics empty project (no events) | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-PERF-01 | Performance index | Covered | `issues/issues-deep.spec.ts` |
-| UC-PERF-02 | Performance transaction detail | Covered | `issues/issues-deep.spec.ts` |
-| UC-PERF-03 | N+1-only filter (`?nplus1=1`) | Covered | `issues/use-cases-issues.spec.ts` |
-| UC-PERF-04 | Performance empty / unknown transaction 404 | Covered | `project/use-cases-remaining-gaps.spec.ts` |
-| UC-REL-01 | Releases page + compare controls | Covered | `issues/issues-deep.spec.ts`, `project/project-settings-deep.spec.ts` |
-| UC-REL-02 | Release health compare query params | Covered | `project/project-settings-deep.spec.ts` |
-| UC-REL-03 | Releases empty state | Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-AN-01 | Analytics charts shell + filters | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-AN-02 | Analytics period presets / custom range / env filters | ✅ Covered | `admin/use-cases-analytics-admin.spec.ts` |
+| UC-AN-03 | Analytics empty project (no events) | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PERF-01 | Performance index | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-PERF-02 | Performance transaction detail | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-PERF-03 | N+1-only filter (`?nplus1=1`) | ✅ Covered | `issues/use-cases-issues.spec.ts` |
+| UC-PERF-04 | Performance empty / unknown transaction 404 | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-REL-01 | Releases page + compare controls | ✅ Covered | `issues/issues-deep.spec.ts`, `project/project-settings-deep.spec.ts` |
+| UC-REL-02 | Release health compare query params | ✅ Covered | `project/project-settings-deep.spec.ts` |
+| UC-REL-03 | Releases empty state | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 
 ---
 
@@ -239,23 +239,23 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-NOTIF-01 | Create destination form loads | Covered | `issues/issues-deep.spec.ts` |
-| UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | Covered | `notifications/use-cases-notifications-keys.spec.ts` (HTTP); Slack/Teams also in hooks-happy |
-| UC-NOTIF-03 | Edit / toggle / resume / delete destination | Covered | `notifications/use-cases-notifications-keys.spec.ts` (toggle+delete) |
-| UC-NOTIF-04 | Send test notification | Covered | `flows/use-cases-destructive-safe.spec.ts` (HTTP destination → queued flash; delivery async) |
-| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Covered | `notifications/use-cases-thresholds-health.spec.ts` (save quiet hours + digest on HTTP dest) |
-| UC-NOTIF-06 | Threshold rule create form | Covered | `issues/issues-deep.spec.ts` |
-| UC-NOTIF-07 | Threshold rule CRUD + toggle | Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-NOTIF-08 | Circuit breaker resume after failures | Covered | `flows/use-cases-oos-closing.spec.ts` (threshold=1 + failing HTTP dest + Resume) |
-| UC-NOTIF-09 | Destinations list shell | Covered | `project/project-settings-deep.spec.ts` |
-| UC-NOTIF-10 | Create Discord destination | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-11 | Create Telegram destination | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-12 | Create email destination | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-13 | Edit destination persists label/endpoint/categories | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-14 | Clear interaction signing secret | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-15 | Threshold rule edit form save | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-16 | Reject SSRF / private endpoint URL | Covered | `notifications/use-cases-channel-matrix.spec.ts` |
-| UC-NOTIF-17 | Flush digests console/cron | Covered | `notifications/use-cases-digest-flush.spec.ts` (`make test-e2e` writes `var/e2e/flush-digests.last`) |
+| UC-NOTIF-01 | Create destination form loads | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | ✅ Covered | `notifications/use-cases-notifications-keys.spec.ts` (HTTP); Slack/Teams also in hooks-happy |
+| UC-NOTIF-03 | Edit / toggle / resume / delete destination | ✅ Covered | `notifications/use-cases-notifications-keys.spec.ts` (toggle+delete) |
+| UC-NOTIF-04 | Send test notification | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (HTTP destination → queued flash; delivery async) |
+| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (save quiet hours + digest on HTTP dest) |
+| UC-NOTIF-06 | Threshold rule create form | ✅ Covered | `issues/issues-deep.spec.ts` |
+| UC-NOTIF-07 | Threshold rule CRUD + toggle | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
+| UC-NOTIF-08 | Circuit breaker resume after failures | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (threshold=1 + failing HTTP dest + Resume) |
+| UC-NOTIF-09 | Destinations list shell | ✅ Covered | `project/project-settings-deep.spec.ts` |
+| UC-NOTIF-10 | Create Discord destination | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-11 | Create Telegram destination | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-12 | Create email destination | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-13 | Edit destination persists label/endpoint/categories | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-14 | Clear interaction signing secret | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-15 | Threshold rule edit form save | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-16 | Reject SSRF / private endpoint URL | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
+| UC-NOTIF-17 | Flush digests console/cron | ✅ Covered | `notifications/use-cases-digest-flush.spec.ts` (`make test-e2e` writes `var/e2e/flush-digests.last`) |
 
 ---
 
@@ -263,24 +263,24 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-ING-01 | Envelope POST with DSN auth ACK | Covered | `ingest/ingest.spec.ts` |
-| UC-ING-02 | Envelope rejects query-string auth (401) | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-03 | Envelope rejects missing secret | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-04 | OTLP logs WARN+ → ACK | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-05 | OTLP traces ERROR span → ACK | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-06 | OTLP metrics failure-like point → ACK | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-07 | OTLP rejects query auth | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-08 | Suspend ingest / quota exceeded | Covered | `notifications/use-cases-thresholds-health.spec.ts` (suspend→403); `flows/use-cases-oos-closing.spec.ts` (daily quota→429) |
-| UC-ING-09 | Read API list issues with Bearer | Covered | `flows/mutations.spec.ts` |
-| UC-ING-10 | Read API get single issue | Covered | `ingest/use-cases-ingest.spec.ts` |
-| UC-ING-11 | Read API rate limit 429 | Covered | `z-late/read-api-ratelimit.spec.ts` (burn default 120/min IP window + cooldown) |
-| UC-ING-12 | OpenAPI JSON for admin | Covered | `admin/admin.spec.ts` |
-| UC-ING-13 | Envelope malformed body rejected | Covered | `ingest/use-cases-ingest-edges.spec.ts` |
-| UC-ING-14 | Monthly quota exceeded → 429 | Covered | `ingest/use-cases-ingest-edges.spec.ts` |
-| UC-ING-15 | Per-project ingest rate limit → 429 | Covered | `ingest/use-cases-ingest-edges.spec.ts` |
-| UC-ING-16 | Unknown project / bad DSN → 401/404 | Covered | `ingest/use-cases-ingest-edges.spec.ts` |
-| UC-ING-17 | OpenAPI HTML docs UI (`/admin/api/doc`) | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ING-18 | Read API unauthorized without Bearer | Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-01 | Envelope POST with DSN auth ACK | ✅ Covered | `ingest/ingest.spec.ts` |
+| UC-ING-02 | Envelope rejects query-string auth (401) | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-03 | Envelope rejects missing secret | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-04 | OTLP logs WARN+ → ACK | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-05 | OTLP traces ERROR span → ACK | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-06 | OTLP metrics failure-like point → ACK | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-07 | OTLP rejects query auth | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-08 | Suspend ingest / quota exceeded | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (suspend→403); `flows/use-cases-oos-closing.spec.ts` (daily quota→429) |
+| UC-ING-09 | Read API list issues with Bearer | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ING-10 | Read API get single issue | ✅ Covered | `ingest/use-cases-ingest.spec.ts` |
+| UC-ING-11 | Read API rate limit 429 | ✅ Covered | `z-late/read-api-ratelimit.spec.ts` (burn default 120/min IP window + cooldown) |
+| UC-ING-12 | OpenAPI JSON for admin | ✅ Covered | `admin/admin.spec.ts` |
+| UC-ING-13 | Envelope malformed body rejected | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-14 | Monthly quota exceeded → 429 | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-15 | Per-project ingest rate limit → 429 | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-16 | Unknown project / bad DSN → 401/404 | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-17 | OpenAPI HTML docs UI (`/admin/api/doc`) | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ING-18 | Read API unauthorized without Bearer | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
 
 ---
 
@@ -288,18 +288,18 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-HOOK-01 | Slack interactions reject unsigned / bad body | Covered | `hooks/use-cases-hooks.spec.ts` |
-| UC-HOOK-02 | Teams actions reject empty JSON | Covered | `hooks/use-cases-hooks.spec.ts` |
-| UC-HOOK-03 | Teams assign-me reject bad body | Covered | `hooks/use-cases-hooks.spec.ts` |
-| UC-HOOK-04 | Inbound email reject unauthenticated | Covered | `hooks/use-cases-hooks.spec.ts` |
-| UC-HOOK-05 | Happy-path Slack Resolve / Assign | Covered | `hooks/use-cases-hooks-happy.spec.ts` (forged Slack signature + linked Slack user id) |
-| UC-HOOK-06 | Happy-path Teams actions | Covered | `hooks/use-cases-hooks-happy.spec.ts` (forged assign-me + anonymous Resolve with restore) |
-| UC-HOOK-07 | Inbound email → issue comment | Covered | `hooks/use-cases-hooks-happy.spec.ts` (ops inbound secret + forged reply token) |
-| UC-HOOK-08 | Slack resolve without mapped Slack user → 403 | Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
-| UC-HOOK-09 | Teams resolve without anonymous flag → 403 | Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
-| UC-HOOK-10 | Teams / Slack action token replay rejected | Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
-| UC-HOOK-11 | Inbound duplicate Message-Id idempotent | Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
-| UC-HOOK-12 | Inbound From ≠ token recipient ignored | Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-01 | Slack interactions reject unsigned / bad body | ✅ Covered | `hooks/use-cases-hooks.spec.ts` |
+| UC-HOOK-02 | Teams actions reject empty JSON | ✅ Covered | `hooks/use-cases-hooks.spec.ts` |
+| UC-HOOK-03 | Teams assign-me reject bad body | ✅ Covered | `hooks/use-cases-hooks.spec.ts` |
+| UC-HOOK-04 | Inbound email reject unauthenticated | ✅ Covered | `hooks/use-cases-hooks.spec.ts` |
+| UC-HOOK-05 | Happy-path Slack Resolve / Assign | ✅ Covered | `hooks/use-cases-hooks-happy.spec.ts` (forged Slack signature + linked Slack user id) |
+| UC-HOOK-06 | Happy-path Teams actions | ✅ Covered | `hooks/use-cases-hooks-happy.spec.ts` (forged assign-me + anonymous Resolve with restore) |
+| UC-HOOK-07 | Inbound email → issue comment | ✅ Covered | `hooks/use-cases-hooks-happy.spec.ts` (ops inbound secret + forged reply token) |
+| UC-HOOK-08 | Slack resolve without mapped Slack user → 403 | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-09 | Teams resolve without anonymous flag → 403 | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-10 | Teams / Slack action token replay rejected | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-11 | Inbound duplicate Message-Id idempotent | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-12 | Inbound From ≠ token recipient ignored | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
 
 ---
 
@@ -307,43 +307,43 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-ADM-01 | Admin hub + deep cards | Covered | `admin/admin.spec.ts`, `admin/settings-deep.spec.ts` |
-| UC-ADM-02 | Users list / new form / activity | Covered | `admin/admin.spec.ts` |
-| UC-ADM-03 | Create user / toggle enabled / change role | Covered | `admin/use-cases-analytics-admin.spec.ts`, `admin/use-cases-admin-remaining.spec.ts`, `flows/use-cases-partials-closing.spec.ts` |
-| UC-ADM-04 | Admin user GDPR export / anonymize | Covered | export `admin/use-cases-admin.spec.ts`; anonymize ephemeral user `flows/use-cases-destructive-safe.spec.ts` |
-| UC-ADM-05 | Groups CRUD + members / projects | Covered | `admin/use-cases-admin-remaining.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (add/remove member) |
-| UC-ADM-06 | Admin projects list / show / edit / ops | Covered | `admin/admin.spec.ts`, `admin/admin-project-deep.spec.ts` |
-| UC-ADM-07 | Suspend ingest from admin | Covered | `admin/use-cases-analytics-admin.spec.ts` |
-| UC-ADM-08 | View-as-member enable / disable | Covered | `admin/use-cases-admin.spec.ts` |
-| UC-ADM-09 | Admin project audit timeline | Covered | `admin/admin-project-deep.spec.ts` |
-| UC-ADM-10 | Admin project config export/import | Covered | `project/project-config.spec.ts` |
-| UC-ADM-11 | Roles / permissions RBAC UI | Covered | `admin/admin-rbac.spec.ts` |
-| UC-ADM-12 | Social login provider CRUD forms | Covered | `admin/use-cases-admin.spec.ts` |
-| UC-ADM-13 | Mailer DSN form + sample email | Covered | `admin/use-cases-admin.spec.ts` + `admin/use-cases-admin-remaining.spec.ts` (sample control / unavailable) |
-| UC-ADM-14 | Mercure settings form | Covered | `smoke/navigation-ui.spec.ts` |
-| UC-ADM-15 | Appearance tabs / colors / presets | Covered | `admin/settings-deep.spec.ts`, `smoke/misc.spec.ts` |
-| UC-ADM-16 | Ops defaults tabs | Covered | `admin/settings-deep.spec.ts` |
-| UC-ADM-17 | Instance config export / import | Covered | `admin/settings-deep.spec.ts` |
-| UC-ADM-18 | Legacy `/settings/*` redirects | Covered | `admin/settings-deep.spec.ts` |
-| UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
-| UC-ADM-20 | Unlink user↔project / group↔project | Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
-| UC-ADM-21 | HTTP log export / purge / delete | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | Covered | `admin/use-cases-kit-mutations.spec.ts` (new form) |
-| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | Covered | `admin/use-cases-kit-mutations.spec.ts` (create form; persist when #[Routable] candidates exist) | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-25 | Permissions create / edit / delete | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-26 | Roles create / edit / delete + assign users | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-27 | Admin create project | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-28 | Admin delete project | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-29 | Admin project members / groups mutate | Covered | `admin/use-cases-final-gaps.spec.ts` (add/role/remove + optional group link) |
-| UC-ADM-30 | Admin projects bulk export / import | Covered | `admin/use-cases-final-gaps.spec.ts` (download JSON + import round-trip) |
-| UC-ADM-31 | Appearance save theme / brand / layout / colors | Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-33 | Mailer send-test delivers (Mailpit) | Covered | `admin/use-cases-admin-gaps.spec.ts` (Mailpit soft-skip if down) |
-| UC-ADM-34 | Mercure settings save | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-35 | Social login edit / delete provider | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-36 | Group edit / delete | Covered | `admin/use-cases-admin-gaps.spec.ts` |
-| UC-ADM-37 | Admin user activity filters | Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-01 | Admin hub + deep cards | ✅ Covered | `admin/admin.spec.ts`, `admin/settings-deep.spec.ts` |
+| UC-ADM-02 | Users list / new form / activity | ✅ Covered | `admin/admin.spec.ts` |
+| UC-ADM-03 | Create user / toggle enabled / change role | ✅ Covered | `admin/use-cases-analytics-admin.spec.ts`, `admin/use-cases-admin-remaining.spec.ts`, `flows/use-cases-partials-closing.spec.ts` |
+| UC-ADM-04 | Admin user GDPR export / anonymize | ✅ Covered | export `admin/use-cases-admin.spec.ts`; anonymize ephemeral user `flows/use-cases-destructive-safe.spec.ts` |
+| UC-ADM-05 | Groups CRUD + members / projects | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (add/remove member) |
+| UC-ADM-06 | Admin projects list / show / edit / ops | ✅ Covered | `admin/admin.spec.ts`, `admin/admin-project-deep.spec.ts` |
+| UC-ADM-07 | Suspend ingest from admin | ✅ Covered | `admin/use-cases-analytics-admin.spec.ts` |
+| UC-ADM-08 | View-as-member enable / disable | ✅ Covered | `admin/use-cases-admin.spec.ts` |
+| UC-ADM-09 | Admin project audit timeline | ✅ Covered | `admin/admin-project-deep.spec.ts` |
+| UC-ADM-10 | Admin project config export/import | ✅ Covered | `project/project-config.spec.ts` |
+| UC-ADM-11 | Roles / permissions RBAC UI | ✅ Covered | `admin/admin-rbac.spec.ts` |
+| UC-ADM-12 | Social login provider CRUD forms | ✅ Covered | `admin/use-cases-admin.spec.ts` |
+| UC-ADM-13 | Mailer DSN form + sample email | ✅ Covered | `admin/use-cases-admin.spec.ts` + `admin/use-cases-admin-remaining.spec.ts` (sample control / unavailable) |
+| UC-ADM-14 | Mercure settings form | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-ADM-15 | Appearance tabs / colors / presets | ✅ Covered | `admin/settings-deep.spec.ts`, `smoke/misc.spec.ts` |
+| UC-ADM-16 | Ops defaults tabs | ✅ Covered | `admin/settings-deep.spec.ts` |
+| UC-ADM-17 | Instance config export / import | ✅ Covered | `admin/settings-deep.spec.ts` |
+| UC-ADM-18 | Legacy `/settings/*` redirects | ✅ Covered | `admin/settings-deep.spec.ts` |
+| UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | ✅ Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
+| UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
+| UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form) |
+| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create form; persist when #[Routable] candidates exist) |
+| UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-27 | Admin create project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-28 | Admin delete project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-29 | Admin project members / groups mutate | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (add/role/remove + optional group link) |
+| UC-ADM-30 | Admin projects bulk export / import | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (download JSON + import round-trip) |
+| UC-ADM-31 | Appearance save theme / brand / layout / colors | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-33 | Mailer send-test delivers (Mailpit) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` (Mailpit soft-skip if down) |
+| UC-ADM-34 | Mercure settings save | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-35 | Social login edit / delete provider | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-36 | Group edit / delete | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-37 | Admin user activity filters | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 
 ---
 
@@ -351,11 +351,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | Covered | Marker hygiene (`smoke/use-cases-auth.spec.ts`); full cold wizard remains Out of scope — never leave `setup.required` |
-| UC-SETUP-02 | Platform catalog redirect when incomplete | Out of scope | Needs incomplete catalog fixture |
-| UC-SETUP-03 | Seed layers / demo project | Covered | `smoke/use-cases-remaining-oos.spec.ts` (demo project on dashboard after `make seed`); Makefile seed itself remains ops |
-| UC-SETUP-04 | Setup progress / advance APIs | Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; never POST advance on warm DB) |
-| UC-SETUP-05 | Setup done page | Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
+| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | ✅ Covered | Marker hygiene (`smoke/use-cases-auth.spec.ts`); full cold wizard remains Out of scope — never leave `setup.required` |
+| UC-SETUP-02 | Platform catalog redirect when incomplete | ❌ Out of scope | Needs incomplete catalog fixture |
+| UC-SETUP-03 | Seed layers / demo project | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (demo project on dashboard after `make seed`); Makefile seed itself remains ops |
+| UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; never POST advance on warm DB) |
+| UC-SETUP-05 | Setup done page | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
 
 ---
 
@@ -363,8 +363,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | Notes |
 |----|----------|--------|-------|
-| UC-LATER-01 | Hotwire Native / UX Native client | Out of scope | Roadmap Later (`008-ux-native`) |
-| UC-LATER-02 | Self-Beacon dogfood client UI | Out of scope | Env/DSN ops; not operator UI |
+| UC-LATER-01 | Hotwire Native / UX Native client | ❌ Out of scope | Roadmap Later (`008-ux-native`) |
+| UC-LATER-02 | Self-Beacon dogfood client UI | ❌ Out of scope | Env/DSN ops; not operator UI |
 
 ---
 
