@@ -22,12 +22,12 @@ use Symfony\Component\RateLimiter\RateLimit;
  * Also clears DB attempts on {@see reset()} (successful login); the decorated limiter's reset is a no-op.
  */
 #[AsDecorator('nowo_login_throttle.database_rate_limiter')]
-final class AuthKitAwareLoginRateLimiter implements RequestRateLimiterInterface
+final readonly class AuthKitAwareLoginRateLimiter implements RequestRateLimiterInterface
 {
     public function __construct(
         #[AutowireDecorated]
-        private readonly RequestRateLimiterInterface $inner,
-        private readonly EntityManagerInterface $entityManager,
+        private RequestRateLimiterInterface $inner,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
