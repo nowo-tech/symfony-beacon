@@ -10,7 +10,8 @@ import {
 
 /**
  * Magic + reset are gated until an encrypted deliverable Mailer DSN is saved
- * (`MailerGatedAuthKitRouteSubscriber`). QR login is `mode: disabled` in AuthKit config.
+ * (`MailerGatedAuthKitRouteSubscriber`). QR login is `mode: enabled` (approve/deny in
+ * `use-cases-auth-qr-dual.spec.ts`; demo admin has seeded `phoneVerifiedAt`).
  */
 async function ensureDeliverableMailer(page: import('@playwright/test').Page): Promise<void> {
   await page.goto('/admin/mailer');
@@ -74,28 +75,23 @@ test.describe('Auth flows — magic, reset, QR', () => {
     }
   });
 
-  test('QR login disabled redirects to login (UC-AUTH-21 gate)', async ({ browser }) => {
-    // Product config: nowo_auth_kit.qr_login.mode=disabled until phoneVerifiedAt path exists.
+  test('QR login creates challenge and status JSON polls (UC-AUTH-21)', async ({ browser }) => {
     const ctx = await browser.newContext({ ignoreHTTPSErrors: true, storageState: { cookies: [], origins: [] } });
     const page = await ctx.newPage();
     try {
-      await page.goto('/login/qr');
+      const response = await page.goto('/login/qr', { waitUntil: 'domcontentloaded' });
+      expect(response?.status() ?? 0, 'QR start must not be rate-limited').toBeLessThan(400);
       await dismissCookieConsent(page);
-      await page.waitForTimeout(1_000);
-      if (/\/login\/qr(\/[0-9a-f-]+)?/i.test(page.url())) {
-        const match = page.url().match(/\/login\/qr\/([0-9a-f-]{8,})/i);
-        if (match?.[1]) {
-          const status = await page.request.get(`/login/qr/${match[1]}/status`, { failOnStatusCode: false });
-          expect(status.status()).toBeLessThan(500);
-        } else {
-          await expect(page.locator('img.nowo-auth-kit__qr-image, img[alt*="QR"], img[src*="data:image"]').first()).toBeVisible({
-            timeout: 15_000,
-          });
-        }
-      } else {
-        await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
-        await expect(page.locator('input[name="login_form[_username]"]')).toBeVisible();
-      }
+      await page.waitForURL(/\/login\/qr\/[0-9a-f-]+/i, { timeout: 20_000 });
+      const id = page.url().match(/\/login\/qr\/([0-9a-f-]+)/i)?.[1];
+      expect(id).toBeTruthy();
+      await expect(page.locator('img.nowo-auth-kit__qr-image, .nowo-auth-kit__qr-url a').first()).toBeVisible({
+        timeout: 15_000,
+      });
+      const status = await page.request.get(`/login/qr/${id}/status`, { failOnStatusCode: false });
+      expect(status.status()).toBe(200);
+      const payload = await status.json();
+      expect(String(payload.status ?? '')).toMatch(/pending/i);
     } finally {
       await ctx.close();
     }

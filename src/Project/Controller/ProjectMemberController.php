@@ -114,7 +114,9 @@ final class ProjectMemberController extends AbstractController
             ),
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$this->acceptSubmittedRoleForm($form)) {
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
+        }
 
         /** @var array{role?: string|null} $data */
         $data = $form->getData() ?? [];
@@ -329,7 +331,9 @@ final class ProjectMemberController extends AbstractController
             ),
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$this->acceptSubmittedRoleForm($form)) {
+            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Access->value]);
+        }
 
         /** @var array{role?: string|null} $data */
         $data = $form->getData() ?? [];

@@ -56,7 +56,21 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 
 [`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
 
-That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~194 Covered / ~28 Gap (see §15 in the catalog). Add or extend specs under the matching domain folder when closing remaining Gaps.
+That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~233 Covered / ~0 Gap (~4 Out of scope). Extend specs under the matching domain folder when product surface grows.
+
+Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install.
+
+Digest flush (`UC-NOTIF-17`): `make test-e2e` runs `app:notifications:flush-digests --force` and writes `var/e2e/flush-digests.last` for `notifications/use-cases-digest-flush.spec.ts`.
+
+Mailpit-backed auth completion (`UC-AUTH-18` / `UC-AUTH-20`):
+
+```bash
+make mailpit
+make test-e2e ARGS='e2e/smoke/use-cases-auth-mailpit.spec.ts'
+# Optional: PLAYWRIGHT_REQUIRE_MAILPIT=1 to fail instead of skip when Mailpit is down
+```
+
+Push HTTP (`UC-ACC-23`) needs `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` in `.env` (see `.env.dist`); recreate `php` after setting keys.
 
 ## File map (legacy names)
 

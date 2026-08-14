@@ -11,7 +11,6 @@ use App\Shared\Mercure\ConfiguredMercure;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
-use Minishlink\WebPush\VAPID;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
@@ -99,14 +98,9 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
     public function testPushSubscribeHappyPathAndValidationErrorsWhenConfigured(): void
     {
         [$client, $user, $project] = $this->bootWithDemoProject('realtime-push-ok@example.com');
-        $keys = VAPID::createVapidKeys();
-        self::getContainer()->set(
-            WebPushClientFactory::class,
-            new WebPushClientFactory(
-                $keys['publicKey'],
-                $keys['privateKey'],
-                'mailto:ops@example.com',
-            ),
+        self::assertTrue(
+            self::getContainer()->get(WebPushClientFactory::class)->isConfigured(),
+            'phpunit.dist.xml must set VAPID_* so Web Push is configured in test',
         );
 
         $em = self::getContainer()->get(EntityManagerInterface::class);

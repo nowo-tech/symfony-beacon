@@ -26,11 +26,11 @@
     >
         {% if qr_data_uri %}
             <img class="nowo-auth-kit__qr-image" src="{{ qr_data_uri }}" alt="{{ 'qr_login.show.qr_alt'|trans({}, 'NowoAuthKitBundle') }}" width="200" height="200">
-        {% else %}
-            <p class="nowo-auth-kit__qr-url">
-                <a href="{{ qr_payload }}" rel="noopener">{{ 'qr_login.show.open_on_phone'|trans({}, 'NowoAuthKitBundle') }}</a>
-            </p>
         {% endif %}
+        {# Always expose the approve URL (a11y + E2E dual-device); QR encodes the same payload. #}
+        <p class="nowo-auth-kit__qr-url">
+            <a href="{{ qr_payload }}" rel="noopener">{{ 'qr_login.show.open_on_phone'|trans({}, 'NowoAuthKitBundle') }}</a>
+        </p>
 
         <p class="nowo-auth-kit__qr-code">
             {{ 'qr_login.show.code_label'|trans({}, 'NowoAuthKitBundle') }}

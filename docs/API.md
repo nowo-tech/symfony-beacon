@@ -81,4 +81,4 @@ Not a public board: no anonymous access; write/mutate API is out of scope.
 
 ## Auth for Twig UI
 
-Session auth via AuthKit (`/login`). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped). AuthKit **QR phone login is disabled** until SMS OTP can set `phoneVerifiedAt` (`096`).
+Session auth via AuthKit (`/login`). Magic login (`/login/magic`) requires an encrypted instance Mailer DSN under **Administration → Mailer**. Share links grant time-limited viewer access (project-wide or issue-scoped). AuthKit **QR phone login** is enabled locally (`qr_login.mode=enabled`); approvers need `phoneVerifiedAt` (demo seed sets it for `admin@symfony-beacon.local` until SMS OTP ships).

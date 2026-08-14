@@ -102,7 +102,9 @@ final class AdminProjectAccessController extends AbstractController
             ),
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$this->acceptSubmittedRoleForm($form)) {
+            return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
+        }
 
         /** @var array{role?: string|null} $data */
         $data = $form->getData() ?? [];
@@ -220,7 +222,9 @@ final class AdminProjectAccessController extends AbstractController
             ),
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$this->acceptSubmittedRoleForm($form)) {
+            return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
+        }
 
         /** @var array{role?: string|null} $data */
         $data = $form->getData() ?? [];

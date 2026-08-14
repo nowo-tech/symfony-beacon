@@ -35,4 +35,40 @@ trait RequiresValidFormTrait
     {
         $this->requireValidForm($form, 'Invalid CSRF token.');
     }
+
+    /**
+     * Accept a submitted role ChoiceType form, or flash and signal the caller to redirect.
+     *
+     * Invalid choice values (tampered POST) map to {@code $invalidRoleFlash} instead of 403.
+     * Missing submission / CSRF failures still deny access.
+     *
+     * @param FormInterface<mixed> $form
+     *
+     * @return bool true when the form is valid; false when the role field is invalid (flash already set)
+     *
+     * @throws AccessDeniedHttpException
+     */
+    protected function acceptSubmittedRoleForm(
+        FormInterface $form,
+        string $invalidRoleFlash = 'flash.project.member_invalid_role',
+    ): bool {
+        if (!$form->isSubmitted()) {
+            $this->requireValidForm($form);
+        }
+        if ($form->isValid()) {
+            return true;
+        }
+        if ($form->has('_token') && !$form->get('_token')->isValid()) {
+            $this->requireValidCsrfForm($form);
+        }
+        if ($form->has('role') && !$form->get('role')->isValid()) {
+            $this->addFlash('error', $invalidRoleFlash);
+
+            return false;
+        }
+
+        $this->requireValidForm($form);
+
+        return true;
+    }
 }

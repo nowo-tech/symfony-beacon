@@ -282,16 +282,21 @@ final class AdminProjectController extends AbstractController
         $form = $this->createForm(ProjectDeleteType::class, null, [
             'csrf_token_id' => 'admin_project_delete_'.$project->getId(),
             'project_id' => (int) $project->getId(),
+            'confirmation_value' => $project->getName(),
             'input_id_prefix' => 'admin-project-delete-confirm-',
         ]);
         $form->handleRequest($request);
-        $this->requireValidForm($form);
+        if (!$form->isSubmitted()) {
+            $this->requireValidCsrfForm($form);
+        }
+        if (!$form->isValid()) {
+            if (!$form->get('confirmation')->isValid()) {
+                $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
 
-        $confirmation = (string) ($form->get('confirmation')->getData() ?? '');
-        if ($confirmation !== $project->getName()) {
-            $this->addFlash('error', 'flash.project.delete_confirmation_mismatch');
+                return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
+            }
 
-            return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
+            $this->requireValidCsrfForm($form);
         }
 
         /** @var User $actor */

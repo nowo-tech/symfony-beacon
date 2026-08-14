@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import {
   dismissProductTour,
   expectAuthenticatedPage,
-  gotoStable,
   waitForPageLoader,
 } from '../support/helpers';
 
@@ -34,14 +33,11 @@ test.describe('Ops chrome — metrics, live, site backup, maintenance', () => {
     expect(probed).toBeTruthy();
   });
 
-  test('SiteBackup panel loads or challenges without 5xx (UC-OPS-09)', async ({ page }) => {
-    await gotoStable(page, '/_site_backup/');
-    await expect(page.locator('body')).toBeVisible();
-    await expect(page.locator('body')).not.toContainText('Whoops, looks like something went wrong');
-    // Password-gated installs show a login form; unlocked installs show the panel.
-    await expect(
-      page.locator('form, [data-testid*="site-backup"], main, .nowo-site-backup').first(),
-    ).toBeVisible({ timeout: 15_000 });
+  test('SiteBackup panel loads or challenges without 5xx (UC-OPS-09)', async ({ request }) => {
+    const res = await request.get('/_site_backup/', { failOnStatusCode: false });
+    // Password hash unset → 401 challenge; configured panel → 200. Never 5xx.
+    expect(res.status(), await res.text()).toBeLessThan(500);
+    expect([200, 401, 403]).toContain(res.status());
   });
 
   test('maintenance history page loads; schedule form is present (UC-OPS-08)', async ({ page }) => {

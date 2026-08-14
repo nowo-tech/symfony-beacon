@@ -15,6 +15,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectApiKeyFactory;
 use App\Project\Service\ProjectFactory;
 use DateTime;
+use DateTimeImmutable;
 use LogicException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -67,8 +68,27 @@ final readonly class DemoIdentitySeeder
             $user->setRoles(['ROLE_ADMIN']);
             $user->setPassword($this->passwordHasher->hashPassword($user, $password));
             $user->setPasswordChangedAt(new DateTime());
+            // Local QR approve/deny E2E (UC-AUTH-22): verified phone without SMS OTP yet.
+            $user->setPhone('+34600000000');
+            $user->setPhoneVerifiedAt(new DateTimeImmutable());
+            $user->setPushNotificationsEnabled(true);
             $this->userRepository->save($user);
             $userCreated = true;
+        } elseif ($user instanceof User && $createDemoUser && 'admin@symfony-beacon.local' === $email) {
+            // Re-seed keeps demo QR approver usable after profile clears verification.
+            $dirty = false;
+            if (null === $user->getPhone() || null === $user->getPhoneVerifiedAt()) {
+                $user->setPhone($user->getPhone() ?? '+34600000000');
+                $user->setPhoneVerifiedAt(new DateTimeImmutable());
+                $dirty = true;
+            }
+            if (!$user->isPushNotificationsEnabled()) {
+                $user->setPushNotificationsEnabled(true);
+                $dirty = true;
+            }
+            if ($dirty) {
+                $this->userRepository->save($user);
+            }
         }
 
         if (!$user instanceof User) {

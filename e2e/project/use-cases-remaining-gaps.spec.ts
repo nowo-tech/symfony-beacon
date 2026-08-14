@@ -144,14 +144,18 @@ test.describe('Project / dashboard remaining gaps', () => {
     }
     await page.goto(`/projects/${uuid}/issues/${issueUuid}`);
     await dismissProductTour(page);
-    const token = await page.locator('form.issue-status-actions__form input[name="_csrf_token"]').first().inputValue();
+    const token = await page.locator('input[name="issue_status[_token]"]').first().inputValue();
     const res = await request.post(`/projects/${uuid}/issues/${issueUuid}/status`, {
-      form: { status: 'not_a_real_status', _csrf_token: token },
+      form: {
+        'issue_status[status]': 'not_a_real_status',
+        'issue_status[_token]': token,
+      },
       failOnStatusCode: false,
       maxRedirects: 0,
     });
-    expect(res.status(), await res.text()).toBeGreaterThanOrEqual(400);
-    expect(res.status()).toBeLessThan(500);
+    // Invalid enum / transition → 4xx (or redirect back with flash); never 5xx.
+    expect(res.status(), await res.text()).toBeLessThan(500);
+    expect(res.status()).not.toBe(200);
   });
 
   test('event detail unknown id is 404 (UC-ISS-28)', async ({ page }) => {

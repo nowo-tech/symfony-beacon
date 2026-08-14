@@ -42,6 +42,10 @@
         <env name="BEACON_HOOKS_ALLOW_ANONYMOUS_RESOLVE" value="0" force="true"/>
         <env name="BEACON_METRICS_REQUIRE_TOKEN" value="0" force="true"/>
         <env name="BEACON_METRICS_TOKEN" value="phpunit-metrics-token" force="true"/>
+        <!-- Web Push VAPID (functional push subscribe tests; empty in .env.dist) -->
+        <env name="VAPID_PUBLIC_KEY" value="BMSurvPcGLr__vOnlz-3LWeLbMhVrZj6DdG0zzCuQchZgJIhavKo-g6Cs_HmKC8xDz9HdEfg1P0PFnywgJE4n-M" force="true"/>
+        <env name="VAPID_PRIVATE_KEY" value="WDYOi2zFK2QricQDnedNNaJYfSlHpSvbUvG47ZmzkXA" force="true"/>
+        <env name="VAPID_SUBJECT" value="mailto:ops@example.com" force="true"/>
     </php>
 
     <testsuites>

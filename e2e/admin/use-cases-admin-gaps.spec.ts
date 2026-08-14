@@ -21,54 +21,37 @@ test.describe('Admin remaining mutations', () => {
     if ((await desc.count()) > 0) {
       await desc.fill('Created by Playwright ADM-27');
     }
-    // Owner may be a select — leave default when present.
     await form.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
     await expect(page.locator('body')).toContainText(name, { timeout: 15_000 });
 
-    const match = page.url().match(/\/admin\/projects\/([0-9a-f-]{36})/i);
-    const uuid =
-      match?.[1] ||
-      (await page.locator(`a[href*="/admin/projects/"]`).filter({ hasText: name }).first().getAttribute('href'))?.match(
-        /\/admin\/projects\/([0-9a-f-]{36})/i,
-      )?.[1];
+    let uuid = page.url().match(/\/admin\/projects\/([0-9a-f-]{36})/i)?.[1];
+    if (!uuid) {
+      await page.goto('/admin/projects');
+      await dismissProductTour(page);
+      const href = await page.locator('a[href*="/admin/projects/"]').filter({ hasText: name }).first().getAttribute('href');
+      uuid = href?.match(/\/admin\/projects\/([0-9a-f-]{36})/i)?.[1];
+    }
     expect(uuid, 'admin project uuid').toBeTruthy();
 
-    // Delete via danger form on show/edit if available.
     await page.goto(`/admin/projects/${uuid}`);
     await dismissProductTour(page);
-    let deleted = false;
-    const deleteForm = page.locator('form[action*="/delete"]').first();
-    if (await deleteForm.isVisible().catch(() => false)) {
-      const confirm = deleteForm.locator('input[name*="[confirmation]"], input[name*="confirm"]');
-      if ((await confirm.count()) > 0) {
-        await confirm.first().click();
-        await confirm.first().fill(name);
-        await page.waitForTimeout(300);
-      }
-      page.once('dialog', (d) => d.accept().catch(() => undefined));
-      await deleteForm.locator('button[type="submit"]').click({ force: true });
-      await waitForPageLoader(page);
-      deleted = true;
-    }
-    if (!deleted) {
-      // Fallback: member danger zone.
-      await page.goto(`/projects/${uuid}/settings/danger`);
-      await dismissProductTour(page);
-      const danger = page.locator('form').filter({ has: page.locator('input[name*="[confirmation]"]') }).last();
-      if (await danger.isVisible().catch(() => false)) {
-        const input = danger.locator('input[name*="[confirmation]"]');
-        await input.click();
-        await input.pressSequentially(name, { delay: 20 });
-        await expect(danger.locator('button[type="submit"]')).toBeEnabled({ timeout: 10_000 });
-        await danger.locator('button[type="submit"]').click();
-        await waitForPageLoader(page);
-        deleted = true;
-      }
-    }
-    expect(deleted, 'project delete affordance').toBeTruthy();
+    // Open danger-zone confirm dialog, type project name, submit delete.
+    const openDelete = page.locator('button, a').filter({ hasText: /delete|eliminar|borrar/i }).first();
+    await expect(openDelete).toBeVisible({ timeout: 15_000 });
+    await openDelete.click();
+    const dialog = page.locator('dialog[open], dialog.confirm-dialog[open]').last();
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    const confirm = dialog.locator('input[name*="[confirmation]"]');
+    await confirm.click();
+    await confirm.pressSequentially(name, { delay: 15 });
+    const submit = dialog.locator('button[type="submit"]');
+    await expect(submit).toBeEnabled({ timeout: 10_000 });
+    await submit.click();
+    await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/admin\/projects/);
   });
 
   test('mercure settings save without 5xx (UC-ADM-34)', async ({ page }) => {

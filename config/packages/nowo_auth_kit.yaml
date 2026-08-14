@@ -52,11 +52,13 @@ nowo_auth_kit:
             social_login:
                 mode: enabled
                 create_user_if_missing: false
-            # QR phone login (AuthKit 1.12). Disabled until a real phone OTP / verification
-            # path sets User.phoneVerifiedAt (profile save only clears or restores it).
+            # QR phone login (AuthKit 1.12). Enabled for local/E2E dual-device approve/deny
+            # (UC-AUTH-22). Approvers need User.phoneVerifiedAt set (seed/demo or SQL).
             qr_login:
-                mode: disabled
+                mode: enabled
                 challenge_ttl: 90
+                # 0 = disabled — local/E2E creates many challenges (Playwright + manual curls).
+                create_rate_limit: 0
                 approve_requires: session
                 desktop_binding: strict
                 phone_field: phone
