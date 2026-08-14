@@ -56,12 +56,12 @@ final class ProjectSettingsPageBuilderTest extends TestCase
 {
     public function testBuildAssemblesOwnerSettingsPage(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 5);
-        $owner = (new User())->setEmail('owner@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($owner, 1);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($owner)->setRole(ProjectRole::Owner);
-        (new ReflectionProperty(ProjectMembership::class, 'id'))->setValue($membership, 21);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
+        $owner = new User()->setEmail('owner@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($owner, 1);
+        $membership = new ProjectMembership()->setProject($project)->setUser($owner)->setRole(ProjectRole::Owner);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 21);
         $project->addMembership($membership);
 
         $formView = new FormView();

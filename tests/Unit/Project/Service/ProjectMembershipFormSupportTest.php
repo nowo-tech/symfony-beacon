@@ -30,7 +30,7 @@ final class ProjectMembershipFormSupportTest extends TestCase
         $project = new Project();
         $linked = $this->group(1, 'Linked');
         $free = $this->group(2, 'Free');
-        $project->addGroupAccess((new ProjectGroupAccess())->setUserGroup($linked)->setRole(ProjectRole::Member));
+        $project->addGroupAccess(new ProjectGroupAccess()->setUserGroup($linked)->setRole(ProjectRole::Member));
         $groupRepo->method('findAllOrdered')->willReturn([$linked, $free]);
 
         $support = new ProjectMembershipFormSupport($projectRepo, $groupRepo);
@@ -40,8 +40,8 @@ final class ProjectMembershipFormSupportTest extends TestCase
 
         $owner = $this->user(10, 'owner@example.com', 'Owner');
         $member = $this->user(11, 'm@example.com', 'Member');
-        $project->addMembership((new ProjectMembership())->setUser($owner)->setRole(ProjectRole::Owner));
-        $project->addMembership((new ProjectMembership())->setUser($member)->setRole(ProjectRole::Member));
+        $project->addMembership(new ProjectMembership()->setUser($owner)->setRole(ProjectRole::Owner));
+        $project->addMembership(new ProjectMembership()->setUser($member)->setRole(ProjectRole::Member));
         $transfer = $support->transferOwnershipChoices($project, $owner);
         self::assertSame(
             ['Member (m@example.com) - member' => $member->getUuid()],
@@ -51,16 +51,16 @@ final class ProjectMembershipFormSupportTest extends TestCase
 
     private function group(int $id, string $name): UserGroup
     {
-        $group = (new UserGroup())->setName($name)->setSlug(strtolower($name));
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($group, $id);
+        $group = new UserGroup()->setName($name)->setSlug(strtolower($name));
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, $id);
 
         return $group;
     }
 
     private function user(int $id, string $email, string $display): User
     {
-        $user = (new User())->setEmail($email)->setDisplayName($display);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail($email)->setDisplayName($display);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

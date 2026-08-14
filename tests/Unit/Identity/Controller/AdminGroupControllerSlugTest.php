@@ -34,21 +34,19 @@ final class AdminGroupControllerSlugTest extends TestCase
 
     public function testUniqueSlugAppendsSuffixOnCollision(): void
     {
-        $existing = (new UserGroup())->setName('Ops')->setSlug('ops');
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($existing, 10);
+        $existing = new UserGroup()->setName('Ops')->setSlug('ops');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($existing, 10);
 
         $groups = $this->createStub(UserGroupRepository::class);
         $groups->method('findOneBySlug')->willReturnCallback(
-            static function (string $slug) use ($existing): ?UserGroup {
-                return match ($slug) {
-                    'ops', 'ops-2' => $existing,
-                    default => null,
-                };
+            static fn (string $slug): ?UserGroup => match ($slug) {
+                'ops', 'ops-2' => $existing,
+                default => null,
             },
         );
 
         $controller = new ReflectionClass(AdminGroupController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminGroupController::class, 'groupRepository'))->setValue($controller, $groups);
+        new ReflectionProperty(AdminGroupController::class, 'groupRepository')->setValue($controller, $groups);
 
         $method = new ReflectionMethod(AdminGroupController::class, 'uniqueSlug');
         self::assertSame('ops-3', $method->invoke($controller, 'Ops'));
@@ -56,14 +54,14 @@ final class AdminGroupControllerSlugTest extends TestCase
 
     public function testUniqueSlugAllowsExceptedGroupToKeepSlug(): void
     {
-        $group = (new UserGroup())->setName('Ops')->setSlug('ops');
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($group, 7);
+        $group = new UserGroup()->setName('Ops')->setSlug('ops');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, 7);
 
         $groups = $this->createStub(UserGroupRepository::class);
         $groups->method('findOneBySlug')->willReturn($group);
 
         $controller = new ReflectionClass(AdminGroupController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminGroupController::class, 'groupRepository'))->setValue($controller, $groups);
+        new ReflectionProperty(AdminGroupController::class, 'groupRepository')->setValue($controller, $groups);
 
         $method = new ReflectionMethod(AdminGroupController::class, 'uniqueSlug');
         self::assertSame('ops', $method->invoke($controller, 'Ops', $group));

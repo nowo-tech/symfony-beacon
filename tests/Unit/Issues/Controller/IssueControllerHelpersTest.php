@@ -43,24 +43,22 @@ final class IssueControllerHelpersTest extends TestCase
 
     public function testBuildEnvironmentComparePartitionsIssues(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
+        $project = new Project()->setName('Acme')->setSlug('acme');
         $onlyA = $this->issue($project, 1, 'A-only');
         $both = $this->issue($project, 2, 'Both');
         $onlyB = $this->issue($project, 3, 'B-only');
 
         $issues = $this->createStub(IssueSearchRepository::class);
         $issues->method('findByLastEnvironment')->willReturnCallback(
-            static function (Project $p, string $environment) use ($onlyA, $both, $onlyB): array {
-                return match ($environment) {
-                    'prod' => [$onlyA, $both],
-                    'staging' => [$both, $onlyB],
-                    default => [],
-                };
+            static fn (Project $p, string $environment): array => match ($environment) {
+                'prod' => [$onlyA, $both],
+                'staging' => [$both, $onlyB],
+                default => [],
             },
         );
 
         $controller = new ReflectionClass(IssueController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(IssueController::class, 'issueSearchRepository'))->setValue($controller, $issues);
+        new ReflectionProperty(IssueController::class, 'issueSearchRepository')->setValue($controller, $issues);
 
         $method = new ReflectionMethod(IssueController::class, 'buildEnvironmentCompare');
         $result = $method->invoke($controller, $project, 'prod', 'staging');
@@ -74,13 +72,13 @@ final class IssueControllerHelpersTest extends TestCase
 
     private function issue(Project $project, int $id, string $title): Issue
     {
-        $issue = (new Issue())
+        $issue = new Issue()
             ->setProject($project)
             ->setFingerprint('fp-'.$id)
             ->setTitle($title)
             ->setLevel(IssueLevel::Error)
             ->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }

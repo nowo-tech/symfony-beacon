@@ -26,8 +26,8 @@ final class IssueSampleSeederTest extends TestCase
 
     public function testSeedsIssuesAndEventsSkippingExistingFingerprints(): void
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 42);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 42);
 
         $persisted = [];
         $em = $this->createStub(EntityManagerInterface::class);
@@ -39,9 +39,7 @@ final class IssueSampleSeederTest extends TestCase
         $existingFp = hash('sha256', 'beacon-sample|42|1');
         $issues = $this->createStub(IssueRepository::class);
         $issues->method('findOneByProjectAndFingerprint')->willReturnCallback(
-            static function (Project $p, string $fp) use ($existingFp): ?Issue {
-                return $fp === $existingFp ? new Issue() : null;
-            },
+            static fn (Project $p, string $fp): ?Issue => $fp === $existingFp ? new Issue() : null,
         );
 
         $result = new IssueSampleSeeder($em, $issues)->seed($project, 2, 3);

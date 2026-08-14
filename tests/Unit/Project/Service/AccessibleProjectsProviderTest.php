@@ -96,7 +96,7 @@ final class AccessibleProjectsProviderTest extends TestCase
     private function user(int $id): User
     {
         $user = new User();
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

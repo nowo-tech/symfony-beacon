@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Project\Service;
 
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserAction;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
 use App\Identity\Repository\UserGroupMembershipRepository;
@@ -107,7 +108,7 @@ final class ProjectGroupAccessManagerTest extends TestCase
         self::assertSame(1, $this->flushCount);
         self::assertTrue(array_any(
             $this->persisted,
-            static fn (object $e): bool => $e instanceof \App\Identity\Entity\UserAction
+            static fn (object $e): bool => $e instanceof UserAction
                 && UserActionType::ProjectGroupLinked === $e->getAction(),
         ));
     }
@@ -117,13 +118,13 @@ final class ProjectGroupAccessManagerTest extends TestCase
         $project = $this->project(1);
         $actor = $this->user(1);
         $group = $this->group(2, 'QA');
-        $target = (new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
+        $target = new ProjectGroupAccess()->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
         $project->addGroupAccess($target);
 
         $this->manager->changeGroupRole($project, $actor, $target, ProjectRole::Admin);
         self::assertSame(ProjectRole::Admin, $target->getRole());
 
-        $wrong = (new ProjectGroupAccess())->setProject($this->project(9))->setUserGroup($group)->setRole(ProjectRole::Member);
+        $wrong = new ProjectGroupAccess()->setProject($this->project(9))->setUserGroup($group)->setRole(ProjectRole::Member);
         try {
             $this->manager->changeGroupRole($project, $actor, $wrong, ProjectRole::Viewer);
             self::fail('expected');
@@ -177,24 +178,24 @@ final class ProjectGroupAccessManagerTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P'.$id)->setSlug('p'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P'.$id)->setSlug('p'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function user(int $id): User
     {
-        $user = (new User())->setEmail('u'.$id.'@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail('u'.$id.'@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }
 
     private function group(int $id, string $name): UserGroup
     {
-        $group = (new UserGroup())->setName($name)->setSlug(strtolower($name));
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($group, $id);
+        $group = new UserGroup()->setName($name)->setSlug(strtolower($name));
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, $id);
 
         return $group;
     }

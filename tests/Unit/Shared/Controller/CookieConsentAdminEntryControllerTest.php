@@ -21,8 +21,8 @@ final class CookieConsentAdminEntryControllerTest extends TestCase
 {
     public function testRedirectsToEditWhenDefaultConfigExists(): void
     {
-        $config = (new CookieConsentConfig())->setName('default')->setDefault(true)->setEnabled(true);
-        (new ReflectionProperty(CookieConsentConfig::class, 'id'))->setValue($config, 7);
+        $config = new CookieConsentConfig()->setName('default')->setDefault(true)->setEnabled(true);
+        new ReflectionProperty(CookieConsentConfig::class, 'id')->setValue($config, 7);
 
         $repo = $this->createStub(CookieConsentConfigRepository::class);
         $repo->method('findDefaultEnabled')->willReturn($config);

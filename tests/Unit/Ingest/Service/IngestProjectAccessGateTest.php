@@ -164,7 +164,7 @@ final class IngestProjectAccessGateTest extends TestCase
     private function project(int $id): Project
     {
         $project = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }

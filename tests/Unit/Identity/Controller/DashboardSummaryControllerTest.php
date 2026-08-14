@@ -25,8 +25,8 @@ final class DashboardSummaryControllerTest extends TestCase
 {
     public function testIndexAggregatesSummaryCards(): void
     {
-        $user = (new User())->setEmail('dev@example.com');
-        $project = (new Project())->setName('Acme')->setSlug('acme');
+        $user = new User()->setEmail('dev@example.com');
+        $project = new Project()->setName('Acme')->setSlug('acme');
 
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findAccessibleByUser')->willReturn([$project]);

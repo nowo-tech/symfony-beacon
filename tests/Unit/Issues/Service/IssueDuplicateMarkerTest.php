@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Issues\Service;
 
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserAction;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Issues\Entity\Issue;
@@ -141,7 +142,7 @@ final class IssueDuplicateMarkerTest extends TestCase
         self::assertGreaterThanOrEqual(1, $this->flushCount);
         self::assertTrue(array_any(
             $this->persisted,
-            static fn (object $e): bool => $e instanceof \App\Identity\Entity\UserAction
+            static fn (object $e): bool => $e instanceof UserAction
                 && UserActionType::IssueMarkedDuplicate === $e->getAction(),
         ));
     }
@@ -200,24 +201,24 @@ final class IssueDuplicateMarkerTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setSlug('p'.$id)->setName('P'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setSlug('p'.$id)->setName('P'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function issue(int $id, Project $project, string $title): Issue
     {
-        $issue = (new Issue())->setProject($project)->setTitle($title)->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        $issue = new Issue()->setProject($project)->setTitle($title)->setStatus(IssueStatus::Unresolved);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }
 
     private function user(int $id): User
     {
-        $user = (new User())->setEmail('u'.$id.'@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail('u'.$id.'@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

@@ -249,7 +249,7 @@ final class DashboardFilterDtoTest extends TestCase
         $user->setEmail($email);
         $user->setDisplayName($displayName);
         if (null !== $id) {
-            (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+            new ReflectionProperty(User::class, 'id')->setValue($user, $id);
         }
 
         return $user;

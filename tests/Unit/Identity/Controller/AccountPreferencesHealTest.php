@@ -20,13 +20,13 @@ final class AccountPreferencesHealTest extends TestCase
 {
     public function testHealSkipsAnonymizedUsers(): void
     {
-        $user = (new User())->setEmail('gone@example.com')->setAnonymizedAt(new DateTimeImmutable());
+        $user = new User()->setEmail('gone@example.com')->setAnonymizedAt(new DateTimeImmutable());
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('flush');
 
         $controller = new ReflectionClass(AccountPreferencesController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AccountPreferencesController::class, 'entityManager'))->setValue($controller, $em);
+        new ReflectionProperty(AccountPreferencesController::class, 'entityManager')->setValue($controller, $em);
 
         $method = new ReflectionMethod(AccountPreferencesController::class, 'healDisplayPreferencesIfNeeded');
         $method->invoke($controller, $user);
@@ -34,14 +34,14 @@ final class AccountPreferencesHealTest extends TestCase
 
     public function testHealAppliesDefaultsWhenRawPreferencesNull(): void
     {
-        $user = (new User())->setEmail('prefs@example.com');
+        $user = new User()->setEmail('prefs@example.com');
         self::assertNull($user->getPreferredLocaleRaw());
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('flush');
 
         $controller = new ReflectionClass(AccountPreferencesController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AccountPreferencesController::class, 'entityManager'))->setValue($controller, $em);
+        new ReflectionProperty(AccountPreferencesController::class, 'entityManager')->setValue($controller, $em);
         $container = new Container();
         $container->set('parameter_bag', new ParameterBag(['default_locale' => 'en']));
         $controller->setContainer($container);
@@ -55,14 +55,14 @@ final class AccountPreferencesHealTest extends TestCase
 
     public function testHealNoopsWhenAllPreferencesSet(): void
     {
-        $user = (new User())->setEmail('ok@example.com');
+        $user = new User()->setEmail('ok@example.com');
         UserDisplayPreferenceDefaults::applyMissing($user, 'en');
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('flush');
 
         $controller = new ReflectionClass(AccountPreferencesController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AccountPreferencesController::class, 'entityManager'))->setValue($controller, $em);
+        new ReflectionProperty(AccountPreferencesController::class, 'entityManager')->setValue($controller, $em);
 
         $method = new ReflectionMethod(AccountPreferencesController::class, 'healDisplayPreferencesIfNeeded');
         $method->invoke($controller, $user);

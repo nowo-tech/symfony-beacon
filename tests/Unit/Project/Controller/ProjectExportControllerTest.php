@@ -17,6 +17,10 @@ use App\Project\Repository\ProjectMembershipRepository;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use ReflectionProperty;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ProjectExportControllerTest extends TestCase
 {
@@ -36,8 +40,8 @@ final class ProjectExportControllerTest extends TestCase
 
     public function testEventToArrayIncludesIssueAndTimestamps(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        $issue = (new Issue())
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        $issue = new Issue()
             ->setProject($project)
             ->setFingerprint('fp')
             ->setTitle('Boom')
@@ -45,7 +49,7 @@ final class ProjectExportControllerTest extends TestCase
             ->setStatus(IssueStatus::Unresolved);
         $received = new DateTimeImmutable('2026-01-02T03:04:05+00:00');
         $eventTs = new DateTimeImmutable('2026-01-02T03:00:00+00:00');
-        $event = (new Event())
+        $event = new Event()
             ->setProject($project)
             ->setIssue($issue)
             ->setEventId('evt-1')
@@ -69,6 +73,58 @@ final class ProjectExportControllerTest extends TestCase
         self::assertSame('php', $row['platform']);
         self::assertSame($received->format(\DATE_ATOM), $row['received_at']);
         self::assertSame($eventTs->format(\DATE_ATOM), $row['event_timestamp']);
+    }
+
+    public function testExportIssuesJsonReturnsEmptyPayload(): void
+    {
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'uuid')->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
+
+        $issues = $this->createStub(IssueSearchRepository::class);
+        $issues->method('search')->willReturn([]);
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findUsersByProject')->willReturn([]);
+
+        $controller = new ProjectExportController(
+            $issues,
+            $this->createStub(EventRepository::class),
+            $memberships,
+            new IssueJsonNormalizer(),
+        );
+
+        $response = $controller->exportIssues($project, Request::create('/export'), 'json');
+        self::assertInstanceOf(JsonResponse::class, $response);
+        $payload = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa', $payload['project']['uuid']);
+        self::assertSame('acme', $payload['project']['slug']);
+        self::assertSame(ProjectExportController::EXPORT_LIMIT, $payload['limit']);
+        self::assertSame(0, $payload['count']);
+        self::assertSame([], $payload['issues']);
+    }
+
+    public function testCsvStreamWritesBomHeadersAndRows(): void
+    {
+        $controller = $this->controller();
+        $method = new ReflectionMethod(ProjectExportController::class, 'csvStream');
+        /** @var StreamedResponse $response */
+        $response = $method->invoke(
+            $controller,
+            'demo.csv',
+            ['a', 'b'],
+            static function (): iterable {
+                yield ['1', '=x'];
+            },
+        );
+
+        self::assertSame('text/csv; charset=UTF-8', $response->headers->get('Content-Type'));
+        self::assertStringContainsString('demo.csv', (string) $response->headers->get('Content-Disposition'));
+
+        ob_start();
+        $response->sendContent();
+        $body = (string) ob_get_clean();
+        self::assertStringStartsWith("\xEF\xBB\xBF", $body);
+        self::assertStringContainsString('a,b', $body);
+        self::assertStringContainsString("'=x", $body);
     }
 
     private function controller(): ProjectExportController

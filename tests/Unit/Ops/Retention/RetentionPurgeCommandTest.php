@@ -14,7 +14,6 @@ use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
-use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -53,8 +52,8 @@ final class RetentionPurgeCommandTest extends TestCase
             $settings->setRetentionDays(7);
             $settings->setRetentionMaxEvents(0);
         });
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 3);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 3);
         $tester = new CommandTester(new RetentionPurgeCommand($this->purger($ops, [$project], deleteEvents: 4), $ops));
         self::assertSame(0, $tester->execute([]));
         self::assertStringContainsString('Purged across 1 project(s)', $tester->getDisplay());

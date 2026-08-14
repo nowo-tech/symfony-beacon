@@ -25,17 +25,14 @@ final class IssueMergeServiceMergeTest extends TestCase
         $project = $this->project(1);
         $source = $this->issue(10, $project, 'Source');
         $canonical = $this->issue(11, $project, 'Canonical');
-        $event = (new Event())->setIssue($source)->setProject($project)->setEventId('e1')
+        $event = new Event()->setIssue($source)->setProject($project)->setEventId('e1')
             ->setReceivedAt(new DateTimeImmutable('2026-08-01T00:00:00+00:00'))
             ->setEventTimestamp(new DateTimeImmutable('2026-08-01T00:00:00+00:00'));
 
         $events = $this->createStub(EventRepository::class);
-        $events->method('findBy')->willReturnCallback(static function (array $criteria) use ($source, $canonical, $event): array {
+        $events->method('findBy')->willReturnCallback(static function (array $criteria) use ($source, $event): array {
             if (($criteria['issue'] ?? null) === $source) {
                 return [$event];
-            }
-            if (($criteria['issue'] ?? null) === $canonical) {
-                return [];
             }
 
             return [];
@@ -66,24 +63,24 @@ final class IssueMergeServiceMergeTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function issue(int $id, Project $project, string $title): Issue
     {
-        $issue = (new Issue())->setProject($project)->setTitle($title)->setStatus(IssueStatus::Unresolved)->setEventCount(2);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        $issue = new Issue()->setProject($project)->setTitle($title)->setStatus(IssueStatus::Unresolved)->setEventCount(2);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }
 
     private function user(int $id): User
     {
-        $user = (new User())->setEmail('u@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail('u@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

@@ -49,7 +49,7 @@ final class InboundEmailControllerTest extends TestCase
     public function testDisabledReturnsNotFound(): void
     {
         $controller = $this->controller(enabled: false, secret: 'secret');
-        $response = $controller(Request::create('/hooks/email/inbound', 'POST'));
+        $response = $controller(Request::create('/hooks/email/inbound', Request::METHOD_POST));
         self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
@@ -57,7 +57,7 @@ final class InboundEmailControllerTest extends TestCase
     {
         $controller = $this->controller(enabled: true, secret: 'secret');
 
-        $missing = $controller(Request::create('/hooks/email/inbound', 'POST', [
+        $missing = $controller(Request::create('/hooks/email/inbound', Request::METHOD_POST, [
             'beacon_secret' => 'secret',
             'sender' => 'a@example.com',
             'recipient' => 'b@example.com',
@@ -67,7 +67,7 @@ final class InboundEmailControllerTest extends TestCase
 
         $bad = $controller(Request::create(
             '/hooks/email/inbound',
-            'POST',
+            Request::METHOD_POST,
             parameters: [
                 'sender' => 'a@example.com',
                 'recipient' => 'b@example.com',
@@ -83,7 +83,7 @@ final class InboundEmailControllerTest extends TestCase
         $controller = $this->controller(enabled: true, secret: 'secret');
         $response = $controller(Request::create(
             '/hooks/email/inbound',
-            'POST',
+            Request::METHOD_POST,
             parameters: ['recipient' => 'inbox@example.com', 'body-plain' => 'hi'],
             server: ['HTTP_X_BEACON_INBOUND_SECRET' => 'secret'],
         ));
@@ -96,7 +96,7 @@ final class InboundEmailControllerTest extends TestCase
 
         $response = $controller(Request::create(
             '/hooks/email/inbound',
-            'POST',
+            Request::METHOD_POST,
             parameters: [
                 'from' => 'Alice <alice@example.com>',
                 'recipient' => 'inbox@example.com',

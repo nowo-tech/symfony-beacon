@@ -74,7 +74,7 @@ final class ProjectMembershipPolicyTest extends TestCase
         $actor = new User();
         $project = new Project();
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
         );
 
         self::assertSame(
@@ -98,9 +98,9 @@ final class ProjectMembershipPolicyTest extends TestCase
         $actor = new User();
         $project = $this->project(1);
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
         );
-        $target = (new ProjectMembership())
+        $target = new ProjectMembership()
             ->setProject($project)
             ->setUser(new User())
             ->setRole(ProjectRole::Owner);
@@ -113,7 +113,7 @@ final class ProjectMembershipPolicyTest extends TestCase
     {
         $project = $this->project(5);
         $other = $this->project(9);
-        $membership = (new ProjectMembership())->setProject($other)->setUser(new User());
+        $membership = new ProjectMembership()->setProject($other)->setUser(new User());
 
         try {
             $this->policy->assertSameProject($project, $membership);
@@ -134,7 +134,7 @@ final class ProjectMembershipPolicyTest extends TestCase
         $project = new Project();
         $group = new UserGroup();
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
         );
         $this->groupMembershipRepository->method('findOneByGroupAndUser')->willReturn(new UserGroupMembership());
 
@@ -147,7 +147,7 @@ final class ProjectMembershipPolicyTest extends TestCase
         $project = new Project();
         $project->setSlug('p'.$id);
         $project->setName('P'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }

@@ -26,7 +26,7 @@ final class IssueMergeServiceRecomputeTest extends TestCase
         $project = $this->project(1);
         $issue = $this->issue(10, $project);
         $connection = $this->createStub(Connection::class);
-        $connection->method('fetchAssociative')->willReturnCallback(static function (string $sql) {
+        $connection->method('fetchAssociative')->willReturnCallback(static function (string $sql): array {
             if (str_contains($sql, 'COUNT(*)')) {
                 return [
                     'cnt' => 2,
@@ -56,7 +56,7 @@ final class IssueMergeServiceRecomputeTest extends TestCase
         $project = $this->project(5);
         $issue = $this->issue(20, $project);
         $connection = $this->createStub(Connection::class);
-        $connection->method('fetchAllAssociative')->willReturnCallback(static function (string $sql) use ($issue) {
+        $connection->method('fetchAllAssociative')->willReturnCallback(static function (string $sql) use ($issue): array {
             if (str_contains($sql, 'GROUP BY')) {
                 return [[
                     'issue_id' => $issue->getId(),
@@ -109,16 +109,16 @@ final class IssueMergeServiceRecomputeTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P')->setSlug('p'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P')->setSlug('p'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function issue(int $id, Project $project): Issue
     {
-        $issue = (new Issue())->setProject($project)->setTitle('I')->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        $issue = new Issue()->setProject($project)->setTitle('I')->setStatus(IssueStatus::Unresolved);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }

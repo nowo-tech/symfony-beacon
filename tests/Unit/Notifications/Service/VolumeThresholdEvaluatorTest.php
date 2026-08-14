@@ -80,26 +80,26 @@ final class VolumeThresholdEvaluatorTest extends TestCase
     {
         $this->rules = [$this->rule(1, 1, 10)];
         $this->entityManager->expects(self::never())->method('flush');
-        $this->evaluator->evaluate((new Project())->setIngestEnabled(false), 'prod', '1.0.0');
+        $this->evaluator->evaluate(new Project()->setIngestEnabled(false), 'prod', '1.0.0');
     }
 
     public function testSkipsWhenContextsEmpty(): void
     {
         $this->rules = [$this->rule(1, 1, 10)];
         $this->entityManager->expects(self::never())->method('flush');
-        $this->evaluator->evaluateContexts((new Project())->setIngestEnabled(true), []);
+        $this->evaluator->evaluateContexts(new Project()->setIngestEnabled(true), []);
     }
 
     public function testSkipsWhenNoEnabledRules(): void
     {
         $this->rules = [];
         $this->entityManager->expects(self::never())->method('flush');
-        $this->evaluator->evaluate((new Project())->setIngestEnabled(true), 'prod', '1.0.0');
+        $this->evaluator->evaluate(new Project()->setIngestEnabled(true), 'prod', '1.0.0');
     }
 
     public function testFiresWhenCountMeetsThresholdAndFlushes(): void
     {
-        $project = (new Project())->setIngestEnabled(true)->setName('P')->setSlug('p');
+        $project = new Project()->setIngestEnabled(true)->setName('P')->setSlug('p');
         $now = new DateTimeImmutable('2026-08-13T12:00:00+00:00');
         $rule = $this->rule(1, errorCount: 5, window: 15)->setProject($project);
         $this->rules = [$rule];
@@ -113,7 +113,7 @@ final class VolumeThresholdEvaluatorTest extends TestCase
 
     public function testSkipsCooldownAndEnvironmentMismatchAndBelowThreshold(): void
     {
-        $project = (new Project())->setIngestEnabled(true);
+        $project = new Project()->setIngestEnabled(true);
         $now = new DateTimeImmutable('2026-08-13T12:00:00+00:00');
         $cooling = $this->rule(1, 1, 10)->setCooldownMinutes(60)->markFired($now->modify('-5 minutes'));
         $envMismatch = $this->rule(2, 1, 10)->setEnvironment('staging');
@@ -128,7 +128,7 @@ final class VolumeThresholdEvaluatorTest extends TestCase
 
     public function testDedupesRuleAcrossContextsAndBatchesSameWindow(): void
     {
-        $project = (new Project())->setIngestEnabled(true)->setName('P')->setSlug('p');
+        $project = new Project()->setIngestEnabled(true)->setName('P')->setSlug('p');
         $now = new DateTimeImmutable('2026-08-13T12:00:00+00:00');
         $rule = $this->rule(7, 3, 20)->setEnvironment('prod')->setProject($project);
         $this->rules = [$rule];
@@ -148,11 +148,11 @@ final class VolumeThresholdEvaluatorTest extends TestCase
 
     private function rule(int $id, int $errorCount, int $window): ProjectThresholdRule
     {
-        $rule = (new ProjectThresholdRule())
+        $rule = new ProjectThresholdRule()
             ->setErrorCount($errorCount)
             ->setWindowMinutes($window)
             ->setEnabled(true);
-        (new ReflectionProperty(ProjectThresholdRule::class, 'id'))->setValue($rule, $id);
+        new ReflectionProperty(ProjectThresholdRule::class, 'id')->setValue($rule, $id);
 
         return $rule;
     }

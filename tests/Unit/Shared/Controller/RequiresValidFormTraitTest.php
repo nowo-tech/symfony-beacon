@@ -8,6 +8,7 @@ use App\Shared\Controller\RequiresValidFormTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 final class RequiresValidFormTraitTest extends TestCase
 {
@@ -26,7 +27,7 @@ final class RequiresValidFormTraitTest extends TestCase
                 $this->requireValidCsrfForm($form);
             }
 
-            protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedHttpException
+            protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
             }
@@ -48,7 +49,7 @@ final class RequiresValidFormTraitTest extends TestCase
                 $this->requireValidCsrfForm($form);
             }
 
-            protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedHttpException
+            protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
             }

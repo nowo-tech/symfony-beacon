@@ -27,6 +27,7 @@ use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -48,7 +49,7 @@ final class DeliverNotificationHandlerTest extends TestCase
         $this->handler($destinations)(new DeliverNotificationMessage(2, []));
 
         $open = $this->destination(enabled: true, endpoint: 'https://example.com/hook');
-        $open->openCircuit(new \DateTimeImmutable());
+        $open->openCircuit(new DateTimeImmutable());
         $destinations = $this->createStub(NotificationDestinationRepository::class);
         $destinations->method('find')->willReturn($open);
         $this->handler($destinations)(new DeliverNotificationMessage(3, []));
@@ -100,7 +101,7 @@ final class DeliverNotificationHandlerTest extends TestCase
 
     private function destination(bool $enabled, string $endpoint): NotificationDestination
     {
-        return (new NotificationDestination())
+        return new NotificationDestination()
             ->setProject(new Project())
             ->setType(NotificationDestinationType::Http)
             ->setEndpointUrl($endpoint)

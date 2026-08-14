@@ -9,6 +9,7 @@ use App\Project\Exception\ProjectAccessException;
 use App\Project\Service\ProjectAccessFlashKeys;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 final class HandlesProjectAccessMutationsTraitTest extends TestCase
 {
@@ -30,7 +31,7 @@ final class HandlesProjectAccessMutationsTraitTest extends TestCase
                 $this->flashes[] = [$type, (string) $message];
             }
 
-            protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedHttpException
+            protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
             }
@@ -57,7 +58,7 @@ final class HandlesProjectAccessMutationsTraitTest extends TestCase
             {
             }
 
-            protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedHttpException
+            protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
             }
@@ -89,7 +90,7 @@ final class HandlesProjectAccessMutationsTraitTest extends TestCase
                 $this->flashes[] = [$type, (string) $message];
             }
 
-            protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedHttpException
+            protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
             }

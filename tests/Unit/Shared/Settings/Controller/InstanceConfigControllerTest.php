@@ -33,8 +33,8 @@ final class InstanceConfigControllerTest extends TestCase
 {
     public function testExportDownloadsJsonAndRecordsAction(): void
     {
-        $user = (new User())->setEmail('admin@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 2);
+        $user = new User()->setEmail('admin@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 2);
 
         $appearance = SiteAppearance::defaults();
         $appearance->setBrandName('Beacon');

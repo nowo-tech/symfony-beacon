@@ -31,10 +31,10 @@ final class AdminRbacControllerHelpersTest extends TestCase
 
     public function testPermissionsFormDataMapsAssignedPermissions(): void
     {
-        $assigned = (new InstancePermission())->setKey('project.view');
-        (new ReflectionProperty(InstancePermission::class, 'id'))->setValue($assigned, 5);
-        $other = (new InstancePermission())->setKey('project.delete');
-        (new ReflectionProperty(InstancePermission::class, 'id'))->setValue($other, 9);
+        $assigned = new InstancePermission()->setKey('project.view');
+        new ReflectionProperty(InstancePermission::class, 'id')->setValue($assigned, 5);
+        $other = new InstancePermission()->setKey('project.delete');
+        new ReflectionProperty(InstancePermission::class, 'id')->setValue($other, 9);
 
         $role = new InstanceRole();
         $role->addPermission($assigned);

@@ -29,8 +29,8 @@ final class MemberRealtimeControllerTest extends TestCase
 {
     public function testConfigWhenMercureDisabled(): void
     {
-        $user = (new User())->setEmail('rt@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 2);
+        $user = new User()->setEmail('rt@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 2);
         $controller = $this->controller($user, mercureEnabled: false, csrfValid: true);
 
         $response = $controller->config(Request::create('/account/realtime/config'));
@@ -45,17 +45,17 @@ final class MemberRealtimeControllerTest extends TestCase
 
     public function testSubscribeRejectsInvalidCsrf(): void
     {
-        $user = (new User())->setEmail('rt@example.com');
+        $user = new User()->setEmail('rt@example.com');
         $user->setPushNotificationsEnabled(true);
         $controller = $this->controller($user, mercureEnabled: false, csrfValid: false);
 
-        $response = $controller->subscribe(Request::create('/account/push/subscribe', 'POST', content: '{}'));
+        $response = $controller->subscribe(Request::create('/account/push/subscribe', Request::METHOD_POST, content: '{}'));
         self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     public function testBrowserMercureHubUrlRewritesWellKnownPath(): void
     {
-        $user = (new User())->setEmail('rt@example.com');
+        $user = new User()->setEmail('rt@example.com');
         $controller = $this->controller($user, mercureEnabled: false, csrfValid: true);
         $method = new ReflectionMethod(MemberRealtimeController::class, 'browserMercureHubUrl');
 

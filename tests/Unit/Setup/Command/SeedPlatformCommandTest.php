@@ -19,6 +19,7 @@ use Nowo\CookieConsentBundle\Repository\CookieDefinitionRepository;
 use Nowo\DashboardMenuBundle\Entity\Menu;
 use Nowo\DashboardMenuBundle\Repository\MenuRepository;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 final class SeedPlatformCommandTest extends TestCase
@@ -76,7 +77,7 @@ final class SeedPlatformCommandTest extends TestCase
     public function testExecuteReportsFailureOnThrowable(): void
     {
         $menuRepo = $this->createStub(MenuRepository::class);
-        $menuRepo->method('findOneByCodeAndContext')->willThrowException(new \RuntimeException('db down'));
+        $menuRepo->method('findOneByCodeAndContext')->willThrowException(new RuntimeException('db down'));
         $loader = new DemoFixtureLoader();
         $em = $this->createStub(EntityManagerInterface::class);
 

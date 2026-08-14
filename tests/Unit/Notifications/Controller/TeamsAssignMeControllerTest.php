@@ -15,9 +15,11 @@ use App\Issues\Service\IssueMentionParser;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Issues\Service\IssueUserMailTransport;
 use App\Notifications\Controller\TeamsAssignMeController;
+use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Enum\NotificationDestinationType;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
-use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Service\ActionTokenConsumer;
 use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\InteractionActionToken;
@@ -25,6 +27,7 @@ use App\Notifications\Service\NotificationCircuitBreaker;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
+use App\Project\Entity\Project;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
@@ -91,10 +94,10 @@ final class TeamsAssignMeControllerTest extends TestCase
         $destinations = $this->createStub(NotificationDestinationRepository::class);
         $destinations->method('findEnabledByProject')->willReturn([]);
         if ($withDestination) {
-            $project = (new \App\Project\Entity\Project())->setName('Acme')->setSlug('acme');
-            $destination = new \App\Notifications\Entity\NotificationDestination();
+            $project = new Project()->setName('Acme')->setSlug('acme');
+            $destination = new NotificationDestination();
             $destination->setProject($project);
-            $destination->setType(\App\Notifications\Enum\NotificationDestinationType::Teams);
+            $destination->setType(NotificationDestinationType::Teams);
             $destination->setSigningSecret('teams-secret');
             $destination->setEndpointUrl('https://outlook.office.com/webhook/x');
             $destination->setLabel('Ops');
@@ -154,7 +157,7 @@ final class TeamsAssignMeControllerTest extends TestCase
             new NullLogger(),
         );
 
-        $user = (new User())->setEmail('assign@example.com');
+        $user = new User()->setEmail('assign@example.com');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
         $container = new Container();

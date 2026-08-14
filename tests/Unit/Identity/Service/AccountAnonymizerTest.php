@@ -68,7 +68,7 @@ final class AccountAnonymizerTest extends TestCase
 
     public function testAlreadyAnonymizedThrows(): void
     {
-        $subject = (new User())->setEmail('a@example.com')->setAnonymizedAt(new DateTimeImmutable());
+        $subject = new User()->setEmail('a@example.com')->setAnonymizedAt(new DateTimeImmutable());
         $this->expectException(AccountAnonymizeException::class);
         $this->expectExceptionMessage(AccountAnonymizeException::ALREADY_ANONYMIZED);
 
@@ -79,7 +79,7 @@ final class AccountAnonymizerTest extends TestCase
     {
         $subject = $this->user(10, 'owner@example.com');
         $project = $this->project(5, 'Solo');
-        $membership = (new ProjectMembership())
+        $membership = new ProjectMembership()
             ->setProject($project)
             ->setUser($subject)
             ->setRole(ProjectRole::Owner);
@@ -151,9 +151,9 @@ final class AccountAnonymizerTest extends TestCase
 
         $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
         $this->membershipRepository->method('findByUser')->willReturn([
-            (new ProjectMembership())->setProject($solo)->setUser($user)->setRole(ProjectRole::Owner),
-            (new ProjectMembership())->setProject($shared)->setUser($user)->setRole(ProjectRole::Owner),
-            (new ProjectMembership())->setProject($memberOnly)->setUser($user)->setRole(ProjectRole::Member),
+            new ProjectMembership()->setProject($solo)->setUser($user)->setRole(ProjectRole::Owner),
+            new ProjectMembership()->setProject($shared)->setUser($user)->setRole(ProjectRole::Owner),
+            new ProjectMembership()->setProject($memberOnly)->setUser($user)->setRole(ProjectRole::Member),
         ]);
         $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1, 2 => 2]);
         $this->rebuildAnonymizer();
@@ -180,16 +180,16 @@ final class AccountAnonymizerTest extends TestCase
 
     private function user(int $id, string $email): User
     {
-        $user = (new User())->setEmail($email);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail($email);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }
 
     private function project(int $id, string $name): Project
     {
-        $project = (new Project())->setName($name);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName($name);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }

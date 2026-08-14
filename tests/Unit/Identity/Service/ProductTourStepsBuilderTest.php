@@ -128,7 +128,7 @@ final class ProductTourStepsBuilderTest extends TestCase
         $project = new Project();
         $user = new User();
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Full),
+            new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Full),
         );
 
         self::assertSame(ProductTourPage::Dashboard, $this->builder->contextForDashboard()->page);

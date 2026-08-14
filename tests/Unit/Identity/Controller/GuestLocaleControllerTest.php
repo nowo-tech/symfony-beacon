@@ -31,7 +31,7 @@ final class GuestLocaleControllerTest extends TestCase
     {
         $controller = $this->controller();
         $this->expectException(NotFoundHttpException::class);
-        $controller->switch(Request::create('/locale/xx', 'POST'), 'xx');
+        $controller->switch(Request::create('/locale/xx', Request::METHOD_POST), 'xx');
     }
 
     private function controller(): GuestLocaleController

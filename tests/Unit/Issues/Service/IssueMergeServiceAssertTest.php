@@ -43,7 +43,7 @@ final class IssueMergeServiceAssertTest extends TestCase
         }
 
         $sameUuid = $this->issue(11, $project);
-        (new ReflectionProperty($sameUuid, 'uuid'))->setValue($sameUuid, $issue->getUuid());
+        new ReflectionProperty($sameUuid, 'uuid')->setValue($sameUuid, $issue->getUuid());
 
         try {
             $this->service->assertCanMarkAsDuplicate($issue, $sameUuid);
@@ -92,7 +92,7 @@ final class IssueMergeServiceAssertTest extends TestCase
         $project = new Project();
         $project->setSlug('p'.$id);
         $project->setName('P'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
@@ -103,7 +103,7 @@ final class IssueMergeServiceAssertTest extends TestCase
         $issue->setProject($project);
         $issue->setFingerprint('fp-'.$id);
         $issue->setTitle('Issue '.$id);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }

@@ -17,6 +17,6 @@ final class IngestRouteRequirementsTest extends TestCase
             Requirement::POSITIVE_INT.'|'.Requirement::UUID,
             IngestRouteRequirements::PROJECT_REF,
         );
-        self::assertTrue((new ReflectionClass(IngestRouteRequirements::class))->isFinal());
+        self::assertTrue(new ReflectionClass(IngestRouteRequirements::class)->isFinal());
     }
 }

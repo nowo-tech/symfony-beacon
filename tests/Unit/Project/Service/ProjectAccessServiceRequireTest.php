@@ -29,7 +29,7 @@ final class ProjectAccessServiceRequireTest extends TestCase
     {
         $project = $this->project(1);
         $user = $this->user(2);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Admin);
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Admin);
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findOneByProjectAndUser')->willReturn($membership);
         $groups = $this->createStub(ProjectGroupAccessRepository::class);
@@ -58,7 +58,7 @@ final class ProjectAccessServiceRequireTest extends TestCase
     {
         $project = $this->project(3);
         $user = $this->user(4);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findOneByProjectAndUser')->willReturn($membership);
         $groups = $this->createStub(ProjectGroupAccessRepository::class);
@@ -81,7 +81,7 @@ final class ProjectAccessServiceRequireTest extends TestCase
     {
         $project = $this->project(5);
         $user = $this->user(9);
-        $link = (new ProjectShareLink())->setProject($project);
+        $link = new ProjectShareLink()->setProject($project);
         $stack = new RequestStack();
         $request = Request::create('/');
         $session = new Session(new MockArraySessionStorage());
@@ -118,16 +118,16 @@ final class ProjectAccessServiceRequireTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P')->setSlug('p'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P')->setSlug('p'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function user(int $id): User
     {
-        $user = (new User())->setEmail('u'.$id.'@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail('u'.$id.'@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Notifications\Service;
 
-use App\Notifications\Entity\NotificationDigestBuffer;
 use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Entity\NotificationDigestBuffer;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationDigestFlusher;
@@ -45,9 +45,9 @@ final class NotificationDigestFlusherTest extends TestCase
     public function testFlushesDigestAndIndividualPayloads(): void
     {
         $digestDest = $this->destination(digest: true);
-        (new ReflectionProperty(NotificationDestination::class, 'id'))->setValue($digestDest, 10);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($digestDest, 10);
         $individual = $this->destination(digest: false);
-        (new ReflectionProperty(NotificationDestination::class, 'id'))->setValue($individual, 11);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($individual, 11);
 
         $removed = 0;
         $buffer = $this->createStub(NotificationDigestBufferRepository::class);
@@ -56,13 +56,13 @@ final class NotificationDigestFlusherTest extends TestCase
             static function (NotificationDestination $d) use ($digestDest, $individual): array {
                 if ($d === $digestDest) {
                     return [
-                        (new NotificationDigestBuffer())->setDestination($d)->setPayload(['summary' => 'One']),
-                        (new NotificationDigestBuffer())->setDestination($d)->setPayload(['summary' => 'Two']),
+                        new NotificationDigestBuffer()->setDestination($d)->setPayload(['summary' => 'One']),
+                        new NotificationDigestBuffer()->setDestination($d)->setPayload(['summary' => 'Two']),
                     ];
                 }
 
                 return [
-                    (new NotificationDigestBuffer())->setDestination($individual)->setPayload(['summary' => 'Solo']),
+                    new NotificationDigestBuffer()->setDestination($individual)->setPayload(['summary' => 'Solo']),
                 ];
             },
         );
@@ -112,14 +112,14 @@ final class NotificationDigestFlusherTest extends TestCase
 
     private function destination(bool $digest): NotificationDestination
     {
-        return (new NotificationDestination())
-            ->setProject((new Project())->setName('P')->setSlug('p'))
+        return new NotificationDestination()
+            ->setProject(new Project()->setName('P')->setSlug('p'))
             ->setLabel('Alerts')
             ->setDigestEnabled($digest);
     }
 
     private function row(NotificationDestination $destination, array $payload): NotificationDigestBuffer
     {
-        return (new NotificationDigestBuffer())->setDestination($destination)->setPayload($payload);
+        return new NotificationDigestBuffer()->setDestination($destination)->setPayload($payload);
     }
 }

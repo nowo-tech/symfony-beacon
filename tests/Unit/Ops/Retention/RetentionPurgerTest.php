@@ -156,8 +156,8 @@ final class RetentionPurgerTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P'.$id)->setSlug('p'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P'.$id)->setSlug('p'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }

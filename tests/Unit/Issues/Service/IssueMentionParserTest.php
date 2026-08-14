@@ -31,7 +31,7 @@ final class IssueMentionParserTest extends TestCase
         self::assertCount(1, $matched);
         self::assertSame($alice, $matched[0]);
 
-        $byEmail = $parser->resolveMentions(new Project(), 'See @bob@acme.test', null);
+        $byEmail = $parser->resolveMentions(new Project(), 'See @bob@acme.test');
         self::assertSame([$bob], $byEmail);
     }
 
@@ -45,8 +45,8 @@ final class IssueMentionParserTest extends TestCase
 
     private function user(int $id, string $email, string $display): User
     {
-        $user = (new User())->setEmail($email)->setDisplayName($display);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail($email)->setDisplayName($display);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

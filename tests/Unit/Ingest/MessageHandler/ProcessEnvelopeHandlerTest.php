@@ -37,22 +37,22 @@ final class ProcessEnvelopeHandlerTest extends TestCase
         $projects->method('find')->willReturn(null);
         $this->handler($projects)(new ProcessEnvelopeMessage(1, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'));
 
-        $disabled = (new Project())->setName('P')->setSlug('p')->setIngestEnabled(false);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($disabled, 2);
+        $disabled = new Project()->setName('P')->setSlug('p')->setIngestEnabled(false);
+        new ReflectionProperty(Project::class, 'id')->setValue($disabled, 2);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn($disabled);
         $this->handler($projects)(new ProcessEnvelopeMessage(2, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'));
 
-        $quota = (new Project())->setName('Q')->setSlug('q')->setEventQuotaDaily(1);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($quota, 3);
+        $quota = new Project()->setName('Q')->setSlug('q')->setEventQuotaDaily(1);
+        new ReflectionProperty(Project::class, 'id')->setValue($quota, 3);
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(1);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn($quota);
         $this->handler($projects, events: $events)(new ProcessEnvelopeMessage(3, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'));
 
-        $monthly = (new Project())->setName('M')->setSlug('m')->setEventQuotaMonthly(1);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($monthly, 4);
+        $monthly = new Project()->setName('M')->setSlug('m')->setEventQuotaMonthly(1);
+        new ReflectionProperty(Project::class, 'id')->setValue($monthly, 4);
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(0);
         $events->method('countReceivedSinceForProject')->willReturn(1);
@@ -65,8 +65,8 @@ final class ProcessEnvelopeHandlerTest extends TestCase
 
     public function testParsesItemsAndFlushesWithoutDispatch(): void
     {
-        $project = (new Project())->setName('Ok')->setSlug('ok');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 9);
+        $project = new Project()->setName('Ok')->setSlug('ok');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 9);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn($project);
 

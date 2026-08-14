@@ -45,7 +45,7 @@ final class SeedDemoCommandTest extends TestCase
         $users = $this->createStub(UserRepository::class);
         $users->method('findOneByEmail')->willReturn(null);
         $users->method('save')->willReturnCallback(static function (User $user) use (&$savedUsers): void {
-            (new ReflectionProperty(User::class, 'id'))->setValue($user, 1);
+            new ReflectionProperty(User::class, 'id')->setValue($user, 1);
             $savedUsers[] = $user;
         });
         $users->method('findAll')->willReturnCallback(static fn (): array => $savedUsers);

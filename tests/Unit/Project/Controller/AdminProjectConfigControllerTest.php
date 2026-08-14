@@ -30,9 +30,9 @@ final class AdminProjectConfigControllerTest extends TestCase
 {
     public function testJsonDownloadAndExportAll(): void
     {
-        $user = (new User())->setEmail('admin@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 1);
-        $project = (new Project())->setName('Acme')->setSlug('acme')->setCode('acme-prod');
+        $user = new User()->setEmail('admin@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 1);
+        $project = new Project()->setName('Acme')->setSlug('acme')->setCode('acme-prod');
 
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findAllOrdered')->willReturn([$project]);

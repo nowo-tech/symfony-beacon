@@ -31,19 +31,17 @@ final class ProjectReleaseHealthControllerTest extends TestCase
 
     public function testBuildReleaseComparePartitionsIssues(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
+        $project = new Project()->setName('Acme')->setSlug('acme');
         $onlyA = $this->issue($project, 1, 'A-only');
         $both = $this->issue($project, 2, 'Both');
         $onlyB = $this->issue($project, 3, 'B-only');
 
         $issues = $this->createStub(IssueSearchRepository::class);
         $issues->method('findByRelease')->willReturnCallback(
-            static function (Project $p, string $release) use ($onlyA, $both, $onlyB): array {
-                return match ($release) {
-                    '1.0.0' => [$onlyA, $both],
-                    '2.0.0' => [$both, $onlyB],
-                    default => [],
-                };
+            static fn (Project $p, string $release): array => match ($release) {
+                '1.0.0' => [$onlyA, $both],
+                '2.0.0' => [$both, $onlyB],
+                default => [],
             },
         );
 
@@ -72,13 +70,13 @@ final class ProjectReleaseHealthControllerTest extends TestCase
 
     private function issue(Project $project, int $id, string $title): Issue
     {
-        $issue = (new Issue())
+        $issue = new Issue()
             ->setProject($project)
             ->setFingerprint('fp-'.$id)
             ->setTitle($title)
             ->setLevel(IssueLevel::Error)
             ->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, $id);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, $id);
 
         return $issue;
     }

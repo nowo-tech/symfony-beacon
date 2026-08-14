@@ -29,16 +29,16 @@ final class IssueShowPageBuilderTest extends TestCase
 {
     public function testBuildAssemblesPageContext(): void
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
-        $issue = (new Issue())
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 1);
+        $issue = new Issue()
             ->setProject($project)
             ->setTitle('Boom')
             ->setStatus(IssueStatus::Unresolved)
             ->setPriority(IssuePriority::High);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, 7);
-        $similar = (new Issue())->setProject($project)->setTitle('Similar')->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($similar, 8);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, 7);
+        $similar = new Issue()->setProject($project)->setTitle('Similar')->setStatus(IssueStatus::Unresolved);
+        new ReflectionProperty(Issue::class, 'id')->setValue($similar, 8);
 
         $event = new Event();
         $events = $this->createStub(EventRepository::class);

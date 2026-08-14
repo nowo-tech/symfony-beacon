@@ -33,13 +33,13 @@ final class IssueUserMailNotifierTest extends TestCase
             $this->user(2, 'alice@example.com', 'Alice'),
         ]);
 
-        $project = (new Project())->setName('Demo');
-        $issue = (new Issue())->setTitle('Crash')->setProject($project);
+        $project = new Project()->setName('Demo');
+        $issue = new Issue()->setTitle('Crash')->setProject($project);
         $author = $this->user(1, 'author@example.com', 'Author');
         $notifier->notifyMentionsFromComment(
             $project,
             $issue,
-            (new IssueComment())->setBody('ping @alice')->setAuthor($author)->setIssue($issue),
+            new IssueComment()->setBody('ping @alice')->setAuthor($author)->setIssue($issue),
             $author,
         );
 
@@ -53,8 +53,8 @@ final class IssueUserMailNotifierTest extends TestCase
         $sent = [];
         $notifier = $this->notifier($this->transport(true, $sent), $this->createStub(LoggerInterface::class), inbound: false);
 
-        $project = (new Project())->setName('Demo');
-        $issue = (new Issue())->setTitle('Crash')->setProject($project);
+        $project = new Project()->setName('Demo');
+        $issue = new Issue()->setTitle('Crash')->setProject($project);
         $actor = $this->user(1, 'actor@example.com', 'Actor');
         $assignee = $this->user(2, 'assignee@example.com', 'Assignee');
 
@@ -76,12 +76,12 @@ final class IssueUserMailNotifierTest extends TestCase
             $this->user(2, 'alice@example.com', 'Alice'),
         ]);
         $project = new Project();
-        $issue = (new Issue())->setTitle('x')->setProject($project);
+        $issue = new Issue()->setTitle('x')->setProject($project);
         $author = $this->user(1, 'a@example.com', 'A');
         $notifier->notifyMentionsFromComment(
             $project,
             $issue,
-            (new IssueComment())->setBody('@alice')->setAuthor($author)->setIssue($issue),
+            new IssueComment()->setBody('@alice')->setAuthor($author)->setIssue($issue),
             $author,
         );
         self::assertSame([], $sent);
@@ -161,8 +161,8 @@ final class IssueUserMailNotifierTest extends TestCase
 
     private function user(int $id, string $email, string $name): User
     {
-        $user = (new User())->setEmail($email)->setDisplayName($name);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail($email)->setDisplayName($name);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

@@ -8,6 +8,7 @@ use App\Setup\Demo\BreadcrumbDemoSeeder;
 use App\Setup\Demo\DemoFixtureLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\BreadcrumbKitBundle\Entity\BreadcrumbCollection;
+use Nowo\BreadcrumbKitBundle\Entity\BreadcrumbItem;
 use Nowo\BreadcrumbKitBundle\Repository\BreadcrumbCollectionRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -54,7 +55,7 @@ final class BreadcrumbDemoSeederTest extends TestCase
         // Pre-create items in fixture order so ensureItem finds matches.
         $itemsByRoute = [];
         foreach ($fixture['items'] as $itemData) {
-            $item = new \Nowo\BreadcrumbKitBundle\Entity\BreadcrumbItem();
+            $item = new BreadcrumbItem();
             $item->setRouteName($itemData['route']);
             $item->setLabel($itemData['label']);
             $item->setTranslations($itemData['translations']);

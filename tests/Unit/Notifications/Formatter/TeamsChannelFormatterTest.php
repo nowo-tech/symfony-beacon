@@ -44,8 +44,8 @@ final class TeamsChannelFormatterTest extends TestCase
 
     public function testFormatAddsResolveAndAssignWhenDestinationHasSigningSecret(): void
     {
-        $destination = (new NotificationDestination())
-            ->setProject((new Project())->setName('Acme')->setSlug('acme'))
+        $destination = new NotificationDestination()
+            ->setProject(new Project()->setName('Acme')->setSlug('acme'))
             ->setLabel('Teams')
             ->setType(NotificationDestinationType::Teams)
             ->setEndpointUrl('https://outlook.office.com/webhook/x')
@@ -86,8 +86,8 @@ final class TeamsChannelFormatterTest extends TestCase
 
     public function testFormatSkipsInteractiveActionsWithoutSigningSecret(): void
     {
-        $destination = (new NotificationDestination())
-            ->setProject((new Project())->setName('Acme')->setSlug('acme'))
+        $destination = new NotificationDestination()
+            ->setProject(new Project()->setName('Acme')->setSlug('acme'))
             ->setLabel('Teams')
             ->setType(NotificationDestinationType::Teams)
             ->setEndpointUrl('https://outlook.office.com/webhook/x');

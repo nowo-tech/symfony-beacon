@@ -244,7 +244,7 @@ final class ProjectConfigPortabilityTest extends TestCase
     public function testImportAdminCreatesMissingProjectAndUsers(): void
     {
         $actor = $this->user('admin@example.com', 'Admin');
-        (new ReflectionProperty(User::class, 'id'))->setValue($actor, 1);
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
 
         $createdUsers = [];
         $userRepo = $this->createStub(UserRepository::class);
@@ -263,7 +263,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $userRepo->method('save')->willReturnCallback(static function (User $user) use (&$createdUsers): void {
             $createdUsers[strtolower($user->getEmail())] = $user;
             if (null === $user->getId()) {
-                (new ReflectionProperty(User::class, 'id'))->setValue($user, 10 + \count($createdUsers));
+                new ReflectionProperty(User::class, 'id')->setValue($user, 10 + \count($createdUsers));
             }
         });
 
@@ -273,7 +273,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $projectRepo->method('hydrateMembershipsForProjects');
         $projectRepo->method('save')->willReturnCallback(static function (Project $project) use (&$saved): void {
             if (null === $project->getId()) {
-                (new ReflectionProperty(Project::class, 'id'))->setValue($project, 42);
+                new ReflectionProperty(Project::class, 'id')->setValue($project, 42);
             }
             $saved[] = $project;
         });

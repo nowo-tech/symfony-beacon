@@ -19,8 +19,8 @@ final class AdminUserControllerHelpersTest extends TestCase
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
         $method = new ReflectionMethod(AdminUserController::class, 'isAppAdmin');
 
-        $admin = (new User())->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        $member = (new User())->setEmail('user@example.com')->setRoles(['ROLE_USER']);
+        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        $member = new User()->setEmail('user@example.com')->setRoles(['ROLE_USER']);
 
         self::assertTrue($method->invoke($controller, $admin));
         self::assertFalse($method->invoke($controller, $member));
@@ -32,7 +32,7 @@ final class AdminUserControllerHelpersTest extends TestCase
         $users->method('countAdmins')->willReturn(3);
 
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminUserController::class, 'userRepository'))->setValue($controller, $users);
+        new ReflectionProperty(AdminUserController::class, 'userRepository')->setValue($controller, $users);
 
         $method = new ReflectionMethod(AdminUserController::class, 'countAdmins');
         self::assertSame(3, $method->invoke($controller));

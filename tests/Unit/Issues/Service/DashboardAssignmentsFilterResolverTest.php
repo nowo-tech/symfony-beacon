@@ -135,7 +135,7 @@ final class DashboardAssignmentsFilterResolverTest extends TestCase
         $user = new User();
         $user->setEmail($email);
         $user->setDisplayName($displayName);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

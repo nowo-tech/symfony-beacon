@@ -81,9 +81,9 @@ final class IssueJsonNormalizerTest extends TestCase
 
     public function testToDtoMirrorsNormalizeShape(): void
     {
-        $assignee = (new User())->setEmail('dev@example.com');
-        $canonical = (new Issue())->setFingerprint('fp-c')->setTitle('Canonical');
-        $issue = (new Issue())
+        $assignee = new User()->setEmail('dev@example.com');
+        $canonical = new Issue()->setFingerprint('fp-c')->setTitle('Canonical');
+        $issue = new Issue()
             ->setFingerprint('fp')
             ->setTitle('Dup')
             ->setLevel(IssueLevel::Error)

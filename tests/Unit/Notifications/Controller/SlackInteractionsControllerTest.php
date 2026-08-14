@@ -16,9 +16,9 @@ use App\Issues\Service\IssueStatusChanger;
 use App\Issues\Service\IssueUserMailNotifier;
 use App\Issues\Service\IssueUserMailTransport;
 use App\Notifications\Controller\SlackInteractionsController;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
-use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Service\HookDestinationContextResolver;
 use App\Notifications\Service\HookMutationPolicy;
 use App\Notifications\Service\NotificationCircuitBreaker;
@@ -52,17 +52,17 @@ final class SlackInteractionsControllerTest extends TestCase
 
         self::assertSame(
             Response::HTTP_BAD_REQUEST,
-            $controller(Request::create('/hooks/slack/interactions', 'POST'))->getStatusCode(),
+            $controller(Request::create('/hooks/slack/interactions', Request::METHOD_POST))->getStatusCode(),
         );
         self::assertSame(
             Response::HTTP_BAD_REQUEST,
-            $controller(Request::create('/hooks/slack/interactions', 'POST', ['payload' => '{']))->getStatusCode(),
+            $controller(Request::create('/hooks/slack/interactions', Request::METHOD_POST, ['payload' => '{']))->getStatusCode(),
         );
         self::assertSame(
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['type' => 'url_verification'], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -70,7 +70,7 @@ final class SlackInteractionsControllerTest extends TestCase
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['actions' => []], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -78,7 +78,7 @@ final class SlackInteractionsControllerTest extends TestCase
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['actions' => [['value' => '']]], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -86,7 +86,7 @@ final class SlackInteractionsControllerTest extends TestCase
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['actions' => [['value' => '{']]], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -94,7 +94,7 @@ final class SlackInteractionsControllerTest extends TestCase
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['actions' => [['value' => json_encode(['a' => 'noop'], \JSON_THROW_ON_ERROR)]]], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -102,7 +102,7 @@ final class SlackInteractionsControllerTest extends TestCase
             Response::HTTP_BAD_REQUEST,
             $controller(Request::create(
                 '/hooks/slack/interactions',
-                'POST',
+                Request::METHOD_POST,
                 ['payload' => json_encode(['actions' => [['value' => json_encode(['a' => 'resolve', 'd' => '', 'p' => 'p', 'i' => 'i'], \JSON_THROW_ON_ERROR)]]], \JSON_THROW_ON_ERROR)],
             ))->getStatusCode(),
         );
@@ -119,7 +119,7 @@ final class SlackInteractionsControllerTest extends TestCase
         ], \JSON_THROW_ON_ERROR);
         $response = $controller(Request::create(
             '/hooks/slack/interactions',
-            'POST',
+            Request::METHOD_POST,
             ['payload' => json_encode(['actions' => [['value' => $value]]], \JSON_THROW_ON_ERROR)],
         ));
         self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());

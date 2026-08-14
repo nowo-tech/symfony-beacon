@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Notifications\MessageHandler;
 
 use App\Issues\Entity\Issue;
+use App\Issues\Repository\EventRepository;
 use App\Notifications\Message\DispatchIngestNotificationsMessage;
 use App\Notifications\MessageHandler\DispatchIngestNotificationsHandler;
 use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
@@ -16,7 +17,6 @@ use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
 use App\Notifications\Service\VolumeThresholdEvaluator;
-use App\Issues\Repository\EventRepository;
 use App\Performance\Entity\PerfTransaction;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
@@ -26,6 +26,7 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -41,12 +42,12 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
 
     public function testDispatchesAlertKindsAndVolumeContexts(): void
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 7);
-        $issue = (new Issue())->setProject($project)->setTitle('T')->setFingerprint('fp');
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, 11);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 7);
+        $issue = new Issue()->setProject($project)->setTitle('T')->setFingerprint('fp');
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, 11);
         $tx = new PerfTransaction();
-        (new ReflectionProperty(PerfTransaction::class, 'id'))->setValue($tx, 22);
+        new ReflectionProperty(PerfTransaction::class, 'id')->setValue($tx, 22);
 
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn($project);
@@ -65,10 +66,10 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
 
         $dispatched = 0;
         $bus = $this->createStub(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$dispatched) {
+        $bus->method('dispatch')->willReturnCallback(static function (object $message) use (&$dispatched): Envelope {
             ++$dispatched;
 
-            return new \Symfony\Component\Messenger\Envelope($message);
+            return new Envelope($message);
         });
 
         $handler = $this->handler($projects, $em, $bus);

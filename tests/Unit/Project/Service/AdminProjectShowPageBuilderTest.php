@@ -46,14 +46,14 @@ final class AdminProjectShowPageBuilderTest extends TestCase
 {
     public function testBuildAssemblesAdminProjectPage(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 9);
-        $actor = (new User())->setEmail('admin@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($actor, 1);
-        $memberUser = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($memberUser, 2);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($memberUser)->setRole(ProjectRole::Member);
-        (new ReflectionProperty(ProjectMembership::class, 'id'))->setValue($membership, 11);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 9);
+        $actor = new User()->setEmail('admin@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
+        $memberUser = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($memberUser, 2);
+        $membership = new ProjectMembership()->setProject($project)->setUser($memberUser)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 11);
         $project->addMembership($membership);
 
         $formView = new FormView();

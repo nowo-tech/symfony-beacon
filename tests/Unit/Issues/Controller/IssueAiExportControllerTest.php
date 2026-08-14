@@ -65,25 +65,25 @@ final class IssueAiExportControllerTest extends TestCase
      */
     private function controller(): array
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        $user = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 1);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        $user = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 1);
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
 
-        $issue = (new Issue())
+        $issue = new Issue()
             ->setProject($project)
             ->setFingerprint('fp-1')
             ->setTitle('Something broke')
             ->setLevel(IssueLevel::Error)
             ->setStatus(IssueStatus::Unresolved);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($issue, 3);
+        new ReflectionProperty(Issue::class, 'id')->setValue($issue, 3);
 
-        $event = (new Event())
+        $event = new Event()
             ->setIssue($issue)
             ->setEventId('evt-1')
             ->setEnvironment('prod')
             ->setPayload([]);
-        (new ReflectionProperty(Event::class, 'id'))->setValue($event, 9);
+        new ReflectionProperty(Event::class, 'id')->setValue($event, 9);
 
         $events = $this->createStub(EventRepository::class);
         $events->method('findLatestForIssue')->willReturn([$event]);

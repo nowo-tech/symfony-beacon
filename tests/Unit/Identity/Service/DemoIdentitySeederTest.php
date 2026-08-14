@@ -27,7 +27,7 @@ final class DemoIdentitySeederTest extends TestCase
         $users = $this->createStub(UserRepository::class);
         $users->method('findOneByEmail')->willReturn(null);
         $users->method('save')->willReturnCallback(static function (User $user) use (&$savedUsers): void {
-            (new ReflectionProperty(User::class, 'id'))->setValue($user, 1);
+            new ReflectionProperty(User::class, 'id')->setValue($user, 1);
             $savedUsers[] = $user;
         });
         $users->method('findAll')->willReturnCallback(static fn (): array => $savedUsers);
@@ -74,14 +74,12 @@ final class DemoIdentitySeederTest extends TestCase
 
     public function testEnsureDemoProjectReturnsExistingAfterSync(): void
     {
-        $project = (new Project())
+        $project = new Project()
             ->setName('old')
             ->setSlug(SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG)
             ->setDescription('old');
         $projects = $this->createStub(ProjectRepository::class);
-        $projects->method('findOneBy')->willReturnCallback(static function (array $criteria) use ($project): ?Project {
-            return ($criteria['slug'] ?? null) === SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG ? $project : null;
-        });
+        $projects->method('findOneBy')->willReturnCallback(static fn (array $criteria): ?Project => ($criteria['slug'] ?? null) === SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG ? $project : null);
         $saved = 0;
         $projects->method('save')->willReturnCallback(static function () use (&$saved): void {
             ++$saved;

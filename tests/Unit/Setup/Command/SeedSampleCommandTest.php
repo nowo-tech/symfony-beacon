@@ -46,8 +46,8 @@ final class SeedSampleCommandTest extends TestCase
         self::assertSame(1, $tester->execute([]));
         self::assertStringContainsString('not found', $tester->getDisplay());
 
-        $project = (new Project())->setName('P')->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
+        $project = new Project()->setName('P')->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 1);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findOneBy')->willReturn($project);
         $tester = new CommandTester($this->command($projects));
@@ -57,8 +57,8 @@ final class SeedSampleCommandTest extends TestCase
 
     public function testSeedsDevProfileAndPurges(): void
     {
-        $project = (new Project())->setName('P')->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
+        $project = new Project()->setName('P')->setSlug(SeedDemoCommand::DEMO_PROJECT_SLUG);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 1);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findOneBy')->willReturn($project);
 

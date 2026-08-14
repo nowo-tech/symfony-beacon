@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Project\Service;
 
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserAction;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
@@ -106,7 +107,7 @@ final class ProjectMembershipManagerTest extends TestCase
         $this->userRepository->method('findOneByEmail')->willReturn($member);
         $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($member)->setRole(ProjectRole::Viewer),
+            new ProjectMembership()->setProject($project)->setUser($member)->setRole(ProjectRole::Viewer),
         );
         $this->rebuild();
         try {
@@ -133,8 +134,8 @@ final class ProjectMembershipManagerTest extends TestCase
         $project = $this->project(1);
         $actor = $this->user(1, 'owner@example.com');
         $targetUser = $this->user(2, 'member@example.com');
-        $actorMembership = (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
-        $target = (new ProjectMembership())->setProject($project)->setUser($targetUser)->setRole(ProjectRole::Member);
+        $actorMembership = new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
+        $target = new ProjectMembership()->setProject($project)->setUser($targetUser)->setRole(ProjectRole::Member);
         $project->addMembership($actorMembership);
         $project->addMembership($target);
 
@@ -165,13 +166,13 @@ final class ProjectMembershipManagerTest extends TestCase
         self::assertSame(ProjectRole::Owner, $target->getRole());
         self::assertSame(ProjectRole::Full, $actorMembership->getRole());
 
-        $removable = (new ProjectMembership())->setProject($project)->setUser($this->user(9, 'v@example.com'))->setRole(ProjectRole::Viewer);
+        $removable = new ProjectMembership()->setProject($project)->setUser($this->user(9, 'v@example.com'))->setRole(ProjectRole::Viewer);
         $project->addMembership($removable);
         $this->manager->remove($project, $actor, $removable);
         self::assertGreaterThan(0, $this->flushCount);
         self::assertTrue(array_any(
             $this->persisted,
-            static fn (object $e): bool => $e instanceof \App\Identity\Entity\UserAction
+            static fn (object $e): bool => $e instanceof UserAction
                 && \in_array($e->getAction(), [
                     UserActionType::ProjectMemberRoleChanged,
                     UserActionType::ProjectOwnershipTransferred,
@@ -186,8 +187,8 @@ final class ProjectMembershipManagerTest extends TestCase
     {
         $project = $this->project(1);
         $actor = $this->user(1, 'owner@example.com');
-        $ownerMembership = (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
-        $full = (new ProjectMembership())->setProject($project)->setUser($this->user(2, 'f@example.com'))->setRole(ProjectRole::Full);
+        $ownerMembership = new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
+        $full = new ProjectMembership()->setProject($project)->setUser($this->user(2, 'f@example.com'))->setRole(ProjectRole::Full);
         $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($ownerMembership);
         $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1]);
 
@@ -236,16 +237,16 @@ final class ProjectMembershipManagerTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P'.$id)->setSlug('p'.$id);
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P'.$id)->setSlug('p'.$id);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }
 
     private function user(int $id, string $email): User
     {
-        $user = (new User())->setEmail($email);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        $user = new User()->setEmail($email);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

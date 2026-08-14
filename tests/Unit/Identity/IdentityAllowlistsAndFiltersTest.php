@@ -30,7 +30,7 @@ final class IdentityAllowlistsAndFiltersTest extends TestCase
     public function testAdminAuditFilterParsesQuery(): void
     {
         $allowed = AdminIdentityAudit::userTimelineActions();
-        $request = Request::create('/', 'GET', [
+        $request = Request::create('/', Request::METHOD_GET, [
             'action' => UserActionType::UserCreated->value,
             'from' => '2026-08-01',
             'to' => '2026-08-13',
@@ -42,7 +42,7 @@ final class IdentityAllowlistsAndFiltersTest extends TestCase
         self::assertSame('23:59:59', $parsed['to']->format('H:i:s'));
         self::assertSame(UserActionType::UserCreated->value, $parsed['filter']['action']);
 
-        $bad = AdminAuditFilter::fromRequest(Request::create('/', 'GET', [
+        $bad = AdminAuditFilter::fromRequest(Request::create('/', Request::METHOD_GET, [
             'action' => 'not-a-real-action',
             'from' => 'bad-date',
         ]), $allowed);

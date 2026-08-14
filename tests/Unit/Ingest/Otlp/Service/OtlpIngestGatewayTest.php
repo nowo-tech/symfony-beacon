@@ -39,17 +39,17 @@ final class OtlpIngestGatewayTest extends TestCase
             $settings->setEnvelopeMaxBytes(10);
         });
         $gateway = $this->gateway($ops);
-        $big = Request::create('/', 'POST', server: [], content: str_repeat('x', 11));
+        $big = Request::create('/', Request::METHOD_POST, server: [], content: str_repeat('x', 11));
         self::assertSame(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $gateway->accept('p', $big)->getStatusCode());
 
-        $withQuery = Request::create('/?beacon_key=abc', 'POST', content: 'body');
+        $withQuery = Request::create('/?beacon_key=abc', Request::METHOD_POST, content: 'body');
         self::assertSame(Response::HTTP_UNAUTHORIZED, $gateway->accept('p', $withQuery)->getStatusCode());
     }
 
     public function testAcceptsAuthorizedProjectAndRecordsAckOnOkRespond(): void
     {
         $project = new Project();
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 7);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 7);
         $project->setIngestEnabled(true);
         $key = ProjectApiKey::generate($project, publicKey: 'pk', secretKey: 'sk');
 
@@ -85,7 +85,7 @@ final class OtlpIngestGatewayTest extends TestCase
         );
         $gateway = new OtlpIngestGateway(new EnvelopeAuthParser(), $gate, $metrics, $ops);
 
-        $request = Request::create('/', 'POST', server: [], content: '{"ok":true}');
+        $request = Request::create('/', Request::METHOD_POST, server: [], content: '{"ok":true}');
         $request->headers->set('X-Beacon-Auth', 'Beacon beacon_key=pk, beacon_secret=sk');
         $accepted = $gateway->accept('ref', $request);
         self::assertIsArray($accepted);

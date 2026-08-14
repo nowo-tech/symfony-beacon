@@ -93,7 +93,7 @@ final class ProjectPermissionVoterTest extends TestCase
     {
         $user = new User();
         $project = new Project();
-        $membership = (new ProjectMembership())
+        $membership = new ProjectMembership()
             ->setProject($project)
             ->setUser($user)
             ->setRole(ProjectRole::Member);

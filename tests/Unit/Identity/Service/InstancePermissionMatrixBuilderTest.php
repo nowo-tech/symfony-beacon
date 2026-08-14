@@ -13,9 +13,9 @@ final class InstancePermissionMatrixBuilderTest extends TestCase
 {
     public function testGroupsPermissionsByCategoryPreservingOrder(): void
     {
-        $a = (new InstancePermission())->setKey('project.view')->setCategory('project');
-        $b = (new InstancePermission())->setKey('project.delete')->setCategory('project');
-        $c = (new InstancePermission())->setKey('admin.users')->setCategory('admin');
+        $a = new InstancePermission()->setKey('project.view')->setCategory('project');
+        $b = new InstancePermission()->setKey('project.delete')->setCategory('project');
+        $c = new InstancePermission()->setKey('admin.users')->setCategory('admin');
 
         $repository = $this->createStub(InstancePermissionRepository::class);
         $repository->method('findAllOrdered')->willReturn([$a, $b, $c]);

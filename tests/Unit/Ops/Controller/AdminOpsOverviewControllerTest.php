@@ -35,8 +35,8 @@ final class AdminOpsOverviewControllerTest extends TestCase
 
     public function testRendersOverviewAndIgnoresInvalidProjectFilter(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 1);
 
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findAllOrdered')->willReturn([$project]);

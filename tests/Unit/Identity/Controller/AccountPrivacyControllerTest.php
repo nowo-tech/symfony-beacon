@@ -9,12 +9,14 @@ use App\Identity\Entity\User;
 use App\Identity\Exception\AccountAnonymizeException;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
+use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\AccountSocialAccounts;
 use App\Identity\Service\UserActionRecorder;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Repository\ProjectMembershipRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Profile\ProfileRegistry;
 use Nowo\AuthKitBundle\Repository\SocialLoginAccountRepository;
 use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
@@ -23,21 +25,26 @@ use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Twig\Environment;
 
 final class AccountPrivacyControllerTest extends TestCase
 {
     public function testExportDownloadsJsonAndRecordsAction(): void
     {
-        $user = (new User())->setEmail('privacy@example.com')->setDisplayName('Privacy');
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 4);
+        $user = new User()->setEmail('privacy@example.com')->setDisplayName('Privacy');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 4);
 
-        $em = $this->createMock(\Doctrine\ORM\EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::atLeastOnce())->method('persist');
         $em->expects(self::atLeastOnce())->method('flush');
 
@@ -64,12 +71,56 @@ final class AccountPrivacyControllerTest extends TestCase
         self::assertSame('privacy@example.com', $payload['account']['email']);
     }
 
+    public function testPrivacyPageRendersWhenUserCanAnonymize(): void
+    {
+        $user = new User()->setEmail('privacy@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($user, 4);
+
+        $form = $this->createStub(FormInterface::class);
+        $form->method('createView')->willReturn(new FormView());
+        $formFactory = $this->createStub(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+
+        $seen = [];
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturnCallback(
+            static function (string $template, array $context) use (&$seen): string {
+                $seen[$template] = $context;
+
+                return 'ok';
+            },
+        );
+
+        $controller = new AccountPrivacyController(
+            $this->exporter(),
+            $this->anonymizer(),
+            new UserActionRecorder($this->createStub(EntityManagerInterface::class), new RequestStack()),
+            new TokenStorage(),
+        );
+
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
+        $router = $this->createStub(UrlGeneratorInterface::class);
+        $router->method('generate')->willReturn('/account/privacy/anonymize');
+        $container = new Container();
+        $container->set('security.token_storage', $tokenStorage);
+        $container->set('form.factory', $formFactory);
+        $container->set('twig', $twig);
+        $container->set('router', $router);
+        $controller->setContainer($container);
+
+        self::assertSame('ok', $controller->privacy()->getContent());
+        self::assertTrue($seen['account/privacy.html.twig']['can_anonymize']);
+        self::assertSame([], $seen['account/privacy.html.twig']['sole_owner_projects']);
+        self::assertFalse($seen['account/privacy.html.twig']['is_last_admin']);
+    }
+
     public function testFlashForAnonymizeExceptionMapsReasonCodes(): void
     {
         $controller = new AccountPrivacyController(
             $this->exporter(),
             $this->anonymizer(),
-            new UserActionRecorder($this->createStub(\Doctrine\ORM\EntityManagerInterface::class), new RequestStack()),
+            new UserActionRecorder($this->createStub(EntityManagerInterface::class), new RequestStack()),
             $this->createStub(TokenStorageInterface::class),
         );
         $method = new ReflectionMethod(AccountPrivacyController::class, 'flashForAnonymizeException');
@@ -94,8 +145,8 @@ final class AccountPrivacyControllerTest extends TestCase
 
     private function anonymizer(): AccountAnonymizer
     {
-        $em = $this->createStub(\Doctrine\ORM\EntityManagerInterface::class);
-        $users = $this->createStub(\App\Identity\Repository\UserRepository::class);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $users = $this->createStub(UserRepository::class);
         $users->method('countAdmins')->willReturn(2);
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findByUser')->willReturn([]);
@@ -103,7 +154,7 @@ final class AccountPrivacyControllerTest extends TestCase
         $push->method('findByUser')->willReturn([]);
         $social = $this->createStub(SocialLoginAccountRepository::class);
         $social->method('findBy')->willReturn([]);
-        $hasher = $this->createStub(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class);
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
 
         return new AccountAnonymizer(
             $em,

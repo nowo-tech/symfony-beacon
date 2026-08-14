@@ -31,20 +31,20 @@ final class ProjectMembershipAdminAdapterTest extends TestCase
 {
     public function testUnlinkMembershipAndGroupAccessDelegate(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
-        $actor = (new User())->setEmail('admin@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($actor, 1);
-        $memberUser = (new User())->setEmail('dev@example.com');
-        (new ReflectionProperty(User::class, 'id'))->setValue($memberUser, 2);
-        $membership = (new ProjectMembership())->setProject($project)->setUser($memberUser)->setRole(ProjectRole::Member);
-        (new ReflectionProperty(ProjectMembership::class, 'id'))->setValue($membership, 9);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 1);
+        $actor = new User()->setEmail('admin@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
+        $memberUser = new User()->setEmail('dev@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($memberUser, 2);
+        $membership = new ProjectMembership()->setProject($project)->setUser($memberUser)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 9);
         $project->addMembership($membership);
 
-        $group = (new UserGroup())->setName('Eng')->setSlug('eng');
-        (new ReflectionProperty(UserGroup::class, 'id'))->setValue($group, 3);
-        $groupAccess = (new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
-        (new ReflectionProperty(ProjectGroupAccess::class, 'id'))->setValue($groupAccess, 4);
+        $group = new UserGroup()->setName('Eng')->setSlug('eng');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, 3);
+        $groupAccess = new ProjectGroupAccess()->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectGroupAccess::class, 'id')->setValue($groupAccess, 4);
         $project->addGroupAccess($groupAccess);
 
         $removed = [];
@@ -57,7 +57,7 @@ final class ProjectMembershipAdminAdapterTest extends TestCase
 
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findOneByProjectAndUser')->willReturn(
-            (new ProjectMembership())->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner),
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner),
         );
         $memberships->method('countOwnersByProjectIds')->willReturn([1 => 1]);
         $groups = $this->createStub(ProjectGroupAccessRepository::class);

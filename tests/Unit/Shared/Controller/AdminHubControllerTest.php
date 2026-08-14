@@ -29,7 +29,7 @@ final class AdminHubControllerTest extends TestCase
 {
     public function testIndexRendersAdminHubWithTourVars(): void
     {
-        $user = (new User())->setEmail('admin@example.com');
+        $user = new User()->setEmail('admin@example.com');
         $settings = InstanceSettings::defaults();
         $settings->markSetupCompleted();
         $settingsRepo = $this->createStub(InstanceSettingsRepository::class);

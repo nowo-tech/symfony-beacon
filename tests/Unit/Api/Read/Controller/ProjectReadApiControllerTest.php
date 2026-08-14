@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Api\Read\Controller;
 
 use App\Api\Read\Controller\ProjectReadApiController;
 use App\Api\Read\Dto\ProjectIssuesListQuery;
-use App\Identity\Entity\User;
 use App\Identity\Service\UserActionRecorder;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueLevel;
@@ -49,9 +48,9 @@ final class ProjectReadApiControllerTest extends TestCase
 
     public function testListAndShowHappyPathAndNotFound(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 5);
-        $issue = (new Issue())
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
+        $issue = new Issue()
             ->setProject($project)
             ->setFingerprint('fp')
             ->setTitle('Boom')
@@ -76,9 +75,7 @@ final class ProjectReadApiControllerTest extends TestCase
 
         $issues = $this->createStub(IssueRepository::class);
         $issues->method('findOneByProjectAndUuid')->willReturnCallback(
-            static function (Project $p, string $uuid) use ($issue): ?Issue {
-                return $uuid === $issue->getUuid() ? $issue : null;
-            },
+            static fn (Project $p, string $uuid): ?Issue => $uuid === $issue->getUuid() ? $issue : null,
         );
 
         $controller = $this->controller(
@@ -116,8 +113,8 @@ final class ProjectReadApiControllerTest extends TestCase
 
     public function testForbiddenWhenTokenProjectDoesNotMatchPath(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 5);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
         $raw = 'brt_'.str_repeat('cd', 24);
         $token = new ProjectReadToken();
         $token->setProject($project);

@@ -102,13 +102,13 @@ final class IssueEnvelopeWriterTest extends TestCase
     public function testRegressionReopensResolvedIssue(): void
     {
         $project = $this->project(1);
-        $existing = (new Issue())
+        $existing = new Issue()
             ->setProject($project)
             ->setFingerprint('fp')
             ->setTitle('Old')
             ->setStatus(IssueStatus::Resolved)
             ->setEventCount(2);
-        (new ReflectionProperty(Issue::class, 'id'))->setValue($existing, 9);
+        new ReflectionProperty(Issue::class, 'id')->setValue($existing, 9);
         $this->eventRepository->method('findOneByProjectAndEventId')->willReturn(null);
         $this->issueRepository->method('findOneByProjectAndFingerprint')->willReturn($existing);
 
@@ -128,8 +128,8 @@ final class IssueEnvelopeWriterTest extends TestCase
 
     private function project(int $id): Project
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, $id);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, $id);
 
         return $project;
     }

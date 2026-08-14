@@ -39,38 +39,34 @@ final class ProjectControllerHelpersTest extends TestCase
 
     public function testRequireDirectMembershipReturnsRowOr404(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        $user = (new User())->setEmail('member@example.com');
-        $membership = (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        $user = new User()->setEmail('member@example.com');
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
 
         $repo = $this->createStub(ProjectMembershipRepository::class);
         $repo->method('findOneByProjectAndUser')->willReturnCallback(
-            static function (Project $p, User $u) use ($project, $user, $membership): ?ProjectMembership {
-                return $p === $project && $u === $user ? $membership : null;
-            },
+            static fn (Project $p, User $u): ?ProjectMembership => $p === $project && $u === $user ? $membership : null,
         );
 
         $controller = new ReflectionClass(AdminProjectAccessController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(AdminProjectAccessController::class, 'membershipRepository'))->setValue($controller, $repo);
+        new ReflectionProperty(AdminProjectAccessController::class, 'membershipRepository')->setValue($controller, $repo);
 
         $method = new ReflectionMethod(AdminProjectAccessController::class, 'requireDirectMembership');
         self::assertSame($membership, $method->invoke($controller, $project, $user));
 
         $this->expectException(NotFoundHttpException::class);
-        $method->invoke($controller, $project, (new User())->setEmail('missing@example.com'));
+        $method->invoke($controller, $project, new User()->setEmail('missing@example.com'));
     }
 
     public function testRequireTargetMembershipReturnsRowOr404(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        $user = (new User())->setEmail('member@example.com');
-        $membership = (new ProjectMembership())->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        $user = new User()->setEmail('member@example.com');
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member);
 
         $repo = $this->createStub(ProjectMembershipRepository::class);
         $repo->method('findOneByProjectAndUser')->willReturnCallback(
-            static function (Project $p, User $u) use ($project, $user, $membership): ?ProjectMembership {
-                return $p === $project && $u === $user ? $membership : null;
-            },
+            static fn (Project $p, User $u): ?ProjectMembership => $p === $project && $u === $user ? $membership : null,
         );
 
         $access = new ProjectAccessService(
@@ -82,19 +78,19 @@ final class ProjectControllerHelpersTest extends TestCase
         );
 
         $controller = new ReflectionClass(ProjectMemberController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(ProjectMemberController::class, 'projectAccess'))->setValue($controller, $access);
+        new ReflectionProperty(ProjectMemberController::class, 'projectAccess')->setValue($controller, $access);
 
         $method = new ReflectionMethod(ProjectMemberController::class, 'requireTargetMembership');
         self::assertSame($membership, $method->invoke($controller, $project, $user));
 
         $this->expectException(NotFoundHttpException::class);
-        $method->invoke($controller, $project, (new User())->setEmail('missing@example.com'));
+        $method->invoke($controller, $project, new User()->setEmail('missing@example.com'));
     }
 
     public function testRedirectAfterMemberAlertsSaveHonorsReturnQuery(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
-        (new ReflectionProperty(Project::class, 'uuid'))->setValue($project, '11111111-1111-7111-8111-111111111111');
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'uuid')->setValue($project, '11111111-1111-7111-8111-111111111111');
 
         $controller = new ReflectionClass(ProjectController::class)->newInstanceWithoutConstructor();
         $router = $this->createStub(UrlGeneratorInterface::class);
@@ -118,7 +114,7 @@ final class ProjectControllerHelpersTest extends TestCase
 
         $method = new ReflectionMethod(ProjectController::class, 'redirectAfterMemberAlertsSave');
 
-        $toAccount = $method->invoke($controller, $project, Request::create('/x', 'GET', ['return' => 'account']));
+        $toAccount = $method->invoke($controller, $project, Request::create('/x', Request::METHOD_GET, ['return' => 'account']));
         self::assertInstanceOf(RedirectResponse::class, $toAccount);
         self::assertSame('/account/notifications', $toAccount->getTargetUrl());
 
@@ -131,15 +127,15 @@ final class ProjectControllerHelpersTest extends TestCase
 
     public function testMaybeFlashApproachingQuotaWarnsOncePerSession(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme')->setEventQuotaDaily(10)->setEventQuotaMonthly(100);
-        (new ReflectionProperty(Project::class, 'uuid'))->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
+        $project = new Project()->setName('Acme')->setSlug('acme')->setEventQuotaDaily(10)->setEventQuotaMonthly(100);
+        new ReflectionProperty(Project::class, 'uuid')->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
 
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(8);
         $events->method('countReceivedSinceForProject')->willReturn(90);
 
         $controller = new ReflectionClass(ProjectController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(ProjectController::class, 'governanceResolver'))->setValue(
+        new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
             new ProjectGovernanceResolver(
                 $events,
@@ -171,12 +167,12 @@ final class ProjectControllerHelpersTest extends TestCase
 
     public function testMaybeFlashApproachingQuotaSkipsWithoutSettingsPermission(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme')->setEventQuotaDaily(10);
+        $project = new Project()->setName('Acme')->setSlug('acme')->setEventQuotaDaily(10);
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(9);
 
         $controller = new ReflectionClass(ProjectController::class)->newInstanceWithoutConstructor();
-        (new ReflectionProperty(ProjectController::class, 'governanceResolver'))->setValue(
+        new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
             new ProjectGovernanceResolver(
                 $events,

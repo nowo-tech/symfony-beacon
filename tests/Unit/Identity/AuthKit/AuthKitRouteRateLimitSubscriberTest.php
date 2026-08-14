@@ -20,7 +20,7 @@ final class AuthKitRouteRateLimitSubscriberTest extends TestCase
     public function testSkipsInTestEnvironment(): void
     {
         $subscriber = new MagicLoginRateLimitSubscriber($this->factory(limit: 1), 'test');
-        $event = $this->event(Request::create('/magic', 'POST'), 'nowo_auth_kit_magic_login_request');
+        $event = $this->event(Request::create('/magic', Request::METHOD_POST), 'nowo_auth_kit_magic_login_request');
         $subscriber->onKernelRequest($event);
         self::assertNull($event->getResponse());
     }
@@ -28,11 +28,11 @@ final class AuthKitRouteRateLimitSubscriberTest extends TestCase
     public function testSkipsNonPostAndWrongRoute(): void
     {
         $subscriber = new MagicLoginRateLimitSubscriber($this->factory(limit: 1), 'prod');
-        $get = $this->event(Request::create('/magic', 'GET'), 'nowo_auth_kit_magic_login_request');
+        $get = $this->event(Request::create('/magic', Request::METHOD_GET), 'nowo_auth_kit_magic_login_request');
         $subscriber->onKernelRequest($get);
         self::assertNull($get->getResponse());
 
-        $wrong = $this->event(Request::create('/login', 'POST'), 'nowo_auth_kit_login');
+        $wrong = $this->event(Request::create('/login', Request::METHOD_POST), 'nowo_auth_kit_login');
         $subscriber->onKernelRequest($wrong);
         self::assertNull($wrong->getResponse());
     }
@@ -43,7 +43,7 @@ final class AuthKitRouteRateLimitSubscriberTest extends TestCase
         $subscriber = new PasswordResetRateLimitSubscriber($factory, 'prod');
 
         $first = $this->event(
-            Request::create('/reset', 'POST', server: ['REMOTE_ADDR' => '203.0.113.10']),
+            Request::create('/reset', Request::METHOD_POST, server: ['REMOTE_ADDR' => '203.0.113.10']),
             'nowo_auth_kit_reset_password_request',
         );
         $subscriber->onKernelRequest($first);
@@ -51,7 +51,7 @@ final class AuthKitRouteRateLimitSubscriberTest extends TestCase
         $this->expectException(TooManyRequestsHttpException::class);
         $this->expectExceptionMessage('Too many password-reset requests.');
         $second = $this->event(
-            Request::create('/reset', 'POST', server: ['REMOTE_ADDR' => '203.0.113.10']),
+            Request::create('/reset', Request::METHOD_POST, server: ['REMOTE_ADDR' => '203.0.113.10']),
             'nowo_auth_kit_reset_password_request_unlocalized',
         );
         $subscriber->onKernelRequest($second);

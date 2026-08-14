@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Setup\Demo;
 
+use App\Analytics\Entity\DailyProjectStat;
 use App\Analytics\Repository\DailyProjectStatRepository;
+use App\Analytics\Service\AnalyticsDemoSeeder;
 use App\Identity\Command\SeedDemoCommand;
+use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueSampleSeeder;
+use App\Performance\Entity\PerfTransaction;
 use App\Performance\Repository\PerfTransactionRepository;
 use App\Performance\Service\NPlusOneDetector;
 use App\Performance\Service\PerformanceDemoSeeder;
-use App\Analytics\Service\AnalyticsDemoSeeder;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Setup\Demo\MercureSampleSeeder;
@@ -29,11 +32,9 @@ final class SampleDataServiceTest extends TestCase
 {
     public function testResolveProjectUsesLegacyFallbackAndThrowsWhenMissing(): void
     {
-        $legacy = (new Project())->setName('Demo')->setSlug(SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG);
+        $legacy = new Project()->setName('Demo')->setSlug(SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG);
         $projects = $this->createStub(ProjectRepository::class);
-        $projects->method('findOneBy')->willReturnCallback(static function (array $criteria) use ($legacy): ?Project {
-            return ($criteria['slug'] ?? null) === SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG ? $legacy : null;
-        });
+        $projects->method('findOneBy')->willReturnCallback(static fn (array $criteria): ?Project => ($criteria['slug'] ?? null) === SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG ? $legacy : null);
 
         $service = $this->service($projects);
         self::assertSame($legacy, $service->resolveProject(SeedDemoCommand::DEMO_PROJECT_SLUG));
@@ -46,8 +47,8 @@ final class SampleDataServiceTest extends TestCase
 
     public function testSeedUnknownProfileThrowsAndDevProfileRuns(): void
     {
-        $project = (new Project())->setName('P')->setSlug('p');
-        (new ReflectionProperty(Project::class, 'id'))->setValue($project, 9);
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 9);
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('findOneBy')->willReturn($project);
 
@@ -63,15 +64,15 @@ final class SampleDataServiceTest extends TestCase
         // Instead seed with profile after replacing only through public API — use load profile would be huge.
         // Seed 'dev' with issue seeder that finds all fingerprints existing → 0 issues created.
         $issues = $this->createStub(IssueRepository::class);
-        $issues->method('findOneByProjectAndFingerprint')->willReturn(new \App\Issues\Entity\Issue());
+        $issues->method('findOneByProjectAndFingerprint')->willReturn(new Issue());
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('flush');
         $em->method('persist');
 
         $tx = $this->createStub(PerfTransactionRepository::class);
-        $tx->method('findOneBy')->willReturn(new \App\Performance\Entity\PerfTransaction());
+        $tx->method('findOneBy')->willReturn(new PerfTransaction());
         $stats = $this->createStub(DailyProjectStatRepository::class);
-        $stats->method('findOneBy')->willReturn(new \App\Analytics\Entity\DailyProjectStat());
+        $stats->method('findOneBy')->willReturn(new DailyProjectStat());
 
         $settings = InstanceSettings::defaults();
         $settings->setMercureEnabled(true);
