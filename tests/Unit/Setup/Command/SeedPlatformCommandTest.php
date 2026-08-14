@@ -31,6 +31,7 @@ final class SeedPlatformCommandTest extends TestCase
         $em->method('flush');
         $em->method('remove');
 
+        /** @var array<string, Menu> $menus */
         $menus = [];
         $menuRepo = $this->createStub(MenuRepository::class);
         $menuRepo->method('findOneByCodeAndContext')->willReturnCallback(

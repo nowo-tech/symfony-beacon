@@ -115,8 +115,11 @@ final class IngestProjectAccessGateTest extends TestCase
         $this->eventRepository->method('countReceivedSinceForProject')->willReturn(0);
         $this->rateLimiter = new IngestRateLimiter(new ArrayAdapter());
         $this->rebuild();
-        self::assertTrue($this->gate->assertIngestAllowed($project)['ok']);
-        self::assertSame('rate limit exceeded', $this->gate->assertIngestAllowed($project)['message']);
+        $allowed = $this->gate->assertIngestAllowed($project);
+        self::assertTrue($allowed['ok']);
+        $limited = $this->gate->assertIngestAllowed($project);
+        self::assertFalse($limited['ok']);
+        self::assertSame('rate limit exceeded', $limited['message']);
     }
 
     public function testAuthorizeComposesCredentialsAndGovernance(): void

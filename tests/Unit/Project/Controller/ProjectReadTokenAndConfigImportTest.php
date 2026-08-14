@@ -153,6 +153,7 @@ final class ProjectReadTokenAndConfigImportTest extends TestCase
         self::assertSame(['flash.project.config_missing_file'], $session->getFlashBag()->peek('error'));
     }
 
+    /** @param FormInterface<mixed> $form */
     private function bootController(
         object $controller,
         User $user,

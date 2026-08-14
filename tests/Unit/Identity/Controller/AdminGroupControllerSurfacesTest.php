@@ -131,6 +131,7 @@ final class AdminGroupControllerSurfacesTest extends TestCase
         $controller->removeProject($group, $access, Request::create('/x', Request::METHOD_POST));
     }
 
+    /** @param FormInterface<mixed> $form */
     private function boot(object $controller, User $user, FormInterface $form, bool $flash = false): Session
     {
         $formFactory = $this->createStub(FormFactoryInterface::class);

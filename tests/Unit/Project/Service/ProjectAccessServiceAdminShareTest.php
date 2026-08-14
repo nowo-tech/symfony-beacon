@@ -60,7 +60,7 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
         $stack->pop();
         $stack->push($request2);
         self::assertTrue($service->isViewAsMemberActive());
-        self::assertSame(ProjectRole::Member, $service->resolveAccess($project, $user)?->role);
+        self::assertSame(ProjectRole::Member, $service->resolveAccess($project, $user)->role);
 
         $this->expectException(AccessDeniedHttpException::class);
         $service->requirePrimaryOwner($project, $user);
@@ -116,8 +116,8 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
         try {
             $service->requireTriage($project, $user);
             self::fail('expected');
-        } catch (AccessDeniedHttpException) {
-            self::assertTrue(true);
+        } catch (AccessDeniedHttpException $exception) {
+            self::assertInstanceOf(AccessDeniedHttpException::class, $exception);
         }
 
         $this->expectException(AccessDeniedHttpException::class);

@@ -436,6 +436,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         self::assertSame(['flash.project.group_not_found'], $session->getFlashBag()->peek('error'));
     }
 
+    /** @param FormInterface<mixed> $form */
     private function boot(
         object $controller,
         User $user,

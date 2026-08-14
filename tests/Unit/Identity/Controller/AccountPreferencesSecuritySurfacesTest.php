@@ -156,6 +156,7 @@ final class AccountPreferencesSecuritySurfacesTest extends TestCase
 
     /**
      * @param array<string, array<string, mixed>> $seen
+     * @param FormInterface<mixed>|null           $form
      */
     private function boot(object $controller, User $user, array &$seen, ?FormInterface $form = null): void
     {

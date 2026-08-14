@@ -118,6 +118,7 @@ final class NotificationDigestFlusherTest extends TestCase
             ->setDigestEnabled($digest);
     }
 
+    /** @param array<string, mixed> $payload */
     private function row(NotificationDestination $destination, array $payload): NotificationDigestBuffer
     {
         return new NotificationDigestBuffer()->setDestination($destination)->setPayload($payload);

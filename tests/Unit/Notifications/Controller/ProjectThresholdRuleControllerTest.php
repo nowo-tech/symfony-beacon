@@ -112,6 +112,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
     }
 
     /**
+     * @param FormInterface<mixed>                $form
      * @param array<string, array<string, mixed>> $seen
      */
     private function boot(object $controller, FormInterface $form, array &$seen, bool $flash = false): Session

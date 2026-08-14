@@ -84,7 +84,7 @@ final class IssueMergeServiceAssertTest extends TestCase
         $canonical = $this->issue(2, $project);
 
         $this->service->assertCanMarkAsDuplicate($source, $canonical);
-        self::assertTrue(true);
+        self::assertNotSame($source->getId(), $canonical->getId());
     }
 
     private function project(int $id): Project

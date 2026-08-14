@@ -134,6 +134,7 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
     }
 
     /**
+     * @param FormInterface<mixed>                $form
      * @param array<string, array<string, mixed>> $seen
      */
     private function boot(

@@ -17,7 +17,9 @@ final class InstanceRbacSeederTest extends TestCase
 {
     public function testSeedIfEmptyCreatesCatalogAndRemovesLegacy(): void
     {
+        /** @var array<string, InstancePermission> $permissions */
         $permissions = [];
+        /** @var array<string, InstanceRole> $roles */
         $roles = [];
         $removed = [];
         $flushed = 0;
@@ -86,7 +88,9 @@ final class InstanceRbacSeederTest extends TestCase
 
     public function testRepeatedSeedKeepsCatalogPopulated(): void
     {
+        /** @var array<string, InstancePermission> $permissions */
         $permissions = [];
+        /** @var array<string, InstanceRole> $roles */
         $roles = [];
         $permissionRepo = $this->createStub(InstancePermissionRepository::class);
         $permissionRepo->method('findOneByKey')->willReturnCallback(

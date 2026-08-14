@@ -52,11 +52,11 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 
 ## Product use-case catalog
 
-**All product use cases** (with Covered / Partial / Gap status) live in:
+**All product use cases** (Covered / Partial / Gap / Out of scope) live in:
 
 [`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
 
-Add a `UC-*` row there whenever you introduce a new scenario, then implement it under the matching domain folder (or extend an existing group).
+That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~194 Covered / ~28 Gap (see §15 in the catalog). Add or extend specs under the matching domain folder when closing remaining Gaps.
 
 ## File map (legacy names)
 

@@ -129,6 +129,7 @@ final class ProjectMembershipPolicyTest extends TestCase
 
     public function testAssertActorCanLinkGroupAllowsGroupMember(): void
     {
+        self::expectNotToPerformAssertions();
         $this->authorizationChecker->method('isGranted')->willReturn(false);
         $actor = new User();
         $project = new Project();
@@ -139,7 +140,6 @@ final class ProjectMembershipPolicyTest extends TestCase
         $this->groupMembershipRepository->method('findOneByGroupAndUser')->willReturn(new UserGroupMembership());
 
         $this->policy->assertActorCanLinkGroup($actor, $group, $project);
-        self::assertTrue(true);
     }
 
     private function project(int $id): Project

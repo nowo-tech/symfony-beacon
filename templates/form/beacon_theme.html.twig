@@ -161,7 +161,7 @@
     {%- endfor -%}
 {%- endblock attributes -%}
 
-{#- Help size/tone: FormKit profile help_attr + global .help-text (page-intro). -#}
+{#- Help size/tone: Symfony form_help uses .help-text (see _components.scss). -#}
 {%- block form_help -%}
     {%- if help is not empty -%}
         {{- parent() -}}

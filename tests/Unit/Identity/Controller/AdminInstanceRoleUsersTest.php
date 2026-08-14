@@ -77,6 +77,7 @@ final class AdminInstanceRoleUsersTest extends TestCase
         self::assertSame('/admin/roles/users', $response->getTargetUrl());
     }
 
+    /** @param FormInterface<mixed> $form */
     private function boot(object $controller, FormInterface $form): Session
     {
         $formFactory = $this->createStub(FormFactoryInterface::class);

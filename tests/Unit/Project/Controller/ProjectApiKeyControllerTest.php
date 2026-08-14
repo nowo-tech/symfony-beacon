@@ -138,6 +138,7 @@ final class ProjectApiKeyControllerTest extends TestCase
         self::assertSame(['flash.project.api_key_revoked'], $session->getFlashBag()->peek('success'));
     }
 
+    /** @param FormInterface<mixed> $form */
     private function boot(object $controller, User $user, FormInterface $form, bool $flash = false): Session
     {
         $formFactory = $this->createStub(FormFactoryInterface::class);

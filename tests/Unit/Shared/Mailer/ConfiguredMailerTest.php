@@ -60,7 +60,7 @@ final class ConfiguredMailerTest extends TestCase
         $mailer->sendSample('to@example.com', $translator);
         $mailer->reset();
         $mailer->send(new Email()->from('from@example.com')->to('to@example.com')->subject('x')->text('y'));
-        self::assertTrue(true);
+        self::assertTrue($mailer->isConfiguredFromDatabase());
     }
 
     private function mailer(InstanceSettings $settings, string $envDsn, string $env = 'test'): ConfiguredMailer

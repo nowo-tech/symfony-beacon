@@ -117,6 +117,7 @@ final class AppearanceSettingsControllerTest extends TestCase
         return new AppearanceSettingsController($repo, new SiteAppearanceProvider($repo));
     }
 
+    /** @return FormInterface<mixed> */
     private function form(): FormInterface
     {
         $form = $this->createStub(FormInterface::class);
@@ -128,6 +129,7 @@ final class AppearanceSettingsControllerTest extends TestCase
     }
 
     /**
+     * @param FormInterface<mixed>                     $form
      * @param array<string, array<string, mixed>>|null $seen
      */
     private function boot(

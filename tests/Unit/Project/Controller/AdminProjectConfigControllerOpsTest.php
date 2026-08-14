@@ -121,6 +121,7 @@ final class AdminProjectConfigControllerOpsTest extends TestCase
         );
     }
 
+    /** @param FormInterface<mixed>|null $form */
     private function boot(
         object $controller,
         User $user,

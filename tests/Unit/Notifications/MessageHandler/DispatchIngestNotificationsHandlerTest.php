@@ -34,10 +34,10 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
 {
     public function testReturnsWhenProjectMissing(): void
     {
+        self::expectNotToPerformAssertions();
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn(null);
         $this->handler($projects)(new DispatchIngestNotificationsMessage(1, [], [], '2026-08-01T00:00:00+00:00'));
-        self::assertTrue(true);
     }
 
     public function testDispatchesAlertKindsAndVolumeContexts(): void
@@ -73,15 +73,17 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
         });
 
         $handler = $this->handler($projects, $em, $bus);
+        /** @var list<array{kind: 'new'|'nplus1'|'regression', issue_id?: int, transaction_id?: int}> $alerts */
+        $alerts = [
+            ['kind' => 'new', 'issue_id' => 11],
+            ['kind' => 'regression', 'issue_id' => 11],
+            ['kind' => 'nplus1', 'transaction_id' => 22],
+            ['kind' => 'new', 'issue_id' => 'bad'],
+            ['kind' => 'nplus1', 'transaction_id' => 999],
+        ];
         $handler(new DispatchIngestNotificationsMessage(
             7,
-            [
-                ['kind' => 'new', 'issue_id' => 11],
-                ['kind' => 'regression', 'issue_id' => 11],
-                ['kind' => 'nplus1', 'transaction_id' => 22],
-                ['kind' => 'new', 'issue_id' => 'bad'],
-                ['kind' => 'nplus1', 'transaction_id' => 999],
-            ],
+            $alerts,
             [['prod', '1.0.0']],
             '2026-08-01T00:00:00+00:00',
         ));

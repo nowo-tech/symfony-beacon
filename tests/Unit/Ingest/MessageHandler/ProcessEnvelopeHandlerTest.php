@@ -33,6 +33,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
 {
     public function testReturnsWhenProjectMissingOrIngestBlocked(): void
     {
+        self::expectNotToPerformAssertions();
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn(null);
         $this->handler($projects)(new ProcessEnvelopeMessage(1, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'));
@@ -59,8 +60,6 @@ final class ProcessEnvelopeHandlerTest extends TestCase
         $projects = $this->createStub(ProjectRepository::class);
         $projects->method('find')->willReturn($monthly);
         $this->handler($projects, events: $events)(new ProcessEnvelopeMessage(4, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'));
-
-        self::assertTrue(true);
     }
 
     public function testParsesItemsAndFlushesWithoutDispatch(): void
@@ -97,9 +96,11 @@ final class ProcessEnvelopeHandlerTest extends TestCase
     ): ProcessEnvelopeHandler {
         $bus ??= $this->createStub(MessageBusInterface::class);
         $em ??= $this->entityManager();
-        $events ??= $this->createStub(EventRepository::class);
-        $events->method('countReceivedTodayForProject')->willReturn(0);
-        $events->method('countReceivedSinceForProject')->willReturn(0);
+        if (null === $events) {
+            $events = $this->createStub(EventRepository::class);
+            $events->method('countReceivedTodayForProject')->willReturn(0);
+            $events->method('countReceivedSinceForProject')->willReturn(0);
+        }
 
         $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
         $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());

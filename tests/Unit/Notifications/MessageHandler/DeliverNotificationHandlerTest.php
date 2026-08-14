@@ -39,6 +39,7 @@ final class DeliverNotificationHandlerTest extends TestCase
 {
     public function testEarlyExitsForMissingDisabledAndOpenCircuit(): void
     {
+        self::expectNotToPerformAssertions();
         $destinations = $this->createStub(NotificationDestinationRepository::class);
         $destinations->method('find')->willReturn(null);
         $this->handler($destinations)(new DeliverNotificationMessage(1, []));
@@ -53,8 +54,6 @@ final class DeliverNotificationHandlerTest extends TestCase
         $destinations = $this->createStub(NotificationDestinationRepository::class);
         $destinations->method('find')->willReturn($open);
         $this->handler($destinations)(new DeliverNotificationMessage(3, []));
-
-        self::assertTrue(true);
     }
 
     public function testRecordsFailureForEmptyEndpoint(): void

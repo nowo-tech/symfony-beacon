@@ -81,8 +81,10 @@ final class PlatformCatalogsSetupRedirectSubscriberTest extends TestCase
             $this->createStub(CookieConsentConfigRepository::class),
         );
 
-        $auth ??= $this->createStub(AuthorizationCheckerInterface::class);
-        $auth->method('isGranted')->willReturn(false);
+        if (null === $auth) {
+            $auth = $this->createStub(AuthorizationCheckerInterface::class);
+            $auth->method('isGranted')->willReturn(false);
+        }
 
         return new PlatformCatalogsSetupRedirectSubscriber(
             $state,

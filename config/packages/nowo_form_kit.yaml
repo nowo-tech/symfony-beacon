@@ -4,6 +4,11 @@
 # default_profile beacon = Beacon product forms.
 # Named kit profiles (auth_kit, dashboard_menu, …) stop vendor prepend from seeding
 # Bootstrap field classes when those bundles require FormKit.
+#
+# FormKit 2.2.0 config tree does not allow help_attr under profiles.*.field_types
+# (or profile defaults). Help chrome is styled via Twig/CSS (.help-text in
+# assets/styles/_components.scss + form theme) — do not reintroduce help_attr
+# until a FormKit release documents it in the schema.
 nowo_form_kit:
     default_profile: beacon
     css_framework: tailwind
@@ -24,15 +29,11 @@ nowo_form_kit:
                     class: 'input'
                 row_attr:
                     class: 'flex flex-col gap-2'
-                # Do not set help_attr globally — SubmitType/ButtonType reject it (AuthKit login).
-                # Help copy still uses auto_help; style via Twig/CSS (.help-text / form theme).
             field_types:
                 textarea:
                     attr:
                         class: 'input'
                         rows: 3
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 checkbox:
                     attr:
                         class: 'checkbox'
@@ -41,22 +42,8 @@ nowo_form_kit:
                 choice:
                     attr:
                         class: 'input'
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
-                text:
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
-                email:
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
-                password:
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
-                integer:
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 submit:
-                    # Explicitly omit help / help_attr (SubmitType options are label-only).
+                    # Explicitly omit help (SubmitType options are label-only).
                     help: false
             help_modal:
                 framework: tailwind
@@ -104,8 +91,6 @@ nowo_form_kit:
                     attr:
                         class: 'nowo-ui-input block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm'
                         rows: 3
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 checkbox:
                     attr:
                         class: 'checkbox'
@@ -114,8 +99,6 @@ nowo_form_kit:
                 choice:
                     attr:
                         class: 'nowo-ui-input block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm'
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 submit:
                     help: false
 
@@ -161,32 +144,18 @@ nowo_form_kit:
             field_types:
                 text:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 search:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 textarea:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 integer:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 number:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 email:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 password:
                     label: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 checkbox:
                     label: false
                 choice:
@@ -194,8 +163,6 @@ nowo_form_kit:
                     # Select empty-option uses ChoiceType "placeholder", not attr.placeholder.
                     # addFilterSelect() restores an empty-option key when the field needs one.
                     placeholder: false
-                    help_attr:
-                        class: 'text-xs text-[var(--color-ink)]/55'
                 submit:
                     help: false
                 hidden:

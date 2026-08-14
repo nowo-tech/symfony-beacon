@@ -94,6 +94,7 @@ final class AdminProjectControllerOpsTest extends TestCase
         self::assertSame('/admin/projects', $disable->getTargetUrl());
     }
 
+    /** @param FormInterface<mixed> $form */
     private function controller(EntityManagerInterface $em, FormInterface $form): AdminProjectController
     {
         return new AdminProjectController(
@@ -109,6 +110,7 @@ final class AdminProjectControllerOpsTest extends TestCase
         );
     }
 
+    /** @param FormInterface<mixed> $form */
     private function csrfFactory(FormInterface $form): CsrfOnlyFormFactory
     {
         $factory = $this->createStub(FormFactoryInterface::class);
@@ -120,6 +122,8 @@ final class AdminProjectControllerOpsTest extends TestCase
 
     /**
      * @param array<string, mixed> $data
+     *
+     * @return FormInterface<mixed>
      */
     private function validForm(array $data): FormInterface
     {

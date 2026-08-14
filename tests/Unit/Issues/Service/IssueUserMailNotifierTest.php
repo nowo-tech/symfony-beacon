@@ -28,6 +28,7 @@ final class IssueUserMailNotifierTest extends TestCase
 
     public function testMentionNotifySendsWithReplyToWhenInboundEnabled(): void
     {
+        /** @var list<Email> $sent */
         $sent = [];
         $notifier = $this->notifier($this->transport(true, $sent), $this->createStub(LoggerInterface::class), inbound: true, members: [
             $this->user(2, 'alice@example.com', 'Alice'),
@@ -50,6 +51,7 @@ final class IssueUserMailNotifierTest extends TestCase
 
     public function testAssigneeNotifyAndSkipBranches(): void
     {
+        /** @var list<Email> $sent */
         $sent = [];
         $notifier = $this->notifier($this->transport(true, $sent), $this->createStub(LoggerInterface::class), inbound: false);
 
@@ -61,7 +63,7 @@ final class IssueUserMailNotifierTest extends TestCase
         $notifier->notifyAssigneeChanged($project, $issue, null, null, $actor);
         $notifier->notifyAssigneeChanged($project, $issue, $assignee, $assignee, $actor);
         $notifier->notifyAssigneeChanged($project, $issue, null, $assignee, $assignee);
-        self::assertSame([], $sent);
+        self::assertSame(0, \count($sent));
 
         $notifier->notifyAssigneeChanged($project, $issue, null, $assignee, $actor);
         self::assertCount(1, $sent);
@@ -71,6 +73,7 @@ final class IssueUserMailNotifierTest extends TestCase
 
     public function testUnavailableAndInvalidEmailAndSendFailure(): void
     {
+        /** @var list<Email> $sent */
         $sent = [];
         $notifier = $this->notifier($this->transport(false, $sent), $this->createStub(LoggerInterface::class), inbound: false, members: [
             $this->user(2, 'alice@example.com', 'Alice'),

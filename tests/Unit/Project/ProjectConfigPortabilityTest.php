@@ -246,6 +246,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $actor = $this->user('admin@example.com', 'Admin');
         new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
 
+        /** @var array<string, User> $createdUsers */
         $createdUsers = [];
         $userRepo = $this->createStub(UserRepository::class);
         $userRepo->method('findIndexedByEmails')->willReturnCallback(

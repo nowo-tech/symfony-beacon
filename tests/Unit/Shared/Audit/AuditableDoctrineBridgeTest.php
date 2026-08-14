@@ -22,6 +22,7 @@ final class AuditableDoctrineBridgeTest extends TestCase
 {
     public function testBridgeDelegatesLifecycleEventsWhenAuditDisabled(): void
     {
+        self::expectNotToPerformAssertions();
         $entity = new stdClass();
         $em = $this->createStub(EntityManagerInterface::class);
 
@@ -53,7 +54,5 @@ final class AuditableDoctrineBridgeTest extends TestCase
         $bridge->prePersist(new PrePersistEventArgs($entity, $em));
         $changeSet = [];
         $bridge->preUpdate(new PreUpdateEventArgs($entity, $em, $changeSet));
-
-        self::assertTrue(true);
     }
 }

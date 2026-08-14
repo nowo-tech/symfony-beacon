@@ -116,6 +116,8 @@ final class AdminUserControllerGuardsTest extends TestCase
 
     /**
      * @param array<string, mixed>|null $data
+     *
+     * @return FormInterface<mixed>
      */
     private function validForm(?array $data = null): FormInterface
     {
@@ -131,6 +133,7 @@ final class AdminUserControllerGuardsTest extends TestCase
         return $form;
     }
 
+    /** @param FormInterface<mixed> $form */
     private function boot(object $controller, User $user, FormInterface $form, bool $flash = false): Session
     {
         $formFactory = $this->createStub(FormFactoryInterface::class);

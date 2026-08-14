@@ -56,8 +56,8 @@ final class SampleDataServiceTest extends TestCase
         try {
             $service->seed($project, 'nope');
             self::fail('expected');
-        } catch (InvalidArgumentException) {
-            self::assertTrue(true);
+        } catch (InvalidArgumentException $exception) {
+            self::assertInstanceOf(InvalidArgumentException::class, $exception);
         }
 
         // Lightweight: use tiny window by calling seed with 'dev' but stub issue repo to skip creates via existing fps — still heavy.

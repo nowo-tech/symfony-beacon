@@ -154,6 +154,8 @@ final class IssueDetailControllerMutationsTest extends TestCase
     }
 
     /**
+     * @param FormInterface<mixed> $form
+     *
      * @return array{0: IssueDetailController, 1: Session, 2: Project, 3: Issue}
      */
     private function triageController(
@@ -230,6 +232,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         return [$controller, $session, $project, $issue];
     }
 
+    /** @return FormInterface<mixed> */
     private function invalidForm(): FormInterface
     {
         $form = $this->createStub(FormInterface::class);

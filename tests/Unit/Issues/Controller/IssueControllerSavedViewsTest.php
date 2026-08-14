@@ -108,6 +108,7 @@ final class IssueControllerSavedViewsTest extends TestCase
         self::assertSame(['issues.view_invalid'], $session->getFlashBag()->peek('error'));
     }
 
+    /** @param FormInterface<mixed>|null $form */
     private function controller(
         User $user,
         ProjectMembership $membership,

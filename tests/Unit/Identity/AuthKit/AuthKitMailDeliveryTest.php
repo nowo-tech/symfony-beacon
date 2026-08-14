@@ -16,6 +16,7 @@ final class AuthKitMailDeliveryTest extends TestCase
 {
     public function testSendSkipsWhenMailerUnavailableOrIdentifierInvalid(): void
     {
+        self::expectNotToPerformAssertions();
         $settings = InstanceSettings::defaults();
         $repo = $this->createStub(InstanceSettingsRepository::class);
         $repo->method('getOrCreate')->willReturn($settings);
@@ -25,11 +26,11 @@ final class AuthKitMailDeliveryTest extends TestCase
 
         $delivery->send('not-an-email', 'subject', 'body');
         $delivery->send('user@example.com', 'subject', 'body');
-        self::assertTrue(true);
     }
 
     public function testSendDispatchesWhenMagicLoginAvailable(): void
     {
+        self::expectNotToPerformAssertions();
         $settings = InstanceSettings::defaults();
         $settings->setMailerDsn('null://null');
         $repo = $this->createStub(InstanceSettingsRepository::class);
@@ -43,6 +44,5 @@ final class AuthKitMailDeliveryTest extends TestCase
         if ($mailer->isMagicLoginAvailable()) {
             $delivery->send('User@Example.COM', 'mail.subject', 'mail.body', ['%token%' => 'abc']);
         }
-        self::assertTrue(true);
     }
 }

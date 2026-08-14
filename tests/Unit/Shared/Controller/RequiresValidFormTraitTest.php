@@ -17,11 +17,13 @@ final class RequiresValidFormTraitTest extends TestCase
         $controller = new class {
             use RequiresValidFormTrait;
 
+            /** @param FormInterface<mixed> $form */
             public function check(FormInterface $form): void
             {
                 $this->requireValidForm($form);
             }
 
+            /** @param FormInterface<mixed> $form */
             public function checkCsrf(FormInterface $form): void
             {
                 $this->requireValidCsrfForm($form);
@@ -44,6 +46,7 @@ final class RequiresValidFormTraitTest extends TestCase
         $controller = new class {
             use RequiresValidFormTrait;
 
+            /** @param FormInterface<mixed> $form */
             public function checkCsrf(FormInterface $form): void
             {
                 $this->requireValidCsrfForm($form);
@@ -59,6 +62,7 @@ final class RequiresValidFormTraitTest extends TestCase
         $valid->method('isSubmitted')->willReturn(true);
         $valid->method('isValid')->willReturn(true);
         $controller->checkCsrf($valid);
-        self::assertTrue(true);
+        self::assertTrue($valid->isSubmitted());
+        self::assertTrue($valid->isValid());
     }
 }

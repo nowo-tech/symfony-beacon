@@ -148,7 +148,7 @@ final class ProjectGroupAccessManagerTest extends TestCase
             $this->manager->assignableGroupRoles($actor, $project),
         );
         $this->manager->assertActorCanLinkGroup($actor, $group, $project);
-        self::assertTrue(true);
+        self::assertSame(ProjectRole::Admin, $this->manager->assignableGroupRoles($actor, $project)[0]);
     }
 
     private function rebuild(bool $adminAuth = true): void

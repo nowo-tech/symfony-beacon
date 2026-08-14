@@ -80,6 +80,7 @@ final class AdminInstancePermissionSurfacesTest extends TestCase
         $session = $this->boot($controller, flash: true);
 
         $response = $controller->new(Request::create('/admin/permissions/new', Request::METHOD_POST));
+        self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame('/admin/permissions?new=1', $response->getTargetUrl());
         self::assertSame(['flash.permissions.key_taken'], $session->getFlashBag()->peek('error'));
     }
@@ -115,18 +116,27 @@ final class AdminInstancePermissionSurfacesTest extends TestCase
         self::assertFalse($seen['admin/permissions/index.html.twig']['open_create']);
     }
 
+    /** @param FormInterface<mixed>|null $namedForm */
     private function controller(
         ?InstancePermissionRepository $permissions = null,
         ?FormInterface $namedForm = null,
     ): AdminInstancePermissionController {
-        $form = $namedForm ?? $this->createStub(FormInterface::class);
-        $form->method('createView')->willReturn(new FormView());
+        if (null === $namedForm) {
+            $form = $this->createStub(FormInterface::class);
+            $form->method('createView')->willReturn(new FormView());
+        } else {
+            $form = $namedForm;
+        }
         $formFactory = $this->createStub(FormFactoryInterface::class);
         $formFactory->method('createNamed')->willReturn($form);
         $formFactory->method('create')->willReturn($form);
 
-        $repo = $permissions ?? $this->createStub(InstancePermissionRepository::class);
-        $repo->method('findAllOrdered')->willReturn([]);
+        if (null === $permissions) {
+            $repo = $this->createStub(InstancePermissionRepository::class);
+            $repo->method('findAllOrdered')->willReturn([]);
+        } else {
+            $repo = $permissions;
+        }
 
         return new AdminInstancePermissionController(
             $repo,

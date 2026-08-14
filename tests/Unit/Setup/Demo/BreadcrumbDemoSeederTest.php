@@ -39,7 +39,7 @@ final class BreadcrumbDemoSeederTest extends TestCase
     {
         $loader = new DemoFixtureLoader();
         $fixture = $loader->load('breadcrumbs.default.json');
-        /** @var array{code: string, contextKey: string, name: string, separatorIcon: string, classList: string, classItem: string, classSeparator: string, classCurrent: string, responsive: array} $collectionData */
+        /** @var array{code: string, contextKey: string, name: string, separatorIcon: string, classList: string, classItem: string, classSeparator: string, classCurrent: string, responsive: array<string, mixed>} $collectionData */
         $collectionData = $fixture['collection'];
         $collection = new BreadcrumbCollection();
         $collection->setCode($collectionData['code']);

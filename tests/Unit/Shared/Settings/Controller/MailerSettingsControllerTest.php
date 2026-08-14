@@ -37,6 +37,7 @@ final class MailerSettingsControllerTest extends TestCase
         $user = new User()->setEmail('admin@example.com');
         new ReflectionProperty(User::class, 'id')->setValue($user, 1);
 
+        /** @var list<UserAction> $persisted */
         $persisted = [];
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
@@ -62,7 +63,7 @@ final class MailerSettingsControllerTest extends TestCase
 
         $method = new ReflectionMethod(MailerSettingsController::class, 'recordMailerAudit');
         $method->invoke($controller, 'smtp://a@example:25', 'from@example.com', 'smtp://a@example:25', 'from@example.com');
-        self::assertSame([], $persisted);
+        self::assertSame(0, \count($persisted));
 
         $method->invoke($controller, 'smtp://a@example:25', 'from@example.com', 'smtp://b@example:25', 'from@example.com');
         self::assertCount(1, $persisted);
