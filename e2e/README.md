@@ -56,9 +56,11 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 
 [`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
 
-That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~233 Covered / ~0 Gap (~4 Out of scope). Extend specs under the matching domain folder when product surface grows.
+That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~247 Covered / ~0 Gap (~5 Out of scope). Extend specs under the matching domain folder when product surface grows.
 
 Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install.
+
+Atomic gaps batch (`UC-AUTH-25/26`, `UC-ACC-24/25`, `UC-DASH-15`, `UC-OPS-12/13`, `UC-SETUP-06`, `UC-ADM-38..42`, `UC-PROJ-27`): `e2e/flows/use-cases-atomic-gaps.spec.ts`.
 
 Digest flush (`UC-NOTIF-17`): `make test-e2e` runs `app:notifications:flush-digests --force` and writes `var/e2e/flush-digests.last` for `notifications/use-cases-digest-flush.spec.ts`.
 

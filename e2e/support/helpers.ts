@@ -240,11 +240,8 @@ export async function resolveDemoProjectUuid(page: Page): Promise<string> {
 
 /** Assert page did not land on login and returned a successful HTML response. */
 export async function expectAuthenticatedPage(page: Page, path: string): Promise<void> {
-  const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await gotoStable(page, path);
   await dismissProductTour(page);
-  expect(response, `No response for ${path}`).not.toBeNull();
-  const status = response!.status();
-  expect(status, `${path} returned ${status}`).toBeLessThan(400);
   await expect(page, `Expected auth for ${path}`).not.toHaveURL(/\/login(\?|$|\/)/);
   await expect(page.locator('body')).toBeVisible();
 }

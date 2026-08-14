@@ -61,6 +61,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-22 | QR login: approve / deny from authenticated device | ✅ Covered | `smoke/use-cases-auth-qr-dual.spec.ts` (guest desktop + authenticated phone; deny POST + approve) |
 | UC-AUTH-23 | Live social IdP redirect + callback | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (authorize redirect + client_id; OAuth callback still external) |
 | UC-AUTH-24 | Localized logout (`/{locale}/logout`) | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` |
+| UC-AUTH-25 | QR login shows challenge image (PNG/SVG data URI) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-AUTH-26 | Password reset code entry page (`/reset-password/complete`) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 
 ---
 
@@ -95,6 +97,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-OPS-10 | Twig inspector / template link (dev) | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (`#_twig_inspector__icon`; skips without WDT) |
 | UC-OPS-11 | Live component endpoint without 5xx | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
+| UC-OPS-12 | Maintenance panel login / logout gate | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (login route; password gate off in host config) |
+| UC-OPS-13 | Clear maintenance schedule | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (clear-schedule control; no live clear) |
+| UC-OPS-14 | SiteBackup restore / clear_restore mutation | ❌ Out of scope | Destructive dump overwrite |
 
 ---
 
@@ -125,6 +130,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-21 | Mark product tour seen (POST) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-ACC-22 | PWA offline document loads | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (`/offline`) |
 | UC-ACC-23 | Push subscribe/unsubscribe HTTP when VAPID set | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (FCM-shaped endpoint; skips without VAPID); browser Push permission still external |
+| UC-ACC-24 | Password expiry date shown on profile | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ACC-25 | Linked social accounts panel on security | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 
 ---
 
@@ -146,6 +153,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-DASH-12 | Empty dashboard (zero projects) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-DASH-13 | Summary / activity empty states | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` (activity empty for zero-membership user) |
 | UC-DASH-14 | Autocomplete assignee / mention endpoints | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-DASH-15 | Dashboard project search (`?q=`) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 
 ---
 
@@ -179,6 +187,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-24 | `full` membership role capabilities | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (settings/danger delete; no transfer) |
 | UC-PROJ-25 | New-project form fragment (`/_new_form`) | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PROJ-26 | Inactive API key rejected on ingest | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-PROJ-27 | Guest share open → login → consume project | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 
 ---
 
@@ -344,6 +353,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-35 | Social login edit / delete provider | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-36 | Group edit / delete | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-37 | Admin user activity filters | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-38 | Group audit timeline + filters | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ADM-39 | Instance role delete guards (system / in-use) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ADM-40 | Instance role permissions matrix save | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ADM-41 | Copy dashboard menu | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ADM-42 | Clear Mailer DSN control on mailer settings | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (control present; not submitted) |
 
 ---
 
@@ -356,6 +370,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-SETUP-03 | Seed layers / demo project | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (demo project on dashboard after `make seed`); Makefile seed itself remains ops |
 | UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; never POST advance on warm DB) |
 | UC-SETUP-05 | Setup done page | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
+| UC-SETUP-06 | Incomplete-setup banner on dashboard (admin) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (instance-config import toggles `setup_completed`) |
 
 ---
 
@@ -372,7 +387,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-14):** ~233 Covered / ~0 Partial / ~0 Gap / ~4 Out of scope (237 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external (HTTP subscribe Covered when VAPID set). Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs.
+**Automation status (2026-08-14):** ~247 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (252 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs.
 
 **Closed Gap batches:**
 
@@ -387,6 +402,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 9. ~~Mailbox token capture UC-AUTH-18/20~~ → Covered via Mailpit (`make mailpit`).
 10. ~~AUTH-23 / OPS-10 / SETUP-03 / ACC-23~~ → Covered (`smoke/use-cases-remaining-oos.spec.ts`; local VAPID in `.env`).
 11. ~~SETUP-04/05 + NOTIF-17~~ → Covered (`smoke/use-cases-setup-warm.spec.ts`, `notifications/use-cases-digest-flush.spec.ts`).
+12. ~~Atomic definition gaps AUTH-25/26, ACC-24/25, DASH-15, OPS-12/13, SETUP-06, ADM-38..42, PROJ-27~~ → Covered (`flows/use-cases-atomic-gaps.spec.ts`); OPS-14 remains Out of scope.
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
