@@ -34,7 +34,6 @@ final class RequiresValidFormTraitTest extends TestCase
                 return new AccessDeniedHttpException($message, $previous);
             }
 
-            /** @param mixed $message */
             protected function addFlash(string $type, mixed $message): void
             {
             }
@@ -62,7 +61,6 @@ final class RequiresValidFormTraitTest extends TestCase
                 return new AccessDeniedHttpException($message, $previous);
             }
 
-            /** @param mixed $message */
             protected function addFlash(string $type, mixed $message): void
             {
             }
