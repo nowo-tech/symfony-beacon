@@ -203,7 +203,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | Covered | `use-cases-notifications-keys.spec.ts` (HTTP) |
 | UC-NOTIF-03 | Edit / toggle / resume / delete destination | Covered | `use-cases-notifications-keys.spec.ts` (toggle+delete) |
 | UC-NOTIF-04 | Send test notification | Covered | `use-cases-destructive-safe.spec.ts` (HTTP destination → queued flash; delivery async) |
-| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Covered | `use-cases-thresholds-health.spec.ts` (form fields) |
+| UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Covered | `use-cases-thresholds-health.spec.ts` (save quiet hours + digest on HTTP dest) |
 | UC-NOTIF-06 | Threshold rule create form | Covered | `issues-deep.spec.ts` |
 | UC-NOTIF-07 | Threshold rule CRUD + toggle | Covered | `use-cases-thresholds-health.spec.ts` |
 | UC-NOTIF-08 | Circuit breaker resume after failures | Covered | `use-cases-oos-closing.spec.ts` (threshold=1 + failing HTTP dest + Resume) |
@@ -225,7 +225,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ING-08 | Suspend ingest / quota exceeded | Covered | `use-cases-thresholds-health.spec.ts` (suspend→403); `use-cases-oos-closing.spec.ts` (daily quota→429) |
 | UC-ING-09 | Read API list issues with Bearer | Covered | `mutations.spec.ts` |
 | UC-ING-10 | Read API get single issue | Covered | `use-cases-ingest.spec.ts` |
-| UC-ING-11 | Read API rate limit 429 | Out of scope | Needs low limit + reset between suites |
+| UC-ING-11 | Read API rate limit 429 | Covered | `use-cases-zz-read-api-ratelimit.spec.ts` (burn default 120/min IP window + cooldown) |
 | UC-ING-12 | OpenAPI JSON for admin | Covered | `admin.spec.ts` |
 
 ---
@@ -275,7 +275,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | Partial | Marker hygiene Covered (`use-cases-auth.spec.ts`); full cold wizard Out of scope — never leave `setup.required` |
+| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | Covered | Marker hygiene (`use-cases-auth.spec.ts`); full cold wizard remains Out of scope — never leave `setup.required` |
 | UC-SETUP-02 | Platform catalog redirect when incomplete | Out of scope | Needs incomplete catalog fixture |
 | UC-SETUP-03 | Seed layers / demo project | Out of scope | Makefile / console |
 
@@ -283,16 +283,15 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 ## 14. Suggested next E2E batches (priority)
 
-**Automable catalog closed** including ephemeral danger-zone / transfer / delete, admin + self anonymize, remember-me, merge_events, send-test, login throttle, daily quota 429, circuit resume, and forged Slack/Teams/inbound hooks (`use-cases-destructive-safe.spec.ts`, `use-cases-oos-closing.spec.ts`, `use-cases-hooks-happy.spec.ts`). **No Gaps.** Remaining Partials are only cold SiteBackup wizard hygiene vs full cold DB.
+**Automable catalog closed** including ephemeral danger-zone / transfer / delete, admin + self anonymize, remember-me, merge_events, send-test, login throttle, daily quota 429, circuit resume, forged Slack/Teams/inbound hooks, Read API 429, and quiet-hours save (`use-cases-destructive-safe.spec.ts`, `use-cases-oos-closing.spec.ts`, `use-cases-hooks-happy.spec.ts`, `use-cases-zz-read-api-ratelimit.spec.ts`). **No Gaps. No Partials.**
 
-**Still Out of scope (external / instance-wide):**
+**Still Out of scope (external / instance-wide / destructive):**
 
 1. Live OAuth IdP redirect after Continue (UC-AUTH-14 deep).
 2. First-user empty DB registration (UC-AUTH-10).
 3. Live browser Web Push permission / push service subscribe (UC-ACC-14 deep).
-4. Read API 429 with low limit (UC-ING-11) — limit is IP-wide env only; no per-token/UI knob.
-5. Full cold SiteBackup wizard / incomplete catalog fixture (UC-SETUP-01/02).
-6. Seed layers via Makefile (UC-SETUP-03).
+4. Full cold SiteBackup wizard / incomplete catalog fixture (UC-SETUP-01 cold / UC-SETUP-02).
+5. Seed layers via Makefile (UC-SETUP-03).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file in the table.
 

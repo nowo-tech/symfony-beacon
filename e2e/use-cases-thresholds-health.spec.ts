@@ -41,17 +41,80 @@ test.describe('Thresholds, health, quiet hours, issue panels', () => {
     }
   });
 
-  test('notification create form exposes quiet hours and digest fields (UC-NOTIF-05)', async ({ page }) => {
+  test('saves quiet hours and digest on HTTP destination (UC-NOTIF-05)', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
     await page.goto(`/projects/${uuid}/notifications/new`);
     await dismissProductTour(page);
     const form = page.getByRole('main').locator('form.notification-destination-form');
     await expect(form).toBeVisible();
-    await expect(
-      form.locator(
-        'input[name*="quietHours"], input[name*="digest"], label:has-text("Quiet"), label:has-text("Digest"), label:has-text("silenc")',
-      ).first(),
-    ).toBeAttached();
+
+    const label = `e2e-quiet-${Date.now().toString(36)}`;
+    await form.locator('input[name="notification_destination[label]"]').fill(label);
+    await form.locator('select[name="notification_destination[type]"]').selectOption('http');
+    // Prefer a host that resolves reliably in Compose (example.com DNS is flaky → SSRF form error).
+    await form.locator('input[name="notification_destination[endpointUrl]"]').fill(
+      'https://hooks.slack.com/services/T/E2E/QUIET',
+    );
+
+    const categories = form.locator('select[name="notification_destination[categories][]"]');
+    if ((await categories.count()) > 0) {
+      await categories.selectOption(['error'], { force: true }).catch(async () => {
+        const ts = form.locator('.ts-control').first();
+        if (await ts.isVisible().catch(() => false)) {
+          await ts.click();
+          await page.locator('.ts-dropdown .option').filter({ hasText: /error|error/i }).first().click({ force: true });
+        }
+      });
+    }
+
+    const quiet = form.locator('input[name="notification_destination[quietHoursEnabled]"]');
+    await expect(quiet).toBeAttached();
+    if (!(await quiet.isChecked().catch(() => false))) {
+      await quiet.check();
+    }
+    const tz = form.locator('input[name="notification_destination[quietHoursTimezone]"]');
+    await expect(tz).toBeVisible({ timeout: 5_000 });
+    await tz.fill('UTC');
+    const start = form.locator('input[name="notification_destination[quietHoursStart]"]');
+    const end = form.locator('input[name="notification_destination[quietHoursEnd]"]');
+    await expect(start).toBeVisible();
+    await start.fill('22:00');
+    await end.fill('07:00');
+    const digest = form.locator('input[name="notification_destination[digestEnabled]"]');
+    if ((await digest.count()) > 0 && !(await digest.isChecked().catch(() => false))) {
+      await digest.check();
+    }
+
+    await form.locator('button[type="submit"]').click();
+    await waitForPageLoader(page);
+    if (page.url().includes('/notifications/new')) {
+      const errs = await page.locator('.form-error, .invalid-feedback, [class*="error"], li').allTextContents();
+      throw new Error(`Quiet-hours destination did not save. Errors: ${errs.join(' | ').slice(0, 800)}`);
+    }
+    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/alerts`), { timeout: 20_000 });
+    await expect(page.getByRole('main')).toContainText(label, { timeout: 15_000 });
+
+    const row = page.locator('#project-notification-destinations li').filter({ hasText: label }).first();
+    await expect(row).toBeVisible();
+    const edit = row.locator(`a[href*="/notifications/"][href*="/edit"]`);
+    await edit.click();
+    await waitForPageLoader(page);
+    const editForm = page.getByRole('main').locator('form.notification-destination-form');
+    await expect(editForm.locator('input[name="notification_destination[quietHoursEnabled]"]')).toBeChecked();
+    await expect(editForm.locator('input[name="notification_destination[digestEnabled]"]')).toBeChecked();
+
+    await page.goto(`/projects/${uuid}/settings/alerts`);
+    await dismissProductTour(page);
+    const del = page
+      .locator('#project-notification-destinations li')
+      .filter({ hasText: label })
+      .locator('form[action*="/delete"] button[type="submit"]')
+      .first();
+    if (await del.isVisible().catch(() => false)) {
+      page.once('dialog', (d) => d.accept().catch(() => undefined));
+      await del.click({ force: true });
+      await waitForPageLoader(page);
+    }
   });
 
   test('project health / delivery panel on alerts settings (UC-PROJ-21)', async ({ page }) => {
