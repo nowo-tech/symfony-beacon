@@ -274,27 +274,19 @@ test.describe('Partials closing — access, filters, social, tour', () => {
 
   test('enabled social provider shows Continue button on login (UC-AUTH-14)', async ({ page, browser }) => {
     const suffix = Date.now().toString(36);
+    const providerSlug = `e2e-idp-${suffix}`;
     const label = `E2E IdP ${suffix}`;
 
     await page.goto('/admin/social-login/new');
     await dismissProductTour(page);
+    const origin = new URL(page.url()).origin;
     const form = page.locator('form').filter({
-      has: page.locator('input[name="social_login_credential[client_id]"], select[name="social_login_credential[provider]"]'),
+      has: page.locator('input[name="social_login_credential[client_id]"]'),
     });
     await expect(form).toBeVisible({ timeout: 15_000 });
 
-    const provider = form.locator('select[name="social_login_credential[provider]"], input[name="social_login_credential[provider]"]');
-    if ((await provider.evaluate((el) => el.tagName)).toLowerCase() === 'select') {
-      const github = provider.locator('option[value="github"]');
-      if ((await github.count()) > 0) {
-        await provider.selectOption('github');
-      } else {
-        await provider.selectOption({ index: 1 });
-      }
-    } else {
-      await provider.fill(`e2e-idp-${suffix}`);
-    }
-
+    // Always use a unique custom IdP so cleanup can delete without touching builtins.
+    await form.locator('input[name="social_login_credential[provider]"]').fill(providerSlug);
     await form.locator('input[name="social_login_credential[label]"]').fill(label);
     await form.locator('input[name="social_login_credential[client_id]"]').fill(`e2e-client-${suffix}`);
     await form.locator('input[name="social_login_credential[client_secret]"]').fill(`e2e-secret-${suffix}`);
@@ -302,49 +294,47 @@ test.describe('Partials closing — access, filters, social, tour', () => {
     if ((await enabled.count()) > 0 && !(await enabled.isChecked().catch(() => false))) {
       await enabled.check();
     }
-    // Custom IdP may need URLs.
-    const authUrl = form.locator('input[name="social_login_credential[authorize_url]"]');
-    if ((await authUrl.count()) > 0 && (await authUrl.isVisible().catch(() => false))) {
-      await authUrl.fill('https://idp.example.invalid/oauth/authorize');
-      await form.locator('input[name="social_login_credential[token_url]"]').fill('https://idp.example.invalid/oauth/token');
-      await form.locator('input[name="social_login_credential[userinfo_url]"]').fill('https://idp.example.invalid/oauth/userinfo');
-    }
+    await form.locator('input[name="social_login_credential[authorize_url]"]').fill('https://idp.example.invalid/oauth/authorize');
+    await form.locator('input[name="social_login_credential[token_url]"]').fill('https://idp.example.invalid/oauth/token');
+    await form.locator('input[name="social_login_credential[userinfo_url]"]').fill('https://idp.example.invalid/oauth/userinfo');
     await form.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
-    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/admin\/social-login\/?$/);
+    await expect(page.getByRole('main')).toContainText(label);
 
-    const origin = new URL(page.url()).origin;
-    const guestCtx = await browser.newContext({
-      ignoreHTTPSErrors: true,
-      storageState: { cookies: [], origins: [] },
-    });
-    const guest = await guestCtx.newPage();
-    await guest.goto(`${origin}/login`);
-    await dismissCookieConsent(guest);
-    await expect(
-      guest.locator(`a[href*="/login/social/"], a:has-text("${label}"), a:has-text("Continue with"), a:has-text("Continuar con")`).first(),
-    ).toBeVisible({ timeout: 15_000 });
-    await guestCtx.close();
-
-    // Best-effort disable so later guest suites stay clean.
-    await page.goto('/admin/social-login');
-    await dismissProductTour(page);
-    const row = page.locator('tr, li, .panel, article').filter({ hasText: label }).first();
-    const editLink = row.locator('a[href*="/edit"], a[href*="/social-login/"]').first();
-    if (await editLink.isVisible().catch(() => false)) {
-      await editLink.click();
-      await waitForPageLoader(page);
-      const en = page.locator('form').filter({ has: page.locator('input[name="social_login_credential[client_id]"]') }).locator('input[name="social_login_credential[enabled]"]');
-      if ((await en.count()) > 0 && (await en.isChecked().catch(() => false))) {
-        await en.uncheck();
-        await page
-          .locator('form')
-          .filter({ has: page.locator('input[name="social_login_credential[client_id]"]') })
-          .locator('button[type="submit"]')
-          .first()
-          .click();
+    try {
+      const guestCtx = await browser.newContext({
+        ignoreHTTPSErrors: true,
+        storageState: { cookies: [], origins: [] },
+      });
+      const guest = await guestCtx.newPage();
+      await guest.goto(`${origin}/login`);
+      await dismissCookieConsent(guest);
+      await expect(
+        guest.locator(`a[href*="/login/social/${providerSlug}"], a:has-text("${label}")`).first(),
+      ).toBeVisible({ timeout: 15_000 });
+      await guestCtx.close();
+    } finally {
+      // Delete the fixture so login stays clean (closed circuit).
+      await page.goto('/admin/social-login');
+      await dismissProductTour(page);
+      const row = page.locator('tr').filter({ hasText: label }).first();
+      if (await row.isVisible().catch(() => false)) {
+        page.once('dialog', (dialog) => dialog.accept());
+        await row.locator(`form[action*="/social-login/${providerSlug}/delete"] button[type="submit"]`).click();
         await waitForPageLoader(page);
       }
+      await expect(page.locator('tr').filter({ hasText: label })).toHaveCount(0);
+
+      const guestCtx = await browser.newContext({
+        ignoreHTTPSErrors: true,
+        storageState: { cookies: [], origins: [] },
+      });
+      const guest = await guestCtx.newPage();
+      await guest.goto(`${origin}/login`);
+      await dismissCookieConsent(guest);
+      await expect(guest.locator(`a:has-text("${label}")`)).toHaveCount(0);
+      await guestCtx.close();
     }
   });
 

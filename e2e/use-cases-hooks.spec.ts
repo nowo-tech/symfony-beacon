@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Interactive hooks / inbound email — reject bad payloads without 5xx.
- * Happy-path signing is Gap (needs Slack/Teams secrets + inbound token).
+ * Happy-path forged signing: `use-cases-hooks-happy.spec.ts`.
  */
 test.describe('Hooks — use cases', () => {
   test('Slack interactions reject empty/unsigned body (UC-HOOK-01)', async ({ request }) => {

@@ -42,8 +42,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-05 | Magic login page loads | Covered | `public.spec.ts` |
 | UC-AUTH-06 | QR login page loads | Covered | `public.spec.ts` |
 | UC-AUTH-07 | Password reset page loads | Covered | `public.spec.ts` |
-| UC-AUTH-08 | Remember-me checkbox / cookie | Covered | `use-cases-auth-chrome.spec.ts` (checkbox; full cookie round-trip Out of scope) |
-| UC-AUTH-09 | Login throttle after N failures | Out of scope | Needs throttle reset between runs |
+| UC-AUTH-08 | Remember-me checkbox / cookie | Covered | `use-cases-auth-chrome.spec.ts` (checkbox); `use-cases-destructive-safe.spec.ts` (REMEMBERME survives session clear) |
+| UC-AUTH-09 | Login throttle after N failures | Covered | `use-cases-oos-closing.spec.ts` (ephemeral username; suite start clears `login_attempts`) |
 | UC-AUTH-10 | First-user registration when DB empty | Out of scope | Destructive / empty DB |
 | UC-AUTH-11 | `/register` redirects to login when users exist | Covered | `use-cases-auth.spec.ts` |
 | UC-AUTH-12 | Logout returns to login | Covered | `dashboard-project.spec.ts` |
@@ -89,7 +89,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-03 | Account projects & groups lists | Covered | `account-deep.spec.ts` |
 | UC-ACC-04 | Privacy GDPR export download | Covered | `account.spec.ts` |
 | UC-ACC-05 | Privacy anonymize panel present | Covered | `account-deep.spec.ts` |
-| UC-ACC-06 | Execute anonymize (self) | Out of scope | Destructive to demo user |
+| UC-ACC-06 | Execute anonymize (self) | Covered | `use-cases-oos-closing.spec.ts` (ephemeral user; not demo admin) |
 | UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-ACC-08 | Collapsed panels prefs | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-ACC-09 | Product tour replay | Covered | `account-deep.spec.ts` |
@@ -97,7 +97,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-11 | Theme toggle chrome | Covered | `navigation-ui.spec.ts` |
 | UC-ACC-12 | Content-width toggle | Covered | `navigation-ui.spec.ts` |
 | UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | Covered | `member-alerts.spec.ts` |
-| UC-ACC-14 | Web Push subscribe / unsubscribe | Out of scope | Needs push service / browser push permission |
+| UC-ACC-14 | Web Push subscribe / unsubscribe | Covered | `use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
 | UC-ACC-15 | Mercure realtime config endpoint | Covered | `use-cases-account-chrome.spec.ts` |
 | UC-ACC-16 | PWA manifest / SW / offline | Covered | `misc.spec.ts` |
 
@@ -141,9 +141,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-14 | Mint / revoke read API token | Covered | `mutations.spec.ts` |
 | UC-PROJ-15 | Member-alerts project override save | Covered | `member-alerts.spec.ts` |
 | UC-PROJ-16 | Config export / import (project) | Covered | `project-config.spec.ts` |
-| UC-PROJ-17 | Clear history (danger zone) | Partial | Danger shell Covered (`use-cases-project.spec.ts`); execute Out of scope |
-| UC-PROJ-18 | Transfer ownership | Out of scope | Destructive |
-| UC-PROJ-19 | Delete project | Out of scope | Destructive |
+| UC-PROJ-17 | Clear history (danger zone) | Covered | `use-cases-destructive-safe.spec.ts` (ephemeral project) |
+| UC-PROJ-18 | Transfer ownership | Covered | `use-cases-destructive-safe.spec.ts` (ephemeral project + second member) |
+| UC-PROJ-19 | Delete project | Covered | `use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
 | UC-PROJ-20 | Notification help page | Covered | `project-settings-deep.spec.ts` |
 | UC-PROJ-21 | Health / delivery history panel | Covered | `use-cases-thresholds-health.spec.ts` |
 
@@ -170,7 +170,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-15 | Ignore status | Covered | `use-cases-issues.spec.ts` |
 | UC-ISS-16 | Change priority | Covered | `mutations.spec.ts` |
 | UC-ISS-17 | Assign / clear assignee | Covered | `mutations.spec.ts` |
-| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `use-cases-partials-closing.spec.ts` (submit without merge_events); merge_events optional Partial |
+| UC-ISS-18 | Mark duplicate (+ optional merge) | Covered | `use-cases-partials-closing.spec.ts` (without merge); `use-cases-destructive-safe.spec.ts` (with merge_events) |
 | UC-ISS-19 | Similar issues panel | Covered | `use-cases-thresholds-health.spec.ts` (attached when present) |
 | UC-ISS-20 | Copy for AI (md/json export) | Covered | `issues-deep.spec.ts` |
 | UC-ISS-21 | Open event detail from issue | Covered | `use-cases-issues.spec.ts` |
@@ -202,11 +202,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-01 | Create destination form loads | Covered | `issues-deep.spec.ts` |
 | UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | Covered | `use-cases-notifications-keys.spec.ts` (HTTP) |
 | UC-NOTIF-03 | Edit / toggle / resume / delete destination | Covered | `use-cases-notifications-keys.spec.ts` (toggle+delete) |
-| UC-NOTIF-04 | Send test notification | Out of scope | Needs outbound channel delivery |
+| UC-NOTIF-04 | Send test notification | Covered | `use-cases-destructive-safe.spec.ts` (HTTP destination → queued flash; delivery async) |
 | UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | Covered | `use-cases-thresholds-health.spec.ts` (form fields) |
 | UC-NOTIF-06 | Threshold rule create form | Covered | `issues-deep.spec.ts` |
 | UC-NOTIF-07 | Threshold rule CRUD + toggle | Covered | `use-cases-thresholds-health.spec.ts` |
-| UC-NOTIF-08 | Circuit breaker resume after failures | Out of scope | Needs forced delivery failures |
+| UC-NOTIF-08 | Circuit breaker resume after failures | Covered | `use-cases-oos-closing.spec.ts` (threshold=1 + failing HTTP dest + Resume) |
 | UC-NOTIF-09 | Destinations list shell | Covered | `project-settings-deep.spec.ts` |
 
 ---
@@ -222,7 +222,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ING-05 | OTLP traces ERROR span → ACK | Covered | `use-cases-ingest.spec.ts` |
 | UC-ING-06 | OTLP metrics failure-like point → ACK | Covered | `use-cases-ingest.spec.ts` |
 | UC-ING-07 | OTLP rejects query auth | Covered | `use-cases-ingest.spec.ts` |
-| UC-ING-08 | Suspend ingest / quota exceeded | Covered | `use-cases-thresholds-health.spec.ts` (suspend→403); quota Exceeded Out of scope |
+| UC-ING-08 | Suspend ingest / quota exceeded | Covered | `use-cases-thresholds-health.spec.ts` (suspend→403); `use-cases-oos-closing.spec.ts` (daily quota→429) |
 | UC-ING-09 | Read API list issues with Bearer | Covered | `mutations.spec.ts` |
 | UC-ING-10 | Read API get single issue | Covered | `use-cases-ingest.spec.ts` |
 | UC-ING-11 | Read API rate limit 429 | Out of scope | Needs low limit + reset between suites |
@@ -238,9 +238,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-HOOK-02 | Teams actions reject bad body | Covered | `use-cases-hooks.spec.ts` |
 | UC-HOOK-03 | Teams assign-me reject bad body | Covered | `use-cases-hooks.spec.ts` |
 | UC-HOOK-04 | Inbound email reject unauthenticated | Covered | `use-cases-hooks.spec.ts` |
-| UC-HOOK-05 | Happy-path Slack Resolve / Assign | Out of scope | Needs signing secrets + linked Slack user |
-| UC-HOOK-06 | Happy-path Teams actions | Out of scope | Needs Teams secrets |
-| UC-HOOK-07 | Inbound email → issue comment | Out of scope | Needs inbound token + mailbox |
+| UC-HOOK-05 | Happy-path Slack Resolve / Assign | Covered | `use-cases-hooks-happy.spec.ts` (forged Slack signature + linked Slack user id) |
+| UC-HOOK-06 | Happy-path Teams actions | Covered | `use-cases-hooks-happy.spec.ts` (forged assign-me + anonymous Resolve with restore) |
+| UC-HOOK-07 | Inbound email → issue comment | Covered | `use-cases-hooks-happy.spec.ts` (ops inbound secret + forged reply token) |
 
 ---
 
@@ -251,7 +251,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-01 | Admin hub + deep cards | Covered | `admin.spec.ts`, `settings-deep.spec.ts` |
 | UC-ADM-02 | Users list / new form / activity | Covered | `admin.spec.ts` |
 | UC-ADM-03 | Create user / toggle enabled / change role | Covered | `use-cases-analytics-admin.spec.ts`, `use-cases-admin-remaining.spec.ts`, `use-cases-partials-closing.spec.ts` |
-| UC-ADM-04 | Admin user GDPR export / anonymize | Partial | export Covered (`use-cases-admin.spec.ts`); anonymize execute Out of scope |
+| UC-ADM-04 | Admin user GDPR export / anonymize | Covered | export `use-cases-admin.spec.ts`; anonymize ephemeral user `use-cases-destructive-safe.spec.ts` |
 | UC-ADM-05 | Groups CRUD + members / projects | Covered | `use-cases-admin-remaining.spec.ts`, `use-cases-partials-closing.spec.ts` (add/remove member) |
 | UC-ADM-06 | Admin projects list / show / edit / ops | Covered | `admin.spec.ts`, `admin-project-deep.spec.ts` |
 | UC-ADM-07 | Suspend ingest from admin | Covered | `use-cases-analytics-admin.spec.ts` |
@@ -283,14 +283,16 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 ## 14. Suggested next E2E batches (priority)
 
-**Automable Partials closed** in `use-cases-partials-closing.spec.ts` (+ prior `use-cases-*` waves). Catalog has **no Gaps**.
+**Automable catalog closed** including ephemeral danger-zone / transfer / delete, admin + self anonymize, remember-me, merge_events, send-test, login throttle, daily quota 429, circuit resume, and forged Slack/Teams/inbound hooks (`use-cases-destructive-safe.spec.ts`, `use-cases-oos-closing.spec.ts`, `use-cases-hooks-happy.spec.ts`). **No Gaps.** Remaining Partials are only cold SiteBackup wizard hygiene vs full cold DB.
 
-**Remaining honest Partial / Out of scope only:**
+**Still Out of scope (external / instance-wide):**
 
-1. Live OAuth IdP redirect after clicking Continue (UC-AUTH-14 deep).
-2. Remember-me cookie across browser restart (UC-AUTH-08 deep).
-3. Mark-duplicate with `merge_events` checked (UC-ISS-18 deep).
-4. Danger-zone / anonymize / throttle / push / signed hooks / cold setup executes (Out of scope rows above).
+1. Live OAuth IdP redirect after Continue (UC-AUTH-14 deep).
+2. First-user empty DB registration (UC-AUTH-10).
+3. Live browser Web Push permission / push service subscribe (UC-ACC-14 deep).
+4. Read API 429 with low limit (UC-ING-11) — limit is IP-wide env only; no per-token/UI knob.
+5. Full cold SiteBackup wizard / incomplete catalog fixture (UC-SETUP-01/02).
+6. Seed layers via Makefile (UC-SETUP-03).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file in the table.
 
