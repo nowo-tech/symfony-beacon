@@ -83,7 +83,7 @@ test.describe('Member alert preferences (091)', () => {
 
   test('project settings member-alerts panel cascades and saves', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings#member-alerts`);
+    await page.goto(`/projects/${uuid}/settings/alerts`);
     await dismissProductTour(page);
 
     const panel = page.locator('[data-testid="project-member-alerts"]');
@@ -114,7 +114,7 @@ test.describe('Member alert preferences (091)', () => {
 
   test('account defaults link from project settings reaches notifications', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings#member-alerts`);
+    await page.goto(`/projects/${uuid}/settings/alerts`);
     await dismissProductTour(page);
     const link = page.locator('[data-testid="project-member-alerts"] a[href*="/account/display/notifications"]');
     await expect(link).toBeVisible();

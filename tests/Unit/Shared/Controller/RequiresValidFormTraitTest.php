@@ -33,6 +33,11 @@ final class RequiresValidFormTraitTest extends TestCase
             {
                 return new AccessDeniedHttpException($message, $previous);
             }
+
+            /** @param mixed $message */
+            protected function addFlash(string $type, mixed $message): void
+            {
+            }
         };
 
         $invalid = $this->createStub(FormInterface::class);
@@ -55,6 +60,11 @@ final class RequiresValidFormTraitTest extends TestCase
             protected function createAccessDeniedException(string $message = 'Access Denied.', ?Throwable $previous = null): AccessDeniedHttpException
             {
                 return new AccessDeniedHttpException($message, $previous);
+            }
+
+            /** @param mixed $message */
+            protected function addFlash(string $type, mixed $message): void
+            {
             }
         };
 

@@ -24,10 +24,20 @@ async function createEnabledUser(
   await form.locator('input[name="admin_user[password]"]').fill(password);
   await form.locator('select[name="admin_user[role]"]').selectOption('user');
   const enabled = form.locator('input[name="admin_user[enabled]"]');
-  if (!(await enabled.isChecked().catch(() => false))) {
+  if ((await enabled.count()) > 0 && !(await enabled.isChecked().catch(() => false))) {
     await enabled.check();
   }
-  await form.locator('button[type="submit"]').click();
+  const submit = form.locator('button.btn-primary[type="submit"]');
+  await expect(submit).toBeEnabled();
+  await Promise.all([
+    page.waitForURL((url) => url.pathname.replace(/\/$/, '') === '/admin/users' && !url.searchParams.has('new'), {
+      timeout: 20_000,
+    }),
+    submit.click(),
+  ]);
+  await waitForPageLoader(page);
+  // Directory may paginate; filter so the new row is visible.
+  await page.goto(`/admin/users?q=${encodeURIComponent(email)}`);
   await waitForPageLoader(page);
   await expect(page.getByRole('main')).toContainText(email, { timeout: 20_000 });
 }
@@ -39,7 +49,7 @@ test.describe('Members, viewer RBAC, mentions — remaining use cases', () => {
   }) => {
     const suffix = Date.now().toString(36);
     const email = `e2e.viewer.${suffix}@example.invalid`;
-    const password = `E2eView!${suffix}`;
+    const password = `E2eView1!${suffix}`;
     const local = `e2e.viewer.${suffix}`;
 
     await createEnabledUser(page, email, password, `Viewer ${suffix}`);
@@ -117,7 +127,7 @@ test.describe('Members, viewer RBAC, mentions — remaining use cases', () => {
   test('@mention in comment appears in mentions inbox (UC-ISS-25 / UC-DASH-06)', async ({ page, browser }) => {
     const suffix = Date.now().toString(36);
     const email = `e2e.mention.${suffix}@example.invalid`;
-    const password = `E2eMen!${suffix}`;
+    const password = `E2eMen1!${suffix}`;
     const token = `e2e.mention.${suffix}`;
 
     await createEnabledUser(page, email, password, `Mention ${suffix}`);

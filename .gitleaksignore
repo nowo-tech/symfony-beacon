@@ -3,3 +3,5 @@
 #
 # generic-api-key false positive in CSRF scope table prose (token …, notification/threshold)
 add88143fab76f523e67165ed78b9afd7ab0bee9:specs/090-csrf-symfony-forms/spec.md:generic-api-key:29
+# Dummy Web Push `auth` key material in E2E (replaced with non-secret placeholder later)
+41ff2aa8a43fe7166903109ff18edd20696a02b8:e2e/smoke/use-cases-remaining-oos.spec.ts:generic-api-key:146

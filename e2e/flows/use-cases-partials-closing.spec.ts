@@ -27,7 +27,17 @@ async function createEnabledUser(
   if (!(await enabled.isChecked().catch(() => false))) {
     await enabled.check();
   }
-  await form.locator('button[type="submit"]').click();
+  const submit = form.locator('button.btn-primary[type="submit"]');
+  await expect(submit).toBeEnabled();
+  await Promise.all([
+    page.waitForURL((url) => url.pathname.replace(/\/$/, '') === '/admin/users' && !url.searchParams.has('new'), {
+      timeout: 20_000,
+    }),
+    submit.click(),
+  ]);
+  await waitForPageLoader(page);
+  // Directory may paginate; filter so the new row is visible.
+  await page.goto(`/admin/users?q=${encodeURIComponent(email)}`);
   await waitForPageLoader(page);
   await expect(page.getByRole('main')).toContainText(email, { timeout: 20_000 });
 }
@@ -98,7 +108,7 @@ test.describe('Partials closing — access, filters, social, tour', () => {
   test('change member role then deactivate (UC-PROJ-06)', async ({ page }) => {
     const suffix = Date.now().toString(36);
     const email = `e2e.role.${suffix}@example.invalid`;
-    const password = `E2eRole!${suffix}`;
+    const password = `E2eRole1!${suffix}`;
 
     await createEnabledUser(page, email, password, `Role ${suffix}`);
     const uuid = await resolveDemoProjectUuid(page);

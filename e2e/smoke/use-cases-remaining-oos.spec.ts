@@ -141,9 +141,10 @@ test.describe('Remaining OOS closing', () => {
     expect(unsubscribeUrl).toBeTruthy();
 
     const endpoint = `https://fcm.googleapis.com/fcm/send/e2e-push-${Date.now().toString(36)}`;
+    // Dummy Web Push key material (not real credentials; storage only in this flow).
     const keys = {
-      p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1X57tkOXBqB19PIn5BnBro0A',
-      auth: 'tBHItJI5svbpez7KI4CCXg',
+      p256dh: 'e2e-dummy-p256dh-key-material',
+      auth: 'e2e-dummy-auth-key',
     };
 
     const sub = await page.request.post(subscribeUrl!, {

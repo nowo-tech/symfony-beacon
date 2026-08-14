@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Shared CSRF / form validation deny for AbstractController subclasses.
  *
  * Controllers must still call handleRequest() or submit() before this helper.
+ *
+ * @method void addFlash(string $type, mixed $message)
  */
 trait RequiresValidFormTrait
 {
