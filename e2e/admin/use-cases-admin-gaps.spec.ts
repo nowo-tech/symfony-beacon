@@ -90,10 +90,19 @@ test.describe('Admin remaining mutations', () => {
     await expect(page.locator('body')).not.toContainText('Whoops, looks like something went wrong');
 
     // Mailpit HTTP API (host-mapped UI port). Soft-skip if Mailpit is down.
-    const uiPort = process.env.MAILPIT_UI_PORT ?? '18026';
-    const search = await request.get(`http://127.0.0.1:${uiPort}/api/v1/search?query=${encodeURIComponent(marker)}`, {
-      failOnStatusCode: false,
-    });
+    const mailpitBase = (process.env.PLAYWRIGHT_MAILPIT_URL ?? `http://127.0.0.1:${process.env.MAILPIT_UI_PORT ?? '18026'}`).replace(
+      /\/$/,
+      '',
+    );
+    let search;
+    try {
+      search = await request.get(`${mailpitBase}/api/v1/search?query=${encodeURIComponent(marker)}`, {
+        failOnStatusCode: false,
+      });
+    } catch {
+      test.skip(true, 'Mailpit UI API unreachable — run make mailpit');
+      return;
+    }
     if (search.status() >= 500 || search.status() === 0) {
       test.skip(true, 'Mailpit UI API unreachable — run make mailpit');
       return;

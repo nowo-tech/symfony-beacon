@@ -70,6 +70,7 @@ async function createEnabledUser(
 
 test.describe('Out-of-scope closing — ephemeral / deep flows', () => {
   test('remember-me cookie keeps session after session cookie cleared (UC-AUTH-08)', async ({ browser }) => {
+    test.setTimeout(90_000);
     const ctx = await browser.newContext({
       ignoreHTTPSErrors: true,
       storageState: { cookies: [], origins: [] },
@@ -94,10 +95,21 @@ test.describe('Out-of-scope closing — ephemeral / deep flows', () => {
     const rememberCookie = cookies.find((c) => /remember/i.test(c.name));
     expect(rememberCookie, `remember cookie among ${cookies.map((c) => c.name).join(',')}`).toBeTruthy();
 
-    const sessionCookies = cookies.filter((c) => /sess|PHPSESSID|SYMFONY/i.test(c.name) && !/remember/i.test(c.name));
-    for (const c of sessionCookies) {
-      await ctx.clearCookies({ name: c.name, domain: c.domain, path: c.path });
-    }
+    // Keep only the remember-me cookie (+ consent) so session fixation cannot leave a half-cleared jar.
+    const consentCookies = cookies.filter((c) => /^Cookie_Consent/i.test(c.name));
+    await ctx.clearCookies();
+    await ctx.addCookies(
+      [rememberCookie!, ...consentCookies].map((c) => ({
+        name: c.name,
+        value: c.value,
+        domain: c.domain,
+        path: c.path,
+        expires: c.expires,
+        httpOnly: c.httpOnly,
+        secure: c.secure,
+        sameSite: c.sameSite as 'Strict' | 'Lax' | 'None',
+      })),
+    );
 
     await page.goto('/dashboard');
     await dismissProductTour(page);

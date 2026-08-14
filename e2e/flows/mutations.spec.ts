@@ -176,7 +176,7 @@ test.describe('Mutations — project settings', () => {
 
   test('saves governance retention fields', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings/access`);
+    await page.goto(`/projects/${uuid}/settings/general`);
     await dismissProductTour(page);
 
     const retention = page.locator('#project_governance_retention_days');
@@ -184,7 +184,7 @@ test.describe('Mutations — project settings', () => {
     await retention.fill('30');
     await page.locator('form').filter({ has: retention }).locator('button[type="submit"]').click();
     await waitForPageLoader(page);
-    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings(?:/access)?`));
+    await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings(?:/general)?`));
     await expect(page.locator('#project_governance_retention_days')).toHaveValue('30');
   });
 });

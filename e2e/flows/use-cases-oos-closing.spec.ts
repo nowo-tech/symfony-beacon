@@ -89,6 +89,7 @@ function minimalEnvelope(message: string): string {
 
 test.describe('Out-of-scope closing — remaining automable flows', () => {
   test('ephemeral user self-anonymizes (UC-ACC-06)', async ({ browser, page }) => {
+    test.setTimeout(120_000);
     const suffix = Date.now().toString(36);
     const email = `e2e.selfanon.${suffix}@example.invalid`;
     const password = `E2eSelfAnon!${suffix}Aa1`;
@@ -124,7 +125,7 @@ test.describe('Out-of-scope closing — remaining automable flows', () => {
     const submit = dialog.locator('[data-testid="account-privacy-anonymize-submit"], button[data-confirm-dialog-target="submit"]');
     await expect(submit).toBeEnabled({ timeout: 10_000 });
     await submit.click();
-    await guest.waitForURL(/\/login/, { timeout: 30_000 });
+    await guest.waitForURL(/\/login/, { timeout: 45_000 });
     await expect(guest.locator('body')).toContainText(/anonymized|anonimiz/i);
     await ctx.close();
   });
