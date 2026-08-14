@@ -22,39 +22,42 @@ PLAYWRIGHT_ON_HOST=1 make test-e2e
 Filters / overrides:
 
 ```bash
-make test-e2e ARGS='e2e/public.spec.ts'
-make test-e2e ARGS='e2e/mutations.spec.ts'
-make test-e2e ARGS='e2e/use-cases-*.spec.ts'
+make test-e2e ARGS='e2e/smoke/public.spec.ts'
+make test-e2e ARGS='e2e/flows/mutations.spec.ts'
+make test-e2e ARGS='e2e/hooks'
+make test-e2e ARGS='e2e/**/use-cases-*.spec.ts'
 PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 ```
 
-When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `helpers.ts`).
+When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `support/helpers.ts`).
+
+## Layout
+
+Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
+
+| Folder | Contents |
+|--------|----------|
+| `setup/` | `auth.setup.ts` (writes `e2e/.auth/admin.json`) |
+| `support/` | Shared helpers |
+| `smoke/` | Public/auth chrome, cookies, navigation, misc |
+| `account/` | Profile, display prefs, member alerts |
+| `admin/` | Hub, users, kits, settings, analytics admin |
+| `project/` | Dashboard, project settings, share, members |
+| `issues/` | Issue list / triage deep |
+| `ingest/` | Envelope / OTLP / Read API happy paths |
+| `hooks/` | Slack / Teams / inbound |
+| `notifications/` | Destinations, thresholds, health |
+| `flows/` | Cross-cutting mutations and closing suites |
+| `z-late/` | Specs that must run last (Read API IP rate limit) |
 
 ## Product use-case catalog
 
-**All product use cases** (with Covered / Partial / Gap status and suggested next batches) live in:
+**All product use cases** (with Covered / Partial / Gap status) live in:
 
 [`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
 
-Add a `UC-*` row there whenever you introduce a new scenario, then implement it under `e2e/use-cases-*.spec.ts` (or extend an existing group).
+Add a `UC-*` row there whenever you introduce a new scenario, then implement it under the matching domain folder (or extend an existing group).
 
-Spec groups:
+## File map (legacy names)
 
-- `public` / `auth.setup` / `dashboard-project` / `account` / `admin` / `ingest` / `misc`
-- `navigation-ui` — tabs, theme, guest redirects
-- `mutations` — create project/group, triage, share links, governance, assignee, read API
-- `issues-deep` — issue detail, AI export, performance/analytics/releases, env compare
-- `dashboard-panels` — summary cards, assignments/mentions/activity/alerts filters
-- `account-deep` — profile, privacy, security, display prefs, locale switch, tour replay
-- `member-alerts` — account/project Live prefs (master cascade, event scope, project dialog)
-- `admin-rbac` — permissions & roles index/show/tabs
-- `kit-admin-deep` — HTTP log, RoutingKit, menus, breadcrumbs, cookie consent admin
-- `settings-deep` — appearance tabs, ops-defaults tabs, instance config, admin hub cards, legacy redirects
-- `cookie-consent` — guest modal + config endpoints
-- `share-access` — invalid token + create/consume share link
-- `project-settings-deep` — governance/members/DSN/notifications smoke
-- `project-config` — project/admin config export/import
-- **`use-cases-*`** — catalog-driven expansions (auth/errors, OTLP ingest, issue workflow, project tabs, admin ops, hooks, dashboard mentions, **share guest**, **notifications/keys**, **analytics/admin lifecycle**)
-
-Auth storage is written to `e2e/.auth/` (gitignored).
-HTML report: `pnpm run test:e2e:report`
+Older flat names still appear in git history; current paths are under the folders above (e.g. `use-cases-hooks-happy.spec.ts` → `hooks/use-cases-hooks-happy.spec.ts`).

@@ -269,7 +269,7 @@ test-unit-js-coverage: ensure-up
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
 # Override: PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
-# Filter:  make test-e2e ARGS='e2e/public.spec.ts'
+# Filter:  make test-e2e ARGS='e2e/smoke/public.spec.ts'
 # Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
 # CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
 PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
