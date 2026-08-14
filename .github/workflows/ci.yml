@@ -300,6 +300,8 @@ jobs:
 
       - name: Ensure node_modules on host
         run: |
+          # Compose entrypoint may create root-/frankenphp-owned node_modules; reclaim for host pnpm.
+          sudo chown -R "$(id -u):$(id -g)" node_modules vendor public/build 2>/dev/null || true
           if [ ! -d node_modules/@playwright/test ]; then
             pnpm install --frozen-lockfile
           fi
