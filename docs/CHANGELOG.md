@@ -7,9 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-08-14
+
+### Fixed
+
+- **E2E CI + AuthKit login throttle (`097` / 6.47)**: decorate LoginThrottle database limiter so AuthKit `login_form[_username]` is tracked per account (not shared CI/Compose IP); clear `login_attempts` on successful login `reset()`; CI Playwright job `timeout-minutes: 90`, Mailpit profile, host `node_modules` chown before `pnpm`; E2E reliability (governance on `/settings/general`, demo ingest via `loadDemoIngestCredentials()`, Mailpit soft-skip on connection errors, remember-me cookie jar rebuild). Spec: `specs/097-e2e-ci-login-throttle/`.
+- Admin project delete confirmation uses the project name; invalid membership role values flash and redirect instead of a bare 403; Web Push functional tests set VAPID in `phpunit.dist.xml`.
+
+### Added
+
+- Playwright product use-case catalog expansion (`docs/product/E2E-USE-CASES.md` ≈ **247 Covered** / ~5 Out of scope), domain-grouped `e2e/` layout, Mailpit-backed auth specs, and `e2e/flows/use-cases-atomic-gaps.spec.ts`.
+- Local FrankenPHP hot reload (`docs/ops/FRANKENPHP-HOT-RELOAD.md`, Vite entry + Compose worker watch).
+- Broader PHPUnit unit coverage for controllers, services, handlers, and setup seeders.
+
 ### Changed
 
 - Pin `nowo-tech/form-kit-bundle` **2.3.0**; FormKit profile `filter` uses `defaults.label: false` / `defaults.required: false` (no per-type `label: false` list). `AbstractGetFilterType` no longer forces `required` in PHP.
+- Hotwire Native / UX Native remains roadmap **Later** (`008`); product focus stays self-hosted web + kits.
+
+### Notes for integrators
+
+- No new Doctrine migrations in this release.
+- `composer update` picks up FormKit **2.3.0** (review filter form labels if you overrode kit defaults).
+- Login throttle behaviour is stricter/correct for AuthKit nested fields: failed attempts are per username (+ IP), not a shared IP bucket — guest/CI traffic no longer locks unrelated accounts.
+- Operators using Mailpit for local auth mail: `make mailpit` (unchanged); CI E2E now starts the Compose `mail` profile automatically.
 
 ## [1.12.0] - 2026-08-13
 
@@ -1068,7 +1089,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.9.0...v1.10.0

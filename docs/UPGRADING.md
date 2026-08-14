@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.12.0)](#unreleased-main-after-1120)
+- [Unreleased (main after 1.13.0)](#unreleased-main-after-1130)
+- [Upgrading from 1.12.0 to 1.13.0](#upgrading-from-1120-to-1130)
 - [Upgrading from 1.11.0 to 1.12.0](#upgrading-from-1110-to-1120)
 - [Upgrading from 1.10.0 to 1.11.0](#upgrading-from-1100-to-1110)
 - [Upgrading from 1.9.0 to 1.10.0](#upgrading-from-190-to-1100)
@@ -65,9 +66,36 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.12.0)
+## Unreleased (main after 1.13.0)
 
 _No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.12.0 to 1.13.0
+
+**E2E CI + AuthKit login throttle (`097` / 6.47)** — per-username AuthKit login throttle decorator, CI Playwright hardening, FormKit **2.3.0**, expanded E2E catalog. See `[1.13.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.13.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up on a fresh clone
+make migrate            # no new migrations expected for 1.13.0
+php bin/console cache:clear
+make vite-build         # if you serve built assets
+```
+
+### Operator checklist
+
+1. **Composer**: confirm `nowo-tech/form-kit-bundle` **2.3.0** (filter defaults no longer force labels/required in PHP).
+2. **Login throttle**: failed AuthKit logins are counted per username (with IP), not as one shared IP bucket — unrelated guest accounts are no longer locked after five failures elsewhere on the same IP.
+3. **Migrations**: none required for this cut; still run `make migrate` / `app:seed-platform` as usual after pull.
+4. **Local mail / E2E**: optional `make mailpit` for magic login / password reset; CI starts Mailpit via Compose profile `mail`.
+5. **Dev only**: FrankenPHP hot reload — see [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md) (not for production Compose).
+
+### Notes
+
+- No breaking HTTP API or env var renames in this release.
+- Product surface docs: [E2E-USE-CASES.md](product/E2E-USE-CASES.md).
 
 ## Upgrading from 1.11.0 to 1.12.0
 
