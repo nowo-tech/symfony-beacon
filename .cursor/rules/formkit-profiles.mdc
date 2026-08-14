@@ -32,10 +32,10 @@ Twig: `form_row` via `{% include 'form/_fields.html.twig' %}` or `not field.rend
 
 | Concern | Rule |
 |---|---|
-| **label** | Never (`field_types.*.label: false`) — Types MUST NOT pass `label` |
+| **label** | Never (`defaults.label: false`) — Types MUST NOT pass `label` |
 | **placeholder** | Always (`auto_placeholder: true` → `{prefix}.{field}.placeholder` in `form`) |
 | **help** | Always (`auto_help: true` → `{prefix}.{field}.help`), unless the field sets `help: false` |
-| **required** | Always `false`, except **`per_page`** (`required: true`). Default forced in `AbstractGetFilterType::mergeFieldOptions()`; pass explicit `required` to override (FormKit YAML `field_types` cannot set `required`) |
+| **required** | Always `false` (`defaults.required: false`), except **`per_page`** (`required: true` in field options) |
 
 CSRF: GET filters use `csrf_protection: false` (intentional). Optional fields do not change authz — controllers still gate access.
 

@@ -121,12 +121,12 @@ nowo_form_kit:
         # GET / dashboard / index filters — own FormKit profile (not beacon).
         # Wire via AbstractGetFilterType (#[FormKitConfig('filter')]), never beacon alone.
         #
-        # Contract:
-        #   - label: never (field_types.*.label: false)
+        # Contract (FormKit >= 2.3.0):
+        #   - label: never (defaults.label: false)
         #   - placeholder: always (auto_placeholder: true → {prefix}.{field}.placeholder)
         #   - help: always (auto_help: true → {prefix}.{field}.help), unless field sets help: false
-        #   - required: always false except per_page (required: true via field options;
-        #     AbstractGetFilterType::mergeFieldOptions defaults false; FormKit YAML cannot set required)
+        #   - required: always false (defaults.required: false) except per_page
+        #     (required: true via field options)
         # Exceptions: hidden (addHiddenFilterField: placeholder+help false);
         # choice empty-option via addFilterSelect; Twig-owned search → placeholder: false
         # (still gets help unless help: false).
@@ -141,32 +141,16 @@ nowo_form_kit:
                     class: 'input'
                 row_attr:
                     class: ''
+                label: false
+                required: false
             field_types:
-                text:
-                    label: false
-                search:
-                    label: false
-                textarea:
-                    label: false
-                integer:
-                    label: false
-                number:
-                    label: false
-                email:
-                    label: false
-                password:
-                    label: false
-                checkbox:
-                    label: false
                 choice:
-                    label: false
                     # Select empty-option uses ChoiceType "placeholder", not attr.placeholder.
                     # addFilterSelect() restores an empty-option key when the field needs one.
                     placeholder: false
                 submit:
                     help: false
                 hidden:
-                    label: false
                     # Pass placeholder/help: false in field options (addHiddenFilterField) so
                     # FormOptionsMerger unsets them — profile alone leaves attr.placeholder,
                     # and HiddenType rejects bool help if left as false.

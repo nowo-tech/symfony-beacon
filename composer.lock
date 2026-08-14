@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "002e534b4e30a6ec0b69b5d9a3d3e75d",
+    "content-hash": "004eadafff04fef074c7273ed9fe5db9",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2602,16 +2602,16 @@
         },
         {
             "name": "nowo-tech/form-kit-bundle",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/FormKitBundle.git",
-                "reference": "930963dd04e2bdb4936ef9ddc287413ffb4c2b9f"
+                "reference": "acd58aca76811a32387efb3329d396d761814858"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/930963dd04e2bdb4936ef9ddc287413ffb4c2b9f",
-                "reference": "930963dd04e2bdb4936ef9ddc287413ffb4c2b9f",
+                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/acd58aca76811a32387efb3329d396d761814858",
+                "reference": "acd58aca76811a32387efb3329d396d761814858",
                 "shasum": ""
             },
             "require": {
@@ -2637,7 +2637,7 @@
                 "phpunit/phpunit": "^10.0",
                 "rector/rector": "^2.0",
                 "symfony/framework-bundle": "^7.4 || ^8.0",
-                "vincentlanglet/twig-cs-fixer": "^3.0"
+                "vincentlanglet/twig-cs-fixer": "^4.0"
             },
             "suggest": {
                 "a2lix/translation-form-bundle": "For the optional \"translations\" type in FormTypeMap (^3.2 on PHP 8.2/Symfony 7.4, ^4.0 on PHP 8.4+/Symfony 7.4|8)",
@@ -2695,7 +2695,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-04T23:04:44+00:00"
+            "time": "2026-08-14T08:27:38+00:00"
         },
         {
             "name": "nowo-tech/http-log-bundle",

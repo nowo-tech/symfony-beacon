@@ -15,13 +15,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Always uses FormKit profile {@code filter} ({@see config/packages/nowo_form_kit.yaml}),
  * not {@code beacon}:
- * - label: never
+ * - label: never ({@code defaults.label: false})
  * - placeholder: always ({@code auto_placeholder}; catalogue {@code {prefix}.{field}.placeholder})
  * - help: always ({@code auto_help}; catalogue {@code {prefix}.{field}.help}), unless the
  *   field passes {@code help: false} (removed by FormKit merger)
- * - required: always {@code false}, except {@code per_page} ({@code required: true}).
- *   Forced in {@see mergeFieldOptions()} unless the field passes an explicit {@code required};
- *   FormKit YAML {@code field_types} cannot declare {@code required}.
+ * - required: always {@code false} ({@code defaults.required: false}), except {@code per_page}
+ *   ({@code required: true} in field options)
  *
  * Extend this class (do not put {@code #[FormKitConfig('filter')]} on ad-hoc types
  * that extend {@see FormKitAbstractType} alone).
@@ -38,23 +37,6 @@ abstract class AbstractGetFilterType extends FormKitAbstractType
             'method' => 'GET',
             'data_class' => null,
         ]);
-    }
-
-    /**
-     * GET filter fields default to optional. Pass {@code required: true} to override
-     * (e.g. {@code per_page}). FormKit profile YAML cannot set {@code required}.
-     *
-     * @param array<string, mixed> $options
-     *
-     * @return array<string, mixed>
-     */
-    #[Override]
-    protected function mergeFieldOptions(string $fieldName, string $fieldTypeSnake, array $options = []): array
-    {
-        $merged = parent::mergeFieldOptions($fieldName, $fieldTypeSnake, $options);
-        $merged['required'] = \array_key_exists('required', $options) && (bool) $options['required'];
-
-        return $merged;
     }
 
     /**

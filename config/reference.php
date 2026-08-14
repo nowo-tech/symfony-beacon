@@ -1846,13 +1846,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         defaults?: array{
  *             attr?: array<string, scalar|Param|null>,
  *             row_attr?: array<string, scalar|Param|null>,
+ *             help_attr?: array<string, scalar|Param|null>,
+ *             label?: scalar|Param|null, // Default label for every field (e.g. false to suppress). When set, overrides the {form}.{field}.label convention.
+ *             placeholder?: scalar|Param|null, // Default placeholder for every field (e.g. false to suppress). When set, overrides auto_placeholder convention.
+ *             help?: scalar|Param|null, // Default help for every field (e.g. false to suppress). When set, overrides auto_help convention.
+ *             required?: bool|Param, // Default required flag for every field. Overridable via field_types, by_form, or PHP options.
  *         },
  *         field_types?: array<string, array{ // Default: []
  *             attr?: array<string, scalar|Param|null>,
  *             row_attr?: array<string, scalar|Param|null>,
+ *             help_attr?: array<string, scalar|Param|null>,
  *             label?: scalar|Param|null,
  *             placeholder?: scalar|Param|null,
  *             help?: scalar|Param|null,
+ *             required?: bool|Param, // Default required flag for this field type / field. Overridable by later cascade layers or PHP options.
  *             translation_domain?: scalar|Param|null,
  *             constraints?: list<mixed>,
  *         }>,
@@ -1861,13 +1868,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             defaults?: array{
  *                 attr?: array<string, scalar|Param|null>,
  *                 row_attr?: array<string, scalar|Param|null>,
+ *                 help_attr?: array<string, scalar|Param|null>,
+ *                 label?: scalar|Param|null, // Default label for every field (e.g. false to suppress). When set, overrides the {form}.{field}.label convention.
+ *                 placeholder?: scalar|Param|null, // Default placeholder for every field (e.g. false to suppress). When set, overrides auto_placeholder convention.
+ *                 help?: scalar|Param|null, // Default help for every field (e.g. false to suppress). When set, overrides auto_help convention.
+ *                 required?: bool|Param, // Default required flag for every field. Overridable via field_types, by_form, or PHP options.
  *             },
  *             fields?: array<string, array{ // Default: []
  *                 attr?: array<string, scalar|Param|null>,
  *                 row_attr?: array<string, scalar|Param|null>,
+ *                 help_attr?: array<string, scalar|Param|null>,
  *                 label?: scalar|Param|null,
  *                 placeholder?: scalar|Param|null,
  *                 help?: scalar|Param|null,
+ *                 required?: bool|Param, // Default required flag for this field type / field. Overridable by later cascade layers or PHP options.
  *                 translation_domain?: scalar|Param|null,
  *                 constraints?: list<mixed>,
  *             }>,
@@ -1885,13 +1899,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     defaults?: array{
  *         attr?: array<string, scalar|Param|null>,
  *         row_attr?: array<string, scalar|Param|null>,
+ *         help_attr?: array<string, scalar|Param|null>,
+ *         label?: scalar|Param|null, // Default label for every field (e.g. false to suppress). When set, overrides the {form}.{field}.label convention.
+ *         placeholder?: scalar|Param|null, // Default placeholder for every field (e.g. false to suppress). When set, overrides auto_placeholder convention.
+ *         help?: scalar|Param|null, // Default help for every field (e.g. false to suppress). When set, overrides auto_help convention.
+ *         required?: bool|Param, // Default required flag for every field. Overridable via field_types, by_form, or PHP options.
  *     },
  *     field_types?: array<string, array{ // Default: []
  *         attr?: array<string, scalar|Param|null>,
  *         row_attr?: array<string, scalar|Param|null>,
+ *         help_attr?: array<string, scalar|Param|null>,
  *         label?: scalar|Param|null,
  *         placeholder?: scalar|Param|null,
  *         help?: scalar|Param|null,
+ *         required?: bool|Param, // Default required flag for this field type / field. Overridable by later cascade layers or PHP options.
  *         translation_domain?: scalar|Param|null,
  *         constraints?: list<mixed>,
  *     }>,
@@ -1900,13 +1921,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         defaults?: array{
  *             attr?: array<string, scalar|Param|null>,
  *             row_attr?: array<string, scalar|Param|null>,
+ *             help_attr?: array<string, scalar|Param|null>,
+ *             label?: scalar|Param|null, // Default label for every field (e.g. false to suppress). When set, overrides the {form}.{field}.label convention.
+ *             placeholder?: scalar|Param|null, // Default placeholder for every field (e.g. false to suppress). When set, overrides auto_placeholder convention.
+ *             help?: scalar|Param|null, // Default help for every field (e.g. false to suppress). When set, overrides auto_help convention.
+ *             required?: bool|Param, // Default required flag for every field. Overridable via field_types, by_form, or PHP options.
  *         },
  *         fields?: array<string, array{ // Default: []
  *             attr?: array<string, scalar|Param|null>,
  *             row_attr?: array<string, scalar|Param|null>,
+ *             help_attr?: array<string, scalar|Param|null>,
  *             label?: scalar|Param|null,
  *             placeholder?: scalar|Param|null,
  *             help?: scalar|Param|null,
+ *             required?: bool|Param, // Default required flag for this field type / field. Overridable by later cascade layers or PHP options.
  *             translation_domain?: scalar|Param|null,
  *             constraints?: list<mixed>,
  *         }>,
