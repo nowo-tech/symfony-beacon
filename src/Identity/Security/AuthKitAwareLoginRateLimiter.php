@@ -81,12 +81,10 @@ final class AuthKitAwareLoginRateLimiter implements RequestRateLimiterInterface
     private function extractUsername(Request $request): ?string
     {
         $loginForm = $request->request->all('login_form');
-        if (\is_array($loginForm)) {
-            foreach (['_username', 'username', 'email'] as $key) {
-                $value = $loginForm[$key] ?? null;
-                if (\is_string($value) && '' !== $value) {
-                    return $value;
-                }
+        foreach (['_username', 'username', 'email'] as $key) {
+            $value = $loginForm[$key] ?? null;
+            if (\is_string($value) && '' !== $value) {
+                return $value;
             }
         }
 
