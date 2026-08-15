@@ -49,7 +49,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-10 | First-user registration when DB empty | ❌ Out of scope | Destructive / empty DB |
 | UC-AUTH-11 | `/register` redirects to login when users exist | ✅ Covered | `smoke/use-cases-auth.spec.ts` |
 | UC-AUTH-12 | Logout returns to login | ✅ Covered | `project/dashboard-project.spec.ts` |
-| UC-AUTH-13 | Guest locale switch | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-AUTH-13 | Guest locale switch | ✅ Covered | `smoke/navigation-ui.spec.ts`; path locale + visible login copy `account/use-cases-theme-locale-mutations.spec.ts` |
 | UC-AUTH-14 | Social login buttons when providers configured | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (enabled provider → guest Continue; live IdP redirect Out of scope) |
 | UC-AUTH-15 | Password policy / strength / toggle UI | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (login reveal + account security) |
 | UC-AUTH-16 | Protected routes redirect guests to login | ✅ Covered | `smoke/navigation-ui.spec.ts` |
@@ -113,11 +113,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-04 | Privacy GDPR export download | ✅ Covered | `account/account.spec.ts` |
 | UC-ACC-05 | Privacy anonymize panel present | ✅ Covered | `account/account-deep.spec.ts` |
 | UC-ACC-06 | Execute anonymize (self) | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral user; not demo admin) |
-| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-ACC-07 | Display prefs (theme, density, motion, font, contrast, sidebar) | ✅ Covered | `account/use-cases-account-chrome.spec.ts`; preferred-theme save + chrome toggle `admin/use-cases-appearance-mutations.spec.ts`; preferred theme applies on load `account/use-cases-theme-locale-mutations.spec.ts` |
 | UC-ACC-08 | Collapsed panels prefs | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
 | UC-ACC-09 | Product tour replay | ✅ Covered | `account/account-deep.spec.ts` |
-| UC-ACC-10 | Authenticated locale switch | ✅ Covered | `account/account-deep.spec.ts` |
-| UC-ACC-11 | Theme toggle chrome | ✅ Covered | `smoke/navigation-ui.spec.ts` |
+| UC-ACC-10 | Authenticated locale switch | ✅ Covered | `account/account-deep.spec.ts`; es/de/en + UI copy `account/use-cases-theme-locale-mutations.spec.ts` |
+| UC-ACC-11 | Theme toggle chrome | ✅ Covered | `smoke/navigation-ui.spec.ts`; light↔dark + navigation persist `account/use-cases-theme-locale-mutations.spec.ts` |
 | UC-ACC-12 | Content-width toggle | ✅ Covered | `smoke/navigation-ui.spec.ts` |
 | UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | ✅ Covered | `account/member-alerts.spec.ts` |
 | UC-ACC-14 | Web Push subscribe / unsubscribe | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
@@ -330,7 +330,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-12 | Social login provider CRUD forms | ✅ Covered | `admin/use-cases-admin.spec.ts` |
 | UC-ADM-13 | Mailer DSN form + sample email | ✅ Covered | `admin/use-cases-admin.spec.ts` + `admin/use-cases-admin-remaining.spec.ts` (sample control / unavailable) |
 | UC-ADM-14 | Mercure settings form | ✅ Covered | `smoke/navigation-ui.spec.ts` |
-| UC-ADM-15 | Appearance tabs / colors / presets | ✅ Covered | `admin/settings-deep.spec.ts`, `smoke/misc.spec.ts` |
+| UC-ADM-15 | Appearance tabs / colors / presets | ✅ Covered | `admin/settings-deep.spec.ts`, `smoke/misc.spec.ts`; accent color mutate+reset `admin/use-cases-appearance-mutations.spec.ts` |
 | UC-ADM-16 | Ops defaults tabs | ✅ Covered | `admin/settings-deep.spec.ts` |
 | UC-ADM-17 | Instance config export / import | ✅ Covered | `admin/settings-deep.spec.ts` |
 | UC-ADM-18 | Legacy `/settings/*` redirects | ✅ Covered | `admin/settings-deep.spec.ts` |
@@ -346,7 +346,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-28 | Admin delete project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-29 | Admin project members / groups mutate | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (add/role/remove + optional group link) |
 | UC-ADM-30 | Admin projects bulk export / import | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (download JSON + import round-trip) |
-| UC-ADM-31 | Appearance save theme / brand / layout / colors | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-31 | Appearance save theme / brand / layout / colors | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (smoke save); full mutate+restore `admin/use-cases-appearance-mutations.spec.ts` (theme preset, brand, layout, colors) |
 | UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-33 | Mailer send-test delivers (Mailpit) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` (Mailpit soft-skip if down) |
 | UC-ADM-34 | Mercure settings save | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
@@ -368,7 +368,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | ✅ Covered | Marker hygiene (`smoke/use-cases-auth.spec.ts`); full cold wizard remains Out of scope — never leave `setup.required` |
 | UC-SETUP-02 | Platform catalog redirect when incomplete | ❌ Out of scope | Needs incomplete catalog fixture |
 | UC-SETUP-03 | Seed layers / demo project | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (demo project on dashboard after `make seed`); Makefile seed itself remains ops |
-| UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; never POST advance on warm DB) |
+| UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; durable_done may 302 `/setup/api/*` to home on warm installs — accepted) |
 | UC-SETUP-05 | Setup done page | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
 | UC-SETUP-06 | Incomplete-setup banner on dashboard (admin) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (instance-config import toggles `setup_completed`) |
 
@@ -387,7 +387,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-14):** ~247 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (252 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs.
+**Automation status (2026-08-15):** ~247 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (252 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
 
 **Closed Gap batches:**
 

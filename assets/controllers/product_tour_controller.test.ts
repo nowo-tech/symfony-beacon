@@ -141,4 +141,56 @@ describe('product-tour controller', () => {
     await Promise.resolve();
     expect(driverFactory).not.toHaveBeenCalled();
   });
+
+  it('covers disconnect, side/align defaults, highlight skip, and persist retry', async () => {
+    await Promise.resolve();
+    const config = driverFactory.mock.calls[0][0] as {
+      steps: Array<{ popover: { side?: string; align?: string } }>;
+      onHighlightStarted: (el?: Element) => void;
+      onDestroyed: () => void;
+    };
+    expect(config.steps[0].popover.side).toBe('top');
+    expect(config.steps[0].popover.align).toBe('center');
+    expect(config.steps[1].popover.side).toBe('bottom');
+    expect(config.steps[1].popover.align).toBe('start');
+
+    config.onHighlightStarted(document.createElement('div'));
+    expect((document.querySelector('details') as HTMLDetailsElement).open).toBe(false);
+
+    fetchMock.mockRejectedValueOnce(new Error('network'));
+    const root = document.querySelector('[data-controller="product-tour"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      root,
+      'product-tour',
+    ) as ProductTourController;
+    destroyMock.mockClear();
+    controller.disconnect();
+    expect(destroyMock).toHaveBeenCalled();
+
+    // Restart a tour instance to exercise persistSeen retry after a failed mark.
+    application.stop();
+    fetchMock.mockRejectedValueOnce(new Error('network'));
+    document.body.innerHTML = `
+      <div data-tour="user-menu"><details><summary>User</summary></details></div>
+      <a data-tour="admin-link" href="/admin">Admin</a>
+      <div
+        data-controller="product-tour"
+        data-product-tour-auto-start-value="true"
+        data-product-tour-force-value="true"
+        data-product-tour-page-value="dashboard"
+        data-product-tour-mark-url-value="/mark"
+        data-product-tour-mark-token-value="tok"
+        data-product-tour-steps-value='[{"popover":{"title":"Welcome","description":"Hi"}}]'
+        data-product-tour-labels-value="{}"
+      ></div>
+    `;
+    window.history.replaceState({}, '', '/dashboard?tour=1');
+    application = Application.start();
+    application.register('product-tour', ProductTourController);
+    await Promise.resolve();
+    const cfg2 = driverFactory.mock.calls.at(-1)?.[0] as { onDestroyed: () => void };
+    cfg2.onDestroyed();
+    await Promise.resolve();
+    await Promise.resolve();
+  });
 });

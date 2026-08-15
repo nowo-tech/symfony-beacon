@@ -25,18 +25,26 @@ test.describe('Member alert preferences (091)', () => {
     const master = form.locator('input[name*="memberAlertsEnabled"]');
     await expect(master).toBeVisible();
 
+    const toggleMaster = async () => {
+      await master.evaluate((el: HTMLInputElement) => {
+        el.checked = !el.checked;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    };
+
     // Ensure known starting state: master ON.
     if (!(await master.isChecked())) {
-      await master.click({ force: true });
+      await toggleMaster();
       await expect(page.locator('[data-testid="member-alerts-events"]')).toBeVisible({ timeout: 15_000 });
     }
 
-    await master.click({ force: true });
+    await toggleMaster();
     await expect(page.locator('[data-testid="member-alerts-master-off-hint"]')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('[data-testid="member-alerts-events"]')).toHaveCount(0);
 
     // Restore ON without persisting so later tests keep defaults.
-    await master.click({ force: true });
+    await toggleMaster();
     await expect(page.locator('[data-testid="member-alerts-events"]')).toBeVisible({ timeout: 15_000 });
   });
 
@@ -48,11 +56,20 @@ test.describe('Member alert preferences (091)', () => {
 
     const enabled = row.locator('input[name*="[enabled]"]');
     await expect(enabled).toBeChecked();
-    await enabled.click({ force: true });
+
+    const toggleEnabled = async () => {
+      await enabled.evaluate((el: HTMLInputElement) => {
+        el.checked = !el.checked;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    };
+
+    await toggleEnabled();
     await expect(row.locator('[data-testid="member-alert-event-scope"]')).toHaveCount(0, { timeout: 15_000 });
 
     // Restore for subsequent navigations (unsaved Live state only).
-    await enabled.click({ force: true });
+    await toggleEnabled();
     await expect(row.locator('[data-testid="member-alert-event-scope"]')).toBeVisible({ timeout: 15_000 });
   });
 

@@ -59,4 +59,15 @@ describe('tabs controller', () => {
     expect(tabB.dataset.state).toBe('active');
     expect(tabB.hidden).toBe(false);
   });
+
+  it('open ignores events without currentTarget', async () => {
+    await Promise.resolve();
+    const root = document.querySelector('[data-controller="tabs"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(root, 'tabs') as TabsController & {
+      activeTabValue: string;
+    };
+    const before = controller.activeTabValue;
+    controller.open({ currentTarget: null } as unknown as Event);
+    expect(controller.activeTabValue).toBe(before);
+  });
 });

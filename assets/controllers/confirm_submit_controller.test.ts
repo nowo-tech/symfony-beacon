@@ -66,4 +66,24 @@ describe('confirm-submit controller', () => {
     controller.confirm(event);
     expect(event.defaultPrevented).toBe(true);
   });
+
+  it('allows submit when message is empty without prompting', async () => {
+    await Promise.resolve();
+    const form = document.querySelector('form') as HTMLFormElement;
+    form.setAttribute('data-confirm-submit-message-value', '   ');
+    application.stop();
+    application = Application.start();
+    application.register('confirm-submit', ConfirmSubmitController);
+    await Promise.resolve();
+
+    const confirm = vi.spyOn(window, 'confirm');
+    const controller = application.getControllerForElementAndIdentifier(
+      form,
+      'confirm-submit',
+    ) as ConfirmSubmitController;
+    const event = new Event('submit', { cancelable: true });
+    controller.confirm(event);
+    expect(confirm).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
 });

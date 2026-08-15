@@ -49,4 +49,36 @@ describe('csrf-protection helpers', () => {
       true,
     );
   });
+
+  it('wires submit listener and guards missing crypto / missing fields', () => {
+    document.body.innerHTML = `
+      <form id="f">
+        <input name="_csrf_token" value="csrf_token_name_ok" data-controller="csrf-protection" />
+      </form>
+      <div id="not-form"></div>
+    `;
+    const form = document.getElementById('f') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit', { bubbles: true }));
+    expect((form.querySelector('input') as HTMLInputElement).value.length).toBeGreaterThan(10);
+
+    document.getElementById('not-form')?.dispatchEvent(new Event('submit', { bubbles: true }));
+
+    removeCsrfToken(document.createElement('form'));
+
+    const cryptoDesc = Object.getOwnPropertyDescriptor(window, 'crypto');
+    Object.defineProperty(window, 'crypto', { configurable: true, value: undefined });
+    // @ts-expect-error coverage path
+    window.msCrypto = undefined;
+    document.body.innerHTML = `
+      <form>
+        <input name="_csrf_token" value="csrf_token_name_ok" data-controller="csrf-protection" />
+      </form>
+    `;
+    expect(() => generateCsrfToken(document.querySelector('form') as HTMLFormElement)).toThrow(
+      /Secure random generator/,
+    );
+    if (cryptoDesc) {
+      Object.defineProperty(window, 'crypto', cryptoDesc);
+    }
+  });
 });

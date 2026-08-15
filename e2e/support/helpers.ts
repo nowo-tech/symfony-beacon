@@ -106,19 +106,29 @@ export function requireSampleOrSkip(ready: boolean, reason: string): void {
   test.skip(true, reason);
 }
 
-/** Navigate with retries for transient WSL/Docker net::ERR_NETWORK_CHANGED. */
-export async function gotoStable(page: Page, path: string, attempts = 3): Promise<void> {
+/** Navigate with retries for transient WSL/Docker net::ERR_NETWORK_CHANGED / chrome-error. */
+export async function gotoStable(page: Page, path: string, attempts = 5): Promise<void> {
+  let lastError: unknown;
   for (let attempt = 0; attempt < attempts; attempt++) {
     try {
-      await page.goto(path);
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      const url = page.url();
+      if (url.startsWith('chrome-error://') || url.startsWith('chrome-error:')) {
+        throw new Error(`Navigation landed on chrome-error for ${path}`);
+      }
       return;
     } catch (err) {
-      if (attempt === attempts - 1 || !/ERR_NETWORK_CHANGED|net::ERR_/i.test(String(err))) {
+      lastError = err;
+      const msg = String(err);
+      const retryable =
+        /ERR_NETWORK_CHANGED|net::ERR_|chrome-error|Navigation landed on chrome-error|Timeout/i.test(msg);
+      if (attempt === attempts - 1 || !retryable) {
         throw err;
       }
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(400 * (attempt + 1));
     }
   }
+  throw lastError;
 }
 
 /** Wait for the Beacon page-loader overlay to release pointer events. */
@@ -188,7 +198,7 @@ export async function dismissProductTour(page: Page): Promise<void> {
 }
 
 export async function loginAsDemo(page: Page, email = DEMO_EMAIL, password = DEMO_PASSWORD): Promise<void> {
-  await page.goto('/login');
+  await gotoStable(page, '/login');
   await dismissCookieConsent(page);
 
   await page.locator('input[name="login_form[_username]"]').fill(email);
@@ -202,17 +212,7 @@ export async function loginAsDemo(page: Page, email = DEMO_EMAIL, password = DEM
 /** Resolve demo project UUID from dashboard project cards. */
 export async function resolveDemoProjectUuid(page: Page): Promise<string> {
   if (!page.url().includes('/dashboard') || page.url().includes('/login')) {
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        await page.goto('/dashboard');
-        break;
-      } catch (err) {
-        if (attempt === 2 || !/ERR_NETWORK_CHANGED|net::ERR_/i.test(String(err))) {
-          throw err;
-        }
-        await page.waitForTimeout(500);
-      }
-    }
+    await gotoStable(page, '/dashboard');
   }
   await dismissProductTour(page);
 
@@ -260,13 +260,15 @@ export async function logout(page: Page): Promise<void> {
   await menu.locator('summary').click();
   const logoutLink = menu.locator('a[href*="/logout"]');
   await expect(logoutLink).toBeVisible();
-  await logoutLink.click();
-  await page.waitForURL(/\/login(\?|$|\/)/, { timeout: 20_000 });
+  await Promise.all([
+    page.waitForURL(/\/login(\?|$|\/)/, { timeout: 30_000 }),
+    logoutLink.click(),
+  ]);
 }
 
 /** Open the first issue detail for a project; returns issue UUID or null. */
 export async function openFirstIssue(page: Page, projectUuid: string): Promise<string | null> {
-  await page.goto(`/projects/${projectUuid}/issues`);
+  await gotoStable(page, `/projects/${projectUuid}/issues`);
   await dismissProductTour(page);
   const issueLink = page.locator(`a[href*="/projects/${projectUuid}/issues/"]`).first();
   if ((await issueLink.count()) === 0) {
@@ -274,8 +276,10 @@ export async function openFirstIssue(page: Page, projectUuid: string): Promise<s
   }
   const href = await issueLink.getAttribute('href');
   const match = href?.match(/\/issues\/([0-9a-f-]{36})/i);
-  await issueLink.click();
-  await page.waitForURL(new RegExp(`/projects/${projectUuid}/issues/[0-9a-f-]{36}`, 'i'));
+  await Promise.all([
+    page.waitForURL(new RegExp(`/projects/${projectUuid}/issues/[0-9a-f-]{36}`, 'i'), { timeout: 30_000 }),
+    issueLink.click(),
+  ]);
   await dismissProductTour(page);
   return match?.[1] ?? null;
 }

@@ -62,4 +62,20 @@ describe('password-toggle controller', () => {
     expect(input.type).toBe('text');
     expect(button.classList.contains('is-password-visible')).toBe(true);
   });
+
+  it('ignores unrelated keys and missing password input', async () => {
+    await Promise.resolve();
+    const button = document.getElementById('toggle') as HTMLButtonElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      button,
+      'password-toggle',
+    ) as PasswordToggleController;
+
+    controller.keydown(new KeyboardEvent('keydown', { key: 'Tab' }));
+    expect((document.getElementById('pwd') as HTMLInputElement).type).toBe('password');
+
+    document.getElementById('pwd')?.remove();
+    controller.toggle();
+    expect(button.classList.contains('is-password-visible')).toBe(false);
+  });
 });

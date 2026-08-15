@@ -107,4 +107,29 @@ describe('qr-login controller', () => {
     expect(document.querySelector('[data-qr-login-target="status"]')?.textContent).toBe('Expired');
     expect(document.querySelector('[data-qr-login-target="countdown"]')?.textContent).toBe('0:00');
   });
+
+  it('treats consumed like approved and stops polling on disconnect', async () => {
+    const assign = vi.fn();
+    vi.stubGlobal('location', { ...window.location, assign });
+    await mount(
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 'consumed', expires_in: 30 }),
+      }),
+    );
+    expect(document.querySelector('[data-qr-login-target="status"]')?.textContent).toBe('Approved');
+    expect(assign).toHaveBeenCalledWith('/complete');
+
+    application.stop();
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ status: 'pending' }),
+    });
+    await mount(fetchImpl);
+    application.stop();
+    await new Promise((r) => setTimeout(r, 100));
+    const callsAfterStop = fetchImpl.mock.calls.length;
+    await new Promise((r) => setTimeout(r, 80));
+    expect(fetchImpl.mock.calls.length).toBe(callsAfterStop);
+  });
 });

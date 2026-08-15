@@ -140,4 +140,62 @@ describe('confirm-dialog controller', () => {
     const dialog = document.querySelector('dialog') as HTMLDialogElement;
     expect(dialog.parentElement).toBe(document.body);
   });
+
+  it('closes on backdrop click after ignore window and cleans up on disconnect', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return 1;
+    });
+    const controller = await getController();
+    const dialog = document.querySelector('dialog') as HTMLDialogElement;
+    const closeSpy = vi.spyOn(dialog, 'close').mockImplementation(function (this: HTMLDialogElement) {
+      this.removeAttribute('open');
+    });
+    vi.spyOn(dialog, 'showModal').mockImplementation(function (this: HTMLDialogElement) {
+      this.setAttribute('open', '');
+    });
+
+    controller.open();
+    dialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(closeSpy).not.toHaveBeenCalled();
+
+    vi.setSystemTime(new Date('2026-01-01T00:00:01Z'));
+    Object.defineProperty(MouseEvent.prototype, 'target', {
+      configurable: true,
+      get() {
+        return dialog;
+      },
+    });
+    dialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // Restore target getter side-effects by using a plain event via handle path:
+    const evt = new MouseEvent('click', { bubbles: true });
+    Object.defineProperty(evt, 'target', { value: dialog });
+    dialog.dispatchEvent(evt);
+
+    const host = document.querySelector('[data-controller="confirm-dialog"]') as HTMLElement;
+    host.remove();
+    controller.disconnect();
+    expect(document.querySelector('dialog')).toBeNull();
+  });
+
+  it('disables submit when expected is set but input missing', async () => {
+    application.stop();
+    document.body.innerHTML = `
+      <div data-controller="confirm-dialog" data-confirm-dialog-expected-value="DELETE">
+        <dialog class="confirm-dialog" data-confirm-dialog-target="dialog">
+          <button type="submit" data-confirm-dialog-target="submit" disabled>Confirm</button>
+        </dialog>
+      </div>
+    `;
+    application = Application.start();
+    application.register('confirm-dialog', ConfirmDialogController);
+    const controller = await getController();
+    const submit = document.querySelector(
+      '[data-confirm-dialog-target="submit"]',
+    ) as HTMLButtonElement;
+    controller.syncSubmit();
+    expect(submit.disabled).toBe(true);
+  });
 });

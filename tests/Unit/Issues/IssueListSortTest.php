@@ -38,4 +38,15 @@ final class IssueListSortTest extends TestCase
         self::assertSame('events', $next->field);
         self::assertSame('desc', $next->direction);
     }
+
+    public function testSqlAndOccurrenceSortableFlags(): void
+    {
+        $title = new IssueListSort('title', 'asc');
+        self::assertTrue($title->isSqlSortable());
+        self::assertFalse($title->isOccurrenceSortable());
+
+        $window = new IssueListSort('events_7d', 'desc');
+        self::assertTrue($window->isSqlSortable());
+        self::assertTrue($window->isOccurrenceSortable());
+    }
 }

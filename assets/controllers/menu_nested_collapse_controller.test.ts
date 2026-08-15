@@ -55,4 +55,75 @@ describe('menu-nested-collapse controller', () => {
     const saved = JSON.parse(localStorage.getItem('beacon.navCollapse') ?? '{}');
     expect(saved.dashboard.submenu).toBe(false);
   });
+
+  it('covers guard paths, invalid storage, and branch-current restore', async () => {
+    await Promise.resolve();
+    const root = document.querySelector('nav') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      root,
+      'menu-nested-collapse',
+    ) as MenuNestedCollapseController;
+
+    controller.toggle({
+      target: document.createElement('span'),
+      preventDefault: () => undefined,
+    } as unknown as Event);
+
+    const button = root.querySelector('button') as HTMLButtonElement;
+    button.removeAttribute('data-bs-target');
+    button.removeAttribute('aria-controls');
+    controller.toggle({
+      target: button,
+      preventDefault: () => undefined,
+    } as unknown as Event);
+
+    button.setAttribute('data-bs-target', '#missing');
+    controller.toggle({
+      target: button,
+      preventDefault: () => undefined,
+    } as unknown as Event);
+
+    application.stop();
+    localStorage.setItem('beacon.navCollapse', '[]');
+    document.body.innerHTML = `
+      <nav data-controller="menu-nested-collapse" data-menu-nested-collapse-menu-code-value="dashboard">
+        <li class="is-branch-current">
+          <button type="button" class="menu-nested-toggle" data-bs-target="#submenu2" aria-controls="submenu2">T</button>
+          <div class="collapse"></div>
+        </li>
+      </nav>
+    `;
+    application = Application.start();
+    application.register('menu-nested-collapse', MenuNestedCollapseController);
+    await Promise.resolve();
+    expect(document.querySelector('.collapse')?.classList.contains('show')).toBe(true);
+
+    localStorage.setItem('beacon.navCollapse', '{bad');
+    application.stop();
+    document.body.innerHTML = `
+      <nav data-controller="menu-nested-collapse">
+        <li>
+          <button type="button" class="menu-nested-toggle" data-bs-target="#p" aria-controls="p">T</button>
+          <div id="p" class="collapse show"></div>
+        </li>
+      </nav>
+    `;
+    application = Application.start();
+    application.register('menu-nested-collapse', MenuNestedCollapseController);
+    await Promise.resolve();
+
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    const nav = document.querySelector('nav') as HTMLElement;
+    const c2 = application.getControllerForElementAndIdentifier(
+      nav,
+      'menu-nested-collapse',
+    ) as MenuNestedCollapseController;
+    c2.toggle({
+      target: nav.querySelector('button'),
+      preventDefault: () => undefined,
+    } as unknown as Event);
+    setItem.mockRestore();
+  });
 });

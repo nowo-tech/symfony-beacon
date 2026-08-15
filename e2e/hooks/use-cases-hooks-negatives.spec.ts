@@ -136,7 +136,29 @@ async function ensureAnonymousResolveOff(page: import('@playwright/test').Page):
     await anon.uncheck();
     await page.locator('form').filter({ has: anon }).locator('button[type="submit"]').click();
     await waitForPageLoader(page);
+    await page.goto('/admin/ops-defaults/notifications');
+    await dismissProductTour(page);
+    await expect(anon).not.toBeChecked();
   }
+}
+
+async function ensureAnonymousResolveOn(page: import('@playwright/test').Page): Promise<void> {
+  await page.goto('/admin/ops-defaults/notifications');
+  await dismissProductTour(page);
+  const anon = page.locator('input[name="instance_ops_defaults[allowAnonymousResolve]"]');
+  const confirm = page.locator('input[name="instance_ops_defaults[confirmAllowAnonymousResolve]"]');
+  await expect(anon).toBeVisible({ timeout: 15_000 });
+  if (await anon.isChecked()) {
+    return;
+  }
+  await anon.check();
+  // Confirmation is required when enabling; field may be visually collapsed — always fill.
+  await confirm.fill('ALLOW_ANONYMOUS_RESOLVE');
+  await page.locator('form').filter({ has: anon }).locator('button[type="submit"]').click();
+  await waitForPageLoader(page);
+  await page.goto('/admin/ops-defaults/notifications');
+  await dismissProductTour(page);
+  await expect(anon).toBeChecked({ timeout: 15_000 });
 }
 
 async function setSlackUserId(page: import('@playwright/test').Page, slackUserId: string): Promise<void> {
@@ -238,15 +260,7 @@ test.describe('Hooks — negative paths', () => {
       await dismissProductTour(page);
       const anon = page.locator('input[name="instance_ops_defaults[allowAnonymousResolve]"]');
       anonymousWasOn = await anon.isChecked();
-      if (!anonymousWasOn) {
-        await anon.check();
-        const confirm = page.locator('input[name="instance_ops_defaults[confirmAllowAnonymousResolve]"]');
-        if (await confirm.isVisible().catch(() => false)) {
-          await confirm.fill('ALLOW_ANONYMOUS_RESOLVE');
-        }
-        await page.locator('form').filter({ has: anon }).locator('button[type="submit"]').click();
-        await waitForPageLoader(page);
-      }
+      await ensureAnonymousResolveOn(page);
 
       const token = teamsActionToken('resolve', TEAMS_SECRET, destUuid, uuid, issueUuid);
       const first = await request.post('/hooks/teams/actions', {

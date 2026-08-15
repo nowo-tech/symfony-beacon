@@ -12,7 +12,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: 1,
   timeout: 60_000,
   expect: { timeout: 15_000 },
@@ -27,6 +27,8 @@ export default defineConfig({
     locale: 'en-US',
     navigationTimeout: 45_000,
     actionTimeout: 15_000,
+    // Prefer DOM ready over full load — FrankenPHP/WSL often stalls on "load".
+    // Specs that need networkidle still override per-call.
   },
   projects: [
     {

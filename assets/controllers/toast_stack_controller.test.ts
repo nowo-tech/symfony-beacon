@@ -82,4 +82,23 @@ describe('toast-stack controller', () => {
     vi.advanceTimersByTime(5000);
     expect(document.querySelector('[data-toast-stack-target="toast"]')).toBeTruthy();
   });
+
+  it('ignores duplicate leave and second done callback', async () => {
+    await Promise.resolve();
+    const toast = document.querySelector('[data-toast-stack-target="toast"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="toast-stack"]') as HTMLElement,
+      'toast-stack',
+    ) as ToastStackController;
+    const event = new Event('click');
+    Object.defineProperty(event, 'currentTarget', {
+      value: toast.querySelector('button'),
+    });
+    controller.dismiss(event);
+    expect(toast.classList.contains('is-leaving')).toBe(true);
+    controller.dismiss(event);
+    toast.dispatchEvent(new Event('animationend'));
+    vi.advanceTimersByTime(400);
+    expect(document.querySelector('[data-toast-stack-target="toast"]')).toBeNull();
+  });
 });

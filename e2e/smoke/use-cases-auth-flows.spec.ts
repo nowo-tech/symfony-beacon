@@ -4,6 +4,7 @@ import {
   DEMO_PASSWORD,
   dismissCookieConsent,
   dismissProductTour,
+  gotoStable,
   loginAsDemo,
   waitForPageLoader,
 } from '../support/helpers';
@@ -14,7 +15,7 @@ import {
  * `use-cases-auth-qr-dual.spec.ts`; demo admin has seeded `phoneVerifiedAt`).
  */
 async function ensureDeliverableMailer(page: import('@playwright/test').Page): Promise<void> {
-  await page.goto('/admin/mailer');
+  await gotoStable(page, '/admin/mailer');
   await waitForPageLoader(page);
   const form = page.locator('form').filter({ has: page.locator('input[name*="[plainMailerDsn]"]') });
   await expect(form).toBeVisible({ timeout: 15_000 });

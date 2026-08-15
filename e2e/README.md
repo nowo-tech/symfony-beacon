@@ -41,7 +41,7 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 | `support/` | Shared helpers |
 | `smoke/` | Public/auth chrome, cookies, navigation, misc |
 | `account/` | Profile, display prefs, member alerts |
-| `admin/` | Hub, users, kits, settings, analytics admin |
+| `admin/` | Hub, users, kits, settings, appearance mutations, analytics admin |
 | `project/` | Dashboard, project settings, share, members |
 | `issues/` | Issue list / triage deep |
 | `ingest/` | Envelope / OTLP / Read API happy paths |
@@ -58,9 +58,11 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 
 That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~247 Covered / ~0 Gap (~5 Out of scope). Extend specs under the matching domain folder when product surface grows.
 
-Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install.
+Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install. On warm installs with SiteBackup `durable_done`, `/setup/api/*` may 302 to home (accepted).
 
 Atomic gaps batch (`UC-AUTH-25/26`, `UC-ACC-24/25`, `UC-DASH-15`, `UC-OPS-12/13`, `UC-SETUP-06`, `UC-ADM-38..42`, `UC-PROJ-27`): `e2e/flows/use-cases-atomic-gaps.spec.ts`.
+
+Local stability: Playwright `retries: 1` (non-CI) and `gotoStable()` (retries `ERR_NETWORK_CHANGED` / `chrome-error`, `domcontentloaded`).
 
 Digest flush (`UC-NOTIF-17`): `make test-e2e` runs `app:notifications:flush-digests --force` and writes `var/e2e/flush-digests.last` for `notifications/use-cases-digest-flush.spec.ts`.
 

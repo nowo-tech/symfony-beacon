@@ -95,4 +95,41 @@ describe('datatable controller', () => {
     await Promise.resolve();
     expect(dtCalls).toHaveLength(0);
   });
+
+  it('cancels pending mount frame on early disconnect and skips without table', async () => {
+    application.stop();
+    dtCalls.length = 0;
+    let scheduled: FrameRequestCallback | null = null;
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      scheduled = cb;
+      return 42;
+    });
+    const cancel = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancel);
+    document.body.innerHTML = `<div data-controller="datatable"></div>`;
+    application = Application.start();
+    application.register('datatable', DatatableController);
+    await Promise.resolve();
+    const el = document.querySelector('[data-controller="datatable"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      el,
+      'datatable',
+    ) as DatatableController;
+    controller.disconnect();
+    expect(cancel).toHaveBeenCalledWith(42);
+    expect(dtCalls).toHaveLength(0);
+
+    // Mount without table target via connect + rAF when scheduled later
+    application.stop();
+    scheduled = null;
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return 1;
+    });
+    document.body.innerHTML = `<div data-controller="datatable"></div>`;
+    application = Application.start();
+    application.register('datatable', DatatableController);
+    await Promise.resolve();
+    expect(dtCalls).toHaveLength(0);
+  });
 });

@@ -20,4 +20,15 @@ final class AppearanceBorderStylesTest extends TestCase
         self::assertSame('1.5px', $strong['width']);
         self::assertSame('1px', $subtle['width']);
     }
+
+    public function testDefaultTokensAndValidation(): void
+    {
+        $default = AppearanceBorderStyles::tokens('unknown');
+        self::assertSame(14, $default['sandMixLight']);
+        self::assertSame(16, $default['sandMixDark']);
+        self::assertSame('1px', $default['width']);
+
+        self::assertTrue(AppearanceBorderStyles::isValid(SiteAppearance::BORDER_SUBTLE));
+        self::assertFalse(AppearanceBorderStyles::isValid('nope'));
+    }
 }

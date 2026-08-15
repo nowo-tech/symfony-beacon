@@ -87,4 +87,94 @@ describe('page-loader controller', () => {
     window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
     expect(overlay.hidden).toBe(true);
   });
+
+  it('covers click guards, load listener, safety hide, and uikit overlay fallback', async () => {
+    await Promise.resolve();
+    vi.advanceTimersByTime(200);
+
+    const overlay = document.querySelector('[data-page-loader-target="overlay"]') as HTMLElement;
+    overlay.hidden = true;
+
+    document.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, button: 1 }),
+    );
+    const prevented = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+    prevented.preventDefault();
+    document.dispatchEvent(prevented);
+    document.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, metaKey: true }),
+    );
+
+    application.stop();
+    Object.defineProperty(document, 'readyState', {
+      configurable: true,
+      get: () => 'loading',
+    });
+    document.body.innerHTML = `
+      <div
+        data-controller="page-loader"
+        data-page-loader-min-visible-value="50"
+        data-page-loader-link-delay-value="5"
+        data-nowo-ui-page-loader
+        class="is-active"
+        hidden
+      ></div>
+      <a href="/same#section">Same path hash</a>
+      <a href="/go" target="_blank">Blank</a>
+      <a href="/file" download>Download</a>
+      <a href="javascript:void(0)">Js</a>
+    `;
+    application = Application.start();
+    application.register('page-loader', PageLoaderController);
+    await Promise.resolve();
+
+    window.dispatchEvent(new Event('load'));
+    vi.advanceTimersByTime(100);
+
+    for (const sel of ['a[href="/same#section"]', 'a[target="_blank"]', 'a[download]', 'a[href^="javascript"]']) {
+      document.querySelector(sel)?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
+      );
+    }
+    vi.advanceTimersByTime(20);
+
+    const go = document.createElement('a');
+    go.href = '/navigate-away';
+    document.body.appendChild(go);
+    go.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+    vi.advanceTimersByTime(10);
+    expect(document.documentElement.classList.contains('is-page-loading')).toBe(true);
+    vi.advanceTimersByTime(8000);
+  });
+
+  it('resolves external uikit overlay and clears timers on disconnect during navigation', async () => {
+    application.stop();
+    document.body.innerHTML = `
+      <div data-controller="page-loader" data-page-loader-link-delay-value="0" data-page-loader-min-visible-value="10"></div>
+      <div data-nowo-ui-page-loader class="is-active" hidden></div>
+      <a href="/elsewhere">Go</a>
+    `;
+    Object.defineProperty(document, 'readyState', {
+      configurable: true,
+      get: () => 'complete',
+    });
+    application = Application.start();
+    application.register('page-loader', PageLoaderController);
+    await Promise.resolve();
+
+    const uikit = document.querySelector('[data-nowo-ui-page-loader]') as HTMLElement;
+    expect(uikit.hidden).toBe(false);
+
+    document.querySelector('a')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
+    );
+    vi.advanceTimersByTime(1);
+
+    const root = document.querySelector('[data-controller="page-loader"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      root,
+      'page-loader',
+    ) as PageLoaderController;
+    expect(() => controller.disconnect()).not.toThrow();
+  });
 });

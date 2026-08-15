@@ -108,4 +108,77 @@ describe('thinking-orb controller', () => {
     expect(canvas.getAttribute('aria-label')).toBe('Working');
     expect(canvas.style.width).toBe('64px');
   });
+
+  it('runs animated loop with IntersectionObserver and visibility changes', async () => {
+    const { watchThemeAndMotion } = await import('../lib/thinking-orbs');
+    vi.mocked(watchThemeAndMotion).mockImplementation((_t, _el, cb) => {
+      cb(false, false);
+      return vi.fn();
+    });
+
+    type IoCb = (entries: Array<{ isIntersecting: boolean }>) => void;
+    let ioCallback: IoCb | null = null;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: IoCb) {
+          ioCallback = cb;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    let rafCalls = 0;
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      rafCalls += 1;
+      if (rafCalls <= 6) {
+        queueMicrotask(() => cb(rafCalls));
+      }
+      return rafCalls;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+
+    const ctx = {
+      setTransform: vi.fn(),
+      clearRect: vi.fn(),
+    };
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ctx as unknown as CanvasRenderingContext2D);
+
+    application.stop();
+    document.body.innerHTML = `
+      <div
+        data-controller="thinking-orb"
+        data-thinking-orb-state-value="working"
+        data-thinking-orb-rotate-states-value="false"
+        data-thinking-orb-paused-value="false"
+      ></div>
+    `;
+    application = Application.start();
+    application.register('thinking-orb', ThinkingOrbController);
+    await Promise.resolve();
+
+    expect(observe).toHaveBeenCalled();
+    ioCallback?.([{ isIntersecting: true }]);
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => 'hidden',
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => 'visible',
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+    ioCallback?.([{ isIntersecting: false }]);
+
+    const root = document.querySelector('[data-controller="thinking-orb"]') as HTMLElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      root,
+      'thinking-orb',
+    ) as ThinkingOrbController;
+    controller.disconnect();
+    expect(disconnect).toHaveBeenCalled();
+  });
 });

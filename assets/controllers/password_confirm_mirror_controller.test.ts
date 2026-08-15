@@ -40,4 +40,28 @@ describe('password-confirm-mirror controller', () => {
     ) as HTMLInputElement;
     expect(confirm.value).toBe('GeneratedPass1!');
   });
+
+  it('ignores non-element clicks, cancel button, and cleans up on disconnect', async () => {
+    await Promise.resolve();
+    const root = document.querySelector('form') as HTMLFormElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      root,
+      'password-confirm-mirror',
+    ) as PasswordConfirmMirrorController;
+    const confirm = document.querySelector(
+      'input[name="user_preferences[plainPassword_confirm]"]',
+    ) as HTMLInputElement;
+
+    document.dispatchEvent(new Event('click'));
+    expect(confirm.value).toBe('');
+
+    const cancel = document.querySelectorAll('button')[0] as HTMLButtonElement;
+    cancel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(confirm.value).toBe('');
+
+    controller.disconnect();
+    const useBtn = document.querySelectorAll('button')[1] as HTMLButtonElement;
+    useBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(confirm.value).toBe('');
+  });
 });

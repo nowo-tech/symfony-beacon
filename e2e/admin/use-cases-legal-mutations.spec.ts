@@ -110,7 +110,7 @@ test.describe('Legal guest necessary-only (isolated)', () => {
 
   test('necessary-only path closes modal (UC-LEGAL-07 isolated)', async ({ page, context }) => {
     await context.clearCookies();
-    await page.goto('/en/login');
+    await page.goto('/en/login', { waitUntil: 'domcontentloaded' });
     await waitForPageLoader(page);
     const openModal = page.locator('#cookieconsent[data-nowo-open="true"]:not(.hidden)');
     try {
@@ -119,13 +119,16 @@ test.describe('Legal guest necessary-only (isolated)', () => {
       test.skip(true, 'Consent modal not shown');
       return;
     }
-    const necessary = openModal.locator('#cookie_consent_use_only_functional_cookies');
+    const necessary = openModal.locator(
+      '#cookie_consent_use_only_functional_cookies, button:has-text("necessary"), button:has-text("necesarias"), button:has-text("Solo cookies"), button:has-text("Refuse")',
+    ).first();
     if (!(await necessary.isVisible().catch(() => false))) {
       await dismissCookieConsent(page);
       test.skip(true, 'Necessary-only control missing');
       return;
     }
-    await necessary.click();
+    // Bundle button can sit under overlay chrome — native DOM click matches dismissCookieConsent.
+    await necessary.evaluate((el: HTMLElement) => el.click());
     await openModal.waitFor({ state: 'hidden', timeout: 10_000 });
   });
 });

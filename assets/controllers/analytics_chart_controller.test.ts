@@ -98,4 +98,24 @@ describe('analytics-chart controller', () => {
     await Promise.resolve();
     expect(chartCalls).toHaveLength(0);
   });
+
+  it('passes through non-hex CSS colors in withAlpha', async () => {
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      getPropertyValue: () => 'rgb(10, 20, 30)',
+    } as CSSStyleDeclaration);
+    application.stop();
+    chartCalls.length = 0;
+    document.body.innerHTML = `
+      <div
+        data-controller="analytics-chart"
+        data-analytics-chart-points-value='[{"date":"d","errors":1,"transactions":1,"nplus1":1}]'
+      >
+        <canvas data-analytics-chart-target="canvas"></canvas>
+      </div>
+    `;
+    application = Application.start();
+    application.register('analytics-chart', AnalyticsChartController);
+    await Promise.resolve();
+    expect(chartCalls).toHaveLength(1);
+  });
 });

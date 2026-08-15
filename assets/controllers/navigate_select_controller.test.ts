@@ -53,4 +53,19 @@ describe('navigate-select controller', () => {
     controller.change({ currentTarget: select } as unknown as Event);
     expect(assign).not.toHaveBeenCalled();
   });
+
+  it('ignores non-select currentTarget', async () => {
+    await Promise.resolve();
+    const assign = vi.fn();
+    vi.stubGlobal('location', { ...window.location, assign });
+
+    const select = document.querySelector('select') as HTMLSelectElement;
+    const controller = application.getControllerForElementAndIdentifier(
+      select,
+      'navigate-select',
+    ) as NavigateSelectController;
+
+    controller.change({ currentTarget: document.createElement('div') } as unknown as Event);
+    expect(assign).not.toHaveBeenCalled();
+  });
 });

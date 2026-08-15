@@ -26,4 +26,13 @@ final class AppearanceCornerStylesTest extends TestCase
         self::assertSame('0.125rem', $radii['card']);
         self::assertSame('0.0625rem', $radii['control']);
     }
+
+    public function testDefaultRadiiAndValidation(): void
+    {
+        $radii = AppearanceCornerStyles::radii('unknown');
+        self::assertSame('0.75rem', $radii['card']);
+        self::assertSame('0.375rem', $radii['control']);
+        self::assertTrue(AppearanceCornerStyles::isValid(SiteAppearance::CORNER_ROUNDED));
+        self::assertFalse(AppearanceCornerStyles::isValid('nope'));
+    }
 }

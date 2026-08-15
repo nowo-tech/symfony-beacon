@@ -15,6 +15,9 @@ describe('resolveDark', () => {
     document.body.appendChild(parent);
 
     expect(resolveDark('auto', host)).toBe(true);
+    parent.setAttribute('data-theme', 'light');
+    expect(resolveDark('auto', host)).toBe(false);
+    parent.remove();
   });
 
   it('reads ancestor dark class', () => {
@@ -38,6 +41,15 @@ describe('prefersReducedMotion', () => {
     expect(prefersReducedMotion()).toBe(true);
     document.documentElement.dataset.motion = 'full';
     expect(prefersReducedMotion()).toBe(false);
+  });
+
+  it('returns false when matchMedia is unavailable', () => {
+    delete document.documentElement.dataset.motion;
+    const original = window.matchMedia;
+    // @ts-expect-error intentional coverage of missing matchMedia
+    window.matchMedia = undefined;
+    expect(prefersReducedMotion()).toBe(false);
+    window.matchMedia = original;
   });
 });
 

@@ -75,4 +75,17 @@ describe('applyThemeBoot', () => {
     applyThemeBoot();
     expect(window.__BEACON_ISSUE_PANEL_DEFAULTS__).toEqual(['raw', 'extra']);
   });
+
+  it('falls back to safe defaults when localStorage throws', () => {
+    const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    applyThemeBoot();
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(document.documentElement.dataset.uiDensity).toBe('comfortable');
+    expect(document.documentElement.dataset.motion).toBe('system');
+    expect(document.documentElement.dataset.fontScale).toBe('md');
+    expect(document.documentElement.dataset.contrast).toBe('system');
+    getItem.mockRestore();
+  });
 });

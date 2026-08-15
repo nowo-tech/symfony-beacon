@@ -115,4 +115,61 @@ describe('clipboard-copy controller', () => {
     expect(button.textContent).toBe('Copied');
     vi.useRealTimers();
   });
+
+  it('covers empty URL, empty body, clipboard failure fallback, and non-element flash', async () => {
+    vi.useFakeTimers();
+    const button = document.querySelector('button') as HTMLButtonElement;
+    button.removeAttribute('data-clipboard-copy-url-value');
+    application.stop();
+    application = Application.start();
+    application.register('clipboard-copy', ClipboardCopyController);
+    await Promise.resolve();
+
+    const controller = application.getControllerForElementAndIdentifier(
+      button,
+      'clipboard-copy',
+    ) as ClipboardCopyController;
+
+    await controller.copyFromUrl(new Event('click'));
+
+    button.setAttribute('data-clipboard-copy-url-value', '/empty.md');
+    application.stop();
+    application = Application.start();
+    application.register('clipboard-copy', ClipboardCopyController);
+    await Promise.resolve();
+    const controller2 = application.getControllerForElementAndIdentifier(
+      button,
+      'clipboard-copy',
+    ) as ClipboardCopyController;
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, text: async () => '   ' }),
+    );
+    const emptyEvent = new Event('click');
+    Object.defineProperty(emptyEvent, 'currentTarget', { value: button });
+    await controller2.copyFromUrl(emptyEvent);
+    expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+
+    vi.mocked(navigator.clipboard.writeText).mockRejectedValueOnce(new Error('denied'));
+    const exec = vi.fn().mockReturnValue(true);
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: exec,
+    });
+    const event = new Event('click');
+    Object.defineProperty(event, 'currentTarget', { value: button });
+    await controller2.copy(event);
+    expect(exec).toHaveBeenCalledWith('copy');
+    expect(button.textContent).toBe('Copied');
+
+    // Second flash while timer active clears previous timeout.
+    await controller2.copy(event);
+    expect(button.textContent).toBe('Copied');
+
+    const nullTarget = new Event('click');
+    Object.defineProperty(nullTarget, 'currentTarget', { value: null });
+    await controller2.copy(nullTarget);
+    vi.useRealTimers();
+  });
 });
