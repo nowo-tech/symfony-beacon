@@ -6,10 +6,10 @@ namespace App\Notifications\Controller;
 
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
+use App\Notifications\Service\ThresholdRuleWriter;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
-use Doctrine\ORM\EntityManagerInterface;
 use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectThresholdRuleController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly ThresholdRuleWriter $thresholdRuleWriter,
     ) {
     }
 
@@ -45,9 +45,7 @@ final class ProjectThresholdRuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $project->addThresholdRule($rule);
-            $this->entityManager->persist($rule);
-            $this->entityManager->flush();
+            $this->thresholdRuleWriter->create($project, $rule);
             $this->addFlash('success', 'thresholds.flash.created');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -76,7 +74,7 @@ final class ProjectThresholdRuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
+            $this->thresholdRuleWriter->update($rule);
             $this->addFlash('success', 'thresholds.flash.updated');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -108,8 +106,7 @@ final class ProjectThresholdRuleController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $rule->setEnabled(!$rule->isEnabled());
-        $this->entityManager->flush();
+        $this->thresholdRuleWriter->toggleEnabled($rule);
         $this->addFlash('success', $rule->isEnabled() ? 'thresholds.flash.enabled' : 'thresholds.flash.disabled');
 
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -133,8 +130,7 @@ final class ProjectThresholdRuleController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $this->entityManager->remove($rule);
-        $this->entityManager->flush();
+        $this->thresholdRuleWriter->delete($rule);
         $this->addFlash('success', 'thresholds.flash.deleted');
 
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);

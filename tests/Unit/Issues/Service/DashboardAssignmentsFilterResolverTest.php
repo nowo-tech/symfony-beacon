@@ -13,6 +13,7 @@ use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -36,7 +37,9 @@ final class DashboardAssignmentsFilterResolverTest extends TestCase
 
         $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
         $this->resolver = new DashboardAssignmentsFilterResolver(
-            new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            new DashboardProjectSelectionResolver(
+                new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            ),
             $this->membershipRepository,
         );
     }

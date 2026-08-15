@@ -19,6 +19,7 @@ use App\Notifications\Service\DashboardAlertsFilterResolver;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -44,7 +45,7 @@ final class DashboardSectionControllersTest extends TestCase
 
         $controller = new DashboardActivityController(
             $actions,
-            new DashboardActivityFilterResolver($this->accessibleProjects()),
+            new DashboardActivityFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects())),
             $this->filterForms(),
         );
         $this->boot($controller, $user, 'dashboard/activity.html.twig');
@@ -64,7 +65,7 @@ final class DashboardSectionControllersTest extends TestCase
 
         $controller = new DashboardAssignmentsController(
             $issues,
-            new DashboardAssignmentsFilterResolver($this->accessibleProjects(), $memberships),
+            new DashboardAssignmentsFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects()), $memberships),
             $this->filterForms(),
         );
         $this->boot($controller, $user, 'dashboard/assignments.html.twig');
@@ -81,7 +82,7 @@ final class DashboardSectionControllersTest extends TestCase
 
         $controller = new DashboardAlertsController(
             $destinations,
-            new DashboardAlertsFilterResolver($this->accessibleProjects()),
+            new DashboardAlertsFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects())),
             $this->filterForms(),
         );
         $this->boot($controller, $user, 'dashboard/alerts.html.twig');
@@ -99,7 +100,7 @@ final class DashboardSectionControllersTest extends TestCase
 
         $controller = new DashboardNewInReleaseController(
             $issues,
-            new DashboardNewInReleaseFilterResolver($this->accessibleProjects(), $issues),
+            new DashboardNewInReleaseFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects()), $issues),
             $this->filterForms(),
         );
         $this->boot($controller, $user, 'dashboard/new_in_release.html.twig');

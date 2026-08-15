@@ -13,6 +13,7 @@ use App\Issues\Service\DashboardNewInReleaseFilterResolver;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -51,7 +52,9 @@ final class DashboardIssueInboxesControllerTest extends TestCase
         $controller = new DashboardAssignmentsController(
             $issues,
             new DashboardAssignmentsFilterResolver(
-                new AccessibleProjectsProvider($projects, new RequestStack()),
+                new DashboardProjectSelectionResolver(
+                    new AccessibleProjectsProvider($projects, new RequestStack()),
+                ),
                 $memberships,
             ),
             new GetFilterFormFactory($formFactory),
@@ -88,7 +91,9 @@ final class DashboardIssueInboxesControllerTest extends TestCase
         $controller = new DashboardNewInReleaseController(
             $issues,
             new DashboardNewInReleaseFilterResolver(
-                new AccessibleProjectsProvider($projects, new RequestStack()),
+                new DashboardProjectSelectionResolver(
+                    new AccessibleProjectsProvider($projects, new RequestStack()),
+                ),
                 $issues,
             ),
             new GetFilterFormFactory($formFactory),

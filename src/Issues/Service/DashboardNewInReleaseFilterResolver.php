@@ -8,9 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Dto\DashboardNewInReleaseFilters;
 use App\Issues\Entity\Issue;
 use App\Issues\Repository\IssueSearchRepository;
-use App\Project\Entity\Project;
-use App\Project\Service\AccessibleProjectFilter;
-use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,25 +17,23 @@ use Symfony\Component\HttpFoundation\Request;
 final readonly class DashboardNewInReleaseFilterResolver
 {
     public function __construct(
-        private AccessibleProjectsProvider $accessibleProjects,
+        private DashboardProjectSelectionResolver $projectSelection,
         private IssueSearchRepository $issueRepository,
     ) {
     }
 
     public function resolve(User $user, Request $request): DashboardNewInReleaseFilters
     {
-        $accessible = $this->accessibleProjects->forUser($user);
-        $project = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
-        $projects = $project instanceof Project ? [$project] : $accessible;
+        $selection = $this->projectSelection->resolve($user, $request);
 
         $releaseRaw = trim($request->query->getString('release'));
         $release = '' !== $releaseRaw ? Issue::normalizeRelease($releaseRaw) : null;
 
         return new DashboardNewInReleaseFilters(
-            accessibleProjects: $accessible,
-            selectedProjects: $projects,
-            availableReleases: $this->issueRepository->findDistinctFirstReleasesAcrossProjects($projects),
-            project: $project,
+            accessibleProjects: $selection['accessible'],
+            selectedProjects: $selection['selected'],
+            availableReleases: $this->issueRepository->findDistinctFirstReleasesAcrossProjects($selection['selected']),
+            project: $selection['project'],
             release: $release,
         );
     }

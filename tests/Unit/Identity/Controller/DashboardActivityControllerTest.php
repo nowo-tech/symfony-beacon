@@ -10,6 +10,7 @@ use App\Identity\Repository\UserActionRepository;
 use App\Identity\Service\DashboardActivityFilterResolver;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -45,7 +46,9 @@ final class DashboardActivityControllerTest extends TestCase
 
         $controller = new DashboardActivityController(
             $actions,
-            new DashboardActivityFilterResolver(new AccessibleProjectsProvider($projects, new RequestStack())),
+            new DashboardActivityFilterResolver(
+                new DashboardProjectSelectionResolver(new AccessibleProjectsProvider($projects, new RequestStack())),
+            ),
             new GetFilterFormFactory($formFactory),
         );
 

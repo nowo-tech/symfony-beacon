@@ -6,11 +6,11 @@ namespace App\Notifications\Controller;
 
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Form\NotificationDestinationFormType;
+use App\Notifications\Service\NotificationDestinationWriter;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
-use Doctrine\ORM\EntityManagerInterface;
 use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +29,7 @@ final class ProjectNotificationController extends AbstractController
 {
     public function __construct(
         private readonly NotificationDispatcher $notificationDispatcher,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly NotificationDestinationWriter $destinationWriter,
     ) {
     }
 
@@ -47,9 +47,7 @@ final class ProjectNotificationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $project->addNotificationDestination($destination);
-            $this->entityManager->persist($destination);
-            $this->entityManager->flush();
+            $this->destinationWriter->create($project, $destination);
             $this->addFlash('success', 'notifications.flash.created');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -78,7 +76,7 @@ final class ProjectNotificationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
+            $this->destinationWriter->update($destination);
             $this->addFlash('success', 'notifications.flash.updated');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -110,8 +108,7 @@ final class ProjectNotificationController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $destination->setEnabled(!$destination->isEnabled());
-        $this->entityManager->flush();
+        $this->destinationWriter->toggleEnabled($destination);
         $this->addFlash('success', $destination->isEnabled() ? 'notifications.flash.enabled' : 'notifications.flash.disabled');
 
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -135,8 +132,7 @@ final class ProjectNotificationController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $destination->resumeCircuit();
-        $this->entityManager->flush();
+        $this->destinationWriter->resumeCircuit($destination);
         $this->addFlash('success', 'notifications.flash.circuit_resumed');
 
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
@@ -160,8 +156,7 @@ final class ProjectNotificationController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $this->entityManager->remove($destination);
-        $this->entityManager->flush();
+        $this->destinationWriter->delete($destination);
         $this->addFlash('success', 'notifications.flash.deleted');
 
         return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
