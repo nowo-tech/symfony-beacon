@@ -274,6 +274,10 @@ jobs:
       - name: Prepare environment
         run: cp .env.dist .env
 
+      # App compose attaches to SHARED_DOCKER_NETWORK as external; infra owns MySQL + Redis.
+      - name: Start shared infra (MySQL + Redis)
+        run: make up-infra
+
       - name: Build and start Compose stack
         run: |
           docker compose build
@@ -289,6 +293,7 @@ jobs:
           done
           echo "Timed out waiting for /health/live" >&2
           docker compose logs --tail=200
+          docker compose -p shared-infra -f compose.infra.yaml --env-file .env logs --tail=100 || true
           exit 1
 
       - name: Wait for Mailpit UI
@@ -345,7 +350,9 @@ jobs:
 
       - name: Tear down Compose
         if: always()
-        run: docker compose --profile hmr --profile mail down -v || true
+        run: |
+          docker compose --profile hmr --profile mail down -v || true
+          make down-infra || true
 
   docker:
     name: Docker build
