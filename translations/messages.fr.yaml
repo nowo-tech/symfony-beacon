@@ -1039,7 +1039,10 @@ preferences:
       ou l’e-mail de connexion.
     tabs_label: Sections du profil
     submit: Enregistrer le profil
-    edit_title: Modifier le profil
+    submit_sensitive: Enregistrer e-mail et ID Slack
+    edit_title: Nom affiché et téléphone
+    edit_sensitive_title: E-mail et ID Slack
+    edit_sensitive_intro: Modifier l'e-mail de connexion ou l'ID membre Slack nécessite votre mot de passe actuel.
     account_id: ID du compte
     member_since: Membre depuis
     last_activity: Dernière activité

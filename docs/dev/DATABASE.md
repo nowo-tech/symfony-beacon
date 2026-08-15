@@ -23,15 +23,15 @@ Source of truth: entity mappings under `src/**/Entity/` and migrations in `migra
 
 ```mermaid
 erDiagram
-    app_user ||--o{ password_history : has
-    app_user ||--o{ project_membership : member_of
-    app_user ||--o{ user_group_membership : in
-    app_user ||--o{ push_subscription : owns
-    app_user ||--o{ user_action : actor_or_subject
-    app_user ||--o{ issue : assignee
-    app_user ||--o{ issue_comment : author
-    app_user ||--o{ issue_saved_view : owns
-    app_user ||--o{ project_share_link : created_by
+    user ||--o{ password_history : has
+    user ||--o{ project_membership : member_of
+    user ||--o{ user_group_membership : in
+    user ||--o{ push_subscription : owns
+    user ||--o{ user_action : actor_or_subject
+    user ||--o{ issue : assignee
+    user ||--o{ issue_comment : author
+    user ||--o{ issue_saved_view : owns
+    user ||--o{ project_share_link : created_by
 
     user_group ||--o{ user_group_membership : has
     user_group ||--o{ project_group_access : grants
@@ -66,7 +66,7 @@ erDiagram
 
 ```mermaid
 erDiagram
-    app_user {
+    user {
         int id PK
         string uuid UK
         string email UK
@@ -131,11 +131,11 @@ erDiagram
         datetime created_at
     }
 
-    app_user ||--o{ password_history : CASCADE
+    user ||--o{ password_history : CASCADE
     user_group ||--o{ user_group_membership : CASCADE
-    app_user ||--o{ user_group_membership : CASCADE
-    app_user ||--o{ user_action : actor
-    app_user ||--o{ user_action : subject
+    user ||--o{ user_group_membership : CASCADE
+    user ||--o{ user_action : actor
+    user ||--o{ user_action : subject
 ```
 
 ---
@@ -416,7 +416,7 @@ erDiagram
     project ||--o{ project_threshold_rule : CASCADE
     notification_destination ||--o{ notification_delivery_attempt : CASCADE
     notification_destination ||--o{ notification_digest_buffer : CASCADE
-    app_user ||--o{ push_subscription : CASCADE
+    user ||--o{ push_subscription : CASCADE
 ```
 
 ---

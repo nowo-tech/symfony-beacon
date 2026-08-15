@@ -1272,7 +1272,10 @@ preferences:
     intro: Review your account details and update your display name or sign-in email.
     tabs_label: Profile sections
     submit: Save profile
-    edit_title: Edit profile
+    submit_sensitive: Save email & Slack ID
+    edit_title: Display name & phone
+    edit_sensitive_title: Email & Slack ID
+    edit_sensitive_intro: Changing your sign-in email or Slack member ID requires your current password.
     account_id: Account ID
     member_since: Member since
     last_activity: Last activity

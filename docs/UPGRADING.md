@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.13.0)](#unreleased-main-after-1130)
+- [Unreleased (main after 1.14.0)](#unreleased-main-after-1140)
+- [Upgrading from 1.13.0 to 1.14.0](#upgrading-from-1130-to-1140)
 - [Upgrading from 1.12.0 to 1.13.0](#upgrading-from-1120-to-1130)
 - [Upgrading from 1.11.0 to 1.12.0](#upgrading-from-1110-to-1120)
 - [Upgrading from 1.10.0 to 1.11.0](#upgrading-from-1100-to-1110)
@@ -66,9 +67,36 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.13.0)
+## Unreleased (main after 1.14.0)
 
 _No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+
+## Upgrading from 1.13.0 to 1.14.0
+
+**Shared MySQL mode & account profile split (`098` / 6.48)** — optional `make up-shared`, identity table rename `app_user` → `user`, Account profile split into basic vs password-gated sensitive forms. See `[1.14.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.14.0   # or pull main at the release commit
+# Optional shared mode: copy MYSQL_* / SHARED_DOCKER_NETWORK from .env.dist — see docs/ops/SHARED-SERVER.md
+composer install
+make ensure-up          # or make up / make up-shared
+make migrate            # Version20260814230000 renames app_user → user
+php bin/console cache:clear
+make vite-build         # if you serve built assets
+```
+
+### Operator checklist
+
+1. **Migrations**: confirm table `` `user` `` exists (was `app_user`). Re-run is safe if already renamed.
+2. **Env (optional shared stack)**: set `MYSQL_HOST` / `MYSQL_HOST_RO` away from `database`, then `make up-shared`. Standalone `make up` unchanged.
+3. **Account profile**: display name / phone save without password; email and Slack user ID require current password on the second panel.
+4. **Integrations**: any automation that POSTed `user_preferences[email]` (etc.) must use `user_profile` / `user_profile_sensitive` field names.
+
+### Notes
+
+- `DATABASE_URL_RO` is reserved; Doctrine does not route reads to the replica yet.
+- No Composer kit pin bumps in this cut.
 
 ## Upgrading from 1.12.0 to 1.13.0
 

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-08-15
+
+### Added
+
+- **Shared MySQL mode (`098` / 6.48)**: `make up-shared` / `down-shared` / `bootstrap-shared-db` against `developer.local.server` or little-vps MySQL (`compose.shared.yaml`, external `${SHARED_DOCKER_NETWORK}`); docs [`SHARED-SERVER.md`](ops/SHARED-SERVER.md). Spec: `specs/098-shared-server-profile-split/`.
+- Account → Profile **sensitive panel**: `AccountProfileSensitiveType` (email + Slack user ID + required current password) beside basic display name / phone form (`user_profile` / `user_profile_sensitive` named forms).
+
+### Changed
+
+- `.env.dist` / `DATABASE_URL` use `${MYSQL_HOST}` / `${MYSQL_PORT}` (standalone default `database`); optional `DATABASE_URL_RO` + `MYSQL_HOST_RO` reserved for future Doctrine read routing.
+- Doctrine identity table renamed **`app_user` → `user`** (`Version20260814230000`); `AuditFields` FK defaults and DATABASE ER diagrams updated.
+- Makefile Compose calls honour `.compose-mode=shared` via `$(DC)`.
+
+### Notes for integrators
+
+- Run migrations after upgrade (`make migrate`) — renames `app_user` to `` `user` `` when needed (idempotent).
+- Shared ops: set `MYSQL_HOST=mysql-9.7-primary` (not `database`), then `make up-shared`; see [SHARED-SERVER.md](ops/SHARED-SERVER.md).
+- Custom scripts posting Account profile fields: basic fields are `user_profile[*]`; email/Slack/password are `user_profile_sensitive[*]` (FormKit catalogue keys remain under `user_preferences`).
+
 ## [1.13.0] - 2026-08-14
 
 ### Fixed
@@ -1089,7 +1108,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.10.0...v1.11.0

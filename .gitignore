@@ -9,6 +9,7 @@
 /.env.prod
 /.env.test
 /.demo-client.env
+/.compose-mode
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/

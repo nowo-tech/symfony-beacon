@@ -34,7 +34,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * for Twig, PropertyAccess forms, and existing call sites.
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'app_user')]
+#[ORM\Table(name: 'user')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', columns: ['email'])]
 #[ORM\UniqueConstraint(name: 'uniq_app_user_uuid', columns: ['uuid'])]
 #[ORM\UniqueConstraint(name: 'uniq_app_user_slack_user_id', columns: ['slack_user_id'])]

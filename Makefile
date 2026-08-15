@@ -1,15 +1,23 @@
-.PHONY: help up down build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: help up up-shared down down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
-	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls
+	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
+
+# Compose file set: shared mode when `.compose-mode` contains "shared" (set by up-shared).
+COMPOSE_SHARED_FILES := -f compose.yaml -f compose.override.yaml -f compose.shared.yaml
+COMPOSE_FILES := $(shell test -f .compose-mode && grep -qx shared .compose-mode && echo '$(COMPOSE_SHARED_FILES)')
+DC := docker compose $(COMPOSE_FILES)
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
 	@echo "  make up              Start stack (php + mysql + messenger) + vite-build; prints HTTP/HTTPS ports"
+	@echo "  make up-shared      Start against shared server MySQL (no local database); see docs/ops/SHARED-SERVER.md"
 	@echo "  make ensure-up       Start stack if php is not running (no rebuild / no vite)"
 	@echo "  make classic         FrankenPHP HTTP in classic mode"
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
-	@echo "  make down            Stop containers"
+	@echo "  make down            Stop containers (standalone)"
+	@echo "  make down-shared     Stop containers (shared compose file set)"
+	@echo "  make bootstrap-shared-db  Create schema/user on shared MySQL primary"
 	@echo "  make build           Rebuild the php image (dev)"
 	@echo "  make build-prod      Build frankenphp_prod image (see docs/PRODUCTION.md)"
 	@echo "  make logs            Follow php service logs"
@@ -87,15 +95,15 @@ strip-cursor-coauthor-from-history:
 # (avoids recursion when `up` itself runs vite-build).
 ensure-up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
-	@docker compose exec -T php true >/dev/null 2>&1 || { \
-		echo "Stack is down — starting (docker compose up -d)…"; \
-		docker compose up -d; \
+	@$(DC) exec -T php true >/dev/null 2>&1 || { \
+		echo "Stack is down — starting compose up -d…"; \
+		$(DC) up -d; \
 	}
 
 # Print published app ports (from running compose, else .env / defaults).
 print-urls:
-	@HTTP_PUB=$$(docker compose port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
-	HTTPS_PUB=$$(docker compose port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
+	@HTTP_PUB=$$($(DC) port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
+	HTTPS_PUB=$$($(DC) port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
 	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
 	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
 	HTTP_PUB=$${HTTP_PUB:-9084}; \
@@ -104,12 +112,13 @@ print-urls:
 	echo "Beacon is up:"; \
 	echo "  HTTP:  http://localhost:$${HTTP_PUB}"; \
 	echo "  HTTPS: https://localhost:$${HTTPS_PUB}"; \
-	MAILPIT_UI=$$(docker compose --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+	MAILPIT_UI=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
 	if [ -n "$$MAILPIT_UI" ]; then \
 		echo "  Mailpit UI: http://localhost:$${MAILPIT_UI}  (SMTP from PHP: smtp://mailer:1025)"; \
 	fi
 
 up:
+	@rm -f .compose-mode
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	docker compose up --build -d
 	@echo "Building frontend assets (static public/build/)…"
@@ -117,53 +126,87 @@ up:
 	@$(MAKE) print-urls
 	@echo "Optional local SMTP: make mailpit  (see docs/ops/MAILPIT.md)"
 
+# Shared infra (developer.local.server server/ or little-vps). Docs: docs/ops/SHARED-SERVER.md
+up-shared:
+	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@set -a; . ./.env; set +a; \
+	if [ "$${MYSQL_HOST:-database}" = "database" ]; then \
+		echo "MYSQL_HOST is still 'database'. For shared mode set MYSQL_HOST=mysql-9.7-primary (and MYSQL_HOST_RO=mysql-9.7-replica) in .env — see docs/ops/SHARED-SERVER.md"; \
+		exit 1; \
+	fi
+	@NET=$${SHARED_DOCKER_NETWORK:-server_network}; \
+	docker network inspect "$$NET" >/dev/null 2>&1 || { \
+		echo "Docker network '$$NET' not found. Start server/ first (docker compose up -d in developer.local.server/server)."; \
+		exit 1; \
+	}
+	@docker ps --format '{{.Names}}' | grep -qx mysql-9.7-primary || { \
+		echo "mysql-9.7-primary is not running. From server/: make up-mysql"; \
+		exit 1; \
+	}
+	@$(MAKE) bootstrap-shared-db
+	@echo shared > .compose-mode
+	docker compose $(COMPOSE_SHARED_FILES) up --build -d
+	@echo "Building frontend assets (static public/build/)…"
+	@$(MAKE) vite-build
+	@$(MAKE) print-urls
+	@echo "Shared mode — DB via $${MYSQL_HOST:-mysql-9.7-primary} (see docs/ops/SHARED-SERVER.md)"
+
 classic:
 	@test -f .env || cp .env.dist .env
-	FRANKENPHP_MODE=classic docker compose up --build -d
+	FRANKENPHP_MODE=classic $(DC) up --build -d
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 worker:
 	@test -f .env || cp .env.dist .env
-	FRANKENPHP_MODE=worker docker compose up --build -d
+	FRANKENPHP_MODE=worker $(DC) up --build -d
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 down:
 	docker compose --profile hmr --profile mail down
+	@rm -f .compose-mode
+
+down-shared:
+	docker compose $(COMPOSE_SHARED_FILES) --profile hmr --profile mail down
+	@rm -f .compose-mode
+
+bootstrap-shared-db:
+	@chmod +x .scripts/bootstrap-shared-db.sh
+	@./.scripts/bootstrap-shared-db.sh
 
 build:
-	docker compose build --no-cache
+	$(DC) build --no-cache
 
 build-prod:
 	docker build --target frankenphp_prod -t ${IMAGES_PREFIX:-}symfony-beacon:prod .
 
 logs:
-	docker compose logs -f php
+	$(DC) logs -f php
 
 vite-hmr: ensure-up
-	docker compose --profile hmr up -d vite
+	$(DC) --profile hmr up -d vite
 	@echo "Vite HMR is on — entrypoints use viteServer (browser shows a pending HMR WebSocket)."
-	@echo "For stable UI without HMR: docker compose --profile hmr stop vite && make vite-build"
+	@echo "For stable UI without HMR: $(DC) --profile hmr stop vite && make vite-build"
 
 vite:
-	docker compose logs -f vite
+	$(DC) logs -f vite
 
 vite-build: ensure-up
-	docker compose exec -T php pnpm run build
+	$(DC) exec -T php pnpm run build
 
 vite-watch: ensure-up
-	docker compose exec php pnpm run watch
+	$(DC) exec php pnpm run watch
 
 pnpm: ensure-up
-	docker compose exec -T php pnpm $(ARGS)
+	$(DC) exec -T php pnpm $(ARGS)
 
 # Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
 # Docs: docs/ops/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
 mailpit:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
-	docker compose --profile mail up -d mailer
-	@UI_PUB=$$(docker compose --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+	$(DC) --profile mail up -d mailer
+	@UI_PUB=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
 	UI_PUB=$${UI_PUB:-18026}; \
 	echo ""; \
 	echo "Mailpit is up (dev/test only — not used in production):"; \
@@ -173,46 +216,46 @@ mailpit:
 	echo "  Docs: docs/ops/MAILPIT.md"
 
 mailpit-logs:
-	docker compose --profile mail logs -f mailer
+	$(DC) --profile mail logs -f mailer
 
 messenger-logs:
-	docker compose logs -f messenger
+	$(DC) logs -f messenger
 
 shell: ensure-up
-	docker compose exec php sh
+	$(DC) exec php sh
 
 console: ensure-up
-	docker compose exec php bin/console $(ARGS)
+	$(DC) exec php bin/console $(ARGS)
 
 # Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
 # Harden key files to 0600 (world-writable keys would decrypt all #[Encrypted] columns).
 ensure-halite-secrets: ensure-up
-	docker compose exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets && find var/secrets -maxdepth 1 -type f -name ".Halite*.key" -exec chmod 600 {} +'
+	$(DC) exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets && find var/secrets -maxdepth 1 -type f -name ".Halite*.key" -exec chmod 600 {} +'
 
 seed-platform: ensure-halite-secrets
-	docker compose exec -T php bin/console app:seed-platform
+	$(DC) exec -T php bin/console app:seed-platform
 
 seed: seed-platform
-	docker compose exec -T php bin/console app:seed-demo
+	$(DC) exec -T php bin/console app:seed-demo
 	@echo "Client env: .demo-client.env — in BeaconBundle/demo/symfony8 run: make sync-beacon"
 	@echo "Server dogfood: BEACON_DSN set in .env when empty (loopback 127.0.0.1)"
 	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
 
 seed-sample: ensure-halite-secrets
-	docker compose exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
+	$(DC) exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 
 # Ensure demo project + API key exist, grant ROLE_ADMIN membership, write .demo-client.env,
 # and set server BEACON_DSN (loopback) when empty. Does not create a demo admin user.
 dogfood: ensure-halite-secrets
-	docker compose exec -T php bin/console app:seed-demo --skip-demo-user
+	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user
 	@echo "Dogfood: BEACON_DSN is written only when empty. If it changed, run: make restart"
 
 migrate: ensure-halite-secrets
-	docker compose exec -T php bin/console doctrine:migrations:migrate -n
+	$(DC) exec -T php bin/console doctrine:migrations:migrate -n
 
 bootstrap: migrate
 	@$(MAKE) seed-platform
-	@docker compose exec -T php sh -c 'mkdir -p var/site-backup && touch var/site-backup/setup.done'
+	@$(DC) exec -T php sh -c 'mkdir -p var/site-backup && touch var/site-backup/setup.done'
 	@echo "Next: make seed (or make ready) for demo user + dogfood DSN — or open /setup / register"
 
 ready: bootstrap seed
@@ -220,11 +263,15 @@ ready: bootstrap seed
 	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
 
 restart: ensure-up
-	docker compose restart php messenger
+	$(DC) restart php messenger
 	@$(MAKE) vite-build
 
 mysql: ensure-up
-	docker compose exec database mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}
+	@if test -f .compose-mode && grep -qx shared .compose-mode; then \
+		docker exec -it mysql-9.7-primary mysql -u$${MYSQL_USER:-beacon} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-symfony_beacon}; \
+	else \
+		$(DC) exec database mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}; \
+	fi
 
 specify-check:
 	@command -v specify >/dev/null || { echo "Install Specify: uv tool install specify-cli"; exit 1; }
@@ -234,38 +281,38 @@ specify-check:
 	@echo "Specs: specs/"
 
 cs: ensure-up
-	docker compose exec -T php vendor/bin/php-cs-fixer check --diff
+	$(DC) exec -T php vendor/bin/php-cs-fixer check --diff
 
 cs-fix: ensure-up
-	docker compose exec -T php vendor/bin/php-cs-fixer fix
+	$(DC) exec -T php vendor/bin/php-cs-fixer fix
 
 twig-cs: ensure-up
-	docker compose exec -T php vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.dist.php
+	$(DC) exec -T php vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.dist.php
 
 twig-cs-fix: ensure-up
-	docker compose exec -T php vendor/bin/twig-cs-fixer fix --config=.twig-cs-fixer.dist.php
+	$(DC) exec -T php vendor/bin/twig-cs-fixer fix --config=.twig-cs-fixer.dist.php
 
 phpstan: ensure-up
-	docker compose exec -T php bin/console cache:warmup --env=dev
-	docker compose exec -T php vendor/bin/phpstan analyse --memory-limit=512M -c phpstan.neon.dist
+	$(DC) exec -T php bin/console cache:warmup --env=dev
+	$(DC) exec -T php vendor/bin/phpstan analyse --memory-limit=512M -c phpstan.neon.dist
 
 rector: ensure-up
-	docker compose exec -T php vendor/bin/rector process --dry-run
+	$(DC) exec -T php vendor/bin/rector process --dry-run
 
 # Always re-run CS Fixer after Rector: rules like blank_line_before_statement leave diffs
 # that fail `php-cs-fixer check` in CI (qa-fix previously ran CS before Rector only).
 rector-fix: ensure-up
-	docker compose exec -T php vendor/bin/rector process
+	$(DC) exec -T php vendor/bin/rector process
 	@$(MAKE) cs-fix
 
 test: ensure-up
-	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
+	$(DC) exec -T php sh -c 'rm -rf var/cache/test/* && vendor/bin/phpunit $(ARGS)'
 
 test-unit-js: ensure-up
-	docker compose exec -T php pnpm run test:unit $(ARGS)
+	$(DC) exec -T php pnpm run test:unit $(ARGS)
 
 test-unit-js-coverage: ensure-up
-	docker compose exec -T php pnpm run test:unit:coverage $(ARGS)
+	$(DC) exec -T php pnpm run test:unit:coverage $(ARGS)
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
 # Override: PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
@@ -278,9 +325,9 @@ PLAYWRIGHT_BASE_URL ?= https://localhost:9447
 PLAYWRIGHT_MAILPIT_URL ?= http://127.0.0.1:18026
 PLAYWRIGHT_REQUIRE_MAILPIT ?=
 test-e2e: ensure-up
-	@docker compose exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
+	@$(DC) exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
 	@# UC-NOTIF-17: console/cron flush — capture for Playwright assertion (no browser surface)
-	@docker compose exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
+	@$(DC) exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
 	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" pnpm exec playwright test $(ARGS)
 else
@@ -300,7 +347,7 @@ endif
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke: ensure-up
-	docker compose exec -T php vendor/bin/phpunit \
+	$(DC) exec -T php vendor/bin/phpunit \
 		tests/Functional/Identity/AuthKitBootstrapTest.php \
 		tests/Functional/Identity/MagicLoginTest.php \
 		tests/Functional/Identity/PasswordResetTest.php \
@@ -308,12 +355,12 @@ kit-smoke: ensure-up
 
 # Soft gate: COVERAGE_MIN defaults in CI; override locally e.g. COVERAGE_MIN=35 make test-coverage
 test-coverage: ensure-up
-	docker compose exec -T php sh -c 'rm -rf var/cache/test/* && mkdir -p var/coverage var/coverage-html'
-	docker compose exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
+	$(DC) exec -T php sh -c 'rm -rf var/cache/test/* && mkdir -p var/coverage var/coverage-html'
+	$(DC) exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
 		--coverage-text \
 		--coverage-clover var/coverage/clover.xml \
 		--coverage-html var/coverage-html
-	docker compose exec -T -e COVERAGE_MIN="$(COVERAGE_MIN)" php sh .scripts/check-coverage-threshold.sh var/coverage/clover.xml
+	$(DC) exec -T -e COVERAGE_MIN="$(COVERAGE_MIN)" php sh .scripts/check-coverage-threshold.sh var/coverage/clover.xml
 
 # Same gate as CI job "Secret scan (Gitleaks)". Requires Docker; pins the CLI version used in .github/workflows/ci.yml.
 GITLEAKS_VERSION ?= 8.28.0
@@ -328,11 +375,11 @@ qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
 
 # Update PHP (Composer) and frontend (pnpm) lockfiles within constraint ranges.
 update-deps: ensure-up
-	docker compose exec -T php composer update
-	docker compose exec -T php pnpm update
+	$(DC) exec -T php composer update
+	$(DC) exec -T php pnpm update
 	@echo "Dependencies updated. Consider: make vite-build && make qa"
 
 # Suggest pinned composer require commands for outdated direct deps (runs in php container).
 # The helper may exit non-zero when outdated packages are found; still print suggestions.
 composer-outdated: ensure-up
-	-docker compose exec -T php bash ./generate-composer-require.sh
+	-$(DC) exec -T php bash ./generate-composer-require.sh

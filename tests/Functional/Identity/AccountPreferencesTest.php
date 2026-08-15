@@ -141,8 +141,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         $form = $crawler->selectButton('Save profile')->form([
-            'user_preferences[displayName]' => 'Updated Prefs',
-            'user_preferences[email]' => 'prefs@example.com',
+            'user_profile[displayName]' => 'Updated Prefs',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
@@ -160,9 +159,9 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $this->login($client, $user);
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
-        $form = $crawler->selectButton('Save profile')->form([
-            'user_preferences[displayName]' => 'Email Prefs',
-            'user_preferences[email]' => 'prefs-email-new@example.com',
+        $form = $crawler->selectButton('Save email & Slack ID')->form([
+            'user_profile_sensitive[email]' => 'prefs-email-new@example.com',
+            'user_profile_sensitive[currentPassword]' => '',
         ]);
         $client->submit($form);
         self::assertFalse($client->getResponse()->isRedirect());
@@ -177,10 +176,9 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         self::assertResponseIsSuccessful();
-        $form = $crawler->selectButton('Save profile')->form();
-        $form['user_preferences[displayName]'] = 'Email Prefs';
-        $form['user_preferences[email]'] = 'prefs-email-new@example.com';
-        $form['user_preferences[currentPassword]'] = 'OldSecret1!Abc';
+        $form = $crawler->selectButton('Save email & Slack ID')->form();
+        $form['user_profile_sensitive[email]'] = 'prefs-email-new@example.com';
+        $form['user_profile_sensitive[currentPassword]'] = 'OldSecret1!Abc';
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
         $client->followRedirect();
@@ -197,12 +195,11 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('input[name="user_preferences[phone]"]');
+        self::assertSelectorExists('input[name="user_profile[phone]"]');
 
         $form = $crawler->selectButton('Save profile')->form([
-            'user_preferences[displayName]' => 'QR User',
-            'user_preferences[email]' => 'qr-phone@example.com',
-            'user_preferences[phone]' => '+34600111222',
+            'user_profile[displayName]' => 'QR User',
+            'user_profile[phone]' => '+34600111222',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
@@ -228,9 +225,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         $form = $crawler->selectButton('Save profile')->form([
-            'user_preferences[displayName]' => 'QR Keep',
-            'user_preferences[email]' => 'qr-phone-keep@example.com',
-            'user_preferences[phone]' => '+34600111222',
+            'user_profile[displayName]' => 'QR Keep',
+            'user_profile[phone]' => '+34600111222',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
@@ -254,9 +250,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         $form = $crawler->selectButton('Save profile')->form([
-            'user_preferences[displayName]' => 'QR Clear',
-            'user_preferences[email]' => 'qr-phone-clear@example.com',
-            'user_preferences[phone]' => '+34600999999',
+            'user_profile[displayName]' => 'QR Clear',
+            'user_profile[phone]' => '+34600999999',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');

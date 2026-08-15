@@ -93,6 +93,15 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # Option B — demo login after make ready / make seed (see below)
 ```
 
+**Shared MySQL** (reuse `developer.local.server/server/` primary+replica — see [docs/ops/SHARED-SERVER.md](docs/ops/SHARED-SERVER.md)):
+
+```bash
+# From developer.local.server/server: make up-mysql
+# In .env: MYSQL_HOST=mysql-9.7-primary, MYSQL_USER=root (see .env.dist shared block)
+make up-shared   # ensures schema exists; no app user needed with root
+make ready
+```
+
 - HTTP: http://localhost:9084  
 - HTTPS: https://localhost:9447  
 - MySQL: Compose service `database` only (no host port; `docker compose exec database mysql …`)

@@ -226,6 +226,7 @@ user_preferences:
     placeholder: Huidig wachtwoord
     help: Alleen vereist bij het instellen van een nieuw wachtwoord.
     help_email_change: Vereist bij het wijzigen van je e-mailadres (login en wachtwoordreset-bestemming).
+    help_sensitive_change: Vereist om je e-mail of Slack-gebruikers-ID bij te werken.
     help_required: Bevestig uw huidige wachtwoord om een ​​nieuw wachtwoord in te stellen.
   plain_password:
     label: Nieuw wachtwoord

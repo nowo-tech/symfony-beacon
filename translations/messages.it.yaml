@@ -1030,7 +1030,10 @@ preferences:
       di accesso.
     tabs_label: Sezioni del profilo
     submit: Salva profilo
-    edit_title: Modifica profilo
+    submit_sensitive: Salva e-mail e Slack ID
+    edit_title: Nome visualizzato e telefono
+    edit_sensitive_title: E-mail e Slack ID
+    edit_sensitive_intro: Per modificare l'e-mail di accesso o lo Slack member ID serve la password attuale.
     account_id: ID account
     member_since: Membro dal
     last_activity: Ultima attività

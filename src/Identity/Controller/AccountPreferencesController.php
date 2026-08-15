@@ -9,6 +9,7 @@ use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Identity\Form\AccountProductTourReplayType;
+use App\Identity\Form\AccountProfileSensitiveType;
 use App\Identity\Form\AccountProfileType;
 use App\Identity\Form\AccountSecurityType;
 use App\Identity\Repository\UserActionRepository;
@@ -29,6 +30,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Nowo\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,6 +63,7 @@ final class AccountPreferencesController extends AbstractController
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
+        private readonly FormFactoryInterface $formFactory,
     ) {
     }
 
@@ -81,51 +84,13 @@ final class AccountPreferencesController extends AbstractController
         $previousPhoneVerifiedAt = $user->getPhoneVerifiedAt();
         $previousSlackUserId = $user->getSlackUserId();
 
-        $form = $this->createForm(AccountProfileType::class, $user);
+        // Distinct form names so only the submitted panel is handled (shared block prefix for FormKit keys).
+        $form = $this->formFactory->createNamed('user_profile', AccountProfileType::class, $user);
+        $sensitiveForm = $this->formFactory->createNamed('user_profile_sensitive', AccountProfileSensitiveType::class, $user);
         $form->handleRequest($request);
+        $sensitiveForm->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($user->getEmail() !== $previousEmail) {
-                $currentPassword = (string) $form->get('currentPassword')->getData();
-                if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
-                    // Revert before re-render: a mutated security user email can invalidate the session.
-                    $user->setEmail($previousEmail);
-                    $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
-
-                    return $this->renderProfile($form, $user);
-                }
-
-                $conflict = $this->userRepository->findOneByEmail($user->getEmail());
-                if ($conflict instanceof User && $conflict->getId() !== $user->getId()) {
-                    $user->setEmail($previousEmail);
-                    $form->get('email')->addError(new FormError($this->translator->trans('preferences.error.email_in_use')));
-
-                    return $this->renderProfile($form, $user);
-                }
-            }
-
-            $newSlack = $user->getSlackUserId();
-            $slackChanged = ($newSlack ?? '') !== ($previousSlackUserId ?? '');
-            if ($slackChanged) {
-                $currentPassword = (string) $form->get('currentPassword')->getData();
-                if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
-                    $user->setSlackUserId($previousSlackUserId);
-                    $form->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
-
-                    return $this->renderProfile($form, $user);
-                }
-
-                if (null !== $newSlack && '' !== $newSlack) {
-                    $slackConflict = $this->userRepository->findOneBySlackUserId($newSlack);
-                    if ($slackConflict instanceof User && $slackConflict->getId() !== $user->getId()) {
-                        $user->setSlackUserId($previousSlackUserId);
-                        $form->get('slackUserId')->addError(new FormError($this->translator->trans('preferences.error.slack_user_id_in_use')));
-
-                        return $this->renderProfile($form, $user);
-                    }
-                }
-            }
-
             $phone = $user->getPhone();
             if (null === $phone || '' === $phone || $phone !== $previousPhone) {
                 $user->setPhoneVerifiedAt(null);
@@ -139,7 +104,54 @@ final class AccountPreferencesController extends AbstractController
             return $this->redirectToRoute('account_profile');
         }
 
-        return $this->renderProfile($form, $user);
+        if ($sensitiveForm->isSubmitted()) {
+            if (!$sensitiveForm->isValid()) {
+                // Mapped fields may already have mutated the security user; revert until a valid save.
+                $user->setEmail($previousEmail);
+                $user->setSlackUserId($previousSlackUserId);
+
+                return $this->renderProfile($form, $sensitiveForm, $user);
+            }
+
+            $currentPassword = (string) $sensitiveForm->get('currentPassword')->getData();
+            if ('' === $currentPassword || !$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+                // Revert before re-render: a mutated security user email can invalidate the session.
+                $user->setEmail($previousEmail);
+                $user->setSlackUserId($previousSlackUserId);
+                $sensitiveForm->get('currentPassword')->addError(new FormError($this->translator->trans('preferences.error.current_password')));
+
+                return $this->renderProfile($form, $sensitiveForm, $user);
+            }
+
+            if ($user->getEmail() !== $previousEmail) {
+                $conflict = $this->userRepository->findOneByEmail($user->getEmail());
+                if ($conflict instanceof User && $conflict->getId() !== $user->getId()) {
+                    $user->setEmail($previousEmail);
+                    $sensitiveForm->get('email')->addError(new FormError($this->translator->trans('preferences.error.email_in_use')));
+
+                    return $this->renderProfile($form, $sensitiveForm, $user);
+                }
+            }
+
+            $newSlack = $user->getSlackUserId();
+            $slackChanged = ($newSlack ?? '') !== ($previousSlackUserId ?? '');
+            if ($slackChanged && null !== $newSlack && '' !== $newSlack) {
+                $slackConflict = $this->userRepository->findOneBySlackUserId($newSlack);
+                if ($slackConflict instanceof User && $slackConflict->getId() !== $user->getId()) {
+                    $user->setSlackUserId($previousSlackUserId);
+                    $sensitiveForm->get('slackUserId')->addError(new FormError($this->translator->trans('preferences.error.slack_user_id_in_use')));
+
+                    return $this->renderProfile($form, $sensitiveForm, $user);
+                }
+            }
+
+            $this->entityManager->flush();
+            $this->addFlash('success', 'flash.preferences.profile_saved');
+
+            return $this->redirectToRoute('account_profile');
+        }
+
+        return $this->renderProfile($form, $sensitiveForm, $user);
     }
 
     #[Route('/account/projects', name: 'account_projects', methods: ['GET'])]
@@ -166,8 +178,9 @@ final class AccountPreferencesController extends AbstractController
 
     /**
      * @param FormInterface<mixed> $form
+     * @param FormInterface<mixed> $sensitiveForm
      */
-    private function renderProfile(FormInterface $form, User $user): Response
+    private function renderProfile(FormInterface $form, FormInterface $sensitiveForm, User $user): Response
     {
         $passwordChangedAt = $user->getPasswordChangedAt();
         $passwordExpiresAt = null;
@@ -192,6 +205,7 @@ final class AccountPreferencesController extends AbstractController
 
         return $this->render('account/profile.html.twig', [
             'form' => $form,
+            'sensitive_form' => $sensitiveForm,
             'profile_user' => $user,
             'profile_roles' => $roleLabels,
             'password_changed_at' => $passwordChangedAt,

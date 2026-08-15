@@ -172,7 +172,7 @@ user_preferences:
   slack_user_id:
     label: Slack user ID
     placeholder: U012ABCDEF
-    help: 'Optional. Your Slack member ID enables Assign/Resolve on Slack alerts. Changing it requires your current password. Find it in Slack → profile → … → Copy member ID.'
+    help: 'Optional. Your Slack member ID enables Assign/Resolve on Slack alerts. Find it in Slack → profile → … → Copy member ID.'
   phone:
     label: Phone number
     placeholder: '+34600111222'
@@ -219,7 +219,7 @@ user_preferences:
     placeholder: Current password
     help: Required only when setting a new password.
     help_email_change: Required when changing your email address (login and password-reset destination).
-    help_sensitive_change: Required when changing your email or Slack user ID.
+    help_sensitive_change: Required to update your email or Slack user ID.
     help_required: Confirm your current password to set a new one.
   plain_password:
     label: New password

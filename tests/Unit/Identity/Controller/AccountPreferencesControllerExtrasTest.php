@@ -56,6 +56,7 @@ final class AccountPreferencesControllerExtrasTest extends TestCase
             static function (string $template, array $context) use ($user): string {
                 self::assertSame('account/profile.html.twig', $template);
                 self::assertSame($user, $context['profile_user']);
+                self::assertArrayHasKey('sensitive_form', $context);
                 self::assertSame(['preferences.profile.role_admin'], $context['profile_roles']);
                 self::assertInstanceOf(DateTimeImmutable::class, $context['password_expires_at']);
                 self::assertIsInt($context['password_days_remaining']);
@@ -70,8 +71,9 @@ final class AccountPreferencesControllerExtrasTest extends TestCase
         $controller->setContainer($container);
 
         $form = $this->createStub(FormInterface::class);
+        $sensitiveForm = $this->createStub(FormInterface::class);
         $method = new ReflectionMethod(AccountPreferencesController::class, 'renderProfile');
-        $response = $method->invoke($controller, $form, $user);
+        $response = $method->invoke($controller, $form, $sensitiveForm, $user);
 
         self::assertInstanceOf(Response::class, $response);
         self::assertSame('ok', $response->getContent());

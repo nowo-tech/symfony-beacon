@@ -1,0 +1,67 @@
+# Shared local / VPS-style stack: use developer.local.server `server/` (or little-vps)
+# MySQL instead of the Compose `database` service.
+#
+#   # 1) Start shared infra (from developer.local.server):
+#   make -C ../../.. -C server up-mysql   # or: cd server && docker compose up -d mysql-9.7-primary mysql-9.7-replica redis-8.10.0
+#
+#   # 2) Set MYSQL_HOST=mysql-9.7-primary (see .env.dist shared block), then:
+#   make bootstrap-shared-db && make up-shared
+#
+# Network name: SHARED_DOCKER_NETWORK (default server_network locally; server_internal on little-vps).
+# Docs: docs/ops/SHARED-SERVER.md
+
+services:
+  # Keep the service definition for merge compatibility but never start it in shared mode.
+  database:
+    profiles: ["standalone-db"]
+
+  php:
+    depends_on:
+      database:
+        condition: service_healthy
+        required: false
+    networks:
+      - default
+      - shared
+
+  messenger:
+    depends_on:
+      database:
+        condition: service_healthy
+        required: false
+      php:
+        condition: service_started
+    networks:
+      - default
+      - shared
+
+  messenger-notify:
+    depends_on:
+      database:
+        condition: service_healthy
+        required: false
+      php:
+        condition: service_started
+    networks:
+      - default
+      - shared
+
+  vite:
+    networks:
+      - default
+      - shared
+
+  mailer:
+    networks:
+      - default
+      - shared
+
+  mercure:
+    networks:
+      - default
+      - shared
+
+networks:
+  shared:
+    name: ${SHARED_DOCKER_NETWORK:-server_network}
+    external: true

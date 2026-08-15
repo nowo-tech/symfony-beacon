@@ -2,6 +2,7 @@ import { createHmac, randomBytes } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 import {
   DEMO_EMAIL,
+  DEMO_PASSWORD,
   dismissProductTour,
   openFirstIssue,
   requireSampleOrSkip,
@@ -141,8 +142,9 @@ async function ensureAnonymousResolveOff(page: import('@playwright/test').Page):
 async function setSlackUserId(page: import('@playwright/test').Page, slackUserId: string): Promise<void> {
   await page.goto('/account/profile');
   await dismissProductTour(page);
-  const form = page.locator('form').filter({ has: page.locator('input[name="user_preferences[slackUserId]"]') });
-  await form.locator('input[name="user_preferences[slackUserId]"]').fill(slackUserId);
+  const form = page.locator('[data-testid="profile-sensitive-form"]');
+  await form.locator('input[name="user_profile_sensitive[slackUserId]"]').fill(slackUserId);
+  await form.locator('input[name="user_profile_sensitive[currentPassword]"]').fill(DEMO_PASSWORD);
   await form.locator('button[type="submit"]').click();
   await waitForPageLoader(page);
 }

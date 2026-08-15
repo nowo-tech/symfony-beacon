@@ -53,7 +53,7 @@ final class UserDisplayPreferenceDefaultsTest extends DatabaseWebTestCase
 
         // Bypass PreUpdate healing so the GET path must heal legacy nulls.
         $em->getConnection()->executeStatement(
-            'UPDATE app_user SET preferred_locale = NULL, preferred_theme = NULL, preferred_motion = NULL, preferred_contrast = NULL WHERE id = ?',
+            'UPDATE `user` SET preferred_locale = NULL, preferred_theme = NULL, preferred_motion = NULL, preferred_contrast = NULL WHERE id = ?',
             [$userId],
         );
         $em->clear();

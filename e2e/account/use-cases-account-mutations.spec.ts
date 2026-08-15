@@ -9,16 +9,16 @@ test.describe('Account mutations — profile & password', () => {
   test('saves profile display name (UC-ACC-17)', async ({ page }) => {
     await page.goto('/account/profile');
     await dismissProductTour(page);
-    const form = page.locator('form').filter({ has: page.locator('input[name="user_preferences[displayName]"]') });
+    const form = page.locator('[data-testid="profile-basic-form"]');
     await expect(form).toBeVisible({ timeout: 15_000 });
-    const nameInput = form.locator('input[name="user_preferences[displayName]"]');
+    const nameInput = form.locator('input[name="user_profile[displayName]"]');
     const previous = await nameInput.inputValue();
     const next = `E2E Admin ${Date.now().toString(36).slice(-4)}`;
     await nameInput.fill(next);
     await form.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(form.locator('input[name="user_preferences[displayName]"]')).toHaveValue(next);
+    await expect(form.locator('input[name="user_profile[displayName]"]')).toHaveValue(next);
 
     // Restore so later suites keep a stable label.
     await nameInput.fill(previous || 'Admin');
@@ -29,13 +29,13 @@ test.describe('Account mutations — profile & password', () => {
   test('rejects email change without current password (UC-ACC-18)', async ({ page }) => {
     await page.goto('/account/profile');
     await dismissProductTour(page);
-    const form = page.locator('form').filter({ has: page.locator('input[name="user_preferences[email]"]') });
+    const form = page.locator('[data-testid="profile-sensitive-form"]');
     await expect(form).toBeVisible({ timeout: 15_000 });
-    const email = form.locator('input[name="user_preferences[email]"]');
+    const email = form.locator('input[name="user_profile_sensitive[email]"]');
     const original = await email.inputValue();
     await email.fill(`e2e.email.${Date.now().toString(36)}@example.invalid`);
     // Leave currentPassword empty — sensitive change must fail.
-    await form.locator('input[name="user_preferences[currentPassword]"]').fill('');
+    await form.locator('input[name="user_profile_sensitive[currentPassword]"]').fill('');
     await form.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
     await expect(page).toHaveURL(/\/account\/profile/);
@@ -43,7 +43,7 @@ test.describe('Account mutations — profile & password', () => {
     // Email should not have stuck on the invalid value after failed save (controller reverts).
     await page.goto('/account/profile');
     await dismissProductTour(page);
-    await expect(page.locator('input[name="user_preferences[email]"]')).toHaveValue(original);
+    await expect(page.locator('input[name="user_profile_sensitive[email]"]')).toHaveValue(original);
   });
 
   test('password change rejects wrong current password and weak new password (UC-ACC-19)', async ({ page }) => {

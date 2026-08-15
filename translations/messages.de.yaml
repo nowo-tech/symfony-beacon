@@ -1041,7 +1041,10 @@ preferences:
     intro: Prüfen Sie Ihre Kontodaten und aktualisieren Sie Anzeigename oder Anmelde-E-Mail.
     tabs_label: Profilbereiche
     submit: Profil speichern
-    edit_title: Profil bearbeiten
+    submit_sensitive: E-Mail & Slack-ID speichern
+    edit_title: Anzeigename & Telefon
+    edit_sensitive_title: E-Mail & Slack-ID
+    edit_sensitive_intro: Zum Ändern der Anmelde-E-Mail oder der Slack-Mitglieder-ID ist Ihr aktuelles Passwort erforderlich.
     account_id: Konto-ID
     member_since: Mitglied seit
     last_activity: Letzte Aktivität

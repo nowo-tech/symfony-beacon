@@ -1019,7 +1019,10 @@ preferences:
     intro: Reveja os dados da conta e atualize o nome de exibição ou o e-mail de acesso.
     tabs_label: Secções do perfil
     submit: Salvar perfil
-    edit_title: Editar perfil
+    submit_sensitive: Guardar e-mail e Slack ID
+    edit_title: Nome de exibição e telefone
+    edit_sensitive_title: E-mail e Slack ID
+    edit_sensitive_intro: Alterar o e-mail de acesso ou o Slack member ID requer a palavra-passe atual.
     account_id: ID da conta
     member_since: Membro desde
     last_activity: Última atividade

@@ -1024,7 +1024,10 @@ preferences:
     intro: Bekijk je accountgegevens en werk weergavenaam of inlog-e-mail bij.
     tabs_label: Profielsecties
     submit: Profiel opslaan
-    edit_title: Profiel bewerken
+    submit_sensitive: E-mail en Slack-ID opslaan
+    edit_title: Weergavenaam en telefoon
+    edit_sensitive_title: E-mail en Slack-ID
+    edit_sensitive_intro: Om je inlog-e-mail of Slack-member-ID te wijzigen is je huidige wachtwoord vereist.
     account_id: Account-ID
     member_since: Lid sinds
     last_activity: Laatste activiteit

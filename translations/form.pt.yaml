@@ -227,6 +227,7 @@ user_preferences:
     placeholder: Senha atual
     help: Necessário apenas ao definir uma nova senha.
     help_email_change: Obrigatória ao alterar o endereço de email (login e destino de redefinição de palavra-passe).
+    help_sensitive_change: Obrigatória para atualizar o e-mail ou o Slack user ID.
     help_required: Confirme sua senha atual para definir uma nova.
   plain_password:
     label: Nova senha

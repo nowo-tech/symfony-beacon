@@ -79,7 +79,7 @@ final class AuditFields
     /**
      * @return array<string, mixed>
      */
-    public static function createdByForeignKey(string $userTable = 'app_user', ?string $name = null): array
+    public static function createdByForeignKey(string $userTable = 'user', ?string $name = null): array
     {
         $fk = [
             'columns' => ['created_by_id'],
@@ -97,7 +97,7 @@ final class AuditFields
     /**
      * @return array<string, mixed>
      */
-    public static function updatedByForeignKey(string $userTable = 'app_user', ?string $name = null): array
+    public static function updatedByForeignKey(string $userTable = 'user', ?string $name = null): array
     {
         $fk = [
             'columns' => ['updated_by_id'],
@@ -115,7 +115,7 @@ final class AuditFields
     /**
      * @return list<array<string, mixed>>
      */
-    public static function blameForeignKeys(string $userTable = 'app_user', ?string $createdName = null, ?string $updatedName = null): array
+    public static function blameForeignKeys(string $userTable = 'user', ?string $createdName = null, ?string $updatedName = null): array
     {
         return [
             self::createdByForeignKey($userTable, $createdName),

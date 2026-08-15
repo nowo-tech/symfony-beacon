@@ -52,6 +52,7 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
         self::assertSame('ok', $controller->profile(Request::create('/account/profile'))->getContent());
         self::assertArrayHasKey('account/profile.html.twig', $seen);
         self::assertSame($user, $seen['account/profile.html.twig']['profile_user']);
+        self::assertArrayHasKey('sensitive_form', $seen['account/profile.html.twig']);
     }
 
     public function testProfileRejectsEmailChangeWithoutCurrentPassword(): void
@@ -63,20 +64,25 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
         $currentPassword->method('getData')->willReturn('');
         $currentPassword->expects(self::once())->method('addError')->with(self::isInstanceOf(FormError::class));
 
-        $form = $this->createStub(FormInterface::class);
-        $form->method('handleRequest')->willReturnCallback(
-            static function () use ($user, $form): Stub {
+        $profileForm = $this->createStub(FormInterface::class);
+        $profileForm->method('handleRequest');
+        $profileForm->method('isSubmitted')->willReturn(false);
+        $profileForm->method('createView')->willReturn(new FormView());
+
+        $sensitiveForm = $this->createStub(FormInterface::class);
+        $sensitiveForm->method('handleRequest')->willReturnCallback(
+            static function () use ($user, $sensitiveForm): Stub {
                 $user->setEmail('new@example.com');
 
-                return $form;
+                return $sensitiveForm;
             },
         );
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('get')->willReturnMap([
+        $sensitiveForm->method('isSubmitted')->willReturn(true);
+        $sensitiveForm->method('isValid')->willReturn(true);
+        $sensitiveForm->method('get')->willReturnMap([
             ['currentPassword', $currentPassword],
         ]);
-        $form->method('createView')->willReturn(new FormView());
+        $sensitiveForm->method('createView')->willReturn(new FormView());
 
         $hasher = $this->createStub(UserPasswordHasherInterface::class);
         $hasher->method('isPasswordValid')->willReturn(false);
@@ -93,7 +99,7 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
         );
 
         $seen = [];
-        $this->boot($controller, $user, $form, $seen);
+        $this->bootNamed($controller, $user, $profileForm, $sensitiveForm, $seen);
 
         self::assertSame('ok', $controller->profile(Request::create('/account/profile', Request::METHOD_POST))->getContent());
         self::assertSame('me@example.com', $user->getEmail());
@@ -143,8 +149,29 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
         FormInterface $form,
         array &$seen,
     ): void {
+        $this->bootNamed($controller, $user, $form, $form, $seen);
+    }
+
+    /**
+     * @param FormInterface<mixed>                $profileForm
+     * @param FormInterface<mixed>                $sensitiveForm
+     * @param array<string, array<string, mixed>> $seen
+     */
+    private function bootNamed(
+        object $controller,
+        User $user,
+        FormInterface $profileForm,
+        FormInterface $sensitiveForm,
+        array &$seen,
+    ): void {
         $formFactory = $this->createStub(FormFactoryInterface::class);
-        $formFactory->method('create')->willReturn($form);
+        $formFactory->method('create')->willReturn($profileForm);
+        $formFactory->method('createNamed')->willReturnCallback(
+            static function (string $name) use ($profileForm, $sensitiveForm): FormInterface {
+                return 'user_profile_sensitive' === $name ? $sensitiveForm : $profileForm;
+            },
+        );
+        new ReflectionProperty(AccountPreferencesController::class, 'formFactory')->setValue($controller, $formFactory);
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));

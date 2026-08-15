@@ -228,6 +228,7 @@ user_preferences:
     placeholder: Mot de passe actuel
     help: Requis uniquement lors de la définition d'un nouveau mot de passe.
     help_email_change: Requis lors du changement d’adresse e-mail (connexion et destination de réinitialisation).
+    help_sensitive_change: Requis pour mettre à jour votre e-mail ou votre ID Slack.
     help_required: Confirmez votre mot de passe actuel pour en définir un nouveau.
   plain_password:
     label: Nouveau mot de passe

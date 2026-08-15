@@ -228,6 +228,7 @@ user_preferences:
     placeholder: Aktuelles Passwort
     help: Nur erforderlich, wenn ein neues Passwort festgelegt wird.
     help_email_change: Erforderlich bei Änderung Ihrer E-Mail-Adresse (Login und Passwort-Reset-Ziel).
+    help_sensitive_change: Erforderlich, um E-Mail oder Slack-Benutzer-ID zu aktualisieren.
     help_required: Bestätigen Sie Ihr aktuelles Passwort, um ein neues festzulegen.
   plain_password:
     label: Neues Passwort
