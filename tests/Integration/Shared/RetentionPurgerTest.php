@@ -18,6 +18,7 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends DatabaseWebTestCase
 {
@@ -134,6 +135,7 @@ final class RetentionPurgerTest extends DatabaseWebTestCase
         return new ProjectGovernanceResolver(
             self::getContainer()->get(EventRepository::class),
             new InstanceOpsDefaults($repository),
+            new ArrayAdapter(),
         );
     }
 }

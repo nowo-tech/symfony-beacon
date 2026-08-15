@@ -70,7 +70,7 @@ final class OtlpIngestGatewayTest extends TestCase
         $gate = new IngestProjectAccessGate(
             $projects,
             $keys,
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
             new IngestRateLimiter(new ArrayAdapter()),
             $em,
         );
@@ -109,7 +109,7 @@ final class OtlpIngestGatewayTest extends TestCase
         $gate = new IngestProjectAccessGate(
             $projects,
             $this->createStub(ProjectApiKeyRepository::class),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
             new IngestRateLimiter(new ArrayAdapter()),
             $em,
         );

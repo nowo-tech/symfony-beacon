@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectControllerHelpersTest extends TestCase
 {
@@ -139,8 +140,9 @@ final class ProjectControllerHelpersTest extends TestCase
             $controller,
             new ProjectGovernanceResolver(
                 $events,
-                $this->opsDefaultsWith(static function (): void {
+                $this->opsDefaultsWith(static function ($settings): void {
                 }),
+                new ArrayAdapter(),
             ),
         );
 
@@ -176,8 +178,9 @@ final class ProjectControllerHelpersTest extends TestCase
             $controller,
             new ProjectGovernanceResolver(
                 $events,
-                $this->opsDefaultsWith(static function (): void {
+                $this->opsDefaultsWith(static function ($settings): void {
                 }),
+                new ArrayAdapter(),
             ),
         );
 

@@ -23,6 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_event_issue_release', columns: ['issue_id', 'release_version'])]
 #[ORM\Index(name: 'idx_event_issue_user_identifier', columns: ['issue_id', 'user_identifier'])]
 #[ORM\Index(name: 'idx_event_project_request_url', columns: ['project_id', 'request_url'])]
+#[ORM\Index(name: 'idx_event_project_received', columns: ['project_id', 'received_at'])]
 class Event
 {
     #[ORM\Id]

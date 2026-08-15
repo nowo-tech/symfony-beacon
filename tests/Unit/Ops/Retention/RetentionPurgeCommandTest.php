@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgeCommandTest extends TestCase
 {
@@ -93,7 +94,7 @@ final class RetentionPurgeCommandTest extends TestCase
                 new IssueHistoryRecorder($em),
                 $em,
             ),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
         );
     }
 }

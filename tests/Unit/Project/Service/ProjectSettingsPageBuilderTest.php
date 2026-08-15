@@ -51,6 +51,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectSettingsPageBuilderTest extends TestCase
 {
@@ -120,7 +121,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(0);
         $events->method('countReceivedSinceForProject')->willReturn(0);
-        $governance = new ProjectGovernanceResolver($events, $ops);
+        $governance = new ProjectGovernanceResolver($events, $ops, new ArrayAdapter());
 
         $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([]);
