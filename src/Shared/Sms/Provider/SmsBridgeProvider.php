@@ -126,10 +126,8 @@ final readonly class SmsBridgeProvider implements SmsSenderInterface
             throw new SmsSendException('SMS Bridge transport error: '.$e->getMessage(), 0, $e);
         }
 
-        if ($statusCode < 200 || $statusCode >= 300 || !\is_array($payload)) {
-            $detail = \is_array($payload)
-                ? (string) ($payload['message'] ?? $payload['error'] ?? json_encode($payload))
-                : 'invalid response';
+        if ($statusCode < 200 || $statusCode >= 300) {
+            $detail = (string) ($payload['message'] ?? $payload['error'] ?? json_encode($payload));
             throw new SmsSendException(\sprintf('SMS Bridge rejected message (HTTP %d): %s', $statusCode, $detail));
         }
 
@@ -179,8 +177,8 @@ final readonly class SmsBridgeProvider implements SmsSenderInterface
             throw new SmsSendException('SMS Bridge transport error: '.$e->getMessage(), 0, $e);
         }
 
-        if ($statusCode < 200 || $statusCode >= 300 || !\is_array($payload)) {
-            $detail = \is_array($payload) ? (string) ($payload['error'] ?? json_encode($payload)) : 'invalid response';
+        if ($statusCode < 200 || $statusCode >= 300) {
+            $detail = (string) ($payload['error'] ?? json_encode($payload));
             throw new SmsSendException(\sprintf('SMS Bridge rejected message (HTTP %d): %s', $statusCode, $detail));
         }
 
