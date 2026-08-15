@@ -19,6 +19,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final readonly class PerformanceEnvelopeWriter
 {
+    /** Hard cap on persisted spans per transaction (payload may still be larger). */
+    public const int MAX_SPANS_PER_TRANSACTION = 500;
+
     public function __construct(
         private NPlusOneDetector $nPlusOneDetector,
         private DailyProjectStatRepository $dailyProjectStatRepository,
@@ -48,6 +51,9 @@ final readonly class PerformanceEnvelopeWriter
                     'start_timestamp' => $span['start_timestamp'] ?? null,
                     'timestamp' => $span['timestamp'] ?? null,
                 ];
+                if (\count($spanInputs) >= self::MAX_SPANS_PER_TRANSACTION) {
+                    break;
+                }
             }
         }
 

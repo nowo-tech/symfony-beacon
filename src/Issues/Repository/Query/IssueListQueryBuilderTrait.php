@@ -100,23 +100,18 @@ trait IssueListQueryBuilderTrait
             $priority,
             $assignee,
             $unassignedOnly,
-            forCount: true,
             tag: $tag,
             url: $url,
             user: $user,
         );
 
-        if (null !== $environment && '' !== $environment) {
-            $qb->select('COUNT(DISTINCT i.id)');
-        } else {
-            $qb->select('COUNT(i.id)');
-        }
+        $qb->select('COUNT(i.id)');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /** @return list<Issue> */
-    public function findByLastEnvironment(Project $project, string $environment, int $limit = 500): array
+    public function findByLastEnvironment(Project $project, string $environment, int $limit = 100): array
     {
         $normalized = Issue::normalizeEnvironment($environment);
         if (null === $normalized) {
@@ -190,7 +185,6 @@ trait IssueListQueryBuilderTrait
         ?IssuePriority $priority,
         ?User $assignee,
         bool $unassignedOnly,
-        bool $forCount = false,
         ?string $tag = null,
         ?string $url = null,
         ?string $user = null,
@@ -217,11 +211,10 @@ trait IssueListQueryBuilderTrait
             $qb->andWhere('i.assignee = :assignee')->setParameter('assignee', $assignee);
         }
         if (null !== $environment && '' !== $environment) {
-            $qb->innerJoin('i.events', 'e')
-                ->andWhere('e.environment = :env')
-                ->setParameter('env', $environment);
-            if (!$forCount) {
-                $qb->distinct();
+            $normalizedEnv = Issue::normalizeEnvironment($environment);
+            if (null !== $normalizedEnv) {
+                $qb->andWhere('i.lastEnvironment = :env')
+                    ->setParameter('env', $normalizedEnv);
             }
         }
         if (null !== $release && '' !== trim($release)) {

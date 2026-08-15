@@ -116,12 +116,14 @@ trait IssueReleaseQueryTrait
     }
 
     /** @return list<string> */
-    public function findDistinctReleases(Project $project): array
+    public function findDistinctReleases(Project $project, int $limit = 100): array
     {
         $projectId = $project->getId();
         if (null === $projectId) {
             return [];
         }
+
+        $limit = max(1, min(500, $limit));
 
         $sql = <<<'SQL'
             SELECT release_value
@@ -137,13 +139,16 @@ trait IssueReleaseQueryTrait
             WHERE release_value <> ''
             GROUP BY release_value
             ORDER BY MAX(seen_at) DESC, release_value DESC
+            LIMIT :limit
             SQL;
 
         /** @var list<int|string> $rows */
         $rows = $this->getEntityManager()->getConnection()->fetchFirstColumn($sql, [
             'projectId' => $projectId,
+            'limit' => $limit,
         ], [
             'projectId' => ParameterType::INTEGER,
+            'limit' => ParameterType::INTEGER,
         ]);
 
         $releases = [];
@@ -200,7 +205,7 @@ trait IssueReleaseQueryTrait
     }
 
     /** @return list<Issue> */
-    public function findByRelease(Project $project, string $release, int $limit = 500): array
+    public function findByRelease(Project $project, string $release, int $limit = 100): array
     {
         $normalized = Issue::normalizeRelease($release);
         if (null === $normalized) {
