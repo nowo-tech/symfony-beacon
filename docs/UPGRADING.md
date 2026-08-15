@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.15.0)](#unreleased-main-after-1150)
+- [Unreleased (main after 1.15.1)](#unreleased-main-after-1151)
+- [Upgrading from 1.15.0 to 1.15.1](#upgrading-from-1150-to-1151)
 - [Upgrading from 1.14.0 to 1.15.0](#upgrading-from-1140-to-1150)
 - [Upgrading from 1.13.0 to 1.14.0](#upgrading-from-1130-to-1140)
 - [Upgrading from 1.12.0 to 1.13.0](#upgrading-from-1120-to-1130)
@@ -68,9 +69,33 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.15.0)
+## Unreleased (main after 1.15.1)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.15.0 to 1.15.1
+
+**Cookie consent guest skin + test/E2E hardening** — host SCSS owns the public modal (CSP-safe), platform seed pins **bottom-left** equal-weight actions, PHPUnit SQLite cold-start fix, Appearance/theme/locale Playwright mutations. See `[1.15.1]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.15.1   # or pull main at the release commit
+composer install
+make ensure-up          # or make up
+php bin/console cache:clear
+make vite-build         # required for guest consent SCSS
+make seed-platform      # upsert cookie profile layout (bottom-left)
+```
+
+### Operator checklist
+
+1. **Assets**: rebuild Vite (`make vite-build`) so `_cookie_consent.scss` is in `public/build/`.
+2. **Cookie profile**: re-run `make seed-platform` (or Setup wizard step 1) so existing `dashboard_cookie_config` picks up bottom-left + equal-weight buttons. See [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md).
+3. **No migrations** in this patch.
+
+### Notes
+
+- PHPUnit / Playwright changes are developer-facing only; production operators skip test suite steps.
 
 ## Upgrading from 1.14.0 to 1.15.0
 

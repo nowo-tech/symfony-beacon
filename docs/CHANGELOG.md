@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.1] - 2026-08-15
+
 ### Fixed
 
 - Cookie consent guest modal: host SCSS owns coloured category cards, Beacon primary/ghost actions, and overlay **bottom-left** positioning (CSP style nonces drop vendor injected CSS). Platform seed upserts the DB profile layout (`docs/product/LEGAL-AND-COOKIES.md`; specs `002` / `055` / `081`).
+- PHPUnit on SQLite: disable SiteBackup cold-start under `when@test` (MySQL probe incompatible); promote tags/`request_url` in search-scale fixtures; align `AdminUserController` unit stubs after mutator extraction; fix duplicate DQL alias in issue search.
+
+### Added
+
+- Playwright mutations for Administration → Appearance (theme preset / brand / layout / colors) and Account theme + locale chrome (`e2e/admin/use-cases-appearance-mutations.spec.ts`, `e2e/account/use-cases-theme-locale-mutations.spec.ts`); E2E hardening (`gotoStable`, retries, Live/HOOK/SETUP fixes). Catalog: `docs/product/E2E-USE-CASES.md`.
+- Broader Vitest controller coverage and PHPUnit unit tests for Read API / issue JSON / appearance helpers.
+
+### Notes for integrators
+
+- No new Doctrine migrations.
+- Rebuild front-end assets (`make vite-build`) so guest consent SCSS ships.
+- Existing instances: `make seed-platform` (or Setup step 1) to upsert cookie profile **bottom-left** + equal-weight actions.
 
 ## [1.15.0] - 2026-08-15
 
@@ -1135,7 +1149,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...HEAD
+[1.15.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...v1.13.0
