@@ -139,7 +139,7 @@ final class ProjectControllerHelpersTest extends TestCase
             $controller,
             new ProjectGovernanceResolver(
                 $events,
-                $this->opsDefaultsWith(static function (): void {
+                $this->opsDefaultsWith(static function ($settings): void {
                 }),
             ),
         );
@@ -176,7 +176,7 @@ final class ProjectControllerHelpersTest extends TestCase
             $controller,
             new ProjectGovernanceResolver(
                 $events,
-                $this->opsDefaultsWith(static function (): void {
+                $this->opsDefaultsWith(static function ($settings): void {
                 }),
             ),
         );

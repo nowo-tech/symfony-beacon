@@ -14,6 +14,7 @@ use DateTimeZone;
  * Resolves effective governance limits (project override → instance default) and quota usage.
  *
  * Monthly quotas use the UTC calendar month (FR-004).
+ * Daily/monthly COUNTs rely on idx_event_project_received for ingest hot path.
  */
 final readonly class ProjectGovernanceResolver
 {
