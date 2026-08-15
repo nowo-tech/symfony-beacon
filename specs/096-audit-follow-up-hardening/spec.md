@@ -26,6 +26,12 @@ Operators get IP rate limits on Bearer Read API, SHA-256 ingest secrets (no Hali
 | F9 | Ingest OTLP / Issues | `OtlpResourceIterator`; `IssueStatusTransition`; `IssueJsonView` + normalizer helper |
 | F10 | Deps | `nowo-tech/beacon-bundle` **1.7.0** |
 
+## Amendments
+
+### 2026-08-15 — QR enabled only under dev/test (`100`)
+
+Default `qr_login.mode: disabled` (this feature) stayed correct for prod. Host now re-enables QR under `when@dev` / `when@test` so UC-AUTH-21/22 and local dual-device flows work without shipping QR in production. Phone UX on Account → Profile moved to `nowo-tech/phone-input-bundle` — see `specs/100-phone-input-profile/`.
+
 ## Non-goals
 
 - Shipping SMS OTP / re-enabling QR login

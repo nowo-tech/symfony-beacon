@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  COMPOSE_ENV_FILES: .env.local
   APP_ENV: test
   APP_SECRET: ChangeMePleaseUseARealSecret
   DEFAULT_URI: http://localhost
@@ -122,7 +123,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.dist .env
+          cp .env.dist .env.local
           php -r '
             $pdo = new PDO("mysql:host=127.0.0.1;port=3306", "root", "!ChangeMeRoot!");
             $pdo->exec("CREATE DATABASE IF NOT EXISTS app_test");
@@ -221,7 +222,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.dist .env
+          cp .env.dist .env.local
           php -r '
             $pdo = new PDO("mysql:host=127.0.0.1;port=3306", "root", "!ChangeMeRoot!");
             $pdo->exec("CREATE DATABASE IF NOT EXISTS app_test");
@@ -272,7 +273,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Prepare environment
-        run: cp .env.dist .env
+        run: cp .env.dist .env.local
 
       # App compose attaches to SHARED_DOCKER_NETWORK as external; infra owns MySQL + Redis.
       - name: Start shared infra (MySQL + Redis)
@@ -297,7 +298,7 @@ jobs:
           done
           echo "Timed out waiting for /health/live" >&2
           docker compose logs --tail=200
-          docker compose -p shared-infra -f compose.infra.yaml --env-file .env logs --tail=100 || true
+          docker compose -p shared-infra -f compose.infra.yaml --env-file .env.local logs --tail=100 || true
           exit 1
 
       - name: Wait for Mailpit UI

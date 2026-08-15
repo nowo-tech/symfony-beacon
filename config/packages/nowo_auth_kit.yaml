@@ -95,11 +95,12 @@ nowo_auth_kit:
                 # false — link existing users by email only (avoids ROLE_ADMIN social sign-ups here).
                 create_user_if_missing: false
 
-            # QR phone login (AuthKit 1.12). Local/E2E dual-device approve/deny (UC-AUTH-22).
+            # QR phone login (AuthKit 1.12). Default disabled (AUTH-005 / REQ-REV SEC-001)
+            # until phone OTP. Re-enabled under when@dev / when@test for E2E + PHPUnit.
             # Approvers need User.phoneVerifiedAt set (seed/demo or SQL).
             qr_login:
                 # disabled | enabled
-                mode: enabled
+                mode: disabled
                 # Challenge TTL in seconds (bundle clamps ~30–180).
                 challenge_ttl: 90
                 # Max challenge creates per client IP per window; 0 = disabled (local/E2E creates many).
@@ -189,3 +190,18 @@ nowo_auth_kit:
                 qr_login_deny:
                     path: /login/qr/{id}/deny
                     name: nowo_auth_kit_qr_login_deny
+
+# Local + PHPUnit / Playwright: enable QR for UC-AUTH-21/22 (prod stays disabled — AUTH-005).
+when@dev:
+    nowo_auth_kit:
+        profiles:
+            default:
+                qr_login:
+                    mode: enabled
+
+when@test:
+    nowo_auth_kit:
+        profiles:
+            default:
+                qr_login:
+                    mode: enabled

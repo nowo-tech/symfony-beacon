@@ -21,6 +21,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Dashboard menus (DB + Twig/API) | `nowo-tech/dashboard-menu-bundle` | Tree menus, i18n, permissions, admin CRUD |
 | Admin UI macros / `nowo-ui-*` CSS / modals | `nowo-tech/ui-kit-bundle` | Host: `css_framework: tailwind`, `icon_set: ux_icon`; remap tokens under `.kit-admin` |
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels; kit profiles for AuthKit/admin |
+| Phone / E.164 country-prefix inputs | `nowo-tech/phone-input-bundle` | Account → Profile (`100`); host CSP Stimulus override — do not hand-roll dial codes |
 | Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
 | Dual locale public paths (`/foo` + `/{locale}/foo`) | `nowo-tech/routing-kit-bundle` | `#[Routable]` + panel `/_routing/`; AuthKit/SiteBackup keep their own locale config |
 | HTTP request/response audit log + admin | `nowo-tech/http-log-bundle` | Admin `/admin/http-log`; async Messenger persist; host layout `kit/http_log_admin_layout.html.twig` |

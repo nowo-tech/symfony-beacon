@@ -105,6 +105,9 @@
     "nowo-tech/password-toggle-bundle": {
         "version": "v2.0.4"
     },
+    "nowo-tech/phone-input-bundle": {
+        "version": "v1.2.1"
+    },
     "nowo-tech/pwa-bundle": {
         "version": "v1.1.2"
     },

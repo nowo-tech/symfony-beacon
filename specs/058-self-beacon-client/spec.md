@@ -46,6 +46,7 @@ As a developer whose platform catalogs already exist, I run `make dogfood` to en
 2. **Given** `BEACON_DSN` was empty or stale (previous dogfood UUID) and seed wrote/updated it, **When** the command finishes, **Then** help text instructs `make restart` so the Kernel reloads the env.
 3. **Given** `var/secrets/` is missing, **When** I run `make dogfood`, **Then** Make creates the directory before seed so Halite key creation succeeds (`048`).
 4. **Given** `BEACON_DSN` already points at an old project UUID, **When** I run `make dogfood`, **Then** `.env` is updated to the current Symfony Beacon loopback DSN (unlike plain `app:seed-demo`, which leaves a non-empty DSN unchanged).
+
 ### User Story 4 - No ingest feedback loop (Priority: P1)
 
 As an operator, failures while processing Envelope ingest must not recursively re-ingest themselves endlessly.
@@ -62,6 +63,7 @@ As an operator, failures while processing Envelope ingest must not recursively r
 - **FR-001**: Require `nowo-tech/beacon-bundle` (^1.6.7) from Packagist and register configuration with empty-DSN-safe env defaults.
 - **FR-002**: Demo seed MUST use stable public and secret keys; MAY write server `BEACON_DSN` to loopback when empty.
 - **FR-003**: `make ready` MUST run bootstrap then seed; `make dogfood` MUST invoke `app:seed-demo --skip-demo-user --sync-server-dsn` (after `ensure-halite-secrets`) so server `BEACON_DSN` is re-wired to the current dogfood project; docs MUST document dogfooding and empty-DSN off switch.
+- **FR-003a** (2026-08-15): `make restart` MUST recreate php/messenger containers so updated `.env.local` (including `BEACON_DSN`) is visible inside the runtime — plain Compose `restart` is insufficient.
 - **FR-004**: A `before_send` service MUST drop self-ingest Envelope request paths; transport MUST be async by default for the server.
 - **FR-005**: `composer.json` MUST NOT require a private VCS repository entry for `nowo-tech/beacon-bundle` once the package is on Packagist.
 - **FR-006**: `make dogfood` / related seed Make targets MUST create `var/secrets/` before console so Halite can persist `.Halite.default.key`.
@@ -78,3 +80,9 @@ As an operator, failures while processing Envelope ingest must not recursively r
 
 - Reporting PHP parse/syntax errors that kill the process before Kernel listeners run (BeaconBundle limitation).
 - Auto-creating a non-demo “self” project on every boot without seed.
+
+## Amendments
+
+### 2026-08-15 — `make restart` reloads `.env.local` (`100`)
+
+`make restart` now runs `docker compose up -d --force-recreate --no-deps php messenger messenger-notify` (not plain `restart`). Compose injects `.env.local` only on create; a soft restart left a stale `BEACON_DSN` after `make dogfood` / seed. Operator working file is `.env.local` (REQ-ENV-003). See `specs/100-phone-input-profile/` O1 / FR-006.

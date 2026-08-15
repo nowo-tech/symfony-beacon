@@ -184,7 +184,7 @@ user_preferences:
   slack_user_id:
     placeholder: U012ABCDEF
   phone:
-    placeholder: '+34600111222'
+    placeholder: '600 111 222'
   preferred_locale:
     label: Sprache
     placeholder: Auto

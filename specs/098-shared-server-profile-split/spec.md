@@ -23,6 +23,12 @@ Beacon stays standalone by default (`make up`). Shared mode (`make up-shared` + 
 | C6 | Schema | Entity table `user`; `Version20260814230000`; AuditFields FK defaults → `user` |
 | C7 | Tests / E2E | PHPUnit profile/sensitive coverage; Playwright selectors for split forms + Slack hook helpers |
 
+## Amendments
+
+### 2026-08-15 — Phone field via phone-input kit (`100`)
+
+`AccountProfileType` phone is no longer a free-text `Length(max: 32)` field. It uses `nowo-tech/phone-input-bundle` `PhoneType` (country ISO + national number → concatenated E.164 on `User.phone`). HTML names are `user_profile[phone][country_iso]` / `[national_number]`; FormKit catalogue prefix remains `user_preferences`. See `specs/100-phone-input-profile/`.
+
 ## Non-goals
 
 - Doctrine read/write routing to `DATABASE_URL_RO` (documented placeholder only)

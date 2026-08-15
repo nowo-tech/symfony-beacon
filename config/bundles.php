@@ -39,4 +39,5 @@ return [
     Nowo\SiteBackupBundle\NowoSiteBackupBundle::class => ['all' => true],
     Nowo\RoutingKitBundle\NowoRoutingKitBundle::class => ['all' => true],
     Nowo\MaintenanceModeBundle\NowoMaintenanceModeBundle::class => ['all' => true],
+    Nowo\PhoneInputBundle\NowoPhoneInputBundle::class => ['all' => true],
 ];

@@ -34,12 +34,12 @@ services:
     container_name: mysql-9.7-primary
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.local}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
       MYSQL_USER: ${MYSQL_USER:-app}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env.local}
       MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
     volumes:
       - ./.data/infra/mysql-primary:/var/lib/mysql
@@ -70,9 +70,9 @@ services:
     container_name: mysql-9.7-replica
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.local}
       MYSQL_PRIMARY_HOST: mysql-9.7-primary
       MYSQL_REPLICATION_USER: replicator
       MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD:-${MYSQL_ROOT_PASSWORD}}

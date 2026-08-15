@@ -35,3 +35,10 @@ As an admin, I can mark a social credential as **Enterprise SSO** so it appears 
 - WebAuthn runtime (ROADMAP **Later**)
 - SAML (ROADMAP **Later**; OIDC enterprise flag shipped here)
 - QR PNG/SVG image generation (shipped in `075-qr-png`)
+
+## Amendments
+
+### 2026-08-15 — Profile phone kit + QR env split (`100`)
+
+- Account → Profile phone field uses `nowo-tech/phone-input-bundle` (`PhoneType`, E.164) instead of free text — see `specs/100-phone-input-profile/`.
+- Production/default `qr_login.mode` remains **disabled** per `096`; local/E2E re-enable via `when@dev` / `when@test` (not a global `enabled` default).

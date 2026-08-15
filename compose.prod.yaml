@@ -1,6 +1,6 @@
 # Production-oriented app stack (no source bind-mount).
 # Infra (MySQL + Redis): compose.infra.yaml — `make up-infra` then:
-#   docker compose -f compose.prod.yaml --env-file .env up --build -d
+#   docker compose -f compose.prod.yaml --env-file .env.local up --build -d
 # Or: make up-prod
 #
 # Secrets/config: `env_file: .env`. `environment:` only forces prod, remaps,
@@ -15,11 +15,11 @@ services:
       target: frankenphp_prod
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       APP_ENV: prod
       # Fail fast if critical secrets are missing from .env (no values embedded here).
-      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env.local.local}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
@@ -59,10 +59,10 @@ services:
       php:
         condition: service_started
     env_file:
-      - .env
+      - .env.local
     environment:
       APP_ENV: prod
-      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env.local.local}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
@@ -96,10 +96,10 @@ services:
       php:
         condition: service_started
     env_file:
-      - .env
+      - .env.local
     environment:
       APP_ENV: prod
-      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env.local.local}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:?Set MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
@@ -126,7 +126,7 @@ services:
     image: dunglas/mercure
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       SERVER_NAME: ':80'
       MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}

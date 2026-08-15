@@ -123,7 +123,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-14 | Web Push subscribe / unsubscribe | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
 | UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
 | UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` |
-| UC-ACC-17 | Save profile (display name / phone / Slack user id) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` |
+| UC-ACC-17 | Save profile (display name / phone / Slack user id) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (phone: kit country ISO + national number → E.164; `100`) |
 | UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
 | UC-ACC-19 | Change password from security | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) |
 | UC-ACC-20 | Account index / preferences redirects | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |

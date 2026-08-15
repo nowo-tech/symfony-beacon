@@ -83,7 +83,7 @@ Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). I
 ```bash
 git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
-cp .env.dist .env
+cp .env.dist .env.local
 make up          # shared infra (MySQL/Redis) + app + builds frontend into public/build/
 make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # or: make bootstrap && make seed

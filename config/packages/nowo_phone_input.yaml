@@ -1,0 +1,18 @@
+# nowo-tech/phone-input-bundle — Account → Profile phone ([REQ-IDENTITY-002])
+# Assets: css/flag-icons.min.css + css/phone_input.css (package nowo_phone_input).
+# Form theme: @NowoPhoneInputBundle/Form/phone_input_widget.html.twig (see twig.yaml).
+nowo_phone_input:
+    country_prefix_selector: true
+    default_country: ES
+    preferred_countries: [ES, PT, FR, GB, DE, IT, US, MX, AR, CL, CO, PE]
+    value_format: CONCATENATED
+    prefix_display: FLAG_AND_PREFIX
+    show_flag: true
+    prefix_search: true
+    flag_display: CSS_ICON
+    phone_validation: COUNTRY
+    use_phone_form_theme: true
+    trim: true
+    container_classes: [nowo-phone-input]
+    prefix_selector_classes: [nowo-phone-input__prefix]
+    national_number_classes: [input, nowo-phone-input__number]

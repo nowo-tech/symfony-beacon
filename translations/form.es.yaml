@@ -184,7 +184,9 @@ user_preferences:
   slack_user_id:
     placeholder: U012ABCDEF
   phone:
-    placeholder: '+34600111222'
+    label: Teléfono
+    placeholder: '600 111 222'
+    help: Opcional. Código de país + número nacional (E.164). Reservado para futuro acceso por SMS/OTP. Cambiar o borrar el número elimina la verificación previa.
   preferred_locale:
     label: Idioma
     placeholder: Automático

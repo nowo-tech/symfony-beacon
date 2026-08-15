@@ -1,13 +1,19 @@
-.PHONY: help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
-DC := docker compose
-DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file .env
-DC_PROD := docker compose -f compose.prod.yaml --env-file .env
+# REQ-ENV-003: operator working file is `.env.local`
+ENV_FILE := .env.local
+export COMPOSE_ENV_FILES := $(ENV_FILE)
+DC := docker compose --env-file $(ENV_FILE)
+DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file $(ENV_FILE)
+DC_PROD := $(DC) -f compose.prod.yaml --env-file $(ENV_FILE)
 # Override for print-urls when using the prod compose file (`make up-prod`).
 COMPOSE ?= $(DC)
+
+ensure-env:
+	@./.scripts/ensure-env-local.sh
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
@@ -99,7 +105,7 @@ strip-cursor-coauthor-from-history:
 # Used as a prerequisite by targets that need a running container. Does not call `make up`
 # (avoids recursion when `up` itself runs vite-build).
 ensure-up:
-	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@$(MAKE) ensure-env
 	@$(MAKE) up-infra
 	@$(DC) exec -T php true >/dev/null 2>&1 || { \
 		echo "App stack is down — starting compose up -d…"; \
@@ -111,8 +117,8 @@ ensure-up:
 print-urls:
 	@HTTP_PUB=$$($(COMPOSE) port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
 	HTTPS_PUB=$$($(COMPOSE) port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
-	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
-	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
+	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env.local 2>/dev/null | cut -d= -f2-); fi; \
+	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env.local 2>/dev/null | cut -d= -f2-); fi; \
 	HTTP_PUB=$${HTTP_PUB:-9084}; \
 	HTTPS_PUB=$${HTTPS_PUB:-9447}; \
 	echo ""; \
@@ -126,10 +132,10 @@ print-urls:
 
 # Shared MySQL + Redis (compose.infra.yaml, project shared-infra).
 # Coexistence: if mysql-9.7-primary already exists (e.g. developer.local.server/server), skip create.
-# MYSQL_TOPOLOGY=simple|replica (from .env or env) — replica adds profile mysql-replica.
+# MYSQL_TOPOLOGY=simple|replica (from .env.local or env) — replica adds profile mysql-replica.
 up-infra:
-	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
-	@set -a; . ./.env; set +a; \
+	@$(MAKE) ensure-env
+	@set -a; . ./.env.local; set +a; \
 	TOPOLOGY="$${MYSQL_TOPOLOGY:-simple}"; \
 	PROFILE_ARGS=""; \
 	if [ "$$TOPOLOGY" = "replica" ]; then PROFILE_ARGS="--profile mysql-replica"; fi; \
@@ -164,7 +170,7 @@ down-infra:
 	-$(DC_INFRA) --profile mysql-replica down
 
 up:
-	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@$(MAKE) ensure-env
 	@$(MAKE) up-infra
 	$(DC) up --build -d
 	@echo "Building frontend assets (static public/build/)…"
@@ -173,7 +179,7 @@ up:
 	@echo "Optional local SMTP: make mailpit  (see docs/ops/MAILPIT.md)"
 
 up-prod:
-	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@$(MAKE) ensure-env
 	@$(MAKE) up-infra
 	$(DC_PROD) up --build -d
 	@$(MAKE) print-urls COMPOSE="$(DC_PROD)"
@@ -184,14 +190,14 @@ up-shared: up
 # Mode is injected via compose.yaml `environment: FRANKENPHP_MODE` (overrides env_file).
 # One-shot for this up/recreate — persist by setting FRANKENPHP_MODE in .env.
 classic:
-	@test -f .env || cp .env.dist .env
+	@$(MAKE) ensure-env
 	@$(MAKE) up-infra
 	FRANKENPHP_MODE=classic $(DC) up --build -d --force-recreate php
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 worker:
-	@test -f .env || cp .env.dist .env
+	@$(MAKE) ensure-env
 	@$(MAKE) up-infra
 	FRANKENPHP_MODE=worker $(DC) up --build -d --force-recreate php
 	@$(MAKE) vite-build
@@ -235,7 +241,7 @@ pnpm: ensure-up
 # Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
 # Docs: docs/ops/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
 mailpit:
-	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@$(MAKE) ensure-env
 	$(DC) --profile mail up -d mailer
 	@UI_PUB=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
 	UI_PUB=$${UI_PUB:-18026}; \
@@ -294,8 +300,10 @@ ready: bootstrap seed
 	@echo "Ready: demo project seeded; restart php if BEACON_DSN was just written (make restart)"
 	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
 
+# Recreate (not plain restart) so Compose reloads .env into the container
+# (e.g. BEACON_DSN after make dogfood / make seed). Plain `restart` keeps stale env.
 restart: ensure-up
-	$(DC) restart php messenger messenger-notify
+	$(DC) up -d --force-recreate --no-deps php messenger messenger-notify
 	@$(MAKE) vite-build
 
 mysql: ensure-up

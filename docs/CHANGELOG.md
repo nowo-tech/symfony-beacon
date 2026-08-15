@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-08-15
+
+### Added
+
+- **SMS Bridge provider** (`App\Shared\Sms\`): env-selected `SMS_PROVIDER=sms_bridge` sends via sibling [sms-bridge](../sms-bridge/) (Twilio-compatible Messages API or native `/api/v1/sms`); `bin/console app:sms:send` for ops smoke tests. Docs: [docs/product/SMS.md](product/SMS.md). Phone OTP / QR approve remain Later.
+- **Phone input kit on Account → Profile (`100` / 6.51)**: `nowo-tech/phone-input-bundle` **1.2.1** (`PhoneType`, country prefix → concatenated E.164 on `User.phone`); CSP-safe host Stimulus prefix picker + themed SCSS (no vendor inline script / Bootstrap phone CSS); AuthKit `qr_login` default **disabled**, enabled under `when@dev` / `when@test` for UC-AUTH-21/22. Spec: `specs/100-phone-input-profile/`.
+- Engineering audit evidence artifact: [`docs/ops/ENGINEERING-AUDIT.md`](ops/ENGINEERING-AUDIT.md) (REV-007).
+- Outbound SMS scaffolding (disabled by default): `SMS_PROVIDER=null` | `sms_bridge` env + `App\Shared\Sms\*` (`app:sms:send` console) for future QR SMS OTP — **not** wired to AuthKit login yet.
+
+### Changed
+
+- **Operator env file (REQ-ENV-003)**: working file is **`.env.local`** (from `.env.dist`); Compose `env_file` / Make `COMPOSE_ENV_FILES` / CI use `.env.local`. `make ensure-env` migrates leftover `.env` → `.env.local`.
+
+### Fixed
+
+- `make restart` recreates php / messenger / messenger-notify (`--force-recreate`) so Compose reloads `.env.local` (e.g. `BEACON_DSN` after `make dogfood` / seed).
+- CI E2E: start shared infra (`make up-infra`) before app Compose; preinstall Composer vendor once + entrypoint `flock` (php/messenger race on bind mount); guest locale URL accepts bare `/login` when `DEFAULT_LOCALE=en`.
+
+### Notes for integrators
+
+- No new Doctrine migrations.
+- Migrate env: `mv .env .env.local` (or `make ensure-env`), then `make restart`.
+- Rebuild front-end assets (`make vite-build`) so phone-prefix Stimulus + SCSS ship.
+- Custom clients posting Account profile phone as a single text field must switch to `user_profile[phone][country_iso]` + `user_profile[phone][national_number]`.
+- Production QR login remains disabled until SMS OTP; local/E2E use `when@dev` / `when@test`.
+
 ## [1.15.1] - 2026-08-15
 
 ### Fixed
@@ -1149,7 +1175,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...v1.16.0
 [1.15.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...v1.14.0

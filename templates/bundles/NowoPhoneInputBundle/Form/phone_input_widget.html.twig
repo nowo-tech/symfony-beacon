@@ -1,0 +1,164 @@
+{#- Host override: Stimulus phone-prefix-picker (CSP-safe). Upstream inline <script> blocked by nonce CSP. -#}
+{%- block nowo_phone_input_widget -%}
+  {%- set prefix_selector = country_prefix_selector ?? true -%}
+  {%- set display = prefix_display ?? 'FLAG_AND_PREFIX' -%}
+  {%- set show_flag = show_flag ?? true -%}
+  {%- set prefix_search = prefix_search ?? true -%}
+  {%- set flags = show_flag ? (flag_display ?? 'CSS_ICON') : 'NONE' -%}
+  {%- set countries_list = countries ?? [] -%}
+  {%- set selected_iso = form.country_iso.vars.value|default(default_country|default('ES')) -%}
+  {%- set selected_country = null -%}
+  {%- for country in countries_list -%}
+    {%- if country.iso == selected_iso -%}
+      {%- set selected_country = country -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if selected_country is null and countries_list|length > 0 -%}
+    {%- set selected_country = countries_list[0] -%}
+  {%- endif -%}
+
+  <div class="{{ (container_classes ?? ['input-group', 'nowo-phone-input'])|join(' ') }}">
+    {%- if prefix_selector and form.country_iso is defined -%}
+      <div data-controller="phone-prefix-picker" class="nowo-phone-input__prefix-picker{% if display == 'FLAG_ONLY' %} nowo-phone-input__prefix-picker--flag-only{% endif %}{% if not show_flag %} nowo-phone-input__prefix-picker--no-flag{% endif %}{% if not prefix_search %} nowo-phone-input__prefix-picker--no-search{% endif %}" data-flag-display="{{ flags }}" data-prefix-display="{{ display }}" data-show-flag="{{ show_flag ? '1' : '0' }}" data-prefix-search="{{ prefix_search ? '1' : '0' }}">
+        <select
+          id="{{ form.country_iso.vars.id }}"
+          name="{{ form.country_iso.vars.full_name }}"
+          class="nowo-phone-input__prefix-select {{ (prefix_selector_classes ?? ['form-select', 'nowo-phone-input__prefix'])|join(' ') }}"
+          aria-label="{{ 'Country prefix'|trans({}, translation_domain|default(null)) }}"
+        >
+          {%- for country in countries_list -%}
+            {%- set option_label -%}
+              {%- if display == 'FULL' -%}
+                {%- if show_flag -%}{{ country.flag }} {%- endif -%}{{ country.dial_code }} {{ country.name }}
+              {%- elseif display == 'PREFIX_ONLY' -%}
+                {{ country.dial_code }}
+              {%- elseif display == 'FLAG_ONLY' -%}
+                {{ country.name }}
+              {%- elseif display == 'ISO_AND_PREFIX' -%}
+                {{ country.iso }} {{ country.dial_code }}
+              {%- else -%}
+                {{ country.dial_code }}
+              {%- endif -%}
+            {%- endset -%}
+            <option
+              value="{{ country.iso }}"
+              data-prefix="{{ country.dial_code }}"
+              data-flag="{{ country.flag }}"
+              data-flag-icon="{{ country.flag_icon|default('circle-flags:' ~ country.iso|lower) }}"
+              {% if selected_iso == country.iso %}selected="selected"{% endif %}
+            >{{ option_label|trim }}</option>
+          {%- endfor -%}
+        </select>
+
+        <button
+          type="button"
+          class="nowo-phone-input__prefix-toggle"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="{{ form.country_iso.vars.id }}_dropdown"
+          data-action="click->phone-prefix-picker#toggleMenu keydown->phone-prefix-picker#onToggleKeydown"
+        >
+          {%- if show_flag -%}
+          <span class="nowo-phone-input__prefix-toggle-flag">
+            {%- if selected_country -%}
+              {% include '@NowoPhoneInputBundle/Form/_phone_country_flag.html.twig' with {
+                country: selected_country,
+                flag_display: flags,
+              } only %}
+            {%- endif -%}
+          </span>
+          {%- endif -%}
+          {%- if display != 'FLAG_ONLY' -%}
+          <span class="nowo-phone-input__prefix-toggle-code">{{ selected_country.dial_code|default('') }}</span>
+          {%- endif -%}
+          <span class="nowo-phone-input__prefix-toggle-caret" aria-hidden="true"></span>
+        </button>
+
+        <div
+          id="{{ form.country_iso.vars.id }}_dropdown"
+          class="nowo-phone-input__prefix-dropdown"
+          hidden
+        >
+          {%- if prefix_search -%}
+          <div class="nowo-phone-input__prefix-search">
+            <input
+              type="search"
+              class="nowo-phone-input__prefix-search-input form-control form-control-sm"
+              placeholder="{{ 'Search country or prefix…'|trans({}, translation_domain|default(null)) }}"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              aria-controls="{{ form.country_iso.vars.id }}_menu"
+              aria-autocomplete="list"
+              data-action="input->phone-prefix-picker#onSearchInput keydown->phone-prefix-picker#onSearchKeydown"
+            />
+          </div>
+          {%- endif -%}
+
+          <ul
+            id="{{ form.country_iso.vars.id }}_menu"
+            class="nowo-phone-input__prefix-menu"
+            role="listbox"
+          >
+            {%- for country in countries_list -%}
+              <li
+                class="nowo-phone-input__prefix-option{% if selected_iso == country.iso %} is-selected{% endif %}"
+                role="option"
+                data-action="click->phone-prefix-picker#onOptionClick mouseenter->phone-prefix-picker#onOptionMouseEnter"
+                data-iso="{{ country.iso }}"
+                data-prefix="{{ country.dial_code }}"
+                data-flag="{{ country.flag }}"
+                data-flag-icon="{{ country.flag_icon|default('circle-flags:' ~ country.iso|lower) }}"
+                data-search="{{ country.iso|lower }} {{ country.name|lower }} {{ country.dial_code }} {{ country.dial_code|replace({'+': ''}) }}"
+                aria-selected="{{ selected_iso == country.iso ? 'true' : 'false' }}"
+              >
+                {%- if show_flag -%}
+                <span class="nowo-phone-input__prefix-option-flag">
+                  {% include '@NowoPhoneInputBundle/Form/_phone_country_flag.html.twig' with {
+                    country: country,
+                    flag_display: flags,
+                  } only %}
+                </span>
+                {%- endif -%}
+                <span class="nowo-phone-input__prefix-option-label">
+                  {%- if display == 'FULL' -%}
+                    {{ country.dial_code }} {{ country.name }}
+                  {%- elseif display == 'PREFIX_ONLY' -%}
+                    {{ country.dial_code }}
+                  {%- elseif display == 'FLAG_ONLY' -%}
+                    <span class="nowo-phone-input__sr-only">{{ country.name }} ({{ country.dial_code }})</span>
+                  {%- elseif display == 'ISO_AND_PREFIX' -%}
+                    {{ country.iso }} {{ country.dial_code }}
+                  {%- else -%}
+                    {{ country.dial_code }}
+                  {%- endif -%}
+                </span>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          <p class="nowo-phone-input__prefix-empty" hidden>
+            {{ 'No countries found'|trans({}, translation_domain|default(null)) }}
+          </p>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- set number_attr = form.national_number.vars.attr|merge({
+      class: ((national_number_classes ?? ['form-control', 'nowo-phone-input__number'])|join(' ') ~ ' ' ~ (form.national_number.vars.attr.class|default('')))|trim,
+    }) -%}
+    <input
+      type="tel"
+      id="{{ form.national_number.vars.id }}"
+      name="{{ form.national_number.vars.full_name }}"
+      value="{{ form.national_number.vars.value }}"
+      {% for attrname, attrvalue in number_attr %}
+        {{ attrname }}="{{ attrvalue }}"
+      {% endfor %}
+      {% if form.national_number.vars.required|default(false) %}required="required"{% endif %}
+      {% if form.national_number.vars.disabled|default(false) %}disabled="disabled"{% endif %}
+      {% if form.national_number.vars.readonly|default(false) %}readonly="readonly"{% endif %}
+    />
+  </div>
+
+{%- endblock nowo_phone_input_widget -%}

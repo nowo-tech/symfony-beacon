@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+    # Defaults when the key is absent from the process env / .env.local
+    env(SMS_PROVIDER): 'null'
+    env(SMS_BRIDGE_BASE_URL): ''
+    env(SMS_BRIDGE_AUTH_TOKEN): ''
+    env(SMS_BRIDGE_ACCOUNT_SID): ''
+    env(SMS_BRIDGE_FROM): ''
+    env(SMS_BRIDGE_DEVICE_ID): ''
+    env(SMS_BRIDGE_API_MODE): 'twilio'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Shared\Sms\SmsSenderInterface: '@App\Shared\Sms\ConfiguredSmsSender'
+
+    App\Shared\Sms\ConfiguredSmsSender:
+        arguments:
+            $provider: '%env(SMS_PROVIDER)%'
+
+    App\Shared\Sms\Provider\SmsBridgeProvider:
+        arguments:
+            $baseUrl: '%env(SMS_BRIDGE_BASE_URL)%'
+            $authToken: '%env(SMS_BRIDGE_AUTH_TOKEN)%'
+            $accountSid: '%env(SMS_BRIDGE_ACCOUNT_SID)%'
+            $defaultFrom: '%env(SMS_BRIDGE_FROM)%'
+            $defaultDeviceId: '%env(SMS_BRIDGE_DEVICE_ID)%'
+            $apiMode: '%env(SMS_BRIDGE_API_MODE)%'

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c5942b8c88415f625e6bc4380c9b59c8",
+    "content-hash": "80a8b5052d33c86fe38df9c05ac912b2",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3328,6 +3328,95 @@
                 }
             ],
             "time": "2026-08-04T12:11:50+00:00"
+        },
+        {
+            "name": "nowo-tech/phone-input-bundle",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/PhoneInputBundle.git",
+                "reference": "200867c160c4e806bd2f0e959817a978da5a12fc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/PhoneInputBundle/zipball/200867c160c4e806bd2f0e959817a978da5a12fc",
+                "reference": "200867c160c4e806bd2f0e959817a978da5a12fc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/form": "^6.0 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/validator": "^6.4 || ^7.0 || ^8.0",
+                "twig/extra-bundle": "^3.12",
+                "twig/string-extra": "^3.12"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "giggsey/libphonenumber-for-php": "^8.0 || ^9.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "rector/rector": "^2.0",
+                "symfony/asset": "^6.0 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+                "symfony/yaml": "^6.0 || ^7.0 || ^8.0",
+                "vincentlanglet/twig-cs-fixer": "^3.0"
+            },
+            "suggest": {
+                "giggsey/libphonenumber-for-php": "Optional E.164 validation and formatting via libphonenumber",
+                "symfony/http-client": "Required by symfony/ux-icons to fetch Iconify icons unless icons are locked locally",
+                "symfony/ux-icons": "Optional SVG country flags via ux_icon (circle-flags:xx) in flag_display=UX_ICON mode"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\PhoneInputBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle providing a phone form type with optional country prefix selector and flexible value formats",
+            "homepage": "https://github.com/nowo-tech/PhoneInputBundle",
+            "keywords": [
+                "E164",
+                "bundle",
+                "country",
+                "form",
+                "phone",
+                "prefix",
+                "symfony",
+                "tel"
+            ],
+            "support": {
+                "issues": "https://github.com/nowo-tech/PhoneInputBundle/issues",
+                "source": "https://github.com/nowo-tech/PhoneInputBundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-07T21:33:38+00:00"
         },
         {
             "name": "nowo-tech/pwa-bundle",

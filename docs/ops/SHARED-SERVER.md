@@ -21,7 +21,7 @@ Primary is always GTID-ready and creates a `replicator` user on first empty data
 ## Quick start (this repo owns infra)
 
 ```bash
-cp .env.dist .env   # once — defaults already point at shared hosts
+cp .env.dist .env.local   # once — defaults already point at shared hosts
 make up            # up-infra + app + vite-build
 make ready         # migrate + seed
 make down          # stops app only; MySQL/Redis stay up for siblings

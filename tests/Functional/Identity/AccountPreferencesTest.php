@@ -195,11 +195,13 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('input[name="user_profile[phone]"]');
+        self::assertSelectorExists('select[name="user_profile[phone][country_iso]"]');
+        self::assertSelectorExists('input[name="user_profile[phone][national_number]"]');
 
         $form = $crawler->selectButton('Save profile')->form([
             'user_profile[displayName]' => 'QR User',
-            'user_profile[phone]' => '+34600111222',
+            'user_profile[phone][country_iso]' => 'ES',
+            'user_profile[phone][national_number]' => '600111222',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
@@ -226,7 +228,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         $form = $crawler->selectButton('Save profile')->form([
             'user_profile[displayName]' => 'QR Keep',
-            'user_profile[phone]' => '+34600111222',
+            'user_profile[phone][country_iso]' => 'ES',
+            'user_profile[phone][national_number]' => '600111222',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');
@@ -251,7 +254,8 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/account/profile');
         $form = $crawler->selectButton('Save profile')->form([
             'user_profile[displayName]' => 'QR Clear',
-            'user_profile[phone]' => '+34600999999',
+            'user_profile[phone][country_iso]' => 'ES',
+            'user_profile[phone][national_number]' => '600999999',
         ]);
         $client->submit($form);
         self::assertResponseRedirects('/account/profile');

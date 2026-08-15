@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.15.1)](#unreleased-main-after-1151)
+- [Unreleased (main after 1.16.0)](#unreleased-main-after-1160)
+- [Upgrading from 1.15.1 to 1.16.0](#upgrading-from-1151-to-1160)
 - [Upgrading from 1.15.0 to 1.15.1](#upgrading-from-1150-to-1151)
 - [Upgrading from 1.14.0 to 1.15.0](#upgrading-from-1140-to-1150)
 - [Upgrading from 1.13.0 to 1.14.0](#upgrading-from-1130-to-1140)
@@ -69,9 +70,39 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.15.1)
+## Unreleased (main after 1.16.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.15.1 to 1.16.0
+
+**Phone input kit + `.env.local` + CI Compose infra (`100` / 6.51)** — `nowo-tech/phone-input-bundle` **1.2.1**; CSP-safe prefix picker; AuthKit QR stays disabled in prod (`when@dev` / `when@test` enable it); operator working env is `.env.local`; `make restart` recreates workers so `BEACON_DSN` reloads. See `[1.16.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.16.0   # or pull main at the release commit
+# Migrate working env (REQ-ENV-003):
+#   mv .env .env.local   # or: make ensure-env
+composer install
+make ensure-up          # or make up
+php bin/console cache:clear
+make vite-build         # required for phone-prefix Stimulus + SCSS
+make restart            # reload BEACON_DSN / Compose env from .env.local
+```
+
+### Operator checklist
+
+1. **Env file**: move secrets to `.env.local` (`cp .env.dist .env.local` on fresh hosts; `mv .env .env.local` or `make ensure-env` when upgrading). Prefer deleting leftover `.env` so Compose does not prefer a stale copy.
+2. **Assets**: rebuild Vite (`make vite-build`) so phone-prefix picker + `_phone_input.scss` ship.
+3. **No migrations** in this cut. Existing `User.phone` values remain; Profile now edits via country + national number.
+4. **QR login**: production remains `qr_login.mode: disabled` until SMS OTP. Local/E2E use `when@dev` / `when@test`.
+5. **Dogfood DSN**: prefer `make restart` (force-recreate) after syncing `BEACON_DSN` — soft Compose restart keeps stale env.
+
+### Notes
+
+- Custom clients posting Account profile phone as a single text field must switch to `user_profile[phone][country_iso]` + `user_profile[phone][national_number]`.
+- Phone is existing account PII (auth surface); no new optional cookies — Cookie Consent unchanged.
+- CI E2E now starts `make up-infra` before the app stack (external `SHARED_DOCKER_NETWORK`).
 
 ## Upgrading from 1.15.0 to 1.15.1
 
@@ -1946,8 +1977,8 @@ No database schema migration is required for 0.3.0 auth/i18n changes.
 ```bash
 git fetch --tags
 git checkout v0.2.0   # or merge/rebase main
-cp .env.dist .env.dist.upstream && diff -u .env .env.dist.upstream || true
-# Merge any new keys from .env.dist into your .env (especially DEFAULT_URI / Vite notes)
+cp .env.dist .env.dist.upstream && diff -u .env.local .env.dist.upstream || true
+# Merge any new keys from .env.dist into your .env.local (especially DEFAULT_URI / Vite notes)
 make down
 make up
 docker compose exec php composer install
@@ -1991,7 +2022,7 @@ If you are starting from this project for the first time:
 ```bash
 git clone git@github.com:nowo-tech/symfony-beacon.git
 cd symfony-beacon
-cp .env.dist .env
+cp .env.dist .env.local
 git config core.hooksPath .githooks   # optional: strip Cursor co-author trailers
 make up
 make bootstrap   # migrate + seed (or: make console ARGS='doctrine:migrations:migrate -n')

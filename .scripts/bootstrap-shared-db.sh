@@ -13,8 +13,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if [[ ! -f .env ]]; then
-  echo "Missing .env — cp .env.dist .env first" >&2
+if [[ ! -f .env.local ]]; then
+  echo "Missing .env.local — cp .env.dist .env.local.local first" >&2
   exit 1
 fi
 

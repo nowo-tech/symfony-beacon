@@ -1,5 +1,5 @@
 ###> symfony/framework-bundle ###
-# Only `.env.dist` is versioned. Install: `cp .env.dist .env` (or `make up`).
+# Only `.env.dist` is versioned. Install: `cp .env.dist .env.local` (or `make up`).
 # Never commit secrets. Optional overrides: `.env.local` (gitignored).
 /.env
 /.env.local

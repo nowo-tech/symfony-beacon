@@ -2,6 +2,12 @@
 
 {% block title %}{{ 'preferences.profile.title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {# Flags only — vendor phone_input.css uses Bootstrap #fff fallbacks and fights dark theme. #}
+    <link rel="stylesheet" href="{{ asset('css/flag-icons.min.css', 'nowo_phone_input') }}">
+{% endblock %}
+
 {% block body %}
 <div class="mx-auto space-y-6">
     <div>

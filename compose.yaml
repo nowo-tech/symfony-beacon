@@ -3,7 +3,7 @@
 # Infra (MySQL + Redis) lives in compose.infra.yaml — start with `make up-infra` first
 # (or `make up`, which does both). Docs: docs/ops/SHARED-SERVER.md
 #
-# App secrets/config come from `.env` via `env_file` (cp .env.dist .env).
+# App secrets/config come from `.env.local` via `env_file` (cp .env.dist .env.local).
 # `environment:` only for renames, forced values, and keys not in `.env`.
 # Production image: docker compose -f compose.prod.yaml … or
 #   docker build --target frankenphp_prod -t symfony-frankenphp .
@@ -15,7 +15,7 @@ services:
       target: frankenphp_dev
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       # Host bind-mount ./:/app is not owned by container root; silence Git "dubious ownership".
       GIT_CONFIG_COUNT: "1"
@@ -72,7 +72,7 @@ services:
       php:
         condition: service_started
     env_file:
-      - .env
+      - .env.local
     environment:
       # Always bind to the compose target port (host publishes VITE_PORT → 5173).
       VITE_LISTEN_PORT: "5173"
@@ -111,7 +111,7 @@ services:
       php:
         condition: service_started
     env_file:
-      - .env
+      - .env.local
     environment:
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
@@ -151,7 +151,7 @@ services:
       php:
         condition: service_started
     env_file:
-      - .env
+      - .env.local
     environment:
       GIT_CONFIG_COUNT: "1"
       GIT_CONFIG_KEY_0: safe.directory
@@ -183,7 +183,7 @@ services:
     image: dunglas/mercure
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       # Hub image expects its own key names (not MERCURE_JWT_SECRET from .env).
       SERVER_NAME: ':80'

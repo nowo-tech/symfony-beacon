@@ -2658,6 +2658,26 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         panel_history?: scalar|Param|null, // Default: "@NowoMaintenanceModeBundle/panel/history.html.twig"
  *     },
  * }
+ * @psalm-type NowoPhoneInputConfig = array{
+ *     country_prefix_selector?: bool|Param, // Enable country prefix selector by default // Default: true
+ *     default_country?: scalar|Param|null, // Default ISO 3166-1 alpha-2 country code // Default: "ES"
+ *     preferred_countries?: list<scalar|Param|null>,
+ *     allowed_countries?: list<scalar|Param|null>,
+ *     excluded_countries?: list<scalar|Param|null>,
+ *     value_format?: "CONCATENATED"|"SEPARATED"|"OBJECT"|Param, // Default model value format // Default: "CONCATENATED"
+ *     prefix_display?: "FULL"|"PREFIX_ONLY"|"FLAG_ONLY"|"FLAG_AND_PREFIX"|"ISO_AND_PREFIX"|Param, // How country prefixes are displayed in the selector // Default: "FLAG_AND_PREFIX"
+ *     show_flag?: bool|Param, // Show country flags in the prefix selector (set false for prefix-only UI) // Default: true
+ *     prefix_search?: bool|Param, // Show a search box in the visual prefix dropdown // Default: true
+ *     flag_display?: "EMOJI"|"CSS_ICON"|"UX_ICON"|"NONE"|Param, // How country flags are rendered in the prefix selector // Default: "CSS_ICON"
+ *     container_classes?: list<scalar|Param|null>,
+ *     prefix_selector_classes?: list<scalar|Param|null>,
+ *     national_number_classes?: list<scalar|Param|null>,
+ *     use_phone_form_theme?: bool|Param, // Use the bundle form theme for rendering // Default: true
+ *     trim?: bool|Param, // Trim whitespace from national number input // Default: true
+ *     invalid_message?: scalar|Param|null, // Default: "The phone number is invalid."
+ *     phone_validation?: "COUNTRY"|"PREFIX"|"NONE"|Param, // Validate national numbers using country ISO (COUNTRY), dial prefix (PREFIX) or disable (NONE) // Default: "COUNTRY"
+ *     use_libphonenumber?: bool|Param, // Use giggsey/libphonenumber-for-php when installed for validation // Default: true
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2697,6 +2717,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_site_backup?: NowoSiteBackupConfig,
  *     nowo_routing_kit?: NowoRoutingKitConfig,
  *     nowo_maintenance_mode?: NowoMaintenanceModeConfig,
+ *     nowo_phone_input?: NowoPhoneInputConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2738,6 +2759,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
+ *         nowo_phone_input?: NowoPhoneInputConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2778,6 +2800,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
+ *         nowo_phone_input?: NowoPhoneInputConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2820,6 +2843,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_site_backup?: NowoSiteBackupConfig,
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
+ *         nowo_phone_input?: NowoPhoneInputConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

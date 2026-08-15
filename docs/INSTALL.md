@@ -16,8 +16,8 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 ## Fresh install
 
 ```bash
-cp .env.dist .env
-# Set SiteBackup secrets in .env (do not commit them):
+cp .env.dist .env.local
+# Set SiteBackup secrets in .env.local (do not commit them):
 #   SITE_SETUP_TOKEN=$(openssl rand -hex 24)
 #   docker compose exec php bin/console nowo:site-backup:hash-password
 #   → paste into SITE_BACKUP_PASSWORD_HASH

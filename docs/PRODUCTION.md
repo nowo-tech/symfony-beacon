@@ -63,7 +63,7 @@ Optional Compose overlay for a full app stack without bind-mounts (infra first):
 ```bash
 make up-infra
 make up-prod
-# or: docker compose -f compose.prod.yaml --env-file .env up --build -d
+# or: docker compose -f compose.prod.yaml --env-file .env.local up --build -d
 ```
 
 See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager in production; do not reuse the `!ChangeMe!` placeholders from `.env.dist`.

@@ -175,8 +175,8 @@ user_preferences:
     help: 'Optional. Your Slack member ID enables Assign/Resolve on Slack alerts. Find it in Slack → profile → … → Copy member ID.'
   phone:
     label: Phone number
-    placeholder: '+34600111222'
-    help: Optional. Reserved for future SMS OTP / phone sign-in. Changing or clearing the number removes any previous phone verification.
+    placeholder: '600 111 222'
+    help: Optional. Country code + national number (E.164). Reserved for future SMS OTP / phone sign-in. Changing or clearing the number removes any previous phone verification.
   preferred_locale:
     label: Language
     placeholder: Auto
