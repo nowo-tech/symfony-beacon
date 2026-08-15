@@ -51,12 +51,10 @@ final class SmsBridgeProviderTest extends TestCase
 
     public function testNativeCreate(): void
     {
-        $http = new MockHttpClient(static function (): MockResponse {
-            return new MockResponse(json_encode([
-                'id' => '019fea2d-507b-7890-8b33-ca488db6f696',
-                'status' => 'queued',
-            ], \JSON_THROW_ON_ERROR), ['http_code' => 202]);
-        });
+        $http = new MockHttpClient(static fn (): MockResponse => new MockResponse(json_encode([
+            'id' => '019fea2d-507b-7890-8b33-ca488db6f696',
+            'status' => 'queued',
+        ], \JSON_THROW_ON_ERROR), ['http_code' => 202]));
 
         $provider = new SmsBridgeProvider(
             $http,
