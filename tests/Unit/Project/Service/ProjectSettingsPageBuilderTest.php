@@ -42,6 +42,7 @@ use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use RuntimeException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -51,7 +52,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectSettingsPageBuilderTest extends TestCase
 {

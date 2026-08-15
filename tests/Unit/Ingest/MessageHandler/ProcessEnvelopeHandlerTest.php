@@ -28,8 +28,8 @@ use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class ProcessEnvelopeHandlerTest extends TestCase
 {

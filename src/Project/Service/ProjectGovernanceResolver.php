@@ -168,7 +168,7 @@ final readonly class ProjectGovernanceResolver
      */
     private function cachedCount(string $key, callable $compute): int
     {
-        return (int) $this->cache->get($key, function (ItemInterface $item) use ($compute): int {
+        return (int) $this->cache->get($key, static function (ItemInterface $item) use ($compute): int {
             $item->expiresAfter(self::QUOTA_COUNT_TTL_SECONDS);
 
             return $compute();

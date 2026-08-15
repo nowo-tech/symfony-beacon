@@ -18,8 +18,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Console\Tester\CommandTester;
 
 final class RetentionPurgeCommandTest extends TestCase
 {
