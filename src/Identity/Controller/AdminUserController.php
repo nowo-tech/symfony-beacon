@@ -351,12 +351,6 @@ final class AdminUserController extends AbstractController
         return $this->redirectToRoute('admin_users');
     }
 
-    /** Whether the account holds ROLE_ADMIN (instance admin, not project owner). */
-    private function isAppAdmin(User $user): bool
-    {
-        return \in_array('ROLE_ADMIN', $user->getRoles(), true);
-    }
-
     /** Number of accounts with ROLE_ADMIN (used to protect the last admin). */
     private function countAdmins(): int
     {

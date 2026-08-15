@@ -148,16 +148,16 @@ final class EnvelopeGoldenContractTest extends DatabaseWebTestCase
         $raw = file_get_contents($path);
         self::assertNotFalse($raw, 'Missing golden fixture: '.$path);
 
-        return str_replace('__HTTPS_PORT__', self::httpsPort(), $raw);
+        return str_replace('__HTTPS_PORT__', $this->httpsPort(), $raw);
     }
 
     /**
      * Same default as .env.dist HTTPS_PORT; override with env for local port remaps.
      */
-    private static function httpsPort(): string
+    private function httpsPort(): string
     {
         $port = $_ENV['HTTPS_PORT'] ?? $_SERVER['HTTPS_PORT'] ?? getenv('HTTPS_PORT');
-        if (!\is_string($port) || $port === '') {
+        if (!\is_string($port) || '' === $port) {
             return '9447';
         }
 

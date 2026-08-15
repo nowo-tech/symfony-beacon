@@ -23,14 +23,14 @@ final class SetupCompletedSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/beacon-setup-completed-'.bin2hex(random_bytes(4));
-        (new Filesystem())->mkdir($this->tmpDir);
+        new Filesystem()->mkdir($this->tmpDir);
         $this->requiredFile = $this->tmpDir.'/setup.required';
         $this->doneFile = $this->tmpDir.'/setup.done';
     }
 
     protected function tearDown(): void
     {
-        (new Filesystem())->remove($this->tmpDir);
+        new Filesystem()->remove($this->tmpDir);
     }
 
     public function testMarksSetupCompletedAndDoneMarkerWhenNotYetDone(): void

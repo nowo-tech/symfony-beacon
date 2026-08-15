@@ -37,7 +37,7 @@ final class AdminUserMutatorTest extends TestCase
     public function testCannotChangeOwnRoleOrDisableSelf(): void
     {
         $actor = new User();
-        (new ReflectionProperty(User::class, 'id'))->setValue($actor, 7);
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 7);
 
         $em = $this->createStub(EntityManagerInterface::class);
         $mutator = new AdminUserMutator(

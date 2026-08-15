@@ -7,6 +7,7 @@ namespace App\Shared\Appearance;
 use App\Shared\Appearance\Entity\SiteAppearance;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use Symfony\Contracts\Service\ResetInterface;
+use Throwable;
 
 /**
  * Resolves site look & feel for Twig (brand + CSS custom properties).
@@ -33,7 +34,7 @@ final class SiteAppearanceProvider implements ResetInterface
 
         try {
             return $this->cached = $this->repository->getOrCreate();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Cold start / missing schema: setup layout must render without Doctrine.
             return $this->cached = SiteAppearance::defaults();
         }

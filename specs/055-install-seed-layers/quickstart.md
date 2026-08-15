@@ -14,7 +14,7 @@ make bootstrap
 
 Then either:
 
-- Open cold-start UI: `https://localhost:9447/setup` ([SiteBackupBundle](https://packagist.org/packages/nowo-tech/site-backup-bundle); see `056`), or
+- Open cold-start UI: `https://localhost:9447/setup` ([SiteBackupBundle](https://packagist.org/packages/nowo-tech/site-backup-bundle) **≥ 1.13**; see `specs/056-setup-wizard`), or
 - Register first admin: `https://localhost:9447/register` (AuthKit; locale-prefixed variants also work), or
 - `make seed` for demo admin + Symfony Beacon project + `.demo-client.env`
 

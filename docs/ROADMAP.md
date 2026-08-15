@@ -312,8 +312,8 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.46 | **Audit follow-up hardening**: Read API IP rate limit; ingest `secret_hash`; `InstancePermissionVoter` abstain on `Project`; membership/group write services + FormType role POSTs; filter DTOs / `MapQueryString`; QR disabled; Slack user-id password+unique; interaction token 24h; OTLP iterator / status transitions | Beacon | `096-audit-follow-up-hardening` | **Done** (v1.12.0) |
 | 6.47 | **E2E CI + AuthKit login throttle**: per-username AuthKit limiter decorator; CI E2E 90m + Mailpit + `node_modules` chown; Playwright reliability + atomic UC catalog (~247 Covered) | Beacon | `097-e2e-ci-login-throttle` | **Done** (v1.13.0) |
 | 6.48 | **Shared MySQL + profile split**: `make up-shared` / `SHARED-SERVER.md`; Account basic vs password-gated sensitive forms; rename `app_user` → `user` | Beacon | `098-shared-server-profile-split` | **Done** (v1.14.0) |
-| 6.49 | **Setup wizard product-complete**: SiteBackup **1.13.0** (`cache_doctrine`, empty-schema cold-start, optional `database_url` Skip) + CookieConsent **1.8.0** (mid-migration schema-ready); durable done store; no host gate/progress/consent workarounds | Beacon | `056-setup-wizard` | **Done** (Unreleased after v1.14.0) |
-| 6.50 | **Redis horizontal scale**: dual-mode Redis (standalone + server share); sessions + rate-limit + Messenger streams; promoted `event_tag` / `request_url`; split `ProjectAccessService`; `AdminUserMutator` | Beacon | `099-redis-horizontal-scale` | **Done** (Unreleased) |
+| 6.49 | **Setup wizard product-complete**: SiteBackup **1.13.0** (`cache_doctrine`, empty-schema cold-start, optional `database_url` Skip) + CookieConsent **1.8.0** (mid-migration schema-ready); durable done store; no host gate/progress/consent workarounds | Beacon | `056-setup-wizard` | **Done** (v1.15.0) |
+| 6.50 | **Redis horizontal scale**: dual-mode Redis (standalone + server share); sessions + rate-limit + Messenger streams; promoted `event_tag` / `request_url`; split `ProjectAccessService`; `AdminUserMutator` | Beacon | `099-redis-horizontal-scale` | **Done** (v1.15.0) |
 
 ### Next (immediate queue)
 
@@ -410,7 +410,8 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.12.0** | Audit follow-up (`096` / 6.46): Read API rate limit; hash-at-rest ingest secrets; Project voter abstain; membership write DRY; filter DTOs; QR disabled; Slack user-id hygiene; beacon-bundle 1.7.0 |
 | **v1.13.0** | E2E CI + AuthKit login throttle (`097` / 6.47); FormKit 2.3.0; Playwright catalog ~247 Covered; FrankenPHP hot reload |
 | **v1.14.0** | Shared MySQL mode + account profile split + `app_user`→`user` (`098` / 6.48); `SHARED-SERVER.md` |
-| **Unreleased** | Setup wizard 100% (`056` / 6.49): SiteBackup 1.13 + CookieConsent 1.8 + `cache_doctrine`; Redis dual-mode + payload promotions + access split (`099` / 6.50) |
+| **v1.15.0** | Setup wizard 100% (`056` / 6.49): SiteBackup 1.13 + CookieConsent 1.8 + `cache_doctrine`; shared infra Compose; Redis dual-mode + payload promotions + access split (`099` / 6.50) |
+| **Unreleased** | — |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -422,4 +423,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-15 (**6.49** product-complete — SiteBackup 1.13 / CookieConsent 1.8 / `cache_doctrine`; **6.50** Unreleased — Redis horizontal scale + payload promotions + Identity/access thin; cut **v1.14.0**).
+Last updated: 2026-08-15 (cut **v1.15.0** — **6.49** setup wizard product-complete + **6.50** Redis horizontal scale / promotions / access split; shared infra Compose).

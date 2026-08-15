@@ -107,10 +107,10 @@ final class BackfillEventPromotionsCommand extends Command
 
             $this->entityManager->flush();
             $this->entityManager->clear();
-            $io->writeln(sprintf('Processed %d / %d events…', $processed, \count($ids)));
+            $io->writeln(\sprintf('Processed %d / %d events…', $processed, \count($ids)));
         }
 
-        $io->success(sprintf('Backfill done: %d events, %d tag rows inserted.', $processed, $tagged));
+        $io->success(\sprintf('Backfill done: %d events, %d tag rows inserted.', $processed, $tagged));
 
         return Command::SUCCESS;
     }

@@ -31,6 +31,6 @@ final class InstanceSettingsDurableSetupDoneStoreTest extends TestCase
         $repo = $this->createStub(InstanceSettingsRepository::class);
         $repo->method('getOrCreate')->willThrowException(new RuntimeException('no schema'));
 
-        self::assertFalse((new InstanceSettingsDurableSetupDoneStore($repo))->isDone());
+        self::assertFalse(new InstanceSettingsDurableSetupDoneStore($repo)->isDone());
     }
 }

@@ -7,10 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-08-15
+
+### Added
+
+- **Redis horizontal scale (`099` / 6.50)**: dual-mode Redis (standalone Compose + shared infra); sessions, rate-limit pools, and Messenger transports on Redis; promoted `event.request_url` + `event_tag` at ingest (indexed filters, no payload `JSON_SEARCH`); `app:events:backfill-promotions` for historical rows; Identity admin thin (`AdminUserMutator`); `ProjectAccessService` split (membership / share / require*). Spec: `specs/099-redis-horizontal-scale/`.
+- **Setup wizard product-complete (`056` / 6.49)**: SiteBackup **1.13.0** (`progress_storage: cache_doctrine`, empty-schema cold-start, optional `database_url` Skip) + CookieConsent **1.8.0** (mid-migration schema-ready); durable done via `InstanceSettingsDurableSetupDoneStore`. Spec: `specs/056-setup-wizard/`.
+
 ### Changed
 
 - **Shared infra in-repo**: `compose.infra.yaml` (project `shared-infra`) owns MySQL + Redis on `${SHARED_DOCKER_NETWORK}`; `compose.yaml` / `compose.prod.yaml` are app-only. `make up` / `make up-infra` / `make up-prod`; `MYSQL_TOPOLOGY=simple|replica`. Removed `compose.shared.yaml`. Docs: [`SHARED-SERVER.md`](ops/SHARED-SERVER.md).
-- **SiteBackupBundle 1.12.0** + **CookieConsentBundle 1.7.0** (`056` / 6.49): per-step journal (`progress_step_rows`), kit-owned durable done (`setup.durable_done` + `DurableSetupDoneStoreInterface`) and cold-start schema gate (`setup.cold_start`); CookieConsent skips Doctrine when the request attribute says cold-start. Beacon wires `InstanceSettingsDurableSetupDoneStore` and drops host gate/redirect/consent decorators.
+- Pins: `nowo-tech/site-backup-bundle` **1.13.0**, `nowo-tech/cookie-consent-bundle` **1.8.0** (supersedes intermediate 1.12 / 1.7 durable-done cut).
+
+### Fixed
+
+- Product tour closes the avatar menu when the tour ends.
+- Compose Makefile targets (`classic` / `worker` / `restart` / `print-urls`) with `messenger-notify`; Envelope golden fixtures share `__HTTPS_PORT__` with the Beacon client SDK.
+
+### Notes for integrators
+
+- Run migrations (`make migrate`) — `Version20260815120000` adds `event.request_url` and `event_tag`. Optional: `php bin/console app:events:backfill-promotions` for existing events.
+- Align `.env` with `.env.dist` (`MYSQL_HOST=mysql-9.7-primary`, `REDIS_HOST=redis-8.10.0`, `REDIS_URL`); start infra with `make up` (runs `up-infra`).
+- Setup: `progress_storage: cache_doctrine`, `setup.durable_done.enabled: true`, alias `DurableSetupDoneStoreInterface` → `InstanceSettingsDurableSetupDoneStore`.
 
 ## [1.14.0] - 2026-08-15
 
@@ -1113,7 +1131,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.11.0...v1.12.0

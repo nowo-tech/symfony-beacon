@@ -2,7 +2,7 @@
 
 **Feature Branch**: `099-redis-horizontal-scale`  
 **Created**: 2026-08-15  
-**Status**: Implemented (Unreleased / Phase 6.50)  
+**Status**: Implemented (v1.15.0 / Phase 6.50)  
 **Roadmap**: Phase 6.50  
 
 **Input**: Operators planning HTTP replicas need shared session + rate-limit storage and an ingest queue that does not compete with MySQL telemetry; use server-share Redis when available and keep an independent Redis service for standalone `make up`. Then constrain issue tag/url filters that scan `event.payload`. Then thin Identity admin HTTP and split `ProjectAccessService`.

@@ -4,8 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.14.0)](#unreleased-main-after-1140)
-- [Upgrading from 1.14.0 (shared infra Compose)](#upgrading-from-1140-shared-infra-compose)
+- [Unreleased (main after 1.15.0)](#unreleased-main-after-1150)
+- [Upgrading from 1.14.0 to 1.15.0](#upgrading-from-1140-to-1150)
 - [Upgrading from 1.13.0 to 1.14.0](#upgrading-from-1130-to-1140)
 - [Upgrading from 1.12.0 to 1.13.0](#upgrading-from-1120-to-1130)
 - [Upgrading from 1.11.0 to 1.12.0](#upgrading-from-1110-to-1120)
@@ -68,40 +68,40 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.14.0)
+## Unreleased (main after 1.15.0)
 
-**SiteBackup 1.12.0 + CookieConsent 1.7.0 (`056` / 6.49)** — per-step journal, kit durable done + cold-start gate; Beacon `InstanceSettingsDurableSetupDoneStore`. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
 
-Also: **in-repo shared infra Compose** (`compose.infra.yaml`) — see [Upgrading from 1.14.0 (shared infra Compose)](#upgrading-from-1140-shared-infra-compose).
+## Upgrading from 1.14.0 to 1.15.0
+
+**Shared infra + setup wizard 100% + Redis scale (`056` / 6.49, `099` / 6.50)** — in-repo `compose.infra.yaml` (MySQL/Redis), SiteBackup **1.13** / CookieConsent **1.8** with `cache_doctrine` progress, Redis sessions/Messenger, promoted event tags/URL. See `[1.15.0]` in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
-composer update nowo-tech/site-backup-bundle nowo-tech/cookie-consent-bundle
+git fetch --tags
+git checkout v1.15.0   # or pull main at the release commit
+# Align .env with .env.dist (MYSQL_HOST=mysql-9.7-primary, REDIS_HOST=redis-8.10.0, REDIS_URL)
+composer install
+make up                 # up-infra + app
+make migrate            # Version20260815120000 — event.request_url + event_tag
 php bin/console cache:clear
+# Optional historical backfill:
+# php bin/console app:events:backfill-promotions
+make vite-build         # if you serve built assets
 ```
 
 ### Operator checklist
 
-1. **No host migration** for `nowo_site_backup_setup_step` / progress tables — SiteBackup creates them with runtime DDL on first DB write during setup (or when chain mirrors after `database_create`).
-2. **Cold start**: enable `setup.cold_start` (SiteBackup) + CookieConsent **1.7**; early wizard steps still use filesystem progress until DBAL works.
-3. **Prod recreate**: if `var/site-backup/setup.done` is missing but `setup_completed_at` is set and catalogs/schema are present, `/setup` redirects home (SiteBackup **1.12** durable done + Beacon `InstanceSettingsDurableSetupDoneStore`).
-4. **Host wiring**: alias `DurableSetupDoneStoreInterface` → `App\Setup\InstanceSettingsDurableSetupDoneStore`; set `setup.durable_done.enabled: true`.
+1. **Compose**: stop old embedded `database` / `redis` if present (`docker compose down`), then `make up`. Data path is `./.data/infra/` (old `./.data/mysql` unused). See [SHARED-SERVER.md](ops/SHARED-SERVER.md).
+2. **Redis**: required for sessions, rate limits, Messenger, and setup `progress_storage: cache_doctrine`.
+3. **Composer**: `nowo-tech/site-backup-bundle` **1.13.0**, `nowo-tech/cookie-consent-bundle` **1.8.0**.
+4. **Setup wiring**: `setup.durable_done.enabled: true`; alias `DurableSetupDoneStoreInterface` → `App\Setup\InstanceSettingsDurableSetupDoneStore`; `progress_storage: cache_doctrine` (no `var/` progress JSON). Cold start: empty schema still enters `/setup`; CookieConsent **1.8** skips Doctrine mid-migration.
+5. **Migrations**: confirm `event.request_url` and `event_tag`. Re-run is safe. Backfill optional for pre-existing events.
+6. **Replica**: `MYSQL_TOPOLOGY=replica` + `MYSQL_HOST_RO=mysql-9.7-replica` when using the read replica container.
 
-## Upgrading from 1.14.0 (shared infra Compose)
+### Notes
 
-**In-repo shared infra** — MySQL/Redis moved to `compose.infra.yaml`; app stacks join `server_network`. Update `.env` from `.env.dist` (`MYSQL_HOST=mysql-9.7-primary`, `REDIS_HOST=redis-8.10.0`, `MYSQL_TOPOLOGY`). See [SHARED-SERVER.md](ops/SHARED-SERVER.md).
-
-```bash
-git pull
-# Align .env hosts with .env.dist (no more MYSQL_HOST=database / REDIS_HOST=redis)
-make up              # up-infra + app
-make migrate
-```
-
-### Operator checklist
-
-1. **Stop old embedded DB/Redis** if you still have Compose services named `database` / `redis` from a previous tree: `docker compose down`, then `make up`.
-2. **Data**: old `./.data/mysql` is unused; new data lives under `./.data/infra/`. Migrate with `mysqldump` / restore if you need existing rows, or keep using coexistence with `developer.local.server/server` containers.
-3. **Replica**: set `MYSQL_TOPOLOGY=replica` and `MYSQL_HOST_RO=mysql-9.7-replica` when you want the read replica container.
+- SiteBackup creates `nowo_site_backup_*` progress tables with runtime DDL — no host migration for those.
+- Prod recreate: missing `var/site-backup/setup.done` still redirects home when durable done + catalogs/schema are present.
 
 ## Upgrading from 1.13.0 to 1.14.0
 

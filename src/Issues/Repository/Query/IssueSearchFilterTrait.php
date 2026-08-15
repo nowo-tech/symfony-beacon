@@ -88,7 +88,7 @@ trait IssueSearchFilterTrait
 
         $like = '%'.SqlLikeEscaper::escape(trim($url)).'%';
         $qb->andWhere(
-            'EXISTS (SELECT 1 FROM '.Event::class." ue"
+            'EXISTS (SELECT 1 FROM '.Event::class.' ue'
             ." WHERE ue.issue = i AND ue.project = :urlFilterProject AND ue.requestUrl LIKE :urlLike ESCAPE '\\')",
         )
             ->setParameter('urlFilterProject', $project)

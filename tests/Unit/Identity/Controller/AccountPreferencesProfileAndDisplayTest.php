@@ -167,9 +167,7 @@ final class AccountPreferencesProfileAndDisplayTest extends TestCase
         $formFactory = $this->createStub(FormFactoryInterface::class);
         $formFactory->method('create')->willReturn($profileForm);
         $formFactory->method('createNamed')->willReturnCallback(
-            static function (string $name) use ($profileForm, $sensitiveForm): FormInterface {
-                return 'user_profile_sensitive' === $name ? $sensitiveForm : $profileForm;
-            },
+            static fn (string $name): FormInterface => 'user_profile_sensitive' === $name ? $sensitiveForm : $profileForm,
         );
         new ReflectionProperty(AccountPreferencesController::class, 'formFactory')->setValue($controller, $formFactory);
 
