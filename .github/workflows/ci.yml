@@ -286,17 +286,29 @@ jobs:
           docker compose run --rm --no-deps php \
             composer install --prefer-dist --no-progress --no-interaction
           docker compose --profile mail up -d
-          # Entrypoint migrates when DB is ready; wait for HTTPS.
+          # External shared network can race with first up; ensure php can resolve MySQL.
+          NET="$(grep -E '^SHARED_DOCKER_NETWORK=' .env.local | cut -d= -f2- || true)"
+          NET="${NET:-server_network}"
+          for svc in php messenger messenger-notify; do
+            cid="$(docker compose ps -q "$svc" 2>/dev/null || true)"
+            if [ -n "$cid" ]; then
+              docker network connect "$NET" "$cid" 2>/dev/null || true
+            fi
+          done
+          # Entrypoint migrates when DB is ready; wait for HTTPS + DB DNS.
           for i in $(seq 1 90); do
             if curl -kfsS https://localhost:9447/health/live >/dev/null 2>&1 \
-              && docker compose exec -T php test -f vendor/autoload_runtime.php; then
-              echo "Stack is live (vendor ready)"
+              && docker compose exec -T php test -f vendor/autoload_runtime.php \
+              && docker compose exec -T php getent hosts mysql-9.7-primary >/dev/null 2>&1; then
+              echo "Stack is live (vendor ready, MySQL DNS ok)"
               exit 0
             fi
-            echo "Waiting for HTTPS + vendor… (${i}/90)"
+            echo "Waiting for HTTPS + vendor + MySQL DNS… (${i}/90)"
             sleep 5
           done
-          echo "Timed out waiting for /health/live" >&2
+          echo "Timed out waiting for /health/live or MySQL DNS" >&2
+          docker compose exec -T php getent hosts mysql-9.7-primary || true
+          docker network inspect "$NET" --format '{{json .Containers}}' || true
           docker compose logs --tail=200
           docker compose -p shared-infra -f compose.infra.yaml --env-file .env.local logs --tail=100 || true
           exit 1
