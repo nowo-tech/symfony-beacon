@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Setup;
 
+use App\Setup\InstanceSettingsDurableSetupDoneStore;
 use App\Setup\SetupCompletedSubscriber;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -42,7 +43,10 @@ final class SetupCompletedSubscriberTest extends TestCase
         $repository->expects(self::once())->method('save')->with($settings);
 
         $markers = new SetupMarkerManager($this->requiredFile, $this->doneFile);
-        $subscriber = new SetupCompletedSubscriber($repository, $markers);
+        $subscriber = new SetupCompletedSubscriber(
+            new InstanceSettingsDurableSetupDoneStore($repository),
+            $markers,
+        );
         $subscriber();
 
         self::assertTrue($settings->isSetupCompleted());
@@ -61,7 +65,10 @@ final class SetupCompletedSubscriberTest extends TestCase
         $markers = new SetupMarkerManager($this->requiredFile, $this->doneFile);
         self::assertFalse($markers->isDone());
 
-        $subscriber = new SetupCompletedSubscriber($repository, $markers);
+        $subscriber = new SetupCompletedSubscriber(
+            new InstanceSettingsDurableSetupDoneStore($repository),
+            $markers,
+        );
         $subscriber();
 
         self::assertTrue($settings->isSetupCompleted());
