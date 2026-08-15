@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Identity\Service\SocialLoginCredentialSeeder;
-use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Settings\Form\SocialLoginCredentialType;
 use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
 use Nowo\AuthKitBundle\SocialLogin\SocialLoginGate;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
