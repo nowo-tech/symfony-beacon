@@ -147,7 +147,7 @@ final class IngestProjectAccessGateTest extends TestCase
         $this->gate = new IngestProjectAccessGate(
             $this->projectRepository,
             $this->apiKeyRepository,
-            new ProjectGovernanceResolver($this->eventRepository, $ops, new ArrayAdapter()),
+            new ProjectGovernanceResolver($this->eventRepository, $ops),
             $this->rateLimiter,
             $this->entityManager,
         );

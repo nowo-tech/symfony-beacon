@@ -9,26 +9,20 @@ use App\Project\Entity\Project;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
 use DateTimeZone;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Resolves effective governance limits (project override → instance default) and quota usage.
  *
  * Monthly quotas use the UTC calendar month (FR-004).
- * Daily/monthly event counts are cached briefly to avoid a COUNT on every ingest ACK + worker.
+ * Daily/monthly COUNTs rely on idx_event_project_received for ingest hot path.
  */
 final readonly class ProjectGovernanceResolver
 {
     public const float APPROACHING_QUOTA_RATIO = 0.8;
 
-    /** Short TTL: slight overshoot under burst is acceptable for soft quota gates. */
-    private const int QUOTA_COUNT_TTL_SECONDS = 30;
-
     public function __construct(
         private EventRepository $eventRepository,
         private InstanceOpsDefaults $opsDefaults,
-        private CacheInterface $cache,
     ) {
     }
 
@@ -59,31 +53,12 @@ final readonly class ProjectGovernanceResolver
 
     public function eventsReceivedToday(Project $project): int
     {
-        $projectId = $project->getId();
-        if (null === $projectId) {
-            return $this->eventRepository->countReceivedTodayForProject($project);
-        }
-
-        $dayKey = new DateTimeImmutable('today')->format('Ymd');
-
-        return $this->cachedCount(
-            'gov_quota_daily_'.$projectId.'_'.$dayKey,
-            fn (): int => $this->eventRepository->countReceivedTodayForProject($project),
-        );
+        return $this->eventRepository->countReceivedTodayForProject($project);
     }
 
     public function eventsReceivedThisMonth(Project $project): int
     {
-        $projectId = $project->getId();
-        $since = self::utcMonthStart();
-        if (null === $projectId) {
-            return $this->eventRepository->countReceivedSinceForProject($project, $since);
-        }
-
-        return $this->cachedCount(
-            'gov_quota_monthly_'.$projectId.'_'.$since->format('Ym'),
-            fn (): int => $this->eventRepository->countReceivedSinceForProject($project, $since),
-        );
+        return $this->eventRepository->countReceivedSinceForProject($project, self::utcMonthStart());
     }
 
     /**
@@ -161,18 +136,6 @@ final readonly class ProjectGovernanceResolver
             'event_quota_daily' => $this->opsDefaults->eventQuotaDaily(),
             'event_quota_monthly' => $this->opsDefaults->eventQuotaMonthly(),
         ];
-    }
-
-    /**
-     * @param callable(): int $compute
-     */
-    private function cachedCount(string $key, callable $compute): int
-    {
-        return (int) $this->cache->get($key, static function (ItemInterface $item) use ($compute): int {
-            $item->expiresAfter(self::QUOTA_COUNT_TTL_SECONDS);
-
-            return $compute();
-        });
     }
 
     private function isApproachingQuota(int $quota, int $count): bool

@@ -23,7 +23,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,7 +141,6 @@ final class ProjectControllerHelpersTest extends TestCase
                 $events,
                 $this->opsDefaultsWith(static function ($settings): void {
                 }),
-                new ArrayAdapter(),
             ),
         );
 
@@ -180,7 +178,6 @@ final class ProjectControllerHelpersTest extends TestCase
                 $events,
                 $this->opsDefaultsWith(static function ($settings): void {
                 }),
-                new ArrayAdapter(),
             ),
         );
 

@@ -42,7 +42,6 @@ use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -121,7 +120,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(0);
         $events->method('countReceivedSinceForProject')->willReturn(0);
-        $governance = new ProjectGovernanceResolver($events, $ops, new ArrayAdapter());
+        $governance = new ProjectGovernanceResolver($events, $ops);
 
         $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([]);

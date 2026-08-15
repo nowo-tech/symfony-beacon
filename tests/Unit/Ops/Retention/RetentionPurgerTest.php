@@ -19,7 +19,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends TestCase
 {
@@ -65,7 +64,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
+            new ProjectGovernanceResolver($events, $ops),
         );
     }
 
@@ -94,7 +93,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
+            new ProjectGovernanceResolver($events, $ops),
         );
 
         $totals = $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'));
@@ -147,7 +146,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
+            new ProjectGovernanceResolver($events, $ops),
         );
 
         $result = $this->purger->purgeProject($project);

@@ -117,7 +117,7 @@ final class EnvelopeControllerTest extends TestCase
             new IngestProjectAccessGate(
                 $this->createStub(ProjectRepository::class),
                 $this->createStub(ProjectApiKeyRepository::class),
-                new ProjectGovernanceResolver($events, $ops, new ArrayAdapter()),
+                new ProjectGovernanceResolver($events, $ops),
                 new IngestRateLimiter(new ArrayAdapter()),
                 $em,
             ),

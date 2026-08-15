@@ -28,7 +28,6 @@ use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 final class ProcessEnvelopeHandlerTest extends TestCase
@@ -106,7 +105,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
 
         $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
         $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
-        $governance = new ProjectGovernanceResolver($events, new InstanceOpsDefaults($settingsRepo), new ArrayAdapter());
+        $governance = new ProjectGovernanceResolver($events, new InstanceOpsDefaults($settingsRepo));
 
         $stats = $this->createStub(DailyProjectStatRepository::class);
         $issueWriter = new IssueEnvelopeWriter(
