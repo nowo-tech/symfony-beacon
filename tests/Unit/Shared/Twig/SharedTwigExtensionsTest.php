@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Twig;
 
-use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Rbac\RbacPermissionCategoryTranslator;
 use App\Shared\Rbac\RbacPermissionTranslator;
 use App\Shared\Rbac\RbacRoleTranslator;
 use App\Shared\Twig\CsrfActionTwigExtension;
 use App\Shared\Twig\RbacPermissionTwigExtension;
 use App\Shared\Twig\RbacRoleTwigExtension;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;

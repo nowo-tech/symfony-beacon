@@ -6,8 +6,8 @@ namespace App\Tests\Unit\Identity\Controller;
 
 use App\Identity\Controller\AccountLocaleController;
 use App\Identity\Entity\User;
-use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Container;
