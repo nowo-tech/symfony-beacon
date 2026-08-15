@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.17.0)](#unreleased-main-after-1170)
+- [Unreleased (main after 1.18.0)](#unreleased-main-after-1180)
+- [Upgrading from 1.17.0 to 1.18.0](#upgrading-from-1170-to-1180)
 - [Upgrading from 1.16.0 to 1.17.0](#upgrading-from-1160-to-1170)
 - [Upgrading from 1.15.1 to 1.16.0](#upgrading-from-1151-to-1160)
 - [Upgrading from 1.15.0 to 1.15.1](#upgrading-from-1150-to-1151)
@@ -71,9 +72,34 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.17.0)
+## Unreleased (main after 1.18.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.17.0 to 1.18.0
+
+**Audit follow-up: ingest/query performance + ops hardening + thin notification/dashboard refactor** — indexes on `event(project_id, received_at)` and `issue(project_id, last_environment)`; environment list filter uses `last_environment`; span/compare/release caps; `.demo-client.env` mode 600 + deploy docs. See `[1.18.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.18.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up
+php bin/console doctrine:migrations:migrate -n
+php bin/console cache:clear
+```
+
+### Operator checklist
+
+1. **Migrations**: apply `Version20260815230000` and `Version20260815231000` (or `make migrate`).
+2. **Environment filters**: issue list “environment” now matches **last seen** environment (aligned with env compare).
+3. **Demo client env**: after `make seed` / `make dogfood`, `.demo-client.env` should be mode `600`; chmod older copies if needed.
+4. **Deploy**: complete `/setup` + first `/register` before publishing HTTP(S); keep `SYMFONY_TRUSTED_PROXIES` limited to real LB CIDRs (see [PRODUCTION.md](PRODUCTION.md)).
+
+### Notes
+
+- No kit pin bumps in this cut.
+- Performance Envelope spans above 500 are truncated at persist time.
 
 ## Upgrading from 1.16.0 to 1.17.0
 

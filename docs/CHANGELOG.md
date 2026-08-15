@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-08-15
+
+### Changed
+
+- **Issue list environment filter**: matches `issue.last_environment` (indexed) instead of joining all `event` rows with `DISTINCT`.
+- **Compare / release lists**: default fetch caps lowered (env/release compare soft limit 100; distinct release lists capped at 100).
+- **Performance ingest**: persist at most **500** spans per transaction.
+- **Notifications / dashboard**: extract `NotificationDestinationWriter` + `ThresholdRuleWriter`; shared `DashboardProjectSelectionResolver` for Mentions/Alerts/Activity/Assignments/New-in-release filters.
+
+### Fixed
+
+- PHP-CS-Fixer import/style drift that failed Quality on `main` after v1.17.0.
+
+### Security / ops
+
+- `app:seed-demo` / `make seed` / `make dogfood` force `.demo-client.env` to mode **600**.
+- PRODUCTION / INSTALL / README: finish setup/first register before exposing the port; scope `SYMFONY_TRUSTED_PROXIES` tightly (IP rate-limit spoofing).
+
+### Performance
+
+- Doctrine index `event(project_id, received_at)` (`idx_event_project_received`) for ingest quota / ops range `COUNT`s.
+- Doctrine index `issue(project_id, last_environment)` for environment list filters and env compare.
+
+### Notes for integrators
+
+- Run migrations: `Version20260815230000`, `Version20260815231000`.
+- Environment issue filters now use **last seen environment** (not “any historical event environment”).
+- Existing `.demo-client.env`: `chmod 600 .demo-client.env` if still world-writable.
+
 ## [1.17.0] - 2026-08-15
 
 ### Changed
@@ -1196,7 +1225,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.0...HEAD
+[1.18.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...v1.16.0
 [1.15.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...v1.15.1
