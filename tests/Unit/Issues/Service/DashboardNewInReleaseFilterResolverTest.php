@@ -10,6 +10,7 @@ use App\Issues\Service\DashboardNewInReleaseFilterResolver;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,9 @@ final class DashboardNewInReleaseFilterResolverTest extends TestCase
         );
         $this->issueRepository = $this->createStub(IssueSearchRepository::class);
         $this->resolver = new DashboardNewInReleaseFilterResolver(
-            new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            new DashboardProjectSelectionResolver(
+                new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            ),
             $this->issueRepository,
         );
     }

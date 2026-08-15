@@ -9,6 +9,7 @@ use App\Notifications\Service\DashboardAlertsFilterResolver;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,7 +28,9 @@ final class DashboardAlertsFilterResolverTest extends TestCase
             fn (): array => $this->projects,
         );
         $this->resolver = new DashboardAlertsFilterResolver(
-            new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            new DashboardProjectSelectionResolver(
+                new AccessibleProjectsProvider($projectRepository, new RequestStack()),
+            ),
         );
     }
 

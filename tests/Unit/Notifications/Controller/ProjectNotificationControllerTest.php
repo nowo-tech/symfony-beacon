@@ -11,6 +11,7 @@ use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationCircuitBreaker;
+use App\Notifications\Service\NotificationDestinationWriter;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
@@ -251,7 +252,7 @@ final class ProjectNotificationControllerTest extends TestCase
                 $em,
                 $this->createStub(MemberIssueRealtimeNotifierInterface::class),
             ),
-            $em,
+            new NotificationDestinationWriter($em),
         );
     }
 }

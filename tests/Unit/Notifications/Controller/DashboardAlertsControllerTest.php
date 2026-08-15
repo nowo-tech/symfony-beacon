@@ -10,6 +10,7 @@ use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\DashboardAlertsFilterResolver;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -45,7 +46,9 @@ final class DashboardAlertsControllerTest extends TestCase
 
         $controller = new DashboardAlertsController(
             $destinations,
-            new DashboardAlertsFilterResolver(new AccessibleProjectsProvider($projects, new RequestStack())),
+            new DashboardAlertsFilterResolver(
+                new DashboardProjectSelectionResolver(new AccessibleProjectsProvider($projects, new RequestStack())),
+            ),
             new GetFilterFormFactory($formFactory),
         );
 

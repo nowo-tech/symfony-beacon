@@ -7,8 +7,7 @@ namespace App\Identity\Service;
 use App\Identity\Dto\DashboardActivityFilters;
 use App\Identity\Entity\User;
 use App\Project\Entity\Project;
-use App\Project\Service\AccessibleProjectFilter;
-use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,20 +16,20 @@ use Symfony\Component\HttpFoundation\Request;
 final readonly class DashboardActivityFilterResolver
 {
     public function __construct(
-        private AccessibleProjectsProvider $accessibleProjects,
+        private DashboardProjectSelectionResolver $projectSelection,
     ) {
     }
 
     public function resolve(User $user, Request $request): DashboardActivityFilters
     {
-        $accessible = $this->accessibleProjects->forUser($user);
-        $project = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
+        $selection = $this->projectSelection->resolve($user, $request);
+        $project = $selection['project'];
 
         return new DashboardActivityFilters(
-            accessibleProjects: $accessible,
+            accessibleProjects: $selection['accessible'],
             projectUuids: $project instanceof Project
                 ? [$project->getUuid()]
-                : array_map(static fn (Project $project): string => $project->getUuid(), $accessible),
+                : array_map(static fn (Project $p): string => $p->getUuid(), $selection['accessible']),
             project: $project,
         );
     }

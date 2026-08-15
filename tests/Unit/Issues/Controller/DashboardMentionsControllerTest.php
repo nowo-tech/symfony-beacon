@@ -10,6 +10,7 @@ use App\Issues\Repository\IssueMentionRepository;
 use App\Issues\Service\DashboardMentionsFilterResolver;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +76,7 @@ final class DashboardMentionsControllerTest extends TestCase
         $controller = new DashboardMentionsController(
             $mentions,
             $this->createStub(EntityManagerInterface::class),
-            new DashboardMentionsFilterResolver($this->accessibleProjects()),
+            new DashboardMentionsFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects())),
             new GetFilterFormFactory($formFactory),
         );
 
@@ -108,7 +109,7 @@ final class DashboardMentionsControllerTest extends TestCase
         $controller = new DashboardMentionsController(
             $mentions,
             $this->createStub(EntityManagerInterface::class),
-            new DashboardMentionsFilterResolver($this->accessibleProjects()),
+            new DashboardMentionsFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects())),
             new GetFilterFormFactory($formFactory),
         );
         $seen = [];
@@ -123,7 +124,7 @@ final class DashboardMentionsControllerTest extends TestCase
         return new DashboardMentionsController(
             $this->createStub(IssueMentionRepository::class),
             $this->createStub(EntityManagerInterface::class),
-            new DashboardMentionsFilterResolver($this->accessibleProjects()),
+            new DashboardMentionsFilterResolver(new DashboardProjectSelectionResolver($this->accessibleProjects())),
             new GetFilterFormFactory($this->createStub(FormFactoryInterface::class)),
         );
     }

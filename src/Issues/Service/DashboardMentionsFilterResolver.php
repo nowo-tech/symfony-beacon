@@ -6,9 +6,7 @@ namespace App\Issues\Service;
 
 use App\Identity\Entity\User;
 use App\Issues\Dto\DashboardMentionsFilters;
-use App\Project\Entity\Project;
-use App\Project\Service\AccessibleProjectFilter;
-use App\Project\Service\AccessibleProjectsProvider;
+use App\Project\Service\DashboardProjectSelectionResolver;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,19 +15,18 @@ use Symfony\Component\HttpFoundation\Request;
 final readonly class DashboardMentionsFilterResolver
 {
     public function __construct(
-        private AccessibleProjectsProvider $accessibleProjects,
+        private DashboardProjectSelectionResolver $projectSelection,
     ) {
     }
 
     public function resolve(User $user, Request $request): DashboardMentionsFilters
     {
-        $accessible = $this->accessibleProjects->forUser($user);
-        $project = AccessibleProjectFilter::resolve($accessible, $request->query->getString('project'));
+        $selection = $this->projectSelection->resolve($user, $request);
 
         return new DashboardMentionsFilters(
-            accessibleProjects: $accessible,
-            selectedProjects: $project instanceof Project ? [$project] : $accessible,
-            project: $project,
+            accessibleProjects: $selection['accessible'],
+            selectedProjects: $selection['selected'],
+            project: $selection['project'],
             unreadOnly: $request->query->getBoolean('unread'),
         );
     }
