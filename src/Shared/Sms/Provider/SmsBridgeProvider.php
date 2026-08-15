@@ -8,6 +8,7 @@ use App\Shared\Sms\Exception\SmsSendException;
 use App\Shared\Sms\SmsOutboundMessage;
 use App\Shared\Sms\SmsSendResult;
 use App\Shared\Sms\SmsSenderInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -22,11 +23,17 @@ final readonly class SmsBridgeProvider implements SmsSenderInterface
 
     public function __construct(
         private HttpClientInterface $httpClient,
+        #[Autowire('%env(SMS_BRIDGE_BASE_URL)%')]
         private string $baseUrl = '',
+        #[Autowire('%env(SMS_BRIDGE_AUTH_TOKEN)%')]
         private string $authToken = '',
+        #[Autowire('%env(SMS_BRIDGE_ACCOUNT_SID)%')]
         private string $accountSid = '',
+        #[Autowire('%env(SMS_BRIDGE_FROM)%')]
         private string $defaultFrom = '',
+        #[Autowire('%env(SMS_BRIDGE_DEVICE_ID)%')]
         private string $defaultDeviceId = '',
+        #[Autowire('%env(SMS_BRIDGE_API_MODE)%')]
         private string $apiMode = 'twilio',
     ) {
     }

@@ -56,7 +56,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Phase 5+ product depth: **threshold alerts**, **delivery history**, admin **project audit**, **encrypted Mailer**, **Prometheus** `/metrics`, **notification circuit breaker**, **GDPR account export/anonymize**, **CI coverage** report — see [ROADMAP](docs/ROADMAP.md) (SSO Later)
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories, Slack/Teams **Resolve** / **Assign**, and channel-native **Send test** — [docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md)
 - Optional **inbound email** replies → issue comments — [docs/product/INBOUND-EMAIL.md](docs/product/INBOUND-EMAIL.md)
-- **QR phone login** (AuthKit + image via `endroid/qr-code`); SMS OTP Later
+- **QR phone login** (AuthKit + image via `endroid/qr-code`); SMS OTP Later — pluggable **SMS Bridge** provider ready ([docs/product/SMS.md](docs/product/SMS.md))
 - Retention purge, ingest rate limits, `/health/live` + `/health/ready`
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)

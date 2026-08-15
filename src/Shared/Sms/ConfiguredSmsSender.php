@@ -7,6 +7,7 @@ namespace App\Shared\Sms;
 use App\Shared\Sms\Exception\SmsSendException;
 use App\Shared\Sms\Provider\SmsBridgeProvider;
 use App\Shared\Sms\Provider\SmsProviderId;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Resolves the active SMS provider from env (`SMS_PROVIDER`).
@@ -18,6 +19,7 @@ final readonly class ConfiguredSmsSender implements SmsSenderInterface
     public function __construct(
         SmsBridgeProvider $smsBridge,
         NullSmsSender $nullSender,
+        #[Autowire('%env(SMS_PROVIDER)%')]
         string $provider = 'null',
     ) {
         $this->delegate = match (SmsProviderId::fromEnv($provider)) {

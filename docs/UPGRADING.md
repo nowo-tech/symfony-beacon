@@ -97,6 +97,7 @@ make restart            # reload BEACON_DSN / Compose env from .env.local
 3. **No migrations** in this cut. Existing `User.phone` values remain; Profile now edits via country + national number.
 4. **QR login**: production remains `qr_login.mode: disabled` until SMS OTP. Local/E2E use `when@dev` / `when@test`.
 5. **Dogfood DSN**: prefer `make restart` (force-recreate) after syncing `BEACON_DSN` — soft Compose restart keeps stale env.
+6. **SMS**: leave `SMS_PROVIDER=null` unless you intentionally configure `sms_bridge` (future OTP; not used by AuthKit yet). New keys are in `.env.dist`.
 
 ### Notes
 

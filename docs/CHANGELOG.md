@@ -11,10 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **SMS Bridge provider** (`App\Shared\Sms\`): env-selected `SMS_PROVIDER=sms_bridge` sends via sibling [sms-bridge](../sms-bridge/) (Twilio-compatible Messages API or native `/api/v1/sms`); `bin/console app:sms:send` for ops smoke tests. Docs: [docs/product/SMS.md](product/SMS.md). Phone OTP / QR approve remain Later.
+- **SMS Bridge provider** (`App\Shared\Sms\`): env-selected `SMS_PROVIDER=sms_bridge` sends via sibling [sms-bridge](../sms-bridge/) (Twilio-compatible Messages API or native `/api/v1/sms`); `bin/console app:sms:send` for ops smoke tests. Docs: [docs/product/SMS.md](product/SMS.md). Phone OTP / QR approve remain Later (not wired to AuthKit login yet).
 - **Phone input kit on Account → Profile (`100` / 6.51)**: `nowo-tech/phone-input-bundle` **1.2.1** (`PhoneType`, country prefix → concatenated E.164 on `User.phone`); CSP-safe host Stimulus prefix picker + themed SCSS (no vendor inline script / Bootstrap phone CSS); AuthKit `qr_login` default **disabled**, enabled under `when@dev` / `when@test` for UC-AUTH-21/22. Spec: `specs/100-phone-input-profile/`.
 - Engineering audit evidence artifact: [`docs/ops/ENGINEERING-AUDIT.md`](ops/ENGINEERING-AUDIT.md) (REV-007).
-- Outbound SMS scaffolding (disabled by default): `SMS_PROVIDER=null` | `sms_bridge` env + `App\Shared\Sms\*` (`app:sms:send` console) for future QR SMS OTP — **not** wired to AuthKit login yet.
 
 ### Changed
 
@@ -29,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No new Doctrine migrations.
 - Migrate env: `mv .env .env.local` (or `make ensure-env`), then `make restart`.
+- Optional SMS: set `SMS_PROVIDER=sms_bridge` + `SMS_BRIDGE_*` in `.env.local` (see [docs/product/SMS.md](product/SMS.md)).
 - Rebuild front-end assets (`make vite-build`) so phone-prefix Stimulus + SCSS ship.
 - Custom clients posting Account profile phone as a single text field must switch to `user_profile[phone][country_iso]` + `user_profile[phone][national_number]`.
 - Production QR login remains disabled until SMS OTP; local/E2E use `when@dev` / `when@test`.
