@@ -102,26 +102,60 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ] || [ 
 	fi
 
 	# Wait for MySQL when Doctrine is available and DATABASE_URL is set (HTTP / console only).
+	# Do NOT create the schema or run migrations here — that belongs to SiteBackup /setup
+	# (`database_create` + `migrations`) or the CLI (`make bootstrap` / `make migrate`).
 	if { [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; } \
 		&& [ -f bin/console ] && [ -n "${DATABASE_URL:-}" ] \
 		&& php bin/console list 2>/dev/null | grep -q 'dbal:run-sql'; then
-		echo 'Waiting for database to be ready...'
+		# Server probe (no schema): "Unknown database" must not look like MySQL is down.
+		mysql_server_ready() {
+			php -r '
+$h = getenv("MYSQL_HOST") ?: "database";
+$p = getenv("MYSQL_PORT") ?: "3306";
+$u = getenv("MYSQL_USER") ?: "root";
+$w = getenv("MYSQL_PASSWORD") ?: "";
+try {
+	new PDO("mysql:host={$h};port={$p};charset=utf8mb4", $u, $w, [
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_TIMEOUT => 3,
+	]);
+	exit(0);
+} catch (Throwable $e) {
+	exit(1);
+}
+'
+		}
+		mysql_schema_ready() {
+			php bin/console dbal:run-sql -q "SELECT 1" >/dev/null 2>&1
+		}
+
+		echo 'Waiting for database server to be ready...'
 		ATTEMPTS=60
-		until [ "$ATTEMPTS" -eq 0 ] || php bin/console dbal:run-sql -q "SELECT 1" >/dev/null 2>&1; do
+		until [ "$ATTEMPTS" -eq 0 ] || mysql_server_ready; do
 			ATTEMPTS=$((ATTEMPTS - 1))
 			echo "Still waiting for database... ${ATTEMPTS} attempts left."
 			sleep 1
 		done
 		if [ "$ATTEMPTS" -eq 0 ]; then
-			echo 'WARNING: database not reachable yet.' >&2
+			echo 'WARNING: database server not reachable yet.' >&2
+		elif mysql_schema_ready; then
+			echo 'Database server and schema are reachable (migrate via /setup or make migrate).'
 		else
-			echo 'The database is now ready and reachable.'
-			if [ -d migrations ] && [ "$(find migrations -iname '*.php' -print -quit 2>/dev/null)" ]; then
-				php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing || true
-			fi
-			# Create messenger_messages tables when Doctrine transport is configured
-			if php bin/console list 2>/dev/null | grep -q 'messenger:setup-transports'; then
-				php bin/console messenger:setup-transports --no-interaction || true
+			# Missing schema is expected for SiteBackup cold start — HTTP must still boot for /setup.
+			echo 'Database schema missing — open /setup (SiteBackup: database_create + migrations).'
+			if [ "$1" != 'frankenphp' ]; then
+				echo 'Waiting for schema (workers need it; complete /setup or make bootstrap)...'
+				ATTEMPTS=60
+				until [ "$ATTEMPTS" -eq 0 ] || mysql_schema_ready; do
+					ATTEMPTS=$((ATTEMPTS - 1))
+					echo "Still waiting for database schema... ${ATTEMPTS} attempts left."
+					sleep 1
+				done
+				if [ "$ATTEMPTS" -eq 0 ]; then
+					echo 'WARNING: database schema not ready yet.' >&2
+				else
+					echo 'Database schema is now reachable.'
+				fi
 			fi
 		fi
 	fi

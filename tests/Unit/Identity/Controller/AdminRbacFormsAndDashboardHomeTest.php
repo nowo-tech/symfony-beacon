@@ -18,6 +18,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\AccessibleProjectsProvider;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Settings\Entity\InstanceSettings;
@@ -158,7 +159,7 @@ final class AdminRbacFormsAndDashboardHomeTest extends TestCase
         $tour = new ProductTourStepsBuilder(
             $this->createStub(TranslatorInterface::class),
             $security,
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $this->createStub(ProjectMembershipRepository::class),
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

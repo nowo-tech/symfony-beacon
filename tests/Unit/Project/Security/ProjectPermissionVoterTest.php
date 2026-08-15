@@ -14,6 +14,7 @@ use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Security\ProjectPermissionVoter;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -34,7 +35,7 @@ final class ProjectPermissionVoterTest extends TestCase
         $this->authorizationChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $this->authorizationChecker->method('isGranted')->willReturn(false);
 
-        $accessService = new ProjectAccessService(
+        $accessService = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

@@ -27,6 +27,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipFormSupport;
@@ -83,7 +84,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $groups->method('findHighestGroupRoleForUser')->willReturn(null);
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(false);
-        $accessService = new ProjectAccessService(
+        $accessService = ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),

@@ -15,6 +15,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -124,7 +125,7 @@ final class IssueControllerSavedViewsTest extends TestCase
         $controller = new ReflectionClass(IssueController::class)->newInstanceWithoutConstructor();
         new ReflectionProperty(IssueController::class, 'projectAccess')->setValue(
             $controller,
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $memberships,
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

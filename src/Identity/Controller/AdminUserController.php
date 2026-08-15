@@ -16,6 +16,7 @@ use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
 use App\Identity\Service\AccountDataExporter;
+use App\Identity\Service\AdminUserMutator;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Project\Entity\Project;
@@ -28,7 +29,6 @@ use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use RuntimeException;
@@ -38,7 +38,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -58,7 +57,7 @@ final class AdminUserController extends AbstractController
         private readonly ProjectMembershipAdminPort $projectMembershipAdminPort,
         private readonly UserActionRecorder $actionRecorder,
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly AdminUserMutator $adminUserMutator,
         private readonly AccountDataExporter $accountDataExporter,
         private readonly AccountAnonymizer $accountAnonymizer,
         private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
@@ -90,41 +89,23 @@ final class AdminUserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var array{email: string, displayName: string, password: string, role: string, enabled: bool} $data */
             $data = $form->getData();
-            $email = strtolower(trim($data['email']));
-            $displayName = trim($data['displayName']);
-            $password = $data['password'];
-            $role = $data['role'];
-            $enabled = (bool) $data['enabled'];
 
-            if ($this->userRepository->findOneByEmail($email) instanceof User) {
+            /** @var User $actor */
+            $actor = $this->getUser();
+            $result = $this->adminUserMutator->create(
+                $actor,
+                $data['email'],
+                $data['displayName'],
+                $data['password'],
+                $data['role'],
+                (bool) $data['enabled'],
+            );
+            if ('email_taken' === $result) {
                 $this->addFlash('error', 'flash.users.email_taken');
 
                 return $this->redirectToRoute('admin_users', ['new' => '1']);
             }
 
-            /** @var User $actor */
-            $actor = $this->getUser();
-
-            $user = new User();
-            $user->setEmail($email);
-            $user->setDisplayName($displayName);
-            $user->setRoles('admin' === $role ? ['ROLE_ADMIN'] : []);
-            $user->setEnabled($enabled);
-            $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-            $user->setPasswordChangedAt(new DateTime());
-
-            $this->entityManager->persist($user);
-            $this->actionRecorder->record(
-                UserActionType::UserCreated,
-                $actor,
-                $user,
-                [
-                    'email' => $user->getEmail(),
-                    'role' => $role,
-                    'enabled' => $enabled ? 1 : 0,
-                ],
-            );
-            $this->entityManager->flush();
             $this->addFlash('success', 'flash.users.created');
 
             return $this->redirectToRoute('admin_users');
@@ -261,42 +242,16 @@ final class AdminUserController extends AbstractController
 
         /** @var User $current */
         $current = $this->getUser();
-        if ($current->getId() === $user->getId()) {
-            $this->addFlash('error', 'flash.users.cannot_change_own_role');
-
-            return $this->redirectToRoute('admin_users');
-        }
-
         /** @var array{role?: string|null} $data */
         $data = $form->getData();
-        $role = (string) ($data['role'] ?? '');
-        if (!\in_array($role, ['user', 'admin'], true)) {
-            $this->addFlash('error', 'flash.users.invalid_role');
-
-            return $this->redirectToRoute('admin_users');
-        }
-
-        $makeAdmin = 'admin' === $role;
-        $wasAdmin = $this->isAppAdmin($user);
-        if ($wasAdmin && !$makeAdmin && $this->countAdmins() <= 1) {
-            $this->addFlash('error', 'flash.users.last_admin');
-
-            return $this->redirectToRoute('admin_users');
-        }
-
-        $from = $wasAdmin ? 'admin' : 'user';
-        $to = $makeAdmin ? 'admin' : 'user';
-        if ($from !== $to) {
-            $user->setRoles($makeAdmin ? ['ROLE_ADMIN'] : []);
-            $this->actionRecorder->record(
-                UserActionType::UserRoleChanged,
-                $current,
-                $user,
-                ['from' => $from, 'to' => $to],
-            );
-            $this->entityManager->flush();
-            $this->addFlash('success', 'flash.users.role_updated');
-        }
+        $result = $this->adminUserMutator->changeInstanceRole($current, $user, (string) ($data['role'] ?? ''));
+        match ($result) {
+            'cannot_change_own' => $this->addFlash('error', 'flash.users.cannot_change_own_role'),
+            'invalid_role' => $this->addFlash('error', 'flash.users.invalid_role'),
+            'last_admin' => $this->addFlash('error', 'flash.users.last_admin'),
+            'updated' => $this->addFlash('success', 'flash.users.role_updated'),
+            default => null,
+        };
 
         return $this->redirectToRoute('admin_users');
     }
@@ -319,25 +274,13 @@ final class AdminUserController extends AbstractController
 
         /** @var User $current */
         $current = $this->getUser();
-        if ($current->getId() === $user->getId()) {
-            $this->addFlash('error', 'flash.users.cannot_disable_self');
-
-            return $this->redirectToRoute('admin_users');
-        }
-
-        $user->setEnabled(!$user->isEnabled());
-        $this->actionRecorder->record(
-            $user->isEnabled() ? UserActionType::UserEnabled : UserActionType::UserDisabled,
-            $current,
-            $user,
-            ['email' => $user->getEmail()],
-        );
-        $this->entityManager->flush();
-
-        $this->addFlash(
-            'success',
-            $user->isEnabled() ? 'flash.users.enabled' : 'flash.users.disabled'
-        );
+        $result = $this->adminUserMutator->toggleEnabled($current, $user);
+        match ($result) {
+            'cannot_disable_self' => $this->addFlash('error', 'flash.users.cannot_disable_self'),
+            'enabled' => $this->addFlash('success', 'flash.users.enabled'),
+            'disabled' => $this->addFlash('success', 'flash.users.disabled'),
+            default => null,
+        };
 
         return $this->redirectToRoute('admin_users');
     }

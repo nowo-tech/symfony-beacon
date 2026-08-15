@@ -36,7 +36,7 @@ English operator and developer manuals for **symfony-beacon**.
 | [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md) | Local hot reload (Caddy + client) |
 | [MERCURE.md](ops/MERCURE.md) | Live issue toasts (hub, JWT, Compose) |
 | [MAILPIT.md](ops/MAILPIT.md) | Local SMTP catcher for development |
-| [SHARED-SERVER.md](ops/SHARED-SERVER.md) | Dual-mode: standalone vs shared MySQL (`server/` / little-vps) |
+| [SHARED-SERVER.md](ops/SHARED-SERVER.md) | Shared MySQL/Redis (`compose.infra.yaml`) + coexistence with `server/` / little-vps |
 
 ## Development (`dev/`)
 

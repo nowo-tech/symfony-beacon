@@ -16,6 +16,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +45,7 @@ final class AnalyticsControllerTest extends TestCase
 
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->createStub(ProjectMembershipRepository::class),
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

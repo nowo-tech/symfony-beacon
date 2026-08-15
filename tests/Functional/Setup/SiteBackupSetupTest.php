@@ -11,8 +11,10 @@ use App\Shared\Settings\Service\PlatformBootstrapState;
 use App\Tests\Support\DatabaseWebTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\SiteBackupBundle\Event\SetupCompletedEvent;
+use Nowo\SiteBackupBundle\Model\SetupProgress;
 use Nowo\SiteBackupBundle\Setup\AdminUserProvisionerInterface;
 use Nowo\SiteBackupBundle\Setup\Storage\SetupMarkerManager;
+use Nowo\SiteBackupBundle\Setup\Storage\SetupProgressStorageInterface;
 use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -130,6 +132,49 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
 
         $reloaded = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
         self::assertTrue($reloaded->isSetupCompleted());
+        self::assertTrue(self::getContainer()->get(SetupMarkerManager::class)->isDone());
+    }
+
+    public function testSetupRedirectsHomeWhenDbSaysDoneEvenWithoutDoneFile(): void
+    {
+        $client = self::createClient();
+        $this->seedPlatformCatalogs();
+        self::assertFalse(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
+
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings->markSetupCompleted();
+        self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
+
+        // Simulate prod container recreate: ephemeral var/ marker + progress gone/idle.
+        $markers = self::getContainer()->get(SetupMarkerManager::class);
+        $markers->clearDone();
+        self::getContainer()->get(SetupProgressStorageInterface::class)->save(new SetupProgress());
+        self::assertFalse($markers->isDone());
+
+        $client->request(Request::METHOD_GET, '/setup?token='.self::SETUP_TOKEN);
+        self::assertTrue($client->getResponse()->isRedirection());
+        self::assertSame('/', $client->getResponse()->headers->get('Location'));
+        self::assertTrue($markers->isDone());
+    }
+
+    public function testSetupStaysOpenForCatalogRepairEvenWhenDbSaysDone(): void
+    {
+        $client = self::createClient();
+        self::assertTrue(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
+
+        $settings = self::getContainer()->get(InstanceSettingsRepository::class)->getOrCreate();
+        $settings->markSetupCompleted();
+        self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
+
+        $client->request(Request::METHOD_GET, '/setup?token='.self::SETUP_TOKEN);
+        if ($client->getResponse()->isRedirection()) {
+            $location = (string) $client->getResponse()->headers->get('Location');
+            self::assertStringContainsString('/setup', $location);
+            $client->followRedirect();
+        }
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('body');
     }
 
     public function testNonAdminDoesNotGetCatalogRedirectToSetup(): void

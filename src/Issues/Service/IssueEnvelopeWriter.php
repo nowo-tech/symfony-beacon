@@ -6,6 +6,7 @@ namespace App\Issues\Service;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Issues\Entity\Event;
+use App\Issues\Entity\EventTag;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
@@ -25,6 +26,7 @@ final readonly class IssueEnvelopeWriter
     public function __construct(
         private FingerprintCalculator $fingerprintCalculator,
         private EventTimestampParser $eventTimestampParser,
+        private EventPayloadPromoter $payloadPromoter,
         private IssueRepository $issueRepository,
         private EventRepository $eventRepository,
         private DailyProjectStatRepository $dailyProjectStatRepository,
@@ -89,10 +91,21 @@ final readonly class IssueEnvelopeWriter
         $event->setPhpVersion($this->extractPhpVersion($payload));
         $event->setSymfonyVersion($this->extractSymfonyVersion($payload));
         $event->setUserIdentifier($this->extractUserIdentifier($payload));
+        $event->setRequestUrl($this->payloadPromoter->extractRequestUrl($payload));
         $event->setReceivedAt($receivedAt);
         $eventTimestamp = $this->eventTimestampParser->parse($payload['timestamp'] ?? ($payload['datetime'] ?? null));
         $event->setEventTimestamp($eventTimestamp ?? $receivedAt);
         $this->entityManager->persist($event);
+
+        foreach ($this->payloadPromoter->extractTags($payload) as $tag) {
+            $eventTag = new EventTag();
+            $eventTag->setEvent($event);
+            $eventTag->setIssue($issue);
+            $eventTag->setProject($project);
+            $eventTag->setTagKey($tag['key']);
+            $eventTag->setTagValue($tag['value']);
+            $this->entityManager->persist($eventTag);
+        }
 
         $this->applyReleaseContext($issue, $payload);
 

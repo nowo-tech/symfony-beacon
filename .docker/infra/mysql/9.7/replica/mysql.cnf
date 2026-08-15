@@ -1,0 +1,16 @@
+[mysqld]
+server-id                      = 2
+gtid_mode                      = ON
+enforce_gtid_consistency        = ON
+log_replica_updates            = ON
+# read_only / super_read_only are set in init AFTER entrypoint sets root password
+# (enabling them here breaks MYSQL_ROOT_PASSWORD on first boot)
+relay_log                      = relay-bin
+
+collation-server               = utf8mb4_unicode_ci
+character-set-server           = utf8mb4
+max_allowed_packet             = 2G
+sort_buffer_size               = 256M
+
+[client]
+default-character-set         = utf8mb4

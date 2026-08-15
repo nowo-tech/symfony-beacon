@@ -1,8 +1,11 @@
 ---
-# Local / default stack: FrankenPHP dev image + bind-mounted app.
+# App stack (dev): FrankenPHP + bind-mounted source.
+# Infra (MySQL + Redis) lives in compose.infra.yaml — start with `make up-infra` first
+# (or `make up`, which does both). Docs: docs/ops/SHARED-SERVER.md
+#
 # App secrets/config come from `.env` via `env_file` (cp .env.dist .env).
 # `environment:` only for renames, forced values, and keys not in `.env`.
-# Production image: docker compose build --build-arg… or
+# Production image: docker compose -f compose.prod.yaml … or
 #   docker build --target frankenphp_prod -t symfony-frankenphp .
 services:
   php:
@@ -11,9 +14,6 @@ services:
       context: .
       target: frankenphp_dev
     restart: unless-stopped
-    depends_on:
-      database:
-        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -48,6 +48,9 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     tty: true
+    networks:
+      - default
+      - shared
 
   # Vite / Pentatrion (pnpm). Optional HMR — enable with: docker compose --profile hmr up -d
   # Default stack uses `make vite-build` (static public/build/). Leaving `pnpm run dev` running
@@ -90,36 +93,11 @@ services:
       retries: 6
       start_period: 20s
     tty: true
+    networks:
+      - default
+      - shared
 
-  ###> doctrine/doctrine-bundle ###
-  # MySQL 9.7 (latest stable official: https://hub.docker.com/_/mysql)
-  database:
-    image: mysql:${MYSQL_VERSION:-9.7}
-    restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      # Host-visible MySQL data (gitignored). Recreate DB: rm -rf .data/mysql && docker compose up -d database
-      - ./.data/mysql:/var/lib/mysql
-    # No host ports — reach via Compose network only (REQ-FP-006): docker compose exec database …
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "127.0.0.1",
-          "-uroot",
-          "-p${MYSQL_ROOT_PASSWORD:-!ChangeMeRoot!}",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 20s
-  ###< doctrine/doctrine-bundle ###
-
-  # Symfony Messenger worker (consumes the async MySQL queue).
+  # Symfony Messenger worker (consumes async_ingest; Redis by default).
   # Different from FRANKENPHP_MODE=worker (HTTP). This service does NOT serve HTTP.
   messenger:
     image: ${IMAGES_PREFIX:-}symfony-beacon-dev
@@ -128,8 +106,6 @@ services:
       target: frankenphp_dev
     restart: unless-stopped
     depends_on:
-      database:
-        condition: service_healthy
       php:
         condition: service_started
     env_file:
@@ -157,6 +133,9 @@ services:
     healthcheck:
       disable: true
     tty: true
+    networks:
+      - default
+      - shared
 
   # Outbound notifications, HTTP-log, and Web Push (async transport).
   # Separate from messenger so notify backlog cannot starve Envelope ingest.
@@ -167,8 +146,6 @@ services:
       target: frankenphp_dev
     restart: unless-stopped
     depends_on:
-      database:
-        condition: service_healthy
       php:
         condition: service_started
     env_file:
@@ -192,6 +169,9 @@ services:
     healthcheck:
       disable: true
     tty: true
+    networks:
+      - default
+      - shared
 
 ###> symfony/mercure-bundle ###
   # Optional Compose hub (production / legacy). Local/dev uses FrankenPHP built-in Mercure
@@ -219,6 +199,9 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
+    networks:
+      - default
+      - shared
 ###< symfony/mercure-bundle ###
 
 volumes:
@@ -229,3 +212,8 @@ volumes:
   mercure_data:
   mercure_config:
 ###< symfony/mercure-bundle ###
+
+networks:
+  shared:
+    name: ${SHARED_DOCKER_NETWORK:-server_network}
+    external: true

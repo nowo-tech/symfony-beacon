@@ -23,6 +23,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -188,7 +189,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
 
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

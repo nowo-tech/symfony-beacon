@@ -11,6 +11,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -58,7 +59,7 @@ final class IssueAssigneeGuardTest extends TestCase
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn($isAdmin);
 
-        return new ProjectAccessService(
+        return ProjectAccessServiceFactory::create(
             $this->createStub(ProjectMembershipRepository::class),
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

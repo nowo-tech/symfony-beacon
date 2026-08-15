@@ -1,6 +1,7 @@
 # Production image (optional)
 
-This repo’s default [`compose.yaml`](../compose.yaml) is a **local/dev** stack (`frankenphp_dev` + bind-mount `./:/app`).  
+This repo’s default [`compose.yaml`](../compose.yaml) is a **local/dev app** stack (`frankenphp_dev` + bind-mount `./:/app`).  
+MySQL and Redis live in [`compose.infra.yaml`](../compose.infra.yaml) (see [SHARED-SERVER.md](ops/SHARED-SERVER.md)).  
 The Dockerfile also defines a **`frankenphp_prod`** target for baked, no-dev deployments.
 
 ## What “prod” means here
@@ -27,7 +28,8 @@ CI already builds this target (`.github/workflows/ci.yml`).
 
 - `APP_SECRET`
 - `DATABASE_URL` (or Compose-equivalent MySQL vars)
-- `MESSENGER_TRANSPORT_DSN` if you run async workers
+- `MESSENGER_TRANSPORT_DSN` if you run async workers (default Redis: `redis://redis-8.10.0:6379/messages` — drain Doctrine `messenger_messages` before switching)
+- `REDIS_URL` (sessions, `cache.app` / rate limits, Messenger streams)
 - `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (never leave empty; never reuse historically known local values)
 - `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit)
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
@@ -46,19 +48,22 @@ Minimal one-off HTTP process (MySQL must be reachable via `DATABASE_URL` on the 
 
 ```bash
 docker run --rm -p 8080:80 -p 8443:443 \
-  --network <compose-project>_default \
+  --network server_network \
   -e APP_ENV=prod \
   -e APP_SECRET="$(openssl rand -hex 16)" \
-  -e DATABASE_URL="mysql://app:CHANGE_ME@database:3306/app?serverVersion=9.7&charset=utf8mb4" \
-  -e MESSENGER_TRANSPORT_DSN="doctrine://default?auto_setup=0" \
+  -e DATABASE_URL="mysql://app:CHANGE_ME@mysql-9.7-primary:3306/app?serverVersion=9.7&charset=utf8mb4" \
+  -e MESSENGER_TRANSPORT_DSN="redis://redis-8.10.0:6379/messages" \
+  -e REDIS_URL="redis://redis-8.10.0:6379" \
   -e FRANKENPHP_MODE=worker \
   symfony-frankenphp:prod
 ```
 
-Optional Compose overlay for a full stack without bind-mounts:
+Optional Compose overlay for a full app stack without bind-mounts (infra first):
 
 ```bash
-docker compose -f compose.prod.yaml --env-file .env up --build -d
+make up-infra
+make up-prod
+# or: docker compose -f compose.prod.yaml --env-file .env up --build -d
 ```
 
 See [`compose.prod.yaml`](../compose.prod.yaml). Prefer a real secrets manager in production; do not reuse the `!ChangeMe!` placeholders from `.env.dist`.
@@ -160,7 +165,7 @@ Do not assume a blanket `/api/` exclusion — that was removed in **v1.11.0** (`
 
 Enable **Require metrics scrape token** in production (Ops defaults). When required and no token is stored, `/metrics` returns **503**.
 
-**Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). The FrankenPHP `Caddyfile` includes a commented `remote_ip` snippet for private-only scrapes. Counters live in `cache.app` (shared only if your cache backend is shared across workers).
+**Do not** expose `/metrics` on the public internet without a token and/or network ACL (private scrape network, reverse-proxy allowlist). The FrankenPHP `Caddyfile` includes a commented `remote_ip` snippet for private-only scrapes. Counters live in `cache.app` (Redis when `REDIS_URL` is set — shared across workers/replicas).
 
 ## Retention purge
 
@@ -220,7 +225,7 @@ Outbound webhooks: keep **Allow private notification URLs** disabled in producti
 
 Minimum operator checklist:
 
-1. **MySQL**: scheduled `mysqldump` (or volume snapshots) of the Compose `database` data directory / managed DB.
+1. **MySQL**: scheduled `mysqldump` (or volume snapshots) of `./.data/infra/mysql-primary` / managed DB.
 2. **Secrets**: backup `.env` / secret manager entries (`APP_SECRET`, DB passwords, webhook URLs) **separately** from SiteBackup archives — SiteBackup `include_paths` intentionally **omits `.env`**.
 3. **Encrypt key**: include `var/secrets/.Halite.default.key` (or `APP_ENCRYPT_KEY`) with secret backups — see [Field encryption key](#field-encryption-key-halite).
 4. **After restore**: run `doctrine:migrations:migrate`, restart `php` + `messenger`, confirm `/health/ready`.

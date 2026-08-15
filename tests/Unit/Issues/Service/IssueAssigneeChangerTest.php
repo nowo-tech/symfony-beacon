@@ -27,6 +27,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
@@ -108,7 +109,7 @@ final class IssueAssigneeChangerTest extends TestCase
         $groups = $this->createStub(ProjectGroupAccessRepository::class);
         $groups->method('findHighestGroupRoleForUser')->willReturn(null);
 
-        $guard = new IssueAssigneeGuard(new ProjectAccessService(
+        $guard = new IssueAssigneeGuard(ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),

@@ -21,6 +21,7 @@ use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectReadTokenManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -147,7 +148,7 @@ final class ProjectReadApiControllerTest extends TestCase
         $manager = new ProjectReadTokenManager(
             $em,
             $tokenRepo ?? $this->createStub(ProjectReadTokenRepository::class),
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $this->createStub(ProjectMembershipRepository::class),
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

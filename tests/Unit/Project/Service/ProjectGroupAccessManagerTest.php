@@ -19,6 +19,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,7 +58,7 @@ final class ProjectGroupAccessManagerTest extends TestCase
             ++$this->flushCount;
         });
 
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),
@@ -155,7 +156,7 @@ final class ProjectGroupAccessManagerTest extends TestCase
     {
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn($adminAuth);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

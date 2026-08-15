@@ -1,13 +1,12 @@
-# Optional production-oriented stack (no source bind-mount).
-# Default local stack remains compose.yaml (frankenphp_dev + ./:/app).
-#
-#   cp .env.dist .env   # set real APP_SECRET / MySQL / SiteBackup secrets first
+# Production-oriented app stack (no source bind-mount).
+# Infra (MySQL + Redis): compose.infra.yaml — `make up-infra` then:
 #   docker compose -f compose.prod.yaml --env-file .env up --build -d
+# Or: make up-prod
 #
 # Secrets/config: `env_file: .env`. `environment:` only forces prod, remaps,
 # fail-fast checks (${VAR:?…}), and values that must differ from the local template.
 #
-# Docs: docs/PRODUCTION.md
+# Docs: docs/PRODUCTION.md · docs/ops/SHARED-SERVER.md
 services:
   php:
     image: ${IMAGES_PREFIX:-}symfony-frankenphp
@@ -15,9 +14,6 @@ services:
       context: .
       target: frankenphp_prod
     restart: unless-stopped
-    depends_on:
-      database:
-        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -29,8 +25,8 @@ services:
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
       SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
       SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
-      # Prod queue: do not auto-create tables at runtime.
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      # Prod queue: Redis by default (override with doctrine://… only if needed).
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://${REDIS_HOST:-redis-8.10.0}:${REDIS_PORT:-6379}/messages}
       FRANKENPHP_MODE: ${FRANKENPHP_MODE:-worker}
       # Never enable filesystem watch / hot_reload in production.
       FRANKENPHP_WORKER_CONFIG: ""
@@ -49,32 +45,9 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-9443}
         protocol: udp
-
-  database:
-    image: mysql:${MYSQL_VERSION:-9.7}
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
-    volumes:
-      - database_data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "127.0.0.1",
-          "-uroot",
-          "-p${MYSQL_ROOT_PASSWORD}",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 20s
+    networks:
+      - default
+      - shared
 
   messenger:
     image: ${IMAGES_PREFIX:-}symfony-frankenphp
@@ -83,8 +56,6 @@ services:
       target: frankenphp_prod
     restart: unless-stopped
     depends_on:
-      database:
-        condition: service_healthy
       php:
         condition: service_started
     env_file:
@@ -97,7 +68,7 @@ services:
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
       SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
       SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://${REDIS_HOST:-redis-8.10.0}:${REDIS_PORT:-6379}/messages}
     volumes:
       - php_secrets:/app/var/secrets
     command:
@@ -110,6 +81,9 @@ services:
         "--time-limit=3600",
         "--memory-limit=256M",
       ]
+    networks:
+      - default
+      - shared
 
   # Outbound notifications, HTTP-log, and Web Push (async transport).
   messenger-notify:
@@ -119,8 +93,6 @@ services:
       target: frankenphp_prod
     restart: unless-stopped
     depends_on:
-      database:
-        condition: service_healthy
       php:
         condition: service_started
     env_file:
@@ -133,7 +105,7 @@ services:
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?Set MERCURE_JWT_SECRET}
       SITE_BACKUP_PASSWORD_HASH: ${SITE_BACKUP_PASSWORD_HASH:?Set SITE_BACKUP_PASSWORD_HASH}
       SITE_SETUP_TOKEN: ${SITE_SETUP_TOKEN:?Set SITE_SETUP_TOKEN}
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://${REDIS_HOST:-redis-8.10.0}:${REDIS_PORT:-6379}/messages}
     volumes:
       - php_secrets:/app/var/secrets
     command:
@@ -146,6 +118,9 @@ services:
         "--time-limit=3600",
         "--memory-limit=256M",
       ]
+    networks:
+      - default
+      - shared
 
   mercure:
     image: dunglas/mercure
@@ -162,11 +137,18 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
+    networks:
+      - default
+      - shared
 
 volumes:
   caddy_data:
   caddy_config:
-  database_data:
   php_secrets:
   mercure_data:
   mercure_config:
+
+networks:
+  shared:
+    name: ${SHARED_DOCKER_NETWORK:-server_network}
+    external: true

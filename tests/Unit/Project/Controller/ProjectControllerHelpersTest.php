@@ -17,6 +17,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectGovernanceResolver;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -69,7 +70,7 @@ final class ProjectControllerHelpersTest extends TestCase
             static fn (Project $p, User $u): ?ProjectMembership => $p === $project && $u === $user ? $membership : null,
         );
 
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $repo,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

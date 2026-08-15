@@ -1,73 +1,126 @@
 # nowo-tech/auth-kit-bundle — first-user bootstrap + i18n + remember me
 # https://github.com/nowo-tech/AuthKitBundle
-# Dual auth URLs: bare /login serves DEFAULT_LOCALE (unlocalized: serve); /{_locale}/login for other locales.
+# Docs: vendor/nowo-tech/auth-kit-bundle/docs/CONFIGURATION.md
+#
+# Dual public auth URLs (Beacon): bare paths serve DEFAULT_LOCALE; other locales use /{_locale}/…
+# Keep security.yaml form_login / logout route names in sync with profiles.*.routes below.
+# Logout target should prefer nowo_auth_kit_login_unlocalized (/login) when unlocalized: serve.
 nowo_auth_kit:
+    # Profile key under profiles: used when no profile is selected explicitly.
     default_profile: default
+    # Optional service id implementing OutboundMailReadyCheckerInterface (password-reset / magic-login UI hints).
     outbound_mail_ready_checker: App\Identity\AuthKit\BeaconOutboundMailReadyChecker
+
+    # Auth route localization (preferred over legacy default_locale / enabled_locales / locale_in_path).
     locale:
+        # never  — only bare paths (/login, /register, …)
+        # always — only prefixed paths (/{_locale}/login, …)
+        # both   — both; bare routes named {name}_unlocalized (see unlocalized)
         in_path: both
+        # Default locale for bare serve/redirect and for localized route defaults (env DEFAULT_LOCALE).
         default: '%default_locale%'
+        # Locales allowed in {_locale} route requirement (must stay aligned with framework.enabled_locales).
         enabled: '%fallback_locales%'
+        # Only when in_path: both
+        # serve    — bare /login renders with locale.default (200); /{locale}/login still exists for all locales
+        # redirect — bare /login 302s to /{default|current}/login (prefixed URLs are canonical)
+        # Note: AuthKit does not 301 /{DEFAULT_LOCALE}/login → /login; that needs an app subscriber if desired.
         unlocalized: serve
+
     profiles:
         default:
+            # FQCN of the user entity (must implement UserInterface).
             user_class: App\Identity\Entity\User
+            # Entity property used as security user identifier (form_login username).
             user_identifier_field: email
+            # disabled | first_user_only | always
             registration_mode: first_user_only
+            # Role assigned on registration (in addition to ROLE_USER from the entity).
             registration_role: ROLE_ADMIN
+            # Route name after successful login (null → firewall default_target_path).
             login_success_route: dashboard_home
+            # Symfony firewall name (must match security.yaml).
             firewall: main
+            # Login form fields: identifier (→ user_identifier_field), password, remember_me.
             login_fields:
                 - identifier
                 - password
                 - remember_me
+            # Registration fields: string names or maps { name, type, property, hash, required }.
             registration_fields:
                 - email
                 - displayName
                 - password
+
+            # Persistent login cookie (Symfony firewall remember_me).
             remember_me:
                 enabled: true
                 # Keep in sync with security.firewalls.main.remember_me.lifetime (30 days).
                 lifetime: 2592000
                 path: /
+
+            # Optional nowo-tech/password-strength-bundle on registration / reset new-password fields.
             password_strength:
                 enabled: true
+                # Policy level passed to PasswordStrengthType (e.g. weak | medium | strong — kit-defined).
                 level: medium
+                # level | conditions
                 policy_mode: level
+
             password_reset:
+                # disabled | enabled
                 mode: enabled
-                # link + OTP code (AuthKit delivery: link | code | both)
+                # link | code | both (link URL token and/or OTP for notifiers)
                 delivery: both
+                # Seconds until the reset credential expires.
                 token_ttl: 3600
                 token_field: passwordResetToken
                 token_expires_field: passwordResetExpiresAt
+
             magic_login:
+                # disabled | enabled (request form + Symfony login_link check route)
                 mode: enabled
+                # Seconds until the signed magic link expires (Symfony login_link lifetime).
                 lifetime: 600
+                # How many times the signed link can be used (Symfony login_link max_uses).
                 max_uses: 1
+                # When true: GET check shows CSRF confirm; POST confirm consumes the link.
                 # Pair with security.login_link.check_post_only (AuthKit 1.16+).
                 confirm_interstitial: true
+
             # OAuth buttons appear only when mode=enabled AND ≥1 enabled row in auth_kit_social_credential.
-            # create_user_if_missing:false — link existing users by email (avoids ROLE_ADMIN social sign-ups).
             social_login:
+                # disabled | enabled
                 mode: enabled
+                # false — link existing users by email only (avoids ROLE_ADMIN social sign-ups here).
                 create_user_if_missing: false
-            # QR phone login (AuthKit 1.12). Enabled for local/E2E dual-device approve/deny
-            # (UC-AUTH-22). Approvers need User.phoneVerifiedAt set (seed/demo or SQL).
+
+            # QR phone login (AuthKit 1.12). Local/E2E dual-device approve/deny (UC-AUTH-22).
+            # Approvers need User.phoneVerifiedAt set (seed/demo or SQL).
             qr_login:
+                # disabled | enabled
                 mode: enabled
+                # Challenge TTL in seconds (bundle clamps ~30–180).
                 challenge_ttl: 90
-                # 0 = disabled — local/E2E creates many challenges (Playwright + manual curls).
+                # Max challenge creates per client IP per window; 0 = disabled (local/E2E creates many).
                 create_rate_limit: 0
+                # session | session_step_up (phone session + QrLoginStepUpInterface)
                 approve_requires: session
+                # strict | soft | off (desktop cookie / IP+UA binding)
                 desktop_binding: strict
                 phone_field: phone
                 phone_verified_field: phoneVerifiedAt
+
             embed:
+                # disabled — full-page routes only
+                # dropdown — embed login/register via auth_kit_dropdown()
                 mode: disabled
+
             css:
                 button_class: 'btn-primary w-full'
                 secondary_button_class: 'btn-secondary flex w-full items-center justify-center no-underline'
+
+            # Twig overrides; copy from @NowoAuthKitBundle/… into templates/bundles/ when customizing.
             templates:
                 layout: '@NowoAuthKitBundle/layout.html.twig'
                 form_theme:
@@ -80,6 +133,10 @@ nowo_auth_kit:
                 reset_request: '@NowoAuthKitBundle/security/reset_request.html.twig'
                 reset_password: '@NowoAuthKitBundle/security/reset_password.html.twig'
                 reset_password_code: '@NowoAuthKitBundle/security/reset_password_code.html.twig'
+
+            # Route path = bare segment; with locale.in_path both|always, loader also registers /{_locale}+path.
+            # Canonical names (nowo_auth_kit_login, …) must match security.yaml login_path / check_path / logout.path.
+            # When in_path: both, bare twins are named {name}_unlocalized (e.g. nowo_auth_kit_login_unlocalized → /login).
             routes:
                 login:
                     path: /login

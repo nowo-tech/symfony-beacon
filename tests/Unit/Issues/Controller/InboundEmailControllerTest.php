@@ -27,6 +27,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
@@ -172,7 +173,7 @@ final class InboundEmailControllerTest extends TestCase
             new InboundEmailQuoteStripper(),
             $this->createStub(IssueRepository::class),
             $this->createStub(UserRepository::class),
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $memberships,
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

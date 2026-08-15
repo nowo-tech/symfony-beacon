@@ -1,0 +1,109 @@
+# Shared infra (MySQL + Redis) for Beacon and sibling projects on the same Docker host.
+#
+#   make up-infra          # primary + redis (MYSQL_TOPOLOGY=simple)
+#   MYSQL_TOPOLOGY=replica make up-infra
+#
+# Fixed Compose project name `shared-infra` so volumes/containers are not tied to
+# COMPOSE_PROJECT_NAME=symfony-beacon. Network name matches developer.local.server/server
+# and little-vps (`SHARED_DOCKER_NETWORK`, default server_network).
+#
+# Coexistence: if mysql-9.7-primary already exists (e.g. from server/), `make up-infra`
+# is a no-op — see docs/ops/SHARED-SERVER.md.
+#
+# No host-published DB/Redis ports (REQ-FP-006): reach via Compose network only.
+name: shared-infra
+
+services:
+  redis-8.10.0:
+    image: redis:${REDIS_VERSION:-8.10.0}-alpine
+    container_name: redis-8.10.0
+    restart: unless-stopped
+    volumes:
+      - ./.data/infra/redis:/data
+    networks:
+      - server_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  mysql-9.7-primary:
+    image: mysql:${MYSQL_VERSION:-9.7}
+    container_name: mysql-9.7-primary
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
+    volumes:
+      - ./.data/infra/mysql-primary:/var/lib/mysql
+      - ./.docker/infra/mysql/9.7/primary/mysql.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - ./.docker/infra/mysql/9.7/primary/init/01-replicator.sh:/docker-entrypoint-initdb.d/00-replicator.sh:ro
+    networks:
+      - server_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  # Opt-in: MYSQL_TOPOLOGY=replica → docker compose --profile mysql-replica
+  mysql-9.7-replica:
+    profiles: ["mysql-replica"]
+    image: mysql:${MYSQL_VERSION:-9.7}
+    container_name: mysql-9.7-replica
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_PRIMARY_HOST: mysql-9.7-primary
+      MYSQL_REPLICATION_USER: replicator
+      MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
+      # Override shared .env so mysql CLI inside this container is not redirected to primary
+      MYSQL_HOST: ""
+    volumes:
+      - ./.data/infra/mysql-replica:/var/lib/mysql
+      - ./.docker/infra/mysql/9.7/replica/mysql.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - ./.docker/infra/mysql/9.7/replica/init/01-start-replica.sh:/docker-entrypoint-initdb.d/01-start-replica.sh:ro
+    networks:
+      - server_network
+    depends_on:
+      mysql-9.7-primary:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+networks:
+  server_network:
+    name: ${SHARED_DOCKER_NETWORK:-server_network}
+    driver: bridge

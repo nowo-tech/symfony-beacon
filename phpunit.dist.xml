@@ -46,6 +46,11 @@
         <env name="VAPID_PUBLIC_KEY" value="BMSurvPcGLr__vOnlz-3LWeLbMhVrZj6DdG0zzCuQchZgJIhavKo-g6Cs_HmKC8xDz9HdEfg1P0PFnywgJE4n-M" force="true"/>
         <env name="VAPID_PRIVATE_KEY" value="WDYOi2zFK2QricQDnedNNaJYfSlHpSvbUvG47ZmzkXA" force="true"/>
         <env name="VAPID_SUBJECT" value="mailto:ops@example.com" force="true"/>
+        <!-- Redis not required in test (framework when@test uses array/mock session) -->
+        <env name="REDIS_URL" value="redis://127.0.0.1:6379" force="true"/>
+        <env name="REDIS_HOST" value="127.0.0.1" force="true"/>
+        <env name="REDIS_PORT" value="6379" force="true"/>
+        <env name="MESSENGER_TRANSPORT_DSN" value="sync://" force="true"/>
     </php>
 
     <testsuites>

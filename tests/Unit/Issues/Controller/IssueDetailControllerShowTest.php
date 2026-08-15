@@ -27,6 +27,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -93,7 +94,7 @@ final class IssueDetailControllerShowTest extends TestCase
             new ReflectionClass(IssueDuplicateMarker::class)->newInstanceWithoutConstructor(),
             $pageBuilder,
             new ReflectionClass(IssueStatusChanger::class)->newInstanceWithoutConstructor(),
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $memberships,
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

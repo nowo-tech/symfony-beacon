@@ -14,6 +14,7 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +43,7 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
         $session->start();
         $request->setSession($session);
         $stack->push($request);
-        $service = new ProjectAccessService(
+        $service = ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),
@@ -86,7 +87,7 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
         $shareLinks->method('findOneByUuid')->willReturn($link);
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(false);
-        $service = new ProjectAccessService($memberships, $groups, $shareLinks, $auth, $stack);
+        $service = ProjectAccessServiceFactory::create($memberships, $groups, $shareLinks, $auth, $stack);
 
         $service->grantShareAccess($project, null, time() + 3600, $link->getUuid());
         self::assertTrue($service->hasActiveShareGrant($project));
@@ -105,7 +106,7 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
         $groups->method('findHighestGroupRoleForUser')->willReturn(null);
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(false);
-        $service = new ProjectAccessService(
+        $service = ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),

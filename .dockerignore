@@ -2,6 +2,7 @@
 **/.github
 **/var
 **/vendor
+**/.data
 **/.env
 **/.env.local
 **/.env.*.local

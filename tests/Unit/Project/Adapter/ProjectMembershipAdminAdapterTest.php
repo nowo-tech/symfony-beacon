@@ -18,6 +18,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
@@ -64,7 +65,7 @@ final class ProjectMembershipAdminAdapterTest extends TestCase
         $groups->method('findHighestGroupRoleForUser')->willReturn(null);
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),

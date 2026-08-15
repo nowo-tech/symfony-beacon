@@ -1,0 +1,7 @@
+# Host overrides for SiteBackup durable-done store (kit default is NullDurableSetupDoneStore).
+services:
+    App\Setup\InstanceSettingsDurableSetupDoneStore:
+        autowire: true
+
+    Nowo\SiteBackupBundle\Setup\DurableSetupDoneStoreInterface:
+        alias: App\Setup\InstanceSettingsDurableSetupDoneStore

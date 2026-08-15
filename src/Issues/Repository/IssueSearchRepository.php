@@ -27,8 +27,15 @@ class IssueSearchRepository extends ServiceEntityRepository
     use IssueReleaseQueryTrait;
     use IssueSearchFilterTrait;
 
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly EventTagRepository $eventTagRepository,
+    ) {
         parent::__construct($registry, Issue::class);
+    }
+
+    protected function eventTagRepository(): EventTagRepository
+    {
+        return $this->eventTagRepository;
     }
 }

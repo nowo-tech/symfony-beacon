@@ -18,6 +18,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use Doctrine\ORM\EntityManagerInterface;
@@ -55,7 +56,7 @@ final class ProjectMembershipManagerTest extends TestCase
             ++$this->flushCount;
         });
 
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),
@@ -213,7 +214,7 @@ final class ProjectMembershipManagerTest extends TestCase
 
     private function rebuild(): void
     {
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

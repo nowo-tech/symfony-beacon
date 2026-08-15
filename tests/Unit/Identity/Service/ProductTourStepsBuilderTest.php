@@ -15,6 +15,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\MockObject\Stub;
@@ -47,7 +48,7 @@ final class ProductTourStepsBuilderTest extends TestCase
 
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(false);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

@@ -1,7 +1,7 @@
 # Install & seed layers
 
 Beacon separates **schema**, **platform catalogs**, **demo identity**, and **optional sample telemetry**.
-Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) at **`/setup`** (ops panel: **`/_site_backup`**).
+Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **≥ 1.11** at **`/setup`** (ops panel: **`/_site_backup`**). Progress uses `chain` storage plus an optional per-step DB journal (runtime DDL — no host migration for those tables).
 
 | Layer | Command / Make | Purpose |
 |-------|----------------|---------|
@@ -39,7 +39,7 @@ After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`
 
 To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 
-Alternatively open the app with an empty (or catalog-less) database: the SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`**. Choose **guided** (migrations, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
+Alternatively open the app with a missing or empty database: the FrankenPHP entrypoint only waits for the MySQL **server** (it does **not** create the schema or run migrations). The SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`**. Choose **guided** (`database_create`, migrations, Messenger transports, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
 
 Headless equivalent:
 

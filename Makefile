@@ -1,22 +1,25 @@
-.PHONY: help up up-shared down down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
-# Compose file set: shared mode when `.compose-mode` contains "shared" (set by up-shared).
-COMPOSE_SHARED_FILES := -f compose.yaml -f compose.override.yaml -f compose.shared.yaml
-COMPOSE_FILES := $(shell test -f .compose-mode && grep -qx shared .compose-mode && echo '$(COMPOSE_SHARED_FILES)')
-DC := docker compose $(COMPOSE_FILES)
+# App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
+DC := docker compose
+DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file .env
+DC_PROD := docker compose -f compose.prod.yaml --env-file .env
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
-	@echo "  make up              Start stack (php + mysql + messenger) + vite-build; prints HTTP/HTTPS ports"
-	@echo "  make up-shared      Start against shared server MySQL (no local database); see docs/ops/SHARED-SERVER.md"
-	@echo "  make ensure-up       Start stack if php is not running (no rebuild / no vite)"
+	@echo "  make up              Ensure shared infra + start app (php/messenger) + vite-build"
+	@echo "  make up-infra        Start shared MySQL + Redis (compose.infra.yaml); see docs/ops/SHARED-SERVER.md"
+	@echo "  make up-prod        Ensure infra + start compose.prod.yaml app stack"
+	@echo "  make up-shared      Alias of make up (legacy name)"
+	@echo "  make ensure-up       Start infra + app if php is not running (no rebuild / no vite)"
 	@echo "  make classic         FrankenPHP HTTP in classic mode"
 	@echo "  make worker          FrankenPHP HTTP in worker mode"
-	@echo "  make down            Stop containers (standalone)"
-	@echo "  make down-shared     Stop containers (shared compose file set)"
+	@echo "  make down            Stop app containers (infra stays for sibling projects)"
+	@echo "  make down-infra     Stop shared infra (MySQL/Redis); warn if other apps use it"
+	@echo "  make down-shared    Alias of make down (legacy name)"
 	@echo "  make bootstrap-shared-db  Create schema/user on shared MySQL primary"
 	@echo "  make build           Rebuild the php image (dev)"
 	@echo "  make build-prod      Build frankenphp_prod image (see docs/PRODUCTION.md)"
@@ -29,7 +32,7 @@ help:
 	@echo "  make mailpit         Start Mailpit (compose profile mail) for local SMTP; prints UI URL"
 	@echo "  make mailpit-logs    Follow Mailpit logs"
 	@echo "  make messenger-logs  Follow Messenger worker logs"
-	@echo "  make mysql           mysql CLI shell"
+	@echo "  make mysql           mysql CLI shell (mysql-9.7-primary)"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
 	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
@@ -90,13 +93,14 @@ strip-cursor-coauthor-from-history:
 	@chmod +x .scripts/strip-cursor-coauthor-from-history.sh
 	@./.scripts/strip-cursor-coauthor-from-history.sh main
 
-# Bring the Compose stack up if the php service cannot exec (no --build, no vite).
+# Bring shared infra + app up if the php service cannot exec (no --build, no vite).
 # Used as a prerequisite by targets that need a running container. Does not call `make up`
 # (avoids recursion when `up` itself runs vite-build).
 ensure-up:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@$(MAKE) up-infra
 	@$(DC) exec -T php true >/dev/null 2>&1 || { \
-		echo "Stack is down — starting compose up -d…"; \
+		echo "App stack is down — starting compose up -d…"; \
 		$(DC) up -d; \
 	}
 
@@ -117,59 +121,83 @@ print-urls:
 		echo "  Mailpit UI: http://localhost:$${MAILPIT_UI}  (SMTP from PHP: smtp://mailer:1025)"; \
 	fi
 
+# Shared MySQL + Redis (compose.infra.yaml, project shared-infra).
+# Coexistence: if mysql-9.7-primary already exists (e.g. developer.local.server/server), skip create.
+# MYSQL_TOPOLOGY=simple|replica (from .env or env) — replica adds profile mysql-replica.
+up-infra:
+	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
+	@set -a; . ./.env; set +a; \
+	TOPOLOGY="$${MYSQL_TOPOLOGY:-simple}"; \
+	PROFILE_ARGS=""; \
+	if [ "$$TOPOLOGY" = "replica" ]; then PROFILE_ARGS="--profile mysql-replica"; fi; \
+	if docker inspect mysql-9.7-primary >/dev/null 2>&1; then \
+		echo "Shared infra: mysql-9.7-primary already exists — not recreating (coexistence)."; \
+		docker start mysql-9.7-primary >/dev/null 2>&1 || true; \
+		docker start redis-8.10.0 >/dev/null 2>&1 || true; \
+		if [ "$$TOPOLOGY" = "replica" ]; then \
+			if ! docker inspect mysql-9.7-replica >/dev/null 2>&1; then \
+				echo "MYSQL_TOPOLOGY=replica but mysql-9.7-replica is missing."; \
+				echo "Start it from the same infra that owns the primary, or remove the primary and run make up-infra."; \
+				exit 1; \
+			fi; \
+			docker start mysql-9.7-replica >/dev/null 2>&1 || true; \
+		fi; \
+		docker inspect redis-8.10.0 >/dev/null 2>&1 || { \
+			echo "redis-8.10.0 is missing while MySQL exists. Start Redis from the same infra owner."; \
+			exit 1; \
+		}; \
+		NET="$${SHARED_DOCKER_NETWORK:-server_network}"; \
+		docker network inspect "$$NET" >/dev/null 2>&1 || { \
+			echo "Docker network '$$NET' not found."; \
+			exit 1; \
+		}; \
+	else \
+		echo "Starting shared infra (MYSQL_TOPOLOGY=$$TOPOLOGY)…"; \
+		$(DC_INFRA) $$PROFILE_ARGS up -d; \
+	fi
+
+down-infra:
+	@echo "Stopping shared-infra (MySQL/Redis). Sibling projects on server_network may break."
+	-$(DC_INFRA) --profile mysql-replica down
+
 up:
 	@rm -f .compose-mode
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
-	docker compose up --build -d
+	@$(MAKE) up-infra
+	$(DC) up --build -d
 	@echo "Building frontend assets (static public/build/)…"
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 	@echo "Optional local SMTP: make mailpit  (see docs/ops/MAILPIT.md)"
 
-# Shared infra (developer.local.server server/ or little-vps). Docs: docs/ops/SHARED-SERVER.md
-up-shared:
+up-prod:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
-	@set -a; . ./.env; set +a; \
-	if [ "$${MYSQL_HOST:-database}" = "database" ]; then \
-		echo "MYSQL_HOST is still 'database'. For shared mode set MYSQL_HOST=mysql-9.7-primary (and MYSQL_HOST_RO=mysql-9.7-replica) in .env — see docs/ops/SHARED-SERVER.md"; \
-		exit 1; \
-	fi
-	@NET=$${SHARED_DOCKER_NETWORK:-server_network}; \
-	docker network inspect "$$NET" >/dev/null 2>&1 || { \
-		echo "Docker network '$$NET' not found. Start server/ first (docker compose up -d in developer.local.server/server)."; \
-		exit 1; \
-	}
-	@docker ps --format '{{.Names}}' | grep -qx mysql-9.7-primary || { \
-		echo "mysql-9.7-primary is not running. From server/: make up-mysql"; \
-		exit 1; \
-	}
-	@$(MAKE) bootstrap-shared-db
-	@echo shared > .compose-mode
-	docker compose $(COMPOSE_SHARED_FILES) up --build -d
-	@echo "Building frontend assets (static public/build/)…"
-	@$(MAKE) vite-build
+	@$(MAKE) up-infra
+	$(DC_PROD) up --build -d
 	@$(MAKE) print-urls
-	@echo "Shared mode — DB via $${MYSQL_HOST:-mysql-9.7-primary} (see docs/ops/SHARED-SERVER.md)"
+
+# Legacy alias — shared mode is the default (`make up`).
+up-shared: up
 
 classic:
 	@test -f .env || cp .env.dist .env
+	@$(MAKE) up-infra
 	FRANKENPHP_MODE=classic $(DC) up --build -d
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 worker:
 	@test -f .env || cp .env.dist .env
+	@$(MAKE) up-infra
 	FRANKENPHP_MODE=worker $(DC) up --build -d
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 down:
-	docker compose --profile hmr --profile mail down
+	$(DC) --profile hmr --profile mail down
 	@rm -f .compose-mode
 
-down-shared:
-	docker compose $(COMPOSE_SHARED_FILES) --profile hmr --profile mail down
-	@rm -f .compose-mode
+down-shared: down
 
 bootstrap-shared-db:
 	@chmod +x .scripts/bootstrap-shared-db.sh
@@ -252,6 +280,7 @@ dogfood: ensure-halite-secrets
 
 migrate: ensure-halite-secrets
 	$(DC) exec -T php bin/console doctrine:migrations:migrate -n
+	$(DC) exec -T php bin/console messenger:setup-transports --no-interaction
 
 bootstrap: migrate
 	@$(MAKE) seed-platform
@@ -267,11 +296,8 @@ restart: ensure-up
 	@$(MAKE) vite-build
 
 mysql: ensure-up
-	@if test -f .compose-mode && grep -qx shared .compose-mode; then \
-		docker exec -it mysql-9.7-primary mysql -u$${MYSQL_USER:-beacon} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-symfony_beacon}; \
-	else \
-		$(DC) exec database mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}; \
-	fi
+	@set -a; . ./.env 2>/dev/null; set +a; \
+	docker exec -it mysql-9.7-primary mysql -u$${MYSQL_USER:-app} -p$${MYSQL_PASSWORD:-!ChangeMe!} $${MYSQL_DATABASE:-app}
 
 specify-check:
 	@command -v specify >/dev/null || { echo "Install Specify: uv tool install specify-cli"; exit 1; }

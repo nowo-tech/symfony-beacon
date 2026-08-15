@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "004eadafff04fef074c7273ed9fe5db9",
+    "content-hash": "e7757506f63e1785f6eef3e916bcefff",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3597,16 +3597,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.10.1",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "d228bf0d53936e1211a66bb58012103d78321491"
+                "reference": "6e826c25af982b0fc9cfd2737b7cf437b52b1582"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/d228bf0d53936e1211a66bb58012103d78321491",
-                "reference": "d228bf0d53936e1211a66bb58012103d78321491",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/6e826c25af982b0fc9cfd2737b7cf437b52b1582",
+                "reference": "6e826c25af982b0fc9cfd2737b7cf437b52b1582",
                 "shasum": ""
             },
             "require": {
@@ -3618,6 +3618,7 @@
                 "symfony/event-dispatcher": "^7.0 || ^8.0",
                 "symfony/filesystem": "^7.0 || ^8.0",
                 "symfony/finder": "^7.0 || ^8.0",
+                "symfony/form": "^7.0 || ^8.0",
                 "symfony/http-foundation": "^7.0 || ^8.0",
                 "symfony/http-kernel": "^7.0 || ^8.0",
                 "symfony/process": "^7.0 || ^8.0",
@@ -3647,7 +3648,7 @@
                 "symfony/flex": "For automatic recipe installation",
                 "symfony/security-bundle": "Required for the private panel when security.allow_unauthenticated is false (default); also for custom SiteBackupAccessGateInterface / access_checker",
                 "symfony/translation": "Required for |trans in panel and restore templates",
-                "symfony/twig-bundle": "Required to render the restore loading page and admin panel"
+                "symfony/twig-bundle": "Required to render the restore loading page and form-based admin/setup UI"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -3687,7 +3688,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-08-07T21:37:15+00:00"
+            "time": "2026-08-15T09:34:22+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",
@@ -8946,6 +8947,82 @@
                 }
             ],
             "time": "2026-06-09T11:06:24+00:00"
+        },
+        {
+            "name": "symfony/redis-messenger",
+            "version": "v8.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/redis-messenger.git",
+                "reference": "ae059a82ee62d65ed7664a778246bc38e5bbacc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/redis-messenger/zipball/ae059a82ee62d65ed7664a778246bc38e5bbacc0",
+                "reference": "ae059a82ee62d65ed7664a778246bc38e5bbacc0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-redis": "*",
+                "php": ">=8.4.1",
+                "symfony/messenger": "^8.1"
+            },
+            "conflict": {
+                "ext-redis": "<6.1",
+                "ext-relay": "<0.12"
+            },
+            "require-dev": {
+                "symfony/property-access": "^7.4|^8.0",
+                "symfony/serializer": "^7.4|^8.0",
+                "symfony/var-dumper": "^7.4|^8.0"
+            },
+            "type": "symfony-messenger-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Messenger\\Bridge\\Redis\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Redis extension Messenger Bridge",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/redis-messenger/tree/v8.1.2"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-22T15:42:13+00:00"
         },
         {
             "name": "symfony/routing",

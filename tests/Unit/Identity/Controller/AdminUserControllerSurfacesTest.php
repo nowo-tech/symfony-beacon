@@ -8,8 +8,10 @@ use App\Identity\Controller\AdminUserController;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
+use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\AccountSocialAccounts;
+use App\Identity\Service\AdminUserMutator;
 use App\Identity\Service\UserActionRecorder;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Repository\ProjectMembershipRepository;
@@ -31,6 +33,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -55,6 +58,16 @@ final class AdminUserControllerSurfacesTest extends TestCase
         new ReflectionProperty(AdminUserController::class, 'csrfOnlyFormFactory')->setValue(
             $controller,
             new CsrfOnlyFormFactory($inner),
+        );
+        $em = $this->createStub(EntityManagerInterface::class);
+        new ReflectionProperty(AdminUserController::class, 'adminUserMutator')->setValue(
+            $controller,
+            new AdminUserMutator(
+                $this->createStub(UserRepository::class),
+                new UserActionRecorder($em, new RequestStack()),
+                $em,
+                $this->createStub(UserPasswordHasherInterface::class),
+            ),
         );
         $session = $this->boot($controller, $admin, flash: true);
 

@@ -13,6 +13,7 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Twig\ProjectPermissionTwigExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +40,7 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         $this->authorizationChecker->expects(self::any())->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
         $this->security = $this->createMock(Security::class);
 
-        $projectAccess = new ProjectAccessService(
+        $projectAccess = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $groupAccessRepository,
             $shareLinkRepository,
@@ -105,7 +106,7 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
             ->method('findHighestGroupRoleForUser')
             ->willReturn(null);
         $shareLinkRepository = $this->createMock(ProjectShareLinkRepository::class);
-        $projectAccess = new ProjectAccessService(
+        $projectAccess = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $groupAccessRepository,
             $shareLinkRepository,

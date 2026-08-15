@@ -27,7 +27,16 @@ final class SiteAppearanceProvider implements ResetInterface
 
     public function get(): SiteAppearance
     {
-        return $this->cached ??= $this->repository->getOrCreate();
+        if (null !== $this->cached) {
+            return $this->cached;
+        }
+
+        try {
+            return $this->cached = $this->repository->getOrCreate();
+        } catch (\Throwable) {
+            // Cold start / missing schema: setup layout must render without Doctrine.
+            return $this->cached = SiteAppearance::defaults();
+        }
     }
 
     public function refresh(): SiteAppearance

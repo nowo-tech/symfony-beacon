@@ -5,6 +5,7 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 ## Table of contents
 
 - [Unreleased (main after 1.14.0)](#unreleased-main-after-1140)
+- [Upgrading from 1.14.0 (shared infra Compose)](#upgrading-from-1140-shared-infra-compose)
 - [Upgrading from 1.13.0 to 1.14.0](#upgrading-from-1130-to-1140)
 - [Upgrading from 1.12.0 to 1.13.0](#upgrading-from-1120-to-1130)
 - [Upgrading from 1.11.0 to 1.12.0](#upgrading-from-1110-to-1120)
@@ -69,18 +70,48 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.14.0)
 
-_No upgrade steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)._
+**SiteBackup 1.11.0 + durable setup-done gate (`056` / 6.49)** — per-step progress journal (`progress_step_rows`) and `/setup` closed from `instance_settings.setup_completed_at` when detectors do not require setup. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+
+Also: **in-repo shared infra Compose** (`compose.infra.yaml`) — see [Upgrading from 1.14.0 (shared infra Compose)](#upgrading-from-1140-shared-infra-compose).
+
+```bash
+composer update nowo-tech/site-backup-bundle
+php bin/console cache:clear
+```
+
+### Operator checklist
+
+1. **No host migration** for `nowo_site_backup_setup_step` / progress tables — SiteBackup creates them with runtime DDL on first DB write during setup (or when chain mirrors after `database_create`).
+2. **Cold start**: early wizard steps still use filesystem progress until DBAL works; existing `progress_storage: chain` is unchanged.
+3. **Prod recreate**: if `var/site-backup/setup.done` is missing but `setup_completed_at` is set and catalogs/schema are present, `/setup` redirects home (Beacon `SetupDbDoneGuard`).
+
+## Upgrading from 1.14.0 (shared infra Compose)
+
+**In-repo shared infra** — MySQL/Redis moved to `compose.infra.yaml`; app stacks join `server_network`. Update `.env` from `.env.dist` (`MYSQL_HOST=mysql-9.7-primary`, `REDIS_HOST=redis-8.10.0`, `MYSQL_TOPOLOGY`). See [SHARED-SERVER.md](ops/SHARED-SERVER.md).
+
+```bash
+git pull
+# Align .env hosts with .env.dist (no more MYSQL_HOST=database / REDIS_HOST=redis)
+make up              # up-infra + app
+make migrate
+```
+
+### Operator checklist
+
+1. **Stop old embedded DB/Redis** if you still have Compose services named `database` / `redis` from a previous tree: `docker compose down`, then `make up`.
+2. **Data**: old `./.data/mysql` is unused; new data lives under `./.data/infra/`. Migrate with `mysqldump` / restore if you need existing rows, or keep using coexistence with `developer.local.server/server` containers.
+3. **Replica**: set `MYSQL_TOPOLOGY=replica` and `MYSQL_HOST_RO=mysql-9.7-replica` when you want the read replica container.
 
 ## Upgrading from 1.13.0 to 1.14.0
 
-**Shared MySQL mode & account profile split (`098` / 6.48)** — optional `make up-shared`, identity table rename `app_user` → `user`, Account profile split into basic vs password-gated sensitive forms. See `[1.14.0]` in [CHANGELOG.md](CHANGELOG.md).
+**Shared MySQL mode & account profile split (`098` / 6.48)** — optional `make up-shared` (now an alias of `make up`), identity table rename `app_user` → `user`, Account profile split into basic vs password-gated sensitive forms. See `[1.14.0]` in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
 git fetch --tags
 git checkout v1.14.0   # or pull main at the release commit
-# Optional shared mode: copy MYSQL_* / SHARED_DOCKER_NETWORK from .env.dist — see docs/ops/SHARED-SERVER.md
+# Shared hosts: copy MYSQL_* / SHARED_DOCKER_NETWORK from .env.dist — see docs/ops/SHARED-SERVER.md
 composer install
-make ensure-up          # or make up / make up-shared
+make ensure-up          # or make up
 make migrate            # Version20260814230000 renames app_user → user
 php bin/console cache:clear
 make vite-build         # if you serve built assets
@@ -89,7 +120,7 @@ make vite-build         # if you serve built assets
 ### Operator checklist
 
 1. **Migrations**: confirm table `` `user` `` exists (was `app_user`). Re-run is safe if already renamed.
-2. **Env (optional shared stack)**: set `MYSQL_HOST` / `MYSQL_HOST_RO` away from `database`, then `make up-shared`. Standalone `make up` unchanged.
+2. **Env**: prefer `MYSQL_HOST=mysql-9.7-primary` / `REDIS_HOST=redis-8.10.0` (defaults in current `.env.dist`).
 3. **Account profile**: display name / phone save without password; email and Slack user ID require current password on the second panel.
 4. **Integrations**: any automation that POSTed `user_preferences[email]` (etc.) must use `user_profile` / `user_profile_sensitive` field names.
 
@@ -547,7 +578,7 @@ make vite-build       # optional if you only run PHP tests
 
 - Compose services load secrets via `env_file: .env` (keep a real `.env` from `.env.dist`; do not commit it).
 - Fresh `.env.dist` defaults: HTTPS `9447`, HTTP ingest `9084`, Vite `5177`, Mailpit UI `18026` / SMTP `1027`. Existing `.env` values are kept — update bookmarks / BeaconBundle client DSNs if you adopt the new defaults.
-- MySQL is **not** published on the host. Use `docker compose exec database mysql …` (or attach another Compose service on the same network). Update any host tooling that used `localhost:3308`.
+- MySQL is **not** published on the host. Use `make mysql` or `docker exec -it mysql-9.7-primary mysql …`. Update any host tooling that used `localhost:3308`.
 - Prod (`compose.prod.yaml`) still fail-fast on missing `APP_SECRET` / MySQL / Mercure / SiteBackup secrets; other keys come from `.env`.
 
 ### Vitest (frontend unit)

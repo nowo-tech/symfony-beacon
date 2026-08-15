@@ -1,0 +1,16 @@
+[mysqld]
+server-id                      = 1
+log-bin                        = mysql-bin
+binlog_format                  = ROW
+binlog_expire_logs_seconds     = 604800
+gtid_mode                      = ON
+enforce_gtid_consistency        = ON
+log_replica_updates            = ON
+
+collation-server               = utf8mb4_unicode_ci
+character-set-server           = utf8mb4
+max_allowed_packet             = 2G
+sort_buffer_size               = 256M
+
+[client]
+default-character-set         = utf8mb4

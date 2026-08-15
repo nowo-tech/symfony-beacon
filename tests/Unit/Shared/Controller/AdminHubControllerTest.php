@@ -10,6 +10,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Shared\Controller\AdminHubController;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
@@ -44,7 +45,7 @@ final class AdminHubControllerTest extends TestCase
         $builder = new ProductTourStepsBuilder(
             $translator,
             $security,
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $this->createStub(ProjectMembershipRepository::class),
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

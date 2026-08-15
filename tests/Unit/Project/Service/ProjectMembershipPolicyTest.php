@@ -16,6 +16,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectMembershipPolicy;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,7 @@ final class ProjectMembershipPolicyTest extends TestCase
         $this->groupMembershipRepository = $this->createStub(UserGroupMembershipRepository::class);
         $this->authorizationChecker = $this->createStub(AuthorizationCheckerInterface::class);
 
-        $accessService = new ProjectAccessService(
+        $accessService = ProjectAccessServiceFactory::create(
             $this->membershipRepository,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

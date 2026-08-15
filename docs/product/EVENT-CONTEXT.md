@@ -12,8 +12,15 @@ Beacon stores the full Envelope event JSON in `event.payload` and promotes commo
 | `php_version` | `payload.contexts.runtime.version` |
 | `symfony_version` | `payload.contexts.framework` when `name` is `symfony` |
 | `user_identifier` | `payload.user.id` / `username` / `email` |
+| `request_url` | `payload.request.url` or `payload.contexts.request.url` (max 512) |
 | `event_timestamp` | `payload.timestamp` (fractional Unix) or `payload.datetime` — stored as `DATETIME(6)` |
 | `received_at` | Server receive time — `DATETIME(6)` |
+
+### Promoted tags (`event_tag`)
+
+Each scalar entry in `payload.tags` is stored as a row (`tag_key`, `tag_value`) linked to `event` / `issue` / `project`. Issue list **tag** filters query this table (exact match on key, value, or `key:value`) — they do **not** run `JSON_SEARCH` on `event.payload`.
+
+Historical events: `bin/console app:events:backfill-promotions` (optional). New ingest writes promotions automatically.
 
 ## Client configuration
 

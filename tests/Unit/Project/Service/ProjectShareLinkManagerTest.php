@@ -13,6 +13,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectShareLinkManager;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -130,7 +131,7 @@ final class ProjectShareLinkManagerTest extends TestCase
         return new ProjectShareLinkManager(
             $em,
             $repo ?? $this->createStub(ProjectShareLinkRepository::class),
-            new ProjectAccessService(
+            ProjectAccessServiceFactory::create(
                 $this->createStub(ProjectMembershipRepository::class),
                 $this->createStub(ProjectGroupAccessRepository::class),
                 $this->createStub(ProjectShareLinkRepository::class),

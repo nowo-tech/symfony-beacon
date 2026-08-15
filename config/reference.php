@@ -2454,6 +2454,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         progress_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup-progress.json"
  *         progress_storage?: "filesystem"|"doctrine"|"chain"|Param, // filesystem = JSON in var/; doctrine = DBAL table; chain = write both, prefer DB on load (survives var/ wipe). // Default: "filesystem"
  *         progress_table?: scalar|Param|null, // DBAL table name when progress_storage is doctrine or chain. // Default: "nowo_site_backup_setup_progress"
+ *         progress_step_rows?: bool|Param, // When true (default) and progress_storage is doctrine/chain, upsert per-step rows (runtime DDL — not Symfony migrations; safe before host schema exists). // Default: true
+ *         progress_steps_table?: scalar|Param|null, // DBAL table for per-step journal when progress_step_rows is true. // Default: "nowo_site_backup_setup_step"
  *         required_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.required"
  *         done_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.done"
  *         php_binary?: scalar|Param|null, // Default: "php"

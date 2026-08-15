@@ -1,6 +1,6 @@
 # Database schema
 
-Beacon persists application data with **Doctrine ORM** on **MySQL** (Compose service `database`; local data under `./.data/mysql`).
+Beacon persists application data with **Doctrine ORM** on **MySQL** (`mysql-9.7-primary` from [`compose.infra.yaml`](../../compose.infra.yaml); local data under `./.data/infra/mysql-primary`).
 
 This page documents the **App\\** entity model (tables under `src/`). Kit tables from `nowo-tech/*` bundles (menus, breadcrumbs, cookie consent, login throttle, …) are owned by those packages and are omitted here.
 
@@ -473,4 +473,4 @@ Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **App
 
 - Architecture flows: [ARCHITECTURE.md](../ARCHITECTURE.md)
 - Migrations: `migrations/`
-- Local MySQL bind mount: `./.data/mysql` in [`compose.yaml`](../../compose.yaml)
+- Local MySQL bind mount: `./.data/infra/mysql-primary` in [`compose.infra.yaml`](../../compose.infra.yaml)

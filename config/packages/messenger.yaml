@@ -5,8 +5,8 @@ framework:
         failure_transport: failed
 
         # JSON + HMAC signatures (via AsMessageHandler sign: true) — avoid PHP native unserialize gadgets
-        # and forged ProcessEnvelopeMessage rows in the Doctrine queue. Drain async queues before deploy
-        # when switching from native PHP serialization.
+        # and forged ProcessEnvelopeMessage rows in the queue. Drain pending Doctrine
+        # messenger_messages rows before deploy when switching MESSENGER_TRANSPORT_DSN to Redis.
         serializer:
             default_serializer: messenger.transport.symfony_serializer
 
@@ -15,7 +15,8 @@ framework:
             async_ingest:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
-                    queue_name: async_ingest
+                    stream: async_ingest
+                    auto_setup: true
                 retry_strategy:
                     max_retries: 3
                     delay: 1000
@@ -26,14 +27,19 @@ framework:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
-                    queue_name: async
+                    stream: async
+                    auto_setup: true
                 retry_strategy:
                     max_retries: 3
                     delay: 1000
                     multiplier: 2
                     max_delay: 10000
 
-            failed: 'doctrine://default?queue_name=failed'
+            failed:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    stream: failed
+                    auto_setup: true
 
             sync: 'sync://'
 

@@ -6,20 +6,24 @@ namespace App\Issues\Repository\Query;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Repository\EventTagRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\SqlLikeEscaper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Full-text / LIKE search and tag/url/user payload filters shared by list and assignment queries.
+ * Full-text / LIKE search and tag/url/user filters shared by list and assignment queries.
+ *
+ * Tag and URL filters use promoted columns / event_tag — not JSON_SEARCH on payload.
  *
  * @phpstan-require-extends ServiceEntityRepository<Issue>
  */
 trait IssueSearchFilterTrait
 {
+    abstract protected function eventTagRepository(): EventTagRepository;
+
     protected function applyFullTextOrLikeQuery(QueryBuilder $qb, string $query): void
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -72,8 +76,7 @@ trait IssueSearchFilterTrait
             return;
         }
 
-        $needle = trim($tag);
-        $ids = $this->issueIdsMatchingPayload($project, $needle, useJsonSearch: true);
+        $ids = $this->eventTagRepository()->findIssueIdsMatchingTag($project, trim($tag));
         $this->restrictToIssueIds($qb, $ids, 'tagFilterIssueIds');
     }
 
@@ -83,9 +86,13 @@ trait IssueSearchFilterTrait
             return;
         }
 
-        $needle = trim($url);
-        $ids = $this->issueIdsMatchingPayload($project, $needle, useJsonSearch: false);
-        $this->restrictToIssueIds($qb, $ids, 'urlFilterIssueIds');
+        $like = '%'.SqlLikeEscaper::escape(trim($url)).'%';
+        $qb->andWhere(
+            'EXISTS (SELECT 1 FROM '.Event::class." ue"
+            ." WHERE ue.issue = i AND ue.project = :urlFilterProject AND ue.requestUrl LIKE :urlLike ESCAPE '\\')",
+        )
+            ->setParameter('urlFilterProject', $project)
+            ->setParameter('urlLike', $like);
     }
 
     protected function applyUserFilter(QueryBuilder $qb, ?string $user): void
@@ -97,47 +104,6 @@ trait IssueSearchFilterTrait
         $qb->andWhere(
             'EXISTS (SELECT 1 FROM '.Event::class." ue WHERE ue.issue = i AND ue.userIdentifier LIKE :userLike ESCAPE '\\')",
         )->setParameter('userLike', '%'.SqlLikeEscaper::escape(trim($user)).'%');
-    }
-
-    /** @return list<int> */
-    private function issueIdsMatchingPayload(Project $project, string $needle, bool $useJsonSearch): array
-    {
-        $conn = $this->getEntityManager()->getConnection();
-        $platform = $conn->getDatabasePlatform();
-        $projectId = $project->getId();
-        if (null === $projectId) {
-            return [];
-        }
-
-        $isSqlite = $platform instanceof SQLitePlatform;
-        $isMysql = $platform instanceof AbstractMySQLPlatform;
-
-        if ($useJsonSearch && $isMysql) {
-            $sql = 'SELECT DISTINCT e.issue_id FROM event e'
-                .' INNER JOIN issue i ON i.id = e.issue_id'
-                .' WHERE i.project_id = ? AND JSON_SEARCH(e.payload, \'one\', ?) IS NOT NULL';
-            $params = [$projectId, $needle];
-        } else {
-            $like = '%'.SqlLikeEscaper::escape($needle).'%';
-            if ($isSqlite) {
-                // SQLite: ESCAPE '\' — one backslash as the escape character.
-                $sql = 'SELECT DISTINCT e.issue_id FROM event e'
-                    .' INNER JOIN issue i ON i.id = e.issue_id'
-                    ." WHERE i.project_id = ? AND CAST(e.payload AS TEXT) LIKE ? ESCAPE '\\'";
-            } else {
-                // MySQL: string literal '\\' is one backslash (NO_BACKSLASH_ESCAPES off).
-                // A single-quoted ESCAPE '\' is a syntax error (see SQLSTATE 1064 near ''\'').
-                $sql = 'SELECT DISTINCT e.issue_id FROM event e'
-                    .' INNER JOIN issue i ON i.id = e.issue_id'
-                    ." WHERE i.project_id = ? AND CAST(e.payload AS CHAR) LIKE ? ESCAPE '\\\\'";
-            }
-            $params = [$projectId, $like];
-        }
-
-        /** @var list<int|string> $rows */
-        $rows = $conn->fetchFirstColumn($sql, $params);
-
-        return array_map(static fn (int|string $id): int => (int) $id, $rows);
     }
 
     /** @param list<int> $ids */

@@ -43,7 +43,8 @@ final readonly class PlatformCatalogsSetupNeedDetector implements SetupNeedDetec
         try {
             return $this->platformBootstrapState->needsPlatformSeed();
         } catch (Throwable) {
-            return false;
+            // Unknown / unreachable database ⇒ cold start (same signal as doctrine_connect).
+            return true;
         }
     }
 

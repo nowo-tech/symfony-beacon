@@ -1,22 +1,66 @@
-# Shared server mode (developer.local.server `server/` or little-vps)
+# Shared infra (in-repo MySQL + Redis)
 
-Beacon stays **standalone by default** (`make up` → Compose service `database`, `MYSQL_HOST=database`).  
-Use **shared mode** when you want one MySQL (and Redis) for several `repositories/other` apps — the same contract later used on little-vps (`server_internal`).
+Beacon’s **default** local/prod app stacks (`compose.yaml`, `compose.prod.yaml`) do **not** embed MySQL or Redis. Shared data services live in [`compose.infra.yaml`](../../compose.infra.yaml) (Compose project `shared-infra`) on a fixed Docker network so several `repositories/other` apps can reuse one MySQL and one Redis — the same hostname contract as `developer.local.server/server` and little-vps (`server_internal`).
 
-## Prerequisites
+## Topology switch (`MYSQL_TOPOLOGY`)
 
-1. Shared infra up (from `developer.local.server/server`):
+| Value | Infra services | Recommended hosts |
+|-------|----------------|--------------------|
+| `simple` (default) | `mysql-9.7-primary` + `redis-8.10.0` | `MYSQL_HOST` / `MYSQL_HOST_RO` → `mysql-9.7-primary` |
+| `replica` | primary + Redis + `mysql-9.7-replica` (Compose profile `mysql-replica`) | `MYSQL_HOST_RO=mysql-9.7-replica` |
+
+Set in `.env` (see `.env.dist`):
+
+```env
+MYSQL_TOPOLOGY=simple
+# or: MYSQL_TOPOLOGY=replica
+```
+
+Primary is always GTID-ready and creates a `replicator` user on first empty datadir, so enabling `replica` later does not require recreating the primary data directory.
+
+## Quick start (this repo owns infra)
+
+```bash
+cp .env.dist .env   # once — defaults already point at shared hosts
+make up            # up-infra + app + vite-build
+make ready         # migrate + seed
+make down          # stops app only; MySQL/Redis stay up for siblings
+make down-infra    # stops shared-infra (warn: other apps may break)
+```
+
+Production-oriented app (same infra):
+
+```bash
+make up-prod       # up-infra + compose.prod.yaml
+```
+
+Legacy aliases: `make up-shared` → `make up`; `make down-shared` → `make down`.
+
+## Coexistence with `developer.local.server/server`
+
+Same container names and network:
+
+| Role | Hostname |
+|------|----------|
+| Network | `${SHARED_DOCKER_NETWORK:-server_network}` |
+| Write MySQL | `mysql-9.7-primary` |
+| Read MySQL | `mysql-9.7-replica` (when topology/replica is up) |
+| Redis | `redis-8.10.0` |
+
+`make up-infra` **does not recreate** containers if `mysql-9.7-primary` already exists (e.g. started from `server/`). It starts them if stopped and requires `redis-8.10.0` + the Docker network. Do **not** run both owners’ compose files against empty names at once — pick one owner for the containers.
+
+Alternative (infra only from `server/`):
 
 ```bash
 cd /path/to/developer.local.server/server
-cp -n .env.dist .env   # once
 docker compose up -d redis-8.10.0 mysql-9.7-primary mysql-9.7-replica
-# or: make up-mysql   # MySQL pair; Redis via make up-base
+# then in Beacon:
+make up
 ```
 
-2. Docker network `server_network` exists (created by the server compose file).
+On little-vps set `SHARED_DOCKER_NETWORK=server_internal` (infra already present; `up-infra` is a coexistence no-op). Prefer a dedicated app user there instead of root.
 
-## Configure Beacon `.env`
+## Configure `.env`
 
 `DATABASE_URL` / `DATABASE_URL_RO` always use the same template:
 
@@ -25,59 +69,78 @@ DATABASE_URL="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT
 DATABASE_URL_RO="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST_RO}:${MYSQL_PORT_RO}/${MYSQL_DATABASE}?serverVersion=${MYSQL_VERSION}&charset=utf8mb4"
 ```
 
-Standalone (`make up`) defaults:
+Redis + Messenger:
 
 ```env
-MYSQL_DATABASE=app
-MYSQL_USER=app
-MYSQL_PASSWORD=!ChangeMe!
-MYSQL_HOST=database
-MYSQL_HOST_RO=database
+REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}
+MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}/messages
 ```
 
-Shared mode (local/dev) — connect as **MySQL root** (same password as `server/.env` `DATABASE_PASSWORD`). No app user to create:
+Defaults from `.env.dist`:
 
 ```env
 SHARED_DOCKER_NETWORK=server_network
-MYSQL_DATABASE=symfony_beacon
-MYSQL_USER=root
-MYSQL_PASSWORD=toChange!          # = server/.env DATABASE_PASSWORD
+MYSQL_TOPOLOGY=simple
+MYSQL_DATABASE=app
+MYSQL_USER=app
+MYSQL_PASSWORD=!ChangeMe!
+MYSQL_ROOT_PASSWORD=!ChangeMeRoot!
 MYSQL_HOST=mysql-9.7-primary
-MYSQL_HOST_RO=mysql-9.7-replica
+MYSQL_HOST_RO=mysql-9.7-primary
+REDIS_HOST=redis-8.10.0
 ```
 
-On little-vps, set `SHARED_DOCKER_NETWORK=server_internal` (same MySQL hostnames). Prefer a dedicated app user there instead of root.
+Optional schema/user helper: `make bootstrap-shared-db` (CREATE DATABASE; optional non-root user). Cold start can also use SiteBackup `/setup`.
 
-`make up-shared` runs `bootstrap-shared-db` automatically (ensures `CREATE DATABASE IF NOT EXISTS`). With `MYSQL_USER=root` it does not create an extra user.
+**Queue migration:** if you previously used `doctrine://default` Messenger, drain `messenger_messages` (or accept loss of pending rows) before switching to Redis.
 
-## Start / stop
+## Compose layout
+
+| File | Role |
+|------|------|
+| `compose.infra.yaml` | Project `shared-infra`: network + MySQL (+ optional replica) + Redis; data under `./.data/infra/` |
+| `compose.yaml` | Dev app only (bind-mount); joins external shared network |
+| `compose.override.yaml` | Mailpit (`mail`), Mercure expose |
+| `compose.prod.yaml` | Prod app only; same external network |
+
+App services (`php`, messengers, vite, mailer, mercure) attach to `${SHARED_DOCKER_NETWORK:-server_network}` as **external**. No host-published MySQL/Redis ports (REQ-FP-006): use `make mysql` or `docker exec -it mysql-9.7-primary mysql …`.
+
+## Join from another project
+
+Sibling apps only need the external network + hostnames:
+
+```yaml
+networks:
+  shared:
+    name: ${SHARED_DOCKER_NETWORK:-server_network}
+    external: true
+```
+
+Start infra once:
 
 ```bash
-make up-shared     # ensures schema + compose.yaml + override + compose.shared.yaml
-make ready         # migrate + seed (same as standalone)
-make down-shared
+make -C /path/to/symfony-beacon up-infra
+# or use developer.local.server/server
 ```
 
-`make up` remains the independent path (embeds MySQL 9.7 in the project Compose file).  
-`make up-shared` refuses to start if `MYSQL_HOST` is still `database`.
+## What Redis is used for
 
-## What shared Compose does
+| Concern | Adapter |
+|---------|---------|
+| HTTP sessions | `framework.session.handler_id` = `REDIS_URL` |
+| `cache.app` + rate-limit pools | `cache.adapter.redis` |
+| Messenger `async_ingest` / `async` / `failed` | `MESSENGER_TRANSPORT_DSN` Redis streams |
+| Password-policy flash throttle | `flash_throttle_storage: cache` → `cache.app` |
 
-| Change | Detail |
-|--------|--------|
-| No local `database` | Service tagged with profile `standalone-db` (not started) |
-| External network | `${SHARED_DOCKER_NETWORK:-server_network}` |
-| App services | `php`, messengers, vite, mailer, mercure join that network |
-
-A marker file `.compose-mode` (`shared`) makes other Make targets use the shared Compose file set while the stack is up.
+`prefix_seed: symfony-beacon` isolates keys when several apps share one Redis.
 
 ## Contract (local ↔ VPS)
 
-| Role | Local `server/` | little-vps |
-|------|-----------------|------------|
+| Role | Local (this repo or `server/`) | little-vps |
+|------|--------------------------------|------------|
 | Network | `server_network` | `server_internal` |
 | Write MySQL | `mysql-9.7-primary` (`MYSQL_HOST`) | Ansible primary hostname |
-| Read MySQL | `mysql-9.7-replica` (`MYSQL_HOST_RO`) | Ansible replica hostname |
-| Redis | `redis-8.10.0` | Redis role container |
+| Read MySQL | `mysql-9.7-replica` (`MYSQL_HOST_RO`) when replica topology is on | Ansible replica hostname |
+| Redis | `redis-8.10.0` (`REDIS_HOST`) | Redis role container |
 
 Beacon does **not** yet route Doctrine reads to the replica; apps write to the primary. `DATABASE_URL_RO` is documented for a future adapter.

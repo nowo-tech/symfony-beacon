@@ -7,11 +7,32 @@ namespace App\Tests\Unit\Setup;
 use App\Setup\SetupCompletedSubscriber;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
+use Nowo\SiteBackupBundle\Setup\Storage\SetupMarkerManager;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class SetupCompletedSubscriberTest extends TestCase
 {
-    public function testMarksSetupCompletedWhenNotYetDone(): void
+    private string $tmpDir;
+
+    private string $requiredFile;
+
+    private string $doneFile;
+
+    protected function setUp(): void
+    {
+        $this->tmpDir = sys_get_temp_dir().'/beacon-setup-completed-'.bin2hex(random_bytes(4));
+        (new Filesystem())->mkdir($this->tmpDir);
+        $this->requiredFile = $this->tmpDir.'/setup.required';
+        $this->doneFile = $this->tmpDir.'/setup.done';
+    }
+
+    protected function tearDown(): void
+    {
+        (new Filesystem())->remove($this->tmpDir);
+    }
+
+    public function testMarksSetupCompletedAndDoneMarkerWhenNotYetDone(): void
     {
         $settings = InstanceSettings::defaults();
         self::assertFalse($settings->isSetupCompleted());
@@ -20,13 +41,15 @@ final class SetupCompletedSubscriberTest extends TestCase
         $repository->method('getOrCreate')->willReturn($settings);
         $repository->expects(self::once())->method('save')->with($settings);
 
-        $subscriber = new SetupCompletedSubscriber($repository);
+        $markers = new SetupMarkerManager($this->requiredFile, $this->doneFile);
+        $subscriber = new SetupCompletedSubscriber($repository, $markers);
         $subscriber();
 
         self::assertTrue($settings->isSetupCompleted());
+        self::assertTrue($markers->isDone());
     }
 
-    public function testSkipsSaveWhenAlreadyCompleted(): void
+    public function testStillHealsDoneMarkerWhenAlreadyCompleted(): void
     {
         $settings = InstanceSettings::defaults();
         $settings->markSetupCompleted();
@@ -35,9 +58,13 @@ final class SetupCompletedSubscriberTest extends TestCase
         $repository->method('getOrCreate')->willReturn($settings);
         $repository->expects(self::never())->method('save');
 
-        $subscriber = new SetupCompletedSubscriber($repository);
+        $markers = new SetupMarkerManager($this->requiredFile, $this->doneFile);
+        self::assertFalse($markers->isDone());
+
+        $subscriber = new SetupCompletedSubscriber($repository, $markers);
         $subscriber();
 
         self::assertTrue($settings->isSetupCompleted());
+        self::assertTrue($markers->isDone());
     }
 }

@@ -19,6 +19,7 @@ use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
@@ -95,7 +96,7 @@ final class IssueAiExportControllerTest extends TestCase
         $groups->method('findHighestGroupRoleForUser')->willReturn(null);
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(false);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $groups,
             $this->createStub(ProjectShareLinkRepository::class),

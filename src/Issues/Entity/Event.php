@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_event_issue_environment', columns: ['issue_id', 'environment'])]
 #[ORM\Index(name: 'idx_event_issue_release', columns: ['issue_id', 'release_version'])]
 #[ORM\Index(name: 'idx_event_issue_user_identifier', columns: ['issue_id', 'user_identifier'])]
+#[ORM\Index(name: 'idx_event_project_request_url', columns: ['project_id', 'request_url'])]
 class Event
 {
     #[ORM\Id]
@@ -57,6 +58,10 @@ class Event
 
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $userIdentifier = null;
+
+    /** Promoted from payload.request.url / contexts.request.url for list filters. */
+    #[ORM\Column(length: 512, nullable: true)]
+    private ?string $requestUrl = null;
 
     /** @var array<string, mixed> */
     #[ORM\Column(type: 'json')]
@@ -189,6 +194,18 @@ class Event
     public function setUserIdentifier(?string $userIdentifier): self
     {
         $this->userIdentifier = $userIdentifier;
+
+        return $this;
+    }
+
+    public function getRequestUrl(): ?string
+    {
+        return $this->requestUrl;
+    }
+
+    public function setRequestUrl(?string $requestUrl): self
+    {
+        $this->requestUrl = $requestUrl;
 
         return $this;
     }

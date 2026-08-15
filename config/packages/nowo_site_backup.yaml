@@ -87,7 +87,10 @@ nowo_site_backup:
         # Fresh clones that must block the app until wizard finishes: set true.
         require_done_marker: false
         # JSON + DBAL; load prefers DB so wiping var/ keeps mid-wizard progress.
+        # SiteBackup 1.11+: per-step journal via runtime DDL (no host migrations; safe before schema exists).
         progress_storage: chain
+        progress_step_rows: true
+        # progress_steps_table: nowo_site_backup_setup_step
         brand_name: 'Symfony Beacon'
         admin_provisioner: App\Setup\AdminUserProvisioner
         # One Continuar click per auto step in the UI (CLI still chains automatically).
@@ -116,6 +119,12 @@ nowo_site_backup:
                         when_answer: { bootstrap_mode: full_database }
                       }
                     - { type: migrations }
+                    - {
+                        type: console,
+                        command: 'messenger:setup-transports',
+                        id: messenger_transports,
+                        label: 'Set up Messenger transports',
+                      }
                     - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
                     - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
                     - {
@@ -132,6 +141,12 @@ nowo_site_backup:
                     - { type: cache_clear }
                     - { type: sql_file, paths: ['var/site-backup/last-restore-dump.sql'], if_exists: true }
                     - { type: migrations }
+                    - {
+                        type: console,
+                        command: 'messenger:setup-transports',
+                        id: messenger_transports,
+                        label: 'Set up Messenger transports',
+                      }
                     - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
                     - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
                     - { type: marker, write_done: true }
@@ -149,6 +164,12 @@ nowo_site_backup:
                         if_exists: false
                       }
                     - { type: migrations }
+                    - {
+                        type: console,
+                        command: 'messenger:setup-transports',
+                        id: messenger_transports,
+                        label: 'Set up Messenger transports',
+                      }
                     - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
                     - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
                     - { type: marker, write_done: true }
@@ -156,6 +177,12 @@ nowo_site_backup:
                 steps:
                     - { type: database_create }
                     - { type: migrations }
+                    - {
+                        type: console,
+                        command: 'messenger:setup-transports',
+                        id: messenger_transports,
+                        label: 'Set up Messenger transports',
+                      }
                     - { type: console, command: 'app:seed-platform', id: seed_platform, label: 'Seed platform catalogs' }
                     - { type: admin_user, roles: ['ROLE_ADMIN'], skip_if_admin_exists: true }
                     - { type: marker, write_done: true }

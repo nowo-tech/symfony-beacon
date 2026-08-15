@@ -6,7 +6,7 @@
 # Usage (from symfony-beacon root, with .env loaded / present):
 #   ./.scripts/bootstrap-shared-db.sh
 #
-# Requires: mysql-9.7-primary running on SHARED_DOCKER_NETWORK (default server_network).
+# Requires: mysql-9.7-primary running (make up-infra, or developer.local.server/server).
 
 set -euo pipefail
 
@@ -44,7 +44,7 @@ if [[ -z "$ROOT_PASS" ]]; then
 fi
 
 if ! docker ps --format '{{.Names}}' | grep -qx "$PRIMARY"; then
-  echo "Container $PRIMARY is not running. Start shared MySQL first (make -C server up-mysql)." >&2
+	echo "Container $PRIMARY is not running. Start shared MySQL first (make up-infra)." >&2
   exit 1
 fi
 

@@ -23,6 +23,7 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectAccessService;
+use App\Tests\Support\ProjectAccessServiceFactory;
 use App\Project\Service\ProjectGroupAccessManager;
 use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
@@ -108,7 +109,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
 
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $this->createStub(ProjectMembershipRepository::class),
             $this->createStub(ProjectGroupAccessRepository::class),
             $links,
@@ -166,7 +167,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $em->expects(self::atLeastOnce())->method('persist');
         $em->expects(self::once())->method('flush');
 
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),
@@ -231,7 +232,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
 
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),
@@ -304,7 +305,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
 
         $memberships = $this->createStub(ProjectMembershipRepository::class);
         $memberships->method('findOneByProjectAndUser')->willReturn(null);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),
@@ -395,7 +396,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $auth = $this->createStub(AuthorizationCheckerInterface::class);
         $auth->method('isGranted')->willReturn(true);
         $memberships = $this->createStub(ProjectMembershipRepository::class);
-        $access = new ProjectAccessService(
+        $access = ProjectAccessServiceFactory::create(
             $memberships,
             $this->createStub(ProjectGroupAccessRepository::class),
             $this->createStub(ProjectShareLinkRepository::class),

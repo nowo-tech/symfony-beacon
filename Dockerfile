@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		intl \
 		opcache \
 		pdo_mysql \
+		redis \
 		zip \
 	&& node --version \
 	&& pnpm --version \

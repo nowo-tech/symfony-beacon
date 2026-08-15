@@ -84,7 +84,7 @@ Membership roles: **owner** / **admin** / **member** / **viewer** (read-only). I
 git clone https://github.com/nowo-tech/symfony-beacon.git
 cd symfony-beacon
 cp .env.dist .env
-make up          # starts stack + builds frontend into public/build/
+make up          # shared infra (MySQL/Redis) + app + builds frontend into public/build/
 make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # or: make bootstrap && make seed
 # Optional QA samples: make seed-sample
@@ -93,18 +93,18 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # Option B — demo login after make ready / make seed (see below)
 ```
 
-**Shared MySQL** (reuse `developer.local.server/server/` primary+replica — see [docs/ops/SHARED-SERVER.md](docs/ops/SHARED-SERVER.md)):
+**Shared infra** (MySQL + Redis on `server_network`, reusable by sibling projects — see [docs/ops/SHARED-SERVER.md](docs/ops/SHARED-SERVER.md)):
 
 ```bash
-# From developer.local.server/server: make up-mysql
-# In .env: MYSQL_HOST=mysql-9.7-primary, MYSQL_USER=root (see .env.dist shared block)
-make up-shared   # ensures schema exists; no app user needed with root
+make up-infra                 # MYSQL_TOPOLOGY=simple|replica
+# or coexist with developer.local.server/server (same container names)
+make up                       # app joins the shared network
 make ready
 ```
 
 - HTTP: http://localhost:9084  
 - HTTPS: https://localhost:9447  
-- MySQL: Compose service `database` only (no host port; `docker compose exec database mysql …`)
+- MySQL: `mysql-9.7-primary` on the shared network (no host port; `make mysql`)
 - Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailer:1025` in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
 - Browser E2E (Playwright): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
