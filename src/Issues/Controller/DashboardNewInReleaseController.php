@@ -8,7 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Form\DashboardNewInReleaseFilterType;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Issues\Service\DashboardNewInReleaseFilterResolver;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

@@ -11,7 +11,7 @@ use App\Project\Entity\Project;
 use App\Project\Form\ProjectReleaseEnvironmentCompareType;
 use App\Project\Form\ProjectReleaseFocusType;
 use App\Project\Security\ProjectPermission;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

@@ -11,6 +11,8 @@ DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file $(EN
 DC_PROD := $(DC) -f compose.prod.yaml --env-file $(ENV_FILE)
 # Override for print-urls when using the prod compose file (`make up-prod`).
 COMPOSE ?= $(DC)
+# Shared stack (developer.local.server/server) when this repo lives under repositories/other/
+SHARED_SERVER_DIR := $(abspath $(CURDIR)/../../../server)
 
 ensure-env:
 	@./.scripts/ensure-env-local.sh
@@ -37,7 +39,7 @@ help:
 	@echo "  make vite-build      pnpm run build (one-shot → public/build/)"
 	@echo "  make vite-watch      pnpm run watch (vite build --watch, no HMR)"
 	@echo "  make pnpm            pnpm in php container (ARGS='install' / 'add -D …')"
-	@echo "  make mailpit         Start Mailpit (compose profile mail) for local SMTP; prints UI URL"
+	@echo "  make mailpit         Start Mailpit (prefers shared server/; else Compose profile mail)"
 	@echo "  make mailpit-logs    Follow Mailpit logs"
 	@echo "  make messenger-logs  Follow messenger + messenger-notify logs"
 	@echo "  make mysql           mysql CLI shell (mysql-9.7-primary)"
@@ -125,9 +127,17 @@ print-urls:
 	echo "Beacon is up:"; \
 	echo "  HTTP:  http://localhost:$${HTTP_PUB}"; \
 	echo "  HTTPS: https://localhost:$${HTTPS_PUB}"; \
-	MAILPIT_UI=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+	MAILPIT_UI=""; \
+	MAILPIT_SMTP_HINT="smtp://mailpit:1025"; \
+	if docker inspect mailpit >/dev/null 2>&1; then \
+		MAILPIT_UI=$$(docker port mailpit 8025/tcp 2>/dev/null | head -1 | sed 's/.*://'); \
+	fi; \
+	if [ -z "$$MAILPIT_UI" ]; then \
+		MAILPIT_UI=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+		MAILPIT_SMTP_HINT="smtp://mailer:1025"; \
+	fi; \
 	if [ -n "$$MAILPIT_UI" ]; then \
-		echo "  Mailpit UI: http://localhost:$${MAILPIT_UI}  (SMTP from PHP: smtp://mailer:1025)"; \
+		echo "  Mailpit UI: http://localhost:$${MAILPIT_UI}  (SMTP from PHP: $${MAILPIT_SMTP_HINT})"; \
 	fi
 
 # Shared MySQL + Redis (compose.infra.yaml, project shared-infra).
@@ -239,21 +249,33 @@ pnpm: ensure-up
 	$(DC) exec -T php pnpm $(ARGS)
 
 # Local SMTP catcher (Mailpit). Dev only — not started by `make up`; not in compose.prod.yaml.
-# Docs: docs/ops/MAILPIT.md — save smtp://mailer:1025 under Administration → Mailer, then Send sample.
+# Prefers developer.local.server/server mailpit on server_network; falls back to Compose profile mail.
+# Docs: docs/ops/MAILPIT.md — save smtp://mailpit:1025 (shared) or smtp://mailer:1025 (app-local).
 mailpit:
 	@$(MAKE) ensure-env
-	$(DC) --profile mail up -d mailer
-	@UI_PUB=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
-	UI_PUB=$${UI_PUB:-18026}; \
-	echo ""; \
-	echo "Mailpit is up (dev/test only — not used in production):"; \
-	echo "  UI:   http://localhost:$${UI_PUB}"; \
-	echo "  SMTP (from PHP container): smtp://mailer:1025"; \
-	echo "  Save that DSN under Administration → Mailer, then use Send sample email."; \
-	echo "  Docs: docs/ops/MAILPIT.md"
+	@if [ -f "$(SHARED_SERVER_DIR)/docker-compose.yml" ]; then \
+		$(DC) --profile mail stop mailer >/dev/null 2>&1 || true; \
+		$(MAKE) -C "$(SHARED_SERVER_DIR)" up-mailpit; \
+		echo "  Save DSN under Administration → Mailer: smtp://mailpit:1025"; \
+		echo "  Docs: docs/ops/MAILPIT.md"; \
+	else \
+		$(DC) --profile mail up -d mailer; \
+		UI_PUB=$$($(DC) --profile mail port mailer 8025 2>/dev/null | head -1 | sed 's/.*://'); \
+		UI_PUB=$${UI_PUB:-18026}; \
+		echo ""; \
+		echo "Mailpit is up (app-local profile mail — shared server/ not found):"; \
+		echo "  UI:   http://localhost:$${UI_PUB}"; \
+		echo "  SMTP (from PHP container): smtp://mailer:1025"; \
+		echo "  Save that DSN under Administration → Mailer, then use Send sample email."; \
+		echo "  Docs: docs/ops/MAILPIT.md"; \
+	fi
 
 mailpit-logs:
-	$(DC) --profile mail logs -f mailer
+	@if docker inspect mailpit >/dev/null 2>&1; then \
+		docker logs -f mailpit; \
+	else \
+		$(DC) --profile mail logs -f mailer; \
+	fi
 
 messenger-logs:
 	$(DC) logs -f messenger messenger-notify

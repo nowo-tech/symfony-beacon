@@ -15,7 +15,7 @@ use App\Project\Entity\Project;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Tests\Support\ProjectAccessServiceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

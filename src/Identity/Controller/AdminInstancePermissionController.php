@@ -12,8 +12,8 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -153,7 +153,7 @@ final class AdminInstancePermissionController extends AbstractController
             return $this->redirectToRoute('admin_permissions');
         }
 
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
             'admin_instance_permission_delete_'.$permission->getId(),
         );
@@ -214,14 +214,14 @@ final class AdminInstancePermissionController extends AbstractController
                 && $permission->getId() === $openPermission->getId()
             ) {
                 $editForms[$permissionId] = $invalidEditForm->createView();
-                $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->create(
+                $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->createNamed(
                     $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
                     'admin_instance_permission_delete_'.$permissionId,
                 )->createView();
                 continue;
             }
             $editForms[$permissionId] = $this->buildEditForm($permission)->createView();
-            $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->create(
+            $deleteForms[$permissionId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_permissions_delete', ['id' => $permission->getUuid()]),
                 'admin_instance_permission_delete_'.$permissionId,
             )->createView();

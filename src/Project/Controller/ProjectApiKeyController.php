@@ -15,7 +15,7 @@ use App\Project\Security\ProjectPermission;
 use App\Project\Service\HumanFriendlyTokenGenerator;
 use App\Project\Service\ProjectApiKeyFactory;
 use App\Shared\Controller\RequiresValidFormTrait;
-use App\Shared\Form\CsrfOnlyType;
+use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Form;
 
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;

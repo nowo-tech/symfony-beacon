@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Identity\Service\SocialLoginCredentialSeeder;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Settings\Form\SocialLoginCredentialType;
 use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Nowo\AuthKitBundle\Repository\SocialLoginCredentialRepository;
@@ -39,7 +39,7 @@ final class AdminSocialLoginController extends AbstractController
         $deleteForms = [];
         foreach ($rows as $row) {
             $provider = $row->getProvider();
-            $deleteForms[$provider] = $this->csrfOnlyFormFactory->create(
+            $deleteForms[$provider] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_social_login_delete', ['provider' => $provider]),
                 'admin_social_login_delete_'.$provider,
             )->createView();
@@ -217,7 +217,7 @@ final class AdminSocialLoginController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_social_login_delete', ['provider' => $provider]),
             'admin_social_login_delete_'.$provider,
         );

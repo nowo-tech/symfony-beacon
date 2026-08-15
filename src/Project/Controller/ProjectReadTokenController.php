@@ -12,7 +12,7 @@ use App\Project\Form\ProjectReadTokenCreateType;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectReadTokenManager;
-use App\Shared\Form\CsrfOnlyType;
+use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;

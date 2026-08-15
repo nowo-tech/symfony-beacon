@@ -31,8 +31,8 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\HiddenFieldsCsrfType;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\Type\HiddenFieldsCsrfType;
 use App\Shared\Health\MessengerQueueHealth;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,8 +94,8 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $apiKeyRotateForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_rotate_'.$keyId, 'POST', false)->createView();
-            $apiKeyRevokeForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_revoke_'.$keyId, 'POST', false)->createView();
+            $apiKeyRotateForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_rotate_'.$keyId, 'POST')->createView();
+            $apiKeyRevokeForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_revoke_'.$keyId, 'POST')->createView();
         }
 
         $projectRoleChoices = ProjectMembershipUiHelper::roleChoices($this->membershipManager->assignableRoles($user, $project));
@@ -111,7 +111,7 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $memberRemoveForms[$memberId] = $this->csrfOnlyFormFactory->create('', 'project_member_remove_'.$memberId, 'POST', false)->createView();
+            $memberRemoveForms[$memberId] = $this->csrfOnlyFormFactory->create('', 'project_member_remove_'.$memberId, 'POST')->createView();
             $memberSetActiveForms[$memberId] = $this->formFactory->create(HiddenFieldsCsrfType::class, [
                 'active' => $member->isActive() ? '0' : '1',
             ], [
@@ -141,7 +141,7 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $groupRemoveForms[$groupAccessId] = $this->csrfOnlyFormFactory->create('', 'project_group_remove_'.$groupAccessId, 'POST', false)->createView();
+            $groupRemoveForms[$groupAccessId] = $this->csrfOnlyFormFactory->create('', 'project_group_remove_'.$groupAccessId, 'POST')->createView();
             $groupRoleForms[$groupAccessId] = $this->formFactory->create(ProjectGroupRoleType::class, [
                 'role' => $groupAccess->getRole()->value,
             ], [
@@ -162,7 +162,7 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $readTokenRevokeForms[$tokenId] = $this->csrfOnlyFormFactory->create('', 'project_read_token_revoke', 'POST', false)->createView();
+            $readTokenRevokeForms[$tokenId] = $this->csrfOnlyFormFactory->create('', 'project_read_token_revoke', 'POST')->createView();
         }
 
         $shareLinks = $this->shareLinkRepository->findActiveByProject($project);
@@ -173,7 +173,7 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $shareRevokeForms[$linkId] = $this->csrfOnlyFormFactory->create('', 'project_share_revoke', 'POST', false)->createView();
+            $shareRevokeForms[$linkId] = $this->csrfOnlyFormFactory->create('', 'project_share_revoke', 'POST')->createView();
         }
 
         $notificationResumeForms = [];
@@ -186,10 +186,10 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $notificationResumeForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_resume_'.$destinationId, 'POST', false)->createView();
-            $notificationToggleForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_toggle_'.$destinationId, 'POST', false)->createView();
-            $notificationTestForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_test_'.$destinationId, 'POST', false)->createView();
-            $notificationDeleteForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_delete_'.$destinationId, 'POST', false)->createView();
+            $notificationResumeForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_resume_'.$destinationId, 'POST')->createView();
+            $notificationToggleForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_toggle_'.$destinationId, 'POST')->createView();
+            $notificationTestForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_test_'.$destinationId, 'POST')->createView();
+            $notificationDeleteForms[$destinationId] = $this->csrfOnlyFormFactory->create('', 'notif_delete_'.$destinationId, 'POST')->createView();
         }
 
         $thresholdToggleForms = [];
@@ -200,8 +200,8 @@ final readonly class ProjectSettingsPageBuilder
                 continue;
             }
 
-            $thresholdToggleForms[$ruleId] = $this->csrfOnlyFormFactory->create('', 'threshold_toggle_'.$ruleId, 'POST', false)->createView();
-            $thresholdDeleteForms[$ruleId] = $this->csrfOnlyFormFactory->create('', 'threshold_delete_'.$ruleId, 'POST', false)->createView();
+            $thresholdToggleForms[$ruleId] = $this->csrfOnlyFormFactory->create('', 'threshold_toggle_'.$ruleId, 'POST')->createView();
+            $thresholdDeleteForms[$ruleId] = $this->csrfOnlyFormFactory->create('', 'threshold_delete_'.$ruleId, 'POST')->createView();
         }
 
         $transferOwnershipChoices = $this->membershipFormSupport->transferOwnershipChoices($project, $user);

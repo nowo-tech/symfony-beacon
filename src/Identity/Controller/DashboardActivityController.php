@@ -9,7 +9,7 @@ use App\Identity\Entity\User;
 use App\Identity\Form\DashboardActivityFilterType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Service\DashboardActivityFilterResolver;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

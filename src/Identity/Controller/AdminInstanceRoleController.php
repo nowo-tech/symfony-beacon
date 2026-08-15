@@ -18,8 +18,8 @@ use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -180,7 +180,7 @@ final class AdminInstanceRoleController extends AbstractController
             return $this->redirectToRoute('admin_roles_show', ['id' => $role->getUuid()]);
         }
 
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_roles_delete', ['id' => $role->getUuid()]),
             'admin_instance_role_delete_'.$role->getId(),
         );
@@ -339,7 +339,7 @@ final class AdminInstanceRoleController extends AbstractController
         #[MapEntity(mapping: ['userId' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_roles_users_remove', [
                 'id' => $role->getUuid(),
                 'userId' => $user->getUuid(),
@@ -477,7 +477,7 @@ final class AdminInstanceRoleController extends AbstractController
                 'method' => 'POST',
                 'csrf_token_id' => 'admin_instance_role_user_add_'.$role->getId(),
             ])->createView(),
-            'deleteForm' => $this->csrfOnlyFormFactory->create(
+            'deleteForm' => $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_roles_delete', ['id' => $role->getUuid()]),
                 'admin_instance_role_delete_'.$role->getId(),
             )->createView(),
@@ -533,7 +533,7 @@ final class AdminInstanceRoleController extends AbstractController
                 continue;
             }
 
-            $forms[$userId] = $this->csrfOnlyFormFactory->create(
+            $forms[$userId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_roles_users_remove', [
                     'id' => $role->getUuid(),
                     'userId' => $user->getUuid(),

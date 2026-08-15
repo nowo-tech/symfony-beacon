@@ -26,6 +26,8 @@
         {% block stylesheets %}
             {# UiKit tokens/components first; Beacon app CSS must win for product chrome. #}
             <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
+            {# CookieConsent ≥1.9: link kit CSS so CSP style-src nonces skip injected <style>. #}
+            <link rel="stylesheet" href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}" data-nowo-cookie-consent-css>
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
         {# After app CSS so site palette / radius / border tokens win the cascade. Nonce matches CSP style-src. #}

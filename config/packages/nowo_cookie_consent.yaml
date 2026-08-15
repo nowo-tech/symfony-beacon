@@ -35,9 +35,9 @@ nowo_cookie_consent:
         access_roles: [ROLE_ADMIN]
         allow_unauthenticated: false
 
-    # Skin follows Beacon via CSS (`assets/styles/_cookie_consent.scss`) + data-theme sync.
-    # Modal layout/position (bottom-left, equal-weight buttons) lives on the DB profile
-    # seeded from src/Setup/Demo/fixtures/cookie_consent.default.json (use_database_config).
+    # Skin: CookieConsent ≥1.9 ships CSP-safe `nowo-cookie-consent.css` (layouts link it with
+    # data-nowo-cookie-consent-css). Modal layout/position (bottom-left, equal-weight buttons)
+    # lives on the DB profile seeded from src/Setup/Demo/fixtures/cookie_consent.default.json.
     color_theme: light
     dark_mode_enabled: false
     disable_page_interaction: true

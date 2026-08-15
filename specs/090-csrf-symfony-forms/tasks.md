@@ -45,3 +45,4 @@
 - [x] T022 ROADMAP 6.39 + CHANGELOG Unreleased note for host Form CSRF migration
 - [x] T023 Confirm intentional exceptions: AJAX header CSRF, AuthKit logout, kit modal `data-token`
 - [x] T024 E2E / DomCrawler selectors for prefixed `beacon` fields (`project_governance_*`, share/token create, `admin_group_member_add`); amend this spec + `077`/`081`
+- [x] T025 FormKit **≥ 2.4** owns CSRF/GET factories (`101`); host deletes `App\Shared\Form\CsrfOnly*` duplicates; `createNamed` / `create` API

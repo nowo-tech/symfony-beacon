@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-08-15
+
+### Changed
+
+- **Kit upstream (CSP + shared helpers) (`101` / 6.52)**: consume `phone-input-bundle` **1.3.0** (CSP-safe prefix picker IIFE + CSS), `cookie-consent-bundle` **1.9.0** (standalone `nowo-cookie-consent.css`, skip style inject), `form-kit-bundle` **2.4.0** (`CsrfOnlyFormFactory` / `GetFilterFormFactory` / CSRF types), `ui-kit-bundle` **1.8.0** (clipboard/tabs IIFEs + Stimulus peers). Removed host forks for phone Twig/Stimulus/SCSS, cookie SCSS, and CSRF form helpers; dashboard filter helpers stay on `App\Shared\Form\AbstractGetFilterType`. Stimulus peers re-export from UiKit vendor path. CSRF factory: prefer `createNamed()` for nested `csrf_only[_token]`; flat tokens use `create()`. Spec: `specs/101-kit-csp-shared-helpers/`.
+- **Shared Mailpit preference**: `make mailpit` prefers `developer.local.server/server` container `mailpit` on `server_network` (`smtp://mailpit:1025`); app-local Compose profile `mail` (`smtp://mailer:1025`) remains the fallback. Docs: [`MAILPIT.md`](ops/MAILPIT.md), [`SHARED-SERVER.md`](ops/SHARED-SERVER.md).
+
+### Fixed
+
+- AuthKit `when@dev` / `when@test` QR overlays no longer wipe `locale.both` (restored unlocalized + localized login routes).
+- CI E2E: reconnect app containers to `SHARED_DOCKER_NETWORK` and wait for MySQL DNS before `make ready` / seed.
+- SMS Bridge provider PHPStan / Rector cleanups; ship [`docs/product/SMS.md`](product/SMS.md) + unit tests (follow-up to v1.16.0).
+
+### Notes for integrators
+
+- No new Doctrine migrations.
+- `composer update` the four kits (or `composer install` on a tagged tree), then `php bin/console assets:install`, `cache:clear`, and `make vite-build`.
+- Public layouts must link kit `nowo-cookie-consent.css` with `data-nowo-cookie-consent-css` (Beacon `base` + `guest_shell` already do).
+- Custom CSRF-only forms: use FormKit factories (`createNamed()` / `create()`); host `App\Shared\Form\CsrfOnly*` types were removed.
+- If Admin → Mailer still points at `smtp://mailer:1025` and you use shared Mailpit, switch to `smtp://mailpit:1025`.
+
 ## [1.16.0] - 2026-08-15
 
 ### Added
@@ -1175,7 +1196,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...v1.16.0
 [1.15.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.14.0...v1.15.0

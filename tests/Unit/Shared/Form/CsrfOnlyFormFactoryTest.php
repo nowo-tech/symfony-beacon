@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Form;
 
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\CsrfOnlyType;
-use App\Shared\Form\HiddenFieldsCsrfType;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
+use Nowo\FormKitBundle\Form\Type\HiddenFieldsCsrfType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -30,7 +30,7 @@ final class CsrfOnlyFormFactoryTest extends TestCase
 
         self::assertSame(
             $form,
-            new CsrfOnlyFormFactory($formFactory)->create('/delete', 'project_delete'),
+            new CsrfOnlyFormFactory($formFactory)->createNamed('/delete', 'project_delete'),
         );
     }
 
@@ -55,7 +55,6 @@ final class CsrfOnlyFormFactoryTest extends TestCase
                 '/kit',
                 'kit',
                 ' delete ',
-                false,
                 '_csrf_token',
             ),
         );

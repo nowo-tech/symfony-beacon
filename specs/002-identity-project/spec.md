@@ -134,8 +134,9 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 
 ## Amendment (cookie consent guest skin + bottom-left, 2026-08-15)
 
-- Public consent chrome is owned by host `assets/styles/_cookie_consent.scss` (category cards, Beacon primary/ghost buttons, overlay `--pos-y-*` / `--pos-x-*`). Vendor JS style inject is unreliable under CSP style nonces — do not rely on it for layout or buttons.
+- **v1.15.1**: Public consent chrome owned by host `assets/styles/_cookie_consent.scss` (CSP style nonces drop vendor injected CSS).
+- **`101` / CookieConsent ≥ 1.9**: chrome ships in kit `nowo-cookie-consent.css`; layouts link it with `data-nowo-cookie-consent-css`; host SCSS fork removed.
 - Default seeded profile (`CookieConsentDemoSeeder` / `cookie_consent.default.json`): consent + preferences modals at **bottom left**, equal-weight action buttons, `box` / `wide`.
-- Product reference: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Related kit pin / public-only rules: `081` Cookie Consent amendments.
+- Product reference: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Related kit pin / public-only rules: `081` Cookie Consent amendments; upstream: `101-kit-csp-shared-helpers`.
 
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

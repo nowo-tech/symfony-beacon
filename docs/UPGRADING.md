@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.16.0)](#unreleased-main-after-1160)
+- [Unreleased (main after 1.17.0)](#unreleased-main-after-1170)
+- [Upgrading from 1.16.0 to 1.17.0](#upgrading-from-1160-to-1170)
 - [Upgrading from 1.15.1 to 1.16.0](#upgrading-from-1151-to-1160)
 - [Upgrading from 1.15.0 to 1.15.1](#upgrading-from-1150-to-1151)
 - [Upgrading from 1.14.0 to 1.15.0](#upgrading-from-1140-to-1150)
@@ -70,9 +71,37 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.16.0)
+## Unreleased (main after 1.17.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.16.0 to 1.17.0
+
+**Kit CSP upstream + shared helpers (`101` / 6.52) + shared Mailpit preference** — pins: PhoneInput **1.3.0**, CookieConsent **1.9.0**, FormKit **2.4.0**, UiKit **1.8.0**; host phone/cookie/CSRF forks removed; `make mailpit` prefers shared `mailpit` (`smtp://mailpit:1025`). See `[1.17.0]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.17.0   # or pull main at the release commit
+composer install
+make ensure-up          # or make up
+php bin/console assets:install
+php bin/console cache:clear
+make vite-build
+```
+
+### Operator checklist
+
+1. **Assets**: `assets:install` publishes kit `nowo-cookie-consent.css` / phone picker JS; `make vite-build` refreshes Stimulus peer re-exports.
+2. **Layouts**: ensure public shells link `nowo-cookie-consent.css` with `data-nowo-cookie-consent-css` (Beacon `base` + `guest_shell` already do).
+3. **Code**: CSRF-only forms use FormKit `CsrfOnlyFormFactory::createNamed()` (nested) or `create()` (flat). Host `App\Shared\Form\CsrfOnly*` types were removed.
+4. **Mailpit (optional)**: if you use the shared `developer.local.server/server` catcher, set Admin → Mailer to `smtp://mailpit:1025` (local profile `mail` still uses `smtp://mailer:1025`).
+5. **No migrations** in this cut.
+
+### Notes
+
+- Profile phone CSS comes from kit `phone_input.css` + flag icons (host `_phone_input.scss` removed).
+- Optional UiKit IIFEs (`nowo-ui-clipboard.js`, `nowo-ui-tabs.js`) are available; Beacon keeps Stimulus peers via vendor re-exports.
+- AuthKit locale overlays and CI MySQL network reconnects are included (fixes after v1.16.0).
 
 ## Upgrading from 1.15.1 to 1.16.0
 

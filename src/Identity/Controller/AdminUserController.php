@@ -26,8 +26,8 @@ use App\Project\Port\ProjectMembershipAdminPort;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use JsonException;
 use RuntimeException;
@@ -134,7 +134,7 @@ final class AdminUserController extends AbstractController
                 continue;
             }
 
-            $removeProjectForms[$membershipId] = $this->csrfOnlyFormFactory->create(
+            $removeProjectForms[$membershipId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_users_projects_remove', [
                     'userId' => $user->getUuid(),
                     'projectId' => $project->getUuid(),
@@ -197,7 +197,7 @@ final class AdminUserController extends AbstractController
         if (!$membership instanceof ProjectMembership) {
             throw $this->createNotFoundException();
         }
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_users_projects_remove', [
                 'userId' => $user->getUuid(),
                 'projectId' => $project->getUuid(),
@@ -263,7 +263,7 @@ final class AdminUserController extends AbstractController
         #[MapEntity(mapping: ['id' => 'uuid'])]
         User $user,
     ): RedirectResponse {
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_users_toggle_enabled', ['id' => $user->getUuid()]),
             'toggle_user_'.$user->getId(),
         );
@@ -380,7 +380,7 @@ final class AdminUserController extends AbstractController
                 continue;
             }
 
-            $toggleEnabledForms[$userId] = $this->csrfOnlyFormFactory->create(
+            $toggleEnabledForms[$userId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_users_toggle_enabled', ['id' => $user->getUuid()]),
                 'toggle_user_'.$userId,
             )->createView();

@@ -27,7 +27,7 @@ use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use App\Project\Service\ProjectShareLinkManager;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Tests\Support\ProjectAccessServiceFactory;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

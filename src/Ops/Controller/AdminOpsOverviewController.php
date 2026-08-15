@@ -8,7 +8,7 @@ use App\Ops\Form\AdminOpsOverviewFilterType;
 use App\Ops\Service\OpsOverviewService;
 use App\Ops\Service\SecurityPosture;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

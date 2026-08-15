@@ -94,7 +94,7 @@ As `ROLE_ADMIN`, kit dashboards keep Beacon Administration look: host `templates
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Pin (exact, as in `composer.json`) at least: `ui-kit-bundle` **1.7.0**, `form-kit-bundle` **2.3.0**, `auth-kit-bundle` **≥ 1.15.0** (host **1.17.0**), `routing-kit-bundle` **≥ 1.3.0** (host **1.4.0**), `dashboard-menu-bundle` **≥ 2.0.1** (host **2.1.1**), `breadcrumb-kit-bundle` **2.1.3**, `cookie-consent-bundle` **≥ 1.6.3**, `http-log-bundle` **1.1.0**, `site-backup-bundle` **≥ 1.10.0** (host **1.10.1**). Exact pins live in `composer.json` / CHANGELOG.
+- **FR-001**: Pin (exact, as in `composer.json`) at least: `ui-kit-bundle` **≥ 1.7.0** (host **1.8.0** after `101`), `form-kit-bundle` **≥ 2.3.0** (host **2.4.0** after `101`), `auth-kit-bundle` **≥ 1.15.0** (host **1.17.0**), `routing-kit-bundle` **≥ 1.3.0** (host **1.4.0**), `dashboard-menu-bundle` **≥ 2.0.1** (host **2.1.1**), `breadcrumb-kit-bundle` **2.1.3**, `cookie-consent-bundle` **≥ 1.6.3** (host **1.9.0** after `101`), `http-log-bundle` **1.1.0**, `site-backup-bundle` **≥ 1.10.0** (host **1.13.0**). Exact pins live in `composer.json` / CHANGELOG.
 - **FR-002**: Host `nowo_ui_kit` MUST set `css_framework: tailwind`, `icon_set: ux_icon`, `row_actions_display: text` (icon / icon_text remain supported). Product `base.html.twig` MAY load `nowo-ui.css` / orb JS from the `nowo_ui_kit` package; Beacon app CSS wins for product chrome. Kit dashboard `base` host overrides MUST NOT re-link `nowo-ui.css` after app CSS.
 - **FR-003**: Host `nowo_form_kit` kit profiles MUST set kit catalogues and `auto_help` / `auto_placeholder: false` for kit-owned forms (see `docs/CONTRIBUTING.md`). Product GET filters MUST use profile `filter` via `AbstractGetFilterType` (`#[FormKitConfig('filter')]`) — not `beacon` alone.
 - **FR-003a**: Product FormKit profile `filter` contract: **label never** (`defaults.label: false` — Types MUST NOT pass `label` / FormKit label keys); **placeholder always** (`auto_placeholder: true` → `translations/form.*.yaml` `{block_prefix}.{field}.placeholder`); **help always** (`auto_help: true` → `{block_prefix}.{field}.help`) unless the field sets `help: false` (FormKit merger unsets it); **required always false** (`defaults.required: false`) except **`per_page`** (`required: true` — page-size select). Hidden fields MUST use `addHiddenFilterField()` (`placeholder` + `help: false` in options). MUST NOT leave `help: false` on `HiddenType` from profile defaults alone. Choice empty options use `addFilterSelect()` (auto `{prefix}.{field}.placeholder` for the empty choice; not pre-`trans()`); pass `placeholder: false` when the select has **no** empty option. Twig MUST paint filter fields with `form_row` via `{% include 'form/_fields.html.twig' %}` or an equivalent `not field.rendered` loop (`077`) — prefer that over hand-rolled `form_widget` + `form_help`. Optional visible captions stay in Twig/`messages` outside FormKit labels. Host MUST register snake-case `search` → `SearchType` in `nowo_form_kit.type_map` when using `addNamedField(..., 'search', ...)`.
@@ -126,11 +126,17 @@ Cookie Consent **≥ 1.6.3**: host `render_routes` whitelist limits consent mark
 
 ## Amendment (Cookie Consent guest skin + bottom-left, 2026-08-15)
 
-Public modal stays on vendor Twig (`ui_theme: tailwind`); Beacon MUST NOT fork `cookie_consent.tailwind.html.twig` for cosmetics. Skin + layout live in host `assets/styles/_cookie_consent.scss`:
+Public modal stays on vendor Twig (`ui_theme: tailwind`); Beacon MUST NOT fork `cookie_consent.tailwind.html.twig` for cosmetics.
 
-- Coloured expandable category cards + Beacon primary/ghost action buttons
-- Overlay flex position classes (`--pos-y-bottom` / `--pos-x-left`, …) — required because CSP style nonces drop the vendor injected stylesheet
-- Seeded DB profile (`055` platform seed / `CookieConsentDemoSeeder`): **bottom left**, equal-weight buttons
+**As shipped in v1.15.1**: skin + layout lived in host `assets/styles/_cookie_consent.scss` (CSP style nonces drop vendor injected CSS).
+
+**As of `101` / CookieConsent ≥ 1.9**: skin ships in kit `nowo-cookie-consent.css`. Host layouts MUST link:
+
+```twig
+<link rel="stylesheet" href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}" data-nowo-cookie-consent-css>
+```
+
+The marker skips JS `<style>` injection. Host MUST NOT keep `_cookie_consent.scss`. Seeded DB profile (`055` platform seed / `CookieConsentDemoSeeder`): **bottom left**, equal-weight buttons (unchanged).
 
 Product doc: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Identity surface note: `002` amendment (2026-08-15).
 
@@ -162,7 +168,7 @@ Supersedes the earlier “UiKit table macros + `ui.btn` + icon-only” list conv
 
 ## Amendment (Product FormKit `filter` profile, 2026-08-13)
 
-Host product GET filters converge on FormKit profile **`filter`** (`config/packages/nowo_form_kit.yaml`) via `App\Shared\Form\AbstractGetFilterType` + `#[FormKitConfig('filter')]`:
+Host product GET filters converge on FormKit profile **`filter`** (`config/packages/nowo_form_kit.yaml`) via `App\Shared\Form\AbstractGetFilterType` + `#[FormKitConfig('filter')]` (as of `101`, host class extends kit `Nowo\FormKitBundle\Form\AbstractGetFilterType` and keeps dashboard helpers):
 
 | Concern | Rule |
 |---|---|
@@ -220,7 +226,8 @@ Host Twig catch-up after Types already on `beacon` / `filter`:
 
 - `064-routing-kit` — RoutingKit install; this feature advances panel FormKit + pagination.
 - `077-form-type-field-loop` — host Form Type field loop; FormKit remains preferred for attrs.
-- `090-csrf-symfony-forms` — host CSRF via Symfony Forms / `CsrfOnlyType`; GET filters on `AbstractGetFilterType`.
+- `090-csrf-symfony-forms` — host CSRF via Symfony Forms / kit `CsrfOnlyType` (FormKit ≥ 2.4 / `101`); GET filters on host `AbstractGetFilterType` → kit base.
+- `101-kit-csp-shared-helpers` — PhoneInput 1.3 / CookieConsent 1.9 / FormKit 2.4 / UiKit 1.8 CSP + shared helpers upstream.
 - `084-ops-env-to-db` — Ops defaults UI (section tabs + FormKit Types).
 - `080-dashboard-aside-panels` / `079-dashboard-assignments` — list pagination convention.
 - `056-setup-wizard` — SiteBackup host layouts stay Tailwind + UiKit tokens.

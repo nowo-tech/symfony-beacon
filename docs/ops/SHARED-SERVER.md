@@ -46,6 +46,7 @@ Same container names and network:
 | Write MySQL | `mysql-9.7-primary` |
 | Read MySQL | `mysql-9.7-replica` (when topology/replica is up) |
 | Redis | `redis-8.10.0` |
+| Mailpit (SMTP catcher) | `mailpit` (`smtp://mailpit:1025`; UI on host `MAILPIT_UI_PORT`) |
 
 `make up-infra` **does not recreate** containers if `mysql-9.7-primary` already exists (e.g. started from `server/`). It starts them if stopped and requires `redis-8.10.0` + the Docker network. Do **not** run both owners’ compose files against empty names at once — pick one owner for the containers.
 
@@ -53,9 +54,10 @@ Alternative (infra only from `server/`):
 
 ```bash
 cd /path/to/developer.local.server/server
-docker compose up -d redis-8.10.0 mysql-9.7-primary mysql-9.7-replica
+docker compose up -d redis-8.10.0 mysql-9.7-primary mysql-9.7-replica mailpit
 # then in Beacon:
 make up
+# Admin → Mailer DSN: smtp://mailpit:1025  (see docs/ops/MAILPIT.md)
 ```
 
 On little-vps set `SHARED_DOCKER_NETWORK=server_internal` (infra already present; `up-infra` is a coexistence no-op). Prefer a dedicated app user there instead of root.
@@ -100,7 +102,7 @@ Optional schema/user helper: `make bootstrap-shared-db` (CREATE DATABASE; option
 |------|------|
 | `compose.infra.yaml` | Project `shared-infra`: network + MySQL (+ optional replica) + Redis; data under `./.data/infra/` |
 | `compose.yaml` | Dev app only (bind-mount); joins external shared network |
-| `compose.override.yaml` | Mailpit (`mail`), Mercure expose |
+| `compose.override.yaml` | App-local Mailpit fallback (`mail`), Mercure expose |
 | `compose.prod.yaml` | Prod app only; same external network |
 
 App services (`php`, messengers, vite, mailer, mercure) attach to `${SHARED_DOCKER_NETWORK:-server_network}` as **external**. No host-published MySQL/Redis ports (REQ-FP-006): use `make mysql` or `docker exec -it mysql-9.7-primary mysql …`.

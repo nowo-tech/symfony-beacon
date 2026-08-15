@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Controller;
 
 use App\Shared\Controller\RequiresValidFormTrait;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

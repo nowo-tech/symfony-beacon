@@ -164,3 +164,8 @@ As a member on AuthKit login/register/reset, the show/hide control stays **to th
 ## Amendment (`IngestProjectAccessGate`, 2026-08-11)
 
 - Follow-on DRY for Envelope + OTLP credential/governance: shared `App\Ingest\Service\IngestProjectAccessGate` (`authorizeCredentials` + `assertIngestAllowed`). Complements D1 (`OtlpIngestPipeline`); HTTP contracts unchanged. Cross-links: `003-ingest`, `067-otlp-ingest`.
+
+## Amendment (UiKit Stimulus peers, 2026-08-15)
+
+Confirm / page-loader / toast / tabs / clipboard Stimulus controllers are upstreamed to UiKit **≥ 1.8** (`stimulus-peers` + optional IIFEs). Beacon re-exports peers from vendor (`101-kit-csp-shared-helpers`). Shared Twig shells (`shared/_confirm_dialog`, toasts, page loader) keep the same `data-controller` identifiers; do not reintroduce host-owned copies of those generic controllers.
+

@@ -21,14 +21,14 @@ Controllers validate mutable posts with `$form->isSubmitted() && $form->isValid(
 
 | ID | Area | Delivered |
 |----|------|-----------|
-| F1 | Shared CSRF-only | `App\Shared\Form\CsrfOnlyType` (FormKit), `HiddenFieldsCsrfType`, `CsrfOnlyFormFactory`, Twig `csrf_action_form`, partial `templates/form/_csrf_action.html.twig` |
+| F1 | Shared CSRF-only | **As of `101` / FormKit ≥ 2.4**: `Nowo\FormKitBundle\Form\Type\CsrfOnlyType`, `HiddenFieldsCsrfType`, `CsrfOnlyFormFactory`, Twig `csrf_action_form`, partial `templates/form/_csrf_action.html.twig`. (Originally shipped under `App\Shared\Form\*` in v1.7.0.) |
 | F2 | Issues triage | `IssueStatusType`, `IssuePriorityType`, `IssueDuplicateType`, `IssueSavedViewType`, `IssueCommentType`; delete saved-view via `CsrfOnlyType` |
 | F3 | Mentions | `MentionsMarkReadType`, `MentionsMarkAllReadType` on dashboard Mentions |
 | F4 | Danger zone | `ProjectClearHistoryType`, `ProjectDeleteType` (typed name on delete; **empty** `getBlockPrefix()` → top-level `confirmation` / `_token`, not `project_delete[...]`) |
 | F5 | Account tours | `AccountProductTourReplayType` on Display → Tours |
 | F6 | Single-action POSTs | Locale switch, view-as disable, API key revoke/rotate, member activate/deactivate/remove, share and read-token revoke, notification and threshold toggles/deletes/tests, admin permission delete, admin project ingest/access toggles — via `CsrfOnlyType` / factory / `HiddenFieldsCsrfType` |
 | F7 | Settings / admin fielded POSTs | Governance, API key / read-token / share / group / member add+role, config import (project + admin + instance), appearance theme picker, mailer test, group-member add, role permissions / role-user add, user role confirm, privacy anonymize (`TypeToConfirmType`), … |
-| F8 | GET filters | `AbstractGetFilterType` + `GetFilterFormFactory`; Issues index, Assignments/Mentions/New-in-release/Alerts/Activity, dashboard project search, admin search / audit timeline, analytics, ops overview, release environment compare |
+| F8 | GET filters | Kit `GetFilterFormFactory` + kit `AbstractGetFilterType`; host `App\Shared\Form\AbstractGetFilterType` extends kit base with dashboard page/project/per_page helpers. Issues index, Assignments/Mentions/New-in-release/Alerts/Activity, dashboard project search, admin search / audit timeline, analytics, ops overview, release environment compare |
 | UX | Dashboard titles | Product dashboard `h1` / intro weight reduced (`text-2xl font-semibold` + quieter intro; kit admin page-header aligned) |
 
 ## Non-goals / intentional exceptions
@@ -89,12 +89,12 @@ As a member, list filters submit via GET Form Types sharing `AbstractGetFilterTy
 ## Requirements *(mandatory)*
 
 - **FR-001**: New host **mutable** POST UIs MUST use a Symfony Form Type (FormKit preferred) or `CsrfOnlyType` / `HiddenFieldsCsrfType` / `csrf_action_form()`. MUST NOT add new Twig `csrf_token('…')` hidden fields for product/admin host HTML forms.
-- **FR-002**: `CsrfOnlyType` MUST extend `FormKitAbstractType`, enable CSRF, accept a unique `csrf_token_id`, and use an empty block prefix so field names stay simple for single-action posts.
-- **FR-003**: Controllers / page builders MUST create CSRF-only forms via `CsrfOnlyFormFactory` or `createForm(CsrfOnlyType::class|HiddenFieldsCsrfType::class, …)` with a stable per-action `csrf_token_id` matching the previous token id when migrating.
+- **FR-002**: Kit `CsrfOnlyType` MUST enable CSRF, accept a unique `csrf_token_id`, and use an empty block prefix so field names stay simple for single-action posts (FormKit ≥ 2.4).
+- **FR-003**: Controllers / page builders MUST create CSRF-only forms via kit `CsrfOnlyFormFactory` (`createNamed` for nested `csrf_only[_token]`, `create` for flat) or `createForm(CsrfOnlyType::class|HiddenFieldsCsrfType::class, …)` with a stable per-action `csrf_token_id` matching the previous token id when migrating.
 - **FR-004**: Named Types for issue triage / danger / mentions / tour replay / Settings / admin MUST live under the owning module (`Issues`, `Project`, `Identity`, `Shared`, …) and follow `077` field-loop rules when the template renders multiple fields.
 - **FR-005**: Functional tests that previously posted `_token` + raw fields MUST submit Symfony form fields (including CSRF) after migration.
 - **FR-006**: Host Settings create/import and admin fielded POSTs listed in Scope F7 MUST be on Form Types before Status Done (as-built: done). Kit vendor modal delete tokens MAY lag (`081`).
-- **FR-007**: Host GET multi-field / search filters MUST extend `AbstractGetFilterType` (or reuse `AdminSearchType` / `SearchQueryType` / `DashboardProjectSearchType`) with FormKit profile `filter`, and be created via `GetFilterFormFactory` where controllers build the view. Contract: never FormKit label; always placeholder (except hidden / Twig-owned search); always help unless `help: false`; **required false** except **`per_page`** (`required: true`); Twig `form_row` + `_fields` / loop (`077`). See `081` FR-003a / filter amendment.
+- **FR-007**: Host GET multi-field / search filters MUST extend `App\Shared\Form\AbstractGetFilterType` (or reuse `AdminSearchType` / kit `SearchQueryType` / `DashboardProjectSearchType`) with FormKit profile `filter`, and be created via kit `GetFilterFormFactory` where controllers build the view. Contract: never FormKit label; always placeholder (except hidden / Twig-owned search); always help unless `help: false`; **required false** except **`per_page`** (`required: true`); Twig `form_row` + `_fields` / loop (`077`). See `081` FR-003a / filter amendment.
 - **FR-008**: AJAX preference / push endpoints MAY keep header CSRF (`X-CSRF-TOKEN`); they are not required to use HTML Form Types.
 
 ## Success Criteria
@@ -124,6 +124,17 @@ Aligns with `081` FR-003a: `AbstractGetFilterType::mergeFieldOptions()` defaults
 
 Product `beacon` Types use non-empty `getBlockPrefix()`. Automated browsers (Playwright DomCrawler / PHPUnit) MUST submit and assert against prefixed names and Symfony ids, e.g. `project_governance[retention_days]` / `#project_governance_retention_days`, `project_share_create[days]`, `project_read_token_create[label]`, `admin_group_member_add[email]`. Unprefixed `name="days"` / `#retention_days` selectors are obsolete after the FormKit migration.
 
+## Amendment (FormKit owns CSRF / GET helpers, 2026-08-15)
+
+FormKit **≥ 2.4** (`101`): move `CsrfOnlyType`, `HiddenFieldsCsrfType`, `SearchQueryType`, `CsrfOnlyFormFactory`, `GetFilterFormFactory`, and the generic `AbstractGetFilterType` base into `nowo-tech/form-kit-bundle`. Host deletes the App duplicates.
+
+| Concern | Rule |
+|---|---|
+| Nested CSRF | `CsrfOnlyFormFactory::createNamed($action, $csrfTokenId, …)` → `csrf_only[_token]` |
+| Flat CSRF | `CsrfOnlyFormFactory::create($action, $csrfTokenId, …)` → top-level `_token` |
+| Twig | `csrf_action_form(..., named: bool)` still supported; maps to `createNamed` / `create` |
+| Dashboard filters | Host `App\Shared\Form\AbstractGetFilterType` extends kit base; keeps `addDashboardPageAndProject` / `addDashboardPerPage` |
+
 ## Related
 
 - `077-form-type-field-loop` — field loop; deferred hand-rolled migration → this spec
@@ -132,6 +143,7 @@ Product `beacon` Types use non-empty `getBlockPrefix()`. Automated browsers (Pla
 - `057-product-tour` — replay Type
 - `080-dashboard-aside-panels` — Mentions mark-read Types + title weight polish
 - `081-formkit-uikit-kit-sync` — FormKit pins / kit forks / kit filter chrome
+- `101-kit-csp-shared-helpers` — FormKit ≥ 2.4 owns CSRF / GET factories; UiKit peers
 - `087-security-audit-hardening` — CSRF as standing security control
 - `089-project-config-export` — project/admin import Types
 

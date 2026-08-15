@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Identity\Controller;
 
 use App\Identity\Controller\GuestLocaleController;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Container;

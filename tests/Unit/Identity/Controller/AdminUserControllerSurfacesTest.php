@@ -15,7 +15,7 @@ use App\Identity\Service\AdminUserMutator;
 use App\Identity\Service\UserActionRecorder;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Repository\ProjectMembershipRepository;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Profile\ProfileRegistry;
 use Nowo\AuthKitBundle\Repository\SocialLoginAccountRepository;

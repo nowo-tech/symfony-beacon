@@ -11,7 +11,7 @@ use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Project\Controller\ProjectReleaseHealthController;
 use App\Project\Entity\Project;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;

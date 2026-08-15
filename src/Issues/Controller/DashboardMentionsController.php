@@ -12,7 +12,7 @@ use App\Issues\Form\MentionsMarkReadType;
 use App\Issues\Repository\IssueMentionRepository;
 use App\Issues\Service\DashboardMentionsFilterResolver;
 use App\Shared\Controller\RequiresValidFormTrait;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

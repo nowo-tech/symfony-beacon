@@ -11,9 +11,9 @@
 
 | ID | Area | Deliverable |
 |----|------|-------------|
-| P1 | Kit | Pin `nowo-tech/phone-input-bundle` **1.2.1**; `config/packages/nowo_phone_input.yaml`; Form theme in `twig.yaml` |
+| P1 | Kit | Pin `nowo-tech/phone-input-bundle` (**1.2.1** at ship; **1.3.0** after `101`) |
 | P2 | Profile form | `AccountProfileType` uses `PhoneType` (CONCATENATED E.164 → `User.phone`); FormKit `mergeFieldOptions` + `user_preferences` catalogue |
-| P3 | CSP / UX | Host widget override + Stimulus `phone-prefix-picker` (no vendor inline script); host SCSS (`_phone_input.scss`); flag-icons only on profile (skip vendor Bootstrap CSS) |
+| P3 | CSP / UX | At ship: host widget override + Stimulus `phone-prefix-picker` + `_phone_input.scss`. **Superseded by `101`**: kit IIFE + `phone_input.css` (no host fork) |
 | P4 | QR env split | Default `qr_login.mode: disabled`; `when@dev` / `when@test` → `enabled` (096 / AUTH-005) |
 | P5 | Tests | PHPUnit submits `user_profile[phone][country_iso]` + `[national_number]`; verify/clear `phoneVerifiedAt` still holds (`095`) |
 | O1 | Dogfood ops | `make restart` → `up -d --force-recreate` for php/messengers so Compose reloads `.env.local` (`BEACON_DSN`) |
@@ -48,8 +48,8 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** a CSP nonce policy, **When** Profile loads, **Then** no blocked inline phone-input script is required; `data-controller="phone-prefix-picker"` is present.
-2. **Given** Stimulus connected, **When** the member opens the prefix menu, **Then** the menu is portaled/positioned so `dialog` overflow does not clip it.
+1. **Given** a CSP nonce policy, **When** Profile loads, **Then** no blocked inline phone-input script is required; the kit CSP-safe picker is active (`data-controller="phone-prefix-picker"` and/or kit IIFE).
+2. **Given** the picker enhanced, **When** the member opens the prefix menu, **Then** the menu is portaled/positioned so `dialog` overflow does not clip it.
 3. **Given** JS disabled, **When** the form renders, **Then** the native country `<select>` remains usable (progressive enhancement).
 
 ### User Story 3 - QR stays off in prod, on in local/CI (P2)
@@ -85,7 +85,7 @@
 
 - **FR-001**: Require `nowo-tech/phone-input-bundle` and register bundle + `nowo_phone_input` defaults.
 - **FR-002**: `AccountProfileType` MUST use kit `PhoneType` with country prefix selector and CONCATENATED value format into `User.phone`.
-- **FR-003**: Host MUST ship a CSP-safe prefix picker (Twig override + Stimulus); MUST NOT rely on vendor inline script or Bootstrap `phone_input.css` on Profile.
+- **FR-003**: Prefix picker MUST be CSP-safe (kit external JS ≥ **1.3**, or equivalent). MUST NOT rely on vendor inline script. Host MUST NOT keep a Twig/Stimulus/SCSS fork after `101`.
 - **FR-004**: Default AuthKit `qr_login.mode` MUST be `disabled`; MUST be `enabled` under `when@dev` and `when@test`.
 - **FR-005**: PHPUnit Account profile tests MUST exercise the compound phone fields and verification hygiene.
 - **FR-006**: `make restart` MUST recreate app containers so `.env.local` (including `BEACON_DSN`) is reloaded.
@@ -111,8 +111,8 @@
 
 - Config: `config/packages/nowo_phone_input.yaml`, `nowo_auth_kit.yaml` (`when@dev` / `when@test`)
 - Form: `src/Identity/Form/AccountProfileType.php`
-- Assets: `assets/controllers/phone_prefix_picker_controller.ts`, `assets/styles/_phone_input.scss`
-- Twig: `templates/bundles/NowoPhoneInputBundle/Form/phone_input_widget.html.twig`, `templates/account/profile.html.twig` (flag-icons asset)
+- Assets (as of `101`): kit `phone_input.css` + flag-icons on Profile; kit `nowo-phone-prefix-picker.js` from widget (no host `_phone_input.scss` / `phone_prefix_picker`)
+- Twig: kit `@NowoPhoneInputBundle/Form/phone_input_widget.html.twig` (no host override); `templates/account/profile.html.twig`
 - Tests: `tests/Functional/Identity/AccountPreferencesTest.php`
 - Make: `restart` target force-recreate
 
@@ -121,3 +121,7 @@
 ### 2026-08-15 — Initial cut (this document)
 
 Implements P1–P5 + O1–O2 as Phase **6.51** / **v1.16.0**. No Doctrine migration. Operator env file is `.env.local`.
+
+### 2026-08-15 — Kit CSP upstream (`101`)
+
+PhoneInput **1.3.0** owns the CSP-safe prefix picker and progressive-enhancement CSS. Host Twig override, Stimulus controller, and `_phone_input.scss` removed. See `101-kit-csp-shared-helpers`.

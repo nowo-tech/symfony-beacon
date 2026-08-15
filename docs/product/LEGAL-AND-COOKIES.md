@@ -21,7 +21,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 
 | Setting | Beacon value |
 |---------|----------------|
-| Pin | `nowo-tech/cookie-consent-bundle` **1.8.0** |
+| Pin | `nowo-tech/cookie-consent-bundle` **1.9.0** |
 | `ui_theme` | `tailwind` |
 | `web_ui` | enabled; Administration → **Cookie consent** (`/admin/cookie-consent` → `/cookie-consent-config/{id}/settings/profile`, CookieConsent **1.5+**) |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
@@ -41,17 +41,17 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 
 Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/` — CookieConsent **1.4.5+** prepends that path automatically. **Do not** fork the public modal Twig for skinning.
 
-### Public modal skin (`assets/styles/_cookie_consent.scss`)
+### Public modal skin (CookieConsent ≥1.9)
 
-Beacon owns the guest-facing consent chrome in host SCSS (Vite `app` build). Vendor `nowo-consent-modal.js` still injects a `<style>` block, but Beacon’s CSP uses **style nonces** — browsers then ignore `'unsafe-inline'`, so injected rules often never apply. Host CSS MUST therefore include:
+Layouts link the kit stylesheet so CSP **style-src nonces** do not depend on JS-injected `<style>`:
 
-| Concern | Host behaviour |
-|---------|----------------|
-| Overlay position | Flex layout for `.show` + `--pos-y-*` / `--pos-x-*` (default profile: **bottom** + **left**) |
-| Category rows | Coloured expandable cards (`<details>` / `summary`) with per-category tints + toggle switch |
-| Actions | Beacon primary / ghost buttons (moss tokens); equal-weight grid when profile enables it |
-| Preferences intro | Spacing under `.nowo-cookie-consent__preferences-intro` |
-| Bubble | Size / position helpers (bubble remains optional / AuthKit extras) |
+```twig
+<link rel="stylesheet"
+      href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}"
+      data-nowo-cookie-consent-css>
+```
+
+The `data-nowo-cookie-consent-css` marker tells `nowo-consent-modal.js` to skip style injection. Skin (category cards, primary/ghost actions, overlay corner) ships in the kit CSS; optional host overrides can still remap `--nowo-cc-*` / moss tokens.
 
 Modal **layout / position / equal-weight buttons** live on the DB profile (`dashboard_cookie_config`), not YAML. `CookieConsentDemoSeeder` + `src/Setup/Demo/fixtures/cookie_consent.default.json` upsert:
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Twig;
 
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Rbac\RbacPermissionCategoryTranslator;
 use App\Shared\Rbac\RbacPermissionTranslator;
 use App\Shared\Rbac\RbacRoleTranslator;

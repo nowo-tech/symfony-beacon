@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "80a8b5052d33c86fe38df9c05ac912b2",
+    "content-hash": "d2ed67171965ad8f2fce55c3719d3495",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2316,16 +2316,16 @@
         },
         {
             "name": "nowo-tech/cookie-consent-bundle",
-            "version": "v1.8.0",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/CookieConsentBundle.git",
-                "reference": "90921f1924e0a3f02dd672cc3be83039406ee579"
+                "reference": "e4bdc5981f96af6f8a78f5990556ae759945abf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/90921f1924e0a3f02dd672cc3be83039406ee579",
-                "reference": "90921f1924e0a3f02dd672cc3be83039406ee579",
+                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/e4bdc5981f96af6f8a78f5990556ae759945abf8",
+                "reference": "e4bdc5981f96af6f8a78f5990556ae759945abf8",
                 "shasum": ""
             },
             "require": {
@@ -2396,7 +2396,7 @@
                 "issues": "https://github.com/nowo-tech/CookieConsentBundle/issues",
                 "source": "https://github.com/nowo-tech/CookieConsentBundle"
             },
-            "time": "2026-08-15T11:07:38+00:00"
+            "time": "2026-08-15T16:53:08+00:00"
         },
         {
             "name": "nowo-tech/dashboard-menu-bundle",
@@ -2602,16 +2602,16 @@
         },
         {
             "name": "nowo-tech/form-kit-bundle",
-            "version": "v2.3.0",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/FormKitBundle.git",
-                "reference": "acd58aca76811a32387efb3329d396d761814858"
+                "reference": "81a8779f3a21c1f58325c88dd57b4831213d7af4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/acd58aca76811a32387efb3329d396d761814858",
-                "reference": "acd58aca76811a32387efb3329d396d761814858",
+                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/81a8779f3a21c1f58325c88dd57b4831213d7af4",
+                "reference": "81a8779f3a21c1f58325c88dd57b4831213d7af4",
                 "shasum": ""
             },
             "require": {
@@ -2695,7 +2695,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-14T08:27:38+00:00"
+            "time": "2026-08-15T16:53:12+00:00"
         },
         {
             "name": "nowo-tech/http-log-bundle",
@@ -3331,16 +3331,16 @@
         },
         {
             "name": "nowo-tech/phone-input-bundle",
-            "version": "v1.2.1",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/PhoneInputBundle.git",
-                "reference": "200867c160c4e806bd2f0e959817a978da5a12fc"
+                "reference": "7cc2327cd79b63f305a8a86701a4a0f16037c9db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/PhoneInputBundle/zipball/200867c160c4e806bd2f0e959817a978da5a12fc",
-                "reference": "200867c160c4e806bd2f0e959817a978da5a12fc",
+                "url": "https://api.github.com/repos/nowo-tech/PhoneInputBundle/zipball/7cc2327cd79b63f305a8a86701a4a0f16037c9db",
+                "reference": "7cc2327cd79b63f305a8a86701a4a0f16037c9db",
                 "shasum": ""
             },
             "require": {
@@ -3365,7 +3365,7 @@
                 "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
                 "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
                 "symfony/yaml": "^6.0 || ^7.0 || ^8.0",
-                "vincentlanglet/twig-cs-fixer": "^3.0"
+                "vincentlanglet/twig-cs-fixer": "^4.0"
             },
             "suggest": {
                 "giggsey/libphonenumber-for-php": "Optional E.164 validation and formatting via libphonenumber",
@@ -3416,7 +3416,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-07T21:33:38+00:00"
+            "time": "2026-08-15T16:56:07+00:00"
         },
         {
             "name": "nowo-tech/pwa-bundle",
@@ -3871,16 +3871,16 @@
         },
         {
             "name": "nowo-tech/ui-kit-bundle",
-            "version": "v1.7.0",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/UiKitBundle.git",
-                "reference": "60935db1e13b438c79248350115e03aef30fe070"
+                "reference": "fb65e3a8db53c734dc530288a15f3aa2dc03c28a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/UiKitBundle/zipball/60935db1e13b438c79248350115e03aef30fe070",
-                "reference": "60935db1e13b438c79248350115e03aef30fe070",
+                "url": "https://api.github.com/repos/nowo-tech/UiKitBundle/zipball/fb65e3a8db53c734dc530288a15f3aa2dc03c28a",
+                "reference": "fb65e3a8db53c734dc530288a15f3aa2dc03c28a",
                 "shasum": ""
             },
             "require": {
@@ -3950,7 +3950,7 @@
                 "issues": "https://github.com/nowo-tech/UiKitBundle/issues",
                 "source": "https://github.com/nowo-tech/UiKitBundle"
             },
-            "time": "2026-08-04T23:04:44+00:00"
+            "time": "2026-08-15T17:05:25+00:00"
         },
         {
             "name": "nowo-tech/user-kit-bundle",

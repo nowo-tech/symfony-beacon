@@ -10,7 +10,7 @@ use App\Issues\Repository\IssueMentionRepository;
 use App\Issues\Service\DashboardMentionsFilterResolver;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;

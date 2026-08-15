@@ -21,8 +21,8 @@ use App\Project\Form\ProjectMemberAddType;
 use App\Project\Form\ProjectMemberRoleType;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Health\MessengerQueueHealth;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,7 +84,7 @@ final readonly class AdminProjectShowPageBuilder
                 continue;
             }
 
-            $removeMemberForms[$memberId] = $this->csrfOnlyFormFactory->create(
+            $removeMemberForms[$memberId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->urlGenerator->generate('admin_projects_members_remove', [
                     'projectId' => $project->getUuid(),
                     'userId' => $memberUser->getUuid(),
@@ -112,7 +112,7 @@ final readonly class AdminProjectShowPageBuilder
                 continue;
             }
 
-            $removeGroupForms[$groupAccessId] = $this->csrfOnlyFormFactory->create(
+            $removeGroupForms[$groupAccessId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->urlGenerator->generate('admin_projects_groups_remove', [
                     'projectId' => $project->getUuid(),
                     'groupAccessId' => $groupAccess->getUuid(),

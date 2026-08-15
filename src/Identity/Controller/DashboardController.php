@@ -9,7 +9,7 @@ use App\Identity\Entity\User;
 use App\Identity\Form\DashboardProjectSearchType;
 use App\Identity\Service\ProductTourStepsBuilder;
 use App\Project\Service\AccessibleProjectsProvider;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

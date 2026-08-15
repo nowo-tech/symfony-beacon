@@ -25,8 +25,8 @@ use App\Project\Port\ProjectMembershipAdminPort;
 use App\Project\Repository\ProjectGroupAccessRepository;
 use App\Shared\Controller\RequiresValidFormTrait;
 use App\Shared\Form\AdminSearchType;
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -147,7 +147,7 @@ final class AdminGroupController extends AbstractController
                 continue;
             }
 
-            $removeMemberForms[$membershipId] = $this->csrfOnlyFormFactory->create(
+            $removeMemberForms[$membershipId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_groups_members_remove', [
                     'groupId' => $group->getUuid(),
                     'userId' => $user->getUuid(),
@@ -162,7 +162,7 @@ final class AdminGroupController extends AbstractController
                 continue;
             }
 
-            $removeProjectForms[$accessId] = $this->csrfOnlyFormFactory->create(
+            $removeProjectForms[$accessId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_groups_projects_remove', [
                     'groupId' => $group->getUuid(),
                     'accessId' => $access->getUuid(),
@@ -188,7 +188,7 @@ final class AdminGroupController extends AbstractController
                 $audit['to'],
                 AdminIdentityAudit::TIMELINE_LIMIT,
             ),
-            'deleteForm' => $this->csrfOnlyFormFactory->create(
+            'deleteForm' => $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('admin_groups_delete', ['id' => $group->getUuid()]),
                 'admin_group_delete_'.$group->getId(),
             )->createView(),
@@ -250,7 +250,7 @@ final class AdminGroupController extends AbstractController
         UserGroup $group,
         Request $request,
     ): RedirectResponse {
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_groups_delete', ['id' => $group->getUuid()]),
             'admin_group_delete_'.$group->getId(),
         );
@@ -351,7 +351,7 @@ final class AdminGroupController extends AbstractController
         if (!$membership instanceof UserGroupMembership) {
             throw $this->createNotFoundException();
         }
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_groups_members_remove', [
                 'groupId' => $group->getUuid(),
                 'userId' => $user->getUuid(),
@@ -394,7 +394,7 @@ final class AdminGroupController extends AbstractController
         if ($access->getUserGroup()?->getId() !== $group->getId()) {
             throw $this->createNotFoundException();
         }
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_groups_projects_remove', [
                 'groupId' => $group->getUuid(),
                 'accessId' => $access->getUuid(),

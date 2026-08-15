@@ -10,7 +10,7 @@ use App\Notifications\Service\NotificationDispatcher;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
-use App\Shared\Form\CsrfOnlyType;
+use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

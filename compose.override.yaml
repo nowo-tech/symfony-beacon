@@ -1,9 +1,10 @@
 
 services:
 ###> symfony/mailer ###
-  # Local SMTP catcher (Mailpit). Dev/test only — not in compose.prod.yaml.
-  # Opt-in profile (same idea as Vite HMR): `make mailpit` or
-  #   docker compose --profile mail up -d mailer
+  # Local SMTP catcher (Mailpit) — app-local fallback when shared server/ Mailpit
+  # is unavailable. Prefer: make mailpit (starts developer.local.server/server
+  # container `mailpit`) → Admin DSN smtp://mailpit:1025. See docs/ops/MAILPIT.md.
+  # Opt-in profile: `make mailpit` or docker compose --profile mail up -d mailer
   mailer:
     profiles: ["mail"]
     image: axllent/mailpit

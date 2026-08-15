@@ -14,7 +14,7 @@ use App\Project\Form\ProjectShareCreateType;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectShareLinkManager;
-use App\Shared\Form\CsrfOnlyType;
+use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use RuntimeException;

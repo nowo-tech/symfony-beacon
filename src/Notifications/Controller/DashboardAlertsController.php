@@ -8,7 +8,7 @@ use App\Identity\Entity\User;
 use App\Notifications\Form\DashboardAlertsFilterType;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Service\DashboardAlertsFilterResolver;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

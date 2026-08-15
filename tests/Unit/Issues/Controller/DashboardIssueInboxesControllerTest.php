@@ -13,7 +13,7 @@ use App\Issues\Service\DashboardNewInReleaseFilterResolver;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\AccessibleProjectsProvider;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;

@@ -9,7 +9,7 @@ use App\Issues\AssignmentScope;
 use App\Issues\Form\DashboardAssignmentsFilterType;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Issues\Service\DashboardAssignmentsFilterResolver;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

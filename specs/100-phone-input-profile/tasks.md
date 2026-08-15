@@ -14,7 +14,7 @@
 
 - [x] T005 Override `phone_input_widget.html.twig` with Stimulus `phone-prefix-picker`
 - [x] T006 Register controller in `assets/stimulus_bootstrap.ts`
-- [x] T007 Add host `_phone_input.scss`; load flag-icons only on Profile (skip vendor Bootstrap CSS)
+- [x] T007 Add host `_phone_input.scss`; load flag-icons only on Profile (skip vendor Bootstrap CSS) — **superseded by `101` T006** (kit CSS)
 
 ## Phase 3: QR env + tests + ops
 

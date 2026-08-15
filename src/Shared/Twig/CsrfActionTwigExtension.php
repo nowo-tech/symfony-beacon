@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Twig;
 
-use App\Shared\Form\CsrfOnlyFormFactory;
-use App\Shared\Form\HiddenFieldsCsrfType;
-use App\Shared\Form\SearchQueryType;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\Type\HiddenFieldsCsrfType;
+use Nowo\FormKitBundle\Form\Type\SearchQueryType;
 use Override;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
@@ -57,8 +57,14 @@ final class CsrfActionTwigExtension extends AbstractExtension
                 ->createView();
         }
 
+        if ($named) {
+            return $this->csrfOnlyFormFactory
+                ->createNamed($action, $csrfTokenId, $method, $csrfFieldName)
+                ->createView();
+        }
+
         return $this->csrfOnlyFormFactory
-            ->create($action, $csrfTokenId, $method, $named, $csrfFieldName)
+            ->create($action, $csrfTokenId, $method, $csrfFieldName)
             ->createView();
     }
 

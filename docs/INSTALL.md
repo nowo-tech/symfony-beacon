@@ -29,7 +29,7 @@ make ready              # migrate + platform + demo + dogfood BEACON_DSN when em
 # make seed             # optional: demo user + project + DSN
 make seed-sample        # optional: PROFILE=dev samples
 # Optional local SMTP catcher (not production):
-# make mailpit          # Mailpit UI + smtp://mailer:1025 — see docs/ops/MAILPIT.md
+# make mailpit          # Mailpit UI + smtp://mailpit:1025 (shared) / smtp://mailer:1025 — see docs/ops/MAILPIT.md
 #
 # Later: make test / make phpstan / make shell auto-call `make ensure-up`
 # (starts Compose if php is down — no rebuild / no Vite). Use `make up` for first boot.
@@ -37,7 +37,7 @@ make seed-sample        # optional: PROFILE=dev samples
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
 
-To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailer:1025` under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
+To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailpit:1025` (shared `server/` catcher) or `smtp://mailer:1025` (app-local profile) under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 
 Alternatively open the app with a missing or empty database: the FrankenPHP entrypoint only waits for the MySQL **server** (it does **not** create the schema or run migrations). The SiteBackup gate redirects to **`/setup`**. Open **`/setup?token=$SITE_SETUP_TOKEN`**. Choose **guided** (`database_create`, migrations, Messenger transports, `app:seed-platform`, first `ROLE_ADMIN`, optional sample) or **full database** (SQL dump import then migrations / seed). Deep-link: `/setup?token=…&profile=full_database`.
 

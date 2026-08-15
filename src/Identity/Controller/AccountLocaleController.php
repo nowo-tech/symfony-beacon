@@ -6,7 +6,7 @@ namespace App\Identity\Controller;
 
 use App\Identity\Entity\User;
 use App\Shared\Controller\RequiresValidFormTrait;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use App\Shared\Http\SafeInternalRedirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

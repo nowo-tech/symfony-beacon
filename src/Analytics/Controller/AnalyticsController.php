@@ -15,7 +15,7 @@ use App\Identity\UserActionType;
 use App\Project\Entity\Project;
 use App\Project\Security\ProjectPermission;
 use App\Project\Service\ProjectAccessService;
-use App\Shared\Form\GetFilterFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

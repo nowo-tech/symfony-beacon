@@ -21,7 +21,7 @@ use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipUiHelper;
 use App\Shared\Controller\RequiresValidFormTrait;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -139,7 +139,7 @@ final class AdminProjectAccessController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $target = $this->requireDirectMembership($project, $memberUser);
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_projects_members_remove', [
                 'projectId' => $project->getUuid(),
                 'userId' => $memberUser->getUuid(),
@@ -261,7 +261,7 @@ final class AdminProjectAccessController extends AbstractController
         if ($groupAccess->getProject()?->getId() !== $project->getId()) {
             throw $this->createNotFoundException();
         }
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('admin_projects_groups_remove', [
                 'projectId' => $project->getUuid(),
                 'groupAccessId' => $groupAccess->getUuid(),

@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Identity\Controller;
 use App\Identity\Controller\AdminSocialLoginController;
 use App\Identity\Entity\User;
 use App\Identity\Service\SocialLoginCredentialSeeder;
-use App\Shared\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Entity\SocialLoginCredential;
 use Nowo\AuthKitBundle\Profile\ProfileRegistry;

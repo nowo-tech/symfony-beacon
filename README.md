@@ -105,7 +105,7 @@ make ready
 - HTTP: http://localhost:9084  
 - HTTPS: https://localhost:9447  
 - MySQL: `mysql-9.7-primary` on the shared network (no host port; `make mysql`)
-- Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailer:1025` in Administration → Mailer
+- Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailpit:1025` (shared) or `smtp://mailer:1025` (app-local) in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
 - Browser E2E (Playwright): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
