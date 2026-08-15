@@ -94,7 +94,6 @@ nowo_site_backup:
             enabled: true
             stop_propagation: true
             mysql_host: '%env(MYSQL_HOST)%'
-            mysql_port: '%env(int:MYSQL_PORT)%'
             mysql_user: '%env(MYSQL_USER)%'
             mysql_password: '%env(MYSQL_PASSWORD)%'
             mysql_database: '%env(MYSQL_DATABASE)%'

@@ -2458,6 +2458,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         progress_steps_table?: scalar|Param|null, // DBAL table for per-step journal when progress_step_rows is true. // Default: "nowo_site_backup_setup_step"
  *         required_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.required"
  *         done_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.done"
+ *         durable_done?: array{ // Close the wizard from a host durable store (survives var/ wipe).
+ *             enabled?: bool|Param, // Default: false
+ *             redirect_target?: scalar|Param|null, // Target when durable done closes the wizard (default /). // Default: "/"
+ *         },
+ *         cold_start?: array{ // Gate requests when the MySQL application schema is not reachable yet.
+ *             enabled?: bool|Param, // Default: false
+ *             stop_propagation?: bool|Param, // Default: true
+ *             safe_path_prefixes?: list<scalar|Param|null>,
+ *             mysql_host?: scalar|Param|null, // Default: null
+ *             mysql_port?: int|Param, // Default: 3306
+ *             mysql_user?: scalar|Param|null, // Default: null
+ *             mysql_password?: scalar|Param|null, // Default: null
+ *             mysql_database?: scalar|Param|null, // Default: null
+ *         },
  *         php_binary?: scalar|Param|null, // Default: "php"
  *         admin_provisioner?: scalar|Param|null, // Service id implementing AdminUserProvisionerInterface. // Default: null
  *         trigger_after_restore?: bool|Param, // Default: true
