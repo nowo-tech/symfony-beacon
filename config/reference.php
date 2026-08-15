@@ -2452,10 +2452,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         brand_name?: scalar|Param|null, // Default: "Site Setup"
  *         setup_token?: scalar|Param|null, // Optional shared secret for /_setup (?token= or X-Setup-Token). // Default: null
  *         progress_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup-progress.json"
- *         progress_storage?: "filesystem"|"doctrine"|"chain"|Param, // filesystem = JSON in var/; doctrine = DBAL table; chain = write both, prefer DB on load (survives var/ wipe). // Default: "filesystem"
- *         progress_table?: scalar|Param|null, // DBAL table name when progress_storage is doctrine or chain. // Default: "nowo_site_backup_setup_progress"
- *         progress_step_rows?: bool|Param, // When true (default) and progress_storage is doctrine/chain, upsert per-step rows (runtime DDL — not Symfony migrations; safe before host schema exists). // Default: true
+ *         progress_storage?: "filesystem"|"doctrine"|"chain"|"cache"|"cache_doctrine"|Param, // filesystem = JSON in var/; doctrine = DBAL; chain = JSON+DB; cache = PSR-6 pool; cache_doctrine = cache+DB (prefer DB on load). // Default: "filesystem"
+ *         progress_table?: scalar|Param|null, // DBAL table name when progress_storage is doctrine, chain, or cache_doctrine. // Default: "nowo_site_backup_setup_progress"
+ *         progress_step_rows?: bool|Param, // When true (default) and progress_storage uses Doctrine, upsert per-step rows (runtime DDL — not Symfony migrations; safe before host schema exists). // Default: true
  *         progress_steps_table?: scalar|Param|null, // DBAL table for per-step journal when progress_step_rows is true. // Default: "nowo_site_backup_setup_step"
+ *         progress_cache_pool?: scalar|Param|null, // PSR-6 cache pool service id when progress_storage is cache or cache_doctrine (default cache.app). // Default: "cache.app"
+ *         progress_cache_key?: scalar|Param|null, // Default: "nowo_site_backup.setup_progress"
+ *         progress_cache_ttl?: int|Param, // TTL seconds for cache / cache_doctrine progress (default 86400). // Default: 86400
  *         required_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.required"
  *         done_marker_file?: scalar|Param|null, // Default: "%kernel.project_dir%/var/site-backup/setup.done"
  *         durable_done?: array{ // Close the wizard from a host durable store (survives var/ wipe).
@@ -2465,6 +2468,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         cold_start?: array{ // Gate requests when the MySQL application schema is not reachable yet.
  *             enabled?: bool|Param, // Default: false
  *             stop_propagation?: bool|Param, // Default: true
+ *             require_application_tables?: bool|Param, // When true (default), an empty MySQL schema (only nowo_site_backup_* tables) stays cold-start until migrations create app tables. // Default: true
  *             safe_path_prefixes?: list<scalar|Param|null>,
  *             mysql_host?: scalar|Param|null, // Default: null
  *             mysql_port?: int|Param, // Default: 3306

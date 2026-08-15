@@ -70,20 +70,21 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.14.0)
 
-**SiteBackup 1.11.0 + durable setup-done gate (`056` / 6.49)** — per-step progress journal (`progress_step_rows`) and `/setup` closed from `instance_settings.setup_completed_at` when detectors do not require setup. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+**SiteBackup 1.12.0 + CookieConsent 1.7.0 (`056` / 6.49)** — per-step journal, kit durable done + cold-start gate; Beacon `InstanceSettingsDurableSetupDoneStore`. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
 
 Also: **in-repo shared infra Compose** (`compose.infra.yaml`) — see [Upgrading from 1.14.0 (shared infra Compose)](#upgrading-from-1140-shared-infra-compose).
 
 ```bash
-composer update nowo-tech/site-backup-bundle
+composer update nowo-tech/site-backup-bundle nowo-tech/cookie-consent-bundle
 php bin/console cache:clear
 ```
 
 ### Operator checklist
 
 1. **No host migration** for `nowo_site_backup_setup_step` / progress tables — SiteBackup creates them with runtime DDL on first DB write during setup (or when chain mirrors after `database_create`).
-2. **Cold start**: early wizard steps still use filesystem progress until DBAL works; existing `progress_storage: chain` is unchanged.
-3. **Prod recreate**: if `var/site-backup/setup.done` is missing but `setup_completed_at` is set and catalogs/schema are present, `/setup` redirects home (Beacon `SetupDbDoneGuard`).
+2. **Cold start**: enable `setup.cold_start` (SiteBackup) + CookieConsent **1.7**; early wizard steps still use filesystem progress until DBAL works.
+3. **Prod recreate**: if `var/site-backup/setup.done` is missing but `setup_completed_at` is set and catalogs/schema are present, `/setup` redirects home (SiteBackup **1.12** durable done + Beacon `InstanceSettingsDurableSetupDoneStore`).
+4. **Host wiring**: alias `DurableSetupDoneStoreInterface` → `App\Setup\InstanceSettingsDurableSetupDoneStore`; set `setup.durable_done.enabled: true`.
 
 ## Upgrading from 1.14.0 (shared infra Compose)
 

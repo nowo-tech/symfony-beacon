@@ -33,7 +33,7 @@ Configured in `config/packages/security.yaml`. Controllers use `#[IsGranted(...)
 - **How it is granted:**
   - First registration (`nowo_auth_kit.registration_mode: first_user_only` → `registration_role: ROLE_ADMIN`).
   - Setup / SiteBackup admin provisioning.
-  - `app:seed-demo` demo user (`make seed` / `make ready`). `make dogfood` uses `--skip-demo-user` and only grants existing admins.
+  - `app:seed-demo` demo user (`make seed` / `make ready`). `make dogfood` uses `--skip-demo-user --sync-server-dsn` and only grants existing admins.
   - Administration → Users → change role (cannot demote the last admin or yourself).
 - **What it unlocks:**
   - `/admin` hub, Users, Groups, Roles, Permissions, Admin Projects, Appearance, Mailer, Mercure.
@@ -41,7 +41,7 @@ Configured in `config/packages/security.yaml`. Controllers use `#[IsGranted(...)
   - Setup wizard after users already exist; platform-catalog redirect when catalogs are missing.
   - **Effective project access:** `ProjectAccessService` treats instance admins as **owner** on every project (unless “view as member” is active). Membership mutations that project admins cannot do (e.g. owner rows) are allowed for `ROLE_ADMIN`.
   - **All dotted permission keys** via `InstancePermissionVoter` (superuser shortcut for catalog / custom `isGranted` checks).
-- **Listing caveat:** `/projects` only lists projects via **direct membership or linked groups**. Effective owner access alone does not put a project on that list. `make dogfood` (`app:seed-demo --skip-demo-user`) therefore grants every existing `ROLE_ADMIN` a direct membership on the **Symfony Beacon** project (`slug=symfony-beacon`) so it appears in the UI (without creating `admin@symfony-beacon.local`).
+- **Listing caveat:** `/projects` only lists projects via **direct membership or linked groups**. Effective owner access alone does not put a project on that list. `make dogfood` (`app:seed-demo --skip-demo-user --sync-server-dsn`) therefore grants every existing `ROLE_ADMIN` a direct membership on the **Symfony Beacon** project (`slug=symfony-beacon`) so it appears in the UI (without creating `admin@symfony-beacon.local`).
 
 ### Custom instance roles (RBAC)
 

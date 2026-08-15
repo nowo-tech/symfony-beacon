@@ -89,6 +89,7 @@ final class SeedDemoCommand extends Command
             ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)')
             ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb/cookie-consent seed')
             ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create the demo admin user; use existing ROLE_ADMIN accounts')
+            ->addOption('sync-server-dsn', null, InputOption::VALUE_NONE, 'Update .env BEACON_DSN to the loopback self DSN even when already set (make dogfood)')
             ->addOption('allow-non-local', null, InputOption::VALUE_NONE, 'Allow running outside dev/test (never uses stable demo API keys)');
     }
 
@@ -116,6 +117,7 @@ final class SeedDemoCommand extends Command
         $baseUrl = (string) $input->getOption('base-url');
         $ingestBaseUrl = (string) $input->getOption('ingest-base-url');
         $skipDemoUser = (bool) $input->getOption('skip-demo-user');
+        $syncServerDsn = (bool) $input->getOption('sync-server-dsn');
         $useStableDemoKeys = $isLocal;
         if ((bool) $input->getOption('with-platform')) {
             if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
@@ -197,11 +199,12 @@ final class SeedDemoCommand extends Command
             $io->success(\sprintf('Wrote %s (BeaconBundle demo: make sync-beacon)', $path));
         }
 
-        if ($this->writeServerBeaconDsnIfEmpty($selfDsn)) {
-            $io->success(\sprintf('Set BEACON_DSN in .env for server dogfooding (%s)', $selfDsn));
-        } else {
-            $io->note('BEACON_DSN already set in .env (left unchanged)');
-        }
+        $dsnWrite = $this->writeServerBeaconDsn($selfDsn, $syncServerDsn);
+        match ($dsnWrite) {
+            'written' => $io->success(\sprintf('Set BEACON_DSN in .env for server dogfooding (%s)', $selfDsn)),
+            'unchanged' => $io->note('BEACON_DSN already matches the self DSN'),
+            'skipped' => $io->note('BEACON_DSN already set in .env (left unchanged; use --sync-server-dsn to re-wire)'),
+        };
 
         return Command::SUCCESS;
     }
@@ -238,26 +241,34 @@ ENV;
     }
 
     /**
-     * Write loopback BEACON_DSN into project `.env` when the variable is missing or empty.
+     * Write loopback BEACON_DSN into project `.env`.
      *
-     * Does not overwrite an operator-chosen DSN.
+     * By default only fills a missing/empty value (preserves operator-chosen DSNs).
+     * With $force (make dogfood / --sync-server-dsn), always re-wires to the current self DSN
+     * so a recreated Symfony Beacon project does not leave a stale project UUID in `.env`.
+     *
+     * @return 'written'|'unchanged'|'skipped' written = file updated; unchanged = already correct;
+     *                                         skipped = non-empty value left alone (no force)
      */
-    private function writeServerBeaconDsnIfEmpty(string $selfDsn): bool
+    private function writeServerBeaconDsn(string $selfDsn, bool $force = false): string
     {
         $path = $this->projectDir.'/.env';
         if (!is_file($path) || !is_readable($path)) {
-            return false;
+            return 'skipped';
         }
 
         $contents = file_get_contents($path);
         if (false === $contents) {
-            return false;
+            return 'skipped';
         }
 
         if (preg_match('/^BEACON_DSN=(.*)$/m', $contents, $matches)) {
             $current = trim($matches[1], " \t\"'");
-            if ('' !== $current) {
-                return false;
+            if ($current === $selfDsn) {
+                return 'unchanged';
+            }
+            if ('' !== $current && !$force) {
+                return 'skipped';
             }
             $updated = preg_replace('/^BEACON_DSN=.*$/m', 'BEACON_DSN='.$selfDsn, $contents, 1);
         } else {
@@ -266,13 +277,13 @@ ENV;
         }
 
         if (!\is_string($updated) || $updated === $contents) {
-            return false;
+            return 'unchanged';
         }
 
         if (false === file_put_contents($path, $updated)) {
             throw new RuntimeException(\sprintf('Unable to update BEACON_DSN in "%s".', $path));
         }
 
-        return true;
+        return 'written';
     }
 }

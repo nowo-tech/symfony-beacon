@@ -97,9 +97,10 @@ nowo_site_backup:
             mysql_user: '%env(MYSQL_USER)%'
             mysql_password: '%env(MYSQL_PASSWORD)%'
             mysql_database: '%env(MYSQL_DATABASE)%'
-        # JSON + DBAL; load prefers DB so wiping var/ keeps mid-wizard progress.
-        # SiteBackup 1.11+: per-step journal via runtime DDL (no host migrations; safe before schema exists).
-        progress_storage: chain
+        # Doctrine + Redis (cache.app) until DBAL writes — no var/ JSON progress.
+        # SiteBackup 1.13+: progress_storage cache_doctrine; empty schema stays cold-start.
+        progress_storage: cache_doctrine
+        progress_cache_pool: cache.app
         progress_step_rows: true
         # progress_steps_table: nowo_site_backup_setup_step
         brand_name: 'Symfony Beacon'
@@ -119,7 +120,8 @@ nowo_site_backup:
                 steps:
                     - { type: requirements }
                     - { type: bootstrap_mode }
-                    - { type: database_url, optional: false }
+                    # Optional: Docker/.env already has DATABASE_URL. Skip → database_create.
+                    - { type: database_url, optional: true }
                     - { type: database_create }
                     - { type: cache_clear }
                     - {
@@ -165,7 +167,8 @@ nowo_site_backup:
             full_database:
                 steps:
                     - { type: requirements }
-                    - { type: database_url, optional: false }
+                    # Optional: Docker/.env already has DATABASE_URL. Skip → database_create.
+                    - { type: database_url, optional: true }
                     - { type: database_create }
                     - { type: cache_clear }
                     - {

@@ -1,14 +1,14 @@
 # Install & seed layers
 
 Beacon separates **schema**, **platform catalogs**, **demo identity**, and **optional sample telemetry**.
-Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **≥ 1.11** at **`/setup`** (ops panel: **`/_site_backup`**). Progress uses `chain` storage plus an optional per-step DB journal (runtime DDL — no host migration for those tables).
+Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **≥ 1.13** at **`/setup`** (ops panel: **`/_site_backup`**). Progress uses **`cache_doctrine`** (Redis `cache.app` + DBAL) — not `var/site-backup/setup-progress.json`. Cookie Consent **≥ 1.8** skips its modal until `dashboard_cookie_config` exists. Per-step journal rows use runtime DDL (no host migration for those tables).
 
 | Layer | Command / Make | Purpose |
 |-------|----------------|---------|
 | Schema | `doctrine:migrations:migrate` | Database structure |
 | Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs + cookie consent profile/inventory (idempotent; safe after upgrades) |
 | Demo | `app:seed-demo` / `make seed` | Local admin + **Symfony Beacon** project (`slug=symfony-beacon`) + `.demo-client.env` + optional server `BEACON_DSN` |
-| Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user`) | Same project/DSN wiring **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to existing `ROLE_ADMIN` users |
+| Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user --sync-server-dsn`) | Same project + **re-wires** server `BEACON_DSN` **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to existing `ROLE_ADMIN` users |
 | Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](ops/MERCURE.md)) |
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
 | Setup UI | `/setup` | SiteBackup wizard (bootstrap choice, migrations, platform seed, admin / optional sample, or full SQL dump) |

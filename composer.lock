@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea16ffc6719ced4a4cfa5dff7ca4aacb",
+    "content-hash": "c5942b8c88415f625e6bc4380c9b59c8",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2316,16 +2316,16 @@
         },
         {
             "name": "nowo-tech/cookie-consent-bundle",
-            "version": "v1.7.0",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/CookieConsentBundle.git",
-                "reference": "683cae2351481f2ffd826824991904bd0360a460"
+                "reference": "90921f1924e0a3f02dd672cc3be83039406ee579"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/683cae2351481f2ffd826824991904bd0360a460",
-                "reference": "683cae2351481f2ffd826824991904bd0360a460",
+                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/90921f1924e0a3f02dd672cc3be83039406ee579",
+                "reference": "90921f1924e0a3f02dd672cc3be83039406ee579",
                 "shasum": ""
             },
             "require": {
@@ -2396,7 +2396,7 @@
                 "issues": "https://github.com/nowo-tech/CookieConsentBundle/issues",
                 "source": "https://github.com/nowo-tech/CookieConsentBundle"
             },
-            "time": "2026-08-15T10:24:49+00:00"
+            "time": "2026-08-15T11:07:38+00:00"
         },
         {
             "name": "nowo-tech/dashboard-menu-bundle",
@@ -3597,16 +3597,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.12.0",
+            "version": "v1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "82f6f25d1a7b5e360ae87f1770a98cd530f13c73"
+                "reference": "2c980b89b43c4b4e2885414b739f5e91b644ce2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/82f6f25d1a7b5e360ae87f1770a98cd530f13c73",
-                "reference": "82f6f25d1a7b5e360ae87f1770a98cd530f13c73",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/2c980b89b43c4b4e2885414b739f5e91b644ce2a",
+                "reference": "2c980b89b43c4b4e2885414b739f5e91b644ce2a",
                 "shasum": ""
             },
             "require": {
@@ -3638,13 +3638,15 @@
                 "phpstan/phpstan-symfony": "^2.0",
                 "phpunit/phpunit": "^10.0",
                 "rector/rector": "^2.0",
+                "symfony/cache": "^7.0 || ^8.0",
                 "symfony/framework-bundle": "^7.0 || ^8.0",
                 "symfony/twig-bundle": "^7.0 || ^8.0",
                 "twig/twig": "^3.12",
                 "vincentlanglet/twig-cs-fixer": "^3.0"
             },
             "suggest": {
-                "doctrine/dbal": "Optional; setup progress doctrine/chain storage, schema detectors, and apps that rely on a DBAL connection",
+                "doctrine/dbal": "Optional; setup progress doctrine/chain/cache_doctrine storage, schema detectors, and apps that rely on a DBAL connection",
+                "symfony/cache": "Optional; setup progress_storage cache / cache_doctrine (PSR-6 pool, typically Redis via cache.app)",
                 "symfony/flex": "For automatic recipe installation",
                 "symfony/security-bundle": "Required for the private panel when security.allow_unauthenticated is false (default); also for custom SiteBackupAccessGateInterface / access_checker",
                 "symfony/translation": "Required for |trans in panel and restore templates",
@@ -3688,7 +3690,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-08-15T10:24:49+00:00"
+            "time": "2026-08-15T11:07:50+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",

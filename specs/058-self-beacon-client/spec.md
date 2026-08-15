@@ -36,16 +36,16 @@ As a developer, after `make up` I run `make ready` (bootstrap + seed) and get a 
 
 ### User Story 3 - Dedicated dogfood Make target (Priority: P2)
 
-As a developer whose platform catalogs already exist, I run `make dogfood` to ensure the **Symfony Beacon** dogfood project + API key exist, grant existing `ROLE_ADMIN` membership, and wire `BEACON_DSN` for `nowo-tech/beacon-bundle` **without** creating a new demo user and without re-running the full platform seed.
+As a developer whose platform catalogs already exist, I run `make dogfood` to ensure the **Symfony Beacon** dogfood project + API key exist, grant existing `ROLE_ADMIN` membership, and **re-wire** `BEACON_DSN` for `nowo-tech/beacon-bundle` **without** creating a new demo user and without re-running the full platform seed.
 
-**Independent Test**: `make help` lists `dogfood`; target ensures `var/secrets/`, invokes `app:seed-demo --skip-demo-user`, and documents `make restart` when DSN was written.
+**Independent Test**: `make help` lists `dogfood`; target ensures `var/secrets/`, invokes `app:seed-demo --skip-demo-user --sync-server-dsn`, and documents `make restart` when DSN was written.
 
 **Acceptance Scenarios**:
 
-1. **Given** a migrated DB with or without dogfood project, **When** I run `make dogfood`, **Then** `app:seed-demo --skip-demo-user` runs and prints the self DSN.
-2. **Given** `BEACON_DSN` was empty and seed wrote it, **When** the command finishes, **Then** help text instructs `make restart` so the Kernel reloads the env.
+1. **Given** a migrated DB with or without dogfood project, **When** I run `make dogfood`, **Then** `app:seed-demo --skip-demo-user --sync-server-dsn` runs and prints the self DSN.
+2. **Given** `BEACON_DSN` was empty or stale (previous dogfood UUID) and seed wrote/updated it, **When** the command finishes, **Then** help text instructs `make restart` so the Kernel reloads the env.
 3. **Given** `var/secrets/` is missing, **When** I run `make dogfood`, **Then** Make creates the directory before seed so Halite key creation succeeds (`048`).
-
+4. **Given** `BEACON_DSN` already points at an old project UUID, **When** I run `make dogfood`, **Then** `.env` is updated to the current Symfony Beacon loopback DSN (unlike plain `app:seed-demo`, which leaves a non-empty DSN unchanged).
 ### User Story 4 - No ingest feedback loop (Priority: P1)
 
 As an operator, failures while processing Envelope ingest must not recursively re-ingest themselves endlessly.
@@ -61,7 +61,7 @@ As an operator, failures while processing Envelope ingest must not recursively r
 
 - **FR-001**: Require `nowo-tech/beacon-bundle` (^1.6.7) from Packagist and register configuration with empty-DSN-safe env defaults.
 - **FR-002**: Demo seed MUST use stable public and secret keys; MAY write server `BEACON_DSN` to loopback when empty.
-- **FR-003**: `make ready` MUST run bootstrap then seed; `make dogfood` MUST invoke `app:seed-demo --skip-demo-user` (after `ensure-halite-secrets`) for dogfood-only re-wire; docs MUST document dogfooding and empty-DSN off switch.
+- **FR-003**: `make ready` MUST run bootstrap then seed; `make dogfood` MUST invoke `app:seed-demo --skip-demo-user --sync-server-dsn` (after `ensure-halite-secrets`) so server `BEACON_DSN` is re-wired to the current dogfood project; docs MUST document dogfooding and empty-DSN off switch.
 - **FR-004**: A `before_send` service MUST drop self-ingest Envelope request paths; transport MUST be async by default for the server.
 - **FR-005**: `composer.json` MUST NOT require a private VCS repository entry for `nowo-tech/beacon-bundle` once the package is on Packagist.
 - **FR-006**: `make dogfood` / related seed Make targets MUST create `var/secrets/` before console so Halite can persist `.Halite.default.key`.

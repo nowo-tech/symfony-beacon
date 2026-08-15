@@ -1,4 +1,4 @@
-.PHONY: help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs messenger-ping vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
@@ -6,43 +6,45 @@
 DC := docker compose
 DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file .env
 DC_PROD := docker compose -f compose.prod.yaml --env-file .env
+# Override for print-urls when using the prod compose file (`make up-prod`).
+COMPOSE ?= $(DC)
 
 help:
 	@echo "symfony-beacon — self-hosted error tracking (Symfony 8.1 + FrankenPHP + MySQL 9.7)"
 	@echo ""
-	@echo "  make up              Ensure shared infra + start app (php/messenger) + vite-build"
+	@echo "  make up              Ensure shared infra + start app (php/messenger/messenger-notify) + vite-build"
 	@echo "  make up-infra        Start shared MySQL + Redis (compose.infra.yaml); see docs/ops/SHARED-SERVER.md"
-	@echo "  make up-prod        Ensure infra + start compose.prod.yaml app stack"
-	@echo "  make up-shared      Alias of make up (legacy name)"
+	@echo "  make up-prod         Ensure infra + start compose.prod.yaml app stack"
+	@echo "  make up-shared       Alias of make up (legacy name)"
 	@echo "  make ensure-up       Start infra + app if php is not running (no rebuild / no vite)"
-	@echo "  make classic         FrankenPHP HTTP in classic mode"
-	@echo "  make worker          FrankenPHP HTTP in worker mode"
+	@echo "  make classic         FrankenPHP HTTP in classic mode (one-shot; does not rewrite .env)"
+	@echo "  make worker          FrankenPHP HTTP in worker mode (one-shot; does not rewrite .env)"
 	@echo "  make down            Stop app containers (infra stays for sibling projects)"
-	@echo "  make down-infra     Stop shared infra (MySQL/Redis); warn if other apps use it"
-	@echo "  make down-shared    Alias of make down (legacy name)"
+	@echo "  make down-infra      Stop shared infra (MySQL/Redis); warn if other apps use it"
+	@echo "  make down-shared     Alias of make down (legacy name)"
 	@echo "  make bootstrap-shared-db  Create schema/user on shared MySQL primary"
 	@echo "  make build           Rebuild the php image (dev)"
 	@echo "  make build-prod      Build frankenphp_prod image (see docs/PRODUCTION.md)"
 	@echo "  make logs            Follow php service logs"
 	@echo "  make vite-hmr        Start Vite HMR (compose profile hmr)"
-	@echo "  make vite            Follow Vite HMR logs"
+	@echo "  make vite            Follow Vite HMR logs (run make vite-hmr first)"
 	@echo "  make vite-build      pnpm run build (one-shot → public/build/)"
 	@echo "  make vite-watch      pnpm run watch (vite build --watch, no HMR)"
 	@echo "  make pnpm            pnpm in php container (ARGS='install' / 'add -D …')"
 	@echo "  make mailpit         Start Mailpit (compose profile mail) for local SMTP; prints UI URL"
 	@echo "  make mailpit-logs    Follow Mailpit logs"
-	@echo "  make messenger-logs  Follow Messenger worker logs"
+	@echo "  make messenger-logs  Follow messenger + messenger-notify logs"
 	@echo "  make mysql           mysql CLI shell (mysql-9.7-primary)"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
 	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
 	@echo "  make seed            Platform seed + demo user/project + .demo-client.env + server BEACON_DSN"
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
-	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + BEACON_DSN (no new user)"
+	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + sync BEACON_DSN (no new user)"
 	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"
 	@echo "  make migrate         doctrine:migrations:migrate -n (no seed)"
 	@echo "  make ready           bootstrap + seed (recommended first local run / dogfooding)"
-	@echo "  make restart         Restart php + messenger"
+	@echo "  make restart         Restart php + messenger + messenger-notify (+ vite-build)"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
 	@echo "Quality:"
@@ -69,7 +71,7 @@ help:
 	@echo "  make setup-hooks                    Install .githooks (strips Cursor co-authors)"
 	@echo "  make check-no-cursor-coauthor       Fail if Cursor trailers exist in history"
 	@echo "  make check-module-boundaries         Fail if AdminProjectController leaves Project"
-	@echo "  make check-envelope-goldens         Diff Envelope fixtures vs sibling BeaconBundle"
+	@echo "  make check-envelope-goldens         Diff Envelope fixtures vs sibling BeaconBundle (__HTTPS_PORT__)"
 	@echo "  make strip-cursor-coauthor-from-history  Rewrite local history to remove them"
 
 setup-hooks:
@@ -105,9 +107,10 @@ ensure-up:
 	}
 
 # Print published app ports (from running compose, else .env / defaults).
+# Use COMPOSE="$(DC_PROD)" after make up-prod so ports come from the prod stack.
 print-urls:
-	@HTTP_PUB=$$($(DC) port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
-	HTTPS_PUB=$$($(DC) port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
+	@HTTP_PUB=$$($(COMPOSE) port php 80 2>/dev/null | head -1 | sed 's/.*://'); \
+	HTTPS_PUB=$$($(COMPOSE) port php 443 2>/dev/null | head -1 | sed 's/.*://'); \
 	if [ -z "$$HTTP_PUB" ]; then HTTP_PUB=$$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
 	if [ -z "$$HTTPS_PUB" ]; then HTTPS_PUB=$$(grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2-); fi; \
 	HTTP_PUB=$${HTTP_PUB:-9084}; \
@@ -161,7 +164,6 @@ down-infra:
 	-$(DC_INFRA) --profile mysql-replica down
 
 up:
-	@rm -f .compose-mode
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	@$(MAKE) up-infra
 	$(DC) up --build -d
@@ -174,28 +176,29 @@ up-prod:
 	@test -f .env || (cp .env.dist .env && echo "Created .env from .env.dist")
 	@$(MAKE) up-infra
 	$(DC_PROD) up --build -d
-	@$(MAKE) print-urls
+	@$(MAKE) print-urls COMPOSE="$(DC_PROD)"
 
 # Legacy alias — shared mode is the default (`make up`).
 up-shared: up
 
+# Mode is injected via compose.yaml `environment: FRANKENPHP_MODE` (overrides env_file).
+# One-shot for this up/recreate — persist by setting FRANKENPHP_MODE in .env.
 classic:
 	@test -f .env || cp .env.dist .env
 	@$(MAKE) up-infra
-	FRANKENPHP_MODE=classic $(DC) up --build -d
+	FRANKENPHP_MODE=classic $(DC) up --build -d --force-recreate php
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 worker:
 	@test -f .env || cp .env.dist .env
 	@$(MAKE) up-infra
-	FRANKENPHP_MODE=worker $(DC) up --build -d
+	FRANKENPHP_MODE=worker $(DC) up --build -d --force-recreate php
 	@$(MAKE) vite-build
 	@$(MAKE) print-urls
 
 down:
 	$(DC) --profile hmr --profile mail down
-	@rm -f .compose-mode
 
 down-shared: down
 
@@ -247,7 +250,7 @@ mailpit-logs:
 	$(DC) --profile mail logs -f mailer
 
 messenger-logs:
-	$(DC) logs -f messenger
+	$(DC) logs -f messenger messenger-notify
 
 shell: ensure-up
 	$(DC) exec php sh
@@ -273,10 +276,10 @@ seed-sample: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 
 # Ensure demo project + API key exist, grant ROLE_ADMIN membership, write .demo-client.env,
-# and set server BEACON_DSN (loopback) when empty. Does not create a demo admin user.
+# and sync server BEACON_DSN (loopback) to the current Symfony Beacon project. No demo user.
 dogfood: ensure-halite-secrets
-	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user
-	@echo "Dogfood: BEACON_DSN is written only when empty. If it changed, run: make restart"
+	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user --sync-server-dsn
+	@echo "Dogfood: BEACON_DSN synced to loopback self DSN. If it changed, run: make restart"
 
 migrate: ensure-halite-secrets
 	$(DC) exec -T php bin/console doctrine:migrations:migrate -n
@@ -292,7 +295,7 @@ ready: bootstrap seed
 	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
 
 restart: ensure-up
-	$(DC) restart php messenger
+	$(DC) restart php messenger messenger-notify
 	@$(MAKE) vite-build
 
 mysql: ensure-up

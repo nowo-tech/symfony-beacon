@@ -57,7 +57,7 @@ final class PlatformCatalogsSetupNeedDetectorTest extends TestCase
         self::assertTrue($detector->isSetupRequired());
     }
 
-    public function testThrowableFromBootstrapStateReturnsFalse(): void
+    public function testThrowableFromBootstrapStateReturnsTrue(): void
     {
         $menus = $this->createStub(MenuRepository::class);
         $menus->method('findOneByCodeAndContext')->willThrowException(new RuntimeException('db down'));
@@ -73,7 +73,8 @@ final class PlatformCatalogsSetupNeedDetectorTest extends TestCase
 
         $detector = new PlatformCatalogsSetupNeedDetector($state, $auth, enabled: true);
 
-        self::assertFalse($detector->isSetupRequired());
+        // Unknown / unreachable DB ⇒ cold start (same signal as doctrine_connect).
+        self::assertTrue($detector->isSetupRequired());
     }
 
     private function bootstrapNeedingSeed(): PlatformBootstrapState

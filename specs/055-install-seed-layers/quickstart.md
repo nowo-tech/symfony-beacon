@@ -39,7 +39,7 @@ Expected:
 
 ```bash
 make dogfood
-# → ensure-halite-secrets + app:seed-demo --skip-demo-user
+# → ensure-halite-secrets + app:seed-demo --skip-demo-user --sync-server-dsn
 # restart php if BEACON_DSN was written
 ```
 

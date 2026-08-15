@@ -99,7 +99,7 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 - **FR-008**: Lightweight N+1 / analytics snippets currently created by demo seed MUST move under sample seed (at least profile `dev`) so demo seed stays identity+project+DSN focused.
 - **FR-009**: English operator docs (README, UPGRADING, CHANGELOG, CONTRIBUTING or INSTALL note) MUST describe the three layers and when to use each.
 - **FR-010**: Automated tests MUST cover: platform seed idempotency; demo seed create-once behavior; sample `dev` create + purge; bootstrap Make/contract smoke as appropriate for the repo’s test style.
-- **FR-011**: `make dogfood` MUST invoke `app:seed-demo --skip-demo-user` (Symfony Beacon project / DSN wiring for existing admins; no new demo user).
+- **FR-011**: `make dogfood` MUST invoke `app:seed-demo --skip-demo-user --sync-server-dsn` (Symfony Beacon project + re-wire server `BEACON_DSN` for existing admins; no new demo user).
 
 ### Key Entities
 

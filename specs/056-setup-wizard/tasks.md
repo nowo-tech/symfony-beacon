@@ -1,7 +1,7 @@
 # Tasks: Setup Wizard UI (`056`)
 
 **Input**: `specs/056-setup-wizard/spec.md`  
-**Status**: Implemented (custom wizard → SiteBackupBundle; DB-durable done gate 2026-08-15)
+**Status**: **Completed** (product 100% — SiteBackup **1.13.0** + CookieConsent **1.8.0**; Beacon host store / provisioner / catalog detectors only)
 
 ## Phase 1: Custom wizard (historical — superseded)
 
@@ -33,15 +33,34 @@
 - [x] T020 Locale switcher uses setup `*_unlocalized` twins; `PlatformCatalogsSetupRedirectSubscriber` uses kit `SetupPathPrefixResolver`
 - [x] T021 Friendlier token gate (`templates.setup_token` + `setup.token.*` catalogues); update `056` spec / ADDING-LOCALES / CONTRIBUTING
 
-## Phase 4: DB-durable done gate (Beacon)
+## Phase 4: DB-durable done gate (historical host — superseded by Phase 5)
 
-- [x] T022 `SetupDbDoneGuard` — `setup_completed_at` + `SetupNeedEvaluator`; heal `setup.done` + progress phase `completed` when closing
-- [x] T023 `SetupDbDoneRedirectSubscriber` — redirect `/setup`, localized `/setup`, `/setup/api/*` to `/` when guard closes wizard; leave `/setup/done` and catalog/schema repair paths open
-- [x] T024 Unit tests (`SetupDbDoneGuardTest`, `SetupDbDoneRedirectSubscriberTest`, updated `SetupCompletedSubscriberTest`) + functional cases in `SiteBackupSetupTest` (DB done without file; repair when catalogs empty)
+- [x] T022 ~~`SetupDbDoneGuard`~~ → SiteBackup **1.12** `SetupDbDoneGuard` + host `DurableSetupDoneStoreInterface`
+- [x] T023 ~~`SetupDbDoneRedirectSubscriber`~~ → SiteBackup **1.12** durable-done redirect subscriber
+- [x] T024 Unit/functional coverage moved to kit + Beacon `InstanceSettingsDurableSetupDoneStoreTest` / `SetupCompletedSubscriberTest` / `SiteBackupSetupTest`
 - [x] T025 Update `056` spec (US7, FR-001/003/008/011, progress model, success criteria)
-- [x] T026 Sync ROADMAP **6.49**, INSTALL / UPGRADING / CHANGELOG Unreleased for SiteBackup 1.11 + DB-durable done gate
+- [x] T026 Sync ROADMAP **6.49**, INSTALL / UPGRADING / CHANGELOG Unreleased
 
-## Upstream SiteBackupBundle (kit `002-setup-step-rows` — adopted)
+## Phase 5: Kits own durable done + cold-start (2026-08-15)
 
-- [x] U001 Normalized setup-step table (`step_id` + `finished_at` / status per profile) — implemented in SiteBackupBundle **v1.11.0** / `specs/002-setup-step-rows` (runtime DDL; filesystem until DB exists)
-- [x] U002 Beacon adopts U001 via `nowo-tech/site-backup-bundle` **1.11.0** + `progress_storage: chain` + `progress_step_rows: true` (no parallel Beacon step table)
+- [x] T027 Pin `nowo-tech/site-backup-bundle` **1.12.0** + `nowo-tech/cookie-consent-bundle` **1.7.0**
+- [x] T028 `InstanceSettingsDurableSetupDoneStore` + `config/services/site_backup.yaml` alias; enable `setup.durable_done` / `setup.cold_start`
+- [x] T029 Remove host `SetupDbDoneGuard` / redirect subscriber / cold-start gate / CookieConsent decorators
+- [x] T030 `SetupCompletedSubscriber` uses `DurableSetupDoneStoreInterface` + `SetupMarkerManager::markDone()`
+- [x] T031 Spec/docs sync (FR-011, ROADMAP 6.49, CHANGELOG / UPGRADING)
+
+## Phase 6: SiteBackup 1.13 + CookieConsent 1.8 — product complete (2026-08-15)
+
+- [x] T032 Upstream SiteBackup **1.13.0**: empty-schema cold-start (`require_application_tables`), `progress_storage: cache|cache_doctrine`, optional `database_url` Skip
+- [x] T033 Upstream CookieConsent **1.8.0**: `CookieConsentSchemaReadySubscriber` + `CookieConsentConfig::TABLE_NAME`
+- [x] T034 Beacon pin **1.13.0** / **1.8.0**; `progress_storage: cache_doctrine` + `progress_cache_pool: cache.app`
+- [x] T035 Remove temporary Beacon host workarounds (Redis progress decorators, ApplicationTables checker, CookieConsent schema subscriber, DatabaseUrl form/Twig overrides)
+- [x] T036 Profiles: `database_url` `optional: true`; `messenger:setup-transports` after migrations; entrypoint / messenger `auto_setup: false` (FR-012 / FR-013)
+- [x] T037 Spec 100% product sync (US8–US9, FR-003/008/011–013, progress model, success criteria, ROADMAP **6.49**)
+
+## Upstream SiteBackupBundle / CookieConsentBundle (adopted)
+
+- [x] U001 Normalized setup-step table — SiteBackup **≥ 1.11.0** / kit `002-setup-step-rows` (runtime DDL)
+- [x] U002 Beacon adopts progress via **`cache_doctrine`** on SiteBackup **1.13.0** (no `var/` JSON; no host Redis storage class)
+- [x] U003 Durable done + cold-start APIs — SiteBackup **1.12.0**; empty-schema + Skip fixes — **1.13.0**
+- [x] U004 CookieConsent cold-start attributes — **1.7.0**; mid-migration table probe — **1.8.0**

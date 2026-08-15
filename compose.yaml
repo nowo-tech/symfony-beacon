@@ -24,6 +24,8 @@ services:
       # Built-in Caddy Mercure (dev Caddyfile) — same secret as MERCURE_JWT_SECRET.
       MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      # Shell override for `make classic` / `make worker` (env_file alone cannot be overridden).
+      FRANKENPHP_MODE: ${FRANKENPHP_MODE:-classic}
       # Worker-mode companion for hot_reload: restart PHP workers on file changes (make worker).
       # Leave empty in production-oriented overrides.
       FRANKENPHP_WORKER_CONFIG: ${FRANKENPHP_WORKER_CONFIG:-watch}

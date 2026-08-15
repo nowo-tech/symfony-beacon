@@ -10,11 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Shared infra in-repo**: `compose.infra.yaml` (project `shared-infra`) owns MySQL + Redis on `${SHARED_DOCKER_NETWORK}`; `compose.yaml` / `compose.prod.yaml` are app-only. `make up` / `make up-infra` / `make up-prod`; `MYSQL_TOPOLOGY=simple|replica`. Removed `compose.shared.yaml`. Docs: [`SHARED-SERVER.md`](ops/SHARED-SERVER.md).
-- **SiteBackupBundle 1.11.0** (`056` / 6.49): per-step setup progress journal (`progress_step_rows: true` with existing `progress_storage: chain`). Tables use runtime DDL (no host migration); cold-start before schema remains filesystem-first.
-
-### Added
-
-- Durable setup-done gate from `instance_settings.setup_completed_at` (`SetupDbDoneGuard` / `SetupDbDoneRedirectSubscriber`) so recreating the PHP container without `var/site-backup/setup.done` does not reopen `/setup` when the instance is already initialized (`056` / 6.49).
+- **SiteBackupBundle 1.12.0** + **CookieConsentBundle 1.7.0** (`056` / 6.49): per-step journal (`progress_step_rows`), kit-owned durable done (`setup.durable_done` + `DurableSetupDoneStoreInterface`) and cold-start schema gate (`setup.cold_start`); CookieConsent skips Doctrine when the request attribute says cold-start. Beacon wires `InstanceSettingsDurableSetupDoneStore` and drops host gate/redirect/consent decorators.
 
 ## [1.14.0] - 2026-08-15
 

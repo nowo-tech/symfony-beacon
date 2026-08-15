@@ -22,11 +22,12 @@ php bin/console app:seed-demo
   [--write-client-env[=path]]
   [--with-platform]
   [--skip-demo-user]
+  [--sync-server-dsn]
 ```
 
 | Aspect | Contract |
 |--------|----------|
-| Side effects | Dogfood project (`slug=symfony-beacon`, legacy `demo` upgraded) + API key; optional demo user unless `--skip-demo-user`; optional `.demo-client.env`; optional platform if `--with-platform`; may write server `BEACON_DSN` when empty |
+| Side effects | Dogfood project (`slug=symfony-beacon`, legacy `demo` upgraded) + API key; optional demo user unless `--skip-demo-user`; optional `.demo-client.env`; optional platform if `--with-platform`; may write server `BEACON_DSN` when empty; `--sync-server-dsn` re-wires `BEACON_DSN` even when already set |
 | Does not | Seed analytics / performance / issue volumes |
 | Idempotent | Create-once for user/project/key |
 
@@ -56,7 +57,7 @@ Also ensures light perf N+1 + analytics window appropriate to size (see research
 | `make bootstrap` | `ensure-halite-secrets` + `migrate -n` + `app:seed-platform` |
 | `make seed-platform` | `ensure-halite-secrets` + `app:seed-platform` |
 | `make seed` | `seed-platform` + `app:seed-demo` |
-| `make dogfood` | `ensure-halite-secrets` + `app:seed-demo --skip-demo-user` |
+| `make dogfood` | `ensure-halite-secrets` + `app:seed-demo --skip-demo-user --sync-server-dsn` |
 | `make seed-sample` | `ensure-halite-secrets` + `app:seed-sample` (`PROFILE` env → `--size`, default `dev`) |
 
 ## Compatibility

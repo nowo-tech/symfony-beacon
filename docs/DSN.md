@@ -36,6 +36,8 @@ After `make seed` / `make ready`, when `BEACON_DSN` is empty, demo seed writes a
 http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_uuid}
 ```
 
+`make dogfood` (`--sync-server-dsn`) **re-wires** that loopback line to the current Symfony Beacon project UUID even when `BEACON_DSN` was already set (useful after DB reset / project recreate). Plain `make seed` still leaves a non-empty operator DSN unchanged.
+
 Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops events whose request path contains `/envelope/` to avoid ingest feedback loops. See `config/packages/nowo_beacon.yaml`.
 
 ### Local demo sync (external BeaconBundle)
