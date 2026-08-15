@@ -296,7 +296,8 @@ seed-platform: ensure-halite-secrets
 
 seed: seed-platform
 	$(DC) exec -T php bin/console app:seed-demo
-	@echo "Client env: .demo-client.env — in BeaconBundle/demo/symfony8 run: make sync-beacon"
+	@test -f .demo-client.env && chmod 600 .demo-client.env || true
+	@echo "Client env: .demo-client.env (mode 600) — in BeaconBundle/demo/symfony8 run: make sync-beacon"
 	@echo "Server dogfood: BEACON_DSN set in .env when empty (loopback 127.0.0.1)"
 	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
 
@@ -307,6 +308,7 @@ seed-sample: ensure-halite-secrets
 # and sync server BEACON_DSN (loopback) to the current Symfony Beacon project. No demo user.
 dogfood: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user --sync-server-dsn
+	@test -f .demo-client.env && chmod 600 .demo-client.env || true
 	@echo "Dogfood: BEACON_DSN synced to loopback self DSN. If it changed, run: make restart"
 
 migrate: ensure-halite-secrets

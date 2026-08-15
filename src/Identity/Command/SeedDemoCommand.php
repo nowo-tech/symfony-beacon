@@ -238,6 +238,11 @@ ENV;
         if (false === file_put_contents($path, $contents)) {
             throw new RuntimeException(\sprintf('Unable to write "%s".', $path));
         }
+
+        // Contains DSN + login credentials — never leave world-writable on shared hosts/WSL.
+        if (!chmod($path, 0600) && is_file($path)) {
+            // Best-effort on filesystems that ignore mode bits; seed still succeeded.
+        }
     }
 
     /**
