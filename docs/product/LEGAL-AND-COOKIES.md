@@ -21,7 +21,7 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 
 | Setting | Beacon value |
 |---------|----------------|
-| Pin | `nowo-tech/cookie-consent-bundle` **1.6.3** |
+| Pin | `nowo-tech/cookie-consent-bundle` **1.8.0** |
 | `ui_theme` | `tailwind` |
 | `web_ui` | enabled; Administration → **Cookie consent** (`/admin/cookie-consent` → `/cookie-consent-config/{id}/settings/profile`, CookieConsent **1.5+**) |
 | `form_action` | `nowo_cookie_consent.show` (`/cookie_consent` — required so XHR does not POST to the current page) |
@@ -39,7 +39,28 @@ Configuration: `config/packages/nowo_cookie_consent.yaml`
 | `render_routes` | Public whitelist (`legal_*`, `nowo_auth_kit_*`, `nowo_site_backup_setup*`, `guest_locale_switch`, `app_home_redirect`) — consent markup only there |
 | `skip_render_routes` | empty (whitelist is enough; deny would still win if set) |
 
-Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/` — CookieConsent **1.4.5+** prepends that path automatically. Skin tokens: `assets/styles/_cookie_consent.scss`. Do **not** fork the modal Twig for skinning; prefer tokens. XHR CSRF double-submit lives in vendor `nowo-consent-modal.js` (**≥1.4.8**).
+Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/` — CookieConsent **1.4.5+** prepends that path automatically. **Do not** fork the public modal Twig for skinning.
+
+### Public modal skin (`assets/styles/_cookie_consent.scss`)
+
+Beacon owns the guest-facing consent chrome in host SCSS (Vite `app` build). Vendor `nowo-consent-modal.js` still injects a `<style>` block, but Beacon’s CSP uses **style nonces** — browsers then ignore `'unsafe-inline'`, so injected rules often never apply. Host CSS MUST therefore include:
+
+| Concern | Host behaviour |
+|---------|----------------|
+| Overlay position | Flex layout for `.show` + `--pos-y-*` / `--pos-x-*` (default profile: **bottom** + **left**) |
+| Category rows | Coloured expandable cards (`<details>` / `summary`) with per-category tints + toggle switch |
+| Actions | Beacon primary / ghost buttons (moss tokens); equal-weight grid when profile enables it |
+| Preferences intro | Spacing under `.nowo-cookie-consent__preferences-intro` |
+| Bubble | Size / position helpers (bubble remains optional / AuthKit extras) |
+
+Modal **layout / position / equal-weight buttons** live on the DB profile (`dashboard_cookie_config`), not YAML. `CookieConsentDemoSeeder` + `src/Setup/Demo/fixtures/cookie_consent.default.json` upsert:
+
+- `consentModal`: `box` / `wide` / **`bottom`** / **`left`** / equal-weight buttons on
+- `preferencesModal`: same corner + equal-weight buttons
+
+Re-run `make seed-platform` after changing the fixture so existing instances pick up position/skin settings.
+
+XHR CSRF double-submit lives in vendor `nowo-consent-modal.js` (**≥1.4.8**).
 
 Routes: `config/routes/nowo_cookie_consent.yaml`  
 Privacy link from the modal: `translations/NowoCookieConsentBundle.*.yaml` → `legal_privacy`.

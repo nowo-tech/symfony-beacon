@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Cookie consent guest modal: host SCSS owns coloured category cards, Beacon primary/ghost actions, and overlay **bottom-left** positioning (CSP style nonces drop vendor injected CSS). Platform seed upserts the DB profile layout (`docs/product/LEGAL-AND-COOKIES.md`; specs `002` / `055` / `081`).
+
 ## [1.15.0] - 2026-08-15
 
 ### Added

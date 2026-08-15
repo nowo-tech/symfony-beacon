@@ -132,4 +132,10 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - Locale switch / guest locale POSTs: Symfony `csrf_action_form()` (`090`).
 - Settings member/group add Forms (`ProjectMemberAddType` / `ProjectGroupAddType`) use FormKit profile `beacon` + `form` catalogue prefixes; Twig `form_row` + `_fields` (`081` FR-003c / `077`).
 
+## Amendment (cookie consent guest skin + bottom-left, 2026-08-15)
+
+- Public consent chrome is owned by host `assets/styles/_cookie_consent.scss` (category cards, Beacon primary/ghost buttons, overlay `--pos-y-*` / `--pos-x-*`). Vendor JS style inject is unreliable under CSP style nonces — do not rely on it for layout or buttons.
+- Default seeded profile (`CookieConsentDemoSeeder` / `cookie_consent.default.json`): consent + preferences modals at **bottom left**, equal-weight action buttons, `box` / `wide`.
+- Product reference: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Related kit pin / public-only rules: `081` Cookie Consent amendments.
+
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

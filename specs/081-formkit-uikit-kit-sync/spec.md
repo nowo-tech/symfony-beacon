@@ -124,6 +124,16 @@ As `ROLE_ADMIN`, kit dashboards keep Beacon Administration look: host `templates
 
 Cookie Consent **≥ 1.6.3**: host `render_routes` whitelist limits consent markup to public shells (`legal_*`, `nowo_auth_kit_*`, `nowo_site_backup_setup*`, `guest_locale_switch`, `app_home_redirect`); authenticated product/admin routes MUST NOT render the modal. Auto-open uses `route_targeting_mode: only` on AuthKit entry routes. Twig guard: `nowo_cookie_consent_should_render()`. Session cookie inventory name MUST match `beacon.session_cookie_name` (`087` session amendment).
 
+## Amendment (Cookie Consent guest skin + bottom-left, 2026-08-15)
+
+Public modal stays on vendor Twig (`ui_theme: tailwind`); Beacon MUST NOT fork `cookie_consent.tailwind.html.twig` for cosmetics. Skin + layout live in host `assets/styles/_cookie_consent.scss`:
+
+- Coloured expandable category cards + Beacon primary/ghost action buttons
+- Overlay flex position classes (`--pos-y-bottom` / `--pos-x-left`, …) — required because CSP style nonces drop the vendor injected stylesheet
+- Seeded DB profile (`055` platform seed / `CookieConsentDemoSeeder`): **bottom left**, equal-weight buttons
+
+Product doc: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Identity surface note: `002` amendment (2026-08-15).
+
 ## Amendment (Kit admin tables + Http Log filters, 2026-08-12)
 
 Host forks aligned to Beacon kit list/filter chrome:

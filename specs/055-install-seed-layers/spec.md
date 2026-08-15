@@ -128,6 +128,15 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 - `load` / `huge` exact row counts and batching strategy are deferred to plan/tasks; this spec only requires distinct profiles and safe defaults (`dev` default).
 - Production Compose operators may run platform seed from the `php` service the same way they run migrations.
 
+## Amendment (cookie consent profile layout, 2026-08-15)
+
+`CookieConsentDemoSeeder` (fixture `cookie_consent.default.json`) upserts display layout on the default enabled profile, not only copy/inventory:
+
+- Consent + preferences modals: `box` / `wide` / **bottom** / **left**, equal-weight buttons
+- Skin chrome remains host SCSS (`002` / `081` 2026-08-15 amendments; `docs/product/LEGAL-AND-COOKIES.md`)
+
+Idempotent: re-running `app:seed-platform` updates an existing profile when fixture values differ.
+
 ## Out of Scope
 
 - Visual / HTTP onboarding wizard (see `056-setup-wizard` / SiteBackup).
