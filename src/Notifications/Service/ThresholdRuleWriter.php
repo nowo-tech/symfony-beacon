@@ -28,7 +28,7 @@ final readonly class ThresholdRuleWriter
         $this->entityManager->flush();
     }
 
-    public function update(ProjectThresholdRule $rule): void
+    public function flush(): void
     {
         $this->entityManager->flush();
     }

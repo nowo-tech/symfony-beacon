@@ -74,7 +74,7 @@ final class ProjectThresholdRuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->thresholdRuleWriter->update($rule);
+            $this->thresholdRuleWriter->flush();
             $this->addFlash('success', 'thresholds.flash.updated');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);

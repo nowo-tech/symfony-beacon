@@ -76,7 +76,7 @@ final class ProjectNotificationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->destinationWriter->update($destination);
+            $this->destinationWriter->flush();
             $this->addFlash('success', 'notifications.flash.updated');
 
             return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);

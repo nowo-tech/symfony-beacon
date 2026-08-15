@@ -28,7 +28,7 @@ final readonly class NotificationDestinationWriter
         $this->entityManager->flush();
     }
 
-    public function update(NotificationDestination $destination): void
+    public function flush(): void
     {
         $this->entityManager->flush();
     }
