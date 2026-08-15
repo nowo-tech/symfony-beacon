@@ -29,7 +29,6 @@ use App\Shared\Form\AdminSearchType;
 use App\Shared\Form\CsrfOnlyFormFactory;
 use App\Shared\Form\GetFilterFormFactory;
 use App\Shared\Pagination\PagePagination;
-use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use RuntimeException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -56,7 +55,6 @@ final class AdminUserController extends AbstractController
         private readonly ProjectMembershipRepository $projectMembershipRepository,
         private readonly ProjectMembershipAdminPort $projectMembershipAdminPort,
         private readonly UserActionRecorder $actionRecorder,
-        private readonly EntityManagerInterface $entityManager,
         private readonly AdminUserMutator $adminUserMutator,
         private readonly AccountDataExporter $accountDataExporter,
         private readonly AccountAnonymizer $accountAnonymizer,

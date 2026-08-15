@@ -6,10 +6,14 @@ namespace App\Tests\Unit\Identity\Controller;
 
 use App\Identity\Controller\AdminUserController;
 use App\Identity\Entity\User;
+use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
+use App\Identity\Service\AdminUserMutator;
+use App\Identity\Service\UserActionRecorder;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -22,6 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -73,6 +78,7 @@ final class AdminUserControllerGuardsTest extends TestCase
 
         $form = $this->validForm(['role' => 'user']);
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
+        new ReflectionProperty(AdminUserController::class, 'adminUserMutator')->setValue($controller, $this->mutator());
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $admin);
@@ -90,6 +96,7 @@ final class AdminUserControllerGuardsTest extends TestCase
 
         $form = $this->validForm(['role' => 'superuser']);
         $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
+        new ReflectionProperty(AdminUserController::class, 'adminUserMutator')->setValue($controller, $this->mutator());
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $target);
@@ -161,5 +168,17 @@ final class AdminUserControllerGuardsTest extends TestCase
         $controller->setContainer($container);
 
         return $session;
+    }
+
+    private function mutator(): AdminUserMutator
+    {
+        $em = $this->createStub(EntityManagerInterface::class);
+
+        return new AdminUserMutator(
+            $this->createStub(UserRepository::class),
+            new UserActionRecorder($em, new RequestStack()),
+            $em,
+            $this->createStub(UserPasswordHasherInterface::class),
+        );
     }
 }

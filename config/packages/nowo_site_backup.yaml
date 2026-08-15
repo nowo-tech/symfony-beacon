@@ -211,6 +211,9 @@ when@test:
             setup_token: 'test-setup-token'
             # PHPUnit seeds catalogs / schema; avoid redirecting every request to /setup.
             require_done_marker: false
+            # Cold-start probes MySQL application tables; PHPUnit uses per-PID SQLite.
+            cold_start:
+                enabled: false
             detectors:
                 marker: false
                 doctrine_connect: false

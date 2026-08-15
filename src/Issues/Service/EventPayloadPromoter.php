@@ -31,9 +31,7 @@ final class EventPayloadPromoter
             if (\count($out) >= self::MAX_TAGS) {
                 break;
             }
-            if (!\is_string($key) && !\is_int($key)) {
-                continue;
-            }
+            // PHP array keys are always int|string
             $tagKey = substr(trim((string) $key), 0, self::MAX_TAG_KEY);
             if ('' === $tagKey) {
                 continue;

@@ -11,6 +11,7 @@ use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
+use App\Issues\Service\EventPayloadPromoter;
 use App\Issues\Service\EventTimestampParser;
 use App\Issues\Service\FingerprintCalculator;
 use App\Issues\Service\IssueEnvelopeWriter;
@@ -48,6 +49,7 @@ final class IssueEnvelopeWriterTest extends TestCase
         $this->writer = new IssueEnvelopeWriter(
             new FingerprintCalculator(),
             new EventTimestampParser(),
+            new EventPayloadPromoter(),
             $this->issueRepository,
             $this->eventRepository,
             $stats,

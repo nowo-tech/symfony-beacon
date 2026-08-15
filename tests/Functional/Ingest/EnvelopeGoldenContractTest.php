@@ -156,7 +156,7 @@ final class EnvelopeGoldenContractTest extends DatabaseWebTestCase
      */
     private function httpsPort(): string
     {
-        $port = $_ENV['HTTPS_PORT'] ?? $_SERVER['HTTPS_PORT'] ?? getenv('HTTPS_PORT');
+        $port = getenv('HTTPS_PORT');
         if (!\is_string($port) || '' === $port) {
             return '9447';
         }

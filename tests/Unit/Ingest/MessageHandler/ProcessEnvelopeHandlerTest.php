@@ -10,6 +10,7 @@ use App\Ingest\MessageHandler\ProcessEnvelopeHandler;
 use App\Ingest\Service\EnvelopeParser;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
+use App\Issues\Service\EventPayloadPromoter;
 use App\Issues\Service\EventTimestampParser;
 use App\Issues\Service\FingerprintCalculator;
 use App\Issues\Service\IssueEnvelopeWriter;
@@ -110,6 +111,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
         $issueWriter = new IssueEnvelopeWriter(
             new FingerprintCalculator(),
             new EventTimestampParser(),
+            new EventPayloadPromoter(),
             $this->createStub(IssueRepository::class),
             $this->createStub(EventRepository::class),
             $stats,

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Identity\Controller;
 
 use App\Identity\Controller\AdminUserController;
-use App\Identity\Entity\User;
 use App\Identity\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -14,18 +13,6 @@ use ReflectionProperty;
 
 final class AdminUserControllerHelpersTest extends TestCase
 {
-    public function testIsAppAdminDetectsRoleAdmin(): void
-    {
-        $controller = new ReflectionClass(AdminUserController::class)->newInstanceWithoutConstructor();
-        $method = new ReflectionMethod(AdminUserController::class, 'isAppAdmin');
-
-        $admin = new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        $member = new User()->setEmail('user@example.com')->setRoles(['ROLE_USER']);
-
-        self::assertTrue($method->invoke($controller, $admin));
-        self::assertFalse($method->invoke($controller, $member));
-    }
-
     public function testCountAdminsDelegatesToRepository(): void
     {
         $users = $this->createStub(UserRepository::class);

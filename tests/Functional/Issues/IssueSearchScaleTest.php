@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Issues;
 
 use App\Issues\Entity\Event;
+use App\Issues\Entity\EventTag;
 use App\Issues\Entity\Issue;
 use App\Issues\IssueListSort;
 use App\Issues\Repository\IssueSearchRepository;
+use App\Issues\Service\EventPayloadPromoter;
 use App\Project\Entity\Project;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
@@ -246,16 +248,31 @@ final class IssueSearchScaleTest extends DatabaseWebTestCase
         array $payload,
         ?string $userIdentifier = null,
     ): Event {
+        $promoter = new EventPayloadPromoter();
         $event = new Event();
         $event->setIssue($issue);
         $event->setEventId(bin2hex(random_bytes(8)));
         $event->setPayload($payload);
         $event->setReceivedAt($at);
         $event->setEventTimestamp($at);
+        $event->setRequestUrl($promoter->extractRequestUrl($payload));
         if (null !== $userIdentifier) {
             $event->setUserIdentifier($userIdentifier);
         }
         $em->persist($event);
+
+        $project = $issue->getProject();
+        if ($project instanceof Project) {
+            foreach ($promoter->extractTags($payload) as $tag) {
+                $eventTag = new EventTag();
+                $eventTag->setEvent($event);
+                $eventTag->setIssue($issue);
+                $eventTag->setProject($project);
+                $eventTag->setTagKey($tag['key']);
+                $eventTag->setTagValue($tag['value']);
+                $em->persist($eventTag);
+            }
+        }
 
         return $event;
     }

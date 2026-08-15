@@ -88,8 +88,8 @@ trait IssueSearchFilterTrait
 
         $like = '%'.SqlLikeEscaper::escape(trim($url)).'%';
         $qb->andWhere(
-            'EXISTS (SELECT 1 FROM '.Event::class.' ue'
-            ." WHERE ue.issue = i AND ue.project = :urlFilterProject AND ue.requestUrl LIKE :urlLike ESCAPE '\\')",
+            'EXISTS (SELECT 1 FROM '.Event::class.' eurl'
+            ." WHERE eurl.issue = i AND eurl.project = :urlFilterProject AND eurl.requestUrl LIKE :urlLike ESCAPE '\\')",
         )
             ->setParameter('urlFilterProject', $project)
             ->setParameter('urlLike', $like);
@@ -102,7 +102,7 @@ trait IssueSearchFilterTrait
         }
 
         $qb->andWhere(
-            'EXISTS (SELECT 1 FROM '.Event::class." ue WHERE ue.issue = i AND ue.userIdentifier LIKE :userLike ESCAPE '\\')",
+            'EXISTS (SELECT 1 FROM '.Event::class." euser WHERE euser.issue = i AND euser.userIdentifier LIKE :userLike ESCAPE '\\')",
         )->setParameter('userLike', '%'.SqlLikeEscaper::escape(trim($user)).'%');
     }
 
