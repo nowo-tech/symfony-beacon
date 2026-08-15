@@ -140,12 +140,14 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return list<string>
      */
-    public function findDistinctReleaseVersions(Project $project): array
+    public function findDistinctReleaseVersions(Project $project, int $limit = 100): array
     {
         $projectId = $project->getId();
         if (null === $projectId) {
             return [];
         }
+
+        $limit = max(1, min(500, $limit));
 
         $sql = <<<'SQL'
             SELECT e.release_version AS release_value
@@ -155,13 +157,16 @@ class EventRepository extends ServiceEntityRepository
               AND e.release_version <> ''
             GROUP BY e.release_version
             ORDER BY MAX(e.received_at) DESC, e.release_version DESC
+            LIMIT :limit
             SQL;
 
         /** @var list<int|string> $rows */
         $rows = $this->getEntityManager()->getConnection()->fetchFirstColumn($sql, [
             'projectId' => $projectId,
+            'limit' => $limit,
         ], [
             'projectId' => ParameterType::INTEGER,
+            'limit' => ParameterType::INTEGER,
         ]);
 
         $releases = [];

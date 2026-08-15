@@ -200,7 +200,7 @@ trait IssueReleaseQueryTrait
     }
 
     /** @return list<Issue> */
-    public function findByRelease(Project $project, string $release, int $limit = 500): array
+    public function findByRelease(Project $project, string $release, int $limit = 100): array
     {
         $normalized = Issue::normalizeRelease($release);
         if (null === $normalized) {
