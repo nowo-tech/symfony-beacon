@@ -51,5 +51,10 @@ final class CookieConsentDemoSeederTest extends TestCase
         $em->method('flush');
 
         self::assertTrue(new CookieConsentDemoSeeder($em, $configs, $definitions, new DemoFixtureLoader())->seedIfEmpty());
+        self::assertSame('bottom', $config->getConsentModalPositionY());
+        self::assertSame('left', $config->getConsentModalPositionX());
+        self::assertTrue($config->isConsentModalEqualWeightButtons());
+        self::assertSame('bottom', $config->getPreferencesModalPositionY());
+        self::assertSame('left', $config->getPreferencesModalPositionX());
     }
 }

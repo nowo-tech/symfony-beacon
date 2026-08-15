@@ -89,6 +89,16 @@ final readonly class CookieConsentDemoSeeder
             'preferencesBubblePosition' => $this->requireString($settings, 'preferencesBubblePosition', 'config.settings'),
             'preferencesBubbleIcon' => $this->requireString($settings, 'preferencesBubbleIcon', 'config.settings'),
             'preferencesBubbleBorderColor' => $this->requireString($settings, 'preferencesBubbleBorderColor', 'config.settings'),
+            'consentModalLayout' => $this->requireString($settings, 'consentModalLayout', 'config.settings'),
+            'consentModalVariant' => $this->requireString($settings, 'consentModalVariant', 'config.settings'),
+            'consentModalPositionY' => $this->requireString($settings, 'consentModalPositionY', 'config.settings'),
+            'consentModalPositionX' => $this->requireString($settings, 'consentModalPositionX', 'config.settings'),
+            'consentModalEqualWeightButtons' => $this->requireBool($settings, 'consentModalEqualWeightButtons', 'config.settings'),
+            'preferencesModalLayout' => $this->requireString($settings, 'preferencesModalLayout', 'config.settings'),
+            'preferencesModalVariant' => $this->requireString($settings, 'preferencesModalVariant', 'config.settings'),
+            'preferencesModalPositionY' => $this->requireString($settings, 'preferencesModalPositionY', 'config.settings'),
+            'preferencesModalPositionX' => $this->requireString($settings, 'preferencesModalPositionX', 'config.settings'),
+            'preferencesModalEqualWeightButtons' => $this->requireBool($settings, 'preferencesModalEqualWeightButtons', 'config.settings'),
             'autoShow' => $this->requireBool($settings, 'autoShow', 'config.settings'),
             'autoShowRouteMode' => $this->requireString($settings, 'autoShowRouteMode', 'config.settings'),
             'granularCookieSelection' => $this->requireBool($settings, 'granularCookieSelection', 'config.settings'),
@@ -121,6 +131,46 @@ final readonly class CookieConsentDemoSeeder
         }
         if ($config->getPreferencesBubbleBorderColor() !== $wanted['preferencesBubbleBorderColor']) {
             $config->setPreferencesBubbleBorderColor($wanted['preferencesBubbleBorderColor']);
+            $changed = true;
+        }
+        if ($config->getConsentModalLayout() !== $wanted['consentModalLayout']) {
+            $config->setConsentModalLayout($wanted['consentModalLayout']);
+            $changed = true;
+        }
+        if ($config->getConsentModalVariant() !== $wanted['consentModalVariant']) {
+            $config->setConsentModalVariant($wanted['consentModalVariant']);
+            $changed = true;
+        }
+        if ($config->getConsentModalPositionY() !== $wanted['consentModalPositionY']) {
+            $config->setConsentModalPositionY($wanted['consentModalPositionY']);
+            $changed = true;
+        }
+        if ($config->getConsentModalPositionX() !== $wanted['consentModalPositionX']) {
+            $config->setConsentModalPositionX($wanted['consentModalPositionX']);
+            $changed = true;
+        }
+        if ($config->isConsentModalEqualWeightButtons() !== $wanted['consentModalEqualWeightButtons']) {
+            $config->setConsentModalEqualWeightButtons($wanted['consentModalEqualWeightButtons']);
+            $changed = true;
+        }
+        if ($config->getPreferencesModalLayout() !== $wanted['preferencesModalLayout']) {
+            $config->setPreferencesModalLayout($wanted['preferencesModalLayout']);
+            $changed = true;
+        }
+        if ($config->getPreferencesModalVariant() !== $wanted['preferencesModalVariant']) {
+            $config->setPreferencesModalVariant($wanted['preferencesModalVariant']);
+            $changed = true;
+        }
+        if ($config->getPreferencesModalPositionY() !== $wanted['preferencesModalPositionY']) {
+            $config->setPreferencesModalPositionY($wanted['preferencesModalPositionY']);
+            $changed = true;
+        }
+        if ($config->getPreferencesModalPositionX() !== $wanted['preferencesModalPositionX']) {
+            $config->setPreferencesModalPositionX($wanted['preferencesModalPositionX']);
+            $changed = true;
+        }
+        if ($config->isPreferencesModalEqualWeightButtons() !== $wanted['preferencesModalEqualWeightButtons']) {
+            $config->setPreferencesModalEqualWeightButtons($wanted['preferencesModalEqualWeightButtons']);
             $changed = true;
         }
         if ($config->isAutoShow() !== $wanted['autoShow']) {
