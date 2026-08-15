@@ -64,7 +64,7 @@ final readonly class ProjectGovernanceResolver
             return $this->eventRepository->countReceivedTodayForProject($project);
         }
 
-        $dayKey = (new DateTimeImmutable('today'))->format('Ymd');
+        $dayKey = new DateTimeImmutable('today')->format('Ymd');
 
         return $this->cachedCount(
             'gov_quota_daily_'.$projectId.'_'.$dayKey,
