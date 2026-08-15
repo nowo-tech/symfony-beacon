@@ -90,8 +90,11 @@ describe('product-tour controller', () => {
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.search).not.toContain('tour=1');
+    expect(details.open).toBe(false);
 
+    details.open = true;
     config.onDestroyed();
+    expect(details.open).toBe(false);
   });
 
   it('marks seen when no steps resolve', async () => {

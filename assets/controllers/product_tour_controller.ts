@@ -63,6 +63,7 @@ export default class extends Controller {
     // Destroy without relying on markSeen here — onDestroyed already persisted if the user finished/closed.
     const active = this.activeDriver;
     this.activeDriver = null;
+    this.closeUserMenu();
     if (active) {
       active.destroy();
     }
@@ -102,6 +103,7 @@ export default class extends Controller {
         // Persist before tear-down so a reload cannot re-open the tour.
         void this.persistSeen();
         this.clearForceQuery();
+        this.closeUserMenu();
         if (active.isActive()) {
           active.destroy();
         }
@@ -109,6 +111,7 @@ export default class extends Controller {
       onDestroyed: () => {
         void this.persistSeen();
         this.clearForceQuery();
+        this.closeUserMenu();
         this.activeDriver = null;
       },
     };
@@ -164,8 +167,8 @@ export default class extends Controller {
   }
 
   private ensureUserMenuOpen(element?: Element): void {
-    const menuRoot = document.querySelector<HTMLElement>('[data-tour="user-menu"]');
-    if (!menuRoot) {
+    const details = this.userMenuDetails();
+    if (!details) {
       return;
     }
 
@@ -178,10 +181,22 @@ export default class extends Controller {
       return;
     }
 
-    const details = menuRoot.querySelector("details");
+    details.open = true;
+  }
+
+  /** Close the avatar menu if the tour opened it for a step highlight. */
+  private closeUserMenu(): void {
+    const details = this.userMenuDetails();
     if (details) {
-      details.open = true;
+      details.open = false;
     }
+  }
+
+  private userMenuDetails(): HTMLDetailsElement | null {
+    const menuRoot = document.querySelector<HTMLElement>('[data-tour="user-menu"]');
+    const details = menuRoot?.querySelector("details");
+
+    return details instanceof HTMLDetailsElement ? details : null;
   }
 
   /** Drop ?tour=1 so a refresh cannot force the tour again after completion. */
