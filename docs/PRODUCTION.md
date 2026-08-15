@@ -248,7 +248,9 @@ Use this list before exposing an instance beyond a trusted network. Details live
 | **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
 | **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production (Ops Overview warns when off) | Prefer private scrape network / Caddy `remote_ip` allowlist |
 | **Health** | `/health/live` + `/health/ready` for probes | Ready checks DB only; queue depth is on `/metrics` |
-| **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` so client IP (login throttle, audit) is not spoofable | Default Compose terminates TLS in Caddy — only needed for an outer proxy |
+| **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` to **only** the real load balancer CIDRs | Too-broad trusts let clients forge `X-Forwarded-For` and bypass ingest/hook/read **IP rate limits** and login throttle. Default Compose terminates TLS in Caddy — leave empty unless you have an outer proxy |
+| **First admin** | Complete `/setup` and/or first `/register` (**`registration_mode: first_user_only` → `ROLE_ADMIN`**) **before** publishing the HTTP(S) port | A fresh instance exposed before the first register lets anyone become admin |
+| **Demo client env** | Keep `.demo-client.env` at mode **600** (seed/dogfood now chmod); never commit it | Contains `BEACON_DSN` + demo login — gitignored, but world-writable copies on shared WSL/hosts leak credentials |
 | **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit` | Controlled sources only; do not `|raw` user/event payload HTML |
 | **Mailer / Mercure** | Real DSN/hub in Admin; never ship Mailpit in prod Compose | Encrypted at rest via Halite |
 | **Legal / cookies** | Privacy/terms/cookies pages; consent kit for non-essential cookies | Required for public operator UX |

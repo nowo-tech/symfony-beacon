@@ -114,9 +114,9 @@ make ready
 - Login: https://localhost:9447/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
 - OpenAPI (after login, admin): https://localhost:9447/admin/api/doc
 
-> After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs).
+> After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs). Complete setup/first register **before** publishing the port — the first registrant is `ROLE_ADMIN`.
 
-Seed prints DSNs and writes `.demo-client.env` for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
+Seed prints DSNs and writes `.demo-client.env` (mode **600**) for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo:
 
 ```text
 UI DSN: https://<public_key>:<secret>@localhost:9447/<project_id>

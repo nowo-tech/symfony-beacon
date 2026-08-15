@@ -7,7 +7,7 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 |-------|----------------|---------|
 | Schema | `doctrine:migrations:migrate` | Database structure |
 | Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs + cookie consent profile/inventory (idempotent; safe after upgrades) |
-| Demo | `app:seed-demo` / `make seed` | Local admin + **Symfony Beacon** project (`slug=symfony-beacon`) + `.demo-client.env` + optional server `BEACON_DSN` |
+| Demo | `app:seed-demo` / `make seed` | Local admin + **Symfony Beacon** project (`slug=symfony-beacon`) + `.demo-client.env` (**mode 600**) + optional server `BEACON_DSN` |
 | Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user --sync-server-dsn`) | Same project + **re-wires** server `BEACON_DSN` **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to existing `ROLE_ADMIN` users |
 | Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](ops/MERCURE.md)) |
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
@@ -36,6 +36,8 @@ make seed-sample        # optional: PROFILE=dev samples
 ```
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
+
+**Before exposing the HTTP(S) port beyond localhost:** finish `/setup` and/or the first `/register` (first user becomes `ROLE_ADMIN`). Keep `SYMFONY_TRUSTED_PROXIES` empty unless an outer load balancer terminates TLS — see [PRODUCTION.md](PRODUCTION.md) operational inventory. If `.demo-client.env` already exists from an older seed, run `chmod 600 .demo-client.env`.
 
 To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailpit:1025` (shared `server/` catcher) or `smtp://mailer:1025` (app-local profile) under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 
