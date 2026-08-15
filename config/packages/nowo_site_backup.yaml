@@ -86,6 +86,18 @@ nowo_site_backup:
         # Existing installs without setup.done stay usable; empty schema / setup.required still gate.
         # Fresh clones that must block the app until wizard finishes: set true.
         require_done_marker: false
+        # SiteBackup 1.12+: durable done via InstanceSettingsDurableSetupDoneStore + cold-start gate.
+        durable_done:
+            enabled: true
+            redirect_target: '/'
+        cold_start:
+            enabled: true
+            stop_propagation: true
+            mysql_host: '%env(MYSQL_HOST)%'
+            mysql_port: '%env(int:MYSQL_PORT)%'
+            mysql_user: '%env(MYSQL_USER)%'
+            mysql_password: '%env(MYSQL_PASSWORD)%'
+            mysql_database: '%env(MYSQL_DATABASE)%'
         # JSON + DBAL; load prefers DB so wiping var/ keeps mid-wizard progress.
         # SiteBackup 1.11+: per-step journal via runtime DDL (no host migrations; safe before schema exists).
         progress_storage: chain
