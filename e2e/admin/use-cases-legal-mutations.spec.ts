@@ -101,7 +101,10 @@ test.describe('Account redirects & admin project rename', () => {
     await form.locator('input[name="project[name]"]').fill(renamed);
     await form.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
-    await expect(page.locator('body')).toContainText(renamed, { timeout: 15_000 });
+    // WSL/CI can stall on the page-loader overlay after admin save — re-enter via stable goto.
+    await gotoStable(page, `/admin/projects/${uuid}/edit`);
+    await dismissProductTour(page);
+    await expect(page.locator('input[name="project[name]"]')).toHaveValue(renamed);
   });
 });
 

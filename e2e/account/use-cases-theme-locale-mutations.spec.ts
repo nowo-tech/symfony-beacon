@@ -179,13 +179,13 @@ test.describe('Guest locale path mutations', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('guest path locale switch changes login language (UC-AUTH-13)', async ({ page }) => {
-    // Start on English (non-default when DEFAULT_LOCALE=es).
+    // Prefer prefixed English so the assertion is independent of DEFAULT_LOCALE.
     await page.goto('/en/login');
     await dismissCookieConsent(page);
     await expect(page.locator('html')).toHaveAttribute('lang', /en/i);
     await expect(page.getByRole('heading', { name: /Sign in/i })).toBeVisible();
 
-    // Default locale (es) uses bare /login with unlocalized: serve.
+    // Non-default locales use /{_locale}/login; DEFAULT_LOCALE may use bare /login (AuthKit unlocalized: serve).
     await switchGuestPathLocale(page, 'es');
     await expect(page).toHaveURL(/\/(es\/)?login/);
     await expect(page.locator('html')).toHaveAttribute('lang', /es/i);
@@ -197,7 +197,8 @@ test.describe('Guest locale path mutations', () => {
     await expect(page.getByRole('heading', { name: /Anmelden/i })).toBeVisible();
 
     await switchGuestPathLocale(page, 'en');
-    await expect(page).toHaveURL(/\/en\/login/);
+    // When DEFAULT_LOCALE=en (CI .env.dist), bare /login serves English; otherwise /en/login.
+    await expect(page).toHaveURL(/\/(en\/)?login/);
     await expect(page.locator('html')).toHaveAttribute('lang', /en/i);
     await expect(page.getByRole('heading', { name: /Sign in/i })).toBeVisible();
   });
