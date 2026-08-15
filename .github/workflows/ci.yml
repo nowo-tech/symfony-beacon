@@ -281,14 +281,18 @@ jobs:
       - name: Build and start Compose stack
         run: |
           docker compose build
+          # Install vendor once before php/messenger share the bind mount (avoids concurrent composer).
+          docker compose run --rm --no-deps php \
+            composer install --prefer-dist --no-progress --no-interaction
           docker compose --profile mail up -d
-          # Entrypoint installs vendor/node_modules and migrates when DB is ready.
+          # Entrypoint migrates when DB is ready; wait for HTTPS.
           for i in $(seq 1 90); do
-            if curl -kfsS https://localhost:9447/health/live >/dev/null 2>&1; then
-              echo "Stack is live"
+            if curl -kfsS https://localhost:9447/health/live >/dev/null 2>&1 \
+              && docker compose exec -T php test -f vendor/autoload_runtime.php; then
+              echo "Stack is live (vendor ready)"
               exit 0
             fi
-            echo "Waiting for HTTPS… (${i}/90)"
+            echo "Waiting for HTTPS + vendor… (${i}/90)"
             sleep 5
           done
           echo "Timed out waiting for /health/live" >&2

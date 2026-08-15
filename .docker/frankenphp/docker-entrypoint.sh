@@ -85,13 +85,26 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ] || [ 
 	fi
 
 	# Install Composer deps when vendor/ is missing (bind-mounted app without a prior install).
-	if [ -f composer.json ] && [ -z "$(ls -A 'vendor/' 2>/dev/null)" ]; then
-		composer install --prefer-dist --no-progress --no-interaction
+	# Use flock: php + messenger + messenger-notify share ./:/app and would race otherwise.
+	if [ -f composer.json ] && [ ! -f vendor/autoload_runtime.php ]; then
+		mkdir -p var
+		(
+			flock 9
+			if [ ! -f vendor/autoload_runtime.php ]; then
+				composer install --prefer-dist --no-progress --no-interaction
+			fi
+		) 9>var/.composer-install.lock
 	fi
 
 	# Install JS deps when node_modules/ is missing (Pentatrion Vite / pnpm).
 	if [ -f package.json ] && [ -z "$(ls -A 'node_modules/' 2>/dev/null)" ]; then
-		pnpm install --frozen-lockfile || pnpm install
+		mkdir -p var
+		(
+			flock 9
+			if [ -z "$(ls -A 'node_modules/' 2>/dev/null)" ]; then
+				pnpm install --frozen-lockfile || pnpm install
+			fi
+		) 9>var/.pnpm-install.lock
 	fi
 
 	# Halite field-encryption key parent dir (doctrine-encrypt-bundle does not mkdir).
