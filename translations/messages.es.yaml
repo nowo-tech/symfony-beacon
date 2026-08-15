@@ -411,20 +411,25 @@ project:
     inactive_dsn_hidden: Las claves revocadas no autentican ingest. No se muestra el DSN ni el secreto.
     public: 'pública:'
     secret_hidden: El DSN completo y el secreto solo se muestran una vez tras crear o rotar (no a viewers).
-    secret_once_hint: Crea o rota esta clave para ver el DSN una sola vez. El secreto no se vuelve a mostrar
-      en esta página.
-    secret_once_banner: DSN nuevo listo — cópialo ahora en tu cliente. No seguirá listado al salir de
-      esta página.
+    secret_once_hint: El secreto no se puede recuperar del servidor. Rota esta clave para generar un DSN
+      nuevo y cópialo al momento — no se volverá a mostrar.
+    secret_once_banner: DSN nuevo listo — cópialo ahora. Se oculta a los 30 segundos y no seguirá listado
+      al salir de esta página. Rota de nuevo si necesitas otra copia.
     dsn_help: Copia este DSN para los clientes (la ruta es el UUID del proyecto). Rota para generar un
       secreto nuevo.
     copy_dsn: Copiar DSN
     dsn_copied: Copiado
+    show_dsn: Mostrar DSN
+    hide_dsn: Ocultar DSN
+    dsn_cleared: Oculto — rota para generar un DSN nuevo
     generate: Sugerir nombre
     generate_hint: Rellena la etiqueta con un nombre legible (adjetivo-sustantivo)
     add: Añadir clave
     revoke: Revocar
     revoke_confirm: ¿Revocar esta clave API? El ingest con este secreto fallará de inmediato.
     rotate: Rotar
+    rotate_hint: Genera un secreto nuevo y muestra el DSN una sola vez para copiarlo
+    rotate_confirm: ¿Rotar esta clave API? El secreto actual deja de funcionar de inmediato. Se mostrará un DSN nuevo una sola vez para copiarlo.
   config:
     title: Exportar / importar proyecto
     tabs_label: Exportar o importar
@@ -579,6 +584,45 @@ issues:
   request_url: URL
   request_query: Query string
   request_headers: Cabeceras
+  console: Console
+  console_command: Command
+  console_command_class: Command class
+  console_exit_code: Exit code
+  console_php_sapi: PHP SAPI
+  console_interactive: Interactive
+  console_verbosity: Verbosity
+  console_cwd: Working directory
+  console_arguments: Arguments
+  console_options: Options
+  console_missing_arguments: Missing arguments
+  messenger: Messenger
+  messenger_message: Message
+  messenger_receiver: Receiver
+  messenger_retry_count: Retries
+  messenger_bus: Bus
+  messenger_transport: Transport
+  messenger_transport_id: Transport message id
+  messenger_handler: Handler
+  messenger_first_failure: First failure
+  scheduler: Scheduler
+  scheduler_name: Schedule
+  scheduler_recurring: Recurring id
+  scheduler_trigger: Trigger
+  scheduler_triggered_at: Triggered at
+  monolog: Monolog
+  monolog_channel: Channel
+  monolog_level: Level
+  monolog_context: Context
+  http_route: Route
+  http_controller: Controller
+  http_status: Status
+  http_query_keys: Query keys
+  http_client: Client
+  trace_id: Trace ID
+  fatal: Fatal error
+  fatal_file: File
+  fatal_line: Line
+  fatal_type: Type
   extra: Datos adicionales
   stacktrace: Stack Trace
   source_context: Código fuente

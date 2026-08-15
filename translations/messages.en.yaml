@@ -404,19 +404,24 @@ project:
     inactive_dsn_hidden: Revoked keys cannot authenticate ingest. DSN and secret are not shown.
     public: 'public:'
     secret_hidden: Full DSN and secret are shown only once after create or rotate (not to viewers).
-    secret_once_hint: Create or rotate this key to reveal the DSN once. The secret is not shown again
-      on this page.
-    secret_once_banner: New DSN ready — copy it into your client now. It will not stay listed after you
-      leave this page.
+    secret_once_hint: The secret cannot be recovered from the server. Rotate this key to mint a new DSN,
+      then copy it immediately — it will not be shown again.
+    secret_once_banner: New DSN ready — copy it now. It hides after 30 seconds and will not stay listed
+      after you leave this page. Rotate again if you need another copy.
     dsn_help: Copy this DSN for clients (path is the project UUID). Rotate to mint a new secret.
     copy_dsn: Copy DSN
     dsn_copied: Copied
+    show_dsn: Show DSN
+    hide_dsn: Hide DSN
+    dsn_cleared: Hidden — rotate to mint a new DSN
     generate: Suggest name
     generate_hint: Fill the label with a human-friendly adjective-noun name
     add: Add key
     revoke: Revoke
     revoke_confirm: Revoke this API key? Ingest with this secret will fail immediately.
     rotate: Rotate
+    rotate_hint: Mint a new secret and show the DSN once for copying
+    rotate_confirm: Rotate this API key? The current secret stops working immediately. A new DSN will be shown once for copying.
   config:
     title: Export / import project
     tabs_label: Export or import
@@ -570,6 +575,45 @@ issues:
   request_url: URL
   request_query: Query string
   request_headers: Headers
+  console: Console
+  console_command: Command
+  console_command_class: Command class
+  console_exit_code: Exit code
+  console_php_sapi: PHP SAPI
+  console_interactive: Interactive
+  console_verbosity: Verbosity
+  console_cwd: Working directory
+  console_arguments: Arguments
+  console_options: Options
+  console_missing_arguments: Missing arguments
+  messenger: Messenger
+  messenger_message: Message
+  messenger_receiver: Receiver
+  messenger_retry_count: Retries
+  messenger_bus: Bus
+  messenger_transport: Transport
+  messenger_transport_id: Transport message id
+  messenger_handler: Handler
+  messenger_first_failure: First failure
+  scheduler: Scheduler
+  scheduler_name: Schedule
+  scheduler_recurring: Recurring id
+  scheduler_trigger: Trigger
+  scheduler_triggered_at: Triggered at
+  monolog: Monolog
+  monolog_channel: Channel
+  monolog_level: Level
+  monolog_context: Context
+  http_route: Route
+  http_controller: Controller
+  http_status: Status
+  http_query_keys: Query keys
+  http_client: Client
+  trace_id: Trace ID
+  fatal: Fatal error
+  fatal_file: File
+  fatal_line: Line
+  fatal_type: Type
   extra: Additional data
   stacktrace: Stack Trace
   source_context: Source

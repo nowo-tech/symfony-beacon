@@ -1,6 +1,6 @@
 {#
   Issue detail event body. Expects `event`.
-  Order: Highlights → Stack → Breadcrumbs → Request → Tags → Contexts → Extra → Raw
+  Order: Highlights → Stack → Breadcrumbs → Request → Console → Messenger → Scheduler → Monolog → Fatal → Tags → Contexts → Extra → Raw
 #}
 {% set payload = event.payload %}
 {% set exceptionValues = payload.exception.values|default([]) %}
@@ -15,6 +15,41 @@
 {% set requestUrl = request.url|default(request.request_uri|default(payload.extra.request_uri|default(null))) %}
 {% set requestMethod = request.method|default(request.request_method|default(payload.extra.request_method|default(null))) %}
 {% set headers = request.headers|default({}) %}
+{% set http = payload.extra.http|default(request|default({})) %}
+{% set httpRoute = http.route|default(request.route|default(null)) %}
+{% set httpController = http.controller|default(request.controller|default(null)) %}
+{% set httpStatus = http.status_code|default(null) %}
+{% set httpQueryKeys = http.query_keys|default(request.query_keys|default([])) %}
+{% set httpClient = http.client|default(request.client|default(null)) %}
+{% set console = payload.extra.console|default({}) %}
+{% set consoleCommand = console.command|default(null) %}
+{% set consoleCommandClass = console.command_class|default(null) %}
+{% set hasConsoleExit = console.exit_code is defined %}
+{% set consolePhpSapi = console.php_sapi|default(null) %}
+{% set consoleArguments = console.arguments|default({}) %}
+{% set consoleOptions = console.options|default({}) %}
+{% set consoleMissing = console.missing_arguments|default([]) %}
+{% set hasConsole = consoleCommand or consoleCommandClass or hasConsoleExit or consolePhpSapi or consoleArguments or consoleOptions or consoleMissing or console.interactive is defined %}
+{% set messenger = payload.extra.messenger|default({}) %}
+{% set messengerClass = messenger.message_class|default(null) %}
+{% set messengerReceiver = messenger.receiver_name|default(null) %}
+{% set hasMessengerRetry = messenger.retry_count is defined %}
+{% set messengerBus = messenger.bus|default(null) %}
+{% set messengerTransport = messenger.transport|default(null) %}
+{% set messengerHandler = messenger.handler_class|default(null) %}
+{% set hasMessenger = messengerClass or messengerReceiver or hasMessengerRetry or messengerBus or messengerTransport or messengerHandler %}
+{% set scheduler = payload.extra.scheduler|default({}) %}
+{% set schedulerName = scheduler.schedule_name|default(null) %}
+{% set schedulerRecurring = scheduler.recurring_id|default(null) %}
+{% set schedulerTrigger = scheduler.trigger|default(null) %}
+{% set hasScheduler = schedulerName or schedulerRecurring or schedulerTrigger %}
+{% set monolog = payload.extra.monolog|default(null) %}
+{% set monologChannel = monolog is iterable ? monolog.channel|default(null) : (monolog ? 'app' : null) %}
+{% set monologLevel = monolog is iterable ? monolog.level|default(null) : null %}
+{% set hasMonolog = monologChannel or monologLevel or monolog is same as(true) %}
+{% set fatal = payload.extra.fatal|default(null) %}
+{% set hasFatal = fatal is iterable and fatal %}
+{% set traceId = payload.extra.trace_id|default(payload.tags.trace_id|default(null)) %}
 {% set levelLabel = payload.level|default(issue is defined ? issue.level : 'error') %}
 
 {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'highlights', title: 'issues.highlights'|trans} %}
@@ -44,6 +79,81 @@
                             {% if requestMethod %}<span class="issue-badge">{{ requestMethod }}</span> {% endif %}
                             {{ requestUrl }}
                         </td>
+                    </tr>
+                {% endif %}
+                {% if httpRoute %}
+                    <tr>
+                        <th>{{ 'issues.http_route'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-http-route">{{ httpRoute }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpController %}
+                    <tr>
+                        <th>{{ 'issues.http_controller'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-http-controller">{{ httpController }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpStatus %}
+                    <tr>
+                        <th>{{ 'issues.http_status'|trans }}</th>
+                        <td class="font-mono" data-testid="issue-http-status">{{ httpStatus }}</td>
+                    </tr>
+                {% endif %}
+                {% if consoleCommand %}
+                    <tr>
+                        <th>{{ 'issues.console_command'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-console-command">
+                            <span class="issue-badge">CLI</span>
+                            {{ consoleCommand }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if consoleMissing is iterable and consoleMissing is not empty %}
+                    <tr>
+                        <th>{{ 'issues.console_missing_arguments'|trans }}</th>
+                        <td class="font-mono" data-testid="issue-console-missing">{{ consoleMissing|join(', ') }}</td>
+                    </tr>
+                {% endif %}
+                {% if messengerClass %}
+                    <tr>
+                        <th>{{ 'issues.messenger_message'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-messenger-message">
+                            <span class="issue-badge">Messenger</span>
+                            {{ messengerClass }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if schedulerName or schedulerRecurring %}
+                    <tr>
+                        <th>{{ 'issues.scheduler'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-scheduler">
+                            <span class="issue-badge">Scheduler</span>
+                            {{ schedulerName|default('—') }}{% if schedulerRecurring %} / {{ schedulerRecurring }}{% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if monologChannel or hasMonolog %}
+                    <tr>
+                        <th>{{ 'issues.monolog'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-monolog">
+                            <span class="issue-badge">Monolog</span>
+                            {{ monologChannel|default('app') }}{% if monologLevel %} · {{ monologLevel }}{% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if hasFatal %}
+                    <tr>
+                        <th>{{ 'issues.fatal'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-fatal">
+                            <span class="issue-badge">Fatal</span>
+                            {{ fatal.file|default('?') }}:{{ fatal.line|default('?') }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if traceId %}
+                    <tr>
+                        <th>{{ 'issues.trace_id'|trans }}</th>
+                        <td class="font-mono break-all" data-testid="issue-trace-id">{{ traceId }}</td>
                     </tr>
                 {% endif %}
                 <tr>
@@ -214,6 +324,39 @@
                         <td class="font-mono break-all">{{ request.query_string }}</td>
                     </tr>
                 {% endif %}
+                {% if httpRoute %}
+                    <tr>
+                        <th>{{ 'issues.http_route'|trans }}</th>
+                        <td class="font-mono break-all">{{ httpRoute }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpController %}
+                    <tr>
+                        <th>{{ 'issues.http_controller'|trans }}</th>
+                        <td class="font-mono break-all">{{ httpController }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpStatus %}
+                    <tr>
+                        <th>{{ 'issues.http_status'|trans }}</th>
+                        <td class="font-mono">{{ httpStatus }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpQueryKeys is iterable and httpQueryKeys is not empty %}
+                    <tr>
+                        <th>{{ 'issues.http_query_keys'|trans }}</th>
+                        <td class="font-mono">{{ httpQueryKeys|join(', ') }}</td>
+                    </tr>
+                {% endif %}
+                {% if httpClient %}
+                    <tr>
+                        <th>{{ 'issues.http_client'|trans }}</th>
+                        <td class="font-mono break-all">
+                            {% if httpClient.ip is defined %}{{ httpClient.ip }}{% endif %}
+                            {% if httpClient.user_agent is defined %} · {{ httpClient.user_agent }}{% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
         {% if headers is iterable and headers is not empty %}
@@ -229,6 +372,115 @@
                 </tbody>
             </table>
         {% endif %}
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+
+{% if hasConsole %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'console', title: 'issues.console'|trans} %}
+    {% block body %}
+        <table class="issue-kv" data-testid="issue-console">
+            <tbody>
+                {% if consoleCommand %}
+                    <tr><th>{{ 'issues.console_command'|trans }}</th><td class="font-mono break-all">{{ consoleCommand }}</td></tr>
+                {% endif %}
+                {% if consoleCommandClass %}
+                    <tr><th>{{ 'issues.console_command_class'|trans }}</th><td class="font-mono break-all">{{ consoleCommandClass }}</td></tr>
+                {% endif %}
+                {% if hasConsoleExit %}
+                    <tr><th>{{ 'issues.console_exit_code'|trans }}</th><td class="font-mono" data-testid="issue-console-exit-code">{{ console.exit_code }}</td></tr>
+                {% endif %}
+                {% if consolePhpSapi %}
+                    <tr><th>{{ 'issues.console_php_sapi'|trans }}</th><td class="font-mono">{{ consolePhpSapi }}</td></tr>
+                {% endif %}
+                {% if console.interactive is defined %}
+                    <tr><th>{{ 'issues.console_interactive'|trans }}</th><td class="font-mono">{{ console.interactive ? 'yes' : 'no' }}</td></tr>
+                {% endif %}
+                {% if console.verbosity is defined %}
+                    <tr><th>{{ 'issues.console_verbosity'|trans }}</th><td class="font-mono">{{ console.verbosity }}</td></tr>
+                {% endif %}
+                {% if console.cwd is defined %}
+                    <tr><th>{{ 'issues.console_cwd'|trans }}</th><td class="font-mono break-all">{{ console.cwd }}</td></tr>
+                {% endif %}
+                {% if consoleMissing is iterable and consoleMissing is not empty %}
+                    <tr><th>{{ 'issues.console_missing_arguments'|trans }}</th><td class="font-mono" data-testid="issue-console-missing-panel">{{ consoleMissing|join(', ') }}</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% if consoleArguments is iterable and consoleArguments is not empty %}
+            <h3 class="issue-section__subtitle">{{ 'issues.console_arguments'|trans }}</h3>
+            <pre class="code-block" data-testid="issue-console-arguments">{{ consoleArguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+        {% if consoleOptions is iterable and consoleOptions is not empty %}
+            <h3 class="issue-section__subtitle">{{ 'issues.console_options'|trans }}</h3>
+            <pre class="code-block" data-testid="issue-console-options">{{ consoleOptions|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if hasMessenger %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'messenger', title: 'issues.messenger'|trans} %}
+    {% block body %}
+        <table class="issue-kv" data-testid="issue-messenger">
+            <tbody>
+                {% if messengerClass %}<tr><th>{{ 'issues.messenger_message'|trans }}</th><td class="font-mono break-all">{{ messengerClass }}</td></tr>{% endif %}
+                {% if messengerHandler %}<tr><th>{{ 'issues.messenger_handler'|trans }}</th><td class="font-mono break-all">{{ messengerHandler }}</td></tr>{% endif %}
+                {% if messengerReceiver %}<tr><th>{{ 'issues.messenger_receiver'|trans }}</th><td class="font-mono">{{ messengerReceiver }}</td></tr>{% endif %}
+                {% if messengerTransport %}<tr><th>{{ 'issues.messenger_transport'|trans }}</th><td class="font-mono">{{ messengerTransport }}</td></tr>{% endif %}
+                {% if hasMessengerRetry %}<tr><th>{{ 'issues.messenger_retry_count'|trans }}</th><td class="font-mono">{{ messenger.retry_count }}</td></tr>{% endif %}
+                {% if messengerBus %}<tr><th>{{ 'issues.messenger_bus'|trans }}</th><td class="font-mono">{{ messengerBus }}</td></tr>{% endif %}
+                {% if messenger.transport_message_id is defined %}<tr><th>{{ 'issues.messenger_transport_id'|trans }}</th><td class="font-mono break-all">{{ messenger.transport_message_id }}</td></tr>{% endif %}
+                {% if messenger.first_failure_at is defined %}<tr><th>{{ 'issues.messenger_first_failure'|trans }}</th><td class="font-mono">{{ messenger.first_failure_at }}</td></tr>{% endif %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if hasScheduler %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'scheduler', title: 'issues.scheduler'|trans} %}
+    {% block body %}
+        <table class="issue-kv" data-testid="issue-scheduler-panel">
+            <tbody>
+                {% if schedulerName %}<tr><th>{{ 'issues.scheduler_name'|trans }}</th><td class="font-mono">{{ schedulerName }}</td></tr>{% endif %}
+                {% if schedulerRecurring %}<tr><th>{{ 'issues.scheduler_recurring'|trans }}</th><td class="font-mono">{{ schedulerRecurring }}</td></tr>{% endif %}
+                {% if schedulerTrigger %}<tr><th>{{ 'issues.scheduler_trigger'|trans }}</th><td class="font-mono break-all">{{ schedulerTrigger }}</td></tr>{% endif %}
+                {% if scheduler.triggered_at is defined %}<tr><th>{{ 'issues.scheduler_triggered_at'|trans }}</th><td class="font-mono">{{ scheduler.triggered_at }}</td></tr>{% endif %}
+            </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if hasMonolog %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'monolog', title: 'issues.monolog'|trans} %}
+    {% block body %}
+        <table class="issue-kv" data-testid="issue-monolog-panel">
+            <tbody>
+                {% if monologChannel %}<tr><th>{{ 'issues.monolog_channel'|trans }}</th><td class="font-mono">{{ monologChannel }}</td></tr>{% endif %}
+                {% if monologLevel %}<tr><th>{{ 'issues.monolog_level'|trans }}</th><td class="font-mono">{{ monologLevel }}</td></tr>{% endif %}
+            </tbody>
+        </table>
+        {% if payload.extra.context is defined and payload.extra.context %}
+            <h3 class="issue-section__subtitle">{{ 'issues.monolog_context'|trans }}</h3>
+            <pre class="code-block">{{ payload.extra.context|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+        {% endif %}
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
+{% if hasFatal %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'fatal', title: 'issues.fatal'|trans} %}
+    {% block body %}
+        <table class="issue-kv" data-testid="issue-fatal-panel">
+            <tbody>
+                {% if fatal.file is defined %}<tr><th>{{ 'issues.fatal_file'|trans }}</th><td class="font-mono break-all">{{ fatal.file }}</td></tr>{% endif %}
+                {% if fatal.line is defined %}<tr><th>{{ 'issues.fatal_line'|trans }}</th><td class="font-mono">{{ fatal.line }}</td></tr>{% endif %}
+                {% if fatal.type is defined %}<tr><th>{{ 'issues.fatal_type'|trans }}</th><td class="font-mono">{{ fatal.type }}</td></tr>{% endif %}
+            </tbody>
+        </table>
     {% endblock %}
 {% endembed %}
 {% endif %}
@@ -258,6 +510,30 @@
             {% endif %}
             {% if payload.server_name is defined %}
                 <li><span class="issue-tags__key">server_name</span><span class="issue-tags__val">{{ payload.server_name }}</span></li>
+            {% endif %}
+            {% if traceId %}
+                <li><span class="issue-tags__key">trace_id</span><span class="issue-tags__val">{{ traceId }}</span></li>
+            {% endif %}
+            {% if httpRoute %}
+                <li><span class="issue-tags__key">http.route</span><span class="issue-tags__val">{{ httpRoute }}</span></li>
+            {% endif %}
+            {% if consoleCommand %}
+                <li><span class="issue-tags__key">console.command</span><span class="issue-tags__val">{{ consoleCommand }}</span></li>
+            {% endif %}
+            {% if messengerClass %}
+                <li><span class="issue-tags__key">messenger.message_class</span><span class="issue-tags__val">{{ messengerClass }}</span></li>
+            {% endif %}
+            {% if messengerHandler %}
+                <li><span class="issue-tags__key">messenger.handler</span><span class="issue-tags__val">{{ messengerHandler }}</span></li>
+            {% endif %}
+            {% if schedulerName %}
+                <li><span class="issue-tags__key">scheduler.schedule</span><span class="issue-tags__val">{{ schedulerName }}</span></li>
+            {% endif %}
+            {% if monologChannel %}
+                <li><span class="issue-tags__key">monolog.channel</span><span class="issue-tags__val">{{ monologChannel }}</span></li>
+            {% endif %}
+            {% if hasFatal %}
+                <li><span class="issue-tags__key">fatal</span><span class="issue-tags__val">true</span></li>
             {% endif %}
             {% if event.phpVersion or runtime %}
                 <li><span class="issue-tags__key">runtime</span><span class="issue-tags__val">php {{ event.phpVersion|default(runtime.version|default('')) }}</span></li>

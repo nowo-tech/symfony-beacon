@@ -412,8 +412,13 @@ project:
     revoke: Revogar
     revoke_confirm: Revogar esta chave de API? A ingestão com este segredo falhará imediatamente.
     rotate: Girar
+    rotate_hint: Gerar um novo segredo e mostrar o DSN uma vez para copiar
+    rotate_confirm: Rodar esta chave de API? O segredo atual deixa de funcionar de imediato. Um novo DSN será mostrado uma vez para copiar.
     copy_dsn: Copiar DSN
     dsn_copied: Copiado
+    show_dsn: Mostrar DSN
+    hide_dsn: Ocultar DSN
+    dsn_cleared: Oculto — rode para gerar um novo DSN
     dsn_help: Copie este DSN para os clientes (o caminho é o UUID do projeto). Rodar gera um novo segredo.
     inactive_dsn_hidden: Chaves revogadas não autenticam ingest. DSN e segredo não são mostrados.
     secret_hidden: DSN completo e segredo são mostrados apenas uma vez após criar ou rodar (não a viewers).
@@ -574,6 +579,45 @@ issues:
   request_url: URL
   request_query: Cadeia de consulta
   request_headers: Cabeçalhos
+  console: Console
+  console_command: Command
+  console_command_class: Command class
+  console_exit_code: Exit code
+  console_php_sapi: PHP SAPI
+  console_interactive: Interactive
+  console_verbosity: Verbosity
+  console_cwd: Working directory
+  console_arguments: Arguments
+  console_options: Options
+  console_missing_arguments: Missing arguments
+  messenger: Messenger
+  messenger_message: Message
+  messenger_receiver: Receiver
+  messenger_retry_count: Retries
+  messenger_bus: Bus
+  messenger_transport: Transport
+  messenger_transport_id: Transport message id
+  messenger_handler: Handler
+  messenger_first_failure: First failure
+  scheduler: Scheduler
+  scheduler_name: Schedule
+  scheduler_recurring: Recurring id
+  scheduler_trigger: Trigger
+  scheduler_triggered_at: Triggered at
+  monolog: Monolog
+  monolog_channel: Channel
+  monolog_level: Level
+  monolog_context: Context
+  http_route: Route
+  http_controller: Controller
+  http_status: Status
+  http_query_keys: Query keys
+  http_client: Client
+  trace_id: Trace ID
+  fatal: Fatal error
+  fatal_file: File
+  fatal_line: Line
+  fatal_type: Type
   extra: Dados adicionais
   stacktrace: Rastreamento de pilha
   source_context: Fonte

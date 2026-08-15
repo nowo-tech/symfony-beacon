@@ -2321,8 +2321,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
@@ -2367,6 +2367,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     ignore_paths?: list<scalar|Param|null>,
  *     register_console_listener?: bool|Param, // When true, report uncaught console command errors (ConsoleEvents::ERROR). // Default: true
  *     register_messenger_listener?: bool|Param, // When true and symfony/messenger is installed, report WorkerMessageFailedEvent failures that will not retry. // Default: true
+ *     register_fatal_handler?: bool|Param, // When true, register a shutdown function that reports fatal PHP errors (E_ERROR, E_PARSE, …). // Default: true
  *     include_scheduler_context?: bool|Param, // When true and a Messenger failure envelope carries Symfony Scheduler ScheduledStamp, attach extra.scheduler (name, recurring id, trigger, triggered_at). Never attaches the message body. // Default: true
  *     auto_http_transaction?: bool|Param, // When true, send a performance transaction for each main HTTP request (skips ignore_paths). // Default: false
  *     before_send?: scalar|Param|null, // Optional service id of an invokable that receives the event/transaction payload array and returns the mutated array, or null to drop the send. // Default: null
@@ -2388,6 +2389,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         runtime?: bool|Param, // Send PHP runtime version in contexts.runtime. // Default: true
  *         framework?: bool|Param, // Send Symfony version in contexts.framework when available. // Default: true
  *         os?: bool|Param, // Send OS family/version in contexts.os. // Default: true
+ *         client?: bool|Param, // Attach client IP and User-Agent on HTTP events (PII). Disabled by default. // Default: false
  *     },
  * }
  * @psalm-type NowoSiteBackupConfig = array{ // Nowo Site Backup Bundle configuration.

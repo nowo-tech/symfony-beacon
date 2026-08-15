@@ -414,8 +414,13 @@ project:
     revoke_confirm: Revocare questa chiave API? L'acquisizione con questo segreto avrà esito negativo
       immediato.
     rotate: Ruotare
+    rotate_hint: Genera un nuovo secret e mostra il DSN una sola volta per copiarlo
+    rotate_confirm: Ruotare questa chiave API? Il secret attuale smette subito di funzionare. Un nuovo DSN verrà mostrato una sola volta per la copia.
     copy_dsn: Copia DSN
     dsn_copied: Copiato
+    show_dsn: Mostra DSN
+    hide_dsn: Nascondi DSN
+    dsn_cleared: Nascosto — ruota per generare un nuovo DSN
     dsn_help: Copia questo DSN per i client (il path è l’UUID del progetto). Ruota per generare un nuovo
       secret.
     inactive_dsn_hidden: Le chiavi revocate non possono autenticare l’ingest. DSN e secret non sono mostrati.
@@ -578,6 +583,45 @@ issues:
   request_url: URL
   request_query: Stringa di query
   request_headers: Intestazioni
+  console: Console
+  console_command: Command
+  console_command_class: Command class
+  console_exit_code: Exit code
+  console_php_sapi: PHP SAPI
+  console_interactive: Interactive
+  console_verbosity: Verbosity
+  console_cwd: Working directory
+  console_arguments: Arguments
+  console_options: Options
+  console_missing_arguments: Missing arguments
+  messenger: Messenger
+  messenger_message: Message
+  messenger_receiver: Receiver
+  messenger_retry_count: Retries
+  messenger_bus: Bus
+  messenger_transport: Transport
+  messenger_transport_id: Transport message id
+  messenger_handler: Handler
+  messenger_first_failure: First failure
+  scheduler: Scheduler
+  scheduler_name: Schedule
+  scheduler_recurring: Recurring id
+  scheduler_trigger: Trigger
+  scheduler_triggered_at: Triggered at
+  monolog: Monolog
+  monolog_channel: Channel
+  monolog_level: Level
+  monolog_context: Context
+  http_route: Route
+  http_controller: Controller
+  http_status: Status
+  http_query_keys: Query keys
+  http_client: Client
+  trace_id: Trace ID
+  fatal: Fatal error
+  fatal_file: File
+  fatal_line: Line
+  fatal_type: Type
   extra: Dati aggiuntivi
   stacktrace: Traccia dello stack
   source_context: Fonte

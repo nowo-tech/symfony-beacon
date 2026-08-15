@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2ed67171965ad8f2fce55c3719d3495",
+    "content-hash": "f4b429e2fc6b8233f1a321873e8a2a19",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2123,16 +2123,16 @@
         },
         {
             "name": "nowo-tech/beacon-bundle",
-            "version": "v1.7.0",
+            "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BeaconBundle.git",
-                "reference": "044f53e0e68180d73c90d7323ca92d74970a7651"
+                "reference": "70d21adc067a7873fec47c1b0420b792b109fd13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/044f53e0e68180d73c90d7323ca92d74970a7651",
-                "reference": "044f53e0e68180d73c90d7323ca92d74970a7651",
+                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/70d21adc067a7873fec47c1b0420b792b109fd13",
+                "reference": "70d21adc067a7873fec47c1b0420b792b109fd13",
                 "shasum": ""
             },
             "require": {
@@ -2215,7 +2215,7 @@
                 "issues": "https://github.com/nowo-tech/BeaconBundle/issues",
                 "source": "https://github.com/nowo-tech/BeaconBundle"
             },
-            "time": "2026-08-12T08:17:49+00:00"
+            "time": "2026-08-15T22:55:28+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",

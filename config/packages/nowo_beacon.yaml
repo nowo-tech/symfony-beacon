@@ -13,11 +13,15 @@ nowo_beacon:
     register_error_listener: true
     register_console_listener: true
     register_messenger_listener: true
+    register_fatal_handler: true
     auto_http_transaction: false
     before_send: App\Shared\Beacon\DropSelfIngestBeforeSend
     instrumentation:
         doctrine: false
         http_client: true
+    monolog_handler:
+        enabled: true
+        level: error
     send:
         environment: true
         release: true
@@ -28,6 +32,7 @@ nowo_beacon:
         runtime: true
         framework: true
         os: true
+        client: false
 
 when@dev:
     nowo_beacon:
