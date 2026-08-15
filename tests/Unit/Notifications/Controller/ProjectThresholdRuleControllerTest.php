@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Notifications\Controller;
 
 use App\Notifications\Controller\ProjectThresholdRuleController;
 use App\Notifications\Entity\ProjectThresholdRule;
+use App\Notifications\Service\ThresholdRuleWriter;
 use App\Project\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -29,7 +30,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
 {
     public function testAssertRuleBelongsToProject(): void
     {
-        $controller = new ProjectThresholdRuleController($this->createStub(EntityManagerInterface::class));
+        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $method = new ReflectionMethod(ProjectThresholdRuleController::class, 'assertRuleBelongsToProject');
 
         $project = new Project()->setName('Acme')->setSlug('acme');
@@ -55,7 +56,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $form->method('isSubmitted')->willReturn(false);
         $form->method('createView')->willReturn(new FormView());
 
-        $controller = new ProjectThresholdRuleController($this->createStub(EntityManagerInterface::class));
+        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $seen = [];
         $this->boot($controller, $form, $seen);
 
@@ -81,7 +82,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
 
-        $controller = new ProjectThresholdRuleController($em);
+        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($em));
         $seen = [];
         $session = $this->boot($controller, $form, $seen, flash: true);
 
@@ -103,7 +104,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $form->method('isSubmitted')->willReturn(false);
         $form->method('isValid')->willReturn(false);
 
-        $controller = new ProjectThresholdRuleController($this->createStub(EntityManagerInterface::class));
+        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $seen = [];
         $this->boot($controller, $form, $seen);
 
