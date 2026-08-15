@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.0)](#unreleased-main-after-1180)
+- [Unreleased (main after 1.18.1)](#unreleased-main-after-1181)
+- [Upgrading from 1.18.0 to 1.18.1](#upgrading-from-1180-to-1181)
 - [Upgrading from 1.17.0 to 1.18.0](#upgrading-from-1170-to-1180)
 - [Upgrading from 1.16.0 to 1.17.0](#upgrading-from-1160-to-1170)
 - [Upgrading from 1.15.1 to 1.16.0](#upgrading-from-1151-to-1160)
@@ -72,9 +73,27 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.0)
+## Unreleased (main after 1.18.1)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.18.0 to 1.18.1
+
+**Messenger Redis DSN** — remove `/messages` from `MESSENGER_TRANSPORT_DSN` so yaml stream names apply (avoids multi-group conflict on shared Redis). See `[1.18.1]` in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git fetch --tags
+git checkout v1.18.1
+# In .env.local:
+#   MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}
+make restart   # recreates php + messenger workers with the new env
+```
+
+### Operator checklist
+
+1. Drop `/messages` from `MESSENGER_TRANSPORT_DSN` (match `.env.dist`).
+2. Recreate Messenger consumers so they load the new DSN.
+3. No migrations.
 
 ## Upgrading from 1.17.0 to 1.18.0
 

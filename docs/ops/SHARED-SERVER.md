@@ -75,7 +75,7 @@ Redis + Messenger:
 
 ```env
 REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}
-MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}/messages
+MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}
 ```
 
 Defaults from `.env.dist`:

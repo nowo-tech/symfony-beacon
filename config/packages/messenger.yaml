@@ -12,6 +12,8 @@ framework:
 
         transports:
             # Envelope / OTLP ingest drain — isolated from outbound side effects.
+            # Stream name MUST come from options (not DSN path): DSN `/messages`
+            # would override this and collide with other apps on shared Redis.
             async_ingest:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:

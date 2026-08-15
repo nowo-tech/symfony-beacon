@@ -28,7 +28,7 @@ CI already builds this target (`.github/workflows/ci.yml`).
 
 - `APP_SECRET`
 - `DATABASE_URL` (or Compose-equivalent MySQL vars)
-- `MESSENGER_TRANSPORT_DSN` if you run async workers (default Redis: `redis://redis-8.10.0:6379/messages` — drain Doctrine `messenger_messages` before switching)
+- `MESSENGER_TRANSPORT_DSN` if you run async workers (default Redis: `redis://redis-8.10.0:6379` — stream names come from `messenger.yaml`; do **not** append `/messages` on shared Redis. Drain Doctrine `messenger_messages` before switching)
 - `REDIS_URL` (sessions, `cache.app` / rate limits, Messenger streams)
 - `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (never leave empty; never reuse historically known local values)
 - `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit)
@@ -52,7 +52,7 @@ docker run --rm -p 8080:80 -p 8443:443 \
   -e APP_ENV=prod \
   -e APP_SECRET="$(openssl rand -hex 16)" \
   -e DATABASE_URL="mysql://app:CHANGE_ME@mysql-9.7-primary:3306/app?serverVersion=9.7&charset=utf8mb4" \
-  -e MESSENGER_TRANSPORT_DSN="redis://redis-8.10.0:6379/messages" \
+  -e MESSENGER_TRANSPORT_DSN="redis://redis-8.10.0:6379" \
   -e REDIS_URL="redis://redis-8.10.0:6379" \
   -e FRANKENPHP_MODE=worker \
   symfony-frankenphp:prod

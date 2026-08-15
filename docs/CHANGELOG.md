@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.1] - 2026-08-15
+
+### Fixed
+
+- **Messenger Redis on shared infra**: `MESSENGER_TRANSPORT_DSN` must not include `/messages` — Symfony Redis transport overwrites yaml `options.stream` with the DSN path, colliding with other apps (e.g. sms-bridge) that already have multiple groups on stream `messages`. Default DSN is now `redis://${REDIS_HOST}:${REDIS_PORT}`; streams stay `async_ingest` / `async` / `failed` in `messenger.yaml`.
+
+### Notes for integrators
+
+- Update `.env.local`: set `MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}` (drop `/messages`), then `make restart` (or recreate `messenger` / `messenger-notify`).
+- No Doctrine migrations.
+
 ## [1.18.0] - 2026-08-15
 
 ### Changed
@@ -1225,7 +1236,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.1...HEAD
+[1.18.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.15.1...v1.16.0
