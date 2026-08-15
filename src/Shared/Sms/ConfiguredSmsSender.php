@@ -31,10 +31,7 @@ final readonly class ConfiguredSmsSender implements SmsSenderInterface
     public function send(SmsOutboundMessage $message): SmsSendResult
     {
         if (!$this->delegate->isConfigured()) {
-            throw new SmsSendException(\sprintf(
-                'SMS provider "%s" is selected but not fully configured.',
-                $this->delegate->getProviderId(),
-            ));
+            throw new SmsSendException(\sprintf('SMS provider "%s" is selected but not fully configured.', $this->delegate->getProviderId()));
         }
 
         return $this->delegate->send($message);

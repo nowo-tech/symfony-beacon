@@ -6,8 +6,8 @@ namespace App\Shared\Sms\Provider;
 
 use App\Shared\Sms\Exception\SmsSendException;
 use App\Shared\Sms\SmsOutboundMessage;
-use App\Shared\Sms\SmsSendResult;
 use App\Shared\Sms\SmsSenderInterface;
+use App\Shared\Sms\SmsSendResult;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

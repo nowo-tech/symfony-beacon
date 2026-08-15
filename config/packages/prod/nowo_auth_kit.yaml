@@ -1,0 +1,13 @@
+# AUTH-005 / REQ-REV SEC-001 — QR login off in production until phone OTP.
+# Repeat locale.*: AuthKit beforeNormalization injects in_path: never on any
+# partial nowo_auth_kit config that omits locale (would drop *_unlocalized routes).
+nowo_auth_kit:
+    locale:
+        in_path: both
+        default: '%default_locale%'
+        enabled: '%fallback_locales%'
+        unlocalized: serve
+    profiles:
+        default:
+            qr_login:
+                mode: disabled
