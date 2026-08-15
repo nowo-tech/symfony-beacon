@@ -1,4 +1,4 @@
-.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
@@ -45,6 +45,7 @@ help:
 	@echo "  make mysql           mysql CLI shell (mysql-9.7-primary)"
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
+	@echo "  make beacon-test     Probe BEACON_DSN via nowo:beacon:test (ARGS='--check-only' optional)"
 	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
 	@echo "  make seed            Platform seed + demo user/project + .demo-client.env + server BEACON_DSN"
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
@@ -285,6 +286,11 @@ shell: ensure-up
 
 console: ensure-up
 	$(DC) exec php bin/console $(ARGS)
+
+# Dogfood: probe the configured BEACON_DSN against this Symfony Beacon instance (BeaconBundle client).
+# Examples: make beacon-test   |   make beacon-test ARGS='--check-only'   |   make beacon-test ARGS='--message=ci'
+beacon-test: ensure-up
+	$(DC) exec php bin/console nowo:beacon:test $(ARGS)
 
 # Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
 # Harden key files to 0600 (world-writable keys would decrypt all #[Encrypted] columns).

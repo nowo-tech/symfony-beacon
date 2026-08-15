@@ -40,6 +40,13 @@ http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_uuid}
 
 Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops events whose request path contains `/envelope/` to avoid ingest feedback loops. See `config/packages/nowo_beacon.yaml`.
 
+Verify the configured DSN (parse only, or live ingest ACK):
+
+```bash
+make beacon-test ARGS='--check-only'
+make beacon-test
+```
+
 ### Local demo sync (external BeaconBundle)
 
 `make seed` writes `.demo-client.env` with a Docker-ready client `BEACON_DSN` (`http://…@host.docker.internal:9084/{uuid}`).

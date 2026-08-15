@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.2] - 2026-08-16
+
+### Added
+
+- **`make beacon-test`**: runs `nowo:beacon:test` in the PHP container to probe the configured `BEACON_DSN` (supports `ARGS='--check-only'` / `--message=`). See [DSN.md](DSN.md).
+
+### Changed
+
+- Pin [`nowo-tech/beacon-bundle`](https://github.com/nowo-tech/BeaconBundle) **1.7.3** (connection probe command + PHP 8.2 DSN parser fix; includes 1.7.2 richer error context).
+- Issue detail: surface rich BeaconBundle extras (console / Messenger / Scheduler / Monolog / fatal / HTTP / trace) for analysis.
+
+### Notes for integrators
+
+- `composer update nowo-tech/beacon-bundle` (or install from this tag).
+- After `make ready` / `make dogfood`, verify dogfooding with `make beacon-test` (or `make beacon-test ARGS='--check-only'`).
+- No Doctrine migrations.
+
 ## [1.18.1] - 2026-08-15
 
 ### Fixed
@@ -1236,7 +1253,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.2...HEAD
+[1.18.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.1...v1.18.2
 [1.18.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.16.0...v1.17.0

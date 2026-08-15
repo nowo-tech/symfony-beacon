@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.1)](#unreleased-main-after-1181)
+- [Unreleased (main after 1.18.2)](#unreleased-main-after-1182)
+- [Upgrading from 1.18.1 to 1.18.2](#upgrading-from-1181-to-1182)
 - [Upgrading from 1.18.0 to 1.18.1](#upgrading-from-1180-to-1181)
 - [Upgrading from 1.17.0 to 1.18.0](#upgrading-from-1170-to-1180)
 - [Upgrading from 1.16.0 to 1.17.0](#upgrading-from-1160-to-1170)
@@ -73,9 +74,31 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.1)
+## Unreleased (main after 1.18.2)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.18.1 to 1.18.2
+
+Additive dogfood / UI tooling. **No migrations.**
+
+1. Update dependencies so `nowo-tech/beacon-bundle` is **1.7.3**:
+
+```bash
+composer update nowo-tech/beacon-bundle
+# or: composer install on a v1.18.2 tree
+```
+
+2. Clear cache if needed: `php bin/console cache:clear` (or `make restart`).
+
+3. Optional — verify the loopback / operator `BEACON_DSN`:
+
+```bash
+make beacon-test ARGS='--check-only'
+make beacon-test
+```
+
+Issue detail now highlights richer BeaconBundle extras (console, Messenger, Scheduler, Monolog, fatals, HTTP, trace). No config changes required for that UI.
 
 ## Upgrading from 1.18.0 to 1.18.1
 
