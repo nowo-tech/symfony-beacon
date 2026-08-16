@@ -10,6 +10,7 @@ use App\Issues\Controller\IssueDetailController;
 use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueLevel;
+use App\Issues\Enum\IssueShowTab;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueCommentRepository;
@@ -122,5 +123,6 @@ final class IssueDetailControllerShowTest extends TestCase
         self::assertSame('ok', $controller->show($project, $issue)->getContent());
         self::assertSame($issue, $seen['issue/show.html.twig']['issue']);
         self::assertSame($project, $seen['issue/show.html.twig']['project']);
+        self::assertSame(IssueShowTab::Main, $seen['issue/show.html.twig']['issueTab']);
     }
 }

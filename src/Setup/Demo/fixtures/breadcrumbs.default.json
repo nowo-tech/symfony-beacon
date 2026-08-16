@@ -295,7 +295,8 @@
       "parent": "issue_index",
       "dynamicParamKeys": [
         "projectId",
-        "id"
+        "id",
+        "tab"
       ],
       "translations": {
         "en": "Issue",

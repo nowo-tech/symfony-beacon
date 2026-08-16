@@ -14,7 +14,6 @@ use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -50,28 +49,34 @@ final class IssueHistoryFunctionalTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
+        $issuePath = '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid();
+        $historyPath = $issuePath.'/history';
+        $crawler = $client->request(Request::METHOD_GET, $issuePath);
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Activity');
         self::assertSelectorTextContains('body', 'Mark resolved');
 
-        $form = $crawler->filter('form.issue-assignee-form')->form();
-        $assigneeField = $form->get('issue_assignee[assignee]');
-        self::assertInstanceOf(ChoiceFormField::class, $assigneeField);
-        $assigneeField->disableValidation();
-        $assigneeField->setValue((string) $member->getId());
-        $client->submit($form);
+        $assignToken = $crawler->filter('form.issue-assignee-form input[name="issue_assignee[_token]"]')->attr('value');
+        self::assertNotNull($assignToken);
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/assign', [
+            'issue_assignee' => [
+                '_token' => $assignToken,
+                'assignee' => (string) $member->getId(),
+            ],
+        ]);
         self::assertResponseRedirects();
         $client->followRedirect();
+        $client->request(Request::METHOD_GET, $historyPath);
         self::assertSelectorTextContains('.issue-history', 'History Member');
 
-        $crawler = $client->getCrawler();
+        $crawler = $client->request(Request::METHOD_GET, $issuePath);
         $resolveForm = $crawler->filter('form.issue-status-actions__form')->reduce(
             static fn ($node): bool => str_contains((string) $node->html(), 'value="resolved"')
         )->form();
         $client->submit($resolveForm);
         self::assertResponseRedirects();
         $client->followRedirect();
+        $client->request(Request::METHOD_GET, $historyPath);
         self::assertSelectorTextContains('.issue-badge--status', 'Resolved');
         self::assertSelectorTextContains('.issue-history', 'Resolved');
 

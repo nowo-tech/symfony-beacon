@@ -9,14 +9,19 @@
 {% set headline = exception.type|default(issue.title) %}
 {% set subtitle = exception.value|default(payload.message|default(issue.culprit)) %}
 
-<a href="{{ path('issue_index', {id: project.uuid}) }}" class="text-sm no-underline">{{ 'issues.back'|trans }}</a>
-
-<header class="issue-hero mt-3">
-    <p class="issue-hero__status">
-        <span class="issue-badge issue-badge--status issue-badge--status-{{ issue.status.value }}">{{ ('issues.status.' ~ issue.status.value)|trans }}</span>
-        <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
-        <span class="issue-badge issue-badge--priority issue-badge--priority-{{ issue.priority.value }}">{{ ('issues.priority.' ~ issue.priority.value)|trans }}</span>
-    </p>
+<header class="issue-hero">
+    <div class="issue-hero__top">
+        {% include 'issue/_back_link.html.twig' with {
+            href: path('issue_index', {id: project.uuid}),
+            label: 'issues.back'|trans,
+            testid: 'issue-back',
+        } only %}
+        <p class="issue-hero__status">
+            <span class="issue-badge issue-badge--status issue-badge--status-{{ issue.status.value }}">{{ ('issues.status.' ~ issue.status.value)|trans }}</span>
+            <span class="issue-badge issue-badge--level">{{ issue.level }}</span>
+            <span class="issue-badge issue-badge--priority issue-badge--priority-{{ issue.priority.value }}">{{ ('issues.priority.' ~ issue.priority.value)|trans }}</span>
+        </p>
+    </div>
     <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
     {% if subtitle and subtitle != headline %}
         <p class="issue-hero__message">{{ subtitle }}</p>
@@ -32,358 +37,383 @@
     {% endif %}
 </header>
 
-<div class="issue-layout">
-    <div class="issue-layout__main">
-        {% if event %}
-            {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
-        {% else %}
-            <section class="panel mt-6">
-                <p class="text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</p>
-            </section>
-        {% endif %}
+{% set tab_items = [] %}
+{% for item in issueTabs %}
+    {% set tab_items = tab_items|merge([{
+        label: item.tabLabelKey()|trans,
+        href: path('issue_show', {projectId: project.uuid, id: issue.uuid, tab: item.value}),
+        current: item == issueTab,
+        attr: {'data-testid': 'issue-tab-' ~ item.value},
+    }]) %}
+{% endfor %}
+{% include 'shared/_tabs.html.twig' with {
+    aria_label: 'issues.tabs_label'|trans,
+    nav_class: 'my-6 beacon-tabs--sections',
+    attr: {'data-testid': 'issue-detail-tabs'},
+    items: tab_items,
+} only %}
 
-        <section class="panel mt-6 issue-comments" data-testid="issue-comments">
-            <h2 class="text-base font-medium mb-3">{{ 'issues.comments_title'|trans }}</h2>
-            {% if comments is empty %}
-                <p class="text-[var(--color-ink)]/55 text-sm mb-4">{{ 'issues.comments_empty'|trans }}</p>
-            {% else %}
-                <ol class="issue-comments__list list-none space-y-3 mb-4">
-                    {% for comment in comments %}
-                        <li class="issue-comments__item border-t border-[var(--color-ink)]/10 pt-3 first:border-0 first:pt-0">
-                            <div class="flex flex-wrap gap-2 text-xs text-[var(--color-ink)]/55 mb-1">
-                                <span class="font-medium text-[var(--color-ink)]">{{ comment.author.displayName ?: comment.author.email }}</span>
-                                <time datetime="{{ comment.createdAt|date('c') }}">{{ comment.createdAt|date('Y-m-d H:i') }}</time>
-                            </div>
-                            <p class="text-sm whitespace-pre-wrap">{{ comment.body }}</p>
-                        </li>
-                    {% endfor %}
-                </ol>
-            {% endif %}
-            {% if can_triage|default(false) %}
-            {{ form_start(commentForm, {attr: {class: 'issue-comments__form'}}) }}
-                {% for field in commentForm %}
-                    {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
-                        {{ form_row(field) }}
-                    {% endif %}
-                {% endfor %}
-                <button type="submit" class="btn-primary">{{ 'issues.comment_submit'|trans }}</button>
-                {% include 'form/_fields.html.twig' with {form: commentForm} only %}
-            {{ form_end(commentForm, {render_rest: false}) }}
-            {% else %}
-                <p class="text-sm text-[var(--color-ink)]/55">{{ 'issues.viewer_readonly'|trans }}</p>
-            {% endif %}
-        </section>
-    </div>
-
-    <aside class="issue-layout__aside">
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'details', title: 'issues.aside_details'|trans} %}
-            {% block body %}
-                <dl class="issue-aside-stats__grid">
-                    <div>
-                        <dt>{{ 'issues.col.events'|trans }}</dt>
-                        <dd class="font-mono text-lg">{{ occurrence.total|default(issue.eventCount) }}</dd>
-                    </div>
-                    <div class="issue-aside-windows">
-                        <div>
-                            <dt>{{ 'issues.col.events_24h'|trans }}</dt>
-                            <dd class="font-mono">{{ occurrence.last24h|default(0) }}</dd>
-                        </div>
-                        <div>
-                            <dt>{{ 'issues.col.events_7d'|trans }}</dt>
-                            <dd class="font-mono">{{ occurrence.last7d|default(0) }}</dd>
-                        </div>
-                        <div>
-                            <dt>{{ 'issues.col.events_30d'|trans }}</dt>
-                            <dd class="font-mono">{{ occurrence.last30d|default(0) }}</dd>
-                        </div>
-                    </div>
-                    <div>
-                        <dt>{{ 'issues.col.first_seen'|trans }}</dt>
-                        <dd>{{ issue.firstSeen|date('Y-m-d H:i:s') }}</dd>
-                    </div>
-                    <div>
-                        <dt>{{ 'issues.col.last_seen'|trans }}</dt>
-                        <dd>{{ issue.lastSeen|date('Y-m-d H:i:s') }}</dd>
-                    </div>
-                    <div>
-                        <dt>{{ 'issues.filter.environment'|trans }}</dt>
-                        <dd>{{ event ? event.environment|default('—') : '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt>{{ 'projects.title'|trans }}</dt>
-                        <dd><a href="{{ path('issue_index', {id: project.uuid}) }}">{{ project.name }}</a></dd>
-                    </div>
-                </dl>
-            {% endblock %}
-        {% endembed %}
-
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'ai_export', title: 'issues.aside_ai_export'|trans} %}
-            {% block body %}
-                <div class="issue-ai-export" data-testid="issue-ai-export">
-                    <p class="issue-assignee-form__help">{{ 'issues.export_for_ai_help'|trans }}</p>
-                    <div class="issue-status-actions__buttons flex flex-wrap gap-2">
-                        {% set ai_md_path = path('issue_export_ai_md', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
-                        {% set ai_json_path = path('issue_export_ai_json', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
-                        <button
-                            type="button"
-                            class="btn-primary"
-                            data-controller="clipboard-copy"
-                            data-clipboard-copy-url-value="{{ ai_md_path }}"
-                            data-clipboard-copy-label-value="{{ 'issues.export_for_ai'|trans|e('html_attr') }}"
-                            data-clipboard-copy-done-label-value="{{ 'issues.export_for_ai_copied'|trans|e('html_attr') }}"
-                            data-action="click->clipboard-copy#copyFromUrl"
-                        >{{ 'issues.export_for_ai'|trans }}</button>
-                        <a class="btn-ghost" href="{{ ai_md_path }}">{{ 'issues.export_for_ai_md'|trans }}</a>
-                        <a class="btn-ghost" href="{{ ai_json_path }}">{{ 'issues.export_for_ai_json'|trans }}</a>
-                    </div>
-                </div>
-            {% endblock %}
-        {% endembed %}
-
-        {% if can_triage|default(false) %}
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
-            {% block body %}
-                <div class="issue-triage">
-                    <div class="issue-status-actions">
-                        <p class="issue-assignee-form__help">{{ 'issues.status_help'|trans }}</p>
-                        <div class="issue-status-actions__buttons">
-                            {% if statusForms['resolved'] is defined %}
-                                {{ form_start(statusForms['resolved'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {% include 'form/_fields.html.twig' with {form: statusForms['resolved']} only %}
-                                    <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
-                                {{ form_end(statusForms['resolved'], {render_rest: false}) }}
-                            {% endif %}
-                            {% if statusForms['unresolved'] is defined %}
-                                {{ form_start(statusForms['unresolved'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {% include 'form/_fields.html.twig' with {form: statusForms['unresolved']} only %}
-                                    <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
-                                {{ form_end(statusForms['unresolved'], {render_rest: false}) }}
-                            {% endif %}
-                            {% if statusForms['ignored'] is defined %}
-                                {{ form_start(statusForms['ignored'], {attr: {class: 'issue-status-actions__form'}}) }}
-                                    {% include 'form/_fields.html.twig' with {form: statusForms['ignored']} only %}
-                                    <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
-                                {{ form_end(statusForms['ignored'], {render_rest: false}) }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="issue-priority-actions">
-                        <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
-                        {{ form_start(priorityForm, {attr: {class: 'issue-priority-form'}}) }}
-                            {% for field in priorityForm %}
-                                {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
-                                    {{ form_row(field, {
-                                        label: false,
-                                        attr: field.vars.attr|merge({'aria-label': 'issues.priority_label'|trans}),
-                                    }) }}
+<div class="issue-detail-tabs grid gap-3">
+{% if issueTab.value == 'main' %}
+        <div class="issue-layout">
+            <div class="issue-layout__main">
+                {% if event %}
+                                    {% include 'issue/_event_payload.html.twig' with {event: event, issue: issue} only %}
+                                {% else %}
+                                    <section class="panel">
+                                        <p class="text-[var(--color-ink)]/60">{{ 'issues.no_events'|trans }}</p>
+                                    </section>
                                 {% endif %}
-                            {% endfor %}
-                            <button type="submit" class="btn-primary">{{ 'issues.priority_save'|trans }}</button>
-                            {% include 'form/_fields.html.twig' with {form: priorityForm} only %}
-                        {{ form_end(priorityForm, {render_rest: false}) }}
-                    </div>
-                </div>
-            {% endblock %}
-        {% endembed %}
 
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'assignee', title: 'issues.assignee'|trans} %}
-            {% block body %}
-                <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
-                {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
-                    {% for field in assigneeForm %}
-                        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
-                            {{ form_row(field, {label: false}) }}
-                        {% endif %}
-                    {% endfor %}
-                    {% include 'form/_fields.html.twig' with {form: assigneeForm} only %}
-                    <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
-                {{ form_end(assigneeForm, {render_rest: false}) }}
-            {% endblock %}
-        {% endembed %}
-
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'similar', title: 'issues.similar_title'|trans} %}
-            {% block body %}
-                <div class="issue-similar" data-testid="similar-issues">
-                    {% if similarIssues|default([]) is empty %}
-                        <p class="text-xs text-[var(--color-ink)]/55">{{ 'issues.similar_empty'|trans }}</p>
-                    {% else %}
-                        <ul class="space-y-2 text-sm">
-                            {% for similar in similarIssues %}
-                                <li class="flex flex-wrap items-start justify-between gap-2">
-                                    <a class="link min-w-0 grow" href="{{ path('issue_show', {projectId: project.uuid, id: similar.uuid}) }}">
-                                        <span class="font-medium">{{ similar.title }}</span>
-                                        <span class="block text-xs text-[var(--color-ink)]/55">{{ ('issues.status.' ~ similar.status.value)|trans }} · {{ similar.lastSeen|date('Y-m-d') }}</span>
-                                    </a>
-                                    {% if can_triage|default(false) and quickDuplicateForms[similar.id] is defined %}
-                                        {{ form_start(quickDuplicateForms[similar.id], {attr: {class: 'shrink-0'}}) }}
-                                            {% include 'form/_fields.html.twig' with {form: quickDuplicateForms[similar.id]} only %}
-                                            <button type="submit" class="btn-ghost btn-sm" title="{{ 'issues.similar_mark_duplicate'|trans }}">{{ 'issues.similar_mark_duplicate'|trans }}</button>
-                                        {{ form_end(quickDuplicateForms[similar.id], {render_rest: false}) }}
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endblock %}
-        {% endembed %}
-
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'duplicate', title: 'issues.aside_duplicate'|trans} %}
-            {% block body %}
-                <div class="issue-duplicate-actions" data-testid="mark-duplicate" data-controller="confirm-dialog">
-                    <p class="issue-assignee-form__help">{{ 'issues.duplicate_aside_help'|trans }}</p>
-                    <button
-                        type="button"
-                        class="btn-ghost w-full"
-                        data-action="confirm-dialog#open"
-                        {% if duplicateCandidates is empty %}disabled{% endif %}
-                    >
-                        {{ 'issues.duplicate_open'|trans }}
-                    </button>
-                    {% if duplicateCandidates is empty %}
-                        <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'issues.duplicate_no_candidates'|trans }}</p>
-                    {% endif %}
-
-                    {% embed 'shared/_confirm_dialog.html.twig' with {
-                        only_dialog: true,
-                        wrapper: false,
-                        dialog_modifier: 'confirm-dialog--wide',
-                        aria_labelledby: 'issue-duplicate-dialog-title',
-                        custom_form: true,
-                    } %}
-                        {% block form %}
-                            {{ form_start(duplicateDialogForm, {
-                                attr: {
-                                    class: 'confirm-dialog__panel',
-                                    'data-controller': 'combobox',
-                                    'data-action': 'submit->combobox#requireValue'
-                                }
-                            }) }}
-                                <div class="confirm-dialog__header">
-                                    <h2 id="issue-duplicate-dialog-title" class="confirm-dialog__title">{{ 'issues.duplicate_modal_title'|trans }}</h2>
-                                    <p class="confirm-dialog__body">{{ 'issues.duplicate_help'|trans }}</p>
-                                </div>
-
-                                <div class="confirm-dialog__content">
-                                    {{ form_row(duplicateDialogForm.canonical_uuid) }}
-
-                                    {{ form_label(duplicateDialogForm.query) }}
-                                    <div class="combobox combobox--stacked">
-                                        {{ form_widget(duplicateDialogForm.query, {
-                                            attr: {
-                                                placeholder: 'issues.duplicate_search_placeholder',
-                                                'data-required-message': 'issues.duplicate_choose'|trans,
-                                            }
-                                        }) }}
-                                        <ul
-                                            id="issue-duplicate-options"
-                                            class="combobox__list"
-                                            role="listbox"
-                                            data-combobox-target="list"
-                                            hidden
-                                        >
-                                            {% for candidate in duplicateCandidates|default([]) %}
-                                                <li role="presentation">
-                                                    <button
-                                                        type="button"
-                                                        class="combobox__option"
-                                                        role="option"
-                                                        data-combobox-target="option"
-                                                        data-action="combobox#select"
-                                                        data-value="{{ candidate.uuid }}"
-                                                        data-label="{{ candidate.title|e('html_attr') }}"
-                                                        data-search="{{ (candidate.title ~ ' ' ~ candidate.uuid)|e('html_attr') }}"
-                                                    >
-                                                        <span class="combobox__option-title">{{ candidate.title }}</span>
-                                                        <span class="combobox__option-meta">{{ candidate.uuid|slice(0, 8) }}…</span>
-                                                    </button>
+                                <section class="panel mt-6 issue-comments" data-testid="issue-comments">
+                                    <h2 class="text-base font-medium mb-3">{{ 'issues.comments_title'|trans }}</h2>
+                                    {% if comments is empty %}
+                                        <p class="text-[var(--color-ink)]/55 text-sm mb-4">{{ 'issues.comments_empty'|trans }}</p>
+                                    {% else %}
+                                        <ol class="issue-comments__list list-none space-y-3 mb-4">
+                                            {% for comment in comments %}
+                                                <li class="issue-comments__item border-t border-[var(--color-ink)]/10 pt-3 first:border-0 first:pt-0">
+                                                    <div class="flex flex-wrap gap-2 text-xs text-[var(--color-ink)]/55 mb-1">
+                                                        <span class="font-medium text-[var(--color-ink)]">{{ comment.author.displayName ?: comment.author.email }}</span>
+                                                        <time datetime="{{ comment.createdAt|date('c') }}">{{ comment.createdAt|date('Y-m-d H:i') }}</time>
+                                                    </div>
+                                                    <p class="text-sm whitespace-pre-wrap">{{ comment.body }}</p>
                                                 </li>
                                             {% endfor %}
-                                            <li
-                                                class="combobox__empty"
-                                                data-combobox-target="empty"
-                                                hidden
-                                            >{{ 'issues.duplicate_search_empty'|trans }}</li>
-                                        </ul>
-                                    </div>
-                                    {{ form_errors(duplicateDialogForm.query) }}
-
-                                    {{ form_row(duplicateDialogForm.merge_events) }}
-                                    {% include 'form/_fields.html.twig' with {form: duplicateDialogForm} only %}
-                                </div>
-
-                                <div class="confirm-dialog__actions">
-                                    <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'issues.duplicate_cancel'|trans }}</button>
-                                    <button type="submit" class="btn-primary">{{ 'issues.duplicate_submit'|trans }}</button>
-                                </div>
-                            {{ form_end(duplicateDialogForm) }}
-                        {% endblock %}
-                    {% endembed %}
-                </div>
-            {% endblock %}
-        {% endembed %}
-
-        {% else %}
-        <div class="panel mt-4 text-sm text-[var(--color-ink)]/55" data-testid="viewer-readonly">{{ 'issues.viewer_readonly'|trans }}</div>
-        {% endif %}
-
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'activity', title: 'issues.history_title'|trans} %}
-            {% block body %}
-                <div class="issue-history">
-                    {% if issueHistory is empty %}
-                        <p class="issue-history__empty">{{ 'issues.history_empty'|trans }}</p>
-                    {% else %}
-                        <ol class="issue-history__list">
-                            {% for entry in issueHistory %}
-                                <li class="issue-history__item">
-                                    <time class="issue-history__when" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
-                                    <div class="issue-history__body">
-                                        {% if entry.kind.value == 'assignee_changed' %}
-                                            <span class="issue-history__kind">{{ 'issues.history_assignee'|trans }}</span>
-                                            <span>
-                                                {{ entry.fromAssignee ? entry.fromAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
-                                                →
-                                                {{ entry.toAssignee ? entry.toAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
-                                            </span>
-                                        {% else %}
-                                            <span class="issue-history__kind">{{ 'issues.history_status'|trans }}</span>
-                                            <span>
-                                                {{ entry.fromStatus ? ('issues.status.' ~ entry.fromStatus.value)|trans : '—' }}
-                                                →
-                                                {{ entry.toStatus ? ('issues.status.' ~ entry.toStatus.value)|trans : '—' }}
-                                            </span>
-                                        {% endif %}
-                                        <span class="issue-history__actor">
-                                            {% if entry.actor %}
-                                                {{ 'issues.history_by'|trans({'%name%': entry.actor.displayName}) }}
-                                            {% else %}
-                                                {{ 'issues.history_by_system'|trans }}
+                                        </ol>
+                                    {% endif %}
+                                    {% if can_triage|default(false) %}
+                                    {{ form_start(commentForm, {attr: {class: 'issue-comments__form'}}) }}
+                                        {% for field in commentForm %}
+                                            {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                                {{ form_row(field) }}
                                             {% endif %}
-                                        </span>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ol>
-                    {% endif %}
-                </div>
-            {% endblock %}
-        {% endembed %}
+                                        {% endfor %}
+                                        <button type="submit" class="btn-primary">{{ 'issues.comment_submit'|trans }}</button>
+                                        {% include 'form/_fields.html.twig' with {form: commentForm} only %}
+                                    {{ form_end(commentForm, {render_rest: false}) }}
+                                    {% else %}
+                                        <p class="text-sm text-[var(--color-ink)]/55">{{ 'issues.viewer_readonly'|trans }}</p>
+                                    {% endif %}
+                                </section>
+            </div>
 
-        {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'recent_events', title: 'issues.recent_events'|trans} %}
-            {% block body %}
-                <ul class="issue-event-list">
-                    {% for e in events %}
-                        <li>
-                            <a href="{{ path('event_show', {projectId: project.uuid, eventId: e.eventId}) }}" class="font-mono text-xs">{{ e.eventId|slice(0, 12) }}…</a>
-                            <span class="text-[var(--color-ink)]/50 text-xs">{{ e.receivedAt|date('H:i:s') }}</span>
-                        </li>
-                    {% else %}
-                        <li class="text-[var(--color-ink)]/60 text-sm">{{ 'issues.no_events'|trans }}</li>
-                    {% endfor %}
-                </ul>
-            {% endblock %}
-        {% endembed %}
-    </aside>
+            <aside class="issue-layout__aside">
+
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'details', title: 'issues.aside_details'|trans} %}
+                    {% block body %}
+                        <dl class="issue-aside-stats__grid">
+                            <div>
+                                <dt>{{ 'issues.col.events'|trans }}</dt>
+                                <dd class="font-mono text-lg">{{ occurrence.total|default(issue.eventCount) }}</dd>
+                            </div>
+                            <div class="issue-aside-windows">
+                                <div>
+                                    <dt>{{ 'issues.col.events_24h'|trans }}</dt>
+                                    <dd class="font-mono">{{ occurrence.last24h|default(0) }}</dd>
+                                </div>
+                                <div>
+                                    <dt>{{ 'issues.col.events_7d'|trans }}</dt>
+                                    <dd class="font-mono">{{ occurrence.last7d|default(0) }}</dd>
+                                </div>
+                                <div>
+                                    <dt>{{ 'issues.col.events_30d'|trans }}</dt>
+                                    <dd class="font-mono">{{ occurrence.last30d|default(0) }}</dd>
+                                </div>
+                            </div>
+                            <div>
+                                <dt>{{ 'issues.col.first_seen'|trans }}</dt>
+                                <dd>{{ issue.firstSeen|date('Y-m-d H:i:s') }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ 'issues.col.last_seen'|trans }}</dt>
+                                <dd>{{ issue.lastSeen|date('Y-m-d H:i:s') }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ 'issues.filter.environment'|trans }}</dt>
+                                <dd>{{ event ? event.environment|default('—') : '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt>{{ 'projects.title'|trans }}</dt>
+                                <dd><a href="{{ path('issue_index', {id: project.uuid}) }}">{{ project.name }}</a></dd>
+                            </div>
+                        </dl>
+                    {% endblock %}
+                {% endembed %}
+
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'ai_export', title: 'issues.aside_ai_export'|trans} %}
+                    {% block body %}
+                        <div class="issue-ai-export" data-testid="issue-ai-export">
+                            <p class="issue-assignee-form__help">{{ 'issues.export_for_ai_help'|trans }}</p>
+                            <div class="issue-status-actions__buttons flex flex-wrap gap-2">
+                                {% set ai_md_path = path('issue_export_ai_md', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
+                                {% set ai_json_path = path('issue_export_ai_json', {projectId: project.uuid, id: issue.uuid}) ~ (event ? '?event=' ~ event.eventId : '') %}
+                                <button
+                                    type="button"
+                                    class="btn-primary"
+                                    data-controller="clipboard-copy"
+                                    data-clipboard-copy-url-value="{{ ai_md_path }}"
+                                    data-clipboard-copy-label-value="{{ 'issues.export_for_ai'|trans|e('html_attr') }}"
+                                    data-clipboard-copy-done-label-value="{{ 'issues.export_for_ai_copied'|trans|e('html_attr') }}"
+                                    data-action="click->clipboard-copy#copyFromUrl"
+                                >{{ 'issues.export_for_ai'|trans }}</button>
+                                <a class="btn-ghost" href="{{ ai_md_path }}">{{ 'issues.export_for_ai_md'|trans }}</a>
+                                <a class="btn-ghost" href="{{ ai_json_path }}">{{ 'issues.export_for_ai_json'|trans }}</a>
+                            </div>
+                        </div>
+                    {% endblock %}
+                {% endembed %}
+
+                {% if can_triage|default(false) %}
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'triage', title: 'issues.aside_triage'|trans} %}
+                    {% block body %}
+                        <div class="issue-triage">
+                            <div class="issue-status-actions">
+                                <p class="issue-assignee-form__help">{{ 'issues.status_help'|trans }}</p>
+                                <div class="issue-status-actions__buttons">
+                                    {% if statusForms['resolved'] is defined %}
+                                        {{ form_start(statusForms['resolved'], {attr: {class: 'issue-status-actions__form'}}) }}
+                                            {% include 'form/_fields.html.twig' with {form: statusForms['resolved']} only %}
+                                            <button type="submit" class="btn-primary">{{ 'issues.status_mark_resolved'|trans }}</button>
+                                        {{ form_end(statusForms['resolved'], {render_rest: false}) }}
+                                    {% endif %}
+                                    {% if statusForms['unresolved'] is defined %}
+                                        {{ form_start(statusForms['unresolved'], {attr: {class: 'issue-status-actions__form'}}) }}
+                                            {% include 'form/_fields.html.twig' with {form: statusForms['unresolved']} only %}
+                                            <button type="submit" class="btn-ghost">{{ 'issues.status_mark_unresolved'|trans }}</button>
+                                        {{ form_end(statusForms['unresolved'], {render_rest: false}) }}
+                                    {% endif %}
+                                    {% if statusForms['ignored'] is defined %}
+                                        {{ form_start(statusForms['ignored'], {attr: {class: 'issue-status-actions__form'}}) }}
+                                            {% include 'form/_fields.html.twig' with {form: statusForms['ignored']} only %}
+                                            <button type="submit" class="btn-ghost">{{ 'issues.status_mark_ignored'|trans }}</button>
+                                        {{ form_end(statusForms['ignored'], {render_rest: false}) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="issue-priority-actions">
+                                <p class="issue-assignee-form__help">{{ 'issues.priority_help'|trans }}</p>
+                                {{ form_start(priorityForm, {attr: {class: 'issue-assignee-form issue-priority-form'}}) }}
+                                    {% for field in priorityForm %}
+                                        {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                            {{ form_row(field, {
+                                                label: false,
+                                                attr: field.vars.attr|merge({'aria-label': 'issues.priority_label'|trans}),
+                                            }) }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% include 'form/_fields.html.twig' with {form: priorityForm} only %}
+                                    <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.priority_save'|trans }}</button>
+                                {{ form_end(priorityForm, {render_rest: false}) }}
+                            </div>
+                        </div>
+                    {% endblock %}
+                {% endembed %}
+
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'assignee', title: 'issues.assignee'|trans} %}
+                    {% block body %}
+                        <p class="issue-assignee-form__help">{{ 'issues.assignee_help'|trans }}</p>
+                        {{ form_start(assigneeForm, {attr: {class: 'issue-assignee-form'}}) }}
+                            {% for field in assigneeForm %}
+                                {% if not field.rendered and 'hidden' not in field.vars.block_prefixes %}
+                                    {{ form_row(field, {label: false}) }}
+                                {% endif %}
+                            {% endfor %}
+                            {% include 'form/_fields.html.twig' with {form: assigneeForm} only %}
+                            <button class="btn-primary issue-assignee-form__submit" type="submit">{{ 'issues.assignee_save'|trans }}</button>
+                        {{ form_end(assigneeForm, {render_rest: false}) }}
+                    {% endblock %}
+                {% endembed %}
+
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'duplicate', title: 'issues.aside_duplicate'|trans} %}
+                    {% block body %}
+                        <div class="issue-duplicate-actions" data-testid="mark-duplicate" data-controller="confirm-dialog">
+                            <p class="issue-assignee-form__help">{{ 'issues.duplicate_aside_help'|trans }}</p>
+                            <button
+                                type="button"
+                                class="btn-ghost w-full"
+                                data-action="confirm-dialog#open"
+                                {% if duplicateCandidates is empty %}disabled{% endif %}
+                            >
+                                {{ 'issues.duplicate_open'|trans }}
+                            </button>
+                            {% if duplicateCandidates is empty %}
+                                <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'issues.duplicate_no_candidates'|trans }}</p>
+                            {% endif %}
+
+                            {% embed 'shared/_confirm_dialog.html.twig' with {
+                                only_dialog: true,
+                                wrapper: false,
+                                dialog_modifier: 'confirm-dialog--wide',
+                                aria_labelledby: 'issue-duplicate-dialog-title',
+                                custom_form: true,
+                            } %}
+                                {% block form %}
+                                    {{ form_start(duplicateDialogForm, {
+                                        attr: {
+                                            class: 'confirm-dialog__panel',
+                                            'data-controller': 'combobox',
+                                            'data-action': 'submit->combobox#requireValue'
+                                        }
+                                    }) }}
+                                        <div class="confirm-dialog__header">
+                                            <h2 id="issue-duplicate-dialog-title" class="confirm-dialog__title">{{ 'issues.duplicate_modal_title'|trans }}</h2>
+                                            <p class="confirm-dialog__body">{{ 'issues.duplicate_help'|trans }}</p>
+                                        </div>
+
+                                        <div class="confirm-dialog__content">
+                                            {{ form_row(duplicateDialogForm.canonical_uuid) }}
+
+                                            {{ form_label(duplicateDialogForm.query) }}
+                                            <div class="combobox combobox--stacked">
+                                                {{ form_widget(duplicateDialogForm.query, {
+                                                    attr: {
+                                                        placeholder: 'issues.duplicate_search_placeholder',
+                                                        'data-required-message': 'issues.duplicate_choose'|trans,
+                                                    }
+                                                }) }}
+                                                <ul
+                                                    id="issue-duplicate-options"
+                                                    class="combobox__list"
+                                                    role="listbox"
+                                                    data-combobox-target="list"
+                                                    hidden
+                                                >
+                                                    {% for candidate in duplicateCandidates|default([]) %}
+                                                        <li role="presentation">
+                                                            <button
+                                                                type="button"
+                                                                class="combobox__option"
+                                                                role="option"
+                                                                data-combobox-target="option"
+                                                                data-action="combobox#select"
+                                                                data-value="{{ candidate.uuid }}"
+                                                                data-label="{{ candidate.title|e('html_attr') }}"
+                                                                data-search="{{ (candidate.title ~ ' ' ~ candidate.uuid)|e('html_attr') }}"
+                                                            >
+                                                                <span class="combobox__option-title">{{ candidate.title }}</span>
+                                                                <span class="combobox__option-meta">{{ candidate.uuid|slice(0, 8) }}…</span>
+                                                            </button>
+                                                        </li>
+                                                    {% endfor %}
+                                                    <li
+                                                        class="combobox__empty"
+                                                        data-combobox-target="empty"
+                                                        hidden
+                                                    >{{ 'issues.duplicate_search_empty'|trans }}</li>
+                                                </ul>
+                                            </div>
+                                            {{ form_errors(duplicateDialogForm.query) }}
+
+                                            {{ form_row(duplicateDialogForm.merge_events) }}
+                                            {% include 'form/_fields.html.twig' with {form: duplicateDialogForm} only %}
+                                        </div>
+
+                                        <div class="confirm-dialog__actions">
+                                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'issues.duplicate_cancel'|trans }}</button>
+                                            <button type="submit" class="btn-primary">{{ 'issues.duplicate_submit'|trans }}</button>
+                                        </div>
+                                    {{ form_end(duplicateDialogForm) }}
+                                {% endblock %}
+                            {% endembed %}
+                        </div>
+                    {% endblock %}
+                {% endembed %}
+
+                {% else %}
+                <div class="panel mt-4 text-sm text-[var(--color-ink)]/55" data-testid="viewer-readonly">{{ 'issues.viewer_readonly'|trans }}</div>
+                {% endif %}
+
+                {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'recent_events', title: 'issues.recent_events'|trans} %}
+                    {% block body %}
+                        <ul class="issue-event-list">
+                            {% for e in events %}
+                                <li>
+                                    <a href="{{ path('event_show', {projectId: project.uuid, eventId: e.eventId}) }}" class="font-mono text-xs">{{ e.eventId|slice(0, 12) }}…</a>
+                                    <span class="text-[var(--color-ink)]/50 text-xs">{{ e.receivedAt|date('H:i:s') }}</span>
+                                </li>
+                            {% else %}
+                                <li class="text-[var(--color-ink)]/60 text-sm">{{ 'issues.no_events'|trans }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endblock %}
+                {% endembed %}
+            </aside>
+        </div>
+{% elseif issueTab.value == 'similar' %}
+        <section class="panel">
+            <div class="issue-similar" data-testid="similar-issues">
+                {% if similarIssues|default([]) is empty %}
+                    <p class="issue-similar__empty">{{ 'issues.similar_empty'|trans }}</p>
+                {% else %}
+                    <p class="issue-similar__help">{{ 'issues.similar_help'|trans }}</p>
+                    <ul class="issue-similar__list">
+                        {% for similar in similarIssues %}
+                            <li class="issue-similar__item">
+                                <div class="issue-similar__body">
+                                    <a class="issue-similar__title link" href="{{ path('issue_show', {projectId: project.uuid, id: similar.uuid}) }}">{{ similar.title }}</a>
+                                    <p class="issue-similar__meta">
+                                        <span class="issue-badge issue-badge--status issue-badge--status-{{ similar.status.value }}">{{ ('issues.status.' ~ similar.status.value)|trans }}</span>
+                                        <span class="issue-badge issue-badge--level">{{ similar.level }}</span>
+                                        <span>{{ similar.lastSeen|date('Y-m-d') }}</span>
+                                        <span class="font-mono">{{ 'issues.col.events'|trans }} {{ similar.eventCount }}</span>
+                                    </p>
+                                </div>
+                                {% if can_triage|default(false) and quickDuplicateForms[similar.id] is defined %}
+                                    {% set quickDuplicateForm = quickDuplicateForms[similar.id] %}
+                                    {{ form_start(quickDuplicateForm, {attr: {class: 'issue-similar__quick'}}) }}
+                                        {{ form_widget(quickDuplicateForm.canonical_uuid) }}
+                                        {{ form_widget(quickDuplicateForm._token) }}
+                                        <button type="submit" class="btn-ghost btn-sm" title="{{ 'issues.similar_mark_duplicate_help'|trans }}">{{ 'issues.similar_mark_duplicate'|trans }}</button>
+                                    {{ form_end(quickDuplicateForm, {render_rest: false}) }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+{% elseif issueTab.value == 'history' %}
+        <section class="panel">
+                    <div class="issue-history">
+                        {% if issueHistory is empty %}
+                            <p class="issue-history__empty">{{ 'issues.history_empty'|trans }}</p>
+                        {% else %}
+                            <ol class="issue-history__list">
+                                {% for entry in issueHistory %}
+                                    <li class="issue-history__item">
+                                        <time class="issue-history__when" datetime="{{ entry.createdAt|date('c') }}">{{ entry.createdAt|date('Y-m-d H:i') }}</time>
+                                        <div class="issue-history__body">
+                                            {% if entry.kind.value == 'assignee_changed' %}
+                                                <span class="issue-history__kind">{{ 'issues.history_assignee'|trans }}</span>
+                                                <span>
+                                                    {{ entry.fromAssignee ? entry.fromAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
+                                                    →
+                                                    {{ entry.toAssignee ? entry.toAssignee.displayName : ('issues.assignee_unassigned'|trans) }}
+                                                </span>
+                                            {% else %}
+                                                <span class="issue-history__kind">{{ 'issues.history_status'|trans }}</span>
+                                                <span>
+                                                    {{ entry.fromStatus ? ('issues.status.' ~ entry.fromStatus.value)|trans : '—' }}
+                                                    →
+                                                    {{ entry.toStatus ? ('issues.status.' ~ entry.toStatus.value)|trans : '—' }}
+                                                </span>
+                                            {% endif %}
+                                            <span class="issue-history__actor">
+                                                {% if entry.actor %}
+                                                    {{ 'issues.history_by'|trans({'%name%': entry.actor.displayName}) }}
+                                                {% else %}
+                                                    {{ 'issues.history_by_system'|trans }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        {% endif %}
+                    </div>
+                </section>
+{% endif %}
 </div>
 {% endblock %}

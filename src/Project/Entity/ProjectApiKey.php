@@ -13,9 +13,10 @@ use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
  * Project ingest credential (public/secret key pair) used in Envelope DSN auth.
  *
  * The public key is an opaque, non-secret identifier (shown in Settings / DSN).
- * The secret is shown once after create/rotate; at rest only a SHA-256 hash is kept
- * ({@see $secretHash}). Legacy rows may still hold an encrypted {@see $secretKey}
- * until the next successful ingest or rotate upgrades them.
+ * The secret is shown once after create/rotate (session flash + temporary reveal);
+ * at rest only a SHA-256 hash is kept ({@see $secretHash}). Legacy rows may still
+ * hold an encrypted {@see $secretKey} until the next successful ingest or rotate
+ * upgrades them — Settings never re-derives a DSN from that column.
  */
 #[ORM\Entity(repositoryClass: ProjectApiKeyRepository::class)]
 #[ORM\Table(name: 'project_api_key')]
@@ -251,5 +252,17 @@ class ProjectApiKey
         }
 
         return \sprintf('%s://%s@%s/%s', $scheme, $userinfo, $authority, $projectUuid);
+    }
+
+    /**
+     * Mask the secret segment of an Envelope DSN for Settings display.
+     *
+     * Example: {@code https://pk:secret@host/uuid} → {@code https://pk:••••••••@host/uuid}.
+     */
+    public static function maskDsn(string $dsn): string
+    {
+        $masked = preg_replace('#(://[^:/@]+:)[^@]+(@)#', '$1••••••••$2', $dsn);
+
+        return \is_string($masked) ? $masked : $dsn;
     }
 }

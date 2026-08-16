@@ -13,6 +13,7 @@ use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
+use App\Project\Entity\ProjectApiKey;
 use App\Project\Enum\ProjectRole;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Form\ProjectApiKeyCreateType;
@@ -88,6 +89,16 @@ final readonly class ProjectSettingsPageBuilder
         $readTokens = $this->readTokenRepository->findByProject($project);
         $apiKeyRotateForms = [];
         $apiKeyRevokeForms = [];
+        $lastApiKeyDsn = $access->canManageApiKeys()
+            ? $request->getSession()->remove('_beacon_last_api_key_dsn')
+            : null;
+        if (!\is_string($lastApiKeyDsn) || '' === $lastApiKeyDsn) {
+            $lastApiKeyDsn = null;
+        }
+        /** @var array<int, string> $apiKeyDsns */
+        $apiKeyDsns = [];
+        /** @var array<int, string> $apiKeyMaskedDsns */
+        $apiKeyMaskedDsns = [];
         foreach ($project->getApiKeys() as $key) {
             $keyId = $key->getId();
             if (null === $keyId) {
@@ -96,6 +107,17 @@ final readonly class ProjectSettingsPageBuilder
 
             $apiKeyRotateForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_rotate_'.$keyId, 'POST')->createView();
             $apiKeyRevokeForms[$keyId] = $this->csrfOnlyFormFactory->create('', 'project_key_revoke_'.$keyId, 'POST')->createView();
+            if ($access->canManageApiKeys() && $key->isActive()) {
+                // One-shot only: full DSN comes from the create/rotate session flash.
+                if (null !== $lastApiKeyDsn && $this->dsnPublicKey($lastApiKeyDsn) === $key->getPublicKey()) {
+                    $apiKeyDsns[$keyId] = $lastApiKeyDsn;
+                    $apiKeyMaskedDsns[$keyId] = ProjectApiKey::maskDsn($lastApiKeyDsn);
+                }
+            }
+        }
+        // Prefer per-key copy controls; keep the flash banner only when it did not match a listed key.
+        if (null !== $lastApiKeyDsn && \in_array($lastApiKeyDsn, $apiKeyDsns, true)) {
+            $lastApiKeyDsn = null;
         }
 
         $projectRoleChoices = ProjectMembershipUiHelper::roleChoices($this->membershipManager->assignableRoles($user, $project));
@@ -306,7 +328,9 @@ final readonly class ProjectSettingsPageBuilder
                 : null,
             'readTokenRevokeForms' => $readTokenRevokeForms,
             'lastReadToken' => $request->getSession()->remove('_beacon_last_read_token'),
-            'lastApiKeyDsn' => $request->getSession()->remove('_beacon_last_api_key_dsn'),
+            'lastApiKeyDsn' => $lastApiKeyDsn,
+            'apiKeyDsns' => $apiKeyDsns,
+            'apiKeyMaskedDsns' => $apiKeyMaskedDsns,
             'notificationResumeForms' => $notificationResumeForms,
             'notificationToggleForms' => $notificationToggleForms,
             'notificationTestForms' => $notificationTestForms,
@@ -411,5 +435,17 @@ final readonly class ProjectSettingsPageBuilder
         }
 
         return $this->membershipRepository->countOwnersByProjectIds([$projectId])[$projectId] ?? 0;
+    }
+
+    /**
+     * Extract the public-key userinfo segment from an Envelope DSN.
+     */
+    private function dsnPublicKey(string $dsn): ?string
+    {
+        if (1 !== preg_match('#://([^:/@]+)(?::[^@]*)?@#', $dsn, $matches)) {
+            return null;
+        }
+
+        return $matches[1];
     }
 }

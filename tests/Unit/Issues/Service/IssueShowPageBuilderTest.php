@@ -9,6 +9,7 @@ use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueShowTab;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueCommentRepository;
@@ -65,6 +66,8 @@ final class IssueShowPageBuilderTest extends TestCase
 
         self::assertSame($project, $page['project']);
         self::assertSame($issue, $page['issue']);
+        self::assertSame(IssueShowTab::Main, $page['issueTab']);
+        self::assertSame(IssueShowTab::cases(), $page['issueTabs']);
         self::assertSame([$event], $page['events']);
         self::assertSame($event, $page['latestEvent']);
         self::assertSame(3, $page['occurrence']->total);

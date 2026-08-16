@@ -181,6 +181,10 @@ test.describe('Partials closing — access, filters, social, tour', () => {
     const open = panel.locator('button[data-action="confirm-dialog#open"]').first();
     if (!(await open.isVisible().catch(() => false)) || (await open.isDisabled().catch(() => false))) {
       // No candidates — similar quick-mark may still exist.
+      const similarTab = page.locator('[data-tabs-target="trigger"][data-tab-id="issue-similar"]').first();
+      if ((await similarTab.count()) > 0) {
+        await similarTab.click();
+      }
       const similar = page.locator('[data-testid="similar-issues"] button[type="submit"]').first();
       if (await similar.isVisible().catch(() => false)) {
         await similar.click();

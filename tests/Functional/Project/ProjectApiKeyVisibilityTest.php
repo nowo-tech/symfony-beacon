@@ -76,7 +76,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
     }
 
-    public function testOwnerSeesOneShotDsnBannerAfterRotate(): void
+    public function testOwnerSeesOneShotCopyableDsnAfterRotate(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('api-key-rotate@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -100,7 +100,7 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         self::assertResponseRedirects();
         $client->followRedirect();
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('[data-testid="api-key-dsn-flash"]');
+        self::assertSelectorExists('[data-testid="api-key-dsn-once"]');
         $html = (string) $client->getResponse()->getContent();
         self::assertStringNotContainsString($oldSecret, $html);
 
@@ -109,14 +109,20 @@ final class ProjectApiKeyVisibilityTest extends DatabaseWebTestCase
         $rotated = $em->getRepository(ProjectApiKey::class)->findOneBy(['project' => $project, 'active' => true]);
         self::assertInstanceOf(ProjectApiKey::class, $rotated);
         self::assertNotNull($rotated->getSecretHash());
-        self::assertSame(1, preg_match('#://[^/]+:([a-f0-9]{32})@#', $html, $matches));
+        self::assertSame(1, preg_match(
+            '#data-(?:temporary-reveal-secret|clipboard-copy-text)-value="[^"]*://[^/]+:([a-f0-9]{32})@#',
+            html_entity_decode($html, \ENT_QUOTES | \ENT_HTML5),
+            $matches,
+        ));
         $newSecret = $matches[1];
         self::assertNotSame($oldSecret, $newSecret);
         self::assertTrue($rotated->matchesSecret($newSecret));
-        self::assertStringContainsString($newSecret, $html);
+        self::assertStringContainsString('data-controller="clipboard-copy"', $html);
+        self::assertStringContainsString('data-controller="temporary-reveal"', $html);
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/access');
         self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('[data-testid="api-key-dsn-once"]');
         self::assertSelectorNotExists('[data-testid="api-key-dsn-flash"]');
         self::assertStringNotContainsString($newSecret, (string) $client->getResponse()->getContent());
     }

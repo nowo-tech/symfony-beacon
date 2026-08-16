@@ -10,6 +10,7 @@ use App\Identity\UserActionType;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssuePriority;
+use App\Issues\Enum\IssueShowTab;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Form\IssueAssigneeType;
 use App\Issues\Form\IssueCommentType;
@@ -53,13 +54,29 @@ final class IssueDetailController extends AbstractController
     ) {
     }
 
-    #[Route('/projects/{projectId}/issues/{id}', name: 'issue_show', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET'])]
+    #[Route(
+        '/projects/{projectId}/issues/{id}/{tab}',
+        name: 'issue_show',
+        requirements: [
+            'projectId' => Requirement::UUID,
+            'id' => Requirement::UUID,
+            'tab' => 'main|similar|history',
+        ],
+        defaults: ['tab' => 'main'],
+        methods: ['GET'],
+    )]
     public function show(
         #[MapEntity(mapping: ['projectId' => 'uuid'])]
         Project $project,
         #[MapEntity(mapping: ['id' => 'uuid'])]
         Issue $issue,
+        string $tab = 'main',
     ): Response {
+        $tabEnum = IssueShowTab::tryFrom($tab);
+        if (null === $tabEnum) {
+            throw $this->createNotFoundException();
+        }
+
         /** @var User $user */
         $user = $this->getUser();
         if ($issue->getProject()?->getId() !== $project->getId()) {
@@ -74,7 +91,10 @@ final class IssueDetailController extends AbstractController
             'issue_title' => $issue->getTitle(),
         ]);
 
-        return $this->render('issue/show.html.twig', $this->issueShowPageBuilder->build($project, $issue, $user, $access));
+        return $this->render(
+            'issue/show.html.twig',
+            $this->issueShowPageBuilder->build($project, $issue, $user, $access, $tabEnum),
+        );
     }
 
     #[Route('/projects/{projectId}/issues/{id}/assign', name: 'issue_assign', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['POST'])]

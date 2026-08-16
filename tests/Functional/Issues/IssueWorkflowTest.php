@@ -59,6 +59,9 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
         self::assertSelectorExists('form.issue-priority-form');
         self::assertSelectorExists('[data-testid="issue-comments"]');
         self::assertSelectorExists('[data-testid="mark-duplicate"]');
+        $similarPath = '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid().'/similar';
+        $client->request(Request::METHOD_GET, $similarPath);
+        self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="similar-issues"] form');
 
         $statusForm = $crawler->filter('form.issue-status-actions__form')->first()->form([
@@ -165,10 +168,7 @@ final class IssueWorkflowTest extends DatabaseWebTestCase
         self::assertNull($reloaded->getDuplicateOf());
         self::assertSame(IssueStatus::Unresolved, $reloaded->getStatus());
 
-        $crawler = $client->request(
-            Request::METHOD_GET,
-            '/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid(),
-        );
+        $crawler = $client->request(Request::METHOD_GET, $similarPath);
         $quickDuplicateForm = $crawler->filter('[data-testid="similar-issues"] form')->first()->form();
         $client->submit($quickDuplicateForm);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$duplicate->getUuid());

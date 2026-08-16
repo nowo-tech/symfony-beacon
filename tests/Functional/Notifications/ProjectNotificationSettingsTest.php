@@ -95,6 +95,131 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         self::assertStringNotContainsString('very-secret-token-abcdef', $client->getResponse()->getContent() ?: '');
     }
 
+    public function testOwnerSeesValidationErrorsForInvalidEndpointAndQuietHours(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('owner-invalid-notif@example.com');
+        $this->login($client, $owner);
+
+        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/notifications/new');
+        self::assertResponseIsSuccessful();
+        $token = $crawler->filter('input[name="notification_destination[_token]"]')->attr('value');
+        self::assertNotEmpty($token);
+
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/notifications/new', [
+            'notification_destination' => [
+                '_token' => $token,
+                'label' => 'Broken email destination',
+                'type' => 'email',
+                'endpointUrl' => 'not-an-email',
+                'enabled' => '1',
+                'categories' => ['error'],
+                'quietHoursEnabled' => '1',
+                'quietHoursTimezone' => 'Mars/Nope',
+                'quietHoursStart' => '25:61',
+                'quietHoursEnd' => '25:61',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+        $content = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('Endpoint does not match the selected type.', $content);
+        self::assertStringContainsString('Invalid timezone identifier.', $content);
+        self::assertStringContainsString('Use 24-hour HH:MM format', $content);
+        self::assertCount(
+            0,
+            self::getContainer()->get(EntityManagerInterface::class)
+                ->getRepository(NotificationDestination::class)
+                ->findBy(['project' => $project]),
+        );
+    }
+
+    public function testOwnerCanClearSigningSecretOnEditAndRangeValidationBlocksEqualTimes(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('owner-edit-notif@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $destination = new NotificationDestination();
+        $destination->setProject($project);
+        $destination->setLabel('Slack ops');
+        $destination->setType(NotificationDestinationType::Slack);
+        $destination->setEndpointUrl('https://hooks.slack.com/services/T00/B00/YYY');
+        $destination->setSigningSecret('keep-me');
+        $destination->setEnabled(true);
+        $destination->setCategories(['error']);
+        $project->addNotificationDestination($destination);
+        $em->persist($destination);
+        $em->flush();
+
+        $this->login($client, $owner);
+
+        $invalidCrawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/notifications/'.$destination->getUuid().'/edit',
+        );
+        self::assertResponseIsSuccessful();
+        $invalidToken = $invalidCrawler->filter('input[name="notification_destination[_token]"]')->attr('value');
+        self::assertNotEmpty($invalidToken);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/projects/'.$project->getUuid().'/notifications/'.$destination->getUuid().'/edit',
+            [
+                'notification_destination' => [
+                    '_token' => $invalidToken,
+                    'label' => 'Slack ops',
+                    'type' => 'slack',
+                    'endpointUrl' => 'https://hooks.slack.com/services/T00/B00/YYY',
+                    'enabled' => '1',
+                    'categories' => ['error'],
+                    'quietHoursEnabled' => '1',
+                    'quietHoursTimezone' => 'UTC',
+                    'quietHoursStart' => '09:00',
+                    'quietHoursEnd' => '09:00',
+                ],
+            ],
+        );
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertStringContainsString(
+            'Start and end times must differ.',
+            (string) $client->getResponse()->getContent(),
+        );
+
+        $validCrawler = $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/notifications/'.$destination->getUuid().'/edit',
+        );
+        self::assertResponseIsSuccessful();
+        $validToken = $validCrawler->filter('input[name="notification_destination[_token]"]')->attr('value');
+        self::assertNotEmpty($validToken);
+
+        $client->request(
+            Request::METHOD_POST,
+            '/projects/'.$project->getUuid().'/notifications/'.$destination->getUuid().'/edit',
+            [
+                'notification_destination' => [
+                    '_token' => $validToken,
+                    'label' => 'Slack ops updated',
+                    'type' => 'slack',
+                    'endpointUrl' => 'https://hooks.slack.com/services/T00/B00/YYY',
+                    'clearSigningSecret' => '1',
+                    'enabled' => '1',
+                    'categories' => ['error', 'warning'],
+                    'quietHoursTimezone' => 'UTC',
+                ],
+            ],
+        );
+
+        self::assertResponseRedirects();
+        $em->clear();
+        /** @var NotificationDestination $reloaded */
+        $reloaded = $em->getRepository(NotificationDestination::class)->findOneBy(['uuid' => $destination->getUuid()]);
+        self::assertInstanceOf(NotificationDestination::class, $reloaded);
+        self::assertSame('Slack ops updated', $reloaded->getLabel());
+        self::assertNull($reloaded->getSigningSecret());
+        self::assertSame(['error', 'warning'], $reloaded->getCategories());
+    }
+
     public function testOwnerCanCreateThresholdRuleAndMemberCannot(): void
     {
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-threshold@example.com');

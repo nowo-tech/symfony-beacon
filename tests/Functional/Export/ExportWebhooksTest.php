@@ -18,7 +18,6 @@ use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -205,12 +204,14 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
             Request::METHOD_GET,
             '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
         );
-        $form = $crawler->filter('form.issue-assignee-form')->form();
-        $assigneeField = $form->get('issue_assignee[assignee]');
-        self::assertInstanceOf(ChoiceFormField::class, $assigneeField);
-        $assigneeField->disableValidation();
-        $assigneeField->setValue((string) $member->getId());
-        $client->submit($form);
+        $assignToken = $crawler->filter('form.issue-assignee-form input[name="issue_assignee[_token]"]')->attr('value');
+        self::assertNotNull($assignToken);
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/assign', [
+            'issue_assignee' => [
+                '_token' => $assignToken,
+                'assignee' => (string) $member->getId(),
+            ],
+        ]);
         self::assertResponseRedirects();
         self::assertStringContainsString('issue.assigned', (string) $requests[\count($requests) - 1]['body']);
 

@@ -3,11 +3,51 @@
         <p class="mb-3 text-sm text-[var(--color-ink)]/60">{{ 'project.api_keys.help'|trans({}, 'form') }}</p>
         <ul class="space-y-3">
             {% for key in project.apiKeys %}
+                {% set keyDsn = membership.canManageApiKeys and key.active ? apiKeyDsns[key.id]|default(null) : null %}
+                {% set keyDsnMasked = keyDsn ? apiKeyMaskedDsns[key.id]|default(null) : null %}
                 <li class="rounded-md border border-[var(--color-sand)] bg-[var(--color-paper)] p-3 text-sm"{% if not key.active %} data-testid="api-key-inactive"{% endif %}>
                     <div class="font-medium">{{ key.label }} {% if not key.active %}<span class="badge badge-error">{{ 'project.api_keys.inactive'|trans }}</span>{% endif %}</div>
                     {% if membership.canManageApiKeys %}
                         <div class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.public'|trans }} {{ key.publicKey }}</div>
-                        {% if key.active %}
+                        {% if keyDsn and keyDsnMasked %}
+                            <div
+                                class="mt-2 flex flex-wrap items-start gap-2"
+                                data-controller="temporary-reveal"
+                                data-temporary-reveal-secret-value="{{ keyDsn|e('html_attr') }}"
+                                data-temporary-reveal-duration-value="30000"
+                                data-temporary-reveal-start-revealed-value="true"
+                                data-temporary-reveal-clear-on-hide-value="true"
+                                data-temporary-reveal-cleared-label-value="{{ 'project.api_keys.dsn_cleared'|trans|e('html_attr') }}"
+                                data-temporary-reveal-show-label-value="{{ 'project.api_keys.show_dsn'|trans|e('html_attr') }}"
+                                data-temporary-reveal-hide-label-value="{{ 'project.api_keys.hide_dsn'|trans|e('html_attr') }}"
+                                data-testid="api-key-dsn-once"
+                            >
+                                <code
+                                    class="block min-w-0 flex-1 break-all rounded-md border border-[var(--color-sand)] bg-[var(--color-mist)]/40 px-2 py-1.5 text-xs font-mono"
+                                    data-temporary-reveal-target="display"
+                                    data-testid="api-key-dsn"
+                                >{{ keyDsnMasked }}</code>
+                                <button
+                                    type="button"
+                                    class="btn-ghost btn-sm shrink-0"
+                                    data-temporary-reveal-target="toggle"
+                                    data-action="click->temporary-reveal#toggle"
+                                    aria-pressed="true"
+                                    aria-label="{{ 'project.api_keys.hide_dsn'|trans }}"
+                                >{{ 'project.api_keys.hide_dsn'|trans }}</button>
+                                <button
+                                    type="button"
+                                    class="btn-ghost btn-sm shrink-0"
+                                    data-controller="clipboard-copy"
+                                    data-clipboard-copy-text-value="{{ keyDsn|e('html_attr') }}"
+                                    data-clipboard-copy-label-value="{{ 'project.api_keys.copy_dsn'|trans|e('html_attr') }}"
+                                    data-clipboard-copy-done-label-value="{{ 'project.api_keys.dsn_copied'|trans|e('html_attr') }}"
+                                    data-action="click->clipboard-copy#copy"
+                                    aria-label="{{ 'project.api_keys.copy_dsn'|trans }}"
+                                >{{ 'project.api_keys.copy_dsn'|trans }}</button>
+                            </div>
+                            <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.secret_once_banner'|trans }}</p>
+                        {% elseif key.active %}
                             <p class="mt-2 text-xs text-[var(--color-ink)]/55" data-testid="api-key-dsn-redacted">{{ 'project.api_keys.secret_once_hint'|trans }}</p>
                         {% else %}
                             <p class="mt-2 text-xs text-[var(--color-ink)]/55">{{ 'project.api_keys.inactive_dsn_hidden'|trans }}</p>
@@ -19,8 +59,13 @@
                         <div class="mt-3 flex flex-wrap gap-2">
                             {{ form_start(apiKeyRotateForms[key.id], {
                                 action: path('project_keys_rotate', {projectId: project.uuid, keyId: key.id}),
+                                attr: {
+                                    'data-controller': 'confirm-submit',
+                                    'data-confirm-submit-message-value': 'project.api_keys.rotate_confirm'|trans,
+                                    'data-action': 'submit->confirm-submit#confirm',
+                                },
                             }) }}
-                                <button class="btn-ghost btn-sm" type="submit">{{ 'project.api_keys.rotate'|trans }}</button>
+                                <button class="btn-ghost btn-sm" type="submit" title="{{ 'project.api_keys.rotate_hint'|trans }}">{{ 'project.api_keys.rotate'|trans }}</button>
                             {{ form_end(apiKeyRotateForms[key.id]) }}
                             {{ form_start(apiKeyRevokeForms[key.id], {
                                 action: path('project_keys_revoke', {projectId: project.uuid, keyId: key.id}),
@@ -38,9 +83,32 @@
             {% endfor %}
         </ul>
         {% if membership.canManageApiKeys and lastApiKeyDsn|default(null) %}
-            <div class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3" data-testid="api-key-dsn-flash">
+            <div
+                class="mt-4 rounded-md border border-[var(--color-moss)]/30 bg-[var(--color-moss)]/10 p-3"
+                data-controller="temporary-reveal"
+                data-temporary-reveal-secret-value="{{ lastApiKeyDsn|e('html_attr') }}"
+                data-temporary-reveal-duration-value="30000"
+                data-temporary-reveal-start-revealed-value="true"
+                data-temporary-reveal-clear-on-hide-value="true"
+                data-temporary-reveal-cleared-label-value="{{ 'project.api_keys.dsn_cleared'|trans|e('html_attr') }}"
+                data-temporary-reveal-show-label-value="{{ 'project.api_keys.show_dsn'|trans|e('html_attr') }}"
+                data-temporary-reveal-hide-label-value="{{ 'project.api_keys.hide_dsn'|trans|e('html_attr') }}"
+                data-testid="api-key-dsn-flash"
+            >
                 <div class="flex flex-wrap items-start gap-2">
-                    <code class="block min-w-0 flex-1 break-all text-sm font-mono">{{ lastApiKeyDsn }}</code>
+                    <code
+                        class="block min-w-0 flex-1 break-all text-sm font-mono"
+                        data-temporary-reveal-target="display"
+                        data-testid="api-key-dsn"
+                    >{{ lastApiKeyDsn }}</code>
+                    <button
+                        type="button"
+                        class="btn-ghost btn-sm shrink-0"
+                        data-temporary-reveal-target="toggle"
+                        data-action="click->temporary-reveal#toggle"
+                        aria-pressed="true"
+                        aria-label="{{ 'project.api_keys.hide_dsn'|trans }}"
+                    >{{ 'project.api_keys.hide_dsn'|trans }}</button>
                     <button
                         type="button"
                         class="btn-ghost btn-sm shrink-0"

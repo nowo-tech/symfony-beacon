@@ -553,8 +553,8 @@ issues:
   title: Incidentes
   search_placeholder: Título da pesquisa…
   empty: Nenhum problema corresponde a esses filtros.
-  back: ← Problemas
-  back_to_issue: ← Problema
+  back: Voltar aos problemas
+  back_to_issue: Voltar ao problema
   event_count: '%count% eventos'
   latest_stack: Última pilha/carga útil
   latest_event: Último evento
@@ -780,6 +780,10 @@ issues:
 
       '
     mention_subject: Foi mencionado em [%project%] %issue%
+  tabs_label: Secções do problema
+  tab_main: Visão geral
+  similar_help: Outras issues deste projeto que parecem relacionadas. Abra uma para comparar, ou marque esta como duplicada.
+  similar_mark_duplicate_help: Marcar esta issue como duplicada dessa issue canónica
   similar_empty: Não há issues semelhantes neste projeto.
   similar_mark_duplicate: Marcar como duplicado
   similar_title: Issues semelhantes
@@ -1217,7 +1221,6 @@ preferences:
     triage: Triagem
     assignee: Cessionário
     duplicate: Duplicado
-    activity: Atividade
     recent_events: Eventos recentes
   error:
     current_password: A senha atual está incorreta.

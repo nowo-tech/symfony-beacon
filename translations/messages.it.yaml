@@ -557,8 +557,8 @@ issues:
   title: Problemi
   search_placeholder: Cerca titolo...
   empty: Nessun problema corrisponde a questi filtri.
-  back: ← Problemi
-  back_to_issue: ← Problema
+  back: Torna ai problemi
+  back_to_issue: Torna al problema
   event_count: '%count% eventi'
   latest_stack: Ultimo stack/carico utile
   latest_event: Ultimo evento
@@ -786,6 +786,10 @@ issues:
 
       '
     mention_subject: Sei stato menzionato in [%project%] %issue%
+  tabs_label: Sezioni del problema
+  tab_main: Panoramica
+  similar_help: Altre issue del progetto che sembrano correlate. Aprine una per confrontare, o segna questa come duplicato.
+  similar_mark_duplicate_help: Segna questa issue come duplicato di quella canonica
   similar_empty: Nessuna issue simile in questo progetto.
   similar_mark_duplicate: Segna come duplicato
   similar_title: Issue simili
@@ -1229,7 +1233,6 @@ preferences:
     triage: Triage
     assignee: Assegnatario
     duplicate: Duplicato
-    activity: Attività
     recent_events: Eventi recenti
   error:
     current_password: La password attuale non è corretta.

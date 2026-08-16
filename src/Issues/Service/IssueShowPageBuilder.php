@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Issues\Dto\IssueOccurrenceStats;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Enum\IssueShowTab;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Form\IssueAssigneeType;
 use App\Issues\Form\IssueCommentType;
@@ -42,6 +43,8 @@ final readonly class IssueShowPageBuilder
      * @return array{
      *     project: Project,
      *     issue: Issue,
+     *     issueTab: IssueShowTab,
+     *     issueTabs: list<IssueShowTab>,
      *     events: list<Event>,
      *     latestEvent: ?Event,
      *     occurrence: IssueOccurrenceStats,
@@ -58,7 +61,13 @@ final readonly class IssueShowPageBuilder
      *     can_triage: bool
      * }
      */
-    public function build(Project $project, Issue $issue, User $user, ProjectAccess $access): array
+    public function build(
+        Project $project,
+        Issue $issue,
+        User $user,
+        ProjectAccess $access,
+        IssueShowTab $tab = IssueShowTab::Main,
+    ): array
     {
         $events = $this->eventRepository->findLatestForIssue($issue);
         $latestEvent = $events[0] ?? null;
@@ -97,6 +106,8 @@ final readonly class IssueShowPageBuilder
         return [
             'project' => $project,
             'issue' => $issue,
+            'issueTab' => $tab,
+            'issueTabs' => IssueShowTab::cases(),
             'events' => $events,
             'latestEvent' => $latestEvent,
             'occurrence' => $occurrence,

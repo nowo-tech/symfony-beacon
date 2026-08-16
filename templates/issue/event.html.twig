@@ -8,13 +8,18 @@
 {% set headline = exception.type|default(payload.message|default(issue.title)) %}
 {% set subtitle = exception.value|default(null) %}
 
-<a href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}" class="text-sm no-underline">{{ 'issues.back_to_issue'|trans }}</a>
-
-<header class="issue-hero mt-3">
-    <p class="issue-hero__status">
-        <span class="issue-badge">{{ 'issues.event'|trans }}</span>
-        <span class="issue-badge issue-badge--level">{{ payload.level|default(issue.level) }}</span>
-    </p>
+<header class="issue-hero">
+    <div class="issue-hero__top">
+        {% include 'issue/_back_link.html.twig' with {
+            href: path('issue_show', {projectId: project.uuid, id: issue.uuid}),
+            label: 'issues.back_to_issue'|trans,
+            testid: 'event-back',
+        } only %}
+        <p class="issue-hero__status">
+            <span class="issue-badge">{{ 'issues.event'|trans }}</span>
+            <span class="issue-badge issue-badge--level">{{ payload.level|default(issue.level) }}</span>
+        </p>
+    </div>
     <h1 class="issue-hero__title font-[family-name:var(--font-display)]">{{ headline }}</h1>
     {% if subtitle %}
         <p class="issue-hero__message">{{ subtitle }}</p>
@@ -42,10 +47,6 @@
                     <div>
                         <dt>{{ 'projects.title'|trans }}</dt>
                         <dd><a href="{{ path('issue_index', {id: project.uuid}) }}">{{ project.name }}</a></dd>
-                    </div>
-                    <div>
-                        <dt>{{ 'issues.back_to_issue'|trans }}</dt>
-                        <dd><a href="{{ path('issue_show', {projectId: project.uuid, id: issue.uuid}) }}">#{{ issue.id }}</a></dd>
                     </div>
                 </dl>
             {% endblock %}

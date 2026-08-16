@@ -549,8 +549,8 @@ issues:
   title: Issues
   search_placeholder: Search title…
   empty: No issues match these filters.
-  back: ← Issues
-  back_to_issue: ← Issue
+  back: Back to issues
+  back_to_issue: Back to issue
   event_count: '%count% events'
   latest_stack: Latest stack / payload
   latest_event: Latest event
@@ -680,6 +680,10 @@ issues:
   comment_too_long: Comment is too long.
   comment_invalid: Could not add the comment.
   similar_title: Similar issues
+  tabs_label: Issue sections
+  tab_main: Overview
+  similar_help: Other issues in this project that look related. Open one to compare, or mark this issue as a duplicate of it.
+  similar_mark_duplicate_help: Mark this issue as a duplicate of that canonical issue
   similar_empty: No similar issues in this project.
   similar_mark_duplicate: Mark duplicate
   mail:
@@ -1553,7 +1557,6 @@ preferences:
     triage: Triage
     assignee: Assignee
     duplicate: Duplicate
-    activity: Activity
     recent_events: Recent events
   error:
     current_password: Current password is incorrect.

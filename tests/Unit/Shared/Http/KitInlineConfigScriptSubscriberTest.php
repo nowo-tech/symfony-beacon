@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface as KernelRequestType;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 final class KitInlineConfigScriptSubscriberTest extends TestCase
@@ -77,6 +78,63 @@ HTML;
         $content = (string) $this->dispatch($html)->getContent();
         self::assertStringNotContainsString('data-breadcrumb-kit-inline-wrap', $content);
         self::assertStringNotContainsString('<script>', $content);
+    }
+
+    public function testRewritesBreadcrumbLayoutAssignments(): void
+    {
+        $html = <<<'HTML'
+<html><body>
+<script>
+window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};
+window.__breadcrumbKitDashboard.cssFramework = "tailwind";
+window.__breadcrumbKitDashboard.importPartialUrl = "/admin/breadcrumb/import";
+window.__breadcrumbKitDashboard.dashboardBase = 'breadcrumbs';
+</script>
+</body></html>
+HTML;
+
+        $content = (string) $this->dispatch($html)->getContent();
+        self::assertStringContainsString('data-kit="breadcrumb-kit"', $content);
+        self::assertStringContainsString('"cssFramework":"tailwind"', $content);
+        self::assertStringContainsString('"importPartialUrl":"/admin/breadcrumb/import"', $content);
+        self::assertStringContainsString('"dashboardBase":"breadcrumbs"', $content);
+    }
+
+    public function testSkipsSubRequestsAndNonHtmlResponses(): void
+    {
+        $subscriber = new KitInlineConfigScriptSubscriber();
+        $kernel = $this->createStub(KernelInterface::class);
+
+        $subRequestResponse = new Response('<script>window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {debug: true});</script>');
+        $subRequestEvent = new ResponseEvent($kernel, Request::create('/'), KernelRequestType::SUB_REQUEST, $subRequestResponse);
+        $subscriber($subRequestEvent);
+        self::assertStringContainsString('window.__nowoDashboardMenuConfig', (string) $subRequestResponse->getContent());
+
+        $jsonResponse = new Response(
+            '<script>window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {debug: true});</script>',
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/json'],
+        );
+        $jsonEvent = new ResponseEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $jsonResponse);
+        $subscriber($jsonEvent);
+        self::assertStringContainsString('window.__nowoDashboardMenuConfig', (string) $jsonResponse->getContent());
+    }
+
+    public function testFallsBackToEmptyJsonWhenObjectLiteralCannotBeNormalized(): void
+    {
+        $html = <<<'HTML'
+<html><body>
+<script>
+window.__nowoDashboardMenuConfig = Object.assign(window.__nowoDashboardMenuConfig || {}, {
+    broken: function () { return true; }
+});
+</script>
+</body></html>
+HTML;
+
+        $content = (string) $this->dispatch($html)->getContent();
+        self::assertStringContainsString('data-kit="dashboard-menu"', $content);
+        self::assertStringContainsString('>{}</script>', $content);
     }
 
     #[DataProvider('untouchedProvider')]

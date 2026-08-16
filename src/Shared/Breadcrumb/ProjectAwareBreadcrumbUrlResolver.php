@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RouterInterface;
  * Fixes parent crumbs on nested project routes where `{id}` means the child entity
  * (issue, transaction) while ancestors still need the project id as `{id}`.
  *
- * Example: on `issue_show` (`/projects/{projectId}/issues/{id}`), crumbs for
+ * Example: on `issue_show` (`/projects/{projectId}/issues/{id}/{tab}`), crumbs for
  * `project_show` / `issue_index` must use `projectId`, not the issue `id`.
  */
 #[AsDecorator(decorates: BreadcrumbUrlResolverInterface::class)]

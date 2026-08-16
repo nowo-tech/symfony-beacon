@@ -569,8 +569,8 @@ issues:
   title: Probleme
   search_placeholder: Titel suchen…
   empty: Keine Probleme entsprechen diesen Filtern.
-  back: ← Probleme
-  back_to_issue: ← Problem
+  back: Zurück zu Problemen
+  back_to_issue: Zurück zum Problem
   event_count: '%count% Ereignisse'
   latest_stack: Neuester Stack/Payload
   latest_event: Neueste Veranstaltung
@@ -797,6 +797,10 @@ issues:
 
       '
     mention_subject: Sie wurden in [%project%] %issue% erwähnt
+  tabs_label: Issue-Bereiche
+  tab_main: Übersicht
+  similar_help: Andere Issues in diesem Projekt, die verwandt wirken. Öffnen zum Vergleichen oder dieses Issue als Duplikat davon markieren.
+  similar_mark_duplicate_help: Dieses Issue als Duplikat jenes kanonischen Issues markieren
   similar_empty: Keine ähnlichen Issues in diesem Projekt.
   similar_mark_duplicate: Als Duplikat markieren
   similar_title: Ähnliche Issues
@@ -1241,7 +1245,6 @@ preferences:
     triage: Triage
     assignee: Bevollmächtigter
     duplicate: Duplikat
-    activity: Aktivität
     recent_events: Aktuelle Ereignisse
   error:
     current_password: Das aktuelle Passwort ist falsch.

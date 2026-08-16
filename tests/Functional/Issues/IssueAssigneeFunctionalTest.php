@@ -11,7 +11,6 @@ use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -59,12 +58,14 @@ final class IssueAssigneeFunctionalTest extends DatabaseWebTestCase
         self::assertSelectorExists('select[name="issue_assignee[assignee]"]');
         self::assertSelectorExists('[data-controller*="symfony--ux-autocomplete--autocomplete"]');
 
-        $form = $crawler->filter('form.issue-assignee-form')->form();
-        $assigneeField = $form->get('issue_assignee[assignee]');
-        self::assertInstanceOf(ChoiceFormField::class, $assigneeField);
-        $assigneeField->disableValidation();
-        $assigneeField->setValue((string) $member->getId());
-        $client->submit($form);
+        $token = $crawler->filter('form.issue-assignee-form input[name="issue_assignee[_token]"]')->attr('value');
+        self::assertNotNull($token);
+        $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid().'/assign', [
+            'issue_assignee' => [
+                'assignee' => (string) $member->getId(),
+                '_token' => $token,
+            ],
+        ]);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/issues/'.$issue->getUuid());
         $client->followRedirect();
         self::assertSelectorTextContains('body', 'Resolver');

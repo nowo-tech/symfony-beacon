@@ -129,9 +129,15 @@ test.describe('Thresholds, health, quiet hours, issue panels', () => {
       requireSampleOrSkip(false, 'No issues — run make seed-sample');
       return;
     }
-    await expect(page.locator('.issue-history, [data-collapse-panel-id-value="activity"]').first()).toBeAttached();
-    // Expand activity / details if collapsed.
-    for (const id of ['activity', 'details', 'similar', 'duplicate']) {
+    await expect(page.locator('[data-testid="issue-detail-tabs"], .issue-history').first()).toBeAttached();
+    // Open history / similar tabs (content stays in DOM; expand aside panels still used for details/duplicate).
+    for (const tabId of ['issue-history', 'issue-similar']) {
+      const tab = page.locator(`[data-tabs-target="trigger"][data-tab-id="${tabId}"]`).first();
+      if ((await tab.count()) > 0) {
+        await tab.click();
+      }
+    }
+    for (const id of ['details', 'duplicate']) {
       const btn = page.locator(`[data-collapse-panel-id-value="${id}"] [data-collapse-panel-target="button"]`).first();
       if ((await btn.count()) > 0 && (await btn.getAttribute('aria-expanded')) === 'false') {
         await btn.click();

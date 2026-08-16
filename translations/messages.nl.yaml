@@ -550,8 +550,8 @@ issues:
   title: Issues
   search_placeholder: Titel zoeken…
   empty: Er zijn geen problemen die overeenkomen met deze filters.
-  back: ← Problemen
-  back_to_issue: ← Probleem
+  back: Terug naar problemen
+  back_to_issue: Terug naar probleem
   event_count: '%count% evenementen'
   latest_stack: Nieuwste stapel / payload
   latest_event: Laatste evenement
@@ -779,6 +779,10 @@ issues:
 
       '
     mention_subject: Je bent genoemd bij [%project%] %issue%
+  tabs_label: Issue-onderdelen
+  tab_main: Overzicht
+  similar_help: Andere issues in dit project die gerelateerd lijken. Open er een om te vergelijken, of markeer deze als duplicaat.
+  similar_mark_duplicate_help: Markeer deze issue als duplicaat van die canonieke issue
   similar_empty: Geen vergelijkbare issues in dit project.
   similar_mark_duplicate: Markeer als duplicaat
   similar_title: Vergelijkbare issues
@@ -1221,7 +1225,6 @@ preferences:
     triage: Triage
     assignee: Cessionaris
     duplicate: Duplicaat
-    activity: Activiteit
     recent_events: Recente gebeurtenissen
   error:
     current_password: Het huidige wachtwoord is onjuist.

@@ -28,9 +28,11 @@ final class IssueSimilarSuggestionsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $owner);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$current->getUuid());
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$current->getUuid().'/similar');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="similar-issues"]');
+        self::assertSelectorNotExists('[data-testid="similar-issues"] input[name$="[query]"]');
+        self::assertSelectorNotExists('[data-testid="similar-issues"] input[name$="[merge_events]"]');
         self::assertSelectorTextContains('[data-testid="similar-issues"]', 'Payment gateway timeout in cart');
         self::assertSelectorTextNotContains('[data-testid="similar-issues"]', 'Unrelated database migration failure');
         self::assertSelectorTextNotContains('[data-testid="similar-issues"]', 'Payment gateway timeout ignored');
@@ -51,7 +53,7 @@ final class IssueSimilarSuggestionsTest extends DatabaseWebTestCase
         $lonely = $this->makeIssue($project, 'lonely-fp', 'Completely unique zxcvbn title');
 
         $this->login($client, $owner);
-        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$lonely->getUuid());
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues/'.$lonely->getUuid().'/similar');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('[data-testid="similar-issues"]', 'No similar issues');
     }

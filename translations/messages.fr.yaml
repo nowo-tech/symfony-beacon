@@ -562,8 +562,8 @@ issues:
   title: Incidents
   search_placeholder: Titre de recherche…
   empty: Aucun problème ne correspond à ces filtres.
-  back: ← Problèmes
-  back_to_issue: ← Problème
+  back: Retour aux problèmes
+  back_to_issue: Retour au problème
   event_count: '%count% événements'
   latest_stack: Dernière pile/charge utile
   latest_event: Dernier événement
@@ -790,6 +790,10 @@ issues:
 
       '
     mention_subject: Vous avez été mentionné sur [%project%] %issue%
+  tabs_label: Sections du problème
+  tab_main: Aperçu
+  similar_help: Autres problèmes du projet qui semblent liés. Ouvrez-en un pour comparer, ou marquez celui-ci comme doublon.
+  similar_mark_duplicate_help: Marquer ce problème comme doublon de ce problème canonique
   similar_empty: Aucun incident similaire dans ce projet.
   similar_mark_duplicate: Marquer comme doublon
   similar_title: Incidents similaires
@@ -1241,7 +1245,6 @@ preferences:
     triage: Triage
     assignee: Cessionnaire
     duplicate: Double
-    activity: Activité
     recent_events: Événements récents
   error:
     current_password: Le mot de passe actuel est incorrect.

@@ -95,10 +95,13 @@ $beacon-btn-sm-font-size: 0.8125rem;
   border: 1px solid transparent;
   border-radius: 0.375rem;
   color: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1.25;
   text-decoration: none;
   background: transparent;
+  cursor: pointer;
 }
 
 .beacon-tabs .nowo-ui-tabs__item:hover {
@@ -107,15 +110,14 @@ $beacon-btn-sm-font-size: 0.8125rem;
 }
 
 .beacon-tabs .nowo-ui-tabs__item.is-active,
-.beacon-tabs .nowo-ui-tabs__item[aria-current='page'] {
+.beacon-tabs .nowo-ui-tabs__item.nowo-ui-tabs__item--active,
+.beacon-tabs .nowo-ui-tabs__item[aria-current='page'],
+.beacon-tabs .nowo-ui-tabs__item[data-active],
+.beacon-tabs .nowo-ui-tabs__item[aria-selected='true'] {
   border-color: color-mix(in srgb, var(--color-moss) 45%, var(--color-sand));
   background: color-mix(in srgb, var(--color-moss) 12%, var(--color-surface));
   color: var(--color-moss-deep);
   font-weight: 600;
-}
-
-.beacon-tabs--sections {
-  margin-top: -0.25rem;
 }
 
 .beacon-tabs--sections .nowo-ui-tabs__item {
@@ -669,20 +671,10 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
   isolation: isolate;
   border-radius: var(--beacon-radius-card, 0.75rem);
   border: var(--beacon-border-width, 1px) solid var(--color-sand);
-  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  /* Opaque surface — translucent glass + blur made dense issue pages read as a different backdrop. */
+  background: var(--color-surface);
   padding: 1.25rem;
   box-shadow: 0 1px 2px rgb(var(--beacon-shadow) / 6%);
-
-  /* Blur on a pseudo-element so <dialog> descendants are not trapped by backdrop-filter. */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    backdrop-filter: blur(8px);
-    pointer-events: none;
-  }
 }
 
 /* —— Issue detail layout —— */
@@ -691,6 +683,11 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
   gap: 1.25rem;
   margin-top: 1rem;
   min-width: 0;
+}
+
+.issue-detail-tabs > .issue-layout,
+.issue-detail-tabs [role='tabpanel'] > .issue-layout {
+  margin-top: 0;
 }
 
 .issue-layout__main {
@@ -757,11 +754,36 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
   overflow: visible;
 }
 
+.issue-hero__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  margin: 0 0 0.85rem;
+}
+
 .issue-hero__status {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0 0 0.65rem;
+  margin: 0;
+}
+
+.issue-back {
+  gap: 0.4rem;
+  padding-inline: 0.65rem;
+  color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+}
+
+.issue-back:hover {
+  color: var(--color-ink);
+}
+
+.issue-back__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
 .issue-hero__title {
@@ -789,6 +811,11 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
 
 .issue-section {
   margin-top: 1rem;
+}
+
+.issue-layout__main > .panel.issue-section:first-child,
+.issue-layout__aside > .panel.issue-section:first-child {
+  margin-top: 0;
 }
 
 .issue-section__title {
@@ -1836,22 +1863,6 @@ input[type='checkbox'].checkbox,
   border-top: 1px solid var(--color-sand);
 }
 
-.issue-priority-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-
-  .input {
-    flex: 1 1 8rem;
-    min-width: 0;
-  }
-
-  .btn-primary {
-    flex: 0 0 auto;
-  }
-}
-
 .issue-duplicate-actions {
   display: flex;
   flex-direction: column;
@@ -1861,6 +1872,83 @@ input[type='checkbox'].checkbox,
 .issue-history {
   margin: 0;
   padding: 0;
+}
+
+.issue-similar__help,
+.issue-similar__empty {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-similar__empty {
+  margin-bottom: 0;
+}
+
+.issue-similar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-similar__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--color-sand);
+}
+
+.issue-similar__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.issue-similar__item:last-child {
+  padding-bottom: 0;
+}
+
+.issue-similar__body {
+  min-width: 0;
+  flex: 1 1 14rem;
+}
+
+.issue-similar__title {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.issue-similar__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.55rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.issue-similar__meta .issue-badge {
+  font-size: 0.65rem;
+}
+
+.issue-similar__quick {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.issue-similar__quick .btn-ghost {
+  white-space: nowrap;
 }
 
 .issue-history__empty {
@@ -2573,6 +2661,7 @@ input[type='checkbox'].checkbox,
   min-height: 100dvh;
   /* clip avoids creating a scrollport that would break sticky sidebar */
   overflow-x: clip;
+  /* Guest / auth shells keep a soft atmosphere. */
   background:
     radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in srgb, var(--color-mist) 90%, var(--color-surface)), transparent 55%),
     radial-gradient(ellipse 70% 45% at 95% 0%, color-mix(in srgb, var(--color-sand) 70%, var(--color-surface)), transparent 50%),
@@ -2596,8 +2685,10 @@ input[type='checkbox'].checkbox,
   opacity: 0.2;
 }
 
+/* Authenticated app: flat paper + shared grid (same ::before as guest). */
 .page-shell--app {
   --app-header-height: 3.5rem;
+  background: var(--color-paper);
 }
 
 /* Thin scrollbars (Firefox + Chromium/WebKit) */

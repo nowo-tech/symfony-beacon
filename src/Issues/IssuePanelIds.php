@@ -22,8 +22,6 @@ final class IssuePanelIds
     public const string TRIAGE = 'triage';
     public const string ASSIGNEE = 'assignee';
     public const string DUPLICATE = 'duplicate';
-    public const string SIMILAR = 'similar';
-    public const string ACTIVITY = 'activity';
     public const string RECENT_EVENTS = 'recent_events';
 
     /**
@@ -45,8 +43,6 @@ final class IssuePanelIds
             self::TRIAGE,
             self::ASSIGNEE,
             self::DUPLICATE,
-            self::SIMILAR,
-            self::ACTIVITY,
             self::RECENT_EVENTS,
         ];
     }

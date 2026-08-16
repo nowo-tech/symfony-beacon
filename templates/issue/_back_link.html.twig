@@ -1,0 +1,9 @@
+{# Compact back control for issue / event detail. Requires: href, label (translated). #}
+<a
+    href="{{ href }}"
+    class="issue-back btn-ghost btn-sm no-underline"
+    data-testid="{{ testid|default('issue-back') }}"
+>
+    {{ ux_icon('tabler:arrow-left', {class: 'issue-back__icon', 'aria-hidden': 'true'}) }}
+    <span>{{ label }}</span>
+</a>

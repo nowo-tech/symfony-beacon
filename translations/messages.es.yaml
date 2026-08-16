@@ -558,8 +558,8 @@ issues:
   title: Incidencias
   search_placeholder: Buscar título…
   empty: Ninguna incidencia coincide con estos filtros.
-  back: ← Incidencias
-  back_to_issue: ← Incidencia
+  back: Volver a incidencias
+  back_to_issue: Volver a la incidencia
   event_count: '%count% eventos'
   latest_stack: Último stack / payload
   latest_event: Último evento
@@ -783,6 +783,10 @@ issues:
 
       '
     mention_subject: Te mencionaron en [%project%] %issue%
+  tabs_label: Secciones de la incidencia
+  tab_main: Principal
+  similar_help: Otras incidencias del proyecto que parecen relacionadas. Ábrela para comparar, o marca esta como duplicado de ella.
+  similar_mark_duplicate_help: Marcar esta incidencia como duplicado de esa incidencia canónica
   similar_empty: No hay incidencias similares en este proyecto.
   similar_mark_duplicate: Marcar como duplicado
   similar_title: Incidencias similares
@@ -1514,7 +1518,6 @@ preferences:
     triage: Triage
     assignee: Asignado a
     duplicate: Duplicado
-    activity: Actividad
     recent_events: Eventos recientes
   error:
     current_password: La contraseña actual no es correcta.
