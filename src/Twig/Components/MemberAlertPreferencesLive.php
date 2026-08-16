@@ -89,7 +89,7 @@ final class MemberAlertPreferencesLive extends AbstractController
             MemberAlertEvent::mapEventsFromFormKeys($rawEvents),
         );
         if ($this->getForm()->has('pushNotificationsEnabled')) {
-            $user->setPushNotificationsEnabled((bool) ($data['pushNotificationsEnabled'] ?? false));
+            $user->setPushNotificationsEnabled((bool) ($data['pushNotificationsEnabled'] ?? true));
             if (!$user->isPushNotificationsEnabled()) {
                 foreach ($this->pushSubscriptionRepository->findByUser($user) as $subscription) {
                     $this->entityManager->remove($subscription);

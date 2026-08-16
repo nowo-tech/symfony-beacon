@@ -76,7 +76,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.18.2)
 
-No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+**`app:beacon:test` / `make beacon-test`** — after ingest ACK, the command prints dogfood warnings (existing issue fingerprint, missing Web Push subscriptions / VAPID, Messenger lag). Thin client-only probe remains `bin/console nowo:beacon:test`. See [DSN.md](DSN.md).
+
+**Web Push default on for new users** — `push_notifications_enabled` DB default becomes `1`. Existing users keep their saved preference. Run migrations.
+
+**CI / E2E** — after `make seed` / `make ready`, `.demo-client.env` is reclaimed to the host user (container wrote it as root:600). No operator action beyond pulling the Makefile fix.
+
+```bash
+make migrate
+make reclaim-demo-client-env   # if Playwright cannot read .demo-client.env
+make beacon-test ARGS='--check-only'
+```
 
 ## Upgrading from 1.18.1 to 1.18.2
 

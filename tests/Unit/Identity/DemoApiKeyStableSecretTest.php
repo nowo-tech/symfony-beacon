@@ -27,6 +27,7 @@ final class DemoApiKeyStableSecretTest extends TestCase
 
         self::assertSame(SeedDemoCommand::DEMO_PUBLIC_KEY, $key->getPublicKey());
         self::assertSame(SeedDemoCommand::DEMO_SECRET_KEY, $key->peekIssuedPlainSecret());
+        self::assertNull($key->getSecretKey());
         self::assertSame(ProjectApiKey::hashSecret(SeedDemoCommand::DEMO_SECRET_KEY), $key->getSecretHash());
 
         $dsn = $key->buildDsn(SeedDemoCommand::SELF_INGEST_BASE_URL, SeedDemoCommand::DEMO_SECRET_KEY);

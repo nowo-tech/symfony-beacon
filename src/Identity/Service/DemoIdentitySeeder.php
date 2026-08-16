@@ -104,12 +104,11 @@ final readonly class DemoIdentitySeeder
             }
 
             $project = $this->createDogfoodProject($user, $useStableDemoKeys);
-            $apiKey = $project->getApiKeys()->first();
+            $apiKey = $this->resolveDogfoodApiKey($project, $useStableDemoKeys);
             $projectCreated = true;
         } else {
             $this->syncDogfoodProjectIdentity($project);
-            $first = $project->getApiKeys()->first();
-            $apiKey = $first instanceof ProjectApiKey ? $first : null;
+            $apiKey = $this->resolveDogfoodApiKey($project, $useStableDemoKeys);
             if (!$apiKey instanceof ProjectApiKey) {
                 $apiKey = $useStableDemoKeys
                     ? $this->apiKeyFactory->create(
@@ -172,6 +171,36 @@ final readonly class DemoIdentitySeeder
         $legacy = $this->projectRepository->findOneBy(['slug' => SeedDemoCommand::LEGACY_DEMO_PROJECT_SLUG]);
 
         return $legacy instanceof Project ? $legacy : null;
+    }
+
+    /**
+     * Prefer the stable demo key (and re-activate it) when seeding locally; otherwise the first key.
+     *
+     * Operators may deactivate the demo key in Settings after creating another key — dogfood DSNs
+     * still use {@see SeedDemoCommand::DEMO_PUBLIC_KEY} + {@see SeedDemoCommand::DEMO_SECRET_KEY}.
+     */
+    private function resolveDogfoodApiKey(Project $project, bool $useStableDemoKeys): ?ProjectApiKey
+    {
+        if ($useStableDemoKeys) {
+            foreach ($project->getApiKeys() as $candidate) {
+                if (!$candidate instanceof ProjectApiKey) {
+                    continue;
+                }
+                if (SeedDemoCommand::DEMO_PUBLIC_KEY !== $candidate->getPublicKey()) {
+                    continue;
+                }
+                if (!$candidate->isActive()) {
+                    $candidate->setActive(true);
+                    $this->projectRepository->save($project);
+                }
+
+                return $candidate;
+            }
+        }
+
+        $first = $project->getApiKeys()->first();
+
+        return $first instanceof ProjectApiKey ? $first : null;
     }
 
     /**

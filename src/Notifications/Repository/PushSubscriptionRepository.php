@@ -25,6 +25,17 @@ class PushSubscriptionRepository extends ServiceEntityRepository
     }
 
     /**
+     * Total stored browser push endpoints (instance-wide dogfood / ops checks).
+     */
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * @return list<PushSubscription>
      */
     public function findByUser(User $user): array

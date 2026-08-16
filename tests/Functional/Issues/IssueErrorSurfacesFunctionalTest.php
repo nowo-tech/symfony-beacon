@@ -9,6 +9,7 @@ use App\Issues\Entity\Issue;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 
 final class IssueErrorSurfacesFunctionalTest extends DatabaseWebTestCase
@@ -54,7 +55,7 @@ final class IssueErrorSurfacesFunctionalTest extends DatabaseWebTestCase
                 ],
                 'console' => [
                     'command' => 'secrets:reveal',
-                    'command_class' => 'Symfony\\Component\\Console\\Command\\Command',
+                    'command_class' => Command::class,
                     'exit_code' => 1,
                     'php_sapi' => 'cli',
                     'interactive' => false,

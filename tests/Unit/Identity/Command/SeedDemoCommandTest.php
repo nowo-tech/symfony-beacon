@@ -107,7 +107,7 @@ final class SeedDemoCommandTest extends TestCase
         $projectDir = $this->tempProjectDirWithEnv("APP_ENV=test\nBEACON_DSN=\n");
         $tester = new CommandTester($this->commandWithSeeder($projectDir));
         self::assertSame(0, $tester->execute(['--write-client-env' => '']));
-        self::assertStringContainsString('Set BEACON_DSN in .env', $tester->getDisplay());
+        self::assertStringContainsString('Set BEACON_DSN for server dogfooding', $tester->getDisplay());
         $env = (string) file_get_contents($projectDir.'/.env');
         self::assertMatchesRegularExpression('/^BEACON_DSN=http:\/\/'.preg_quote(SeedDemoCommand::DEMO_PUBLIC_KEY, '/').':/m', $env);
         $this->cleanupTempProjectDir($projectDir);
@@ -127,7 +127,7 @@ final class SeedDemoCommandTest extends TestCase
             '--write-client-env' => '',
             '--sync-server-dsn' => true,
         ]));
-        self::assertStringContainsString('Set BEACON_DSN in .env', $tester->getDisplay());
+        self::assertStringContainsString('Set BEACON_DSN for server dogfooding', $tester->getDisplay());
         $env = (string) file_get_contents($projectDir.'/.env');
         self::assertStringNotContainsString('00000000-0000-0000-0000-000000000000', $env);
         self::assertMatchesRegularExpression('/^BEACON_DSN=http:\/\/'.preg_quote(SeedDemoCommand::DEMO_PUBLIC_KEY, '/').':/m', $env);

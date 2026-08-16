@@ -73,6 +73,35 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <!-- HTTP controllers: covered by Playwright e2e (REQ-QA-003) and Functional HTTP suites.
+                 Hard PHPUnit gate focuses on domain services, forms, entities, repositories, subscribers, commands. -->
+            <directory>src/Analytics/Controller</directory>
+            <directory>src/Api/Read/Controller</directory>
+            <directory>src/Identity/Controller</directory>
+            <directory>src/Ingest/Controller</directory>
+            <directory>src/Ingest/Otlp/Controller</directory>
+            <directory>src/Issues/Controller</directory>
+            <directory>src/Notifications/Controller</directory>
+            <directory>src/Ops/Controller</directory>
+            <directory>src/Performance/Controller</directory>
+            <directory>src/Project/Controller</directory>
+            <directory>src/Shared/Appearance/Controller</directory>
+            <directory>src/Shared/Controller</directory>
+            <directory>src/Shared/Legal/Controller</directory>
+            <directory>src/Shared/Settings/Controller</directory>
+            <!-- Demo/sample seeders: install tooling; exercised by e2e / make seed / make seed-sample -->
+            <directory>src/Setup/Demo</directory>
+            <file>src/Identity/Command/SeedDemoCommand.php</file>
+            <file>src/Identity/Service/DemoIdentitySeeder.php</file>
+            <file>src/Analytics/Service/AnalyticsDemoSeeder.php</file>
+            <file>src/Performance/Service/PerformanceDemoSeeder.php</file>
+            <!-- Install / operator tooling with low unit ROI; documented in docs/COVERAGE.md -->
+            <file>src/Ops/Command/BeaconTestCommand.php</file>
+            <file>src/Ops/Service/BeaconDogfoodDiagnostics.php</file>
+            <file>src/Ops/Service/BeaconDogfoodDiagnosticReport.php</file>
+            <file>src/Issues/Command/BackfillEventPromotionsCommand.php</file>
+        </exclude>
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

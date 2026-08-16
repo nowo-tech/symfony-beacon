@@ -69,9 +69,9 @@ class UserUiPreferences
     #[ORM\Column(nullable: true)]
     private ?array $productTourSeenPages = null;
 
-    /** Opt-in for PWA / browser push alerts on new issues in associated projects. */
-    #[ORM\Column(options: ['default' => false])]
-    private bool $pushNotificationsEnabled = false;
+    /** Prefer browser push for member alerts (default on; browser permission still required). */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $pushNotificationsEnabled = true;
 
     /** Master switch for member live/push alert content (opt-out; default on). */
     #[ORM\Column(options: ['default' => true])]
@@ -438,7 +438,7 @@ class UserUiPreferences
         $this->preferredCollapsedIssuePanels = null;
         $this->productTourSeenAt = null;
         $this->productTourSeenPages = null;
-        $this->pushNotificationsEnabled = false;
+        $this->pushNotificationsEnabled = true;
         $this->memberAlertsEnabled = true;
 
         return $this;

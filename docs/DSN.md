@@ -40,12 +40,23 @@ http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_uuid}
 
 Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops events whose request path contains `/envelope/` to avoid ingest feedback loops. See `config/packages/nowo_beacon.yaml`.
 
-Verify the configured DSN (parse only, or live ingest ACK):
+Verify the configured DSN (parse only, or live ingest ACK + local dogfood hints):
 
 ```bash
 make beacon-test ARGS='--check-only'
 make beacon-test
+make beacon-test ARGS='--message=unique-probe --wait=15'
 ```
+
+`make beacon-test` runs `app:beacon:test` (wraps BeaconBundle `nowo:beacon:test`). After a successful HTTP ACK it waits for Messenger to persist the event and warns when:
+
+- the issue already had events (no “new issue” member alert; try `--message=unique-probe-<token>`),
+- there are no `push_subscription` rows / VAPID is unset (no Web Push),
+- the event never appears (workers not running).
+
+HTTP **200** only means ingest accepted the Envelope — not that a browser notification was sent. Thin client-only probe: `bin/console nowo:beacon:test`.
+
+Dogfood from inside the `php` container must use a **loopback** DSN (`http://…@127.0.0.1/{uuid}`), not `localhost:{published-port}` (that port is on the host). Prefer `make dogfood` (reactivates the stable demo key and rewrites `.env.local`) then recreate/restart so Compose reloads `env_file`.
 
 ### Local demo sync (external BeaconBundle)
 

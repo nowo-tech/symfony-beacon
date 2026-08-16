@@ -26,7 +26,7 @@
 | `events[issue.new].enabled` | checkbox | checked |
 | `events[issue.new].scope` | `all` \| `involved` (UI may use `involved` boolean) | `all` |
 | … same for regression, resolved, reopened, assigned, commented | | |
-| `pushNotificationsEnabled` | checkbox | existing behavior (unchecked by default) |
+| `pushNotificationsEnabled` | checkbox | checked by default (browser permission still required) |
 
 ### Per-project fields
 

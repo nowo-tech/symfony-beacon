@@ -25,7 +25,7 @@
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `memberAlertsEnabled` | bool | `true` | Master gate (opt-out) |
-| `pushNotificationsEnabled` | bool | `false` | **Unchanged** — Web Push device opt-in |
+| `pushNotificationsEnabled` | bool | `true` | Browser push preference (default on; permission prompt still required) |
 
 ## `member_account_alert_event`
 

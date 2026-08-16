@@ -1,4 +1,4 @@
-.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test seed seed-platform seed-sample dogfood bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
@@ -11,6 +11,7 @@ DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file $(EN
 DC_PROD := $(DC) -f compose.prod.yaml --env-file $(ENV_FILE)
 # Override for print-urls when using the prod compose file (`make up-prod`).
 COMPOSE ?= $(DC)
+COVERAGE_MIN ?= 100
 # Shared stack (developer.local.server/server) when this repo lives under repositories/other/
 SHARED_SERVER_DIR := $(abspath $(CURDIR)/../../../server)
 
@@ -65,7 +66,7 @@ help:
 	@echo "  make rector          Rector dry-run"
 	@echo "  make rector-fix      Rector apply, then CS Fixer (Rector can leave spacing diffs)"
 	@echo "  make test            PHPUnit"
-	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); optional COVERAGE_MIN=N"
+	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); defaults to COVERAGE_MIN=100"
 	@echo "  make test-unit-js    Vitest unit tests for assets/"
 	@echo "  make test-unit-js-coverage  Vitest + V8 coverage → var/coverage-js/"
 	@echo "  make test-e2e        Playwright browser E2E (Docker image; needs make up + make seed[+sample])"
@@ -287,10 +288,10 @@ shell: ensure-up
 console: ensure-up
 	$(DC) exec php bin/console $(ARGS)
 
-# Dogfood: probe the configured BEACON_DSN against this Symfony Beacon instance (BeaconBundle client).
-# Examples: make beacon-test   |   make beacon-test ARGS='--check-only'   |   make beacon-test ARGS='--message=ci'
+# Dogfood: probe BEACON_DSN + local hints (issue novelty / Web Push readiness). Thin client-only: bin/console nowo:beacon:test
+# Examples: make beacon-test   |   make beacon-test ARGS='--check-only'   |   make beacon-test ARGS='--message=ci --wait=15'
 beacon-test: ensure-up
-	$(DC) exec php bin/console nowo:beacon:test $(ARGS)
+	$(DC) exec php bin/console app:beacon:test $(ARGS)
 
 # Halite key file lives under var/secrets/; the encrypt bundle does not mkdir for you.
 # Harden key files to 0600 (world-writable keys would decrypt all #[Encrypted] columns).
@@ -302,7 +303,7 @@ seed-platform: ensure-halite-secrets
 
 seed: seed-platform
 	$(DC) exec -T php bin/console app:seed-demo
-	@test -f .demo-client.env && chmod 600 .demo-client.env || true
+	@$(MAKE) reclaim-demo-client-env
 	@echo "Client env: .demo-client.env (mode 600) — in BeaconBundle/demo/symfony8 run: make sync-beacon"
 	@echo "Server dogfood: BEACON_DSN set in .env when empty (loopback 127.0.0.1)"
 	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
@@ -314,8 +315,18 @@ seed-sample: ensure-halite-secrets
 # and sync server BEACON_DSN (loopback) to the current Symfony Beacon project. No demo user.
 dogfood: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user --sync-server-dsn
-	@test -f .demo-client.env && chmod 600 .demo-client.env || true
+	@$(MAKE) reclaim-demo-client-env
 	@echo "Dogfood: BEACON_DSN synced to loopback self DSN. If it changed, run: make restart"
+
+# PHP container often writes .demo-client.env as root:600; host Playwright/E2E must be able to read it.
+reclaim-demo-client-env:
+	@if [ -f .demo-client.env ]; then \
+		$(DC) exec -u root -T php chown $(shell id -u):$(shell id -g) /app/.demo-client.env 2>/dev/null \
+			|| sudo chown "$(shell id -u):$(shell id -g)" .demo-client.env 2>/dev/null \
+			|| chown "$(shell id -u):$(shell id -g)" .demo-client.env 2>/dev/null \
+			|| true; \
+		chmod 600 .demo-client.env 2>/dev/null || true; \
+	fi
 
 migrate: ensure-halite-secrets
 	$(DC) exec -T php bin/console doctrine:migrations:migrate -n
@@ -420,7 +431,7 @@ kit-smoke: ensure-up
 		tests/Functional/Identity/PasswordResetTest.php \
 		tests/Functional/Identity/LoginThrottleTest.php
 
-# Soft gate: COVERAGE_MIN defaults in CI; override locally e.g. COVERAGE_MIN=35 make test-coverage
+# Hard gate: includable PHPUnit source must stay at COVERAGE_MIN=100; override locally only for diagnosis.
 test-coverage: ensure-up
 	$(DC) exec -T php sh -c 'rm -rf var/cache/test/* && mkdir -p var/coverage var/coverage-html'
 	$(DC) exec -T -e XDEBUG_MODE=coverage php vendor/bin/phpunit \

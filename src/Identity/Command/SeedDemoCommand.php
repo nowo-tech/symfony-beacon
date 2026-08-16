@@ -201,9 +201,9 @@ final class SeedDemoCommand extends Command
 
         $dsnWrite = $this->writeServerBeaconDsn($selfDsn, $syncServerDsn);
         match ($dsnWrite) {
-            'written' => $io->success(\sprintf('Set BEACON_DSN in .env for server dogfooding (%s)', $selfDsn)),
+            'written' => $io->success(\sprintf('Set BEACON_DSN for server dogfooding (%s)', $selfDsn)),
             'unchanged' => $io->note('BEACON_DSN already matches the self DSN'),
-            'skipped' => $io->note('BEACON_DSN already set in .env (left unchanged; use --sync-server-dsn to re-wire)'),
+            'skipped' => $io->note('BEACON_DSN already set (left unchanged; use --sync-server-dsn to re-wire)'),
         };
 
         return Command::SUCCESS;
@@ -246,19 +246,19 @@ ENV;
     }
 
     /**
-     * Write loopback BEACON_DSN into project `.env`.
+     * Write loopback BEACON_DSN into `.env.local` (Compose env_file) or `.env` as fallback.
      *
      * By default only fills a missing/empty value (preserves operator-chosen DSNs).
      * With $force (make dogfood / --sync-server-dsn), always re-wires to the current self DSN
-     * so a recreated Symfony Beacon project does not leave a stale project UUID in `.env`.
+     * so a recreated Symfony Beacon project does not leave a stale project UUID in env files.
      *
      * @return 'written'|'unchanged'|'skipped' written = file updated; unchanged = already correct;
-     *                                         skipped = non-empty value left alone (no force)
+     *                                         skipped = non-empty value left alone (no force) or no file
      */
     private function writeServerBeaconDsn(string $selfDsn, bool $force = false): string
     {
-        $path = $this->projectDir.'/.env';
-        if (!is_file($path) || !is_readable($path)) {
+        $path = $this->resolveServerEnvPath();
+        if (null === $path) {
             return 'skipped';
         }
 
@@ -290,5 +290,20 @@ ENV;
         }
 
         return 'written';
+    }
+
+    /**
+     * Prefer `.env.local` (operator Compose env_file) over `.env`.
+     */
+    private function resolveServerEnvPath(): ?string
+    {
+        foreach (['.env.local', '.env'] as $name) {
+            $path = $this->projectDir.'/'.$name;
+            if (is_file($path) && is_readable($path) && is_writable($path)) {
+                return $path;
+            }
+        }
+
+        return null;
     }
 }

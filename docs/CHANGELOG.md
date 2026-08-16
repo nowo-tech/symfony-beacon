@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`app:beacon:test`**: dogfood wrapper around BeaconBundle `nowo:beacon:test` — after ingest ACK, waits for Messenger persistence and warns when the issue already had events (no “new issue” alert), when there are no Web Push subscriptions / VAPID, or when the event never appears (`--wait=`). `make beacon-test` now runs this command (thin client probe remains `nowo:beacon:test`). See [DSN.md](DSN.md).
+
+### Fixed
+
+- **CI E2E**: reclaim host ownership of `.demo-client.env` after seed (`chmod 600` as root left the file unreadable for Playwright). Rector dry-run for `IssueErrorSurfacesFunctionalTest` (`Command::class`).
+
+### Changed
+
+- **Web Push preference default on**: new users get `pushNotificationsEnabled = true` (browser permission prompt still required). Column DB default updated; existing rows unchanged. See [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
+
 ## [1.18.2] - 2026-08-16
 
 ### Added

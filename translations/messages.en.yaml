@@ -1517,7 +1517,7 @@ preferences:
       'issue.assigned': When an issue is assigned (or reassigned).
       'issue.commented': When someone comments on an issue.
   push_notifications: Browser push (device)
-  push_notifications_help: Optional device opt-in. When enabled, Beacon asks the browser
+  push_notifications_help: On by default for new accounts. When enabled, Beacon asks the browser
     for permission and can deliver alerts matching your member-alert preferences —
     even when the app is in the background (installed PWA or supported browser). Live
     in-app toasts require Administration → Mercure separately, and the member-alerts

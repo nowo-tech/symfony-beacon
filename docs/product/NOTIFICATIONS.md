@@ -25,7 +25,7 @@ Signed-in members manage alerts under **Account → Display → Notifications** 
 1. **Master** — `memberAlertsEnabled` (default **on**). Off stops live toasts and Web Push for member issue events.
 2. **Account event defaults** — per-event enable + scope (`all` issues vs **involved** = assignee or `@mention`).
 3. **Per project** — enable/disable that project; optional event/scope overrides; reset clears overrides. Any member with **project access** (viewer+) may save their own overrides; Settings admin rights are not required.
-4. **Browser push** — separate device opt-in (`pushNotificationsEnabled`, default **off**). Still filtered by the matrix above.
+4. **Browser push** — `pushNotificationsEnabled` (default **on** for new users). The browser still prompts for permission; opt-out clears stored subscriptions. Still filtered by the matrix above.
 
 **Project destinations** (Slack, email, …) on the same settings page are project-owned and independent of member prefs.
 
@@ -45,7 +45,7 @@ Summary:
 ### Web Push (PWA)
 
 1. Generate VAPID keys and set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` (e.g. `mailto:ops@example.com`). Leave keys empty to hide the Account push option.
-2. Members keep member alerts on (matrix), then opt in under **Account → Display → Notifications → Browser push**. The browser service worker (`/sw.js`, extended with push handlers) shows notifications; taps open the issue URL.
+2. Members keep member alerts on (matrix). Browser push preference defaults **on**; the browser still asks for notification permission under **Account → Display → Notifications → Browser push**. The service worker (`/sw.js`, with push handlers) shows notifications; taps open the issue URL.
 3. Subscription endpoints are stored encrypted in `push_subscription`. Opting out deletes stored subscriptions. Recipients are filtered through the same preference evaluator as Mercure.
 
 **Privacy:** Web Push is a device subscription, not a marketing cookie. Still offer Privacy / Terms / Cookie settings for operators; use `nowo-tech/cookie-consent-bundle` when adding non-essential tracking.
