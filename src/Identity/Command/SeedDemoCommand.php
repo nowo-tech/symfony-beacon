@@ -88,7 +88,7 @@ final class SeedDemoCommand extends Command
             ->addOption('ingest-base-url', null, InputOption::VALUE_REQUIRED, 'Docker client ingest base URL for BEACON_DSN', 'http://host.docker.internal:9084')
             ->addOption('write-client-env', null, InputOption::VALUE_OPTIONAL, 'Path for demo-client.env (empty string skips write)')
             ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb/cookie-consent seed')
-            ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create the demo admin user; use existing ROLE_ADMIN accounts')
+            ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create admin@…; dogfood with existing ROLE_ADMIN accounts (earliest registered preferred)')
             ->addOption('sync-server-dsn', null, InputOption::VALUE_NONE, 'Update .env BEACON_DSN to the loopback self DSN even when already set (make dogfood)')
             ->addOption('allow-non-local', null, InputOption::VALUE_NONE, 'Allow running outside dev/test (never uses stable demo API keys)');
     }
@@ -140,7 +140,7 @@ final class SeedDemoCommand extends Command
         }
 
         if ($skipDemoUser) {
-            $io->note('Skipped demo user creation (--skip-demo-user); using existing accounts');
+            $io->note('Skipped demo user creation (--skip-demo-user); granting existing ROLE_ADMIN accounts');
         } elseif ($result['user_created']) {
             $io->success(\sprintf('Created user %s', $email));
         } else {
@@ -184,7 +184,10 @@ final class SeedDemoCommand extends Command
         $io->writeln('Self DSN (server dogfood / 127.0.0.1): '.$selfDsn);
         $io->writeln('Public key: '.$apiKey->getPublicKey());
         if ($skipDemoUser) {
-            $io->writeln(\sprintf('Sign in with an existing ROLE_ADMIN (e.g. %s)', $owner->getEmail()));
+            $io->writeln(\sprintf(
+                'Sign in with an existing ROLE_ADMIN (first registered: %s). Password is not written to .demo-client.env.',
+                $owner->getEmail(),
+            ));
         } else {
             $io->writeln(\sprintf('Login: %s / %s', $email, $password));
         }

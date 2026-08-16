@@ -135,9 +135,14 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 ## Amendment (cookie consent guest skin + bottom-left, 2026-08-15)
 
 - **v1.15.1**: Public consent chrome owned by host `assets/styles/_cookie_consent.scss` (CSP style nonces drop vendor injected CSS).
-- **`101` / CookieConsent ≥ 1.9**: chrome ships in kit `nowo-cookie-consent.css`; layouts link it with `data-nowo-cookie-consent-css`; host SCSS fork removed.
+- **`101` / CookieConsent ≥ 1.9**: chrome ships in kit `nowo-cookie-consent.css`; layouts originally linked the kit pack with `data-nowo-cookie-consent-css`.
 - Default seeded profile (`CookieConsentDemoSeeder` / `cookie_consent.default.json`): consent + preferences modals at **bottom left**, equal-weight action buttons, `box` / `wide`.
 - Product reference: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Related kit pin / public-only rules: `081` Cookie Consent amendments; upstream: `101-kit-csp-shared-helpers`.
+
+## Amendment (cookie consent Vite bundle, 2026-08-17)
+
+- **`103` / v1.20.0**: Kit skin is imported into Vite `app` CSS (`assets/app.ts`) so ad blockers that match `/bundles/nowocookieconsent/*` cannot strip the modal. Layouts set `data-nowo-cookie-consent-external-css="true"` and MUST NOT `<link>` the kit pack stylesheet on public pages.
+- Thin host `_cookie_consent.scss` returns as a bridge only (footer clearance + position fallbacks); Tailwind `@source`s CookieConsent vendor Twig. See `103-cookie-consent-vite-e2e-security`.
 
 ## Amendment (temporary API DSN reveal, 2026-08-16)
 

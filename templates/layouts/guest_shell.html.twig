@@ -1,6 +1,6 @@
 {# Guest / pre-login shell: theme + locale controls (AuthKit-aligned). #}
 <!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}"{% if site_appearance.footerFixed %} data-footer-fixed="1"{% endif %}>
+<html lang="{{ app.request.locale|default('en') }}"{% if site_appearance.footerFixed %} data-footer-fixed="1"{% endif %} data-nowo-cookie-consent-external-css="true">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,7 +12,6 @@
     <link rel="icon" href="{{ asset('brand/beacon-mark.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
     <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
-    <link rel="stylesheet" href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}" data-nowo-cookie-consent-css>
     {{ vite_entry_link_tags('app') }}
     {# After app CSS so site palette / radius / border tokens win the cascade. #}
     <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>{{ site_appearance.cssOverrides|raw }}</style>

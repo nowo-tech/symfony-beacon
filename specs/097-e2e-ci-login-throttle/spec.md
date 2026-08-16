@@ -93,3 +93,13 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 ## Amendment (`.demo-client.env` host reclaim, 2026-08-16)
 
 After seed writes `.demo-client.env` as container-root mode **600**, host Playwright could not read credentials (`missing/unreadable`). `make seed` / `make dogfood` MUST run `make reclaim-demo-client-env` (chown via PHP container to the host UID). Extends C3 / C5 ingest credential loading (`058` FR-009). Cross-ref: `specs/058-self-beacon-client/`.
+
+## Amendment (E2E security denials catalog, 2026-08-17)
+
+Catalog expansion beyond the atomic-gap batch (`103` / Phase 6.54):
+
+- New domain folder `e2e/security/` (`access-denials.spec.ts`, `auth-gates.spec.ts`) + `e2e/support/security.ts`
+- Product catalog §16 `UC-SEC-01`…`12` (guest redirects, admin/project ACL 403s, role demotion, inactive membership, auth gates)
+- Automation status ~**259** Covered / ~5 Out of scope (was ~247 at v1.13.0)
+
+Run: `make test-e2e ARGS='e2e/security'`. Cross-ref: `docs/product/E2E-USE-CASES.md`, `e2e/README.md`.

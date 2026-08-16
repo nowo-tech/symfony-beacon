@@ -43,15 +43,14 @@ Twig overrides (optional) live under `templates/bundles/NowoCookieConsentBundle/
 
 ### Public modal skin (CookieConsent ≥1.9)
 
-Layouts link the kit stylesheet so CSP **style-src nonces** do not depend on JS-injected `<style>`:
+Kit skin is **bundled into the Vite `app` CSS** (`assets/app.ts` imports `nowo-cookie-consent.css`). Layouts set `data-nowo-cookie-consent-external-css="true"` on `<html>` so `nowo-consent-modal.js` skips injecting a `<style>` tag.
 
-```twig
-<link rel="stylesheet"
-      href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}"
-      data-nowo-cookie-consent-css>
-```
+Do **not** link `/bundles/nowocookieconsent/nowo-cookie-consent.css` on public pages — many ad blockers match that path and strip the modal chrome (unstyled top-left dump). Optional host token remaps still go through `--nowo-cc-*` / moss.
 
-The `data-nowo-cookie-consent-css` marker tells `nowo-consent-modal.js` to skip style injection. Skin (category cards, primary/ghost actions, overlay corner) ships in the kit CSS; optional host overrides can still remap `--nowo-cc-*` / moss tokens.
+Host bridge (layout only):
+
+- `assets/styles/tailwind.css` `@source`s CookieConsent vendor Twig so Tailwind utilities on the modal markup are generated.
+- `assets/styles/_cookie_consent.scss` positions the bottom-left box via `data-nowo-*`, clears `.site-legal-footer`, and keeps the preferences bubble bottom-right.
 
 Modal **layout / position / equal-weight buttons** live on the DB profile (`dashboard_cookie_config`), not YAML. `CookieConsentDemoSeeder` + `src/Setup/Demo/fixtures/cookie_consent.default.json` upsert:
 

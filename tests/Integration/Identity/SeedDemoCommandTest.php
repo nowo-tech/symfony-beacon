@@ -129,4 +129,50 @@ final class SeedDemoCommandTest extends DatabaseWebTestCase
         $accessible = self::getContainer()->get(ProjectRepository::class)->findAccessibleByUser($admin);
         self::assertCount(1, $accessible);
     }
+
+    public function testDogfoodIgnoresFixedAdminEmailWhenEarlierRoleAdminExists(): void
+    {
+        $client = self::createClient();
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+
+        $first = new User();
+        $first->setEmail('earliest-admin@example.com');
+        $first->setDisplayName('Earliest Admin');
+        $first->setRoles(['ROLE_ADMIN']);
+        $first->setPassword($hasher->hashPassword($first, 'AdminPass1!'));
+        $em->persist($first);
+        $em->flush();
+
+        // Leftover from a prior make seed — dogfood must not prefer this over the first ROLE_ADMIN.
+        $fixed = new User();
+        $fixed->setEmail('admin@symfony-beacon.local');
+        $fixed->setDisplayName('Fixed Demo');
+        $fixed->setRoles(['ROLE_ADMIN']);
+        $fixed->setPassword($hasher->hashPassword($fixed, 'admin123'));
+        $em->persist($fixed);
+        $em->flush();
+
+        $clientEnv = tempnam(sys_get_temp_dir(), 'beacon-dogfood-');
+        self::assertNotFalse($clientEnv);
+
+        $application = new Application($client->getKernel());
+        $tester = new CommandTester($application->find('app:seed-demo'));
+        $tester->execute([
+            '--skip-demo-user' => true,
+            '--write-client-env' => $clientEnv,
+        ]);
+        self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertStringContainsString('earliest-admin@example.com', $tester->getDisplay());
+
+        $env = (string) file_get_contents($clientEnv);
+        self::assertStringContainsString('BEACON_LOGIN_EMAIL=earliest-admin@example.com', $env);
+        self::assertStringNotContainsString('BEACON_LOGIN_EMAIL=admin@symfony-beacon.local', $env);
+        @unlink($clientEnv);
+
+        $project = self::getContainer()->get(ProjectRepository::class)->findOneBy(['slug' => SeedDemoCommand::DEMO_PROJECT_SLUG]);
+        self::assertNotNull($project);
+        self::assertCount(1, self::getContainer()->get(ProjectRepository::class)->findAccessibleByUser($first));
+        self::assertCount(1, self::getContainer()->get(ProjectRepository::class)->findAccessibleByUser($fixed));
+    }
 }

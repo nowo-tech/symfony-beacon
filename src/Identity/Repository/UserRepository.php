@@ -134,6 +134,53 @@ class UserRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * Earliest registered instance admin (lowest id with ROLE_ADMIN in the JSON roles column).
+     *
+     * Used by dogfood seeding (`app:seed-demo --skip-demo-user`) so ownership / `.demo-client.env`
+     * login hint follows the first registered ROLE_ADMIN — never a hard-coded personal email
+     * and never a leftover `admin@symfony-beacon.local` from a prior `make seed`.
+     */
+    public function findFirstInstanceAdmin(bool $excludeAnonymized = true): ?User
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%')
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(1);
+
+        if ($excludeAnonymized) {
+            $qb->andWhere('u.anonymizedAt IS NULL');
+        }
+
+        /** @var User|null $user */
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        return $user;
+    }
+
+    /**
+     * All instance ROLE_ADMIN accounts, oldest first (dogfood membership grants).
+     *
+     * @return list<User>
+     */
+    public function findInstanceAdmins(bool $excludeAnonymized = true): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%')
+            ->orderBy('u.id', 'ASC');
+
+        if ($excludeAnonymized) {
+            $qb->andWhere('u.anonymizedAt IS NULL');
+        }
+
+        /** @var list<User> $users */
+        $users = $qb->getQuery()->getResult();
+
+        return $users;
+    }
+
     public function save(User $user, bool $flush = true): void
     {
         $this->getEntityManager()->persist($user);

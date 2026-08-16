@@ -2,7 +2,7 @@
 
 **Feature Branch**: `058-self-beacon-client`  
 **Created**: 2026-07-29  
-**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16; ignore expected 403s 2026-08-16)
+**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16; ignore expected 403s 2026-08-16; earliest ROLE_ADMIN dogfood resolve 2026-08-17 / `103`)
 
 **Input**: Install `nowo-tech/beacon-bundle` in the Beacon server so the instance can report its own errors to a seeded demo project. First-run path wires a stable DSN to loopback ingest without recursive Envelope amplification.
 
@@ -135,3 +135,10 @@ Functional / BrowserKit traffic without `ROLE_ADMIN` (and project ACL 403s) prod
 ### 2026-08-15 — `make restart` reloads `.env.local` (`100`)
 
 `make restart` now runs `docker compose up -d --force-recreate --no-deps php messenger messenger-notify` (not plain `restart`). Compose injects `.env.local` only on create; a soft restart left a stale `BEACON_DSN` after `make dogfood` / seed. Operator working file is `.env.local` (REQ-ENV-003). See `specs/100-phone-input-profile/` O1 / FR-006.
+
+### 2026-08-17 — Dogfood earliest ROLE_ADMIN (`103`)
+
+- **FR-011**: With `--skip-demo-user`, owner resolution MUST use `UserRepository::findFirstInstanceAdmin()` (lowest id with `ROLE_ADMIN`, excluding anonymized). `--email` and leftover `admin@symfony-beacon.local` MUST NOT override that choice.
+- **FR-012**: Membership grants MUST cover every `findInstanceAdmins()` result (oldest first), not a single preferred owner only.
+- **SC-007**: Integration/unit tests assert multi-admin membership and that a later `admin@…` does not become the `.demo-client.env` login hint when an earlier admin exists.
+- Cross-ref: `055` FR-011a, `docs/INSTALL.md`, `docs/product/ROLES.md`.

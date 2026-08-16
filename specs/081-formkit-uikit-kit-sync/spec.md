@@ -130,15 +130,11 @@ Public modal stays on vendor Twig (`ui_theme: tailwind`); Beacon MUST NOT fork `
 
 **As shipped in v1.15.1**: skin + layout lived in host `assets/styles/_cookie_consent.scss` (CSP style nonces drop vendor injected CSS).
 
-**As of `101` / CookieConsent ≥ 1.9**: skin ships in kit `nowo-cookie-consent.css`. Host layouts MUST link:
+**As of `101` / CookieConsent ≥ 1.9**: skin ships in kit `nowo-cookie-consent.css` (originally linked from layouts with `data-nowo-cookie-consent-css`).
 
-```twig
-<link rel="stylesheet" href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}" data-nowo-cookie-consent-css>
-```
+**As of `103` / v1.20.0**: kit skin is **bundled into Vite `app` CSS**; layouts set `data-nowo-cookie-consent-external-css="true"` and MUST NOT `<link>` `/bundles/nowocookieconsent/nowo-cookie-consent.css` (ad blockers strip that path). A thin host `_cookie_consent.scss` bridge is allowed for footer clearance + position fallbacks; Tailwind `@source`s vendor CookieConsent Twig. Seeded DB profile (`055` / `CookieConsentDemoSeeder`): **bottom left**, equal-weight buttons (unchanged).
 
-The marker skips JS `<style>` injection. Host MUST NOT keep `_cookie_consent.scss`. Seeded DB profile (`055` platform seed / `CookieConsentDemoSeeder`): **bottom left**, equal-weight buttons (unchanged).
-
-Product doc: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Identity surface note: `002` amendment (2026-08-15).
+Product doc: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Identity surface note: `002` amendments (2026-08-15 / 2026-08-17). Spec: `103-cookie-consent-vite-e2e-security`.
 
 ## Amendment (Kit admin tables + Http Log filters, 2026-08-12)
 

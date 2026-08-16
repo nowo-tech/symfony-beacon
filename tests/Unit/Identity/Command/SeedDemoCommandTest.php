@@ -162,6 +162,8 @@ final class SeedDemoCommandTest extends TestCase
             new ReflectionProperty(User::class, 'id')->setValue($user, 1);
             $savedUsers[] = $user;
         });
+        $users->method('findInstanceAdmins')->willReturnCallback(static fn (): array => $savedUsers);
+        $users->method('findFirstInstanceAdmin')->willReturnCallback(static fn (): ?User => $savedUsers[0] ?? null);
         $users->method('findAll')->willReturnCallback(static fn (): array => $savedUsers);
 
         $projects = $this->createStub(ProjectRepository::class);

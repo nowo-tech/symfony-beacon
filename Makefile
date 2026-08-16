@@ -313,8 +313,8 @@ seed: seed-platform
 seed-sample: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 
-# Ensure demo project + API key exist, grant ROLE_ADMIN membership, write .demo-client.env,
-# and sync server BEACON_DSN (loopback) to the current Symfony Beacon project. No demo user.
+# Ensure demo project + API key exist, grant every ROLE_ADMIN membership (first registered = preferred owner),
+# write .demo-client.env, and sync server BEACON_DSN (loopback). No admin@… demo user.
 dogfood: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user --sync-server-dsn
 	@$(MAKE) reclaim-demo-client-env

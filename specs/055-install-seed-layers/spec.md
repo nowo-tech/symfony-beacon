@@ -100,6 +100,7 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 - **FR-009**: English operator docs (README, UPGRADING, CHANGELOG, CONTRIBUTING or INSTALL note) MUST describe the three layers and when to use each.
 - **FR-010**: Automated tests MUST cover: platform seed idempotency; demo seed create-once behavior; sample `dev` create + purge; bootstrap Make/contract smoke as appropriate for the repo’s test style.
 - **FR-011**: `make dogfood` MUST invoke `app:seed-demo --skip-demo-user --sync-server-dsn` (Symfony Beacon project + re-wire server `BEACON_DSN` for existing admins; no new demo user).
+- **FR-011a** (`103`, 2026-08-17): With `--skip-demo-user`, owner / `.demo-client.env` login hint MUST be the earliest registered `ROLE_ADMIN` (`UserRepository::findFirstInstanceAdmin`); `--email` and leftover `admin@symfony-beacon.local` MUST NOT win. Membership MUST be granted to **every** instance `ROLE_ADMIN` (`findInstanceAdmins`).
 
 ### Key Entities
 
@@ -133,9 +134,13 @@ As an operator reading README / UPGRADING, I follow a single clear recipe: migra
 `CookieConsentDemoSeeder` (fixture `cookie_consent.default.json`) upserts display layout on the default enabled profile, not only copy/inventory:
 
 - Consent + preferences modals: `box` / `wide` / **bottom** / **left**, equal-weight buttons
-- Skin chrome remains host SCSS (`002` / `081` 2026-08-15 amendments; `docs/product/LEGAL-AND-COOKIES.md`)
+- Skin chrome delivery evolved: host SCSS (v1.15.1) → kit pack link (`101`) → Vite-bundled kit CSS + thin host bridge (`103` / v1.20.0). See `002` / `081` / `103` and `docs/product/LEGAL-AND-COOKIES.md`.
 
 Idempotent: re-running `app:seed-platform` updates an existing profile when fixture values differ.
+
+## Amendment (dogfood earliest ROLE_ADMIN, 2026-08-17)
+
+Extends FR-011 / FR-011a (`103` / `058`): `make dogfood` must not bind ownership to a hard-coded personal email or prefer leftover `admin@…` over the first registered instance admin. PHPUnit covers multi-admin grants + `--email` ignore under `--skip-demo-user`.
 
 ## Out of Scope
 

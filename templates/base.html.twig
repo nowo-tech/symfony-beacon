@@ -2,6 +2,7 @@
 <html
     lang="{{ app.request.locale|default('en') }}"
     {% if site_appearance.footerFixed %}data-footer-fixed="1"{% endif %}
+    data-nowo-cookie-consent-external-css="true"
     {% if app.user and app.user.preferredTheme in ['light', 'dark'] %}data-theme="{{ app.user.preferredTheme|e('html_attr') }}"{% endif %}
     {% if app.user %}data-user-theme="{{ app.user.preferredTheme|e('html_attr') }}"{% endif %}
     {% if app.user %}
@@ -26,8 +27,6 @@
         {% block stylesheets %}
             {# UiKit tokens/components first; Beacon app CSS must win for product chrome. #}
             <link rel="stylesheet" href="{{ asset('css/nowo-ui.css', 'nowo_ui_kit') }}">
-            {# CookieConsent ≥1.9: link kit CSS so CSP style-src nonces skip injected <style>. #}
-            <link rel="stylesheet" href="{{ asset('nowo-cookie-consent.css', 'nowo_cookie_consent') }}" data-nowo-cookie-consent-css>
             {{ vite_entry_link_tags('app') }}
         {% endblock %}
         {# After app CSS so site palette / radius / border tokens win the cascade. Nonce matches CSP style-src. #}

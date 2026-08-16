@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-08-17
+
+### Added
+
+- **E2E security denials**: Playwright domain `e2e/security/` + helpers `e2e/support/security.ts`; catalog §16 `UC-SEC-01`…`12` (guest redirects, admin/project ACL 403s, role demotion, inactive membership, auth gates) (`103` / Phase 6.54).
+- **`UserRepository::findFirstInstanceAdmin` / `findInstanceAdmins`**: dogfood ownership and multi-admin membership grants.
+
+### Changed
+
+- **Cookie Consent CSS delivery**: kit `nowo-cookie-consent.css` is imported into Vite `app` CSS so ad blockers cannot strip `/bundles/nowocookieconsent/*`; layouts use `data-nowo-cookie-consent-external-css="true"`; thin host `_cookie_consent.scss` bridge for footer/position; Tailwind `@source`s vendor Twig (`103` / amends `101` / `081` / `002`).
+- **PWA** service-worker `cache_version` bumped to **v5**.
+- **`make dogfood` / `--skip-demo-user`**: prefers earliest registered `ROLE_ADMIN` for ownership / `.demo-client.env` hint; grants **every** instance admin membership; ignores `--email` and leftover `admin@…` (`055` / `058` / `103`).
+- Spec `103` (new); amended `002` / `055` / `058` / `081` / `097` / `101`; ROADMAP Phase **6.54**; E2E catalog ~259 Covered.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After upgrade, rebuild frontend assets (`make assets` / Vite) and recreate PHP / clear PWA caches so guests pick up bundled CMP CSS (`cache_version` v5).
+- Local dogfood: `make dogfood` then `make restart` if `BEACON_DSN` changed; sign in as the first registered admin (password is not written to `.demo-client.env`).
+
 ## [1.19.0] - 2026-08-16
 
 ### Added
@@ -1350,7 +1370,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.19.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.0...HEAD
+[1.20.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...v1.19.0
 [1.18.7]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.6...v1.18.7
 [1.18.6]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.5...v1.18.6

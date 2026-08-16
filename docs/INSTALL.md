@@ -8,7 +8,7 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 | Schema | `doctrine:migrations:migrate` | Database structure |
 | Platform | `app:seed-platform` / `make seed-platform` | Menus + breadcrumbs + cookie consent profile/inventory (idempotent; safe after upgrades) |
 | Demo | `app:seed-demo` / `make seed` | Local admin + **Symfony Beacon** project (`slug=symfony-beacon`) + `.demo-client.env` (**mode 600**) + optional server `BEACON_DSN` |
-| Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user --sync-server-dsn`) | Same project + **re-wires** server `BEACON_DSN` **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to existing `ROLE_ADMIN` users |
+| Dogfood | `make dogfood` (`app:seed-demo --skip-demo-user --sync-server-dsn`) | Same project + **re-wires** server `BEACON_DSN` **without** creating `admin@symfony-beacon.local`; grants Symfony Beacon access to **every existing `ROLE_ADMIN`** (preferred owner / `.demo-client.env` login hint = **earliest registered** admin). Does **not** bind to a hard-coded personal email. |
 | Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](ops/MERCURE.md)) |
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
 | Setup UI | `/setup` | SiteBackup wizard (bootstrap choice, migrations, platform seed, admin / optional sample, or full SQL dump) |

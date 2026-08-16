@@ -28,7 +28,7 @@ nowo_pwa:
         enabled: true
         strategy: network-first
         # Bump when deny/precache rules change so browsers drop stale SW caches.
-        cache_version: v4
+        cache_version: v5
         cache_name_prefix: beacon-pwa
         # Never precache auth HTML: pathname.endsWith('/login') also matches /es/login.
         precache_urls:

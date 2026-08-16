@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* CookieConsent public modal (ui_theme: tailwind) — vendor Twig utilities. */
+@source "../../vendor/nowo-tech/cookie-consent-bundle/src/Resources/views";
+
 @theme {
   --font-sans: "Montserrat", "Segoe UI", sans-serif;
   --font-display: "Montserrat", "Segoe UI", sans-serif;

@@ -38,7 +38,9 @@ final readonly class DemoIdentitySeeder
     }
 
     /**
-     * @param bool $createDemoUser    when false (dogfood), never create admin@…; use existing ROLE_ADMIN
+     * @param bool $createDemoUser    when false (dogfood), never create admin@… and never prefer
+     *                                `--email`; resolve ownership from existing ROLE_ADMIN accounts
+     *                                (earliest registered first)
      * @param bool $useStableDemoKeys when true (local only), use documented DEMO_PUBLIC_KEY / DEMO_SECRET_KEY
      *
      * @return array{
@@ -50,7 +52,7 @@ final readonly class DemoIdentitySeeder
      *     user: User
      * }
      *
-     * @throws LogicException when $createDemoUser is false and no user can own a new dogfood project
+     * @throws LogicException when $createDemoUser is false and no ROLE_ADMIN can own the dogfood project
      */
     public function seed(
         string $email = 'admin@symfony-beacon.local',
@@ -59,40 +61,48 @@ final readonly class DemoIdentitySeeder
         bool $useStableDemoKeys = true,
     ): array {
         $userCreated = false;
-        $user = $this->userRepository->findOneByEmail($email);
+        $user = null;
 
-        if (!$user instanceof User && $createDemoUser) {
-            $user = new User();
-            $user->setEmail($email);
-            $user->setDisplayName('Demo Admin');
-            $user->setRoles(['ROLE_ADMIN']);
-            $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-            $user->setPasswordChangedAt(new DateTime());
-            // Local QR approve/deny E2E (UC-AUTH-22): verified phone without SMS OTP yet.
-            $user->setPhone('+34600000000');
-            $user->setPhoneVerifiedAt(new DateTimeImmutable());
-            $user->setPushNotificationsEnabled(true);
-            $this->userRepository->save($user);
-            $userCreated = true;
-        } elseif ($user instanceof User && $createDemoUser && 'admin@symfony-beacon.local' === $email) {
-            // Re-seed keeps demo QR approver usable after profile clears verification.
-            $dirty = false;
-            if (null === $user->getPhone() || null === $user->getPhoneVerifiedAt()) {
-                $user->setPhone($user->getPhone() ?? '+34600000000');
+        if ($createDemoUser) {
+            $user = $this->userRepository->findOneByEmail($email);
+
+            if (!$user instanceof User) {
+                $user = new User();
+                $user->setEmail($email);
+                $user->setDisplayName('Demo Admin');
+                $user->setRoles(['ROLE_ADMIN']);
+                $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+                $user->setPasswordChangedAt(new DateTime());
+                // Local QR approve/deny E2E (UC-AUTH-22): verified phone without SMS OTP yet.
+                $user->setPhone('+34600000000');
                 $user->setPhoneVerifiedAt(new DateTimeImmutable());
-                $dirty = true;
-            }
-            if (!$user->isPushNotificationsEnabled()) {
                 $user->setPushNotificationsEnabled(true);
-                $dirty = true;
-            }
-            if ($dirty) {
                 $this->userRepository->save($user);
+                $userCreated = true;
+            } elseif ('admin@symfony-beacon.local' === $email) {
+                // Re-seed keeps demo QR approver usable after profile clears verification.
+                $dirty = false;
+                if (null === $user->getPhone() || null === $user->getPhoneVerifiedAt()) {
+                    $user->setPhone($user->getPhone() ?? '+34600000000');
+                    $user->setPhoneVerifiedAt(new DateTimeImmutable());
+                    $dirty = true;
+                }
+                if (!$user->isPushNotificationsEnabled()) {
+                    $user->setPushNotificationsEnabled(true);
+                    $dirty = true;
+                }
+                if ($dirty) {
+                    $this->userRepository->save($user);
+                }
             }
-        }
-
-        if (!$user instanceof User) {
-            $user = $this->findFirstInstanceAdmin() ?? $this->userRepository->findOneBy([]);
+        } else {
+            // Dogfood: ignore --email / leftover admin@…; use the first registered ROLE_ADMIN.
+            $user = $this->userRepository->findFirstInstanceAdmin();
+            if (!$user instanceof User) {
+                throw new LogicException(
+                    'Cannot dogfood without an existing ROLE_ADMIN. Register the first admin (or run app:seed-demo without --skip-demo-user), then re-run make dogfood.',
+                );
+            }
         }
 
         $projectCreated = false;
@@ -145,17 +155,6 @@ final readonly class DemoIdentitySeeder
             'api_key' => $apiKey,
             'user' => $user,
         ];
-    }
-
-    private function findFirstInstanceAdmin(): ?User
-    {
-        foreach ($this->userRepository->findAll() as $candidate) {
-            if (\in_array('ROLE_ADMIN', $candidate->getRoles(), true)) {
-                return $candidate;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -266,11 +265,7 @@ final readonly class DemoIdentitySeeder
         }
 
         $added = 0;
-        foreach ($this->userRepository->findAll() as $candidate) {
-            if (!\in_array('ROLE_ADMIN', $candidate->getRoles(), true)) {
-                continue;
-            }
-
+        foreach ($this->userRepository->findInstanceAdmins() as $candidate) {
             $id = $candidate->getId();
             if (null === $id || isset($memberUserIds[$id])) {
                 continue;

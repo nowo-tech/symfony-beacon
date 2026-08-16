@@ -1,0 +1,100 @@
+/* CookieConsent host bridge.
+ *
+ * Kit skin is bundled into app.css (see app.ts) so ad blockers that match
+ * `/bundles/nowocookieconsent/*` cannot strip the modal chrome. Layouts set
+ * `data-nowo-cookie-consent-external-css="true"` so the kit JS skips style injection.
+ *
+ * This file only fixes host chrome collision (legal footer) + data-attribute
+ * position fallbacks when JS layout classes are slow/missing.
+ */
+
+.page-shell {
+  --site-legal-footer-height: 3.75rem;
+}
+
+.page-shell:not(.page-shell--app) > .site-legal-footer {
+  z-index: 1;
+}
+
+/* Bubble: DB/YAML want bottom-right; clear the legal footer strip. */
+.nowo-cookie-consent__preferences-bubble.nowo-cookie-consent__preferences-bubble {
+  position: fixed;
+  z-index: 70;
+  right: 1.25rem;
+  left: auto;
+  bottom: calc(var(--site-legal-footer-height) + 1.25rem);
+}
+
+.nowo-cookie-consent__preferences-bubble--bottom-left {
+  left: 1.25rem;
+  right: auto;
+}
+
+/* Viewport shell — do not rely solely on Tailwind utilities from vendor Twig. */
+#cookieconsent.nowo-cookie-consent {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  box-sizing: border-box;
+}
+
+#cookieconsent.nowo-cookie-consent.show {
+  display: flex !important;
+  flex-direction: column;
+  max-height: 100dvh;
+  min-height: 100dvh;
+  padding: 1rem;
+  padding-bottom: calc(var(--site-legal-footer-height) + 0.75rem);
+}
+
+/* Prefer data-* from the server so layout works even before JS class sync. */
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-y='bottom'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-y-bottom {
+  justify-content: flex-end;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-y='top'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-y-top {
+  justify-content: flex-start;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-y='middle'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-y-middle {
+  justify-content: center;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-x='left'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-x-left {
+  align-items: flex-start;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-x='right'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-x-right {
+  align-items: flex-end;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-position-x='center'],
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--pos-x-center {
+  align-items: center;
+}
+
+#cookieconsent.nowo-cookie-consent.show[data-nowo-layout='box'] .nowo-cookie-consent__dialog,
+#cookieconsent.nowo-cookie-consent.show.nowo-cookie-consent--layout-box .nowo-cookie-consent__dialog {
+  width: 100%;
+  max-width: min(36rem, calc(100vw - 2rem));
+  margin-inline: 0;
+}
+
+#cookieconsent.nowo-cookie-consent[data-nowo-disable-page-interaction='true'].show::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--nowo-cc-overlay, rgba(0, 0, 0, 0.65));
+}
+
+#cookieconsent .nowo-cookie-consent__dialog,
+#cookieconsent .nowo-cookie-consent__panel {
+  position: relative;
+  z-index: 1;
+}

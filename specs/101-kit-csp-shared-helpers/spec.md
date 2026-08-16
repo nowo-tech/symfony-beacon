@@ -42,12 +42,12 @@
 
 **Why this priority**: Host SCSS duplicated kit chrome because CSP nonces dropped injected styles.
 
-**Independent Test**: Guest login shell shows themed bottom-left modal; layout has `link[data-nowo-cookie-consent-css]`; no `_cookie_consent.scss` in Vite app.
+**Independent Test**: Guest login shell shows themed bottom-left modal; kit skin is present without JS-injected `<style>`; position remains bottom-left.
 
-**Acceptance Scenarios**:
+**Acceptance Scenarios** (amended by `103` / v1.20.0 — Vite bundle):
 
-1. **Given** CookieConsent **≥ 1.9**, **When** public shells load, **Then** they link `nowo-cookie-consent.css` with `data-nowo-cookie-consent-css`.
-2. **Given** that marker, **When** the modal JS boots, **Then** it does not inject a `<style>` block for the skin.
+1. **Given** CookieConsent **≥ 1.9**, **When** public shells load, **Then** kit skin CSS is available (originally via kit pack `<link data-nowo-cookie-consent-css>`; as of `103`, via Vite-bundled `app` CSS + `data-nowo-cookie-consent-external-css="true"`).
+2. **Given** the external-CSS marker, **When** the modal JS boots, **Then** it does not inject a `<style>` block for the skin.
 3. **Given** the seeded DB profile, **When** the modal opens, **Then** position remains bottom-left with equal-weight actions.
 
 ### User Story 3 - CSRF / GET helpers from FormKit (P1)
@@ -76,8 +76,8 @@
 ## Functional Requirements
 
 - **FR-001**: Pin `nowo-tech/phone-input-bundle` **1.3.0**, `cookie-consent-bundle` **1.9.0**, `form-kit-bundle` **2.4.0**, `ui-kit-bundle` **1.8.0** (exact pins in `composer.json`).
-- **FR-002**: MUST NOT keep host forks for phone widget Twig, `phone_prefix_picker` Stimulus, `_phone_input.scss`, or `_cookie_consent.scss`.
-- **FR-003**: Public layouts (`base`, `guest_shell`) MUST link kit cookie CSS with `data-nowo-cookie-consent-css`.
+- **FR-002**: MUST NOT keep host forks for phone widget Twig, `phone_prefix_picker` Stimulus, or `_phone_input.scss`. A thin `_cookie_consent.scss` host bridge is allowed again as of `103` (footer/position only — not a full skin fork).
+- **FR-003**: Public layouts (`base`, `guest_shell`) MUST load kit cookie skin without JS `<style>` injection. As of `103`: Vite-bundled import + `data-nowo-cookie-consent-external-css="true"` (do not `<link>` `/bundles/nowocookieconsent/*` on public pages).
 - **FR-004**: Host MUST NOT redefine `CsrfOnlyType`, `HiddenFieldsCsrfType`, `SearchQueryType`, `CsrfOnlyFormFactory`, or `GetFilterFormFactory` under `App\Shared\Form`.
 - **FR-005**: Host `AbstractGetFilterType` MUST extend kit `Nowo\FormKitBundle\Form\AbstractGetFilterType` and MAY keep Beacon-only dashboard helpers.
 - **FR-006**: `CsrfOnlyFormFactory::create()` is flat; nested `csrf_only[_token]` MUST use `createNamed()`. Twig `csrf_action_form()` preserves the `$named` bool by calling the matching kit method.
@@ -109,3 +109,7 @@
 ### 2026-08-15 — Initial cut (this document)
 
 Implements K1–K5 + B1 as Phase **6.52**. No Doctrine migration.
+
+### 2026-08-17 — Cookie CSS Vite bundle (`103`)
+
+Ad blockers often strip `/bundles/nowocookieconsent/nowo-cookie-consent.css`. Host now imports the kit CSS into Vite `app`, sets `data-nowo-cookie-consent-external-css="true"`, and keeps a thin `_cookie_consent.scss` bridge. Amends FR-002 / FR-003 and User Story 2. Full write-up: `103-cookie-consent-vite-e2e-security`.

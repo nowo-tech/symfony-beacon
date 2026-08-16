@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.19.0)](#unreleased-main-after-1190)
+- [Unreleased (main after 1.20.0)](#unreleased-main-after-1200)
+- [Upgrading from 1.19.0 to 1.20.0](#upgrading-from-1190-to-1200)
 - [Upgrading from 1.18.7 to 1.19.0](#upgrading-from-1187-to-1190)
 - [Upgrading from 1.18.6 to 1.18.7](#upgrading-from-1186-to-1187)
 - [Upgrading from 1.18.5 to 1.18.6](#upgrading-from-1185-to-1186)
@@ -80,9 +81,32 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.19.0)
+## Unreleased (main after 1.20.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.19.0 to 1.20.0
+
+Cookie Consent skin is bundled into Vite `app` CSS (ad-blocker resilient); dogfood prefers the earliest `ROLE_ADMIN`; Playwright security denials catalog (`UC-SEC-01`…`12`). **No migrations.**
+
+1. Pull / checkout `v1.20.0`.
+
+2. Rebuild frontend assets and refresh the PHP container (PWA `cache_version` is **v5**):
+
+```bash
+make assets   # or your usual Vite build
+make restart  # recreate PHP so env / SW precache rules reload
+```
+
+3. Local dogfood (optional): `make dogfood` grants **every** `ROLE_ADMIN` membership; `.demo-client.env` login hint is the **first registered** admin (not leftover `admin@…`). Password is not written to that file — use your real admin password.
+
+4. Contributors — security E2E slice:
+
+```bash
+make test-e2e ARGS='e2e/security'
+```
+
+See [LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md), [INSTALL.md](INSTALL.md), and [E2E-USE-CASES.md](product/E2E-USE-CASES.md) §16.
 
 ## Upgrading from 1.18.7 to 1.19.0
 

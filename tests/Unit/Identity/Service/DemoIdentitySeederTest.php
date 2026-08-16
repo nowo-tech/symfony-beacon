@@ -30,6 +30,8 @@ final class DemoIdentitySeederTest extends TestCase
             new ReflectionProperty(User::class, 'id')->setValue($user, 1);
             $savedUsers[] = $user;
         });
+        $users->method('findInstanceAdmins')->willReturnCallback(static fn (): array => $savedUsers);
+        $users->method('findFirstInstanceAdmin')->willReturnCallback(static fn (): ?User => $savedUsers[0] ?? null);
         $users->method('findAll')->willReturnCallback(static fn (): array => $savedUsers);
 
         $projects = $this->createStub(ProjectRepository::class);
@@ -50,6 +52,66 @@ final class DemoIdentitySeederTest extends TestCase
         self::assertSame(SeedDemoCommand::DEMO_PROJECT_SLUG, $result['project']->getSlug());
         self::assertInstanceOf(ProjectApiKey::class, $result['api_key']);
         self::assertSame(SeedDemoCommand::DEMO_PUBLIC_KEY, $result['api_key']->getPublicKey());
+    }
+
+    public function testDogfoodSkipDemoUserUsesEarliestAdminNotEmailOption(): void
+    {
+        $firstAdmin = new User();
+        $firstAdmin->setEmail('first-admin@example.com');
+        $firstAdmin->setRoles(['ROLE_ADMIN']);
+        new ReflectionProperty(User::class, 'id')->setValue($firstAdmin, 1);
+
+        $laterDemo = new User();
+        $laterDemo->setEmail('admin@symfony-beacon.local');
+        $laterDemo->setRoles(['ROLE_ADMIN']);
+        new ReflectionProperty(User::class, 'id')->setValue($laterDemo, 2);
+
+        $users = $this->createStub(UserRepository::class);
+        // Even if --email resolves to admin@…, dogfood must ignore it.
+        $users->method('findOneByEmail')->willReturn($laterDemo);
+        $users->method('findFirstInstanceAdmin')->willReturn($firstAdmin);
+        $users->method('findInstanceAdmins')->willReturn([$firstAdmin, $laterDemo]);
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('findOneBy')->willReturn(null);
+        $projects->method('save');
+
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $apiKeys = new ProjectApiKeyFactory($em);
+        $seeder = new DemoIdentitySeeder(
+            $users,
+            $projects,
+            $hasher,
+            new ProjectFactory($projects, $apiKeys),
+            $apiKeys,
+        );
+
+        $result = $seeder->seed('admin@symfony-beacon.local', 'admin123', false);
+        self::assertFalse($result['user_created']);
+        self::assertSame('first-admin@example.com', $result['user']->getEmail());
+        self::assertTrue($result['project_created']);
+    }
+
+    public function testDogfoodSkipDemoUserThrowsWithoutRoleAdmin(): void
+    {
+        $users = $this->createStub(UserRepository::class);
+        $users->method('findFirstInstanceAdmin')->willReturn(null);
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('findOneBy')->willReturn(null);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $apiKeys = new ProjectApiKeyFactory($em);
+        $seeder = new DemoIdentitySeeder(
+            $users,
+            $projects,
+            $this->createStub(UserPasswordHasherInterface::class),
+            new ProjectFactory($projects, $apiKeys),
+            $apiKeys,
+        );
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('ROLE_ADMIN');
+        $seeder->seed('admin@symfony-beacon.local', 'admin123', false);
     }
 
     public function testEnsureDemoProjectThrowsWithoutOwner(): void

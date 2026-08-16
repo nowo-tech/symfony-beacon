@@ -387,7 +387,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-15):** ~247 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (252 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
+**Automation status (2026-08-16):** ~259 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (264 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
 
 **Closed Gap batches:**
 
@@ -403,8 +403,32 @@ Membership roles: see [ROLES.md](ROLES.md).
 10. ~~AUTH-23 / OPS-10 / SETUP-03 / ACC-23~~ → Covered (`smoke/use-cases-remaining-oos.spec.ts`; local VAPID in `.env`).
 11. ~~SETUP-04/05 + NOTIF-17~~ → Covered (`smoke/use-cases-setup-warm.spec.ts`, `notifications/use-cases-digest-flush.spec.ts`).
 12. ~~Atomic definition gaps AUTH-25/26, ACC-24/25, DASH-15, OPS-12/13, SETUP-06, ADM-38..42, PROJ-27~~ → Covered (`flows/use-cases-atomic-gaps.spec.ts`); OPS-14 remains Out of scope.
+13. ~~Security denials UC-SEC-01..12~~ → Covered (`security/access-denials.spec.ts`, `security/auth-gates.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
+
+---
+
+## 16. Security denials (negative access control)
+
+Focused suite proving **blocked** access — HTTP 403 branded gates, login redirects, and membership revocation. Happy-path auth (magic/QR/reset completion) stays in §1; this section is the denial matrix.
+
+| ID | Use case | Status | E2E file(s) |
+|----|----------|--------|-------------|
+| UC-SEC-01 | Guest protected routes redirect to login (dashboard/admin/account/project) | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-02 | `ROLE_USER` without `ROLE_ADMIN` → Administration 403 | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-03 | Authenticated user without project membership → project surfaces 403 | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-04 | Viewer: read OK; settings / notification CRUD / triage POST → 403 | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-05 | Member: triage chrome OK; settings / API keys / delete → 403 | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-06 | Project `admin`: settings OK; delete project → 403 | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-07 | Demote `admin` → `viewer` then settings/notifications blocked | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-08 | Deactivated membership revokes project access (403) | ✅ Covered | `security/access-denials.spec.ts` |
+| UC-SEC-09 | Invalid credentials stay on login | ✅ Covered | `security/auth-gates.spec.ts` |
+| UC-SEC-10 | Disabled account cannot authenticate | ✅ Covered | `security/auth-gates.spec.ts` |
+| UC-SEC-11 | Password reset + QR/magic login stay public (no dashboard leak) | ✅ Covered | `security/auth-gates.spec.ts` |
+| UC-SEC-12 | `/register` closed when users exist | ✅ Covered | `security/auth-gates.spec.ts` |
+
+Helpers: `e2e/support/security.ts` (`expectForbidden`, `createEnabledUser`, `addProjectMember`, `loginAsUser`, …).
 
 ---
 

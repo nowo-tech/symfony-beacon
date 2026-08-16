@@ -33,7 +33,7 @@ Configured in `config/packages/security.yaml`. Controllers use `#[IsGranted(...)
 - **How it is granted:**
   - First registration (`nowo_auth_kit.registration_mode: first_user_only` → `registration_role: ROLE_ADMIN`).
   - Setup / SiteBackup admin provisioning.
-  - `app:seed-demo` demo user (`make seed` / `make ready`). `make dogfood` uses `--skip-demo-user --sync-server-dsn` and only grants existing admins.
+  - `app:seed-demo` demo user (`make seed` / `make ready`). `make dogfood` uses `--skip-demo-user --sync-server-dsn` and grants **every** existing `ROLE_ADMIN` (preferred owner / `.demo-client.env` hint = earliest registered admin by id — not a leftover `admin@…` and not a hard-coded personal email).
   - Administration → Users → change role (cannot demote the last admin or yourself).
 - **What it unlocks:**
   - `/admin` hub, Users, Groups, Roles, Permissions, Admin Projects, Appearance, Mailer, Mercure.
