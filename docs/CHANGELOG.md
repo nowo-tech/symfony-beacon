@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.7] - 2026-08-16
+
+### Changed
+
+- **Makefile DX**: `MAKEFLAGS += --no-print-directory` so recursive `$(MAKE)` (e.g. `ensure-up` → `ensure-env` / `up-infra`) no longer prints `Entering/Leaving directory` noise on targets like `make cs-fix` (`086`).
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator steps beyond pulling `v1.18.7`.
+
 ## [1.18.6] - 2026-08-16
 
 ### Fixed
@@ -1319,7 +1329,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.6...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...HEAD
+[1.18.7]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.6...v1.18.7
 [1.18.6]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.5...v1.18.6
 [1.18.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.4...v1.18.5
 [1.18.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.3...v1.18.4

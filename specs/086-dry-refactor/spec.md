@@ -26,7 +26,7 @@ Contributors need **one place** for repeated OTLP gate/map/dispatch, project boo
 | T8 | Twig | Confirm-dialog **structured chrome**: form-bearing embeds use `header_wrapper` + `content_wrapper` (`confirm-dialog__header` / `__content` / `__actions`); prefer default actions + `submit_disabled` over custom `{% block actions %}` |
 | T9 | Twig / Stimulus | `open_on_connect` on `shared/_confirm_dialog.html.twig` emits `data-confirm-dialog-open-on-connect-value="true"` **only** for explicit true; omit otherwise (Stimulus Boolean treats empty/`null` attr as true) |
 | T10 | SCSS / kit | Confirm-dialog `::backdrop` and kit `.modal-backdrop` use a **black** scrim (not `--color-ink` / `--beacon-ink`); darker opacity under `html[data-theme='dark']` |
-| DX | Makefile | `ensure-up` prerequisite on targets that `docker compose exec` (no `--build` / no Vite) |
+| DX | Makefile | `ensure-up` prerequisite on targets that `docker compose exec` (no `--build` / no Vite); `MAKEFLAGS += --no-print-directory` so recursive `$(MAKE)` stays quiet (`v1.18.7`) |
 | UI | Forms | Platform `.checkbox` + FormKit `field_types.checkbox.attr.class: checkbox`; AuthKit / kit-admin / confirm-dialog selectors |
 | UI | Password toggle | `.input-group.form-password-toggle` flex row, **gap 0.5rem**, eye on the right; `nowo_password_toggle` button_classes `input-group-text`; hide `::-ms-reveal` |
 | QA | Static analysis | PHPStan 0 errors (bootstrap FrankenPHP ignores where needed) |
