@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   beaconAuthHeader,
+  createApiKeyAndParseDsn,
   dismissProductTour,
   ingestHttpBase,
   loadDemoIngestCredentials,
@@ -72,18 +73,7 @@ async function createKeyAndParseDsn(
   uuid: string,
   label: string,
 ): Promise<{ publicKey: string; secretKey: string; projectRef: string }> {
-  await page.goto(`/projects/${uuid}/settings/access`);
-  await dismissProductTour(page);
-  const createForm = page.locator('form').filter({ has: page.locator('input[name="project_api_key_create[label]"]') });
-  await createForm.locator('input[name="project_api_key_create[label]"]').fill(label);
-  await createForm.locator('button[type="submit"].btn-primary, button.btn-primary[type="submit"]').click();
-  await waitForPageLoader(page);
-  const flash = page.locator('[data-testid="api-key-dsn-flash"]');
-  await expect(flash).toBeVisible({ timeout: 15_000 });
-  const flashText = await flash.innerText();
-  const dsnMatch = flashText.match(/https?:\/\/([^:]+):([^@]+)@[^/\s]+\/([^\s]+)/i);
-  expect(dsnMatch, 'DSN in flash').toBeTruthy();
-  return { publicKey: dsnMatch![1], secretKey: dsnMatch![2], projectRef: dsnMatch![3] };
+  return createApiKeyAndParseDsn(page, uuid, label);
 }
 
 test.describe('Ingest edges — malformed, quotas, bad DSN', () => {

@@ -9,8 +9,10 @@ use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use DateTime;
 use DateTimeImmutable;
+use InvalidArgumentException;
 use Nowo\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 final class UserTest extends TestCase
 {
@@ -85,7 +87,7 @@ final class UserTest extends TestCase
             ->markProductTourSeen($tourSeenAt)
             ->setAnonymizedAt(new DateTimeImmutable('2026-08-16 14:00:00'));
         $user->setCreatedBy($actor);
-        $user->setUpdatedBy(new \stdClass());
+        $user->setUpdatedBy(new stdClass());
 
         self::assertSame('es', $user->getPreferredLocale());
         self::assertSame('dark', $user->getPreferredTheme());
@@ -101,7 +103,7 @@ final class UserTest extends TestCase
         $user->removeInstanceRole($enabledRole);
         self::assertFalse($user->hasInstanceRole($enabledRole));
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $user->addPasswordHistory($this->createStub(PasswordHistoryInterface::class));
     }
 }

@@ -41,6 +41,21 @@ final class DropSelfIngestBeforeSendTest extends TestCase
         ]));
     }
 
+    public function testDropsEnvelopePathFromContextsRequest(): void
+    {
+        $filter = new DropSelfIngestBeforeSend();
+        self::assertNull($filter([
+            'message' => 'ingest failed',
+            'contexts' => [
+                'request' => [
+                    'url' => 'http://127.0.0.1/api/1/envelope/',
+                    'path' => '/api/1/envelope/',
+                    'uri' => '/api/1/envelope/',
+                ],
+            ],
+        ]));
+    }
+
     public function testKeepsDashboardException(): void
     {
         $filter = new DropSelfIngestBeforeSend();

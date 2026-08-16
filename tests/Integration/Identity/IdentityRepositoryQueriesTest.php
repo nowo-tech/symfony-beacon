@@ -13,7 +13,6 @@ use App\Identity\Repository\UserRepository;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use ReflectionProperty;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
@@ -83,14 +82,14 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         $em->persist($disabledRole);
         $em->flush();
 
-        self::assertSame($admin->getId(), $users->findOneByEmail(' admin@example.com ') ?->getId());
+        self::assertSame($admin->getId(), $users->findOneByEmail(' admin@example.com ')?->getId());
         self::assertSame(
             ['admin@example.com' => $admin, 'staff@example.com' => $staff],
             $users->findIndexedByEmails([' ', 'Admin@example.com', 'staff@example.com', 'admin@example.com']),
         );
         self::assertSame([], $users->findIndexedByEmails([' ', '']));
         self::assertNull($users->findOneBySlackUserId('   '));
-        self::assertSame($admin->getId(), $users->findOneBySlackUserId(' U123 ') ?->getId());
+        self::assertSame($admin->getId(), $users->findOneBySlackUserId(' U123 ')?->getId());
 
         self::assertCount(2, $users->findAllForAdminDirectory('Person', 10, 0));
         self::assertCount(1, $users->findAllForAdminDirectory(null, 1, 1));

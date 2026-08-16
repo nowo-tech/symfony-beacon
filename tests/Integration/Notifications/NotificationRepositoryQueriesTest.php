@@ -281,5 +281,4 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertCount(0, $attempts->findRecentForDestination($failedA));
         self::assertCount(0, $attempts->findRecentForDestination($failedB));
     }
-
 }

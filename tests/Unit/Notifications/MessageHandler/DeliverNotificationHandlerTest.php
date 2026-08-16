@@ -31,6 +31,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use RuntimeException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -137,7 +138,7 @@ final class DeliverNotificationHandlerTest extends TestCase
             ++$flush;
         });
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Destination returned HTTP 500');
 
         try {
@@ -164,8 +165,8 @@ final class DeliverNotificationHandlerTest extends TestCase
         });
 
         $this->handler($destinations, em: $em)(new DeliverNotificationMessage(8, [
-            'summary' => "Email summary
-with newline",
+            'summary' => 'Email summary
+with newline',
             'event' => 'issue.resolved',
         ]));
 

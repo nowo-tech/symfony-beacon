@@ -9,16 +9,17 @@ use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
-use App\Identity\UserActionType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\AccountSocialAccounts;
+use App\Identity\UserActionType;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectMembershipRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
 use Nowo\AuthKitBundle\Profile\ProfileRegistry;
@@ -131,7 +132,6 @@ final class AccountDataExporterTest extends TestCase
         ], 'main'), $credentials);
     }
 
-
     public function testExportIncludesMembershipsGroupsActivityHistoryAndRoles(): void
     {
         $user = new User();
@@ -139,7 +139,7 @@ final class AccountDataExporterTest extends TestCase
         $user->setDisplayName('Full Export');
         $user->setSlackUserId('U999');
         $user->setPhone('+34600111222');
-        $user->setPhoneVerifiedAt(new \DateTimeImmutable('2024-01-02T03:04:05+00:00'));
+        $user->setPhoneVerifiedAt(new DateTimeImmutable('2024-01-02T03:04:05+00:00'));
         $user->setPreferredTheme('dark');
         $user->setPreferredContentWidth('full');
         $user->setPreferredUiDensity('compact');
@@ -149,12 +149,12 @@ final class AccountDataExporterTest extends TestCase
         $user->setPreferredSidebar('collapsed');
         $user->setPushNotificationsEnabled(true);
         $user->setRoles(['ROLE_ADMIN', 'ROLE_SUPPORT']);
-        $user->setAnonymizedAt(new \DateTimeImmutable('2024-01-03T00:00:00+00:00'));
+        $user->setAnonymizedAt(new DateTimeImmutable('2024-01-03T00:00:00+00:00'));
         (new ReflectionProperty(User::class, 'id'))->setValue($user, 10);
 
         $passwordHistory = (new PasswordHistory())
             ->setPassword('hash')
-            ->setCreatedAt(new \DateTimeImmutable('2024-01-04T00:00:00+00:00'));
+            ->setCreatedAt(new DateTimeImmutable('2024-01-04T00:00:00+00:00'));
         $user->addPasswordHistory($passwordHistory);
         (new ReflectionProperty(User::class, 'passwordHistory'))->setValue(
             $user,
@@ -227,5 +227,4 @@ final class AccountDataExporterTest extends TestCase
         self::assertSame(1, $document['push_subscriptions_count']);
         self::assertCount(1, $document['social_accounts']);
     }
-
 }

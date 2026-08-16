@@ -27,7 +27,7 @@ final class KitInlineConfigScriptSubscriberExtraTest extends TestCase
         $html = "<html><body><script>\n"
             ."window.__breadcrumbKitDashboard = window.__breadcrumbKitDashboard || {};\n"
             ."window.__breadcrumbKitDashboard.dashboardBase = '\xB1';\n"
-            ."</script></body></html>";
+            .'</script></body></html>';
 
         $method = new ReflectionMethod(KitInlineConfigScriptSubscriber::class, 'rewriteBreadcrumbKit');
         self::assertSame($html, $method->invoke($subscriber, $html));

@@ -6,7 +6,9 @@ namespace App\Tests\Unit\Shared\Settings\Entity;
 
 use App\Identity\Entity\User;
 use App\Shared\Settings\Entity\InstanceSettings;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 final class InstanceSettingsTest extends TestCase
 {
@@ -19,7 +21,7 @@ final class InstanceSettingsTest extends TestCase
 
         $settings->markSetupCompleted();
         self::assertTrue($settings->isSetupCompleted());
-        self::assertInstanceOf(\DateTimeImmutable::class, $settings->getSetupCompletedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $settings->getSetupCompletedAt());
 
         $settings->clearSetupCompleted();
         self::assertFalse($settings->isSetupCompleted());
@@ -30,7 +32,7 @@ final class InstanceSettingsTest extends TestCase
         $user = new User()->setEmail('admin@example.com');
         $settings = InstanceSettings::defaults();
         $settings->setCreatedBy($user);
-        $settings->setUpdatedBy(new \stdClass());
+        $settings->setUpdatedBy(new stdClass());
 
         self::assertSame($user, $settings->getCreatedBy());
         self::assertNull($settings->getUpdatedBy());

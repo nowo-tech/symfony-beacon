@@ -10,6 +10,7 @@ use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Tour\ProductTourPage;
 use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 
 final class CoverageRegressionTest extends TestCase
@@ -38,8 +39,8 @@ final class CoverageRegressionTest extends TestCase
         self::assertNull($translation->getId());
         self::assertSame('es', $translation->setLocale(' ES ')->getLocale());
         self::assertSame('Manage members', $translation->setName('  Manage members  ')->getName());
-        self::assertNull($translation->setDescription(" 
- ")->getDescription());
+        self::assertNull($translation->setDescription(' 
+ ')->getDescription());
         self::assertSame('Readable description', $translation->setDescription(' Readable description ')->getDescription());
     }
 
@@ -49,7 +50,7 @@ final class CoverageRegressionTest extends TestCase
         $history = new PasswordHistory();
 
         self::assertNull($history->getId());
-        self::assertInstanceOf(\DateTimeInterface::class, $history->getCreatedAt());
+        self::assertInstanceOf(DateTimeInterface::class, $history->getCreatedAt());
 
         $history->setUser($user)->setPassword('hashed-secret');
 

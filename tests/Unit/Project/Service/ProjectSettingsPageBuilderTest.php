@@ -504,7 +504,6 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         self::assertFalse($session->has('_beacon_last_share_url'));
     }
 
-
     public function testBuildCreatesOptionalFormsAndHandlesUnsavedProjectState(): void
     {
         $project = new Project()->setName('Unsaved')->setSlug('unsaved');
@@ -641,5 +640,4 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         self::assertNotNull($page['deleteProjectForm']);
         self::assertSame([$availableGroup], $page['availableGroups']);
     }
-
 }

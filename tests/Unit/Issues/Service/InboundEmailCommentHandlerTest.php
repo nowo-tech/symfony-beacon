@@ -155,7 +155,6 @@ final class InboundEmailCommentHandlerTest extends TestCase
         );
     }
 
-
     public function testIgnoresMissingIssueAndUnknownUser(): void
     {
         $tokenSvc = new InboundEmailReplyToken($this->opsDefaultsWith(static function (InstanceSettings $s): void {
@@ -217,8 +216,8 @@ final class InboundEmailCommentHandlerTest extends TestCase
         self::assertSame(
             'ignored',
             $this->handler(replyToken: $tokenSvc, issueRepo: $issueRepo, userRepo: $userRepo, isAdmin: true)
-                ->handle('alice@example.com', 'Alice <reply+'.$token.'@beacon.test>', "> quoted
-> only", 'mid-empty'),
+                ->handle('alice@example.com', 'Alice <reply+'.$token.'@beacon.test>', '> quoted
+> only', 'mid-empty'),
         );
     }
 

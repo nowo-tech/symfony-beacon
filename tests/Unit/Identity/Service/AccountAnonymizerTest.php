@@ -21,9 +21,9 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Repository\SocialLoginAccountRepository;
 use PHPUnit\Framework\MockObject\Stub;
-use stdClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -172,7 +172,6 @@ final class AccountAnonymizerTest extends TestCase
         );
         self::assertFalse($this->anonymizer->isLastAdmin($user));
     }
-
 
     public function testAnonymizeRemovesPasswordHistoryPushSubscriptionsAndSocialAccounts(): void
     {

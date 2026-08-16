@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   beaconAuthHeader,
+  createApiKeyAndParseDsn,
   dismissProductTour,
   ingestHttpBase,
   resolveDemoProjectUuid,
@@ -58,31 +59,20 @@ test.describe('Notifications & API keys — use cases', () => {
 
   test('creates ephemeral API key, rotates it, old secret rejected (UC-PROJ-05)', async ({ page, request }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings/access`);
-    await dismissProductTour(page);
-
     const label = `e2e-key-${Date.now().toString(36)}`;
-    const createForm = page.locator('form').filter({ has: page.locator('input[name="project_api_key_create[label]"]') });
-    await expect(createForm).toBeVisible();
-    await createForm.locator('input[name="project_api_key_create[label]"]').fill(label);
-    await createForm.locator('button[type="submit"].btn-primary, button.btn-primary[type="submit"]').click();
-    await waitForPageLoader(page);
-
-    const flash = page.locator('[data-testid="api-key-dsn-flash"]');
-    await expect(flash).toBeVisible({ timeout: 15_000 });
-    const flashText = await flash.innerText();
-    const dsnMatch = flashText.match(/https?:\/\/([^:]+):([^@]+)@[^/\s]+\/([^\s]+)/i);
-    expect(dsnMatch, 'DSN in flash').toBeTruthy();
-    const publicKey = dsnMatch![1];
-    const secretBefore = dsnMatch![2];
-    const projectRef = dsnMatch![3];
+    const { publicKey, secretKey: secretBefore, projectRef } = await createApiKeyAndParseDsn(page, uuid, label);
 
     const row = page.locator('li').filter({ hasText: label }).first();
     await expect(row).toBeVisible();
+    page.once('dialog', (d) => d.accept().catch(() => undefined));
     await row.locator('form[action*="/rotate"] button[type="submit"]').click();
     await waitForPageLoader(page);
-    // Rotate should invalidate the previous secret even if the one-time DSN flash is raced away.
+    // Rotate should invalidate the previous secret even if the one-time DSN reveal is raced away.
     await expect(page.locator('li').filter({ hasText: label }).first()).toBeVisible();
+    // New one-shot DSN should appear after rotate (row reveal or flash).
+    await expect(page.locator('[data-testid="api-key-dsn-once"], [data-testid="api-key-dsn-flash"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
 
     const base = ingestHttpBase();
     const denied = await request.post(`${base}/api/${projectRef}/envelope/`, {

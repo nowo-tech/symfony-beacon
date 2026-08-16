@@ -7,18 +7,18 @@ namespace App\Tests\Unit\Identity\Form;
 use App\Identity\Entity\User;
 use App\Identity\Form\AccountDisplayType;
 use App\Issues\IssuePanelIds;
+use InvalidArgumentException;
 use Nowo\FormKitBundle\Form\Constraint\ConstraintDefinitionFactory;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\TagInputBundle\Form\TagType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
-use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -44,7 +44,7 @@ final class AccountDisplayTypeTest extends TestCase
         $panelView = $panels->createView()['preferredCollapsedIssuePanels'];
         self::assertTrue($panels->has('preferredCollapsedIssuePanels'));
         self::assertStringContainsString('nowo-tag-input', (string) ($panelView->vars['attr']['data-controller'] ?? ''));
-        self::assertSame(json_encode(IssuePanelIds::all(), JSON_THROW_ON_ERROR), $panelView->vars['attr']['data-nowo-tag-input-whitelist-value']);
+        self::assertSame(json_encode(IssuePanelIds::all(), \JSON_THROW_ON_ERROR), $panelView->vars['attr']['data-nowo-tag-input-whitelist-value']);
 
         $tours = $this->formFactory()->create(AccountDisplayType::class, new User(), [
             'section' => AccountDisplayType::SECTION_TOURS,

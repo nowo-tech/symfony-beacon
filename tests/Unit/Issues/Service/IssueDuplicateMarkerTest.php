@@ -27,6 +27,7 @@ use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -181,7 +182,7 @@ final class IssueDuplicateMarkerTest extends TestCase
         $this->issueRepository->method('findOneByProjectAndUuid')->willReturn($canonical);
 
         $failingEvents = $this->createStub(EventRepository::class);
-        $failingEvents->method('findBy')->willThrowException(new \InvalidArgumentException('boom'));
+        $failingEvents->method('findBy')->willThrowException(new InvalidArgumentException('boom'));
         $this->rebuildMarker($failingEvents);
 
         self::assertSame(

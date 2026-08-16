@@ -23,8 +23,8 @@ final class PerfSpanTest extends TestCase
 
         self::assertSame($transaction, $span->getTransaction());
         self::assertSame('span-123', $span->getSpanId());
-        self::assertSame(80, strlen($span->getOp()));
-        self::assertSame(500, strlen($span->getDescription()));
+        self::assertSame(80, \strlen($span->getOp()));
+        self::assertSame(500, \strlen($span->getDescription()));
         self::assertSame(12.5, $span->getDurationMs());
         self::assertTrue($span->isNPlusOneCandidate());
     }

@@ -107,7 +107,6 @@ final class SmsBridgeProviderTest extends TestCase
         self::assertSame('sms_bridge', $sender->getProviderId());
     }
 
-
     public function testTwilioCompatibleIncludesOptionalFieldsAndNormalizesDefaults(): void
     {
         $requests = [];
@@ -216,5 +215,4 @@ final class SmsBridgeProviderTest extends TestCase
         self::assertFalse((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'Bearer abc', '', '', '', 'native'))->isConfigured());
         self::assertTrue((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'smscli_token', '', '', '', 'native'))->isConfigured());
     }
-
 }

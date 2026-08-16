@@ -17,8 +17,10 @@ use App\Project\Service\ProjectFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Throwable;
 
 final class ProjectConfigPortabilityTest extends TestCase
 {
@@ -450,7 +452,6 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertFalse($importedMembership->isActive());
     }
 
-
     public function testExportFallsBackToSlugAndSkipsMembershipWithoutUsers(): void
     {
         $owner = $this->user('owner@example.com', 'Owner');
@@ -546,7 +547,6 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertSame(0, $saved[0]->getRetentionMaxEvents());
     }
 
-
     public function testPrivateNormalizationAndUpsertBranches(): void
     {
         $existing = new Project();
@@ -576,7 +576,7 @@ final class ProjectConfigPortabilityTest extends TestCase
             new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
         );
 
-        $normalizeMethod = new \ReflectionMethod(ProjectConfigPortability::class, 'normalizeProjects');
+        $normalizeMethod = new ReflectionMethod(ProjectConfigPortability::class, 'normalizeProjects');
         $normalized = $normalizeMethod->invoke($service, [
             'schema' => ProjectConfigPortability::SCHEMA,
             'version' => 1,
@@ -595,7 +595,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertSame('member@example.com', $normalized[0]['memberships'][0]['email']);
         self::assertSame(ProjectRole::Member->value, $normalized[0]['memberships'][0]['role']);
 
-        $upsertMethod = new \ReflectionMethod(ProjectConfigPortability::class, 'upsertProject');
+        $upsertMethod = new ReflectionMethod(ProjectConfigPortability::class, 'upsertProject');
         $row = [
             'code' => 'existing-code',
             'uuid' => '',
@@ -614,7 +614,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertSame('existing', $existing->getCode());
         self::assertSame('Existing Updated', $existing->getName());
 
-        $applyMethod = new \ReflectionMethod(ProjectConfigPortability::class, 'applyProjectFields');
+        $applyMethod = new ReflectionMethod(ProjectConfigPortability::class, 'applyProjectFields');
         $fresh = new Project();
         $applyMethod->invoke($service, $fresh, $row);
         self::assertSame('existing-code', (new ReflectionProperty(Project::class, 'code'))->getValue($fresh));
@@ -622,7 +622,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         try {
             $upsertMethod->invoke($service, array_merge($row, ['code' => 'missing-code']), $this->user('actor@example.com', 'Actor'), false);
             self::fail('Expected project_not_found exception.');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             self::assertSame('project_not_found', $e->getPrevious()?->getMessage() ?? $e->getMessage());
         }
     }

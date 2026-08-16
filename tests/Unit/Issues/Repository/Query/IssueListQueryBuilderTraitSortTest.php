@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Issues\Repository\Query;
 
 use App\Issues\IssueListSort;
 use App\Issues\Repository\Query\IssueListQueryBuilderTrait;
+use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -48,7 +49,7 @@ final class IssueListQueryBuilderTraitSortTest extends TestCase
         $qb->expects(self::once())->method('addSelect')->with(self::stringContains('occ_count'))->willReturnSelf();
         $qb->expects(self::once())
             ->method('setParameter')
-            ->with('occSince', self::isInstanceOf(\DateTimeImmutable::class))
+            ->with('occSince', self::isInstanceOf(DateTimeImmutable::class))
             ->willReturnSelf();
         $qb->expects(self::once())->method('orderBy')->with('occ_count', 'DESC')->willReturnSelf();
         $qb->expects(self::exactly(2))->method('addOrderBy')->willReturnSelf();

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Coverage;
 
 use App\Identity\Entity\User;
-use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
-use App\Issues\Entity\IssueMention;
 use App\Issues\Repository\EventTagRepository;
 use App\Issues\Repository\IssueMentionRepository;
 use App\Notifications\Entity\MemberAccountAlertEvent;

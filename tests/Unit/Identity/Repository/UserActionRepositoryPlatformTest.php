@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use RuntimeException;
+use stdClass;
 
 final class UserActionRepositoryPlatformTest extends TestCase
 {
@@ -24,14 +25,14 @@ final class UserActionRepositoryPlatformTest extends TestCase
         self::assertStringContainsString("JSON_UNQUOTE(JSON_EXTRACT(context, '$.project_uuid')) IN (:projectUuids)", $contextIn->invoke($repository, new MySQLPlatform(), 'project_uuid'));
 
         try {
-            $context->invoke($repository, new \stdClass(), 'project_uuid');
+            $context->invoke($repository, new stdClass(), 'project_uuid');
             self::fail('Expected unsupported platform exception for equality predicate');
         } catch (RuntimeException $e) {
             self::assertStringContainsString('unsupported', $e->getMessage());
         }
 
         try {
-            $contextIn->invoke($repository, new \stdClass(), 'project_uuid');
+            $contextIn->invoke($repository, new stdClass(), 'project_uuid');
             self::fail('Expected unsupported platform exception for IN predicate');
         } catch (RuntimeException $e) {
             self::assertStringContainsString('unsupported', $e->getMessage());

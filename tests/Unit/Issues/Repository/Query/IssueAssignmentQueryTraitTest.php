@@ -35,12 +35,12 @@ final class IssueAssignmentQueryTraitTest extends TestCase
         $params = [];
         $firstResult = null;
 
-        $qb->method('andWhere')->willReturnCallback(function (string $expr) use (&$wheres, $qb): QueryBuilder {
+        $qb->method('andWhere')->willReturnCallback(static function (string $expr) use (&$wheres, $qb): QueryBuilder {
             $wheres[] = $expr;
 
             return $qb;
         });
-        $qb->method('setParameter')->willReturnCallback(function (string $key, mixed $value) use (&$params, $qb): QueryBuilder {
+        $qb->method('setParameter')->willReturnCallback(static function (string $key, mixed $value) use (&$params, $qb): QueryBuilder {
             $params[$key] = $value;
 
             return $qb;
@@ -48,7 +48,7 @@ final class IssueAssignmentQueryTraitTest extends TestCase
         $qb->method('leftJoin')->willReturnSelf();
         $qb->method('addSelect')->willReturnSelf();
         $qb->method('setMaxResults')->willReturnSelf();
-        $qb->method('setFirstResult')->willReturnCallback(function (int $value) use (&$firstResult, $qb): QueryBuilder {
+        $qb->method('setFirstResult')->willReturnCallback(static function (int $value) use (&$firstResult, $qb): QueryBuilder {
             $firstResult = $value;
 
             return $qb;

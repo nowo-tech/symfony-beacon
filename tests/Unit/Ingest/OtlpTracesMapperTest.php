@@ -71,7 +71,6 @@ final class OtlpTracesMapperTest extends TestCase
         new OtlpTracesMapper()->mapToEventPayloads('{');
     }
 
-
     public function testMapsExceptionOnlySpanAndStringStatusCodes(): void
     {
         $mapper = new OtlpTracesMapper();
@@ -169,5 +168,4 @@ final class OtlpTracesMapperTest extends TestCase
         self::assertCount(1, $payloads);
         self::assertSame('worker failed', $payloads[0]['message']);
     }
-
 }

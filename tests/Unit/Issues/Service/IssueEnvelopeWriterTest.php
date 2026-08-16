@@ -16,12 +16,12 @@ use App\Issues\Service\EventTimestampParser;
 use App\Issues\Service\FingerprintCalculator;
 use App\Issues\Service\IssueEnvelopeWriter;
 use App\Issues\Service\IssueHistoryRecorder;
-use ReflectionMethod;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use ReflectionProperty;
 
 final class IssueEnvelopeWriterTest extends TestCase

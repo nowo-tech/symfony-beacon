@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   beaconAuthHeader,
+  createApiKeyAndParseDsn,
   dismissProductTour,
   expectAuthenticatedPage,
   gotoStable,
@@ -88,21 +89,8 @@ test.describe('Project / dashboard remaining gaps', () => {
 
   test('revoked/inactive API key rejected on ingest (UC-PROJ-26)', async ({ page, request }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/settings/access`);
-    await dismissProductTour(page);
     const label = `e2e-inactive-${Date.now().toString(36)}`;
-    const createForm = page.locator('form').filter({ has: page.locator('input[name="project_api_key_create[label]"]') });
-    await createForm.locator('input[name="project_api_key_create[label]"]').fill(label);
-    await createForm.locator('button[type="submit"].btn-primary, button.btn-primary[type="submit"]').click();
-    await waitForPageLoader(page);
-    const flash = page.locator('[data-testid="api-key-dsn-flash"]');
-    await expect(flash).toBeVisible({ timeout: 15_000 });
-    const flashText = await flash.innerText();
-    const dsnMatch = flashText.match(/https?:\/\/([^:]+):([^@]+)@[^/\s]+\/([^\s]+)/i);
-    expect(dsnMatch, 'DSN in flash').toBeTruthy();
-    const publicKey = dsnMatch![1];
-    const secretKey = dsnMatch![2];
-    const projectRef = dsnMatch![3];
+    const { publicKey, secretKey, projectRef } = await createApiKeyAndParseDsn(page, uuid, label);
 
     const row = page.locator('li').filter({ hasText: label }).first();
     await expect(row).toBeVisible();

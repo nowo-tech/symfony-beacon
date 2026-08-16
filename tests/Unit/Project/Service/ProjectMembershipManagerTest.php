@@ -211,7 +211,6 @@ final class ProjectMembershipManagerTest extends TestCase
         }
     }
 
-
     public function testTransferAndSetActiveGuardFailures(): void
     {
         $project = $this->project(1);

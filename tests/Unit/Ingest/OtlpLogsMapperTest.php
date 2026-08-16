@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Ingest;
 use App\Ingest\Otlp\Service\OtlpLogsMapper;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class OtlpLogsMapperTest extends TestCase
 {
@@ -70,7 +71,6 @@ final class OtlpLogsMapperTest extends TestCase
         new OtlpLogsMapper()->mapToEventPayloads('{');
     }
 
-
     public function testMapsSeverityTextFallbacksAndRejectsScalarJson(): void
     {
         $mapper = new OtlpLogsMapper();
@@ -121,16 +121,15 @@ final class OtlpLogsMapperTest extends TestCase
         $mapper->mapToEventPayloads('"scalar"');
     }
 
-
     public function testCoversHelperFallbacksAndRecordLimit(): void
     {
         $mapper = new OtlpLogsMapper();
 
-        $extractBody = new \ReflectionMethod(OtlpLogsMapper::class, 'extractBody');
+        $extractBody = new ReflectionMethod(OtlpLogsMapper::class, 'extractBody');
         self::assertSame('', $extractBody->invoke($mapper, 123));
         self::assertSame('snake-case body', $extractBody->invoke($mapper, ['string_value' => 'snake-case body']));
 
-        $mapLevel = new \ReflectionMethod(OtlpLogsMapper::class, 'mapLevel');
+        $mapLevel = new ReflectionMethod(OtlpLogsMapper::class, 'mapLevel');
         self::assertSame('fatal', $mapLevel->invoke($mapper, 0, 'CRITICAL'));
         self::assertSame('error', $mapLevel->invoke($mapper, 0, ''));
 
@@ -169,5 +168,4 @@ final class OtlpLogsMapperTest extends TestCase
         self::assertCount(1, $fallback);
         self::assertSame('OTLP log', $fallback[0]['message']);
     }
-
 }

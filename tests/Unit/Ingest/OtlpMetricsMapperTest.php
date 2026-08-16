@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Ingest;
 use App\Ingest\Otlp\Service\OtlpMetricsMapper;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class OtlpMetricsMapperTest extends TestCase
 {
@@ -100,7 +101,6 @@ final class OtlpMetricsMapperTest extends TestCase
         new OtlpMetricsMapper()->mapToEventPayloads('{');
     }
 
-
     public function testMapsFailureStatusAndFallbackNames(): void
     {
         $mapper = new OtlpMetricsMapper();
@@ -157,19 +157,18 @@ final class OtlpMetricsMapperTest extends TestCase
         new OtlpMetricsMapper()->mapToEventPayloads('"scalar"');
     }
 
-
     public function testCoversPrivateHelperBranchesAndDataPointLimits(): void
     {
         $mapper = new OtlpMetricsMapper();
 
-        $dataPoints = new \ReflectionMethod(OtlpMetricsMapper::class, 'dataPoints');
+        $dataPoints = new ReflectionMethod(OtlpMetricsMapper::class, 'dataPoints');
         self::assertSame([], $dataPoints->invoke($mapper, ['name' => 'no-points']));
 
-        $isFailurePoint = new \ReflectionMethod(OtlpMetricsMapper::class, 'isFailurePoint');
+        $isFailurePoint = new ReflectionMethod(OtlpMetricsMapper::class, 'isFailurePoint');
         self::assertTrue($isFailurePoint->invoke($mapper, 'healthy.metric', ['error.type' => 'Timeout']));
         self::assertFalse($isFailurePoint->invoke($mapper, 'healthy.metric', []));
 
-        $numericValue = new \ReflectionMethod(OtlpMetricsMapper::class, 'numericValue');
+        $numericValue = new ReflectionMethod(OtlpMetricsMapper::class, 'numericValue');
         self::assertSame(9.5, $numericValue->invoke($mapper, ['sum' => '9.5']));
         self::assertNull($numericValue->invoke($mapper, ['sum' => 'NaN-ish']));
 
@@ -246,5 +245,4 @@ final class OtlpMetricsMapperTest extends TestCase
             ], \JSON_THROW_ON_ERROR)),
         );
     }
-
 }

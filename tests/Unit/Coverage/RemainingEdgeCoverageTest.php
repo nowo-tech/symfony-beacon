@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Coverage;
 
+use App\Ingest\Otlp\Service\OtlpLogsMapper;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueLevel;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Export\AiIssueExportFormatter;
 use App\Issues\Form\ProjectMemberAutocompleteField;
-use App\Ingest\Otlp\Service\OtlpLogsMapper;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Formatter\DiscordChannelFormatter;
 use App\Notifications\Message\DeliverNotificationMessage;
@@ -21,10 +21,10 @@ use App\Notifications\Service\NotificationCircuitBreaker;
 use App\Notifications\Service\NotificationDispatcher;
 use App\Notifications\Service\NotificationPayloadBuilder;
 use App\Notifications\Service\QuietHoursEvaluator;
+use App\Project\Entity\Project;
 use App\Project\Entity\ProjectShareLink;
 use App\Project\Repository\ProjectShareLinkRepository;
 use App\Project\Service\ProjectShareGrantStore;
-use App\Project\Entity\Project;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
@@ -32,13 +32,15 @@ use Nowo\FormKitBundle\Form\Constraint\ConstraintDefinitionFactory;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use ReflectionMethod;
+use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class RemainingEdgeCoverageTest extends TestCase
@@ -65,7 +67,7 @@ final class RemainingEdgeCoverageTest extends TestCase
 
     public function testDiscordEmbedDropsMissingUrlKey(): void
     {
-        $method = new \ReflectionMethod(DiscordChannelFormatter::class, 'discordEmbed');
+        $method = new ReflectionMethod(DiscordChannelFormatter::class, 'discordEmbed');
         $embed = $method->invoke(new DiscordChannelFormatter(), ['event' => 'issue.new'], 'Boom');
 
         self::assertArrayNotHasKey('url', $embed);
@@ -96,7 +98,7 @@ final class RemainingEdgeCoverageTest extends TestCase
 
     public function testOtlpLogsMapperExtractBodyReturnsRawString(): void
     {
-        $method = new \ReflectionMethod(OtlpLogsMapper::class, 'extractBody');
+        $method = new ReflectionMethod(OtlpLogsMapper::class, 'extractBody');
 
         self::assertSame('raw body', $method->invoke(new OtlpLogsMapper(), 'raw body'));
     }
@@ -109,7 +111,7 @@ final class RemainingEdgeCoverageTest extends TestCase
         $destination->setLabel('Webhook');
         $destination->setEnabled(true);
         $destination->setCategories(['error']);
-        new \ReflectionProperty(NotificationDestination::class, 'id')->setValue($destination, 1);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($destination, 1);
 
         $repo = $this->createStub(NotificationDestinationRepository::class);
         $repo->method('findEnabledByProject')->willReturn([$destination]);
@@ -139,7 +141,7 @@ final class RemainingEdgeCoverageTest extends TestCase
             $this->createStub(\App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface::class),
         );
 
-        $method = new \ReflectionMethod(NotificationDispatcher::class, 'dispatchIssuePayload');
+        $method = new ReflectionMethod(NotificationDispatcher::class, 'dispatchIssuePayload');
         $method->invoke($dispatcher, $project, 'unknown-level', [
             'event' => 'issue.new',
             'category' => NotificationCategories::ISSUE_RESOLVED,
@@ -160,7 +162,7 @@ final class RemainingEdgeCoverageTest extends TestCase
         $stack->push($request);
 
         $project = (new Project())->setName('Beacon')->setSlug('beacon');
-        new \ReflectionProperty(Project::class, 'id')->setValue($project, 5);
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
         $link = (new ProjectShareLink())->setProject($project)->setTokenHash('hash');
         $repo = $this->createStub(ProjectShareLinkRepository::class);
         $repo->method('findOneByUuid')->willReturn($link);

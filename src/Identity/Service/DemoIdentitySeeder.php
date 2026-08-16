@@ -99,9 +99,7 @@ final readonly class DemoIdentitySeeder
             // Dogfood: ignore --email / leftover admin@…; use the first registered ROLE_ADMIN.
             $user = $this->userRepository->findFirstInstanceAdmin();
             if (!$user instanceof User) {
-                throw new LogicException(
-                    'Cannot dogfood without an existing ROLE_ADMIN. Register the first admin (or run app:seed-demo without --skip-demo-user), then re-run make dogfood.',
-                );
+                throw new LogicException('Cannot dogfood without an existing ROLE_ADMIN. Register the first admin (or run app:seed-demo without --skip-demo-user), then re-run make dogfood.');
             }
         }
 

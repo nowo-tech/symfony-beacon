@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Shared\Encryption {
     final class EnsureHaliteFsHooks
     {
-        public static $isDir = null;
-        public static $mkdir = null;
-        public static $glob = null;
-        public static $isFile = null;
-        public static $filePerms = null;
-        public static $chmod = null;
+        public static $isDir;
+        public static $mkdir;
+        public static $glob;
+        public static $isFile;
+        public static $filePerms;
+        public static $chmod;
 
         public static function reset(): void
         {
@@ -25,32 +25,32 @@ namespace App\Shared\Encryption {
 
     function is_dir(string $path): bool
     {
-        return \is_callable(EnsureHaliteFsHooks::$isDir) ? (EnsureHaliteFsHooks::$isDir)($path) : \is_dir($path);
+        return \is_callable(EnsureHaliteFsHooks::$isDir) ? (EnsureHaliteFsHooks::$isDir)($path) : is_dir($path);
     }
 
     function mkdir(string $directory, int $permissions = 0777, bool $recursive = false): bool
     {
-        return \is_callable(EnsureHaliteFsHooks::$mkdir) ? (EnsureHaliteFsHooks::$mkdir)($directory, $permissions, $recursive) : \mkdir($directory, $permissions, $recursive);
+        return \is_callable(EnsureHaliteFsHooks::$mkdir) ? (EnsureHaliteFsHooks::$mkdir)($directory, $permissions, $recursive) : mkdir($directory, $permissions, $recursive);
     }
 
     function glob(string $pattern, int $flags = 0): array|false
     {
-        return \is_callable(EnsureHaliteFsHooks::$glob) ? (EnsureHaliteFsHooks::$glob)($pattern, $flags) : \glob($pattern, $flags);
+        return \is_callable(EnsureHaliteFsHooks::$glob) ? (EnsureHaliteFsHooks::$glob)($pattern, $flags) : glob($pattern, $flags);
     }
 
     function is_file(string $filename): bool
     {
-        return \is_callable(EnsureHaliteFsHooks::$isFile) ? (EnsureHaliteFsHooks::$isFile)($filename) : \is_file($filename);
+        return \is_callable(EnsureHaliteFsHooks::$isFile) ? (EnsureHaliteFsHooks::$isFile)($filename) : is_file($filename);
     }
 
     function fileperms(string $filename): int|false
     {
-        return \is_callable(EnsureHaliteFsHooks::$filePerms) ? (EnsureHaliteFsHooks::$filePerms)($filename) : \fileperms($filename);
+        return \is_callable(EnsureHaliteFsHooks::$filePerms) ? (EnsureHaliteFsHooks::$filePerms)($filename) : fileperms($filename);
     }
 
     function chmod(string $filename, int $permissions): bool
     {
-        return \is_callable(EnsureHaliteFsHooks::$chmod) ? (EnsureHaliteFsHooks::$chmod)($filename, $permissions) : \chmod($filename, $permissions);
+        return \is_callable(EnsureHaliteFsHooks::$chmod) ? (EnsureHaliteFsHooks::$chmod)($filename, $permissions) : chmod($filename, $permissions);
     }
 }
 

@@ -13,6 +13,7 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 final class IssueSearchFilterTraitTest extends TestCase
 {
@@ -78,12 +79,12 @@ final class IssueSearchFilterTraitTest extends TestCase
         $repo->applyUrl($qb, $project, ' ');
         $repo->applyUser($qb, null);
 
-        $projectId = new \ReflectionProperty(Project::class, 'id');
+        $projectId = new ReflectionProperty(Project::class, 'id');
         $projectId->setValue($project, 10);
         $tagCall = 0;
         $tagRepository->expects(self::exactly(2))
             ->method('findIssueIdsMatchingTag')
-            ->willReturnCallback(function (Project $actualProject, string $tag) use ($project, &$tagCall): array {
+            ->willReturnCallback(static function (Project $actualProject, string $tag) use ($project, &$tagCall): array {
                 ++$tagCall;
                 TestCase::assertSame($project, $actualProject);
                 if (1 === $tagCall) {
@@ -101,7 +102,7 @@ final class IssueSearchFilterTraitTest extends TestCase
         $andWhereCall = 0;
         $qb->expects(self::exactly(4))
             ->method('andWhere')
-            ->willReturnCallback(function (string $expression) use (&$andWhereCall, $qb): QueryBuilder {
+            ->willReturnCallback(static function (string $expression) use (&$andWhereCall, $qb): QueryBuilder {
                 ++$andWhereCall;
                 $expected = [
                     'i.id IN (:tagFilterIssueIds)',
@@ -116,7 +117,7 @@ final class IssueSearchFilterTraitTest extends TestCase
         $setParameterCall = 0;
         $qb->expects(self::exactly(4))
             ->method('setParameter')
-            ->willReturnCallback(function (string $name, mixed $value) use (&$setParameterCall, $project, $qb): QueryBuilder {
+            ->willReturnCallback(static function (string $name, mixed $value) use (&$setParameterCall, $project, $qb): QueryBuilder {
                 ++$setParameterCall;
                 $expected = [
                     ['tagFilterIssueIds', [9, 3]],
@@ -155,7 +156,8 @@ final class IssueSearchFilterTraitHarness
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EventTagRepository $eventTagRepository,
-    ) {}
+    ) {
+    }
 
     public function getEntityManager(): EntityManagerInterface
     {

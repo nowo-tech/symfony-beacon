@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Issues\Service;
 
-use App\Issues\Enum\IssueStatus;
 use App\Issues\Service\IssueStatusTransition;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;

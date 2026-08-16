@@ -200,7 +200,6 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertSame(0, $repository->markAllReadForUser($member, []));
     }
 
-
     public function testIssueRepositoryLookupsAndSimilarCandidates(): void
     {
         [, , $project] = $this->bootWithDemoProject('issue-repo-owner@example.com');
@@ -248,7 +247,6 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
                 $repository->findDuplicateCandidates($project, $current, 3),
             ),
         );
-
     }
 
     private function issue(Project $project, string $title, string $level, IssueStatus $status): Issue

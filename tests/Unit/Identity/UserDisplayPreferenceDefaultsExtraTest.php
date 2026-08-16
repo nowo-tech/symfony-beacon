@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity;
 
-use App\Identity\Entity\User;
 use App\Identity\Entity\Embeddable\UserUiPreferences;
+use App\Identity\Entity\User;
 use App\Identity\UserDisplayPreferenceDefaults;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;

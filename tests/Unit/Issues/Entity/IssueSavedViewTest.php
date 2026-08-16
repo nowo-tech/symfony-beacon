@@ -26,7 +26,7 @@ final class IssueSavedViewTest extends TestCase
         self::assertNull($view->getId());
         self::assertSame($user, $view->getUser());
         self::assertSame($project, $view->getProject());
-        self::assertSame(IssueSavedView::NAME_MAX_LENGTH, strlen($view->getName()));
+        self::assertSame(IssueSavedView::NAME_MAX_LENGTH, \strlen($view->getName()));
         self::assertSame(['status' => 'unresolved', 'sort' => 'last_seen'], $view->getQueryJson());
     }
 }

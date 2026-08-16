@@ -30,5 +30,4 @@ final class IssueStatusTransitionTest extends TestCase
         self::assertContains(IssueStatus::Unresolved, IssueStatusTransition::allowedTargets(IssueStatus::Resolved));
         self::assertContains(IssueStatus::Unresolved, IssueStatusTransition::allowedTargets(IssueStatus::Ignored));
     }
-
 }

@@ -41,7 +41,7 @@ final class OutboundUrlGuardTest extends TestCase
 
         $options = $guard->httpClientOptionsForUrl('https://example.com/webhook');
         self::assertSame('example.com', array_key_first($options['resolve']));
-        self::assertNotFalse(filter_var($options['resolve']['example.com'], FILTER_VALIDATE_IP));
+        self::assertNotFalse(filter_var($options['resolve']['example.com'], \FILTER_VALIDATE_IP));
         self::assertSame([], $guard->httpClientOptionsForUrl('https://1.1.1.1/webhook'));
 
         $this->expectException(InvalidArgumentException::class);

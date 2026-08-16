@@ -266,6 +266,52 @@ export async function logout(page: Page): Promise<void> {
   ]);
 }
 
+/** Parsed one-shot API key DSN after create/rotate (public:secret@host/ref). */
+export type ParsedApiKeyDsn = {
+  publicKey: string;
+  secretKey: string;
+  projectRef: string;
+  raw: string;
+};
+
+const API_KEY_DSN_RE = /https?:\/\/([^:]+):([^@]+)@[^/\s]+\/([^\s"']+)/i;
+
+/**
+ * Wait for the create/rotate DSN reveal.
+ * Spec 102 attaches the one-shot DSN to the matching key row (`api-key-dsn-once`);
+ * the legacy flash banner (`api-key-dsn-flash`) only appears when no row matched.
+ */
+export async function waitForApiKeyDsnReveal(page: Page): Promise<ParsedApiKeyDsn> {
+  const reveal = page.locator('[data-testid="api-key-dsn-once"], [data-testid="api-key-dsn-flash"]').first();
+  await expect(reveal).toBeVisible({ timeout: 15_000 });
+
+  // Prefer the Stimulus secret attribute (display may still show a masked value).
+  const secretAttr = (await reveal.getAttribute('data-temporary-reveal-secret-value'))?.trim() ?? '';
+  const displayText = (await reveal.locator('[data-testid="api-key-dsn"]').innerText().catch(() => '')).trim();
+  const raw = secretAttr || displayText;
+  const dsnMatch = raw.match(API_KEY_DSN_RE);
+  expect(dsnMatch, 'DSN in create/rotate reveal').toBeTruthy();
+
+  return {
+    publicKey: dsnMatch![1],
+    secretKey: dsnMatch![2],
+    projectRef: dsnMatch![3],
+    raw: dsnMatch![0],
+  };
+}
+
+/** Create an API key on Settings → Access and parse the one-shot DSN. */
+export async function createApiKeyAndParseDsn(page: Page, projectUuid: string, label: string): Promise<ParsedApiKeyDsn> {
+  await page.goto(`/projects/${projectUuid}/settings/access`);
+  await dismissProductTour(page);
+  const createForm = page.locator('form').filter({ has: page.locator('input[name="project_api_key_create[label]"]') });
+  await createForm.locator('input[name="project_api_key_create[label]"]').fill(label);
+  await createForm.locator('button[type="submit"].btn-primary, button.btn-primary[type="submit"]').click();
+  await waitForPageLoader(page);
+
+  return waitForApiKeyDsnReveal(page);
+}
+
 /** Open the first issue detail for a project; returns issue UUID or null. */
 export async function openFirstIssue(page: Page, projectUuid: string): Promise<string | null> {
   await gotoStable(page, `/projects/${projectUuid}/issues`);

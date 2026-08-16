@@ -102,7 +102,6 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertStringNotContainsString('Bearer secret-token', $json);
     }
 
-
     public function testBuildCanonicalUsesFallbacksForEmptyPayload(): void
     {
         $project = (new Project())
@@ -256,5 +255,4 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertSame('%2Frelative%2Fpath%3Ftoken=%5Bredacted%5D', $relativeData['request']['url']);
         self::assertSame('&&', $relativeData['request']['query_string']);
     }
-
 }

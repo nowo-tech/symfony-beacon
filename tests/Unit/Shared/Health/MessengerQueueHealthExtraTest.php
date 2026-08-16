@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 final class MessengerQueueHealthExtraTest extends TestCase
 {
@@ -17,7 +18,7 @@ final class MessengerQueueHealthExtraTest extends TestCase
         $schema = $this->createMock(AbstractSchemaManager::class);
         $schema->expects(self::once())
             ->method('tablesExist')
-            ->willThrowException(new \RuntimeException('boom'));
+            ->willThrowException(new RuntimeException('boom'));
 
         $connection = $this->createStub(Connection::class);
         $connection->method('createSchemaManager')->willReturn($schema);

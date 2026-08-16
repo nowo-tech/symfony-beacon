@@ -223,7 +223,8 @@ test.describe('Mutations — issue assignee & read API', () => {
       }
     }
 
-    const assigneeForm = page.locator('form.issue-assignee-form');
+    // Priority form also reuses `.issue-assignee-form` styles — scope to the assignee form name.
+    const assigneeForm = page.locator('form[name="issue_assignee"]');
     await expect(assigneeForm).toBeVisible({ timeout: 15_000 });
     // Symfony UX Autocomplete / Tom Select wrapper.
     await expect(

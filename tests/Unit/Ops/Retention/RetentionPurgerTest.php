@@ -154,7 +154,6 @@ final class RetentionPurgerTest extends TestCase
         self::assertTrue(array_any($this->sql, static fn (string $s): bool => str_contains($s, 'DELETE FROM event WHERE id IN')));
     }
 
-
     public function testPurgeSkipsInvalidAndUnreloadableProjects(): void
     {
         $detached = $this->project(9);

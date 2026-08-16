@@ -8,6 +8,7 @@ use App\Shared\Appearance\Entity\SiteAppearance;
 use App\Shared\Appearance\Repository\SiteAppearanceRepository;
 use App\Shared\Appearance\SiteAppearanceProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 final class SiteAppearanceProviderTest extends TestCase
 {
@@ -106,7 +107,7 @@ final class SiteAppearanceProviderTest extends TestCase
     public function testFallsBackToDefaultsWhenRepositoryFails(): void
     {
         $repo = $this->createMock(SiteAppearanceRepository::class);
-        $repo->expects(self::once())->method('getOrCreate')->willThrowException(new \RuntimeException('db missing'));
+        $repo->expects(self::once())->method('getOrCreate')->willThrowException(new RuntimeException('db missing'));
 
         $provider = new SiteAppearanceProvider($repo);
         $appearance = $provider->get();

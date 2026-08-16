@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.1] - 2026-08-17
+
+### Fixed
+
+- **CI Quality**: PHP-CS-Fixer style drift on unit/integration tests and `DemoIdentitySeeder`.
+- **CI Coverage**: unit coverage for `DropSelfIngestBeforeSend` `contexts.request` path (closes 99.96% → 100% gate).
+- **E2E**: API key create/rotate DSN parsing uses `api-key-dsn-once` (spec 102 row reveal) with flash banner fallback; accept `confirm-submit` dialog on rotate; assignee panel scopes to `form[name="issue_assignee"]` (priority form shares `.issue-assignee-form` styles).
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator runtime steps beyond pulling `v1.20.1`.
+
 ## [1.20.0] - 2026-08-17
 
 ### Added
@@ -1370,7 +1382,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.1...HEAD
+[1.20.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.0...v1.20.1
 [1.20.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...v1.19.0
 [1.18.7]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.6...v1.18.7

@@ -13,12 +13,12 @@ use Nowo\FormKitBundle\Form\FormTypeMap;
 use Nowo\PasswordToggleBundle\Form\Type\PasswordType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 final class InstanceMercureSettingsTypeTest extends TestCase
 {

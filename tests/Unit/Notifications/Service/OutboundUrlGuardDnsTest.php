@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Notifications\Service {
     final class OutboundUrlGuardDnsHooks
     {
-        public static $dnsGetRecord = null;
-        public static $getHostByNameL = null;
+        public static $dnsGetRecord;
+        public static $getHostByNameL;
 
         public static function reset(): void
         {
@@ -15,18 +15,18 @@ namespace App\Notifications\Service {
         }
     }
 
-    function dns_get_record(string $hostname, int $type = DNS_ANY): array|false
+    function dns_get_record(string $hostname, int $type = \DNS_ANY): array|false
     {
         return \is_callable(OutboundUrlGuardDnsHooks::$dnsGetRecord)
             ? (OutboundUrlGuardDnsHooks::$dnsGetRecord)($hostname, $type)
-            : \dns_get_record($hostname, $type);
+            : dns_get_record($hostname, $type);
     }
 
     function gethostbynamel(string $hostname): array|false
     {
         return \is_callable(OutboundUrlGuardDnsHooks::$getHostByNameL)
             ? (OutboundUrlGuardDnsHooks::$getHostByNameL)($hostname)
-            : \gethostbynamel($hostname);
+            : gethostbynamel($hostname);
     }
 }
 
