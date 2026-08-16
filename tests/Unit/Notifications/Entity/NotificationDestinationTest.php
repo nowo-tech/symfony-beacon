@@ -109,7 +109,7 @@ final class NotificationDestinationTest extends TestCase
         $destination->recordDeliveryFailure(str_repeat('x', 3005), $deliveredAt);
         self::assertSame($deliveredAt, $destination->getLastDeliveryAt());
         self::assertFalse($destination->isLastDeliverySuccess());
-        self::assertSame(2000, strlen((string) $destination->getLastDeliveryError()));
+        self::assertSame(2000, \strlen((string) $destination->getLastDeliveryError()));
 
         $destination->openCircuit($openedAt);
         $destination->recordDeliverySuccess($secondAt);

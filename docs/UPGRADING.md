@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.4)](#unreleased-main-after-1184)
+- [Unreleased (main after 1.18.5)](#unreleased-main-after-1185)
+- [Upgrading from 1.18.4 to 1.18.5](#upgrading-from-1184-to-1185)
 - [Upgrading from 1.18.3 to 1.18.4](#upgrading-from-1183-to-1184)
 - [Upgrading from 1.18.2 to 1.18.3](#upgrading-from-1182-to-1183)
 - [Upgrading from 1.18.1 to 1.18.2](#upgrading-from-1181-to-1182)
@@ -76,9 +77,13 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.4)
+## Unreleased (main after 1.18.5)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.18.4 to 1.18.5
+
+CI style-only fix. **No migrations.** Pull `v1.18.5` (or `composer install` on that tag).
 
 ## Upgrading from 1.18.3 to 1.18.4
 

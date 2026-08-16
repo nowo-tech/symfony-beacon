@@ -67,8 +67,7 @@ final readonly class IssueShowPageBuilder
         User $user,
         ProjectAccess $access,
         IssueShowTab $tab = IssueShowTab::Main,
-    ): array
-    {
+    ): array {
         $events = $this->eventRepository->findLatestForIssue($issue);
         $latestEvent = $events[0] ?? null;
         $occurrence = $this->eventRepository->occurrenceStatsForIssue($issue);

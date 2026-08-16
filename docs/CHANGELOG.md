@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.5] - 2026-08-16
+
+### Fixed
+
+- **CI Quality**: PHP-CS-Fixer style on `IssueShowPageBuilder` and `NotificationDestinationTest` (brace / `\strlen`).
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator steps beyond pulling `v1.18.5`.
+
 ## [1.18.4] - 2026-08-16
 
 ### Added
@@ -1299,7 +1309,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.5...HEAD
+[1.18.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.4...v1.18.5
 [1.18.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.3...v1.18.4
 [1.18.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.2...v1.18.3
 [1.18.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.1...v1.18.2
