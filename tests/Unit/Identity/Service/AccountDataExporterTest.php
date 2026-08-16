@@ -150,35 +150,35 @@ final class AccountDataExporterTest extends TestCase
         $user->setPushNotificationsEnabled(true);
         $user->setRoles(['ROLE_ADMIN', 'ROLE_SUPPORT']);
         $user->setAnonymizedAt(new DateTimeImmutable('2024-01-03T00:00:00+00:00'));
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, 10);
+        new ReflectionProperty(User::class, 'id')->setValue($user, 10);
 
-        $passwordHistory = (new PasswordHistory())
+        $passwordHistory = new PasswordHistory()
             ->setPassword('hash')
             ->setCreatedAt(new DateTimeImmutable('2024-01-04T00:00:00+00:00'));
         $user->addPasswordHistory($passwordHistory);
-        (new ReflectionProperty(User::class, 'passwordHistory'))->setValue(
+        new ReflectionProperty(User::class, 'passwordHistory')->setValue(
             $user,
             new ArrayCollection([new stdClass(), $passwordHistory]),
         );
 
-        $project = (new Project())
+        $project = new Project()
             ->setName('Beacon')
             ->setSlug('beacon');
-        $membership = (new ProjectMembership())
+        $membership = new ProjectMembership()
             ->setProject($project)
             ->setUser($user)
             ->setRole(ProjectRole::Admin);
 
-        $group = (new UserGroup())
+        $group = new UserGroup()
             ->setName('Operators')
             ->setSlug('operators');
-        $groupMembership = (new UserGroupMembership())
+        $groupMembership = new UserGroupMembership()
             ->setUser($user)
             ->setUserGroup($group);
-        $orphanMembership = (new UserGroupMembership())
+        $orphanMembership = new UserGroupMembership()
             ->setUser($user);
 
-        $action = (new UserAction())
+        $action = new UserAction()
             ->setAction(UserActionType::MagicLoginRequested)
             ->setContext(['ip' => '127.0.0.1']);
 

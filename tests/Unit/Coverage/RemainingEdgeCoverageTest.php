@@ -15,6 +15,7 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Formatter\DiscordChannelFormatter;
 use App\Notifications\Message\DeliverNotificationMessage;
 use App\Notifications\NotificationCategories;
+use App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface;
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Notifications\Repository\NotificationDigestBufferRepository;
 use App\Notifications\Service\NotificationCircuitBreaker;
@@ -28,6 +29,9 @@ use App\Project\Service\ProjectShareGrantStore;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Nowo\FormKitBundle\Form\Constraint\ConstraintDefinitionFactory;
 use Nowo\FormKitBundle\Form\FormOptionsMerger;
 use Nowo\FormKitBundle\Form\FormTypeMap;
@@ -47,7 +51,7 @@ final class RemainingEdgeCoverageTest extends TestCase
 {
     public function testAiIssueExportFormatterKeepsNullMessageForEventPayloadWithoutStringMessage(): void
     {
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
         $issue = new Issue();
         $issue->setProject($project);
         $issue->setFingerprint('fp-edge');
@@ -60,7 +64,7 @@ final class RemainingEdgeCoverageTest extends TestCase
         $event->setIssue($issue);
         $event->setPayload(['message' => ['not-a-string']]);
 
-        $data = (new AiIssueExportFormatter())->buildCanonical($project, $issue, $event, 'https://beacon.test/issues/edge');
+        $data = new AiIssueExportFormatter()->buildCanonical($project, $issue, $event, 'https://beacon.test/issues/edge');
 
         self::assertNull($data['event']['message']);
     }
@@ -84,7 +88,7 @@ final class RemainingEdgeCoverageTest extends TestCase
             'max_results' => 7,
         ]);
 
-        $qb = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->method('innerJoin')->willReturnSelf();
         $qb->expects(self::once())->method('andWhere')->with('membership.project = :projectId')->willReturnSelf();
         $qb->expects(self::once())->method('setParameter')->with('projectId', 0)->willReturnSelf();
@@ -93,7 +97,7 @@ final class RemainingEdgeCoverageTest extends TestCase
         $qb->expects(self::once())->method('setMaxResults')->with(7)->willReturnSelf();
 
         $filter = $options['filter_query'];
-        $filter($qb, '   ', $this->createStub(\Doctrine\ORM\EntityRepository::class));
+        $filter($qb, '   ', $this->createStub(EntityRepository::class));
     }
 
     public function testOtlpLogsMapperExtractBodyReturnsRawString(): void
@@ -105,7 +109,7 @@ final class RemainingEdgeCoverageTest extends TestCase
 
     public function testNotificationDispatcherFallsBackUnknownLevelsToError(): void
     {
-        $project = (new Project())->setName('Acme')->setSlug('acme');
+        $project = new Project()->setName('Acme')->setSlug('acme');
         $destination = new NotificationDestination();
         $destination->setProject($project);
         $destination->setLabel('Webhook');
@@ -127,7 +131,7 @@ final class RemainingEdgeCoverageTest extends TestCase
 
             return new Envelope($message);
         });
-        $em = $this->createMock(\Doctrine\ORM\EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('flush');
 
         $dispatcher = new NotificationDispatcher(
@@ -138,7 +142,7 @@ final class RemainingEdgeCoverageTest extends TestCase
             new NotificationCircuitBreaker(new InstanceOpsDefaults($settingsRepo)),
             $bus,
             $em,
-            $this->createStub(\App\Notifications\Realtime\MemberIssueRealtimeNotifierInterface::class),
+            $this->createStub(MemberIssueRealtimeNotifierInterface::class),
         );
 
         $method = new ReflectionMethod(NotificationDispatcher::class, 'dispatchIssuePayload');
@@ -161,9 +165,9 @@ final class RemainingEdgeCoverageTest extends TestCase
         $stack = new RequestStack();
         $stack->push($request);
 
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
         new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
-        $link = (new ProjectShareLink())->setProject($project)->setTokenHash('hash');
+        $link = new ProjectShareLink()->setProject($project)->setTokenHash('hash');
         $repo = $this->createStub(ProjectShareLinkRepository::class);
         $repo->method('findOneByUuid')->willReturn($link);
 
@@ -171,7 +175,7 @@ final class RemainingEdgeCoverageTest extends TestCase
             $project->getUuid() => ['expires' => time() + 60, 'share' => $link->getUuid(), 'issue' => false],
         ]);
 
-        self::assertNull((new ProjectShareGrantStore($stack, $repo))->getActiveShareEntry($project)['issue']);
+        self::assertNull(new ProjectShareGrantStore($stack, $repo)->getActiveShareEntry($project)['issue']);
     }
 
     private function formOptionsMerger(): FormOptionsMerger

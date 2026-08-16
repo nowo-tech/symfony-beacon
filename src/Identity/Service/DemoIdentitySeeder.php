@@ -107,10 +107,6 @@ final readonly class DemoIdentitySeeder
         $project = $this->findDogfoodProject();
         $apiKey = null;
         if (!$project instanceof Project) {
-            if (!$user instanceof User) {
-                throw new LogicException('Cannot create the Symfony Beacon project without an existing user. Register an admin first, or run app:seed-demo without --skip-demo-user.');
-            }
-
             $project = $this->createDogfoodProject($user, $useStableDemoKeys);
             $apiKey = $this->resolveDogfoodApiKey($project, $useStableDemoKeys);
             $projectCreated = true;
@@ -130,16 +126,9 @@ final readonly class DemoIdentitySeeder
                 $this->projectRepository->save($project);
                 $projectCreated = true;
             }
-
-            if (!$user instanceof User) {
-                $ownerMembership = $project->getMemberships()->first();
-                $user = $ownerMembership instanceof ProjectMembership
-                    ? $ownerMembership->getUser()
-                    : null;
-            }
         }
 
-        if (!$user instanceof User || !$apiKey instanceof ProjectApiKey) {
+        if (!$apiKey instanceof ProjectApiKey) {
             throw new LogicException('Symfony Beacon project or owner could not be resolved.');
         }
 

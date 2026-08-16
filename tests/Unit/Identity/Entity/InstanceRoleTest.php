@@ -13,12 +13,12 @@ final class InstanceRoleTest extends TestCase
 {
     public function testPermissionsAndAuditUsersAreManaged(): void
     {
-        $role = (new InstanceRole())
+        $role = new InstanceRole()
             ->setName(' Support ')
             ->setCode(' support ')
             ->setDescription(' Handles incidents ');
 
-        $permission = (new InstancePermission())->setKey('project.view');
+        $permission = new InstancePermission()->setKey('project.view');
         $role->addPermission($permission);
         self::assertTrue($role->hasPermissionKey(' PROJECT.VIEW '));
 

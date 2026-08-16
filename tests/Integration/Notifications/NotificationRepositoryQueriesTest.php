@@ -172,45 +172,45 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         $em->persist($otherProject);
         $em->flush();
 
-        $ownerProjectPreference = (new MemberProjectAlertPreference())
+        $ownerProjectPreference = new MemberProjectAlertPreference()
             ->setUser($owner)
             ->setProject($project)
             ->setEnabled(false);
-        $memberProjectPreference = (new MemberProjectAlertPreference())
+        $memberProjectPreference = new MemberProjectAlertPreference()
             ->setUser($member)
             ->setProject($project);
         $em->persist($ownerProjectPreference);
         $em->persist($memberProjectPreference);
 
-        $ownerAssigned = (new MemberAccountAlertEvent())
+        $ownerAssigned = new MemberAccountAlertEvent()
             ->setUser($owner)
             ->setEvent(MemberAlertEvent::IssueAssigned)
             ->setEnabled(false);
-        $ownerCommented = (new MemberAccountAlertEvent())
+        $ownerCommented = new MemberAccountAlertEvent()
             ->setUser($owner)
             ->setEvent(MemberAlertEvent::IssueCommented);
-        $memberResolved = (new MemberAccountAlertEvent())
+        $memberResolved = new MemberAccountAlertEvent()
             ->setUser($member)
             ->setEvent(MemberAlertEvent::IssueResolved);
         $em->persist($ownerAssigned);
         $em->persist($ownerCommented);
         $em->persist($memberResolved);
 
-        $failedA = (new NotificationDestination())
+        $failedA = new NotificationDestination()
             ->setProject($project)
             ->setLabel('Zulu webhook')
             ->setType(NotificationDestinationType::Http)
             ->setEndpointUrl('https://example.test/zulu')
             ->setEnabled(true)
             ->recordDeliveryFailure('boom', new DateTimeImmutable('2026-08-16 10:00:00'));
-        $failedB = (new NotificationDestination())
+        $failedB = new NotificationDestination()
             ->setProject($project)
             ->setLabel('Alpha webhook')
             ->setType(NotificationDestinationType::Http)
             ->setEndpointUrl('https://example.test/alpha')
             ->setEnabled(false)
             ->recordDeliveryFailure('denied', new DateTimeImmutable('2026-08-16 09:00:00'));
-        $healthy = (new NotificationDestination())
+        $healthy = new NotificationDestination()
             ->setProject($otherProject)
             ->setLabel('Healthy webhook')
             ->setType(NotificationDestinationType::Http)
@@ -225,7 +225,7 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         $em->persist($healthy);
         $em->flush();
 
-        $attempt1 = $attempts->record($failedA, false, '500', new DateTimeImmutable('2026-08-16 10:00:00'));
+        $attempts->record($failedA, false, '500', new DateTimeImmutable('2026-08-16 10:00:00'));
         $attempt2 = $attempts->record($failedA, true, null, new DateTimeImmutable('2026-08-16 10:05:00'));
         $attempt3 = $attempts->record($failedB, false, '401', new DateTimeImmutable('2026-08-16 09:00:00'));
         $em->flush();

@@ -25,14 +25,14 @@ final class UserActionRepositoryTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
         $repository = self::getContainer()->get(UserActionRepository::class);
 
-        $member = (new User())
+        $member = new User()
             ->setEmail('activity-member@example.com')
             ->setDisplayName('Activity Member')
             ->setPassword($hasher->hashPassword(new User(), 'secret'));
-        $group = (new UserGroup())
+        $group = new UserGroup()
             ->setName('Operators')
             ->setSlug('operators');
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other project')
             ->setSlug('other-project');
         $em->persist($member);
@@ -115,7 +115,7 @@ final class UserActionRepositoryTest extends DatabaseWebTestCase
 
     private function action(UserActionType $type, ?User $actor, ?User $subject, array $context, DateTimeImmutable $createdAt): UserAction
     {
-        $action = (new UserAction())
+        $action = new UserAction()
             ->setAction($type)
             ->setActor($actor)
             ->setSubjectUser($subject)

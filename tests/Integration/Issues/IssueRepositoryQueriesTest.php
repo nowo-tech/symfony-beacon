@@ -12,6 +12,7 @@ use App\Issues\Entity\IssueMention;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueMentionRepository;
+use App\Issues\Repository\IssueRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
@@ -204,7 +205,7 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
     {
         [, , $project] = $this->bootWithDemoProject('issue-repo-owner@example.com');
         $em = self::getContainer()->get(EntityManagerInterface::class);
-        $repository = self::getContainer()->get(\App\Issues\Repository\IssueRepository::class);
+        $repository = self::getContainer()->get(IssueRepository::class);
 
         $current = $this->issue($project, 'similar-current', 'Payment gateway timeout on checkout', IssueStatus::Unresolved);
         $current->setLastSeen(new DateTimeImmutable('2026-08-16 12:00:00'));
@@ -219,7 +220,7 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         $shortMatch = $this->issue($project, 'similar-short-match', 'AB', IssueStatus::Unresolved);
         $shortMatch->setLastSeen(new DateTimeImmutable('2026-08-16 07:00:00'));
 
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other similar')
             ->setSlug('other-similar');
         $otherIssue = $this->issue($otherProject, 'similar-other', 'Payment gateway timeout on checkout', IssueStatus::Unresolved);

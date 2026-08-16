@@ -155,7 +155,6 @@ final class ProductTourStepsBuilderTest extends TestCase
             page: ProductTourPage::ProjectIssues,
             isInstanceAdmin: false,
             canCreateProject: false,
-            projectRole: null,
         ));
         self::assertStringContainsString('tour.role.viewer', $viewerSteps[0]['popover']['description']);
     }
@@ -182,7 +181,7 @@ final class ProductTourStepsBuilderTest extends TestCase
                     return null;
                 }
 
-                return (new ProjectMembership())
+                return new ProjectMembership()
                     ->setProject($project)
                     ->setUser($user)
                     ->setRole(ProjectRole::Member);

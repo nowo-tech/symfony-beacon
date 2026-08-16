@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity\Service;
 
+use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserAction;
 use App\Identity\Exception\AccountAnonymizeException;
@@ -180,12 +181,12 @@ final class AccountAnonymizerTest extends TestCase
             ->setRoles(['ROLE_USER']);
         $actor = $this->user(8, 'admin@example.com');
 
-        $history = (new \App\Identity\Entity\PasswordHistory())
+        $history = new PasswordHistory()
             ->setPassword('old-hash')
             ->setCreatedAt(new DateTimeImmutable('2026-08-01 00:00:00'));
         $subject->addPasswordHistory($history);
 
-        $subscription = (new PushSubscription($subject))->setSubscription('https://push.example.test/1', 'key', 'auth');
+        $subscription = new PushSubscription($subject)->setSubscription('https://push.example.test/1', 'key', 'auth');
         $socialAccount = new stdClass();
 
         $this->pushRepository = $this->createStub(PushSubscriptionRepository::class);

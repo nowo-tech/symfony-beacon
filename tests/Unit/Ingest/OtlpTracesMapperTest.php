@@ -135,7 +135,7 @@ final class OtlpTracesMapperTest extends TestCase
             ];
         }
 
-        $payloads = (new OtlpTracesMapper())->mapToEventPayloads(json_encode([
+        $payloads = new OtlpTracesMapper()->mapToEventPayloads(json_encode([
             'resourceSpans' => [[
                 'resource' => ['attributes' => []],
                 'scopeSpans' => [[
@@ -150,7 +150,7 @@ final class OtlpTracesMapperTest extends TestCase
 
     public function testTreatsUnknownStatusShapesAsNonErrorUnlessExceptionAttributesExist(): void
     {
-        $payloads = (new OtlpTracesMapper())->mapToEventPayloads(json_encode([
+        $payloads = new OtlpTracesMapper()->mapToEventPayloads(json_encode([
             'resourceSpans' => [[
                 'resource' => ['attributes' => []],
                 'scopeSpans' => [[

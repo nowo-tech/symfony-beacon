@@ -100,7 +100,7 @@ final class NotificationDigestFlusherTest extends TestCase
 
         $nullId = $this->destination(digest: false);
 
-        $digestWithoutProject = (new NotificationDestination())
+        $digestWithoutProject = new NotificationDestination()
             ->setLabel('Digest')
             ->setDigestEnabled(true);
         new ReflectionProperty(NotificationDestination::class, 'id')->setValue($digestWithoutProject, 21);

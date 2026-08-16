@@ -14,6 +14,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use Stringable;
 
 final class EventRepositoryUnitTest extends TestCase
 {
@@ -111,7 +112,7 @@ final class EventRepositoryUnitTest extends TestCase
     }
 }
 
-final class StringableDateTime extends DateTimeImmutable
+final class StringableDateTime extends DateTimeImmutable implements Stringable
 {
     public function __toString(): string
     {

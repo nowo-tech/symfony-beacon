@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.2] - 2026-08-17
+
+### Fixed
+
+- **CI Quality (PHPStan)**: restore `\native()` fallbacks in namespaced FS/DNS test hooks (PHP-CS-Fixer `native_function_invocation` `strict` was stripping them); set CS Fixer `strict: false`; add `phpstan/phpstan-phpunit` + `phpstan-baseline.neon` for residual coverage-era test noise; ignore FrankenPHP worker static rules under `tests/*`.
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator runtime steps beyond pulling `v1.20.2`.
+
 ## [1.20.1] - 2026-08-17
 
 ### Fixed
@@ -1382,7 +1392,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.2...HEAD
+[1.20.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.1...v1.20.2
 [1.20.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.0...v1.20.1
 [1.20.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...v1.19.0

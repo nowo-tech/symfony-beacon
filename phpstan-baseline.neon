@@ -1,0 +1,529 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: src/Shared/Encryption/EnsureHaliteSecretsDirectoryListener.php
+
+		-
+			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, \$variable\-\>count\(\)\)\.$#'
+			identifier: phpunit.assertCount
+			count: 3
+			path: tests/Functional/Identity/AdminProjectsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 2
+			path: tests/Functional/Ingest/EnvelopeIngestFunctionalTest.php
+
+		-
+			message: '#^Method App\\Tests\\Integration\\Identity\\UserActionRepositoryTest\:\:action\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Integration/Identity/UserActionRepositoryTest.php
+
+		-
+			message: '#^Call to an undefined method PHPUnit\\Framework\\MockObject\\InvocationStubber\:\:with\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: tests/Unit/Coverage/RepositoryGapRegressionTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''App\\\\Performance\\\\Repository\\\\PerfSpanRepository'' and App\\Performance\\Repository\\PerfSpanRepository will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Coverage/TinyRemainingCoverageTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/Controller/AccountLocaleControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 50 and 50 will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/Controller/AccountPreferencesSecuritySurfacesTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/CoverageRegressionTest.php
+
+		-
+			message: '#^Parameter \#1 \$names of method App\\Identity\\Entity\\InstancePermission\:\:syncTranslations\(\) expects array\<string, string\>, array\<int\|string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Unit/Identity/Entity/InstancePermissionTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/Entity/UserGroupAndMembershipTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 100 and 100 will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/IdentityAllowlistsAndAuditFilterTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 50 and 50 will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/IdentityAllowlistsAndAuditFilterTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 50 and 50 will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/IdentityAllowlistsAndFiltersTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotEmpty\(\) with non\-empty\-array\<string, App\\Identity\\Entity\\InstancePermission\> will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Identity/Service/InstanceRbacSeederTest.php
+
+		-
+			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, count\(\$variable\)\)\.$#'
+			identifier: phpunit.assertCount
+			count: 2
+			path: tests/Unit/Identity/Service/InstanceRbacSeederTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and null will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: tests/Unit/Identity/UserUiPreferencesCoverageCloseTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with ''\[1\-9\]\[0\-9\]\*\|\[0\-9a\-f…'' and ''\[1\-9\]\[0\-9\]\*\|\[0\-9a\-f…'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Ingest/IngestRouteRequirementsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/Issues/Controller/IssueControllerSavedViewsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Issues/Controller/IssueDetailControllerMutationsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Issues/Entity/CoverageRegressionTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Issues/Entity/InboundEmailMessageTest.php
+
+		-
+			message: '#^Call to an undefined method PHPUnit\\Framework\\MockObject\\InvocationStubber\:\:with\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/EventRepositoryUnitTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\Issues\\Repository\\EventRepositoryUnitTest\:\:queryBuilderReturning\(\) has parameter \$query with generic class Doctrine\\ORM\\Query but does not specify its types\: TKey, TResult$#'
+			identifier: missingType.generics
+			count: 1
+			path: tests/Unit/Issues/Repository/EventRepositoryUnitTest.php
+
+		-
+			message: '#^Call to an undefined method PHPUnit\\Framework\\MockObject\\InvocationStubber\:\:with\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/IssueRepositoryUnitTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\Issues\\Repository\\IssueRepositoryUnitTest\:\:queryBuilderReturning\(\) has parameter \$result with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Issues/Repository/IssueRepositoryUnitTest.php
+
+		-
+			message: '#^Trait App\\Issues\\Repository\\Query\\IssueAssignmentQueryTrait requires using class to extend Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository\<App\\Issues\\Entity\\Issue\>, but App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueAssignmentQueryTraitHarness does not\.$#'
+			identifier: class.missingExtends
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueAssignmentQueryTraitTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness\:\:applyFullTextOrLikeQuery\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness\:\:applyTagFilter\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness\:\:applyUrlFilter\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness\:\:applyUserFilter\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness\:\:createQueryBuilder\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Trait App\\Issues\\Repository\\Query\\IssueListQueryBuilderTrait requires using class to extend Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository\<App\\Issues\\Entity\\Issue\>, but App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueListQueryBuilderTraitSortHarness does not\.$#'
+			identifier: class.missingExtends
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueListQueryBuilderTraitSortTest.php
+
+		-
+			message: '#^Trait App\\Issues\\Repository\\Query\\IssueReleaseQueryTrait requires using class to extend Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository\<App\\Issues\\Entity\\Issue\>, but App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueReleaseQueryTraitHarness does not\.$#'
+			identifier: class.missingExtends
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueReleaseQueryTraitTest.php
+
+		-
+			message: '#^Trait App\\Issues\\Repository\\Query\\IssueSearchFilterTrait requires using class to extend Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository\<App\\Issues\\Entity\\Issue\>, but App\\Tests\\Unit\\Issues\\Repository\\Query\\IssueSearchFilterTraitHarness does not\.$#'
+			identifier: class.missingExtends
+			count: 1
+			path: tests/Unit/Issues/Repository/Query/IssueSearchFilterTraitTest.php
+
+		-
+			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, count\(\$variable\)\)\.$#'
+			identifier: phpunit.assertCount
+			count: 1
+			path: tests/Unit/Issues/Service/IssueUserMailNotifierTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Notifications/Controller/ProjectThresholdRuleControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Notifications/Entity/NotificationDigestBufferTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 4
+			path: tests/Unit/Notifications/MemberAlertEnumAndEntityTest.php
+
+		-
+			message: '#^Parameter \#1 \$expected of static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 3
+			path: tests/Unit/Notifications/MemberAlertEnumAndEntityTest.php
+
+		-
+			message: '#^Anonymous function never returns false so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 5
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardDnsTest.php
+
+		-
+			message: '#^Function App\\Notifications\\Service\\dns_get_record\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardDnsTest.php
+
+		-
+			message: '#^Function App\\Notifications\\Service\\gethostbynamel\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardDnsTest.php
+
+		-
+			message: '#^Property App\\Notifications\\Service\\OutboundUrlGuardDnsHooks\:\:\$dnsGetRecord has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardDnsTest.php
+
+		-
+			message: '#^Property App\\Notifications\\Service\\OutboundUrlGuardDnsHooks\:\:\$getHostByNameL has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardDnsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Notifications/Service/OutboundUrlGuardTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Minishlink\\\\WebPush\\\\Subscription'' and Minishlink\\WebPush\\Subscription will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Notifications/WebPushClientFactoryTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Minishlink\\\\WebPush\\\\WebPush'' and Minishlink\\WebPush\\WebPush will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Notifications/WebPushClientFactoryTest.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: tests/Unit/Notifications/WebPushClientFactoryTest.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Throwable\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: tests/Unit/Notifications/WebPushClientFactoryTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\PrivateConstructorCoverageTest\:\:privateConstructorClasses\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/PrivateConstructorCoverageTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/AdminProjectConfigControllerOpsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/AdminProjectControllerOpsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/ProjectAccessMutationControllersTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/ProjectApiKeyControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/ProjectDangerZoneControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/ProjectReadTokenAndConfigImportTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Controller/ProjectShareLinkControllerOpenTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/Project/CoverageRegressionTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Entity/ProjectReadTokenEntityTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and null will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: tests/Unit/Project/Entity/ProjectReadTokenEntityTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Entity/ProjectShareLinkEntityTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Repository/ProjectRepositoryTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\Project\\Repository\\ProjectRepositoryTest\:\:queryBuilderReturning\(\) has parameter \$query with generic class Doctrine\\ORM\\Query but does not specify its types\: TKey, TResult$#'
+			identifier: missingType.generics
+			count: 1
+			path: tests/Unit/Project/Repository/ProjectRepositoryTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\AccessDeniedHttpException'' and Symfony\\Component\\HttpKernel\\Exception\\AccessDeniedHttpException will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Project/Service/ProjectAccessServiceAdminShareTest.php
+
+		-
+			message: '#^Offset ''issue'' does not exist on null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Unit/Project/Service/ProjectShareGrantStoreTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''InvalidArgumentException'' and InvalidArgumentException will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Setup/Demo/SampleDataServiceTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Appearance/Controller/AppearanceSettingsControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''App\\\\Shared\\\\Appearance\\\\Entity\\\\SiteAppearance'' and App\\Shared\\Appearance\\Entity\\SiteAppearance will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Appearance/SiteAppearanceProviderTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 2 and 1 will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: tests/Unit/Shared/Appearance/SiteAppearanceProviderTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with 3 and \*NEVER\* will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: tests/Unit/Shared/Appearance/SiteAppearanceProviderTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Controller/CookieConsentAdminEntryControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Doctrine/DoctrineTraitsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Function App\\Shared\\Encryption\\glob\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$chmod has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$filePerms has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$glob has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$isDir has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$isFile has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Property App\\Shared\\Encryption\\EnsureHaliteFsHooks\:\:\$mkdir has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: tests/Unit/Shared/Encryption/EnsureHaliteSecretsDirectoryListenerFsTest.php
+
+		-
+			message: '#^Method Symfony\\Contracts\\Translation\\TranslatorInterface@anonymous/tests/Unit/Shared/Form/ConfiguredFormTypesTest\.php\:311\:\:trans\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Shared/Form/ConfiguredFormTypesTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with array\{10, 25, 50, 100\} and array\{10, 25, 50, 100\} will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Form/DashboardProjectFilterFieldsTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\Shared\\Form\\FormKitAbstractTypeHarness\:\:exposeTwigOwnedChromeOptions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Shared/Form/FormKitAbstractTypeTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''App\\\\Shared\\\\Settings\\\\Service\\\\InstanceOpsDefaults'' and App\\Shared\\Settings\\Service\\InstanceOpsDefaults will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/InstanceOpsDefaultsTest.php
+
+		-
+			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, count\(\$variable\)\)\.$#'
+			identifier: phpunit.assertCount
+			count: 1
+			path: tests/Unit/Shared/Settings/Controller/MailerSettingsControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Symfony\\\\Component\\\\HttpFoundation\\\\RedirectResponse'' and Symfony\\Component\\HttpFoundation\\RedirectResponse will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Shared/Settings/Controller/OpsDefaultsControllerTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and null will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: tests/Unit/Shared/Settings/Entity/InstanceSettingsTest.php

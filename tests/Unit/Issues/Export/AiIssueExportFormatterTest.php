@@ -104,7 +104,7 @@ final class AiIssueExportFormatterTest extends TestCase
 
     public function testBuildCanonicalUsesFallbacksForEmptyPayload(): void
     {
-        $project = (new Project())
+        $project = new Project()
             ->setName('Beacon')
             ->setSlug('beacon');
 
@@ -138,7 +138,7 @@ final class AiIssueExportFormatterTest extends TestCase
 
     public function testBuildCanonicalFallsBackToContextRequestAndTopLevelStacktrace(): void
     {
-        $project = (new Project())
+        $project = new Project()
             ->setName('Beacon')
             ->setSlug('beacon');
 
@@ -209,7 +209,7 @@ final class AiIssueExportFormatterTest extends TestCase
 
     public function testBuildCanonicalHandlesMalformedAndRelativeRequestUrls(): void
     {
-        $project = (new Project())
+        $project = new Project()
             ->setName('Beacon')
             ->setSlug('beacon');
 

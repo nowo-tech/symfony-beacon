@@ -12,7 +12,7 @@ final class NotificationDestinationExtraTest extends TestCase
 {
     public function testMaskedEndpointUrlUsesPlaceholderForMalformedEmailAddress(): void
     {
-        $destination = (new NotificationDestination())
+        $destination = new NotificationDestination()
             ->setType(NotificationDestinationType::Email)
             ->setEndpointUrl('invalid-email-value');
 

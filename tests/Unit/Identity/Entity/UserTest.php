@@ -18,7 +18,7 @@ final class UserTest extends TestCase
 {
     public function testNormalizesIdentityFieldsAndInitials(): void
     {
-        $user = (new User())
+        $user = new User()
             ->setEmail(' Person@example.com ')
             ->setDisplayName('Mary Jane')
             ->setSlackUserId(' U123 ')
@@ -52,9 +52,9 @@ final class UserTest extends TestCase
     public function testTracksRolesPasswordHistoryPreferencesAndAuditUsers(): void
     {
         $user = new User();
-        $enabledRole = (new InstanceRole())->setName('Support')->setCode('ROLE_SUPPORT');
-        $disabledRole = (new InstanceRole())->setName('Dormant')->setCode('ROLE_DORMANT')->setEnabled(false);
-        $history = (new PasswordHistory())->setPassword('old-hash');
+        $enabledRole = new InstanceRole()->setName('Support')->setCode('ROLE_SUPPORT');
+        $disabledRole = new InstanceRole()->setName('Dormant')->setCode('ROLE_DORMANT')->setEnabled(false);
+        $history = new PasswordHistory()->setPassword('old-hash');
         $actor = new User();
         $tourSeenAt = new DateTimeImmutable('2026-08-16 13:00:00');
 

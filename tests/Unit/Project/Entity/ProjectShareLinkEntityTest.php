@@ -15,12 +15,12 @@ final class ProjectShareLinkEntityTest extends TestCase
 {
     public function testTracksUsageExpiryAndRevocation(): void
     {
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
         $issue = new Issue();
         $user = new User();
         $now = new DateTimeImmutable('2026-08-16 12:00:00');
 
-        $link = (new ProjectShareLink())
+        $link = new ProjectShareLink()
             ->setProject($project)
             ->setIssue($issue)
             ->setCreatedBy($user)

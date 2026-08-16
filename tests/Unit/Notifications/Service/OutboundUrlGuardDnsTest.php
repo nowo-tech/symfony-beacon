@@ -19,14 +19,14 @@ namespace App\Notifications\Service {
     {
         return \is_callable(OutboundUrlGuardDnsHooks::$dnsGetRecord)
             ? (OutboundUrlGuardDnsHooks::$dnsGetRecord)($hostname, $type)
-            : dns_get_record($hostname, $type);
+            : \dns_get_record($hostname, $type);
     }
 
     function gethostbynamel(string $hostname): array|false
     {
         return \is_callable(OutboundUrlGuardDnsHooks::$getHostByNameL)
             ? (OutboundUrlGuardDnsHooks::$getHostByNameL)($hostname)
-            : gethostbynamel($hostname);
+            : \gethostbynamel($hostname);
     }
 }
 
@@ -50,13 +50,11 @@ namespace App\Tests\Unit\Notifications\Service {
         {
             $guard = $this->guard();
 
-            OutboundUrlGuardDnsHooks::$dnsGetRecord = static function (string $host, int $type): array|false {
-                return match ($type) {
-                    \DNS_A => [],
-                    \DNS_AAAA => [['ipv6' => '2606:4700:4700::1111']],
-                    default => [],
-                };
-            };
+            OutboundUrlGuardDnsHooks::$dnsGetRecord = (static fn (string $host, int $type): array|false => match ($type) {
+                \DNS_A => [],
+                \DNS_AAAA => [['ipv6' => '2606:4700:4700::1111']],
+                default => [],
+            });
             $options = $guard->httpClientOptionsForUrl('https://example.test/hook');
             self::assertSame('2606:4700:4700::1111', $options['resolve']['example.test']);
 

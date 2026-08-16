@@ -20,7 +20,7 @@ final class ProjectShareGrantStoreTest extends TestCase
     public function testIgnoresGrantWhenNoSessionRequestExists(): void
     {
         $store = new ProjectShareGrantStore(new RequestStack(), $this->createStub(ProjectShareLinkRepository::class));
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
 
         $store->grantShareAccess($project, null, time() + 60, 'share-uuid');
 
@@ -37,25 +37,23 @@ final class ProjectShareGrantStoreTest extends TestCase
         $stack = new RequestStack();
         $stack->push($request);
 
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
         new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
-        $validLink = (new ProjectShareLink())
+        $validLink = new ProjectShareLink()
             ->setProject($project)
             ->setTokenHash('hash');
         $validShareUuid = $validLink->getUuid();
 
-        $revokedLink = (new ProjectShareLink())
+        $revokedLink = new ProjectShareLink()
             ->setProject($project)
             ->setTokenHash('revoked');
         $revokedLink->revoke();
 
         $repo = $this->createStub(ProjectShareLinkRepository::class);
-        $repo->method('findOneByUuid')->willReturnCallback(static function (string $uuid) use ($validShareUuid, $validLink, $revokedLink): ?ProjectShareLink {
-            return match ($uuid) {
-                $validShareUuid => $validLink,
-                'revoked-share' => $revokedLink,
-                default => null,
-            };
+        $repo->method('findOneByUuid')->willReturnCallback(static fn (string $uuid): ?ProjectShareLink => match ($uuid) {
+            $validShareUuid => $validLink,
+            'revoked-share' => $revokedLink,
+            default => null,
         });
 
         $store = new ProjectShareGrantStore($stack, $repo);

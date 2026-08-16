@@ -458,8 +458,8 @@ final class ProjectConfigPortabilityTest extends TestCase
         $project = new Project();
         $project->setName('Fallback');
         $project->setSlug('fallback-slug');
-        $project->addMembership((new ProjectMembership())->setRole(ProjectRole::Owner));
-        $project->addMembership((new ProjectMembership())->setUser($owner)->setRole(ProjectRole::Admin));
+        $project->addMembership(new ProjectMembership()->setRole(ProjectRole::Owner));
+        $project->addMembership(new ProjectMembership()->setUser($owner)->setRole(ProjectRole::Admin));
 
         $projectRepo = $this->createMock(ProjectRepository::class);
         $projectRepo->expects(self::once())->method('hydrateMembershipsForProjects')->with([$project]);
@@ -617,7 +617,7 @@ final class ProjectConfigPortabilityTest extends TestCase
         $applyMethod = new ReflectionMethod(ProjectConfigPortability::class, 'applyProjectFields');
         $fresh = new Project();
         $applyMethod->invoke($service, $fresh, $row);
-        self::assertSame('existing-code', (new ReflectionProperty(Project::class, 'code'))->getValue($fresh));
+        self::assertSame('existing-code', new ReflectionProperty(Project::class, 'code')->getValue($fresh));
 
         try {
             $upsertMethod->invoke($service, array_merge($row, ['code' => 'missing-code']), $this->user('actor@example.com', 'Actor'), false);

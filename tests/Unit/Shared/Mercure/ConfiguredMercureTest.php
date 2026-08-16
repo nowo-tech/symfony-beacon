@@ -96,12 +96,12 @@ final class ConfiguredMercureTest extends TestCase
                 return true;
             }
 
-            public function getMercureUrl(): ?string
+            public function getMercureUrl(): string
             {
                 return 'http://mercure/.well-known/mercure';
             }
 
-            public function getMercureJwtSecret(): ?string
+            public function getMercureJwtSecret(): string
             {
                 return 0 === $this->secretCalls++ ? 'first-secret' : '';
             }
@@ -159,7 +159,7 @@ final class ConfiguredMercureTest extends TestCase
             new MercureHubUrlGuard(),
         );
 
-        $cachedHub = (new ReflectionClass(Hub::class))->newInstanceWithoutConstructor();
+        $cachedHub = new ReflectionClass(Hub::class)->newInstanceWithoutConstructor();
         new ReflectionProperty($mercure, 'hub')->setValue($mercure, $cachedHub);
 
         self::assertSame($cachedHub, $this->invokePrivateMethod($mercure, 'hub'));

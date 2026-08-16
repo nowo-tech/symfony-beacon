@@ -15,7 +15,7 @@ final class InstancePermissionTest extends TestCase
     public function testNormalizesScalarFieldsAndAuditUsers(): void
     {
         $user = new User();
-        $permission = (new InstancePermission())
+        $permission = new InstancePermission()
             ->setKey(' Project.View ')
             ->setName(' View project ')
             ->setDescription(' description ')
@@ -40,7 +40,7 @@ final class InstancePermissionTest extends TestCase
     public function testManagesTranslationsAndLocaleLookups(): void
     {
         $permission = new InstancePermission();
-        $existing = (new InstancePermissionTranslation())
+        $existing = new InstancePermissionTranslation()
             ->setLocale(' ES ')
             ->setName(' Nombre ')
             ->setDescription(' Descripcion ');

@@ -210,9 +210,9 @@ final class SmsBridgeProviderTest extends TestCase
 
     public function testIsConfiguredRespectsModeSpecificCredentials(): void
     {
-        self::assertFalse((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', '', 'ACbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'))->isConfigured());
-        self::assertFalse((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'smscli_testtoken', 'bad-sid'))->isConfigured());
-        self::assertFalse((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'Bearer abc', '', '', '', 'native'))->isConfigured());
-        self::assertTrue((new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'smscli_token', '', '', '', 'native'))->isConfigured());
+        self::assertFalse(new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', '', 'ACbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')->isConfigured());
+        self::assertFalse(new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'smscli_testtoken', 'bad-sid')->isConfigured());
+        self::assertFalse(new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'Bearer abc', '', '', '', 'native')->isConfigured());
+        self::assertTrue(new SmsBridgeProvider(new MockHttpClient(), 'https://sms-bridge.example', 'smscli_token', '', '', '', 'native')->isConfigured());
     }
 }

@@ -26,10 +26,10 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
     {
         $user = $this->user(1, 'alerts@example.com');
         $project = new Project()->setName('Demo')->setSlug('demo');
-        $issue = (new Issue())->setProject($project);
+        $issue = new Issue()->setProject($project);
 
         $projectPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
-        $projectPrefs->method('findOneByUserAndProject')->willReturn((new MemberProjectAlertPreference())->setUser($user)->setProject($project)->setEnabled(false));
+        $projectPrefs->method('findOneByUserAndProject')->willReturn(new MemberProjectAlertPreference()->setUser($user)->setProject($project)->setEnabled(false));
         $evaluator = new MemberAlertPreferenceEvaluator(
             $projectPrefs,
             $this->createStub(MemberAccountAlertEventRepository::class),
@@ -40,7 +40,7 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
 
         $projectPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $projectEvents = $this->createStub(MemberProjectAlertEventRepository::class);
-        $projectEvents->method('findOneByUserProjectAndEvent')->willReturn((new MemberProjectAlertEvent())
+        $projectEvents->method('findOneByUserProjectAndEvent')->willReturn(new MemberProjectAlertEvent()
             ->setUser($user)
             ->setProject($project)
             ->setEvent(MemberAlertEvent::IssueAssigned)
@@ -59,7 +59,7 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
     public function testFilterEligibleUsersCoversRowBasedBranches(): void
     {
         $project = new Project()->setName('Demo')->setSlug('demo');
-        $issue = (new Issue())->setProject($project);
+        $issue = new Issue()->setProject($project);
 
         $mentioned = $this->user(1, 'mentioned@example.com');
         $disabled = $this->user(2, 'disabled@example.com')->setMemberAlertsEnabled(false);
@@ -69,9 +69,9 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
         $issue->setAssignee($allScope);
         $withoutId = new User()->setEmail('no-id@example.com');
 
-        $projectPref = (new MemberProjectAlertPreference())->setUser($projectDisabled)->setProject($project)->setEnabled(false);
-        $accountRow = (new MemberAccountAlertEvent())->setUser($accountDisabled)->setEvent(MemberAlertEvent::IssueAssigned)->setEnabled(false);
-        $projectRow = (new MemberProjectAlertEvent())->setUser($allScope)->setProject($project)->setEvent(MemberAlertEvent::IssueAssigned)->setScope(MemberAlertScope::All);
+        $projectPref = new MemberProjectAlertPreference()->setUser($projectDisabled)->setProject($project)->setEnabled(false);
+        $accountRow = new MemberAccountAlertEvent()->setUser($accountDisabled)->setEvent(MemberAlertEvent::IssueAssigned)->setEnabled(false);
+        $projectRow = new MemberProjectAlertEvent()->setUser($allScope)->setProject($project)->setEvent(MemberAlertEvent::IssueAssigned)->setScope(MemberAlertScope::All);
 
         $projectPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $projectPrefs->method('findIndexedByUserIdsForProject')->willReturn([3 => $projectPref]);
@@ -98,7 +98,7 @@ final class MemberAlertPreferenceEvaluatorTest extends TestCase
     public function testFilterEligibleUsersReturnsEarlyWhenNoEnabledUsersRemain(): void
     {
         $project = new Project()->setName('Demo')->setSlug('demo');
-        $issue = (new Issue())->setProject($project);
+        $issue = new Issue()->setProject($project);
         $disabled = $this->user(2, 'disabled@example.com')->setMemberAlertsEnabled(false);
         $withoutId = new User()->setEmail('no-id@example.com');
 

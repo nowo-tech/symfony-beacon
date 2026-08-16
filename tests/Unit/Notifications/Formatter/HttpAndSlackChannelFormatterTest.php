@@ -50,7 +50,7 @@ final class HttpAndSlackChannelFormatterTest extends TestCase
 
     public function testSlackSkipsInteractiveBlocksForSamplePayloadEvenWithSigningSecret(): void
     {
-        $formatted = (new SlackChannelFormatter())->format('https://hooks.slack.com/services/T/B/X', [
+        $formatted = new SlackChannelFormatter()->format('https://hooks.slack.com/services/T/B/X', [
             'event' => 'issue.new',
             'summary' => 'Sample',
             'project' => ['uuid' => 'p-uuid'],
@@ -63,7 +63,7 @@ final class HttpAndSlackChannelFormatterTest extends TestCase
 
     public function testSlackSkipsInteractiveBlocksForUnsupportedEvent(): void
     {
-        $formatted = (new SlackChannelFormatter())->format('https://hooks.slack.com/services/T/B/X', [
+        $formatted = new SlackChannelFormatter()->format('https://hooks.slack.com/services/T/B/X', [
             'event' => 'issue.resolved',
             'summary' => 'Sample',
             'project' => ['uuid' => 'p-uuid'],
@@ -75,7 +75,7 @@ final class HttpAndSlackChannelFormatterTest extends TestCase
 
     public function testSlackSkipsInteractiveBlocksWhenProjectOrIssuePayloadIsInvalid(): void
     {
-        $formatted = (new SlackChannelFormatter())->format('https://hooks.slack.com/services/T/B/X', [
+        $formatted = new SlackChannelFormatter()->format('https://hooks.slack.com/services/T/B/X', [
             'event' => 'issue.new',
             'summary' => 'Sample',
             'project' => 'not-an-array',
@@ -87,7 +87,7 @@ final class HttpAndSlackChannelFormatterTest extends TestCase
 
     public function testSlackSkipsInteractiveBlocksWhenInteractiveUuidsAreMissing(): void
     {
-        $formatted = (new SlackChannelFormatter())->format('https://hooks.slack.com/services/T/B/X', [
+        $formatted = new SlackChannelFormatter()->format('https://hooks.slack.com/services/T/B/X', [
             'event' => 'issue.new',
             'summary' => 'Sample',
             'project' => [],
@@ -99,7 +99,7 @@ final class HttpAndSlackChannelFormatterTest extends TestCase
 
     private function slackDestinationWithSigningSecret(): NotificationDestination
     {
-        return (new NotificationDestination())
+        return new NotificationDestination()
             ->setProject(new Project()->setName('Acme')->setSlug('acme'))
             ->setLabel('Slack')
             ->setType(NotificationDestinationType::Slack)

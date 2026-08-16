@@ -16,7 +16,7 @@ final class EventPayloadPromoterExtraTest extends TestCase
             $payload['tags']['tag_'.$i] = 'value_'.$i;
         }
 
-        $tags = (new EventPayloadPromoter())->extractTags($payload);
+        $tags = new EventPayloadPromoter()->extractTags($payload);
 
         self::assertSame(['key' => 'bool_true', 'value' => 'true'], $tags[0]);
         self::assertSame(['key' => 'bool_false', 'value' => 'false'], $tags[1]);

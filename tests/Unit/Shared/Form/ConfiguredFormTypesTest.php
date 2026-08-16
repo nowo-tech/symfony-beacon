@@ -57,7 +57,7 @@ final class ConfiguredFormTypesTest extends TestCase
             new RbacPermissionTranslator($translator),
         );
 
-        $permission = (new InstancePermission())
+        $permission = new InstancePermission()
             ->setKey('project.view')
             ->setName('Fallback name')
             ->setDescription('Fallback description')
@@ -140,8 +140,8 @@ final class ConfiguredFormTypesTest extends TestCase
             $this->translator(),
         );
 
-        $destination = (new NotificationDestination())
-            ->setProject((new Project())->setName('Beacon')->setSlug('beacon'))
+        $destination = new NotificationDestination()
+            ->setProject(new Project()->setName('Beacon')->setSlug('beacon'))
             ->setSigningSecret('keep-me');
 
         $invalidForm = $this->formFactory([$type])->create(NotificationDestinationFormType::class, $destination);

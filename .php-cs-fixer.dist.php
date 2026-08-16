@@ -31,7 +31,8 @@ return (new PhpCsFixer\Config())
         'native_function_invocation' => [
             'include' => ['@compiler_optimized'],
             'scope' => 'namespaced',
-            'strict' => true,
+            // Keep explicit `\fn()` fallbacks in namespaced test hooks (is_dir, dns_get_record, …).
+            'strict' => false,
         ],
     ])
     ->setFinder($finder)

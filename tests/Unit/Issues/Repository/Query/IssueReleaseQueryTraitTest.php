@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Issues\Repository\Query;
 
 use App\Issues\Repository\Query\IssueReleaseQueryTrait;
 use App\Project\Entity\Project;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -19,7 +20,7 @@ final class IssueReleaseQueryTraitTest extends TestCase
         $project = new Project();
         new ReflectionProperty(Project::class, 'id')->setValue($project, 9);
 
-        $connection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('fetchFirstColumn')->willReturnOnConsecutiveCalls(
             [' ', '1.0.0', '1.0.0'],
             ['', '2.0.0', '2.0.0'],

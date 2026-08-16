@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Project\Repository;
 
+use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
@@ -32,7 +33,7 @@ final class ProjectRepositoryTest extends TestCase
             ->getMock();
         $repo->expects(self::never())->method('createQueryBuilder');
 
-        $repo->hydrateMembershipsForProjects([new \App\Project\Entity\Project()]);
+        $repo->hydrateMembershipsForProjects([new Project()]);
         self::assertTrue(true);
     }
 

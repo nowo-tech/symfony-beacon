@@ -149,13 +149,13 @@ final class IssueSearchFilterTraitTest extends TestCase
     }
 }
 
-final class IssueSearchFilterTraitHarness
+final readonly class IssueSearchFilterTraitHarness
 {
     use IssueSearchFilterTrait;
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly EventTagRepository $eventTagRepository,
+        private EntityManagerInterface $entityManager,
+        private EventTagRepository $eventTagRepository,
     ) {
     }
 

@@ -30,20 +30,20 @@ final class IssueSearchRepositoryTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
         $repository = self::getContainer()->get(IssueSearchRepository::class);
 
-        $teammate = (new User())
+        $teammate = new User()
             ->setEmail('search-teammate@example.com')
             ->setDisplayName('Teammate');
         $teammate->setPassword($hasher->hashPassword($teammate, 'secret'));
         new ReflectionProperty(User::class, 'id')->setValue($teammate, 2001);
 
         $project->addMembership(
-            (new ProjectMembership())
+            new ProjectMembership()
                 ->setProject($project)
                 ->setUser($teammate)
                 ->setRole(ProjectRole::Member),
         );
 
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other search')
             ->setSlug('other-search');
         $em->persist($teammate);

@@ -31,7 +31,7 @@ final class AuthKitAwareLoginRateLimiterTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::never())->method('createQueryBuilder');
 
-        $request = Request::create('/', 'POST', [
+        $request = Request::create('/', Request::METHOD_POST, [
             'login_form' => ['email' => 'nested@example.com'],
         ]);
 
@@ -72,8 +72,8 @@ final class AuthKitAwareLoginRateLimiterTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())->method('createQueryBuilder')->willReturn($qb);
 
-        $request = Request::create('/', 'POST', ['email' => 'flat@example.com'], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
+        $request = Request::create('/', Request::METHOD_POST, ['email' => 'flat@example.com'], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
 
-        (new AuthKitAwareLoginRateLimiter($inner, $entityManager))->reset($request);
+        new AuthKitAwareLoginRateLimiter($inner, $entityManager)->reset($request);
     }
 }

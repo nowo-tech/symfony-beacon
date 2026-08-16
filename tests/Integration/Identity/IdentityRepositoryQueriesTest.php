@@ -26,7 +26,7 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         $roles = self::getContainer()->get(InstanceRoleRepository::class);
         $permissions = self::getContainer()->get(InstancePermissionRepository::class);
 
-        $admin = (new User())
+        $admin = new User()
             ->setEmail(' Admin@example.com ')
             ->setDisplayName('Admin Person')
             ->setPassword($hasher->hashPassword(new User(), 'secret'))
@@ -35,7 +35,7 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         $admin->setUpdatedBy($owner);
         $admin->setRoles(['ROLE_ADMIN']);
 
-        $staff = (new User())
+        $staff = new User()
             ->setEmail('staff@example.com')
             ->setDisplayName('Staff Person')
             ->setPassword($hasher->hashPassword(new User(), 'secret'));
@@ -43,16 +43,16 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         $staff->setUpdatedBy($owner);
         $staff->setAnonymizedAt(new DateTimeImmutable());
 
-        $viewer = (new User())
+        $viewer = new User()
             ->setEmail('viewer@example.com')
             ->setDisplayName('Viewer')
             ->setPassword($hasher->hashPassword(new User(), 'secret'));
 
-        $permission = (new InstancePermission())
+        $permission = new InstancePermission()
             ->setKey('project.view')
             ->setName('Project view')
             ->setCategory('access');
-        $role = (new InstanceRole())
+        $role = new InstanceRole()
             ->setName('Support')
             ->setCode('support')
             ->setDescription('Support role');
@@ -62,11 +62,11 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         $admin->addInstanceRole($role);
         $viewer->addInstanceRole($role);
 
-        $disabledPermission = (new InstancePermission())
+        $disabledPermission = new InstancePermission()
             ->setKey('project.delete')
             ->setName('Delete')
             ->setCategory('access');
-        $disabledRole = (new InstanceRole())
+        $disabledRole = new InstanceRole()
             ->setName('Dormant')
             ->setCode('ROLE_DORMANT')
             ->setEnabled(false);
@@ -97,7 +97,7 @@ final class IdentityRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertSame(1, $users->countAdmins());
         self::assertSame(1, $users->countAdmins(excludeAnonymized: true));
 
-        $saved = (new User())
+        $saved = new User()
             ->setEmail('saved@example.com')
             ->setDisplayName('Saved User')
             ->setPassword($hasher->hashPassword(new User(), 'secret'));

@@ -89,7 +89,7 @@ final class IngestProjectAccessGateTest extends TestCase
     public function testAuthorizeCredentialsFlushesWhenLegacySecretIsUpgraded(): void
     {
         $project = $this->project(10);
-        $key = (new ProjectApiKey())
+        $key = new ProjectApiKey()
             ->setProject($project)
             ->setPublicKey('public-key');
         new ReflectionProperty(ProjectApiKey::class, 'secretKey')->setValue($key, 'legacy-secret');

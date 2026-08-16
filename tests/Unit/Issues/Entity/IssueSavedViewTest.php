@@ -14,7 +14,7 @@ final class IssueSavedViewTest extends TestCase
     public function testAccessorsPersistTrimmedNameProjectUserAndQuery(): void
     {
         $user = new User()->setEmail('saved-view@example.com');
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
         $view = new IssueSavedView();
 
         $view

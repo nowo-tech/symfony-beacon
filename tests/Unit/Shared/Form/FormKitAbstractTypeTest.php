@@ -12,7 +12,7 @@ final class FormKitAbstractTypeTest extends TestCase
 {
     public function testTwigOwnedChromeOptionsDisableTranslatorOwnedChrome(): void
     {
-        $type = (new ReflectionClass(FormKitAbstractTypeHarness::class))->newInstanceWithoutConstructor();
+        $type = new ReflectionClass(FormKitAbstractTypeHarness::class)->newInstanceWithoutConstructor();
 
         self::assertSame([
             'label' => false,

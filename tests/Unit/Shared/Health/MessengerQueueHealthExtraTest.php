@@ -28,7 +28,7 @@ final class MessengerQueueHealthExtraTest extends TestCase
 
         self::assertSame(
             ['pending' => null, 'available' => false],
-            (new MessengerQueueHealth($em))->asyncPending(),
+            new MessengerQueueHealth($em)->asyncPending(),
         );
     }
 }

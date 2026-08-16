@@ -161,7 +161,7 @@ final class TeamsChannelFormatterTest extends TestCase
 
     private function destinationWithSigningSecret(): NotificationDestination
     {
-        return (new NotificationDestination())
+        return new NotificationDestination()
             ->setProject(new Project()->setName('Acme')->setSlug('acme'))
             ->setLabel('Teams')
             ->setType(NotificationDestinationType::Teams)

@@ -166,6 +166,7 @@
         "nowo-tech/twig-inspector-bundle": "1.1.1",
         "phpstan/phpstan": "2.2.8",
         "phpstan/phpstan-doctrine": "2.0.28",
+        "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "2.0.20",
         "phpunit/phpunit": "13.2.6",
         "rector/rector": "2.6.1",

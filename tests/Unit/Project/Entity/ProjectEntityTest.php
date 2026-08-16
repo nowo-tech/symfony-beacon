@@ -13,8 +13,8 @@ final class ProjectEntityTest extends TestCase
 {
     public function testExposesIssuesCollectionAndRemovesThresholdRules(): void
     {
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
-        $rule = (new ProjectThresholdRule())->setProject($project)->setLabel('Burst');
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
+        $rule = new ProjectThresholdRule()->setProject($project)->setLabel('Burst');
 
         self::assertCount(0, $project->getIssues());
         self::assertContainsOnlyInstancesOf(Issue::class, $project->getIssues()->toArray());

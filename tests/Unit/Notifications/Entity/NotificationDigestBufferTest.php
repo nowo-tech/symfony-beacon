@@ -15,8 +15,8 @@ final class NotificationDigestBufferTest extends TestCase
 {
     public function testAccessorsExposeDestinationPayloadAndTimestamp(): void
     {
-        $project = (new Project())->setName('Beacon')->setSlug('beacon');
-        $destination = (new NotificationDestination())
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
+        $destination = new NotificationDestination()
             ->setProject($project)
             ->setLabel('Ops')
             ->setType(NotificationDestinationType::Http)

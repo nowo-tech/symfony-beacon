@@ -17,7 +17,7 @@ final class EventTagTest extends TestCase
         $event = new Event();
         $issue = new Issue();
         $project = new Project();
-        $tag = (new EventTag())
+        $tag = new EventTag()
             ->setEvent($event)
             ->setIssue($issue)
             ->setProject($project)

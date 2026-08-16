@@ -90,7 +90,7 @@ final class RepositoryGapRegressionTest extends TestCase
 
     public function testMemberAccountAlertEventRepositorySkipsRowsWithoutUserId(): void
     {
-        $row = (new MemberAccountAlertEvent())
+        $row = new MemberAccountAlertEvent()
             ->setUser(new User()->setEmail('alerts@example.com'))
             ->setEvent(MemberAlertEvent::IssueAssigned);
 
@@ -118,11 +118,11 @@ final class RepositoryGapRegressionTest extends TestCase
         $user = new User()->setEmail('project-alerts@example.com');
         $project = new Project();
 
-        $projectlessRow = (new MemberProjectAlertEvent())
+        $projectlessRow = new MemberProjectAlertEvent()
             ->setUser($user)
             ->setProject(new Project())
             ->setEvent(MemberAlertEvent::IssueAssigned);
-        $userlessRow = (new MemberProjectAlertEvent())
+        $userlessRow = new MemberProjectAlertEvent()
             ->setUser(new User()->setEmail('no-id@example.com'))
             ->setProject($project)
             ->setEvent(MemberAlertEvent::IssueAssigned);

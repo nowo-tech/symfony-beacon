@@ -119,7 +119,7 @@ final class InstancePermissionVoterTest extends TestCase
 
     public function testDeniesNonUserTokensAndUsersWithoutDatabaseId(): void
     {
-        $this->permissions->method('findOneByKey')->willReturn((new InstancePermission())->setKey('project.view'));
+        $this->permissions->method('findOneByKey')->willReturn(new InstancePermission()->setKey('project.view'));
         $nonUserToken = $this->createMock(TokenInterface::class);
         $nonUserToken->method('getUser')->willReturn(new InMemoryUser('anon', 'secret'));
 

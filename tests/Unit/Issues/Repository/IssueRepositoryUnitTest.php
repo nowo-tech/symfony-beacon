@@ -22,7 +22,7 @@ final class IssueRepositoryUnitTest extends TestCase
 
         self::assertSame([], $repo->findSimilarIssues(new Issue(), 5));
 
-        $issue = (new Issue())
+        $issue = new Issue()
             ->setProject(new Project()->setName('Demo')->setSlug('demo'))
             ->setTitle('   ');
         self::assertSame([], $repo->findSimilarIssues($issue, 5));
@@ -31,28 +31,28 @@ final class IssueRepositoryUnitTest extends TestCase
     public function testFindSimilarIssuesFallsBackToShortTitleAndSortsByScoreThenRecency(): void
     {
         $project = new Project()->setName('Demo')->setSlug('demo');
-        $current = (new Issue())
+        $current = new Issue()
             ->setProject($project)
             ->setTitle('AB')
             ->setStatus(IssueStatus::Unresolved)
             ->setLastSeen(new DateTimeImmutable('2026-08-16 12:00:00'));
         new ReflectionProperty(Issue::class, 'id')->setValue($current, 10);
 
-        $exactOlder = (new Issue())
+        $exactOlder = new Issue()
             ->setProject($project)
             ->setTitle('AB')
             ->setStatus(IssueStatus::Resolved)
             ->setLastSeen(new DateTimeImmutable('2026-08-16 10:00:00'));
         new ReflectionProperty(Issue::class, 'id')->setValue($exactOlder, 11);
 
-        $exactNewer = (new Issue())
+        $exactNewer = new Issue()
             ->setProject($project)
             ->setTitle('AB')
             ->setStatus(IssueStatus::Resolved)
             ->setLastSeen(new DateTimeImmutable('2026-08-16 11:00:00'));
         new ReflectionProperty(Issue::class, 'id')->setValue($exactNewer, 12);
 
-        $partial = (new Issue())
+        $partial = new Issue()
             ->setProject($project)
             ->setTitle('AB related')
             ->setStatus(IssueStatus::Resolved)

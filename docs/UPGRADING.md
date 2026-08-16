@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.20.1)](#unreleased-main-after-1201)
+- [Unreleased (main after 1.20.2)](#unreleased-main-after-1202)
+- [Upgrading from 1.20.1 to 1.20.2](#upgrading-from-1201-to-1202)
 - [Upgrading from 1.20.0 to 1.20.1](#upgrading-from-1200-to-1201)
 - [Upgrading from 1.19.0 to 1.20.0](#upgrading-from-1190-to-1200)
 - [Upgrading from 1.18.7 to 1.19.0](#upgrading-from-1187-to-1190)
@@ -82,9 +83,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.20.1)
+## Unreleased (main after 1.20.2)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.20.1 to 1.20.2
+
+CI Quality: PHPStan baseline + phpstan-phpunit; restore namespaced test-hook `\native()` fallbacks; PHP-CS-Fixer `native_function_invocation.strict=false`. **No migrations.**
+
+1. Pull / checkout `v1.20.2`.
+
+2. No operator runtime steps.
 
 ## Upgrading from 1.20.0 to 1.20.1
 

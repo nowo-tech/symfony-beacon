@@ -13,7 +13,7 @@ final class PerfSpanTest extends TestCase
     public function testNormalizesFieldLengthsAndFlags(): void
     {
         $transaction = new PerfTransaction();
-        $span = (new PerfSpan())
+        $span = new PerfSpan()
             ->setTransaction($transaction)
             ->setSpanId('span-123')
             ->setOp(str_repeat('o', 100))

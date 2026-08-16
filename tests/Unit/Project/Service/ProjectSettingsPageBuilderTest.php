@@ -379,7 +379,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         new ReflectionProperty(UserGroup::class, 'id')->setValue($allowedGroup, 51);
         $forbiddenGroup = new UserGroup()->setName('Forbidden')->setSlug('forbidden');
         new ReflectionProperty(UserGroup::class, 'id')->setValue($forbiddenGroup, 52);
-        $actorGroupMembership = (new UserGroupMembership())
+        $actorGroupMembership = new UserGroupMembership()
             ->setUser($memberUser)
             ->setUserGroup($allowedGroup);
 

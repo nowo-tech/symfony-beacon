@@ -67,10 +67,4 @@ final class IssueListQueryBuilderTraitSortHarness
     {
         $this->applySqlSort($qb, $sort);
     }
-
-    private function applyOccurrence(QueryBuilder $qb, IssueListSort $sort): void
-    {
-        $method = new ReflectionMethod(self::class, 'applyOccurrenceSqlSort');
-        $method->invoke($this, $qb, $sort);
-    }
 }

@@ -278,9 +278,9 @@ final class NotificationOutboundFormatterTest extends TestCase
     {
         $reflection = new ReflectionClass(NotificationOutboundFormatter::class);
         $formatter = $reflection->newInstanceWithoutConstructor();
-        (new ReflectionProperty(NotificationOutboundFormatter::class, 'telegramFormatter'))
+        new ReflectionProperty(NotificationOutboundFormatter::class, 'telegramFormatter')
             ->setValue($formatter, new TelegramChannelFormatter());
-        (new ReflectionProperty(NotificationOutboundFormatter::class, 'formatters'))
+        new ReflectionProperty(NotificationOutboundFormatter::class, 'formatters')
             ->setValue($formatter, []);
 
         $this->expectException(InvalidArgumentException::class);

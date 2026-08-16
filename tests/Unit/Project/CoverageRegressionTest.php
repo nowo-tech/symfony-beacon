@@ -16,13 +16,13 @@ final class CoverageRegressionTest extends TestCase
 {
     public function testProjectApiKeyReturnsFalseWhenNoSecretIsStored(): void
     {
-        self::assertFalse((new ProjectApiKey())->matchesSecret('missing-secret'));
+        self::assertFalse(new ProjectApiKey()->matchesSecret('missing-secret'));
     }
 
     public function testProjectMembershipAndGroupAccessExposeCreationTimestamps(): void
     {
-        self::assertInstanceOf(DateTimeImmutable::class, (new ProjectMembership())->getCreatedAt());
-        self::assertInstanceOf(DateTimeImmutable::class, (new ProjectGroupAccess())->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, new ProjectMembership()->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, new ProjectGroupAccess()->getCreatedAt());
     }
 
     public function testProjectRolePermissionsMirrorRoleMatrix(): void
