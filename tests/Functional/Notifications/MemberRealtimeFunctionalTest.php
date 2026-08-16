@@ -47,12 +47,15 @@ final class MemberRealtimeFunctionalTest extends DatabaseWebTestCase
         self::assertSame([IssueRealtimeTopics::forUser($user->getUuid())], $payload['mercure']['topics']);
         self::assertIsString($payload['mercure']['token']);
         self::assertNotSame('', $payload['mercure']['token']);
-        self::assertFalse($payload['push']['preferenceEnabled']);
+        self::assertTrue($payload['push']['preferenceEnabled']);
     }
 
     public function testPushSubscribeRejectsInvalidCsrfAndDisabledPreference(): void
     {
         [$client, $user, $project] = $this->bootWithDemoProject('realtime-push@example.com');
+        $user->setPushNotificationsEnabled(false);
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
+
         $this->login($client, $user);
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/issues');
         self::assertResponseIsSuccessful();

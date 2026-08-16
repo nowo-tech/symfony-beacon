@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.2)](#unreleased-main-after-1182)
+- [Unreleased (main after 1.18.3)](#unreleased-main-after-1183)
+- [Upgrading from 1.18.2 to 1.18.3](#upgrading-from-1182-to-1183)
 - [Upgrading from 1.18.1 to 1.18.2](#upgrading-from-1181-to-1182)
 - [Upgrading from 1.18.0 to 1.18.1](#upgrading-from-1180-to-1181)
 - [Upgrading from 1.17.0 to 1.18.0](#upgrading-from-1170-to-1180)
@@ -74,19 +75,35 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.2)
+## Unreleased (main after 1.18.3)
 
-**`app:beacon:test` / `make beacon-test`** — after ingest ACK, the command prints dogfood warnings (existing issue fingerprint, missing Web Push subscriptions / VAPID, Messenger lag). Thin client-only probe remains `bin/console nowo:beacon:test`. See [DSN.md](DSN.md).
+No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
 
-**Web Push default on for new users** — `push_notifications_enabled` DB default becomes `1`. Existing users keep their saved preference. Run migrations.
+## Upgrading from 1.18.2 to 1.18.3
 
-**CI / E2E** — after `make seed` / `make ready`, `.demo-client.env` is reclaimed to the host user (container wrote it as root:600). No operator action beyond pulling the Makefile fix.
+Dogfood probe diagnostics, Web Push preference default **on** for new users, and CI/host readability of `.demo-client.env`.
+
+1. Pull / checkout `v1.18.3` and run migrations:
 
 ```bash
 make migrate
-make reclaim-demo-client-env   # if Playwright cannot read .demo-client.env
-make beacon-test ARGS='--check-only'
+# Version20260816120000 — ALTER `user`.push_notifications_enabled DEFAULT 1
 ```
+
+2. Optional — verify dogfood DSN and understand ACK ≠ Web Push:
+
+```bash
+make beacon-test ARGS='--check-only'
+make beacon-test ARGS='--message=unique-probe --wait=15'
+```
+
+3. If host Playwright / local tools cannot read `.demo-client.env` after seed:
+
+```bash
+make reclaim-demo-client-env
+```
+
+Existing users keep their saved `pushNotificationsEnabled` value. Preference **on** still requires a browser `push_subscription` (open Issues so `issue-realtime` can subscribe). See [DSN.md](DSN.md) and [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
 
 ## Upgrading from 1.18.1 to 1.18.2
 

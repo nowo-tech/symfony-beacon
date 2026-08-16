@@ -181,3 +181,8 @@ Phase 10 after ship (tooling / Live DI polish)
 | Auth/client | T041–T044 (4) |
 | Release polish | T045–T047 (3) |
 | **Total** | **47** |
+
+## Amendment tasks (2026-08-16)
+
+- [x] T048 Default `pushNotificationsEnabled` to true (entity + DB default migration); docs/contracts/quickstart clarify preference ≠ `push_subscription`
+- [x] T049 Unit coverage for new-user default; English help copy for browser push preference

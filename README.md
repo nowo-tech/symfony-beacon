@@ -116,7 +116,7 @@ make ready
 
 > After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs). Complete setup/first register **before** publishing the port — the first registrant is `ROLE_ADMIN`.
 
-Seed prints DSNs and writes `.demo-client.env` (mode **600**) for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo. Verify dogfooding with `make beacon-test` (or `ARGS='--check-only'`). See [docs/DSN.md](docs/DSN.md).
+Seed prints DSNs and writes `.demo-client.env` (mode **600**) for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo. Verify dogfooding with `make beacon-test` (runs `app:beacon:test`: ingest ACK + warnings when Web Push cannot fire; or `ARGS='--check-only'`). See [docs/DSN.md](docs/DSN.md).
 
 ```text
 UI DSN: https://<public_key>:<secret>@localhost:9447/<project_id>
@@ -166,9 +166,9 @@ make test ARGS='--testsuite Unit'
 # or
 docker compose exec php vendor/bin/phpunit
 
-# HTML + Clover report (Xdebug in Compose); optional soft gate:
+# HTML + Clover report (Xdebug in Compose); defaults to the hard statement gate:
 make test-coverage
-# COVERAGE_MIN=40 make test-coverage
+# COVERAGE_MIN=0 make test-coverage   # optional local diagnosis override
 
 # Frontend unit (Vitest + jsdom in the php container):
 make test-unit-js
@@ -180,7 +180,7 @@ make test-e2e
 
 Layout: `tests/Unit/` (pure `TestCase`), `tests/Functional/` (HTTP), `tests/Integration/` (kernel/DB/commands), helpers in `tests/Support/`. Frontend unit specs: `assets/**/*.test.ts` (`vitest.config.ts`).
 
-CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. Soft gate defaults to `COVERAGE_MIN=35` in CI (never 100%). See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and `specs/033-coverage-ci/`.
+CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that uploads Clover/HTML artifacts. The includable `src/` tree is gated at `COVERAGE_MIN=100` in CI and by default in `make test-coverage`; local overrides such as `COVERAGE_MIN=0` are for diagnosis only. See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and [docs/COVERAGE.md](docs/COVERAGE.md).
 
 | Suite | Notes |
 |-------|--------|

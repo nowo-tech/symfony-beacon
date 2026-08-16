@@ -11,7 +11,7 @@ final readonly class BeaconDogfoodDiagnosticReport
 {
     /**
      * @param list<string> $warnings Operator-facing warnings (empty when nothing noteworthy)
-     * @param list<string> $notes Informal status lines (issue uuid, counts, …)
+     * @param list<string> $notes    Informal status lines (issue uuid, counts, …)
      */
     public function __construct(
         public bool $projectFound,

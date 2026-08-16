@@ -66,4 +66,4 @@ When Mercure instance-enabled **and** `memberAlertsEnabled` (default true):
 
 When account master off: `mercure.enabled` false or empty `topics` / null token (no EventSource).
 
-Web Push subscribe/unsubscribe endpoints unchanged; still require device opt-in + `X-CSRF-TOKEN` / `account_push`.
+Web Push subscribe/unsubscribe endpoints unchanged; still require browser permission + `push_subscription` persistence + `X-CSRF-TOKEN` / `account_push`. Account preference default **on** does not create a subscription by itself.

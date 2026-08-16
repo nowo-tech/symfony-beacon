@@ -100,7 +100,7 @@ As a member, on a project I can override account event toggles and involvement s
 - Member has account master on but zero projects enabled → no member push/live alerts.
 - Member enables a project but lacks (or loses) project access → no delivery; prefs UI hides or shows read-only inaccessible state without leaking other projects’ data.
 - Actor is the member themselves (e.g. I resolve my own issue) → still notify if prefs match (do not auto-suppress self-actions in v1).
-- Mercure hub disabled / Web Push not configured / member did not opt into Web Push → live and push channels degrade independently; preference evaluation still runs but undeliverable channels are skipped without failing ingest.
+- Mercure hub disabled / Web Push not configured / member has preference off **or** no `push_subscription` row → live and push channels degrade independently; preference evaluation still runs but undeliverable channels are skipped without failing ingest.
 - Quiet hours / digest apply only to **project outbound destinations** (Slack, etc.), not to these member prefs, unless a later spec says otherwise.
 - High fan-out (many members, many events) must not block Envelope ACK; delivery stays asynchronous / non-blocking for ingest.
 
@@ -113,8 +113,9 @@ As a member, on a project I can override account event toggles and involvement s
 - **FR-003**: System MUST support involvement scope per event: **all project issues** or **involved only**. Default scope: **all project issues**. Missing scope MUST mean **all project issues**. Account defaults MAY be overridden per project.
 - **FR-004**: Supported member alert events MUST include at least: **new issue**, **regression**, **resolve**, **reopen**, **assign**, **comment**. Mentions SHOULD map to the comment/mention path so @mentions can alert when comment (or a dedicated mention toggle) is enabled—see Assumptions.
 - **FR-005**: Member alerts MUST only be considered for projects the user can access (membership or equivalent project access that already grants issue visibility). No alerts for projects outside that set.
-- **FR-006**: When evaluating delivery, the system MUST apply gates in order: account master → project enabled → event enabled (project override or account default) → involvement scope → channel availability (live hub / Web Push opt-in).
-- **FR-007**: Live in-app alerts and Web Push MUST honor the same preference evaluation. Existing instance gates remain: Mercure admin enablement for live; VAPID + member Web Push opt-in for push.
+- **FR-006**: When evaluating delivery, the system MUST apply gates in order: account master → project enabled → event enabled (project override or account default) → involvement scope → channel availability (live hub / Web Push preference + device subscription).
+- **FR-007**: Live in-app alerts and Web Push MUST honor the same preference evaluation. Existing instance gates remain: Mercure admin enablement for live; VAPID + `pushNotificationsEnabled` (default **on** for new users) + a stored `push_subscription` row for push. Account preference alone MUST NOT imply a device endpoint exists.
+- **FR-007a** (2026-08-16): New users MUST have `pushNotificationsEnabled = true` by default (`` `user` `` column default true; existing rows unchanged). Browser Notification permission and service-worker subscribe (`POST /account/push/subscribe`) remain required before Web Push delivery.
 - **FR-008**: Preference UI MUST exist under **Account** (global + per accessible project). An optional Project Settings shortcut is allowed for members who can open Settings; it MUST NOT be the only way to edit per-project overrides.
 - **FR-009**: Changing preferences MUST take effect for subsequent events without requiring re-login (short cache TTL acceptable if documented).
 - **FR-010**: Preference evaluation MUST NOT block or fail Envelope ingest acknowledgment.
@@ -127,7 +128,7 @@ As a member, on a project I can override account event toggles and involvement s
 - **Account member alert preferences**: Master enable; per-event enable; optional default involvement scope per event.
 - **Project member alert preferences**: Per user+project enable; optional overrides for per-event enable and involvement scope; inherits account defaults when unset.
 - **Involvement**: For an issue, the member counts as involved when they are the **current assignee**, and/or have been **@mentioned** on that issue (existing mention records), and/or are otherwise listed by product rule documented in Assumptions for v1.
-- **Member alert channels**: Live toast (when Mercure enabled) and Web Push (when configured and opted in)—distinct from project webhook destinations.
+- **Member alert channels**: Live toast (when Mercure enabled) and Web Push (when configured, preference on, and a `push_subscription` exists)—distinct from project webhook destinations.
 
 ## Success Criteria *(mandatory)*
 
@@ -152,7 +153,7 @@ As a member, on a project I can override account event toggles and involvement s
 - New projects the member gains access to default to **enabled** (still opt-out).
 - Instance Mercure / VAPID remain operator prerequisites for each channel; prefs never bypass those.
 - **Authorization**: own prefs are personal data for the signed-in user; project access (viewer+) is enough to edit overrides for that project. Project Settings UI remains gated for secrets/DSN/destinations; the Account entry point covers viewers and members.
-- Legal/privacy: Web Push remains an explicit device subscription; Account prefs copy stays in English; operators should keep Privacy/Terms available for self-hosted SaaS surfaces.
+- Legal/privacy: Web Push still requires an explicit browser permission + device subscription (`push_subscription`); Account prefs copy stays in English; operators should keep Privacy/Terms available for self-hosted SaaS surfaces. `pushNotificationsEnabled` defaults **on** for new accounts but does not itself create a device endpoint.
 - UI copy and docs remain English (`lang="en"`).
 
 ## Out of scope
@@ -179,3 +180,7 @@ As a member, on a project I can override account event toggles and involvement s
 ## Amendment (Live `pref-switch` chrome, 2026-08-13)
 
 Account / project member-alert LiveComponent Twigs intentionally use `form_widget` for master / push / event / scope toggles so `pref-switch` + Live `data-model` / `role="switch"` stay intact. Default theme `checkbox_row` MUST NOT replace that chrome until a dedicated switch theme block exists. Listed as a standing exception in `077` / `081` Twig consolidation amendments.
+
+## Amendment (Browser push preference default on, 2026-08-16)
+
+`UserUiPreferences.pushNotificationsEnabled` defaults to **true** for new users (Doctrine column default `1` on table `` `user` ``; migration `Version20260816120000` changes default only — no mass update of existing rows). Product copy: preference on by default; browser still prompts for Notification permission; `issue-realtime` registers `push_subscription` when the member visits a page that mounts the controller with VAPID configured. Dogfood `make beacon-test` counts `push_subscription` rows (not the preference flag) when warning about missing Web Push.

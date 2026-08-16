@@ -64,10 +64,10 @@ final class BeaconTestCommand extends Command
         $result = $this->tester->test($checkOnly, $message);
         $this->writeTarget($io, $result->getTarget());
 
-        if ($result->getEventId() !== null) {
+        if (null !== $result->getEventId()) {
             $io->writeln('Event id: <info>'.$result->getEventId().'</info>');
         }
-        if ($result->getHttpStatus() !== null) {
+        if (null !== $result->getHttpStatus()) {
             $io->writeln('HTTP status: <info>'.$result->getHttpStatus().'</info>');
         }
 
@@ -93,14 +93,14 @@ final class BeaconTestCommand extends Command
             $waitSeconds,
         );
 
-        if ($report->notes !== []) {
+        if ([] !== $report->notes) {
             $io->section('Dogfood diagnostics');
             foreach ($report->notes as $note) {
                 $io->writeln(' • '.$note);
             }
         }
 
-        if ($report->warnings !== []) {
+        if ([] !== $report->warnings) {
             $io->warning($report->warnings);
 
             return Command::SUCCESS;
@@ -118,7 +118,7 @@ final class BeaconTestCommand extends Command
      */
     private function writeTarget(SymfonyStyle $io, array $target): void
     {
-        if ($target === []) {
+        if ([] === $target) {
             return;
         }
 

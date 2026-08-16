@@ -6,17 +6,23 @@ Validate `091-member-push-preferences` after implementation.
 
 - Stack up: `make up` (or `docker compose up -d`)
 - Mercure enabled under **Administration → Mercure** (sample seed may already enable it)
-- Optional Web Push: `VAPID_*` in `.env` + Account → Display → enable browser push
+- Optional Web Push: `VAPID_*` in `.env` + Account → Display → browser push preference (default **on** for new users) + visit a project/issues page so `issue-realtime` can create a `push_subscription` after the browser permission prompt
 - Two users (A, B) with access to the same project; browser session as A
 - Optional: a third user as **viewer** on the project (for §7)
 
 ## 1. Defaults = all on
 
 1. As user A, open Account → Display → Notifications.
-2. Confirm member alerts master checked; all events on; scope all; projects listed (modals) checked or absent rows meaning on.
-3. Keep a tab open on the app (Mercure connected — DevTools EventSource to `/users/{uuid}/member-alerts`).
-4. Ingest a **new** issue into the project (SDK or test envelope).
-5. **Expect**: live toast for A with event title + project · preview link (same-origin); Web Push if opted in.
+2. Confirm member alerts master checked; browser push preference checked (new accounts); all events on; scope all; projects listed (modals) checked or absent rows meaning on.
+3. Keep a tab open on the app (Mercure connected — DevTools EventSource to `/users/{uuid}/member-alerts`). Open Issues so Web Push can subscribe if permission is granted (`SELECT COUNT(*) FROM push_subscription` > 0).
+4. Ingest a **new** issue into the project (SDK, `make beacon-test ARGS='--message=unique-…'`, or test envelope).
+5. **Expect**: live toast for A with event title + project · preview link (same-origin); Web Push only if a `push_subscription` row exists (preference alone is not enough).
+
+## 1b. Preference vs device subscription
+
+1. Enable browser push preference and save.
+2. Confirm `push_subscription` may still be **0** until `issue-realtime` runs subscribe on a mounted page.
+3. Dogfood: `make beacon-test` warns on zero subscriptions even when preference is on.
 
 ## 2. Account master off
 

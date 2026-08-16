@@ -114,14 +114,14 @@ final readonly class BeaconDogfoodDiagnostics
                 $issueEventCount = $issue->getEventCount();
                 $priorIssueExisted = $issueEventCount > 1;
                 $priorEventCount = $priorIssueExisted ? $issueEventCount - 1 : 0;
-                $notes[] = sprintf(
+                $notes[] = \sprintf(
                     'Persisted event %s → issue %s (events=%d).',
                     $event->getEventId(),
                     $issueUuid,
                     $issueEventCount,
                 );
                 if ($priorIssueExisted) {
-                    $warnings[] = sprintf(
+                    $warnings[] = \sprintf(
                         'Issue already existed before this probe (uuid=%s, events=%d) — ingest did not queue a “new issue” member alert.',
                         $issueUuid,
                         $issueEventCount,
@@ -130,7 +130,7 @@ final readonly class BeaconDogfoodDiagnostics
                 }
             }
         } else {
-            $warnings[] = sprintf(
+            $warnings[] = \sprintf(
                 'Event id %s was not found within %ds — ensure messenger / messenger-notify workers are running (make up / make restart).',
                 $eventId ?? '(none)',
                 max(0, $waitSeconds),

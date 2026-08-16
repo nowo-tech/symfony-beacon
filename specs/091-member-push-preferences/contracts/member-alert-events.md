@@ -20,7 +20,7 @@ Not a public HTTP API. Describes the dispatcher → member channel contract.
 3. Project preference enabled (missing row → true)  
 4. Event enabled after merge (missing → true)  
 5. Scope `all` **or** (`involved` and user involved)  
-6. Channel: Mercure if hub enabled; Web Push if VAPID + device opt-in + subscription  
+6. Channel: Mercure if hub enabled; Web Push if VAPID + `pushNotificationsEnabled` (default true for new users) + stored `push_subscription` 
 
 ## Mercure publish
 
@@ -37,7 +37,7 @@ Not a public HTTP API. Describes the dispatcher → member channel contract.
 ## Web Push
 
 - Message includes `event` + issue payload + optional `eligibleUserIds` (null = legacy all push-enabled members; empty = none)
-- Handler iterates project members, skips users failing evaluation or without device opt-in/subscription  
+- Handler iterates project members, skips users failing evaluation or without push preference / `push_subscription` 
 
 ## Failure
 

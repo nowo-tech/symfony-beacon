@@ -13,11 +13,11 @@
 
 ## R2 — Separate master alerts from Web Push device opt-in
 
-**Decision**: Add `memberAlertsEnabled` (default **true**) distinct from existing `pushNotificationsEnabled` (default **false**, device/browser push).
+**Decision**: Add `memberAlertsEnabled` (default **true**) distinct from `pushNotificationsEnabled` (browser push preference; historically default **false**, amended **2026-08-16** to default **true** for new users). Actual Web Push still requires VAPID + browser permission + `push_subscription` row.
 
-**Rationale**: Spec opt-out for alert *content* vs explicit device permission for Web Push APIs. Reusing one flag would either spam push without consent or silence live toasts by default.
+**Rationale**: Spec opt-out for alert *content* vs explicit device permission for Web Push APIs. Preference-on-by-default aligns with the opt-out product philosophy while keeping the browser permission prompt as the real device gate. Reusing one flag would either spam push without consent or silence live toasts by default.
 
-**Alternatives considered**: Reuse `pushNotificationsEnabled` as master — rejected (conflicts with FR opt-out and browser permission UX).
+**Alternatives considered**: Reuse `pushNotificationsEnabled` as master — rejected (conflicts with FR opt-out and browser permission UX). Keep preference default off forever — rejected 2026-08-16 (operators expected new users to have push preference enabled; device registration remains separate).
 
 ## R3 — Storage shape
 

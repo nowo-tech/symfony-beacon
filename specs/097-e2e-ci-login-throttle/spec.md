@@ -89,3 +89,7 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 - Key type: `src/Identity/Security/AuthKitAwareLoginRateLimiter.php` (`#[AsDecorator('nowo_login_throttle.database_rate_limiter')]`).
 - Workflow: `.github/workflows/ci.yml` E2E job.
 - Specs file: `e2e/flows/use-cases-atomic-gaps.spec.ts`.
+
+## Amendment (`.demo-client.env` host reclaim, 2026-08-16)
+
+After seed writes `.demo-client.env` as container-root mode **600**, host Playwright could not read credentials (`missing/unreadable`). `make seed` / `make dogfood` MUST run `make reclaim-demo-client-env` (chown via PHP container to the host UID). Extends C3 / C5 ingest credential loading (`058` FR-009). Cross-ref: `specs/058-self-beacon-client/`.

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.3] - 2026-08-16
+
 ### Added
 
 - **`app:beacon:test`**: dogfood wrapper around BeaconBundle `nowo:beacon:test` — after ingest ACK, waits for Messenger persistence and warns when the issue already had events (no “new issue” alert), when there are no Web Push subscriptions / VAPID, or when the event never appears (`--wait=`). `make beacon-test` now runs this command (thin client probe remains `nowo:beacon:test`). See [DSN.md](DSN.md).
@@ -14,10 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **CI E2E**: reclaim host ownership of `.demo-client.env` after seed (`chmod 600` as root left the file unreadable for Playwright). Rector dry-run for `IssueErrorSurfacesFunctionalTest` (`Command::class`).
+- Migration `Version20260816120000` targets table `` `user` `` (renamed from `app_user` in 1.17+), not `app_user`.
 
 ### Changed
 
-- **Web Push preference default on**: new users get `pushNotificationsEnabled = true` (browser permission prompt still required). Column DB default updated; existing rows unchanged. See [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
+- **Web Push preference default on**: new users get `pushNotificationsEnabled = true` (browser permission prompt still required; `push_subscription` row still required for delivery). Column DB default updated; existing rows unchanged. See [NOTIFICATIONS.md](product/NOTIFICATIONS.md).
+- Specs `058` / `091` / `097` amended for probe diagnostics, push default, and client-env reclaim.
+
+### Notes for integrators
+
+- Run migrations: `Version20260816120000`.
+- After `make ready` / `make dogfood`, verify with `make beacon-test` (or `ARGS='--check-only'` / `--message=unique-…`).
+- If Playwright cannot read `.demo-client.env`: `make reclaim-demo-client-env`.
 
 ## [1.18.2] - 2026-08-16
 

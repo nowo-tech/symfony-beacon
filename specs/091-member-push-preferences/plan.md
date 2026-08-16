@@ -6,7 +6,7 @@
 
 ## Summary
 
-Add **opt-out** member alert preferences (account master + per-event + involvement scope, plus per-project enable/overrides) for Mercure live toasts and Web Push. Expand realtime beyond **new issue** to regression / resolve / reopen / assign / comment. Evaluate prefs **server-side** before publish/send. Keep existing Web Push **device** opt-in (`UserUiPreferences.pushNotificationsEnabled`, default off) separate from the new **member alerts master** (default on).
+Add **opt-out** member alert preferences (account master + per-event + involvement scope, plus per-project enable/overrides) for Mercure live toasts and Web Push. Expand realtime beyond **new issue** to regression / resolve / reopen / assign / comment. Evaluate prefs **server-side** before publish/send. Keep existing Web Push **device** preference (`UserUiPreferences.pushNotificationsEnabled`, default **on** for new users as of 2026-08-16) separate from the **member alerts master** (default on). A stored `push_subscription` remains required for actual browser push.
 
 ## Technical Context
 
@@ -38,7 +38,7 @@ Add **opt-out** member alert preferences (account master + per-event + involveme
 
 | Slice | Approach |
 |-------|----------|
-| Account prefs | Account → Display → Notifications via LiveComponents (`MemberAlertPreferencesLive`): master **member alerts** (default on), event toggles, default scope; keep existing Web Push device checkbox separate |
+| Account prefs | Account → Display → Notifications via LiveComponents (`MemberAlertPreferencesLive`): master **member alerts** (default on), event toggles, default scope; keep existing Web Push device checkbox separate (preference default **on**; device subscribe still via `issue-realtime`) |
 | Project prefs | **Primary**: same Account page (list via `ProjectRepository::findAccessibleByUser`) with per-project LiveComponent modals. **Optional shortcut**: Project Settings `#member-alerts` for members who can open Settings. Save gates use `requireAccess` (viewer+), never Settings-admin-only |
 | Evaluator | `MemberAlertPreferenceEvaluator` — gates: master ∧ project ∧ event ∧ scope; missing data = on / all-issues |
 | Involvement | Assignee OR `IssueMention` for user on issue (new repo helper) |
