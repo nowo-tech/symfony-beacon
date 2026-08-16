@@ -25,18 +25,18 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $repository = self::getContainer()->get(NotificationDigestBufferRepository::class);
 
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other project')
             ->setSlug('other-project');
         $em->persist($otherProject);
 
-        $first = (new NotificationDestination())
+        $first = new NotificationDestination()
             ->setProject($project)
             ->setLabel('Slack')
             ->setType(NotificationDestinationType::Slack)
             ->setEndpointUrl('https://hooks.slack.com/services/T00/B00/AAA')
             ->setCategories(['error']);
-        $second = (new NotificationDestination())
+        $second = new NotificationDestination()
             ->setProject($otherProject)
             ->setLabel('HTTP')
             ->setType(NotificationDestinationType::Http)
@@ -83,10 +83,10 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
         $repository = self::getContainer()->get(MemberProjectAlertEventRepository::class);
 
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other alerts')
             ->setSlug('other-alerts');
-        $member = (new User())
+        $member = new User()
             ->setEmail('alerts-member@example.com')
             ->setDisplayName('Alerts Member')
             ->setPassword($hasher->hashPassword(new User(), 'secret'));
@@ -94,17 +94,17 @@ final class NotificationRepositoryQueriesTest extends DatabaseWebTestCase
         $em->persist($member);
         $em->flush();
 
-        $ownerAssigned = (new MemberProjectAlertEvent())
+        $ownerAssigned = new MemberProjectAlertEvent()
             ->setUser($owner)
             ->setProject($project)
             ->setEvent(MemberAlertEvent::IssueAssigned)
             ->setEnabled(false)
             ->setScope(MemberAlertScope::Involved);
-        $ownerCommented = (new MemberProjectAlertEvent())
+        $ownerCommented = new MemberProjectAlertEvent()
             ->setUser($owner)
             ->setProject($otherProject)
             ->setEvent(MemberAlertEvent::IssueCommented);
-        $memberResolved = (new MemberProjectAlertEvent())
+        $memberResolved = new MemberProjectAlertEvent()
             ->setUser($member)
             ->setProject($project)
             ->setEvent(MemberAlertEvent::IssueResolved);

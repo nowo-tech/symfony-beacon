@@ -19,7 +19,7 @@ final class DailyProjectStatRepositoryTest extends DatabaseWebTestCase
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $repository = self::getContainer()->get(DailyProjectStatRepository::class);
 
-        $otherProject = (new Project())
+        $otherProject = new Project()
             ->setName('Other')
             ->setSlug('other-stats');
         $em->persist($otherProject);
@@ -43,14 +43,14 @@ final class DailyProjectStatRepositoryTest extends DatabaseWebTestCase
         $otherProjectDay->incrementNPlusOneCount(1);
         $em->flush();
 
-        $older = (new DailyProjectStat())
+        $older = new DailyProjectStat()
             ->setProject($project)
             ->setStatDate($minusTwo->setTime(9, 0));
         $older->incrementErrorCount();
-        $oldest = (new DailyProjectStat())
+        $oldest = new DailyProjectStat()
             ->setProject($project)
             ->setStatDate($minusThree->setTime(9, 0));
-        $otherOlder = (new DailyProjectStat())
+        $otherOlder = new DailyProjectStat()
             ->setProject($otherProject)
             ->setStatDate($minusTwo->setTime(9, 0));
         $em->persist($older);
@@ -93,7 +93,7 @@ final class DailyProjectStatRepositoryTest extends DatabaseWebTestCase
             array_map(static fn (DailyProjectStat $stat): string => $stat->getStatDate()->format('Y-m-d'), $range),
         );
 
-        $unsaved = (new Project())->setName('Unsaved')->setSlug('unsaved-stats');
+        $unsaved = new Project()->setName('Unsaved')->setSlug('unsaved-stats');
         $map = $repository->findLastDaysForProjects([$project, $otherProject, $unsaved], 30);
         self::assertArrayHasKey((int) $project->getId(), $map);
         self::assertArrayHasKey((int) $otherProject->getId(), $map);

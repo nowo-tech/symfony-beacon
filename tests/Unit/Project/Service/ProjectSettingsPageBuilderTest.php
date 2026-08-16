@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Project\Service;
 
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
@@ -197,21 +198,21 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $membership = new ProjectMembership()->setProject($project)->setUser($owner)->setRole(ProjectRole::Owner);
         new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 21);
         $project->addMembership($membership);
-        $project->addMembership((new ProjectMembership())->setProject($project)->setUser($owner)->setRole(ProjectRole::Member));
+        $project->addMembership(new ProjectMembership()->setProject($project)->setUser($owner)->setRole(ProjectRole::Member));
 
         $apiKey = ProjectApiKey::generate($project, 'Primary', 'public-one', 'secret-one');
         new ReflectionProperty(ProjectApiKey::class, 'id')->setValue($apiKey, 7);
         $project->addApiKey($apiKey);
         $project->addApiKey(ProjectApiKey::generate($project, 'Unsaved', 'public-two', 'secret-two'));
 
-        $group = (new \App\Identity\Entity\UserGroup())->setName('Ops')->setSlug('ops');
-        new ReflectionProperty(\App\Identity\Entity\UserGroup::class, 'id')->setValue($group, 88);
-        $groupAccess = (new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
+        $group = new UserGroup()->setName('Ops')->setSlug('ops');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($group, 88);
+        $groupAccess = new ProjectGroupAccess()->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
         new ReflectionProperty(ProjectGroupAccess::class, 'id')->setValue($groupAccess, 77);
         $project->addGroupAccess($groupAccess);
-        $project->addGroupAccess((new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Admin));
+        $project->addGroupAccess(new ProjectGroupAccess()->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Admin));
 
-        $destination = (new NotificationDestination())
+        $destination = new NotificationDestination()
             ->setProject($project)
             ->setLabel('Slack')
             ->setType(NotificationDestinationType::Slack)
@@ -219,25 +220,25 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         new ReflectionProperty(NotificationDestination::class, 'id')->setValue($destination, 55);
         $project->addNotificationDestination($destination);
         $project->addNotificationDestination(
-            (new NotificationDestination())
+            new NotificationDestination()
                 ->setProject($project)
                 ->setLabel('Unsaved')
                 ->setType(NotificationDestinationType::Email)
                 ->setEndpointUrl('ops@example.com'),
         );
 
-        $threshold = (new ProjectThresholdRule())->setProject($project)->setLabel('Burst');
+        $threshold = new ProjectThresholdRule()->setProject($project)->setLabel('Burst');
         new ReflectionProperty(ProjectThresholdRule::class, 'id')->setValue($threshold, 66);
         $project->addThresholdRule($threshold);
-        $project->addThresholdRule((new ProjectThresholdRule())->setProject($project)->setLabel('Unsaved threshold'));
+        $project->addThresholdRule(new ProjectThresholdRule()->setProject($project)->setLabel('Unsaved threshold'));
 
-        $savedReadToken = (new ProjectReadToken())->setProject($project)->setCreatedBy($owner)->setLabel('Reader')->setPrefix('brt_demo')->setTokenHash('hash');
+        $savedReadToken = new ProjectReadToken()->setProject($project)->setCreatedBy($owner)->setLabel('Reader')->setPrefix('brt_demo')->setTokenHash('hash');
         new ReflectionProperty(ProjectReadToken::class, 'id')->setValue($savedReadToken, 33);
-        $unsavedReadToken = (new ProjectReadToken())->setProject($project)->setCreatedBy($owner)->setLabel('Unsaved')->setPrefix('brt_unsaved')->setTokenHash('hash');
+        $unsavedReadToken = new ProjectReadToken()->setProject($project)->setCreatedBy($owner)->setLabel('Unsaved')->setPrefix('brt_unsaved')->setTokenHash('hash');
 
-        $savedShare = (new ProjectShareLink())->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
+        $savedShare = new ProjectShareLink()->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
         new ReflectionProperty(ProjectShareLink::class, 'id')->setValue($savedShare, 44);
-        $unsavedShare = (new ProjectShareLink())->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
+        $unsavedShare = new ProjectShareLink()->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
 
         $formView = new FormView();
         $form = $this->createStub(FormInterface::class);
@@ -278,7 +279,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $recorder = new UserActionRecorder($em, new RequestStack());
 
         $userGroups = $this->createStub(UserGroupRepository::class);
-        $userGroups->method('findAllOrdered')->willReturn([$group, new \App\Identity\Entity\UserGroup()]);
+        $userGroups->method('findAllOrdered')->willReturn([$group, new UserGroup()]);
         $groupMemberships = $this->createStub(UserGroupMembershipRepository::class);
         $groupMemberships->method('countByGroupIds')->willReturn([88 => 3]);
         $groupMemberships->method('findByUser')->willReturn([]);

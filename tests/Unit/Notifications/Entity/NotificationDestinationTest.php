@@ -124,15 +124,15 @@ final class NotificationDestinationTest extends TestCase
         self::assertSame(0, $destination->getConsecutiveFailures());
         self::assertNull($destination->getCircuitOpenedAt());
 
-        $older = (new NotificationDeliveryAttempt())
+        $older = new NotificationDeliveryAttempt()
             ->setAttemptedAt(new DateTimeImmutable('2026-08-16T08:00:00+00:00'))
             ->setErrorSnippet(' older ')
             ->setSuccessful(false);
-        $newer = (new NotificationDeliveryAttempt())
+        $newer = new NotificationDeliveryAttempt()
             ->setAttemptedAt(new DateTimeImmutable('2026-08-16T08:00:00+00:00'))
             ->setErrorSnippet('should clear')
             ->setSuccessful(true);
-        $latest = (new NotificationDeliveryAttempt())
+        $latest = new NotificationDeliveryAttempt()
             ->setAttemptedAt(new DateTimeImmutable('2026-08-16T12:00:00+00:00'))
             ->setSuccessful(false);
 

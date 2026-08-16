@@ -36,8 +36,8 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
 
         $issue = $this->issue($project, 'Event repo issue', 'error', IssueStatus::Unresolved);
         $secondIssue = $this->issue($project, 'Searchable culprit', 'fatal', IssueStatus::Resolved);
-        $otherProject = (new Project())->setName('Elsewhere')->setSlug('elsewhere-events');
-        $emptyProject = (new Project())->setName('No Events')->setSlug('no-events');
+        $otherProject = new Project()->setName('Elsewhere')->setSlug('elsewhere-events');
+        $emptyProject = new Project()->setName('No Events')->setSlug('no-events');
         $em->persist($issue);
         $em->persist($secondIssue);
         $em->persist($otherProject);
@@ -141,28 +141,28 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
         $repository = self::getContainer()->get(IssueMentionRepository::class);
 
-        $member = (new User())
+        $member = new User()
             ->setEmail('mentioned@example.com')
             ->setDisplayName('Mentioned');
         $member->setPassword($hasher->hashPassword($member, 'secret'));
-        $other = (new User())
+        $other = new User()
             ->setEmail('other-mentioned@example.com')
             ->setDisplayName('Other Mentioned');
         $other->setPassword($hasher->hashPassword($other, 'secret'));
-        $membership = (new ProjectMembership())
+        $membership = new ProjectMembership()
             ->setUser($member)
             ->setRole(ProjectRole::Member);
         $project->addMembership($membership);
 
         $issue = $this->issue($project, 'Mention issue', 'error', IssueStatus::Unresolved);
-        $comment = (new IssueComment())
+        $comment = new IssueComment()
             ->setIssue($issue)
             ->setAuthor($owner)
             ->setBody('hello @mentioned');
-        $mentionUnread = (new IssueMention())
+        $mentionUnread = new IssueMention()
             ->setComment($comment)
             ->setMentionedUser($member);
-        $mentionRead = (new IssueMention())
+        $mentionRead = new IssueMention()
             ->setComment($comment)
             ->setMentionedUser($other)
             ->markRead(new DateTimeImmutable('2026-08-16 12:00:00'));

@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface as KernelRequestType;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -115,7 +114,7 @@ HTML;
             Response::HTTP_OK,
             ['Content-Type' => 'application/json'],
         );
-        $jsonEvent = new ResponseEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $jsonResponse);
+        $jsonEvent = new ResponseEvent($kernel, Request::create('/'), KernelRequestType::MAIN_REQUEST, $jsonResponse);
         $subscriber($jsonEvent);
         self::assertStringContainsString('window.__nowoDashboardMenuConfig', (string) $jsonResponse->getContent());
     }
@@ -157,7 +156,7 @@ HTML;
         $kernel = $this->createStub(KernelInterface::class);
         $request = Request::create('/');
         $response = new Response($html, Response::HTTP_OK, ['Content-Type' => 'text/html; charset=UTF-8']);
-        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($kernel, $request, KernelRequestType::MAIN_REQUEST, $response);
         (new KitInlineConfigScriptSubscriber())($event);
 
         return $response;
