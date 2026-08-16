@@ -93,6 +93,41 @@ final class NotificationDigestFlusherTest extends TestCase
         self::assertSame('notification.digest', $dispatched[0]->payload['event'] ?? null);
     }
 
+    public function testFlushSkipsEmptyRowsNullIdsAndDigestDestinationsWithoutProject(): void
+    {
+        $emptyRows = $this->destination(digest: false);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($emptyRows, 20);
+
+        $nullId = $this->destination(digest: false);
+
+        $digestWithoutProject = (new NotificationDestination())
+            ->setLabel('Digest')
+            ->setDigestEnabled(true);
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($digestWithoutProject, 21);
+
+        $buffer = $this->createStub(NotificationDigestBufferRepository::class);
+        $buffer->method('findDestinationsWithBufferedItems')->willReturn([$emptyRows, $nullId, $digestWithoutProject]);
+        $buffer->method('findForDestination')->willReturnCallback(
+            fn (NotificationDestination $destination): array => match (true) {
+                $destination === $emptyRows => [],
+                $destination === $nullId => [$this->row($nullId, ['summary' => 'pending'])],
+                default => [$this->row($digestWithoutProject, ['summary' => 'digest'])],
+            },
+        );
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::never())->method('dispatch');
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())->method('flush');
+
+        $result = $this->flusher($buffer, $bus, $em)->flush(force: true);
+
+        self::assertSame(2, $result['destinations']);
+        self::assertSame(0, $result['messages']);
+        self::assertSame(0, $result['skipped_quiet']);
+    }
+
     private function flusher(
         NotificationDigestBufferRepository $buffer,
         MessageBusInterface $bus,

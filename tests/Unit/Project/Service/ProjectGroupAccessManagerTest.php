@@ -132,8 +132,22 @@ final class ProjectGroupAccessManagerTest extends TestCase
             self::assertSame(ProjectAccessException::WRONG_PROJECT, $e->reasonCode);
         }
 
+        try {
+            $this->manager->changeGroupRole($project, $actor, $target, ProjectRole::Full);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::INVALID_ROLE, $e->reasonCode);
+        }
+
         $this->manager->removeGroup($project, $actor, $target);
         self::assertGreaterThanOrEqual(2, $this->flushCount);
+
+        try {
+            $this->manager->removeGroup($project, $actor, $wrong);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::WRONG_PROJECT, $e->reasonCode);
+        }
     }
 
     public function testAssignableRolesAndLinkAssertion(): void

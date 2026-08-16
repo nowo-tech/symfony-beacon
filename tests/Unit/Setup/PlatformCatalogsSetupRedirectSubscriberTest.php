@@ -11,6 +11,7 @@ use Nowo\CookieConsentBundle\Repository\CookieConsentConfigRepository;
 use Nowo\DashboardMenuBundle\Repository\MenuRepository;
 use Nowo\SiteBackupBundle\Routing\SetupPathPrefixResolver;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -66,6 +67,29 @@ final class PlatformCatalogsSetupRedirectSubscriberTest extends TestCase
         $subscriber = $this->subscriber();
         $event = $this->event('/account/profile', route: 'nowo_auth_kit_account');
         $subscriber->onKernelRequest($event);
+        self::assertNull($event->getResponse());
+    }
+
+    public function testSwallowsCatalogStateFailures(): void
+    {
+        $menus = $this->createStub(MenuRepository::class);
+        $menus->method('findOneByCodeAndContext')->willThrowException(new RuntimeException('db offline'));
+        $state = new PlatformBootstrapState(
+            $menus,
+            $this->createStub(BreadcrumbCollectionRepository::class),
+            $this->createStub(CookieConsentConfigRepository::class),
+        );
+
+        $subscriber = new PlatformCatalogsSetupRedirectSubscriber(
+            $state,
+            $this->createStub(AuthorizationCheckerInterface::class),
+            new SetupPathPrefixResolver(new RequestStack(), '/setup', 'never', 'en', ['en']),
+            '/setup',
+            true,
+        );
+        $event = $this->event('/dashboard');
+        $subscriber->onKernelRequest($event);
+
         self::assertNull($event->getResponse());
     }
 

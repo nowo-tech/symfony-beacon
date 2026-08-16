@@ -31,6 +31,13 @@ final class DiscordAndTelegramChannelFormatterTest extends TestCase
         self::assertSame(0xC9A227, $formatted['json']['embeds'][0]['color']);
         self::assertSame('Beacon · sample send', $formatted['json']['embeds'][0]['footer']['text']);
         self::assertSame('https://beacon.test/i/1', $formatted['json']['embeds'][0]['url']);
+
+        $withoutUrl = $formatter->format('https://discord.com/api/webhooks/1/x', [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'url' => '',
+        ], null);
+        self::assertArrayNotHasKey('url', $withoutUrl['json']['embeds'][0]);
     }
 
     public function testTelegramParsesEndpointAndRejectsInvalid(): void

@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Ingest\Otlp\Service;
 
 use App\Ingest\Otlp\Service\OtlpResourceIterator;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class OtlpResourceIteratorTest extends TestCase
 {
@@ -110,5 +111,67 @@ final class OtlpResourceIteratorTest extends TestCase
         );
 
         self::assertFalse($called);
+    }
+
+    public function testIgnoresNonArrayScopesAndRecords(): void
+    {
+        $called = false;
+
+        OtlpResourceIterator::walk(
+            [
+                'resourceSpans' => [[
+                    'resource' => ['attributes' => []],
+                    'scopeSpans' => 'not-an-array',
+                ]],
+            ],
+            'resourceSpans',
+            'resource_spans',
+            'scopeSpans',
+            'scope_spans',
+            'spans',
+            'spans',
+            static fn (array $attrs): array => [],
+            static function () use (&$called): bool {
+                $called = true;
+
+                return true;
+            },
+        );
+
+        OtlpResourceIterator::walk(
+            [
+                'resourceSpans' => [[
+                    'resource' => ['attributes' => []],
+                    'scopeSpans' => [[
+                        'spans' => 'not-an-array',
+                    ]],
+                ]],
+            ],
+            'resourceSpans',
+            'resource_spans',
+            'scopeSpans',
+            'scope_spans',
+            'spans',
+            'spans',
+            static fn (array $attrs): array => [],
+            static function () use (&$called): bool {
+                $called = true;
+
+                return true;
+            },
+        );
+
+        self::assertFalse($called);
+    }
+
+    public function testPrivateConstructorIsInvokableViaReflection(): void
+    {
+        $reflection = new ReflectionClass(OtlpResourceIterator::class);
+        $instance = $reflection->newInstanceWithoutConstructor();
+        $constructor = $reflection->getConstructor();
+        self::assertNotNull($constructor);
+        $constructor->invoke($instance);
+
+        self::assertInstanceOf(OtlpResourceIterator::class, $instance);
     }
 }

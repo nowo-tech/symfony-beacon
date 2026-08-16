@@ -59,4 +59,25 @@ final class PerformanceEnvelopeWriterTest extends TestCase
         self::assertSame(1, $stat->getTransactionCount());
         self::assertCount(1, $persisted);
     }
+
+    public function testCapsSpanInputsAtConfiguredMaximum(): void
+    {
+        $em = $this->createStub(EntityManagerInterface::class);
+        $stats = $this->createStub(DailyProjectStatRepository::class);
+        $stats->method('findOrCreate')->willReturn(new DailyProjectStat());
+        $writer = new PerformanceEnvelopeWriter(new NPlusOneDetector(), $stats, $em);
+
+        $spans = [];
+        for ($i = 0; $i < PerformanceEnvelopeWriter::MAX_SPANS_PER_TRANSACTION + 1; ++$i) {
+            $spans[] = [
+                'op' => 'db',
+                'description' => 'SELECT '.$i,
+                'span_id' => 's'.$i,
+            ];
+        }
+
+        $result = $writer->write(new Project(), ['spans' => $spans], new DateTimeImmutable('2026-08-13T12:00:00+00:00'));
+
+        self::assertSame(PerformanceEnvelopeWriter::MAX_SPANS_PER_TRANSACTION, $result->transaction->getSpanCount());
+    }
 }

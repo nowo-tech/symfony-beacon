@@ -19,4 +19,12 @@ final class MailerDsnAuditTest extends TestCase
         self::assertSame(['scheme' => null, 'host' => null], MailerDsnAudit::redact(''));
         self::assertSame(['scheme' => 'sendmail', 'host' => 'default'], MailerDsnAudit::redact('sendmail://default'));
     }
+
+    public function testRedactHandlesMalformedOrPartialDsns(): void
+    {
+        self::assertSame(['scheme' => null, 'host' => null], MailerDsnAudit::redact('http://example.com:99999'));
+        self::assertSame(['scheme' => null, 'host' => 'mail.example'], MailerDsnAudit::redact('//mail.example'));
+        self::assertSame(['scheme' => null, 'host' => null], MailerDsnAudit::redact('sendmail://'));
+        self::assertSame(['scheme' => 'smtp', 'host' => null], MailerDsnAudit::redact('smtp:/var/run/mailer.sock'));
+    }
 }

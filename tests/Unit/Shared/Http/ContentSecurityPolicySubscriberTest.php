@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Shared\Http;
 
 use App\Shared\Http\ContentSecurityPolicySubscriber;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -104,6 +105,15 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         $nonce = $request->attributes->get(ContentSecurityPolicySubscriber::REQUEST_ATTR_NONCE);
         self::assertIsString($nonce);
         self::assertNotSame('', $nonce);
+    }
+
+    public function testOriginOfRejectsMalformedAndNonHttpUrls(): void
+    {
+        $method = new ReflectionMethod(ContentSecurityPolicySubscriber::class, 'originOf');
+        $subscriber = new ContentSecurityPolicySubscriber(kernelDebug: false);
+
+        self::assertNull($method->invoke($subscriber, 'http://example.com:99999'));
+        self::assertNull($method->invoke($subscriber, 'ftp://example.test/resource'));
     }
 
     private function dispatch(

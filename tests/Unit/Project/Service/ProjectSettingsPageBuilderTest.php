@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Project\Service;
 
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
+use App\Identity\Entity\UserGroupMembership;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
@@ -363,4 +364,282 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         self::assertArrayHasKey('memberAlertsHasOverrides', $page);
         self::assertSame('https://beacon.test/share/new', $page['lastShareUrl']);
     }
+
+    public function testBuildFiltersGroupsForLimitedMemberAccess(): void
+    {
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 9);
+        $memberUser = new User()->setEmail('member@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($memberUser, 11);
+        $membership = new ProjectMembership()->setProject($project)->setUser($memberUser)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 31);
+        $project->addMembership($membership);
+
+        $allowedGroup = new UserGroup()->setName('Allowed')->setSlug('allowed');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($allowedGroup, 51);
+        $forbiddenGroup = new UserGroup()->setName('Forbidden')->setSlug('forbidden');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($forbiddenGroup, 52);
+        $actorGroupMembership = (new UserGroupMembership())
+            ->setUser($memberUser)
+            ->setUserGroup($allowedGroup);
+
+        $formView = new FormView();
+        $form = $this->createStub(FormInterface::class);
+        $form->method('createView')->willReturn($formView);
+        $formFactory = $this->createStub(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $formFactory->method('createNamed')->willReturn($form);
+
+        $urls = $this->createStub(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('/projects/x/settings');
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('hydrateAccessGraph');
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn($membership);
+        $memberships->method('countOwnersByProjectIds')->willReturn([9 => 1]);
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(false);
+        $accessService = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+        $policy = new ProjectMembershipPolicy(
+            $memberships,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $accessService,
+            $auth,
+        );
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->method('flush');
+        $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
+        $recorder = new UserActionRecorder($em, new RequestStack());
+
+        $userGroups = $this->createStub(UserGroupRepository::class);
+        $userGroups->method('findAllOrdered')->willReturn([$allowedGroup, $forbiddenGroup, new UserGroup()]);
+        $groupMemberships = $this->createStub(UserGroupMembershipRepository::class);
+        $groupMemberships->method('countByGroupIds')->willReturn([51 => 2]);
+        $groupMemberships->method('findByUser')->willReturn([$actorGroupMembership]);
+        $attempts = $this->createStub(NotificationDeliveryAttemptRepository::class);
+        $attempts->method('findRecentByDestinations')->willReturn([]);
+        $readTokens = $this->createStub(ProjectReadTokenRepository::class);
+        $readTokens->method('findByProject')->willReturn([]);
+        $shareLinks = $this->createStub(ProjectShareLinkRepository::class);
+        $shareLinks->method('findActiveByProject')->willReturn([]);
+
+        $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
+        $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+        $governance = new ProjectGovernanceResolver(
+            $this->createStub(EventRepository::class),
+            new InstanceOpsDefaults($settingsRepo),
+        );
+
+        $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
+        $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([]);
+        $accountEvents = $this->createStub(MemberAccountAlertEventRepository::class);
+        $accountEvents->method('findIndexedByEventForUser')->willReturn([]);
+        $projectEvents = $this->createStub(MemberProjectAlertEventRepository::class);
+        $projectEvents->method('findIndexedByProjectIdForUser')->willReturn([]);
+
+        $builder = new ProjectSettingsPageBuilder(
+            $formFactory,
+            new CsrfOnlyFormFactory($formFactory),
+            $urls,
+            $auth,
+            new MemberAlertPreferenceManager($alertPrefs, $accountEvents, $projectEvents, $em),
+            $projects,
+            $readTokens,
+            $shareLinks,
+            new HumanFriendlyTokenGenerator(),
+            new ProjectMembershipManager(
+                $this->createStub(UserRepository::class),
+                $memberships,
+                $policy,
+                $recorder,
+                $em,
+            ),
+            new ProjectGroupAccessManager($groups, $policy, $recorder, $em),
+            new ProjectMembershipFormSupport($projects, $userGroups),
+            $groupMemberships,
+            $userGroups,
+            $attempts,
+            $governance,
+            new MessengerQueueHealth($em),
+            $memberships,
+            $accessService,
+        );
+
+        $request = Request::create('https://beacon.test/projects/'.$project->getUuid().'/settings/access');
+        $session = new Session(new MockArraySessionStorage());
+        $session->start();
+        $session->set('_beacon_last_read_token', 'brt_secret_once');
+        $session->set('_beacon_last_share_url', 'https://beacon.test/share/member');
+        $request->setSession($session);
+
+        $access = new ProjectAccess(ProjectRole::Member, directMembership: $membership);
+        $page = $builder->build($project, $memberUser, $access, $request, ProjectSettingsSection::Access);
+
+        self::assertSame([$allowedGroup], $page['availableGroups']);
+        self::assertSame([51 => 2], $page['group_member_counts']);
+        self::assertSame([ProjectSettingsSection::Access, ProjectSettingsSection::Alerts], $page['settingsSections']);
+        self::assertNull($page['governanceForm']);
+        self::assertNull($page['apiKeyCreateForm']);
+        self::assertNull($page['memberAddForm']);
+        self::assertNull($page['shareCreateForm']);
+        self::assertNull($page['readTokenCreateForm']);
+        self::assertNull($page['groupAddForm']);
+        self::assertNull($page['configImportForm']);
+        self::assertNull($page['transferOwnershipForm']);
+        self::assertNull($page['clearHistoryForm']);
+        self::assertNull($page['deleteProjectForm']);
+        self::assertSame('brt_secret_once', $page['lastReadToken']);
+        self::assertSame('https://beacon.test/share/member', $page['lastShareUrl']);
+        self::assertFalse($session->has('_beacon_last_read_token'));
+        self::assertFalse($session->has('_beacon_last_share_url'));
+    }
+
+
+    public function testBuildCreatesOptionalFormsAndHandlesUnsavedProjectState(): void
+    {
+        $project = new Project()->setName('Unsaved')->setSlug('unsaved');
+        $owner = new User()->setEmail('owner@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($owner, 1);
+        $membership = new ProjectMembership()->setProject($project)->setUser($owner)->setRole(ProjectRole::Owner);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 21);
+        $project->addMembership($membership);
+
+        $apiKey = ProjectApiKey::generate($project, 'Primary', 'public-one', 'secret-one');
+        new ReflectionProperty(ProjectApiKey::class, 'id')->setValue($apiKey, 7);
+        $project->addApiKey($apiKey);
+
+        $availableGroup = new UserGroup()->setName('Available')->setSlug('available');
+        new ReflectionProperty(UserGroup::class, 'id')->setValue($availableGroup, 88);
+
+        $formView = new FormView();
+        $form = $this->createStub(FormInterface::class);
+        $form->method('createView')->willReturn($formView);
+        $formFactory = $this->createStub(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $formFactory->method('createNamed')->willReturn($form);
+
+        $urls = $this->createStub(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('/projects/x/settings');
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('hydrateAccessGraph');
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn($membership);
+        $memberships->method('countOwnersByProjectIds')->willReturn([]);
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(true);
+        $accessService = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+
+        $policy = new ProjectMembershipPolicy(
+            $memberships,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $accessService,
+            $auth,
+        );
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->method('flush');
+        $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
+        $recorder = new UserActionRecorder($em, new RequestStack());
+
+        $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
+        $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([]);
+        $accountEvents = $this->createStub(MemberAccountAlertEventRepository::class);
+        $accountEvents->method('findIndexedByEventForUser')->willReturn([]);
+        $projectEvents = $this->createStub(MemberProjectAlertEventRepository::class);
+        $projectEvents->method('findIndexedByProjectIdForUser')->willReturn([]);
+        $memberAlertPreferenceManager = new MemberAlertPreferenceManager($alertPrefs, $accountEvents, $projectEvents, $em);
+        $membershipManager = new ProjectMembershipManager(
+            $this->createStub(UserRepository::class),
+            $memberships,
+            $policy,
+            $recorder,
+            $em,
+        );
+        $groupAccessManager = new ProjectGroupAccessManager($groups, $policy, $recorder, $em);
+
+        $userGroups = $this->createStub(UserGroupRepository::class);
+        $userGroups->method('findAllOrdered')->willReturn([$availableGroup]);
+        $groupMemberships = $this->createStub(UserGroupMembershipRepository::class);
+        $groupMemberships->method('countByGroupIds')->willReturn([88 => 2]);
+        $groupMemberships->method('findByUser')->willReturn([]);
+        $attempts = $this->createStub(NotificationDeliveryAttemptRepository::class);
+        $attempts->method('findRecentByDestinations')->willReturn([]);
+        $readTokens = $this->createStub(ProjectReadTokenRepository::class);
+        $readTokens->method('findByProject')->willReturn([]);
+        $shareLinks = $this->createStub(ProjectShareLinkRepository::class);
+        $shareLinks->method('findActiveByProject')->willReturn([]);
+
+        $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
+        $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+        $events = $this->createStub(EventRepository::class);
+        $events->method('countReceivedTodayForProject')->willReturn(0);
+        $events->method('countReceivedSinceForProject')->willReturn(0);
+        $governanceResolver = new ProjectGovernanceResolver($events, new InstanceOpsDefaults($settingsRepo));
+
+        $builder = new ProjectSettingsPageBuilder(
+            $formFactory,
+            new CsrfOnlyFormFactory($formFactory),
+            $urls,
+            $auth,
+            $memberAlertPreferenceManager,
+            $projects,
+            $readTokens,
+            $shareLinks,
+            new HumanFriendlyTokenGenerator(),
+            $membershipManager,
+            $groupAccessManager,
+            new ProjectMembershipFormSupport($projects, $userGroups),
+            $groupMemberships,
+            $userGroups,
+            $attempts,
+            $governanceResolver,
+            new MessengerQueueHealth($em),
+            $memberships,
+            $accessService,
+        );
+
+        $request = Request::create('https://beacon.test/projects/'.$project->getUuid().'/settings/access');
+        $session = new Session(new MockArraySessionStorage());
+        $session->start();
+        $session->set('_beacon_last_api_key_dsn', 'not-a-dsn');
+        $request->setSession($session);
+
+        $access = new ProjectAccess(ProjectRole::Owner, directMembership: $membership);
+        $page = $builder->build($project, $owner, $access, $request, ProjectSettingsSection::Access);
+
+        self::assertSame(0, $page['ownerCount']);
+        self::assertSame('not-a-dsn', $page['lastApiKeyDsn']);
+        self::assertNotNull($page['governanceForm']);
+        self::assertNotNull($page['apiKeyCreateForm']);
+        self::assertNotNull($page['memberAddForm']);
+        self::assertNotNull($page['shareCreateForm']);
+        self::assertNotNull($page['readTokenCreateForm']);
+        self::assertNotNull($page['groupAddForm']);
+        self::assertNotNull($page['configImportForm']);
+        self::assertNotNull($page['transferOwnershipForm']);
+        self::assertNotNull($page['clearHistoryForm']);
+        self::assertNotNull($page['deleteProjectForm']);
+        self::assertSame([$availableGroup], $page['availableGroups']);
+    }
+
 }

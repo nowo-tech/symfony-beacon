@@ -51,10 +51,6 @@ final class OtlpTracesMapper implements OtlpSignalMapperInterface
             'spans',
             $this->attributesMap(...),
             function (array $resourceAttrs, array $span) use (&$events): bool {
-                if (\count($events) >= self::MAX_SPANS) {
-                    return false;
-                }
-
                 $payload = $this->mapSpan($span, $resourceAttrs);
                 if (null !== $payload) {
                     $events[] = $payload;

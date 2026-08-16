@@ -9,6 +9,7 @@ use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use RuntimeException;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -61,6 +62,17 @@ final class ConfiguredMailerTest extends TestCase
         $mailer->reset();
         $mailer->send(new Email()->from('from@example.com')->to('to@example.com')->subject('x')->text('y'));
         self::assertTrue($mailer->isConfiguredFromDatabase());
+    }
+
+    public function testReusesResolvedMailerWhenDsnDoesNotChange(): void
+    {
+        $mailer = $this->mailer(InstanceSettings::defaults(), 'null://null');
+        $resolver = new ReflectionMethod(ConfiguredMailer::class, 'mailer');
+
+        $first = $resolver->invoke($mailer);
+        $second = $resolver->invoke($mailer);
+
+        self::assertSame($first, $second);
     }
 
     private function mailer(InstanceSettings $settings, string $envDsn, string $env = 'test'): ConfiguredMailer

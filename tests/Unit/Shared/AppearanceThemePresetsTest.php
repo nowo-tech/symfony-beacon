@@ -61,4 +61,26 @@ final class AppearanceThemePresetsTest extends TestCase
         self::assertNotEmpty($dark);
         self::assertSame(\count(AppearanceThemePresets::all()), \count($light) + \count($dark));
     }
+
+    public function testMatchIdPrefersLightAndFallsBackToDark(): void
+    {
+        $light = SiteAppearance::defaults();
+        AppearanceThemePresets::apply($light, 'ocean');
+        self::assertSame('ocean', AppearanceThemePresets::matchId($light));
+
+        $dark = SiteAppearance::defaults();
+        $dark->setAccentColor('#123456');
+        AppearanceThemePresets::apply($dark, 'midnight');
+        self::assertSame('midnight', AppearanceThemePresets::matchId($dark));
+    }
+
+    public function testMatchForModeDelegatesToLightOrDarkCatalog(): void
+    {
+        $appearance = SiteAppearance::defaults();
+        AppearanceThemePresets::apply($appearance, 'ocean');
+        AppearanceThemePresets::apply($appearance, 'midnight');
+
+        self::assertSame('midnight', AppearanceThemePresets::matchForMode($appearance, 'dark'));
+        self::assertSame('ocean', AppearanceThemePresets::matchForMode($appearance, 'light'));
+    }
 }

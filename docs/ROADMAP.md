@@ -207,7 +207,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later — never 100%) | Beacon | `033-coverage-ci` | **Done** (v0.16.0) |
+| 6.7 | **CI coverage soft gate** (promote `033`; informational first, modest threshold later) | Beacon | `033-coverage-ci` | **Done** (v0.16.0; soft 35% later; **hard 100%** in **v1.19.0** / QA-002) |
 | 6.8 | **GDPR helpers**: account data export + soft-delete / anonymize path. Prod path is app-owned; `nowo-tech/anonymize-bundle` is **dev/test-only** (staging dumps) — do not use it as the runtime anonymize executor | Beacon | `043-gdpr-user-export` | **Done** (v0.16.0) |
 | 6.9 | **Issue mentions + assignee notify**: `@user` in comments; email (instance Mailer) on assign / mention | Beacon | `040-issue-mentions-notify` | **Done** (v0.16.0) |
 | 6.10 | **Similar issues** suggestions on issue show (fingerprint / title proximity; link or mark-duplicate shortcut) | Beacon | `041-similar-issues` | **Done** (v0.16.0) |
@@ -352,7 +352,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 - Native store apps / Hotwire Native shells **inside this repo** until `008-ux-native` is prioritized (**Later** on this roadmap; PWA is the current mobile path)
 - **PagerDuty-native** (generic HTTP webhook / digests may still target it)
 - Public anonymous issue boards (share links in `026` still require constrained auth / viewer semantics)
-- Enforcing **100%** code coverage
+- Mutation testing / 100% coverage of HTTP controllers and demo/install seed CLI (those stay excluded; includable `src/` is hard-gated at 100% — see `033` / [COVERAGE.md](COVERAGE.md))
 
 See `docs/ARCHITECTURE.md` non-goals and constitution.
 
@@ -418,6 +418,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.16.0** | Phone input kit on Account → Profile (`100` / 6.51); `.env.local` (REQ-ENV-003); `make restart` force-recreate; CI shared-infra + Composer flock |
 | **v1.17.0** | Kit CSP upstream + shared helpers (`101` / 6.52): PhoneInput 1.3 / CookieConsent 1.9 / FormKit 2.4 / UiKit 1.8; shared Mailpit preference |
 | **v1.18.4** | Issue detail tabs + temporary API DSN reveal (`102` / 6.53); dogfood `ignore_exceptions` for expected 403s; PHPStan CLI sleep ignore for `app:beacon:test` |
+| **v1.19.0** | REQ-QA-002 closed (`033`): hard `COVERAGE_MIN=100` on includable PHP + Vitest 100% whitelist; `docs/COVERAGE.md`; engineering-audit REF-001 closed |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -429,4 +430,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-15 (Phase **6.52** / `101` shipped in **v1.17.0** after **v1.16.0** / **6.51**).
+Last updated: 2026-08-16 (REQ-QA-002 / `033` hard coverage gate in **v1.19.0**).

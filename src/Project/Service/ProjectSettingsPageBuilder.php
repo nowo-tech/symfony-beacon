@@ -236,6 +236,120 @@ final readonly class ProjectSettingsPageBuilder
             'events' => MemberAlertEvent::mapEventsToFormKeys($memberAlertRow['events'] ?? []),
         ];
 
+        $governanceForm = null;
+        $apiKeyCreateForm = null;
+        $memberAddForm = null;
+        $shareCreateForm = null;
+        $readTokenCreateForm = null;
+        $groupAddForm = null;
+        $configImportForm = null;
+        $transferOwnershipForm = null;
+        $clearHistoryForm = null;
+        $deleteProjectForm = null;
+
+        if ($access->canManageSettings()) {
+            $governanceForm = $this->formFactory->create(ProjectGovernanceType::class, [
+                'retention_days' => $project->getRetentionDays(),
+                'retention_max_events' => $project->getRetentionMaxEvents(),
+                'ingest_rate_limit_per_minute' => $project->getIngestRateLimitPerMinute(),
+                'event_quota_daily' => $project->getEventQuotaDaily(),
+                'event_quota_monthly' => $project->getEventQuotaMonthly(),
+            ], [
+                'action' => $this->urlGenerator->generate('project_governance_save', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_governance_'.$project->getId(),
+                'env_defaults' => $this->governanceResolver->envDefaults(),
+            ])->createView();
+            $readTokenCreateForm = $this->formFactory->create(ProjectReadTokenCreateType::class, [
+                'label' => '',
+            ], [
+                'action' => $this->urlGenerator->generate('project_read_token_create', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_read_token_create',
+            ])->createView();
+            $configImportForm = $this->formFactory->create(ProjectConfigImportType::class, null, [
+                'action' => $this->urlGenerator->generate('project_config_import', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_config_import_'.$project->getId(),
+            ])->createView();
+            $clearHistoryForm = $this->formFactory->create(ProjectClearHistoryType::class, null, [
+                'csrf_token_id' => 'project_clear_'.$project->getId(),
+            ])->createView();
+        }
+
+        if ($access->canManageApiKeys()) {
+            $apiKeyCreateForm = $this->formFactory->create(ProjectApiKeyCreateType::class, [
+                'label' => $this->tokenGenerator->generateLabel(),
+            ], [
+                'action' => $this->urlGenerator->generate('project_keys_create', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_key_create_'.$project->getId(),
+            ])->createView();
+        }
+
+        if ([] !== $projectRoleChoices) {
+            $memberAddForm = $this->formFactory->create(ProjectMemberAddType::class, [
+                'email' => '',
+                'role' => ProjectRole::Member->value,
+            ], [
+                'action' => $this->urlGenerator->generate('project_members_add', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_member_add_'.$project->getId(),
+                'role_choices' => $projectRoleChoices,
+            ])->createView();
+        }
+
+        if ($access->canManageShareLinks()) {
+            $shareCreateForm = $this->formFactory->create(ProjectShareCreateType::class, [
+                'days' => 7,
+                'max_uses' => 1,
+                'issue_uuid' => '',
+            ], [
+                'action' => $this->urlGenerator->generate('project_share_create', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_share_create',
+            ])->createView();
+        }
+
+        if ([] !== $availableGroups && [] !== $projectGroupRoleChoices) {
+            $groupAddForm = $this->formFactory->create(ProjectGroupAddType::class, [
+                'group' => '',
+                'role' => ProjectRole::Member->value,
+            ], [
+                'action' => $this->urlGenerator->generate('project_groups_add', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_group_add_'.$project->getId(),
+                'group_choices' => $this->membershipFormSupport->groupChoicesForLinking(
+                    $project,
+                    $groupMemberCounts,
+                    $availableGroups,
+                ),
+                'role_choices' => $projectGroupRoleChoices,
+            ])->createView();
+        }
+
+        if ($access->isPrimaryOwner()) {
+            $transferOwnershipForm = $this->formFactory->create(ProjectTransferOwnershipType::class, [
+                'user' => '',
+                'confirmation' => '',
+            ], [
+                'action' => $this->urlGenerator->generate('project_transfer_ownership', ['projectId' => $project->getUuid()]),
+                'method' => 'POST',
+                'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
+                'user_choices' => $transferOwnershipChoices,
+                'project_id' => (int) $project->getId(),
+                'confirmation_value' => $project->getName(),
+            ])->createView();
+        }
+
+        if ($access->canDeleteProject()) {
+            $deleteProjectForm = $this->formFactory->create(ProjectDeleteType::class, null, [
+                'csrf_token_id' => 'project_delete_'.$project->getId(),
+                'project_id' => (int) $project->getId(),
+                'confirmation_value' => $project->getName(),
+            ])->createView();
+        }
+
         return [
             'project' => $project,
             'access' => $access,
@@ -260,72 +374,23 @@ final readonly class ProjectSettingsPageBuilder
             'effectiveQuota' => $this->governanceResolver->effectiveEventQuotaDaily($project),
             'eventsThisMonth' => $this->governanceResolver->eventsReceivedThisMonth($project),
             'effectiveMonthlyQuota' => $this->governanceResolver->effectiveEventQuotaMonthly($project),
-            'governanceForm' => $access->canManageSettings()
-                ? $this->formFactory->create(ProjectGovernanceType::class, [
-                    'retention_days' => $project->getRetentionDays(),
-                    'retention_max_events' => $project->getRetentionMaxEvents(),
-                    'ingest_rate_limit_per_minute' => $project->getIngestRateLimitPerMinute(),
-                    'event_quota_daily' => $project->getEventQuotaDaily(),
-                    'event_quota_monthly' => $project->getEventQuotaMonthly(),
-                ], [
-                    'action' => $this->urlGenerator->generate('project_governance_save', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_governance_'.$project->getId(),
-                    'env_defaults' => $this->governanceResolver->envDefaults(),
-                ])->createView()
-                : null,
+            'governanceForm' => $governanceForm,
             'messengerQueue' => $this->messengerQueueHealth->asyncPending(),
-            'apiKeyCreateForm' => $access->canManageApiKeys()
-                ? $this->formFactory->create(ProjectApiKeyCreateType::class, [
-                    'label' => $this->tokenGenerator->generateLabel(),
-                ], [
-                    'action' => $this->urlGenerator->generate('project_keys_create', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_key_create_'.$project->getId(),
-                ])->createView()
-                : null,
+            'apiKeyCreateForm' => $apiKeyCreateForm,
             'apiKeyRotateForms' => $apiKeyRotateForms,
             'apiKeyRevokeForms' => $apiKeyRevokeForms,
-            'memberAddForm' => [] !== $projectRoleChoices
-                ? $this->formFactory->create(ProjectMemberAddType::class, [
-                    'email' => '',
-                    'role' => ProjectRole::Member->value,
-                ], [
-                    'action' => $this->urlGenerator->generate('project_members_add', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_member_add_'.$project->getId(),
-                    'role_choices' => $projectRoleChoices,
-                ])->createView()
-                : null,
+            'memberAddForm' => $memberAddForm,
             'memberRemoveForms' => $memberRemoveForms,
             'memberSetActiveForms' => $memberSetActiveForms,
             'memberRoleForms' => $memberRoleForms,
             'groupRoleForms' => $groupRoleForms,
             'groupRemoveForms' => $groupRemoveForms,
             'shareLinks' => $shareLinks,
-            'shareCreateForm' => $access->canManageShareLinks()
-                ? $this->formFactory->create(ProjectShareCreateType::class, [
-                    'days' => 7,
-                    'max_uses' => 1,
-                    'issue_uuid' => '',
-                ], [
-                    'action' => $this->urlGenerator->generate('project_share_create', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_share_create',
-                ])->createView()
-                : null,
+            'shareCreateForm' => $shareCreateForm,
             'shareRevokeForms' => $shareRevokeForms,
             'lastShareUrl' => $request->getSession()->remove('_beacon_last_share_url'),
             'readTokens' => $readTokens,
-            'readTokenCreateForm' => $access->canManageSettings()
-                ? $this->formFactory->create(ProjectReadTokenCreateType::class, [
-                    'label' => '',
-                ], [
-                    'action' => $this->urlGenerator->generate('project_read_token_create', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_read_token_create',
-                ])->createView()
-                : null,
+            'readTokenCreateForm' => $readTokenCreateForm,
             'readTokenRevokeForms' => $readTokenRevokeForms,
             'lastReadToken' => $request->getSession()->remove('_beacon_last_read_token'),
             'lastApiKeyDsn' => $lastApiKeyDsn,
@@ -337,54 +402,11 @@ final readonly class ProjectSettingsPageBuilder
             'notificationDeleteForms' => $notificationDeleteForms,
             'thresholdToggleForms' => $thresholdToggleForms,
             'thresholdDeleteForms' => $thresholdDeleteForms,
-            'groupAddForm' => [] !== $availableGroups && [] !== $projectGroupRoleChoices
-                ? $this->formFactory->create(ProjectGroupAddType::class, [
-                    'group' => '',
-                    'role' => ProjectRole::Member->value,
-                ], [
-                    'action' => $this->urlGenerator->generate('project_groups_add', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_group_add_'.$project->getId(),
-                    'group_choices' => $this->membershipFormSupport->groupChoicesForLinking(
-                        $project,
-                        $groupMemberCounts,
-                        $availableGroups,
-                    ),
-                    'role_choices' => $projectGroupRoleChoices,
-                ])->createView()
-                : null,
-            'configImportForm' => $access->canManageSettings()
-                ? $this->formFactory->create(ProjectConfigImportType::class, null, [
-                    'action' => $this->urlGenerator->generate('project_config_import', ['id' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_config_import_'.$project->getId(),
-                ])->createView()
-                : null,
-            'transferOwnershipForm' => $access->isPrimaryOwner()
-                ? $this->formFactory->create(ProjectTransferOwnershipType::class, [
-                    'user' => '',
-                    'confirmation' => '',
-                ], [
-                    'action' => $this->urlGenerator->generate('project_transfer_ownership', ['projectId' => $project->getUuid()]),
-                    'method' => 'POST',
-                    'csrf_token_id' => 'project_transfer_ownership_'.$project->getId(),
-                    'user_choices' => $transferOwnershipChoices,
-                    'project_id' => (int) $project->getId(),
-                    'confirmation_value' => $project->getName(),
-                ])->createView()
-                : null,
-            'clearHistoryForm' => $access->canManageSettings()
-                ? $this->formFactory->create(ProjectClearHistoryType::class, null, [
-                    'csrf_token_id' => 'project_clear_'.$project->getId(),
-                ])->createView()
-                : null,
-            'deleteProjectForm' => $access->canDeleteProject()
-                ? $this->formFactory->create(ProjectDeleteType::class, null, [
-                    'csrf_token_id' => 'project_delete_'.$project->getId(),
-                    'project_id' => (int) $project->getId(),
-                    'confirmation_value' => $project->getName(),
-                ])->createView()
-                : null,
+            'groupAddForm' => $groupAddForm,
+            'configImportForm' => $configImportForm,
+            'transferOwnershipForm' => $transferOwnershipForm,
+            'clearHistoryForm' => $clearHistoryForm,
+            'deleteProjectForm' => $deleteProjectForm,
         ];
     }
 

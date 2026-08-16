@@ -132,6 +132,46 @@ final class InstanceConfigPortabilityExportImportTest extends TestCase
         self::assertNotSame('#000000', $appearance->getAccentColor());
     }
 
+    public function testImportAppliesDarkThemeShortcut(): void
+    {
+        $appearance = SiteAppearance::defaults();
+        $appearance->setAccentColorDark('#000000');
+        $appearanceRepo = $this->createStub(SiteAppearanceRepository::class);
+        $appearanceRepo->method('getOrCreate')->willReturn($appearance);
+        $appearanceRepo->method('save');
+        $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
+        $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+        $portability = new InstanceConfigPortability(
+            $appearanceRepo,
+            $settingsRepo,
+            new SiteAppearanceProvider($appearanceRepo),
+        );
+
+        $portability->import([
+            'schema' => InstanceConfigPortability::SCHEMA,
+            'version' => InstanceConfigPortability::VERSION,
+            'appearance' => [
+                'theme_id_dark' => 'midnight',
+            ],
+        ]);
+
+        self::assertNotSame('#000000', $appearance->getAccentColorDark());
+    }
+
+    public function testImportRejectsInvalidAppearanceColor(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('invalid_color:accent_color_dark');
+
+        $this->portability(SiteAppearance::defaults(), InstanceSettings::defaults())->import([
+            'schema' => InstanceConfigPortability::SCHEMA,
+            'version' => InstanceConfigPortability::VERSION,
+            'appearance' => [
+                'accent_color_dark' => 'blue',
+            ],
+        ]);
+    }
+
     private function portability(SiteAppearance $appearance, InstanceSettings $settings): InstanceConfigPortability
     {
         $appearanceRepo = $this->createStub(SiteAppearanceRepository::class);

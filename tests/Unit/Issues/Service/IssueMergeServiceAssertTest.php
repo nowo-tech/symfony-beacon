@@ -87,6 +87,19 @@ final class IssueMergeServiceAssertTest extends TestCase
         self::assertNotSame($source->getId(), $canonical->getId());
     }
 
+    public function testAllowsUnrelatedDuplicateLoopByBreakingSeenIds(): void
+    {
+        $project = $this->project(1);
+        $source = $this->issue(1, $project);
+        $canonical = $this->issue(2, $project);
+        $loop = $this->issue(3, $project);
+        $canonical->setDuplicateOf($loop);
+        $loop->setDuplicateOf($canonical);
+
+        $this->service->assertCanMarkAsDuplicate($source, $canonical);
+        self::assertSame($loop, $canonical->getDuplicateOf());
+    }
+
     private function project(int $id): Project
     {
         $project = new Project();

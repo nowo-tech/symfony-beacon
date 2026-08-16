@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.7)](#unreleased-main-after-1187)
+- [Unreleased (main after 1.19.0)](#unreleased-main-after-1190)
+- [Upgrading from 1.18.7 to 1.19.0](#upgrading-from-1187-to-1190)
 - [Upgrading from 1.18.6 to 1.18.7](#upgrading-from-1186-to-1187)
 - [Upgrading from 1.18.5 to 1.18.6](#upgrading-from-1185-to-1186)
 - [Upgrading from 1.18.4 to 1.18.5](#upgrading-from-1184-to-1185)
@@ -79,9 +80,24 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.7)
+## Unreleased (main after 1.19.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.18.7 to 1.19.0
+
+REQ-QA-002 / `033`: hard coverage gate on includable PHP (`COVERAGE_MIN=100`) plus Vitest 100% on the documented TypeScript whitelist. **No migrations.**
+
+1. Pull / checkout `v1.19.0` (operators: no runtime steps).
+
+2. Contributors — keep the Coverage CI job green:
+
+```bash
+make test-coverage          # defaults to COVERAGE_MIN=100
+make test-unit-js-coverage  # Vitest V8 thresholds
+```
+
+See [COVERAGE.md](COVERAGE.md) for PHPUnit exclusions (controllers, demo/seed CLI) and the Vitest includable set. Local diagnosis only: `COVERAGE_MIN=0 make test-coverage`.
 
 ## Upgrading from 1.18.6 to 1.18.7
 

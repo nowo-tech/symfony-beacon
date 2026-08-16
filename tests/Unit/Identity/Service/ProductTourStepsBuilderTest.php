@@ -141,6 +141,76 @@ final class ProductTourStepsBuilderTest extends TestCase
         self::assertSame('[data-tour="admin-users"]', $adminSteps[1]['element']);
     }
 
+    public function testProjectIssuesContextFallsBackToMembershipAndNullRoleUsesViewerCopy(): void
+    {
+        $project = new Project();
+        $user = new User();
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
+            new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member),
+        );
+
+        self::assertSame(ProjectRole::Member, $this->builder->contextForProjectIssues($project, $user)->projectRole);
+
+        $viewerSteps = $this->builder->build(new ProductTourContext(
+            page: ProductTourPage::ProjectIssues,
+            isInstanceAdmin: false,
+            canCreateProject: false,
+            projectRole: null,
+        ));
+        self::assertStringContainsString('tour.role.viewer', $viewerSteps[0]['popover']['description']);
+    }
+
+    public function testProjectIssuesContextFallsBackToRequireMembershipWhenAccessCacheMisses(): void
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(
+            static fn (string $id, array $params = []): string => [] === $params
+                ? $id
+                : $id.'|'.json_encode($params, \JSON_THROW_ON_ERROR),
+        );
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(false);
+        $project = new Project();
+        $user = new User();
+        $membershipRepo = $this->createStub(ProjectMembershipRepository::class);
+        $membershipRepo->method('findOneByProjectAndUser')->willReturnCallback(
+            static function () use ($project, $user): ?ProjectMembership {
+                static $calls = 0;
+                ++$calls;
+
+                if (1 === $calls) {
+                    return null;
+                }
+
+                return (new ProjectMembership())
+                    ->setProject($project)
+                    ->setUser($user)
+                    ->setRole(ProjectRole::Member);
+            },
+        );
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(false);
+        $access = ProjectAccessServiceFactory::create(
+            $membershipRepo,
+            $this->createStub(ProjectGroupAccessRepository::class),
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+
+        $builder = new ProductTourStepsBuilder(
+            $translator,
+            $security,
+            $access,
+            $this->settingsRepository,
+        );
+
+        self::assertSame(
+            ProjectRole::Member,
+            $builder->contextForProjectIssues($project, $user)->projectRole,
+        );
+    }
+
     public function testTwigVarsForceAndAutoStart(): void
     {
         $settings = InstanceSettings::defaults();

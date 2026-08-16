@@ -48,10 +48,6 @@ final class OtlpMetricsMapper implements OtlpSignalMapperInterface
             'metrics',
             $this->attributesMap(...),
             function (array $resourceAttrs, array $metric) use (&$events): bool {
-                if (\count($events) >= self::MAX_DATA_POINTS) {
-                    return false;
-                }
-
                 $name = isset($metric['name']) && \is_string($metric['name']) ? $metric['name'] : '';
                 foreach ($this->dataPoints($metric) as $point) {
                     if (\count($events) >= self::MAX_DATA_POINTS) {

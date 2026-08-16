@@ -41,4 +41,12 @@ final class SlackRequestSignatureVerifierTest extends TestCase
 
         self::assertFalse($verifier->isValid($secret, $ts, $sig, $body, 1_700_000_000 + 301));
     }
+
+    public function testRejectsBlankHeadersAndNonNumericTimestamp(): void
+    {
+        $verifier = new SlackRequestSignatureVerifier();
+
+        self::assertFalse($verifier->isValid(' ', '1700000000', 'sig', 'body', 1_700_000_000));
+        self::assertFalse($verifier->isValid('secret', 'not-a-number', 'sig', 'body', 1_700_000_000));
+    }
 }

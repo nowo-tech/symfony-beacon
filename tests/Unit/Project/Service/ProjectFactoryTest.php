@@ -110,4 +110,24 @@ final class ProjectFactoryTest extends TestCase
         self::assertNotSame('symfony-beacon', $project->getSlug());
         self::assertStringStartsWith('symfony-beacon-', $project->getSlug());
     }
+
+    public function testCreateFallsBackToRandomProjectSlugWhenNameHasNoAsciiSlug(): void
+    {
+        $owner = new User();
+        $repository = $this->createStub(ProjectRepository::class);
+        $repository->method('findOneBy')->willReturn(null);
+
+        $apiKeyRepo = $this->createStub(EntityRepository::class);
+        $apiKeyRepo->method('findOneBy')->willReturn(null);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getRepository')->willReturn($apiKeyRepo);
+
+        $factory = new ProjectFactory(
+            $repository,
+            new ProjectApiKeyFactory($em),
+        );
+        $project = $factory->create($owner, '!!!');
+
+        self::assertStringStartsWith('project-', $project->getSlug());
+    }
 }

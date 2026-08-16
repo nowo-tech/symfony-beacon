@@ -15,7 +15,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 final class InstancePermissionVoterTest extends TestCase
 {
@@ -112,6 +114,23 @@ final class InstancePermissionVoterTest extends TestCase
         self::assertSame(
             VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($token, null, [ProjectPermission::DELETE]),
+        );
+    }
+
+    public function testDeniesNonUserTokensAndUsersWithoutDatabaseId(): void
+    {
+        $this->permissions->method('findOneByKey')->willReturn((new InstancePermission())->setKey('project.view'));
+        $nonUserToken = $this->createMock(TokenInterface::class);
+        $nonUserToken->method('getUser')->willReturn(new InMemoryUser('anon', 'secret'));
+
+        self::assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->voter->vote($nonUserToken, null, ['project.view']),
+        );
+
+        self::assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->voter->vote(new UsernamePasswordToken(new User(), 'main', []), null, ['project.view']),
         );
     }
 }

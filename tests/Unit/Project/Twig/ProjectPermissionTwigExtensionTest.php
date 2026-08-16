@@ -133,4 +133,18 @@ final class ProjectPermissionTwigExtensionTest extends TestCase
         self::assertTrue($this->extension->canOpenSettings($project));
         self::assertTrue($this->extension->grants($project, ProjectPermission::MEMBERS_MANAGE));
     }
+
+    public function testBlankPermissionIsRejectedWithoutQueryingAccess(): void
+    {
+        $user = new User();
+        $project = new Project();
+        $membership = new ProjectMembership();
+        $membership->setUser($user);
+        $membership->setRole(ProjectRole::Member);
+
+        $this->security->method('getUser')->willReturn($user);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($membership);
+
+        self::assertFalse($this->extension->grants($project, '   '));
+    }
 }

@@ -211,6 +211,71 @@ final class ProjectMembershipManagerTest extends TestCase
         }
     }
 
+
+    public function testTransferAndSetActiveGuardFailures(): void
+    {
+        $project = $this->project(1);
+        $otherProject = $this->project(2);
+        $actor = $this->user(1, 'owner@example.com');
+        $actorMembership = new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Owner);
+        $target = new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Member);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($actorMembership);
+        $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1]);
+
+        try {
+            $this->manager->changeRole($project, $actor, $actorMembership, ProjectRole::Admin);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::LAST_OWNER, $e->reasonCode);
+        }
+
+        try {
+            $this->manager->transferOwnership($project, $actor, $target);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::CANNOT_TRANSFER_TO_SELF, $e->reasonCode);
+        }
+
+        $disabledTargetUser = $this->user(2, 'disabled@example.com')->setEnabled(false);
+        $disabledTarget = new ProjectMembership()->setProject($project)->setUser($disabledTargetUser)->setRole(ProjectRole::Member);
+        try {
+            $this->manager->transferOwnership($project, $actor, $disabledTarget);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::USER_DISABLED, $e->reasonCode);
+        }
+
+        $otherOwner = new ProjectMembership()->setProject($project)->setUser($this->user(3, 'other-owner@example.com'))->setRole(ProjectRole::Owner);
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(null);
+        $this->rebuild();
+        try {
+            $this->manager->transferOwnership($project, $actor, $otherOwner);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::ALREADY_OWNER, $e->reasonCode);
+        }
+
+        $foreignMembership = new ProjectMembership()->setProject($otherProject)->setUser($this->user(4, 'foreign@example.com'))->setRole(ProjectRole::Member);
+        try {
+            $this->manager->setActive($project, $actor, $foreignMembership, false);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::FORBIDDEN, $e->reasonCode);
+        }
+
+        $this->membershipRepository = $this->createStub(ProjectMembershipRepository::class);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn($actorMembership);
+        $this->membershipRepository->method('countOwnersByProjectIds')->willReturn([1 => 1]);
+        $this->rebuild();
+        try {
+            $this->manager->setActive($project, $actor, $actorMembership, false);
+            self::fail('expected');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::LAST_OWNER, $e->reasonCode);
+        }
+    }
+
     private function rebuild(): void
     {
         $access = ProjectAccessServiceFactory::create(

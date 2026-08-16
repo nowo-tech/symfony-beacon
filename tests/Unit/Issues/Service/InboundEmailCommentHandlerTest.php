@@ -155,6 +155,73 @@ final class InboundEmailCommentHandlerTest extends TestCase
         );
     }
 
+
+    public function testIgnoresMissingIssueAndUnknownUser(): void
+    {
+        $tokenSvc = new InboundEmailReplyToken($this->opsDefaultsWith(static function (InstanceSettings $s): void {
+            $s->setInboundWebhookSecret('secret');
+        }));
+        $token = $tokenSvc->issue('missing-issue', 'alice@example.com');
+
+        $missingIssueRepo = $this->createStub(IssueRepository::class);
+        $missingIssueRepo->method('findOneBy')->willReturn(null);
+        self::assertSame(
+            'ignored',
+            $this->handler(replyToken: $tokenSvc, issueRepo: $missingIssueRepo)
+                ->handle('alice@example.com', 'reply+'.$token.'@beacon.test', 'body', null),
+        );
+
+        $project = new Project();
+        $project->setSlug('demo');
+        $project->setName('Demo');
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint('fp');
+        $issue->setTitle('Title');
+        $issueRepo = $this->createStub(IssueRepository::class);
+        $issueRepo->method('findOneBy')->willReturn($issue);
+
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('findOneByEmail')->willReturn(null);
+        self::assertSame(
+            'ignored',
+            $this->handler(replyToken: $tokenSvc, issueRepo: $issueRepo, userRepo: $userRepo)
+                ->handle('alice@example.com', 'reply+'.$token.'@beacon.test', 'body', null),
+        );
+    }
+
+    public function testAcceptsAddressWrappedRecipientAndIgnoresInvalidCommentBody(): void
+    {
+        $tokenSvc = new InboundEmailReplyToken($this->opsDefaultsWith(static function (InstanceSettings $s): void {
+            $s->setInboundWebhookSecret('secret');
+        }));
+        $token = $tokenSvc->issue('issue-uuid', 'alice@example.com');
+
+        $project = new Project();
+        $project->setSlug('demo');
+        $project->setName('Demo');
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint('fp');
+        $issue->setTitle('Title');
+
+        $user = new User();
+        $user->setEmail('alice@example.com');
+        $user->setDisplayName('Alice');
+
+        $issueRepo = $this->createStub(IssueRepository::class);
+        $issueRepo->method('findOneBy')->willReturn($issue);
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('findOneByEmail')->willReturn($user);
+
+        self::assertSame(
+            'ignored',
+            $this->handler(replyToken: $tokenSvc, issueRepo: $issueRepo, userRepo: $userRepo, isAdmin: true)
+                ->handle('alice@example.com', 'Alice <reply+'.$token.'@beacon.test>', "> quoted
+> only", 'mid-empty'),
+        );
+    }
+
     private function handler(
         ?InboundEmailReplyToken $replyToken = null,
         ?IssueRepository $issueRepo = null,

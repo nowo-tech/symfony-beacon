@@ -150,16 +150,141 @@ final class NotificationDispatcherTest extends TestCase
         self::assertSame(1, $count);
     }
 
+    public function testDispatchNPlusOneSkipsUnmatchedAndOpenCircuitDestinations(): void
+    {
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+
+        $wrongCategory = $this->destination($project, [NotificationCategories::ISSUE_RESOLVED], true);
+        $openCircuit = $this->destination($project, [NotificationCategories::N_PLUS_ONE], true);
+        $openCircuit->openCircuit();
+
+        $repo = $this->createStub(NotificationDestinationRepository::class);
+        $repo->method('findEnabledByProject')->willReturn([$wrongCategory, $openCircuit]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::never())->method('dispatch');
+
+        $dispatcher = $this->dispatcher($repo, $bus);
+        $tx = new PerfTransaction();
+        $tx->setProject($project);
+        $tx->setTransactionName('GET /api');
+        $tx->setNPlusOneCount(2);
+        $tx->setSpanCount(10);
+        $tx->setEventId('tx2');
+
+        $dispatcher->dispatchNPlusOne($project, $tx);
+    }
+
+    public function testDispatchTestReturnsEarlyWithoutDestinationId(): void
+    {
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+
+        $destination = new NotificationDestination();
+        $destination->setProject($project);
+        $destination->setLabel('No id');
+        $destination->setType(NotificationDestinationType::Http);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::never())->method('dispatch');
+
+        $this->dispatcher($this->createStub(NotificationDestinationRepository::class), $bus, null, false)
+            ->dispatchTest($project, $destination);
+    }
+
+    public function testDispatchNewIssueFallsBackToErrorAndSkipsDestinationsWithoutId(): void
+    {
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+
+        $missingId = new NotificationDestination();
+        $missingId->setProject($project);
+        $missingId->setLabel('Missing id');
+        $missingId->setType(NotificationDestinationType::Http);
+        $missingId->setEnabled(true);
+        $missingId->setEndpointUrl('https://example.test/hook');
+        $missingId->setCategories(['error']);
+
+        $deliverable = $this->destination($project, ['error'], true);
+        $repo = $this->createStub(NotificationDestinationRepository::class);
+        $repo->method('findEnabledByProject')->willReturn([$missingId, $deliverable]);
+
+        $messages = [];
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->willReturnCallback(
+            static function (object $message) use (&$messages): Envelope {
+                $messages[] = $message;
+
+                return new Envelope($message);
+            },
+        );
+
+        $dispatcher = $this->dispatcher($repo, $bus);
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setTitle('Boom');
+        $issue->setLevel('not-a-real-level');
+        $issue->setStatus(IssueStatus::Unresolved);
+        $issue->setFingerprint('abc');
+
+        $dispatcher->dispatchNewIssue($project, $issue);
+        self::assertSame('error', $messages[0]->payload['category']);
+    }
+
+    public function testDispatchNewIssueFallsBackToErrorAndSkipsZeroDestinationId(): void
+    {
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+
+        $zeroId = $this->destination($project, ['error'], true);
+        new ReflectionProperty($zeroId, 'id')->setValue($zeroId, 0);
+        $deliverable = $this->destination($project, ['error'], true);
+
+        $repo = $this->createStub(NotificationDestinationRepository::class);
+        $repo->method('findEnabledByProject')->willReturn([$zeroId, $deliverable]);
+
+        $messages = [];
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->willReturnCallback(
+            static function (object $message) use (&$messages): Envelope {
+                $messages[] = $message;
+
+                return new Envelope($message);
+            },
+        );
+
+        $dispatcher = $this->dispatcher($repo, $bus);
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setTitle('Boom');
+        $issue->setLevel('TRACE');
+        $issue->setStatus(IssueStatus::Unresolved);
+        $issue->setFingerprint('abc');
+
+        $dispatcher->dispatchNewIssue($project, $issue);
+
+        self::assertSame($deliverable->getId(), $messages[0]->destinationId);
+        self::assertSame('error', $messages[0]->payload['category']);
+    }
+
     private function dispatcher(
         NotificationDestinationRepository $repo,
         MessageBusInterface $bus,
         ?MemberIssueRealtimeNotifierInterface $realtime = null,
+        bool $expectsFlush = true,
     ): NotificationDispatcher {
         $urls = $this->createStub(UrlGeneratorInterface::class);
         $urls->method('generate')->willReturn('https://beacon.test/issue');
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::atLeastOnce())->method('flush');
+        $expectsFlush
+            ? $em->expects(self::atLeastOnce())->method('flush')
+            : $em->expects(self::never())->method('flush');
 
         return new NotificationDispatcher(
             $repo,

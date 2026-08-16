@@ -163,10 +163,39 @@ final class IssueDuplicateMarkerTest extends TestCase
         self::assertSame($canonical, $issue->getDuplicateOf());
     }
 
-    private function rebuildMarker(): void
+    public function testMapsUnexpectedValidationAndMergeFailuresToFlashMessages(): void
     {
-        $eventRepository = $this->createStub(EventRepository::class);
-        $eventRepository->method('findBy')->willReturn([]);
+        $project = $this->project(1)->setName('Demo');
+        $issue = $this->issue(10, $project, 'Source');
+        $sameIdCanonical = $this->issue(10, $project, 'Same Id');
+        $actor = $this->user(5);
+
+        $this->issueRepository->method('findOneByProjectAndUuid')->willReturn($sameIdCanonical);
+        self::assertSame(
+            'issues.duplicate_invalid',
+            $this->marker->mark($project, $issue, $actor, $sameIdCanonical->getUuid(), false)['flash'],
+        );
+
+        $canonical = $this->issue(11, $project, 'Canonical');
+        $this->issueRepository = $this->createStub(IssueRepository::class);
+        $this->issueRepository->method('findOneByProjectAndUuid')->willReturn($canonical);
+
+        $failingEvents = $this->createStub(EventRepository::class);
+        $failingEvents->method('findBy')->willThrowException(new \InvalidArgumentException('boom'));
+        $this->rebuildMarker($failingEvents);
+
+        self::assertSame(
+            'issues.merge_failed',
+            $this->marker->mark($project, $issue, $actor, $canonical->getUuid(), true)['flash'],
+        );
+    }
+
+    private function rebuildMarker(?EventRepository $eventRepository = null): void
+    {
+        if (null === $eventRepository) {
+            $eventRepository = $this->createStub(EventRepository::class);
+            $eventRepository->method('findBy')->willReturn([]);
+        }
         $merge = new IssueMergeService(
             $eventRepository,
             $this->issueRepository,

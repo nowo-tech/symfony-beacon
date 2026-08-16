@@ -47,6 +47,16 @@ final class EnvelopeAuthParserTest extends TestCase
         self::assertSame('sec', $auth['secret_key']);
     }
 
+    public function testParseFromRequestSkipsMalformedChunks(): void
+    {
+        $auth = $this->parser->parseFromRequest(
+            'Beacon malformed, beacon_key=from-header, beacon_secret=hdr-secret',
+        );
+
+        self::assertSame('from-header', $auth['public_key']);
+        self::assertSame('hdr-secret', $auth['secret_key']);
+    }
+
     public function testParseFromRequestWithoutCredentialsReturnsNulls(): void
     {
         $auth = $this->parser->parseFromRequest(null);

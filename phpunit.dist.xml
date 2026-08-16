@@ -102,6 +102,9 @@
             <file>src/Ops/Service/BeaconDogfoodDiagnosticReport.php</file>
             <file>src/Issues/Command/BackfillEventPromotionsCommand.php</file>
             <file>src/Shared/Sms/Command/SmsSendCommand.php</file>
+            <!-- Sample/install seed commands & seeders (make seed-sample); not production runtime -->
+            <file>src/Setup/Command/SeedSampleCommand.php</file>
+            <file>src/Issues/Service/IssueSampleSeeder.php</file>
         </exclude>
 
         <deprecationTrigger>

@@ -22,13 +22,16 @@
 
 ## Decision: Informational by default; soft gate via `COVERAGE_MIN`
 
-**Decision**: Upload Clover + HTML artifacts always. Enforce a minimum statement % only when env `COVERAGE_MIN` is non-empty (workflow env / repo variable). Default empty → job fails only if PHPUnit fails or Clover is missing.
+**Decision (original)**: Upload Clover + HTML artifacts always. Enforce a minimum statement % only when env `COVERAGE_MIN` is non-empty (workflow env / repo variable). Default empty → job fails only if PHPUnit fails or Clover is missing.
 
-**Rationale**: FR-002 / FR-003 — never require 100%; do not block releases until a baseline is agreed. Soft threshold remains available after maintainers record a baseline.
+**Rationale (original)**: FR-002 / FR-003 — do not block releases until a baseline is agreed. Soft threshold remains available after maintainers record a baseline.
+
+**Amendment (v1.19.0 / REQ-QA-002)**: After the includable `src/` tree reached 100% statements, CI and Makefile default `COVERAGE_MIN=100`. Controllers / demo seed CLI stay excluded (documented in `docs/COVERAGE.md`). Local diagnosis may still use `COVERAGE_MIN=0`.
 
 **Alternatives considered**:
 - `continue-on-error: true` on coverage → hides real test failures in that job
-- Hard-coded threshold in YAML → premature without baseline
+- Hard-coded threshold in YAML without exclusions → premature / flaky on controllers
+- Keep soft 35% forever → diverges from platform QA-002 once baseline is closed
 
 ## Decision: Clover statement metrics for the gate
 

@@ -73,6 +73,19 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
     }
 
     #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsMissingPanelHash(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '',
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('SITE_BACKUP_PASSWORD_HASH must be set');
+        $guard->assertProductionSecretsSafe();
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
     public function testNonLocalAcceptsRotatedSecrets(string $environment): void
     {
         $guard = new SiteBackupSecurityDefaultsGuard(
@@ -155,6 +168,20 @@ final class SiteBackupSecurityDefaultsGuardTest extends TestCase
         );
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('APP_SECRET must be at least 16 characters');
+        $guard->assertProductionSecretsSafe();
+    }
+
+    #[DataProvider('nonLocalEnvironmentsProvider')]
+    public function testNonLocalRejectsMissingAppSecret(string $environment): void
+    {
+        $guard = new SiteBackupSecurityDefaultsGuard(
+            $environment,
+            'unique-production-setup-token',
+            '$2y$12$notTheLocalDefaultHashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            '',
+        );
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('APP_SECRET must be set');
         $guard->assertProductionSecretsSafe();
     }
 

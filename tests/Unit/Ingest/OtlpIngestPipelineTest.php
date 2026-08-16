@@ -8,6 +8,7 @@ use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\Otlp\Service\OtlpIngestGatewayInterface;
 use App\Ingest\Otlp\Service\OtlpIngestPipeline;
 use App\Ingest\Otlp\Service\OtlpSignalMapperInterface;
+use App\Ingest\Service\IngestProjectAccessGate;
 use App\Project\Entity\Project;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -81,6 +82,38 @@ final class OtlpIngestPipelineTest extends TestCase
         $response = $pipeline->ingest('3', $request, $mapper, 'traces');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testMissingProjectIdReturnsUnauthorizedResponse(): void
+    {
+        $request = Request::create('/otlp', Request::METHOD_POST, content: '{}');
+        $project = new Project();
+
+        $gateway = $this->createMock(OtlpIngestGatewayInterface::class);
+        $gateway->expects(self::once())->method('accept')->willReturn([
+            'project' => $project,
+            'body' => '{}',
+        ]);
+        $gateway->expects(self::once())
+            ->method('respond')
+            ->with(IngestProjectAccessGate::UNAUTHORIZED_MESSAGE, Response::HTTP_UNAUTHORIZED)
+            ->willReturn(new Response(IngestProjectAccessGate::UNAUTHORIZED_MESSAGE, Response::HTTP_UNAUTHORIZED));
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::never())->method('dispatch');
+
+        $mapper = $this->createMock(OtlpSignalMapperInterface::class);
+        $mapper->expects(self::never())->method('mapToEventPayloads');
+
+        $pipeline = new OtlpIngestPipeline(
+            $gateway,
+            $bus,
+            $this->createStub(LoggerInterface::class),
+        );
+
+        $response = $pipeline->ingest('1', $request, $mapper, 'logs');
+
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
     }
 
     public function testEmptyPayloadsAckWithoutDispatch(): void

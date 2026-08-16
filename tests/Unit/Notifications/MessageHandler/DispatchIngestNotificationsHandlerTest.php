@@ -79,6 +79,7 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
             ['kind' => 'regression', 'issue_id' => 11],
             ['kind' => 'nplus1', 'transaction_id' => 22],
             ['kind' => 'new', 'issue_id' => 'bad'],
+            ['kind' => 'nplus1', 'transaction_id' => 'bad'],
             ['kind' => 'nplus1', 'transaction_id' => 999],
         ];
         $handler(new DispatchIngestNotificationsMessage(
@@ -90,6 +91,28 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
 
         // Destinations empty → dispatcher does not enqueue DeliverNotificationMessage, volume similarly no-op.
         self::assertSame(0, $dispatched);
+    }
+
+    public function testSkipsAlertsWhoseIssueOrTransactionCannotBeReloaded(): void
+    {
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 8);
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('find')->willReturn($project);
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('find')->willReturn(null);
+
+        self::expectNotToPerformAssertions();
+        $this->handler($projects, $em)(new DispatchIngestNotificationsMessage(
+            8,
+            [
+                ['kind' => 'new', 'issue_id' => 99],
+                ['kind' => 'nplus1', 'transaction_id' => 100],
+            ],
+            [],
+            '2026-08-01T00:00:00+00:00',
+        ));
     }
 
     private function handler(

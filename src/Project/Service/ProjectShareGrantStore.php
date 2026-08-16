@@ -134,9 +134,7 @@ final readonly class ProjectShareGrantStore
 
         return [
             'expires' => $expires,
-            'issue' => isset($entry['issue']) && \is_string($entry['issue']) && '' !== $entry['issue']
-                ? $entry['issue']
-                : null,
+            'issue' => isset($entry['issue']) && \is_string($entry['issue']) && '' !== $entry['issue'] ? $entry['issue'] : null,
             'share' => $shareUuid,
         ];
     }

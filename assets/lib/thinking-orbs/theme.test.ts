@@ -96,4 +96,26 @@ describe('watchThemeAndMotion', () => {
     parent.remove();
     expect(resolveDark('auto', null)).toEqual(expect.any(Boolean));
   });
+
+  it('watches motion only when theme is explicit', () => {
+    const listeners: Array<() => void> = [];
+    const matchMedia = window.matchMedia as unknown as ReturnType<typeof vi.fn>;
+    matchMedia.mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: (_: string, cb: () => void) => listeners.push(cb),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    const onChange = vi.fn();
+    const unsub = watchThemeAndMotion('dark', null, onChange);
+    expect(onChange).toHaveBeenCalledWith(true, expect.any(Boolean));
+    listeners.forEach((cb) => cb());
+    unsub();
+  });
+
 });

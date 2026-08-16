@@ -151,7 +151,7 @@ jobs:
           php bin/console cache:warmup --env=test
           vendor/bin/phpunit
 
-  # Informational coverage (PCOV). Soft gate only when COVERAGE_MIN is set (never 100% by default).
+  # Coverage (PCOV) for the includable PHPUnit tree; default gate is 100%.
   coverage:
     name: Coverage (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -160,8 +160,8 @@ jobs:
       matrix:
         php: ["8.5"]
     env:
-      # Soft statement-% floor (specs/033 + remediation F0.3). Raise only after reviewing Clover; never 100%.
-      COVERAGE_MIN: "35"
+      # Statement coverage floor for includable PHPUnit source; keep at 100 unless debugging locally.
+      COVERAGE_MIN: "100"
 
     services:
       mysql:

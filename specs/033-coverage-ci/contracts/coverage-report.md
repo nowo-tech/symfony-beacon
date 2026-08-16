@@ -1,22 +1,29 @@
-# Contract: Coverage report & soft gate
+# Contract: Coverage report & hard gate (REQ-QA-002)
 
 ## Local command
 
 ```bash
 make test-coverage
-# equivalent (in php container):
-# XDEBUG_MODE=coverage vendor/bin/phpunit \
-#   --coverage-text \
-#   --coverage-clover var/coverage/clover.xml \
-#   --coverage-html var/coverage-html
+# defaults to COVERAGE_MIN=100
+# diagnosis only:
+# COVERAGE_MIN=0 make test-coverage
 ```
 
-Optional soft gate:
+Equivalent inside the php container:
 
 ```bash
-COVERAGE_MIN=40 make test-coverage
-# or after a run:
-COVERAGE_MIN=40 .scripts/check-coverage-threshold.sh var/coverage/clover.xml
+XDEBUG_MODE=coverage vendor/bin/phpunit \
+  --coverage-text \
+  --coverage-clover var/coverage/clover.xml \
+  --coverage-html var/coverage-html
+COVERAGE_MIN=100 .scripts/check-coverage-threshold.sh var/coverage/clover.xml
+```
+
+TypeScript:
+
+```bash
+make test-unit-js-coverage
+# Vitest V8 thresholds: lines/statements 100 on the includable whitelist
 ```
 
 ## CI job
@@ -25,16 +32,16 @@ COVERAGE_MIN=40 .scripts/check-coverage-threshold.sh var/coverage/clover.xml
 - Driver: PCOV (`coverage: pcov`)
 - Outputs: `var/coverage/clover.xml`, `var/coverage-html/`
 - Upload: `actions/upload-artifact` (clover + HTML)
-- Soft gate: same script; `COVERAGE_MIN` workflow env default empty
+- Hard gate: `.scripts/check-coverage-threshold.sh` with workflow `env.COVERAGE_MIN: "100"`
 
 ## Failure modes
 
 | Condition | Exit | Notes |
 |-----------|------|--------|
-| PHPUnit failures | Fail job | Not soft |
+| PHPUnit failures | Fail job | — |
 | Clover file missing / unreadable | Fail check script | Documented generation failure |
-| `COVERAGE_MIN` unset or empty | Pass (informational) | Default |
-| Coverage % &lt; `COVERAGE_MIN` | Fail with clear message | Soft threshold |
-| Coverage % ≥ `COVERAGE_MIN` | Pass | — |
+| `COVERAGE_MIN` unset or empty | Pass (informational) | Local diagnosis only; CI sets `100` |
+| Coverage % &lt; `COVERAGE_MIN` | Fail with clear message | Hard floor in CI |
+| Coverage % ≥ `COVERAGE_MIN` | Pass | Default floor is **100** on includable `src/` |
 
-Never require 100% coverage.
+Exclusions and Vitest whitelist: [docs/COVERAGE.md](../../../docs/COVERAGE.md).

@@ -37,4 +37,14 @@ final class NPlusOneDetectorTest extends TestCase
         $result = new NPlusOneDetector()->detect($spans);
         self::assertSame(0, $result['count']);
     }
+
+    public function testSkipsDatabaseSpansWhoseNormalizedQueryIsBlank(): void
+    {
+        $result = new NPlusOneDetector()->detect([
+            ['op' => 'db.sql.query', 'description' => '   ', 'span_id' => 'blank'],
+        ]);
+
+        self::assertSame(0, $result['count']);
+        self::assertSame([], $result['candidate_span_ids']);
+    }
 }

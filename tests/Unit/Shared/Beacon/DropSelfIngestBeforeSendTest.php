@@ -54,4 +54,14 @@ final class DropSelfIngestBeforeSendTest extends TestCase
 
         self::assertSame($event, $filter($event));
     }
+
+    public function testKeepsMalformedAbsoluteUrlAfterPathFallback(): void
+    {
+        $filter = new DropSelfIngestBeforeSend();
+        $event = [
+            'transaction' => 'https://collector.invalid',
+        ];
+
+        self::assertSame($event, $filter($event));
+    }
 }

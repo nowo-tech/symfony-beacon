@@ -98,6 +98,81 @@ final class DeliverNotificationHandlerTest extends TestCase
         self::assertNull($destination->getLastDeliveryError());
     }
 
+    public function testAllowsSampleDeliveryForDisabledDestination(): void
+    {
+        $destination = $this->destination(enabled: false, endpoint: 'https://example.com/hook');
+        $destinations = $this->createStub(NotificationDestinationRepository::class);
+        $destinations->method('find')->willReturn($destination);
+
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(202);
+        $http = $this->createMock(HttpClientInterface::class);
+        $http->expects(self::once())
+            ->method('request')
+            ->with(self::identicalTo('POST'), self::identicalTo('https://example.com/hook'), self::isArray())
+            ->willReturn($response);
+
+        $this->handler($destinations, http: $http)(new DeliverNotificationMessage(6, [
+            'test' => true,
+            'summary' => 'Sample',
+        ]));
+
+        self::assertNull($destination->getLastDeliveryError());
+    }
+
+    public function testRecordsFailureAndRethrowsOnHttpError(): void
+    {
+        $destination = $this->destination(enabled: true, endpoint: 'https://example.com/hook');
+        $destinations = $this->createStub(NotificationDestinationRepository::class);
+        $destinations->method('find')->willReturn($destination);
+
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(500);
+        $http = $this->createStub(HttpClientInterface::class);
+        $http->method('request')->willReturn($response);
+
+        $flush = 0;
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('flush')->willReturnCallback(static function () use (&$flush): void {
+            ++$flush;
+        });
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Destination returned HTTP 500');
+
+        try {
+            $this->handler($destinations, http: $http, em: $em)(new DeliverNotificationMessage(7, [
+                'summary' => 'Boom',
+            ]));
+        } finally {
+            self::assertSame(1, $flush);
+            self::assertSame('Destination returned HTTP 500', $destination->getLastDeliveryError());
+        }
+    }
+
+    public function testDeliversEmailNotifications(): void
+    {
+        $destination = $this->destination(enabled: true, endpoint: 'ops@example.com');
+        $destination->setType(NotificationDestinationType::Email);
+        $destinations = $this->createStub(NotificationDestinationRepository::class);
+        $destinations->method('find')->willReturn($destination);
+
+        $flush = 0;
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('flush')->willReturnCallback(static function () use (&$flush): void {
+            ++$flush;
+        });
+
+        $this->handler($destinations, em: $em)(new DeliverNotificationMessage(8, [
+            'summary' => "Email summary
+with newline",
+            'event' => 'issue.resolved',
+        ]));
+
+        self::assertSame(1, $flush);
+        self::assertNull($destination->getLastDeliveryError());
+    }
+
     private function destination(bool $enabled, string $endpoint): NotificationDestination
     {
         return new NotificationDestination()

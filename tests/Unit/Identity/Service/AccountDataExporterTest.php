@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity\Service;
 
+use App\Identity\Entity\PasswordHistory;
 use App\Identity\Entity\User;
+use App\Identity\Entity\UserAction;
+use App\Identity\Entity\UserGroup;
+use App\Identity\Entity\UserGroupMembership;
+use App\Identity\UserActionType;
 use App\Identity\Repository\UserActionRepository;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Service\AccountDataExporter;
 use App\Identity\Service\AccountSocialAccounts;
 use App\Notifications\Repository\PushSubscriptionRepository;
+use App\Project\Entity\Project;
+use App\Project\Entity\ProjectMembership;
+use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectMembershipRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Nowo\AuthKitBundle\Entity\SocialLoginAccount;
 use Nowo\AuthKitBundle\Profile\ProfileRegistry;
 use Nowo\AuthKitBundle\Repository\SocialLoginAccountRepository;
@@ -121,4 +130,102 @@ final class AccountDataExporterTest extends TestCase
             ],
         ], 'main'), $credentials);
     }
+
+
+    public function testExportIncludesMembershipsGroupsActivityHistoryAndRoles(): void
+    {
+        $user = new User();
+        $user->setEmail('full@example.com');
+        $user->setDisplayName('Full Export');
+        $user->setSlackUserId('U999');
+        $user->setPhone('+34600111222');
+        $user->setPhoneVerifiedAt(new \DateTimeImmutable('2024-01-02T03:04:05+00:00'));
+        $user->setPreferredTheme('dark');
+        $user->setPreferredContentWidth('full');
+        $user->setPreferredUiDensity('compact');
+        $user->setPreferredMotion('reduce');
+        $user->setPreferredFontScale('lg');
+        $user->setPreferredContrast('more');
+        $user->setPreferredSidebar('collapsed');
+        $user->setPushNotificationsEnabled(true);
+        $user->setRoles(['ROLE_ADMIN', 'ROLE_SUPPORT']);
+        $user->setAnonymizedAt(new \DateTimeImmutable('2024-01-03T00:00:00+00:00'));
+        (new ReflectionProperty(User::class, 'id'))->setValue($user, 10);
+
+        $passwordHistory = (new PasswordHistory())
+            ->setPassword('hash')
+            ->setCreatedAt(new \DateTimeImmutable('2024-01-04T00:00:00+00:00'));
+        $user->addPasswordHistory($passwordHistory);
+        (new ReflectionProperty(User::class, 'passwordHistory'))->setValue(
+            $user,
+            new ArrayCollection([new stdClass(), $passwordHistory]),
+        );
+
+        $project = (new Project())
+            ->setName('Beacon')
+            ->setSlug('beacon');
+        $membership = (new ProjectMembership())
+            ->setProject($project)
+            ->setUser($user)
+            ->setRole(ProjectRole::Admin);
+
+        $group = (new UserGroup())
+            ->setName('Operators')
+            ->setSlug('operators');
+        $groupMembership = (new UserGroupMembership())
+            ->setUser($user)
+            ->setUserGroup($group);
+        $orphanMembership = (new UserGroupMembership())
+            ->setUser($user);
+
+        $action = (new UserAction())
+            ->setAction(UserActionType::MagicLoginRequested)
+            ->setContext(['ip' => '127.0.0.1']);
+
+        $social = new SocialLoginAccount();
+        $social->setProvider('google');
+        $social->setEmail('google@example.com');
+
+        $socialRepo = $this->createStub(SocialLoginAccountRepository::class);
+        $socialRepo->method('findBy')->willReturn([$social]);
+
+        $projects = $this->createStub(ProjectMembershipRepository::class);
+        $projects->method('findByUser')->willReturn([$membership]);
+
+        $groups = $this->createStub(UserGroupMembershipRepository::class);
+        $groups->method('findByUser')->willReturn([$groupMembership, $orphanMembership]);
+
+        $actions = $this->createStub(UserActionRepository::class);
+        $actions->method('findForUser')->willReturn([$action]);
+
+        $push = $this->createStub(PushSubscriptionRepository::class);
+        $push->method('findByUser')->willReturn([new stdClass()]);
+
+        $exporter = new AccountDataExporter(
+            $projects,
+            $groups,
+            $actions,
+            $push,
+            new AccountSocialAccounts($this->gate(), $socialRepo),
+        );
+
+        $document = $exporter->export($user);
+
+        self::assertSame('beacon', $document['project_memberships'][0]['project_slug'] ?? 'beacon');
+        self::assertSame('Beacon', $document['project_memberships'][0]['project_name']);
+        self::assertSame('admin', $document['project_memberships'][0]['role']);
+        self::assertSame('Operators', $document['group_memberships'][0]['group_name']);
+        self::assertCount(1, $document['group_memberships']);
+        self::assertSame(UserActionType::MagicLoginRequested->value, $document['security_activity'][0]['action']);
+        self::assertSame(['ip' => '127.0.0.1'], $document['security_activity'][0]['context']);
+        self::assertSame(1, $document['password_history']['count']);
+        self::assertSame('ROLE_ADMIN', $document['account']['roles'][0]);
+        self::assertContains('ROLE_SUPPORT', $document['account']['roles']);
+        self::assertNotContains('ROLE_USER', $document['account']['roles']);
+        self::assertSame('U999', $document['account']['slack_user_id']);
+        self::assertSame('+34600111222', $document['account']['phone']);
+        self::assertSame(1, $document['push_subscriptions_count']);
+        self::assertCount(1, $document['social_accounts']);
+    }
+
 }

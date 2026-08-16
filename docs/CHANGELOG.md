@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-08-16
+
+### Added
+
+- **`docs/COVERAGE.md`**: inventory of PHPUnit source exclusions, Vitest includable whitelist, and measured floors (REQ-QA-002).
+- Broad PHPUnit unit/integration coverage expansion across Identity, Ingest, Issues, Notifications, Performance, Project, Setup, Shared, Analytics, and Ops edge paths.
+- Vitest coverage for additional shell Stimulus controllers (`menu_nested_collapse`, `password_confirm_mirror`, thinking-orbs theme helpers).
+
+### Changed
+
+- **CI Coverage hard gate**: workflow `COVERAGE_MIN` raised from soft **35** to **100** on the includable PHPUnit `src/` tree (`033` / REQ-QA-002). Local `make test-coverage` already defaults to `COVERAGE_MIN=100`.
+- Vitest coverage `include` narrowed to the hard-gated shell/controller whitelist (browser/canvas/Mercure controllers remain e2e-owned).
+- PHPUnit excludes sample/install seed paths (`SeedSampleCommand`, `IssueSampleSeeder`) from the coverage denominator.
+- Coverage-oriented micro-refactors (OTLP mapper early-exit dedupe, Settings page form assembly, Telegram endpoint parse, AI export event payload assembly, Mercure/JSON/PWA/share helpers) with no intended product contract change.
+- Spec `033` amended for the hard gate; ROADMAP / ENGINEERING-AUDIT (REF-001 closed).
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator runtime steps beyond pulling `v1.19.0`.
+- Contributors: Coverage CI fails if includable statement % drops below 100. See [COVERAGE.md](COVERAGE.md). Diagnosis only: `COVERAGE_MIN=0 make test-coverage`.
+
 ## [1.18.7] - 2026-08-16
 
 ### Changed
@@ -1329,7 +1350,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.19.0...HEAD
+[1.19.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.7...v1.19.0
 [1.18.7]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.6...v1.18.7
 [1.18.6]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.5...v1.18.6
 [1.18.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.4...v1.18.5

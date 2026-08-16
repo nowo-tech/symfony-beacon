@@ -3,17 +3,19 @@
 ## Local
 
 1. `make up` (stack running).
-2. `make test-coverage` — prints text summary; writes `var/coverage/clover.xml` and `var/coverage-html/`.
+2. `make test-coverage` — prints text summary; writes `var/coverage/clover.xml` and `var/coverage-html/`; defaults to `COVERAGE_MIN=100`.
 3. Open `var/coverage-html/index.html` in a browser.
-4. Optional: `COVERAGE_MIN=1 .scripts/check-coverage-threshold.sh var/coverage/clover.xml` (should pass once a baseline exists; use a high value only to verify fail messaging).
+4. Diagnosis only: `COVERAGE_MIN=0 make test-coverage` (skips the hard fail while inspecting gaps).
+5. Frontend: `make test-unit-js-coverage` → `var/coverage-js/` (Vitest 100% on the includable set).
 
 ## CI
 
 1. Push a branch / open a PR.
 2. Confirm job **Coverage (PHP 8.5)** runs after checkout + composer + MySQL prepare.
 3. Download the coverage artifact from the Actions run.
-4. Confirm `COVERAGE_MIN` is empty in the workflow (informational). To enable a soft gate later, set the workflow `env.COVERAGE_MIN` or a repository variable and re-run.
+4. Confirm workflow `env.COVERAGE_MIN` is `"100"`. The job fails if includable statement coverage drops below that floor.
 
 ## Docs check
 
-- [docs/CONTRIBUTING.md](../../docs/CONTRIBUTING.md) documents `make test-coverage` and the soft-gate env.
+- [docs/CONTRIBUTING.md](../../docs/CONTRIBUTING.md) documents `make test-coverage` and `COVERAGE_MIN=100`.
+- [docs/COVERAGE.md](../../docs/COVERAGE.md) lists PHP exclusions and the TypeScript includable set.

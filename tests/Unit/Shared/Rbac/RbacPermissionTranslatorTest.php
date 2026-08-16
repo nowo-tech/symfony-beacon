@@ -82,6 +82,7 @@ final class RbacPermissionTranslatorTest extends TestCase
         $this->translator->expects(self::never())->method('trans');
 
         self::assertSame('', $this->rbacPermissionTranslator->nameKey(''));
+        self::assertSame('', $this->rbacPermissionTranslator->descriptionKey('   '));
         self::assertSame('', $this->rbacPermissionTranslator->name($permission));
         self::assertNull($this->rbacPermissionTranslator->description($permission));
     }

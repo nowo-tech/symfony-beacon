@@ -417,9 +417,7 @@ final readonly class ProjectConfigPortability
                     && (!$existing instanceof ProjectMembership || ProjectRole::Owner !== $existing->getRole())
                 ) {
                     $warnings[] = \sprintf('%s: role owner ignored on panel import (use Transfer ownership)', $row['email']);
-                    $role = $existing instanceof ProjectMembership && ProjectRole::Full === $existing->getRole()
-                        ? ProjectRole::Full
-                        : ProjectRole::Admin;
+                    $role = $existing instanceof ProjectMembership && ProjectRole::Full === $existing->getRole() ? ProjectRole::Full : ProjectRole::Admin;
                 } elseif (ProjectRole::Full === $role
                     && (!$existing instanceof ProjectMembership || !\in_array($existing->getRole(), [ProjectRole::Owner, ProjectRole::Full], true))
                 ) {

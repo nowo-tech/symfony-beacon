@@ -48,4 +48,12 @@ final class SafeInternalRedirectTest extends TestCase
             '/fallback',
         ));
     }
+
+    public function testRejectsEmptyControlCharacterAndDecodedDoubleSlashTargets(): void
+    {
+        $request = Request::create('https://beacon.example/dashboard');
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, '   ', '/fallback'));
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, "/safe\x01oops", '/fallback'));
+        self::assertSame('/fallback', SafeInternalRedirect::resolve($request, '/%2F%2Fevil.example', '/fallback'));
+    }
 }

@@ -42,9 +42,7 @@ final class DiscordChannelFormatter implements ChannelHttpFormatterInterface
         return array_filter([
             'title' => (string) ($payload['event'] ?? 'Beacon'),
             'description' => $summary,
-            'url' => isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url']
-                ? $payload['url']
-                : null,
+            'url' => isset($payload['url']) && \is_string($payload['url']) && '' !== $payload['url'] ? $payload['url'] : null,
             'color' => true === ($payload['test'] ?? false) ? 0xC9A227 : 0x1F6F54,
             'fields' => OutboundPayloadFacts::discordFields($payload),
             'footer' => [

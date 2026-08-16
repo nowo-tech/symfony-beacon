@@ -49,6 +49,18 @@ final class AiIssueExportFormatter
         $request = $this->scrubRequest($this->extractRequest($payload));
         $tags = $this->scrubAssocSecrets($this->normalizeTags($payload['tags'] ?? []));
         $breadcrumbs = $this->scrubBreadcrumbs($this->summarizeBreadcrumbs($payload['breadcrumbs'] ?? null));
+        $eventData = null;
+        if ($event instanceof Event) {
+            $eventData = [
+                'event_id' => $event->getEventId(),
+                'environment' => $event->getEnvironment(),
+                'release' => $event->getReleaseVersion(),
+                'platform' => $event->getPlatform(),
+                'timestamp' => $event->getEventTimestamp()->format(\DATE_ATOM),
+                'received_at' => $event->getReceivedAt()->format(\DATE_ATOM),
+                'message' => isset($payload['message']) && \is_string($payload['message']) ? $payload['message'] : null,
+            ];
+        }
 
         return [
             'format' => self::FORMAT,
@@ -69,15 +81,7 @@ final class AiIssueExportFormatter
                     'slug' => $project->getSlug(),
                 ],
             ],
-            'event' => $event instanceof Event ? [
-                'event_id' => $event->getEventId(),
-                'environment' => $event->getEnvironment(),
-                'release' => $event->getReleaseVersion(),
-                'platform' => $event->getPlatform(),
-                'timestamp' => $event->getEventTimestamp()->format(\DATE_ATOM),
-                'received_at' => $event->getReceivedAt()->format(\DATE_ATOM),
-                'message' => isset($payload['message']) && \is_string($payload['message']) ? $payload['message'] : null,
-            ] : null,
+            'event' => $eventData,
             'exception' => $exception,
             'stacktrace' => $frames,
             'request' => $request,

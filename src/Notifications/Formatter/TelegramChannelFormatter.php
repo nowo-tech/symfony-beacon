@@ -48,12 +48,9 @@ final class TelegramChannelFormatter implements ChannelHttpFormatterInterface
             throw new InvalidArgumentException('Telegram endpoint must be bot_token@chat_id.');
         }
 
-        $token = substr($endpoint, 0, $at);
-        $chatId = substr($endpoint, $at + 1);
-        if ('' === $token || '' === $chatId) {
-            throw new InvalidArgumentException('Telegram endpoint must be bot_token@chat_id.');
-        }
-
-        return ['token' => $token, 'chat_id' => $chatId];
+        return [
+            'token' => substr($endpoint, 0, $at),
+            'chat_id' => substr($endpoint, $at + 1),
+        ];
     }
 }

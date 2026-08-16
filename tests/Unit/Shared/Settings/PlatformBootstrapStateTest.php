@@ -46,6 +46,20 @@ final class PlatformBootstrapStateTest extends TestCase
         self::assertTrue($state->hasDefaultCookieConsent());
     }
 
+    public function testNeedsSeedWhenBreadcrumbCollectionIsMissing(): void
+    {
+        $breadcrumbs = $this->createStub(BreadcrumbCollectionRepository::class);
+        $breadcrumbs->method('findOneByCodeAndContextKey')->willReturn(null);
+
+        $state = new PlatformBootstrapState(
+            $this->menusWithRequiredCodes(),
+            $breadcrumbs,
+            $this->cookieConsentPresent(),
+        );
+
+        self::assertFalse($state->hasDefaultBreadcrumbs());
+    }
+
     public function testReadyWhenAllCatalogsPresent(): void
     {
         $collection = new BreadcrumbCollection();

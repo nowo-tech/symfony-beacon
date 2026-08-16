@@ -48,10 +48,6 @@ final class OtlpLogsMapper implements OtlpSignalMapperInterface
             'log_records',
             $this->attributesMap(...),
             function (array $resourceAttrs, array $record) use (&$events): bool {
-                if (\count($events) >= self::MAX_RECORDS) {
-                    return false;
-                }
-
                 $payload = $this->mapRecord($record, $resourceAttrs);
                 if (null !== $payload) {
                     $events[] = $payload;

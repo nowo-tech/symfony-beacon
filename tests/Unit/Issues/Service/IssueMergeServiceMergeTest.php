@@ -32,7 +32,7 @@ final class IssueMergeServiceMergeTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('findBy')->willReturnCallback(static function (array $criteria) use ($source, $event): array {
             if (($criteria['issue'] ?? null) === $source) {
-                return [$event];
+                return [$event, 'skip'];
             }
 
             return [];

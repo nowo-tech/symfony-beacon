@@ -95,6 +95,7 @@ final class OtlpIngestGatewayTest extends TestCase
         self::assertSame(200, $ok->getStatusCode());
         $denied = $gateway->respond('nope', Response::HTTP_FORBIDDEN);
         self::assertSame(403, $denied->getStatusCode());
+        self::assertSame(500, $gateway->respond('boom', Response::HTTP_INTERNAL_SERVER_ERROR)->getStatusCode());
     }
 
     private function gateway(?object $ops = null): OtlpIngestGateway

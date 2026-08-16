@@ -82,4 +82,25 @@ final class FingerprintCalculatorTest extends TestCase
 
         self::assertSame($a, $b);
     }
+
+    public function testIgnoresNonArrayFramesWhenChoosingTopFrame(): void
+    {
+        $calc = new FingerprintCalculator();
+        $payload = [
+            'exception' => [
+                'values' => [[
+                    'type' => 'RuntimeException',
+                    'value' => 'fail',
+                    'stacktrace' => [
+                        'frames' => [
+                            'skip-me',
+                            ['filename' => 'src/Foo.php', 'function' => 'bar', 'lineno' => 10],
+                        ],
+                    ],
+                ]],
+            ],
+        ];
+
+        self::assertSame('bar', $calc->culprit($payload));
+    }
 }

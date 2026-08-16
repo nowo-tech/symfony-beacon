@@ -52,7 +52,21 @@ describe('password-confirm-mirror controller', () => {
       'input[name="user_preferences[plainPassword_confirm]"]',
     ) as HTMLInputElement;
 
+    // Element target outside .password-strength-modal-item → early return.
+    confirm.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(confirm.value).toBe('');
+
     document.dispatchEvent(new Event('click'));
+    expect(confirm.value).toBe('');
+
+    const text = document.createTextNode('x');
+    root.appendChild(text);
+    text.dispatchEvent?.(new MouseEvent('click', { bubbles: true }));
+    const odd = new Event('click', { bubbles: true });
+    Object.defineProperty(odd, 'target', { value: text });
+    document.dispatchEvent(odd);
+    // Direct handler path (Stimulus binds onClick privately via arrow field).
+    (controller as unknown as { onClick: (e: Event) => void }).onClick(odd);
     expect(confirm.value).toBe('');
 
     const cancel = document.querySelectorAll('button')[0] as HTMLButtonElement;

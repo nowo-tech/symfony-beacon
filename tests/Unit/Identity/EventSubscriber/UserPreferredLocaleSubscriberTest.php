@@ -102,6 +102,22 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         self::assertSame('de', $translator->locale);
     }
 
+    public function testSkipsWhenPreferenceAndDefaultLocaleAreBlank(): void
+    {
+        $user = new User();
+        $user->setEmail('user@example.com');
+        $translator = new RecordingTranslator();
+        $request = Request::create('/projects');
+        $event = $this->mainEvent($request);
+
+        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, '   ')
+            ->onKernelRequest($event);
+
+        self::assertSame('en', $request->getLocale());
+        self::assertSame('en', $translator->locale);
+        self::assertNull($event->getResponse());
+    }
+
     private function userWithLocale(string $locale): User
     {
         $user = new User();

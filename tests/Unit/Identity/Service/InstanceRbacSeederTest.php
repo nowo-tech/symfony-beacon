@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Identity\Service;
 
 use App\Identity\Entity\InstancePermission;
 use App\Identity\Entity\InstanceRole;
+use App\Identity\Entity\User;
 use App\Identity\Repository\InstancePermissionRepository;
 use App\Identity\Repository\InstanceRoleRepository;
 use App\Identity\Service\InstanceRbacSeeder;
@@ -55,6 +56,14 @@ final class InstanceRbacSeederTest extends TestCase
         $obsolete->setCategory('admin');
         $permissions['admin.legacy'] = $obsolete;
 
+        $roleWithObsoletePermission = new InstanceRole();
+        $roleWithObsoletePermission->setCode('ROLE_OBSOLETE_HOLDER');
+        $roleWithObsoletePermission->addPermission($obsolete);
+        $roles[$roleWithObsoletePermission->getCode()] = $roleWithObsoletePermission;
+
+        $user = new User();
+        $user->addInstanceRole($legacy);
+
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(static function (object $entity) use (&$permissions, &$roles): void {
             if ($entity instanceof InstancePermission) {
@@ -82,6 +91,8 @@ final class InstanceRbacSeederTest extends TestCase
         self::assertGreaterThanOrEqual(1, $flushed);
         self::assertNotContains($obsolete, array_values($permissions));
         self::assertArrayNotHasKey($legacy->getCode(), $roles);
+        self::assertFalse($roleWithObsoletePermission->getPermissions()->contains($obsolete));
+        self::assertFalse($user->hasInstanceRole($legacy));
         self::assertNotEmpty($permissions);
         self::assertNotEmpty($roles);
     }

@@ -120,6 +120,36 @@ final class ProjectShareLinkManagerTest extends TestCase
         $manager->consume($link, $user);
     }
 
+    public function testRevokeReturnsEarlyWhenAlreadyRevokedAndConsumeRejectsWrongIssueProject(): void
+    {
+        $project = $this->project(1);
+        $actor = new User();
+        $actor->setEmail('owner@example.com');
+
+        $revoked = new ProjectShareLink();
+        $revoked->setProject($project)->setCreatedBy($actor)->setExpiresAt(new DateTimeImmutable('+1 day'))->setTokenHash('hash');
+        $revoked->revoke();
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::never())->method('flush');
+        $this->manager($em)->revoke($revoked, $actor);
+
+        $wrongIssue = new Issue();
+        $wrongIssue->setProject($this->project(2));
+        $wrongIssue->setFingerprint('wrong');
+        $wrongIssue->setTitle('Wrong project');
+
+        $link = new ProjectShareLink();
+        $link->setProject($project)->setIssue($wrongIssue)->setExpiresAt(new DateTimeImmutable('+1 day'))->setTokenHash('hash');
+
+        try {
+            $this->manager($this->createStub(EntityManagerInterface::class))->consume($link, $actor);
+            self::fail('expected issue_wrong_project');
+        } catch (RuntimeException $e) {
+            self::assertSame('issue_wrong_project', $e->getMessage());
+        }
+    }
+
     private function manager(
         EntityManagerInterface $em,
         ?ProjectShareLinkRepository $repo = null,

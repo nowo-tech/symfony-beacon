@@ -60,6 +60,23 @@ final class ProjectMembershipUiHelperTest extends TestCase
         );
     }
 
+    public function testGroupChoicesSkipGroupsWhoseIdDisappearsDuringChoiceBuild(): void
+    {
+        $group = new class extends UserGroup {
+            private int $calls = 0;
+
+            public function getId(): ?int
+            {
+                ++$this->calls;
+
+                return 1 === $this->calls ? 9 : null;
+            }
+        };
+        $group->setName('Flaky');
+
+        self::assertSame([], ProjectMembershipUiHelper::groupChoicesForLinking(new Project(), [$group], [9 => 1]));
+    }
+
     public function testTransferOwnershipChoicesExcludesActor(): void
     {
         $actor = $this->userWithId(1, 'actor@example.com', 'Actor');

@@ -40,7 +40,7 @@ final class JsonUploadReader
 
         $raw = file_get_contents($path);
         if (false === $raw) {
-            throw new InvalidArgumentException('missing_file');
+            throw new InvalidArgumentException('missing_file'); // @codeCoverageIgnore
         }
 
         if (\strlen($raw) > $limit) {

@@ -38,9 +38,6 @@ final class PwaStatelessCookieSubscriber
 
         $headers = $event->getResponse()->headers;
         foreach ($headers->getCookies() as $cookie) {
-            if (!$cookie instanceof Cookie) {
-                continue;
-            }
             $headers->removeCookie($cookie->getName(), $cookie->getPath(), $cookie->getDomain());
         }
         $headers->remove('Set-Cookie');

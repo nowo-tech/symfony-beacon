@@ -50,4 +50,28 @@ final class AdminUserMutatorTest extends TestCase
         self::assertSame('cannot_change_own', $mutator->changeInstanceRole($actor, $actor, 'admin'));
         self::assertSame('cannot_disable_self', $mutator->toggleEnabled($actor, $actor));
     }
+
+    public function testChangeInstanceRoleReturnsLastAdminAndUnchangedWhenApplicable(): void
+    {
+        $actor = new User();
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 7);
+
+        $target = new User();
+        new ReflectionProperty(User::class, 'id')->setValue($target, 8);
+        $target->setRoles(['ROLE_ADMIN']);
+
+        $users = $this->createMock(UserRepository::class);
+        $users->expects(self::once())->method('countAdmins')->willReturn(1);
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $mutator = new AdminUserMutator(
+            $users,
+            new UserActionRecorder($em, new RequestStack()),
+            $em,
+            $this->createStub(UserPasswordHasherInterface::class),
+        );
+
+        self::assertSame('last_admin', $mutator->changeInstanceRole($actor, $target, 'user'));
+        self::assertSame('unchanged', $mutator->changeInstanceRole($actor, $target, 'admin'));
+    }
 }

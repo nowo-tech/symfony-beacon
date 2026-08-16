@@ -65,6 +65,19 @@ final class MetricsControllerTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
+    public function testRejectsAnonymousRequestsWhenTokenIsOptionalButUnset(): void
+    {
+        $ops = $this->opsDefaultsWith(static function ($settings): void {
+            $settings->setMetricsRequireToken(false);
+            $settings->setMetricsToken(null);
+        });
+        $controller = $this->controller($ops, admin: false);
+
+        $response = $controller(Request::create('/metrics'));
+
+        self::assertSame(401, $response->getStatusCode());
+    }
+
     private function controller(object $ops, bool $admin = false): MetricsController
     {
         $em = $this->createStub(EntityManagerInterface::class);

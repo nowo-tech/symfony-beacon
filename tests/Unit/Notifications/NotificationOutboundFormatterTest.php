@@ -15,6 +15,8 @@ use App\Notifications\Service\InteractionActionToken;
 use App\Notifications\Service\NotificationOutboundFormatter;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionProperty;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class NotificationOutboundFormatterTest extends TestCase
@@ -262,5 +264,26 @@ final class NotificationOutboundFormatterTest extends TestCase
         $formatter = $this->formatter();
         $this->expectException(InvalidArgumentException::class);
         $formatter->parseTelegramEndpoint('not-valid');
+    }
+
+    public function testRejectsEmailDestinationsForHttpDelivery(): void
+    {
+        $formatter = $this->formatter();
+
+        $this->expectException(InvalidArgumentException::class);
+        $formatter->httpRequest(NotificationDestinationType::Email, 'mailto:test@example.com', []);
+    }
+
+    public function testRejectsUnsupportedDestinationTypesWhenNoFormatterClaimsThem(): void
+    {
+        $reflection = new ReflectionClass(NotificationOutboundFormatter::class);
+        $formatter = $reflection->newInstanceWithoutConstructor();
+        (new ReflectionProperty(NotificationOutboundFormatter::class, 'telegramFormatter'))
+            ->setValue($formatter, new TelegramChannelFormatter());
+        (new ReflectionProperty(NotificationOutboundFormatter::class, 'formatters'))
+            ->setValue($formatter, []);
+
+        $this->expectException(InvalidArgumentException::class);
+        $formatter->httpRequest(NotificationDestinationType::Slack, 'https://example.test/hook', []);
     }
 }

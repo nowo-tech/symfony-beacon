@@ -14,6 +14,7 @@ use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueSearchRepository;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Project\Entity\Project;
+use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Repository\ProjectGroupAccessRepository;
@@ -142,5 +143,101 @@ final class AdminProjectShowPageBuilderTest extends TestCase
         self::assertArrayHasKey('deleteProjectForm', $page);
         self::assertSame(0, $page['opsStats']['open_issues']);
         self::assertNotEmpty($page['projectAuditActions']);
+    }
+
+    public function testBuildSkipsIncompleteRowsAndUnsavedProjectOwnerCount(): void
+    {
+        $project = new Project()->setName('Draft')->setSlug('draft');
+        $actor = new User()->setEmail('admin@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
+
+        $membership = new ProjectMembership()->setProject($project)->setUser(null)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 15);
+        $project->addMembership($membership);
+        $project->addGroupAccess(new ProjectGroupAccess()->setProject($project)->setRole(ProjectRole::Member));
+
+        $formView = new FormView();
+        $form = $this->createStub(FormInterface::class);
+        $form->method('createView')->willReturn($formView);
+        $formFactory = $this->createStub(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $formFactory->method('createNamed')->willReturn($form);
+
+        $urls = $this->createStub(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('/admin/projects/draft');
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('hydrateAccessGraph');
+        $memberships = $this->createMock(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn(null);
+        $memberships->expects(self::never())->method('countOwnersByProjectIds');
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(true);
+        $access = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+        $policy = new ProjectMembershipPolicy(
+            $memberships,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $access,
+            $auth,
+        );
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->method('flush');
+        $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
+        $recorder = new UserActionRecorder($em, new RequestStack());
+
+        $userGroups = $this->createStub(UserGroupRepository::class);
+        $userGroups->method('findAllOrdered')->willReturn([]);
+        $groupMemberships = $this->createStub(UserGroupMembershipRepository::class);
+        $groupMemberships->method('countByGroupIds')->willReturn([]);
+        $attempts = $this->createStub(NotificationDeliveryAttemptRepository::class);
+        $attempts->method('findRecentByDestinations')->willReturn([]);
+        $actions = $this->createStub(UserActionRepository::class);
+        $actions->method('findForProject')->willReturn([]);
+
+        $issues = $this->createStub(IssueSearchRepository::class);
+        $issues->method('countByProjectAndStatus')->willReturn(0);
+        $events = $this->createStub(EventRepository::class);
+        $events->method('countReceivedSinceForProject')->willReturn(0);
+        $events->method('findLastReceivedAtForProject')->willReturn(null);
+
+        $builder = new AdminProjectShowPageBuilder(
+            $formFactory,
+            $urls,
+            new CsrfOnlyFormFactory($formFactory),
+            new GetFilterFormFactory($formFactory),
+            $projects,
+            new ProjectMembershipManager(
+                $this->createStub(UserRepository::class),
+                $memberships,
+                $policy,
+                $recorder,
+                $em,
+            ),
+            new ProjectGroupAccessManager($groups, $policy, $recorder, $em),
+            new ProjectMembershipFormSupport($projects, $userGroups),
+            $memberships,
+            $groupMemberships,
+            $userGroups,
+            $attempts,
+            new ProjectOpsStatsService($issues, $events),
+            new MessengerQueueHealth($em),
+            $actions,
+        );
+
+        $page = $builder->build($project, $actor, Request::create('/admin/projects/'.$project->getUuid()));
+
+        self::assertSame(0, $page['ownerCount']);
+        self::assertSame([], $page['removeMemberForms']);
+        self::assertSame([], $page['groupRoleForms']);
+        self::assertSame([], $page['removeGroupForms']);
     }
 }

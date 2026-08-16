@@ -86,6 +86,23 @@ final class IngestProjectAccessGateTest extends TestCase
         );
     }
 
+    public function testAuthorizeCredentialsFlushesWhenLegacySecretIsUpgraded(): void
+    {
+        $project = $this->project(10);
+        $key = (new ProjectApiKey())
+            ->setProject($project)
+            ->setPublicKey('public-key');
+        new ReflectionProperty(ProjectApiKey::class, 'secretKey')->setValue($key, 'legacy-secret');
+
+        $this->projectRepository->method('findOneByIngestPath')->willReturn($project);
+        $this->apiKeyRepository->method('findActiveByPublicKey')->willReturn($key);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager->expects(self::once())->method('flush');
+        $this->rebuild();
+
+        self::assertTrue($this->gate->authorizeCredentials('ref', 'public-key', 'legacy-secret')['ok']);
+    }
+
     public function testAssertIngestAllowedEnforcesGovernanceAndRate(): void
     {
         $project = $this->project(10)->setIngestEnabled(false);
@@ -120,6 +137,11 @@ final class IngestProjectAccessGateTest extends TestCase
         $limited = $this->gate->assertIngestAllowed($project);
         self::assertFalse($limited['ok']);
         self::assertSame('rate limit exceeded', $limited['message']);
+    }
+
+    public function testAssertIngestAllowedRejectsUnpersistedProjects(): void
+    {
+        self::assertSame($this->unauthorized(), $this->gate->assertIngestAllowed(new Project()));
     }
 
     public function testAuthorizeComposesCredentialsAndGovernance(): void

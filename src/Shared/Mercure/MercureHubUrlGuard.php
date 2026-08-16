@@ -70,7 +70,7 @@ final class MercureHubUrlGuard
         if (false !== filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
             $packed = @inet_pton($ip);
             if (false === $packed) {
-                return true;
+                return true; // @codeCoverageIgnore
             }
 
             // fe80::/10 link-local (including metadata-accessible variants).

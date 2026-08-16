@@ -102,11 +102,70 @@ final class TeamsChannelFormatterTest extends TestCase
         self::assertSame([], $formatted['json']['potentialAction']);
     }
 
+    public function testFormatSkipsInteractiveActionsForSamplePayloadEvenWithSigningSecret(): void
+    {
+        $formatted = $this->formatter()->format('https://outlook.office.com/webhook/x', [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'test' => true,
+            'project' => ['uuid' => 'p-uuid'],
+            'issue' => ['uuid' => 'i-uuid'],
+        ], $this->destinationWithSigningSecret());
+
+        self::assertSame([], $formatted['json']['potentialAction']);
+    }
+
+    public function testFormatSkipsInteractiveActionsForUnsupportedEvent(): void
+    {
+        $formatted = $this->formatter()->format('https://outlook.office.com/webhook/x', [
+            'event' => 'issue.resolved',
+            'summary' => 'Boom',
+            'project' => ['uuid' => 'p-uuid'],
+            'issue' => ['uuid' => 'i-uuid'],
+        ], $this->destinationWithSigningSecret());
+
+        self::assertSame([], $formatted['json']['potentialAction']);
+    }
+
+    public function testFormatSkipsInteractiveActionsWhenProjectOrIssuePayloadIsInvalid(): void
+    {
+        $formatted = $this->formatter()->format('https://outlook.office.com/webhook/x', [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'project' => 'not-an-array',
+            'issue' => 'not-an-array',
+        ], $this->destinationWithSigningSecret());
+
+        self::assertSame([], $formatted['json']['potentialAction']);
+    }
+
+    public function testFormatSkipsInteractiveActionsWhenInteractiveUuidsAreMissing(): void
+    {
+        $formatted = $this->formatter()->format('https://outlook.office.com/webhook/x', [
+            'event' => 'issue.new',
+            'summary' => 'Boom',
+            'project' => [],
+            'issue' => [],
+        ], $this->destinationWithSigningSecret());
+
+        self::assertSame([], $formatted['json']['potentialAction']);
+    }
+
     private function formatter(?UrlGeneratorInterface $urls = null): TeamsChannelFormatter
     {
         return new TeamsChannelFormatter(
             $urls ?? $this->createStub(UrlGeneratorInterface::class),
             new InteractionActionToken(),
         );
+    }
+
+    private function destinationWithSigningSecret(): NotificationDestination
+    {
+        return (new NotificationDestination())
+            ->setProject(new Project()->setName('Acme')->setSlug('acme'))
+            ->setLabel('Teams')
+            ->setType(NotificationDestinationType::Teams)
+            ->setEndpointUrl('https://outlook.office.com/webhook/x')
+            ->setSigningSecret('teams-secret');
     }
 }

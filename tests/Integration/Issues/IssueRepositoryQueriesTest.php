@@ -52,31 +52,33 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         $week = $this->event($issue, 'evt-week', 'production', '1.0.1', $weekAt, '/orders/1');
         $old = $this->event($issue, 'evt-old', 'staging', null, $oldAt, '/legacy');
         $search = $this->event($secondIssue, 'search-123', 'production', '2.0.0', $searchAt, '/search');
+        $blankRelease = $this->event($issue, 'evt-blank', 'production', '   ', $recentAt->modify('-10 minutes'), '/blank');
         $other = $this->event($otherIssue, 'other-evt', 'production', '9.9.9', $otherAt, '/outside');
-        $issue->incrementEventCount()->incrementEventCount();
+        $issue->incrementEventCount()->incrementEventCount()->incrementEventCount();
         $em->persist($recent);
         $em->persist($week);
         $em->persist($old);
         $em->persist($search);
+        $em->persist($blankRelease);
         $em->persist($other);
         $em->flush();
 
-        self::assertSame([$recent, $week], $repository->findLatestForIssue($issue, 2));
+        self::assertSame([$recent, $blankRelease], $repository->findLatestForIssue($issue, 2));
         self::assertSame($recent->getId(), $repository->findOneByEventId('evt-recent')?->getId());
         self::assertSame($recent->getId(), $repository->findOneByProjectAndEventId($project, 'evt-recent')?->getId());
         self::assertNull($repository->findOneByProjectAndEventId($otherProject, 'evt-recent'));
 
         $stats = $repository->occurrenceStatsForIssue($issue, $now);
-        self::assertSame(3, $stats->total);
-        self::assertSame(1, $stats->last24h);
-        self::assertSame(2, $stats->last7d);
-        self::assertSame(2, $stats->last30d);
+        self::assertSame(4, $stats->total);
+        self::assertSame(2, $stats->last24h);
+        self::assertSame(3, $stats->last7d);
+        self::assertSame(3, $stats->last30d);
         self::assertSame([], $repository->occurrenceStatsForIssues([new Issue()], $now));
 
-        self::assertSame(1, $repository->countReceivedTodayForProject($project));
-        self::assertSame(3, $repository->countReceivedSinceForProject($project, $now->modify('-5 days')));
+        self::assertSame(2, $repository->countReceivedTodayForProject($project));
+        self::assertSame(4, $repository->countReceivedSinceForProject($project, $now->modify('-5 days')));
         self::assertSame(
-            [(int) $project->getId() => 3, (int) $otherProject->getId() => 1],
+            [(int) $project->getId() => 4, (int) $otherProject->getId() => 1],
             $repository->countReceivedSinceForProjectIds(
                 [(int) $project->getId(), (int) $otherProject->getId()],
                 $now->modify('-5 days'),
@@ -85,8 +87,8 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertSame([], $repository->countReceivedSinceForProjectIds([], new DateTimeImmutable('2026-08-15 00:00:00')));
 
         self::assertSame(
-            ['1.0.0', '2.0.0'],
-            $repository->findDistinctReleaseVersions($project, 2),
+            ['1.0.0'],
+            $repository->findDistinctReleaseVersions($project, 1),
         );
         self::assertSame([], $repository->findDistinctReleaseVersions(new Project(), 5));
 
@@ -105,7 +107,7 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertSame([], $repository->findLastReceivedAtForProjectIds([]));
 
         self::assertSame(
-            3,
+            4,
             $repository->countReceivedSince(
                 $project,
                 $now->modify('-5 days'),
@@ -113,15 +115,17 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
                 null,
             ),
         );
+        self::assertSame(1, $repository->countReceivedSince($project, $now->modify('-5 days'), 'production', ' 1.0.0 '));
         self::assertCount(
             1,
             $repository->searchForExport($project, 'search', 'fatal', IssueStatus::Resolved, 'production', '2.0.0', 10),
         );
+        self::assertCount(1, $repository->searchForExport($project, ' ', '', null, '', ' ', 0));
         self::assertSame(
             [
                 $weekAt->format('Y-m-d') => 1,
                 $searchAt->format('Y-m-d') => 1,
-                $recentAt->format('Y-m-d') => 1,
+                $recentAt->format('Y-m-d') => 2,
             ],
             $repository->countErrorsByDay(
                 $project,
@@ -132,6 +136,11 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
                 null,
             ),
         );
+        self::assertSame(
+            [$recentAt->format('Y-m-d') => 1],
+            $repository->countErrorsByDay($project, $now->modify('-5 days'), $now, 'production', '1.0.0', 'error'),
+        );
+        self::assertSame([], $repository->countErrorsByDay(new Project(), $now->modify('-5 days'), $now));
     }
 
     public function testIssueMentionRepositoryQueries(): void
@@ -189,6 +198,57 @@ final class IssueRepositoryQueriesTest extends DatabaseWebTestCase
         self::assertSame(1, $repository->markAllReadForUser($member, [$project]));
         self::assertFalse($repository->findOneForUser($member, (int) $mentionUnread->getId())?->isUnread());
         self::assertSame(0, $repository->markAllReadForUser($member, []));
+    }
+
+
+    public function testIssueRepositoryLookupsAndSimilarCandidates(): void
+    {
+        [, , $project] = $this->bootWithDemoProject('issue-repo-owner@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $repository = self::getContainer()->get(\App\Issues\Repository\IssueRepository::class);
+
+        $current = $this->issue($project, 'similar-current', 'Payment gateway timeout on checkout', IssueStatus::Unresolved);
+        $current->setLastSeen(new DateTimeImmutable('2026-08-16 12:00:00'));
+        $exact = $this->issue($project, 'similar-exact', 'Payment gateway timeout in cart', IssueStatus::Unresolved);
+        $exact->setLastSeen(new DateTimeImmutable('2026-08-16 11:00:00'));
+        $partial = $this->issue($project, 'similar-partial', 'Payment gateway timeout retry', IssueStatus::Unresolved);
+        $partial->setLastSeen(new DateTimeImmutable('2026-08-16 10:00:00'));
+        $ignored = $this->issue($project, 'similar-ignored', 'Payment gateway timeout ignored', IssueStatus::Ignored);
+        $ignored->setLastSeen(new DateTimeImmutable('2026-08-16 09:00:00'));
+        $shortTitle = $this->issue($project, 'similar-short', 'AB', IssueStatus::Unresolved);
+        $shortTitle->setLastSeen(new DateTimeImmutable('2026-08-16 08:00:00'));
+        $shortMatch = $this->issue($project, 'similar-short-match', 'AB', IssueStatus::Unresolved);
+        $shortMatch->setLastSeen(new DateTimeImmutable('2026-08-16 07:00:00'));
+
+        $otherProject = (new Project())
+            ->setName('Other similar')
+            ->setSlug('other-similar');
+        $otherIssue = $this->issue($otherProject, 'similar-other', 'Payment gateway timeout on checkout', IssueStatus::Unresolved);
+
+        $em->persist($current);
+        $em->persist($exact);
+        $em->persist($partial);
+        $em->persist($ignored);
+        $em->persist($shortTitle);
+        $em->persist($shortMatch);
+        $em->persist($otherProject);
+        $em->flush();
+        $em->persist($otherIssue);
+        $em->flush();
+
+        self::assertSame($current->getId(), $repository->findOneByProjectAndFingerprint($project, $current->getFingerprint())?->getId());
+        self::assertSame($current->getId(), $repository->findOneByProjectAndUuid($project, $current->getUuid())?->getId());
+        self::assertNull($repository->findOneByProjectAndUuid($otherProject, $current->getUuid()));
+        self::assertSame($current->getId(), $repository->findOneByUuidHydrated($current->getUuid())?->getId());
+
+        self::assertSame(
+            [$exact->getId(), $partial->getId(), $ignored->getId()],
+            array_map(
+                static fn (Issue $issue): ?int => $issue->getId(),
+                $repository->findDuplicateCandidates($project, $current, 3),
+            ),
+        );
+
     }
 
     private function issue(Project $project, string $title, string $level, IssueStatus $status): Issue

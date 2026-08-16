@@ -11,6 +11,7 @@ use App\Identity\Repository\UserRepository;
 use App\Identity\Service\AccountAnonymizer;
 use App\Identity\Service\UserActionRecorder;
 use App\Identity\UserActionType;
+use App\Notifications\Entity\PushSubscription;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectMembership;
@@ -20,6 +21,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\AuthKitBundle\Repository\SocialLoginAccountRepository;
 use PHPUnit\Framework\MockObject\Stub;
+use stdClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,16 +39,22 @@ final class AccountAnonymizerTest extends TestCase
     private array $persisted = [];
     private int $flushCount = 0;
     private AccountAnonymizer $anonymizer;
+    /** @var list<object> */
+    private array $removed = [];
 
     protected function setUp(): void
     {
         $this->persisted = [];
+        $this->removed = [];
         $this->flushCount = 0;
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->entityManager->method('persist')->willReturnCallback(function (object $entity): void {
             if ($entity instanceof UserAction) {
                 $this->persisted[] = $entity;
             }
+        });
+        $this->entityManager->method('remove')->willReturnCallback(function (object $entity): void {
+            $this->removed[] = $entity;
         });
         $this->entityManager->method('flush')->willReturnCallback(function (): void {
             ++$this->flushCount;
@@ -163,6 +171,35 @@ final class AccountAnonymizerTest extends TestCase
             $this->anonymizer->soleOwnerProjects($user),
         );
         self::assertFalse($this->anonymizer->isLastAdmin($user));
+    }
+
+
+    public function testAnonymizeRemovesPasswordHistoryPushSubscriptionsAndSocialAccounts(): void
+    {
+        $subject = $this->user(7, 'invalid-email')
+            ->setDisplayName('Person')
+            ->setRoles(['ROLE_USER']);
+        $actor = $this->user(8, 'admin@example.com');
+
+        $history = (new \App\Identity\Entity\PasswordHistory())
+            ->setPassword('old-hash')
+            ->setCreatedAt(new DateTimeImmutable('2026-08-01 00:00:00'));
+        $subject->addPasswordHistory($history);
+
+        $subscription = (new PushSubscription($subject))->setSubscription('https://push.example.test/1', 'key', 'auth');
+        $socialAccount = new stdClass();
+
+        $this->pushRepository = $this->createStub(PushSubscriptionRepository::class);
+        $this->pushRepository->method('findByUser')->willReturn([$subscription]);
+        $this->socialRepository = $this->createStub(SocialLoginAccountRepository::class);
+        $this->socialRepository->method('findBy')->willReturn([$socialAccount]);
+        $this->rebuildAnonymizer();
+
+        $this->anonymizer->anonymize($subject, $actor);
+
+        self::assertCount(3, $this->removed);
+        self::assertSame([], $subject->getPasswordHistory()->toArray());
+        self::assertSame('unknown', $this->persisted[0]->getContext()['previous_email_domain']);
     }
 
     private function rebuildAnonymizer(): void

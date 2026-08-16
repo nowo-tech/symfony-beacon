@@ -103,6 +103,23 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
         self::assertSame('en', $translator->locale);
     }
 
+    public function testSkipsGuestRequestsWithoutSession(): void
+    {
+        $translator = new RecordingTranslator();
+        $request = Request::create('/');
+        $event = $this->mainEvent($request);
+
+        new GuestSessionLocaleSubscriber(
+            new TokenStorage(),
+            $translator,
+            ['en', 'fr'],
+            'en',
+        )->onKernelRequest($event);
+
+        self::assertSame('en', $request->getLocale());
+        self::assertSame('en', $translator->locale);
+    }
+
     private function requestWithSession(string $sessionLocale): Request
     {
         $request = Request::create('/');

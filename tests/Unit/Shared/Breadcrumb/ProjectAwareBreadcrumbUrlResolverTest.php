@@ -78,4 +78,25 @@ final class ProjectAwareBreadcrumbUrlResolverTest extends TestCase
 
         self::assertSame([null, []], $resolver->resolve('project_show', [], null));
     }
+
+    public function testLeavesParamsUntouchedWhenTargetRouteDoesNotExist(): void
+    {
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('getRouteCollection')->willReturn(new RouteCollection());
+
+        $request = Request::create('/projects/5/issues/99');
+        $request->attributes->set('_route_params', ['projectId' => 5, 'id' => 99]);
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $inner = $this->createMock(BreadcrumbUrlResolverInterface::class);
+        $inner->expects(self::once())
+            ->method('resolve')
+            ->with('missing_route', [], null)
+            ->willReturn([null, []]);
+
+        $resolver = new ProjectAwareBreadcrumbUrlResolver($inner, $stack, $router);
+
+        self::assertSame([null, []], $resolver->resolve('missing_route', [], null));
+    }
 }

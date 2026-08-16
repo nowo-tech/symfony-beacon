@@ -16,6 +16,7 @@ use App\Issues\Service\EventTimestampParser;
 use App\Issues\Service\FingerprintCalculator;
 use App\Issues\Service\IssueEnvelopeWriter;
 use App\Issues\Service\IssueHistoryRecorder;
+use ReflectionMethod;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -126,6 +127,15 @@ final class IssueEnvelopeWriterTest extends TestCase
         self::assertFalse($result->countsTowardVolumeThreshold);
         self::assertSame(IssueStatus::Unresolved, $existing->getStatus());
         self::assertSame(3, $existing->getEventCount());
+    }
+
+    public function testExtractUserIdentifierReturnsNullWhenUserArrayHasNoScalarIdentifiers(): void
+    {
+        $method = new ReflectionMethod(IssueEnvelopeWriter::class, 'extractUserIdentifier');
+
+        self::assertNull($method->invoke($this->writer, [
+            'user' => ['id' => [], 'username' => '', 'email' => null],
+        ]));
     }
 
     private function project(int $id): Project

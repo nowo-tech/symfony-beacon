@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Shared\Mercure;
 
 use App\Shared\Mercure\MercureHubUrlGuard;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class MercureHubUrlGuardTest extends TestCase
 {
@@ -35,5 +36,14 @@ final class MercureHubUrlGuardTest extends TestCase
         self::assertSame(MercureHubUrlGuard::RESULT_UNSAFE, $guard->classifyHttpUrl('http://169.254.169.254/latest/meta-data'));
         self::assertSame(MercureHubUrlGuard::RESULT_UNSAFE, $guard->classifyHttpUrl('http://metadata.google.internal/computeMetadata/v1'));
         self::assertSame(MercureHubUrlGuard::RESULT_UNSAFE, $guard->classifyHttpUrl('http://[fe80::1]/.well-known/mercure'));
+    }
+
+    public function testBlockedIpGuardTreatsUnparseableIpv6AndNonIpsAsUnsafe(): void
+    {
+        $guard = new MercureHubUrlGuard();
+        $method = new ReflectionMethod(MercureHubUrlGuard::class, 'isBlockedIp');
+
+        self::assertTrue($method->invoke($guard, 'fe80::1%eth0'));
+        self::assertTrue($method->invoke($guard, 'definitely-not-an-ip'));
     }
 }

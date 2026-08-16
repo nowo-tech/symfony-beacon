@@ -78,6 +78,51 @@ final class ProjectAccessServiceRequireTest extends TestCase
         $service->requireRole($project, $user, ProjectRole::Owner);
     }
 
+    public function testRequireAnyPermissionRejectsEmptyPermissionList(): void
+    {
+        $project = $this->project(30);
+        $user = $this->user(40);
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Admin);
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn($membership);
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(false);
+        $service = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+
+        $this->expectException(AccessDeniedHttpException::class);
+        $service->requireAnyPermission($project, $user);
+    }
+
+    public function testResolveAccessDropsInactiveDirectMembership(): void
+    {
+        $project = $this->project(31);
+        $user = $this->user(41);
+        $membership = new ProjectMembership()->setProject($project)->setUser($user)->setRole(ProjectRole::Member)->setActive(false);
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn($membership);
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(false);
+        $service = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+
+        self::assertNull($service->resolveAccess($project, $user));
+    }
+
     public function testShareGrantHelpersAndIssueRead(): void
     {
         $project = $this->project(5);

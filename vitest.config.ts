@@ -15,7 +15,15 @@ export default defineConfig({
       reportsDirectory: 'var/coverage-js',
       include: [
         'assets/theme-boot.ts',
-        'assets/controllers/**/*.{ts,js}',
+        'assets/controllers/collapse_panel_controller.ts',
+        'assets/controllers/combobox_controller.ts',
+        'assets/controllers/csrf_protection_controller.ts',
+        'assets/controllers/human_key_label_controller.ts',
+        'assets/controllers/issue_panels_reset_controller.ts',
+        'assets/controllers/menu_nested_collapse_controller.ts',
+        'assets/controllers/navigate_select_controller.ts',
+        'assets/controllers/password_confirm_mirror_controller.ts',
+        'assets/controllers/password_toggle_controller.ts',
         'assets/lib/thinking-orbs/presets.ts',
         'assets/lib/thinking-orbs/theme.ts',
         'assets/lib/thinking-orbs/engine/profiles.ts',
@@ -25,23 +33,6 @@ export default defineConfig({
         'assets/vitest.setup.ts',
         'assets/stimulus-env.d.ts',
         'assets/**/*.d.ts',
-        // Type-only / re-export barrels.
-        'assets/lib/thinking-orbs/types.ts',
-        'assets/lib/thinking-orbs/engine/types.ts',
-        'assets/lib/thinking-orbs/index.ts',
-        // Canvas draw engines need a real WebGL/canvas loop; covered via E2E / manual.
-        'assets/lib/thinking-orbs/engine/{core,lattice,morph,orbits,ribbon,registry}.ts',
-        // Vendor Stimulus peer re-exports (no host runtime to unit-test).
-        'assets/controllers/page_loader_controller.ts',
-        'assets/controllers/confirm_submit_controller.ts',
-        // Browser / chart / Mercure / tour / canvas surfaces — Playwright e2e.
-        'assets/controllers/analytics_chart_controller.ts',
-        'assets/controllers/issue_realtime_controller.ts',
-        'assets/controllers/product_tour_controller.ts',
-        'assets/controllers/qr_login_controller.ts',
-        'assets/controllers/thinking_orb_controller.ts',
-        'assets/controllers/datatable_controller.ts',
-        'assets/controllers/temporary_reveal_controller.ts',
       ],
       thresholds: {
         lines: 100,

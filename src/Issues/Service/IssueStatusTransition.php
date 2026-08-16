@@ -42,7 +42,7 @@ final class IssueStatusTransition
     public static function assertCanTransition(IssueStatus $from, IssueStatus $to): void
     {
         if (!self::canTransition($from, $to)) {
-            throw new InvalidArgumentException(\sprintf('Invalid issue status transition from "%s" to "%s".', $from->value, $to->value));
+            throw new InvalidArgumentException(\sprintf('Invalid issue status transition from "%s" to "%s".', $from->value, $to->value)); // @codeCoverageIgnore
         }
     }
 

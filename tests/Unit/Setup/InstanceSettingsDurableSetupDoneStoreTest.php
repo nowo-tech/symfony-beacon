@@ -33,4 +33,17 @@ final class InstanceSettingsDurableSetupDoneStoreTest extends TestCase
 
         self::assertFalse(new InstanceSettingsDurableSetupDoneStore($repo)->isDone());
     }
+
+    public function testMarkDoneSwallowsSaveFailures(): void
+    {
+        $settings = InstanceSettings::defaults();
+        $repo = $this->createMock(InstanceSettingsRepository::class);
+        $repo->method('getOrCreate')->willReturn($settings);
+        $repo->method('save')->willThrowException(new RuntimeException('db offline'));
+
+        $store = new InstanceSettingsDurableSetupDoneStore($repo);
+        $store->markDone();
+
+        self::assertTrue($settings->isSetupCompleted());
+    }
 }

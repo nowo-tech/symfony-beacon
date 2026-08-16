@@ -66,4 +66,11 @@ final class InteractionActionTokenTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $svc->issueActionToken('delete', 'secret', 'd', 'p', 'i');
     }
+
+    public function testValidationRejectsUnknownRequestedAction(): void
+    {
+        $svc = new InteractionActionToken();
+
+        self::assertFalse($svc->isValidActionToken('delete', 'secret', []));
+    }
 }

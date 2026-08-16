@@ -92,6 +92,52 @@ final class ProjectMembershipPolicyTest extends TestCase
         $this->policy->assertActorCanManage(new Project(), new User());
     }
 
+    public function testAssertActorCanTransferOwnershipThrowsForNonOwner(): void
+    {
+        $this->authorizationChecker->method('isGranted')->willReturn(false);
+        $actor = new User();
+        $project = new Project();
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
+        );
+
+        try {
+            $this->policy->assertActorCanTransferOwnership($project, $actor);
+            self::fail('Expected ProjectAccessException');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::FORBIDDEN, $e->reasonCode);
+        }
+    }
+
+    public function testAssertAssignableRoleThrowsWhenRoleCannotBeAssigned(): void
+    {
+        $this->authorizationChecker->method('isGranted')->willReturn(false);
+        $actor = new User();
+        $project = new Project();
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(
+            new ProjectMembership()->setProject($project)->setUser($actor)->setRole(ProjectRole::Admin),
+        );
+
+        try {
+            $this->policy->assertAssignableRole($actor, $project, ProjectRole::Owner);
+            self::fail('Expected ProjectAccessException');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::INVALID_ROLE, $e->reasonCode);
+        }
+    }
+
+    public function testAssertAssignableGroupRoleThrowsWhenRoleCannotBeAssignedToGroups(): void
+    {
+        $this->authorizationChecker->method('isGranted')->willReturn(true);
+
+        try {
+            $this->policy->assertAssignableGroupRole(new User(), new Project(), ProjectRole::Owner);
+            self::fail('Expected ProjectAccessException');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::INVALID_ROLE, $e->reasonCode);
+        }
+    }
+
     public function testAssertCanMutateTargetBlocksAdminChangingOwner(): void
     {
         $this->authorizationChecker->method('isGranted')->willReturn(false);
@@ -107,6 +153,25 @@ final class ProjectMembershipPolicyTest extends TestCase
 
         $this->expectException(ProjectAccessException::class);
         $this->policy->assertCanMutateTarget($actor, $project, $target);
+    }
+
+    public function testAssertCanMutateTargetThrowsWhenActorHasNoProjectAccess(): void
+    {
+        $this->authorizationChecker->method('isGranted')->willReturn(false);
+        $actor = new User();
+        $project = $this->project(1);
+        $this->membershipRepository->method('findOneByProjectAndUser')->willReturn(null);
+        $target = new ProjectMembership()
+            ->setProject($project)
+            ->setUser(new User())
+            ->setRole(ProjectRole::Viewer);
+
+        try {
+            $this->policy->assertCanMutateTarget($actor, $project, $target);
+            self::fail('Expected ProjectAccessException');
+        } catch (ProjectAccessException $e) {
+            self::assertSame(ProjectAccessException::FORBIDDEN, $e->reasonCode);
+        }
     }
 
     public function testAssertSameProjectAndCountOwners(): void

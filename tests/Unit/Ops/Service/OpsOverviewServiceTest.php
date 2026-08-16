@@ -128,6 +128,53 @@ final class OpsOverviewServiceTest extends TestCase
         self::assertCount(2, $overview['projects']);
     }
 
+    public function testBuildSkipsUnsavedProjectsAndFailedDestinationsWithoutProject(): void
+    {
+        $saved = $this->project(5, 'Saved', ingestEnabled: true);
+        $unsaved = new Project();
+        $unsaved->setName('Unsaved');
+        $unsaved->setSlug('unsaved');
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('findAllOrdered')->willReturn([$saved, $unsaved]);
+
+        $issues = $this->createStub(IssueSearchRepository::class);
+        $issues->method('countByStatusForProjectIds')->willReturn([5 => 3]);
+
+        $events = $this->createStub(EventRepository::class);
+        $events->method('countReceivedSinceForProjectIds')->willReturn([5 => 0]);
+        $events->method('findLastReceivedAtForProjectIds')->willReturn([]);
+
+        $daily = $this->createStub(DailyProjectStatRepository::class);
+        $daily->method('findLastDaysForProjects')->willReturn([5 => []]);
+
+        $orphan = new NotificationDestination();
+        $orphan->setLabel('Orphan');
+        $orphan->setType(NotificationDestinationType::Http);
+        $orphan->setEndpointUrl('https://example.test/orphan');
+        $orphan->recordDeliveryFailure('no project');
+
+        $destinations = $this->createStub(NotificationDestinationRepository::class);
+        $destinations->method('findWithFailedLastDelivery')->willReturn([$orphan]);
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
+
+        $overview = new OpsOverviewService(
+            new MessengerQueueHealth($em),
+            $projects,
+            new ProjectOpsStatsService($issues, $events),
+            $daily,
+            $destinations,
+        )->build();
+
+        self::assertSame(3, $overview['open_issues_total']);
+        self::assertCount(1, $overview['open_issues_by_project']);
+        self::assertSame($saved, $overview['open_issues_by_project'][0]['project']);
+        self::assertSame([], $overview['spikes']);
+        self::assertSame([], $overview['failed_deliveries']);
+    }
+
     private function project(int $id, string $name, bool $ingestEnabled): Project
     {
         $project = new Project();

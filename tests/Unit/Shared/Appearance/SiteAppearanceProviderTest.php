@@ -102,4 +102,16 @@ final class SiteAppearanceProviderTest extends TestCase
         $provider->refresh();
         self::assertStringContainsString('--beacon-shadow: 15 28 24;', $provider->getCssOverrides());
     }
+
+    public function testFallsBackToDefaultsWhenRepositoryFails(): void
+    {
+        $repo = $this->createMock(SiteAppearanceRepository::class);
+        $repo->expects(self::once())->method('getOrCreate')->willThrowException(new \RuntimeException('db missing'));
+
+        $provider = new SiteAppearanceProvider($repo);
+        $appearance = $provider->get();
+
+        self::assertInstanceOf(SiteAppearance::class, $appearance);
+        self::assertSame(SiteAppearance::defaults()->getBrandName(), $appearance->getBrandName());
+    }
 }

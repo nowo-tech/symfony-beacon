@@ -48,4 +48,12 @@ final class InboundEmailReplyTokenTest extends TestCase
         self::assertNull($this->tokens->parseValid('.', $now));
         self::assertNull($this->tokens->isValid('bad', $now));
     }
+
+    public function testRejectsTokensWhoseDecodedClaimsAreNotAnObject(): void
+    {
+        $payload = rtrim(strtr(base64_encode('123'), '+/', '-_'), '=');
+        $sig = hash_hmac('sha256', $payload, 'test-inbound-secret');
+
+        self::assertNull($this->tokens->parseValid($payload.'.'.$sig, 1_700_000_000));
+    }
 }

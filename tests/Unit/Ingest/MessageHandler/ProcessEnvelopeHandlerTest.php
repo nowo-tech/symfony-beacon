@@ -13,6 +13,7 @@ use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\EventPayloadPromoter;
 use App\Issues\Service\EventTimestampParser;
 use App\Issues\Service\FingerprintCalculator;
+use App\Issues\Entity\Event;
 use App\Issues\Service\IssueEnvelopeWriter;
 use App\Issues\Service\IssueHistoryRecorder;
 use App\Performance\Service\NPlusOneDetector;
@@ -89,11 +90,39 @@ final class ProcessEnvelopeHandlerTest extends TestCase
         self::assertSame(1, $flush);
     }
 
+    public function testSkipsEventItemsWhoseWriterReturnsSkippedResult(): void
+    {
+        $project = new Project()->setName('Ok')->setSlug('ok');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 10);
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('find')->willReturn($project);
+
+        $flush = 0;
+        $em = $this->entityManager(static function () use (&$flush): void {
+            ++$flush;
+        });
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects(self::never())->method('dispatch');
+
+        $issueEvents = $this->createStub(EventRepository::class);
+        $issueEvents->method('findOneByProjectAndEventId')->willReturn(new Event());
+
+        $raw = "{\"sdk\":{}}\n".
+            "{\"type\":\"event\"}\n".
+            "{\"event_id\":\"dup-1\",\"message\":\"skip me\"}\n";
+
+        $this->handler($projects, bus: $bus, em: $em, issueEvents: $issueEvents)(
+            new ProcessEnvelopeMessage(10, $raw, '2026-08-01T00:00:00+00:00'),
+        );
+        self::assertSame(1, $flush);
+    }
+
     private function handler(
         ProjectRepository $projects,
         ?MessageBusInterface $bus = null,
         ?EntityManagerInterface $em = null,
         ?EventRepository $events = null,
+        ?EventRepository $issueEvents = null,
     ): ProcessEnvelopeHandler {
         $bus ??= $this->createStub(MessageBusInterface::class);
         $em ??= $this->entityManager();
@@ -113,7 +142,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
             new EventTimestampParser(),
             new EventPayloadPromoter(),
             $this->createStub(IssueRepository::class),
-            $this->createStub(EventRepository::class),
+            $issueEvents ?? $this->createStub(EventRepository::class),
             $stats,
             new IssueHistoryRecorder($em),
             $em,
