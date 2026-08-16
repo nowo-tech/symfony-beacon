@@ -101,6 +101,7 @@
             <file>src/Ops/Service/BeaconDogfoodDiagnostics.php</file>
             <file>src/Ops/Service/BeaconDogfoodDiagnosticReport.php</file>
             <file>src/Issues/Command/BackfillEventPromotionsCommand.php</file>
+            <file>src/Shared/Sms/Command/SmsSendCommand.php</file>
         </exclude>
 
         <deprecationTrigger>

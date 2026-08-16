@@ -35,8 +35,8 @@ As a project admin, I revoke a compromised key and rotate to a new key without d
 **Acceptance Scenarios**:
 
 1. **Given** an active API key, **When** I revoke it, **Then** subsequent ingest using that key is rejected **and** Settings no longer shows a copyable DSN/secret for that key (public id + inactive badge only).
-2. **Given** I rotate a key, **When** rotation completes, **Then** a new secret is available to managers (one-shot banner and/or listed under the **active** replacement key) and the previous key is inactive (no copyable DSN); ingest with the old secret fails after cutover.
-3. **Given** multiple keys, **When** I revoke one, **Then** other **active** keys remain valid and may still show a copyable DSN.
+2. **Given** I rotate a key, **When** rotation completes, **Then** a new secret is available to managers via the one-shot flash (temporary-reveal under the **active** replacement key when public key matches — `102`) and the previous key is inactive (no copyable DSN); ingest with the old secret fails after cutover.
+3. **Given** multiple keys, **When** I revoke one, **Then** other **active** keys remain valid for ingest; they MUST NOT re-show a full DSN on ordinary GET (show-once only after their own create/rotate).
 
 ---
 
@@ -68,7 +68,7 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 - **FR-001**: Project Settings MUST expose per-project retention, rate limit, and quota controls for actors with `project.settings.manage` (`ProjectAccessService::requirePermission`).
 - **FR-002**: Ingest MUST enforce the project's rate and quota settings.
 - **FR-003**: Actors with `project.api_keys.manage` MUST be able to revoke API keys so they can no longer authenticate ingest. Revoked (`active=false`) keys MUST NOT render a copyable DSN, secret, or clipboard-copy control in Settings.
-- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`). Ordinary Settings GET MUST NOT re-list the full DSN (`002` FR-003 / `087`).
+- **FR-004**: Actors with `project.api_keys.manage` MUST be able to rotate API keys and obtain a replacement secret. Create/rotate MUST flash a one-shot DSN (`_beacon_last_api_key_dsn`) presented with temporary-reveal (`102`). Ordinary Settings GET MUST NOT re-list the full DSN (`002` FR-003 / `087`).
 - **FR-005**: System MUST surface approaching-limit warnings to actors with `project.settings.manage` before hard enforcement.
 - **FR-006**: Governance changes MUST be attributable (who changed what) where audit facilities exist.
 - **FR-007**: Actors without the matching `project.*` grant MUST NOT see or modify governance or keys (**panel hidden** + HTTP **403** on GET Settings when lacking Settings-surface grants, and on POST without the key). See `002` FR-013 / FR-014.
@@ -108,7 +108,11 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 ## Amendment (API key DSN visibility, 2026-08-11)
 
 - Revoked / inactive API keys MUST NOT show a copyable DSN or secret in Settings (FR-003). Covered by `ProjectApiKeyVisibilityTest`.
-- Active keys also MUST NOT re-list DSN on ordinary GET; create/rotate one-shot banner only (`002` FR-003 / `087` show-once restore).
+- Active keys also MUST NOT re-list DSN on ordinary GET; create/rotate one-shot flash only (`002` FR-003 / `087` show-once restore).
+
+## Amendment (temporary reveal UX, 2026-08-16)
+
+- One-shot flash MAY render on the matching active key row (public-key match) instead of a separate banner; Stimulus `temporary-reveal` auto-hides (~30s) and can clear plaintext from the DOM (`102`). Masked display uses `ProjectApiKey::maskDsn()`. Show-once + hash-at-rest rules unchanged (`096`).
 
 ## Amendment (FormKit `beacon` governance form, 2026-08-13)
 

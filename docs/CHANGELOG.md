@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.4] - 2026-08-16
+
+### Added
+
+- **Issue detail tabs**: `GET /projects/{uuid}/issues/{id}/{tab}` with `main` | `similar` | `history` (default `main`); shared section tabs; similar suggestions and assignment/status history as dedicated URLs (`102` / Phase 6.53).
+- **Temporary API DSN reveal**: Stimulus `temporary-reveal` (~30s, clear-on-hide) after create/rotate; masked DSN via `ProjectApiKey::maskDsn()`; show-once session flash preserved (`002` / `018` / `087` / `102`).
+
+### Changed
+
+- Issue/event shell: flat app paper + tighter hero back-nav / panel spacing.
+- Dogfood client: `nowo_beacon.ignore_exceptions` skips expected `AccessDeniedException` / `AccessDeniedHttpException` so admin/ACL 403s do not flood the self-Beacon project (`058`).
+- Specs `102` (new); amended `041` / `015` / `002` / `018` / `087` / `058`; ROADMAP Phase **6.53**.
+
+### Fixed
+
+- **CI Quality**: PHPStan FrankenPHP hardening ignore for CLI-only `usleep` poll in `BeaconDogfoodDiagnostics` (`app:beacon:test`).
+- Coverage excludes host `SmsSendCommand`; unit coverage for Settings DSN reveal wiring and project config portability.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After upgrade, recreate PHP (`make restart`) so `ignore_exceptions` is loaded from `config/packages/nowo_beacon.yaml`.
+- Issue deep links may use `/similar` and `/history` tab suffixes; bare issue URL remains Main.
+
 ## [1.18.3] - 2026-08-16
 
 ### Added
@@ -1275,7 +1299,9 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.4...HEAD
+[1.18.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.3...v1.18.4
+[1.18.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.2...v1.18.3
 [1.18.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.1...v1.18.2
 [1.18.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.18.0...v1.18.1
 [1.18.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.17.0...v1.18.0

@@ -11,3 +11,4 @@
 - [x] T009 Pin `nowo-tech/beacon-bundle` **1.7.3**; `make beacon-test` → `app:beacon:test` (wraps `nowo:beacon:test` + dogfood diagnostics)
 - [x] T010 Seed/dogfood write loopback `BEACON_DSN` preferring `.env.local`; `make reclaim-demo-client-env` after writing `.demo-client.env` (CI/host readable)
 - [x] T011 Docs: DSN.md / CHANGELOG / UPGRADING; unit tests for dogfood diagnostics
+- [x] T012 `ignore_exceptions` for `AccessDeniedException` + `AccessDeniedHttpException` in `nowo_beacon.yaml`; spec FR-010 / SC-003a; DSN.md note

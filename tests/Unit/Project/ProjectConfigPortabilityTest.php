@@ -241,6 +241,40 @@ final class ProjectConfigPortabilityTest extends TestCase
         ], $project, $actor);
     }
 
+    public function testPanelImportRejectsEmptyProjectsAndMissingBundleMatch(): void
+    {
+        $actor = $this->user('admin@example.com', 'Admin');
+        $project = new Project();
+        $project->setName('Acme');
+        $project->setSlug('acme');
+        $project->setCode('acme-prod');
+
+        try {
+            $this->service()->importPanel([
+                'schema' => ProjectConfigPortability::SCHEMA,
+                'version' => 1,
+                'projects' => [],
+            ], $project, $actor);
+            self::fail('Expected empty_projects exception.');
+        } catch (InvalidArgumentException $e) {
+            self::assertSame('empty_projects', $e->getMessage());
+        }
+
+        try {
+            $this->service()->importPanel([
+                'schema' => ProjectConfigPortability::SCHEMA,
+                'version' => 1,
+                'projects' => [
+                    ['code' => 'other-a', 'slug' => 'other-a', 'name' => 'Other A', 'memberships' => []],
+                    ['code' => 'other-b', 'slug' => 'other-b', 'name' => 'Other B', 'memberships' => []],
+                ],
+            ], $project, $actor);
+            self::fail('Expected project_not_in_bundle exception.');
+        } catch (InvalidArgumentException $e) {
+            self::assertSame('project_not_in_bundle', $e->getMessage());
+        }
+    }
+
     public function testImportAdminCreatesMissingProjectAndUsers(): void
     {
         $actor = $this->user('admin@example.com', 'Admin');
@@ -311,6 +345,109 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertNotEmpty($saved);
         self::assertSame('new-proj', $saved[0]->getCode());
         self::assertSame(14, $saved[0]->getRetentionDays());
+    }
+
+    public function testImportAdminNormalizesRowsAndHandlesSlugCollision(): void
+    {
+        $actor = $this->user('admin@example.com', 'Admin');
+        new ReflectionProperty(User::class, 'id')->setValue($actor, 1);
+
+        /** @var array<string, User> $createdUsers */
+        $createdUsers = [];
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('findIndexedByEmails')->willReturnCallback(
+            static function (array $emails) use ($actor, &$createdUsers): array {
+                $map = ['admin@example.com' => $actor];
+                foreach ($emails as $email) {
+                    if (\array_key_exists($email, $createdUsers)) {
+                        $map[$email] = $createdUsers[$email];
+                    }
+                }
+
+                return $map;
+            },
+        );
+        $userRepo->method('save')->willReturnCallback(static function (User $user) use (&$createdUsers): void {
+            $createdUsers[strtolower($user->getEmail())] = $user;
+            if (null === $user->getId()) {
+                new ReflectionProperty(User::class, 'id')->setValue($user, 100 + \count($createdUsers));
+            }
+        });
+
+        $saved = [];
+        $projectRepo = $this->createStub(ProjectRepository::class);
+        $projectRepo->method('findOneBy')->willReturnCallback(static function (array $criteria): ?Project {
+            if (isset($criteria['slug']) && 'taken-slug' === $criteria['slug']) {
+                return new Project();
+            }
+
+            return null;
+        });
+        $projectRepo->method('hydrateMembershipsForProjects');
+        $projectRepo->method('save')->willReturnCallback(static function (Project $project) use (&$saved): void {
+            if (null === $project->getId()) {
+                new ReflectionProperty(Project::class, 'id')->setValue($project, 77);
+            }
+            $saved[] = $project;
+        });
+
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
+        $hasher->method('hashPassword')->willReturn('hash');
+        $service = new ProjectConfigPortability(
+            $projectRepo,
+            $userRepo,
+            new PortableUserProvisioner($userRepo, $hasher),
+            new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
+        );
+
+        $result = $service->importAdmin([
+            'schema' => ProjectConfigPortability::SCHEMA,
+            'version' => 1,
+            'projects' => [[
+                'code' => ' Demo-Code ',
+                'slug' => 'taken-slug',
+                'name' => ' Demo Project ',
+                'description' => '   ',
+                'ingest_enabled' => false,
+                'retention_days' => '7',
+                'retention_max_events' => 'oops',
+                'ingest_rate_limit_per_minute' => 5,
+                'event_quota_daily' => '',
+                'event_quota_monthly' => '21',
+                'memberships' => [
+                    ['email' => 'not-an-email', 'display_name' => 'Bad', 'role' => 'owner', 'active' => true],
+                    ['email' => 'new-user@example.com', 'display_name' => '  ', 'role' => 'not-a-role', 'active' => false],
+                ],
+            ]],
+        ], $actor);
+
+        self::assertSame(1, $result['projects_upserted']);
+        self::assertSame(1, $result['users_created']);
+        self::assertSame(1, $result['memberships_applied']);
+        self::assertSame([], $result['memberships_skipped']);
+        self::assertSame([], $result['warnings']);
+        self::assertNotEmpty($saved);
+        self::assertSame('demo-code', $saved[0]->getCode());
+        self::assertSame('Demo Project', $saved[0]->getName());
+        self::assertNull($saved[0]->getDescription());
+        self::assertFalse($saved[0]->isIngestEnabled());
+        self::assertSame(7, $saved[0]->getRetentionDays());
+        self::assertNull($saved[0]->getRetentionMaxEvents());
+        self::assertSame(5, $saved[0]->getIngestRateLimitPerMinute());
+        self::assertNull($saved[0]->getEventQuotaDaily());
+        self::assertSame(21, $saved[0]->getEventQuotaMonthly());
+        self::assertStringStartsWith('demo-project-demo-code', $saved[0]->getSlug());
+        self::assertGreaterThanOrEqual(2, $saved[0]->getMemberships()->count());
+        $importedMembership = null;
+        foreach ($saved[0]->getMemberships() as $membership) {
+            if ('new-user@example.com' === $membership->getUser()?->getEmail()) {
+                $importedMembership = $membership;
+                break;
+            }
+        }
+        self::assertNotNull($importedMembership);
+        self::assertSame(ProjectRole::Member, $importedMembership->getRole());
+        self::assertFalse($importedMembership->isActive());
     }
 
     private function service(): ProjectConfigPortability

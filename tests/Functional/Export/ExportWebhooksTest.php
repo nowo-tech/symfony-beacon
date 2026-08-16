@@ -180,6 +180,13 @@ final class ExportWebhooksTest extends DatabaseWebTestCase
 
         $requests = [];
         $mock = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests): MockResponse {
+            if (str_contains($url, 'api.iconify.design/collections')) {
+                return new MockResponse('{"prefixes":["tabler"]}', ['http_code' => 200]);
+            }
+            if (str_contains($url, 'api.iconify.design/tabler.json')) {
+                return new MockResponse('{"prefix":"tabler","icons":{"arrow-left":{"body":"<path d=\\"M0 0h24v24H0z\\"/>"}}}', ['http_code' => 200]);
+            }
+
             $requests[] = ['method' => $method, 'url' => $url, 'body' => $options['body'] ?? ''];
 
             return new MockResponse('ok', ['http_code' => 200]);

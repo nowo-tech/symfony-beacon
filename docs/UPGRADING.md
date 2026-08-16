@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.18.3)](#unreleased-main-after-1183)
+- [Unreleased (main after 1.18.4)](#unreleased-main-after-1184)
+- [Upgrading from 1.18.3 to 1.18.4](#upgrading-from-1183-to-1184)
 - [Upgrading from 1.18.2 to 1.18.3](#upgrading-from-1182-to-1183)
 - [Upgrading from 1.18.1 to 1.18.2](#upgrading-from-1181-to-1182)
 - [Upgrading from 1.18.0 to 1.18.1](#upgrading-from-1180-to-1181)
@@ -75,9 +76,24 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.18.3)
+## Unreleased (main after 1.18.4)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.18.3 to 1.18.4
+
+Issue detail path tabs, temporary API DSN reveal UX, and dogfood noise reduction for expected 403s. **No migrations.**
+
+1. Pull / checkout `v1.18.4` and recreate PHP so config reloads:
+
+```bash
+make restart
+# or: php bin/console cache:clear
+```
+
+2. Optional — confirm dogfood no longer records ACL/admin 403s as issues (see [DSN.md](DSN.md) `ignore_exceptions`).
+
+3. Issue URLs: Main remains `/projects/{uuid}/issues/{id}` (or `…/main`); Similar / History are `…/similar` and `…/history`. API key create/rotate still shows the DSN once (temporary reveal); ordinary Settings GET stays redacted.
 
 ## Upgrading from 1.18.2 to 1.18.3
 

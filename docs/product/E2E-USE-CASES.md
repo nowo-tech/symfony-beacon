@@ -206,18 +206,18 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-09 | Delete saved view | ✅ Covered | `issues/use-cases-issues.spec.ts` |
 | UC-ISS-10 | Export issues CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
 | UC-ISS-11 | Export events CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
-| UC-ISS-12 | Open issue detail | ✅ Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` |
+| UC-ISS-12 | Open issue detail | ✅ Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` (path tabs `main` / `similar` / `history` — `102`) |
 | UC-ISS-13 | Add comment | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-ISS-14 | Resolve / reopen status | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-ISS-15 | Ignore status | ✅ Covered | `issues/use-cases-issues.spec.ts` |
 | UC-ISS-16 | Change priority | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-ISS-17 | Assign / clear assignee | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-ISS-18 | Mark duplicate (+ optional merge) | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (without merge); `flows/use-cases-destructive-safe.spec.ts` (with merge_events) |
-| UC-ISS-19 | Similar issues panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (attached when present) |
+| UC-ISS-19 | Similar issues panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (`…/similar` tab / `issue-detail-tabs` — `041` / `102`) |
 | UC-ISS-20 | Copy for AI (md/json export) | ✅ Covered | `issues/issues-deep.spec.ts` |
 | UC-ISS-21 | Open event detail from issue | ✅ Covered | `issues/use-cases-issues.spec.ts` |
 | UC-ISS-22 | Stack / request / tags / contexts panels | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-ISS-23 | Assignment & status history | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
+| UC-ISS-23 | Assignment & status history | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (`…/history` tab — `102`) |
 | UC-ISS-24 | Viewer read-only chrome | ✅ Covered | `project/use-cases-members-viewer.spec.ts` |
 | UC-ISS-25 | @mention in comment → dashboard mentions | ✅ Covered | `project/use-cases-members-viewer.spec.ts` |
 | UC-ISS-26 | Empty issue list / no-sample shell | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |

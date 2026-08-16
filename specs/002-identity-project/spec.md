@@ -63,7 +63,7 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 
 - **FR-001**: AuthKit owns login/register/password UX; app does not maintain a parallel SecurityController login.
 - **FR-002**: Project Settings is the management surface for actors with Settings-surface grants; project show routes to Issues; actors with `project.members.manage` add/remove **direct** members, **activate/deactivate** memberships (`089`), and assign roles (`full` / `admin` / `member` / `viewer` where applicable — and `owner` only via **Transfer ownership**, not the member edit/remove controls). Member rows with role `owner` MUST NOT show edit-role or remove actions (Settings and Admin → Projects). Server-side: the last **active** owner cannot be removed, demoted, or deactivated; a **full** member cannot be removed until demoted. Capability checks MUST use `ProjectRole` / `ProjectPermission` (or equivalent helpers on `ProjectAccess`).
-- **FR-003**: API keys support labels and safe public identifiers for operators; creating a key MUST validate CSRF; DSNs MUST include secret when present (`https://public:secret@host/{projectUuid}`). Mutations MUST require `project.api_keys.manage`. Settings MUST NOT re-embed the full DSN/secret on ordinary GET — create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`) cleared from session on that render. **Revoked / inactive** keys MUST NOT render a copyable DSN, secret, or clipboard-copy control (public key + inactive badge only).
+- **FR-003**: API keys support labels and safe public identifiers for operators; creating a key MUST validate CSRF; DSNs MUST include secret when present (`https://public:secret@host/{projectUuid}`). Mutations MUST require `project.api_keys.manage`. Settings MUST NOT re-embed the full DSN/secret on ordinary GET — create/rotate MUST flash a one-shot DSN (`_beacon_last_api_key_dsn`) cleared from session on that render, shown via temporary-reveal UI (`102`). **Revoked / inactive** keys MUST NOT render a copyable DSN, secret, or clipboard-copy control (public key + inactive badge only).
 - **FR-004**: Account Display preferences include default collapsed issue panels. New users MUST persist concrete locale (`%default_locale%`), theme, contrast, and motion defaults; legacy null columns heal on `/account/display`.
 - **FR-005**: Kits may include dashboard-menu, breadcrumb-kit, form-kit, cookie-consent, PWA, and RoutingKit (as configured in the app).
 - **FR-006**: Project data is membership-scoped: dashboard lists only accessible projects; controllers enforce `ProjectAccessService` (**active** direct membership **or** linked group **or** share grant). Prefer `requirePermission(ProjectPermission::…)` over raw role rank where a named capability exists.
@@ -114,7 +114,7 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 ## Success Criteria
 
 - **SC-001**: First-boot registration + login + project membership flows are covered by tests.
-- **SC-002**: Operators can copy a DSN (with secret) from the one-shot create/rotate banner and manage keys without leaving Settings; ordinary Settings GET never embeds the secret (`ProjectApiKeyVisibilityTest`).
+- **SC-002**: Operators can copy a DSN (with secret) from the one-shot create/rotate reveal (temporary-reveal + clipboard) and manage keys without leaving Settings; ordinary Settings GET never embeds the secret (`ProjectApiKeyVisibilityTest` / `102`).
 - **SC-003**: Dashboard create-project modal and group-link restrictions are covered by functional tests.
 - **SC-004**: Dual public locale routing (AuthKit/SiteBackup `both` + `serve`, legal bare→default, functional tests) is covered.
 - **SC-005**: Platform seed + Admin permissions UI cover **8** built-in `project.*` keys and **5** system project-mirror roles (`ROLE_PROJECT_VIEWER` / `MEMBER` / `ADMIN` / `FULL` / `OWNER`); leftover `admin.*` rows and legacy operator InstanceRoles are removed; `ProjectPermission` / `InstanceRoleCatalog` / `AdminInstanceRbacTest` assert catalog keys, role matrices, and closed dialogs on `/admin/permissions`.
@@ -138,5 +138,10 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - **`101` / CookieConsent ≥ 1.9**: chrome ships in kit `nowo-cookie-consent.css`; layouts link it with `data-nowo-cookie-consent-css`; host SCSS fork removed.
 - Default seeded profile (`CookieConsentDemoSeeder` / `cookie_consent.default.json`): consent + preferences modals at **bottom left**, equal-weight action buttons, `box` / `wide`.
 - Product reference: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md). Related kit pin / public-only rules: `081` Cookie Consent amendments; upstream: `101-kit-csp-shared-helpers`.
+
+## Amendment (temporary API DSN reveal, 2026-08-16)
+
+- Create/rotate still uses session `_beacon_last_api_key_dsn` (consumed once). Settings MAY attach that flash to the matching **active** key row by public key; UI uses Stimulus `temporary-reveal` (~30s, clear-on-hide) + masked `ProjectApiKey::maskDsn()` (`102`).
+- Ordinary Settings GET without flash remains public key + rotate hint only. Revoked keys stay fully redacted. Cross-links: `018` FR-003/004, `087` FR-001, `102`.
 
 See product README, [`docs/product/ROLES.md`](../../docs/product/ROLES.md), [`docs/CONTRIBUTING.md`](../../docs/CONTRIBUTING.md), and constitution.

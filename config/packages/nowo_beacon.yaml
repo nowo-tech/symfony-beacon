@@ -15,6 +15,10 @@ nowo_beacon:
     register_messenger_listener: true
     register_fatal_handler: true
     auto_http_transaction: false
+    # Expected 403s (admin firewall / project ACL) must not pollute dogfood issues.
+    ignore_exceptions:
+        - Symfony\Component\Security\Core\Exception\AccessDeniedException
+        - Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
     before_send: App\Shared\Beacon\DropSelfIngestBeforeSend
     instrumentation:
         doctrine: false

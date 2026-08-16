@@ -2,7 +2,7 @@
 
 **Feature Branch**: `058-self-beacon-client`  
 **Created**: 2026-07-29  
-**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16)
+**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16; ignore expected 403s 2026-08-16)
 
 **Input**: Install `nowo-tech/beacon-bundle` in the Beacon server so the instance can report its own errors to a seeded demo project. First-run path wires a stable DSN to loopback ingest without recursive Envelope amplification.
 
@@ -58,6 +58,7 @@ As an operator, failures while processing Envelope ingest must not recursively r
 
 1. **Given** an event whose request URL/path contains `/envelope/`, **When** `before_send` runs, **Then** the event is dropped.
 2. **Given** a normal dashboard exception, **When** `before_send` runs, **Then** the event is kept.
+3. **Given** an `AccessDeniedException` or `AccessDeniedHttpException` (expected 403 from admin firewall / project ACL), **When** the automatic HTTP exception listener runs, **Then** the event is not reported (see Amendments — ignore expected access denials).
 
 ### User Story 5 - Probe dogfood DSN without assuming Web Push (Priority: P2)
 
@@ -79,15 +80,17 @@ As a developer, I run `make beacon-test` to verify Envelope auth + ACK against t
 - **FR-003**: `make ready` MUST run bootstrap then seed; `make dogfood` MUST invoke `app:seed-demo --skip-demo-user --sync-server-dsn` (after `ensure-halite-secrets`) so server `BEACON_DSN` is re-wired to the current dogfood project; docs MUST document dogfooding and empty-DSN off switch.
 - **FR-003a** (2026-08-15): `make restart` MUST recreate php/messenger containers so updated `.env.local` (including `BEACON_DSN`) is visible inside the runtime — plain Compose `restart` is insufficient.
 - **FR-004**: A `before_send` service MUST drop self-ingest Envelope request paths; transport MUST be async by default for the server.
+- **FR-004a**: Host `nowo_beacon.ignore_exceptions` MUST exclude expected access-denial classes so dogfood issues stay signal (see Amendments 2026-08-16 — ignore expected 403s).
 - **FR-005**: `composer.json` MUST NOT require a private VCS repository entry for `nowo-tech/beacon-bundle` once the package is on Packagist.
 - **FR-006**: `make dogfood` / related seed Make targets MUST create `var/secrets/` before console so Halite can persist `.Halite.default.key`.
-- **FR-007**–**FR-009**: See Amendments (2026-08-16).
+- **FR-007**–**FR-010**: See Amendments (2026-08-16).
 
 ## Success Criteria
 
 - **SC-001**: After `make ready` or `make dogfood` (+ restart if DSN written), operators can open the Symfony Beacon project and optionally receive self-reported errors when DSN is set.
 - **SC-002**: Empty `BEACON_DSN` disables all client sends.
 - **SC-003**: Envelope path events are never re-queued via the client `before_send`.
+- **SC-003a**: Expected 403 access denials are not reported by the automatic dogfood listener (see Amendments).
 - **SC-004**: Makefile help distinguishes `dogfood` from `seed` / `seed-platform`.
 - **SC-005**: `make dogfood` succeeds on a fresh `var/` without a pre-existing `secrets/` directory.
 - **SC-006**: See Amendments (2026-08-16) — `make beacon-test` verifies dogfood ingest without implying Web Push.
@@ -98,6 +101,16 @@ As a developer, I run `make beacon-test` to verify Envelope auth + ACK against t
 - Auto-creating a non-demo “self” project on every boot without seed.
 
 ## Amendments
+
+### 2026-08-16 — Ignore expected access denials in dogfood listener
+
+Functional / BrowserKit traffic without `ROLE_ADMIN` (and project ACL 403s) produced noisy dogfood issues while security behaved correctly.
+
+- **FR-010**: `config/packages/nowo_beacon.yaml` MUST list at least:
+  - `Symfony\Component\Security\Core\Exception\AccessDeniedException`
+  - `Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException`
+  under `ignore_exceptions` so the automatic HTTP/console/Messenger listeners skip them. Manual `captureException()` remains unaffected (BeaconBundle semantics).
+- **SC-003a**: After config reload, repeating an unauthenticated/forbidden hit on `/admin/*` or a project ACL denial MUST NOT create a new dogfood issue for those classes.
 
 ### 2026-08-16 — Connection probe + `.env.local` + readable `.demo-client.env`
 

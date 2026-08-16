@@ -15,7 +15,7 @@ Operators and maintainers need the Beacon self-host surface to **fail closed** o
 
 | ID | Area | Delivered |
 |----|------|-----------|
-| S1 | Project Settings | Create/rotate one-shot DSN banner (`_beacon_last_api_key_dsn`); ordinary GET shows public key only (show-once restored 2026-08-11); revoked keys never expose secret/DSN. **Follow-up `096` / v1.12.0:** secret stored as SHA-256 `secret_hash` (not recoverable Halite ciphertext) |
+| S1 | Project Settings | Create/rotate one-shot DSN (`_beacon_last_api_key_dsn`); ordinary GET shows public key only (show-once restored 2026-08-11); **`102` / 2026-08-16:** flash presented via temporary-reveal (~30s, clear-on-hide) on matching active key row; revoked keys never expose secret/DSN. **Follow-up `096` / v1.12.0:** secret stored as SHA-256 `secret_hash` (not recoverable Halite ciphertext) |
 | S2 | Demo seed | `app:seed-demo` blocked outside `dev`/`test` unless `--allow-non-local` (never stable DEMO_* keys outside local) |
 | S3 | Bootstrap guard | `SiteBackupSecurityDefaultsGuard` also rejects empty / documented / short `APP_SECRET` |
 | S4 | Metrics | `InstanceSettings::DEFAULT_METRICS_REQUIRE_TOKEN = true`; migration sets column default true (existing rows unchanged) |
@@ -43,16 +43,16 @@ See also: `093-security-residual-hardening` (Ops posture, hook rate limits, metr
 
 ### User Story 1 - Owners obtain DSN after create/rotate (Priority: P1)
 
-As a project owner, after I create or rotate an API key I see the full DSN in a one-shot banner; Settings also lists a copyable DSN under **active** keys when the secret is available. **Revoked** keys never show a copyable DSN.
+As a project owner, after I create or rotate an API key I briefly see the full DSN (temporary-reveal under the matching active key or flash); ordinary Settings visits do not re-show it. **Revoked** keys never show a copyable DSN.
 
-**Why this priority**: Persistent secret-in-DOM for unused/revoked credentials and anonymous viewers remains a high-impact finding; managers need a recoverable DSN for live keys.
+**Why this priority**: Persistent secret-in-DOM for unused/revoked credentials and anonymous viewers remains a high-impact finding; managers need a one-shot copyable DSN after minting.
 
-**Independent Test**: `ProjectApiKeyVisibilityTest` — active key with secret shows `data-testid="api-key-dsn"`; after revoke, `api-key-inactive` and no DSN/secret in HTML; viewer Settings → 403.
+**Independent Test**: `ProjectApiKeyVisibilityTest` — after rotate, flash/reveal shows `data-testid="api-key-dsn"` once; ordinary GET has `api-key-dsn-redacted`; after revoke, `api-key-inactive` and no DSN/secret in HTML; viewer Settings → 403.
 
 **Acceptance Scenarios**:
 
-1. **Given** `project.api_keys.manage` and an **active** key with secret, **When** I open Settings, **Then** I may see a copyable full DSN under that key (`002` FR-003).
-2. **Given** I create or rotate a key, **When** I land on Settings after redirect, **Then** the full DSN appears in a one-shot banner (`_beacon_last_api_key_dsn`) cleared from session on that render.
+1. **Given** `project.api_keys.manage` and an **active** key without a fresh flash, **When** I open Settings, **Then** I see public id + redacted hint only — not a full DSN (`002` FR-003 / `102`).
+2. **Given** I create or rotate a key, **When** I land on Settings after redirect, **Then** the full DSN appears via temporary-reveal (`_beacon_last_api_key_dsn` cleared from session on that render; MAY attach to the matching active key by public key).
 3. **Given** a **revoked** / inactive key, **When** I open Settings, **Then** I see public id + inactive badge only — no secret, no copyable DSN, no clipboard-copy for that key.
 4. **Given** a viewer, **When** Settings is requested, **Then** HTTP 403 and no secret appears (unchanged from `052` / visibility tests).
 
@@ -102,7 +102,7 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN banner (`_beacon_last_api_key_dsn`) cleared from session on that render. Ordinary Settings GET MUST NOT re-embed the secret/DSN for active keys (public key + rotate hint only). **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
+- **FR-001**: Settings MUST gate API key secrets/DSN to `project.api_keys.manage` only. Create/rotate MUST flash a one-shot DSN (`_beacon_last_api_key_dsn`) cleared from session on that render and presented with temporary-reveal (`102`). Ordinary Settings GET MUST NOT re-embed the secret/DSN for active keys (public key + rotate hint only). **Revoked / inactive** keys MUST NEVER render secret or copyable DSN. Viewers and non-managers MUST NOT see secrets.
 - **FR-002**: `app:seed-demo` MUST refuse non-local environments unless `--allow-non-local`; stable DEMO_* material MUST be local-only.
 - **FR-003**: Outside `dev`/`test`, APP_SECRET MUST NOT be empty, MUST NOT equal the documented `.env.dist` default, and MUST be at least 16 characters (`SiteBackupSecurityDefaultsGuard`, extending `062`). When `MERCURE_JWT_SECRET` is set, it MUST NOT equal the documented Mercure placeholder and MUST be at least 32 characters (empty allowed when Mercure unused; see `062` Mercure amendment).
 - **FR-004**: New instance settings MUST default `metrics_require_token` to true; column DB default MUST match for new rows.
@@ -122,6 +122,10 @@ As a new install operator, Prometheus scrape expects a configured Bearer token b
 ## Amendment (API key DSN listing, 2026-08-11)
 
 Briefly allowed listing a copyable DSN under **active** keys for managers (recoverability). **Superseded** the same day: restore strict show-once (ordinary GET = public key only; create/rotate flash only). Inactive-key redaction remains mandatory. Cross-links: `002` FR-003, `018` FR-003 / FR-004.
+
+## Amendment (temporary reveal UX, 2026-08-16)
+
+Show-once remains mandatory. The flash MAY render on the matching active key row; Stimulus `temporary-reveal` (~30s, clear-on-hide) + `ProjectApiKey::maskDsn()` improve shoulder-surfing / DOM residual risk without restoring recoverable secrets from storage (`096` / `102`). Vitest covers the controller; `ProjectApiKeyVisibilityTest` / builder unit tests cover wiring.
 
 ## Amendment (`MERCURE_JWT_SECRET` bootstrap, 2026-08-11)
 

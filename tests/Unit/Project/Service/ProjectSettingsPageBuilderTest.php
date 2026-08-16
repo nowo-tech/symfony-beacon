@@ -10,6 +10,9 @@ use App\Identity\Repository\UserGroupRepository;
 use App\Identity\Repository\UserRepository;
 use App\Identity\Service\UserActionRecorder;
 use App\Issues\Repository\EventRepository;
+use App\Notifications\Entity\NotificationDestination;
+use App\Notifications\Entity\ProjectThresholdRule;
+use App\Notifications\Enum\NotificationDestinationType;
 use App\Notifications\Repository\MemberAccountAlertEventRepository;
 use App\Notifications\Repository\MemberProjectAlertEventRepository;
 use App\Notifications\Repository\MemberProjectAlertPreferenceRepository;
@@ -17,7 +20,11 @@ use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Project\Access\ProjectAccess;
 use App\Project\Entity\Project;
+use App\Project\Entity\ProjectApiKey;
+use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
+use App\Project\Entity\ProjectReadToken;
+use App\Project\Entity\ProjectShareLink;
 use App\Project\Enum\ProjectRole;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Repository\ProjectGroupAccessRepository;
@@ -179,5 +186,180 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         self::assertSame('https://beacon.test/share/x', $page['lastShareUrl']);
         self::assertFalse($session->has('_beacon_last_share_url'));
         self::assertNotSame('', $page['suggestedLabel']);
+    }
+
+    public function testBuildExposesMatchedApiKeyDsnAndSkipsUnsavedRows(): void
+    {
+        $project = new Project()->setName('Acme')->setSlug('acme');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 5);
+        $owner = new User()->setEmail('owner@example.com');
+        new ReflectionProperty(User::class, 'id')->setValue($owner, 1);
+        $membership = new ProjectMembership()->setProject($project)->setUser($owner)->setRole(ProjectRole::Owner);
+        new ReflectionProperty(ProjectMembership::class, 'id')->setValue($membership, 21);
+        $project->addMembership($membership);
+        $project->addMembership((new ProjectMembership())->setProject($project)->setUser($owner)->setRole(ProjectRole::Member));
+
+        $apiKey = ProjectApiKey::generate($project, 'Primary', 'public-one', 'secret-one');
+        new ReflectionProperty(ProjectApiKey::class, 'id')->setValue($apiKey, 7);
+        $project->addApiKey($apiKey);
+        $project->addApiKey(ProjectApiKey::generate($project, 'Unsaved', 'public-two', 'secret-two'));
+
+        $group = (new \App\Identity\Entity\UserGroup())->setName('Ops')->setSlug('ops');
+        new ReflectionProperty(\App\Identity\Entity\UserGroup::class, 'id')->setValue($group, 88);
+        $groupAccess = (new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Member);
+        new ReflectionProperty(ProjectGroupAccess::class, 'id')->setValue($groupAccess, 77);
+        $project->addGroupAccess($groupAccess);
+        $project->addGroupAccess((new ProjectGroupAccess())->setProject($project)->setUserGroup($group)->setRole(ProjectRole::Admin));
+
+        $destination = (new NotificationDestination())
+            ->setProject($project)
+            ->setLabel('Slack')
+            ->setType(NotificationDestinationType::Slack)
+            ->setEndpointUrl('https://hooks.slack.com/services/T/B/X');
+        new ReflectionProperty(NotificationDestination::class, 'id')->setValue($destination, 55);
+        $project->addNotificationDestination($destination);
+        $project->addNotificationDestination(
+            (new NotificationDestination())
+                ->setProject($project)
+                ->setLabel('Unsaved')
+                ->setType(NotificationDestinationType::Email)
+                ->setEndpointUrl('ops@example.com'),
+        );
+
+        $threshold = (new ProjectThresholdRule())->setProject($project)->setLabel('Burst');
+        new ReflectionProperty(ProjectThresholdRule::class, 'id')->setValue($threshold, 66);
+        $project->addThresholdRule($threshold);
+        $project->addThresholdRule((new ProjectThresholdRule())->setProject($project)->setLabel('Unsaved threshold'));
+
+        $savedReadToken = (new ProjectReadToken())->setProject($project)->setCreatedBy($owner)->setLabel('Reader')->setPrefix('brt_demo')->setTokenHash('hash');
+        new ReflectionProperty(ProjectReadToken::class, 'id')->setValue($savedReadToken, 33);
+        $unsavedReadToken = (new ProjectReadToken())->setProject($project)->setCreatedBy($owner)->setLabel('Unsaved')->setPrefix('brt_unsaved')->setTokenHash('hash');
+
+        $savedShare = (new ProjectShareLink())->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
+        new ReflectionProperty(ProjectShareLink::class, 'id')->setValue($savedShare, 44);
+        $unsavedShare = (new ProjectShareLink())->setProject($project)->setCreatedBy($owner)->setTokenHash('hash');
+
+        $formView = new FormView();
+        $form = $this->createStub(FormInterface::class);
+        $form->method('createView')->willReturn($formView);
+        $formFactory = $this->createStub(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $formFactory->method('createNamed')->willReturn($form);
+
+        $urls = $this->createStub(UrlGeneratorInterface::class);
+        $urls->method('generate')->willReturn('/projects/x/settings');
+
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('hydrateAccessGraph');
+        $memberships = $this->createStub(ProjectMembershipRepository::class);
+        $memberships->method('findOneByProjectAndUser')->willReturn($membership);
+        $memberships->method('countOwnersByProjectIds')->willReturn([5 => 1]);
+        $groups = $this->createStub(ProjectGroupAccessRepository::class);
+        $groups->method('findHighestGroupRoleForUser')->willReturn(null);
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(true);
+        $accessService = ProjectAccessServiceFactory::create(
+            $memberships,
+            $groups,
+            $this->createStub(ProjectShareLinkRepository::class),
+            $auth,
+            new RequestStack(),
+        );
+        $policy = new ProjectMembershipPolicy(
+            $memberships,
+            $this->createStub(UserGroupMembershipRepository::class),
+            $accessService,
+            $auth,
+        );
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->method('flush');
+        $em->method('getConnection')->willThrowException(new RuntimeException('offline'));
+        $recorder = new UserActionRecorder($em, new RequestStack());
+
+        $userGroups = $this->createStub(UserGroupRepository::class);
+        $userGroups->method('findAllOrdered')->willReturn([$group, new \App\Identity\Entity\UserGroup()]);
+        $groupMemberships = $this->createStub(UserGroupMembershipRepository::class);
+        $groupMemberships->method('countByGroupIds')->willReturn([88 => 3]);
+        $groupMemberships->method('findByUser')->willReturn([]);
+        $attempts = $this->createStub(NotificationDeliveryAttemptRepository::class);
+        $attempts->method('findRecentByDestinations')->willReturn([55 => []]);
+        $readTokens = $this->createStub(ProjectReadTokenRepository::class);
+        $readTokens->method('findByProject')->willReturn([$savedReadToken, $unsavedReadToken]);
+        $shareLinks = $this->createStub(ProjectShareLinkRepository::class);
+        $shareLinks->method('findActiveByProject')->willReturn([$savedShare, $unsavedShare]);
+
+        $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
+        $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
+        $ops = new InstanceOpsDefaults($settingsRepo);
+        $events = $this->createStub(EventRepository::class);
+        $events->method('countReceivedTodayForProject')->willReturn(5);
+        $events->method('countReceivedSinceForProject')->willReturn(9);
+        $governance = new ProjectGovernanceResolver($events, $ops);
+
+        $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
+        $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([['enabled' => false, 'events' => [], 'hasOverrides' => true]]);
+        $accountEvents = $this->createStub(MemberAccountAlertEventRepository::class);
+        $accountEvents->method('findIndexedByEventForUser')->willReturn([]);
+        $projectEvents = $this->createStub(MemberProjectAlertEventRepository::class);
+        $projectEvents->method('findIndexedByProjectIdForUser')->willReturn([]);
+
+        $builder = new ProjectSettingsPageBuilder(
+            $formFactory,
+            new CsrfOnlyFormFactory($formFactory),
+            $urls,
+            $auth,
+            new MemberAlertPreferenceManager($alertPrefs, $accountEvents, $projectEvents, $em),
+            $projects,
+            $readTokens,
+            $shareLinks,
+            new HumanFriendlyTokenGenerator(),
+            new ProjectMembershipManager(
+                $this->createStub(UserRepository::class),
+                $memberships,
+                $policy,
+                $recorder,
+                $em,
+            ),
+            new ProjectGroupAccessManager($groups, $policy, $recorder, $em),
+            new ProjectMembershipFormSupport($projects, $userGroups),
+            $groupMemberships,
+            $userGroups,
+            $attempts,
+            $governance,
+            new MessengerQueueHealth($em),
+            $memberships,
+            $accessService,
+        );
+
+        $request = Request::create('https://beacon.test/projects/'.$project->getUuid().'/settings');
+        $session = new Session(new MockArraySessionStorage());
+        $session->start();
+        $session->set('_beacon_last_api_key_dsn', 'https://public-one:secret-one@beacon.test/'.$project->getUuid());
+        $session->set('_beacon_last_share_url', 'https://beacon.test/share/new');
+        $request->setSession($session);
+
+        $access = new ProjectAccess(ProjectRole::Owner, directMembership: $membership);
+        $page = $builder->build($project, $owner, $access, $request, ProjectSettingsSection::Access);
+
+        self::assertSame([88 => 3], $page['group_member_counts']);
+        self::assertSame(5, $page['eventsToday']);
+        self::assertSame(9, $page['eventsThisMonth']);
+        self::assertSame('https://public-one:secret-one@beacon.test/'.$project->getUuid(), $page['apiKeyDsns'][7]);
+        self::assertStringContainsString('public-one:••••••••@beacon.test', $page['apiKeyMaskedDsns'][7]);
+        self::assertNull($page['lastApiKeyDsn']);
+        self::assertArrayHasKey(77, $page['groupRoleForms']);
+        self::assertArrayHasKey(77, $page['groupRemoveForms']);
+        self::assertArrayHasKey(33, $page['readTokenRevokeForms']);
+        self::assertArrayHasKey(44, $page['shareRevokeForms']);
+        self::assertArrayHasKey(55, $page['notificationResumeForms']);
+        self::assertArrayHasKey(55, $page['notificationToggleForms']);
+        self::assertArrayHasKey(55, $page['notificationTestForms']);
+        self::assertArrayHasKey(55, $page['notificationDeleteForms']);
+        self::assertArrayHasKey(66, $page['thresholdToggleForms']);
+        self::assertArrayHasKey(66, $page['thresholdDeleteForms']);
+        self::assertArrayHasKey('enabled', $page['memberAlertsInitial']);
+        self::assertArrayHasKey('memberAlertsHasOverrides', $page);
+        self::assertSame('https://beacon.test/share/new', $page['lastShareUrl']);
     }
 }

@@ -128,3 +128,7 @@ Issue show/index triage mutations (priority, duplicate, saved views) and status 
 ## Amendment (Duplicate combobox chrome, 2026-08-13)
 
 Issue show duplicate dialog keeps Stimulus combobox markup around `IssueDuplicateType.query` via `form_widget` for that child; residual fields use `_fields` (`077`). Standing interactive-chrome exception until a theme combobox row exists (`077` / `081` Twig consolidation amendments). Comment / priority / assignee panels use `form_row` + catalogue prefixes (`issue_comment`, `issue_priority`, `issue_assignee`).
+
+## Amendment (Issue detail tabs, 2026-08-16)
+
+Issue show is split into path-based tabs `main` | `similar` | `history` (`102-issue-detail-tabs-api-reveal`). Comments, priority, assignee, and duplicate dialog remain on **Main**; similar suggestions on **Similar** (`041`); assignment/status timeline on **History**. Deep links and E2E MUST use `…/issues/{id}/{tab}` (default `main`). Workflow Form Types / CSRF rules in this spec are unchanged.

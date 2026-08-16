@@ -187,6 +187,7 @@ final readonly class BeaconDogfoodDiagnostics
             if ($event instanceof Event) {
                 return $event;
             }
+            // CLI diagnostics only (`app:beacon:test`); ignored by PHPStan FrankenPHP hardening.
             usleep(200_000);
         } while (microtime(true) < $deadline);
 
