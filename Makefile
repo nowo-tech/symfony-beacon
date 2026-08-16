@@ -4,6 +4,8 @@
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
 # REQ-ENV-003: operator working file is `.env.local`
+# Quiet recursive $(MAKE) noise (Entering/Leaving directory).
+MAKEFLAGS += --no-print-directory
 ENV_FILE := .env.local
 export COMPOSE_ENV_FILES := $(ENV_FILE)
 DC := docker compose --env-file $(ENV_FILE)
