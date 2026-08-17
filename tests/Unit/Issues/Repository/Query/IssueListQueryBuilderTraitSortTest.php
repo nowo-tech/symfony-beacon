@@ -54,8 +54,23 @@ final class IssueListQueryBuilderTraitSortTest extends TestCase
         $qb->expects(self::once())->method('orderBy')->with('occ_count', 'DESC')->willReturnSelf();
         $qb->expects(self::exactly(2))->method('addOrderBy')->willReturnSelf();
 
-        $method = new ReflectionMethod(IssueListQueryBuilderTraitSortHarness::class, 'applyOccurrence');
+        // Reach private applyOccurrenceSqlSort default branch (unknown occurrence field → 24h).
+        $method = new ReflectionMethod(IssueListQueryBuilderTraitSortHarness::class, 'applyOccurrenceSqlSort');
         $method->invoke(new IssueListQueryBuilderTraitSortHarness(), $qb, new IssueListSort('bogus', 'desc'));
+    }
+
+    public function testApplyOccurrenceSortCoversNamedWindows(): void
+    {
+        foreach (['events_24h', 'events_7d', 'events_30d'] as $field) {
+            $qb = $this->createMock(QueryBuilder::class);
+            $qb->expects(self::once())->method('addSelect')->with(self::stringContains('occ_count'))->willReturnSelf();
+            $qb->expects(self::once())->method('setParameter')->with('occSince', self::isInstanceOf(DateTimeImmutable::class))->willReturnSelf();
+            $qb->expects(self::once())->method('orderBy')->with('occ_count', 'ASC')->willReturnSelf();
+            $qb->expects(self::exactly(2))->method('addOrderBy')->willReturnSelf();
+
+            $harness = new IssueListQueryBuilderTraitSortHarness();
+            $harness->apply($qb, new IssueListSort($field, 'asc'));
+        }
     }
 }
 

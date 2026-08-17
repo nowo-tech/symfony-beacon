@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.20.2)](#unreleased-main-after-1202)
+- [Unreleased (main after 1.20.3)](#unreleased-main-after-1203)
+- [Upgrading from 1.20.2 to 1.20.3](#upgrading-from-1202-to-1203)
 - [Upgrading from 1.20.1 to 1.20.2](#upgrading-from-1201-to-1202)
 - [Upgrading from 1.20.0 to 1.20.1](#upgrading-from-1200-to-1201)
 - [Upgrading from 1.19.0 to 1.20.0](#upgrading-from-1190-to-1200)
@@ -83,9 +84,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.20.2)
+## Unreleased (main after 1.20.3)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.20.2 to 1.20.3
+
+CI Quality/Coverage: occurrence-sort PHPUnit harness fix (100% statement coverage). **No migrations.**
+
+1. Pull / checkout `v1.20.3`.
+
+2. No operator runtime steps.
 
 ## Upgrading from 1.20.1 to 1.20.2
 
