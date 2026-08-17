@@ -8,7 +8,7 @@ export const DEMO_PASSWORD = process.env.PLAYWRIGHT_DEMO_PASSWORD ?? 'admin123';
 
 const helpersDir = path.dirname(fileURLToPath(import.meta.url));
 
-/** Demo ingest credentials from `make seed` (`.demo-client.env`). */
+/** Demo ingest credentials from `make seed` (`.demo-client.env`) or isolated `make ready-e2e` (`.demo-client.e2e.env`). */
 export type DemoIngestCredentials = {
   projectId: string;
   publicKey: string;
@@ -21,11 +21,18 @@ export type DemoIngestCredentials = {
  * Returns null when missing (callers should `requireSampleOrSkip`).
  */
 export function loadDemoIngestCredentials(): DemoIngestCredentials | null {
-  const envCandidates = [
-    path.join(helpersDir, '..', '..', '.demo-client.env'),
-    path.join(helpersDir, '..', '.demo-client.env.cache'),
-    path.join(helpersDir, '.demo-client.env.cache'),
-  ];
+  const isolated = process.env.PLAYWRIGHT_ISOLATED === '1';
+  const envCandidates = isolated
+    ? [
+        path.join(helpersDir, '..', '..', '.demo-client.e2e.env'),
+        path.join(helpersDir, '..', '.demo-client.env.cache'),
+        path.join(helpersDir, '.demo-client.env.cache'),
+      ]
+    : [
+        path.join(helpersDir, '..', '..', '.demo-client.env'),
+        path.join(helpersDir, '..', '.demo-client.env.cache'),
+        path.join(helpersDir, '.demo-client.env.cache'),
+      ];
   let envText = '';
   for (const envPath of envCandidates) {
     try {

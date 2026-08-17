@@ -87,4 +87,5 @@ composer.phar
 /playwright/.cache/
 /e2e/.auth/
 /e2e/.demo-client.env.cache
+/.demo-client.e2e.env
 ###< playwright ###

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-08-17
+
+### Added
+
+- **Isolated Playwright E2E stack** (`104` / Phase 6.55): parallel Compose project `symfony-beacon-e2e` on MySQL schema `app_e2e`, Redis DB index `1`, HTTPS `:9460` / HTTP `:9085`. Make targets `up-e2e`, `ready-e2e`, `seed-e2e`, `test-e2e-isolated`, `down-e2e` keep dogfood (`MYSQL_DATABASE` / `:9447`) untouched while tests run.
+- **`app:seed-demo --server-env-file`**: write loopback `BEACON_DSN` into a dedicated env file (e.g. `.env.e2e.local`) without rewriting operator `.env.local`; isolated seed also writes `.demo-client.e2e.env`.
+- **`E2E_BEACON_TARGET=self|dogfood|off`**: BeaconBundle on the E2E SUT reports into `app_e2e` (default), the dogfood project, or nowhere — so test-time errors can be triaged without polluting development memberships/users.
+- **Morphicons UI**: Lucide-driven spring morphs for theme toggle, burger menu, and password reveal (replaces static icon swaps; Vitest coverage under `assets/lib/morphicons/`).
+
+### Changed
+
+- Playwright isolated mode uses `PLAYWRIGHT_ISOLATED=1`, separate auth state (`e2e/.auth/admin.e2e.json`), and `.demo-client.e2e.env` credentials.
+- Docs: `e2e/README.md`, CONTRIBUTING, INSTALL, ROADMAP Phase **6.55**, specs `104` / amendments on `097` + `058`.
+
+### Notes for integrators
+
+- No Doctrine migrations. No production operator runtime steps.
+- Local developers who want a clean dogfood DB: `make up-e2e && make ready-e2e && make test-e2e-isolated` (CI continues to use `make test-e2e`).
+- Optional: `E2E_BEACON_TARGET=dogfood make ready-e2e` to land SUT errors on `:9447`.
+
 ## [1.20.3] - 2026-08-17
 
 ### Fixed

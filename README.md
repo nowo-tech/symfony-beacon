@@ -107,7 +107,7 @@ make ready
 - MySQL: `mysql-9.7-primary` on the shared network (no host port; `make mysql`)
 - Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailpit:1025` (shared) or `smtp://mailer:1025` (app-local) in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
-- Browser E2E (Playwright): `make test-e2e` — see [`e2e/README.md`](e2e/README.md)
+- Browser E2E (Playwright): `make test-e2e` (dogfood DB) or `make up-e2e && make ready-e2e && make test-e2e-isolated` (`app_e2e` / `:9460`) — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
 - First-user registration (empty DB only): https://localhost:9447/register
@@ -174,8 +174,10 @@ make test-coverage
 make test-unit-js
 make test-unit-js-coverage   # → var/coverage-js/
 
-# Browser E2E (after make up + make seed):
+# Browser E2E (after make up + make seed) — mutates dogfood DB:
 make test-e2e
+# Isolated E2E (keeps dogfood DB clean; parallel stack on :9460):
+# make up-e2e && make ready-e2e && make test-e2e-isolated
 ```
 
 Layout: `tests/Unit/` (pure `TestCase`), `tests/Functional/` (HTTP), `tests/Integration/` (kernel/DB/commands), helpers in `tests/Support/`. Frontend unit specs: `assets/**/*.test.ts` (`vitest.config.ts`).
@@ -187,7 +189,7 @@ CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that upl
 | PHP | PHPUnit (`make test` / CI) — Unit / Functional / Integration |
 | Coverage | `make test-coverage` / CI Coverage job |
 | Frontend unit | Vitest (`make test-unit-js`) — Stimulus + libs |
-| E2E | Playwright (`make test-e2e` / CI) |
+| E2E | Playwright (`make test-e2e` / CI; local prefer `make test-e2e-isolated`) |
 | Build | Vite build in CI Docker job |
 
 ## Documentation

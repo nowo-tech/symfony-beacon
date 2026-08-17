@@ -90,6 +90,8 @@ final class SeedDemoCommand extends Command
             ->addOption('with-platform', null, InputOption::VALUE_NONE, 'Also run platform menu/breadcrumb/cookie-consent seed')
             ->addOption('skip-demo-user', null, InputOption::VALUE_NONE, 'Do not create admin@…; dogfood with existing ROLE_ADMIN accounts (earliest registered preferred)')
             ->addOption('sync-server-dsn', null, InputOption::VALUE_NONE, 'Update .env BEACON_DSN to the loopback self DSN even when already set (make dogfood)')
+            ->addOption('skip-server-dsn', null, InputOption::VALUE_NONE, 'Do not write BEACON_DSN into .env.local / .env (isolated E2E seed)')
+            ->addOption('server-env-file', null, InputOption::VALUE_REQUIRED, 'Write loopback BEACON_DSN into this env file only (e.g. .env.e2e.local); does not touch .env.local')
             ->addOption('allow-non-local', null, InputOption::VALUE_NONE, 'Allow running outside dev/test (never uses stable demo API keys)');
     }
 
@@ -118,6 +120,19 @@ final class SeedDemoCommand extends Command
         $ingestBaseUrl = (string) $input->getOption('ingest-base-url');
         $skipDemoUser = (bool) $input->getOption('skip-demo-user');
         $syncServerDsn = (bool) $input->getOption('sync-server-dsn');
+        $skipServerDsn = (bool) $input->getOption('skip-server-dsn');
+        $serverEnvFileOpt = $input->getOption('server-env-file');
+        $serverEnvFile = \is_string($serverEnvFileOpt) && '' !== $serverEnvFileOpt ? $serverEnvFileOpt : null;
+        if ($syncServerDsn && $skipServerDsn) {
+            $io->error('Use only one of --sync-server-dsn or --skip-server-dsn.');
+
+            return Command::FAILURE;
+        }
+        if (null !== $serverEnvFile && ($syncServerDsn || $skipServerDsn)) {
+            $io->error('Do not combine --server-env-file with --sync-server-dsn or --skip-server-dsn.');
+
+            return Command::FAILURE;
+        }
         $useStableDemoKeys = $isLocal;
         if ((bool) $input->getOption('with-platform')) {
             if ($this->breadcrumbDemoSeeder->seedIfEmpty()) {
@@ -202,12 +217,24 @@ final class SeedDemoCommand extends Command
             $io->success(\sprintf('Wrote %s (BeaconBundle demo: make sync-beacon)', $path));
         }
 
-        $dsnWrite = $this->writeServerBeaconDsn($selfDsn, $syncServerDsn);
-        match ($dsnWrite) {
-            'written' => $io->success(\sprintf('Set BEACON_DSN for server dogfooding (%s)', $selfDsn)),
-            'unchanged' => $io->note('BEACON_DSN already matches the self DSN'),
-            'skipped' => $io->note('BEACON_DSN already set (left unchanged; use --sync-server-dsn to re-wire)'),
-        };
+        if ($skipServerDsn) {
+            $io->note('Skipped writing BEACON_DSN to .env.local / .env (--skip-server-dsn)');
+        } elseif (null !== $serverEnvFile) {
+            $path = $this->resolveWritableEnvPath($serverEnvFile);
+            $dsnWrite = $this->writeServerBeaconDsnToPath($path, $selfDsn, true);
+            match ($dsnWrite) {
+                'written' => $io->success(\sprintf('Set BEACON_DSN for stack dogfooding in %s (%s)', $path, $selfDsn)),
+                'unchanged' => $io->note(\sprintf('BEACON_DSN already matches the self DSN in %s', $path)),
+                'skipped' => $io->warning(\sprintf('Could not write BEACON_DSN to %s', $path)),
+            };
+        } else {
+            $dsnWrite = $this->writeServerBeaconDsn($selfDsn, $syncServerDsn);
+            match ($dsnWrite) {
+                'written' => $io->success(\sprintf('Set BEACON_DSN for server dogfooding (%s)', $selfDsn)),
+                'unchanged' => $io->note('BEACON_DSN already matches the self DSN'),
+                'skipped' => $io->note('BEACON_DSN already set (left unchanged; use --sync-server-dsn to re-wire)'),
+            };
+        }
 
         return Command::SUCCESS;
     }
@@ -265,6 +292,14 @@ ENV;
             return 'skipped';
         }
 
+        return $this->writeServerBeaconDsnToPath($path, $selfDsn, $force);
+    }
+
+    /**
+     * @return 'written'|'unchanged'|'skipped'
+     */
+    private function writeServerBeaconDsnToPath(string $path, string $selfDsn, bool $force = false): string
+    {
         $contents = file_get_contents($path);
         if (false === $contents) {
             return 'skipped';
@@ -308,5 +343,23 @@ ENV;
         }
 
         return null;
+    }
+
+    /**
+     * Resolve a relative or absolute env file path under the project (must be writable).
+     */
+    private function resolveWritableEnvPath(string $pathOrRelative): string
+    {
+        $path = str_starts_with($pathOrRelative, '/')
+            ? $pathOrRelative
+            : $this->projectDir.'/'.$pathOrRelative;
+        if (!is_file($path)) {
+            throw new RuntimeException(\sprintf('Env file "%s" does not exist.', $path));
+        }
+        if (!is_readable($path) || !is_writable($path)) {
+            throw new RuntimeException(\sprintf('Env file "%s" is not writable.', $path));
+        }
+
+        return $path;
     }
 }

@@ -1,5 +1,39 @@
 # Playwright browser E2E against the local Compose stack
 
+## Isolated DB (recommended for local dogfooding)
+
+`make test-e2e` hits the **same** MySQL schema as `make up` (`MYSQL_DATABASE`, usually `app`) and creates ephemeral users/projects there.
+
+To keep development data clean, use a **second Compose project** on schema `app_e2e` (Redis DB index `1`, HTTPS `:9460` by default). Dogfood on `:9447` can stay up in parallel — run Playwright against `:9460` without stopping development.
+
+```bash
+make up              # dogfood stack stays up (:9447)
+make up-e2e          # create app_e2e + start symfony-beacon-e2e (php/messenger*)
+make ready-e2e       # migrate + seed + sample + wire BeaconBundle on E2E
+make test-e2e-isolated
+# optional: make down-e2e   # stop E2E containers; schema app_e2e is kept
+```
+
+### BeaconBundle during isolated E2E (detect errors while tests run)
+
+After `make ready-e2e`, the **E2E** PHP containers get `BEACON_DSN` in `.env.e2e.local` only (`.env.local` / dogfood DSN unchanged). Exceptions and Monolog `error+` from the app under test are reported via `nowo-tech/beacon-bundle` (same as dogfood), with `DropSelfIngestBeforeSend` avoiding ingest feedback loops.
+
+| `E2E_BEACON_TARGET` | Where test-time errors appear |
+|---------------------|-------------------------------|
+| `self` (default) | E2E project issues — open `https://localhost:9460` |
+| `dogfood` | Dogfood project issues — open `https://localhost:9447` (uses `.demo-client.env`) |
+| `off` | No reporting from the E2E stack |
+
+```bash
+E2E_BEACON_TARGET=dogfood make ready-e2e   # re-seed + recreate with dogfood DSN
+```
+
+Overrides: `E2E_HTTPS_PORT=9450 E2E_MYSQL_DATABASE=app_e2e make up-e2e` (pick a free host port if `:9460` is taken).
+
+Auth state: `e2e/.auth/admin.e2e.json` (does not overwrite dogfood `admin.json`). Client env: `.demo-client.e2e.env` (does not overwrite `.demo-client.env`). Seed uses `--skip-server-dsn` so `.env.local` `BEACON_DSN` is untouched.
+
+## Dogfood stack (mutates your dev DB)
+
 Prerequisites:
 
 ```bash
@@ -23,6 +57,7 @@ Filters / overrides:
 
 ```bash
 make test-e2e ARGS='e2e/smoke/public.spec.ts'
+make test-e2e-isolated ARGS='e2e/smoke/public.spec.ts'
 make test-e2e ARGS='e2e/flows/mutations.spec.ts'
 make test-e2e ARGS='e2e/hooks'
 make test-e2e ARGS='e2e/**/use-cases-*.spec.ts'

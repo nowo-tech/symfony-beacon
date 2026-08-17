@@ -142,3 +142,11 @@ Functional / BrowserKit traffic without `ROLE_ADMIN` (and project ACL 403s) prod
 - **FR-012**: Membership grants MUST cover every `findInstanceAdmins()` result (oldest first), not a single preferred owner only.
 - **SC-007**: Integration/unit tests assert multi-admin membership and that a later `admin@…` does not become the `.demo-client.env` login hint when an earlier admin exists.
 - Cross-ref: `055` FR-011a, `docs/INSTALL.md`, `docs/product/ROLES.md`.
+
+### 2026-08-17 — Isolated E2E server-env file (`104`)
+
+Playwright may run against a parallel Compose stack (schema `app_e2e`) that must dogfood via BeaconBundle **without** rewriting the operator `.env.local`.
+
+- **FR-013**: `app:seed-demo` MUST accept `--server-env-file=<path>` to write the loopback `BEACON_DSN` only into that file (force update). It MUST NOT combine with `--skip-server-dsn` or `--sync-server-dsn`.
+- **FR-014**: Isolated E2E Make targets MUST pass `--server-env-file=.env.e2e.local` and `--write-client-env=.demo-client.e2e.env`, then recreate the E2E containers so `BEACON_DSN` is loaded.
+- Cross-ref: `specs/104-isolated-e2e-stack/`, `specs/097-e2e-ci-login-throttle/` (isolated amendment).

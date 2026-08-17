@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated up-e2e down-e2e ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -7,6 +7,7 @@
 # Quiet recursive $(MAKE) noise (Entering/Leaving directory).
 MAKEFLAGS += --no-print-directory
 ENV_FILE := .env.local
+E2E_ENV_FILE := .env.e2e.local
 export COMPOSE_ENV_FILES := $(ENV_FILE)
 DC := docker compose --env-file $(ENV_FILE)
 DC_INFRA := docker compose -p shared-infra -f compose.infra.yaml --env-file $(ENV_FILE)
@@ -16,6 +17,26 @@ COMPOSE ?= $(DC)
 COVERAGE_MIN ?= 100
 # Shared stack (developer.local.server/server) when this repo lives under repositories/other/
 SHARED_SERVER_DIR := $(abspath $(CURDIR)/../../../server)
+# Isolated E2E defaults (override: E2E_HTTPS_PORT=9450 make up-e2e).
+# Must be defined before DC_E2E (immediate := expansion).
+E2E_HTTP_PORT ?= 9085
+E2E_HTTPS_PORT ?= 9460
+E2E_MYSQL_DATABASE ?= app_e2e
+E2E_REDIS_DB ?= 1
+# BeaconBundle on the E2E stack: self (app_e2e issues @ :9460) | dogfood (report into :9447 project) | off
+E2E_BEACON_TARGET ?= self
+PLAYWRIGHT_E2E_BASE_URL ?= https://localhost:$(E2E_HTTPS_PORT)
+# Isolated Playwright stack (app_e2e + Redis DB 1 + ports 9085/9460 by default).
+# Always pass -p: COMPOSE_PROJECT_NAME inside --env-file is NOT used as the project name
+# (Compose reads the process env / directory name). Without -p, `up` recreates dogfood.
+# Force HTTP(S)_PORT on the process env so a sourced .env.local in the parent shell cannot
+# override --env-file interpolation (Compose prefers the process environment).
+DC_E2E := HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E2E_HTTPS_PORT) \
+	DEFAULT_URI=https://localhost:$(E2E_HTTPS_PORT) \
+	MYSQL_DATABASE=$(E2E_MYSQL_DATABASE) \
+	COMPOSE_PROJECT_NAME=symfony-beacon-e2e COMPOSE_ENV_FILES=$(E2E_ENV_FILE) \
+	docker compose -p symfony-beacon-e2e --env-file $(E2E_ENV_FILE) \
+	-f compose.yaml -f compose.override.yaml -f compose.e2e.yaml
 
 ensure-env:
 	@./.scripts/ensure-env-local.sh
@@ -71,7 +92,11 @@ help:
 	@echo "  make test-coverage   PHPUnit + Clover/HTML (var/coverage*); defaults to COVERAGE_MIN=100"
 	@echo "  make test-unit-js    Vitest unit tests for assets/"
 	@echo "  make test-unit-js-coverage  Vitest + V8 coverage → var/coverage-js/"
-	@echo "  make test-e2e        Playwright browser E2E (Docker image; needs make up + make seed[+sample])"
+	@echo "  make test-e2e        Playwright E2E against dogfood stack (make up + seed[+sample]; mutates MYSQL_DATABASE)"
+	@echo "  make test-e2e-isolated  Playwright against isolated stack (app_e2e / :$(E2E_HTTPS_PORT); needs make ready-e2e)"
+	@echo "  make up-e2e          Start isolated E2E Compose project (does not stop dogfood stack)"
+	@echo "  make ready-e2e       Migrate + seed + seed-sample on app_e2e"
+	@echo "  make down-e2e        Stop isolated E2E Compose project (keeps app_e2e schema)"
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test"
@@ -395,6 +420,8 @@ test-unit-js-coverage: ensure-up
 	$(DC) exec -T php pnpm run test:unit:coverage $(ARGS)
 
 # Browser E2E via official Playwright image (WSL-friendly Chromium deps).
+# Dogfood stack (mutates MYSQL_DATABASE from .env.local): make up && make seed[+sample] && make test-e2e
+# Isolated stack (app_e2e): make up-e2e && make ready-e2e && make test-e2e-isolated
 # Override: PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 # Filter:  make test-e2e ARGS='e2e/smoke/public.spec.ts'
 # Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
@@ -415,6 +442,93 @@ else
 		--user "$(shell id -u):$(shell id -g)" \
 		-v "$(CURDIR):/work" -w /work \
 		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_BASE_URL)" \
+		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
+		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
+		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
+		-e CI="$(CI)" \
+		-e HOME=/tmp \
+		-e XDG_CACHE_HOME=/tmp/.cache \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
+endif
+
+# --- Isolated E2E stack (schema app_e2e; does not mutate dogfood MYSQL_DATABASE) ---
+ensure-e2e-env: ensure-env
+	@chmod +x .scripts/ensure-e2e-env.sh
+	@E2E_HTTP_PORT="$(E2E_HTTP_PORT)" E2E_HTTPS_PORT="$(E2E_HTTPS_PORT)" \
+		E2E_MYSQL_DATABASE="$(E2E_MYSQL_DATABASE)" E2E_REDIS_DB="$(E2E_REDIS_DB)" \
+		E2E_BEACON_TARGET="$(E2E_BEACON_TARGET)" \
+		E2E_ENV_FILE="$(E2E_ENV_FILE)" ./.scripts/ensure-e2e-env.sh
+
+ensure-e2e-db: up-infra ensure-e2e-env
+	@set -a; . ./$(ENV_FILE); set +a; \
+	DB="$(E2E_MYSQL_DATABASE)"; \
+	echo "Ensuring MySQL schema \`$$DB\` on mysql-9.7-primary…"; \
+	docker exec -i -e MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysql-9.7-primary \
+		mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$$DB\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
+GRANT ALL PRIVILEGES ON \`$$DB\`.* TO '$${MYSQL_USER}'@'%'; FLUSH PRIVILEGES;"
+
+up-e2e: ensure-e2e-db
+	$(DC_E2E) up -d php messenger messenger-notify
+	@$(MAKE) print-urls COMPOSE="$(DC_E2E)"
+	@echo "Isolated E2E stack: DB=$(E2E_MYSQL_DATABASE)  HTTPS=$(PLAYWRIGHT_E2E_BASE_URL)"
+	@echo "Next: make ready-e2e   then   make test-e2e-isolated"
+
+ensure-e2e-up: ensure-e2e-env
+	@$(MAKE) up-infra
+	@$(DC_E2E) exec -T php true >/dev/null 2>&1 || { \
+		echo "E2E stack is down — starting…"; \
+		$(MAKE) up-e2e; \
+	}
+
+down-e2e:
+	@if [ -f "$(E2E_ENV_FILE)" ]; then \
+		$(DC_E2E) down; \
+	else \
+		echo "No $(E2E_ENV_FILE) — nothing to stop (run make up-e2e first)."; \
+	fi
+
+seed-e2e: ensure-e2e-up
+	@$(DC_E2E) exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets'
+	$(DC_E2E) exec -T php bin/console app:seed-platform
+	$(DC_E2E) exec -T php bin/console app:seed-demo \
+		--server-env-file=.env.e2e.local \
+		--write-client-env=.demo-client.e2e.env \
+		--base-url="$(PLAYWRIGHT_E2E_BASE_URL)" \
+		--ingest-base-url="http://host.docker.internal:$(E2E_HTTP_PORT)"
+	@if [ -f .demo-client.e2e.env ]; then \
+		$(DC_E2E) exec -u root -T php chown $(shell id -u):$(shell id -g) /app/.demo-client.e2e.env 2>/dev/null || true; \
+		chmod 600 .demo-client.e2e.env 2>/dev/null || true; \
+	fi
+	@# Re-apply E2E_BEACON_TARGET (self/dogfood/off) and recreate so BeaconBundle picks up BEACON_DSN.
+	@$(MAKE) ensure-e2e-env
+	$(DC_E2E) up -d --force-recreate php messenger messenger-notify
+	@echo "E2E BeaconBundle target=$(E2E_BEACON_TARGET) — errors during tests report via BEACON_DSN in $(E2E_ENV_FILE)"
+
+ready-e2e: ensure-e2e-up
+	@$(DC_E2E) exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets'
+	$(DC_E2E) exec -T php bin/console doctrine:migrations:migrate -n
+	$(DC_E2E) exec -T php bin/console messenger:setup-transports --no-interaction
+	@$(MAKE) seed-e2e
+	$(DC_E2E) exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
+	@echo "E2E DB ready. Run: make test-e2e-isolated"
+
+test-e2e-isolated: ensure-e2e-up
+	@$(DC_E2E) exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
+	@$(DC_E2E) exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
+ifeq ($(PLAYWRIGHT_ON_HOST),1)
+	PLAYWRIGHT_ISOLATED=1 \
+	PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
+	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
+	PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
+	PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
+	pnpm exec playwright test $(ARGS)
+else
+	docker run --rm --network=host \
+		--user "$(shell id -u):$(shell id -g)" \
+		-v "$(CURDIR):/work" -w /work \
+		-e PLAYWRIGHT_ISOLATED=1 \
+		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
 		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
 		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \

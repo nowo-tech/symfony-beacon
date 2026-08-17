@@ -12,6 +12,7 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 | Sample | `app:seed-sample` / `make seed-sample` | QA/load issues & charts (`dev` / `load` / `huge`); also enables Mercure with env defaults (see [MERCURE.md](ops/MERCURE.md)) |
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
 | Setup UI | `/setup` | SiteBackup wizard (bootstrap choice, migrations, platform seed, admin / optional sample, or full SQL dump) |
+| Isolated E2E | `make up-e2e` / `ready-e2e` / `test-e2e-isolated` | Parallel Compose stack on schema `app_e2e` (`:9460`) so Playwright does not mutate dogfood `MYSQL_DATABASE` — see [`e2e/README.md`](../e2e/README.md) |
 
 ## Fresh install
 

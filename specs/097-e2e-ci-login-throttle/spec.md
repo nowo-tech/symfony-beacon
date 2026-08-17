@@ -103,3 +103,14 @@ Catalog expansion beyond the atomic-gap batch (`103` / Phase 6.54):
 - Automation status ~**259** Covered / ~5 Out of scope (was ~247 at v1.13.0)
 
 Run: `make test-e2e ARGS='e2e/security'`. Cross-ref: `docs/product/E2E-USE-CASES.md`, `e2e/README.md`.
+
+## Amendment (Isolated local E2E stack, 2026-08-17)
+
+Local dogfood hygiene (`104` / Phase 6.55): parallel Compose project `symfony-beacon-e2e` on schema `app_e2e` so Playwright does not mutate `MYSQL_DATABASE`.
+
+- Make: `up-e2e` / `ready-e2e` / `test-e2e-isolated` / `down-e2e`
+- Seed: `app:seed-demo --server-env-file=.env.e2e.local` + `.demo-client.e2e.env`
+- Optional BeaconBundle on the SUT: `E2E_BEACON_TARGET=self|dogfood|off`
+- CI continues to use `make test-e2e` against the ephemeral CI DB
+
+Cross-ref: `specs/104-isolated-e2e-stack/`, `e2e/README.md`.

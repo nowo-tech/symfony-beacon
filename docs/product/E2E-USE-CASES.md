@@ -14,6 +14,8 @@ Status values:
 
 Run: `make up && make seed && make seed-sample && make test-e2e` — see [`e2e/README.md`](../../e2e/README.md).
 
+Local developers who want to keep dogfood MySQL clean: `make up-e2e && make ready-e2e && make test-e2e-isolated` (schema `app_e2e` / `:9460`; optional `E2E_BEACON_TARGET` for BeaconBundle reporting — spec `104`).
+
 ---
 
 ## Actors

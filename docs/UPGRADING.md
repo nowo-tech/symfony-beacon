@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.20.3)](#unreleased-main-after-1203)
+- [Unreleased (main after 1.21.0)](#unreleased-main-after-1210)
+- [Upgrading from 1.20.3 to 1.21.0](#upgrading-from-1203-to-1210)
 - [Upgrading from 1.20.2 to 1.20.3](#upgrading-from-1202-to-1203)
 - [Upgrading from 1.20.1 to 1.20.2](#upgrading-from-1201-to-1202)
 - [Upgrading from 1.20.0 to 1.20.1](#upgrading-from-1200-to-1201)
@@ -84,9 +85,35 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.20.3)
+## Unreleased (main after 1.21.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.20.3 to 1.21.0
+
+Isolated Playwright E2E stack (`104` / Phase 6.55) + Morphicons chrome. **No migrations.**
+
+1. Pull / checkout `v1.21.0`.
+
+2. Rebuild frontend assets (Morphicons / Vite):
+
+```bash
+make vite-build
+```
+
+3. Local E2E without mutating dogfood MySQL (optional):
+
+```bash
+make up-e2e
+make ready-e2e
+make test-e2e-isolated
+# optional: E2E_BEACON_TARGET=dogfood make ready-e2e   # SUT errors → :9447
+# make down-e2e
+```
+
+4. CI / default path unchanged: `make test-e2e` still targets the Compose dogfood schema.
+
+See [e2e/README.md](../e2e/README.md) and [CHANGELOG.md](CHANGELOG.md) `[1.21.0]`.
 
 ## Upgrading from 1.20.2 to 1.20.3
 

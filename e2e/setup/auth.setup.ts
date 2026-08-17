@@ -5,13 +5,21 @@ import { fileURLToPath } from 'node:url';
 import { dismissCookieConsent, dismissProductTour, DEMO_EMAIL, DEMO_PASSWORD } from '../support/helpers';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const authFile = path.join(__dirname, '..', '.auth', 'admin.json');
+const isolated = process.env.PLAYWRIGHT_ISOLATED === '1';
+const authFile =
+  process.env.PLAYWRIGHT_AUTH_FILE ??
+  path.join(__dirname, '..', '.auth', isolated ? 'admin.e2e.json' : 'admin.json');
 
 function loadDemoCredentials(): { email: string; password: string } {
-  const candidates = [
-    path.join(__dirname, '..', '..', '.demo-client.env'),
-    path.join(__dirname, '..', '.demo-client.env.cache'),
-  ];
+  const candidates = isolated
+    ? [
+        path.join(__dirname, '..', '..', '.demo-client.e2e.env'),
+        path.join(__dirname, '..', '.demo-client.env.cache'),
+      ]
+    : [
+        path.join(__dirname, '..', '..', '.demo-client.env'),
+        path.join(__dirname, '..', '.demo-client.env.cache'),
+      ];
   for (const envPath of candidates) {
     try {
       if (!fs.existsSync(envPath)) {
