@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-08-17
+
+### Added
+
+- **`app:beacon:test --suite` / `make beacon-suite`**: dogfood multi-event probe (message info/error, exception, console, HTTP, messenger+scheduler, breadcrumbs) with unique fingerprints per run token so Issues UI panels can be validated end-to-end. Default `make beacon-test` remains a single ACK probe. Suite client tags are where-explicit (`console.command`, `url` / `http.route`, `messenger.message_class`, `transaction`; `source=dogfood.suite`, `probe_kind`, `probe_run`). Spec `058` FR-015 / FR-016 / User Story 6.
+
+### Notes for integrators
+
+- No Doctrine migrations. After pull: optional `make beacon-suite` (requires loopback `BEACON_DSN` + Messenger workers). See [DSN.md](DSN.md).
+
 ## [1.21.0] - 2026-08-17
 
 ### Added
@@ -1422,7 +1432,9 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...HEAD
+[1.22.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.21.0...v1.22.0
+[1.21.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.3...v1.21.0
 [1.20.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.2...v1.20.3
 [1.20.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.1...v1.20.2
 [1.20.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.0...v1.20.1

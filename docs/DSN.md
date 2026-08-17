@@ -46,6 +46,8 @@ Verify the configured DSN (parse only, or live ingest ACK + local dogfood hints)
 make beacon-test ARGS='--check-only'
 make beacon-test
 make beacon-test ARGS='--message=unique-probe --wait=15'
+make beacon-suite
+make beacon-test ARGS='--suite --run-token=demo --wait=15'
 ```
 
 `make beacon-test` runs `app:beacon:test` (wraps BeaconBundle `nowo:beacon:test`). After a successful HTTP ACK it waits for Messenger to persist the event and warns when:
@@ -53,6 +55,19 @@ make beacon-test ARGS='--message=unique-probe --wait=15'
 - the issue already had events (no “new issue” member alert; try `--message=unique-probe-<token>`),
 - there are no `push_subscription` rows / VAPID is unset (no Web Push),
 - the event never appears (workers not running).
+
+`make beacon-suite` (`app:beacon:test --suite`) posts **several synthetic events** with unique fingerprints (shared `probe_run` token) so you can open Issues and validate UI panels:
+
+| Kind | What to check on the issue detail |
+|------|-----------------------------------|
+| `message-info` / `message-error` | Message + level badge |
+| `exception` | Stack / culprit |
+| `console` | Highlights CLI command + Console panel (`extra.console`) |
+| `http` | Request / HTTP route · controller · status |
+| `messenger` | Messenger (+ Scheduler) panels |
+| `breadcrumbs` | Breadcrumbs trail |
+
+Filter or search by tag `probe_run=<token>` (printed by the command). Client tags are **where-explicit** by kind (`console.command`, `url` / `http.route`, `messenger.message_class`, plus `probe_kind` / `source=dogfood.suite`). On real Bundle-captured failures, command/URL live in `extra` / request and appear as **system** tags in the issue UI. Default single-probe `make beacon-test` stays a thin ACK check.
 
 HTTP **200** only means ingest accepted the Envelope — not that a browser notification was sent. Thin client-only probe: `bin/console nowo:beacon:test`.
 

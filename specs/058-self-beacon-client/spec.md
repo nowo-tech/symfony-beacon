@@ -2,7 +2,7 @@
 
 **Feature Branch**: `058-self-beacon-client`  
 **Created**: 2026-07-29  
-**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16; ignore expected 403s 2026-08-16; earliest ROLE_ADMIN dogfood resolve 2026-08-17 / `103`)
+**Status**: Implemented (2026-07-29; Packagist + `make dogfood` + `ensure-halite-secrets` 2026-07-30; probe/`app:beacon:test` + `.env.local` DSN + reclaim client env 2026-08-16; ignore expected 403s 2026-08-16; earliest ROLE_ADMIN dogfood resolve 2026-08-17 / `103`; dogfood probe suite + explicit client tags 2026-08-17)
 
 **Input**: Install `nowo-tech/beacon-bundle` in the Beacon server so the instance can report its own errors to a seeded demo project. First-run path wires a stable DSN to loopback ingest without recursive Envelope amplification.
 
@@ -73,6 +73,20 @@ As a developer, I run `make beacon-test` to verify Envelope auth + ACK against t
 3. **Given** a repeated default probe message, **When** the event persists, **Then** diagnostics warn that the issue already existed (no “new issue” member alert).
 4. **Given** zero `push_subscription` rows, **When** the probe succeeds, **Then** diagnostics warn that HTTP 200 is only an ingest ACK.
 
+### User Story 6 - Multi-event dogfood suite for issue UI (Priority: P2)
+
+As a developer, I run `make beacon-suite` (`app:beacon:test --suite`) to create several distinct Issues (message, exception, console, HTTP, messenger, breadcrumbs) so I can validate issue-detail panels and client/system tags without waiting for a real production failure.
+
+**Independent Test**: With loopback DSN loaded and workers running, `make beacon-suite` ACKs all suite kinds; Issues list shows one new issue per kind sharing `probe_run`; console issue has `extra.console.command` and client tag `console.command`.
+
+**Acceptance Scenarios**:
+
+1. **Given** a valid loopback `BEACON_DSN`, **When** I run `make beacon-suite` (or `app:beacon:test --suite`), **Then** ingest returns HTTP 2xx for every suite kind and the CLI prints a kind → event-id table.
+2. **Given** a suite run token `T`, **When** events persist, **Then** Issues can be found via tag `probe_run=T` (and `probe_kind=<kind>`).
+3. **Given** the `console` suite event, **When** I open issue detail, **Then** Highlights/Console show command `app:beacon:test` and client tags include `console.command` + `transaction`.
+4. **Given** the `http` suite event, **When** I open issue detail, **Then** Request/HTTP panels show URL/route and client tags include `url` + `http.route` (+ `http.method`).
+5. **Given** `make beacon-test` without `--suite`, **When** it runs, **Then** behavior remains a single ACK probe (suite is opt-in).
+
 ## Requirements
 
 - **FR-001**: Require `nowo-tech/beacon-bundle` (**1.7.3+**) from Packagist and register configuration with empty-DSN-safe env defaults.
@@ -83,7 +97,8 @@ As a developer, I run `make beacon-test` to verify Envelope auth + ACK against t
 - **FR-004a**: Host `nowo_beacon.ignore_exceptions` MUST exclude expected access-denial classes so dogfood issues stay signal (see Amendments 2026-08-16 — ignore expected 403s).
 - **FR-005**: `composer.json` MUST NOT require a private VCS repository entry for `nowo-tech/beacon-bundle` once the package is on Packagist.
 - **FR-006**: `make dogfood` / related seed Make targets MUST create `var/secrets/` before console so Halite can persist `.Halite.default.key`.
-- **FR-007**–**FR-010**: See Amendments (2026-08-16).
+- **FR-007**–**FR-010**: See Amendments (2026-08-16) — single probe, wait diagnostics, ignore 403s, client env reclaim.
+- **FR-015**–**FR-016**: See Amendments (2026-08-17) — dogfood probe suite + explicit where-it-happened client tags.
 
 ## Success Criteria
 
@@ -94,11 +109,13 @@ As a developer, I run `make beacon-test` to verify Envelope auth + ACK against t
 - **SC-004**: Makefile help distinguishes `dogfood` from `seed` / `seed-platform`.
 - **SC-005**: `make dogfood` succeeds on a fresh `var/` without a pre-existing `secrets/` directory.
 - **SC-006**: See Amendments (2026-08-16) — `make beacon-test` verifies dogfood ingest without implying Web Push.
+- **SC-008**: See Amendments (2026-08-17) — `make beacon-suite` creates distinct issues with actionable client tags.
 
 ## Out of scope
 
 - Reporting PHP parse/syntax errors that kill the process before Kernel listeners run (BeaconBundle limitation).
 - Auto-creating a non-demo “self” project on every boot without seed.
+- BeaconBundle automatically promoting `extra.console` / request URL into **client** tags on real failures (system tags are derived in the issue UI from `extra` / request; suite sets explicit client tags for dogfood clarity).
 
 ## Amendments
 
@@ -142,6 +159,15 @@ Functional / BrowserKit traffic without `ROLE_ADMIN` (and project ACL 403s) prod
 - **FR-012**: Membership grants MUST cover every `findInstanceAdmins()` result (oldest first), not a single preferred owner only.
 - **SC-007**: Integration/unit tests assert multi-admin membership and that a later `admin@…` does not become the `.demo-client.env` login hint when an earlier admin exists.
 - Cross-ref: `055` FR-011a, `docs/INSTALL.md`, `docs/product/ROLES.md`.
+
+### 2026-08-17 — Dogfood probe suite (`app:beacon:test --suite`)
+
+Operators validating issue detail panels need more than a single `info` connection-test message (no `extra.console` / HTTP / messenger). A vague client tag `source=app:beacon:test` is not enough to show **where** the failure happened.
+
+- **FR-015**: `app:beacon:test --suite` (Make: `beacon-suite`) MUST POST several synthetic Envelopes synchronously (message info/error, exception, console, HTTP, messenger[+scheduler], breadcrumbs), each with a unique fingerprint sharing a run token (`--run-token=` or random). Default `make beacon-test` without `--suite` MUST remain a single ACK probe.
+- **FR-015a**: Suite events MUST carry client tags `source=dogfood.suite`, `probe_kind=<kind>`, and `probe_run=<token>` so operators can find them in Issues.
+- **FR-016**: Suite client tags MUST be **where-explicit** by kind: `console` → `console.command` + `transaction`; `http` → `url` + `http.route` + `http.method` (+ `transaction`); `messenger` → `messenger.message_class` (+ `transaction`). Real BeaconBundle listeners continue to put command/URL in `extra` / request (issue UI promotes those as **system** tags); the suite additionally sets client tags for dogfood clarity.
+- **SC-008**: After `make beacon-suite` against a loopback dogfood DSN, ingest ACKs all suite kinds; the `console` event persists with `extra.console.command` and client tag `console.command=app:beacon:test`; the `http` event persists with client tags `url` and `http.route` (Messenger workers running).
 
 ### 2026-08-17 — Isolated E2E server-env file (`104`)
 

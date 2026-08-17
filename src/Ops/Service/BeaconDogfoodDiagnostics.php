@@ -94,7 +94,7 @@ final readonly class BeaconDogfoodDiagnostics
             );
         }
 
-        $notes[] = 'Probe level is info (BeaconBundle connection test). Webhook destinations often omit info; member alerts only fire for new/regression issues.';
+        $notes[] = 'Webhook destinations often omit info-level events; member alerts only fire for new/regression issues.';
 
         $event = null;
         if (null !== $eventId && '' !== $eventId) {

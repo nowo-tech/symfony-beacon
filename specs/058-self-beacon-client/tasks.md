@@ -12,3 +12,5 @@
 - [x] T010 Seed/dogfood write loopback `BEACON_DSN` preferring `.env.local`; `make reclaim-demo-client-env` after writing `.demo-client.env` (CI/host readable)
 - [x] T011 Docs: DSN.md / CHANGELOG / UPGRADING; unit tests for dogfood diagnostics
 - [x] T012 `ignore_exceptions` for `AccessDeniedException` + `AccessDeniedHttpException` in `nowo_beacon.yaml`; spec FR-010 / SC-003a; DSN.md note
+- [x] T013 `BeaconDogfoodProbeSuite` + `app:beacon:test --suite` / `make beacon-suite` (message/exception/console/http/messenger/breadcrumbs; unique fingerprints)
+- [x] T014 Suite client tags where-explicit (`console.command`, `url`/`http.route`, `messenger.message_class`, `transaction`) + unit tests; spec FR-015 / FR-016 / SC-008 / User Story 6; DSN.md + CHANGELOG

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.21.0)](#unreleased-main-after-1210)
+- [Unreleased (main after 1.22.0)](#unreleased-main-after-1220)
+- [Upgrading from 1.21.0 to 1.22.0](#upgrading-from-1210-to-1220)
 - [Upgrading from 1.20.3 to 1.21.0](#upgrading-from-1203-to-1210)
 - [Upgrading from 1.20.2 to 1.20.3](#upgrading-from-1202-to-1203)
 - [Upgrading from 1.20.1 to 1.20.2](#upgrading-from-1201-to-1202)
@@ -85,9 +86,29 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.21.0)
+## Unreleased (main after 1.22.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.21.0 to 1.22.0
+
+Dogfood multi-event probe suite (`058` amendment). **No migrations.**
+
+1. Pull / checkout `v1.22.0`.
+
+2. Optional — validate Issues UI panels against the loopback dogfood project:
+
+```bash
+make dogfood          # if BEACON_DSN needs re-wiring
+make restart          # reload .env.local into php/messenger
+make beacon-suite     # or: make beacon-test ARGS='--suite --run-token=demo'
+```
+
+3. In the Symfony Beacon project Issues list, filter by tag `probe_run=<token>` (printed by the command). Console/HTTP suite issues expose where-it-happened client tags (`console.command`, `url` / `http.route`, …).
+
+4. Single ACK probe is unchanged: `make beacon-test`.
+
+See [DSN.md](DSN.md) and [CHANGELOG.md](CHANGELOG.md) `[1.22.0]`.
 
 ## Upgrading from 1.20.3 to 1.21.0
 
