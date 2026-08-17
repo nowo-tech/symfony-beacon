@@ -32,6 +32,10 @@ As an operator, prod responses include baseline security headers.
 
 Prod Caddy snippets remain the baseline for HSTS / frame / referrer. HTML **Content-Security-Policy** is owned by `ContentSecurityPolicySubscriber` (nonce for `script-src` / `style-src-elem`; `style-src-attr 'unsafe-inline'` for CSSOM; optional Mercure origin on `connect-src`). Kit admin host `<style>` blocks MUST use `csp_nonce()`. See `081` amendment “Kit Administration chrome sync” and `docs/PRODUCTION.md`.
 
+## Amendment (Hot Reload CSP, 2026-08-17)
+
+Debug CSP MUST NOT list `cdn.jsdelivr.net` by default. `nowo-tech/hot-reload-bundle` ≥**1.3.2** (`require-dev`, `dev`/`test` only) appends that host via `csp_augment_script_src` **when it injects**, and stamps the preserve boot script with request attribute `_beacon_csp_nonce`. Production MUST NOT register the bundle. See `docs/ops/FRANKENPHP-HOT-RELOAD.md`.
+
 ## Out of scope
 
 - WAF.

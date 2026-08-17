@@ -57,6 +57,7 @@
 - [x] T035 Remove temporary Beacon host workarounds (Redis progress decorators, ApplicationTables checker, CookieConsent schema subscriber, DatabaseUrl form/Twig overrides)
 - [x] T036 Profiles: `database_url` `optional: true`; `messenger:setup-transports` after migrations; entrypoint / messenger `auto_setup: false` (FR-012 / FR-013)
 - [x] T037 Spec 100% product sync (US8–US9, FR-003/008/011–013, progress model, success criteria, ROADMAP **6.49**)
+- [x] T038 Gate AuthKit until setup 100% (drop login/register exclusions); spec FR-014; INSTALL/README first-admin = wizard
 
 ## Upstream SiteBackupBundle / CookieConsentBundle (adopted)
 

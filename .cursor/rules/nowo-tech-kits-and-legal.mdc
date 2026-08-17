@@ -21,14 +21,14 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Dashboard menus (DB + Twig/API) | `nowo-tech/dashboard-menu-bundle` | Tree menus, i18n, permissions, admin CRUD |
 | Admin UI macros / `nowo-ui-*` CSS / modals | `nowo-tech/ui-kit-bundle` | Host: `css_framework: tailwind`, `icon_set: ux_icon`; remap tokens under `.kit-admin`; ≥1.8 Stimulus peers (clipboard/confirm/toast/tabs/page-loader) |
 | Symfony forms (options merge, i18n conventions) | `nowo-tech/form-kit-bundle` | Prefer over hand-rolled form themes / labels; kit profiles for AuthKit/admin; ≥2.4 CSRF-only + GET filter factories (`090` / `101`) |
-| Phone / E.164 country-prefix inputs | `nowo-tech/phone-input-bundle` | Account → Profile (`100`); ≥1.3 CSP-safe kit picker — do not hand-roll dial codes or host Twig forks |
-| Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers |
+| Phone / E.164 country-prefix inputs | `nowo-tech/phone-input-bundle` | Account → Profile (`100`); ≥1.3 CSP-safe kit picker — do not hand-roll dial codes or host Twig/JS forks. Thin `_phone_input.scss` theme bridge is allowed (Bootstrap tokens → Beacon `--color-*`) |
+| Progressive Web App (manifest, SW, install) | `nowo-tech/pwa-bundle` | Prefer over hand-rolled service workers. Do **not** fork `pwa/install_links.html.twig` (vendor + host SCSS BEM + Preferences hint) |
 | Dual locale public paths (`/foo` + `/{locale}/foo`) | `nowo-tech/routing-kit-bundle` | `#[Routable]` + panel `/_routing/`; AuthKit/SiteBackup keep their own locale config |
 | HTTP request/response audit log + admin | `nowo-tech/http-log-bundle` | Admin `/admin/http-log`; async Messenger persist; host layout `kit/http_log_admin_layout.html.twig` |
 | Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest. Also installed **in this server** for dogfooding when `BEACON_DSN` is set. |
 | Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs + Mailer DSN |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
-| FrankenPHP hot reload (dev client) | `nowo-tech/hot-reload-bundle` | ≥1.3: auto-inject + CSP nonce/augment + `@NowoHotReloadBundle` WDT panel; prefer over hand-rolled Vite/Twig Idiomorph wiring |
+| FrankenPHP hot reload (dev client) | `nowo-tech/hot-reload-bundle` | ≥**1.3.2**: auto-inject + CSP nonce/augment + `@NowoHotReloadBundle` WDT panel + Twig Extra; prefer over hand-rolled Vite/Twig Idiomorph wiring |
 
 Packagist vendor: https://packagist.org/packages/nowo-tech/
 

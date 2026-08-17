@@ -188,7 +188,7 @@ make qa
 ## 6. Manual smoke checklist
 
 1. Clear cache: `docker compose exec -T php php bin/console cache:clear`
-2. Anonymous: open `/{locale}/login` and `/{locale}/register` (if first-user registration still open); open `/setup` (default locale) and `/{locale}/setup`.
+2. Anonymous: open `/setup` (default locale) and `/{locale}/setup`. AuthKit `/{locale}/login` and `/{locale}/register` stay gated until setup completes; after setup, first-user registration remains `first_user_only`.
 3. Locale switcher on AuthKit layout changes the path locale.
 4. Sign in; switch locale from the header; confirm preference persists after reload (no `_locale=` in the URL).
 5. Account → Display language list includes the new locale.

@@ -15,3 +15,4 @@ Add `nowo-tech/beacon-bundle` to the Beacon server for dogfooding. Seed demo key
 5. (2026-08-16) Pin beacon-bundle **1.7.3**; host wrapper diagnostics (ACK ≠ Web Push).
 6. (2026-08-16) `nowo_beacon.ignore_exceptions`: `AccessDeniedException` + `AccessDeniedHttpException`; document in DSN.md / spec FR-010.
 7. (2026-08-17) `BeaconDogfoodProbeSuite` + `app:beacon:test --suite` / `make beacon-suite`; explicit where-it-happened client tags (FR-015 / FR-016).
+8. (2026-08-17) Spec implementation table: seven kinds, sync `EnvelopeTransport`, fingerprint `beacon-suite`+kind+token, `--check-only` preview (FR-015b). Docs: DSN.md operator matrix.

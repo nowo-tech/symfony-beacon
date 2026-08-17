@@ -224,6 +224,7 @@ Host Twig catch-up after Types already on `beacon` / `filter`:
 - `077-form-type-field-loop` — host Form Type field loop; FormKit remains preferred for attrs.
 - `090-csrf-symfony-forms` — host CSRF via Symfony Forms / kit `CsrfOnlyType` (FormKit ≥ 2.4 / `101`); GET filters on host `AbstractGetFilterType` → kit base.
 - `101-kit-csp-shared-helpers` — PhoneInput 1.3 / CookieConsent 1.9 / FormKit 2.4 / UiKit 1.8 CSP + shared helpers upstream.
+- `nowo-tech/pwa-bundle` — Preferences install links = vendor + `_components.scss` BEM (no `install_links.html.twig` host fork as of 2026-08-17).
 - `084-ops-env-to-db` — Ops defaults UI (section tabs + FormKit Types).
 - `080-dashboard-aside-panels` / `079-dashboard-assignments` — list pagination convention.
 - `056-setup-wizard` — SiteBackup host layouts stay Tailwind + UiKit tokens.
@@ -236,7 +237,7 @@ Host Twig catch-up after Types already on `beacon` / `filter`:
 
 ## Out of Scope
 
-- Replacing every kit Twig host fork with pure vendor templates in this release (shrink over time).
+- Replacing every kit Twig host fork with pure vendor templates in this release (shrink over time). **PWA `install_links` fork was removed 2026-08-17** (vendor template + host SCSS BEM + Preferences hint beside `nowo_pwa_install_links()`). Keep `install_prompt` only while brand mark needs Twig.
 - Changing FormKit/AuthKit/UiKit/RoutingKit internals beyond consuming Packagist releases (e.g. merger clearing `attr.placeholder` when only profile `placeholder: false` is set — host uses `addHiddenFilterField` instead).
 - Migrating guest/login layout fully onto UiKit shell (AuthKit keeps `guest_shell` / layout override).
 - Legal notice / privacy copy rewrites (remind operators to keep English legal pages current when adding tracking).

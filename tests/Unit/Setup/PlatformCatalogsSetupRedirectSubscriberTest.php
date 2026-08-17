@@ -62,12 +62,29 @@ final class PlatformCatalogsSetupRedirectSubscriberTest extends TestCase
         self::assertNull($member->getResponse());
     }
 
-    public function testSkipsExcludedAuthKitRoute(): void
+    public function testRedirectsAuthKitLoginAndRegisterWhenCatalogsMissing(): void
     {
         $subscriber = $this->subscriber();
-        $event = $this->event('/account/profile', route: 'nowo_auth_kit_account');
-        $subscriber->onKernelRequest($event);
-        self::assertNull($event->getResponse());
+
+        foreach (['nowo_auth_kit_login' => '/login', 'nowo_auth_kit_register' => '/register'] as $route => $path) {
+            $event = $this->event($path, route: $route);
+            $subscriber->onKernelRequest($event);
+            self::assertNotNull($event->getResponse(), $route.' should stay gated until setup completes');
+            self::assertSame('/setup', $event->getResponse()->headers->get('Location'));
+        }
+    }
+
+    public function testStillSkipsLegalAndHealthRoutes(): void
+    {
+        $subscriber = $this->subscriber();
+
+        $legal = $this->event('/legal/privacy', route: 'legal_privacy');
+        $subscriber->onKernelRequest($legal);
+        self::assertNull($legal->getResponse());
+
+        $health = $this->event('/health/live', route: 'health_live');
+        $subscriber->onKernelRequest($health);
+        self::assertNull($health->getResponse());
     }
 
     public function testSwallowsCatalogStateFailures(): void

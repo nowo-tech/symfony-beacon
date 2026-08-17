@@ -11,7 +11,7 @@
 
 | ID | Area | Deliverable |
 |----|------|-------------|
-| K1 | PhoneInput **1.3.0** | CSP-safe external `nowo-phone-prefix-picker.js` + widget markup; kit `phone_input.css` progressive enhancement; no host Twig/Stimulus/SCSS fork |
+| K1 | PhoneInput **1.3.0** | CSP-safe external `nowo-phone-prefix-picker.js` + widget markup; kit `phone_input.css`; no host Twig/Stimulus fork. Thin `_phone_input.scss` theme bridge allowed (2026-08-17). |
 | K2 | CookieConsent **1.9.0** | Standalone `nowo-cookie-consent.css`; skip `<style>` inject when `data-nowo-cookie-consent-css`; Beacon skin upstream; layouts link kit CSS |
 | K4 | FormKit **2.4.0** | `CsrfOnlyType` / `HiddenFieldsCsrfType` / `SearchQueryType` / `CsrfOnlyFormFactory` / `GetFilterFormFactory` / kit `AbstractGetFilterType`; Beacon keeps dashboard helpers on `App\Shared\Form\AbstractGetFilterType` |
 | K5 | UiKit **1.8.0** | IIFEs `nowo-ui-clipboard.js` / `nowo-ui-tabs.js`; Stimulus peers under `stimulus-peers/`; Beacon re-exports peers from vendor |
@@ -26,11 +26,11 @@
 
 ## User Scenarios & Testing
 
-### User Story 1 - Profile phone under CSP without host fork (P1)
+### User Story 1 - Profile phone under CSP without host Twig/JS fork (P1)
 
 **Why this priority**: Host fork duplicated kit behaviour; kit 1.3 owns CSP-safe picker.
 
-**Independent Test**: Account → Profile with CSP; prefix picker works; no `templates/bundles/NowoPhoneInputBundle` override; no `phone_prefix_picker_controller.ts`.
+**Independent Test**: Account → Profile with CSP; prefix picker works; no `templates/bundles/NowoPhoneInputBundle` override; no `phone_prefix_picker_controller.ts`. Thin `_phone_input.scss` theme bridge may be present.
 
 **Acceptance Scenarios**:
 
@@ -76,7 +76,7 @@
 ## Functional Requirements
 
 - **FR-001**: Pin `nowo-tech/phone-input-bundle` **1.3.0**, `cookie-consent-bundle` **1.9.0**, `form-kit-bundle` **2.4.0**, `ui-kit-bundle` **1.8.0** (exact pins in `composer.json`).
-- **FR-002**: MUST NOT keep host forks for phone widget Twig, `phone_prefix_picker` Stimulus, or `_phone_input.scss`. A thin `_cookie_consent.scss` host bridge is allowed again as of `103` (footer/position only — not a full skin fork).
+- **FR-002**: MUST NOT keep host forks for phone widget Twig or `phone_prefix_picker` Stimulus. A thin `_phone_input.scss` host **theme bridge** is allowed (2026-08-17): remap kit Bootstrap `--bs-*` fallbacks to Beacon `--color-*` / `data-theme` only — do not re-fork picker JS/Twig. A thin `_cookie_consent.scss` host bridge is allowed again as of `103` (footer/position only — not a full skin fork).
 - **FR-003**: Public layouts (`base`, `guest_shell`) MUST load kit cookie skin without JS `<style>` injection. As of `103`: Vite-bundled import + `data-nowo-cookie-consent-external-css="true"` (do not `<link>` `/bundles/nowocookieconsent/*` on public pages).
 - **FR-004**: Host MUST NOT redefine `CsrfOnlyType`, `HiddenFieldsCsrfType`, `SearchQueryType`, `CsrfOnlyFormFactory`, or `GetFilterFormFactory` under `App\Shared\Form`.
 - **FR-005**: Host `AbstractGetFilterType` MUST extend kit `Nowo\FormKitBundle\Form\AbstractGetFilterType` and MAY keep Beacon-only dashboard helpers.
@@ -86,7 +86,7 @@
 ## Success Criteria
 
 - **SC-001**: Kit releases published on Packagist; Beacon `composer update` resolves the four pins.
-- **SC-002**: Profile phone + guest cookie modal work under CSP without host SCSS forks.
+- **SC-002**: Profile phone + guest cookie modal work under CSP without host Twig/JS picker forks (thin SCSS token bridges allowed).
 - **SC-003**: `lint:container` + targeted PHPUnit/Vitest for CSRF factories and peer controllers pass.
 - **SC-004**: Specs `100` / `090` / `081` / `002` amended; ROADMAP Phase **6.52** recorded.
 
@@ -113,3 +113,7 @@ Implements K1–K5 + B1 as Phase **6.52**. No Doctrine migration.
 ### 2026-08-17 — Cookie CSS Vite bundle (`103`)
 
 Ad blockers often strip `/bundles/nowocookieconsent/nowo-cookie-consent.css`. Host now imports the kit CSS into Vite `app`, sets `data-nowo-cookie-consent-external-css="true"`, and keeps a thin `_cookie_consent.scss` bridge. Amends FR-002 / FR-003 and User Story 2. Full write-up: `103-cookie-consent-vite-e2e-security`.
+
+### 2026-08-17 — PhoneInput host theme bridge
+
+FR-002 no longer forbids `_phone_input.scss`. Kit `phone_input.css` uses Bootstrap color tokens; Beacon remaps them under `html .nowo-phone-input*` (including portaled dropdown under `body`) so dark mode / `.input` metrics match. Picker JS and widget Twig stay vendor-only (`100` amendment).

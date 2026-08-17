@@ -13,7 +13,7 @@
 |----|------|-------------|
 | P1 | Kit | Pin `nowo-tech/phone-input-bundle` (**1.2.1** at ship; **1.3.0** after `101`) |
 | P2 | Profile form | `AccountProfileType` uses `PhoneType` (CONCATENATED E.164 → `User.phone`); FormKit `mergeFieldOptions` + `user_preferences` catalogue |
-| P3 | CSP / UX | At ship: host widget override + Stimulus `phone-prefix-picker` + `_phone_input.scss`. **Superseded by `101`**: kit IIFE + `phone_input.css` (no host fork) |
+| P3 | CSP / UX | Kit IIFE + `phone_input.css` (no host Twig/JS fork). Host `_phone_input.scss` theme bridge only (2026-08-17). |
 | P4 | QR env split | Default `qr_login.mode: disabled`; `when@dev` / `when@test` → `enabled` (096 / AUTH-005) |
 | P5 | Tests | PHPUnit submits `user_profile[phone][country_iso]` + `[national_number]`; verify/clear `phoneVerifiedAt` still holds (`095`) |
 | O1 | Dogfood ops | `make restart` → `up -d --force-recreate` for php/messengers so Compose reloads `.env.local` (`BEACON_DSN`) |
@@ -85,7 +85,7 @@
 
 - **FR-001**: Require `nowo-tech/phone-input-bundle` and register bundle + `nowo_phone_input` defaults.
 - **FR-002**: `AccountProfileType` MUST use kit `PhoneType` with country prefix selector and CONCATENATED value format into `User.phone`.
-- **FR-003**: Prefix picker MUST be CSP-safe (kit external JS ≥ **1.3**, or equivalent). MUST NOT rely on vendor inline script. Host MUST NOT keep a Twig/Stimulus/SCSS fork after `101`.
+- **FR-003**: Prefix picker MUST be CSP-safe (kit external JS ≥ **1.3**, or equivalent). MUST NOT rely on vendor inline script. Host MUST NOT keep a Twig/Stimulus picker fork after `101`. A thin host `_phone_input.scss` **theme bridge** is allowed (token remap only — Bootstrap `--bs-*` fallbacks → Beacon `--color-*` / `data-theme`; no picker JS/Twig).
 - **FR-004**: Default AuthKit `qr_login.mode` MUST be `disabled`; MUST be `enabled` under `when@dev` and `when@test`.
 - **FR-005**: PHPUnit Account profile tests MUST exercise the compound phone fields and verification hygiene.
 - **FR-006**: `make restart` MUST recreate app containers so `.env.local` (including `BEACON_DSN`) is reloaded.
@@ -111,7 +111,7 @@
 
 - Config: `config/packages/nowo_phone_input.yaml`, `nowo_auth_kit.yaml` (`when@dev` / `when@test`)
 - Form: `src/Identity/Form/AccountProfileType.php`
-- Assets (as of `101`): kit `phone_input.css` + flag-icons on Profile; kit `nowo-phone-prefix-picker.js` from widget (no host `_phone_input.scss` / `phone_prefix_picker`)
+- Assets (as of `101` + 2026-08-17 theme bridge): kit `phone_input.css` + flag-icons on Profile; kit `nowo-phone-prefix-picker.js` from widget (no host Twig/Stimulus). Host `_phone_input.scss` remaps kit Bootstrap tokens to Beacon `--color-*` / `data-theme` (imported from `app.scss`).
 - Twig: kit `@NowoPhoneInputBundle/Form/phone_input_widget.html.twig` (no host override); `templates/account/profile.html.twig`
 - Tests: `tests/Functional/Identity/AccountPreferencesTest.php`
 - Make: `restart` target force-recreate
@@ -124,4 +124,8 @@ Implements P1–P5 + O1–O2 as Phase **6.51** / **v1.16.0**. No Doctrine migrat
 
 ### 2026-08-15 — Kit CSP upstream (`101`)
 
-PhoneInput **1.3.0** owns the CSP-safe prefix picker and progressive-enhancement CSS. Host Twig override, Stimulus controller, and `_phone_input.scss` removed. See `101-kit-csp-shared-helpers`.
+PhoneInput **1.3.0** owns the CSP-safe prefix picker and progressive-enhancement CSS. Host Twig override and Stimulus `phone_prefix_picker` removed.
+
+### 2026-08-17 — Host theme bridge (`_phone_input.scss`)
+
+Kit `phone_input.css` still paints the prefix toggle / portaled dropdown with Bootstrap tokens (`--bs-body-bg` → white fallback). Beacon is Tailwind + `--color-*` / `data-theme`, so without a host bridge the country picker stays white in dark mode and misaligns with `.input`. Host `assets/styles/_phone_input.scss` (loaded from `app.scss`) remaps theme + metrics only — **not** a Twig/JS fork. Same pattern as the thin `_cookie_consent.scss` bridge (`103`). See `101` amendment.

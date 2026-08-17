@@ -7,10 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.0] - 2026-08-17
+
 ### Changed
 
 - **Platform OTHER 100% close**: BP-004 boundary script asserts `SqlLikeEscaper` + Project `EXTRA_LAZY`; ENGINEERING-AUDIT records hot-path query inventory (REV-003) and kit Twig fork inventory (REV-004); removed host fork `templates/bundles/NowoPwaBundle/pwa/install_links.html.twig` (vendor + SCSS BEM + Preferences hint). Matrix: Beacon column no remaining ⚠️/❌.
-- **FrankenPHP hot reload client**: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) **1.3.0** (Twig `@NowoHotReloadBundle` profiler panel, CSP nonce via `_beacon_csp_nonce`, `csp_augment_script_src`, WDT). Host config only sets the nonce attribute (bundle defaults for the rest). Removed host `HotReloadCspNonceSubscriber` / always-on jsDelivr in debug CSP. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
+- **FrankenPHP hot reload client**: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) **1.3.2** (Twig Extra runtime; Twig `@NowoHotReloadBundle` profiler panel, CSP nonce via `_beacon_csp_nonce`, `csp_augment_script_src`, WDT). Host config only sets the nonce attribute (bundle defaults for the rest). Removed host Vite/Twig Idiomorph client and always-on jsDelivr in debug CSP. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
+- **Setup gate**: SiteBackup no longer excludes AuthKit `/login`/`/register` (or localized twins). First admin is created in the wizard (`admin_user`) or via `make ready` / CLI — not a public register flow on an incomplete catalog (`056` FR-014).
+- **PhoneInput theme bridge**: host `_phone_input.scss` remaps kit Bootstrap tokens to Beacon `--color-*` / `data-theme` (no Twig/JS fork). Rebuild assets after pull (`make vite-build`).
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: `composer install` (pins `nowo-tech/hot-reload-bundle` **1.3.2**, `require-dev`) and `make vite-build` (PhoneInput theme bridge).
+- Cold-start: finish **`/setup`** (or `make ready`) for the first admin. Existing instances with `setup_completed_at` are unchanged.
 
 ## [1.22.0] - 2026-08-17
 
@@ -1437,7 +1447,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...HEAD
+[1.23.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...v1.23.0
 [1.22.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.21.0...v1.22.0
 [1.21.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.3...v1.21.0
 [1.20.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.2...v1.20.3

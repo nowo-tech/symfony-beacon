@@ -2,7 +2,7 @@
 
 Local Docker uses FrankenPHP’s built-in **hot reload**: when you change PHP, Twig, config, or assets, the browser updates without a manual refresh.
 
-Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-reload/). Client integration: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) ≥**1.3.0** (wraps [`frankenphp-hot-reload`](https://www.npmjs.com/package/frankenphp-hot-reload) + optional Idiomorph from jsDelivr).
+Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-reload/). Client integration: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) ≥**1.3.2** (wraps [`frankenphp-hot-reload`](https://www.npmjs.com/package/frankenphp-hot-reload) + optional Idiomorph from jsDelivr; Twig Extra runtime).
 
 ## What is wired
 
@@ -10,7 +10,7 @@ Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-
 |-------|------|
 | `.docker/frankenphp/Caddyfile` | `php_server { hot_reload { watch … } }` + built-in `mercure` (dev only); HTTP Mercure is reverse-proxied to that hub for Messenger |
 | `FRANKENPHP_WORKER_CONFIG=watch` | With `make worker`, restarts PHP workers when watched files change |
-| `nowo-tech/hot-reload-bundle` | Dev/test: auto-inject client, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment, Web Debug Toolbar panel `nowo_hot_reload` |
+| `nowo-tech/hot-reload-bundle` **≥1.3.2** | Dev/test only: auto-inject client, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment (`cdn.jsdelivr.net`), Web Debug Toolbar panel `nowo_hot_reload`. Host YAML overrides the nonce attribute only. |
 | `.docker/frankenphp/Caddyfile.prod` | **No** hot reload (production) |
 
 ## How to use
@@ -26,7 +26,7 @@ No Twig includes are required: with `auto_inject: true`, `HotReloadResponseSubsc
 
 ## CSP note
 
-Host CSP stays `script-src 'self' 'nonce-…'` in debug. When Hot Reload injects, the bundle appends `https://cdn.jsdelivr.net` via `csp_augment_script_src` and stamps the preserve boot script with the `_beacon_csp_nonce` request attribute. Production does **not** load this bundle. Do not enable `hot_reload` in production Compose.
+Host CSP stays `script-src 'self' 'nonce-…'` in debug (no always-on jsDelivr). When Hot Reload injects, the bundle appends `https://cdn.jsdelivr.net` via `csp_augment_script_src` and stamps the preserve boot script with the `_beacon_csp_nonce` request attribute. Production does **not** register this bundle (`allow_production: false`). Do not enable `hot_reload` in production Compose.
 
 ## Mercure note
 

@@ -98,12 +98,16 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertStringNotContainsString('token=', $location);
     }
 
-    public function testLoginAndHealthDoNotRedirectWhenPlatformCatalogsEmpty(): void
+    public function testLoginAndRegisterRedirectToSetupWhenPlatformCatalogsEmpty(): void
     {
         $client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/en/login');
-        self::assertResponseIsSuccessful();
+        foreach (['/en/login', '/en/register', '/login', '/register'] as $path) {
+            $client->request(Request::METHOD_GET, $path);
+            self::assertTrue($client->getResponse()->isRedirection(), $path.' should redirect to setup');
+            $location = (string) $client->getResponse()->headers->get('Location');
+            self::assertMatchesRegularExpression('#/setup/?$#', $location, $path);
+        }
 
         $client->request(Request::METHOD_GET, '/health/live');
         self::assertResponseIsSuccessful();

@@ -13,7 +13,7 @@
 ## Phase 2: Beacon consume
 
 - [x] T005 Pin four kits in `composer.json` / lock; `assets:install`
-- [x] T006 Remove phone Twig override, `phone_prefix_picker`, `_phone_input.scss`; link kit CSS on Profile
+- [x] T006 Remove phone Twig override and `phone_prefix_picker`; link kit CSS on Profile. Host `_phone_input.scss` later restored as theme bridge only (`100` T014 / 2026-08-17).
 - [x] T007 Remove `_cookie_consent.scss`; link `nowo-cookie-consent.css` on `base` + `guest_shell`
 - [x] T008 Switch to FormKit CSRF/GET FQCNs; migrate `createNamed` / `create`; slim host `AbstractGetFilterType`
 - [x] T009 Re-export UiKit Stimulus peers; drop phone-prefix from `stimulus_bootstrap.ts`

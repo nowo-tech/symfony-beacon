@@ -56,18 +56,19 @@ make beacon-test ARGS='--suite --run-token=demo --wait=15'
 - there are no `push_subscription` rows / VAPID is unset (no Web Push),
 - the event never appears (workers not running).
 
-`make beacon-suite` (`app:beacon:test --suite`) posts **several synthetic events** with unique fingerprints (shared `probe_run` token) so you can open Issues and validate UI panels:
+`make beacon-suite` (`app:beacon:test --suite`) posts **seven synthetic Envelopes** synchronously (not via `nowo_beacon.transport.mode`) with fingerprint `['beacon-suite', <kind>, <runToken>]` so you can open Issues and validate UI panels. Preview without sending: `make beacon-test ARGS='--suite --check-only'`.
 
-| Kind | What to check on the issue detail |
-|------|-----------------------------------|
-| `message-info` / `message-error` | Message + level badge |
-| `exception` | Stack / culprit |
-| `console` | Highlights CLI command + Console panel (`extra.console`) |
-| `http` | Request / HTTP route · controller · status |
-| `messenger` | Messenger (+ Scheduler) panels |
-| `breadcrumbs` | Breadcrumbs trail |
+| Kind | Extra / context | Client tags (plus `source=dogfood.suite`, `probe_kind`, `probe_run`) | Issue UI to check |
+|------|-----------------|---------------------------------------------------------------------|-------------------|
+| `message-info` | info message | `transaction=cli://…#message-info` | Message + level badge |
+| `message-error` | error message | `transaction=cli://…#message-error` | Message + error badge |
+| `exception` | `RuntimeException` stack | `transaction=cli://…#exception` | Stack / culprit |
+| `console` | `extra.console.command=app:beacon:test` | `console.command`, `transaction=cli://app:beacon:test` | Highlights + Console panel |
+| `http` | GET `project_issues_index`, `extra.http` status 500 | `url`, `http.route`, `http.method` | Request / HTTP panels |
+| `messenger` | `extra.messenger` + `extra.scheduler` | `messenger.message_class` | Messenger + Scheduler panels |
+| `breadcrumbs` | three `dogfood` crumbs | `transaction=cli://…#breadcrumbs` | Breadcrumbs trail |
 
-Filter or search by tag `probe_run=<token>` (printed by the command). Client tags are **where-explicit** by kind (`console.command`, `url` / `http.route`, `messenger.message_class`, plus `probe_kind` / `source=dogfood.suite`). On real Bundle-captured failures, command/URL live in `extra` / request and appear as **system** tags in the issue UI. Default single-probe `make beacon-test` stays a thin ACK check.
+Filter or search by tag `probe_run=<token>` (printed by the command). On real Bundle-captured failures, command/URL live in `extra` / request and appear as **system** tags; the suite also sets **client** tags so dogfood Issues are searchable. Default single-probe `make beacon-test` stays a thin ACK check. Workers must be running for events to persist. See spec `058` User Story 6 / FR-015.
 
 HTTP **200** only means ingest accepted the Envelope — not that a browser notification was sent. Thin client-only probe: `bin/console nowo:beacon:test`.
 

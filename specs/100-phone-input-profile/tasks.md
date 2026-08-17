@@ -27,3 +27,7 @@
 - [x] T011 Spec + ROADMAP 6.51 + CHANGELOG + `feature.json`
 - [x] T012 Cross-amend `072` / `096` / `098` / `058`; kits rule; `docs/API.md` QR note
 - [x] T013 Operator working file `.env.local` (REQ-ENV-003); CI `COMPOSE_ENV_FILES`; `ensure-env-local.sh`
+
+## Phase 5: Host theme bridge (2026-08-17)
+
+- [x] T014 Host `_phone_input.scss` token remap (`html .nowo-phone-input*` + portaled dropdown) imported from `app.scss`; no Twig/Stimulus fork

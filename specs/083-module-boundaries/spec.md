@@ -29,7 +29,7 @@ There is no new end-user product surface. Success is measurable as: docs ↔ cod
 | Tests | `AnalyticsPeriodResolverTest` + `AnalyticsSeriesServiceTest`; Performance list + `nplus1` filter |
 | Demo seed | `Setup\Demo\*` + `Setup\Command\{SeedPlatform,SeedSample}` (left Shared) |
 | Project HTTP | `AdminProjectController` + `AdminProjectAccessController`; `ProjectController` + `ProjectApiKeyController` + `ProjectDangerZoneController` |
-| CI guardrail | `.scripts/check-module-boundaries.sh` (+ `make check-module-boundaries` / CI git-hygiene) |
+| CI guardrail | `.scripts/check-module-boundaries.sh` (+ `make check-module-boundaries` / CI git-hygiene). **2026-08-17 (BP-004):** also asserts `src/Shared/Doctrine/SqlLikeEscaper.php` exists and `Project` collections use `EXTRA_LAZY`. |
 
 ### Deferred (convergence)
 
@@ -182,3 +182,10 @@ As a maintainer, Analytics period charts/filters and Performance N+1 listing hav
 - Prior features: `002-identity-project`, `003-ingest`, `004-issues`, `025-analytics-charts`, `035-ops-overview`, `051` (worker re-check), `056-setup-wizard`, `067`/`070`/`074` (OTLP), `084-ops-env-to-db`, `079-dashboard-assignments`
 - Successor: `085-architecture-convergence`
 - Audit artifact: Cursor canvas architecture audit 2026-08-05
+- Platform close (2026-08-17): `docs/ops/ENGINEERING-AUDIT.md` REV-003/004 + BP-004 script guards (`SqlLikeEscaper`, Project `EXTRA_LAZY`); CONTRIBUTING §21
+
+## Amendments
+
+### 2026-08-17 — BP-004 CI evidence (REQ-BP-004)
+
+`.scripts/check-module-boundaries.sh` already banned AdminProject leaving `Project`, Identity → `ProjectMembershipManager` / `ProjectCreationFormFactory`, OTLP leaving `Ingest/Otlp`, Metrics leaving `Ops`, and Shared owning Issues/Performance write-path types. The platform OTHER 100% close adds file-existence of `SqlLikeEscaper` and an `EXTRA_LAZY` assertion on `src/Project/Entity/Project.php`. Hot-path query inventory and kit Twig fork inventory live in `docs/ops/ENGINEERING-AUDIT.md` (REV-003 / REV-004).

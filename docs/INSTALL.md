@@ -38,7 +38,7 @@ make seed-sample        # optional: PROFILE=dev samples
 
 After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
 
-**Before exposing the HTTP(S) port beyond localhost:** finish `/setup` and/or the first `/register` (first user becomes `ROLE_ADMIN`). Keep `SYMFONY_TRUSTED_PROXIES` empty unless an outer load balancer terminates TLS — see [PRODUCTION.md](PRODUCTION.md) operational inventory. If `.demo-client.env` already exists from an older seed, run `chmod 600 .demo-client.env`.
+**Before exposing the HTTP(S) port beyond localhost:** finish `/setup` (or `make ready`). AuthKit `/login` and `/register` stay gated until catalogs/setup are complete — the first `ROLE_ADMIN` is created in the wizard `admin_user` step (or demo seed). Keep `SYMFONY_TRUSTED_PROXIES` empty unless an outer load balancer terminates TLS — see [PRODUCTION.md](PRODUCTION.md) operational inventory. If `.demo-client.env` already exists from an older seed, run `chmod 600 .demo-client.env`.
 
 To exercise magic login, password reset, or email notifications locally, start **Mailpit** (`make mailpit`), save `smtp://mailpit:1025` (shared `server/` catcher) or `smtp://mailer:1025` (app-local profile) under **Administration → Mailer**, then use **Send sample email**. Details: [MAILPIT.md](ops/MAILPIT.md). Do not run Mailpit in production.
 

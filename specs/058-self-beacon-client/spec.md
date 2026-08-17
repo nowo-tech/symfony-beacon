@@ -87,6 +87,42 @@ As a developer, I run `make beacon-suite` (`app:beacon:test --suite`) to create 
 4. **Given** the `http` suite event, **When** I open issue detail, **Then** Request/HTTP panels show URL/route and client tags include `url` + `http.route` (+ `http.method`).
 5. **Given** `make beacon-test` without `--suite`, **When** it runs, **Then** behavior remains a single ACK probe (suite is opt-in).
 
+## Implementation (as-built, 2026-08-17)
+
+Host wrapper `app:beacon:test` lives in `App\Ops\Command\BeaconTestCommand`. Default path still delegates to BeaconBundle `BeaconConnectionTester` + `BeaconDogfoodDiagnostics`. `--suite` is opt-in and does **not** go through the Bundle tester: it posts Envelopes with `EnvelopeTransport::sendDetailed()` (sync HTTP, same as the Bundle connection test) so `nowo_beacon.transport.mode` cannot drop or delay suite events.
+
+| Surface | Behaviour |
+|---------|-----------|
+| `make beacon-test` | Single ACK probe + local VAPID / push / novelty warnings |
+| `make beacon-test ARGS='--check-only'` | Parse DSN; send nothing |
+| `make beacon-suite` | `bin/console app:beacon:test --suite` |
+| `ARGS='--suite --run-token=T --wait=15'` | Stable fingerprints + diagnostics wait |
+
+CLI options: `--suite`, `--run-token=` (default random hex), `--check-only` (preview kinds, no POST), `--wait=` (Messenger persist, default 10s), `--message=` (single probe only; ignored with `--suite`).
+
+| Class | Role |
+|-------|------|
+| `BeaconDogfoodProbeSuite` | Build + POST one Envelope per kind; `preview()` / `run()` / `buildEnvelopeBody()` / `caseSpec()` |
+| `BeaconDogfoodProbeSuiteReport` | Run token, DSN target, case rows, success flag; `diagnosticEventId()` prefers `console` |
+| `BeaconDogfoodProbeCaseResult` | Per-kind HTTP status, ACK, event id, error |
+| `BeaconDogfoodProbeSuiteTest` | Unit coverage for fingerprints, extras, and where-explicit client tags |
+
+Fingerprint for every kind: `['beacon-suite', <kind>, <runToken>]`. Shared client tags: `source=dogfood.suite`, `probe_kind=<kind>`, `probe_run=<token>`. Message body: `Beacon dogfood suite [<kind>] run=<token>`.
+
+| Kind | Level | Extra / request | Client tags (plus shared) | Issue UI to check |
+|------|-------|-----------------|---------------------------|-------------------|
+| `message-info` | info | `source`, `probe_kind` | `transaction=cli://app:beacon:test#message-info` | Message + level badge |
+| `message-error` | error | same | `…#message-error` | Message + error badge |
+| `exception` | error | `RuntimeException` stack | `transaction=cli://app:beacon:test#exception` | Stack / culprit |
+| `console` | error | `extra.console` (`command=app:beacon:test`, command class, exit_code, options.suite) | `console.command`, `transaction=cli://app:beacon:test` | Highlights + Console panel |
+| `http` | error | Synthetic `Request` (`project_issues_index`, GET, UA `BeaconDogfoodProbeSuite/1.0`) + `extra.http` (route, controller, status 500) | `url`, `http.route`, `http.method`, `transaction=<route>` | Request / HTTP panels |
+| `messenger` | error | `extra.messenger` (DeliverWebPush message class / `async_notify`) + `extra.scheduler` | `messenger.message_class`, `transaction=messenger://…` | Messenger + Scheduler panels |
+| `breadcrumbs` | warning | three `dogfood` crumbs via `BreadcrumbBuffer` | `transaction=cli://app:beacon:test#breadcrumbs` | Breadcrumbs trail |
+
+Operators filter Issues by tag `probe_run=<token>` (printed by the command). Real BeaconBundle listeners still put command/URL in `extra` / request (issue UI promotes those as **system** tags); the suite additionally sets **client** tags so dogfood Issues are searchable without waiting for a production failure.
+
+`--check-only` with `--suite` lists `BeaconDogfoodProbeSuite::KINDS` and does not POST. After ACK, diagnostics wait on the console event id when present. Workers must be running for events to persist (`make worker` / Compose `messenger`).
+
 ## Requirements
 
 - **FR-001**: Require `nowo-tech/beacon-bundle` (**1.7.3+**) from Packagist and register configuration with empty-DSN-safe env defaults.
@@ -98,7 +134,8 @@ As a developer, I run `make beacon-suite` (`app:beacon:test --suite`) to create 
 - **FR-005**: `composer.json` MUST NOT require a private VCS repository entry for `nowo-tech/beacon-bundle` once the package is on Packagist.
 - **FR-006**: `make dogfood` / related seed Make targets MUST create `var/secrets/` before console so Halite can persist `.Halite.default.key`.
 - **FR-007**–**FR-010**: See Amendments (2026-08-16) — single probe, wait diagnostics, ignore 403s, client env reclaim.
-- **FR-015**–**FR-016**: See Amendments (2026-08-17) — dogfood probe suite + explicit where-it-happened client tags.
+- **FR-011**–**FR-014**: See Amendments (2026-08-17) — earliest ROLE_ADMIN dogfood resolve + isolated E2E `--server-env-file`.
+- **FR-015**–**FR-016** (incl. **FR-015b**): See Amendments (2026-08-17) — dogfood probe suite, `--check-only` preview, explicit where-it-happened client tags.
 
 ## Success Criteria
 
@@ -164,9 +201,10 @@ Functional / BrowserKit traffic without `ROLE_ADMIN` (and project ACL 403s) prod
 
 Operators validating issue detail panels need more than a single `info` connection-test message (no `extra.console` / HTTP / messenger). A vague client tag `source=app:beacon:test` is not enough to show **where** the failure happened.
 
-- **FR-015**: `app:beacon:test --suite` (Make: `beacon-suite`) MUST POST several synthetic Envelopes synchronously (message info/error, exception, console, HTTP, messenger[+scheduler], breadcrumbs), each with a unique fingerprint sharing a run token (`--run-token=` or random). Default `make beacon-test` without `--suite` MUST remain a single ACK probe.
+- **FR-015**: `app:beacon:test --suite` (Make: `beacon-suite`) MUST POST several synthetic Envelopes **synchronously** (not via `nowo_beacon.transport.mode`) for kinds `message-info`, `message-error`, `exception`, `console`, `http`, `messenger`, `breadcrumbs`. Each Envelope MUST use fingerprint `['beacon-suite', <kind>, <runToken>]` (`--run-token=` or random hex). Default `make beacon-test` without `--suite` MUST remain a single ACK probe.
 - **FR-015a**: Suite events MUST carry client tags `source=dogfood.suite`, `probe_kind=<kind>`, and `probe_run=<token>` so operators can find them in Issues.
-- **FR-016**: Suite client tags MUST be **where-explicit** by kind: `console` → `console.command` + `transaction`; `http` → `url` + `http.route` + `http.method` (+ `transaction`); `messenger` → `messenger.message_class` (+ `transaction`). Real BeaconBundle listeners continue to put command/URL in `extra` / request (issue UI promotes those as **system** tags); the suite additionally sets client tags for dogfood clarity.
+- **FR-015b**: `--suite --check-only` MUST validate the DSN and list planned kinds without POSTing. `--message=` MUST be ignored when `--suite` is set.
+- **FR-016**: Suite client tags MUST be **where-explicit** by kind: `console` → `console.command` + `transaction`; `http` → `url` + `http.route` + `http.method` (+ `transaction`); `messenger` → `messenger.message_class` (+ `transaction`). Console extra MUST include `extra.console.command=app:beacon:test`. HTTP extra MUST include route `project_issues_index` and a Request on the stack. Messenger extra MUST include a message class plus optional `extra.scheduler`. Breadcrumbs kind MUST attach a short `BreadcrumbBuffer` trail. Real BeaconBundle listeners continue to put command/URL in `extra` / request (issue UI promotes those as **system** tags); the suite additionally sets client tags for dogfood clarity.
 - **SC-008**: After `make beacon-suite` against a loopback dogfood DSN, ingest ACKs all suite kinds; the `console` event persists with `extra.console.command` and client tag `console.command=app:beacon:test`; the `http` event persists with client tags `url` and `http.route` (Messenger workers running).
 
 ### 2026-08-17 — Isolated E2E server-env file (`104`)

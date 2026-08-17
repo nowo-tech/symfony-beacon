@@ -162,7 +162,7 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.95.18",
         "nowo-tech/composer-update-helper": "2.0.34",
-        "nowo-tech/hot-reload-bundle": "1.3.0",
+        "nowo-tech/hot-reload-bundle": "1.3.2",
         "nowo-tech/phpstan-frankenphp": "1.1.0",
         "nowo-tech/twig-inspector-bundle": "1.1.1",
         "phpstan/phpstan": "2.2.8",

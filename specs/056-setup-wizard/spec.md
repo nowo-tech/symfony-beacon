@@ -6,17 +6,17 @@
 
 **Input**: After CLI seed layers (`055`), provide a cold-start UI so empty instances can migrate, seed platform catalogs, create the first admin, and optionally load sample data.
 
-**Current product (pins)**: [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **1.13.0** at `setup.path_prefix: /setup` (ops panel `/_site_backup`); [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) **1.8.0**. Beacon owns host chrome layouts (including friendlier token gate Twig), `AdminUserProvisioner`, `PlatformCatalogsSetupNeedDetector` / redirect subscriber, `InstanceSettingsDurableSetupDoneStore`, and `SetupCompletedSubscriber` → `instance_settings.setup_completed_at`. Complements AuthKit first-user register; does not replace Docker/Compose install.
+**Current product (pins)**: [`nowo-tech/site-backup-bundle`](https://packagist.org/packages/nowo-tech/site-backup-bundle) **1.13.0** at `setup.path_prefix: /setup` (ops panel `/_site_backup`); [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) **1.9.0** (mid-migration skip since **1.8.0**). Beacon owns host chrome layouts (including friendlier token gate Twig), `AdminUserProvisioner`, `PlatformCatalogsSetupNeedDetector` / redirect subscriber, `InstanceSettingsDurableSetupDoneStore`, and `SetupCompletedSubscriber` → `instance_settings.setup_completed_at`. Complements AuthKit after setup is complete (`registration_mode: first_user_only`); does not replace Docker/Compose install. Cold-start first admin is the wizard `admin_user` step (FR-014) — AuthKit stays gated until catalogs/setup are done.
 
 ## User Scenarios
 
 ### US1 — Forced setup when catalogs or schema need it (P1)
 
-As an operator on a fresh (or wiped) instance, SiteBackup detectors (including Beacon’s `PlatformCatalogsSetupNeedDetector`) send HTML traffic to the **locale-aware setup prefix** while the application schema is missing/empty, setup progress is incomplete, or menus / breadcrumbs / cookie consent catalogs are missing. With Beacon’s `setup.locale.in_path: both` + `unlocalized: serve`, that is bare **`/setup`** for `DEFAULT_LOCALE` and **`/{_locale}/setup`** for other enabled locales (`SetupPathPrefixResolver` + `SetupRequestSubscriber`). SiteBackup `setup.cold_start` (with `require_application_tables: true`) keeps the gate cold until non-`nowo_site_backup_*` tables exist. Exclusions cover health, assets, AuthKit login/register/reset, legal, cookie-consent, locale switch, RoutingKit `/admin/_routing`, error previews `/_error` (dev), and ingest API (`nowo_site_backup.exclusions`). `PlatformCatalogsSetupRedirectSubscriber` keeps the FR-006 non-admin exception on top of the kit gate.
+As an operator on a fresh (or wiped) instance, SiteBackup detectors (including Beacon’s `PlatformCatalogsSetupNeedDetector`) send HTML traffic to the **locale-aware setup prefix** while the application schema is missing/empty, setup progress is incomplete, or menus / breadcrumbs / cookie consent catalogs are missing. With Beacon’s `setup.locale.in_path: both` + `unlocalized: serve`, that is bare **`/setup`** for `DEFAULT_LOCALE` and **`/{_locale}/setup`** for other enabled locales (`SetupPathPrefixResolver` + `SetupRequestSubscriber`). SiteBackup `setup.cold_start` (with `require_application_tables: true`) keeps the gate cold until non-`nowo_site_backup_*` tables exist. Exclusions cover health, assets, legal, cookie-consent, locale switch, RoutingKit `/admin/_routing`, error previews `/_error` (dev), and ingest API (`nowo_site_backup.exclusions`). **AuthKit `/login` / `/register` / `/logout` / `/reset-password` (and localized twins) are not excluded** — they stay gated until setup is 100% done; the first admin is created in the wizard `admin_user` step. `PlatformCatalogsSetupRedirectSubscriber` keeps the FR-006 non-admin exception on top of the kit gate and must not treat `nowo_auth_kit_*` as excluded.
 
 ### US2 — Guided fresh_install profile (P1)
 
-As an anonymous or admin operator on setup, I follow the SiteBackup `fresh_install` profile: requirements → bootstrap mode (guided vs full SQL) → optional `database_url` (Skip allowed when Docker/`.env` already has `DATABASE_URL`) → `database_create` → cache clear → migrations → `messenger:setup-transports` → `app:seed-platform` → first `ROLE_ADMIN` via `AdminUserProvisioner` (skip if an admin already exists) → optional sample (`app:seed-sample --size=dev --ensure-demo` on guided) → durable done (`instance_settings.setup_completed_at` via `SetupCompletedEvent`) plus ephemeral file marker (`var/site-backup/setup.done`). AuthKit register remains available outside the wizard for first-user signup when appropriate.
+As an anonymous or admin operator on setup, I follow the SiteBackup `fresh_install` profile: requirements → bootstrap mode (guided vs full SQL) → optional `database_url` (Skip allowed when Docker/`.env` already has `DATABASE_URL`) → `database_create` → cache clear → migrations → `messenger:setup-transports` → `app:seed-platform` → first `ROLE_ADMIN` via `AdminUserProvisioner` (skip if an admin already exists) → optional sample (`app:seed-sample --size=dev --ensure-demo` on guided) → durable done (`instance_settings.setup_completed_at` via `SetupCompletedEvent`) plus ephemeral file marker (`var/site-backup/setup.done`). Public AuthKit register is **not** a cold-start path; finish the wizard (or `make ready` / CLI setup) before `/login` is reachable.
 
 ### US3 — Existing instances skip the wizard (P1)
 
@@ -61,6 +61,7 @@ As an operator on `/setup` before CookieConsent tables exist, the guest shell MU
 - **FR-011**: Beacon MUST treat `instance_settings.setup_completed_at` as the durable “setup done” signal via `InstanceSettingsDurableSetupDoneStore` implementing `DurableSetupDoneStoreInterface`. With `setup.durable_done.enabled: true`, SiteBackup closes `/setup` (+ localized / API) when the store says done and detectors do not require setup; the kit heals `setup.done` + progress phase. Cold-start uses SiteBackup `setup.cold_start` (`require_application_tables: true`) + CookieConsent **1.8** schema-ready probe — **no** Beacon host cold-start / CookieConsent decorators.
 - **FR-012**: `database_url` steps in Beacon profiles MUST be `optional: true`. SiteBackup MUST keep Skip available (and the field non-required) when the step is optional even if detectors report `database connection failed` (missing/empty schema). Beacon MUST NOT ship Twig/form overrides for that Skip behaviour.
 - **FR-013**: FrankenPHP entrypoint MUST wait for the MySQL **server** only (no auto `CREATE DATABASE` / migrate / `messenger:setup-transports` on boot) so SiteBackup can own cold-start; workers MAY wait for schema. Messenger doctrine transports MUST use `auto_setup: false` so consumers do not create tables before the wizard.
+- **FR-014**: While setup is required, SiteBackup exclusions and `PlatformCatalogsSetupRedirectSubscriber` MUST NOT open AuthKit (`/login`, `/register`, `/logout`, `/reset-password`, localized twins, `nowo_auth_kit_*` routes). First `ROLE_ADMIN` MUST be created via the wizard `admin_user` step (`AdminUserProvisioner`) or CLI (`nowo:site-backup:setup` / `make ready`). After setup is complete, AuthKit `registration_mode: first_user_only` remains the post-bootstrap rule.
 
 ## Progress model
 
@@ -85,7 +86,8 @@ Beacon global seal = `instance_settings.setup_completed_at` (FR-001 / FR-011); f
 - Empty schema after `database_create` keeps `/setup` rendering (200) without CookieConsent / Twig Doctrine 500s (US1 / US9).
 - Optional `database_url` Skip works with missing schema (FR-012).
 - Catalog/schema repair still opens the wizard even if `setup_completed_at` is set (US7).
-- Pins: SiteBackup **1.13.0**, CookieConsent **1.8.0**, `progress_storage: cache_doctrine` in `nowo_site_backup.yaml`.
+- Pins: SiteBackup **1.13.0**, CookieConsent **≥ 1.8.0** (current **1.9.0**), `progress_storage: cache_doctrine` in `nowo_site_backup.yaml`.
+- Hitting `/login` or `/register` (bare or localized) while catalogs/setup are incomplete redirects to `/setup` (FR-014).
 
 ## Out of Scope
 
@@ -96,3 +98,9 @@ Beacon global seal = `instance_settings.setup_completed_at` (FR-001 / FR-011); f
 - RoutingKitBundle managing SiteBackup/AuthKit paths; see `064-routing-kit`.
 - Beacon-owned normalized setup-step history table (belongs in SiteBackupBundle).
 - Pure POST-only progress without Redis/cache (kit uses PSR-6 as the pre-DB bridge).
+
+## Amendments
+
+### 2026-08-17 — AuthKit gated until setup completes (FR-014)
+
+Cold-start previously excluded AuthKit paths so `/login` and `/register` could run beside an incomplete catalog. That raced the wizard `admin_user` step (two first-admin paths). Host YAML `nowo_site_backup.exclusions` no longer lists `/login` `/register` `/logout` `/reset-password`; the localized exclusion regex is `(legal|setup)` only. `PlatformCatalogsSetupRedirectSubscriber` dropped those path prefixes and the `nowo_auth_kit_*` route allow-list. First admin = wizard / CLI only until `setup_completed_at` (and catalogs) are done.

@@ -74,7 +74,7 @@ Identity in this repo owns **User** persistence, account preferences, magic-logi
 | Choice | Rationale |
 |--------|-----------|
 | Envelope protocol on the server | Operators can point Envelope-compatible clients (especially `nowo-tech/beacon-bundle`) at this server immediately. |
-| `nowo-tech/beacon-bundle` in another repository | Client instrumentation evolves independently. This server may still **require** the bundle to dogfood its own errors (`BEACON_DSN` → loopback demo project after `make ready`). External apps keep using a separate install. |
+| `nowo-tech/beacon-bundle` in another repository | Client instrumentation evolves independently. This server may still **require** the bundle to dogfood its own errors (`BEACON_DSN` → loopback demo project after `make ready`). Operators verify with `make beacon-test` (ACK) or `make beacon-suite` (multi-event UI probe — spec `058`). External apps keep using a separate install. |
 
 Promoted event columns (environment, release, PHP/Symfony versions, …) exist for **UI and filters**; full JSON in `event.payload` remains the source of truth ([EVENT-CONTEXT.md](product/EVENT-CONTEXT.md)).
 

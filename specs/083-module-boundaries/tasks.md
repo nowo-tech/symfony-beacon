@@ -37,3 +37,4 @@ Appended after implement (2026-08-06). Query/list split is Done; HTTP/mutation s
 - [x] T017 Split `ProjectController` → settings core + `ProjectApiKeyController` + `ProjectDangerZoneController`
 - [x] T018 Analytics series release/level filter test + Performance pagination beyond last page
 - [x] T019 CI/Make `check-module-boundaries` (AdminProject stays in Project)
+- [x] T020 BP-004: script asserts `SqlLikeEscaper` + Project `EXTRA_LAZY`; ENGINEERING-AUDIT inventories; CONTRIBUTING §21

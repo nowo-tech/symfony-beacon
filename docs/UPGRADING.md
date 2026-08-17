@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.22.0)](#unreleased-main-after-1220)
+- [Unreleased (main after 1.23.0)](#unreleased-main-after-1230)
+- [Upgrading from 1.22.0 to 1.23.0](#upgrading-from-1220-to-1230)
 - [Upgrading from 1.21.0 to 1.22.0](#upgrading-from-1210-to-1220)
 - [Upgrading from 1.20.3 to 1.21.0](#upgrading-from-1203-to-1210)
 - [Upgrading from 1.20.2 to 1.20.3](#upgrading-from-1202-to-1203)
@@ -86,9 +87,27 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.22.0)
+## Unreleased (main after 1.23.0)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.22.0 to 1.23.0
+
+Kit + first-run polish (`056` FR-014, hot-reload-bundle **1.3.2**, PhoneInput theme bridge, PWA `install_links` vendor-only). **No migrations.**
+
+1. Pull / checkout `v1.23.0`.
+
+2. `composer install` — pins `nowo-tech/hot-reload-bundle` **1.3.2** (`require-dev`). Host YAML still only sets `csp_nonce_request_attribute: '_beacon_csp_nonce'`.
+
+3. Rebuild frontend assets (PhoneInput host theme bridge `_phone_input.scss`):
+
+```bash
+make vite-build
+```
+
+4. Cold-start: finish **`/setup`** (or `make ready`) for the first admin. `/login` and `/register` stay gated until setup is complete (`056` FR-014). Existing instances with `setup_completed_at` are unchanged.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.23.0]`.
 
 ## Upgrading from 1.21.0 to 1.22.0
 
@@ -2301,10 +2320,10 @@ make bootstrap   # migrate + seed (or: make console ARGS='doctrine:migrations:mi
 
 Then either:
 
-- Register the first admin at https://localhost:9447/en/register, or
-- Use the seeded demo login from `make bootstrap` / `make seed`: `admin@symfony-beacon.local` / `admin123`
+- Open **`/setup?token=$SITE_SETUP_TOKEN`** and create the first admin in the wizard (`admin_user` step), or
+- Use `make ready` / `make seed` for the demo login: `admin@symfony-beacon.local` / `admin123`
 
-Open https://localhost:9447/ (redirects to `/en/login`). After login you land on `/dashboard`.
+AuthKit `/login` and `/register` stay gated until setup (or platform catalogs) are complete. Open https://localhost:9447/ (redirects to `/setup` on a cold DB). After login you land on `/dashboard`.
 
 ### Breaking expectations for consumers
 

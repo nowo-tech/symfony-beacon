@@ -89,7 +89,7 @@ make ready       # migrate + platform + demo admin/project + dogfood BEACON_DSN
 # or: make bootstrap && make seed
 # Optional QA samples: make seed-sample
 # Optional local SMTP: make mailpit  (UI http://localhost:18026 — docs/ops/MAILPIT.md)
-# Option A — register the first admin in the UI: https://localhost:9447/en/register
+# Option A — first admin via SiteBackup wizard: https://localhost:9447/setup?token=$SITE_SETUP_TOKEN
 # Option B — demo login after make ready / make seed (see below)
 ```
 
@@ -110,11 +110,11 @@ make ready
 - Browser E2E (Playwright): `make test-e2e` (dogfood DB) or `make up-e2e && make ready-e2e && make test-e2e-isolated` (`app_e2e` / `:9460`) — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
-- First-user registration (empty DB only): https://localhost:9447/register
-- Login: https://localhost:9447/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
+- First admin on a cold DB: SiteBackup wizard at `/setup` (AuthKit `/register` stays gated until setup completes)
+- Login (after setup or `make ready`): https://localhost:9447/login (serves `DEFAULT_LOCALE`; other languages via `/en/login`, …; **Remember me**; header language switcher)
 - OpenAPI (after login, admin): https://localhost:9447/admin/api/doc
 
-> After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs). Complete setup/first register **before** publishing the port — the first registrant is `ROLE_ADMIN`.
+> After the first user exists, `/register` redirects to login. AuthKit: bare paths for `DEFAULT_LOCALE`, prefixed for other locales. First-run / cold DB uses SiteBackup at `/setup` (panel `/_site_backup`); **AuthKit `/login` and `/register` stay gated until setup is 100% done** (first admin = wizard `admin_user` step or `make ready`). Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. **`.env.dist` ships `DEFAULT_LOCALE=en`; this project's `.env` uses `es`.** After sign-in the app home is **`/dashboard`** with language from the account preference (no `_locale` in dashboard URLs). Complete **`/setup` or `make ready` before publishing the port** — the first admin is `ROLE_ADMIN`.
 
 Seed prints DSNs and writes `.demo-client.env` (mode **600**) for the [BeaconBundle](https://github.com/nowo-tech/BeaconBundle) FrankenPHP demo. Verify dogfooding with `make beacon-test` (ingest ACK + Web Push readiness warnings; or `ARGS='--check-only'`). To exercise Issues UI panels with several synthetic event kinds: `make beacon-suite`. See [docs/DSN.md](docs/DSN.md).
 
