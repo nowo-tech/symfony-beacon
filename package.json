@@ -44,6 +44,8 @@
     "datatables.net-responsive": "3.0.8",
     "datatables.net-responsive-dt": "3.0.8",
     "driver.js": "1.8.0",
-    "jquery": "4.0.0"
+    "jquery": "4.0.0",
+    "lucide": "^1.31.0",
+    "morphicons": "^1.7.0"
   }
 }

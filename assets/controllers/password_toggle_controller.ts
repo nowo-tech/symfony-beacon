@@ -1,12 +1,11 @@
 import { Controller } from '@hotwired/stimulus';
+import { syncPasswordMorphIcon } from '../lib/morphicons';
 
 /**
  * Show/hide password without inline onclick= (CSP script-src 'self').
  *
  * Replaces nowo-tech/password-toggle-bundle native handlers on the host form theme.
- * Icon visibility: toggles {@code is-password-visible} (PasswordToggleBundle ≥2.1.1 CSS
- * and host `_components.scss`); do not set element.style (CSP style-src with a nonce
- * ignores 'unsafe-inline').
+ * Icons: Morphicons EyeOff ↔ Eye (falls back to dual UX Icons until hydrated).
  *
  * Usage (on the toggle button next to the password input):
  *   data-controller="password-toggle"
@@ -23,6 +22,12 @@ export default class extends Controller {
   declare readonly showLabelValue: string;
   declare readonly hideLabelValue: string;
 
+  connect(): void {
+    const input = this.element.previousElementSibling;
+    const visible = input instanceof HTMLInputElement && input.type === 'text';
+    syncPasswordMorphIcon(this.element as HTMLElement, visible, false);
+  }
+
   toggle(): void {
     const input = this.element.previousElementSibling;
     if (!(input instanceof HTMLInputElement)) {
@@ -33,12 +38,14 @@ export default class extends Controller {
       input.type = 'text';
       this.element.classList.add('is-password-visible');
       this.element.setAttribute('aria-label', this.hideLabelValue);
+      syncPasswordMorphIcon(this.element as HTMLElement, true, true);
       return;
     }
 
     input.type = 'password';
     this.element.classList.remove('is-password-visible');
     this.element.setAttribute('aria-label', this.showLabelValue);
+    syncPasswordMorphIcon(this.element as HTMLElement, false, true);
   }
 
   keydown(event: KeyboardEvent): void {

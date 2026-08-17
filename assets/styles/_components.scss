@@ -1612,6 +1612,37 @@ input[type='checkbox'].checkbox,
   display: block;
 }
 
+.input-group.form-password-toggle .password-toggle__morph {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: inherit;
+  line-height: 0;
+}
+
+.input-group.form-password-toggle [data-controller~='password-toggle']:not(.is-morph-ready) .password-toggle__morph {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.input-group.form-password-toggle .is-morph-ready .icon-hidden,
+.input-group.form-password-toggle .is-morph-ready .icon-visible {
+  display: none !important;
+}
+
+.input-group.form-password-toggle .is-morph-ready .password-toggle__morph {
+  position: static;
+  opacity: 1;
+  width: 1.125rem;
+  height: 1.125rem;
+  overflow: visible;
+}
+
 /* nowo-tech/password-strength-bundle generator (account security + AuthKit) */
 .password-strength-input-row {
   display: flex;
@@ -2938,6 +2969,46 @@ body::-webkit-scrollbar-corner,
   display: block;
 }
 
+.theme-toggle__morph {
+  /* Real box (not morphicons display:contents) so the SVG paints. */
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: inherit;
+  line-height: 0;
+}
+
+/* FOUC: keep morph in DOM (driver needs it) but hide until hydrated. */
+.theme-toggle:not(.is-morph-ready) .theme-toggle__morph {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.theme-toggle.is-morph-ready .theme-toggle__icon--static {
+  display: none !important;
+}
+
+.theme-toggle.is-morph-ready .theme-toggle__morph {
+  position: static;
+  opacity: 1;
+  width: 14px;
+  height: 14px;
+  overflow: visible;
+}
+
+.theme-toggle--icon-only {
+  width: 2rem;
+  padding-inline: 0;
+  justify-content: center;
+}
+
 .theme-toggle__label {
   max-width: 5.5rem;
   overflow: hidden;
@@ -3151,6 +3222,38 @@ body::-webkit-scrollbar-corner,
     outline: 2px solid var(--color-moss);
     outline-offset: 2px;
   }
+}
+
+.nowo-ui-burger__morph {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  line-height: 0;
+}
+
+.app-sidebar-toggle:not(.is-morph-ready) .nowo-ui-burger__morph {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.app-sidebar-toggle.is-morph-ready .nowo-ui-burger__icon--static {
+  display: none !important;
+}
+
+.app-sidebar-toggle.is-morph-ready .nowo-ui-burger__morph {
+  position: static;
+  opacity: 1;
+  width: 18px;
+  height: 18px;
+  overflow: visible;
 }
 
 .app-sidebar {

@@ -5,13 +5,20 @@ import './styles/app.scss';
 // `/bundles/nowocookieconsent/nowo-cookie-consent.css` by URL pattern.
 import '../vendor/nowo-tech/cookie-consent-bundle/src/Resources/public/nowo-cookie-consent.css';
 import './stimulus_bootstrap';
+import {
+  syncContentWidthMorphIcon,
+  syncSidebarMorphIcon,
+  syncThemeMorphIcon,
+  type ContentWidth as MorphContentWidth,
+  type Theme as MorphTheme,
+} from './lib/morphicons';
 
 document.documentElement.dataset.assets = 'ts+scss+tailwind+stimulus';
 
 const THEME_KEY = 'beacon-theme';
 const SIDEBAR_KEY = 'beacon-sidebar';
 
-type Theme = 'light' | 'dark';
+type Theme = MorphTheme;
 
 function isTheme(value: string | null): value is Theme {
   return value === 'light' || value === 'dark';
@@ -30,11 +37,12 @@ function resolveTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function syncThemeControls(theme: Theme): void {
+function syncThemeControls(theme: Theme, animate = false): void {
   document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((button) => {
     const nextLabel = theme === 'dark' ? button.dataset.labelLight : button.dataset.labelDark;
     const nextAria = theme === 'dark' ? button.dataset.ariaToLight : button.dataset.ariaToDark;
     const label = button.querySelector<HTMLElement>('[data-theme-label]');
+    const wasReady = button.classList.contains('is-morph-ready');
 
     button.dataset.themeCurrent = theme;
     button.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
@@ -44,6 +52,7 @@ function syncThemeControls(theme: Theme): void {
     if (label && nextLabel) {
       label.textContent = nextLabel;
     }
+    syncThemeMorphIcon(button, theme, animate && wasReady);
   });
 }
 
@@ -58,7 +67,7 @@ function syncCookieConsentTheme(theme: Theme): void {
   modal.dataset.nowoDarkMode = dark ? 'true' : 'false';
 }
 
-function applyTheme(theme: Theme, persist: boolean): void {
+function applyTheme(theme: Theme, persist: boolean, animate = false): void {
   document.documentElement.dataset.theme = theme;
   if (persist) {
     try {
@@ -68,7 +77,7 @@ function applyTheme(theme: Theme, persist: boolean): void {
     }
     syncThemeToAccount(theme);
   }
-  syncThemeControls(theme);
+  syncThemeControls(theme, animate);
   syncCookieConsentTheme(theme);
 }
 
@@ -112,7 +121,7 @@ function initTheme(): void
     }
     button.addEventListener('click', () => {
       const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-      applyTheme(current === 'dark' ? 'light' : 'dark', true);
+      applyTheme(current === 'dark' ? 'light' : 'dark', true, true);
     });
   });
 
@@ -129,7 +138,7 @@ function initTheme(): void
     } catch {
       return;
     }
-    applyTheme(event.matches ? 'dark' : 'light', false);
+    applyTheme(event.matches ? 'dark' : 'light', false, true);
   });
 }
 
@@ -258,7 +267,10 @@ function applySidebar(collapsed: boolean, animate = true): void {
     document
       .querySelectorAll<HTMLElement>('[data-sidebar-toggle], [data-nowo-ui-burger]')
       .forEach((button) => {
+        const wasReady = button.classList.contains('is-morph-ready');
         button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        // Menu when closed, X when open (matches aria-expanded).
+        syncSidebarMorphIcon(button, !collapsed, animate && wasReady);
       });
   };
 
@@ -396,7 +408,7 @@ function initSidebar(): void {
   });
 }
 
-type ContentWidth = 'content' | 'full';
+type ContentWidth = MorphContentWidth;
 
 function isContentWidth(value: string | null | undefined): value is ContentWidth {
   return value === 'content' || value === 'full';
@@ -411,11 +423,12 @@ function resolveContentWidth(): ContentWidth {
   return shell?.classList.contains('is-full-width') ? 'full' : 'content';
 }
 
-function syncContentWidthControls(width: ContentWidth): void {
+function syncContentWidthControls(width: ContentWidth, animate = false): void {
   document.querySelectorAll<HTMLElement>('[data-content-width-toggle]').forEach((button) => {
     const nextLabel = width === 'full' ? button.dataset.labelContent : button.dataset.labelFull;
     const nextAria = width === 'full' ? button.dataset.ariaToContent : button.dataset.ariaToFull;
     const label = button.querySelector<HTMLElement>('[data-content-width-label]');
+    const wasReady = button.classList.contains('is-morph-ready');
 
     button.dataset.contentWidthCurrent = width;
     button.setAttribute('aria-pressed', width === 'full' ? 'true' : 'false');
@@ -425,6 +438,7 @@ function syncContentWidthControls(width: ContentWidth): void {
     if (label && nextLabel) {
       label.textContent = nextLabel;
     }
+    syncContentWidthMorphIcon(button, width, animate && wasReady);
   });
 }
 
@@ -441,7 +455,7 @@ function applyContentWidth(width: ContentWidth, persist: boolean, animate = true
     shell.dataset.contentWidth = width;
     shell.classList.toggle('is-full-width', width === 'full');
     shell.classList.toggle('is-content-width', width === 'content');
-    syncContentWidthControls(width);
+    syncContentWidthControls(width, animate);
 
     if (persist) {
       syncContentWidthToAccount(width);

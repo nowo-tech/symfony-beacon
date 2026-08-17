@@ -1,4 +1,5 @@
-{# Content width toggle (centered column ↔ full width). Persists via account preference. #}
+{# Content width toggle (centered column ↔ full width). Persists via account preference.
+   Static SVGs keep FOUC-safe paint; <morph-icon> takes over after JS. #}
 <button
     type="button"
     class="theme-toggle content-width-toggle"
@@ -11,14 +12,21 @@
     aria-label="{{ 'layout.switch_to_full'|trans }}"
 >
     {# Shown when current = content → click expands to full #}
-    <svg class="theme-toggle__icon content-width-toggle__icon--to-full" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <svg class="theme-toggle__icon content-width-toggle__icon--to-full theme-toggle__icon--static" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     {# Shown when current = full → click returns to content #}
-    <svg class="theme-toggle__icon content-width-toggle__icon--to-content" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <svg class="theme-toggle__icon content-width-toggle__icon--to-content theme-toggle__icon--static" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
         <rect x="8" y="8" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.75"/>
     </svg>
+    <morph-icon
+        class="theme-toggle__morph"
+        data-content-width-morph
+        size="14"
+        stroke-width="1.75"
+        aria-hidden="true"
+    ></morph-icon>
     {% if not compact|default(false) %}
         <span class="theme-toggle__label" data-content-width-label>{{ 'layout.width_full'|trans }}</span>
     {% endif %}
