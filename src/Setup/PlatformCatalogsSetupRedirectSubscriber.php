@@ -102,10 +102,6 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             '/build/',
             '/assets/',
             '/api/',
-            '/login',
-            '/register',
-            '/logout',
-            '/reset-password',
             '/legal',
             '/locale/',
             '/cookie_consent',
@@ -122,15 +118,15 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
         }
 
         return (bool) preg_match(
-            '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$)#',
+            '#^/(en|es|de|nl|fr|it|pt)/(legal|setup)(/|$)#',
             $path,
         );
     }
 
     private function isExcludedRoute(string $route): bool
     {
-        return str_starts_with($route, 'nowo_auth_kit_')
-            || str_starts_with($route, 'legal_')
+        // AuthKit stays gated until catalogs/setup are complete (first user via wizard).
+        return str_starts_with($route, 'legal_')
             || str_starts_with($route, 'health_')
             || str_starts_with($route, 'guest_locale_')
             || str_starts_with($route, 'nowo_site_backup_')

@@ -43,6 +43,8 @@ nowo_site_backup:
         password_protection: true
         password_hash: '%env(SITE_BACKUP_PASSWORD_HASH)%'
     exclusions:
+        # AuthKit (/login|/register|…) stays GATED until setup is 100% done.
+        # First admin is created inside the wizard (`admin_user` step).
         paths:
             - /health/live
             - /health/ready
@@ -54,10 +56,6 @@ nowo_site_backup:
             - /admin/maintenance
             - /build/
             - /assets/
-            - /login
-            - /register
-            - /logout
-            - /reset-password
             - /legal
             - /locale/
             - /cookie_consent
@@ -65,7 +63,7 @@ nowo_site_backup:
             - /admin/_routing
             - /_error
         patterns:
-            - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|legal|setup)(/|$|\?)#'
+            - '#^/(en|es|de|nl|fr|it|pt)/(legal|setup)(/|$|\?)#'
             - '#^/(manifest\.webmanifest|sw\.js|offline)$#'
             - '#^/_maintenance(_preview)?(/|$|\?)#'
             - '#^/admin/maintenance(/|$|\?)#'
