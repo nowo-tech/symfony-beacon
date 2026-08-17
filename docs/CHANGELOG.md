@@ -913,7 +913,7 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 
 ### Changed
 
-- Composer kit bumps: AuthKit **1.11.4** (`auth_panel` / mail-ready / form themes / Twig UI globals), PWA **1.2.0** (mark/button config), SiteBackup **1.6.0**, Beacon client **1.6.9**, Dashboard Menu **1.0.4** / Breadcrumb **2.0.11** (`--nowo-ui-*`), Cookie Consent **1.4.7** (CSRF-optional modal); dropped AuthKit `security/*` and PWA Twig forks; kit admin maps `--nowo-ui-*` under `.kit-admin`
+- Composer kit bumps: AuthKit **1.11.4** (`auth_panel` / mail-ready / form themes / Twig UI globals), PWA **1.2.1** (mark/button config), SiteBackup **1.6.0**, Beacon client **1.6.9**, Dashboard Menu **1.0.4** / Breadcrumb **2.0.11** (`--nowo-ui-*`), Cookie Consent **1.4.7** (CSRF-optional modal); dropped AuthKit `security/*` and PWA Twig forks; kit admin maps `--nowo-ui-*` under `.kit-admin`
 - Cookie Consent **1.4.5**: vendor Tailwind modal/form use `--nowo-cc-*` tokens; dropped host form-theme fork and manual `twig.paths` (bundle `TwigPathsPass` prepends app overrides)
 - Cookie consent **modal** uses vendor Twig again (skin via `_cookie_consent.scss`); dropped host fork of `cookie_consent.tailwind.html.twig` so `display_config` / two-step / preference sections track CookieConsent upgrades
 - AuthKit layout extends shared `layouts/guest_shell.html.twig` (single guest chrome; bubble via `cookie_consent_extras` block)

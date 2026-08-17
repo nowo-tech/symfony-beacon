@@ -30,8 +30,10 @@
             <h2 id="display-pwa-heading" class="text-lg font-semibold text-[var(--color-ink)]">{{ 'preferences.display.pwa_title'|trans }}</h2>
             <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.display.pwa_intro'|trans }}</p>
         </div>
-        <div class="border-t border-[var(--color-sand)] pt-4">
+        <div class="border-t border-[var(--color-sand)] pt-4 nowo-pwa-install-links-host">
             {{ nowo_pwa_install_links() }}
+            {# Host hint (no Twig fork of kit install_links) — shown when neither install nor uninstall control is visible #}
+            <p class="nowo-pwa-install-links__hint">{{ 'preferences.display.pwa_unavailable'|trans }}</p>
         </div>
     </section>
 </div>

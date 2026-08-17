@@ -30,7 +30,7 @@ Related host shells (preferred over full page forks when possible): [`templates/
 | [NowoHttpLogBundle](#nowohttplogbundle) | HTTP log list / filter / detail |
 | [NowoSiteBackupBundle](#nowositebackupbundle) | Backup panel tables + actions |
 | [NowoAuthKitBundle](#nowoauthkitbundle) | Guest layout + a few security pages |
-| [NowoPwaBundle](#nowopwabundle) | Install prompt / preferences links |
+| [NowoPwaBundle](#nowopwabundle) | Install prompt (links = vendor + host SCSS) |
 | [NelmioApiDocBundle](#nelmioapidocbundle) | Swagger UI inside app shell |
 | [TwigBundle](#twigbundle) | HTTP error pages |
 
@@ -259,9 +259,10 @@ Do **not** use `@!Nowo…` bang namespaces — kit TwigPathsPass does not regist
 | File | Why |
 |------|-----|
 | `install_prompt.html.twig` | Dismissible prompt; BEM root token; brand mark via `_brand_icon.html.twig` / SiteAppearance. |
-| `install_links.html.twig` | Preferences install/uninstall with Beacon `btn-*` (not default PWA blue). |
 
-**Intended strategy:** prefer YAML (`install_prompt.*` button classes, mark asset) + host SCSS. These forks exist for brand mark and button chrome — re-check after PWA bundle bumps whether YAML covers the need.
+**`install_links`:** vendor template + host SCSS (`.nowo-pwa-install-links__*`) + Preferences hint beside `nowo_pwa_install_links()` — **no** host fork.
+
+**Intended strategy:** prefer YAML (`install_prompt.*` button classes, mark asset) + host SCSS. Keep `install_prompt` fork only while brand mark needs Twig.
 
 **Upgrade notes:** Keep `data-pwa-install-action` / dismiss keys / BEM structure required by bundle JS.
 

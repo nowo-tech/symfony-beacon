@@ -4650,9 +4650,9 @@ html[data-footer-fixed='1'] .site-legal-footer {
   --nowo-pwa-install-links-install-color: #0c1210;
 }
 
-/* Let Beacon .btn-* own chrome (beat pwa.css link rules). */
-.nowo-pwa-install-links a.btn-primary,
-.nowo-pwa-install-links a.btn-ghost {
+/* Vendor BEM anchors (no host Twig fork) — beat default pwa.css blue. */
+.nowo-pwa-install-links__install,
+.nowo-pwa-install-links__uninstall {
   padding: $beacon-btn-padding-y $beacon-btn-padding-x;
   font-size: $beacon-btn-font-size;
   line-height: 1.25;
@@ -4660,7 +4660,7 @@ html[data-footer-fixed='1'] .site-legal-footer {
   text-decoration: none;
 }
 
-.nowo-pwa-install-links a.btn-primary {
+.nowo-pwa-install-links__install {
   font-weight: 600;
   color: #fff;
   background: var(--color-moss);
@@ -4679,11 +4679,11 @@ html[data-footer-fixed='1'] .site-legal-footer {
   }
 }
 
-[data-theme='dark'] .nowo-pwa-install-links a.btn-primary {
+[data-theme='dark'] .nowo-pwa-install-links__install {
   color: #0c1210;
 }
 
-.nowo-pwa-install-links a.btn-ghost {
+.nowo-pwa-install-links__uninstall {
   font-weight: 500;
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-surface) 70%, transparent);
@@ -4700,6 +4700,13 @@ html[data-footer-fixed='1'] .site-legal-footer {
   }
 }
 
+.nowo-pwa-install-links-host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nowo-pwa-install-links-gap, 0.65rem);
+}
+
 .nowo-pwa-install-links__hint {
   display: none;
   margin: 0;
@@ -4710,7 +4717,7 @@ html[data-footer-fixed='1'] .site-legal-footer {
 }
 
 /* Show help only when neither install nor uninstall control is visible */
-.nowo-pwa-install-links:not(:has(.nowo-pwa-install-links__install:not([hidden]))):not(:has(.nowo-pwa-install-links__uninstall:not([hidden]))) .nowo-pwa-install-links__hint {
+.nowo-pwa-install-links-host:not(:has(.nowo-pwa-install-links__install:not([hidden]))):not(:has(.nowo-pwa-install-links__uninstall:not([hidden]))) .nowo-pwa-install-links__hint {
   display: block;
 }
 
