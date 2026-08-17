@@ -1,0 +1,11 @@
+# nowo-tech/hot-reload-bundle — https://packagist.org/packages/nowo-tech/hot-reload-bundle
+# Dev-only (require-dev). Injects FrankenPHP Hot Reload client when FRANKENPHP_HOT_RELOAD is set.
+# Server side: .docker/frankenphp/Caddyfile (mercure + php_server hot_reload). See docs/ops/FRANKENPHP-HOT-RELOAD.md.
+# ≥1.3: Twig @NowoHotReloadBundle profiler panel; CSP nonce + script-src augment; WDT `nowo_hot_reload`.
+# Other keys match bundle defaults — only override the host CSP nonce attribute.
+
+when@dev: &nowo_hot_reload
+    nowo_hot_reload:
+        csp_nonce_request_attribute: '_beacon_csp_nonce'
+
+when@test: *nowo_hot_reload

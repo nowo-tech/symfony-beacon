@@ -36,6 +36,8 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         $csp = (string) $response->headers->get('Content-Security-Policy');
         self::assertStringContainsString("script-src 'self' 'nonce-", $csp);
         self::assertStringContainsString("'unsafe-eval'", $csp);
+        // jsDelivr for Hot Reload is appended by nowo-tech/hot-reload-bundle when it injects (csp_augment_script_src).
+        self::assertStringNotContainsString('cdn.jsdelivr.net', $csp);
         self::assertMatchesRegularExpression("/style-src-elem 'self' 'nonce-[A-Za-z0-9+\/=]+' 'unsafe-inline'/", $csp);
         self::assertStringContainsString("style-src-attr 'unsafe-inline'", $csp);
     }

@@ -24,8 +24,6 @@
     "@tailwindcss/vite": "4.3.3",
     "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.2",
-    "frankenphp-hot-reload": "1.0.1",
-    "idiomorph": "0.7.4",
     "jsdom": "^30.0.1",
     "sass": "1.102.0",
     "tailwindcss": "4.3.3",

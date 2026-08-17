@@ -1356,6 +1356,21 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     reduced_motion?: bool|Param, // Respect reduced motion (accessibility). When true or system prefers-reduced-motion, animations are minimized. // Default: false
  *     keyboard_shortcut?: scalar|Param|null, // Keyboard shortcut to toggle inspector (e.g. "Ctrl+Shift+T"). Empty to disable. // Default: "Ctrl+Shift+T"
  * }
+ * @psalm-type NowoHotReloadConfig = array{
+ *     enabled?: bool|Param, // Master switch. When false, nothing is injected even if FRANKENPHP_HOT_RELOAD is set. // Default: true
+ *     auto_inject?: bool|Param, // When true, HotReloadResponseSubscriber injects assets into HTML responses. // Default: true
+ *     require_frankenphp_env?: bool|Param, // When true (default), inject only if FRANKENPHP_HOT_RELOAD is set or mercure_url is configured. // Default: true
+ *     allow_production?: bool|Param, // When false (default), enabling this bundle in the prod environment raises InvalidConfigurationException. // Default: false
+ *     mercure_url?: scalar|Param|null, // Optional Mercure hub URL. When null, uses $_SERVER['FRANKENPHP_HOT_RELOAD'] when present. // Default: null
+ *     idiomorph?: bool|Param, // When true, include Idiomorph for DOM morphing instead of a full page reload. // Default: true
+ *     idiomorph_script_url?: scalar|Param|null, // URL of the Idiomorph script (classic script tag). Prefer a version-pinned CDN URL. // Default: "https://cdn.jsdelivr.net/npm/idiomorph@0.7.4"
+ *     hot_reload_script_url?: scalar|Param|null, // URL of the frankenphp-hot-reload ESM module. Prefer a version-pinned CDN URL. // Default: "https://cdn.jsdelivr.net/npm/frankenphp-hot-reload@1.0.1/+esm"
+ *     preserve_selectors?: list<scalar|Param|null>,
+ *     preserve_observe?: bool|Param, // When true, the preserve boot script also uses MutationObserver for late-injected toolbar nodes. // Default: true
+ *     csp_nonce_request_attribute?: scalar|Param|null, // Request attribute name that holds the CSP nonce (e.g. "_csp_nonce"). Applied to the inline preserve boot script. // Default: null
+ *     csp_augment_script_src?: bool|Param, // When true, append CDN hosts to an existing Content-Security-Policy script-src on the response after injection. // Default: true
+ *     csp_script_src_hosts?: list<scalar|Param|null>,
+ * }
  * @psalm-type NowoAuthKitConfig = array{
  *     default_profile?: scalar|Param|null, // Profile name used when no profile is specified explicitly. // Default: "default"
  *     outbound_mail_ready_checker?: scalar|Param|null, // Optional service id implementing OutboundMailReadyCheckerInterface for password-reset and magic-login UI hints. // Default: null
@@ -2321,8 +2336,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
@@ -2733,6 +2748,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         web_profiler?: WebProfilerConfig,
  *         nowo_twig_inspector?: NowoTwigInspectorConfig,
+ *         nowo_hot_reload?: NowoHotReloadConfig,
  *         nowo_auth_kit?: NowoAuthKitConfig,
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
@@ -2817,6 +2833,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         web_profiler?: WebProfilerConfig,
  *         nowo_twig_inspector?: NowoTwigInspectorConfig,
+ *         nowo_hot_reload?: NowoHotReloadConfig,
  *         nowo_auth_kit?: NowoAuthKitConfig,
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,

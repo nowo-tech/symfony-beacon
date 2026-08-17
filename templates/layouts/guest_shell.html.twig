@@ -17,7 +17,6 @@
     <style{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>{{ site_appearance.cssOverrides|raw }}</style>
     {{ vite_entry_script_tags('app') }}
     <script src="{{ asset('js/nowo-ui-orb.js', 'nowo_ui_kit') }}" defer></script>
-    {% include '_frankenphp_hot_reload.html.twig' %}
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="page-shell">

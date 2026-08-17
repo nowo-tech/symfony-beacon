@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **FrankenPHP hot reload client**: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) **1.3.0** (Twig `@NowoHotReloadBundle` profiler panel, CSP nonce via `_beacon_csp_nonce`, `csp_augment_script_src`, WDT). Host config only sets the nonce attribute (bundle defaults for the rest). Removed host `HotReloadCspNonceSubscriber` / always-on jsDelivr in debug CSP. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
+
 ## [1.22.0] - 2026-08-17
 
 ### Added

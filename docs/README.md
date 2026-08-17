@@ -33,7 +33,7 @@ English operator and developer manuals for **symfony-beacon**.
 | Doc | Topic |
 |-----|--------|
 | [FRANKENPHP-CODING.md](ops/FRANKENPHP-CODING.md) | Classic vs worker modes, ResetInterface |
-| [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md) | Local hot reload (Caddy + client) |
+| [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md) | Local hot reload (Caddy + nowo-tech/hot-reload-bundle) |
 | [MERCURE.md](ops/MERCURE.md) | Live issue toasts (hub, JWT, Compose) |
 | [MAILPIT.md](ops/MAILPIT.md) | Local SMTP catcher for development |
 | [SHARED-SERVER.md](ops/SHARED-SERVER.md) | Shared MySQL/Redis (`compose.infra.yaml`) + coexistence with `server/` / little-vps |
