@@ -145,8 +145,21 @@ if [ -n "$identity_creation_hits" ]; then
   bad=1
 fi
 
+# --- Shared LIKE helper + EXTRA_LAZY contract (REQ-BP-004) ---
+if [ ! -f src/Shared/Doctrine/SqlLikeEscaper.php ]; then
+  echo "error: missing src/Shared/Doctrine/SqlLikeEscaper.php (LIKE queries must escape wildcards)." >&2
+  bad=1
+fi
+
+if [ -f src/Project/Entity/Project.php ]; then
+  if ! file_contains "EXTRA_LAZY" src/Project/Entity/Project.php; then
+    echo "error: Project collections should use EXTRA_LAZY fetch (REQ-BP-004)." >&2
+    bad=1
+  fi
+fi
+
 if [ "$bad" -ne 0 ]; then
   exit 1
 fi
 
-echo "OK: module boundaries (AdminProject, OTLP, Shared write-path, Ops, Envelope writers, Metrics, Port)."
+echo "OK: module boundaries (AdminProject, OTLP, Shared write-path, Ops, Envelope writers, Metrics, Port, SqlLikeEscaper, EXTRA_LAZY)."
