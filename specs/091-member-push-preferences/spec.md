@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-12
 
-**Status**: Implemented (shipped **v1.8.0**; LiveComponent DI polish **v1.8.1**; QA/CI follow-ups **v1.8.2**; realtime/prefs batching **v1.11.0** / `095`)
+**Status**: Implemented (shipped **v1.8.0**; LiveComponent DI polish **v1.8.1**; QA/CI follow-ups **v1.8.2**; realtime/prefs batching **v1.11.0** / `095`; Rector 2.6.2 Symfony sets **v1.23.2**)
 
 **Input**: User description: "Per-user push notifications for interesting issue events (new, regression, resolve, reopen, assign, comment, and related), configurable at account level and per project. Defaults all on (opt-out): members manually turn off noisy events/projects. Scope can be all project issues or only when the member is involved. Delivery requires account-level alerts enabled AND the specific project enabled, and only for projects the member can access."
 
@@ -172,6 +172,11 @@ As a member, on a project I can override account event toggles and involvement s
 | **v1.8.0** | Feature cut: Account matrix, Mercure `/users/{uuid}/member-alerts`, Web Push filter, viewer `requireAccess`, migrations |
 | **v1.8.1** | Constructor-injected LiveComponents; restore `seedTestOpsDefaults` helper name |
 | **v1.8.2** | PHPStan typing clean-up; Rector skips that preserve PHPStan aliases / Live method injection; `make rector-fix` → CS Fixer |
+| **v1.23.2** | Rector **2.6.2** removed `SymfonySetList::SYMFONY_*` version constants; host keeps code-quality / annotations-to-attributes only |
+
+## Amendment (Rector 2.6.2 Symfony sets, 2026-08-18)
+
+Rector **2.6.2** deleted per-version `SymfonySetList::SYMFONY_*` constants (including `SYMFONY_81`). Host `rector.php` MUST keep `SYMFONY_CODE_QUALITY` + `ANNOTATIONS_TO_ATTRIBUTES` only. Do **not** enable `withComposerBased(symfony: true)` until Autowire (`%…%`), Twig `AsTwigFunction`, RequestStack test constructors, and `User::eraseCredentials()` churn is acceptable. Conservative skips from **v1.8.2** remain (`RemoveReturnTagIncompatibleWithNativeTypeRector`, `FlipTypeControlToUseExclusiveTypeRector`). Shipped **v1.23.2**.
 
 ## Amendment (FormKit preference forms, 2026-08-13)
 

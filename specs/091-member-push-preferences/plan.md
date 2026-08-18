@@ -134,3 +134,4 @@ None — justified complexity is product scope (prefs matrix), not stack violati
 - **v1.8.0** — feature + Phase 9 auth/client hardening.
 - **v1.8.1** — LiveComponent constructor DI (`Member*AlertPreferencesLive`); PHPUnit helper naming.
 - **v1.8.2** — PHPStan generics / array-shape docs; conservative Rector skips; CS after Rector in Make.
+- **v1.23.2** — Rector 2.6.2: no `SymfonySetList::SYMFONY_*` version constants; Symfony code-quality sets only.

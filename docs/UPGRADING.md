@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.23.1)](#unreleased-main-after-1231)
+- [Unreleased (main after 1.23.2)](#unreleased-main-after-1232)
+- [Upgrading from 1.23.1 to 1.23.2](#upgrading-from-1231-to-1232)
 - [Upgrading from 1.23.0 to 1.23.1](#upgrading-from-1230-to-1231)
 - [Upgrading from 1.22.0 to 1.23.0](#upgrading-from-1220-to-1230)
 - [Upgrading from 1.21.0 to 1.22.0](#upgrading-from-1210-to-1220)
@@ -88,9 +89,19 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.23.1)
+## Unreleased (main after 1.23.2)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.23.1 to 1.23.2
+
+CI Quality: Rector 2.6.2 dropped `SymfonySetList::SYMFONY_81`. **No migrations.**
+
+1. Pull / checkout `v1.23.2`.
+
+2. No operator runtime steps. Contributors: `rector.php` keeps Symfony code-quality / annotations-to-attributes sets only — do not re-enable `withComposerBased(symfony: true)` until Autowire / `eraseCredentials` / Twig helper churn is acceptable.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.23.2]`.
 
 ## Upgrading from 1.23.0 to 1.23.1
 

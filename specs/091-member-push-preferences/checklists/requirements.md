@@ -36,4 +36,4 @@
 - N+1 / volume / duplicate member alerts deferred to Out of scope / Assumptions for v1.
 - Post-implementation: FR-013 / SC-007 require Account-primary per-project edits for **viewers** (`requireAccess`); Project Settings remains an optional shortcut for Settings-capable roles only.
 - Checklist re-validated 2026-08-12 after auth + toast hardening (Phase 9).
-- Shipped: **v1.8.0** (feature), **v1.8.1** (Live DI), **v1.8.2** (PHPStan/Rector/CS tooling). See spec **Shipped releases**.
+- Shipped: **v1.8.0** (feature), **v1.8.1** (Live DI), **v1.8.2** (PHPStan/Rector/CS tooling), **v1.23.2** (Rector 2.6.2 Symfony set constants). See spec **Shipped releases**.

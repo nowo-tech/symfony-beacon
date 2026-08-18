@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.2] - 2026-08-18
+
 ### Fixed
 
-- **CI Quality**: Rector 2.6.2 removed `SymfonySetList::SYMFONY_81`. Config no longer references that constant (composer-based Symfony sets deferred — they would rewrite Autowire/`eraseCredentials`/Twig helpers).
+- **CI Quality**: Rector 2.6.2 removed `SymfonySetList::SYMFONY_81`. `rector.php` no longer references per-version Symfony set constants; keep `SYMFONY_CODE_QUALITY` + `ANNOTATIONS_TO_ATTRIBUTES` only (composer-based Symfony sets deferred — they would rewrite Autowire/`eraseCredentials`/Twig helpers). Spec `091`.
+
+### Notes for integrators
+
+- No Doctrine migrations. No operator runtime steps beyond pulling `v1.23.2`.
 
 ## [1.23.1] - 2026-08-18
 
@@ -1463,7 +1469,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.2...HEAD
+[1.23.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...v1.23.0
 [1.22.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.21.0...v1.22.0
