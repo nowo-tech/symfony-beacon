@@ -7,7 +7,6 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
-use Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector;
 use Rector\Symfony\Set\SymfonySetList;
 
 /*
@@ -30,9 +29,6 @@ return RectorConfig::configure()
         RemoveReturnTagIncompatibleWithNativeTypeRector::class,
         // Prefer explicit `null !== $x` / `instanceof self` over FQCN instanceof churn.
         FlipTypeControlToUseExclusiveTypeRector::class,
-        // LiveActions / controllers often use method injection on purpose (UX Live + thin actions).
-        // Apply constructor DI manually when it clearly helps (e.g. Member*AlertPreferencesLive).
-        ControllerMethodInjectionToConstructorRector::class,
     ])
     // Match composer.json "php": ">=8.5" / FrankenPHP image.
     ->withPhpSets(php85: true)
@@ -41,7 +37,9 @@ return RectorConfig::configure()
         SetList::CODE_QUALITY,
         SetList::DEAD_CODE,
         SetList::TYPE_DECLARATION,
-        SymfonySetList::SYMFONY_81,
+        // Rector 2.6.2 removed SymfonySetList::SYMFONY_* version constants.
+        // Do not enable withComposerBased(symfony: true) yet: it would churn Autowire('%…%'),
+        // Twig AsTwigFunction, RequestStack test constructors, and User::eraseCredentials().
         SymfonySetList::SYMFONY_CODE_QUALITY,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
     ])

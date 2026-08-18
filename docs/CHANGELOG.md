@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **CI Quality**: Rector 2.6.2 removed `SymfonySetList::SYMFONY_81`. Config no longer references that constant (composer-based Symfony sets deferred — they would rewrite Autowire/`eraseCredentials`/Twig helpers).
+
 ## [1.23.1] - 2026-08-18
 
 ### Changed
