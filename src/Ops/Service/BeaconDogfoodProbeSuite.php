@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Ops\Service;
 
+use App\Issues\Controller\IssueController;
+use App\Notifications\Message\DeliverWebPushForProjectMessage;
+use App\Notifications\MessageHandler\DeliverWebPushForProjectHandler;
+use App\Ops\Command\BeaconTestCommand;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -31,10 +35,10 @@ use Throwable;
  * Uses sync HTTP (same approach as BeaconBundle {@see \Nowo\BeaconBundle\Connection\BeaconConnectionTester})
  * regardless of `nowo_beacon.transport.mode`.
  */
-final class BeaconDogfoodProbeSuite
+final readonly class BeaconDogfoodProbeSuite
 {
     /** @var list<string> */
-    public const KINDS = [
+    public const array KINDS = [
         'message-info',
         'message-error',
         'exception',
@@ -45,23 +49,23 @@ final class BeaconDogfoodProbeSuite
     ];
 
     public function __construct(
-        private readonly BeaconDsnParser $parser,
-        private readonly HttpClientInterface $httpClient,
+        private BeaconDsnParser $parser,
+        private HttpClientInterface $httpClient,
         #[Autowire('%nowo.beacon.dsn%')]
-        private readonly string $dsn,
+        private string $dsn,
         #[Autowire('%nowo.beacon.enabled%')]
-        private readonly bool $reportingEnabled,
+        private bool $reportingEnabled,
         #[Autowire('%nowo.beacon.verify_peer%')]
-        private readonly bool $verifyPeer = true,
+        private bool $verifyPeer = true,
         #[Autowire('%nowo.beacon.timeout%')]
-        private readonly float $timeout = 5.0,
+        private float $timeout = 5.0,
         #[Autowire('%nowo.beacon.environment%')]
-        private readonly string $environment = 'prod',
+        private string $environment = 'prod',
         #[Autowire('%nowo.beacon.release%')]
-        private readonly string $release = '',
+        private string $release = '',
         #[Autowire('%nowo.beacon.server_name%')]
-        private readonly string $serverName = 'unknown',
-        private readonly ?LoggerInterface $logger = null,
+        private string $serverName = 'unknown',
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -269,12 +273,12 @@ final class BeaconDogfoodProbeSuite
                     'probe_kind' => $kind,
                     'console' => [
                         'command' => 'app:beacon:test',
-                        'command_class' => \App\Ops\Command\BeaconTestCommand::class,
+                        'command_class' => BeaconTestCommand::class,
                         'exit_code' => 1,
                         'php_sapi' => \PHP_SAPI,
                         'interactive' => false,
                         'verbosity' => 32,
-                        'cwd' => (string) (getcwd() ?: '/app'),
+                        'cwd' => getcwd() ?: '/app',
                         'arguments' => ['command' => 'app:beacon:test'],
                         'options' => ['suite' => true, 'wait' => '10'],
                     ],
@@ -292,17 +296,17 @@ final class BeaconDogfoodProbeSuite
                     'source' => 'app:beacon:test',
                     'probe_kind' => $kind,
                     'messenger' => [
-                        'message_class' => 'App\\Notifications\\Message\\DeliverWebPushForProjectMessage',
+                        'message_class' => DeliverWebPushForProjectMessage::class,
                         'receiver_name' => 'async_notify',
                         'retry_count' => 2,
                         'bus' => 'messenger.bus.default',
                         'transport' => 'async_notify',
-                        'handler_class' => 'App\\Notifications\\MessageHandler\\DeliverWebPushForProjectMessageHandler',
+                        'handler_class' => DeliverWebPushForProjectHandler::class,
                     ],
                     'scheduler' => [
                         'schedule_name' => 'default',
                         'recurring_id' => 'dogfood-probe-'.$runToken,
-                        'triggered_at' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM),
+                        'triggered_at' => new DateTimeImmutable('now', new DateTimeZone('UTC'))->format(DateTimeInterface::ATOM),
                         'trigger' => 'every 1 hour',
                     ],
                 ],
@@ -344,11 +348,11 @@ final class BeaconDogfoodProbeSuite
         $throwable = new HttpException(500, 'Synthetic HTTP failure for dogfood suite ('.$runToken.')');
         $request = Request::create(
             'https://beacon.example.test/projects/symfony-beacon/issues?q=dogfood-'.$runToken,
-            'GET',
+            Request::METHOD_GET,
         );
         $request->headers->set('User-Agent', 'BeaconDogfoodProbeSuite/1.0');
         $request->attributes->set('_route', 'project_issues_index');
-        $request->attributes->set('_controller', 'App\\Issues\\Controller\\IssueController::index');
+        $request->attributes->set('_controller', IssueController::class.'::index');
 
         return [
             'message' => $label,
@@ -361,7 +365,7 @@ final class BeaconDogfoodProbeSuite
                 'request_method' => $request->getMethod(),
                 'http' => [
                     'route' => 'project_issues_index',
-                    'controller' => 'App\\Issues\\Controller\\IssueController::index',
+                    'controller' => IssueController::class.'::index',
                     'status_code' => 500,
                     'query_keys' => ['q'],
                     'client' => [
@@ -380,7 +384,7 @@ final class BeaconDogfoodProbeSuite
      * Client tags that mirror where the failure happened (command / URL / message class).
      *
      * Real BeaconBundle listeners store this in `extra`; the issue UI also promotes those
-     * as system tags. The suite sets explicit client tags so “Tags del cliente” is actionable.
+     * as system tags. The suite sets explicit client tags so the client-tags UI is actionable.
      *
      * @param array{
      *     message: string,
@@ -401,6 +405,8 @@ final class BeaconDogfoodProbeSuite
             'probe_run' => $runToken,
             'source' => 'dogfood.suite',
         ];
+        $rawMessengerClass = $spec['extra']['messenger']['message_class'] ?? null;
+        $messengerClass = \is_string($rawMessengerClass) && '' !== $rawMessengerClass ? $rawMessengerClass : 'unknown';
 
         return match ($kind) {
             'console' => $tags + [
@@ -414,8 +420,8 @@ final class BeaconDogfoodProbeSuite
                 'transaction' => (string) (($spec['extra']['http']['route'] ?? null) ?: 'project_issues_index'),
             ],
             'messenger' => $tags + [
-                'messenger.message_class' => (string) (($spec['extra']['messenger']['message_class'] ?? null) ?: 'unknown'),
-                'transaction' => 'messenger://'.(string) (($spec['extra']['messenger']['message_class'] ?? null) ?: 'unknown'),
+                'messenger.message_class' => $messengerClass,
+                'transaction' => 'messenger://'.$messengerClass,
             ],
             'exception' => $tags + [
                 'transaction' => 'cli://app:beacon:test#exception',

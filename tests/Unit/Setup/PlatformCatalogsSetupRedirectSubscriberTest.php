@@ -87,6 +87,51 @@ final class PlatformCatalogsSetupRedirectSubscriberTest extends TestCase
         self::assertNull($health->getResponse());
     }
 
+    public function testSkipsUnsafeMethodsAndExcludedRoutesOnOpenPaths(): void
+    {
+        $subscriber = $this->subscriber();
+
+        $post = $this->event('/dashboard');
+        $post->getRequest()->setMethod(Request::METHOD_POST);
+        $subscriber->onKernelRequest($post);
+        self::assertNull($post->getResponse());
+
+        $xhr = $this->event('/dashboard');
+        $xhr->getRequest()->headers->set('X-Requested-With', 'XMLHttpRequest');
+        $subscriber->onKernelRequest($xhr);
+        self::assertNull($xhr->getResponse());
+
+        $backup = $this->event('/dashboard', route: 'nowo_site_backup_status');
+        $subscriber->onKernelRequest($backup);
+        self::assertNull($backup->getResponse());
+    }
+
+    public function testSlashSetupPrefixStillRedirectsGuests(): void
+    {
+        $menus = $this->createStub(MenuRepository::class);
+        $menus->method('findOneByCodeAndContext')->willReturn(null);
+        $state = new PlatformBootstrapState(
+            $menus,
+            $this->createStub(BreadcrumbCollectionRepository::class),
+            $this->createStub(CookieConsentConfigRepository::class),
+        );
+        $auth = $this->createStub(AuthorizationCheckerInterface::class);
+        $auth->method('isGranted')->willReturn(false);
+
+        $subscriber = new PlatformCatalogsSetupRedirectSubscriber(
+            $state,
+            $auth,
+            new SetupPathPrefixResolver(new RequestStack(), '/setup', 'never', 'en', ['en']),
+            '/',
+            true,
+        );
+        $event = $this->event('/dashboard');
+        $subscriber->onKernelRequest($event);
+
+        self::assertNotNull($event->getResponse());
+        self::assertSame('/setup', $event->getResponse()->headers->get('Location'));
+    }
+
     public function testSwallowsCatalogStateFailures(): void
     {
         $menus = $this->createStub(MenuRepository::class);

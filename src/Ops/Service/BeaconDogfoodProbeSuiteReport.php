@@ -14,7 +14,7 @@ final readonly class BeaconDogfoodProbeSuiteReport
      *
      * @var list<string>
      */
-    private const DIAGNOSTIC_KIND_PREFERENCE = ['console', 'exception', 'http', 'messenger', 'message-error', 'breadcrumbs', 'message-info'];
+    private const array DIAGNOSTIC_KIND_PREFERENCE = ['console', 'exception', 'http', 'messenger', 'message-error', 'breadcrumbs', 'message-info'];
 
     /**
      * @param array{
