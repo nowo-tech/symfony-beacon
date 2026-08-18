@@ -36,6 +36,10 @@ Prod Caddy snippets remain the baseline for HSTS / frame / referrer. HTML **Cont
 
 Debug CSP MUST NOT list `cdn.jsdelivr.net` by default. `nowo-tech/hot-reload-bundle` ≥**1.3.2** (`require-dev`, `dev`/`test` only) appends that host via `csp_augment_script_src` **when it injects**, and stamps the preserve boot script with request attribute `_beacon_csp_nonce`. Production MUST NOT register the bundle. See `docs/ops/FRANKENPHP-HOT-RELOAD.md`.
 
+## Amendment (Hot Reload 1.4.0, 2026-08-18)
+
+Host pin is `nowo-tech/hot-reload-bundle` **1.4.0**. CSP contract is unchanged. Dev MAY run `nowo:hot-reload:check` and use profiler environment checks. See `docs/ops/FRANKENPHP-HOT-RELOAD.md`.
+
 ## Out of scope
 
 - WAF.

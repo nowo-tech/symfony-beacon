@@ -28,7 +28,7 @@ When implementing product features in this repo, **prefer official `nowo-tech/*`
 | Client SDK for this Beacon server | `nowo-tech/beacon-bundle` | DSN (`BEACON_DSN`) with host/port; Envelope ingest. Also installed **in this server** for dogfooding when `BEACON_DSN` is set. |
 | Field encryption | `nowo-tech/doctrine-encrypt-bundle` | Halite; API secrets + webhook URLs + Mailer DSN |
 | Twig debug overlay | `nowo-tech/twig-inspector-bundle` | Already used in `require-dev` |
-| FrankenPHP hot reload (dev client) | `nowo-tech/hot-reload-bundle` | ≥**1.3.2**: auto-inject + CSP nonce/augment + `@NowoHotReloadBundle` WDT panel + Twig Extra; prefer over hand-rolled Vite/Twig Idiomorph wiring |
+| FrankenPHP hot reload (dev client) | `nowo-tech/hot-reload-bundle` | ≥**1.4.0**: auto-inject + CSP nonce/augment + `@NowoHotReloadBundle` WDT panel + Twig Extra + `nowo:hot-reload:check`; prefer over hand-rolled Vite/Twig Idiomorph wiring |
 
 Packagist vendor: https://packagist.org/packages/nowo-tech/
 

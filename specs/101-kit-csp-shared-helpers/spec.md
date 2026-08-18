@@ -75,7 +75,7 @@
 
 ## Functional Requirements
 
-- **FR-001**: Pin `nowo-tech/phone-input-bundle` **1.3.0**, `cookie-consent-bundle` **1.9.0**, `form-kit-bundle` **2.4.0**, `ui-kit-bundle` **1.8.0** (exact pins in `composer.json`).
+- **FR-001**: Pin `nowo-tech/phone-input-bundle` **1.3.0**, `cookie-consent-bundle` **1.9.0**, `form-kit-bundle` **≥ 2.4.0** (host **2.4.1** as of v1.23.1), `ui-kit-bundle` **1.8.0** (exact pins in `composer.json`).
 - **FR-002**: MUST NOT keep host forks for phone widget Twig or `phone_prefix_picker` Stimulus. A thin `_phone_input.scss` host **theme bridge** is allowed (2026-08-17): remap kit Bootstrap `--bs-*` fallbacks to Beacon `--color-*` / `data-theme` only — do not re-fork picker JS/Twig. A thin `_cookie_consent.scss` host bridge is allowed again as of `103` (footer/position only — not a full skin fork).
 - **FR-003**: Public layouts (`base`, `guest_shell`) MUST load kit cookie skin without JS `<style>` injection. As of `103`: Vite-bundled import + `data-nowo-cookie-consent-external-css="true"` (do not `<link>` `/bundles/nowocookieconsent/*` on public pages).
 - **FR-004**: Host MUST NOT redefine `CsrfOnlyType`, `HiddenFieldsCsrfType`, `SearchQueryType`, `CsrfOnlyFormFactory`, or `GetFilterFormFactory` under `App\Shared\Form`.
@@ -117,3 +117,7 @@ Ad blockers often strip `/bundles/nowocookieconsent/nowo-cookie-consent.css`. Ho
 ### 2026-08-17 — PhoneInput host theme bridge
 
 FR-002 no longer forbids `_phone_input.scss`. Kit `phone_input.css` uses Bootstrap color tokens; Beacon remaps them under `html .nowo-phone-input*` (including portaled dropdown under `body`) so dark mode / `.input` metrics match. Picker JS and widget Twig stay vendor-only (`100` amendment).
+
+### 2026-08-18 — FormKit pin 2.4.1 (v1.23.1)
+
+Host pin is FormKit **2.4.1**. Floor remains **≥ 2.4.0** (K4 / T003). No host Form API change.

@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.23.0)](#unreleased-main-after-1230)
+- [Unreleased (main after 1.23.1)](#unreleased-main-after-1231)
+- [Upgrading from 1.23.0 to 1.23.1](#upgrading-from-1230-to-1231)
 - [Upgrading from 1.22.0 to 1.23.0](#upgrading-from-1220-to-1230)
 - [Upgrading from 1.21.0 to 1.22.0](#upgrading-from-1210-to-1220)
 - [Upgrading from 1.20.3 to 1.21.0](#upgrading-from-1203-to-1210)
@@ -87,9 +88,23 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.23.0)
+## Unreleased (main after 1.23.1)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.23.0 to 1.23.1
+
+Pin refresh + Composer DX (`make update-deps` now bumps exact pins). **No migrations.**
+
+1. Pull / checkout `v1.23.1`.
+
+2. `composer install` — pins include `nowo-tech/hot-reload-bundle` **1.4.0** (`require-dev`), FormKit **2.4.1**, password-strength **2.2.0**, password-toggle **2.1.1**, `symfony/mercure-bundle` **0.5.0**, Symfony **8.1.4**. Mercure hubs stay protocol **0.x**; no JWT/cookie migration.
+
+3. Optional (local Docker): `pnpm install` if you rebuild assets. Dev: `bin/console nowo:hot-reload:check` after `make up`.
+
+4. Contributors: `make update-deps` runs `generate-composer-require.sh --run` then `composer update` + `pnpm update`. Preview: `make composer-outdated`.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.23.1]`.
 
 ## Upgrading from 1.22.0 to 1.23.0
 

@@ -102,7 +102,7 @@ help:
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test"
 	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
-	@echo "  make update-deps     composer update + pnpm update (in php container)"
+	@echo "  make update-deps     bump pinned Composer deps (helper --run) + composer update + pnpm update"
 	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
 	@echo ""
 	@echo "Git hygiene:"
@@ -572,8 +572,9 @@ qa: cs twig-cs phpstan rector check-module-boundaries test
 # rector-fix re-applies CS Fixer so the tree matches CI `php-cs-fixer check`.
 qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
 
-# Update PHP (Composer) and frontend (pnpm) lockfiles within constraint ranges.
+# Bump exact pins via composer-update-helper, then refresh lockfiles (Composer + pnpm).
 update-deps: ensure-up
+	-$(DC) exec -T php bash ./generate-composer-require.sh --run
 	$(DC) exec -T php composer update
 	$(DC) exec -T php pnpm update
 	@echo "Dependencies updated. Consider: make vite-build && make qa"

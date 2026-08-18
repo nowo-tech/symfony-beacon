@@ -2,7 +2,7 @@
 
 Local Docker uses FrankenPHP’s built-in **hot reload**: when you change PHP, Twig, config, or assets, the browser updates without a manual refresh.
 
-Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-reload/). Client integration: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) ≥**1.3.2** (wraps [`frankenphp-hot-reload`](https://www.npmjs.com/package/frankenphp-hot-reload) + optional Idiomorph from jsDelivr; Twig Extra runtime).
+Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-reload/). Client integration: [`nowo-tech/hot-reload-bundle`](https://packagist.org/packages/nowo-tech/hot-reload-bundle) ≥**1.4.0** (wraps [`frankenphp-hot-reload`](https://www.npmjs.com/package/frankenphp-hot-reload) + optional Idiomorph from jsDelivr; Twig Extra runtime; `nowo:hot-reload:check`).
 
 ## What is wired
 
@@ -10,7 +10,7 @@ Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-
 |-------|------|
 | `.docker/frankenphp/Caddyfile` | `php_server { hot_reload { watch … } }` + built-in `mercure` (dev only); HTTP Mercure is reverse-proxied to that hub for Messenger |
 | `FRANKENPHP_WORKER_CONFIG=watch` | With `make worker`, restarts PHP workers when watched files change |
-| `nowo-tech/hot-reload-bundle` **≥1.3.2** | Dev/test only: auto-inject client, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment (`cdn.jsdelivr.net`), Web Debug Toolbar panel `nowo_hot_reload`. Host YAML overrides the nonce attribute only. |
+| `nowo-tech/hot-reload-bundle` **≥1.4.0** | Dev/test only: auto-inject client, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment (`cdn.jsdelivr.net`), Web Debug Toolbar panel `nowo_hot_reload` (environment checks + Mercure URL). Host YAML overrides the nonce attribute only. CLI: `bin/console nowo:hot-reload:check`. |
 | `.docker/frankenphp/Caddyfile.prod` | **No** hot reload (production) |
 
 ## How to use
@@ -18,7 +18,7 @@ Official docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-
 1. Start the stack (`make up` / `make classic` / `make worker`).
 2. Run `make vite-build` after changing TypeScript/SCSS (or use the optional Vite HMR profile).
 3. Edit a Twig/PHP file under the watched paths — the open tab should morph/reload.
-4. Optional: open the Symfony Web Debug Toolbar → **Hot Reload** (`on` / `ready` / `idle` / `off`).
+4. Optional: `bin/console nowo:hot-reload:check` (pass/fail/warn). Open the Symfony Web Debug Toolbar → **Hot Reload** (`on` / `ready` / `idle` / `off`).
 
 Watched paths (see Caddyfile): `src/`, `config/`, `templates/`, `translations/`, `assets/`, `.env`, `composer.json`.
 

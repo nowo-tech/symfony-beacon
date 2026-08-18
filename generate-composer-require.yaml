@@ -2,9 +2,10 @@
 # Suggests exact `composer require` commands from `composer outdated --direct`.
 # Beacon pins exact versions in composer.json; review Flex constraints before applying.
 #
-# Run: make composer-outdated
-# Or:  docker compose exec php bash ./generate-composer-require.sh
-#      docker compose exec php bash ./generate-composer-require.sh --release-detail
+# Preview: make composer-outdated
+# Apply:   make update-deps   (runs this script with --run, then composer update + pnpm update)
+# Or:      docker compose exec php bash ./generate-composer-require.sh
+#          docker compose exec php bash ./generate-composer-require.sh --release-detail
 
 language: en
 check-dependencies: true

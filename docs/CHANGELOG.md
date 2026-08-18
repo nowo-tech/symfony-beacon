@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.1] - 2026-08-18
+
+### Changed
+
+- **`make update-deps`**: runs [`nowo-tech/composer-update-helper`](https://packagist.org/packages/nowo-tech/composer-update-helper) `generate-composer-require.sh --run` (rewrites exact pins in `composer.json`) **before** `composer update` + `pnpm update`. Preview still: `make composer-outdated`. Exact pins never move on `composer update` alone.
+- **Composer pins**: Symfony **8.1.4** (console/form/framework/messenger/uid/validator/http-client/rate-limiter/redis-messenger/doctrine-messenger/translation + web-profiler); `doctrine/orm` **3.6.8**; `nelmio/api-doc-bundle` **5.11.1**; `symfony/mercure-bundle` **0.5.0** (host hubs stay protocol **0.x**); FormKit **2.4.1**; password-strength **2.2.0**; password-toggle **2.1.1**; `nowo-tech/hot-reload-bundle` **1.4.0** (`nowo:hot-reload:check` + profiler environment checks). Dev: php-cs-fixer **3.95.19**, phpunit **13.3.1**, rector **2.6.2**. Frontend: `@openai/codex-security` **^0.1.14**.
+
+### Notes for integrators
+
+- No Doctrine migrations. No production operator runtime steps.
+- After pull: `composer install` (and `pnpm install` if you rebuild assets). Dev: optional `bin/console nowo:hot-reload:check` after `make up`.
+
 ## [1.23.0] - 2026-08-17
 
 ### Changed
@@ -1447,7 +1459,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.1...HEAD
+[1.23.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...v1.23.0
 [1.22.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.21.0...v1.22.0
 [1.21.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.20.3...v1.21.0
