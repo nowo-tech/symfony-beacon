@@ -49,7 +49,9 @@ upsert DEFAULT_URI "https://localhost:${E2E_HTTPS_PORT}" "$OUT"
 upsert MYSQL_DATABASE "$E2E_MYSQL_DATABASE" "$OUT"
 upsert VITE_PORT "$E2E_VITE_PORT" "$OUT"
 
-# Isolate sessions / cache / Messenger streams from the dogfood stack (shared Redis host).
+# Isolate sessions / cache / Messenger from the dogfood stack (shared Redis host).
+# REDIS_URL path = Redis DB index. MESSENGER path would be the stream name (overrides
+# messenger.yaml) — use ?dbindex=N instead (REQ-MESSENGER-001).
 # shellcheck disable=SC1091
 set -a
 # shellcheck source=/dev/null
@@ -58,7 +60,7 @@ set +a
 REDIS_HOST="${REDIS_HOST:-redis-8.10.0}"
 REDIS_PORT="${REDIS_PORT:-6379}"
 upsert REDIS_URL "redis://${REDIS_HOST}:${REDIS_PORT}/${E2E_REDIS_DB}" "$OUT"
-upsert MESSENGER_TRANSPORT_DSN "redis://${REDIS_HOST}:${REDIS_PORT}/${E2E_REDIS_DB}" "$OUT"
+upsert MESSENGER_TRANSPORT_DSN "redis://${REDIS_HOST}:${REDIS_PORT}?dbindex=${E2E_REDIS_DB}" "$OUT"
 
 # BeaconBundle dogfood for the E2E stack (never touch .env.local).
 # - self (default): loopback DSN of app_e2e's Symfony Beacon project (from .demo-client.e2e.env)

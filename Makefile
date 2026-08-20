@@ -29,11 +29,14 @@ PLAYWRIGHT_E2E_BASE_URL ?= https://localhost:$(E2E_HTTPS_PORT)
 # Isolated Playwright stack (app_e2e + Redis DB 1 + ports 9085/9460 by default).
 # Always pass -p: COMPOSE_PROJECT_NAME inside --env-file is NOT used as the project name
 # (Compose reads the process env / directory name). Without -p, `up` recreates dogfood.
-# Force HTTP(S)_PORT on the process env so a sourced .env.local in the parent shell cannot
-# override --env-file interpolation (Compose prefers the process environment).
+# Force HTTP(S)_PORT (+ Redis DSNs for compose.e2e interpolation) on the process env so a
+# sourced .env.local / empty shell var cannot override --env-file (Compose prefers the
+# process environment). Messenger uses ?dbindex= — path would steal stream names.
 DC_E2E := HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E2E_HTTPS_PORT) \
 	DEFAULT_URI=https://localhost:$(E2E_HTTPS_PORT) \
 	MYSQL_DATABASE=$(E2E_MYSQL_DATABASE) \
+	REDIS_URL=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}/$(E2E_REDIS_DB) \
+	MESSENGER_TRANSPORT_DSN=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}?dbindex=$(E2E_REDIS_DB) \
 	COMPOSE_PROJECT_NAME=symfony-beacon-e2e COMPOSE_ENV_FILES=$(E2E_ENV_FILE) \
 	docker compose -p symfony-beacon-e2e --env-file $(E2E_ENV_FILE) \
 	-f compose.yaml -f compose.override.yaml -f compose.e2e.yaml

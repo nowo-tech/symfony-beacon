@@ -1,5 +1,6 @@
 security:
   password_hashers:
+    # Hash a plaintext password: php bin/console security:hash-password
     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: auto
   providers:
     app_user_provider:
@@ -101,6 +102,8 @@ security:
       roles: PUBLIC_ACCESS
     # Bundle admin UIs (in-bundle ROLE_ADMIN / access_checker as well)
     - path: ^/admin/(api/doc|_routing|http-log|maintenance)
+      roles: ROLE_ADMIN
+    - path: ^/admin
       roles: ROLE_ADMIN
     - path: ^/
       roles: ROLE_USER

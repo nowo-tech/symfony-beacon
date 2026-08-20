@@ -45,3 +45,9 @@ nowo_dashboard_menu:
     security:
         access_roles: [ROLE_ADMIN]
         allow_unauthenticated: false
+
+when@prod:
+    nowo_dashboard_menu:
+        security:
+            allow_unauthenticated: false
+            access_roles: [ROLE_ADMIN]

@@ -62,3 +62,11 @@ nowo_maintenance_mode:
             - '#^/(en|es|de|nl|fr|it|pt)/(login|register|logout|reset-password|setup)(/|$|\?)#'
             - '#^/api/[^/]+/envelope(/|$|\?)#'
             - '#^/api/[^/]+/otlp(/|$|\?)#'
+
+when@prod:
+    nowo_maintenance_mode:
+        preview:
+            enabled: false
+        security:
+            access_roles: [ROLE_ADMIN]
+            allow_unauthenticated: false

@@ -1374,6 +1374,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type NowoAuthKitConfig = array{
  *     default_profile?: scalar|Param|null, // Profile name used when no profile is specified explicitly. // Default: "default"
  *     outbound_mail_ready_checker?: scalar|Param|null, // Optional service id implementing OutboundMailReadyCheckerInterface for password-reset and magic-login UI hints. // Default: null
+ *     login_throttle_required?: bool|Param, // When true, container compilation fails if nowo-tech/login-throttle-bundle is not registered (production hardening). // Default: false
  *     profiles?: array<string, array{ // Default: []
  *         user_class?: scalar|Param|null, // FQCN of the application user entity (must implement UserInterface). // Default: null
  *         user_identifier_field?: scalar|Param|null, // Entity property used as the security user identifier (form_login username). // Default: "email"
@@ -2336,8 +2337,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
